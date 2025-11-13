@@ -86,10 +86,10 @@ const Contato = () => {
                     <div>
                       <h3 className="font-semibold text-foreground mb-1">Email</h3>
                       <a
-                        href="mailto:contato@doutorpark.com.br"
+                        href="mailto:drbezerramed@gmail.com"
                         className="text-primary hover:underline"
                       >
-                        contato@doutorpark.com.br
+                        drbezerramed@gmail.com
                       </a>
                     </div>
                   </CardContent>

@@ -1,105 +1,54 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+
+const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
 const FAQ = () => {
   const faqs = [
     {
       category: "Geral",
       questions: [
-        {
-          q: "O que é o Doutor Park?",
-          a: "O Doutor Park é uma plataforma completa de telemedicina e gestão de consultório online. Oferecemos todas as ferramentas que um médico precisa para atender pacientes remotamente com segurança, organizar sua agenda e gerenciar prontuários digitais."
-        },
-        {
-          q: "A plataforma é aprovada pelo CFM?",
-          a: "Sim! O Doutor Park está 100% em conformidade com a resolução CFM 2.314/2022 que regulamenta a telemedicina no Brasil. Todos os atendimentos são registrados conforme as normas do Conselho Federal de Medicina."
-        },
-        {
-          q: "Preciso de conhecimento técnico para usar?",
-          a: "Não! Nossa plataforma foi desenvolvida pensando na simplicidade. A interface é intuitiva e oferecemos treinamento completo para você e sua equipe começarem a usar rapidamente."
-        }
-      ]
+        { q: "O que é a Planta & Raiz?", a: "Planta & Raiz é uma plataforma completa que democratiza o acesso a terapias e medicamentos à base de cannabis medicinal com telemedicina, marketplace, profissionais verificados e programa de indicação." },
+        { q: "Isso substitui consulta médica?", a: "Não. A plataforma organiza acesso e acompanhamento. Prescrição e conduta clínica dependem de avaliação individual por profissional habilitado." },
+        { q: "Preciso de receita para usar a plataforma?", a: "Não! Você pode usar a plataforma para triagem, consultas e conteúdos. A prescrição só ocorre após avaliação por profissional, quando aplicável." },
+      ],
     },
     {
-      category: "Funcionalidades",
+      category: "Consultas e Profissionais",
       questions: [
-        {
-          q: "Como funcionam as consultas por vídeo?",
-          a: "As consultas acontecem através de videochamada em HD diretamente na plataforma. Não é necessário instalar nenhum programa adicional. Você e seu paciente acessam o link da consulta e iniciam o atendimento com um clique."
-        },
-        {
-          q: "Posso gravar as consultas?",
-          a: "Sim! A plataforma permite gravação automática das consultas com consentimento do paciente, armazenando tudo de forma segura e criptografada conforme a LGPD."
-        },
-        {
-          q: "Como funciona o sistema de agendamento?",
-          a: "Nosso sistema inteligente permite que você configure sua disponibilidade e seus pacientes podem agendar consultas online 24/7. A plataforma envia confirmações automáticas por WhatsApp e lembretes para reduzir faltas."
-        },
-        {
-          q: "O prontuário é integrado?",
-          a: "Sim! O prontuário eletrônico está totalmente integrado ao sistema. Durante a consulta você pode acessar e atualizar o histórico do paciente, anexar exames e emitir receitas digitais."
-        }
-      ]
+        { q: "Como funciona a consulta?", a: "Você faz a triagem, escolhe o profissional (filtros por especialidade, preço e avaliação), paga via Pix e consulta por chat ou vídeo dentro da plataforma." },
+        { q: "Os profissionais são verificados?", a: "Sim! Todos os profissionais passam por verificação de documentos, CRM e qualificações antes de estarem disponíveis na plataforma." },
+        { q: "Posso escolher meu profissional?", a: "Sim! Você pode filtrar por especialidade, idioma, preço e avaliação para escolher o profissional que melhor se adequa às suas necessidades." },
+      ],
     },
     {
-      category: "Segurança e Privacidade",
+      category: "Pagamentos",
       questions: [
-        {
-          q: "Os dados dos pacientes estão seguros?",
-          a: "Absolutamente! Utilizamos criptografia de ponta a ponta, servidores seguros no Brasil e estamos 100% em conformidade com a LGPD. Fazemos backup automático diário de todos os dados."
-        },
-        {
-          q: "Quem tem acesso aos dados?",
-          a: "Apenas você e os profissionais autorizados da sua clínica têm acesso aos dados dos pacientes. Nós da Doutor Park nunca acessamos informações médicas dos pacientes."
-        },
-        {
-          q: "Como funciona a assinatura digital?",
-          a: "Oferecemos integração com certificados digitais ICP-Brasil para assinatura de receitas, atestados e outros documentos médicos com validade legal em todo território nacional."
-        }
-      ]
+        { q: "Como funciona o pagamento via Pix?", a: "Geramos cobrança Pix pela API do Mercado Pago. Você recebe um QR code e/ou código copia-e-cola. A confirmação é automática via webhook." },
+        { q: "Quais formas de pagamento são aceitas?", a: "Atualmente trabalhamos exclusivamente com Pix via Mercado Pago, garantindo rapidez e segurança nas transações." },
+        { q: "Posso cancelar minha assinatura?", a: "Sim! Você pode cancelar a qualquer momento sem taxas ou burocracia." },
+      ],
     },
     {
-      category: "Preços e Pagamento",
+      category: "Marketplace",
       questions: [
-        {
-          q: "Como funciona o teste grátis?",
-          a: "Você tem 30 dias para testar todas as funcionalidades da plataforma sem pagar nada e sem precisar cadastrar cartão de crédito. Se gostar, escolhe um plano e continua usando."
-        },
-        {
-          q: "Posso cancelar a qualquer momento?",
-          a: "Sim! Não há fidelidade. Você pode cancelar sua assinatura a qualquer momento sem taxas ou burocracia. Seus dados ficam disponíveis para exportação."
-        },
-        {
-          q: "Quais formas de pagamento aceitam?",
-          a: "Aceitamos cartão de crédito, boleto bancário e PIX. O pagamento é mensal e você recebe nota fiscal automaticamente."
-        }
-      ]
+        { q: "O que é o marketplace?", a: "É um espaço multi-vendor com lojas, farmácias, suplementos e produtos de bem-estar verificados. Checkout via Pix com repasse automático." },
+        { q: "Os produtos são legais?", a: "Sim! Todos os produtos listados seguem a legislação vigente. Produtos controlados só são disponibilizados com prescrição válida." },
+      ],
     },
     {
-      category: "Suporte",
+      category: "Indicação e Afiliados",
       questions: [
-        {
-          q: "Como funciona o suporte?",
-          a: "Oferecemos suporte via WhatsApp, email e chat dentro da plataforma. No plano Professional e Clínica você tem suporte prioritário com tempo de resposta reduzido."
-        },
-        {
-          q: "Vocês oferecem treinamento?",
-          a: "Sim! Todos os planos incluem material de treinamento em vídeo. No plano Clínica oferecemos treinamento ao vivo para toda sua equipe."
-        },
-        {
-          q: "E se eu tiver um problema técnico durante uma consulta?",
-          a: "Nosso suporte técnico está disponível durante todo o horário comercial para resolver qualquer problema rapidamente. Além disso, a plataforma tem redundância para garantir máxima disponibilidade."
-        }
-      ]
-    }
+        { q: "Como funciona o programa de indicação?", a: "Você recebe um link/código único. Comissões são pagas por venda real (assinaturas, consultas ou marketplace) com antifraude e auditoria." },
+        { q: "Quanto posso ganhar indicando?", a: "Até 25% da taxa da plataforma no 1º nível, 10% no 2º nível e 5% no 3º nível. Comissões são sobre a taxa da plataforma, não sobre o total." },
+        { q: "Existe algum risco?", a: "Não! Não é investimento nem rendimento garantido. É simplesmente comissão por venda real de serviços/produtos." },
+      ],
+    },
   ];
 
   return (
@@ -109,34 +58,30 @@ const FAQ = () => {
 
       <section className="pt-24 pb-16 md:pt-32">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4">
-              Perguntas <span className="text-primary">Frequentes</span>
+          <motion.div className="text-center mb-16" initial="hidden" animate="visible" variants={fadeUp}>
+            <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground mb-4">
+              Perguntas <span className="text-gradient-gold">Frequentes</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Encontre respostas para as dúvidas mais comuns sobre o Doutor Park
+              Confiança = conversão + recorrência. Tire todas as suas dúvidas.
             </p>
-          </div>
+          </motion.div>
 
           <div className="max-w-4xl mx-auto space-y-8">
             {faqs.map((category, catIndex) => (
               <div key={catIndex}>
-                <h2 className="text-2xl font-bold text-foreground mb-4">
-                  {category.category}
-                </h2>
-                <Accordion type="single" collapsible className="space-y-4">
+                <h2 className="text-xl font-display font-bold text-foreground mb-4">{category.category}</h2>
+                <Accordion type="single" collapsible className="space-y-3">
                   {category.questions.map((faq, qIndex) => (
                     <AccordionItem
                       key={qIndex}
                       value={`${catIndex}-${qIndex}`}
-                      className="bg-card border border-border rounded-lg px-6"
+                      className="bg-card border border-border rounded-xl px-6"
                     >
                       <AccordionTrigger className="text-left hover:no-underline py-4">
-                        <span className="font-semibold text-foreground">
-                          {faq.q}
-                        </span>
+                        <span className="font-bold text-foreground text-sm">{faq.q}</span>
                       </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground pb-4">
+                      <AccordionContent className="text-muted-foreground pb-4 text-sm leading-relaxed">
                         {faq.a}
                       </AccordionContent>
                     </AccordionItem>
@@ -147,16 +92,10 @@ const FAQ = () => {
           </div>
 
           <div className="mt-16 text-center">
-            <p className="text-lg text-muted-foreground mb-6">
-              Não encontrou o que procurava?
-            </p>
-            <Button size="lg" asChild>
-              <a
-                href="https://wa.me/5511987131241"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Falar com Nossa Equipe
+            <p className="text-muted-foreground mb-6">Não encontrou o que procurava?</p>
+            <Button size="lg" className="font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground" asChild>
+              <a href="https://wa.me/5511987131241?text=Olá!%20Tenho%20uma%20dúvida%20sobre%20a%20Planta%20%26%20Raiz" target="_blank" rel="noopener noreferrer">
+                Falar com Nossa Equipe <ArrowRight size={20} className="ml-2" />
               </a>
             </Button>
           </div>

@@ -5,30 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, MapPin, Phone, Clock } from "lucide-react";
+import { Mail, MapPin, Phone, Clock, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { motion } from "framer-motion";
+
+const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
 const Contato = () => {
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: ""
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
     const message = `Olá! Meu nome é ${formData.name}.%0A%0AEmail: ${formData.email}%0ATelefone: ${formData.phone}%0A%0AMensagem: ${formData.message}`;
     window.open(`https://wa.me/5511987131241?text=${message}`, "_blank");
-    
-    toast({
-      title: "Redirecionando para WhatsApp",
-      description: "Você será direcionado para conversar conosco!",
-    });
+    toast({ title: "Redirecionando para WhatsApp", description: "Você será direcionado para conversar conosco!" });
   };
+
+  const contactInfo = [
+    { icon: Phone, title: "WhatsApp", value: "(11) 98713-1241", href: "https://wa.me/5511987131241", color: "primary" },
+    { icon: Mail, title: "Email", value: "drbezerramed@gmail.com", href: "mailto:drbezerramed@gmail.com", color: "secondary" },
+    { icon: MapPin, title: "Localização", value: "São Paulo, SP", color: "primary" },
+    { icon: Clock, title: "Atendimento", value: "Seg-Sex: 9h às 18h | Sáb: 9h às 13h", color: "secondary" },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -37,186 +37,65 @@ const Contato = () => {
 
       <section className="pt-24 pb-16 md:pt-32">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-4">
-              Entre em <span className="text-primary">Contato</span>
+          <motion.div className="text-center mb-16" initial="hidden" animate="visible" variants={fadeUp}>
+            <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground mb-4">
+              Entre em <span className="text-gradient-green">Contato</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Estamos aqui para ajudar! Fale conosco através de qualquer um dos canais abaixo
+              Estamos aqui para ajudar. Fale conosco por WhatsApp ou envie uma mensagem.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-            {/* Contact Info */}
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-3xl font-bold text-foreground mb-6">
-                  Informações de Contato
-                </h2>
-                <p className="text-muted-foreground mb-8">
-                  Nossa equipe está pronta para responder suas dúvidas e ajudar você a começar com o Doutor Park.
-                </p>
-              </div>
-
-              <div className="space-y-6">
-                <Card>
-                  <CardContent className="p-6 flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <Phone className="text-primary" size={24} />
+            <div className="space-y-4">
+              {contactInfo.map((info, i) => (
+                <Card key={i} className="border-border hover:border-primary/30 transition-colors">
+                  <CardContent className="p-5 flex items-start gap-4">
+                    <div className={`w-11 h-11 rounded-xl ${info.color === 'primary' ? 'bg-gradient-gold border-gold' : 'bg-gradient-green border-green'} border flex items-center justify-center shrink-0`}>
+                      <info.icon size={20} className={info.color === 'primary' ? 'text-primary' : 'text-secondary'} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground mb-1">Telefone / WhatsApp</h3>
-                      <a
-                        href="https://wa.me/5511987131241"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        (11) 98713-1241
-                      </a>
+                      <h3 className="font-bold text-foreground text-sm mb-1">{info.title}</h3>
+                      {info.href ? (
+                        <a href={info.href} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">{info.value}</a>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">{info.value}</p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
-
-                <Card>
-                  <CardContent className="p-6 flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center shrink-0">
-                      <Mail className="text-secondary" size={24} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground mb-1">Email</h3>
-                      <a
-                        href="mailto:drbezerramed@gmail.com"
-                        className="text-primary hover:underline"
-                      >
-                        drbezerramed@gmail.com
-                      </a>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6 flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <MapPin className="text-primary" size={24} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground mb-1">Endereço</h3>
-                      <p className="text-muted-foreground">
-                        São Paulo, SP<br />
-                        Capital
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6 flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center shrink-0">
-                      <Clock className="text-secondary" size={24} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground mb-1">Horário de Atendimento</h3>
-                      <p className="text-muted-foreground">
-                        Segunda a Sexta: 9h às 18h<br />
-                        Sábado: 9h às 13h
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              ))}
             </div>
 
-            {/* Contact Form */}
-            <Card>
+            <Card className="border-border">
               <CardContent className="p-8">
-                <h2 className="text-2xl font-bold text-foreground mb-6">
-                  Envie uma Mensagem
-                </h2>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Nome Completo
-                    </label>
-                    <Input
-                      required
-                      placeholder="Dr. João Silva"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                    />
+                <h2 className="text-xl font-display font-bold text-foreground mb-6">Envie uma Mensagem</h2>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground mb-2">Nome</label>
+                      <Input required placeholder="Seu nome" className="bg-muted border-border" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground mb-2">Telefone</label>
+                      <Input required type="tel" placeholder="(11) 99999-9999" className="bg-muted border-border" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                    </div>
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Email
-                    </label>
-                    <Input
-                      required
-                      type="email"
-                      placeholder="seu@email.com"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                    />
+                    <label className="block text-xs font-bold text-muted-foreground mb-2">Email</label>
+                    <Input required type="email" placeholder="seu@email.com" className="bg-muted border-border" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Telefone
-                    </label>
-                    <Input
-                      required
-                      type="tel"
-                      placeholder="(11) 99999-9999"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                    />
+                    <label className="block text-xs font-bold text-muted-foreground mb-2">Mensagem</label>
+                    <Textarea required placeholder="Como podemos ajudar?" rows={4} className="bg-muted border-border" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} />
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Mensagem
-                    </label>
-                    <Textarea
-                      required
-                      placeholder="Como podemos ajudar?"
-                      rows={5}
-                      value={formData.message}
-                      onChange={(e) =>
-                        setFormData({ ...formData, message: e.target.value })
-                      }
-                    />
-                  </div>
-
-                  <Button type="submit" size="lg" className="w-full">
-                    Enviar Mensagem via WhatsApp
+                  <Button type="submit" className="w-full font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
+                    Enviar via WhatsApp <ArrowRight size={18} className="ml-2" />
                   </Button>
                 </form>
               </CardContent>
             </Card>
           </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-16 bg-gradient-to-br from-primary to-secondary">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-            Prefere uma Demonstração ao Vivo?
-          </h2>
-          <p className="text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
-            Agende uma demonstração personalizada com nossa equipe
-          </p>
-          <Button size="lg" variant="secondary" asChild>
-            <a href="https://wa.me/5511987131241" target="_blank" rel="noopener noreferrer">
-              Agendar Demonstração
-            </a>
-          </Button>
         </div>
       </section>
 

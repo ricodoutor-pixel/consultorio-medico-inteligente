@@ -9,7 +9,7 @@ export const Navbar = () => {
   const links = [
     { to: "/como-funciona", label: "Como Funciona" },
     { to: "/profissionais", label: "Profissionais" },
-    { to: "/marketplace", label: "Marketplace" },
+    { to: "/shopping", label: "Shopping" },
     { to: "/planos", label: "Planos" },
     { to: "/faq", label: "FAQ" },
     { to: "/contato", label: "Contato" },
@@ -23,9 +23,12 @@ export const Navbar = () => {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center glow-green">
               <Leaf size={20} className="text-primary-foreground" />
             </div>
-            <span className="text-lg font-display font-bold text-foreground">
-              Planta <span className="text-gradient-gold">&</span> Raiz
-            </span>
+            <div className="leading-tight">
+              <span className="text-sm font-display font-bold text-foreground block">
+                Planta <span className="text-gradient-gold">&</span> Raiz
+              </span>
+              <span className="text-[10px] text-muted-foreground font-semibold">Democratizando o acesso</span>
+            </div>
           </NavLink>
 
           <div className="hidden lg:flex items-center gap-6">
@@ -57,7 +60,7 @@ export const Navbar = () => {
           <button
             className="lg:hidden p-2 text-foreground"
             onClick={() => setIsOpen(!isOpen)}
-            aria-label="Menu"
+            aria-label="Abrir menu de navegação"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>

@@ -6,11 +6,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import ComoFunciona from "./pages/ComoFunciona";
 import Profissionais from "./pages/Profissionais";
-import Marketplace from "./pages/Marketplace";
+import Shopping from "./pages/Shopping";
 import Precos from "./pages/Precos";
 import FAQ from "./pages/FAQ";
 import Contato from "./pages/Contato";
-import Solucao from "./pages/Solucao";
+import Pay from "./pages/Pay";
+import Carteira from "./pages/Carteira";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,12 +27,16 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/como-funciona" element={<ComoFunciona />} />
           <Route path="/profissionais" element={<Profissionais />} />
-          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/profissionais/:id" element={<Profissionais />} />
+          <Route path="/shopping" element={<Shopping />} />
+          <Route path="/shopping/:id" element={<Shopping />} />
           <Route path="/planos" element={<Precos />} />
           <Route path="/precos" element={<Precos />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contato" element={<Contato />} />
-          <Route path="/solucao" element={<Solucao />} />
+          <Route path="/pay" element={<Pay />} />
+          <Route path="/carteira" element={<Carteira />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -3,7 +3,7 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Zap, Stethoscope, ShoppingBag, Shield, MessageSquare, FileText, CheckCircle2, ArrowRight } from "lucide-react";
+import { Users, Zap, Stethoscope, ShoppingBag, Shield, FileText, CheckCircle2, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
@@ -12,29 +12,29 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 const ComoFunciona = () => {
   const steps = [
     {
+      icon: Users,
+      title: "1. Escolha o Profissional",
+      desc: "Filtre por especialidade, preço e avaliação. São 5 categorias com profissionais verificados e preços populares.",
+      items: ["Médicos Prescritores", "Farmácia Clínica", "Terapia Ocupacional", "Acupuntura", "Saúde Ocupacional"],
+    },
+    {
       icon: Zap,
-      title: "1. Cadastro + Triagem",
-      desc: "Crie sua conta, responda o questionário guiado e nossa IA gera um resumo para o profissional — sem diagnóstico, apenas organização.",
-      items: ["Cadastro simples por telefone ou email", "Questionário de saúde guiado", "Resumo automático com IA", "Consentimentos LGPD"],
+      title: "2. Pague via Pix",
+      desc: "Pagamento rápido e seguro com Mercado Pago. QR code + copia e cola com confirmação automática por webhook.",
+      items: ["QR code instantâneo", "Copia e cola Pix", "Confirmação automática", "Recibo digital no app"],
     },
     {
       icon: Stethoscope,
-      title: "2. Escolha do Profissional + Consulta",
-      desc: "Filtre por especialidade, idioma, preço e avaliação. Pague via Pix e consulte por chat ou vídeo diretamente no app.",
-      items: ["Filtros avançados (especialidade, preço, avaliação)", "Agenda online em tempo real", "Pagamento Pix com QR code", "Chat + vídeo HD integrado"],
+      title: "3. Receba Atendimento",
+      desc: "Consulta por chat ou vídeo quando aplicável. Receita e documentos ficam no seu histórico digital seguro.",
+      items: ["Chat ou vídeo (quando aplicável)", "Prescrição quando necessário", "Histórico de documentos", "Acompanhamento contínuo"],
     },
-    {
-      icon: FileText,
-      title: "3. Prescrição + Documentos",
-      desc: "Após avaliação individual, o profissional emite prescrição quando aplicável. Tudo fica no seu histórico digital.",
-      items: ["Prescrição digital segura", "Histórico completo de documentos", "Anexo de exames e laudos", "Receitas acessíveis a qualquer momento"],
-    },
-    {
-      icon: ShoppingBag,
-      title: "4. Marketplace + Entrega",
-      desc: "Encontre produtos, suplementos e itens de bem-estar de lojas parceiras verificadas. Checkout via Pix.",
-      items: ["Catálogo multi-vendor", "Lojas e farmácias verificadas", "Checkout com Pix Mercado Pago", "Acompanhamento do pedido"],
-    },
+  ];
+
+  const extras = [
+    { icon: ShoppingBag, title: "Shopping Popular", desc: "Após o atendimento, encontre produtos de bem-estar no Shopping com preços acessíveis." },
+    { icon: Shield, title: "Segurança & LGPD", desc: "Seus dados são protegidos. Criptografia, consentimentos e conformidade total." },
+    { icon: FileText, title: "Tudo Documentado", desc: "Receitas, recibos, histórico — tudo acessível pelo celular a qualquer momento." },
   ];
 
   return (
@@ -53,14 +53,14 @@ const ComoFunciona = () => {
               Como <span className="text-gradient-gold">Funciona</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Do cadastro à entrega — um fluxo simples, seguro e transparente
+              3 passos simples — escolha o profissional, pague via Pix, receba atendimento
             </p>
           </motion.div>
 
-          <motion.div className="space-y-12 max-w-4xl mx-auto" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+          <motion.div className="space-y-8 max-w-4xl mx-auto" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {steps.map((step, i) => (
               <motion.div key={i} variants={fadeUp}>
-                <Card className="border-border hover:border-primary/30 transition-colors overflow-hidden">
+                <Card className="border-border hover:border-primary/30 transition-colors">
                   <CardContent className="p-8">
                     <div className="flex flex-col md:flex-row gap-6">
                       <div className={`w-14 h-14 rounded-2xl ${i % 2 === 0 ? 'bg-gradient-gold border-gold' : 'bg-gradient-green border-green'} border flex items-center justify-center shrink-0`}>
@@ -87,23 +87,23 @@ const ComoFunciona = () => {
         </div>
       </section>
 
-      {/* Security section */}
+      {/* Extras */}
       <section className="py-16 md:py-24 bg-card/30">
         <div className="container mx-auto px-4">
-          <motion.div className="max-w-3xl mx-auto text-center" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <Shield size={48} className="text-primary mx-auto mb-4" />
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">Segurança e Compliance</h2>
-            <p className="text-muted-foreground mb-8 leading-relaxed">
-              Seus dados são protegidos com criptografia de ponta. Estamos em total conformidade com a LGPD.
-              Prescrição e conduta clínica dependem exclusivamente de avaliação individual por profissional habilitado.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              {["LGPD Compliant", "Criptografia E2E", "Antifraude", "Auditoria"].map((badge) => (
-                <span key={badge} className="px-4 py-2 rounded-full text-sm font-bold border border-border bg-card text-muted-foreground">
-                  {badge}
-                </span>
-              ))}
-            </div>
+          <motion.div className="grid md:grid-cols-3 gap-6" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            {extras.map((e, i) => (
+              <motion.div key={i} variants={fadeUp}>
+                <Card className="h-full border-border">
+                  <CardContent className="p-6">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-gold border border-gold flex items-center justify-center mb-4">
+                      <e.icon size={24} className="text-primary" />
+                    </div>
+                    <h3 className="text-lg font-display font-bold text-foreground mb-2">{e.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">{e.desc}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
@@ -112,15 +112,13 @@ const ComoFunciona = () => {
       <section className="py-16 md:py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 pointer-events-none" />
         <div className="container mx-auto px-4 text-center relative">
-          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-6">
-            Pronto Para Começar?
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-6">Pronto Para Começar?</h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-            Inicie sua jornada de saúde com profissionais qualificados e tecnologia de ponta
+            Acesse profissionais habilitados com preços populares e pagamento via Pix
           </p>
           <Button size="lg" className="text-lg font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground" asChild>
-            <a href="https://wa.me/5511987131241?text=Olá!%20Quero%20começar%20na%20Planta%20%26%20Raiz" target="_blank" rel="noopener noreferrer">
-              Começar Agora <ArrowRight size={20} className="ml-2" />
+            <a href="/profissionais">
+              Ver Profissionais <ArrowRight size={20} className="ml-2" />
             </a>
           </Button>
         </div>

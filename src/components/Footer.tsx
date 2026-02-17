@@ -14,7 +14,7 @@ export const Footer = () => {
               <span className="font-display font-bold text-foreground">Planta & Raiz</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Democratizando o acesso a terapias e medicamentos à base de cannabis medicinal com segurança, profissionalismo e preço justo.
+              Democratizando o acesso a medicamentos à base de cannabis. Preços populares, segurança e orientação profissional.
             </p>
           </div>
 
@@ -24,7 +24,7 @@ export const Footer = () => {
               {[
                 { to: "/como-funciona", label: "Como Funciona" },
                 { to: "/profissionais", label: "Profissionais" },
-                { to: "/marketplace", label: "Marketplace" },
+                { to: "/shopping", label: "Shopping" },
                 { to: "/planos", label: "Planos" },
                 { to: "/faq", label: "FAQ" },
               ].map((link) => (
@@ -42,11 +42,11 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Phone size={14} className="text-primary" />
-                <a href="tel:+5511987131241" className="hover:text-primary transition-colors">(11) 98713-1241</a>
+                <a href="https://wa.me/5511987131241" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">(11) 98713-1241</a>
               </li>
               <li className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Mail size={14} className="text-primary" />
-                <a href="mailto:drbezerramed@gmail.com" className="hover:text-primary transition-colors">drbezerramed@gmail.com</a>
+                <a href="mailto:contato@plantaeraiz.com.br" className="hover:text-primary transition-colors">contato@plantaeraiz.com.br</a>
               </li>
               <li className="flex items-start gap-2 text-muted-foreground text-sm">
                 <MapPin size={14} className="text-primary mt-0.5" />
@@ -58,11 +58,11 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold text-foreground mb-4 text-sm">Legal</h4>
             <ul className="space-y-2 text-sm">
-              <li><NavLink to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Política de Privacidade</NavLink></li>
-              <li><NavLink to="/terms" className="text-muted-foreground hover:text-primary transition-colors">Termos de Uso</NavLink></li>
+              <li><NavLink to="/termos" className="text-muted-foreground hover:text-primary transition-colors">Termos de Uso</NavLink></li>
+              <li><NavLink to="/privacidade" className="text-muted-foreground hover:text-primary transition-colors">Política de Privacidade</NavLink></li>
             </ul>
             <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-              Conteúdo informativo. Prescrição e conduta clínica dependem de avaliação individual por profissional habilitado.
+              ⚠️ Conteúdo educativo. Prescrição e conduta clínica dependem de avaliação individual por profissional habilitado.
             </p>
           </div>
         </div>
@@ -71,6 +71,7 @@ export const Footer = () => {
           <p className="text-muted-foreground text-sm flex items-center justify-center gap-2">
             © {new Date().getFullYear()} Planta & Raiz. Feito com
             <Heart size={14} className="text-destructive fill-destructive" />
+            para quem mais precisa
           </p>
         </div>
       </div>

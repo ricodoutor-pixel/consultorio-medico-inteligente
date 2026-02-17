@@ -13,40 +13,41 @@ const FAQ = () => {
     {
       category: "Geral",
       questions: [
-        { q: "O que é a Planta & Raiz?", a: "Planta & Raiz é uma plataforma completa que democratiza o acesso a terapias e medicamentos à base de cannabis medicinal com telemedicina, marketplace, profissionais verificados e programa de indicação." },
-        { q: "Isso substitui consulta médica?", a: "Não. A plataforma organiza acesso e acompanhamento. Prescrição e conduta clínica dependem de avaliação individual por profissional habilitado." },
-        { q: "Preciso de receita para usar a plataforma?", a: "Não! Você pode usar a plataforma para triagem, consultas e conteúdos. A prescrição só ocorre após avaliação por profissional, quando aplicável." },
+        { q: "O que é a Planta & Raiz?", a: "Planta & Raiz é uma plataforma que democratiza o acesso a profissionais habilitados, teleatendimento quando aplicável e um Shopping de bem-estar com preços populares e pagamento via Pix." },
+        { q: "A Planta & Raiz vende 'cura' ou promete resultados?", a: "Não. A plataforma é de intermediação e educação. Qualquer conduta clínica depende de avaliação individual por profissional habilitado." },
+        { q: "Posso usar sem receita médica?", a: "Sim! Você pode consultar profissionais, usar o Shopping de bem-estar e acessar conteúdos. Prescrição só quando aplicável após avaliação." },
       ],
     },
     {
-      category: "Consultas e Profissionais",
+      category: "Profissionais",
       questions: [
-        { q: "Como funciona a consulta?", a: "Você faz a triagem, escolhe o profissional (filtros por especialidade, preço e avaliação), paga via Pix e consulta por chat ou vídeo dentro da plataforma." },
-        { q: "Os profissionais são verificados?", a: "Sim! Todos os profissionais passam por verificação de documentos, CRM e qualificações antes de estarem disponíveis na plataforma." },
-        { q: "Posso escolher meu profissional?", a: "Sim! Você pode filtrar por especialidade, idioma, preço e avaliação para escolher o profissional que melhor se adequa às suas necessidades." },
+        { q: "Os profissionais são verificados?", a: "Sim! Todos passam por verificação de documentos, registro profissional e qualificações antes de estarem disponíveis." },
+        { q: "Posso escolher meu profissional?", a: "Sim! Filtre por categoria (5 disponíveis), preço, avaliação e experiência." },
+        { q: "Como funciona o atendimento?", a: "Escolha o profissional, pague via Pix e receba atendimento por chat ou vídeo quando aplicável." },
       ],
     },
     {
       category: "Pagamentos",
       questions: [
-        { q: "Como funciona o pagamento via Pix?", a: "Geramos cobrança Pix pela API do Mercado Pago. Você recebe um QR code e/ou código copia-e-cola. A confirmação é automática via webhook." },
-        { q: "Quais formas de pagamento são aceitas?", a: "Atualmente trabalhamos exclusivamente com Pix via Mercado Pago, garantindo rapidez e segurança nas transações." },
-        { q: "Posso cancelar minha assinatura?", a: "Sim! Você pode cancelar a qualquer momento sem taxas ou burocracia." },
+        { q: "Como funciona o Pix Mercado Pago?", a: "Geramos cobrança Pix pela API. Você recebe QR code e/ou copia e cola. Confirmação automática via webhook." },
+        { q: "Posso cancelar assinatura?", a: "Sim! Cancelamento a qualquer momento sem taxas ou burocracia." },
+        { q: "O pagamento é seguro?", a: "Sim! Usamos Mercado Pago com criptografia e conformidade PCI DSS." },
       ],
     },
     {
-      category: "Marketplace",
+      category: "Shopping",
       questions: [
-        { q: "O que é o marketplace?", a: "É um espaço multi-vendor com lojas, farmácias, suplementos e produtos de bem-estar verificados. Checkout via Pix com repasse automático." },
-        { q: "Os produtos são legais?", a: "Sim! Todos os produtos listados seguem a legislação vigente. Produtos controlados só são disponibilizados com prescrição válida." },
+        { q: "O que é o Shopping?", a: "É um marketplace multi-vendor com lojas verificadas, produtos de bem-estar e preços populares. Checkout via Pix." },
+        { q: "Como garantir qualidade?", a: "Vendedores com verificação (CNPJ/CPF), produtos com laudos/COA, política de devolução e moderação." },
+        { q: "Os produtos são legais?", a: "Sim! Todos seguem legislação vigente. Produtos controlados só com prescrição válida." },
       ],
     },
     {
-      category: "Indicação e Afiliados",
+      category: "Legal & Compliance",
       questions: [
-        { q: "Como funciona o programa de indicação?", a: "Você recebe um link/código único. Comissões são pagas por venda real (assinaturas, consultas ou marketplace) com antifraude e auditoria." },
-        { q: "Quanto posso ganhar indicando?", a: "Até 25% da taxa da plataforma no 1º nível, 10% no 2º nível e 5% no 3º nível. Comissões são sobre a taxa da plataforma, não sobre o total." },
-        { q: "Existe algum risco?", a: "Não! Não é investimento nem rendimento garantido. É simplesmente comissão por venda real de serviços/produtos." },
+        { q: "A plataforma é defensável legalmente?", a: "Sim. Foco em receita por serviço (consulta, intermediação, assinatura popular), sem promessa de retorno financeiro. Termos, LGPD e auditoria." },
+        { q: "O que é o modelo de receita?", a: "Taxa sobre consultas (10-20%), take rate do Shopping (8-15%), assinatura popular com benefícios. Sem linguagem de investimento." },
+        { q: "Posso usar relatos reais na landing?", a: "Sim, mas apenas com consentimento explícito e documentado. Nomes e fotos ilustrativos devem ser identificados como tal." },
       ],
     },
   ];
@@ -60,10 +61,10 @@ const FAQ = () => {
         <div className="container mx-auto px-4">
           <motion.div className="text-center mb-16" initial="hidden" animate="visible" variants={fadeUp}>
             <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground mb-4">
-              Perguntas <span className="text-gradient-gold">Frequentes</span>
+              FAQ + <span className="text-gradient-gold">Segurança</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Confiança = conversão + recorrência. Tire todas as suas dúvidas.
+              Transparência, orientação e boas práticas
             </p>
           </motion.div>
 

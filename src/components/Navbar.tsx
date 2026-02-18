@@ -7,12 +7,11 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const links = [
-    { to: "/como-funciona", label: "Como Funciona" },
+    { to: "/", label: "Entrada" },
     { to: "/profissionais", label: "Profissionais" },
     { to: "/shopping", label: "Shopping" },
     { to: "/planos", label: "Planos" },
-    { to: "/cadastro-profissional", label: "Cadastro Profissional" },
-    { to: "/faq", label: "FAQ" },
+    { to: "/cadastro-profissional", label: "Cadastro como profissional" },
   ];
 
   return (

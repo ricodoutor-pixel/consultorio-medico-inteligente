@@ -3,7 +3,7 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, ArrowRight, Users, Zap } from "lucide-react";
+import { CheckCircle2, ArrowRight, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -13,47 +13,51 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 const Precos = () => {
   const plans = [
     {
-      name: "Start",
-      price: "R$ 29,90",
+      id: "popular",
+      name: "Popular",
+      price: "R$ 19,90",
+      priceValue: 19.9,
       period: "/mês",
       tag: "START",
-      description: "Acesso básico à plataforma e comunidade",
+      description: "Suporte básico + descontos no Shopping + acesso rápido a triagem.",
       features: [
         "Acesso ao app + suporte",
         "Biblioteca de conteúdos",
         "Cupons em parceiros",
-        "Link de indicação",
+        "Descontos no Shopping",
       ],
       highlighted: false,
     },
     {
-      name: "Pro",
-      price: "R$ 59,90",
+      id: "essencial",
+      name: "Essencial",
+      price: "R$ 29,90",
+      priceValue: 29.9,
       period: "/mês",
       tag: "POPULAR",
-      description: "Para quem quer atendimento prioritário",
+      description: "Benefícios do Popular + prioridade moderada em atendimento.",
       features: [
-        "Todos benefícios Start",
+        "Todos benefícios Popular",
         "Prioridade no suporte",
         "Consulta com desconto",
-        "Relatórios avançados",
-        "API de integração",
+        "Relatórios de acompanhamento",
       ],
       highlighted: true,
     },
     {
-      name: "Império",
-      price: "R$ 99,90",
+      id: "familia",
+      name: "Família",
+      price: "R$ 49,90",
+      priceValue: 49.9,
       period: "/mês",
-      tag: "VIP",
-      description: "Experiência premium com concierge dedicado",
+      tag: "MELHOR VALOR",
+      description: "Até 3 perfis + suporte ampliado + descontos exclusivos.",
       features: [
-        "Todos benefícios Pro",
-        "Concierge (humano + IA)",
-        "Acesso VIP a parceiros",
-        "Marketplace com desconto",
-        "Gestor dedicado",
-        "Treinamento exclusivo",
+        "Todos benefícios Essencial",
+        "Até 3 perfis familiares",
+        "Suporte ampliado",
+        "Descontos exclusivos no Shopping",
+        "Frete grátis em pedidos",
       ],
       highlighted: false,
     },
@@ -63,7 +67,7 @@ const Precos = () => {
     { q: "Posso mudar de plano depois?", a: "Sim! Upgrade ou downgrade a qualquer momento, sem burocracia." },
     { q: "O pagamento é somente via Pix?", a: "Sim. Utilizamos Pix via Mercado Pago com confirmação automática por webhook." },
     { q: "Existe taxa de setup?", a: "Não! Todos os planos são mensais sem taxas adicionais." },
-    { q: "Como funciona a indicação?", a: "Você ganha comissão por venda real (assinatura, consulta ou marketplace), com antifraude e auditoria." },
+    { q: "Como funciona a indicação?", a: "Você ganha comissão por venda real (assinatura, consulta ou Shopping), com antifraude e auditoria." },
   ];
 
   return (
@@ -75,16 +79,16 @@ const Precos = () => {
         <div className="container mx-auto px-4">
           <motion.div className="text-center mb-16" initial="hidden" animate="visible" variants={fadeUp}>
             <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground mb-4">
-              Planos com <span className="text-gradient-gold">Preço Justo</span>
+              Planos <span className="text-gradient-gold">Populares</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Modelo sustentável para manter acesso democrático. Pagamento via Pix.
+              Escolha um plano e clique em Assinar para ir ao pagamento Pix (Mercado Pago).
             </p>
           </motion.div>
 
           <motion.div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            {plans.map((plan, index) => (
-              <motion.div key={index} variants={fadeUp}>
+            {plans.map((plan) => (
+              <motion.div key={plan.id} variants={fadeUp}>
                 <Card className={`relative h-full border-border ${plan.highlighted ? 'border-primary/50 glow-gold scale-105' : ''}`}>
                   {plan.tag && (
                     <div className={`absolute -top-3 right-4 px-3 py-1 rounded-full text-xs font-bold ${plan.highlighted ? 'bg-gradient-gold border border-gold text-primary' : 'bg-card border border-border text-muted-foreground'}`}>
@@ -110,7 +114,7 @@ const Precos = () => {
                       className={`w-full font-bold ${plan.highlighted ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground' : 'bg-gradient-to-r from-primary/20 to-primary/10 border border-gold text-primary hover:from-primary/30'}`}
                       asChild
                     >
-                      <Link to={`/pay?type=subscription&planId=${plan.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}`}>
+                      <Link to={`/pay?type=subscription&planId=${plan.id}`}>
                         Assinar via Pix
                       </Link>
                     </Button>
@@ -139,7 +143,7 @@ const Precos = () => {
               Programa de <span className="text-gradient-gold">Indicação</span>
             </h2>
             <p className="text-muted-foreground mb-8 leading-relaxed">
-              Ganhe comissão por venda real — assinaturas, consultas ou marketplace. Até 3 níveis de indicação com antifraude e auditoria.
+              Ganhe comissão por venda real — assinaturas, consultas ou Shopping. Até 3 níveis de indicação com antifraude e auditoria.
             </p>
             <div className="grid sm:grid-cols-3 gap-4 mb-8">
               {[

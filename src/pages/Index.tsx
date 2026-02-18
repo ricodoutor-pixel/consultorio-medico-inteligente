@@ -51,7 +51,8 @@ const Index = () => {
             </motion.h1>
 
             <motion.p variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-              Escolha o profissional, pague via Pix e receba atendimento. Shopping de bem-estar com preços populares para quem mais precisa.
+              Conectamos pacientes a profissionais habilitados (teleatendimento quando aplicável) e ao Shopping de bem-estar com preços populares.
+              Você escolhe o especialista, faz uma pré-entrevista, paga via Pix e segue para atendimento.
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -63,6 +64,11 @@ const Index = () => {
               <Button size="lg" variant="outline" className="text-lg border-border hover:bg-muted" asChild>
                 <a href="/shopping">
                   <ShoppingBag size={18} className="mr-2" /> Abrir Shopping
+                </a>
+              </Button>
+              <Button size="lg" className="text-lg font-bold bg-gradient-to-r from-secondary/20 to-secondary/10 border border-green text-secondary hover:from-secondary/30" asChild>
+                <a href="/planos">
+                  Começar agora <ArrowRight size={20} className="ml-2" />
                 </a>
               </Button>
             </motion.div>
@@ -85,16 +91,17 @@ const Index = () => {
       {/* How it works */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <motion.div className="text-center mb-16" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+            <motion.div className="text-center mb-16" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4">Como Funciona</h2>
-            <p className="text-muted-foreground text-lg">3 passos simples — sem burocracia</p>
+            <p className="text-muted-foreground text-lg">Fluxo simples e rápido — sem burocracia</p>
           </motion.div>
 
-          <motion.div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+          <motion.div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {[
-              { step: "1", icon: Users, title: "Escolha o Profissional", desc: "Filtre por especialidade, preço e avaliação. Profissionais verificados com currículo completo." },
-              { step: "2", icon: Zap, title: "Pague via Pix", desc: "Pagamento rápido e seguro via Pix Mercado Pago. QR code + copia e cola com confirmação automática." },
-              { step: "3", icon: Stethoscope, title: "Receba Atendimento", desc: "Consulta por chat ou vídeo. Receita e documentos ficam no seu histórico digital." },
+              { step: "1", icon: Users, title: "Escolha o Especialista", desc: "Filtre por especialidade, preço e avaliação. Profissionais verificados." },
+              { step: "2", icon: Zap, title: "Pré-entrevista (2 min)", desc: "Preencha um formulário rápido com seu objetivo e resumo do caso." },
+              { step: "3", icon: Zap, title: "Pague via Pix", desc: "Pagamento rápido via Pix Mercado Pago. QR code + copia e cola." },
+              { step: "4", icon: Stethoscope, title: "Atendimento", desc: "O profissional recebe o resumo e atende por chat ou vídeo." },
             ].map((item) => (
               <motion.div key={item.step} variants={fadeUp}>
                 <Card className="h-full border-border hover:border-primary/30 transition-colors group">

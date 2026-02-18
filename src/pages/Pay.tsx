@@ -13,9 +13,9 @@ import { professionals } from "@/data/professionals";
 const PIX_PLACEHOLDER = "00020126580014br.gov.bcb.pix0136plantaeraiz-pix-placeholder5204000053039865802BR";
 
 const plans: Record<string, { name: string; price: number }> = {
-  start: { name: "Start", price: 29.9 },
-  pro: { name: "Pro", price: 59.9 },
-  imperio: { name: "Império", price: 99.9 },
+  popular: { name: "Popular", price: 19.9 },
+  essencial: { name: "Essencial", price: 29.9 },
+  familia: { name: "Família", price: 49.9 },
 };
 
 const Pay = () => {

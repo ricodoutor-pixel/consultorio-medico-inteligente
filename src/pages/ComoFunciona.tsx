@@ -3,7 +3,8 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, Zap, Stethoscope, ShoppingBag, Shield, FileText, CheckCircle2, ArrowRight } from "lucide-react";
+import { Users, Zap, Stethoscope, ShoppingBag, Shield, FileText, CheckCircle2, ArrowRight, MessageSquare, UserPlus } from "lucide-react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
@@ -18,15 +19,21 @@ const ComoFunciona = () => {
       items: ["Médicos Prescritores", "Farmácia Clínica", "Terapia Ocupacional", "Acupuntura", "Saúde Ocupacional"],
     },
     {
+      icon: MessageSquare,
+      title: "2. Pré-entrevista (2 minutos)",
+      desc: "Preencha um formulário rápido com seu objetivo, preferência de atendimento e resumo do caso. O profissional recebe tudo antes da consulta.",
+      items: ["Objetivo (sono, dor, ansiedade, etc.)", "Preferência: chat ou vídeo", "Resumo do caso", "WhatsApp para contato"],
+    },
+    {
       icon: Zap,
-      title: "2. Pague via Pix",
+      title: "3. Pague via Pix (Mercado Pago)",
       desc: "Pagamento rápido e seguro com Mercado Pago. QR code + copia e cola com confirmação automática por webhook.",
       items: ["QR code instantâneo", "Copia e cola Pix", "Confirmação automática", "Recibo digital no app"],
     },
     {
       icon: Stethoscope,
-      title: "3. Receba Atendimento",
-      desc: "Consulta por chat ou vídeo quando aplicável. Receita e documentos ficam no seu histórico digital seguro.",
+      title: "4. Atendimento liberado",
+      desc: "O profissional recebe o resumo e inicia atendimento por chat ou vídeo. Receita e documentos ficam no seu histórico.",
       items: ["Chat ou vídeo (quando aplicável)", "Prescrição quando necessário", "Histórico de documentos", "Acompanhamento contínuo"],
     },
   ];
@@ -53,7 +60,7 @@ const ComoFunciona = () => {
               Como <span className="text-gradient-gold">Funciona</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              3 passos simples — escolha o profissional, pague via Pix, receba atendimento
+              4 passos simples — escolha, pré-entrevista, pague via Pix, atendimento
             </p>
           </motion.div>
 
@@ -83,6 +90,20 @@ const ComoFunciona = () => {
                 </Card>
               </motion.div>
             ))}
+          </motion.div>
+
+          {/* CTAs */}
+          <motion.div className="flex flex-col sm:flex-row gap-4 justify-center mt-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+            <Button size="lg" className="text-lg font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground" asChild>
+              <Link to="/falar-com-especialista">
+                <MessageSquare size={20} className="mr-2" /> Falar com especialista agora
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" className="text-lg border-border hover:bg-muted font-bold" asChild>
+              <Link to="/cadastro-profissional">
+                <UserPlus size={20} className="mr-2" /> Cadastro como profissional
+              </Link>
+            </Button>
           </motion.div>
         </div>
       </section>
@@ -117,9 +138,9 @@ const ComoFunciona = () => {
             Acesse profissionais habilitados com preços populares e pagamento via Pix
           </p>
           <Button size="lg" className="text-lg font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground" asChild>
-            <a href="/profissionais">
+            <Link to="/profissionais">
               Ver Profissionais <ArrowRight size={20} className="ml-2" />
-            </a>
+            </Link>
           </Button>
         </div>
       </section>

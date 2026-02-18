@@ -11,8 +11,8 @@ export const Navbar = () => {
     { to: "/profissionais", label: "Profissionais" },
     { to: "/shopping", label: "Shopping" },
     { to: "/planos", label: "Planos" },
+    { to: "/cadastro-profissional", label: "Cadastro Profissional" },
     { to: "/faq", label: "FAQ" },
-    { to: "/contato", label: "Contato" },
   ];
 
   return (
@@ -51,9 +51,9 @@ export const Navbar = () => {
               </a>
             </Button>
             <Button size="sm" className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-bold" asChild>
-              <a href="https://wa.me/5511987131241?text=Olá!%20Quero%20começar%20na%20Planta%20%26%20Raiz" target="_blank" rel="noopener noreferrer">
+              <NavLink to="/planos">
                 Começar Agora
-              </a>
+              </NavLink>
             </Button>
           </div>
 
@@ -79,9 +79,9 @@ export const Navbar = () => {
               </NavLink>
             ))}
             <Button className="w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-bold" asChild>
-              <a href="https://wa.me/5511987131241?text=Olá!%20Quero%20começar%20na%20Planta%20%26%20Raiz" target="_blank" rel="noopener noreferrer">
+              <NavLink to="/planos" onClick={() => setIsOpen(false)}>
                 Começar Agora
-              </a>
+              </NavLink>
             </Button>
           </div>
         )}

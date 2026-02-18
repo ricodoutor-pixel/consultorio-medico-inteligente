@@ -13,6 +13,8 @@ import Contato from "./pages/Contato";
 import Pay from "./pages/Pay";
 import Carteira from "./pages/Carteira";
 import Admin from "./pages/Admin";
+import CadastroProfissional from "./pages/CadastroProfissional";
+import FalarComEspecialista from "./pages/FalarComEspecialista";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +38,8 @@ const App = () => (
           <Route path="/contato" element={<Contato />} />
           <Route path="/pay" element={<Pay />} />
           <Route path="/carteira" element={<Carteira />} />
+          <Route path="/cadastro-profissional" element={<CadastroProfissional />} />
+          <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

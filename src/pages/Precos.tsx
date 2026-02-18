@@ -4,6 +4,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, ArrowRight, Users, Zap } from "lucide-react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
@@ -109,13 +110,9 @@ const Precos = () => {
                       className={`w-full font-bold ${plan.highlighted ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground' : 'bg-gradient-to-r from-primary/20 to-primary/10 border border-gold text-primary hover:from-primary/30'}`}
                       asChild
                     >
-                      <a
-                        href={`https://wa.me/5511987131241?text=Olá!%20Quero%20assinar%20o%20plano%20${encodeURIComponent(plan.name)}%20da%20Planta%20%26%20Raiz`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
+                      <Link to={`/pay?type=subscription&planId=${plan.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}`}>
                         Assinar via Pix
-                      </a>
+                      </Link>
                     </Button>
                   </CardContent>
                 </Card>

@@ -44,9 +44,9 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
               <p className="text-xs text-muted-foreground mb-1">Experiência: {pro.experience}</p>
               <p className="text-2xl font-display font-bold text-gradient-gold mb-4">{pro.price} <span className="text-sm text-muted-foreground font-normal">/ consulta</span></p>
               <Button className="w-full font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground mb-2" asChild>
-                <a href={`https://wa.me/${pro.whatsapp}?text=Olá!%20Quero%20agendar%20com%20${encodeURIComponent(pro.name)}`} target="_blank" rel="noopener noreferrer">
-                  <MessageSquare size={16} className="mr-2" /> Agendar via WhatsApp
-                </a>
+                <Link to={`/falar-com-especialista?pro=${pro.id}`}>
+                  <MessageSquare size={16} className="mr-2" /> Falar com Especialista
+                </Link>
               </Button>
             </CardContent>
           </Card>
@@ -62,9 +62,9 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
               <div className="flex flex-wrap gap-2">
                 {pro.slots.map((slot) => (
                   <Button key={slot} variant="outline" size="sm" className="border-border hover:border-primary/50 hover:bg-primary/10 text-sm" asChild>
-                    <a href={`https://wa.me/${pro.whatsapp}?text=Olá!%20Quero%20agendar%20às%20${slot}%20com%20${encodeURIComponent(pro.name)}`} target="_blank" rel="noopener noreferrer">
+                    <Link to={`/falar-com-especialista?pro=${pro.id}`}>
                       {slot}
-                    </a>
+                    </Link>
                   </Button>
                 ))}
               </div>
@@ -198,9 +198,9 @@ const Profissionais = () => {
                     </div>
                     <div className="flex gap-2">
                       <Button className="flex-1 bg-gradient-to-r from-primary/20 to-primary/10 border border-gold text-primary hover:from-primary/30 text-sm font-bold" asChild>
-                        <a href={`https://wa.me/${p.whatsapp}?text=Olá!%20Quero%20agendar%20com%20${encodeURIComponent(p.name)}`} target="_blank" rel="noopener noreferrer">
-                          WhatsApp
-                        </a>
+                        <Link to={`/falar-com-especialista?pro=${p.id}`}>
+                          Falar com Especialista
+                        </Link>
                       </Button>
                       <Button variant="outline" className="flex-1 text-sm font-bold border-border" asChild>
                         <Link to={`/profissionais/${p.id}`}>Ver Perfil</Link>
@@ -225,9 +225,9 @@ const Profissionais = () => {
           <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-6">É Profissional de Saúde?</h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">Cadastre-se e atenda pacientes de todo o Brasil com preços populares</p>
           <Button size="lg" className="font-bold bg-gradient-to-r from-secondary/20 to-secondary/10 border border-green text-secondary hover:from-secondary/30" asChild>
-            <a href="https://wa.me/5511987131241?text=Olá!%20Sou%20profissional%20e%20quero%20me%20cadastrar%20na%20Planta%20%26%20Raiz" target="_blank" rel="noopener noreferrer">
+            <Link to="/cadastro-profissional">
               Cadastrar como Profissional <ArrowRight size={20} className="ml-2" />
-            </a>
+            </Link>
           </Button>
         </div>
       </section>

@@ -1,21 +1,51 @@
 import { useState } from "react";
+import { useSearchParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { QrCode, Copy, CheckCircle2, Clock, ArrowRight, ShoppingCart, AlertCircle } from "lucide-react";
+import { QrCode, Copy, CheckCircle2, Clock, ArrowRight, ShoppingCart, AlertCircle, Stethoscope, Star } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
+import { professionals } from "@/data/professionals";
 
 const PIX_PLACEHOLDER = "00020126580014br.gov.bcb.pix0136plantaeraiz-pix-placeholder5204000053039865802BR";
 
+const plans: Record<string, { name: string; price: number }> = {
+  start: { name: "Start", price: 29.9 },
+  pro: { name: "Pro", price: 59.9 },
+  imperio: { name: "Império", price: 99.9 },
+};
+
 const Pay = () => {
+  const [searchParams] = useSearchParams();
+  const payType = searchParams.get("type") || "order";
+  const planId = searchParams.get("planId");
+  const proId = searchParams.get("proId");
+  const amountParam = searchParams.get("amount");
+
   const { items, total, clearCart, count } = useCart();
   const { toast } = useToast();
   const [status, setStatus] = useState<"pending" | "processing" | "approved">("pending");
   const [copied, setCopied] = useState(false);
+
+  const pro = proId ? professionals.find((p) => p.id === proId) : null;
+  const plan = planId ? plans[planId] : null;
+
+  // Determine amount and label based on type
+  let paymentAmount = 0;
+  let paymentLabel = "";
+  if (payType === "intake" || payType === "appointment") {
+    paymentAmount = amountParam ? parseFloat(amountParam) : (pro?.priceValue || 0);
+    paymentLabel = pro ? `Consulta com ${pro.name}` : "Consulta";
+  } else if (payType === "subscription") {
+    paymentAmount = plan?.price || 0;
+    paymentLabel = plan ? `Assinatura ${plan.name}` : "Assinatura";
+  } else {
+    paymentAmount = total();
+    paymentLabel = `Pedido Shopping (${count()} itens)`;
+  }
 
   const handleCopy = () => {
     navigator.clipboard.writeText(PIX_PLACEHOLDER);
@@ -28,9 +58,12 @@ const Pay = () => {
     setStatus("processing");
     setTimeout(() => {
       setStatus("approved");
+      if (payType === "order") clearCart();
       toast({ title: "Pagamento aprovado!", description: "Seu acesso foi liberado." });
     }, 3000);
   };
+
+  const canPay = paymentAmount > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,9 +82,12 @@ const Pay = () => {
             <Card className="border-border">
               <CardContent className="p-6">
                 <h2 className="font-display font-bold text-foreground mb-4 flex items-center gap-2">
-                  <ShoppingCart size={18} /> Resumo do Pedido
+                  {payType === "order" ? <><ShoppingCart size={18} /> Resumo do Pedido</> :
+                   payType === "subscription" ? <><Star size={18} /> Assinatura</> :
+                   <><Stethoscope size={18} /> Consulta</>}
                 </h2>
-                {items.length === 0 ? (
+
+                {payType === "order" && items.length === 0 ? (
                   <div className="text-center py-8">
                     <ShoppingCart size={40} className="text-muted-foreground mx-auto mb-3" />
                     <p className="text-muted-foreground text-sm mb-4">Nenhum item no carrinho</p>
@@ -59,7 +95,7 @@ const Pay = () => {
                       <Link to="/shopping">Ir ao Shopping</Link>
                     </Button>
                   </div>
-                ) : (
+                ) : payType === "order" ? (
                   <>
                     <div className="space-y-3 mb-4">
                       {items.map((item) => (
@@ -75,14 +111,28 @@ const Pay = () => {
                         </div>
                       ))}
                     </div>
-                    <div className="border-t border-border pt-3">
-                      <div className="flex justify-between items-center">
-                        <span className="font-bold text-foreground text-lg">Total:</span>
-                        <span className="text-2xl font-display font-bold text-gradient-gold">R$ {total().toFixed(2).replace(".", ",")}</span>
-                      </div>
-                    </div>
                   </>
+                ) : (
+                  <div className="p-4 rounded-xl bg-muted/30 border border-border">
+                    {pro && (
+                      <div className="flex items-center gap-3 mb-3">
+                        <img src={pro.imageUrl} alt={pro.name} className="w-12 h-12 rounded-xl object-cover border border-border" />
+                        <div>
+                          <p className="font-bold text-foreground">{pro.name}</p>
+                          <p className="text-xs text-muted-foreground">{pro.category}</p>
+                        </div>
+                      </div>
+                    )}
+                    <p className="text-sm text-muted-foreground">{paymentLabel}</p>
+                  </div>
                 )}
+
+                <div className="border-t border-border pt-3 mt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-foreground text-lg">Total:</span>
+                    <span className="text-2xl font-display font-bold text-gradient-gold">R$ {paymentAmount.toFixed(2).replace(".", ",")}</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -97,14 +147,19 @@ const Pay = () => {
                   <div className="text-center py-8">
                     <CheckCircle2 size={48} className="text-secondary mx-auto mb-4" />
                     <h3 className="text-xl font-display font-bold text-foreground mb-2">Pagamento Aprovado!</h3>
-                    <p className="text-muted-foreground text-sm mb-6">Seu acesso foi liberado automaticamente.</p>
+                    <p className="text-muted-foreground text-sm mb-6">
+                      {payType === "intake" || payType === "appointment"
+                        ? "Seu atendimento foi liberado automaticamente."
+                        : payType === "subscription"
+                        ? "Sua assinatura foi ativada!"
+                        : "Seu pedido foi confirmado."}
+                    </p>
                     <Button className="font-bold bg-gradient-to-r from-secondary/20 to-secondary/10 border border-green text-secondary" asChild>
                       <Link to="/carteira">Ver Meus Pedidos <ArrowRight size={16} className="ml-2" /></Link>
                     </Button>
                   </div>
                 ) : (
                   <>
-                    {/* QR Placeholder */}
                     <div className="border border-gold/30 rounded-xl p-6 bg-gradient-gold/30 text-center mb-4">
                       <div className="w-40 h-40 mx-auto rounded-xl border-2 border-dashed border-gold/50 flex items-center justify-center bg-card mb-3">
                         <QrCode size={64} className="text-primary" />
@@ -112,7 +167,6 @@ const Pay = () => {
                       <p className="text-xs text-muted-foreground">QR code gerado pelo Mercado Pago (produção)</p>
                     </div>
 
-                    {/* Copy paste */}
                     <div className="mb-4">
                       <label className="text-xs font-bold text-muted-foreground block mb-2">Pix Copia e Cola</label>
                       <div className="flex gap-2">
@@ -125,7 +179,6 @@ const Pay = () => {
                       </div>
                     </div>
 
-                    {/* Status */}
                     <div className="flex items-center gap-2 p-3 rounded-xl bg-muted/30 border border-border mb-4">
                       {status === "processing" ? (
                         <>
@@ -140,11 +193,10 @@ const Pay = () => {
                       )}
                     </div>
 
-                    {/* Simulate */}
                     <Button
                       className="w-full font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground"
                       onClick={simulatePayment}
-                      disabled={status === "processing" || items.length === 0}
+                      disabled={status === "processing" || !canPay}
                     >
                       {status === "processing" ? "Processando..." : "Simular Pagamento Aprovado"}
                     </Button>
@@ -157,26 +209,6 @@ const Pay = () => {
               </CardContent>
             </Card>
           </div>
-
-          {/* How it works */}
-          <Card className="border-border mt-8 max-w-5xl mx-auto">
-            <CardContent className="p-6">
-              <h3 className="font-display font-bold text-foreground mb-4">Como funciona em produção</h3>
-              <div className="grid sm:grid-cols-5 gap-3">
-                {[
-                  "1. Criar cobrança Pix via Mercado Pago",
-                  "2. Salvar transação no banco (pending)",
-                  "3. Webhook confirma pagamento (approved)",
-                  "4. Liberar pedido/consulta automaticamente",
-                  "5. Notificar usuário + recibo",
-                ].map((step, i) => (
-                  <div key={i} className="p-3 rounded-xl bg-muted/30 border border-border">
-                    <p className="text-xs text-muted-foreground font-bold">{step}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </section>
 

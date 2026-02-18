@@ -253,8 +253,8 @@ const Index = () => {
               Acesse profissionais habilitados e o Shopping com preços populares
             </p>
             <Button size="lg" className="text-lg font-bold bg-gradient-to-r from-secondary/20 to-secondary/10 border border-green text-secondary hover:from-secondary/30" asChild>
-              <a href="https://wa.me/5511987131241?text=Olá!%20Quero%20acessar%20a%20Planta%20%26%20Raiz" target="_blank" rel="noopener noreferrer">
-                Quero Acessar Agora <ArrowRight size={20} className="ml-2" />
+              <a href="/planos">
+                Começar Agora <ArrowRight size={20} className="ml-2" />
               </a>
             </Button>
           </motion.div>

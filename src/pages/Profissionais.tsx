@@ -23,16 +23,15 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
       </Link>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Profile */}
         <div className="lg:col-span-1">
           <Card className="border-border sticky top-24">
             <CardContent className="p-6">
               <img src={pro.imageUrl} alt={`Ilustração - ${pro.name}`} className="w-20 h-20 rounded-2xl object-cover border border-border mb-4" />
-              <h1 className="text-xl font-display font-bold text-foreground">{pro.name}</h1>
+              <h1 className="text-xl font-display font-black text-foreground">{pro.name}</h1>
               <p className="text-sm text-muted-foreground mb-2">{pro.category}</p>
               <div className="flex items-center gap-2 mb-4">
                 <Star size={14} className="text-primary fill-primary" />
-                <span className="text-sm font-bold">{pro.rating}</span>
+                <span className="text-sm font-black">{pro.rating}</span>
                 <span className="text-xs text-muted-foreground">• {pro.consults} consultas</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">{pro.bio}</p>
@@ -42,8 +41,8 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mb-1">Experiência: {pro.experience}</p>
-              <p className="text-2xl font-display font-bold text-gradient-gold mb-4">{pro.price} <span className="text-sm text-muted-foreground font-normal">/ consulta</span></p>
-              <Button className="w-full font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground mb-2" asChild>
+              <p className="text-2xl font-display font-black text-gradient-green mb-4">{pro.price} <span className="text-sm text-muted-foreground font-normal">/ consulta</span></p>
+              <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl mb-2" asChild>
                 <Link to={`/falar-com-especialista?pro=${pro.id}`}>
                   <MessageSquare size={16} className="mr-2" /> Falar com Especialista
                 </Link>
@@ -52,52 +51,46 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
           </Card>
         </div>
 
-        {/* Details */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Agenda */}
           <Card className="border-border">
             <CardContent className="p-6">
-              <h2 className="text-lg font-display font-bold text-foreground mb-4 flex items-center gap-2"><Clock size={18} /> Agenda Disponível</h2>
+              <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2"><Clock size={18} /> Agenda Disponível</h2>
               <p className="text-sm text-muted-foreground mb-3">Horários para hoje (exemplo ilustrativo)</p>
               <div className="flex flex-wrap gap-2">
                 {pro.slots.map((slot) => (
-                  <Button key={slot} variant="outline" size="sm" className="border-border hover:border-primary/50 hover:bg-primary/10 text-sm" asChild>
-                    <Link to={`/falar-com-especialista?pro=${pro.id}`}>
-                      {slot}
-                    </Link>
+                  <Button key={slot} variant="outline" size="sm" className="border-border hover:border-primary/50 hover:bg-primary/10 text-sm rounded-xl" asChild>
+                    <Link to={`/falar-com-especialista?pro=${pro.id}`}>{slot}</Link>
                   </Button>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Services */}
           <Card className="border-border">
             <CardContent className="p-6">
-              <h2 className="text-lg font-display font-bold text-foreground mb-4">Serviços</h2>
+              <h2 className="text-lg font-display font-black text-foreground mb-4">Serviços</h2>
               <div className="space-y-3">
                 {pro.services.map((s, i) => (
-                  <div key={i} className="flex items-start justify-between p-3 rounded-xl bg-muted/30 border border-border">
+                  <div key={i} className="flex items-start justify-between p-3 rounded-2xl bg-muted/30 border border-border">
                     <div>
-                      <p className="font-bold text-sm text-foreground">{s.name}</p>
+                      <p className="font-black text-sm text-foreground">{s.name}</p>
                       <p className="text-xs text-muted-foreground">{s.desc}</p>
                     </div>
-                    <span className="text-sm font-bold text-gradient-gold whitespace-nowrap ml-4">{s.price}</span>
+                    <span className="text-sm font-black text-gradient-green whitespace-nowrap ml-4">{s.price}</span>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Reviews */}
           <Card className="border-border">
             <CardContent className="p-6">
-              <h2 className="text-lg font-display font-bold text-foreground mb-4">Avaliações</h2>
+              <h2 className="text-lg font-display font-black text-foreground mb-4">Avaliações</h2>
               <div className="space-y-3">
                 {pro.reviews.map((r, i) => (
-                  <div key={i} className="p-3 rounded-xl bg-muted/30 border border-border">
+                  <div key={i} className="p-3 rounded-2xl bg-muted/30 border border-border">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-bold text-sm">{r.name}</span>
+                      <span className="font-black text-sm">{r.name}</span>
                       <div className="flex">{Array.from({ length: r.rating }).map((_, j) => <Star key={j} size={12} className="text-primary fill-primary" />)}</div>
                     </div>
                     <p className="text-sm text-muted-foreground">"{r.text}"</p>
@@ -138,29 +131,26 @@ const Profissionais = () => {
       <Navbar />
       <WhatsAppButton />
 
-      <section className="pt-24 pb-16 md:pt-32 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[10%] left-[15%] w-[500px] h-[300px] rounded-full bg-primary/8 blur-[100px]" />
-        </div>
-        <div className="container mx-auto px-4 relative">
-          <motion.div className="text-center mb-12" initial="hidden" animate="visible" variants={fadeUp}>
-            <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground mb-4">
-              <span className="text-gradient-gold">Profissionais</span> Verificados
+      <section className="pt-24 pb-16 md:pt-32 hero-glow">
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div className="mb-12" initial="hidden" animate="visible" variants={fadeUp}>
+            <h1 className="text-4xl md:text-6xl font-display font-black text-foreground mb-4 tracking-tight">
+              <span className="text-gradient-green">Profissionais</span> Verificados
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              5 categorias, 15 profissionais com preços populares e atendimento via WhatsApp
+            <p className="text-lg text-muted-foreground max-w-2xl font-medium">
+              Escolha uma categoria e clique em "Falar com especialista" para iniciar a pré-entrevista.
             </p>
           </motion.div>
 
           {/* Tabs */}
-          <div className="flex flex-wrap gap-2 justify-center mb-10">
+          <div className="flex flex-wrap gap-2 mb-10">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-bold border transition-colors ${
+                className={`px-4 py-2.5 rounded-full text-sm font-black border transition-colors ${
                   activeCategory === cat
-                    ? "border-gold bg-gradient-gold text-primary"
+                    ? "border-green bg-gradient-green text-primary"
                     : "border-border bg-card/50 text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -170,15 +160,15 @@ const Profissionais = () => {
           </div>
 
           {/* Cards */}
-          <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} key={activeCategory}>
+          <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} key={activeCategory}>
             {filtered.map((p) => (
               <motion.div key={p.id} variants={fadeUp}>
                 <Card className="border-border hover:border-primary/30 transition-all hover:-translate-y-1">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-4 mb-4">
-                      <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-xl object-cover border border-border" />
+                      <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" />
                       <div>
-                        <h3 className="font-bold text-foreground">{p.name}</h3>
+                        <h3 className="font-black text-foreground">{p.name}</h3>
                         <p className="text-sm text-muted-foreground">{p.category}</p>
                       </div>
                     </div>
@@ -191,18 +181,18 @@ const Profissionais = () => {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-1">
                         <Star size={14} className="text-primary fill-primary" />
-                        <span className="text-sm font-bold text-foreground">{p.rating}</span>
+                        <span className="text-sm font-black text-foreground">{p.rating}</span>
                         <span className="text-xs text-muted-foreground ml-1">{p.consults} consultas</span>
                       </div>
-                      <span className="text-lg font-display font-bold text-gradient-gold">{p.price}</span>
+                      <span className="text-lg font-display font-black text-gradient-green">{p.price}</span>
                     </div>
                     <div className="flex gap-2">
-                      <Button className="flex-1 bg-gradient-to-r from-primary/20 to-primary/10 border border-gold text-primary hover:from-primary/30 text-sm font-bold" asChild>
+                      <Button className="flex-1 bg-primary text-primary-foreground text-sm font-black rounded-xl" asChild>
                         <Link to={`/falar-com-especialista?pro=${p.id}`}>
                           Falar com Especialista
                         </Link>
                       </Button>
-                      <Button variant="outline" className="flex-1 text-sm font-bold border-border" asChild>
+                      <Button variant="outline" className="flex-1 text-sm font-black border-border rounded-xl" asChild>
                         <Link to={`/profissionais/${p.id}`}>Ver Perfil</Link>
                       </Button>
                     </div>
@@ -219,12 +209,12 @@ const Profissionais = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 md:py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 pointer-events-none" />
-        <div className="container mx-auto px-4 text-center relative">
-          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-6">É Profissional de Saúde?</h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">Cadastre-se e atenda pacientes de todo o Brasil com preços populares</p>
-          <Button size="lg" className="font-bold bg-gradient-to-r from-secondary/20 to-secondary/10 border border-green text-secondary hover:from-secondary/30" asChild>
+      <section className="py-20 md:py-28 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-purple pointer-events-none opacity-20" />
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h2 className="text-3xl md:text-5xl font-display font-black text-foreground mb-6 tracking-tight">É Profissional de Saúde?</h2>
+          <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto font-medium">Cadastre-se e atenda pacientes de todo o Brasil com preços populares</p>
+          <Button size="lg" className="font-black bg-secondary text-secondary-foreground rounded-2xl h-14 px-8" asChild>
             <Link to="/cadastro-profissional">
               Cadastrar como Profissional <ArrowRight size={20} className="ml-2" />
             </Link>

@@ -7,37 +7,39 @@
     --background: 240 20% 4%;
     --foreground: 240 10% 93%;
 
-    --card: 240 15% 8%;
+    --card: 240 15% 7%;
     --card-foreground: 240 10% 93%;
 
-    --popover: 240 15% 8%;
+    --popover: 240 15% 7%;
     --popover-foreground: 240 10% 93%;
 
-    --primary: 45 76% 52%;
-    --primary-foreground: 240 20% 4%;
+    --primary: 152 80% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 152 100% 74%;
-    --secondary-foreground: 240 20% 4%;
+    --secondary: 270 60% 60%;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 240 15% 14%;
-    --muted-foreground: 240 10% 72%;
+    --muted-foreground: 240 10% 68%;
 
     --accent: 152 60% 15%;
-    --accent-foreground: 152 100% 74%;
+    --accent-foreground: 152 80% 45%;
 
     --destructive: 350 80% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 10% 16%;
-    --input: 240 10% 16%;
-    --ring: 45 76% 52%;
+    --border: 240 10% 14%;
+    --input: 240 10% 14%;
+    --ring: 152 80% 45%;
 
     --radius: 1rem;
 
+    --green: 152 80% 45%;
+    --green-glow: 152 90% 60%;
+    --purple: 270 60% 60%;
+    --purple-glow: 270 70% 72%;
     --gold: 45 76% 52%;
     --gold-glow: 45 76% 62%;
-    --green: 152 100% 74%;
-    --green-glow: 152 100% 84%;
     --dark-deeper: 240 25% 3%;
   }
 }
@@ -58,42 +60,93 @@
 }
 
 @layer utilities {
+  .text-gradient-green {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(152 80% 45%), hsl(152 90% 65%));
+  }
+
+  .text-gradient-purple {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(270 60% 60%), hsl(270 70% 78%));
+  }
+
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, hsl(45 76% 52%), hsl(45 76% 72%));
   }
 
-  .text-gradient-green {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(152 100% 74%), hsl(152 100% 54%));
+  .bg-gradient-green {
+    background: linear-gradient(135deg, hsl(152 80% 45% / 0.15), hsl(152 80% 45% / 0.03));
+  }
+
+  .bg-gradient-purple {
+    background: linear-gradient(135deg, hsl(270 60% 60% / 0.15), hsl(270 60% 60% / 0.03));
   }
 
   .bg-gradient-gold {
     background: linear-gradient(135deg, hsl(45 76% 52% / 0.2), hsl(45 76% 52% / 0.05));
   }
 
-  .bg-gradient-green {
-    background: linear-gradient(135deg, hsl(152 100% 74% / 0.15), hsl(152 100% 74% / 0.03));
+  .border-green {
+    border-color: hsl(152 80% 45% / 0.30);
+  }
+
+  .border-purple {
+    border-color: hsl(270 60% 60% / 0.30);
   }
 
   .border-gold {
     border-color: hsl(45 76% 52% / 0.35);
   }
 
-  .border-green {
-    border-color: hsl(152 100% 74% / 0.25);
+  .glow-green {
+    box-shadow: 0 0 40px hsl(152 80% 45% / 0.18), 0 0 80px hsl(152 80% 45% / 0.06);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 40px hsl(270 60% 60% / 0.15), 0 0 80px hsl(270 60% 60% / 0.05);
   }
 
   .glow-gold {
     box-shadow: 0 0 40px hsl(45 76% 52% / 0.15), 0 0 80px hsl(45 76% 52% / 0.05);
   }
 
-  .glow-green {
-    box-shadow: 0 0 40px hsl(152 100% 74% / 0.12), 0 0 80px hsl(152 100% 74% / 0.04);
-  }
-
   .glass {
     @apply backdrop-blur-xl;
-    background: hsl(240 15% 8% / 0.7);
+    background: hsl(240 15% 7% / 0.78);
+  }
+
+  .hero-glow {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-glow::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -10%;
+    width: 60%;
+    height: 80%;
+    background: radial-gradient(ellipse, hsl(152 80% 45% / 0.12), transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero-glow::after {
+    content: '';
+    position: absolute;
+    top: 0%;
+    right: -10%;
+    width: 50%;
+    height: 70%;
+    background: radial-gradient(ellipse, hsl(270 60% 60% / 0.10), transparent 65%);
+    pointer-events: none;
+  }
+
+  .step-number {
+    @apply w-12 h-12 rounded-2xl flex items-center justify-center font-display font-black text-lg;
+    background: linear-gradient(135deg, hsl(152 80% 45% / 0.18), hsl(152 80% 45% / 0.06));
+    border: 1px solid hsl(152 80% 45% / 0.25);
+    color: hsl(152 80% 45%);
   }
 }

@@ -13,8 +13,8 @@ import { professionals } from "@/data/professionals";
 const PIX_PLACEHOLDER = "00020126580014br.gov.bcb.pix0136plantaeraiz-pix-placeholder5204000053039865802BR";
 
 const plans: Record<string, { name: string; price: number }> = {
-  popular: { name: "Popular", price: 19.9 },
-  essencial: { name: "Essencial", price: 29.9 },
+  essencial: { name: "Essencial", price: 19.9 },
+  acesso: { name: "Acesso", price: 29.9 },
   familia: { name: "Família", price: 49.9 },
 };
 
@@ -33,7 +33,6 @@ const Pay = () => {
   const pro = proId ? professionals.find((p) => p.id === proId) : null;
   const plan = planId ? plans[planId] : null;
 
-  // Determine amount and label based on type
   let paymentAmount = 0;
   let paymentLabel = "";
   if (payType === "intake" || payType === "appointment") {
@@ -72,16 +71,15 @@ const Pay = () => {
 
       <section className="pt-24 pb-16 md:pt-32">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4 text-center">
-            Pagamento <span className="text-gradient-gold">Pix</span>
+          <h1 className="text-3xl md:text-5xl font-display font-black text-foreground mb-4 tracking-tight">
+            Pagamento <span className="text-gradient-green">Pix</span>
           </h1>
-          <p className="text-muted-foreground text-center mb-10">Pague e receba acesso automaticamente</p>
+          <p className="text-muted-foreground mb-10 font-medium">Pague e receba acesso automaticamente</p>
 
-          <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Order Summary */}
+          <div className="grid lg:grid-cols-2 gap-8 max-w-5xl">
             <Card className="border-border">
               <CardContent className="p-6">
-                <h2 className="font-display font-bold text-foreground mb-4 flex items-center gap-2">
+                <h2 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
                   {payType === "order" ? <><ShoppingCart size={18} /> Resumo do Pedido</> :
                    payType === "subscription" ? <><Star size={18} /> Assinatura</> :
                    <><Stethoscope size={18} /> Consulta</>}
@@ -91,34 +89,32 @@ const Pay = () => {
                   <div className="text-center py-8">
                     <ShoppingCart size={40} className="text-muted-foreground mx-auto mb-3" />
                     <p className="text-muted-foreground text-sm mb-4">Nenhum item no carrinho</p>
-                    <Button variant="outline" asChild>
+                    <Button variant="outline" className="rounded-xl" asChild>
                       <Link to="/shopping">Ir ao Shopping</Link>
                     </Button>
                   </div>
                 ) : payType === "order" ? (
-                  <>
-                    <div className="space-y-3 mb-4">
-                      {items.map((item) => (
-                        <div key={item.product.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border">
-                          <div className="flex items-center gap-3">
-                            <img src={item.product.imageUrl} alt={item.product.title} className="w-10 h-10 rounded-lg object-cover" />
-                            <div>
-                              <p className="text-sm font-bold text-foreground">{item.product.title}</p>
-                              <p className="text-xs text-muted-foreground">Qtd: {item.qty}</p>
-                            </div>
+                  <div className="space-y-3 mb-4">
+                    {items.map((item) => (
+                      <div key={item.product.id} className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border">
+                        <div className="flex items-center gap-3">
+                          <img src={item.product.imageUrl} alt={item.product.title} className="w-10 h-10 rounded-lg object-cover" />
+                          <div>
+                            <p className="text-sm font-black text-foreground">{item.product.title}</p>
+                            <p className="text-xs text-muted-foreground">Qtd: {item.qty}</p>
                           </div>
-                          <span className="text-sm font-bold text-gradient-gold">R$ {(item.product.priceValue * item.qty).toFixed(2).replace(".", ",")}</span>
                         </div>
-                      ))}
-                    </div>
-                  </>
+                        <span className="text-sm font-black text-gradient-green">R$ {(item.product.priceValue * item.qty).toFixed(2).replace(".", ",")}</span>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
-                  <div className="p-4 rounded-xl bg-muted/30 border border-border">
+                  <div className="p-4 rounded-2xl bg-muted/30 border border-border">
                     {pro && (
                       <div className="flex items-center gap-3 mb-3">
-                        <img src={pro.imageUrl} alt={pro.name} className="w-12 h-12 rounded-xl object-cover border border-border" />
+                        <img src={pro.imageUrl} alt={pro.name} className="w-12 h-12 rounded-2xl object-cover border border-border" />
                         <div>
-                          <p className="font-bold text-foreground">{pro.name}</p>
+                          <p className="font-black text-foreground">{pro.name}</p>
                           <p className="text-xs text-muted-foreground">{pro.category}</p>
                         </div>
                       </div>
@@ -129,24 +125,23 @@ const Pay = () => {
 
                 <div className="border-t border-border pt-3 mt-4">
                   <div className="flex justify-between items-center">
-                    <span className="font-bold text-foreground text-lg">Total:</span>
-                    <span className="text-2xl font-display font-bold text-gradient-gold">R$ {paymentAmount.toFixed(2).replace(".", ",")}</span>
+                    <span className="font-black text-foreground text-lg">Total:</span>
+                    <span className="text-2xl font-display font-black text-gradient-green">R$ {paymentAmount.toFixed(2).replace(".", ",")}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Pix Payment */}
             <Card className="border-border">
               <CardContent className="p-6">
-                <h2 className="font-display font-bold text-foreground mb-4 flex items-center gap-2">
+                <h2 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
                   <QrCode size={18} /> Pague com Pix
                 </h2>
 
                 {status === "approved" ? (
                   <div className="text-center py-8">
-                    <CheckCircle2 size={48} className="text-secondary mx-auto mb-4" />
-                    <h3 className="text-xl font-display font-bold text-foreground mb-2">Pagamento Aprovado!</h3>
+                    <CheckCircle2 size={48} className="text-primary mx-auto mb-4" />
+                    <h3 className="text-xl font-display font-black text-foreground mb-2">Pagamento Aprovado!</h3>
                     <p className="text-muted-foreground text-sm mb-6">
                       {payType === "intake" || payType === "appointment"
                         ? "Seu atendimento foi liberado automaticamente."
@@ -154,32 +149,32 @@ const Pay = () => {
                         ? "Sua assinatura foi ativada!"
                         : "Seu pedido foi confirmado."}
                     </p>
-                    <Button className="font-bold bg-gradient-to-r from-secondary/20 to-secondary/10 border border-green text-secondary" asChild>
+                    <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
                       <Link to="/carteira">Ver Meus Pedidos <ArrowRight size={16} className="ml-2" /></Link>
                     </Button>
                   </div>
                 ) : (
                   <>
-                    <div className="border border-gold/30 rounded-xl p-6 bg-gradient-gold/30 text-center mb-4">
-                      <div className="w-40 h-40 mx-auto rounded-xl border-2 border-dashed border-gold/50 flex items-center justify-center bg-card mb-3">
+                    <div className="border border-green/30 rounded-2xl p-6 bg-gradient-green text-center mb-4">
+                      <div className="w-40 h-40 mx-auto rounded-2xl border-2 border-dashed border-green/50 flex items-center justify-center bg-card mb-3">
                         <QrCode size={64} className="text-primary" />
                       </div>
                       <p className="text-xs text-muted-foreground">QR code gerado pelo Mercado Pago (produção)</p>
                     </div>
 
                     <div className="mb-4">
-                      <label className="text-xs font-bold text-muted-foreground block mb-2">Pix Copia e Cola</label>
+                      <label className="text-xs font-black text-muted-foreground block mb-2">Pix Copia e Cola</label>
                       <div className="flex gap-2">
                         <code className="flex-1 p-3 rounded-xl bg-muted border border-border text-xs text-foreground break-all font-mono">
                           {PIX_PLACEHOLDER.substring(0, 40)}...
                         </code>
-                        <Button variant="outline" size="sm" onClick={handleCopy} className="shrink-0" aria-label="Copiar código Pix">
-                          {copied ? <CheckCircle2 size={16} className="text-secondary" /> : <Copy size={16} />}
+                        <Button variant="outline" size="sm" onClick={handleCopy} className="shrink-0 rounded-xl" aria-label="Copiar código Pix">
+                          {copied ? <CheckCircle2 size={16} className="text-primary" /> : <Copy size={16} />}
                         </Button>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 p-3 rounded-xl bg-muted/30 border border-border mb-4">
+                    <div className="flex items-center gap-2 p-3 rounded-2xl bg-muted/30 border border-border mb-4">
                       {status === "processing" ? (
                         <>
                           <Clock size={16} className="text-primary animate-spin" />
@@ -194,7 +189,7 @@ const Pay = () => {
                     </div>
 
                     <Button
-                      className="w-full font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground"
+                      className="w-full font-black bg-primary text-primary-foreground rounded-2xl"
                       onClick={simulatePayment}
                       disabled={status === "processing" || !canPay}
                     >

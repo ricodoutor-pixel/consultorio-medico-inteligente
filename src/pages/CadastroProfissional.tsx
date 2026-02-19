@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CheckCircle2, Upload, UserPlus, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { categories } from "@/data/professionals";
@@ -19,6 +20,7 @@ const CadastroProfissional = () => {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [lgpdConsent, setLgpdConsent] = useState(false);
   const [form, setForm] = useState({
     nomeCompleto: "",
     email: "",
@@ -28,6 +30,8 @@ const CadastroProfissional = () => {
     resumoAtuacao: "",
     registroProfissional: "",
     cidadeUF: "",
+    atendimento: "chat",
+    disponibilidade: "",
   });
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
@@ -50,12 +54,15 @@ const CadastroProfissional = () => {
       toast({ title: "Preencha todos os campos obrigatórios", variant: "destructive" });
       return;
     }
+    if (!lgpdConsent) {
+      toast({ title: "Aceite os termos de uso e LGPD para continuar", variant: "destructive" });
+      return;
+    }
     setLoading(true);
-    // Simulate API call
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
-      toast({ title: "Cadastro enviado!", description: "Sua solicitação será analisada pela equipe." });
+      toast({ title: "Cadastro enviado!", description: "Status: PENDENTE DE VERIFICAÇÃO. Aguarde aprovação." });
     }, 1500);
   };
 
@@ -67,21 +74,21 @@ const CadastroProfissional = () => {
         <section className="pt-24 pb-16 md:pt-32">
           <div className="container mx-auto px-4 max-w-2xl text-center">
             <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-              <CheckCircle2 size={64} className="text-secondary mx-auto mb-6" />
-              <h1 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4">
-                Cadastro <span className="text-gradient-gold">Enviado!</span>
+              <CheckCircle2 size={64} className="text-primary mx-auto mb-6" />
+              <h1 className="text-3xl md:text-5xl font-display font-black text-foreground mb-4">
+                Cadastro <span className="text-gradient-green">Enviado!</span>
               </h1>
               <p className="text-muted-foreground text-lg mb-2">
                 Seu cadastro foi recebido com status <strong className="text-primary">PENDENTE DE VERIFICAÇÃO</strong>.
               </p>
               <p className="text-muted-foreground mb-8">
-                Nossa equipe irá analisar seus dados e documentos. Você receberá uma notificação por e-mail e WhatsApp assim que for aprovado.
+                Nossa equipe irá analisar seus dados e documentos. Você receberá notificação por e-mail e WhatsApp assim que for aprovado.
               </p>
               <div className="flex gap-3 justify-center flex-wrap">
-                <Button className="font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground" asChild>
+                <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
                   <a href="/profissionais">Ver Profissionais <ArrowRight size={16} className="ml-2" /></a>
                 </Button>
-                <Button variant="outline" className="font-bold border-border" asChild>
+                <Button variant="outline" className="font-black border-border rounded-2xl" asChild>
                   <a href="https://wa.me/5511987131241?text=Olá!%20Enviei%20meu%20cadastro%20de%20profissional" target="_blank" rel="noopener noreferrer">
                     Falar com Suporte
                   </a>
@@ -104,11 +111,11 @@ const CadastroProfissional = () => {
         <div className="container mx-auto px-4 max-w-3xl">
           <motion.div className="text-center mb-10" initial="hidden" animate="visible" variants={fadeUp}>
             <UserPlus size={40} className="text-primary mx-auto mb-4" />
-            <h1 className="text-3xl md:text-5xl font-display font-bold text-foreground mb-4">
-              Cadastro de <span className="text-gradient-gold">Profissional</span>
+            <h1 className="text-3xl md:text-5xl font-display font-black text-foreground mb-4">
+              Cadastro de <span className="text-gradient-green">Profissional</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Atenda pacientes de todo o Brasil com preços populares. Preencha o formulário abaixo e aguarde a verificação.
+              Atenda pacientes de todo o Brasil com preços populares. Preencha o formulário e aguarde a verificação.
             </p>
           </motion.div>
 
@@ -158,9 +165,29 @@ const CadastroProfissional = () => {
                     </div>
                   </div>
 
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="cidadeUF">Cidade / UF</Label>
+                      <Input id="cidadeUF" placeholder="São Paulo / SP" value={form.cidadeUF} onChange={(e) => handleChange("cidadeUF", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="atendimento">Tipo de Atendimento</Label>
+                      <Select value={form.atendimento} onValueChange={(v) => handleChange("atendimento", v)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="chat">Chat</SelectItem>
+                          <SelectItem value="video">Vídeo</SelectItem>
+                          <SelectItem value="ambos">Chat + Vídeo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="cidadeUF">Cidade / UF</Label>
-                    <Input id="cidadeUF" placeholder="São Paulo / SP (opcional)" value={form.cidadeUF} onChange={(e) => handleChange("cidadeUF", e.target.value)} />
+                    <Label htmlFor="disponibilidade">Disponibilidade</Label>
+                    <Input id="disponibilidade" placeholder="Ex: Seg-Sex 9h-17h" value={form.disponibilidade} onChange={(e) => handleChange("disponibilidade", e.target.value)} />
                   </div>
 
                   <div className="space-y-2">
@@ -172,9 +199,9 @@ const CadastroProfissional = () => {
                     <Label>Foto de Perfil</Label>
                     <div className="flex items-center gap-4">
                       {fotoPreview ? (
-                        <img src={fotoPreview} alt="Preview" className="w-16 h-16 rounded-xl object-cover border border-border" />
+                        <img src={fotoPreview} alt="Preview" className="w-16 h-16 rounded-2xl object-cover border border-border" />
                       ) : (
-                        <div className="w-16 h-16 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted/30">
+                        <div className="w-16 h-16 rounded-2xl border-2 border-dashed border-border flex items-center justify-center bg-muted/30">
                           <Upload size={20} className="text-muted-foreground" />
                         </div>
                       )}
@@ -185,14 +212,31 @@ const CadastroProfissional = () => {
                     </div>
                   </div>
 
+                  <div className="space-y-2">
+                    <Label>Documentos (opcional)</Label>
+                    <Input type="file" accept=".pdf,.jpg,.png" className="max-w-[300px]" />
+                    <p className="text-xs text-muted-foreground">PDF, JPG ou PNG — certificados, diplomas, registros.</p>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-muted/30 border border-border">
+                    <Checkbox
+                      id="lgpd"
+                      checked={lgpdConsent}
+                      onCheckedChange={(v) => setLgpdConsent(v === true)}
+                    />
+                    <label htmlFor="lgpd" className="text-xs text-muted-foreground cursor-pointer leading-relaxed">
+                      Autorizo o tratamento dos meus dados pessoais conforme a <strong>LGPD</strong> (Lei Geral de Proteção de Dados) e concordo com os <strong>Termos de Uso</strong> e <strong>Política de Privacidade</strong> da plataforma Planta & Raiz.
+                    </label>
+                  </div>
+
                   <div className="pt-2">
-                    <Button type="submit" disabled={loading} className="w-full font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-lg h-12">
+                    <Button type="submit" disabled={loading} className="w-full font-black bg-primary text-primary-foreground text-lg h-12 rounded-2xl">
                       {loading ? "Enviando..." : "Enviar Cadastro"}
                     </Button>
                   </div>
 
                   <p className="text-xs text-muted-foreground text-center">
-                    Ao enviar, você concorda com os Termos de Uso e Política de Privacidade. Seu cadastro será analisado pela equipe administrativa.
+                    Após enviar, seu cadastro ficará como "Pendente de Verificação". A equipe analisará seus dados antes de liberar.
                   </p>
                 </form>
               </CardContent>

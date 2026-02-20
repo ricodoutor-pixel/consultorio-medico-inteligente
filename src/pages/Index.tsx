@@ -4,11 +4,15 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Leaf, Stethoscope, ShoppingBag, Users, Star, Shield, Zap, ArrowRight, TrendingUp, MessageSquare } from "lucide-react";
+import { Leaf, Stethoscope, ShoppingBag, Users, Star, Shield, Zap, ArrowRight, TrendingUp, MessageSquare, ClipboardList, Smartphone } from "lucide-react";
 import { motion } from "framer-motion";
 import { testimonials } from "@/data/testimonials";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
+import heroPhoneMockup from "@/assets/hero-phone-mockup.png";
+import triagemPatient from "@/assets/triagem-patient.png";
+import consultaChat from "@/assets/consulta-chat.png";
+import triagemForm from "@/assets/triagem-form.png";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -53,59 +57,75 @@ const Index = () => {
       {/* Hero */}
       <section className="hero-glow pt-28 pb-20 md:pt-40 md:pb-32">
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="max-w-5xl" initial="hidden" animate="visible" variants={stagger}>
-            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 bg-gradient-green border border-green rounded-full px-4 py-2 text-sm font-bold text-primary mb-8">
-              <Leaf size={16} />
-              PLATAFORMA POPULAR • SAÚDE • SHOPPING
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div initial="hidden" animate="visible" variants={stagger}>
+              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 bg-gradient-green border border-green rounded-full px-4 py-2 text-sm font-bold text-primary mb-8">
+                <Leaf size={16} />
+                PLATAFORMA POPULAR • SAÚDE • SHOPPING
+              </motion.div>
+
+              <motion.h1 variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-display font-black text-foreground leading-[1.08] mb-8 tracking-tight">
+                Democratizando o acesso a{" "}
+                <span className="text-gradient-green">medicamentos</span>{" "}
+                à base de{" "}
+                <span className="text-gradient-purple">cannabis</span>
+              </motion.h1>
+
+              <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-3xl mb-10 leading-relaxed font-medium">
+                Conectamos pacientes a profissionais habilitados, usamos o que há de mais novo em tecnologia — inteligência artificial e teleatendimento via vídeo e chat, direto na plataforma — aliado ao Shopping de bem-estar com preços populares. Você escolhe o especialista, faz uma pré-entrevista, paga via Pix seguro Mercado Pago e segue para o atendimento. Receba sua receita e volte ao Shopping, com centenas de farmácias e produtores autorizados pela ANVISA, oferecendo os melhores preços com frete grátis para todo o Brasil.
+              </motion.p>
+
+              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 mb-10">
+                <Button size="lg" className="text-base font-black h-14 px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl" asChild>
+                  <Link to="/profissionais">
+                    Ver Profissionais <ArrowRight size={20} className="ml-2" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" className="text-base font-black h-14 px-8 border-border hover:bg-muted rounded-2xl" asChild>
+                  <Link to="/shopping">
+                    Abrir Shopping <ShoppingBag size={18} className="ml-2" />
+                  </Link>
+                </Button>
+                <Button size="lg" className="text-base font-black h-14 px-8 bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-2xl" asChild>
+                  <Link to="/planos">
+                    Começar agora <ArrowRight size={20} className="ml-2" />
+                  </Link>
+                </Button>
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
+                {["Preços populares", "Pix Mercado Pago", "Teleatendimento", "Shopping multi-vendor", "Foco baixa renda"].map((pill) => (
+                  <span key={pill} className="px-4 py-2 rounded-full text-xs font-bold text-muted-foreground border border-border bg-card/60">
+                    {pill}
+                  </span>
+                ))}
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="mt-6 px-4 py-3 rounded-2xl border border-primary/20 bg-primary/5 max-w-3xl">
+                <p className="text-xs text-muted-foreground font-medium">
+                  ⚠️ Conteúdo educativo. Prescrição e conduta clínica dependem de avaliação individual por profissional habilitado.
+                </p>
+              </motion.div>
             </motion.div>
 
-            <motion.h1 variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-display font-black text-foreground leading-[1.08] mb-8 tracking-tight">
-              Democratizando o acesso a{" "}
-              <span className="text-gradient-green">medicamentos</span>{" "}
-              à base de{" "}
-              <span className="text-gradient-purple">cannabis</span>
-            </motion.h1>
-
-            <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-3xl mb-10 leading-relaxed font-medium">
-              Conectamos pacientes a profissionais habilitados, usamos o que há de mais novo em tecnologia — inteligência artificial e teleatendimento via vídeo e chat, direto na plataforma — aliado ao Shopping de bem-estar com preços populares. Você escolhe o especialista, faz uma pré-entrevista, paga via Pix seguro Mercado Pago e segue para o atendimento. Receba sua receita e volte ao Shopping, com centenas de farmácias e produtores autorizados pela ANVISA, oferecendo os melhores preços com frete grátis para todo o Brasil.
-            </motion.p>
-
-            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 mb-10">
-              <Button size="lg" className="text-base font-black h-14 px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl" asChild>
-                <Link to="/profissionais">
-                  Ver Profissionais <ArrowRight size={20} className="ml-2" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="text-base font-black h-14 px-8 border-border hover:bg-muted rounded-2xl" asChild>
-                <Link to="/shopping">
-                  Abrir Shopping <ShoppingBag size={18} className="ml-2" />
-                </Link>
-              </Button>
-              <Button size="lg" className="text-base font-black h-14 px-8 bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-2xl" asChild>
-                <Link to="/planos">
-                  Começar agora <ArrowRight size={20} className="ml-2" />
-                </Link>
-              </Button>
+            {/* Phone Mockup */}
+            <motion.div
+              className="hidden lg:flex justify-center"
+              initial={{ opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.9, delay: 0.3 }}
+            >
+              <img
+                src={heroPhoneMockup}
+                alt="Planta & Raiz — App de consulta e medicamentos à base de cannabis"
+                className="w-[340px] xl:w-[400px] drop-shadow-2xl"
+              />
             </motion.div>
-
-            <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
-              {["Preços populares", "Pix Mercado Pago", "Teleatendimento", "Shopping multi-vendor", "Foco baixa renda"].map((pill) => (
-                <span key={pill} className="px-4 py-2 rounded-full text-xs font-bold text-muted-foreground border border-border bg-card/60">
-                  {pill}
-                </span>
-              ))}
-            </motion.div>
-
-            <motion.div variants={fadeUp} className="mt-6 px-4 py-3 rounded-2xl border border-primary/20 bg-primary/5 max-w-3xl">
-              <p className="text-xs text-muted-foreground font-medium">
-                ⚠️ Conteúdo educativo. Prescrição e conduta clínica dependem de avaliação individual por profissional habilitado.
-              </p>
-            </motion.div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Step by step — Blis-inspired numbered horizontal */}
+      {/* Step by step — with visual images */}
       <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
           <motion.div className="mb-16" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
@@ -115,8 +135,17 @@ const Index = () => {
           </motion.div>
 
           <motion.div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            {steps.map((s) => (
+            {steps.map((s, i) => (
               <motion.div key={s.n} variants={fadeUp} className="space-y-4">
+                {i === 0 && (
+                  <img src={triagemPatient} alt="Paciente usando a plataforma" className="w-full h-32 object-cover rounded-2xl border border-border mb-2" />
+                )}
+                {i === 1 && (
+                  <img src={triagemForm} alt="Triagem emocional" className="w-full h-32 object-cover object-top rounded-2xl border border-border mb-2" />
+                )}
+                {i === 3 && (
+                  <img src={consultaChat} alt="Consulta com especialista" className="w-full h-32 object-cover rounded-2xl border border-border mb-2" />
+                )}
                 <div className="step-number">{s.n}</div>
                 <h3 className="text-lg font-display font-black text-primary">{s.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed font-medium">{s.desc}</p>

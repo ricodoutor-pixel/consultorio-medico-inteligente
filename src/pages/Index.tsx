@@ -50,46 +50,56 @@ const Index = () => {
       <Navbar />
       <WhatsAppButton />
 
-      {/* Hero — Blis-inspired large typography + glow */}
+      {/* Hero */}
       <section className="hero-glow pt-28 pb-20 md:pt-40 md:pb-32">
         <div className="container mx-auto px-4 relative z-10">
           <motion.div className="max-w-5xl" initial="hidden" animate="visible" variants={stagger}>
             <motion.div variants={fadeUp} className="inline-flex items-center gap-2 bg-gradient-green border border-green rounded-full px-4 py-2 text-sm font-bold text-primary mb-8">
               <Leaf size={16} />
-              PLATAFORMA POPULAR DE SAÚDE
+              PLATAFORMA POPULAR • SAÚDE • SHOPPING
             </motion.div>
 
-            <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl lg:text-8xl font-display font-black text-foreground leading-[1.05] mb-8 tracking-tight">
-              Uma nova maneira de{" "}
-              <span className="text-gradient-green">acessar</span>{" "}
-              saúde e{" "}
-              <span className="text-gradient-purple">bem-estar</span>
+            <motion.h1 variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-display font-black text-foreground leading-[1.08] mb-8 tracking-tight">
+              Democratizando o acesso a{" "}
+              <span className="text-gradient-green">medicamentos</span>{" "}
+              à base de{" "}
+              <span className="text-gradient-purple">cannabis</span>
             </motion.h1>
 
-            <motion.p variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed font-medium">
-              Conectamos pacientes a profissionais habilitados e ao Shopping de bem-estar.
-              Preços populares, Pix Mercado Pago e atendimento sem burocracia.
+            <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-3xl mb-10 leading-relaxed font-medium">
+              Conectamos pacientes a profissionais habilitados, usamos o que há de mais novo em tecnologia — inteligência artificial e teleatendimento via vídeo e chat, direto na plataforma — aliado ao Shopping de bem-estar com preços populares. Você escolhe o especialista, faz uma pré-entrevista, paga via Pix seguro Mercado Pago e segue para o atendimento. Receba sua receita e volte ao Shopping, com centenas de farmácias e produtores autorizados pela ANVISA, oferecendo os melhores preços com frete grátis para todo o Brasil.
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 mb-10">
               <Button size="lg" className="text-base font-black h-14 px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl" asChild>
-                <Link to="/falar-com-especialista">
-                  Falar com Especialista <ArrowRight size={20} className="ml-2" />
+                <Link to="/profissionais">
+                  Ver Profissionais <ArrowRight size={20} className="ml-2" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="text-base font-black h-14 px-8 border-border hover:bg-muted rounded-2xl" asChild>
+                <Link to="/shopping">
+                  Abrir Shopping <ShoppingBag size={18} className="ml-2" />
+                </Link>
+              </Button>
+              <Button size="lg" className="text-base font-black h-14 px-8 bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-2xl" asChild>
                 <Link to="/planos">
-                  Ver Planos
+                  Começar agora <ArrowRight size={20} className="ml-2" />
                 </Link>
               </Button>
             </motion.div>
 
             <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
-              {["Preços populares", "Pix instantâneo", "Profissionais verificados", "Shopping multi-vendor"].map((pill) => (
+              {["Preços populares", "Pix Mercado Pago", "Teleatendimento", "Shopping multi-vendor", "Foco baixa renda"].map((pill) => (
                 <span key={pill} className="px-4 py-2 rounded-full text-xs font-bold text-muted-foreground border border-border bg-card/60">
                   {pill}
                 </span>
               ))}
+            </motion.div>
+
+            <motion.div variants={fadeUp} className="mt-6 px-4 py-3 rounded-2xl border border-primary/20 bg-primary/5 max-w-3xl">
+              <p className="text-xs text-muted-foreground font-medium">
+                ⚠️ Conteúdo educativo. Prescrição e conduta clínica dependem de avaliação individual por profissional habilitado.
+              </p>
             </motion.div>
           </motion.div>
         </div>

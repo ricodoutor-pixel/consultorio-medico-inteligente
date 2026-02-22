@@ -10,6 +10,7 @@ export const Navbar = () => {
     { to: "/", label: "Entrada" },
     { to: "/profissionais", label: "Profissionais" },
     { to: "/shopping", label: "Shopping" },
+    { to: "/biblioteca", label: "Biblioteca" },
     { to: "/planos", label: "Planos" },
     { to: "/cadastro-profissional", label: "Cadastro profissional" },
   ];

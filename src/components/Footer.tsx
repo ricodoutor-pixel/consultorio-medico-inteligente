@@ -1,5 +1,6 @@
 import { Leaf, Mail, MapPin, Phone, Heart } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
@@ -46,7 +47,7 @@ export const Footer = () => {
               </li>
               <li className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Mail size={14} className="text-primary" />
-                <a href="mailto:contato@plantaeraiz.com.br" className="hover:text-primary transition-colors">contato@plantaeraiz.com.br</a>
+                <a href="mailto:drbezerramed@gmail.com" className="hover:text-primary transition-colors">drbezerramed@gmail.com</a>
               </li>
               <li className="flex items-start gap-2 text-muted-foreground text-sm">
                 <MapPin size={14} className="text-primary mt-0.5" />
@@ -70,7 +71,9 @@ export const Footer = () => {
         <div className="border-t border-border mt-8 pt-8 text-center">
           <p className="text-muted-foreground text-sm flex items-center justify-center gap-2">
             © {new Date().getFullYear()} Planta & Raiz. Feito com
-            <Heart size={14} className="text-destructive fill-destructive" />
+            <Link to="/admin-login" className="hover:scale-125 transition-transform" title="Área administrativa">
+              <Heart size={14} className="text-destructive fill-destructive cursor-pointer" />
+            </Link>
             para quem mais precisa
           </p>
         </div>

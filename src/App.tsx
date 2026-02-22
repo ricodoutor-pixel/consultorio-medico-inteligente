@@ -13,6 +13,8 @@ import Contato from "./pages/Contato";
 import Pay from "./pages/Pay";
 import Carteira from "./pages/Carteira";
 import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin";
+import BibliotecaCientifica from "./pages/BibliotecaCientifica";
 import CadastroProfissional from "./pages/CadastroProfissional";
 import FalarComEspecialista from "./pages/FalarComEspecialista";
 import NotFound from "./pages/NotFound";
@@ -41,6 +43,8 @@ const App = () => (
           <Route path="/cadastro-profissional" element={<CadastroProfissional />} />
           <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/biblioteca" element={<BibliotecaCientifica />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

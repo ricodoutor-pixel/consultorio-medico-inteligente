@@ -17,6 +17,10 @@ import AdminLogin from "./pages/AdminLogin";
 import BibliotecaCientifica from "./pages/BibliotecaCientifica";
 import CadastroProfissional from "./pages/CadastroProfissional";
 import FalarComEspecialista from "./pages/FalarComEspecialista";
+import Legal from "./pages/Legal";
+import Indicacoes from "./pages/Indicacoes";
+import Telemedicina from "./pages/Telemedicina";
+import Cadastro from "./pages/Cadastro";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,7 +45,13 @@ const App = () => (
           <Route path="/pay" element={<Pay />} />
           <Route path="/carteira" element={<Carteira />} />
           <Route path="/cadastro-profissional" element={<CadastroProfissional />} />
+          <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />
+          <Route path="/telemedicina" element={<Telemedicina />} />
+          <Route path="/indicacoes" element={<Indicacoes />} />
+          <Route path="/legal" element={<Legal />} />
+          <Route path="/termos" element={<Legal />} />
+          <Route path="/privacidade" element={<Legal />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/biblioteca" element={<BibliotecaCientifica />} />

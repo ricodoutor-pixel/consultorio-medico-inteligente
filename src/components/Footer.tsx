@@ -1,4 +1,4 @@
-import { Leaf, Mail, MapPin, Phone, Heart } from "lucide-react";
+import { Leaf, Mail, MapPin, Phone, Heart, Scale } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { Link } from "react-router-dom";
 
@@ -15,7 +15,7 @@ export const Footer = () => {
               <span className="font-display font-bold text-foreground">Planta & Raiz</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Democratizando o acesso a medicamentos à base de cannabis. Preços populares, segurança e orientação profissional.
+              A maior clínica de telemedicina + marketplace de cannabis medicinal. Democratizando o acesso com segurança e tecnologia IA.
             </p>
           </div>
 
@@ -23,11 +23,13 @@ export const Footer = () => {
             <h4 className="font-semibold text-foreground mb-4 text-sm">Navegação</h4>
             <ul className="space-y-2">
               {[
-                { to: "/como-funciona", label: "Como Funciona" },
+                { to: "/telemedicina", label: "Telemedicina" },
                 { to: "/profissionais", label: "Profissionais" },
                 { to: "/shopping", label: "Shopping" },
+                { to: "/biblioteca", label: "Biblioteca" },
+                { to: "/indicacoes", label: "Indicações" },
                 { to: "/planos", label: "Planos" },
-                { to: "/faq", label: "FAQ" },
+                { to: "/cadastro", label: "Cadastro" },
               ].map((link) => (
                 <li key={link.to}>
                   <NavLink to={link.to} className="text-muted-foreground hover:text-primary transition-colors text-sm">
@@ -51,19 +53,20 @@ export const Footer = () => {
               </li>
               <li className="flex items-start gap-2 text-muted-foreground text-sm">
                 <MapPin size={14} className="text-primary mt-0.5" />
-                <span>São Paulo, SP</span>
+                <span>São Paulo, SP — Brasil</span>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-foreground mb-4 text-sm">Legal</h4>
+            <h4 className="font-semibold text-foreground mb-4 text-sm">Legal & Compliance</h4>
             <ul className="space-y-2 text-sm">
-              <li><NavLink to="/termos" className="text-muted-foreground hover:text-primary transition-colors">Termos de Uso</NavLink></li>
+              <li><NavLink to="/legal" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><Scale size={12} /> Conformidade & Legal</NavLink></li>
+              <li><NavLink to="/termos" className="text-muted-foreground hover:text-primary transition-colors">Termos de Serviço</NavLink></li>
               <li><NavLink to="/privacidade" className="text-muted-foreground hover:text-primary transition-colors">Política de Privacidade</NavLink></li>
             </ul>
             <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-              ⚠️ Conteúdo educativo. Prescrição e conduta clínica dependem de avaliação individual por profissional habilitado.
+              ⚠️ Conteúdo educativo. Prescrição e conduta clínica dependem de avaliação por profissional habilitado.
             </p>
           </div>
         </div>

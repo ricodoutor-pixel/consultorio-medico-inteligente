@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Leaf, Stethoscope, ShoppingBag, Users, Star, Shield, Zap, ArrowRight, TrendingUp, MessageSquare, ClipboardList, Smartphone } from "lucide-react";
+import { Leaf, Stethoscope, ShoppingBag, Users, Star, Shield, Zap, ArrowRight, TrendingUp, MessageSquare, ClipboardList, Smartphone, Gift, BookOpen, Video, UserPlus, Globe, Download, HeartPulse } from "lucide-react";
 import { motion } from "framer-motion";
 import { testimonials } from "@/data/testimonials";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -59,9 +59,17 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div initial="hidden" animate="visible" variants={stagger}>
-              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 bg-gradient-green border border-green rounded-full px-4 py-2 text-sm font-bold text-primary mb-8">
-                <Leaf size={16} />
-                PLATAFORMA POPULAR • SAÚDE • SHOPPING
+              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 flex-wrap mb-8">
+                <span className="inline-flex items-center gap-2 bg-gradient-green border border-green rounded-full px-4 py-2 text-sm font-bold text-primary">
+                  <Leaf size={16} />
+                  PLATAFORMA POPULAR • SAÚDE • SHOPPING
+                </span>
+                <Link to="/cadastro">
+                  <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-black hover:bg-primary/90 transition-colors cursor-pointer animate-pulse">
+                    <UserPlus size={16} />
+                    CADASTRO
+                  </span>
+                </Link>
               </motion.div>
 
               <motion.h1 variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-display font-black text-foreground leading-[1.08] mb-8 tracking-tight">
@@ -122,6 +130,70 @@ const Index = () => {
               />
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Live Stats */}
+      <section className="py-12 border-b border-border">
+        <div className="container mx-auto px-4">
+          <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            {[
+              { value: "45K+", label: "Usuários Ativos", icon: Users },
+              { value: "4.9★", label: "Avaliação Média", icon: Star },
+              { value: "125K+", label: "Downloads App", icon: Download },
+              { value: "R$6.3M", label: "Projeção Anual", icon: TrendingUp },
+            ].map((stat, i) => (
+              <motion.div key={i} variants={fadeUp}>
+                <Card className="border-border text-center hover:border-primary/20 transition-colors">
+                  <CardContent className="p-5">
+                    <stat.icon size={24} className="text-primary mx-auto mb-2" />
+                    <p className="text-2xl md:text-3xl font-display font-black text-foreground">{stat.value}</p>
+                    <span className="text-xs text-muted-foreground font-bold uppercase">{stat.label}</span>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Hub Navigation */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <motion.div className="mb-10" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+            <h2 className="text-3xl md:text-5xl font-display font-black text-foreground tracking-tight">
+              Ecossistema <span className="text-gradient-purple">Completo</span>
+            </h2>
+            <p className="text-muted-foreground font-medium mt-2">Tudo que você precisa em um só lugar.</p>
+          </motion.div>
+
+          <motion.div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            {[
+              { icon: Stethoscope, label: "Telemedicina", to: "/telemedicina", color: "green" },
+              { icon: BookOpen, label: "Biblioteca", to: "/biblioteca", color: "purple" },
+              { icon: ShoppingBag, label: "Shopping", to: "/shopping", color: "green" },
+              { icon: Gift, label: "Indicações", to: "/indicacoes", color: "gold" },
+              { icon: UserPlus, label: "Cadastro", to: "/cadastro", color: "green" },
+              { icon: Globe, label: "Legal", to: "/legal", color: "purple" },
+            ].map((hub, i) => (
+              <motion.div key={i} variants={fadeUp}>
+                <Link to={hub.to}>
+                  <Card className="border-border hover:border-primary/30 transition-all hover:-translate-y-1 cursor-pointer group">
+                    <CardContent className="p-4 text-center">
+                      <div className={`w-12 h-12 mx-auto mb-3 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform ${
+                        hub.color === "green" ? "bg-gradient-green border border-green" :
+                        hub.color === "purple" ? "bg-gradient-purple border border-purple" :
+                        "bg-gradient-gold border border-gold"
+                      }`}>
+                        <hub.icon size={22} className={hub.color === "green" ? "text-primary" : hub.color === "purple" ? "text-secondary" : "text-[hsl(45,76%,52%)]"} />
+                      </div>
+                      <p className="font-bold text-sm text-foreground">{hub.label}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
@@ -310,17 +382,22 @@ const Index = () => {
               Comece sua jornada <span className="text-gradient-green">agora</span>
             </h2>
             <p className="text-muted-foreground text-lg mb-8 font-medium">
-              Acesse profissionais habilitados e o Shopping com preços populares. Pagamento 100% via Pix.
+              Acesse profissionais habilitados, telemedicina com IA e o Shopping com preços populares. Pagamento 100% via Pix.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="font-black h-14 px-8 bg-primary text-primary-foreground rounded-2xl" asChild>
-                <Link to="/falar-com-especialista">
-                  Falar com Especialista <MessageSquare size={18} className="ml-2" />
+                <Link to="/telemedicina">
+                  Iniciar Consulta IA <HeartPulse size={18} className="ml-2" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" className="font-black h-14 px-8 border-primary/30 text-primary rounded-2xl" asChild>
+                <Link to="/cadastro">
+                  Cadastre-se Grátis <UserPlus size={18} className="ml-2" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="font-black h-14 px-8 border-border rounded-2xl" asChild>
-                <Link to="/planos">
-                  Ver Planos <ArrowRight size={18} className="ml-2" />
+                <Link to="/indicacoes">
+                  Indique e Ganhe <Gift size={18} className="ml-2" />
                 </Link>
               </Button>
             </div>

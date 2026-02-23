@@ -7,12 +7,13 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const links = [
-    { to: "/", label: "Entrada" },
+    { to: "/", label: "Início" },
     { to: "/profissionais", label: "Profissionais" },
+    { to: "/telemedicina", label: "Telemedicina" },
     { to: "/shopping", label: "Shopping" },
     { to: "/biblioteca", label: "Biblioteca" },
+    { to: "/indicacoes", label: "Indicações" },
     { to: "/planos", label: "Planos" },
-    { to: "/cadastro-profissional", label: "Cadastro profissional" },
   ];
 
   return (
@@ -27,11 +28,11 @@ export const Navbar = () => {
               <span className="text-sm font-display font-black text-foreground block">
                 Planta <span className="text-gradient-purple">&</span> Raiz
               </span>
-              <span className="text-[10px] text-muted-foreground font-semibold">Democratizando o acesso</span>
+              <span className="text-[10px] text-muted-foreground font-semibold">Mega Clínica Digital</span>
             </div>
           </NavLink>
 
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-5">
             {links.map((link) => (
               <NavLink
                 key={link.to}
@@ -45,10 +46,11 @@ export const Navbar = () => {
           </div>
 
           <div className="hidden lg:flex items-center gap-3">
+            <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary" asChild>
+              <NavLink to="/cadastro">Cadastro</NavLink>
+            </Button>
             <Button size="sm" className="bg-primary text-primary-foreground font-black rounded-xl" asChild>
-              <NavLink to="/falar-com-especialista">
-                Iniciar Agora
-              </NavLink>
+              <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
             </Button>
           </div>
 
@@ -73,11 +75,14 @@ export const Navbar = () => {
                 {link.label}
               </NavLink>
             ))}
-            <Button className="w-full bg-primary text-primary-foreground font-black rounded-xl" asChild>
-              <NavLink to="/falar-com-especialista" onClick={() => setIsOpen(false)}>
-                Iniciar Agora
-              </NavLink>
-            </Button>
+            <div className="flex gap-2 pt-2">
+              <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary" asChild>
+                <NavLink to="/cadastro" onClick={() => setIsOpen(false)}>Cadastro</NavLink>
+              </Button>
+              <Button className="flex-1 bg-primary text-primary-foreground font-black rounded-xl" asChild>
+                <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>Consulta</NavLink>
+              </Button>
+            </div>
           </div>
         )}
       </div>

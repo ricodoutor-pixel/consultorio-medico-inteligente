@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { FrogChatModal } from "@/components/FrogChatModal";
 import Index from "./pages/Index";
 import ComoFunciona from "./pages/ComoFunciona";
 import Profissionais from "./pages/Profissionais";
@@ -21,6 +22,10 @@ import Legal from "./pages/Legal";
 import Indicacoes from "./pages/Indicacoes";
 import Telemedicina from "./pages/Telemedicina";
 import Cadastro from "./pages/Cadastro";
+import ConsultationPayment from "./pages/ConsultationPayment";
+import SpecialistDashboard from "./pages/SpecialistDashboard";
+import InfluencerDashboard from "./pages/InfluencerDashboard";
+import OnlineUsers from "./pages/OnlineUsers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +36,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <FrogChatModal />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/como-funciona" element={<ComoFunciona />} />
@@ -52,6 +58,10 @@ const App = () => (
           <Route path="/legal" element={<Legal />} />
           <Route path="/termos" element={<Legal />} />
           <Route path="/privacidade" element={<Legal />} />
+          <Route path="/pagamento" element={<ConsultationPayment />} />
+          <Route path="/dashboard-especialista" element={<SpecialistDashboard />} />
+          <Route path="/influenciadores" element={<InfluencerDashboard />} />
+          <Route path="/usuarios-online" element={<OnlineUsers />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/biblioteca" element={<BibliotecaCientifica />} />

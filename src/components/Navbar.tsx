@@ -14,6 +14,7 @@ export const Navbar = () => {
     { to: "/biblioteca", label: "Biblioteca" },
     { to: "/indicacoes", label: "Indicações" },
     { to: "/planos", label: "Planos" },
+    { to: "/influenciadores", label: "Influencers" },
   ];
 
   return (

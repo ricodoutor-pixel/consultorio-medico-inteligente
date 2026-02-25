@@ -91,16 +91,7 @@ export const FrogChatModal = () => {
   };
 
   if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-6 z-50 w-16 h-16 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
-        aria-label="Abrir chat com Verdinho"
-        style={{ background: "radial-gradient(circle, hsl(152 80% 45% / 0.3), transparent 80%)" }}
-      >
-        <FrogMascot size={48} />
-      </button>
-    );
+    return null;
   }
 
   return (

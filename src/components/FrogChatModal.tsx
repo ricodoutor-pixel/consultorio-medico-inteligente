@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, MessageCircle } from "lucide-react";
+import { X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FrogMascot } from "@/components/FrogMascot";
 
 interface Message {
   id: string;
@@ -10,28 +11,19 @@ interface Message {
 }
 
 const aiResponses: { [key: string]: string } = {
-  agendamento:
-    'Para agendar uma consulta, clique em "Ver Profissionais" na página inicial. Você passará por uma pré-entrevista com IA que leva cerca de 5 minutos.',
-  prescrição:
-    "Nossas prescrições digitais são certificadas ICP-Brasil e conformes com a ANVISA. Você recebe um código de validação para usar na farmácia.",
-  medicamentos:
-    "Após sua consulta, você pode comprar medicamentos diretamente em nosso marketplace integrado com pagamento via PIX ou cartão.",
-  profissionais:
-    "Temos 500+ profissionais verificados especializados em cannabis medicinal. Você pode filtrar por especialidade, idioma e preço.",
-  segurança:
-    "Operamos com conformidade LGPD, ANVISA, CFM e ICP-Brasil. Todos os dados são criptografados e sua privacidade é garantida.",
-  preço:
-    "Consultas a partir de R$ 55. Temos planos populares com descontos e frete grátis no Shopping para todo o Brasil.",
-  pix:
-    "Aceitamos pagamento via PIX com QR Code ou código copia e cola. A confirmação é instantânea e automática via Mercado Pago.",
-  indicação:
-    "Nosso sistema de Indicação Premiada paga 10% de comissão automática! Gere seu código único, compartilhe e ganhe por cada indicação.",
-  biblioteca:
-    "A Biblioteca Científica contém 100 variedades de cannabis com detalhes completos: efeitos, THC/CBD, benefícios, origem e avaliações.",
-  shopping:
-    "No Shopping você encontra óleos, cápsulas, chás, pomadas e vitaminas de farmácias autorizadas ANVISA com frete grátis para todo o Brasil.",
-  default:
-    "Ótima pergunta! 🤔 Você pode explorar nossos serviços de telemedicina, marketplace e prescrições digitais. Qual desses temas te interessa?",
+  agendamento: 'Para agendar uma consulta, clique em "Telemedicina" no menu. Você passará por uma pré-entrevista com IA de 7 perguntas e escolherá seu especialista.',
+  prescrição: "Nossas prescrições digitais são certificadas ICP-Brasil e conformes com a ANVISA. Você recebe um código de validação para usar na farmácia.",
+  medicamentos: "Após sua consulta, compre medicamentos no nosso Shopping com farmácias autorizadas ANVISA. Pagamento via PIX e frete grátis para todo o Brasil.",
+  profissionais: "Temos 500+ profissionais verificados: médicos prescritores, farmacêuticos, terapeutas e psicólogos. Filtre por especialidade, idioma e preço.",
+  segurança: "Operamos com conformidade LGPD, ANVISA, CFM e ICP-Brasil. Criptografia TLS 1.3, 2FA e todos os dados protegidos.",
+  preço: "Consultas a partir de R$ 55. Planos populares com descontos exclusivos. Shopping com preços acessíveis e frete grátis.",
+  pix: "Aceitamos PIX via Mercado Pago: QR Code ou copia e cola. Confirmação instantânea e automática por webhook.",
+  indicação: "Sistema de Indicação Premiada: ganhe 10% de comissão automática! Gere seu código único, compartilhe e receba via PIX.",
+  biblioteca: "Nossa Biblioteca Científica tem 100+ variedades catalogadas com efeitos, THC/CBD, benefícios, origem e avaliações de usuários.",
+  shopping: "Shopping com farmácias e produtores autorizados ANVISA. Óleos, cápsulas, chás, pomadas. Frete grátis para todo o Brasil.",
+  download: "Nosso app está disponível para iOS e Android! Acesse /download para baixar. 125K+ downloads, nota 4.9★.",
+  como: "É simples: 1) Escolha um especialista, 2) Faça a pré-entrevista IA, 3) Pague via PIX, 4) Receba atendimento por chat/vídeo.",
+  default: "Olá! 🐸 Posso ajudar com consultas, biblioteca de variedades, shopping, indicações e muito mais. O que deseja saber?",
 };
 
 export const FrogChatModal = () => {
@@ -39,7 +31,7 @@ export const FrogChatModal = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Olá! 🐸 Sou o Sapo Verde, assistente de IA da Planta & Raiz. Como posso ajudar você hoje?",
+      text: "Olá! 🐸 Sou o Verdinho, assistente IA da Planta & Raiz. Pergunte sobre consultas, shopping, biblioteca ou qualquer dúvida!",
       sender: "ai",
       timestamp: new Date(),
     },
@@ -51,6 +43,13 @@ export const FrogChatModal = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Listen for external open events
+  useEffect(() => {
+    const handler = () => setIsOpen(true);
+    window.addEventListener("open-frog-chat", handler);
+    return () => window.removeEventListener("open-frog-chat", handler);
+  }, []);
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -80,15 +79,12 @@ export const FrogChatModal = () => {
       else if (lower.includes("indica") || lower.includes("comiss")) aiResponse = aiResponses.indicação;
       else if (lower.includes("biblio") || lower.includes("cepa") || lower.includes("varied")) aiResponse = aiResponses.biblioteca;
       else if (lower.includes("shop") || lower.includes("compra") || lower.includes("produto")) aiResponse = aiResponses.shopping;
+      else if (lower.includes("download") || lower.includes("app") || lower.includes("celular")) aiResponse = aiResponses.download;
+      else if (lower.includes("como") || lower.includes("funciona") || lower.includes("passo")) aiResponse = aiResponses.como;
 
       setMessages((prev) => [
         ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          text: aiResponse,
-          sender: "ai",
-          timestamp: new Date(),
-        },
+        { id: (Date.now() + 1).toString(), text: aiResponse, sender: "ai", timestamp: new Date() },
       ]);
       setIsLoading(false);
     }, 800);
@@ -98,10 +94,11 @@ export const FrogChatModal = () => {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:scale-110 transition-transform glow-green"
-        aria-label="Abrir chat com IA"
+        className="fixed bottom-24 right-6 z-50 w-16 h-16 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+        aria-label="Abrir chat com Verdinho"
+        style={{ background: "radial-gradient(circle, hsl(152 80% 45% / 0.3), transparent 80%)" }}
       >
-        <span className="text-2xl">🐸</span>
+        <FrogMascot size={48} />
       </button>
     );
   }
@@ -111,10 +108,10 @@ export const FrogChatModal = () => {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-primary/10">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🐸</span>
+          <FrogMascot size={28} />
           <div>
-            <p className="font-display font-black text-sm text-foreground">Sapo Verde</p>
-            <p className="text-[10px] text-muted-foreground font-semibold">Assistente de IA • Online</p>
+            <p className="font-display font-black text-sm text-foreground">Verdinho</p>
+            <p className="text-[10px] text-muted-foreground font-semibold">Assistente IA • Online 24/7</p>
           </div>
         </div>
         <button onClick={() => setIsOpen(false)} className="p-1 rounded-lg hover:bg-muted transition-colors text-muted-foreground">
@@ -157,7 +154,7 @@ export const FrogChatModal = () => {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-          placeholder="Digite sua pergunta..."
+          placeholder="Pergunte ao Verdinho..."
           className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
         />
         <Button size="icon" onClick={handleSendMessage} disabled={isLoading || !inputValue.trim()} className="rounded-xl bg-primary text-primary-foreground h-9 w-9">

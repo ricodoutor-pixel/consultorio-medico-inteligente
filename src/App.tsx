@@ -26,6 +26,7 @@ import ConsultationPayment from "./pages/ConsultationPayment";
 import SpecialistDashboard from "./pages/SpecialistDashboard";
 import InfluencerDashboard from "./pages/InfluencerDashboard";
 import OnlineUsers from "./pages/OnlineUsers";
+import DownloadApp from "./pages/DownloadApp";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -65,6 +66,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/biblioteca" element={<BibliotecaCientifica />} />
+          <Route path="/download" element={<DownloadApp />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

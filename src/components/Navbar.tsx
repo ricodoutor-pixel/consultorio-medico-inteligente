@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Menu, X, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
+import { FrogMascot } from "@/components/FrogMascot";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,21 +18,29 @@ export const Navbar = () => {
     { to: "/influenciadores", label: "Influencers" },
   ];
 
+  const openChat = () => {
+    const event = new CustomEvent("open-frog-chat");
+    window.dispatchEvent(event);
+  };
+
   return (
     <nav className="fixed top-0 w-full glass border-b border-border z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <NavLink to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green">
-              <Leaf size={20} className="text-primary-foreground" />
-            </div>
-            <div className="leading-tight">
-              <span className="text-sm font-display font-black text-foreground block">
-                Planta <span className="text-gradient-purple">&</span> Raiz
-              </span>
-              <span className="text-[10px] text-muted-foreground font-semibold">Mega Clínica Digital</span>
-            </div>
-          </NavLink>
+          <div className="flex items-center gap-2">
+            <NavLink to="/" className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green">
+                <Leaf size={20} className="text-primary-foreground" />
+              </div>
+              <div className="leading-tight">
+                <span className="text-sm font-display font-black text-foreground block">
+                  Planta <span className="text-gradient-purple">&</span> Raiz
+                </span>
+                <span className="text-[10px] text-muted-foreground font-semibold">Mega Clínica Digital</span>
+              </div>
+            </NavLink>
+            <FrogMascot onClick={openChat} size={34} />
+          </div>
 
           <div className="hidden lg:flex items-center gap-5">
             {links.map((link) => (

@@ -15,51 +15,57 @@ const Precos = () => {
     {
       id: "essencial",
       name: "Essencial",
-      price: "R$ 19,90",
-      priceValue: 19.9,
+      price: "R$ 29",
+      priceValue: 29,
       period: "/mês",
       tag: "START",
-      description: "Suporte básico + descontos no Shopping + acesso rápido a triagem.",
+      description: "Acesso à biblioteca científica + Chat IA Verdinho 24/7 + pré-entrevista gratuita.",
       features: [
-        "Acesso ao app + suporte",
-        "Biblioteca de conteúdos",
-        "Cupons em parceiros",
-        "Descontos no Shopping",
+        "Acesso à biblioteca científica",
+        "Chat IA Verdinho 24/7",
+        "Pré-entrevista gratuita",
+        "Recomendações personalizadas",
       ],
       highlighted: false,
+      checkoutUrl: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=71c153e9de1147f796c4e9354cbaa88a",
     },
     {
       id: "acesso",
       name: "Acesso",
-      price: "R$ 29,90",
-      priceValue: 29.9,
+      price: "R$ 79",
+      priceValue: 79,
       period: "/mês",
-      tag: "POPULAR",
-      description: "Benefícios do Essencial + prioridade em atendimento e consulta com desconto.",
+      tag: "MAIS POPULAR",
+      description: "Tudo do Essencial + consultas com profissionais + prontuário digital criptografado.",
       features: [
-        "Todos benefícios Essencial",
-        "Prioridade no suporte",
-        "Consulta com desconto",
-        "Relatórios de acompanhamento",
+        "Tudo do Essencial",
+        "Consultas com profissionais (1ª grátis)",
+        "Prontuário digital criptografado",
+        "Receitas digitais assinadas",
+        "Histórico de consultas",
+        "Suporte prioritário",
       ],
       highlighted: true,
+      checkoutUrl: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=9d541916b1324a15a78155fa74371013",
     },
     {
       id: "familia",
       name: "Família",
-      price: "R$ 49,90",
-      priceValue: 49.9,
+      price: "R$ 149",
+      priceValue: 149,
       period: "/mês",
       tag: "MELHOR VALOR",
-      description: "Até 3 perfis + suporte ampliado + descontos exclusivos.",
+      description: "Tudo do Acesso + até 5 membros + relatórios de saúde mensais.",
       features: [
-        "Todos benefícios Acesso",
-        "Até 3 perfis familiares",
-        "Suporte ampliado",
-        "Descontos exclusivos no Shopping",
-        "Frete grátis em pedidos",
+        "Tudo do Acesso",
+        "Até 5 membros da família",
+        "Compartilhamento seguro de prontuários",
+        "15% desconto em consultas adicionais",
+        "Acesso prioritário a novos profissionais",
+        "Relatórios de saúde mensais",
       ],
       highlighted: false,
+      checkoutUrl: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=97dee2a0d53c462f95296d83a1e1ce61",
     },
   ];
 
@@ -107,9 +113,9 @@ const Precos = () => {
                       className={`w-full font-black rounded-2xl ${plan.highlighted ? 'bg-primary text-primary-foreground' : 'bg-gradient-green border border-green text-primary hover:bg-primary/20'}`}
                       asChild
                     >
-                      <Link to={`/pay?type=subscription&planId=${plan.id}`}>
-                        Assinar via Pix
-                      </Link>
+                      <a href={(plan as any).checkoutUrl} target="_blank" rel="noopener noreferrer">
+                        Assinar Agora
+                      </a>
                     </Button>
                   </CardContent>
                 </Card>

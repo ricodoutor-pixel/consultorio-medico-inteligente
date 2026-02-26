@@ -39,7 +39,9 @@ export const Navbar = () => {
                 <span className="text-[10px] text-muted-foreground font-semibold">Mega Clínica Digital</span>
               </div>
             </NavLink>
-            <FrogMascot onClick={openChat} size={30} />
+            <div className="ml-2">
+              <FrogMascot onClick={openChat} size={44} />
+            </div>
           </div>
 
           <div className="hidden lg:flex items-center gap-5">

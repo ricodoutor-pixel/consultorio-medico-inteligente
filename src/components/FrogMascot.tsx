@@ -6,9 +6,9 @@ interface FrogMascotProps {
   size?: number;
 }
 
-type Personality = "happy" | "crowned" | "dancing" | "waving" | "jumping";
+type Personality = "happy" | "crowned" | "dancing" | "waving" | "jumping" | "spinning" | "sleeping" | "excited";
 
-const PERSONALITIES: Personality[] = ["happy", "crowned", "dancing", "waving", "jumping"];
+const PERSONALITIES: Personality[] = ["happy", "crowned", "dancing", "waving", "jumping", "spinning", "sleeping", "excited"];
 
 export const FrogMascot = ({ onClick, size = 60 }: FrogMascotProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -101,11 +101,17 @@ export const FrogMascot = ({ onClick, size = 60 }: FrogMascotProps) => {
   const isDancing = personality === "dancing";
   const isWaving = personality === "waving";
   const isJumping = personality === "jumping";
+  const isSpinning = personality === "spinning";
+  const isSleeping = personality === "sleeping";
+  const isExcited = personality === "excited";
 
   // Personality-based body animation
-  const bodyAnimation = () => {
+  const bodyAnimation = (): Record<string, unknown> => {
     if (isDancing) return { rotate: [0, -8, 8, -8, 8, 0], transition: { duration: 0.8, repeat: Infinity } };
-    if (isJumping) return { y: [0, -8, 0, -5, 0], transition: { duration: 0.6, repeat: Infinity } };
+    if (isJumping) return { y: [0, -12, 0, -8, 0, -4, 0], transition: { duration: 0.8, repeat: Infinity } };
+    if (isSpinning) return { rotate: [0, 360], transition: { duration: 1.5, repeat: Infinity, ease: "linear" } };
+    if (isSleeping) return { rotate: [0, 3, -3, 0], y: [0, 2, 0], transition: { duration: 2, repeat: Infinity } };
+    if (isExcited) return { scale: [1, 1.15, 1, 1.1, 1], transition: { duration: 0.5, repeat: Infinity } };
     if (isClicked) return { y: [0, -4, 0] };
     return { y: 0 };
   };
@@ -117,7 +123,7 @@ export const FrogMascot = ({ onClick, size = 60 }: FrogMascotProps) => {
       onMouseLeave={() => setIsHovered(false)}
       className="relative cursor-pointer select-none focus:outline-none flex flex-col items-center"
       whileTap={{ scale: 0.92 }}
-      animate={{ x: bounceX, ...bodyAnimation() }}
+      animate={{ x: bounceX, ...(bodyAnimation() as any) }}
       transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
       aria-label="Pergunte ao Verdinho — Assistente IA"
       title="Pergunte ao Verdinho 🐸"
@@ -343,6 +349,35 @@ export const FrogMascot = ({ onClick, size = 60 }: FrogMascotProps) => {
             transition={{ duration: 0.6, repeat: Infinity }}
           >
             💚
+          </motion.span>
+        )}
+        {isSleeping && (
+          <motion.span
+            className="absolute -top-3 right-0 text-xs pointer-events-none"
+            initial={{ opacity: 0, y: 0 }}
+            animate={{ opacity: [0, 1, 0], y: -10, scale: [0.5, 1.2, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            💤
+          </motion.span>
+        )}
+        {isExcited && (
+          <motion.span
+            className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 0], y: -12, rotate: [0, 20, -20, 0] }}
+            transition={{ duration: 0.6, repeat: Infinity }}
+          >
+            🔥
+          </motion.span>
+        )}
+        {isSpinning && (
+          <motion.span
+            className="absolute -top-2 -right-2 text-xs pointer-events-none"
+            animate={{ rotate: [0, 360], opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1, repeat: Infinity }}
+          >
+            ⭐
           </motion.span>
         )}
       </AnimatePresence>

@@ -13,7 +13,33 @@ export interface CannabisStrain {
   dificuldade: string;
   rendimento: string;
   avaliacao: number;
+  imageUrl?: string;
 }
+
+const plantImages = [
+  "https://images.unsplash.com/photo-1603909223429-69bb7101f420?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1589484344286-6db67286952c?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1587754378885-de tried-e63e?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1616690002178-4e28e2b92d97?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1503262028195-93c528f03218?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1457530378978-8bac673b8062?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1501004318855-fce2fc823eb9?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1462275646964-a0e3c11f18a6?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1442458370899-ae20e367c5d8?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1476954789527-4a4e2cc60cf9?w=300&h=300&fit=crop",
+  "https://images.unsplash.com/photo-1509223197845-458d87a6c3f4?w=300&h=300&fit=crop",
+];
+
+const getPlantImage = (id: number) => plantImages[(id - 1) % plantImages.length];
 
 export const strains: CannabisStrain[] = [
   { id: 1, nome: "Charlotte's Web", tipo: "Sativa", thc: "<0,3%", cbd: "17%", descricao: "Variedade com alto teor de CBD e níveis insignificantes de THC, desenvolvida especificamente para fins terapêuticos. Amplamente reconhecida por seu uso em epilepsia refratária pediátrica.", efeitos: ["Relaxante", "Clareza mental", "Calmante"], sabores: ["Terroso", "Herbáceo", "Pinho"], beneficiosSaude: ["Epilepsia", "Ansiedade", "Inflamação", "Dor crônica"], origem: "EUA — Irmãos Stanley", florescimento: "9-12 semanas", dificuldade: "Moderada", rendimento: "400-500g/m²", avaliacao: 4.9 },

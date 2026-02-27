@@ -15,8 +15,8 @@ const Precos = () => {
     {
       id: "essencial",
       name: "Essencial",
-      price: "R$ 19,90",
-      priceValue: 1990,
+      price: "R$ 50",
+      priceValue: 5000,
       period: "/mês",
       tag: "START",
       description: "Acesso à biblioteca científica + Chat IA Verdinho 24/7 + pré-entrevista gratuita.",
@@ -32,8 +32,8 @@ const Precos = () => {
     {
       id: "acesso",
       name: "Acesso",
-      price: "R$ 29,90",
-      priceValue: 2990,
+      price: "R$ 100",
+      priceValue: 10000,
       period: "/mês",
       tag: "MAIS POPULAR",
       description: "Tudo do Essencial + consultas com profissionais + prontuário digital criptografado.",
@@ -51,8 +51,8 @@ const Precos = () => {
     {
       id: "familia",
       name: "Família",
-      price: "R$ 49,90",
-      priceValue: 4990,
+      price: "R$ 250",
+      priceValue: 25000,
       period: "/mês",
       tag: "MELHOR VALOR",
       description: "Tudo do Acesso + até 5 membros + relatórios de saúde mensais.",

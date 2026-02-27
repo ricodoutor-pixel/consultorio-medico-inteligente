@@ -347,10 +347,29 @@ export const FrogMascot = ({ onClick, size = 60 }: FrogMascotProps) => {
         )}
       </AnimatePresence>
 
-      {/* Label */}
-      <span className="text-[9px] font-bold text-primary/70 mt-[-2px] whitespace-nowrap">
-        pergunte ao verdinho!
-      </span>
+      {/* Sparkle trail when moving */}
+      <AnimatePresence>
+        {isHovered && (
+          <>
+            <motion.span
+              className="absolute -top-3 left-0 text-[10px] pointer-events-none"
+              initial={{ opacity: 0, y: 0 }}
+              animate={{ opacity: [0, 1, 0], y: -12, x: [-4, 4, -4] }}
+              transition={{ duration: 1.2, repeat: Infinity }}
+            >
+              ✨
+            </motion.span>
+            <motion.span
+              className="absolute -top-1 right-0 text-[10px] pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 1, 0], y: -10 }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.3 }}
+            >
+              🌿
+            </motion.span>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Glow */}
       <motion.div

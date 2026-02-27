@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { strains, strainCategories, type CannabisStrain } from "@/data/strains";
-import { Search, Star, Leaf, X, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain } from "lucide-react";
+import { Search, Star, Leaf, X, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.04 } } };
@@ -147,6 +148,18 @@ const BibliotecaCientifica = () => {
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">THC {strain.thc}</span>
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary/10 text-secondary font-bold">CBD {strain.cbd}</span>
                     </div>
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full mt-3 text-[10px] h-7 font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-xl"
+                      asChild
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Link to="/profissionais">
+                        Saiba Mais <ArrowRight size={10} className="ml-1" />
+                      </Link>
+                    </Button>
                   </CardContent>
                 </Card>
               </motion.div>

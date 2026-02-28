@@ -26,8 +26,8 @@ export const Navbar = () => {
   return (
     <nav className="fixed top-0 w-full glass border-b border-border z-50">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between h-20">
+          <div className="flex items-center gap-2 md:gap-3">
             <NavLink to="/" className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green">
                 <Leaf size={20} className="text-primary-foreground" />
@@ -39,8 +39,11 @@ export const Navbar = () => {
                 <span className="text-[10px] text-muted-foreground font-semibold">Mega Clínica Digital</span>
               </div>
             </NavLink>
-            <div className="ml-2">
-              <FrogMascot onClick={openChat} size={44} />
+            <div className="ml-1 md:hidden">
+              <FrogMascot onClick={openChat} size={34} jumpDistance={0} />
+            </div>
+            <div className="ml-1 hidden md:flex items-center overflow-visible">
+              <FrogMascot onClick={openChat} size={52} jumpDistance={82} />
             </div>
           </div>
 

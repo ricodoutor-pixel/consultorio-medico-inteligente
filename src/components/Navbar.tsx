@@ -40,10 +40,10 @@ export const Navbar = () => {
               </div>
             </NavLink>
             <div className="ml-1 md:hidden">
-              <FrogMascot onClick={openChat} size={34} jumpDistance={0} />
+              <FrogMascot onClick={openChat} size={34} />
             </div>
             <div className="ml-1 hidden md:flex items-center overflow-visible">
-              <FrogMascot onClick={openChat} size={52} jumpDistance={82} />
+              <FrogMascot onClick={openChat} size={52} />
             </div>
           </div>
 

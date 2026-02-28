@@ -16,45 +16,45 @@ export interface CannabisStrain {
   imageUrl?: string;
 }
 
-// Cannabis flower/bud photo IDs from Unsplash
-const cannabisPhotos = [
-  "kNbUs1W1gLA", // cannabis bud close-up
-  "aJgQFnkAmAo", // cannabis bud white pistils
-  "CFVSPAPem50", // cannabis buds green leaves
-  "PagyR7Jh3HE", // cannabis flower shot
-  "douK2pleVKY", // bud with trichomes
-  "7-VhhCfFtzk", // green and brown kush
-  "chGZHi1EAX4", // marijuana plant
-  "z-FrWHpcHvc", // green kush on plate
-  "y564-s5pJe4", // brown green kush
-  "0csXB_zQqsM", // CBD plant macro
-  "hAyInG_uDtE", // cannabis selective focus
-  "hWbc4fP7UUo", // kush on surface
-  "OJpybQKSPh4", // plant close up
-  "4-EYUBFz_e4", // cannabis leaf plant
-  "RfT4smmoIrc", // plant macro lens
-  "Bu6BSErSL_M", // jar filled with kush
-  "bddmwA73uec", // pile of weed
-  "_OtpJET8rBs", // cannabis bud growing
-];
-
-const focalPoints = [
-  "", // default center
-  "&fp-x=0.3&fp-y=0.3",
-  "&fp-x=0.7&fp-y=0.3",
-  "&fp-x=0.3&fp-y=0.7",
-  "&fp-x=0.7&fp-y=0.7",
-  "&fp-x=0.5&fp-y=0.2",
+// Fontes de flores de cannabis + fallback IA para garantir 100 cards com imagem
+const qualityKeywords = [
+  "premium",
+  "indoor",
+  "outdoor",
+  "trichomes",
+  "resin",
+  "dense-buds",
+  "sativa",
+  "indica",
+  "hybrid",
+  "medical",
+  "organic",
+  "artisan",
+  "greenhouse",
+  "craft",
+  "top-shelf",
+  "exotic",
+  "terpenes",
+  "frosty",
+  "purple-bud",
+  "lime-bud",
 ];
 
 const plantImages: Record<number, string> = {};
 for (let i = 1; i <= 100; i++) {
-  const photoIdx = (i - 1) % cannabisPhotos.length;
-  const focalIdx = Math.floor((i - 1) / cannabisPhotos.length) % focalPoints.length;
-  plantImages[i] = `https://images.unsplash.com/photo-${cannabisPhotos[photoIdx]}?w=300&h=300&fit=crop&crop=entropy${focalPoints[focalIdx]}`;
+  const quality = qualityKeywords[(i - 1) % qualityKeywords.length];
+  plantImages[i] = `https://source.unsplash.com/300x300/?cannabis,bud,flower,macro,${quality}&sig=${2000 + i}`;
 }
 
-export const getPlantImage = (id: number) => plantImages[id] || `https://images.unsplash.com/photo-1503262028195-93c528f03218?w=300&h=300&fit=crop`;
+export const getPlantImage = (id: number) =>
+  plantImages[id] || `https://source.unsplash.com/300x300/?cannabis,bud,flower,macro&sig=${5000 + id}`;
+
+export const getPlantImageFallback = (id: number) => {
+  const prompt = encodeURIComponent(
+    `ultra realistic macro photo of cannabis flower bud, no people, different quality grade ${id}, detailed trichomes`
+  );
+  return `https://image.pollinations.ai/prompt/${prompt}?width=300&height=300&seed=${9000 + id}`;
+};
 
 export const strains: CannabisStrain[] = [
   { id: 1, nome: "Charlotte's Web", tipo: "Sativa", thc: "<0,3%", cbd: "17%", descricao: "Variedade com alto teor de CBD e níveis insignificantes de THC, desenvolvida especificamente para fins terapêuticos. Amplamente reconhecida por seu uso em epilepsia refratária pediátrica.", efeitos: ["Relaxante", "Clareza mental", "Calmante"], sabores: ["Terroso", "Herbáceo", "Pinho"], beneficiosSaude: ["Epilepsia", "Ansiedade", "Inflamação", "Dor crônica"], origem: "EUA — Irmãos Stanley", florescimento: "9-12 semanas", dificuldade: "Moderada", rendimento: "400-500g/m²", avaliacao: 4.9 },

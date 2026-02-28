@@ -139,21 +139,18 @@ const BibliotecaCientifica = () => {
 
                     <div className="w-20 h-20 mx-auto mb-3 rounded-xl overflow-hidden border border-border group-hover:scale-110 transition-transform">
                       <img 
-                        src={strain.imageUrl || getPlantImage(strain.id)}
+                        src={getPlantImage(strain.id)}
                         alt={strain.nome}
                         className="w-full h-full object-cover"
                         loading="lazy"
                         onError={(e) => {
                           const target = e.currentTarget;
-                          if (!target.src.includes("image.pollinations.ai")) {
+                          if (!target.dataset.fallback) {
+                            target.dataset.fallback = "1";
                             target.src = getPlantImageFallback(strain.id);
-                            return;
+                          } else {
+                            target.src = "/placeholder.svg";
                           }
-                          if (!target.src.includes("picsum.photos")) {
-                            target.src = getPlantImageFinalFallback(strain.id);
-                            return;
-                          }
-                          target.src = "/placeholder.svg";
                         }}
                       />
                     </div>
@@ -197,20 +194,17 @@ const BibliotecaCientifica = () => {
                 <div className="flex items-center gap-3">
                   <div className="w-16 h-16 rounded-xl overflow-hidden border border-border flex-shrink-0">
                     <img 
-                      src={selected.imageUrl || getPlantImage(selected.id)}
+                      src={getPlantImage(selected.id)}
                       alt={selected.nome}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const target = e.currentTarget;
-                        if (!target.src.includes("image.pollinations.ai")) {
+                        if (!target.dataset.fallback) {
+                          target.dataset.fallback = "1";
                           target.src = getPlantImageFallback(selected.id);
-                          return;
+                        } else {
+                          target.src = "/placeholder.svg";
                         }
-                        if (!target.src.includes("picsum.photos")) {
-                          target.src = getPlantImageFinalFallback(selected.id);
-                          return;
-                        }
-                        target.src = "/placeholder.svg";
                       }}
                     />
                   </div>

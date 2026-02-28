@@ -16,123 +16,33 @@ export interface CannabisStrain {
   imageUrl?: string;
 }
 
-// Cannabis-specific AI-generated images via pollinations.ai
-// Each strain gets a unique, descriptive prompt for realistic cannabis flower imagery
-const strainVisuals: Record<number, string> = {
-  1: "Charlotte's Web CBD hemp flower, light green buds, minimal trichomes",
-  2: "ACDC cannabis flower, dense green buds with orange pistils",
-  3: "Harlequin sativa cannabis bud, bright green with amber hairs",
-  4: "Cannatonic hybrid cannabis flower, frosty trichomes close up",
-  5: "Ringo's Gift CBD cannabis bud, light green dense nugs",
-  6: "Sour Tsunami cannabis flower, green with crystalline trichomes",
-  7: "Pennywise indica cannabis bud, dark green with purple hues",
-  8: "Harle-Tsu CBD hemp flower, bright green compact buds",
-  9: "Remedy indica cannabis flower, dense dark green buds",
-  10: "Suzy Q CBD cannabis bud, light green with orange hairs",
-  11: "Blue Dream cannabis flower, blue-green buds with orange pistils",
-  12: "OG Kush cannabis bud, dense lime green with heavy trichomes",
-  13: "Granddaddy Purple cannabis flower, deep purple buds with orange hairs",
-  14: "Jack Herer sativa cannabis bud, bright green spear-shaped nugs",
-  15: "Gorilla Glue cannabis flower, extremely resinous sticky buds",
-  16: "Girl Scout Cookies cannabis bud, dark green with purple leaves",
-  17: "White Widow cannabis flower, white crystalline trichomes coating",
-  18: "Northern Lights indica bud, compact dark green with resin",
-  19: "Sour Diesel cannabis flower, light green with red-orange hairs",
-  20: "Amnesia Haze sativa bud, fluffy light green with lemon hairs",
-  21: "Afghan Kush indica cannabis, dark green compact resinous buds",
-  22: "Durban Poison sativa flower, bright green elongated buds",
-  23: "Strawberry Cough cannabis bud, red pistils on green base",
-  24: "AK-47 hybrid cannabis flower, dense green with white trichomes",
-  25: "Bubba Kush indica bud, dark green with purple tints",
-  26: "Cheesy Auto CBD cannabis flower, compact green buds",
-  27: "Gelato hybrid cannabis bud, dark purple and green with orange hairs",
-  28: "Wedding Cake cannabis flower, frosty white trichomes dense buds",
-  29: "Purple Punch indica bud, deep purple with sweet aroma visual",
-  30: "Runtz hybrid cannabis flower, rainbow colors green purple orange",
-  31: "Zkittlez indica cannabis bud, colorful purple green dense",
-  32: "Pineapple Express cannabis flower, golden green tropical buds",
-  33: "Tangie sativa cannabis bud, bright orange hairs on green",
-  34: "Trainwreck hybrid cannabis flower, lime green frosty buds",
-  35: "Cheese indica cannabis bud, dense golden green nugs",
-  36: "Lemon Haze sativa flower, bright yellow-green with citrus trichomes",
-  37: "Skywalker OG indica bud, dark green dense with white frost",
-  38: "Green Crack sativa cannabis flower, bright neon green buds",
-  39: "Bruce Banner hybrid cannabis bud, massive green dense nugs",
-  40: "Mimosa hybrid cannabis flower, bright orange and green buds",
-  41: "MAC cannabis bud, white frosty trichomes purple undertones",
-  42: "Ice Cream Cake indica flower, dark purple green creamy trichomes",
-  43: "Do-Si-Dos indica cannabis bud, purple green dense frosty",
-  44: "Forbidden Fruit indica flower, dark purple cherry colored buds",
-  45: "Cereal Milk hybrid cannabis bud, light green creamy trichomes",
-  46: "Tropicana Cookies sativa flower, purple orange colorful buds",
-  47: "Slurricane indica cannabis bud, deep purple berry colored",
-  48: "Gary Payton hybrid cannabis flower, dense green trichome-heavy",
-  49: "Critical Mass indica bud, massive dense green nugs",
-  50: "Blueberry indica cannabis flower, blue purple tinted buds",
-  51: "Super Lemon Haze sativa bud, bright lemon yellow-green",
-  52: "Platinum OG indica flower, silver-white trichomes on green",
-  53: "Grape Ape indica cannabis bud, deep purple grape colored",
-  54: "Maui Wowie sativa flower, tropical green golden buds",
-  55: "Cherry Pie hybrid cannabis bud, red-pink pistils green base",
-  56: "King Louis XIII indica flower, dark green ultra resinous",
-  57: "Animal Mints hybrid cannabis bud, mint green frosty dense",
-  58: "Sunset Sherbet indica flower, orange purple sunset colors",
-  59: "Dosidos indica cannabis bud, lime green purple frosty",
-  60: "Sundae Driver hybrid flower, colorful green purple cream",
-  61: "Purple Haze sativa cannabis bud, purple haze colored fluffy",
-  62: "White Rhino indica flower, white trichome covered dense",
-  63: "Super Silver Haze sativa bud, silver-green elongated nugs",
-  64: "Banana Kush indica cannabis flower, yellow-green banana shaped",
-  65: "Blackberry Kush indica bud, dark blackberry purple buds",
-  66: "LA Confidential indica flower, dark green compact resinous",
-  67: "Thin Mint GSC hybrid cannabis bud, dark green minty trichomes",
-  68: "Master Kush indica flower, classic green dense resinous buds",
-  69: "G13 indica cannabis bud, legendary dense green frosty",
-  70: "Hawaiian Snow sativa flower, bright green tropical buds",
-  71: "Kali Mist sativa cannabis bud, wispy light green hairs",
-  72: "WiFi OG hybrid flower, white fire trichomes green buds",
-  73: "Headband hybrid cannabis bud, OG green with band of trichomes",
-  74: "Chocolope sativa flower, chocolate brown and green buds",
-  75: "Papaya hybrid cannabis bud, tropical orange-green dense",
-  76: "Hindu Kush indica flower, dark green resinous mountain buds",
-  77: "Mango Kush indica cannabis bud, orange mango colored hairs",
-  78: "Orange Cookies hybrid flower, orange pistils green base",
-  79: "Purple Urkle indica cannabis bud, deep dark purple dense",
-  80: "Kosher Kush indica flower, dark green extremely frosty",
-  81: "Grapefruit sativa cannabis bud, pink-orange citrus colored",
-  82: "Golden Goat hybrid flower, golden-green with red hairs",
-  83: "Dutch Treat indica cannabis bud, pale green sweet buds",
-  84: "Lava Cake indica flower, dark purple black with orange hairs",
-  85: "Biscotti hybrid cannabis bud, dark green cookie-shaped dense",
-  86: "Diesel Cannabis sativa flower, pungent green-brown buds",
-  87: "Candyland sativa cannabis bud, golden sugar-coated green",
-  88: "Apple Fritter hybrid flower, green with apple-red undertones",
-  89: "London Pound Cake indica bud, purple vanilla frosted",
-  90: "Trophy Wife hybrid cannabis flower, golden green premium buds",
-  91: "Snowcap sativa cannabis bud, white snow-capped green",
-  92: "Colombian Gold sativa flower, classic golden-green buds",
-  93: "Fire OG indica cannabis bud, fiery orange hairs green base",
-  94: "Strawberry Banana hybrid flower, red and yellow colored buds",
-  95: "Guava cannabis hybrid bud, tropical pink-green dense",
-  96: "Cherry AK-47 hybrid flower, cherry red pistils green",
-  97: "Peanut Butter Breath hybrid bud, brown-green nutty dense",
-  98: "Vanilla Frosting hybrid cannabis flower, white vanilla trichomes",
-  99: "Mochi hybrid cannabis bud, purple green sticky dense",
-  100: "Rainbow Belts hybrid flower, multicolor rainbow buds dense",
-};
+// Curated real cannabis flower photos from Wikimedia Commons (public domain/CC)
+// These are actual cannabis plant photographs - educational/scientific use
+const cannabisPhotos: string[] = [
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Cannabis_sativa_001.JPG/440px-Cannabis_sativa_001.JPG",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Cannabis_sativa_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-026.jpg/440px-Cannabis_sativa_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-026.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Cannabis_sativa_plant_%284%29.JPG/440px-Cannabis_sativa_plant_%284%29.JPG",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Cannabis_sativa_plant_%288%29.JPG/440px-Cannabis_sativa_plant_%288%29.JPG",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Cannabis_flower.jpg/440px-Cannabis_flower.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Cannabis_female_flowers_close-up.jpg/440px-Cannabis_female_flowers_close-up.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Cannabis_macro.jpg/440px-Cannabis_macro.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Marijuana_Bud.jpg/440px-Marijuana_Bud.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Marijuana_plant.jpg/440px-Marijuana_plant.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Hemp_bunch-dried_out_-seeds_close_up_PNr%C2%B00062.jpg/440px-Hemp_bunch-dried_out_-seeds_close_up_PNr%C2%B00062.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Trichomes_Close_Up.jpg/440px-Trichomes_Close_Up.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Macro_cannabis_bud.jpg/440px-Macro_cannabis_bud.jpg",
+];
 
+// Use pollinations.ai with ultra-specific short prompts as primary
 export const getPlantImage = (id: number) => {
-  const visual = strainVisuals[id] || `cannabis flower bud strain ${id}`;
   return `https://image.pollinations.ai/prompt/${encodeURIComponent(
-    `ultra realistic macro photography of ${visual}, professional cannabis photography, studio lighting, dark background, extremely detailed trichomes, 8k quality, botanical documentation style`
-  )}?width=420&height=420&seed=${id}&nologo=true`;
+    `cannabis bud macro photo, dense trichomes, orange pistils, dark background, 4k`
+  )}?width=420&height=420&seed=${id * 7}&nologo=true`;
 };
 
 export const getPlantImageFallback = (id: number) => {
-  const visual = strainVisuals[id] || `cannabis flower bud strain ${id}`;
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(
-    `close up photo of ${visual}, medical cannabis, green plant, macro detail`
-  )}?width=420&height=420&seed=${id + 1000}&nologo=true`;
+  // Cycle through curated real cannabis photos
+  return cannabisPhotos[id % cannabisPhotos.length];
 };
 
 export const getPlantImageFinalFallback = (_id: number) =>

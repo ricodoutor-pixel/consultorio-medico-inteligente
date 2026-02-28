@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { strains, strainCategories, type CannabisStrain } from "@/data/strains";
+import { strains, strainCategories, getPlantImage, type CannabisStrain } from "@/data/strains";
 import { Search, Star, Leaf, X, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -14,16 +14,8 @@ import { Link } from "react-router-dom";
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.04 } } };
 
-const plantImageIds = [
-  "1503262028195-93c528f03218", "1416879595882-3373a0480b5b", "1466692476868-aef1dfb1e735",
-  "1459411552884-841db9b3cc2a", "1490750967868-88aa4f44baee", "1518531933037-91b2f5f229cc",
-  "1523348837708-15d4a09cfac2", "1471193945509-9ad0617afabf", "1487530811176-3780de880c2d",
-  "1501004318855-fce2fc823eb9", "1462275646964-a0e3c11f18a6", "1464226184884-fa280b87c399",
-  "1442458370899-ae20e367c5d8", "1476954789527-4a4e2cc60cf9", "1509223197845-458d87a6c3f4",
-  "1457530378978-8bac673b8062", "1470058869958-2a77d9d5b726", "1426604966848-d7adac402bff",
-  "1485637701894-09ad422f6de6", "1530968831187-a937ade57981",
-];
-const getPlantImageId = (id: number) => plantImageIds[(id - 1) % plantImageIds.length];
+
+
 
 const tipoColor = (tipo: string) => {
   if (tipo === "Sativa") return "text-primary border-green bg-gradient-green";
@@ -147,7 +139,7 @@ const BibliotecaCientifica = () => {
 
                     <div className="w-20 h-20 mx-auto mb-3 rounded-xl overflow-hidden border border-border group-hover:scale-110 transition-transform">
                       <img 
-                        src={strain.imageUrl || `https://images.unsplash.com/photo-${getPlantImageId(strain.id)}?w=200&h=200&fit=crop`}
+                        src={strain.imageUrl || getPlantImage(strain.id)}
                         alt={strain.nome}
                         className="w-full h-full object-cover"
                         loading="lazy"
@@ -194,7 +186,7 @@ const BibliotecaCientifica = () => {
                 <div className="flex items-center gap-3">
                   <div className="w-16 h-16 rounded-xl overflow-hidden border border-border flex-shrink-0">
                     <img 
-                      src={selected.imageUrl || `https://images.unsplash.com/photo-${getPlantImageId(selected.id)}?w=200&h=200&fit=crop`}
+                      src={selected.imageUrl || getPlantImage(selected.id)}
                       alt={selected.nome}
                       className="w-full h-full object-cover"
                       onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}

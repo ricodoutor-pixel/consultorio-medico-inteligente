@@ -16,44 +16,45 @@ export interface CannabisStrain {
   imageUrl?: string;
 }
 
-// Fontes de flores de cannabis + fallback IA para garantir 100 cards com imagem
-const qualityKeywords = [
-  "premium",
-  "indoor",
-  "outdoor",
-  "trichomes",
-  "resin",
-  "dense-buds",
-  "sativa",
-  "indica",
-  "hybrid",
-  "medical",
-  "organic",
-  "artisan",
-  "greenhouse",
-  "craft",
-  "top-shelf",
-  "exotic",
-  "terpenes",
-  "frosty",
-  "purple-bud",
-  "lime-bud",
+// Cannabis flower images via pollinations.ai — unique per strain
+const strainVisuals: string[] = [
+  "purple kush dense buds covered in trichomes",
+  "bright green sativa flower with orange hairs",
+  "frosty indica nug macro shot crystal trichomes",
+  "golden amber cannabis bud close up resinous",
+  "deep purple cannabis flower premium quality",
+  "lime green sativa buds with red pistils",
+  "dense hybrid cannabis nug covered in crystals",
+  "dark green indica flower with thick trichomes",
+  "exotic cannabis bud orange and purple colors",
+  "medical grade cannabis flower pristine quality",
+  "organic outdoor grown cannabis bud natural light",
+  "indoor hydroponic cannabis flower dense compact",
+  "artisan craft cannabis nug white trichomes",
+  "top shelf exotic cannabis bud vibrant colors",
+  "greenhouse cannabis flower mature ready harvest",
+  "frosty purple cannabis bud macro photography",
+  "sativa dominant cannabis flower long thin buds",
+  "indica dominant cannabis nug round dense shape",
+  "hybrid cannabis flower balanced bud structure",
+  "premium cannabis bud glistening resin droplets",
 ];
 
 const plantImages: Record<number, string> = {};
 for (let i = 1; i <= 100; i++) {
-  const quality = qualityKeywords[(i - 1) % qualityKeywords.length];
-  plantImages[i] = `https://source.unsplash.com/300x300/?cannabis,bud,flower,macro,${quality}&sig=${2000 + i}`;
+  const visual = strainVisuals[(i - 1) % strainVisuals.length];
+  const prompt = encodeURIComponent(`ultra realistic macro photo of cannabis flower bud, ${visual}, no people, no text, professional photography, bokeh background`);
+  plantImages[i] = `https://image.pollinations.ai/prompt/${prompt}?width=300&height=300&seed=${7000 + i}&nologo=true`;
 }
 
 export const getPlantImage = (id: number) =>
-  plantImages[id] || `https://source.unsplash.com/300x300/?cannabis,bud,flower,macro&sig=${5000 + id}`;
+  plantImages[id] || `https://image.pollinations.ai/prompt/${encodeURIComponent("cannabis flower bud macro photo detailed trichomes")}?width=300&height=300&seed=${5000 + id}&nologo=true`;
 
 export const getPlantImageFallback = (id: number) => {
   const prompt = encodeURIComponent(
-    `ultra realistic macro photo of cannabis flower bud, no people, different quality grade ${id}, detailed trichomes`
+    `realistic cannabis marijuana flower bud close up, dense trichomes, quality grade ${id}, no people no text`
   );
-  return `https://image.pollinations.ai/prompt/${prompt}?width=300&height=300&seed=${9000 + id}`;
+  return `https://image.pollinations.ai/prompt/${prompt}?width=300&height=300&seed=${9000 + id}&nologo=true`;
 };
 
 export const strains: CannabisStrain[] = [

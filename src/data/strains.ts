@@ -16,33 +16,51 @@ export interface CannabisStrain {
   imageUrl?: string;
 }
 
-// Curated real cannabis flower photos from Wikimedia Commons (public domain/CC)
-// These are actual cannabis plant photographs - educational/scientific use
-const cannabisPhotos: string[] = [
+// High-quality cannabis photos from Unsplash (free, commercial use)
+// Each strain gets a unique, deterministic photo based on its ID
+const unsplashCannabisPhotos: string[] = [
+  "https://images.unsplash.com/photo-1603909223429-69bb7101a5e4?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1616690002498-7b1a0e4c01e4?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1589484484776-2c28d96a1a16?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1587316745903-a19d1946cbaf?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1585063560108-fba0a2f5c25f?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1567857177791-77de3e17d649?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1560036515-4564b5e27e35?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1536819114556-1e10f967fb61?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1604660437530-dbb97a0cb96c?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1518568740969-24cf3a2a5dce?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1605039832819-0ca04e7eba85?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1591032621478-009eb0ce26ba?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1602168432685-3c5e40fee834?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1565799511073-ac6c66bc5da4?w=420&h=420&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1611070794963-bc9a8b6c39d8?w=420&h=420&fit=crop&crop=center",
+];
+
+// Wikimedia Commons botanical photos as fallback
+const wikiCannabisPhotos: string[] = [
   "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Cannabis_sativa_001.JPG/440px-Cannabis_sativa_001.JPG",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Cannabis_sativa_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-026.jpg/440px-Cannabis_sativa_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-026.jpg",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Cannabis_sativa_plant_%284%29.JPG/440px-Cannabis_sativa_plant_%284%29.JPG",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Cannabis_sativa_plant_%288%29.JPG/440px-Cannabis_sativa_plant_%288%29.JPG",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Cannabis_flower.jpg/440px-Cannabis_flower.jpg",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Cannabis_female_flowers_close-up.jpg/440px-Cannabis_female_flowers_close-up.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Cannabis_macro.jpg/440px-Cannabis_macro.jpg",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Marijuana_Bud.jpg/440px-Marijuana_Bud.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Marijuana_plant.jpg/440px-Marijuana_plant.jpg",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Hemp_bunch-dried_out_-seeds_close_up_PNr%C2%B00062.jpg/440px-Hemp_bunch-dried_out_-seeds_close_up_PNr%C2%B00062.jpg",
   "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Trichomes_Close_Up.jpg/440px-Trichomes_Close_Up.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Macro_cannabis_bud.jpg/440px-Macro_cannabis_bud.jpg",
 ];
 
-// Use pollinations.ai with ultra-specific short prompts as primary
+// Primary: Unsplash high-quality cannabis photos
 export const getPlantImage = (id: number) => {
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(
-    `cannabis bud macro photo, dense trichomes, orange pistils, dark background, 4k`
-  )}?width=420&height=420&seed=${id * 7}&nologo=true`;
+  return unsplashCannabisPhotos[(id - 1) % unsplashCannabisPhotos.length];
 };
 
+// Fallback: Wikimedia Commons botanical photos
 export const getPlantImageFallback = (id: number) => {
-  // Cycle through curated real cannabis photos
-  return cannabisPhotos[id % cannabisPhotos.length];
+  return wikiCannabisPhotos[(id - 1) % wikiCannabisPhotos.length];
 };
 
 export const getPlantImageFinalFallback = (_id: number) =>

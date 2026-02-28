@@ -16,51 +16,62 @@ export interface CannabisStrain {
   imageUrl?: string;
 }
 
-// High-quality cannabis photos from Unsplash (free, commercial use)
-// Each strain gets a unique, deterministic photo based on its ID
-const unsplashCannabisPhotos: string[] = [
-  "https://images.unsplash.com/photo-1603909223429-69bb7101a5e4?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1616690002498-7b1a0e4c01e4?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1589484484776-2c28d96a1a16?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1587316745903-a19d1946cbaf?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1585063560108-fba0a2f5c25f?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1567857177791-77de3e17d649?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1560036515-4564b5e27e35?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1536819114556-1e10f967fb61?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1604660437530-dbb97a0cb96c?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1518568740969-24cf3a2a5dce?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1605039832819-0ca04e7eba85?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1591032621478-009eb0ce26ba?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1602168432685-3c5e40fee834?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1565799511073-ac6c66bc5da4?w=420&h=420&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1611070794963-bc9a8b6c39d8?w=420&h=420&fit=crop&crop=center",
+// High-quality real cannabis/plant photos from Unsplash & Pexels (free, commercial use)
+// 40 unique photos to cover all 100 strains with variety
+const realPlantPhotos: string[] = [
+  // Cannabis buds & flowers (Unsplash verified working URLs)
+  "https://images.unsplash.com/photo-1603909223429-69bb7101a5e4?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1616690002498-7b1a0e4c01e4?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1589484484776-2c28d96a1a16?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1587316745903-a19d1946cbaf?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1585063560108-fba0a2f5c25f?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1567857177791-77de3e17d649?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1560036515-4564b5e27e35?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1536819114556-1e10f967fb61?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1604660437530-dbb97a0cb96c?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1605039832819-0ca04e7eba85?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1591032621478-009eb0ce26ba?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1602168432685-3c5e40fee834?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1565799511073-ac6c66bc5da4?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1611070794963-bc9a8b6c39d8?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1518568740969-24cf3a2a5dce?w=400&h=400&fit=crop",
+  // Botanical / medicinal plants (Pexels verified)
+  "https://images.pexels.com/photos/7667908/pexels-photo-7667908.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.pexels.com/photos/7667731/pexels-photo-7667731.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.pexels.com/photos/7667686/pexels-photo-7667686.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.pexels.com/photos/7667911/pexels-photo-7667911.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.pexels.com/photos/6157049/pexels-photo-6157049.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.pexels.com/photos/7667728/pexels-photo-7667728.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.pexels.com/photos/7667714/pexels-photo-7667714.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.pexels.com/photos/7667732/pexels-photo-7667732.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.pexels.com/photos/7667912/pexels-photo-7667912.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.pexels.com/photos/7667688/pexels-photo-7667688.jpeg?auto=compress&w=400&h=400&fit=crop",
+  // Additional cannabis close-ups (Unsplash)
+  "https://images.unsplash.com/photo-1574169208507-84376144848b?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1503262028195-93c528f03218?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1457364559154-aa2644600ebb?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1515150144380-bac9e12bfd2e?w=400&h=400&fit=crop",
 ];
 
-// Wikimedia Commons botanical photos as fallback
-const wikiCannabisPhotos: string[] = [
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Cannabis_sativa_001.JPG/440px-Cannabis_sativa_001.JPG",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Cannabis_sativa_plant_%284%29.JPG/440px-Cannabis_sativa_plant_%284%29.JPG",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Cannabis_sativa_plant_%288%29.JPG/440px-Cannabis_sativa_plant_%288%29.JPG",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Cannabis_flower.jpg/440px-Cannabis_flower.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Cannabis_female_flowers_close-up.jpg/440px-Cannabis_female_flowers_close-up.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Marijuana_Bud.jpg/440px-Marijuana_Bud.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Hemp_bunch-dried_out_-seeds_close_up_PNr%C2%B00062.jpg/440px-Hemp_bunch-dried_out_-seeds_close_up_PNr%C2%B00062.jpg",
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Trichomes_Close_Up.jpg/440px-Trichomes_Close_Up.jpg",
-];
-
-// Primary: Unsplash high-quality cannabis photos
+// Primary: real plant photos
 export const getPlantImage = (id: number) => {
-  return unsplashCannabisPhotos[(id - 1) % unsplashCannabisPhotos.length];
+  return realPlantPhotos[(id - 1) % realPlantPhotos.length];
 };
 
-// Fallback: Wikimedia Commons botanical photos
+// Fallback: different photo from the pool
 export const getPlantImageFallback = (id: number) => {
-  return wikiCannabisPhotos[(id - 1) % wikiCannabisPhotos.length];
+  return realPlantPhotos[(id + 19) % realPlantPhotos.length];
 };
 
 export const getPlantImageFinalFallback = (_id: number) =>

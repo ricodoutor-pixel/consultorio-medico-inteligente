@@ -1,8 +1,6 @@
 import { useState, memo } from "react";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
-import verdinhoKiss from "@/assets/verdinho-kiss.jpg";
-import verdinhoScepter from "@/assets/verdinho-scepter.jpg";
+import verdinhoFrog from "@/assets/verdinho-frog.png";
 
 interface FrogMascotProps {
   onClick?: () => void;
@@ -11,41 +9,28 @@ interface FrogMascotProps {
 
 export const FrogMascot = memo(({ onClick, size = 56 }: FrogMascotProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [imageIndex, setImageIndex] = useState(0);
-
-  const images = [verdinhoKiss, verdinhoScepter];
-
-  const handleClick = () => {
-    setImageIndex((prev) => (prev + 1) % 2);
-    onClick?.();
-  };
 
   return (
     <motion.button
-      onClick={handleClick}
+      onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={cn("cursor-pointer select-none focus:outline-none relative")}
+      className="cursor-pointer select-none focus:outline-none relative"
       aria-label="Pergunte ao Verdinho — Assistente IA"
       title="Pergunte ao Verdinho 🐸"
       whileTap={{ scale: 0.9 }}
-      whileHover={{ scale: 1.1 }}
-      animate={{ y: [0, -4, 0] }}
+      whileHover={{ scale: 1.12 }}
+      animate={{ y: [0, -3, 0] }}
       transition={{ y: { duration: 2, repeat: Infinity, ease: "easeInOut" } }}
     >
       <img
-        src={images[imageIndex]}
+        src={verdinhoFrog}
         alt="Verdinho - Assistente IA"
-        className="rounded-full object-cover border-2 border-primary/40"
-        style={{
-          width: size,
-          height: size,
-          filter: "drop-shadow(0 2px 6px hsl(152 80% 45% / 0.35))",
-        }}
+        className="object-contain"
+        style={{ width: size, height: size }}
         draggable={false}
       />
 
-      {/* Hover tooltip */}
       {isHovered && (
         <motion.div
           className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full text-[9px] font-bold pointer-events-none bg-primary/20 border border-primary/30 text-primary"

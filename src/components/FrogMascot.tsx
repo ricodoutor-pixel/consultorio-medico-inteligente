@@ -8,7 +8,7 @@ interface FrogMascotProps {
   jumpDistance?: number;
 }
 
-type FrogPhase = "rest" | "jump" | "wave" | "thinking";
+type FrogPhase = "rest" | "jump" | "prince" | "wave";
 
 export const FrogMascot = ({ onClick, size = 60, jumpDistance = 90 }: FrogMascotProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -26,18 +26,19 @@ export const FrogMascot = ({ onClick, size = 60, jumpDistance = 90 }: FrogMascot
   const isCompact = size < 40;
   const effectiveJumpDistance = isCompact || reduceMotion ? 0 : jumpDistance;
   const stageWidth = isCompact ? size + 10 : size + effectiveJumpDistance + 28;
-  const stageHeight = isCompact ? size * 1.45 : size * 2.1;
+  const stageHeight = isCompact ? size * 2 : size * 2.6;
 
   const isJumping = phase === "jump";
+  const isPrince = phase === "prince";
   const isWaving = phase === "wave";
-  const isThinking = phase === "thinking";
 
+  // Phase cycle: rest → prince (standing, smiling, moving limbs) → jump (hops toward menu and back) → rest
   useEffect(() => {
     if (reduceMotion) return;
 
     if (isCompact) {
       let idx = 0;
-      const compactPhases: FrogPhase[] = ["rest", "wave", "rest", "thinking"];
+      const compactPhases: FrogPhase[] = ["rest", "prince", "rest", "wave"];
       const interval = setInterval(() => {
         idx = (idx + 1) % compactPhases.length;
         setPhase(compactPhases[idx]);
@@ -45,27 +46,35 @@ export const FrogMascot = ({ onClick, size = 60, jumpDistance = 90 }: FrogMascot
       return () => clearInterval(interval);
     }
 
-    const interval = setInterval(() => {
-      setPhase("jump");
-      window.setTimeout(() => setPhase("rest"), 1650);
-    }, 3000);
-
-    return () => clearInterval(interval);
+    // Cycle: rest(3s) → prince(3s) → jump(1.65s) → rest
+    let timeout: number;
+    const cycle = () => {
+      setPhase("prince");
+      timeout = window.setTimeout(() => {
+        setPhase("jump");
+        timeout = window.setTimeout(() => {
+          setPhase("rest");
+          timeout = window.setTimeout(cycle, 3000);
+        }, 1650);
+      }, 3000);
+    };
+    timeout = window.setTimeout(cycle, 2000);
+    return () => clearTimeout(timeout);
   }, [isCompact, reduceMotion]);
 
+  // Blinking
   useEffect(() => {
     const blink = () => {
       setIsBlinking(true);
       window.setTimeout(() => setIsBlinking(false), 130);
     };
-
     const interval = setInterval(() => {
       if (Math.random() > 0.58) blink();
     }, 2700);
-
     return () => clearInterval(interval);
   }, []);
 
+  // Smooth pupil tracking
   const animatePupils = useCallback(() => {
     const lerp = 0.14;
     currentOffset.current.x += (targetOffset.current.x - currentOffset.current.x) * lerp;
@@ -79,26 +88,24 @@ export const FrogMascot = ({ onClick, size = 60, jumpDistance = 90 }: FrogMascot
     return () => cancelAnimationFrame(frameRef.current);
   }, [animatePupils]);
 
+  // Mouse tracking for eyes
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       if (!svgRef.current) return;
       const rect = svgRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-
       const dx = event.clientX - centerX;
       const dy = event.clientY - centerY;
       const distance = Math.hypot(dx, dy);
       const clampedDistance = Math.min(distance / 130, 1);
       const angle = Math.atan2(dy, dx);
-      const maxOffset = 3.2;
-
+      const maxOffset = 2.8;
       targetOffset.current = {
         x: Math.cos(angle) * maxOffset * clampedDistance,
         y: Math.sin(angle) * maxOffset * clampedDistance,
       };
     };
-
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
@@ -113,11 +120,10 @@ export const FrogMascot = ({ onClick, size = 60, jumpDistance = 90 }: FrogMascot
     onClick?.();
   };
 
-  const mouthPath = isJumping || isClicked
-    ? "M 18 33 Q 30 46 42 33"
-    : isThinking
-    ? "M 24 34 Q 30 36 36 34"
-    : "M 20 33 Q 30 40 40 33";
+  // Wide smile when prince/jumping/clicked, normal smile otherwise
+  const mouthPath = isPrince || isJumping || isClicked
+    ? "M 28 42 Q 40 56 52 42"
+    : "M 30 42 Q 40 50 50 42";
 
   return (
     <div className="relative overflow-visible" style={{ width: stageWidth, height: stageHeight }}>
@@ -133,7 +139,7 @@ export const FrogMascot = ({ onClick, size = 60, jumpDistance = 90 }: FrogMascot
           isJumping && !isCompact
             ? {
                 x: [0, effectiveJumpDistance, effectiveJumpDistance * 0.3, 0],
-                y: [0, -size * 0.3, -size * 0.12, 0],
+                y: [0, -size * 0.4, -size * 0.15, 0],
               }
             : { x: 0, y: 0 }
         }
@@ -143,143 +149,129 @@ export const FrogMascot = ({ onClick, size = 60, jumpDistance = 90 }: FrogMascot
             : { duration: 0.45, ease: "easeOut" }
         }
       >
-        <svg ref={svgRef} viewBox="0 0 64 76" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: size, height: size * 1.2 }}>
+        {/* Full-body standing frog SVG — based on cartoon reference */}
+        <svg
+          ref={svgRef}
+          viewBox="0 0 80 120"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ width: size, height: size * 1.5 }}
+        >
           <defs>
-            <radialGradient id="frogHead" cx="0.38" cy="0.25" r="0.75">
-              <stop offset="0%" stopColor="hsl(var(--primary))" />
-              <stop offset="100%" stopColor="hsl(135 66% 38%)" />
+            <radialGradient id="frogBody" cx="0.4" cy="0.3" r="0.7">
+              <stop offset="0%" stopColor="hsl(120 60% 55%)" />
+              <stop offset="100%" stopColor="hsl(120 55% 38%)" />
             </radialGradient>
-            <radialGradient id="frogBelly" cx="0.5" cy="0.4" r="0.8">
-              <stop offset="0%" stopColor="hsl(50 85% 94%)" />
-              <stop offset="100%" stopColor="hsl(54 72% 86%)" />
+            <radialGradient id="frogBelly" cx="0.5" cy="0.35" r="0.6">
+              <stop offset="0%" stopColor="hsl(55 90% 88%)" />
+              <stop offset="100%" stopColor="hsl(52 70% 75%)" />
+            </radialGradient>
+            <radialGradient id="eyeGlow" cx="0.4" cy="0.3" r="0.6">
+              <stop offset="0%" stopColor="hsl(42 95% 65%)" />
+              <stop offset="100%" stopColor="hsl(30 90% 50%)" />
             </radialGradient>
           </defs>
 
+          {/* === CROWN (golden, 5 spikes) === */}
           <motion.g
-            animate={{ y: [0, -1.5, 0], scale: [1, 1.02, 1] }}
+            animate={{ y: [0, -1.5, 0] }}
             transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
           >
             <polygon
-              points="18,10 22,1 27,7 32,-1 37,7 42,1 46,10"
+              points="27,14 30,4 34,10 37,0 40,10 43,2 47,8 50,4 53,14"
               fill="hsl(45 96% 52%)"
               stroke="hsl(42 88% 40%)"
-              strokeWidth="0.7"
+              strokeWidth="0.8"
             />
+            {/* Crown jewels */}
+            <circle cx="37" cy="7" r="1.5" fill="hsl(0 70% 50%)" />
+            <circle cx="43" cy="6" r="1" fill="hsl(200 70% 50%)" />
+            <circle cx="31" cy="8" r="1" fill="hsl(280 60% 55%)" />
             <motion.circle
-              cx="32"
-              cy="4"
-              r="12"
+              cx="37" cy="3" r="8"
               fill="hsl(48 100% 70%)"
-              animate={{ opacity: [0.06, 0.18, 0.06], scale: [0.9, 1.08, 0.9] }}
+              animate={{ opacity: [0.04, 0.14, 0.04], scale: [0.9, 1.1, 0.9] }}
               transition={{ duration: 2.2, repeat: Infinity }}
             />
           </motion.g>
 
-          <ellipse cx="32" cy="48" rx="16" ry="10" fill="url(#frogHead)" />
-          <ellipse cx="32" cy="49" rx="11" ry="7" fill="url(#frogBelly)" opacity="0.92" />
+          {/* === HEAD (large, round) === */}
+          <ellipse cx="40" cy="28" rx="18" ry="16" fill="url(#frogBody)" />
 
-          <motion.g
-            animate={isJumping ? { rotate: [0, -12, 10, 0] } : isThinking ? { rotate: [0, 6, 0] } : { rotate: 0 }}
-            transition={{ duration: 0.8, repeat: isJumping ? Infinity : 0 }}
-            style={{ transformOrigin: "9px 57px" }}
-          >
-            <line x1="9" y1="32" x2="9" y2="67" stroke="hsl(45 94% 52%)" strokeWidth="2" strokeLinecap="round" />
-            <circle cx="9" cy="30" r="3.8" fill="hsl(var(--destructive))" />
-            <circle cx="9" cy="30" r="2.1" fill="hsl(0 82% 74%)" opacity="0.65" />
-          </motion.g>
+          {/* Dark green spots on head */}
+          <circle cx="28" cy="24" r="1.8" fill="hsl(130 50% 30%)" opacity="0.5" />
+          <circle cx="52" cy="24" r="1.8" fill="hsl(130 50% 30%)" opacity="0.5" />
+          <circle cx="35" cy="38" r="1.3" fill="hsl(130 50% 30%)" opacity="0.35" />
+          <circle cx="46" cy="37" r="1.2" fill="hsl(130 50% 30%)" opacity="0.3" />
 
-          <motion.ellipse
-            cx="17"
-            cy="46"
-            rx="6"
-            ry="3.2"
-            fill="hsl(136 66% 35%)"
-            animate={{ rotate: isJumping ? [0, -30, 20, 0] : isWaving ? [0, -22, 15, -22, 0] : 0 }}
-            transition={{ duration: isWaving ? 0.7 : 0.55, repeat: isWaving || isJumping ? Infinity : 0 }}
-            style={{ transformOrigin: "23px 46px" }}
-          />
-          <motion.ellipse
-            cx="47"
-            cy="46"
-            rx="6"
-            ry="3.2"
-            fill="hsl(136 66% 35%)"
-            animate={{ rotate: isJumping ? [0, 30, -20, 0] : isWaving ? [0, 26, -18, 26, 0] : isThinking ? [0, 16, 0] : 0 }}
-            transition={{ duration: isWaving ? 0.7 : 0.55, repeat: isWaving || isJumping ? Infinity : 0 }}
-            style={{ transformOrigin: "41px 46px" }}
-          />
+          {/* === EYES (big, orange/yellow with dark pupils) === */}
+          {/* Left eye bulge */}
+          <circle cx="31" cy="18" r="9" fill="hsl(120 55% 45%)" />
+          <circle cx="31" cy="17" r="7" fill="url(#eyeGlow)" />
+          {/* Right eye bulge */}
+          <circle cx="49" cy="18" r="9" fill="hsl(120 55% 45%)" />
+          <circle cx="49" cy="17" r="7" fill="url(#eyeGlow)" />
 
-          <motion.ellipse
-            cx="22"
-            cy="67"
-            rx="8"
-            ry="3.4"
-            fill="hsl(136 62% 34%)"
-            animate={isJumping ? { y: [0, -4, 0], rotate: [0, -12, 0] } : { y: 0, rotate: 0 }}
-            transition={{ duration: 0.45, repeat: isJumping ? Infinity : 0 }}
-          />
-          <motion.ellipse
-            cx="42"
-            cy="67"
-            rx="8"
-            ry="3.4"
-            fill="hsl(136 62% 34%)"
-            animate={isJumping ? { y: [0, -4, 0], rotate: [0, 12, 0] } : { y: 0, rotate: 0 }}
-            transition={{ duration: 0.45, repeat: isJumping ? Infinity : 0, delay: 0.22 }}
-          />
-
-          <ellipse cx="32" cy="28" rx="21" ry="17" fill="url(#frogHead)" />
-
-          <circle cx="18" cy="23" r="1.5" fill="hsl(136 58% 30%)" opacity="0.55" />
-          <circle cx="46" cy="23" r="1.5" fill="hsl(136 58% 30%)" opacity="0.55" />
-          <circle cx="24" cy="36" r="1.4" fill="hsl(136 58% 30%)" opacity="0.32" />
-          <circle cx="40" cy="36" r="1.4" fill="hsl(136 58% 30%)" opacity="0.32" />
-
-          <circle cx="22" cy="18" r="9.2" fill="hsl(132 64% 46%)" />
-          <circle cx="42" cy="18" r="9.2" fill="hsl(132 64% 46%)" />
-          <circle cx="22" cy="17" r="6.6" fill="hsl(var(--background))" />
-          <circle cx="42" cy="17" r="6.6" fill="hsl(var(--background))" />
-
-          {!isBlinking && !isThinking && (
+          {/* Pupils (track mouse) */}
+          {!isBlinking && (
             <>
-              <circle cx={22 + pupilOffset.x} cy={17 + pupilOffset.y} r={3.8} fill="hsl(var(--foreground))" />
-              <circle cx={42 + pupilOffset.x} cy={17 + pupilOffset.y} r={3.8} fill="hsl(var(--foreground))" />
-              <circle cx={20.7 + pupilOffset.x * 0.85} cy={15.8 + pupilOffset.y * 0.85} r={1.1} fill="hsl(var(--background))" opacity="0.95" />
-              <circle cx={40.7 + pupilOffset.x * 0.85} cy={15.8 + pupilOffset.y * 0.85} r={1.1} fill="hsl(var(--background))" opacity="0.95" />
+              <circle
+                cx={31 + pupilOffset.x}
+                cy={17 + pupilOffset.y}
+                r={3.5}
+                fill="hsl(0 0% 10%)"
+              />
+              <circle
+                cx={49 + pupilOffset.x}
+                cy={17 + pupilOffset.y}
+                r={3.5}
+                fill="hsl(0 0% 10%)"
+              />
+              {/* Eye highlights */}
+              <circle
+                cx={29.5 + pupilOffset.x * 0.7}
+                cy={15.5 + pupilOffset.y * 0.7}
+                r={1.3}
+                fill="hsl(0 0% 100%)"
+                opacity="0.9"
+              />
+              <circle
+                cx={47.5 + pupilOffset.x * 0.7}
+                cy={15.5 + pupilOffset.y * 0.7}
+                r={1.3}
+                fill="hsl(0 0% 100%)"
+                opacity="0.9"
+              />
             </>
           )}
 
-          {isThinking && !isBlinking && (
-            <>
-              <line x1="16" y1="17" x2="28" y2="17" stroke="hsl(var(--foreground))" strokeWidth="1.6" strokeLinecap="round" />
-              <line x1="36" y1="17" x2="48" y2="17" stroke="hsl(var(--foreground))" strokeWidth="1.6" strokeLinecap="round" />
-            </>
-          )}
-
+          {/* Blinking eyelids */}
           {isBlinking && (
             <>
-              <ellipse cx="22" cy="17" rx="6.6" ry="2" fill="hsl(132 64% 46%)" />
-              <ellipse cx="42" cy="17" rx="6.6" ry="2" fill="hsl(132 64% 46%)" />
+              <ellipse cx="31" cy="17" rx="7" ry="2" fill="hsl(120 55% 45%)" />
+              <ellipse cx="49" cy="17" rx="7" ry="2" fill="hsl(120 55% 45%)" />
             </>
           )}
 
+          {/* === MOUTH (wide smile) === */}
           <motion.path
             d={mouthPath}
-            stroke="hsl(var(--foreground))"
-            strokeWidth="1.8"
+            stroke="hsl(0 0% 15%)"
+            strokeWidth="1.6"
             fill="none"
             strokeLinecap="round"
             transition={{ duration: 0.25 }}
           />
 
+          {/* Open mouth interior when smiling big */}
           <AnimatePresence>
-            {(isJumping || isClicked) && (
+            {(isPrince || isJumping || isClicked) && (
               <motion.ellipse
-                cx="32"
-                cy="38"
-                rx="5.2"
-                ry="3.8"
-                fill="hsl(356 70% 52%)"
+                cx="40"
+                cy="46"
+                rx="6"
+                ry="4"
+                fill="hsl(0 65% 45%)"
                 initial={{ opacity: 0, scaleY: 0 }}
                 animate={{ opacity: 1, scaleY: 1 }}
                 exit={{ opacity: 0, scaleY: 0 }}
@@ -287,8 +279,132 @@ export const FrogMascot = ({ onClick, size = 60, jumpDistance = 90 }: FrogMascot
               />
             )}
           </AnimatePresence>
+
+          {/* === BODY (torso) === */}
+          <ellipse cx="40" cy="62" rx="15" ry="20" fill="url(#frogBody)" />
+          {/* Belly */}
+          <ellipse cx="40" cy="64" rx="10" ry="15" fill="url(#frogBelly)" opacity="0.92" />
+
+          {/* Body spots */}
+          <circle cx="28" cy="55" r="2" fill="hsl(130 50% 30%)" opacity="0.4" />
+          <circle cx="52" cy="58" r="1.8" fill="hsl(130 50% 30%)" opacity="0.4" />
+          <circle cx="30" cy="70" r="1.5" fill="hsl(130 50% 30%)" opacity="0.35" />
+          <circle cx="50" cy="72" r="1.6" fill="hsl(130 50% 30%)" opacity="0.35" />
+
+          {/* === LEFT ARM (open, with fingers) === */}
+          <motion.g
+            animate={
+              isPrince
+                ? { rotate: [0, -15, 10, -15, 0] }
+                : isWaving
+                ? { rotate: [0, -25, 15, -25, 0] }
+                : isJumping
+                ? { rotate: [0, -30, 20, 0] }
+                : { rotate: 0 }
+            }
+            transition={{
+              duration: isPrince ? 1.5 : isWaving ? 0.7 : 0.55,
+              repeat: isPrince || isWaving || isJumping ? Infinity : 0,
+            }}
+            style={{ transformOrigin: "26px 52px" }}
+          >
+            {/* Upper arm */}
+            <ellipse cx="18" cy="50" rx="6" ry="3" fill="hsl(120 55% 42%)" transform="rotate(-30 18 50)" />
+            {/* Lower arm */}
+            <ellipse cx="10" cy="45" rx="5" ry="2.5" fill="hsl(120 55% 42%)" transform="rotate(-50 10 45)" />
+            {/* Hand with fingers */}
+            <circle cx="6" cy="40" r="2.5" fill="hsl(120 58% 48%)" />
+            <circle cx="3" cy="37" r="1.5" fill="hsl(120 58% 48%)" />
+            <circle cx="5" cy="36" r="1.5" fill="hsl(120 58% 48%)" />
+            <circle cx="8" cy="37" r="1.5" fill="hsl(120 58% 48%)" />
+            <circle cx="9" cy="39" r="1.3" fill="hsl(120 58% 48%)" />
+          </motion.g>
+
+          {/* === RIGHT ARM (open, with fingers) === */}
+          <motion.g
+            animate={
+              isPrince
+                ? { rotate: [0, 15, -10, 15, 0] }
+                : isWaving
+                ? { rotate: [0, 25, -15, 25, 0] }
+                : isJumping
+                ? { rotate: [0, 30, -20, 0] }
+                : { rotate: 0 }
+            }
+            transition={{
+              duration: isPrince ? 1.5 : isWaving ? 0.7 : 0.55,
+              repeat: isPrince || isWaving || isJumping ? Infinity : 0,
+            }}
+            style={{ transformOrigin: "54px 52px" }}
+          >
+            <ellipse cx="62" cy="50" rx="6" ry="3" fill="hsl(120 55% 42%)" transform="rotate(30 62 50)" />
+            <ellipse cx="70" cy="45" rx="5" ry="2.5" fill="hsl(120 55% 42%)" transform="rotate(50 70 45)" />
+            <circle cx="74" cy="40" r="2.5" fill="hsl(120 58% 48%)" />
+            <circle cx="77" cy="37" r="1.5" fill="hsl(120 58% 48%)" />
+            <circle cx="75" cy="36" r="1.5" fill="hsl(120 58% 48%)" />
+            <circle cx="72" cy="37" r="1.5" fill="hsl(120 58% 48%)" />
+            <circle cx="71" cy="39" r="1.3" fill="hsl(120 58% 48%)" />
+          </motion.g>
+
+          {/* === SCEPTER (in right hand area) === */}
+          <motion.g
+            animate={isPrince ? { rotate: [0, 5, -5, 0] } : { rotate: 0 }}
+            transition={{ duration: 1.2, repeat: isPrince ? Infinity : 0 }}
+            style={{ transformOrigin: "72px 55px" }}
+          >
+            <line x1="72" y1="30" x2="72" y2="60" stroke="hsl(45 94% 52%)" strokeWidth="1.8" strokeLinecap="round" />
+            <circle cx="72" cy="28" r="3.2" fill="hsl(0 70% 50%)" />
+            <circle cx="72" cy="28" r="1.8" fill="hsl(0 82% 70%)" opacity="0.6" />
+          </motion.g>
+
+          {/* === LEFT LEG (frog-like, bent) === */}
+          <motion.g
+            animate={
+              isJumping
+                ? { y: [0, -6, 0], rotate: [0, -15, 0] }
+                : isPrince
+                ? { rotate: [0, -5, 5, 0] }
+                : { y: 0, rotate: 0 }
+            }
+            transition={{ duration: 0.5, repeat: isJumping || isPrince ? Infinity : 0 }}
+            style={{ transformOrigin: "32px 78px" }}
+          >
+            {/* Thigh */}
+            <ellipse cx="30" cy="82" rx="6" ry="8" fill="hsl(120 55% 42%)" transform="rotate(10 30 82)" />
+            {/* Shin */}
+            <ellipse cx="26" cy="96" rx="4" ry="8" fill="hsl(120 55% 42%)" transform="rotate(-10 26 96)" />
+            {/* Webbed foot */}
+            <ellipse cx="22" cy="106" rx="8" ry="3" fill="hsl(120 55% 42%)" />
+            {/* Toes */}
+            <circle cx="15" cy="105" r="1.8" fill="hsl(120 58% 48%)" />
+            <circle cx="18" cy="103" r="1.5" fill="hsl(120 58% 48%)" />
+            <circle cx="26" cy="103" r="1.5" fill="hsl(120 58% 48%)" />
+            <circle cx="29" cy="105" r="1.8" fill="hsl(120 58% 48%)" />
+          </motion.g>
+
+          {/* === RIGHT LEG (frog-like, bent, slightly lifted in prince pose) === */}
+          <motion.g
+            animate={
+              isJumping
+                ? { y: [0, -6, 0], rotate: [0, 15, 0] }
+                : isPrince
+                ? { rotate: [0, 8, -3, 0], y: [0, -3, 0] }
+                : { y: 0, rotate: 0 }
+            }
+            transition={{ duration: 0.5, repeat: isJumping || isPrince ? Infinity : 0, delay: isJumping ? 0.15 : 0 }}
+            style={{ transformOrigin: "48px 78px" }}
+          >
+            <ellipse cx="50" cy="82" rx="6" ry="8" fill="hsl(120 55% 42%)" transform="rotate(-10 50 82)" />
+            <ellipse cx="54" cy="96" rx="4" ry="8" fill="hsl(120 55% 42%)" transform="rotate(10 54 96)" />
+            <ellipse cx="58" cy="106" rx="8" ry="3" fill="hsl(120 55% 42%)" />
+            <circle cx="51" cy="105" r="1.8" fill="hsl(120 58% 48%)" />
+            <circle cx="54" cy="103" r="1.5" fill="hsl(120 58% 48%)" />
+            <circle cx="62" cy="103" r="1.5" fill="hsl(120 58% 48%)" />
+            <circle cx="65" cy="105" r="1.8" fill="hsl(120 58% 48%)" />
+          </motion.g>
         </svg>
 
+        {/* Jump heart emoji */}
         <AnimatePresence>
           {isJumping && !isCompact && (
             <motion.span
@@ -303,10 +419,11 @@ export const FrogMascot = ({ onClick, size = 60, jumpDistance = 90 }: FrogMascot
           )}
         </AnimatePresence>
 
+        {/* Hover glow */}
         <motion.div
           className="absolute inset-0 rounded-full pointer-events-none"
           style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.24), transparent 72%)" }}
-          animate={{ opacity: isHovered ? 0.82 : [0.18, 0.34, 0.18] }}
+          animate={{ opacity: isHovered ? 0.82 : [0.1, 0.25, 0.1] }}
           transition={{ duration: 2.6, repeat: Infinity }}
         />
       </motion.button>

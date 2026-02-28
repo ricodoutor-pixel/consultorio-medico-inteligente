@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { strains, strainCategories, getPlantImage, type CannabisStrain } from "@/data/strains";
+import { strains, strainCategories, getPlantImage, getPlantImageFallback, type CannabisStrain } from "@/data/strains";
 import { Search, Star, Leaf, X, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -143,7 +143,14 @@ const BibliotecaCientifica = () => {
                         alt={strain.nome}
                         className="w-full h-full object-cover"
                         loading="lazy"
-                        onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (!target.src.includes("image.pollinations.ai")) {
+                            target.src = getPlantImageFallback(strain.id);
+                            return;
+                          }
+                          target.src = '/placeholder.svg';
+                        }}
                       />
                     </div>
 
@@ -189,7 +196,14 @@ const BibliotecaCientifica = () => {
                       src={selected.imageUrl || getPlantImage(selected.id)}
                       alt={selected.nome}
                       className="w-full h-full object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.includes("image.pollinations.ai")) {
+                          target.src = getPlantImageFallback(selected.id);
+                          return;
+                        }
+                        target.src = '/placeholder.svg';
+                      }}
                     />
                   </div>
                   <div>

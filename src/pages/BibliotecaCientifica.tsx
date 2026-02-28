@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { strains, strainCategories, getPlantImage, getPlantImageFallback, type CannabisStrain } from "@/data/strains";
+import { strains, strainCategories, getPlantImage, getPlantImageFallback, getPlantImageFinalFallback, type CannabisStrain } from "@/data/strains";
 import { Search, Star, Leaf, X, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -149,7 +149,11 @@ const BibliotecaCientifica = () => {
                             target.src = getPlantImageFallback(strain.id);
                             return;
                           }
-                          target.src = '/placeholder.svg';
+                          if (!target.src.includes("picsum.photos")) {
+                            target.src = getPlantImageFinalFallback(strain.id);
+                            return;
+                          }
+                          target.src = "/placeholder.svg";
                         }}
                       />
                     </div>
@@ -202,7 +206,11 @@ const BibliotecaCientifica = () => {
                           target.src = getPlantImageFallback(selected.id);
                           return;
                         }
-                        target.src = '/placeholder.svg';
+                        if (!target.src.includes("picsum.photos")) {
+                          target.src = getPlantImageFinalFallback(selected.id);
+                          return;
+                        }
+                        target.src = "/placeholder.svg";
                       }}
                     />
                   </div>

@@ -100,7 +100,7 @@ export const FrogMascot = memo(({ onClick, size = 60, jumpDistance = 90 }: FrogM
             key={imageIndex}
             src={images[imageIndex]}
             alt="Verdinho - Assistente IA"
-            className="rounded-full object-contain drop-shadow-lg"
+            className="object-contain drop-shadow-lg mix-blend-multiply"
             style={{ width: size, height: size }}
             initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}

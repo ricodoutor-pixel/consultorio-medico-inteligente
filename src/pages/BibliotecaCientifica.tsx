@@ -14,15 +14,27 @@ import { Link } from "react-router-dom";
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.03 } } };
 
+const getTipoCategory = (tipo: string) => {
+  const t = tipo.toLowerCase();
+  if (t.includes("cbd")) return "cbd";
+  if (t.includes("sativa")) return "sativa";
+  if (t.includes("indica")) return "indica";
+  return "hibrida";
+};
+
 const tipoColor = (tipo: string) => {
-  if (tipo === "Sativa") return "text-primary border-green bg-gradient-green";
-  if (tipo === "Indica") return "text-secondary border-purple bg-gradient-purple";
+  const cat = getTipoCategory(tipo);
+  if (cat === "sativa") return "text-primary border-green bg-gradient-green";
+  if (cat === "indica") return "text-secondary border-purple bg-gradient-purple";
+  if (cat === "cbd") return "text-emerald-500 border-emerald-500/30 bg-emerald-500/10";
   return "text-[hsl(45,76%,52%)] border-gold bg-gradient-gold";
 };
 
 const tipoBadgeStyle = (tipo: string) => {
-  if (tipo === "Sativa") return "bg-primary/20 text-primary border-primary/30";
-  if (tipo === "Indica") return "bg-secondary/20 text-secondary border-secondary/30";
+  const cat = getTipoCategory(tipo);
+  if (cat === "sativa") return "bg-primary/20 text-primary border-primary/30";
+  if (cat === "indica") return "bg-secondary/20 text-secondary border-secondary/30";
+  if (cat === "cbd") return "bg-emerald-500/20 text-emerald-500 border-emerald-500/30";
   return "bg-[hsl(45,76%,52%)]/20 text-[hsl(45,76%,52%)] border-[hsl(45,76%,52%)]/30";
 };
 
@@ -49,7 +61,7 @@ const BibliotecaCientifica = () => {
   const filtered = useMemo(() => {
     let results = strains.filter((s) => {
       const matchSearch = !search || s.nome.toLowerCase().includes(search.toLowerCase()) || s.efeitos.some(e => e.toLowerCase().includes(search.toLowerCase())) || s.beneficiosSaude.some(b => b.toLowerCase().includes(search.toLowerCase()));
-      const matchTipo = !filterTipo || s.tipo === filterTipo;
+      const matchTipo = !filterTipo || getTipoCategory(s.tipo) === filterTipo;
       return matchSearch && matchTipo;
     });
 
@@ -144,16 +156,21 @@ const BibliotecaCientifica = () => {
                 className="pl-10 bg-card border-border"
               />
             </div>
-            <div className="flex gap-2">
-              {["Indica", "Sativa", "Híbrida"].map((t) => (
+            <div className="flex gap-2 flex-wrap">
+              {[
+                { key: "cbd", label: "Alto CBD" },
+                { key: "sativa", label: "Sativa" },
+                { key: "indica", label: "Indica" },
+                { key: "hibrida", label: "Híbrida" },
+              ].map((t) => (
                 <button
-                  key={t}
-                  onClick={() => setFilterTipo(filterTipo === t ? null : t)}
+                  key={t.key}
+                  onClick={() => setFilterTipo(filterTipo === t.key ? null : t.key)}
                   className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${
-                    filterTipo === t ? tipoColor(t) : "border-border bg-card/50 text-muted-foreground hover:border-primary/20"
+                    filterTipo === t.key ? tipoColor(t.label) : "border-border bg-card/50 text-muted-foreground hover:border-primary/20"
                   }`}
                 >
-                  {t}
+                  {t.label}
                 </button>
               ))}
             </div>

@@ -16,30 +16,110 @@ export interface CannabisStrain {
   imageUrl?: string;
 }
 
-const plantImages = [
-  "https://images.unsplash.com/photo-1603909223429-69bb7101f420?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1589484344286-6db67286952c?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1587754378885-de tried-e63e?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1616690002178-4e28e2b92d97?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1503262028195-93c528f03218?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1457530378978-8bac673b8062?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1501004318855-fce2fc823eb9?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1462275646964-a0e3c11f18a6?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1442458370899-ae20e367c5d8?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1476954789527-4a4e2cc60cf9?w=300&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1509223197845-458d87a6c3f4?w=300&h=300&fit=crop",
-];
+const plantImages: Record<number, string> = {
+  1: "https://images.unsplash.com/photo-1603909223429-69bb7101f420?w=300&h=300&fit=crop", // Charlotte's Web
+  2: "https://images.unsplash.com/photo-1589484344286-6db67286952c?w=300&h=300&fit=crop", // ACDC
+  3: "https://images.unsplash.com/photo-1616690002178-4e28e2b92d97?w=300&h=300&fit=crop", // Harlequin
+  4: "https://images.unsplash.com/photo-1587754378885-69cd7f4d3e95?w=300&h=300&fit=crop", // Cannatonic
+  5: "https://images.unsplash.com/photo-1503262028195-93c528f03218?w=300&h=300&fit=crop", // Ringo's Gift
+  6: "https://images.unsplash.com/photo-1457530378978-8bac673b8062?w=300&h=300&fit=crop", // Sour Tsunami
+  7: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=300&fit=crop", // Pennywise
+  8: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=300&h=300&fit=crop", // Harle-Tsu
+  9: "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=300&h=300&fit=crop", // Remedy
+  10: "https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=300&h=300&fit=crop", // Suzy Q
+  11: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=300&h=300&fit=crop", // Blue Dream
+  12: "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=300&h=300&fit=crop", // OG Kush
+  13: "https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=300&h=300&fit=crop", // Granddaddy Purple
+  14: "https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=300&h=300&fit=crop", // Jack Herer
+  15: "https://images.unsplash.com/photo-1501004318855-fce2fc823eb9?w=300&h=300&fit=crop", // Gorilla Glue
+  16: "https://images.unsplash.com/photo-1462275646964-a0e3c11f18a6?w=300&h=300&fit=crop", // Girl Scout Cookies
+  17: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=300&h=300&fit=crop", // White Widow
+  18: "https://images.unsplash.com/photo-1442458370899-ae20e367c5d8?w=300&h=300&fit=crop", // Northern Lights
+  19: "https://images.unsplash.com/photo-1476954789527-4a4e2cc60cf9?w=300&h=300&fit=crop", // Sour Diesel
+  20: "https://images.unsplash.com/photo-1509223197845-458d87a6c3f4?w=300&h=300&fit=crop", // Amnesia Haze
+  21: "https://images.unsplash.com/photo-1530968831187-a937ade57981?w=300&h=300&fit=crop", // Afghan Kush
+  22: "https://images.unsplash.com/photo-1485637701894-09ad422f6de6?w=300&h=300&fit=crop", // Durban Poison
+  23: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=300&h=300&fit=crop", // Strawberry Cough
+  24: "https://images.unsplash.com/photo-1470058869958-2a77d9d5b726?w=300&h=300&fit=crop", // AK-47
+  25: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=300&h=300&fit=crop", // Bubba Kush
+  26: "https://images.unsplash.com/photo-1500673922987-e212871fec22?w=300&h=300&fit=crop", // Cheesy Auto CBD
+  27: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300&h=300&fit=crop", // Gelato
+  28: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=300&h=300&fit=crop", // Wedding Cake
+  29: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=300&h=300&fit=crop", // Purple Punch
+  30: "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?w=300&h=300&fit=crop", // Runtz
+  31: "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=300&h=300&fit=crop", // Zkittlez
+  32: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=300&h=300&fit=crop", // Mimosa
+  33: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=300&h=300&fit=crop", // Pineapple Express
+  34: "https://images.unsplash.com/photo-1518882555-0e886e8e28a4?w=300&h=300&fit=crop", // Tangie
+  35: "https://images.unsplash.com/photo-1534710961216-75c88202f43e?w=300&h=300&fit=crop", // Green Crack
+  36: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=300&h=300&fit=crop", // Trainwreck
+  37: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=300&h=300&fit=crop", // LA Confidential
+  38: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=300&h=300&fit=crop", // Cheese
+  39: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=300&fit=crop", // Maui Wowie
+  40: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=300&h=300&fit=crop", // Super Lemon Haze
+  41: "https://images.unsplash.com/photo-1446934466863-62c6346de546?w=300&h=300&fit=crop", // GDP x Cookies
+  42: "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?w=300&h=300&fit=crop", // Critical Mass
+  43: "https://images.unsplash.com/photo-1475113548554-5a36f1f523d6?w=300&h=300&fit=crop", // Super Silver Haze
+  44: "https://images.unsplash.com/photo-1446329813274-7c9036bd9a1f?w=300&h=300&fit=crop", // Skunk #1
+  45: "https://images.unsplash.com/photo-1504567961542-e24d9439a724?w=300&h=300&fit=crop", // Hindu Kush
+  46: "https://images.unsplash.com/photo-1474524955719-b9f87c50ce47?w=300&h=300&fit=crop", // Lemon Haze
+  47: "https://images.unsplash.com/photo-1473448912268-2022ce9509d8?w=300&h=300&fit=crop", // Blueberry
+  48: "https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=300&h=300&fit=crop", // Cherry Pie
+  49: "https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=300&h=300&fit=crop&q=80", // Ice Cream Cake
+  50: "https://images.unsplash.com/photo-1429734956993-8a9b0555e122?w=300&h=300&fit=crop", // Do-Si-Dos
+  51: "https://images.unsplash.com/photo-1510797215324-95aa89f43c33?w=300&h=300&fit=crop", // MAC 1
+  52: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=300&h=300&fit=crop", // Tropicana Cookies
+  53: "https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?w=300&h=300&fit=crop", // Forbidden Fruit
+  54: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=300&h=300&fit=crop&q=80", // Cereal Milk
+  55: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop", // Banana Kush
+  56: "https://images.unsplash.com/photo-1495908333425-29a06ce0f127?w=300&h=300&fit=crop", // Lava Cake
+  57: "https://images.unsplash.com/photo-1551893134-1854b65e0b28?w=300&h=300&fit=crop", // Slurricane
+  58: "https://images.unsplash.com/photo-1516205651411-aef33a44f7c2?w=300&h=300&fit=crop", // Papaya
+  59: "https://images.unsplash.com/photo-1531685250784-7569952593d2?w=300&h=300&fit=crop", // Bruce Banner
+  60: "https://images.unsplash.com/photo-1590686756873-f5e4cf11bbbc?w=300&h=300&fit=crop", // Platinum OG
+  61: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=300&h=300&fit=crop", // Headband
+  62: "https://images.unsplash.com/photo-1540206458-a985485e2db6?w=300&h=300&fit=crop", // Skywalker OG
+  63: "https://images.unsplash.com/photo-1478827536114-da961b7f86d2?w=300&h=300&fit=crop", // King Louis XIII
+  64: "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?w=300&h=300&fit=crop", // Grape Ape
+  65: "https://images.unsplash.com/photo-1504204267155-aabd8923cdeb?w=300&h=300&fit=crop", // Tahoe OG
+  66: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300&h=300&fit=crop", // Master Kush
+  67: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=300&h=300&fit=crop", // Death Star
+  68: "https://images.unsplash.com/photo-1486728297118-82a07bc48a28?w=300&h=300&fit=crop", // Golden Goat
+  69: "https://images.unsplash.com/photo-1516939884455-1445c8652f83?w=300&h=300&fit=crop", // Purple Haze
+  70: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=300&h=300&fit=crop", // Super Skunk
+  71: "https://images.unsplash.com/photo-1470058869958-2a77d9d5b726?w=300&h=300&fit=crop&q=80", // Kosher Kush
+  72: "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?w=300&h=300&fit=crop", // Alien OG
+  73: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=300&h=300&fit=crop", // Blackberry Kush
+  74: "https://images.unsplash.com/photo-1516214104703-d870798883c5?w=300&h=300&fit=crop", // Sundae Driver
+  75: "https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?w=300&h=300&fit=crop", // Mango Kush
+  76: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300&h=300&fit=crop", // Animal Cookies
+  77: "https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=300&h=300&fit=crop", // Kali Mist
+  78: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=300&h=300&fit=crop", // Lamb's Bread
+  79: "https://images.unsplash.com/photo-1550236520-7050f3582da0?w=300&h=300&fit=crop", // White Rhino
+  80: "https://images.unsplash.com/photo-1515150144380-bca9f1650ed9?w=300&h=300&fit=crop", // Chocolope
+  81: "https://images.unsplash.com/photo-1533038590840-1cde6e668a91?w=300&h=300&fit=crop", // SFV OG
+  82: "https://images.unsplash.com/photo-1425934398893-310a009a77f9?w=300&h=300&fit=crop", // Original Skunk Auto
+  83: "https://images.unsplash.com/photo-1563720223809-b9c9cde5a2d1?w=300&h=300&fit=crop", // Jamaican OG
+  84: "https://images.unsplash.com/photo-1521747116042-5a810fda9664?w=300&h=300&fit=crop", // Auto Skunk Mass
+  85: "https://images.unsplash.com/photo-1543459176-4426b37223ba?w=300&h=300&fit=crop", // Dedoverde Haze
+  86: "https://images.unsplash.com/photo-1498579150354-977475b7ea0b?w=300&h=300&fit=crop", // Loud Lemonade
+  87: "https://images.unsplash.com/photo-1552084162-ec07b3f162dc?w=300&h=300&fit=crop", // G-13 Diesel
+  88: "https://images.unsplash.com/photo-1536882240095-0379873feb4e?w=300&h=300&fit=crop", // Gelato Sorbet
+  89: "https://images.unsplash.com/photo-1501004318855-fce2fc823eb9?w=300&h=300&fit=crop&q=80", // SFL Kush
+  90: "https://images.unsplash.com/photo-1470509037663-253afd7f0f51?w=300&h=300&fit=crop", // Critical Kush
+  91: "https://images.unsplash.com/photo-1462275646964-a0e3c11f18a6?w=300&h=300&fit=crop&q=80", // Candyland
+  92: "https://images.unsplash.com/photo-1519183071298-a2ac2d361a4e?w=300&h=300&fit=crop", // Motor Breath
+  93: "https://images.unsplash.com/photo-1518882555-0e886e8e28a4?w=300&h=300&fit=crop&q=80", // London Pound Cake
+  94: "https://images.unsplash.com/photo-1504567961542-e24d9439a724?w=300&h=300&fit=crop&q=80", // Mac and Cheese
+  95: "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?w=300&h=300&fit=crop&q=80", // Grease Monkey
+  96: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=300&h=300&fit=crop&q=80", // Ghost Train Haze
+  97: "https://images.unsplash.com/photo-1446934466863-62c6346de546?w=300&h=300&fit=crop&q=80", // Sherbert
+  98: "https://images.unsplash.com/photo-1475113548554-5a36f1f523d6?w=300&h=300&fit=crop&q=80", // Gary Payton
+  99: "https://images.unsplash.com/photo-1473448912268-2022ce9509d8?w=300&h=300&fit=crop&q=80", // Watermelon Zkittlez
+  100: "https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=300&h=300&fit=crop&q=80", // Biscotti
+};
 
-const getPlantImage = (id: number) => plantImages[(id - 1) % plantImages.length];
+export const getPlantImage = (id: number) => plantImages[id] || `https://images.unsplash.com/photo-1503262028195-93c528f03218?w=300&h=300&fit=crop`;
 
 export const strains: CannabisStrain[] = [
   { id: 1, nome: "Charlotte's Web", tipo: "Sativa", thc: "<0,3%", cbd: "17%", descricao: "Variedade com alto teor de CBD e níveis insignificantes de THC, desenvolvida especificamente para fins terapêuticos. Amplamente reconhecida por seu uso em epilepsia refratária pediátrica.", efeitos: ["Relaxante", "Clareza mental", "Calmante"], sabores: ["Terroso", "Herbáceo", "Pinho"], beneficiosSaude: ["Epilepsia", "Ansiedade", "Inflamação", "Dor crônica"], origem: "EUA — Irmãos Stanley", florescimento: "9-12 semanas", dificuldade: "Moderada", rendimento: "400-500g/m²", avaliacao: 4.9 },

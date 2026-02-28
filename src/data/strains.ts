@@ -16,15 +16,15 @@ export interface CannabisStrain {
 }
 
 const realPlantPhotos: string[] = [
-  "https://images.unsplash.com/photo-1603909223429-69bb7101a5e4?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1616690002498-7b1a0e4c01e4?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1589484484776-2c28d96a1a16?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1587316745903-a19d1946cbaf?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1585063560108-fba0a2f5c25f?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1567857177791-77de3e17d649?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1560036515-4564b5e27e35?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1603909223429-69bb7101a5e4?w=400&h=400&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=400&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1585063560108-fba0a2f5c25f?w=400&h=400&fit=crop&q=80",
+  "https://images.pexels.com/photos/7667908/pexels-photo-7667908.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1560036515-4564b5e27e35?w=400&h=400&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&h=400&fit=crop&q=80",
+  "https://images.pexels.com/photos/7667731/pexels-photo-7667731.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.pexels.com/photos/7667686/pexels-photo-7667686.jpeg?auto=compress&w=400&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1567857177791-77de3e17d649?w=400&h=400&fit=crop&q=80",
 ];
 
 export const getPlantImage = (id: number) => realPlantPhotos[(id - 1) % realPlantPhotos.length];

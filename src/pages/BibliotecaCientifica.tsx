@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { strains, strainCategories, getPlantImage, getPlantImageFallback, type CannabisStrain } from "@/data/strains";
+import { strains, strainCategories, type CannabisStrain } from "@/data/strains";
 import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -238,19 +238,11 @@ const BibliotecaCientifica = () => {
                     {/* Image */}
                     <div className="relative w-full aspect-square overflow-hidden">
                       <img
-                        src={getPlantImage(strain.id)}
+                        src={strain.imagem}
                         alt={strain.nome}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
-                        onError={(e) => {
-                          const target = e.currentTarget;
-                          if (!target.dataset.fallback) {
-                            target.dataset.fallback = "1";
-                            target.src = getPlantImageFallback(strain.id);
-                          } else {
-                            target.src = "/placeholder.svg";
-                          }
-                        }}
+                        onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
                       />
                       {/* Overlay gradient */}
                       <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-80" />
@@ -318,19 +310,11 @@ const BibliotecaCientifica = () => {
                     <CardContent className="p-3 flex items-center gap-4">
                       <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border border-border">
                         <img
-                          src={getPlantImage(strain.id)}
+                          src={strain.imagem}
                           alt={strain.nome}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform"
                           loading="lazy"
-                          onError={(e) => {
-                            const target = e.currentTarget;
-                            if (!target.dataset.fallback) {
-                              target.dataset.fallback = "1";
-                              target.src = getPlantImageFallback(strain.id);
-                            } else {
-                              target.src = "/placeholder.svg";
-                            }
-                          }}
+                          onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -374,18 +358,10 @@ const BibliotecaCientifica = () => {
               {/* Hero image */}
               <div className="relative w-full h-48 -mt-6 -mx-6 mb-4 overflow-hidden rounded-t-lg" style={{ width: "calc(100% + 48px)" }}>
                 <img
-                  src={getPlantImage(selected.id)}
+                  src={selected.imagem}
                   alt={selected.nome}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    if (!target.dataset.fallback) {
-                      target.dataset.fallback = "1";
-                      target.src = getPlantImageFallback(selected.id);
-                    } else {
-                      target.src = "/placeholder.svg";
-                    }
-                  }}
+                  onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
                 <div className="absolute bottom-3 left-4 right-4">

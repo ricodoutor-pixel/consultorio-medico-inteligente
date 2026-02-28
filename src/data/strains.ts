@@ -1,3 +1,13 @@
+import charlottesWeb from "@/assets/strains/charlottes-web.jpg";
+import acdc from "@/assets/strains/acdc.jpg";
+import harlequin from "@/assets/strains/harlequin.jpg";
+import cannatonic from "@/assets/strains/cannatonic.jpg";
+import blueDream from "@/assets/strains/blue-dream.jpg";
+import ogKush from "@/assets/strains/og-kush.jpg";
+import granddaddyPurple from "@/assets/strains/granddaddy-purple.jpg";
+import northernLights from "@/assets/strains/northern-lights.jpg";
+import sourDiesel from "@/assets/strains/sour-diesel.jpg";
+
 export interface CannabisStrain {
   id: number;
   nome: string;
@@ -13,22 +23,15 @@ export interface CannabisStrain {
   dificuldade: string;
   rendimento: string;
   avaliacao: number;
+  imagem: string;
 }
 
-const realPlantPhotos: string[] = [
-  "https://images.unsplash.com/photo-1603909223429-69bb7101a5e4?w=400&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1585063560108-fba0a2f5c25f?w=400&h=400&fit=crop&q=80",
-  "https://images.pexels.com/photos/7667908/pexels-photo-7667908.jpeg?auto=compress&w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1560036515-4564b5e27e35?w=400&h=400&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&h=400&fit=crop&q=80",
-  "https://images.pexels.com/photos/7667731/pexels-photo-7667731.jpeg?auto=compress&w=400&h=400&fit=crop",
-  "https://images.pexels.com/photos/7667686/pexels-photo-7667686.jpeg?auto=compress&w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1567857177791-77de3e17d649?w=400&h=400&fit=crop&q=80",
-];
+export const getPlantImage = (id: number) => {
+  const strain = strains.find(s => s.id === id);
+  return strain?.imagem || "/placeholder.svg";
+};
 
-export const getPlantImage = (id: number) => realPlantPhotos[(id - 1) % realPlantPhotos.length];
-export const getPlantImageFallback = (id: number) => realPlantPhotos[(id + 4) % realPlantPhotos.length];
+export const getPlantImageFallback = (_id: number) => "/placeholder.svg";
 
 export const strainCategories = [
   { nome: "Alto CBD", emoji: "💚", descricao: "Fins terapêuticos" },
@@ -53,6 +56,7 @@ export const strains: CannabisStrain[] = [
     dificuldade: "Moderada",
     rendimento: "400-500g/m²",
     avaliacao: 4.9,
+    imagem: charlottesWeb,
   },
   {
     id: 2,
@@ -69,6 +73,7 @@ export const strains: CannabisStrain[] = [
     dificuldade: "Fácil",
     rendimento: "350-450g/m²",
     avaliacao: 4.8,
+    imagem: acdc,
   },
   {
     id: 3,
@@ -85,6 +90,7 @@ export const strains: CannabisStrain[] = [
     dificuldade: "Moderada",
     rendimento: "300-400g/m²",
     avaliacao: 4.7,
+    imagem: harlequin,
   },
   {
     id: 4,
@@ -101,6 +107,7 @@ export const strains: CannabisStrain[] = [
     dificuldade: "Moderada",
     rendimento: "400-500g/m²",
     avaliacao: 4.6,
+    imagem: cannatonic,
   },
   {
     id: 5,
@@ -117,6 +124,7 @@ export const strains: CannabisStrain[] = [
     dificuldade: "Fácil",
     rendimento: "500-600g/m²",
     avaliacao: 4.8,
+    imagem: blueDream,
   },
   {
     id: 6,
@@ -133,6 +141,7 @@ export const strains: CannabisStrain[] = [
     dificuldade: "Difícil",
     rendimento: "350-450g/m²",
     avaliacao: 4.7,
+    imagem: ogKush,
   },
   {
     id: 7,
@@ -149,6 +158,7 @@ export const strains: CannabisStrain[] = [
     dificuldade: "Moderada",
     rendimento: "400-500g/m²",
     avaliacao: 4.6,
+    imagem: granddaddyPurple,
   },
   {
     id: 8,
@@ -165,6 +175,7 @@ export const strains: CannabisStrain[] = [
     dificuldade: "Fácil",
     rendimento: "500-600g/m²",
     avaliacao: 4.7,
+    imagem: northernLights,
   },
   {
     id: 9,
@@ -181,5 +192,6 @@ export const strains: CannabisStrain[] = [
     dificuldade: "Difícil",
     rendimento: "400-500g/m²",
     avaliacao: 4.7,
+    imagem: sourDiesel,
   },
 ];

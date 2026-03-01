@@ -90,15 +90,19 @@ const BibliotecaCientifica = () => {
               <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center">
                 <Leaf size={24} className="text-primary" />
               </div>
-              <span className="text-sm font-bold text-primary tracking-wider">ENCICLOPÉDIA DE PLANTAS</span>
+              <span className="text-sm font-bold text-primary tracking-wider">BIBLIOTECA CIENTÍFICA</span>
             </div>
 
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-black text-foreground leading-tight mb-4">
-              🌿 Maior Biblioteca de Cannabis Medicinal do Mundo
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-black text-foreground leading-tight mb-2">
+              Vamos crescer juntos 🌱
             </h1>
 
+            <h2 className="text-lg md:text-2xl font-display font-bold text-primary leading-tight mb-4">
+              🌿 Maior Biblioteca de Cannabis Medicinal do Mundo
+            </h2>
+
             <p className="text-base md:text-lg text-muted-foreground max-w-3xl leading-relaxed font-medium mb-6">
-              Explore <span className="text-primary font-bold">{strains.length}+</span> variedades medicinais com informações científicas completas, fotos reais e dados de cultivo.
+              A <span className="text-primary font-bold">Planta y Raiz</span> conecta milhares de pacientes e usuários de cannabis curiosos e conscientes com as diversas variedades, produtos e fornecedores que melhor atendem às suas necessidades. Seja você um dispensário, uma marca de produtos ou um profissional de saúde, a parceria com a Plataforma Planta y Raiz oferece a oportunidade de alcançar um público cada vez mais crescente, altamente engajado, informado e personalizado — exatamente quando ele está pronto para explorar, ser atendido e comprar.
             </p>
 
             {/* Stats */}

@@ -25,8 +25,8 @@ const aiImg = (name: string, type: string) => {
   const id = Math.abs(hash);
   const color = colors[id % colors.length];
   const t = type.toLowerCase().includes("indica") ? "indica" : type.toLowerCase().includes("sativa") ? "sativa" : "hybrid";
-  const prompt = `${color} ${name} cannabis flower bud macro photo, ${t}, trichomes, beautiful, black background, 4k`;
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${id}&nologo=true`;
+  const prompt = `hyperrealistic oil painting of a ${color} ${name} cannabis flower bud, ${t} strain, glistening trichomes, vibrant pistils, dramatic chiaroscuro lighting, museum quality botanical illustration, rich textures, dark moody background, masterpiece, ultra detailed, 8k resolution`;
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${id}&nologo=true&model=flux`;
 };
 
 export const getPlantImage = (id: number) => {

@@ -54,6 +54,22 @@ const CadastroProfissional = () => {
       toast({ title: "Preencha todos os campos obrigatórios", variant: "destructive" });
       return;
     }
+    if (form.nomeCompleto.length < 3 || form.nomeCompleto.length > 100) {
+      toast({ title: "Nome inválido", description: "O nome deve ter entre 3 e 100 caracteres.", variant: "destructive" });
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      toast({ title: "E-mail inválido", description: "Insira um e-mail válido.", variant: "destructive" });
+      return;
+    }
+    if (!/^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(form.telefone.replace(/\s/g, ""))) {
+      toast({ title: "Telefone inválido", description: "Insira um telefone válido.", variant: "destructive" });
+      return;
+    }
+    if (form.resumoAtuacao.length > 500) {
+      toast({ title: "Resumo muito longo", description: "Máximo de 500 caracteres.", variant: "destructive" });
+      return;
+    }
     if (!lgpdConsent) {
       toast({ title: "Aceite os termos de uso e LGPD para continuar", variant: "destructive" });
       return;

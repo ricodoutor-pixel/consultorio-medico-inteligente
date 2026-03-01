@@ -31,8 +31,29 @@ const Cadastro = () => {
 
   const handleChange = (key: string, value: string) => setFormData({ ...formData, [key]: value });
 
+  const validateForm = (): boolean => {
+    if (!type) return false;
+    const email = formData.email || "";
+    const nome = formData.nome || "";
+    if (nome.length < 3 || nome.length > 100) {
+      toast({ title: "Nome inválido", description: "O nome deve ter entre 3 e 100 caracteres.", variant: "destructive" });
+      return false;
+    }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast({ title: "E-mail inválido", description: "Insira um e-mail válido.", variant: "destructive" });
+      return false;
+    }
+    const telefone = formData.telefone || "";
+    if (telefone && !/^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(telefone.replace(/\s/g, ""))) {
+      toast({ title: "Telefone inválido", description: "Insira um telefone válido.", variant: "destructive" });
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
     setSubmitted(true);
     toast({
       title: "Cadastro enviado com sucesso! ✅",

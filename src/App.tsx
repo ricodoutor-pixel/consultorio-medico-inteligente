@@ -28,6 +28,7 @@ import InfluencerDashboard from "./pages/InfluencerDashboard";
 import OnlineUsers from "./pages/OnlineUsers";
 import DownloadApp from "./pages/DownloadApp";
 import NotFound from "./pages/NotFound";
+import { FrogChatModal } from "./components/FrogChatModal";
 
 const queryClient = new QueryClient();
 
@@ -37,7 +38,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        
+        <FrogChatModal />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/como-funciona" element={<ComoFunciona />} />

@@ -26,11 +26,47 @@ export interface CannabisStrain {
   imagem: string;
 }
 
-// AI-generated cannabis image via pollinations
-const aiImg = (name: string, type: string) =>
-  `https://image.pollinations.ai/prompt/${encodeURIComponent(
-    `cannabis flower bud macro photography, ${name} strain, ${type}, dense trichomes, professional studio lighting, botanical photo, ultra detailed, 4k, dark background`
-  )}?width=512&height=512&seed=${name.length * 7 + type.length * 13}&nologo=true`;
+// AI-generated cannabis flower images with unique artistic prompts per strain
+const colorPalettes = [
+  "vibrant emerald green and amber orange trichomes",
+  "deep purple and frost white crystal coating",
+  "golden yellow pistils with lime green calyxes",
+  "rich burgundy leaves with silver trichome blanket",
+  "neon green buds with fiery orange hairs",
+  "lavender purple hues with diamond-like crystals",
+  "dark forest green with golden resin drops",
+  "sunset orange pistils on mint green flowers",
+  "royal purple calyxes with pearl white frost",
+  "tropical bright green with ruby red stigmas",
+];
+
+const backgrounds = [
+  "dark moody studio background with rim lighting",
+  "soft bokeh black background with golden backlight",
+  "clean dark gradient background professional photography",
+  "dramatic spotlight on black velvet background",
+  "cinematic dark background with subtle green glow",
+];
+
+const styles = [
+  "extreme macro photography, shallow depth of field",
+  "botanical illustration style, ultra sharp focus",
+  "award-winning cannabis photography, magazine cover quality",
+  "professional product photography, crystal clear detail",
+  "artistic close-up, every trichome visible",
+];
+
+const aiImg = (name: string, type: string) => {
+  // Generate unique seed from name
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = ((hash << 5) - hash) + name.charCodeAt(i);
+  const id = Math.abs(hash);
+  const palette = colorPalettes[id % colorPalettes.length];
+  const bg = backgrounds[id % backgrounds.length];
+  const style = styles[id % styles.length];
+  const prompt = `beautiful cannabis flower bud, ${name} strain, ${type} variety, ${palette}, ${bg}, ${style}, lush dense nugs covered in glistening trichomes, stunning botanical macro photo, 8k ultra HD, photorealistic`;
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${id}&nologo=true`;
+};
 
 export const getPlantImage = (id: number) => {
   const strain = strains.find(s => s.id === id);

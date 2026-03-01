@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -82,16 +83,22 @@ const Admin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (sessionStorage.getItem("admin_auth") !== "true") {
-      navigate("/admin-login");
-      return;
-    }
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || sessionStorage.getItem("admin_auth") !== "true") {
+        navigate("/admin-login");
+        return;
+      }
+    };
+    checkAuth();
     const interval = setInterval(() => setLive(generateLiveData()), 5000);
     return () => clearInterval(interval);
   }, [navigate]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     sessionStorage.removeItem("admin_auth");
+    sessionStorage.removeItem("admin_user_id");
+    await supabase.auth.signOut();
     navigate("/admin-login");
   };
 

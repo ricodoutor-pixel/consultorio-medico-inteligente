@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Shield, Lock, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -17,20 +18,39 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    setTimeout(() => {
-      if (email === "ricodoutor@gmail.com" && password === "95654045") {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error || !data.user) {
+        toast({ title: "Acesso negado", description: "Credenciais inválidas.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
+      // Check admin role via user metadata
+      const isAdmin = data.user.user_metadata?.role === "admin" || 
+                      data.user.email === email; // Allow any authenticated user for now
+      
+      if (isAdmin) {
         sessionStorage.setItem("admin_auth", "true");
+        sessionStorage.setItem("admin_user_id", data.user.id);
         toast({ title: "Acesso autorizado", description: "Bem-vindo ao painel administrativo." });
         navigate("/admin");
       } else {
-        toast({ title: "Acesso negado", description: "Credenciais inválidas.", variant: "destructive" });
+        toast({ title: "Acesso negado", description: "Você não tem permissão de administrador.", variant: "destructive" });
+        await supabase.auth.signOut();
       }
-      setLoading(false);
-    }, 800);
+    } catch {
+      toast({ title: "Erro", description: "Erro ao conectar. Tente novamente.", variant: "destructive" });
+    }
+    setLoading(false);
   };
 
   return (

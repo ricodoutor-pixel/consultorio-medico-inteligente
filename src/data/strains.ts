@@ -16,71 +16,17 @@ export interface CannabisStrain {
   imagem: string;
 }
 
-// Fine-art exhibition quality AI cannabis flower gallery
-const palettes = [
-  "luminous emerald green with amber trichome crystals glistening like diamonds",
-  "deep royal purple fading to midnight blue dusted in silver frost",
-  "golden sunset orange pistils spiraling over lime sugar leaves",
-  "rich burgundy wine leaves blanketed in pristine white crystal",
-  "electric neon green buds with fiery copper orange hairs glowing",
-  "lavender violet shimmer with pearl white trichome heads catching light",
-  "dark forest green dripping molten gold resin droplets",
-  "candy pink pastel green calyx draped in snow crystal coat",
-  "deep indigo sapphire blue with prismatic rainbow trichome refraction",
-  "tropical mango orange and chartreuse green dense bud clusters",
-  "rose gold champagne pistils on jade green flowering tops",
-  "crimson scarlet and dark emerald with crystalline diamond frost",
-  "pale mint green with strawberry pink undertones and gold dust",
-  "obsidian black sugar leaves with electric purple veins and white frost",
-  "peach apricot and sage green with honey amber resin coating",
-  "teal turquoise calyxes with tangerine orange hairs and crystal glaze",
-];
-
-const scenes = [
-  "dark moody gallery, dramatic chiaroscuro lighting, velvet background, museum masterpiece",
-  "soft golden hour backlight halo, floating pollen particles, ethereal atmosphere",
-  "clean black gradient, precision studio strobes, gallery print quality",
-  "single spotlight on black velvet, Dutch master painting style, Renaissance light",
-  "cinematic dark backdrop with bioluminescent emerald glow, otherworldly beauty",
-  "midnight blue gradient with bokeh light orbs like floating stars",
-  "deep charcoal with warm amber rim light, jewel exhibition display",
-  "pure black void with crystalline spotlight, luxury jewelry photography style",
-];
-
-const techniques = [
-  "extreme macro 100mm f/2.8 lens, individual trichome heads visible, shallow DOF, focus stacking",
-  "botanical fine art print, museum gallery quality, Ansel Adams precision",
-  "award-winning High Times Cannabis Cup centerfold, glossy magazine quality",
-  "professional product photography, dew droplets, studio strobe perfection",
-  "artistic close-up Hasselblad medium format, jewel-like crystalline detail",
-  "cinematic anamorphic lens, luxury brand campaign aesthetic, color graded",
-  "National Geographic botanical macro, scientific precision meets fine art",
-  "large format 8x10 film photography, tonal richness, gallery exhibition print",
-];
-
-const forms = [
-  "dense chunky nug covered in glistening trichomes like morning dew",
-  "perfectly manicured flower with visible resin glands sparkling",
-  "frosty cola with sugar leaf trim showing diamond crystal coating",
-  "tight compact bud dripping with sticky golden resin",
-  "fluffy airy flower with vibrant pistil coverage and frost",
-  "massive top cola with cascading trichome blanket",
-];
+// AI cannabis flower images - simple reliable prompts
+const colors = ["purple", "green", "orange", "frosty white", "golden", "pink", "deep green", "blue-purple", "lime", "red-orange", "silver", "emerald", "violet", "amber", "teal", "magenta"];
 
 const aiImg = (name: string, type: string) => {
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = ((hash << 5) - hash) + name.charCodeAt(i);
   const id = Math.abs(hash);
-  const palette = palettes[id % palettes.length];
-  const scene = scenes[id % scenes.length];
-  const tech = techniques[id % techniques.length];
-  const form = forms[id % forms.length];
-  const typeHint = type.toLowerCase().includes("indica") ? "indica wide-leaf chunky dense bud"
-    : type.toLowerCase().includes("sativa") ? "sativa elongated airy cola with thin leaves"
-    : type.toLowerCase().includes("cbd") ? "CBD-rich therapeutic flower with gentle structure"
-    : "hybrid balanced dense flowering bud";
-  const prompt = `breathtaking ${name} cannabis flower, ${typeHint}, ${form}, ${palette}, ${scene}, ${tech}, fine art exhibition quality painting, 8k ultra HD, photorealistic masterpiece, beautiful as a framed gallery artwork, no text no watermark no labels`;
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=768&seed=${id}&nologo=true`;
+  const color = colors[id % colors.length];
+  const t = type.toLowerCase().includes("indica") ? "indica" : type.toLowerCase().includes("sativa") ? "sativa" : "hybrid";
+  const prompt = `${color} ${name} cannabis flower bud macro photo, ${t}, trichomes, beautiful, black background, 4k`;
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${id}&nologo=true`;
 };
 
 export const getPlantImage = (id: number) => {

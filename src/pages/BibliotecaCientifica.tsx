@@ -10,6 +10,7 @@ import { strains, strainCategories, type CannabisStrain } from "@/data/strains";
 import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { StrainImage } from "@/components/StrainImage";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.03 } } };
@@ -241,12 +242,13 @@ const BibliotecaCientifica = () => {
                   >
                     {/* Image */}
                     <div className="relative w-full aspect-square overflow-hidden">
-                      <img
-                        src={strain.imagem}
-                        alt={strain.nome}
+                      <StrainImage
+                        strainId={strain.id}
+                        strainName={strain.nome}
+                        strainType={strain.tipo}
+                        fallbackUrl={strain.imagem}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        loading="lazy"
-                        onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
+                        alt={strain.nome}
                       />
                       {/* Overlay gradient */}
                       <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-80" />
@@ -313,12 +315,13 @@ const BibliotecaCientifica = () => {
                   >
                     <CardContent className="p-3 flex items-center gap-4">
                       <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border border-border">
-                        <img
-                          src={strain.imagem}
-                          alt={strain.nome}
+                        <StrainImage
+                          strainId={strain.id}
+                          strainName={strain.nome}
+                          strainType={strain.tipo}
+                          fallbackUrl={strain.imagem}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform"
-                          loading="lazy"
-                          onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
+                          alt={strain.nome}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -361,11 +364,13 @@ const BibliotecaCientifica = () => {
             <>
               {/* Hero image */}
               <div className="relative w-full h-48 -mt-6 -mx-6 mb-4 overflow-hidden rounded-t-lg" style={{ width: "calc(100% + 48px)" }}>
-                <img
-                  src={selected.imagem}
-                  alt={selected.nome}
+                <StrainImage
+                  strainId={selected.id}
+                  strainName={selected.nome}
+                  strainType={selected.tipo}
+                  fallbackUrl={selected.imagem}
                   className="w-full h-full object-cover"
-                  onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
+                  alt={selected.nome}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
                 <div className="absolute bottom-3 left-4 right-4">

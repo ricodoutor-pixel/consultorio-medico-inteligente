@@ -26,45 +26,62 @@ export interface CannabisStrain {
   imagem: string;
 }
 
-// AI-generated cannabis flower images with unique artistic prompts per strain
+// AI-generated cannabis flower images — ultra beautiful unique prompts per strain
 const colorPalettes = [
-  "vibrant emerald green and amber orange trichomes",
-  "deep purple and frost white crystal coating",
-  "golden yellow pistils with lime green calyxes",
-  "rich burgundy leaves with silver trichome blanket",
-  "neon green buds with fiery orange hairs",
-  "lavender purple hues with diamond-like crystals",
-  "dark forest green with golden resin drops",
-  "sunset orange pistils on mint green flowers",
-  "royal purple calyxes with pearl white frost",
-  "tropical bright green with ruby red stigmas",
+  "vibrant emerald green with glowing amber trichomes dripping resin",
+  "deep royal purple fading to midnight blue with frosty diamond crystals",
+  "golden sunset orange pistils curling over lime green sugar leaves",
+  "rich burgundy and wine red leaves blanketed in silver frost",
+  "electric neon green buds with fiery copper orange hairs",
+  "lavender and violet hues shimmering with pearl white trichome heads",
+  "dark forest green with molten gold resin droplets",
+  "candy pink and pastel green calyx with snow white crystal coat",
+  "deep indigo and sapphire blue with prismatic rainbow trichomes",
+  "tropical mango orange and bright chartreuse green bud structure",
+  "rose gold and champagne colored pistils on jade green flowers",
+  "crimson red and dark emerald contrast with crystalline frost",
 ];
 
 const backgrounds = [
-  "dark moody studio background with rim lighting",
-  "soft bokeh black background with golden backlight",
-  "clean dark gradient background professional photography",
-  "dramatic spotlight on black velvet background",
-  "cinematic dark background with subtle green glow",
+  "dark moody studio, dramatic rim lighting, smoke wisps",
+  "soft bokeh black background with warm golden backlight halo",
+  "clean dark gradient, professional studio photography setup",
+  "dramatic single spotlight on black velvet, museum quality",
+  "cinematic dark background with ethereal green bioluminescent glow",
+  "midnight blue gradient with subtle star-like light particles",
+  "deep charcoal with soft amber side light and shadow play",
 ];
 
 const styles = [
-  "extreme macro photography, shallow depth of field",
-  "botanical illustration style, ultra sharp focus",
-  "award-winning cannabis photography, magazine cover quality",
-  "professional product photography, crystal clear detail",
-  "artistic close-up, every trichome visible",
+  "extreme macro photography, trichome heads visible, shallow depth of field, Canon 100mm f/2.8",
+  "botanical fine art photography, every crystal sharp, museum print quality",
+  "award-winning High Times Cannabis Cup photography, magazine centerfold",
+  "professional product shot, water droplets on trichomes, studio strobe lighting",
+  "artistic close-up, bokeh background, jewel-like trichome detail, Hasselblad quality",
+  "cinematic color grading, anamorphic lens flare, luxury brand aesthetic",
+  "National Geographic botanical macro, scientific precision meets art",
+];
+
+const descriptors = [
+  "dense chunky nug structure covered in glistening trichomes",
+  "perfectly manicured flower with visible resin glands",
+  "frosty cola with sugar leaf trim showing crystal coating",
+  "tight compact bud dripping with sticky resin",
+  "fluffy airy flower structure with vibrant pistil coverage",
 ];
 
 const aiImg = (name: string, type: string) => {
-  // Generate unique seed from name
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = ((hash << 5) - hash) + name.charCodeAt(i);
   const id = Math.abs(hash);
   const palette = colorPalettes[id % colorPalettes.length];
   const bg = backgrounds[id % backgrounds.length];
   const style = styles[id % styles.length];
-  const prompt = `beautiful cannabis flower bud, ${name} strain, ${type} variety, ${palette}, ${bg}, ${style}, lush dense nugs covered in glistening trichomes, stunning botanical macro photo, 8k ultra HD, photorealistic`;
+  const desc = descriptors[id % descriptors.length];
+  const typeHint = type.toLowerCase().includes("indica") ? "indica wide-leaf chunky bud" :
+                   type.toLowerCase().includes("sativa") ? "sativa elongated airy cola" :
+                   type.toLowerCase().includes("cbd") ? "CBD-rich therapeutic flower" : "hybrid balanced bud";
+  const prompt = `stunning ${name} cannabis flower, ${typeHint}, ${desc}, ${palette}, ${bg}, ${style}, breathtaking botanical beauty, 8k ultra HD, photorealistic masterpiece, no text no watermark`;
   return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${id}&nologo=true`;
 };
 

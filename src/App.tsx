@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { FrogChatModal } from "@/components/FrogChatModal";
+
 import Index from "./pages/Index";
 import ComoFunciona from "./pages/ComoFunciona";
 import Profissionais from "./pages/Profissionais";
@@ -37,7 +37,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <FrogChatModal />
+        
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/como-funciona" element={<ComoFunciona />} />

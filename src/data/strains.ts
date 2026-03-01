@@ -1,13 +1,3 @@
-import charlottesWeb from "@/assets/strains/charlottes-web.jpg";
-import acdc from "@/assets/strains/acdc.jpg";
-import harlequin from "@/assets/strains/harlequin.jpg";
-import cannatonic from "@/assets/strains/cannatonic.jpg";
-import blueDream from "@/assets/strains/blue-dream.jpg";
-import ogKush from "@/assets/strains/og-kush.jpg";
-import granddaddyPurple from "@/assets/strains/granddaddy-purple.jpg";
-import northernLights from "@/assets/strains/northern-lights.jpg";
-import sourDiesel from "@/assets/strains/sour-diesel.jpg";
-
 export interface CannabisStrain {
   id: number;
   nome: string;
@@ -26,63 +16,71 @@ export interface CannabisStrain {
   imagem: string;
 }
 
-// AI-generated cannabis flower images — ultra beautiful unique prompts per strain
-const colorPalettes = [
-  "vibrant emerald green with glowing amber trichomes dripping resin",
-  "deep royal purple fading to midnight blue with frosty diamond crystals",
-  "golden sunset orange pistils curling over lime green sugar leaves",
-  "rich burgundy and wine red leaves blanketed in silver frost",
-  "electric neon green buds with fiery copper orange hairs",
-  "lavender and violet hues shimmering with pearl white trichome heads",
-  "dark forest green with molten gold resin droplets",
-  "candy pink and pastel green calyx with snow white crystal coat",
-  "deep indigo and sapphire blue with prismatic rainbow trichomes",
-  "tropical mango orange and bright chartreuse green bud structure",
-  "rose gold and champagne colored pistils on jade green flowers",
-  "crimson red and dark emerald contrast with crystalline frost",
+// Fine-art exhibition quality AI cannabis flower gallery
+const palettes = [
+  "luminous emerald green with amber trichome crystals glistening like diamonds",
+  "deep royal purple fading to midnight blue dusted in silver frost",
+  "golden sunset orange pistils spiraling over lime sugar leaves",
+  "rich burgundy wine leaves blanketed in pristine white crystal",
+  "electric neon green buds with fiery copper orange hairs glowing",
+  "lavender violet shimmer with pearl white trichome heads catching light",
+  "dark forest green dripping molten gold resin droplets",
+  "candy pink pastel green calyx draped in snow crystal coat",
+  "deep indigo sapphire blue with prismatic rainbow trichome refraction",
+  "tropical mango orange and chartreuse green dense bud clusters",
+  "rose gold champagne pistils on jade green flowering tops",
+  "crimson scarlet and dark emerald with crystalline diamond frost",
+  "pale mint green with strawberry pink undertones and gold dust",
+  "obsidian black sugar leaves with electric purple veins and white frost",
+  "peach apricot and sage green with honey amber resin coating",
+  "teal turquoise calyxes with tangerine orange hairs and crystal glaze",
 ];
 
-const backgrounds = [
-  "dark moody studio, dramatic rim lighting, smoke wisps",
-  "soft bokeh black background with warm golden backlight halo",
-  "clean dark gradient, professional studio photography setup",
-  "dramatic single spotlight on black velvet, museum quality",
-  "cinematic dark background with ethereal green bioluminescent glow",
-  "midnight blue gradient with subtle star-like light particles",
-  "deep charcoal with soft amber side light and shadow play",
+const scenes = [
+  "dark moody gallery, dramatic chiaroscuro lighting, velvet background, museum masterpiece",
+  "soft golden hour backlight halo, floating pollen particles, ethereal atmosphere",
+  "clean black gradient, precision studio strobes, gallery print quality",
+  "single spotlight on black velvet, Dutch master painting style, Renaissance light",
+  "cinematic dark backdrop with bioluminescent emerald glow, otherworldly beauty",
+  "midnight blue gradient with bokeh light orbs like floating stars",
+  "deep charcoal with warm amber rim light, jewel exhibition display",
+  "pure black void with crystalline spotlight, luxury jewelry photography style",
 ];
 
-const styles = [
-  "extreme macro photography, trichome heads visible, shallow depth of field, Canon 100mm f/2.8",
-  "botanical fine art photography, every crystal sharp, museum print quality",
-  "award-winning High Times Cannabis Cup photography, magazine centerfold",
-  "professional product shot, water droplets on trichomes, studio strobe lighting",
-  "artistic close-up, bokeh background, jewel-like trichome detail, Hasselblad quality",
-  "cinematic color grading, anamorphic lens flare, luxury brand aesthetic",
-  "National Geographic botanical macro, scientific precision meets art",
+const techniques = [
+  "extreme macro 100mm f/2.8 lens, individual trichome heads visible, shallow DOF, focus stacking",
+  "botanical fine art print, museum gallery quality, Ansel Adams precision",
+  "award-winning High Times Cannabis Cup centerfold, glossy magazine quality",
+  "professional product photography, dew droplets, studio strobe perfection",
+  "artistic close-up Hasselblad medium format, jewel-like crystalline detail",
+  "cinematic anamorphic lens, luxury brand campaign aesthetic, color graded",
+  "National Geographic botanical macro, scientific precision meets fine art",
+  "large format 8x10 film photography, tonal richness, gallery exhibition print",
 ];
 
-const descriptors = [
-  "dense chunky nug structure covered in glistening trichomes",
-  "perfectly manicured flower with visible resin glands",
-  "frosty cola with sugar leaf trim showing crystal coating",
-  "tight compact bud dripping with sticky resin",
-  "fluffy airy flower structure with vibrant pistil coverage",
+const forms = [
+  "dense chunky nug covered in glistening trichomes like morning dew",
+  "perfectly manicured flower with visible resin glands sparkling",
+  "frosty cola with sugar leaf trim showing diamond crystal coating",
+  "tight compact bud dripping with sticky golden resin",
+  "fluffy airy flower with vibrant pistil coverage and frost",
+  "massive top cola with cascading trichome blanket",
 ];
 
 const aiImg = (name: string, type: string) => {
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = ((hash << 5) - hash) + name.charCodeAt(i);
   const id = Math.abs(hash);
-  const palette = colorPalettes[id % colorPalettes.length];
-  const bg = backgrounds[id % backgrounds.length];
-  const style = styles[id % styles.length];
-  const desc = descriptors[id % descriptors.length];
-  const typeHint = type.toLowerCase().includes("indica") ? "indica wide-leaf chunky bud" :
-                   type.toLowerCase().includes("sativa") ? "sativa elongated airy cola" :
-                   type.toLowerCase().includes("cbd") ? "CBD-rich therapeutic flower" : "hybrid balanced bud";
-  const prompt = `stunning ${name} cannabis flower, ${typeHint}, ${desc}, ${palette}, ${bg}, ${style}, breathtaking botanical beauty, 8k ultra HD, photorealistic masterpiece, no text no watermark`;
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${id}&nologo=true`;
+  const palette = palettes[id % palettes.length];
+  const scene = scenes[id % scenes.length];
+  const tech = techniques[id % techniques.length];
+  const form = forms[id % forms.length];
+  const typeHint = type.toLowerCase().includes("indica") ? "indica wide-leaf chunky dense bud"
+    : type.toLowerCase().includes("sativa") ? "sativa elongated airy cola with thin leaves"
+    : type.toLowerCase().includes("cbd") ? "CBD-rich therapeutic flower with gentle structure"
+    : "hybrid balanced dense flowering bud";
+  const prompt = `breathtaking ${name} cannabis flower, ${typeHint}, ${form}, ${palette}, ${scene}, ${tech}, fine art exhibition quality painting, 8k ultra HD, photorealistic masterpiece, beautiful as a framed gallery artwork, no text no watermark no labels`;
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=768&height=768&seed=${id}&nologo=true`;
 };
 
 export const getPlantImage = (id: number) => {
@@ -107,7 +105,7 @@ export const strains: CannabisStrain[] = [
     efeitos: ["Relaxamento", "Clareza mental", "Sem efeito psicoativo significativo"],
     sabores: ["Terroso", "Herbáceo", "Pinho"],
     beneficiosSaude: ["Epilepsia", "Ansiedade", "Inflamação", "Dor crônica"],
-    origem: "EUA — Irmãos Stanley", florescimento: "9-12 semanas", dificuldade: "Moderada", rendimento: "400-500g/m²", avaliacao: 4.9, imagem: charlottesWeb,
+    origem: "EUA — Irmãos Stanley", florescimento: "9-12 semanas", dificuldade: "Moderada", rendimento: "400-500g/m²", avaliacao: 4.9, imagem: aiImg("Charlotte's Web", "Alto CBD"),
   },
   {
     id: 2, nome: "ACDC", tipo: "Alto CBD", thc: "1% - 6%", cbd: "14% - 20%",
@@ -115,7 +113,7 @@ export const strains: CannabisStrain[] = [
     efeitos: ["Calmante", "Foco", "Leve relaxamento corporal"],
     sabores: ["Terroso", "Madeira", "Cereja"],
     beneficiosSaude: ["Ansiedade", "Dor neuropática", "Esclerose múltipla", "Artrite"],
-    origem: "Espanha", florescimento: "9-10 semanas", dificuldade: "Fácil", rendimento: "350-450g/m²", avaliacao: 4.8, imagem: acdc,
+    origem: "Espanha", florescimento: "9-10 semanas", dificuldade: "Fácil", rendimento: "350-450g/m²", avaliacao: 4.8, imagem: aiImg("ACDC", "Alto CBD"),
   },
   {
     id: 3, nome: "Harlequin", tipo: "Sativa dominante (rica em CBD)", thc: "4% - 10%", cbd: "8% - 15%",
@@ -123,7 +121,7 @@ export const strains: CannabisStrain[] = [
     efeitos: ["Equilíbrio mental", "Alívio da dor", "Leve euforia controlada"],
     sabores: ["Manga", "Terroso", "Cítrico"],
     beneficiosSaude: ["Dor crônica", "Inflamação", "Ansiedade", "Enxaqueca"],
-    origem: "Colômbia/Tailândia/Suíça", florescimento: "8-9 semanas", dificuldade: "Moderada", rendimento: "300-400g/m²", avaliacao: 4.7, imagem: harlequin,
+    origem: "Colômbia/Tailândia/Suíça", florescimento: "8-9 semanas", dificuldade: "Moderada", rendimento: "300-400g/m²", avaliacao: 4.7, imagem: aiImg("Harlequin", "Sativa CBD"),
   },
   {
     id: 4, nome: "Cannatonic", tipo: "Híbrida (rica em CBD)", thc: "5% - 8%", cbd: "6% - 17%",
@@ -131,7 +129,7 @@ export const strains: CannabisStrain[] = [
     efeitos: ["Relaxamento", "Calma mental", "Pouco efeito psicoativo"],
     sabores: ["Cítrico", "Terroso", "Amadeirado"],
     beneficiosSaude: ["Espasmos musculares", "Dor crônica", "Estresse", "Inflamação"],
-    origem: "Espanha — Resin Seeds", florescimento: "9-10 semanas", dificuldade: "Moderada", rendimento: "400-500g/m²", avaliacao: 4.6, imagem: cannatonic,
+    origem: "Espanha — Resin Seeds", florescimento: "9-10 semanas", dificuldade: "Moderada", rendimento: "400-500g/m²", avaliacao: 4.6, imagem: aiImg("Cannatonic", "Híbrida CBD"),
   },
   {
     id: 5, nome: "Blue Dream", tipo: "Híbrida (Sativa dominante)", thc: "17% - 24%", cbd: "0.1% - 0.2%",
@@ -139,7 +137,7 @@ export const strains: CannabisStrain[] = [
     efeitos: ["Energia", "Criatividade", "Euforia leve"],
     sabores: ["Mirtilo", "Baunilha", "Doce"],
     beneficiosSaude: ["Depressão", "Fadiga", "Dor leve", "Estresse"],
-    origem: "EUA — Califórnia", florescimento: "9-10 semanas", dificuldade: "Fácil", rendimento: "500-600g/m²", avaliacao: 4.8, imagem: blueDream,
+    origem: "EUA — Califórnia", florescimento: "9-10 semanas", dificuldade: "Fácil", rendimento: "500-600g/m²", avaliacao: 4.8, imagem: aiImg("Blue Dream", "Híbrida Sativa"),
   },
   {
     id: 6, nome: "OG Kush", tipo: "Híbrida (Indica dominante)", thc: "19% - 26%", cbd: "<1%",
@@ -147,7 +145,7 @@ export const strains: CannabisStrain[] = [
     efeitos: ["Relaxamento profundo", "Sedação leve", "Alívio da tensão"],
     sabores: ["Pinho", "Terroso", "Amadeirado"],
     beneficiosSaude: ["Dor crônica", "Insônia", "Ansiedade", "Estresse"],
-    origem: "EUA — Flórida/Califórnia", florescimento: "8-9 semanas", dificuldade: "Difícil", rendimento: "350-450g/m²", avaliacao: 4.7, imagem: ogKush,
+    origem: "EUA — Flórida/Califórnia", florescimento: "8-9 semanas", dificuldade: "Difícil", rendimento: "350-450g/m²", avaliacao: 4.7, imagem: aiImg("OG Kush", "Híbrida Indica"),
   },
   {
     id: 7, nome: "Granddaddy Purple", tipo: "Indica", thc: "17% - 23%", cbd: "<1%",
@@ -155,7 +153,7 @@ export const strains: CannabisStrain[] = [
     efeitos: ["Sedação", "Relaxamento corporal intenso", "Efeito calmante"],
     sabores: ["Uva", "Baga", "Doce"],
     beneficiosSaude: ["Insônia", "Espasmos musculares", "Dor intensa", "Perda de apetite"],
-    origem: "EUA — Ken Estes", florescimento: "8-11 semanas", dificuldade: "Moderada", rendimento: "400-500g/m²", avaliacao: 4.6, imagem: granddaddyPurple,
+    origem: "EUA — Ken Estes", florescimento: "8-11 semanas", dificuldade: "Moderada", rendimento: "400-500g/m²", avaliacao: 4.6, imagem: aiImg("Granddaddy Purple", "Indica"),
   },
   {
     id: 8, nome: "Northern Lights", tipo: "Indica", thc: "16% - 21%", cbd: "<1%",
@@ -163,7 +161,7 @@ export const strains: CannabisStrain[] = [
     efeitos: ["Relaxamento profundo", "Sensação de bem-estar", "Auxílio no sono"],
     sabores: ["Pinho", "Terroso", "Doce"],
     beneficiosSaude: ["Insônia", "Ansiedade", "Dor crônica", "Estresse"],
-    origem: "EUA — Pacific Northwest", florescimento: "7-9 semanas", dificuldade: "Fácil", rendimento: "500-600g/m²", avaliacao: 4.7, imagem: northernLights,
+    origem: "EUA — Pacific Northwest", florescimento: "7-9 semanas", dificuldade: "Fácil", rendimento: "500-600g/m²", avaliacao: 4.7, imagem: aiImg("Northern Lights", "Indica"),
   },
   {
     id: 9, nome: "Sour Diesel", tipo: "Sativa", thc: "20% - 25%", cbd: "<1%",
@@ -171,7 +169,7 @@ export const strains: CannabisStrain[] = [
     efeitos: ["Energia intensa", "Foco", "Estimulação mental"],
     sabores: ["Diesel", "Cítrico", "Terroso"],
     beneficiosSaude: ["Depressão", "Fadiga", "Estresse", "Dor leve"],
-    origem: "EUA — Costa Leste", florescimento: "10-11 semanas", dificuldade: "Difícil", rendimento: "400-500g/m²", avaliacao: 4.7, imagem: sourDiesel,
+    origem: "EUA — Costa Leste", florescimento: "10-11 semanas", dificuldade: "Difícil", rendimento: "400-500g/m²", avaliacao: 4.7, imagem: aiImg("Sour Diesel", "Sativa"),
   },
 
   // === 10-100: VARIEDADES COM IMAGENS DE IA ===

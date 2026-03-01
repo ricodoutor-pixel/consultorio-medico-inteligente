@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Menu, X, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
-import { FrogMascot } from "@/components/FrogMascot";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,11 +16,6 @@ export const Navbar = () => {
     { to: "/planos", label: "Planos" },
     { to: "/influenciadores", label: "Influencers" },
   ];
-
-  const openChat = () => {
-    const event = new CustomEvent("open-frog-chat");
-    window.dispatchEvent(event);
-  };
 
   return (
     <nav className="fixed top-0 w-full glass border-b border-border z-50">
@@ -39,12 +33,6 @@ export const Navbar = () => {
                 <span className="text-[10px] text-muted-foreground font-semibold">Mega Clínica Digital</span>
               </div>
             </NavLink>
-            <div className="ml-1 md:hidden">
-              <FrogMascot onClick={openChat} size={34} />
-            </div>
-            <div className="ml-1 hidden md:flex items-center overflow-visible">
-              <FrogMascot onClick={openChat} size={52} />
-            </div>
           </div>
 
           <div className="hidden lg:flex items-center gap-5">

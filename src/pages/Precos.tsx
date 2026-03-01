@@ -19,10 +19,10 @@ const Precos = () => {
       priceValue: 5000,
       period: "/mês",
       tag: "START",
-      description: "Acesso à biblioteca científica + Chat IA Verdinho 24/7 + pré-entrevista gratuita.",
+      description: "Acesso à biblioteca científica + Chat IA 24/7 + pré-entrevista gratuita.",
       features: [
         "Acesso à biblioteca científica",
-        "Chat IA Verdinho 24/7",
+        "Chat IA 24/7",
         "Pré-entrevista gratuita",
         "Recomendações personalizadas",
       ],

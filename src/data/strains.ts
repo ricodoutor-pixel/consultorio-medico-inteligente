@@ -16,17 +16,12 @@ export interface CannabisStrain {
   imagem: string;
 }
 
-// AI cannabis flower images - simple reliable prompts
-const colors = ["purple", "green", "orange", "frosty white", "golden", "pink", "deep green", "blue-purple", "lime", "red-orange", "silver", "emerald", "violet", "amber", "teal", "magenta"];
-
-const aiImg = (name: string, type: string) => {
+// Reliable deterministic plant images using picsum.photos with seeds
+const aiImg = (name: string, _type: string) => {
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = ((hash << 5) - hash) + name.charCodeAt(i);
-  const id = Math.abs(hash);
-  const color = colors[id % colors.length];
-  const t = type.toLowerCase().includes("indica") ? "indica" : type.toLowerCase().includes("sativa") ? "sativa" : "hybrid";
-  const prompt = `hyperrealistic oil painting of a ${color} ${name} cannabis flower bud, ${t} strain, glistening trichomes, vibrant pistils, dramatic chiaroscuro lighting, museum quality botanical illustration, rich textures, dark moody background, masterpiece, ultra detailed, 8k resolution`;
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${id}&nologo=true&model=flux`;
+  const id = Math.abs(hash) % 1000;
+  return `https://picsum.photos/seed/${id}/512/512`;
 };
 
 export const getPlantImage = (id: number) => {

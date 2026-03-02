@@ -35,21 +35,25 @@ const Pay = () => {
 
   let paymentAmount = 0;
   let paymentLabel = "";
+  let paymentLink = "";
   if (payType === "intake" || payType === "appointment") {
     paymentAmount = amountParam ? parseFloat(amountParam) : (pro?.priceValue || 0);
     paymentLabel = pro ? `Consulta com ${pro.name}` : "Consulta";
+    paymentLink = pro?.paymentLink || "https://link.mercadopago.com.br/assinaturaplantaerai";
   } else if (payType === "subscription") {
     paymentAmount = plan?.price || 0;
     paymentLabel = plan ? `Assinatura ${plan.name}` : "Assinatura";
+    paymentLink = "https://link.mercadopago.com.br/assinaturaplantaerai";
   } else {
     paymentAmount = total();
     paymentLabel = `Pedido Shopping (${count()} itens)`;
+    paymentLink = "https://link.mercadopago.com.br/assinaturaplantaerai";
   }
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(PIX_PLACEHOLDER);
+    navigator.clipboard.writeText(paymentLink);
     setCopied(true);
-    toast({ title: "Código Pix copiado!", description: "Cole no app do seu banco." });
+    toast({ title: "Link copiado!", description: "Cole no navegador para pagar." });
     setTimeout(() => setCopied(false), 3000);
   };
 
@@ -163,12 +167,12 @@ const Pay = () => {
                     </div>
 
                     <div className="mb-4">
-                      <label className="text-xs font-black text-muted-foreground block mb-2">Pix Copia e Cola</label>
+                      <label className="text-xs font-black text-muted-foreground block mb-2">Link de Pagamento (Copia e Cola)</label>
                       <div className="flex gap-2">
                         <code className="flex-1 p-3 rounded-xl bg-muted border border-border text-xs text-foreground break-all font-mono">
-                          {PIX_PLACEHOLDER.substring(0, 40)}...
+                          {paymentLink}
                         </code>
-                        <Button variant="outline" size="sm" onClick={handleCopy} className="shrink-0 rounded-xl" aria-label="Copiar código Pix">
+                        <Button variant="outline" size="sm" onClick={handleCopy} className="shrink-0 rounded-xl" aria-label="Copiar link de pagamento">
                           {copied ? <CheckCircle2 size={16} className="text-primary" /> : <Copy size={16} />}
                         </Button>
                       </div>
@@ -189,7 +193,17 @@ const Pay = () => {
                     </div>
 
                     <Button
-                      className="w-full font-black bg-primary text-primary-foreground rounded-2xl"
+                      className="w-full font-black bg-primary text-primary-foreground rounded-2xl mb-2"
+                      asChild
+                    >
+                      <a href={paymentLink} target="_blank" rel="noopener noreferrer">
+                        Pagar Agora no Mercado Pago <ArrowRight size={16} className="ml-2" />
+                      </a>
+                    </Button>
+
+                    <Button
+                      className="w-full font-black rounded-2xl"
+                      variant="outline"
                       onClick={simulatePayment}
                       disabled={status === "processing" || !canPay}
                     >
@@ -197,7 +211,7 @@ const Pay = () => {
                     </Button>
 
                     <p className="text-xs text-muted-foreground mt-4">
-                      Em produção: cobrança criada via API Mercado Pago + confirmação automática via webhook.
+                      Pagamento seguro via Mercado Pago. Confirmação automática.
                     </p>
                   </>
                 )}

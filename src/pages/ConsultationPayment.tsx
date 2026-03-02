@@ -38,8 +38,8 @@ const ConsultationPayment = () => {
   }, [status]);
 
   const handleCopyPix = () => {
-    navigator.clipboard.writeText(pixCode);
-    toast({ title: "Código PIX copiado!", description: "Cole no app do seu banco para pagar." });
+    navigator.clipboard.writeText(pro.paymentLink);
+    toast({ title: "Link copiado!", description: "Cole no navegador para pagar." });
   };
 
   const simulatePayment = () => {
@@ -103,14 +103,14 @@ const ConsultationPayment = () => {
                       </div>
                     </div>
 
-                    {/* PIX Copy & Paste */}
+                    {/* Link copia e cola */}
                     <div className="mb-4">
-                      <label className="text-xs font-bold text-muted-foreground mb-1 block">Código PIX (Copia e Cola)</label>
+                      <label className="text-xs font-bold text-muted-foreground mb-1 block">Link de Pagamento (Copia e Cola)</label>
                       <div className="flex gap-2">
                         <input
                           type="text"
                           readOnly
-                          value={pixCode}
+                          value={pro.paymentLink}
                           className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-xs text-foreground font-mono"
                         />
                         <Button variant="outline" size="sm" onClick={handleCopyPix} className="rounded-xl border-primary/30 text-primary">
@@ -146,16 +146,27 @@ const ConsultationPayment = () => {
                       </div>
                     </div>
 
+                    {/* Pagar direto */}
+                    <Button
+                      className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12 mb-2"
+                      asChild
+                    >
+                      <a href={pro.paymentLink} target="_blank" rel="noopener noreferrer">
+                        Pagar Agora no Mercado Pago
+                      </a>
+                    </Button>
+
                     {/* Simulate Payment */}
                     <Button
                       onClick={simulatePayment}
                       disabled={status === "processing"}
-                      className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12"
+                      variant="outline"
+                      className="w-full font-black rounded-2xl h-12"
                     >
                       {status === "processing" ? (
-                        <span className="animate-pulse">Aguardando confirmação do PIX...</span>
+                        <span className="animate-pulse">Aguardando confirmação...</span>
                       ) : (
-                        <>Simular Pagamento PIX</>
+                        <>Simular Pagamento</>
                       )}
                     </Button>
                   </>

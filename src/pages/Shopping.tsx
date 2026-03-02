@@ -267,9 +267,9 @@ const Shopping = () => {
           <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">É Lojista ou Fabricante?</h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">Cadastre sua loja no Shopping, gerencie produtos e receba via Pix</p>
           <Button size="lg" className="font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground" asChild>
-            <a href="https://wa.me/5511987131241?text=Olá!%20Quero%20cadastrar%20minha%20loja%20no%20Shopping%20Planta%20%26%20Raiz" target="_blank" rel="noopener noreferrer">
+            <Link to="/cadastro">
               Cadastrar Loja <ArrowRight size={20} className="ml-2" />
-            </a>
+            </Link>
           </Button>
         </div>
       </section>

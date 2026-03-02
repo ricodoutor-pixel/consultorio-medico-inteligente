@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Gift, Copy, QrCode, Users, DollarSign, TrendingUp, Medal, Share2, CheckCircle2, ArrowRight } from "lucide-react";
+import { Gift, Copy, QrCode, Users, DollarSign, TrendingUp, Medal, Share2, CheckCircle2, ArrowRight, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
@@ -32,7 +34,21 @@ const myReferrals = [
 
 const Indicacoes = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    checkAuth();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -40,6 +56,41 @@ const Indicacoes = () => {
     toast({ title: "Copiado!", description: "Link de indicação copiado para a área de transferência." });
     setTimeout(() => setCopied(false), 3000);
   };
+
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="pt-32 text-center text-muted-foreground">Carregando...</div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <section className="pt-24 pb-16 md:pt-32">
+          <div className="container mx-auto px-4 max-w-lg text-center">
+            <Lock size={48} className="text-primary mx-auto mb-6" />
+            <h1 className="text-3xl md:text-5xl font-display font-black text-foreground mb-4 tracking-tight">
+              Indicação <span className="text-gradient-green">Premiada</span>
+            </h1>
+            <p className="text-muted-foreground mb-8 font-medium">
+              Acesso exclusivo para usuários cadastrados. Faça login ou cadastre-se para participar do programa de indicações.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-14 px-8" onClick={() => navigate("/cadastro")}>
+                Criar Conta <ArrowRight size={18} className="ml-2" />
+              </Button>
+            </div>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

@@ -67,6 +67,28 @@ const Precos = () => {
       highlighted: false,
       checkoutUrl: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=97dee2a0d53c462f95296d83a1e1ce61",
     },
+    {
+      id: "empresas",
+      name: "Empresas & Parceiros",
+      price: "Sob consulta",
+      priceValue: 0,
+      period: "",
+      tag: "ENTERPRISE",
+      description: "Plano completo para clínicas, farmácias, associações e parceiros estratégicos.",
+      features: [
+        "Tudo do Família (ilimitado)",
+        "API de integração white-label",
+        "Painel administrativo dedicado",
+        "Onboarding e treinamento exclusivo",
+        "Suporte 24/7 com gerente de conta",
+        "Relatórios analíticos avançados",
+        "SLA garantido de 99.9%",
+        "Integração com sistemas próprios",
+      ],
+      highlighted: false,
+      checkoutUrl: "/contato",
+      isEnterprise: true,
+    },
   ];
 
   return (
@@ -85,38 +107,49 @@ const Precos = () => {
             </p>
           </motion.div>
 
-          <motion.div className="grid md:grid-cols-3 gap-6 max-w-5xl" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+          <motion.div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {plans.map((plan) => (
               <motion.div key={plan.id} variants={fadeUp}>
-                <Card className={`relative h-full border-border ${plan.highlighted ? 'border-primary/50 glow-green scale-[1.03]' : ''}`}>
+                <Card className={`relative h-full border-border ${plan.highlighted ? 'border-primary/50 glow-green scale-[1.03]' : ''} ${(plan as any).isEnterprise ? 'border-secondary/40 bg-gradient-purple' : ''}`}>
                   {plan.tag && (
-                    <div className={`absolute -top-3 right-4 px-3 py-1 rounded-full text-xs font-black ${plan.highlighted ? 'bg-gradient-green border border-green text-primary' : 'bg-card border border-border text-muted-foreground'}`}>
+                    <div className={`absolute -top-3 right-4 px-3 py-1 rounded-full text-xs font-black ${plan.highlighted ? 'bg-gradient-green border border-green text-primary' : (plan as any).isEnterprise ? 'bg-secondary/20 border border-secondary/30 text-secondary' : 'bg-card border border-border text-muted-foreground'}`}>
                       {plan.tag}
                     </div>
                   )}
                   <CardContent className="p-6">
                     <h3 className="text-xl font-display font-black text-foreground mb-1">{plan.name}</h3>
                     <div className="mb-2">
-                      <span className="text-4xl font-display font-black text-gradient-green">{plan.price}</span>
-                      <span className="text-muted-foreground text-sm">{plan.period}</span>
+                      <span className={`text-4xl font-display font-black ${(plan as any).isEnterprise ? 'text-gradient-purple text-2xl' : 'text-gradient-green'}`}>{plan.price}</span>
+                      {plan.period && <span className="text-muted-foreground text-sm">{plan.period}</span>}
                     </div>
                     <p className="text-sm text-muted-foreground mb-6">{plan.description}</p>
                     <ul className="space-y-3 mb-6">
                       {plan.features.map((feature, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
+                          <CheckCircle2 size={16} className={`${(plan as any).isEnterprise ? 'text-secondary' : 'text-primary'} shrink-0 mt-0.5`} />
                           {feature}
                         </li>
                       ))}
                     </ul>
-                    <Button
-                      className={`w-full font-black rounded-2xl ${plan.highlighted ? 'bg-primary text-primary-foreground' : 'bg-gradient-green border border-green text-primary hover:bg-primary/20'}`}
-                      asChild
-                    >
-                      <a href={(plan as any).checkoutUrl} target="_blank" rel="noopener noreferrer">
-                        Assinar Agora
-                      </a>
-                    </Button>
+                    {(plan as any).isEnterprise ? (
+                      <Button
+                        className="w-full font-black rounded-2xl bg-secondary text-secondary-foreground hover:bg-secondary/90"
+                        asChild
+                      >
+                        <Link to="/contato">
+                          Falar com Comercial <ArrowRight size={16} className="ml-2" />
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Button
+                        className={`w-full font-black rounded-2xl ${plan.highlighted ? 'bg-primary text-primary-foreground' : 'bg-gradient-green border border-green text-primary hover:bg-primary/20'}`}
+                        asChild
+                      >
+                        <a href={plan.checkoutUrl} target="_blank" rel="noopener noreferrer">
+                          Assinar Agora
+                        </a>
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>

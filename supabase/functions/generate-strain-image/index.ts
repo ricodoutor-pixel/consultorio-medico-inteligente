@@ -48,7 +48,10 @@ serve(async (req) => {
 
     // Try to download and upload to storage for caching
     try {
-      const imageResp = await fetch(pollinationsUrl, { signal: AbortSignal.timeout(15000) });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const imageResp = await fetch(pollinationsUrl, { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (imageResp.ok) {
         const imageBlob = await imageResp.arrayBuffer();
         const fileName = `strain-${strain_id}.jpg`;

@@ -16,12 +16,22 @@ export interface CannabisStrain {
   imagem: string;
 }
 
-// Reliable deterministic plant images using picsum.photos with seeds
-const aiImg = (name: string, _type: string) => {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = ((hash << 5) - hash) + name.charCodeAt(i);
-  const id = Math.abs(hash) % 1000;
-  return `https://picsum.photos/seed/${id}/512/512`;
+// AI-generated cannabis flower images via Pollinations.ai
+const aiImg = (name: string, type: string) => {
+  const colors: Record<string, string> = {
+    "indica": "deep purple and dark green",
+    "sativa": "bright lime green and golden orange",
+    "híbrida": "emerald green and amber",
+    "cbd": "frosty silver-green and white",
+  };
+  const t = type.toLowerCase();
+  const colorKey = t.includes("indica") ? "indica" : t.includes("sativa") ? "sativa" : t.includes("cbd") ? "cbd" : "híbrida";
+  const color = colors[colorKey];
+  const seed = encodeURIComponent(name.replace(/\s+/g, "-").toLowerCase());
+  const prompt = encodeURIComponent(
+    `ultra realistic close-up macro photograph of a beautiful ${name} cannabis flower bud, ${color} tones, dense sparkling trichomes, vibrant orange pistils, professional botanical photography, shallow depth of field, dark moody background, studio lighting, 8k, masterpiece quality`
+  );
+  return `https://image.pollinations.ai/prompt/${prompt}?width=512&height=512&seed=${seed}&nologo=true&model=flux`;
 };
 
 export const getPlantImage = (id: number) => {

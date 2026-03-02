@@ -1,6 +1,3 @@
-import { useStrainImage } from "@/hooks/useStrainImage";
-import { Skeleton } from "@/components/ui/skeleton";
-
 interface StrainImageProps {
   strainId: number;
   strainName: string;
@@ -11,20 +8,21 @@ interface StrainImageProps {
 }
 
 export function StrainImage({ strainId, strainName, strainType, fallbackUrl, className = "", alt }: StrainImageProps) {
-  const { imageUrl, loading } = useStrainImage(strainId, strainName, strainType, fallbackUrl);
-
-  if (loading) {
-    return <Skeleton className={`w-full h-full ${className}`} />;
-  }
-
   return (
     <img
-      src={imageUrl}
+      src={fallbackUrl}
       alt={alt || strainName}
       className={className}
       loading="lazy"
       onError={(e) => {
-        e.currentTarget.src = "/placeholder.svg";
+        // Fallback to picsum with strain id as seed
+        const target = e.currentTarget;
+        if (!target.dataset.retried) {
+          target.dataset.retried = "1";
+          target.src = `https://picsum.photos/seed/strain${strainId}/512/512`;
+        } else {
+          target.src = "/placeholder.svg";
+        }
       }}
     />
   );

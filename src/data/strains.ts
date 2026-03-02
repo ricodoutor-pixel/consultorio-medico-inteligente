@@ -16,22 +16,32 @@ export interface CannabisStrain {
   imagem: string;
 }
 
-// AI-generated cannabis flower images via Pollinations.ai
+// Local AI-generated cannabis flower images by type
+import indicaPurple from "@/assets/strains/indica-purple.jpg";
+import indicaDeep from "@/assets/strains/indica-deep.jpg";
+import indicaPink from "@/assets/strains/indica-pink.jpg";
+import sativaGreen from "@/assets/strains/sativa-green.jpg";
+import sativaLime from "@/assets/strains/sativa-lime.jpg";
+import sativaForest from "@/assets/strains/sativa-forest.jpg";
+import hybridOrange from "@/assets/strains/hybrid-orange.jpg";
+import hybridGold from "@/assets/strains/hybrid-gold.jpg";
+import hybridRed from "@/assets/strains/hybrid-red.jpg";
+import cbdFrosty from "@/assets/strains/cbd-frosty.jpg";
+import cbdEmerald from "@/assets/strains/cbd-emerald.jpg";
+import cbdSilver from "@/assets/strains/cbd-silver.jpg";
+
+const indicaImages = [indicaPurple, indicaDeep, indicaPink];
+const sativaImages = [sativaGreen, sativaLime, sativaForest];
+const hybridImages = [hybridOrange, hybridGold, hybridRed];
+const cbdImages = [cbdFrosty, cbdEmerald, cbdSilver];
+
 const aiImg = (name: string, type: string) => {
-  const colors: Record<string, string> = {
-    "indica": "deep purple and dark green",
-    "sativa": "bright lime green and golden orange",
-    "híbrida": "emerald green and amber",
-    "cbd": "frosty silver-green and white",
-  };
+  const seed = Math.abs([...name].reduce((h, c) => ((h << 5) - h) + c.charCodeAt(0), 0));
   const t = type.toLowerCase();
-  const colorKey = t.includes("indica") ? "indica" : t.includes("sativa") ? "sativa" : t.includes("cbd") ? "cbd" : "híbrida";
-  const color = colors[colorKey];
-  const seed = encodeURIComponent(name.replace(/\s+/g, "-").toLowerCase());
-  const prompt = encodeURIComponent(
-    `ultra realistic close-up macro photograph of a beautiful ${name} cannabis flower bud, ${color} tones, dense sparkling trichomes, vibrant orange pistils, professional botanical photography, shallow depth of field, dark moody background, studio lighting, 8k, masterpiece quality`
-  );
-  return `https://image.pollinations.ai/prompt/${prompt}?width=512&height=512&seed=${seed}&nologo=true&model=flux`;
+  if (t.includes("indica")) return indicaImages[seed % 3];
+  if (t.includes("sativa")) return sativaImages[seed % 3];
+  if (t.includes("cbd")) return cbdImages[seed % 3];
+  return hybridImages[seed % 3];
 };
 
 export const getPlantImage = (id: number) => {

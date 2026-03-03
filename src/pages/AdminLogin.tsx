@@ -35,11 +35,15 @@ const AdminLogin = () => {
         return;
       }
 
-      // Check admin role via user metadata
-      const isAdmin = data.user.user_metadata?.role === "admin" || 
-                      data.user.email === email; // Allow any authenticated user for now
-      
-      if (isAdmin) {
+      // Check admin role via user_roles table
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (roleData) {
         sessionStorage.setItem("admin_auth", "true");
         sessionStorage.setItem("admin_user_id", data.user.id);
         toast({ title: "Acesso autorizado", description: "Bem-vindo ao painel administrativo." });

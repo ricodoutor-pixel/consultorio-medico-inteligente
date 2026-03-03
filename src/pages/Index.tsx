@@ -72,11 +72,20 @@ const Index = () => {
                 </Link>
               </motion.div>
 
-              <motion.h1 variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-display font-black text-foreground leading-[1.08] mb-8 tracking-tight">
-                Democratizando o acesso a{" "}
-                <span className="text-gradient-green">medicamentos</span>{" "}
-                à base de{" "}
-                <span className="text-gradient-purple">cannabis</span>
+              <motion.h1 
+                variants={fadeUp} 
+                className="text-3xl md:text-5xl lg:text-6xl font-display font-black leading-[1.1] mb-8 tracking-tight"
+              >
+                <span className="text-foreground">Democratizando o </span>
+                <span className="text-gradient-green">Acesso</span>
+                <span className="text-foreground"> a </span>
+                <span className="text-gradient-purple">Medicamentos</span>
+                <span className="text-foreground"> e </span>
+                <span className="text-gradient-gold">Suprimentos</span>
+                <span className="text-foreground"> à Base De </span>
+                <span className="text-gradient-green">Cannabis</span>
+                <span className="text-foreground"> Em Todo </span>
+                <span className="text-gradient-purple">el Mundo</span>
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-3xl mb-10 leading-relaxed font-medium">

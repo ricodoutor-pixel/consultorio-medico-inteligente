@@ -12,9 +12,9 @@ export const Navbar = () => {
     { to: "/telemedicina", label: "Telemedicina" },
     { to: "/shopping", label: "Shopping" },
     { to: "/biblioteca", label: "Biblioteca" },
-    { to: "/indicacoes", label: "Indicações" },
+    { to: "/comunidade", label: "Comunidade" },
+    { to: "/dashboard", label: "Meu Painel" },
     { to: "/planos", label: "Planos" },
-    { to: "/influenciadores", label: "Influencers" },
   ];
 
   return (

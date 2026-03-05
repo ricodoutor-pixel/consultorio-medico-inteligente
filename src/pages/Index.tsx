@@ -181,9 +181,9 @@ const Index = () => {
               { icon: Stethoscope, label: "Telemedicina", to: "/telemedicina", color: "green" },
               { icon: BookOpen, label: "Biblioteca", to: "/biblioteca", color: "purple" },
               { icon: ShoppingBag, label: "Shopping", to: "/shopping", color: "green" },
+              { icon: Users, label: "Comunidade", to: "/comunidade", color: "purple" },
               { icon: Gift, label: "Indicações", to: "/indicacoes", color: "gold" },
-              { icon: UserPlus, label: "Cadastro", to: "/cadastro", color: "green" },
-              { icon: Globe, label: "Legal", to: "/legal", color: "purple" },
+              { icon: HeartPulse, label: "Meu Painel", to: "/dashboard", color: "green" },
             ].map((hub, i) => (
               <motion.div key={i} variants={fadeUp}>
                 <Link to={hub.to}>

@@ -27,6 +27,8 @@ import SpecialistDashboard from "./pages/SpecialistDashboard";
 import InfluencerDashboard from "./pages/InfluencerDashboard";
 import OnlineUsers from "./pages/OnlineUsers";
 import DownloadApp from "./pages/DownloadApp";
+import Comunidade from "./pages/Comunidade";
+import DashboardPaciente from "./pages/DashboardPaciente";
 import NotFound from "./pages/NotFound";
 import { FrogChatModal } from "./components/FrogChatModal";
 
@@ -68,6 +70,8 @@ const App = () => (
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/biblioteca" element={<BibliotecaCientifica />} />
           <Route path="/download" element={<DownloadApp />} />
+          <Route path="/comunidade" element={<Comunidade />} />
+          <Route path="/dashboard" element={<DashboardPaciente />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

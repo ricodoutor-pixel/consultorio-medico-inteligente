@@ -145,11 +145,26 @@ const Precos = () => {
           </motion.div>
 
           <motion.div className="mt-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <div className="flex flex-wrap gap-6">
+            <div className="flex flex-wrap gap-6 mb-8">
               {["✓ Pagamento via Pix", "✓ Cancelamento livre", "✓ Conformidade LGPD", "✓ Comissão por indicação"].map((item, i) => (
                 <span key={i} className="text-sm font-bold text-muted-foreground">{item}</span>
               ))}
             </div>
+            <motion.a
+              href="https://doutorpark.com.br/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-display font-black text-lg text-primary-foreground cursor-pointer"
+              style={{
+                background: 'linear-gradient(135deg, hsl(152 80% 45%), hsl(152 90% 55%), hsl(45 76% 52%))',
+                boxShadow: '0 0 30px hsl(152 80% 45% / 0.4), 0 0 60px hsl(45 76% 52% / 0.2)',
+              }}
+              whileHover={{ scale: 1.05, boxShadow: '0 0 50px hsl(152 80% 45% / 0.6), 0 0 80px hsl(45 76% 52% / 0.3)' }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
+              🌿 Invista Em Cannabis Medicinal <ArrowRight size={22} />
+            </motion.a>
           </motion.div>
         </div>
       </section>

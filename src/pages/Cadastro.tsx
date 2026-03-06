@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { validateCPF, validateCNPJ, formatCPF, formatCNPJ } from "@/lib/validators";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,16 @@ const Cadastro = () => {
     const telefone = formData.telefone || "";
     if (telefone && !/^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(telefone.replace(/\s/g, ""))) {
       toast({ title: "Telefone inválido", description: "Insira um telefone válido.", variant: "destructive" });
+      return false;
+    }
+    const cpf = formData.cpf || "";
+    if (cpf && !validateCPF(cpf)) {
+      toast({ title: "CPF inválido", description: "Insira um CPF válido.", variant: "destructive" });
+      return false;
+    }
+    const cnpj = formData.cnpj || "";
+    if (cnpj && !validateCNPJ(cnpj)) {
+      toast({ title: "CNPJ inválido", description: "Insira um CNPJ válido.", variant: "destructive" });
       return false;
     }
     return true;

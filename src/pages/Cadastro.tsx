@@ -50,6 +50,16 @@ const Cadastro = () => {
       toast({ title: "Telefone inválido", description: "Insira um telefone válido.", variant: "destructive" });
       return false;
     }
+    const cpf = formData.cpf || "";
+    if (cpf && !validateCPF(cpf)) {
+      toast({ title: "CPF inválido", description: "Insira um CPF válido.", variant: "destructive" });
+      return false;
+    }
+    const cnpj = formData.cnpj || "";
+    if (cnpj && !validateCNPJ(cnpj)) {
+      toast({ title: "CNPJ inválido", description: "Insira um CNPJ válido.", variant: "destructive" });
+      return false;
+    }
     return true;
   };
 

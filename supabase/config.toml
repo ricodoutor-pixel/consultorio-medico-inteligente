@@ -2,3 +2,6 @@ project_id = "shmbwdjuddvquszwkvuq"
 
 [functions.generate-strain-image]
 verify_jwt = false
+
+[functions.mercadopago-webhook]
+verify_jwt = false

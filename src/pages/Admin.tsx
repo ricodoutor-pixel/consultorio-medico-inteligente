@@ -80,6 +80,7 @@ type Tab = "dashboard" | "users" | "webhooks" | "alerts" | "analytics";
 const Admin = () => {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [live, setLive] = useState(generateLiveData());
+  const [timeFilter, setTimeFilter] = useState<"24h" | "7d" | "30d" | "90d">("30d");
   const navigate = useNavigate();
 
   useEffect(() => {

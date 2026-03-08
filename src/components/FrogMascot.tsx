@@ -119,7 +119,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             style={{ clipPath: `inset(0 0 ${size * 0.48}px 0)` }}
             draggable={false}
           />
-          <FrogCrown size={size} isHovered={anim.isHovered} />
+          {/* Crown removed */}
         </motion.div>
       </div>
 

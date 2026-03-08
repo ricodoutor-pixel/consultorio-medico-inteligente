@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { professionals } from "@/data/professionals";
-import { CheckCircle2, Copy, Clock, ArrowRight, Shield, QrCode, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle2, Copy, Clock, ArrowRight, Shield, QrCode, Loader2, AlertCircle, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,17 +17,56 @@ const ConsultationPayment = () => {
   const proId = searchParams.get("pro") || "med-1";
   const appointmentId = searchParams.get("appointment") || null;
   const pro = professionals.find((p) => p.id === proId) || professionals[0];
-  const [status, setStatus] = useState<"pending" | "processing" | "confirmed" | "rejected">("pending");
-  const [countdown, setCountdown] = useState(300);
-  const [pollCount, setPollCount] = useState(0);
+  const [status, setStatus] = useState<"pending" | "loading" | "processing" | "confirmed" | "rejected">("pending");
+  const [countdown, setCountdown] = useState(900); // 15 min
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   const commission = pro.priceValue * 0.1;
   const total = pro.priceValue;
 
+  // Create Mercado Pago payment preference on mount
+  useEffect(() => {
+    createPayment();
+  }, []);
+
+  const createPayment = async () => {
+    setStatus("loading");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke("create-payment", {
+        body: {
+          appointmentId,
+          doctorName: pro.name,
+          amount: total,
+          patientEmail: session?.user?.email || "",
+          description: `Consulta com ${pro.name} - Planta & Raiz`,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.init_point) {
+        setCheckoutUrl(data.init_point);
+        setStatus("pending");
+      } else if (data?.error) {
+        // Fallback to static link if MP API fails
+        console.warn("Fallback to static link:", data.error);
+        setCheckoutUrl(pro.paymentLink);
+        setStatus("pending");
+      }
+    } catch (err) {
+      console.error("Payment creation error:", err);
+      // Fallback to static link
+      setCheckoutUrl(pro.paymentLink);
+      setStatus("pending");
+      toast({ title: "Usando link de pagamento direto", description: "Link alternativo disponível." });
+    }
+  };
+
   // Countdown timer
   useEffect(() => {
-    if (status !== "pending") return;
+    if (status !== "pending" && status !== "processing") return;
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) { clearInterval(timer); return 0; }
@@ -50,7 +89,7 @@ const ConsultationPayment = () => {
         toast({ title: "✅ Pagamento confirmado!", description: "Sua consulta está agendada." });
       } else if (data?.status === "rejected") {
         setStatus("rejected");
-        toast({ title: "❌ Pagamento recusado", description: "Tente novamente ou use outro método.", variant: "destructive" });
+        toast({ title: "❌ Pagamento recusado", description: "Tente novamente.", variant: "destructive" });
       }
     } catch (err) {
       console.error("Payment check error:", err);
@@ -63,12 +102,11 @@ const ConsultationPayment = () => {
     if (!appointmentId) return;
     const interval = setInterval(() => {
       checkPaymentStatus();
-      setPollCount(p => p + 1);
     }, 5000);
     return () => clearInterval(interval);
   }, [checkPaymentStatus, status, appointmentId]);
 
-  // Also listen to realtime notifications
+  // Realtime listener
   useEffect(() => {
     if (!appointmentId) return;
     const channel = supabase
@@ -78,7 +116,7 @@ const ConsultationPayment = () => {
         schema: "public",
         table: "appointments",
         filter: `id=eq.${appointmentId}`,
-      }, (payload) => {
+      }, (payload: any) => {
         if (payload.new?.payment_status === "paid") {
           setStatus("confirmed");
           toast({ title: "✅ Pagamento confirmado!", description: "Redirecionando..." });
@@ -88,17 +126,11 @@ const ConsultationPayment = () => {
     return () => { supabase.removeChannel(channel); };
   }, [appointmentId, toast]);
 
-  const handleCopyPix = () => {
-    navigator.clipboard.writeText(pro.paymentLink);
-    toast({ title: "Link copiado!", description: "Cole no navegador para pagar." });
-  };
-
-  const simulatePayment = () => {
-    setStatus("processing");
-    setTimeout(() => {
-      setStatus("confirmed");
-      toast({ title: "✅ Pagamento confirmado!", description: "Você será redirecionado para a entrevista." });
-    }, 3000);
+  const handleCopyLink = () => {
+    if (checkoutUrl) {
+      navigator.clipboard.writeText(checkoutUrl);
+      toast({ title: "Link copiado!", description: "Cole no navegador para pagar." });
+    }
   };
 
   const minutes = Math.floor(countdown / 60);
@@ -130,10 +162,15 @@ const ConsultationPayment = () => {
             <Card className="border-border mb-6">
               <CardContent className="p-6">
                 <h3 className="font-display font-black text-foreground text-lg mb-4 flex items-center gap-2">
-                  <QrCode size={20} className="text-primary" /> Pagamento via PIX
+                  <QrCode size={20} className="text-primary" /> Pagamento via Mercado Pago
                 </h3>
 
-                {status === "confirmed" ? (
+                {status === "loading" ? (
+                  <div className="text-center py-12">
+                    <Loader2 size={48} className="text-primary animate-spin mx-auto mb-4" />
+                    <p className="text-muted-foreground">Gerando link de pagamento...</p>
+                  </div>
+                ) : status === "confirmed" ? (
                   <div className="text-center py-8">
                     <CheckCircle2 size={64} className="text-primary mx-auto mb-4" />
                     <h4 className="text-xl font-display font-black text-foreground mb-2">Pagamento Confirmado!</h4>
@@ -148,36 +185,30 @@ const ConsultationPayment = () => {
                   <div className="text-center py-8">
                     <AlertCircle size={64} className="text-destructive mx-auto mb-4" />
                     <h4 className="text-xl font-display font-black text-foreground mb-2">Pagamento Recusado</h4>
-                    <p className="text-muted-foreground mb-6">Tente novamente com outro método de pagamento.</p>
-                    <Button onClick={() => setStatus("pending")} className="bg-primary text-primary-foreground font-black rounded-2xl">
+                    <p className="text-muted-foreground mb-6">Tente novamente com outro método.</p>
+                    <Button onClick={createPayment} className="bg-primary text-primary-foreground font-black rounded-2xl">
                       Tentar Novamente
                     </Button>
                   </div>
                 ) : (
                   <>
-                    {/* QR Code placeholder */}
-                    <div className="w-48 h-48 mx-auto mb-4 rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center bg-muted/30">
-                      <div className="text-center">
-                        <QrCode size={64} className="text-primary mx-auto mb-2" />
-                        <p className="text-xs text-muted-foreground font-bold">QR Code PIX</p>
+                    {/* Link copy */}
+                    {checkoutUrl && (
+                      <div className="mb-4">
+                        <label className="text-xs font-bold text-muted-foreground mb-1 block">Link de Pagamento</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            readOnly
+                            value={checkoutUrl}
+                            className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-xs text-foreground font-mono truncate"
+                          />
+                          <Button variant="outline" size="sm" onClick={handleCopyLink} className="rounded-xl border-primary/30 text-primary">
+                            <Copy size={14} className="mr-1" /> Copiar
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Link copia e cola */}
-                    <div className="mb-4">
-                      <label className="text-xs font-bold text-muted-foreground mb-1 block">Link de Pagamento (Copia e Cola)</label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          readOnly
-                          value={pro.paymentLink}
-                          className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-xs text-foreground font-mono"
-                        />
-                        <Button variant="outline" size="sm" onClick={handleCopyPix} className="rounded-xl border-primary/30 text-primary">
-                          <Copy size={14} className="mr-1" /> Copiar
-                        </Button>
-                      </div>
-                    </div>
+                    )}
 
                     {/* Timer */}
                     <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border mb-4">
@@ -190,8 +221,8 @@ const ConsultationPayment = () => {
                       </span>
                     </div>
 
-                    {/* Polling status indicator */}
-                    {appointmentId && status === "pending" && (
+                    {/* Polling status */}
+                    {appointmentId && (
                       <div className="flex items-center gap-2 p-2 rounded-lg bg-primary/5 border border-primary/20 mb-4">
                         <Loader2 size={14} className="text-primary animate-spin" />
                         <span className="text-xs text-muted-foreground">Aguardando confirmação automática do pagamento...</span>
@@ -214,28 +245,15 @@ const ConsultationPayment = () => {
                       </div>
                     </div>
 
-                    {/* Pagar direto */}
+                    {/* Pay button */}
                     <Button
-                      className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12 mb-2"
+                      className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12"
                       asChild
                     >
-                      <a href={pro.paymentLink} target="_blank" rel="noopener noreferrer">
+                      <a href={checkoutUrl || pro.paymentLink} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink size={16} className="mr-2" />
                         Pagar Agora no Mercado Pago
                       </a>
-                    </Button>
-
-                    {/* Simulate Payment */}
-                    <Button
-                      onClick={simulatePayment}
-                      disabled={status === "processing"}
-                      variant="outline"
-                      className="w-full font-black rounded-2xl h-12"
-                    >
-                      {status === "processing" ? (
-                        <span className="flex items-center gap-2"><Loader2 size={16} className="animate-spin" /> Aguardando confirmação...</span>
-                      ) : (
-                        <>Simular Pagamento</>
-                      )}
                     </Button>
                   </>
                 )}

@@ -27,7 +27,7 @@ export const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!authenticated) {
-    return <Navigate to="/cadastro" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;

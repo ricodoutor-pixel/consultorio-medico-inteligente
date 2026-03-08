@@ -32,6 +32,8 @@ const Legal = lazy(() => import("./pages/Legal"));
 const Indicacoes = lazy(() => import("./pages/Indicacoes"));
 const Telemedicina = lazy(() => import("./pages/Telemedicina"));
 const Cadastro = lazy(() => import("./pages/Cadastro"));
+const Login = lazy(() => import("./pages/Login"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const ConsultationPayment = lazy(() => import("./pages/ConsultationPayment"));
 const SpecialistDashboard = lazy(() => import("./pages/SpecialistDashboard"));
 const InfluencerDashboard = lazy(() => import("./pages/InfluencerDashboard"));
@@ -73,6 +75,8 @@ const App = () => (
                 <Route path="/carteira" element={<Carteira />} />
                 <Route path="/cadastro-profissional" element={<CadastroProfissional />} />
                 <Route path="/cadastro" element={<Cadastro />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />
                 <Route path="/telemedicina" element={<Telemedicina />} />
                 <Route path="/indicacoes" element={<Indicacoes />} />
@@ -94,7 +98,6 @@ const App = () => (
                 <Route path="/dashboard-medico" element={<DashboardMedico />} />
                 <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />
                 <Route path="/notificacoes" element={<Notificacoes />} />
-                <Route path="*" element={<NotFound />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

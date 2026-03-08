@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { Stethoscope, ArrowRight, ArrowLeft, CheckCircle2, Brain, Heart, Activity, Shield, Leaf, Watch, FileText, Download, Printer } from "lucide-react";
+import { Stethoscope, ArrowRight, ArrowLeft, CheckCircle2, Brain, Heart, Activity, Shield, Leaf, Watch, FileText, Download, Printer, UserCheck, Scale, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { professionals } from "@/data/professionals";
@@ -41,14 +41,23 @@ const wearableData = {
 };
 
 const Telemedicina = () => {
-  const [step, setStep] = useState(0);
+  // step: -1 = TCLE consent, 0 = intro/identification, 1-10 = questions, 11+ = results
+  const [step, setStep] = useState(-1);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [sliderValue, setSliderValue] = useState([50]);
   const [showPrescription, setShowPrescription] = useState(false);
   const [showWearables, setShowWearables] = useState(false);
+  const [tcleAccepted, setTcleAccepted] = useState(false);
+  const [patientData, setPatientData] = useState({
+    nome: "",
+    cpf: "",
+    dataNascimento: "",
+    email: "",
+    telefone: "",
+  });
 
   const currentQ = interviewQuestions[step - 1];
-  const progress = step === 0 ? 0 : step > 10 ? 100 : Math.round((step / 10) * 100);
+  const progress = step <= 0 ? 0 : step > 10 ? 100 : Math.round((step / 10) * 100);
   const medicos = professionals.filter(p => p.category === "Médicos Prescritores");
 
   const handleCheckbox = (option: string, checked: boolean) => {
@@ -67,6 +76,26 @@ const Telemedicina = () => {
     if (currentQ.type === "checkbox") return Array.isArray(val) && val.length > 0;
     if (currentQ.type === "slider") return true;
     return !!val;
+  };
+
+  const isPatientDataValid = () => {
+    return patientData.nome.trim().length >= 3 &&
+      patientData.cpf.replace(/\D/g, "").length === 11 &&
+      patientData.dataNascimento &&
+      patientData.email.includes("@") &&
+      patientData.telefone.replace(/\D/g, "").length >= 10;
+  };
+
+  const formatCpf = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  };
+
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   };
 
   const tooltipStyle = { background: "hsl(240 15% 8%)", border: "1px solid hsl(240 10% 16%)", borderRadius: "12px", color: "hsl(240 10% 93%)" };
@@ -90,6 +119,17 @@ const Telemedicina = () => {
             <p className="text-muted-foreground max-w-2xl font-medium">
               Pré-entrevista adaptativa com 10 perguntas + análise IA + receita digital ANVISA + integração com wearables.
             </p>
+            <div className="flex flex-wrap gap-2 mt-4">
+              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">
+                <Scale size={10} className="mr-1" /> Resolução CFM 2.314/2022
+              </Badge>
+              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">
+                <Shield size={10} className="mr-1" /> RDC ANVISA 660/2022
+              </Badge>
+              <Badge variant="outline" className="text-[10px] border-secondary/30 text-secondary">
+                <Shield size={10} className="mr-1" /> LGPD Conforme
+              </Badge>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -97,53 +137,191 @@ const Telemedicina = () => {
       <section className="py-8 pb-20">
         <div className="container mx-auto px-4">
           {/* Progress */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-muted-foreground font-bold">Progresso da entrevista</span>
-              <span className="text-xs text-primary font-bold">{progress}%</span>
+          {step >= 0 && (
+            <div className="max-w-2xl mx-auto mb-8">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-muted-foreground font-bold">Progresso da entrevista</span>
+                <span className="text-xs text-primary font-bold">{progress}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-muted overflow-hidden" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Progresso da entrevista">
+                <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
+              </div>
             </div>
-            <div className="h-2 rounded-full bg-muted overflow-hidden">
-              <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
-            </div>
-          </div>
+          )}
 
           <div className="max-w-2xl mx-auto">
-            {/* Intro */}
-            {step === 0 && (
+
+            {/* ========== STEP -1: TCLE — Termo de Consentimento Livre e Esclarecido ========== */}
+            {step === -1 && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp}>
                 <Card className="border-border">
-                  <CardContent className="p-8 text-center">
-                    <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-green border border-green flex items-center justify-center">
-                      <Brain size={40} className="text-primary" />
-                    </div>
-                    <h2 className="text-2xl font-display font-black text-foreground mb-4">Entrevista IA — Pré-consulta</h2>
-                    <p className="text-muted-foreground mb-6">
-                      Responda 10 perguntas adaptativas para que o especialista receba seu resumo clínico completo antes do atendimento.
-                    </p>
-
-                    <div className="grid sm:grid-cols-4 gap-3 mb-8">
-                      {[
-                        { icon: Activity, label: "Análise de sintomas" },
-                        { icon: Heart, label: "Histórico médico" },
-                        { icon: Shield, label: "Conformidade LGPD" },
-                        { icon: Watch, label: "Dados de wearables" },
-                      ].map((f, i) => (
-                        <div key={i} className="p-3 rounded-xl bg-muted/30 border border-border text-center">
-                          <f.icon size={20} className="text-primary mx-auto mb-2" />
-                          <span className="text-xs font-bold text-foreground">{f.label}</span>
-                        </div>
-                      ))}
+                  <CardContent className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-gold border border-gold flex items-center justify-center">
+                        <Scale size={24} className="text-[hsl(45,76%,52%)]" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-display font-black text-foreground">Termo de Consentimento</h2>
+                        <p className="text-xs text-muted-foreground font-semibold">Resolução CFM nº 2.314/2022 — Art. 5º e 12</p>
+                      </div>
                     </div>
 
-                    <Button size="lg" className="font-black bg-primary text-primary-foreground rounded-2xl h-14 px-10" onClick={() => setStep(1)}>
-                      Iniciar Entrevista <ArrowRight size={18} className="ml-2" />
+                    <div className="bg-muted/30 border border-border rounded-2xl p-5 mb-6 max-h-[300px] overflow-y-auto text-sm text-muted-foreground leading-relaxed space-y-3">
+                      <p className="font-bold text-foreground text-sm">TERMO DE CONSENTIMENTO LIVRE E ESCLARECIDO PARA TELECONSULTA (TCLE)</p>
+
+                      <p><strong className="text-foreground">1. Natureza do Atendimento:</strong> Eu, paciente, declaro que estou ciente de que o atendimento será realizado por meio de tecnologia de telemedicina, conforme Resolução CFM nº 2.314/2022, e que a teleconsulta ocorrerá em tempo real por chat ou vídeo, com profissional médico devidamente registrado no CRM.</p>
+
+                      <p><strong className="text-foreground">2. Identificação e Autenticação:</strong> Comprometo-me a fornecer dados pessoais verdadeiros (nome completo, CPF, data de nascimento) para identificação obrigatória conforme Art. 5º da Resolução CFM nº 2.314/2022. A verificação da identidade poderá ser solicitada por foto de documento com selfie.</p>
+
+                      <p><strong className="text-foreground">3. Registro em Prontuário:</strong> Todas as informações da teleconsulta serão registradas em prontuário eletrônico do paciente, conforme Art. 6º da Resolução CFM nº 2.314/2022 e Resolução CFM nº 1.638/2002. O prontuário será mantido sob sigilo médico pelo prazo mínimo de 20 anos.</p>
+
+                      <p><strong className="text-foreground">4. Prescrição Digital:</strong> As prescrições serão emitidas exclusivamente por médico habilitado, com assinatura digital ICP-Brasil válida, conforme Lei 14.063/2020 e RDC ANVISA nº 660/2022. Produtos de cannabis medicinal serão prescritos em conformidade com a regulamentação vigente da ANVISA.</p>
+
+                      <p><strong className="text-foreground">5. Limitações da Telemedicina:</strong> Estou ciente de que a telemedicina possui limitações inerentes, como impossibilidade de exame físico direto. O médico poderá, a qualquer momento, solicitar consulta presencial se julgar clinicamente necessário (Art. 12, §2º, Resolução CFM nº 2.314/2022).</p>
+
+                      <p><strong className="text-foreground">6. Proteção de Dados:</strong> Meus dados pessoais e de saúde serão tratados como dados sensíveis conforme LGPD (Lei 13.709/2018, Art. 11), com consentimento explícito, criptografia AES-256, e acesso restrito aos profissionais envolvidos no atendimento. Posso revogar o consentimento a qualquer momento.</p>
+
+                      <p><strong className="text-foreground">7. Direito de Recusa:</strong> Tenho o direito de recusar ou interromper o atendimento por telemedicina a qualquer momento, sem prejuízo ao meu tratamento, podendo solicitar atendimento presencial.</p>
+
+                      <p><strong className="text-foreground">8. Gravação:</strong> A consulta NÃO será gravada em áudio ou vídeo sem meu consentimento expresso prévio, conforme Art. 7º da Resolução CFM nº 2.314/2022.</p>
+
+                      <p className="text-[10px] text-muted-foreground/60">Referências legais: Resolução CFM nº 2.314/2022 | Lei 13.709/2018 (LGPD) | Lei 14.063/2020 | RDC ANVISA nº 660/2022 | Resolução CFM nº 1.638/2002 | Código de Ética Médica (Resolução CFM nº 2.217/2018)</p>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20 mb-6">
+                      <Checkbox
+                        id="tcle-accept"
+                        checked={tcleAccepted}
+                        onCheckedChange={(checked) => setTcleAccepted(!!checked)}
+                      />
+                      <Label htmlFor="tcle-accept" className="text-sm text-foreground cursor-pointer leading-relaxed">
+                        Li e compreendi integralmente o Termo de Consentimento Livre e Esclarecido (TCLE) para teleconsulta. Concordo com os termos e autorizo o tratamento dos meus dados pessoais e de saúde conforme descrito.
+                      </Label>
+                    </div>
+
+                    <Button
+                      size="lg"
+                      className="w-full font-black bg-primary text-primary-foreground rounded-2xl h-14"
+                      onClick={() => setStep(0)}
+                      disabled={!tcleAccepted}
+                    >
+                      Aceitar e Continuar <ArrowRight size={18} className="ml-2" />
                     </Button>
+
+                    <p className="text-[10px] text-muted-foreground text-center mt-3">
+                      🔒 Seus dados são protegidos pela LGPD. Ao aceitar, você não está se comprometendo com nenhum pagamento.
+                    </p>
                   </CardContent>
                 </Card>
               </motion.div>
             )}
 
-            {/* Questions 1-10 */}
+            {/* ========== STEP 0: Patient Identification (CFM Art. 5º) ========== */}
+            {step === 0 && (
+              <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+                <Card className="border-border">
+                  <CardContent className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center">
+                        <UserCheck size={24} className="text-primary" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-display font-black text-foreground">Identificação do Paciente</h2>
+                        <p className="text-xs text-muted-foreground font-semibold">Obrigatório — Resolução CFM 2.314/2022, Art. 5º</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="patient-name" className="text-sm font-bold text-foreground">Nome completo *</Label>
+                        <Input
+                          id="patient-name"
+                          value={patientData.nome}
+                          onChange={(e) => setPatientData({ ...patientData, nome: e.target.value })}
+                          placeholder="Nome completo conforme documento"
+                          className="mt-1 bg-muted border-border"
+                          autoComplete="name"
+                        />
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="patient-cpf" className="text-sm font-bold text-foreground">CPF *</Label>
+                          <Input
+                            id="patient-cpf"
+                            value={patientData.cpf}
+                            onChange={(e) => setPatientData({ ...patientData, cpf: formatCpf(e.target.value) })}
+                            placeholder="000.000.000-00"
+                            className="mt-1 bg-muted border-border"
+                            maxLength={14}
+                            inputMode="numeric"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="patient-dob" className="text-sm font-bold text-foreground">Data de nascimento *</Label>
+                          <Input
+                            id="patient-dob"
+                            type="date"
+                            value={patientData.dataNascimento}
+                            onChange={(e) => setPatientData({ ...patientData, dataNascimento: e.target.value })}
+                            className="mt-1 bg-muted border-border"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="patient-email" className="text-sm font-bold text-foreground">E-mail *</Label>
+                          <Input
+                            id="patient-email"
+                            type="email"
+                            value={patientData.email}
+                            onChange={(e) => setPatientData({ ...patientData, email: e.target.value })}
+                            placeholder="seu@email.com"
+                            className="mt-1 bg-muted border-border"
+                            autoComplete="email"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="patient-phone" className="text-sm font-bold text-foreground">Telefone/WhatsApp *</Label>
+                          <Input
+                            id="patient-phone"
+                            value={patientData.telefone}
+                            onChange={(e) => setPatientData({ ...patientData, telefone: formatPhone(e.target.value) })}
+                            placeholder="(11) 98765-4321"
+                            className="mt-1 bg-muted border-border"
+                            maxLength={15}
+                            inputMode="tel"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 p-3 rounded-xl bg-muted/30 border border-border">
+                      <p className="text-[10px] text-muted-foreground leading-relaxed flex items-start gap-1.5">
+                        <Shield size={12} className="text-primary shrink-0 mt-0.5" />
+                        Seus dados são protegidos pela LGPD (Lei 13.709/2018) e serão usados exclusivamente para identificação no prontuário eletrônico, conforme Resolução CFM nº 1.638/2002. Acesso restrito ao médico responsável pelo atendimento.
+                      </p>
+                    </div>
+
+                    <div className="flex justify-between mt-6">
+                      <Button variant="outline" className="rounded-xl" onClick={() => setStep(-1)}>
+                        <ArrowLeft size={16} className="mr-1" /> Voltar
+                      </Button>
+                      <Button
+                        className="font-black bg-primary text-primary-foreground rounded-xl"
+                        onClick={() => setStep(1)}
+                        disabled={!isPatientDataValid()}
+                      >
+                        Iniciar Entrevista <ArrowRight size={16} className="ml-1" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* ========== STEPS 1-10: Interview Questions ========== */}
             {step >= 1 && step <= 10 && currentQ && (
               <motion.div key={step} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
                 <Card className="border-border">
@@ -177,6 +355,7 @@ const Telemedicina = () => {
                         onChange={(e) => setAnswers({ ...answers, [step]: e.target.value })}
                         placeholder={currentQ.placeholder || "Digite sua resposta..."}
                         className="bg-muted border-border min-h-[100px]"
+                        aria-label={currentQ.question}
                       />
                     )}
 
@@ -207,6 +386,7 @@ const Telemedicina = () => {
                           max={100}
                           step={5}
                           className="w-full"
+                          aria-label="Proporção CBD/THC"
                         />
                         <div className="flex justify-between">
                           <Badge className="bg-secondary/10 text-secondary border-secondary/30">CBD {100 - sliderValue[0]}%</Badge>
@@ -228,7 +408,7 @@ const Telemedicina = () => {
               </motion.div>
             )}
 
-            {/* Result */}
+            {/* ========== STEP 11+: Results ========== */}
             {step > 10 && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-6">
                 {/* AI Analysis */}
@@ -236,18 +416,27 @@ const Telemedicina = () => {
                   <CardContent className="p-8 text-center">
                     <CheckCircle2 size={48} className="text-primary mx-auto mb-4" />
                     <h2 className="text-2xl font-display font-black text-foreground mb-2">Pré-entrevista Concluída!</h2>
-                    <p className="text-muted-foreground mb-6">Suas 10 respostas foram registradas com sucesso.</p>
+                    <p className="text-muted-foreground mb-4">
+                      Paciente: <span className="font-bold text-foreground">{patientData.nome}</span>
+                    </p>
+                    <p className="text-muted-foreground text-sm mb-6">Suas 10 respostas foram registradas no prontuário eletrônico.</p>
 
                     <div className="p-4 rounded-2xl bg-gradient-green border border-green mb-4 text-left">
                       <h4 className="font-bold text-foreground text-sm mb-3 flex items-center gap-2">
-                        <Leaf size={14} className="text-primary" /> Recomendação IA
+                        <Leaf size={14} className="text-primary" /> Recomendação IA (pré-análise)
                       </h4>
                       <p className="text-sm text-muted-foreground mb-2">
-                        Com base nas suas respostas, recomendamos consultar um <span className="text-primary font-bold">médico prescritor</span> para avaliação personalizada.
+                        Com base nas suas respostas, recomendamos consultar um <span className="text-primary font-bold">médico prescritor</span> para avaliação clínica personalizada.
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Possíveis variedades indicadas: Charlotte's Web (CBD alto), ACDC (CBD:THC 20:1), Harlequin (equilíbrio funcional).
                       </p>
+                      <div className="mt-3 p-2 rounded-lg bg-background/50 border border-border">
+                        <p className="text-[10px] text-muted-foreground flex items-start gap-1">
+                          <AlertTriangle size={10} className="text-[hsl(45,76%,52%)] shrink-0 mt-0.5" />
+                          Esta é uma pré-análise automatizada e NÃO constitui diagnóstico médico. A prescrição final será feita exclusivamente pelo médico durante a consulta, conforme Art. 6º da Resolução CFM nº 2.314/2022.
+                        </p>
+                      </div>
                     </div>
 
                     <div className="flex gap-3 justify-center flex-wrap">
@@ -275,7 +464,7 @@ const Telemedicina = () => {
                           { label: "HRV", value: `${wearableData.hrv} ms`, icon: "📊" },
                         ].map((s) => (
                           <div key={s.label} className="p-3 rounded-xl bg-muted/30 border border-border text-center">
-                            <span className="text-lg">{s.icon}</span>
+                            <span className="text-lg" aria-hidden="true">{s.icon}</span>
                             <p className="text-sm font-black text-foreground">{s.value}</p>
                             <span className="text-[10px] text-muted-foreground">{s.label}</span>
                           </div>
@@ -305,7 +494,7 @@ const Telemedicina = () => {
                             ].map((s) => (
                               <div key={s.label} className="flex items-center gap-2">
                                 <span className="text-[10px] text-muted-foreground w-16">{s.label}</span>
-                                <div className="flex-1 h-3 rounded-full bg-muted overflow-hidden">
+                                <div className="flex-1 h-3 rounded-full bg-muted overflow-hidden" role="progressbar" aria-valuenow={s.value} aria-valuemax={8} aria-label={`${s.label}: ${s.value}h`}>
                                   <div className={`h-full rounded-full ${s.color}`} style={{ width: `${(s.value / 8) * 100}%` }} />
                                 </div>
                                 <span className="text-[10px] font-bold text-foreground w-8">{s.value}h</span>
@@ -319,7 +508,7 @@ const Telemedicina = () => {
                   </Card>
                 )}
 
-                {/* ANVISA Prescription Template */}
+                {/* ANVISA Prescription Template — Updated for RDC 660/2022 + CFM 2.314/2022 */}
                 {showPrescription && (
                   <Card className="border-border border-primary/20">
                     <CardContent className="p-6">
@@ -328,58 +517,83 @@ const Telemedicina = () => {
                           <FileText size={16} className="text-primary" /> Receita Digital ANVISA
                         </h3>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" className="rounded-xl text-xs">
-                            <Download size={12} className="mr-1" /> PDF
+                          <Button variant="outline" size="sm" className="rounded-xl text-xs" aria-label="Baixar receita em PDF">
+                            <Download size={12} className="mr-1" aria-hidden="true" /> PDF
                           </Button>
-                          <Button variant="outline" size="sm" className="rounded-xl text-xs">
-                            <Printer size={12} className="mr-1" /> Imprimir
+                          <Button variant="outline" size="sm" className="rounded-xl text-xs" aria-label="Imprimir receita">
+                            <Printer size={12} className="mr-1" aria-hidden="true" /> Imprimir
                           </Button>
                         </div>
                       </div>
 
                       <div className="bg-white text-black p-6 rounded-xl border-2 border-primary/30">
                         <div className="text-center border-b-2 border-gray-300 pb-4 mb-4">
-                          <p className="text-[10px] text-gray-500 font-bold">RECEITUÁRIO DE CONTROLE ESPECIAL</p>
-                          <p className="text-[10px] text-gray-500">Portaria SVS/MS nº 344/98 — ANVISA</p>
+                          <p className="text-[10px] text-gray-500 font-bold">RECEITUÁRIO DE CONTROLE ESPECIAL — 1ª VIA (FARMÁCIA)</p>
+                          <p className="text-[10px] text-gray-500">RDC ANVISA nº 660/2022 | Portaria SVS/MS nº 344/98</p>
                           <h4 className="font-bold text-lg mt-2">🌿 Planta & Raiz — Clínica Online</h4>
-                          <p className="text-xs text-gray-600">CNPJ: 00.000.000/0001-00 | CRM: 000000/UF</p>
+                          <p className="text-xs text-gray-600">CNPJ: __.___.___ /0001-__ | Responsável Técnico: CRM ______/UF</p>
+                          <p className="text-[10px] text-gray-400">Endereço do estabelecimento: __________________________________</p>
                         </div>
 
                         <div className="space-y-3 text-sm">
                           <div className="flex justify-between">
                             <span className="text-gray-500">Paciente:</span>
-                            <span className="font-bold">____________________</span>
+                            <span className="font-bold">{patientData.nome || "____________________"}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-500">CPF:</span>
-                            <span>___.___.___-__</span>
+                            <span>{patientData.cpf || "___.___.___-__"}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-500">Data:</span>
+                            <span className="text-gray-500">Data de Nascimento:</span>
+                            <span>{patientData.dataNascimento ? new Date(patientData.dataNascimento + "T12:00:00").toLocaleDateString("pt-BR") : "__/__/____"}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Data da Prescrição:</span>
                             <span>{new Date().toLocaleDateString("pt-BR")}</span>
                           </div>
 
                           <div className="border-t border-gray-200 pt-3 mt-3">
-                            <p className="font-bold mb-2">PRESCRIÇÃO:</p>
-                            <p className="text-gray-600">Canabidiol (CBD) — Uso oral</p>
-                            <p className="text-gray-600">Concentração: ____mg/mL</p>
-                            <p className="text-gray-600">Posologia: ____ gotas, ____ vezes ao dia</p>
-                            <p className="text-gray-600">Duração do tratamento: ____ dias</p>
+                            <p className="font-bold mb-1 text-xs text-gray-500">CID-10 (Código Internacional de Doenças):</p>
+                            <p className="text-gray-600">___.__ — ________________________________</p>
                           </div>
 
                           <div className="border-t border-gray-200 pt-3 mt-3">
-                            <p className="font-bold mb-1">OBSERVAÇÕES:</p>
-                            <p className="text-xs text-gray-500">Produto autorizado pela ANVISA conforme RDC nº 660/2022. Uso exclusivo do paciente identificado.</p>
+                            <p className="font-bold mb-2">PRESCRIÇÃO:</p>
+                            <div className="space-y-1.5 text-gray-600">
+                              <p>1. Canabidiol (CBD) — Uso oral</p>
+                              <p className="pl-4">• Concentração: ____mg/mL</p>
+                              <p className="pl-4">• Posologia: ____ gotas, ____ vezes ao dia</p>
+                              <p className="pl-4">• Via de administração: sublingual</p>
+                              <p className="pl-4">• Duração do tratamento: ____ dias</p>
+                              <p className="pl-4">• Quantidade total prescrita: ____ frasco(s) de ____mL</p>
+                            </div>
+                          </div>
+
+                          <div className="border-t border-gray-200 pt-3 mt-3">
+                            <p className="font-bold mb-1">ORIENTAÇÕES AO PACIENTE:</p>
+                            <p className="text-xs text-gray-500">Manter em local fresco e protegido da luz. Uso exclusivo do paciente. Comunicar ao médico qualquer reação adversa. Não utilizar se estiver grávida ou amamentando sem orientação médica.</p>
+                          </div>
+
+                          <div className="border-t border-gray-200 pt-3 mt-3">
+                            <p className="font-bold mb-1">OBSERVAÇÕES LEGAIS:</p>
+                            <p className="text-xs text-gray-500">Produto autorizado pela ANVISA conforme RDC nº 660/2022. Uso exclusivo do paciente identificado. Dispensação mediante apresentação de receituário de controle especial (2 vias). Válido por 30 dias da emissão. Prescrição emitida em teleconsulta conforme Resolução CFM nº 2.314/2022.</p>
                           </div>
 
                           <div className="border-t-2 border-gray-300 pt-4 mt-4 text-center">
                             <div className="w-48 mx-auto border-b border-gray-400 mb-1" />
-                            <p className="text-xs text-gray-500">Assinatura e Carimbo do Médico</p>
-                            <p className="text-[10px] text-gray-400 mt-1">🔐 Assinatura digital validada • Hash: ****-****-****</p>
+                            <p className="text-xs text-gray-500">Assinatura Digital do Médico</p>
+                            <p className="text-[10px] text-gray-400">CRM: ______/UF | RQE: ______</p>
+                            <p className="text-[10px] text-gray-400 mt-1">🔐 Assinatura digital ICP-Brasil (Lei 14.063/2020) • Certificado: ****-****</p>
+                            <p className="text-[10px] text-gray-400">Validação: https://validar.iti.gov.br</p>
                           </div>
                         </div>
                       </div>
-                      <p className="text-[10px] text-muted-foreground mt-3">⚠️ Modelo de receita digital. A prescrição real será emitida pelo médico após consulta com assinatura digital ICP-Brasil.</p>
+
+                      <div className="mt-3 space-y-1">
+                        <p className="text-[10px] text-muted-foreground">⚠️ MODELO de receita digital. A prescrição real será emitida pelo médico após teleconsulta, com assinatura digital ICP-Brasil válida (Lei 14.063/2020, nível avançado ou qualificado).</p>
+                        <p className="text-[10px] text-muted-foreground">📋 Conforme Resolução CFM nº 2.314/2022, Art. 6º: toda prescrição em telemedicina deve conter identificação do médico (CRM + RQE), identificação do paciente (nome + CPF), CID-10, e ser registrada em prontuário eletrônico.</p>
+                      </div>
                     </CardContent>
                   </Card>
                 )}
@@ -391,7 +605,7 @@ const Telemedicina = () => {
                     <Card key={pro.id} className="border-border hover:border-primary/20 transition-colors">
                       <CardContent className="p-4 flex items-center justify-between flex-wrap gap-3">
                         <div className="flex items-center gap-3">
-                          <img src={pro.imageUrl} alt={pro.name} className="w-12 h-12 rounded-xl object-cover border border-border" />
+                          <img src={pro.imageUrl} alt={`Foto do ${pro.name}`} className="w-12 h-12 rounded-xl object-cover border border-border" />
                           <div>
                             <p className="font-black text-sm text-foreground">{pro.name}</p>
                             <p className="text-xs text-muted-foreground">{pro.tags.join(" • ")}</p>

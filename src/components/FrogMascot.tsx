@@ -36,7 +36,7 @@ const RIGHT_EYE = { cx: 0.62, cy: 0.32 };
 const PUPIL_RADIUS_RATIO = 0.05;
 const MAX_EYE_OFFSET = 0.03;
 
-export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJumpToNav = false }: FrogMascotProps) => {
+export const FrogMascot = memo(({ onClick, size = 48, mood = "happy", enableJumpToNav = false }: FrogMascotProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [eyeOffset, setEyeOffset] = useState({ x: 0, y: 0 });
   const [headRotate, setHeadRotate] = useState(0);

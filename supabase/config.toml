@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.mercadopago-webhook]
 verify_jwt = false
+
+[functions.triage-summary]
+verify_jwt = false
+
+[functions.check-payment]
+verify_jwt = false

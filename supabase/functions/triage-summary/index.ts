@@ -1,0 +1,151 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Não autorizado" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { answers, patientData, appointmentId } = await req.json();
+
+    if (!answers || !patientData) {
+      return new Response(JSON.stringify({ error: "Dados incompletos" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // Build clinical context from triage answers
+    const triageText = `
+Paciente: ${patientData.nome}, CPF: ${patientData.cpf}, Nascimento: ${patientData.dataNascimento}
+1. Queixa principal: ${answers[1] || "Não informado"}
+2. Duração do problema: ${answers[2] || "Não informado"}
+3. Uso prévio de cannabis: ${answers[3] || "Não informado"}
+4. Alergias: ${answers[4] || "Nenhuma"}
+5. Medicamentos atuais: ${answers[5] || "Nenhum"}
+6. Histórico familiar: ${answers[6] || "Não informado"}
+7. Comorbidades: ${Array.isArray(answers[7]) ? answers[7].join(", ") : answers[7] || "Nenhuma"}
+8. Objetivo do tratamento: ${answers[8] || "Não informado"}
+9. Preferência THC/CBD: ${answers[9] || "Equilibrado"}
+10. Disponibilidade: ${answers[10] || "Flexível"}
+`.trim();
+
+    const systemPrompt = `Você é um assistente médico da Planta & Raiz, especializado em cannabis medicinal.
+Gere um RESUMO CLÍNICO estruturado a partir da triagem do paciente, seguindo este formato:
+
+## Resumo Clínico Pré-Consulta
+
+### Queixa Principal
+[resumo da queixa]
+
+### Histórico Relevante
+- Duração: [tempo]
+- Comorbidades: [lista]
+- Medicamentos atuais: [lista]
+- Alergias: [lista]
+- Histórico familiar: [relevante]
+
+### Experiência Prévia com Cannabis
+[detalhes]
+
+### Objetivo Terapêutico
+[objetivo do paciente]
+
+### Sugestão de Abordagem (Pré-análise)
+- Perfil canabinóide sugerido: [CBD:THC ratio]
+- Possíveis cepas indicadas: [2-3 sugestões]
+- Via de administração sugerida: [oral/sublingual/inalatória]
+- Considerações especiais: [interações, contraindicações]
+
+### Score de Prioridade
+[Baixa/Média/Alta/Urgente] — [justificativa breve]
+
+⚠️ AVISO: Esta pré-análise é automatizada e NÃO constitui diagnóstico. A avaliação final é responsabilidade exclusiva do médico prescritor (CFM 2.314/2022).
+
+Responda APENAS com o resumo clínico, sem comentários adicionais. Máximo 400 palavras.`;
+
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: triageText },
+        ],
+      }),
+    });
+
+    if (!aiResponse.ok) {
+      if (aiResponse.status === 429) {
+        return new Response(JSON.stringify({ error: "Muitas requisições. Tente novamente." }), {
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (aiResponse.status === 402) {
+        return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const errText = await aiResponse.text();
+      console.error("AI error:", aiResponse.status, errText);
+      return new Response(JSON.stringify({ error: "Erro no serviço de IA" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const aiData = await aiResponse.json();
+    const summary = aiData.choices?.[0]?.message?.content || "Resumo não disponível.";
+
+    // Optionally save to medical_records if user is authenticated and appointmentId provided
+    if (appointmentId) {
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+
+      await supabase.from("medical_records").upsert({
+        appointment_id: appointmentId,
+        patient_id: patientData.userId || "00000000-0000-0000-0000-000000000000",
+        doctor_id: patientData.doctorId || "00000000-0000-0000-0000-000000000000",
+        chief_complaint: answers[1] || "",
+        notes: summary,
+        diagnosis_cid: null,
+        vitals: {
+          triage_answers: answers,
+          triage_date: new Date().toISOString(),
+          patient_info: { nome: patientData.nome, cpf: patientData.cpf },
+        },
+      }, { onConflict: "appointment_id" });
+    }
+
+    return new Response(JSON.stringify({ summary, triageData: triageText }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    console.error("triage-summary error:", e);
+    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

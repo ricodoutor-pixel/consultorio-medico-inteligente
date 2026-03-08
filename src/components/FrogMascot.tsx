@@ -115,7 +115,7 @@ export const FrogMascot = memo(({ onClick, size = 48, mood = "happy", enableJump
     }, 3000);
   }, []);
 
-  // Idle bounce - real frog-like sideways hop
+  // Idle bounce - small frog hop every 3 seconds
   useEffect(() => {
     const doHop = async () => {
       if (isJumping) return;
@@ -123,20 +123,18 @@ export const FrogMascot = memo(({ onClick, size = 48, mood = "happy", enableJump
       
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        spawnPawPrints(rect.left + rect.width / 2, rect.bottom, 1, 2);
+        spawnPawPrints(rect.left + rect.width / 2, rect.bottom, 1, 1);
       }
       
       await controls.start({
-        x: [0, 15, 25, 15, 0],
-        y: [0, -18, -6, -14, 0],
-        rotate: [0, -8, 2, -5, 0],
-        scaleX: [1, 1.15, 0.9, 1.1, 1],
-        scaleY: [1, 0.85, 1.15, 0.9, 1],
-        transition: { duration: 0.8, ease: "easeInOut", times: [0, 0.25, 0.5, 0.75, 1] },
+        y: [0, -12, 0],
+        scaleX: [1, 1.05, 1],
+        scaleY: [1, 0.95, 1],
+        transition: { duration: 0.4, ease: "easeInOut" },
       });
       setIsJumping(false);
     };
-    const interval = setInterval(doHop, 4500 + Math.random() * 3000);
+    const interval = setInterval(doHop, 3000);
     return () => clearInterval(interval);
   }, [controls, isJumping, spawnPawPrints]);
 

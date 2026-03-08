@@ -475,6 +475,15 @@ const Telemedicina = () => {
                         </p>
                       </div>
                     </div>
+
+                    <div className="flex gap-3 justify-center flex-wrap">
+                      <Button variant="outline" className="rounded-xl text-xs" onClick={() => setShowWearables(!showWearables)}>
+                        <Watch size={14} className="mr-1" /> {showWearables ? "Ocultar" : "Ver"} Dados Wearables
+                      </Button>
+                      <Button variant="outline" className="rounded-xl text-xs" onClick={() => setShowPrescription(!showPrescription)}>
+                        <FileText size={14} className="mr-1" /> {showPrescription ? "Ocultar" : "Ver"} Modelo Receita ANVISA
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
 

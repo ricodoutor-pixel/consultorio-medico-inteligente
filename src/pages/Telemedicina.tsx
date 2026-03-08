@@ -11,11 +11,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { Stethoscope, ArrowRight, ArrowLeft, CheckCircle2, Brain, Heart, Activity, Shield, Leaf, Watch, FileText, Download, Printer, UserCheck, Scale, AlertTriangle } from "lucide-react";
+import { Stethoscope, ArrowRight, ArrowLeft, CheckCircle2, Brain, Heart, Activity, Shield, Leaf, Watch, FileText, Download, Printer, UserCheck, Scale, AlertTriangle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { professionals } from "@/data/professionals";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import ReactMarkdown from "react-markdown";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -48,6 +51,9 @@ const Telemedicina = () => {
   const [showPrescription, setShowPrescription] = useState(false);
   const [showWearables, setShowWearables] = useState(false);
   const [tcleAccepted, setTcleAccepted] = useState(false);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const { toast } = useToast();
   const [patientData, setPatientData] = useState({
     nome: "",
     cpf: "",
@@ -399,7 +405,25 @@ const Telemedicina = () => {
                       <Button variant="outline" className="rounded-xl" onClick={() => setStep(step - 1)}>
                         <ArrowLeft size={16} className="mr-1" /> Voltar
                       </Button>
-                      <Button className="font-black bg-primary text-primary-foreground rounded-xl" onClick={() => setStep(step + 1)} disabled={!isAnswered()}>
+                      <Button className="font-black bg-primary text-primary-foreground rounded-xl" onClick={async () => {
+                        setStep(step + 1);
+                        if (step === 10) {
+                          // Trigger AI summary
+                          setAiLoading(true);
+                          try {
+                            const { data, error } = await supabase.functions.invoke("triage-summary", {
+                              body: { answers, patientData },
+                            });
+                            if (error) throw error;
+                            setAiSummary(data?.summary || null);
+                          } catch (err: any) {
+                            console.error("Triage AI error:", err);
+                            toast({ title: "Erro na análise IA", description: "A pré-análise não pôde ser gerada. Prossiga com o agendamento.", variant: "destructive" });
+                          } finally {
+                            setAiLoading(false);
+                          }
+                        }
+                      }} disabled={!isAnswered()}>
                         {step === 10 ? "Ver Resultado" : "Próxima"} <ArrowRight size={16} className="ml-1" />
                       </Button>
                     </div>
@@ -423,14 +447,27 @@ const Telemedicina = () => {
 
                     <div className="p-4 rounded-2xl bg-gradient-green border border-green mb-4 text-left">
                       <h4 className="font-bold text-foreground text-sm mb-3 flex items-center gap-2">
-                        <Leaf size={14} className="text-primary" /> Recomendação IA (pré-análise)
+                        <Leaf size={14} className="text-primary" /> Resumo Clínico IA
                       </h4>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Com base nas suas respostas, recomendamos consultar um <span className="text-primary font-bold">médico prescritor</span> para avaliação clínica personalizada.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Possíveis variedades indicadas: Charlotte's Web (CBD alto), ACDC (CBD:THC 20:1), Harlequin (equilíbrio funcional).
-                      </p>
+                      {aiLoading ? (
+                        <div className="flex items-center gap-3 py-4">
+                          <Loader2 size={20} className="text-primary animate-spin" />
+                          <span className="text-sm text-muted-foreground">Gerando análise clínica com IA...</span>
+                        </div>
+                      ) : aiSummary ? (
+                        <div className="prose prose-sm prose-invert max-w-none text-sm text-muted-foreground [&_h2]:text-foreground [&_h2]:text-base [&_h3]:text-foreground [&_h3]:text-sm [&_strong]:text-foreground [&_li]:text-muted-foreground">
+                          <ReactMarkdown>{aiSummary}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Com base nas suas respostas, recomendamos consultar um <span className="text-primary font-bold">médico prescritor</span> para avaliação clínica personalizada.
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Possíveis variedades indicadas: Charlotte's Web (CBD alto), ACDC (CBD:THC 20:1), Harlequin (equilíbrio funcional).
+                          </p>
+                        </>
+                      )}
                       <div className="mt-3 p-2 rounded-lg bg-background/50 border border-border">
                         <p className="text-[10px] text-muted-foreground flex items-start gap-1">
                           <AlertTriangle size={10} className="text-[hsl(45,76%,52%)] shrink-0 mt-0.5" />

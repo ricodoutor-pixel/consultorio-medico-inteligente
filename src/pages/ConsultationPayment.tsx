@@ -1,41 +1,92 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { professionals } from "@/data/professionals";
-import { CheckCircle2, Copy, Clock, ArrowRight, Shield, QrCode } from "lucide-react";
+import { CheckCircle2, Copy, Clock, ArrowRight, Shield, QrCode, Loader2, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
 const ConsultationPayment = () => {
   const [searchParams] = useSearchParams();
   const proId = searchParams.get("pro") || "med-1";
+  const appointmentId = searchParams.get("appointment") || null;
   const pro = professionals.find((p) => p.id === proId) || professionals[0];
-  const [status, setStatus] = useState<"pending" | "processing" | "confirmed">("pending");
+  const [status, setStatus] = useState<"pending" | "processing" | "confirmed" | "rejected">("pending");
   const [countdown, setCountdown] = useState(300);
+  const [pollCount, setPollCount] = useState(0);
   const { toast } = useToast();
 
-  const pixCode = "00020126580014br.gov.bcb.pix0136plantaeraiz-" + pro.id + "-" + Date.now().toString(36);
   const commission = pro.priceValue * 0.1;
   const total = pro.priceValue;
 
+  // Countdown timer
   useEffect(() => {
     if (status !== "pending") return;
     const timer = setInterval(() => {
       setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
+        if (prev <= 1) { clearInterval(timer); return 0; }
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(timer);
   }, [status]);
+
+  // Real-time payment polling via check-payment edge function
+  const checkPaymentStatus = useCallback(async () => {
+    if (!appointmentId || status === "confirmed") return;
+    try {
+      const { data, error } = await supabase.functions.invoke("check-payment", {
+        body: { appointmentId },
+      });
+      if (error) throw error;
+      if (data?.status === "paid" || data?.status === "approved") {
+        setStatus("confirmed");
+        toast({ title: "✅ Pagamento confirmado!", description: "Sua consulta está agendada." });
+      } else if (data?.status === "rejected") {
+        setStatus("rejected");
+        toast({ title: "❌ Pagamento recusado", description: "Tente novamente ou use outro método.", variant: "destructive" });
+      }
+    } catch (err) {
+      console.error("Payment check error:", err);
+    }
+  }, [appointmentId, status, toast]);
+
+  // Poll every 5 seconds for payment status
+  useEffect(() => {
+    if (status !== "pending" && status !== "processing") return;
+    if (!appointmentId) return;
+    const interval = setInterval(() => {
+      checkPaymentStatus();
+      setPollCount(p => p + 1);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [checkPaymentStatus, status, appointmentId]);
+
+  // Also listen to realtime notifications
+  useEffect(() => {
+    if (!appointmentId) return;
+    const channel = supabase
+      .channel(`payment-${appointmentId}`)
+      .on("postgres_changes", {
+        event: "UPDATE",
+        schema: "public",
+        table: "appointments",
+        filter: `id=eq.${appointmentId}`,
+      }, (payload) => {
+        if (payload.new?.payment_status === "paid") {
+          setStatus("confirmed");
+          toast({ title: "✅ Pagamento confirmado!", description: "Redirecionando..." });
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [appointmentId, toast]);
 
   const handleCopyPix = () => {
     navigator.clipboard.writeText(pro.paymentLink);
@@ -93,6 +144,15 @@ const ConsultationPayment = () => {
                       </Link>
                     </Button>
                   </div>
+                ) : status === "rejected" ? (
+                  <div className="text-center py-8">
+                    <AlertCircle size={64} className="text-destructive mx-auto mb-4" />
+                    <h4 className="text-xl font-display font-black text-foreground mb-2">Pagamento Recusado</h4>
+                    <p className="text-muted-foreground mb-6">Tente novamente com outro método de pagamento.</p>
+                    <Button onClick={() => setStatus("pending")} className="bg-primary text-primary-foreground font-black rounded-2xl">
+                      Tentar Novamente
+                    </Button>
+                  </div>
                 ) : (
                   <>
                     {/* QR Code placeholder */}
@@ -130,6 +190,14 @@ const ConsultationPayment = () => {
                       </span>
                     </div>
 
+                    {/* Polling status indicator */}
+                    {appointmentId && status === "pending" && (
+                      <div className="flex items-center gap-2 p-2 rounded-lg bg-primary/5 border border-primary/20 mb-4">
+                        <Loader2 size={14} className="text-primary animate-spin" />
+                        <span className="text-xs text-muted-foreground">Aguardando confirmação automática do pagamento...</span>
+                      </div>
+                    )}
+
                     {/* Price Breakdown */}
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
@@ -164,7 +232,7 @@ const ConsultationPayment = () => {
                       className="w-full font-black rounded-2xl h-12"
                     >
                       {status === "processing" ? (
-                        <span className="animate-pulse">Aguardando confirmação...</span>
+                        <span className="flex items-center gap-2"><Loader2 size={16} className="animate-spin" /> Aguardando confirmação...</span>
                       ) : (
                         <>Simular Pagamento</>
                       )}

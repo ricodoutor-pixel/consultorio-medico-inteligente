@@ -23,6 +23,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
   const [autoMood, setAutoMood] = useState<FrogExpression | null>(null);
   const [isWaving, setIsWaving] = useState(false);
   const [isBouncing, setIsBouncing] = useState(false);
+  const [isDaydreaming, setIsDaydreaming] = useState(false);
+  const [daydreamPhase, setDaydreamPhase] = useState<"thinking" | "kiss" | "hearts" | "wakeup" | null>(null);
   const [breathScale, setBreathScale] = useState(1);
   const [tongueOut, setTongueOut] = useState(false);
   const [cheekBlush, setCheekBlush] = useState(0);

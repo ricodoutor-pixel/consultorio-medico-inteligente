@@ -89,6 +89,12 @@ const App = () => (
                 <Route path="/download" element={<DownloadApp />} />
                 <Route path="/comunidade" element={<Comunidade />} />
                 <Route path="/dashboard" element={<DashboardPaciente />} />
+                <Route path="/agendamento" element={<Agendamento />} />
+                <Route path="/prontuario" element={<Prontuario />} />
+                <Route path="/dashboard-medico" element={<DashboardMedico />} />
+                <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />
+                <Route path="/notificacoes" element={<Notificacoes />} />
+                <Route path="*" element={<NotFound />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

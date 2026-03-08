@@ -199,74 +199,19 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         />
       )}
 
-      {/* 3D Head container — MetaMask-style perspective tilt, body stays still */}
-      <motion.div
-        className="relative z-10"
-        style={{ perspective: 400, transformStyle: "preserve-3d" }}
-      >
-        <motion.div
-          animate={{
-            rotateY: headRotation.x,
-            rotateX: headRotation.y,
-          }}
-          transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.8 }}
-          style={{ transformStyle: "preserve-3d" }}
-        >
+      {/* BODY layer — stays completely still */}
+      <div className="relative z-10">
         <img
           src={verdinhoImg}
-          alt="Verdinho - Assistente IA"
+          alt=""
           width={size}
           height={size}
           className="drop-shadow-lg pointer-events-none"
+          style={{ clipPath: `inset(${size * 0.45}px 0 0 0)` }}
           draggable={false}
         />
 
-        {/* Clip top of image to remove green hair */}
-        <div
-          className="absolute pointer-events-none z-20"
-          style={{ top: 0, left: 0, width: size, height: size * 0.12, background: 'transparent' }}
-        />
-
-        {/* Prince crown - refined */}
-        <svg
-          className="absolute pointer-events-none z-30 drop-shadow-md"
-          style={{ top: crownY - size * 0.02, left: crownX - size * 0.02, width: crownW + size * 0.04, height: crownH + size * 0.02 }}
-          viewBox="0 0 110 65"
-          fill="none"
-        >
-          {/* Crown base with shadow */}
-          <path
-            d="M8 58 L8 28 L22 40 L38 10 L55 34 L72 10 L88 40 L102 28 L102 58 Z"
-            fill="url(#crownGoldV2)"
-            stroke="#96700a"
-            strokeWidth="2.5"
-          />
-          {/* Crown band */}
-          <rect x="8" y="48" width="94" height="10" rx="2" fill="url(#crownBand)" opacity="0.6" />
-          {/* Gems */}
-          <circle cx="38" cy="18" r="5" fill="#e74c3c" stroke="#a83228" strokeWidth="1" />
-          <circle cx="55" cy="38" r="4" fill="#2980b9" stroke="#1a5276" strokeWidth="1" />
-          <circle cx="72" cy="18" r="5" fill="#27ae60" stroke="#1a7a42" strokeWidth="1" />
-          {/* Gem shine */}
-          <circle cx="36" cy="16" r="1.5" fill="white" opacity="0.7" />
-          <circle cx="53" cy="36" r="1.2" fill="white" opacity="0.7" />
-          <circle cx="70" cy="16" r="1.5" fill="white" opacity="0.7" />
-          <defs>
-            <linearGradient id="crownGoldV2" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ffe066" />
-              <stop offset="40%" stopColor="#ffd700" />
-              <stop offset="70%" stopColor="#ffb300" />
-              <stop offset="100%" stopColor="#cc8800" />
-            </linearGradient>
-            <linearGradient id="crownBand" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#ffd700" />
-              <stop offset="50%" stopColor="#fff1a8" />
-              <stop offset="100%" stopColor="#ffd700" />
-            </linearGradient>
-          </defs>
-        </svg>
-
-        {/* Bow tie */}
+        {/* Bow tie — on body, static */}
         <svg
           className="absolute pointer-events-none z-30"
           style={{ top: size * 0.72, left: (size - size * 0.28) / 2, width: size * 0.28, height: size * 0.16 }}
@@ -277,8 +222,68 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           <path d="M30 17 L58 2 L58 32 Z" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
           <circle cx="30" cy="17" r="5" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
         </svg>
+      </div>
+
+      {/* HEAD layer — 3D perspective rotation following mouse */}
+      <div
+        className="absolute inset-0 z-20"
+        style={{ perspective: 600 }}
+      >
+        <motion.div
+          className="w-full h-full"
+          animate={{
+            rotateY: headRotation.x,
+            rotateX: headRotation.y,
+          }}
+          transition={{ type: "spring", stiffness: 120, damping: 14, mass: 0.6 }}
+          style={{ transformStyle: "preserve-3d", transformOrigin: "50% 55%" }}
+        >
+          <img
+            src={verdinhoImg}
+            alt="Verdinho - Assistente IA"
+            width={size}
+            height={size}
+            className="drop-shadow-lg pointer-events-none"
+            style={{ clipPath: `inset(0 0 ${size * 0.48}px 0)` }}
+            draggable={false}
+          />
+
+          {/* Prince crown - on head, moves with it */}
+          <svg
+            className="absolute pointer-events-none z-30 drop-shadow-md"
+            style={{ top: crownY - size * 0.02, left: crownX - size * 0.02, width: crownW + size * 0.04, height: crownH + size * 0.02 }}
+            viewBox="0 0 110 65"
+            fill="none"
+          >
+            <path
+              d="M8 58 L8 28 L22 40 L38 10 L55 34 L72 10 L88 40 L102 28 L102 58 Z"
+              fill="url(#crownGoldV2)"
+              stroke="#96700a"
+              strokeWidth="2.5"
+            />
+            <rect x="8" y="48" width="94" height="10" rx="2" fill="url(#crownBand)" opacity="0.6" />
+            <circle cx="38" cy="18" r="5" fill="#e74c3c" stroke="#a83228" strokeWidth="1" />
+            <circle cx="55" cy="38" r="4" fill="#2980b9" stroke="#1a5276" strokeWidth="1" />
+            <circle cx="72" cy="18" r="5" fill="#27ae60" stroke="#1a7a42" strokeWidth="1" />
+            <circle cx="36" cy="16" r="1.5" fill="white" opacity="0.7" />
+            <circle cx="53" cy="36" r="1.2" fill="white" opacity="0.7" />
+            <circle cx="70" cy="16" r="1.5" fill="white" opacity="0.7" />
+            <defs>
+              <linearGradient id="crownGoldV2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ffe066" />
+                <stop offset="40%" stopColor="#ffd700" />
+                <stop offset="70%" stopColor="#ffb300" />
+                <stop offset="100%" stopColor="#cc8800" />
+              </linearGradient>
+              <linearGradient id="crownBand" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#ffd700" />
+                <stop offset="50%" stopColor="#fff1a8" />
+                <stop offset="100%" stopColor="#ffd700" />
+              </linearGradient>
+            </defs>
+          </svg>
         </motion.div>
-      </motion.div>
+      </div>
 
       {/* Eyes + Smile SVG overlay */}
       <svg

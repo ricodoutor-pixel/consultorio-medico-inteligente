@@ -25,30 +25,59 @@ export const FrogAccessories = memo(({ size, isWaving, expression, cheekBlush }:
         <circle cx="28" cy="15" r="1.5" fill="white" opacity="0.8" />
       </svg>
 
-      {/* Lipstick kiss mark on right cheek (waving side) */}
+      {/* Lipstick kiss mark on right cheek — PERMANENT & VISIBLE */}
       <svg
         className="absolute inset-0 pointer-events-none z-30"
         viewBox={`0 0 ${size} ${size}`}
         width={size}
         height={size}
       >
-        <g transform={`translate(${size * 0.68}, ${size * 0.48}) scale(${size * 0.0012})`}>
+        <g transform={`translate(${size * 0.72}, ${size * 0.46}) rotate(-12) scale(${size * 0.0025})`}>
           {/* Upper lip */}
           <path
-            d="M-8 0 Q-6 -8 0 -4 Q6 -8 8 0"
-            fill="#cc1a1a"
-            opacity="0.85"
+            d="M-10 0 Q-8 -12 -2 -6 Q0 -4 2 -6 Q8 -12 10 0"
+            fill="#cc0000"
+            opacity="0.9"
           />
           {/* Lower lip */}
           <path
-            d="M-8 0 Q-4 6 0 4 Q4 6 8 0"
-            fill="#e62222"
-            opacity="0.8"
+            d="M-10 0 Q-5 10 0 7 Q5 10 10 0"
+            fill="#e60000"
+            opacity="0.85"
           />
           {/* Lip gloss shine */}
-          <ellipse cx="-2" cy="-2" rx="1.5" ry="1" fill="#ff6666" opacity="0.5" />
+          <ellipse cx="-3" cy="-4" rx="2.5" ry="1.5" fill="#ff4444" opacity="0.6" />
+          <ellipse cx="3" cy="-4" rx="2" ry="1" fill="#ff6666" opacity="0.4" />
+          {/* Lipstick smudge glow */}
+          <circle cx="0" cy="0" r="12" fill="#ff0000" opacity="0.08" />
         </g>
       </svg>
+
+      {/* Floating mini hearts around kiss mark when in love */}
+      {(expression === "love" || cheekBlush > 0) && (
+        <svg
+          className="absolute inset-0 pointer-events-none z-35"
+          viewBox={`0 0 ${size} ${size}`}
+          width={size}
+          height={size}
+        >
+          <text x={size * 0.78} y={size * 0.38} fontSize={size * 0.06} opacity="0.8">
+            💕
+            <animate attributeName="y" values={`${size * 0.38};${size * 0.28}`} dur="2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.8;0" dur="2s" repeatCount="indefinite" />
+          </text>
+          <text x={size * 0.82} y={size * 0.44} fontSize={size * 0.04} opacity="0.6">
+            ❤️
+            <animate attributeName="y" values={`${size * 0.44};${size * 0.32}`} dur="2.5s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.6;0" dur="2.5s" repeatCount="indefinite" />
+          </text>
+          <text x={size * 0.66} y={size * 0.36} fontSize={size * 0.05} opacity="0.7">
+            💋
+            <animate attributeName="y" values={`${size * 0.36};${size * 0.26}`} dur="3s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.7;0" dur="3s" repeatCount="indefinite" />
+          </text>
+        </svg>
+      )}
 
       {/* Cheek blush */}
       {cheekBlush > 0 && (

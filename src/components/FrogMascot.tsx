@@ -175,7 +175,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       aria-label="Pergunte ao Verdinho — Assistente IA"
       title="Pergunte ao Verdinho 🐸"
       whileTap={{ scale: 0.85, rotate: -8 }}
-      whileHover={{ scale: 1.15 }}
+      whileHover={{ scale: 3 }}
       animate={controls}
       style={{ width: size, height: size }}
     >
@@ -204,12 +204,9 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         className="relative z-10"
         animate={{ 
           rotate: headRotation.x,
-          y: isSleeping ? [0, 2, 0] : headRotation.y * 0.3,
+          y: headRotation.y * 0.3,
         }}
-        transition={isSleeping 
-          ? { rotate: { type: "spring", stiffness: 200, damping: 12 }, y: { duration: 2, repeat: Infinity, ease: "easeInOut" } }
-          : { type: "spring", stiffness: 200, damping: 12 }
-        }
+        transition={{ type: "spring", stiffness: 200, damping: 12 }}
       >
         <img
           src={verdinhoImg}
@@ -243,6 +240,18 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
               <stop offset="100%" stopColor="#e6a200" />
             </linearGradient>
           </defs>
+        </svg>
+
+        {/* Bow tie */}
+        <svg
+          className="absolute pointer-events-none z-30"
+          style={{ top: size * 0.72, left: (size - size * 0.28) / 2, width: size * 0.28, height: size * 0.16 }}
+          viewBox="0 0 60 34"
+          fill="none"
+        >
+          <path d="M30 17 L2 2 L2 32 Z" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
+          <path d="M30 17 L58 2 L58 32 Z" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
+          <circle cx="30" cy="17" r="5" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
         </svg>
       </motion.div>
 

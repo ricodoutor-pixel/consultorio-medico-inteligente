@@ -296,6 +296,7 @@ export const FrogChatModal = () => {
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
             placeholder="Pergunte ao Verdinho..."
             disabled={isStreaming}
+            aria-label="Digite sua mensagem para o Verdinho"
             className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50"
           />
           <Button

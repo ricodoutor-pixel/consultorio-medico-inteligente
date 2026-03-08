@@ -147,7 +147,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       </svg>
 
       {/* Expression emoji */}
-      {emoji && (
+      {emoji && !anim.isDaydreaming && (
         <motion.span
           className="absolute -top-1 -right-1 z-40 text-xs pointer-events-none"
           initial={{ opacity: 0, scale: 0 }}
@@ -157,6 +157,13 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           {emoji}
         </motion.span>
       )}
+
+      {/* Daydream bubble */}
+      <FrogDaydream
+        size={size}
+        isDaydreaming={anim.isDaydreaming}
+        daydreamPhase={anim.daydreamPhase}
+      />
 
       {/* Hover tooltip */}
       {anim.isHovered && (

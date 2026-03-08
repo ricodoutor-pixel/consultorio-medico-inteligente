@@ -19,19 +19,20 @@ const MAX_EYE_OFFSET = 0.025;
 export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJumpToNav = false, hasNewMessage = false }: FrogMascotProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [eyeOffset, setEyeOffset] = useState({ x: 0, y: 0 });
+  const [headRotation, setHeadRotation] = useState({ x: 0, y: 0 });
   const [blink, setBlink] = useState(false);
   const [smile, setSmile] = useState(false);
-  const [headTilt, setHeadTilt] = useState(0);
   const [expression, setExpression] = useState(mood);
   const [messageBounce, setMessageBounce] = useState(false);
+  const [autoMood, setAutoMood] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
   const bounceY = useMotionValue(0);
   const rotate = useTransform(bounceY, [-12, 0, 12], [-3, 0, 3]);
 
-  useEffect(() => setExpression(mood), [mood]);
+  useEffect(() => { if (!autoMood) setExpression(mood); }, [mood, autoMood]);
 
-  // Eye tracking
+  // Eye + head tracking from mouse
   useEffect(() => {
     const handlePointer = (clientX: number, clientY: number) => {
       if (!containerRef.current) return;
@@ -47,6 +48,10 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         x: (dx / (dist || 1)) * maxOff * factor,
         y: (dy / (dist || 1)) * maxOff * factor,
       });
+      // Head follows mouse: tilt left/right and up/down
+      const headX = Math.max(-15, Math.min(15, (dx / 400) * 15));
+      const headY = Math.max(-8, Math.min(8, (dy / 400) * 8));
+      setHeadRotation({ x: headX, y: headY });
     };
     const onMouse = (e: MouseEvent) => handlePointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => {
@@ -60,7 +65,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     };
   }, [size]);
 
-  // Blinking every ~3s
+  // Blinking
   useEffect(() => {
     const interval = setInterval(() => {
       setBlink(true);
@@ -78,15 +83,17 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     return () => clearInterval(interval);
   }, []);
 
-  // Head tilt left/right every ~4s
+  // Random personality shifts every 8-15s
   useEffect(() => {
+    const moods: Array<"happy" | "thinking" | "confused" | "sleeping" | "excited"> = ["happy", "thinking", "confused", "sleeping", "excited"];
     const interval = setInterval(() => {
-      const direction = Math.random() > 0.5 ? 1 : -1;
-      setHeadTilt(direction * (4 + Math.random() * 4));
-      setTimeout(() => setHeadTilt(0), 800);
-    }, 4000 + Math.random() * 2000);
+      const m = moods[Math.floor(Math.random() * moods.length)];
+      setAutoMood(m);
+      setExpression(m);
+      setTimeout(() => { setAutoMood(null); setExpression(mood); }, 3000);
+    }, 8000 + Math.random() * 7000);
     return () => clearInterval(interval);
-  }, []);
+  }, [mood]);
 
   // Idle bounce
   useEffect(() => {

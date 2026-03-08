@@ -60,7 +60,9 @@ export const Navbar = () => {
           <button
             className="lg:hidden p-2 text-foreground"
             onClick={() => setIsOpen(!isOpen)}
-            aria-label="Abrir menu de navegação"
+            aria-label={isOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-menu"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>

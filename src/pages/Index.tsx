@@ -79,13 +79,15 @@ const Index = () => {
                 <span className="text-foreground">Democratizando o </span>
                 <span className="text-gradient-green">Acesso</span>
                 <span className="text-foreground"> a </span>
-                <span className="text-gradient-purple">Medicamentos</span>
-                <span className="text-foreground"> e </span>
+                <span className="text-gradient-purple">Telemedicina</span>
+                <span className="text-foreground">, </span>
                 <span className="text-gradient-gold">Suprimentos</span>
+                <span className="text-foreground"> e </span>
+                <span className="text-gradient-green">Medicamentos</span>
                 <span className="text-foreground"> à Base De </span>
-                <span className="text-gradient-green">Cannabis</span>
+                <span className="text-gradient-purple">Cannabis</span>
                 <span className="text-foreground"> Em Todo </span>
-                <span className="text-gradient-purple">el Mundo</span>
+                <span className="text-gradient-gold">el Mundo</span>
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-3xl mb-10 leading-relaxed font-medium">

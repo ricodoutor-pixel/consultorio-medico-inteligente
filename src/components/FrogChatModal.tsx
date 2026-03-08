@@ -236,7 +236,7 @@ export const FrogChatModal = () => {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3" role="log" aria-live="polite" aria-label="Mensagens do chat">
           {messages.map((message) => (
             <motion.div
               key={message.id}

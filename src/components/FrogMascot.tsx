@@ -2,10 +2,10 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import verdinhoImg from "@/assets/verdinho-mascot.png";
 import { useFrogAnimations, FrogExpression } from "./frog/useFrogAnimations";
-import { FrogCrown } from "./frog/FrogCrown";
 import { FrogEyes } from "./frog/FrogEyes";
 import { FrogMouth } from "./frog/FrogMouth";
 import { FrogAccessories } from "./frog/FrogAccessories";
+import { FrogDaydream } from "./frog/FrogDaydream";
 
 interface FrogMascotProps {
   onClick?: () => void;

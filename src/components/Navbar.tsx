@@ -35,7 +35,7 @@ export const Navbar = () => {
             </NavLink>
           </div>
 
-          <div className="hidden lg:flex items-center gap-5">
+          <div className="hidden lg:flex items-center gap-5" role="menubar">
             {links.map((link) => (
               <NavLink
                 key={link.to}

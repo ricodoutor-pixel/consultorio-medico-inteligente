@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, Send, Sparkles, Trash2 } from "lucide-react";
+import { X, Send, Sparkles, Trash2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FrogMascot } from "@/components/FrogMascot";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   id: string;
@@ -76,12 +77,11 @@ async function streamChat({
   }
 }
 
-// Fallback responses when AI is unavailable
 const fallbackResponses: Record<string, string> = {
-  default: "Olá! 🐸 Estou tendo dificuldade para me conectar ao meu cérebro IA agora. Mas posso te ajudar! Acesse /telemedicina para consultas, /shopping para produtos, ou /profissionais para encontrar especialistas. 💚",
-  oi: "Eae! 🐸👑 Sou o Verdinho! Desculpa, estou com problemas técnicos, mas a plataforma funciona normalmente. Como posso ajudar? 💚",
-  consulta: "Para agendar uma consulta: acesse /telemedicina, faça a triagem IA, escolha seu especialista e pague via PIX! Tudo em 5 minutos. ✅",
-  preco: "Consultas a partir de R$ 55 via PIX (Mercado Pago). Confira nossos planos em /planos com descontos especiais! 💳",
+  default: "Olá! 🐸 Estou com dificuldade para me conectar agora. Mas posso te ajudar! Acesse /telemedicina para consultas, /shopping para produtos, ou /profissionais para especialistas. 💚",
+  oi: "Eae! 🐸👑 Sou o Verdinho! Estou com problemas técnicos, mas a plataforma funciona normalmente. Como posso ajudar? 💚",
+  consulta: "Para agendar: acesse /telemedicina, faça a triagem IA, escolha seu especialista e pague via PIX! Tudo em 5 minutos. ✅",
+  preco: "Consultas a partir de R$ 55 via PIX (Mercado Pago). Confira nossos planos em /planos! 💳",
 };
 
 const getFallback = (text: string): string => {
@@ -92,12 +92,19 @@ const getFallback = (text: string): string => {
   return fallbackResponses.default;
 };
 
+const QUICK_ACTIONS = [
+  { label: "🩺 Agendar consulta", msg: "Como faço para agendar uma consulta?" },
+  { label: "💊 Cannabis medicinal", msg: "O que é cannabis medicinal e quais condições trata?" },
+  { label: "💰 Preços", msg: "Quais são os preços das consultas?" },
+  { label: "📱 Como funciona?", msg: "Como funciona a plataforma Planta & Raiz?" },
+];
+
 export const FrogChatModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Olá! 🐸👑 Sou o Verdinho, assistente IA da Planta & Raiz! Posso te ajudar com consultas médicas, dúvidas sobre cannabis medicinal, dicas de saúde, suporte da plataforma ou simplesmente bater um papo. Pergunte qualquer coisa!",
+      text: "Olá! 🐸👑 Sou o **Verdinho**, assistente IA da **Planta & Raiz**!\n\nPosso te ajudar com:\n- 🩺 Consultas e agendamentos\n- 💊 Cannabis medicinal\n- 🛒 Shopping e produtos\n- 📋 Cadastro e plataforma\n- 🧠 Saúde e bem-estar\n\nPergunte qualquer coisa!",
       sender: "ai",
       timestamp: new Date(),
     },
@@ -118,12 +125,12 @@ export const FrogChatModal = () => {
     return () => window.removeEventListener("open-frog-chat", handler);
   }, []);
 
-  const handleSendMessage = useCallback(() => {
-    if (!inputValue.trim() || isStreaming) return;
+  const sendMessage = useCallback((text: string) => {
+    if (!text.trim() || isStreaming) return;
 
     const userMsg: Message = {
       id: Date.now().toString(),
-      text: inputValue,
+      text,
       sender: "user",
       timestamp: new Date(),
     };
@@ -140,13 +147,12 @@ export const FrogChatModal = () => {
         role: (m.sender === "user" ? "user" : "assistant") as "user" | "assistant",
         content: m.text,
       }));
-
-    history.push({ role: "user", content: inputValue });
+    history.push({ role: "user", content: text });
 
     let accumulated = "";
 
     streamChat({
-      messages: history.slice(-10), // keep last 10 messages for context
+      messages: history.slice(-12),
       onDelta: (delta) => {
         accumulated += delta;
         setStreamingText(accumulated);
@@ -156,12 +162,7 @@ export const FrogChatModal = () => {
         if (accumulated) {
           setMessages((prev) => [
             ...prev,
-            {
-              id: (Date.now() + 1).toString(),
-              text: accumulated,
-              sender: "ai",
-              timestamp: new Date(),
-            },
+            { id: (Date.now() + 1).toString(), text: accumulated, sender: "ai", timestamp: new Date() },
           ]);
         }
         setStreamingText("");
@@ -170,23 +171,21 @@ export const FrogChatModal = () => {
       },
       onError: (err) => {
         console.error("Chat error:", err);
-        // Use fallback
-        const fallback = getFallback(inputValue);
+        const fallback = getFallback(text);
         setMessages((prev) => [
           ...prev,
-          {
-            id: (Date.now() + 1).toString(),
-            text: fallback,
-            sender: "ai",
-            timestamp: new Date(),
-          },
+          { id: (Date.now() + 1).toString(), text: fallback, sender: "ai", timestamp: new Date() },
         ]);
         setStreamingText("");
         setIsStreaming(false);
         setFrogMood("happy");
       },
     });
-  }, [inputValue, isStreaming, messages]);
+  }, [isStreaming, messages]);
+
+  const handleSendMessage = useCallback(() => {
+    sendMessage(inputValue);
+  }, [inputValue, sendMessage]);
 
   const clearChat = () => {
     setMessages([
@@ -210,33 +209,33 @@ export const FrogChatModal = () => {
         role="dialog"
         aria-label="Chat com Verdinho — Assistente IA"
         aria-modal="true"
-        className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[70vh] rounded-2xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
+        className="fixed bottom-6 right-6 z-50 w-[400px] max-w-[calc(100vw-2rem)] h-[560px] max-h-[75vh] rounded-2xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-gradient-to-r from-primary/10 to-secondary/10">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10">
           <div className="flex items-center gap-2">
-            <FrogMascot size={32} mood={frogMood} />
+            <FrogMascot size={36} mood={frogMood} />
             <div>
               <p className="font-display font-black text-sm text-foreground flex items-center gap-1">
-                Verdinho <Sparkles size={12} className="text-primary" />
+                Verdinho <Sparkles size={12} className="text-primary" /> <span className="text-[10px] font-normal text-muted-foreground">IA</span>
               </p>
               <p className="text-[10px] text-muted-foreground font-semibold">
-                IA Premium • {isStreaming ? "Digitando..." : "Online 24/7"}
+                {isStreaming ? "✍️ Digitando..." : "🟢 Online 24/7 • Sabe tudo!"}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-1">
             <button onClick={clearChat} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground" title="Limpar conversa" aria-label="Limpar conversa">
-              <Trash2 size={14} aria-hidden="true" />
+              <Trash2 size={14} />
             </button>
             <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground" aria-label="Fechar chat">
-              <X size={18} aria-hidden="true" />
+              <X size={18} />
             </button>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" role="log" aria-live="polite" aria-label="Mensagens do chat">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3" role="log" aria-live="polite">
           {messages.map((message) => (
             <motion.div
               key={message.id}
@@ -252,7 +251,13 @@ export const FrogChatModal = () => {
                       : "bg-muted text-foreground rounded-bl-md"
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{message.text}</p>
+                  {message.sender === "ai" ? (
+                    <div className="prose prose-sm prose-invert max-w-none [&>p]:my-1 [&>ul]:my-1 [&>ol]:my-1 [&>li]:my-0.5">
+                      <ReactMarkdown>{message.text}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p className="whitespace-pre-wrap">{message.text}</p>
+                  )}
                   <p className={`text-[10px] mt-1 ${message.sender === "user" ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
                     {message.timestamp.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                   </p>
@@ -266,7 +271,10 @@ export const FrogChatModal = () => {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
               <div className="max-w-[85%]">
                 <div className="bg-muted text-foreground rounded-2xl rounded-bl-md px-3 py-2 text-sm leading-relaxed">
-                  <p className="whitespace-pre-wrap">{streamingText}<span className="animate-pulse">▊</span></p>
+                  <div className="prose prose-sm prose-invert max-w-none [&>p]:my-1">
+                    <ReactMarkdown>{streamingText}</ReactMarkdown>
+                  </div>
+                  <span className="animate-pulse text-primary">▊</span>
                 </div>
               </div>
             </motion.div>
@@ -284,6 +292,22 @@ export const FrogChatModal = () => {
               </div>
             </div>
           )}
+
+          {/* Quick actions - only show at start */}
+          {messages.length === 1 && !isStreaming && (
+            <div className="flex flex-wrap gap-2 pt-2">
+              {QUICK_ACTIONS.map((action) => (
+                <button
+                  key={action.label}
+                  onClick={() => sendMessage(action.msg)}
+                  className="text-xs px-3 py-1.5 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors font-semibold"
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div ref={messagesEndRef} />
         </div>
 
@@ -294,9 +318,9 @@ export const FrogChatModal = () => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
-            placeholder="Pergunte ao Verdinho..."
+            placeholder="Pergunte qualquer coisa ao Verdinho..."
             disabled={isStreaming}
-            aria-label="Digite sua mensagem para o Verdinho"
+            aria-label="Digite sua mensagem"
             className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50"
           />
           <Button
@@ -305,8 +329,8 @@ export const FrogChatModal = () => {
             disabled={isStreaming || !inputValue.trim()}
             className="rounded-xl bg-primary text-primary-foreground h-9 w-9"
           >
-            <Send size={16} aria-hidden="true" />
-            <span className="sr-only">Enviar mensagem</span>
+            <Send size={16} />
+            <span className="sr-only">Enviar</span>
           </Button>
         </div>
       </motion.div>

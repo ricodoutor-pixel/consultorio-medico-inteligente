@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Menu, X, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
+import { FrogMascot } from "@/components/FrogMascot";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,11 +18,14 @@ export const Navbar = () => {
     { to: "/planos", label: "Planos" },
   ];
 
+  const openChat = () => window.dispatchEvent(new Event("open-frog-chat"));
+
   return (
     <nav className="fixed top-0 w-full glass border-b border-border z-50" role="navigation" aria-label="Navegação principal">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center gap-2 md:gap-3">
+          {/* Logo + Verdinho mascot */}
+          <div className="flex items-center gap-1 md:gap-2">
             <NavLink to="/" className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green">
                 <Leaf size={20} className="text-primary-foreground" />
@@ -33,6 +37,16 @@ export const Navbar = () => {
                 <span className="text-[10px] text-muted-foreground font-semibold">Mega Clínica Digital</span>
               </div>
             </NavLink>
+
+            {/* Verdinho mascot - next to logo, jumps along navbar */}
+            <div className="ml-1">
+              <FrogMascot
+                size={38}
+                mood="happy"
+                onClick={openChat}
+                enableJumpToNav={true}
+              />
+            </div>
           </div>
 
           <div className="hidden lg:flex items-center gap-5" role="menubar">

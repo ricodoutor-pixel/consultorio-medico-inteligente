@@ -112,15 +112,15 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     if (!enableJumpToNav) return;
     const doNavJump = async () => {
       await controls.start({
-        x: [0, 60, 120, 180, 200],
-        y: [0, -15, 0, -15, 0],
-        transition: { duration: 1.2, ease: "easeInOut" },
+        x: [0, 25, 50, 70, 80],
+        y: [0, -10, 0, -10, 0],
+        transition: { duration: 1, ease: "easeInOut" },
       });
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 300));
       await controls.start({
-        x: [200, 140, 80, 30, 0],
-        y: [0, -15, 0, -12, 0],
-        transition: { duration: 1.2, ease: "easeInOut" },
+        x: [80, 55, 35, 15, 0],
+        y: [0, -10, 0, -8, 0],
+        transition: { duration: 1, ease: "easeInOut" },
       });
     };
     const timeout = setTimeout(doNavJump, 10000);
@@ -217,27 +217,47 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           draggable={false}
         />
 
-        {/* Prince crown */}
+        {/* Clip top of image to remove green hair */}
+        <div
+          className="absolute pointer-events-none z-20"
+          style={{ top: 0, left: 0, width: size, height: size * 0.12, background: 'transparent' }}
+        />
+
+        {/* Prince crown - refined */}
         <svg
-          className="absolute pointer-events-none z-30"
-          style={{ top: crownY, left: crownX, width: crownW, height: crownH }}
-          viewBox="0 0 100 60"
+          className="absolute pointer-events-none z-30 drop-shadow-md"
+          style={{ top: crownY - size * 0.02, left: crownX - size * 0.02, width: crownW + size * 0.04, height: crownH + size * 0.02 }}
+          viewBox="0 0 110 65"
           fill="none"
         >
+          {/* Crown base with shadow */}
           <path
-            d="M5 55 L5 25 L20 38 L35 12 L50 32 L65 12 L80 38 L95 25 L95 55 Z"
-            fill="url(#crownGold)"
-            stroke="#b8860b"
-            strokeWidth="2"
+            d="M8 58 L8 28 L22 40 L38 10 L55 34 L72 10 L88 40 L102 28 L102 58 Z"
+            fill="url(#crownGoldV2)"
+            stroke="#96700a"
+            strokeWidth="2.5"
           />
-          <circle cx="35" cy="20" r="4" fill="#e74c3c" />
-          <circle cx="50" cy="36" r="3" fill="#3498db" />
-          <circle cx="65" cy="20" r="4" fill="#2ecc71" />
+          {/* Crown band */}
+          <rect x="8" y="48" width="94" height="10" rx="2" fill="url(#crownBand)" opacity="0.6" />
+          {/* Gems */}
+          <circle cx="38" cy="18" r="5" fill="#e74c3c" stroke="#a83228" strokeWidth="1" />
+          <circle cx="55" cy="38" r="4" fill="#2980b9" stroke="#1a5276" strokeWidth="1" />
+          <circle cx="72" cy="18" r="5" fill="#27ae60" stroke="#1a7a42" strokeWidth="1" />
+          {/* Gem shine */}
+          <circle cx="36" cy="16" r="1.5" fill="white" opacity="0.7" />
+          <circle cx="53" cy="36" r="1.2" fill="white" opacity="0.7" />
+          <circle cx="70" cy="16" r="1.5" fill="white" opacity="0.7" />
           <defs>
-            <linearGradient id="crownGold" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="crownGoldV2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#ffe066" />
+              <stop offset="40%" stopColor="#ffd700" />
+              <stop offset="70%" stopColor="#ffb300" />
+              <stop offset="100%" stopColor="#cc8800" />
+            </linearGradient>
+            <linearGradient id="crownBand" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#ffd700" />
-              <stop offset="50%" stopColor="#ffb300" />
-              <stop offset="100%" stopColor="#e6a200" />
+              <stop offset="50%" stopColor="#fff1a8" />
+              <stop offset="100%" stopColor="#ffd700" />
             </linearGradient>
           </defs>
         </svg>

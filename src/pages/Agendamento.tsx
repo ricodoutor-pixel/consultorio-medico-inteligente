@@ -1,0 +1,324 @@
+import { useState, useEffect } from "react";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
+import { supabase } from "@/integrations/supabase/client";
+import { Calendar as CalIcon, Clock, Video, MessageSquare, Phone, Star, MapPin, ChevronRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+
+const timeSlots = [
+  "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+  "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30",
+];
+
+const consultTypes = [
+  { id: "video", label: "Vídeo", icon: Video, desc: "Consulta por vídeo HD" },
+  { id: "chat", label: "Chat", icon: MessageSquare, desc: "Consulta por mensagem" },
+  { id: "phone", label: "Telefone", icon: Phone, desc: "Consulta por telefone" },
+];
+
+type Doctor = {
+  id: string;
+  user_id: string;
+  crm: string;
+  crm_state: string;
+  rqe: string | null;
+  specialty: string;
+  bio: string | null;
+  consultation_price: number;
+  is_online: boolean;
+  rating: number | null;
+  total_consultations: number | null;
+  profiles?: { full_name: string; avatar_url: string | null } | null;
+};
+
+const Agendamento = () => {
+  const { toast } = useToast();
+  const [step, setStep] = useState(1);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [selectedTime, setSelectedTime] = useState("");
+  const [consultType, setConsultType] = useState("video");
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user?.id || null));
+    fetchDoctors();
+  }, []);
+
+  const fetchDoctors = async () => {
+    const { data } = await supabase.from("doctors").select("*").eq("is_verified", true);
+    if (data) setDoctors(data as Doctor[]);
+  };
+
+  const handleBook = async () => {
+    if (!userId) {
+      toast({ title: "Faça login primeiro", description: "Você precisa estar logado para agendar.", variant: "destructive" });
+      return;
+    }
+    if (!selectedDoctor || !selectedDate || !selectedTime) return;
+
+    setLoading(true);
+    const scheduledAt = new Date(selectedDate);
+    const [h, m] = selectedTime.split(":").map(Number);
+    scheduledAt.setHours(h, m, 0, 0);
+
+    const { error } = await supabase.from("appointments").insert({
+      patient_id: userId,
+      doctor_id: selectedDoctor.id,
+      scheduled_at: scheduledAt.toISOString(),
+      type: consultType,
+      notes,
+      amount: selectedDoctor.consultation_price,
+      status: "scheduled",
+      payment_status: "pending",
+    });
+
+    setLoading(false);
+    if (error) {
+      toast({ title: "Erro ao agendar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "✅ Consulta Agendada!", description: `${format(scheduledAt, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}` });
+      setStep(5);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <section className="pt-24 pb-16 md:pt-32">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+            <h1 className="text-3xl md:text-4xl font-display font-black text-foreground mb-2">
+              Agendar <span className="text-gradient-green">Consulta</span>
+            </h1>
+            <p className="text-muted-foreground mb-8">Sistema de agendamento inteligente — CFM 2.314/2022</p>
+
+            {/* Progress */}
+            <div className="flex items-center gap-2 mb-8">
+              {["Especialista", "Data", "Horário", "Confirmação"].map((label, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${step > i + 1 ? "bg-primary text-primary-foreground" : step === i + 1 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                    {step > i + 1 ? <CheckCircle2 size={14} /> : i + 1}
+                  </div>
+                  <span className={`text-xs font-bold hidden sm:block ${step >= i + 1 ? "text-foreground" : "text-muted-foreground"}`}>{label}</span>
+                  {i < 3 && <ChevronRight size={14} className="text-muted-foreground" />}
+                </div>
+              ))}
+            </div>
+
+            {/* Step 1: Select Doctor */}
+            {step === 1 && (
+              <div className="space-y-4">
+                <h2 className="font-display font-black text-lg text-foreground">Escolha o Especialista</h2>
+                {doctors.length === 0 ? (
+                  <Card className="border-border">
+                    <CardContent className="p-8 text-center">
+                      <AlertCircle size={32} className="text-muted-foreground mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">Nenhum especialista disponível no momento.</p>
+                      <p className="text-xs text-muted-foreground mt-1">Médicos verificados aparecerão aqui automaticamente.</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  doctors.map(doc => (
+                    <Card key={doc.id} className={`border-border cursor-pointer transition-all hover:border-primary/40 ${selectedDoctor?.id === doc.id ? "border-primary bg-primary/5" : ""}`} onClick={() => { setSelectedDoctor(doc); setStep(2); }}>
+                      <CardContent className="p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                            <Video size={20} className="text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground">{doc.specialty}</p>
+                            <p className="text-xs text-muted-foreground">CRM {doc.crm}/{doc.crm_state} {doc.rqe ? `• RQE ${doc.rqe}` : ""}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Star size={12} className="text-[hsl(var(--gold))]" />
+                              <span className="text-xs text-foreground font-bold">{doc.rating || "5.0"}</span>
+                              <span className="text-xs text-muted-foreground">• {doc.total_consultations || 0} consultas</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-display font-black text-primary">R$ {Number(doc.consultation_price).toFixed(2)}</p>
+                          {doc.is_online && <Badge className="bg-primary/10 text-primary border-green text-[10px]">Online</Badge>}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* Step 2: Select Date */}
+            {step === 2 && (
+              <div className="space-y-4">
+                <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
+                  <CalIcon size={18} className="text-primary" /> Escolha a Data
+                </h2>
+                <Card className="border-border">
+                  <CardContent className="p-6 flex justify-center">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(d) => { setSelectedDate(d); if (d) setStep(3); }}
+                      disabled={(date) => date < new Date() || date.getDay() === 0}
+                      locale={ptBR}
+                      className="rounded-md"
+                    />
+                  </CardContent>
+                </Card>
+                <Button variant="outline" onClick={() => setStep(1)} className="rounded-xl">← Voltar</Button>
+              </div>
+            )}
+
+            {/* Step 3: Select Time & Type */}
+            {step === 3 && (
+              <div className="space-y-6">
+                <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
+                  <Clock size={18} className="text-primary" /> Horário e Modalidade
+                </h2>
+
+                <div>
+                  <p className="text-sm font-bold text-foreground mb-3">Tipo de Consulta</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {consultTypes.map(ct => (
+                      <Card key={ct.id} className={`cursor-pointer transition-all border-border hover:border-primary/40 ${consultType === ct.id ? "border-primary bg-primary/5" : ""}`} onClick={() => setConsultType(ct.id)}>
+                        <CardContent className="p-4 text-center">
+                          <ct.icon size={24} className="text-primary mx-auto mb-2" />
+                          <p className="text-sm font-bold text-foreground">{ct.label}</p>
+                          <p className="text-[10px] text-muted-foreground">{ct.desc}</p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-bold text-foreground mb-3">Horários Disponíveis — {selectedDate ? format(selectedDate, "dd/MM/yyyy") : ""}</p>
+                  <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                    {timeSlots.map(t => (
+                      <button key={t} onClick={() => setSelectedTime(t)} className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${selectedTime === t ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground hover:border-primary/40"}`}>
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-bold text-foreground mb-2">Observações (opcional)</p>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Descreva brevemente seus sintomas ou motivo da consulta..."
+                    className="w-full h-24 rounded-xl bg-card border border-border p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:border-primary focus:outline-none"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setStep(2)} className="rounded-xl">← Voltar</Button>
+                  <Button onClick={() => selectedTime && setStep(4)} disabled={!selectedTime} className="rounded-xl flex-1">
+                    Confirmar Horário <ChevronRight size={14} className="ml-1" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Confirmation */}
+            {step === 4 && (
+              <div className="space-y-6">
+                <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
+                  <CheckCircle2 size={18} className="text-primary" /> Confirme sua Consulta
+                </h2>
+
+                <Card className="border-primary/30 bg-primary/5">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground font-bold uppercase">Especialista</p>
+                        <p className="text-sm font-bold text-foreground">{selectedDoctor?.specialty}</p>
+                        <p className="text-xs text-muted-foreground">CRM {selectedDoctor?.crm}/{selectedDoctor?.crm_state}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground font-bold uppercase">Data e Hora</p>
+                        <p className="text-sm font-bold text-foreground">
+                          {selectedDate && format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{selectedTime} • {consultTypes.find(c => c.id === consultType)?.label}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground font-bold uppercase">Valor</p>
+                        <p className="text-2xl font-display font-black text-primary">R$ {Number(selectedDoctor?.consultation_price || 0).toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground font-bold uppercase">Pagamento</p>
+                        <p className="text-sm font-bold text-foreground">PIX via Mercado Pago</p>
+                      </div>
+                    </div>
+
+                    {notes && (
+                      <div>
+                        <p className="text-xs text-muted-foreground font-bold uppercase">Observações</p>
+                        <p className="text-sm text-foreground">{notes}</p>
+                      </div>
+                    )}
+
+                    <div className="border-t border-border pt-4">
+                      <p className="text-[10px] text-muted-foreground">
+                        ⚖️ Conforme CFM 2.314/2022 Art. 12, o paciente pode cancelar com até 24h de antecedência sem custo. 
+                        Dados protegidos pela LGPD (Lei 13.709/2018).
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setStep(3)} className="rounded-xl">← Voltar</Button>
+                  <Button onClick={handleBook} disabled={loading} className="rounded-xl flex-1">
+                    {loading ? "Agendando..." : "✅ Confirmar Agendamento"}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 5: Success */}
+            {step === 5 && (
+              <Card className="border-primary/30 bg-primary/5">
+                <CardContent className="p-8 text-center">
+                  <CheckCircle2 size={48} className="text-primary mx-auto mb-4" />
+                  <h2 className="text-2xl font-display font-black text-foreground mb-2">Consulta Agendada!</h2>
+                  <p className="text-muted-foreground mb-6">
+                    Sua consulta foi agendada para{" "}
+                    <strong className="text-foreground">
+                      {selectedDate && format(selectedDate, "dd/MM/yyyy")} às {selectedTime}
+                    </strong>
+                  </p>
+                  <div className="flex gap-3 justify-center">
+                    <Button variant="outline" className="rounded-xl" onClick={() => { setStep(1); setSelectedDoctor(null); setSelectedDate(undefined); setSelectedTime(""); setNotes(""); }}>
+                      Novo Agendamento
+                    </Button>
+                    <Button className="rounded-xl" asChild>
+                      <a href="/dashboard">Ir para Dashboard</a>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </motion.div>
+        </div>
+      </section>
+      <Footer />
+    </div>
+  );
+};
+
+export default Agendamento;

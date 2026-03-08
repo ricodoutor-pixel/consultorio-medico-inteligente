@@ -224,6 +224,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
   return {
     containerRef, controls, isHovered, eyeOffset, headRotation, blink, smile,
     expression, messageBounce, isWaving, isBouncing, breathScale, tongueOut,
-    cheekBlush, eyeSparkle, headTilt, sneezing, onHoverStart, onHoverEnd,
+    cheekBlush, eyeSparkle, headTilt, sneezing, isDaydreaming, daydreamPhase,
+    onHoverStart, onHoverEnd,
   };
 }

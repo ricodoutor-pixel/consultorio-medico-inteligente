@@ -199,15 +199,19 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         />
       )}
 
-      {/* Mascot with head tilt */}
+      {/* 3D Head container — MetaMask-style perspective tilt, body stays still */}
       <motion.div
         className="relative z-10"
-        animate={{ 
-          rotate: headRotation.x,
-          y: headRotation.y * 0.3,
-        }}
-        transition={{ type: "spring", stiffness: 200, damping: 12 }}
+        style={{ perspective: 400, transformStyle: "preserve-3d" }}
       >
+        <motion.div
+          animate={{
+            rotateY: headRotation.x,
+            rotateX: headRotation.y,
+          }}
+          transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.8 }}
+          style={{ transformStyle: "preserve-3d" }}
+        >
         <img
           src={verdinhoImg}
           alt="Verdinho - Assistente IA"

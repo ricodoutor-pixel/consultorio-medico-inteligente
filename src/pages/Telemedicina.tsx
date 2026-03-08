@@ -447,29 +447,33 @@ const Telemedicina = () => {
 
                     <div className="p-4 rounded-2xl bg-gradient-green border border-green mb-4 text-left">
                       <h4 className="font-bold text-foreground text-sm mb-3 flex items-center gap-2">
-                        <Leaf size={14} className="text-primary" /> Recomendação IA (pré-análise)
+                        <Leaf size={14} className="text-primary" /> Resumo Clínico IA
                       </h4>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Com base nas suas respostas, recomendamos consultar um <span className="text-primary font-bold">médico prescritor</span> para avaliação clínica personalizada.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Possíveis variedades indicadas: Charlotte's Web (CBD alto), ACDC (CBD:THC 20:1), Harlequin (equilíbrio funcional).
-                      </p>
+                      {aiLoading ? (
+                        <div className="flex items-center gap-3 py-4">
+                          <Loader2 size={20} className="text-primary animate-spin" />
+                          <span className="text-sm text-muted-foreground">Gerando análise clínica com IA...</span>
+                        </div>
+                      ) : aiSummary ? (
+                        <div className="prose prose-sm prose-invert max-w-none text-sm text-muted-foreground [&_h2]:text-foreground [&_h2]:text-base [&_h3]:text-foreground [&_h3]:text-sm [&_strong]:text-foreground [&_li]:text-muted-foreground">
+                          <ReactMarkdown>{aiSummary}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Com base nas suas respostas, recomendamos consultar um <span className="text-primary font-bold">médico prescritor</span> para avaliação clínica personalizada.
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Possíveis variedades indicadas: Charlotte's Web (CBD alto), ACDC (CBD:THC 20:1), Harlequin (equilíbrio funcional).
+                          </p>
+                        </>
+                      )}
                       <div className="mt-3 p-2 rounded-lg bg-background/50 border border-border">
                         <p className="text-[10px] text-muted-foreground flex items-start gap-1">
                           <AlertTriangle size={10} className="text-[hsl(45,76%,52%)] shrink-0 mt-0.5" />
                           Esta é uma pré-análise automatizada e NÃO constitui diagnóstico médico. A prescrição final será feita exclusivamente pelo médico durante a consulta, conforme Art. 6º da Resolução CFM nº 2.314/2022.
                         </p>
                       </div>
-                    </div>
-
-                    <div className="flex gap-3 justify-center flex-wrap">
-                      <Button variant="outline" className="rounded-xl text-xs" onClick={() => setShowWearables(!showWearables)}>
-                        <Watch size={14} className="mr-1" /> {showWearables ? "Ocultar" : "Ver"} Dados Wearables
-                      </Button>
-                      <Button variant="outline" className="rounded-xl text-xs" onClick={() => setShowPrescription(!showPrescription)}>
-                        <FileText size={14} className="mr-1" /> {showPrescription ? "Ocultar" : "Ver"} Modelo Receita ANVISA
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>

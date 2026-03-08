@@ -25,6 +25,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
   const [expression, setExpression] = useState(mood);
   const [messageBounce, setMessageBounce] = useState(false);
   const [autoMood, setAutoMood] = useState<string | null>(null);
+  const [isWaving, setIsWaving] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
   const bounceY = useMotionValue(0);
@@ -48,7 +49,6 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         x: (dx / (dist || 1)) * maxOff * factor,
         y: (dy / (dist || 1)) * maxOff * factor,
       });
-      // 3D perspective head rotation — rotateY for left/right, rotateX for up/down
       const rotY = Math.max(-25, Math.min(25, (dx / 300) * 25));
       const rotX = Math.max(-15, Math.min(15, -(dy / 300) * 15));
       setHeadRotation({ x: rotY, y: rotX });
@@ -95,11 +95,11 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     return () => clearInterval(interval);
   }, [mood]);
 
-  // Idle bounce
+  // Idle bounce in place (no horizontal movement)
   useEffect(() => {
     const doJump = () => {
       controls.start({
-        y: [0, -12, -3, -9, 0],
+        y: [0, -14, -4, -10, 0],
         transition: { duration: 0.7, ease: "easeInOut", times: [0, 0.3, 0.5, 0.7, 1] },
       });
     };
@@ -107,26 +107,20 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     return () => clearInterval(interval);
   }, [controls]);
 
-  // Jump-to-nav
+  // Wave animation every 30 seconds
   useEffect(() => {
-    if (!enableJumpToNav) return;
-    const doNavJump = async () => {
-      await controls.start({
-        x: [0, 25, 50, 70, 80],
-        y: [0, -10, 0, -10, 0],
-        transition: { duration: 1, ease: "easeInOut" },
-      });
-      await new Promise(r => setTimeout(r, 300));
-      await controls.start({
-        x: [80, 55, 35, 15, 0],
-        y: [0, -10, 0, -8, 0],
-        transition: { duration: 1, ease: "easeInOut" },
-      });
+    const doWave = () => {
+      setIsWaving(true);
+      setExpression("waving");
+      setTimeout(() => {
+        setIsWaving(false);
+        setExpression(mood);
+      }, 2000);
     };
-    const timeout = setTimeout(doNavJump, 10000);
-    const interval = setInterval(doNavJump, 20000);
+    const timeout = setTimeout(doWave, 15000);
+    const interval = setInterval(doWave, 30000);
     return () => { clearTimeout(timeout); clearInterval(interval); };
-  }, [controls, enableJumpToNav]);
+  }, [mood]);
 
   // New message micro-interaction
   useEffect(() => {
@@ -160,10 +154,10 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
   const smileCurve = smile || isHovered;
 
   // Crown dimensions
-  const crownW = size * 0.38;
-  const crownH = size * 0.22;
+  const crownW = size * 0.42;
+  const crownH = size * 0.25;
   const crownX = (size - crownW) / 2;
-  const crownY = size * 0.02;
+  const crownY = size * 0.01;
 
   return (
     <motion.button
@@ -211,17 +205,45 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           draggable={false}
         />
 
-        {/* Bow tie — on body, static */}
+        {/* Bow tie — on neck area */}
         <svg
           className="absolute pointer-events-none z-30"
-          style={{ top: size * 0.72, left: (size - size * 0.28) / 2, width: size * 0.28, height: size * 0.16 }}
+          style={{ top: size * 0.58, left: (size - size * 0.3) / 2, width: size * 0.3, height: size * 0.18 }}
           viewBox="0 0 60 34"
           fill="none"
         >
-          <path d="M30 17 L2 2 L2 32 Z" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
-          <path d="M30 17 L58 2 L58 32 Z" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
-          <circle cx="30" cy="17" r="5" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
+          <path d="M30 17 L2 2 L2 32 Z" fill="white" stroke="#d4d4d4" strokeWidth="1.5" />
+          <path d="M30 17 L58 2 L58 32 Z" fill="white" stroke="#d4d4d4" strokeWidth="1.5" />
+          <circle cx="30" cy="17" r="5" fill="white" stroke="#d4d4d4" strokeWidth="1.5" />
+          {/* Shine on knot */}
+          <circle cx="28" cy="15" r="1.5" fill="white" opacity="0.8" />
         </svg>
+
+        {/* Waving arm */}
+        {isWaving && (
+          <motion.svg
+            className="absolute pointer-events-none z-40"
+            style={{ top: size * 0.42, right: -size * 0.1, width: size * 0.35, height: size * 0.35 }}
+            viewBox="0 0 50 50"
+            fill="none"
+            animate={{ rotate: [0, -20, 15, -20, 15, 0] }}
+            transition={{ duration: 1.8, ease: "easeInOut" }}
+          >
+            {/* Little frog arm waving */}
+            <path
+              d="M10 40 Q15 25 25 15 Q30 10 35 8"
+              stroke="#4ade80"
+              strokeWidth="5"
+              strokeLinecap="round"
+              fill="none"
+            />
+            {/* Hand */}
+            <circle cx="35" cy="8" r="5" fill="#4ade80" />
+            <path d="M33 4 L31 1" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" />
+            <path d="M36 3 L36 0" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" />
+            <path d="M39 4 L41 1" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" />
+          </motion.svg>
+        )}
       </div>
 
       {/* HEAD layer — 3D perspective rotation following mouse */}
@@ -248,40 +270,96 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             draggable={false}
           />
 
-          {/* Prince crown - on head, moves with it */}
-          <svg
-            className="absolute pointer-events-none z-30 drop-shadow-md"
-            style={{ top: crownY - size * 0.02, left: crownX - size * 0.02, width: crownW + size * 0.04, height: crownH + size * 0.02 }}
-            viewBox="0 0 110 65"
+          {/* Prince crown - refined with hover glow */}
+          <motion.svg
+            className="absolute pointer-events-none z-30"
+            style={{
+              top: crownY - size * 0.02,
+              left: crownX - size * 0.02,
+              width: crownW + size * 0.04,
+              height: crownH + size * 0.02,
+              filter: isHovered ? "drop-shadow(0 0 8px rgba(255,215,0,0.8)) drop-shadow(0 0 16px rgba(255,215,0,0.4))" : "drop-shadow(0 1px 2px rgba(0,0,0,0.3))",
+            }}
+            animate={{
+              scale: isHovered ? 1.08 : 1,
+            }}
+            transition={{ duration: 0.3 }}
+            viewBox="0 0 120 70"
             fill="none"
           >
+            {/* Crown shadow */}
+            <ellipse cx="60" cy="64" rx="45" ry="4" fill="rgba(0,0,0,0.15)" />
+            {/* Crown body */}
             <path
-              d="M8 58 L8 28 L22 40 L38 10 L55 34 L72 10 L88 40 L102 28 L102 58 Z"
-              fill="url(#crownGoldV2)"
-              stroke="#96700a"
-              strokeWidth="2.5"
+              d="M10 60 L10 30 L25 42 L40 8 L60 35 L80 8 L95 42 L110 30 L110 60 Z"
+              fill="url(#crownGoldV3)"
+              stroke="url(#crownStroke)"
+              strokeWidth="2"
             />
-            <rect x="8" y="48" width="94" height="10" rx="2" fill="url(#crownBand)" opacity="0.6" />
-            <circle cx="38" cy="18" r="5" fill="#e74c3c" stroke="#a83228" strokeWidth="1" />
-            <circle cx="55" cy="38" r="4" fill="#2980b9" stroke="#1a5276" strokeWidth="1" />
-            <circle cx="72" cy="18" r="5" fill="#27ae60" stroke="#1a7a42" strokeWidth="1" />
-            <circle cx="36" cy="16" r="1.5" fill="white" opacity="0.7" />
-            <circle cx="53" cy="36" r="1.2" fill="white" opacity="0.7" />
-            <circle cx="70" cy="16" r="1.5" fill="white" opacity="0.7" />
+            {/* Crown inner details */}
+            <path
+              d="M15 55 L15 35 L27 44 L40 16 L60 38 L80 16 L93 44 L105 35 L105 55 Z"
+              fill="url(#crownInner)"
+              opacity="0.3"
+            />
+            {/* Crown band with ornament */}
+            <rect x="10" y="50" width="100" height="10" rx="2" fill="url(#crownBandV3)" />
+            <rect x="10" y="50" width="100" height="2" fill="rgba(255,255,255,0.3)" />
+            {/* Main gems with glow */}
+            <circle cx="40" cy="16" r="6" fill="url(#rubyGem)" stroke="#8b1a1a" strokeWidth="1" />
+            <circle cx="60" cy="40" r="5" fill="url(#sapphireGem)" stroke="#1a3a6b" strokeWidth="1" />
+            <circle cx="80" cy="16" r="6" fill="url(#emeraldGem)" stroke="#0d5e2f" strokeWidth="1" />
+            {/* Small accent gems */}
+            <circle cx="25" cy="38" r="3" fill="#ffd700" stroke="#b8860b" strokeWidth="0.8" />
+            <circle cx="95" cy="38" r="3" fill="#ffd700" stroke="#b8860b" strokeWidth="0.8" />
+            {/* Gem highlights */}
+            <circle cx="37" cy="13" r="2.5" fill="white" opacity="0.6" />
+            <circle cx="57" cy="37" r="2" fill="white" opacity="0.6" />
+            <circle cx="77" cy="13" r="2.5" fill="white" opacity="0.6" />
+            {/* Crown tip ornaments */}
+            <circle cx="40" cy="6" r="2" fill="#ffd700" />
+            <circle cx="60" cy="32" r="1.5" fill="#ffd700" />
+            <circle cx="80" cy="6" r="2" fill="#ffd700" />
             <defs>
-              <linearGradient id="crownGoldV2" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#ffe066" />
-                <stop offset="40%" stopColor="#ffd700" />
-                <stop offset="70%" stopColor="#ffb300" />
+              <linearGradient id="crownGoldV3" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#fff5b8" />
+                <stop offset="20%" stopColor="#ffe066" />
+                <stop offset="50%" stopColor="#ffd700" />
+                <stop offset="75%" stopColor="#f0a500" />
                 <stop offset="100%" stopColor="#cc8800" />
               </linearGradient>
-              <linearGradient id="crownBand" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#ffd700" />
-                <stop offset="50%" stopColor="#fff1a8" />
+              <linearGradient id="crownStroke" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#d4a017" />
+                <stop offset="100%" stopColor="#8b6914" />
+              </linearGradient>
+              <linearGradient id="crownInner" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#fff5b8" />
                 <stop offset="100%" stopColor="#ffd700" />
               </linearGradient>
+              <linearGradient id="crownBandV3" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#e6a200" />
+                <stop offset="25%" stopColor="#ffd700" />
+                <stop offset="50%" stopColor="#fff5b8" />
+                <stop offset="75%" stopColor="#ffd700" />
+                <stop offset="100%" stopColor="#e6a200" />
+              </linearGradient>
+              <radialGradient id="rubyGem" cx="0.35" cy="0.35">
+                <stop offset="0%" stopColor="#ff6b6b" />
+                <stop offset="60%" stopColor="#e74c3c" />
+                <stop offset="100%" stopColor="#8b1a1a" />
+              </radialGradient>
+              <radialGradient id="sapphireGem" cx="0.35" cy="0.35">
+                <stop offset="0%" stopColor="#74b9ff" />
+                <stop offset="60%" stopColor="#2980b9" />
+                <stop offset="100%" stopColor="#1a3a6b" />
+              </radialGradient>
+              <radialGradient id="emeraldGem" cx="0.35" cy="0.35">
+                <stop offset="0%" stopColor="#55efc4" />
+                <stop offset="60%" stopColor="#27ae60" />
+                <stop offset="100%" stopColor="#0d5e2f" />
+              </radialGradient>
             </defs>
-          </svg>
+          </motion.svg>
         </motion.div>
       </div>
 
@@ -292,14 +370,12 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         width={size}
         height={size}
       >
-        {/* Sleeping eyes */}
         {isSleeping && (
           <>
             <path d={`M ${size * LEFT_EYE.cx - pupilR * 1.5} ${size * LEFT_EYE.cy} Q ${size * LEFT_EYE.cx} ${size * LEFT_EYE.cy + pupilR} ${size * LEFT_EYE.cx + pupilR * 1.5} ${size * LEFT_EYE.cy}`} fill="none" stroke="#2d8a4e" strokeWidth={1.5} strokeLinecap="round" />
             <path d={`M ${size * RIGHT_EYE.cx - pupilR * 1.5} ${size * RIGHT_EYE.cy} Q ${size * RIGHT_EYE.cx} ${size * RIGHT_EYE.cy + pupilR} ${size * RIGHT_EYE.cx + pupilR * 1.5} ${size * RIGHT_EYE.cy}`} fill="none" stroke="#2d8a4e" strokeWidth={1.5} strokeLinecap="round" />
           </>
         )}
-        {/* Confused spiral eyes */}
         {isConfused && !blink && (
           <>
             <circle cx={size * LEFT_EYE.cx} cy={size * LEFT_EYE.cy} r={pupilR * 0.8} fill="none" stroke="#111" strokeWidth={1.2} />
@@ -308,7 +384,6 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             <path d={`M ${size * RIGHT_EYE.cx} ${size * RIGHT_EYE.cy - pupilR * 0.4} A ${pupilR * 0.4} ${pupilR * 0.4} 0 1 1 ${size * RIGHT_EYE.cx + pupilR * 0.4} ${size * RIGHT_EYE.cy}`} fill="none" stroke="#111" strokeWidth={1} />
           </>
         )}
-        {/* Normal pupils */}
         {!blink && !isSleeping && !isConfused && (
           <>
             <circle cx={size * LEFT_EYE.cx + eyeOffset.x} cy={size * LEFT_EYE.cy + eyeOffset.y} r={pupilR} fill="#111" opacity="0.85" />
@@ -317,14 +392,12 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             <circle cx={size * RIGHT_EYE.cx + eyeOffset.x * 0.3 - pupilR * 0.4} cy={size * RIGHT_EYE.cy + eyeOffset.y * 0.3 - pupilR * 0.5} r={pupilR * 0.38} fill="white" opacity="0.9" />
           </>
         )}
-        {/* Blink */}
         {blink && !isSleeping && (
           <>
             <line x1={size * LEFT_EYE.cx - pupilR * 1.2} y1={size * LEFT_EYE.cy} x2={size * LEFT_EYE.cx + pupilR * 1.2} y2={size * LEFT_EYE.cy} stroke="#2d8a4e" strokeWidth={2} strokeLinecap="round" />
             <line x1={size * RIGHT_EYE.cx - pupilR * 1.2} y1={size * RIGHT_EYE.cy} x2={size * RIGHT_EYE.cx + pupilR * 1.2} y2={size * RIGHT_EYE.cy} stroke="#2d8a4e" strokeWidth={2} strokeLinecap="round" />
           </>
         )}
-        {/* Smile / confused mouth */}
         {isConfused && (
           <path
             d={`M ${size * 0.43} ${size * 0.56} Q ${size * 0.47} ${size * 0.52} ${size * 0.53} ${size * 0.57} Q ${size * 0.56} ${size * 0.53} ${size * 0.58} ${size * 0.56}`}

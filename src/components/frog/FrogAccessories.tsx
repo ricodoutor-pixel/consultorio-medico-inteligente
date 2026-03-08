@@ -25,6 +25,31 @@ export const FrogAccessories = memo(({ size, isWaving, expression, cheekBlush }:
         <circle cx="28" cy="15" r="1.5" fill="white" opacity="0.8" />
       </svg>
 
+      {/* Lipstick kiss mark on right cheek (waving side) */}
+      <svg
+        className="absolute inset-0 pointer-events-none z-30"
+        viewBox={`0 0 ${size} ${size}`}
+        width={size}
+        height={size}
+      >
+        <g transform={`translate(${size * 0.68}, ${size * 0.48}) scale(${size * 0.0012})`}>
+          {/* Upper lip */}
+          <path
+            d="M-8 0 Q-6 -8 0 -4 Q6 -8 8 0"
+            fill="#cc1a1a"
+            opacity="0.85"
+          />
+          {/* Lower lip */}
+          <path
+            d="M-8 0 Q-4 6 0 4 Q4 6 8 0"
+            fill="#e62222"
+            opacity="0.8"
+          />
+          {/* Lip gloss shine */}
+          <ellipse cx="-2" cy="-2" rx="1.5" ry="1" fill="#ff6666" opacity="0.5" />
+        </g>
+      </svg>
+
       {/* Cheek blush */}
       {cheekBlush > 0 && (
         <svg

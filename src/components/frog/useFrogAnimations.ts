@@ -76,7 +76,6 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     const interval = setInterval(() => {
       setBlink(true);
       setTimeout(() => setBlink(false), 130);
-      // 30% chance of double blink
       if (Math.random() < 0.3) {
         setTimeout(() => {
           setBlink(true);
@@ -109,15 +108,17 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Random personality shifts
+  // Random personality shifts — more love-focused
   useEffect(() => {
     const interval = setInterval(() => {
-      const m = ALL_MOODS[Math.floor(Math.random() * ALL_MOODS.length)];
-      setAutoMood(m);
-      setExpression(m);
+      // 40% chance of love expression
+      const m = Math.random() < 0.4
+        ? "love"
+        : ALL_MOODS[Math.floor(Math.random() * ALL_MOODS.length)];
+      setAutoMood(m as FrogExpression);
+      setExpression(m as FrogExpression);
 
-      // Expression-specific side effects
-      if (m === "love") setCheekBlush(0.6);
+      if (m === "love") { setCheekBlush(0.8); setEyeSparkle(true); }
       if (m === "surprised") setEyeSparkle(true);
       if (m === "sneeze") setSneezing(true);
       if (m === "laughing") setIsBouncing(true);
@@ -148,27 +149,33 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => clearInterval(interval);
   }, [controls]);
 
+  // Waving arm every 15s
+  useEffect(() => {
+    const doWave = () => {
+      setIsWaving(true);
+      setExpression("waving");
+      setTimeout(() => {
+        setIsWaving(false);
+        setExpression(baseMood);
+      }, 1500);
+    };
+    const interval = setInterval(doWave, 15000);
+    return () => clearInterval(interval);
+  }, [baseMood]);
+
   // Daydream sequence every 30s
   useEffect(() => {
     const doDaydream = () => {
-      // Phase 1: thinking — thought bubble appears
       setIsDaydreaming(true);
       setDaydreamPhase("thinking");
       setExpression("love");
-      setCheekBlush(0.6);
+      setCheekBlush(0.8);
+      setEyeSparkle(true);
 
-      // Phase 2: kiss — sapinha kisses
-      setTimeout(() => {
-        setDaydreamPhase("kiss");
-        setEyeSparkle(true);
-      }, 2000);
+      setTimeout(() => { setDaydreamPhase("kiss"); }, 2000);
 
-      // Phase 3: hearts explosion
-      setTimeout(() => {
-        setDaydreamPhase("hearts");
-      }, 3500);
+      setTimeout(() => { setDaydreamPhase("hearts"); }, 3500);
 
-      // Phase 4: wake up confused
       setTimeout(() => {
         setDaydreamPhase("wakeup");
         setIsDaydreaming(false);
@@ -177,7 +184,6 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         setEyeSparkle(false);
       }, 5000);
 
-      // Back to normal
       setTimeout(() => {
         setDaydreamPhase(null);
         setExpression(baseMood);

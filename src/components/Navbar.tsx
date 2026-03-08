@@ -39,9 +39,9 @@ export const Navbar = () => {
             </NavLink>
 
             {/* Verdinho mascot - next to logo, jumps along navbar */}
-            <div className="ml-2">
+            <div className="ml-1">
               <FrogMascot
-                size={44}
+                size={38}
                 mood="happy"
                 onClick={openChat}
                 enableJumpToNav={true}

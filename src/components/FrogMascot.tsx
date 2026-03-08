@@ -2,10 +2,10 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import verdinhoImg from "@/assets/verdinho-mascot.png";
 import { useFrogAnimations, FrogExpression } from "./frog/useFrogAnimations";
-import { FrogCrown } from "./frog/FrogCrown";
 import { FrogEyes } from "./frog/FrogEyes";
 import { FrogMouth } from "./frog/FrogMouth";
 import { FrogAccessories } from "./frog/FrogAccessories";
+import { FrogDaydream } from "./frog/FrogDaydream";
 
 interface FrogMascotProps {
   onClick?: () => void;
@@ -119,7 +119,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             style={{ clipPath: `inset(0 0 ${size * 0.48}px 0)` }}
             draggable={false}
           />
-          <FrogCrown size={size} isHovered={anim.isHovered} />
+          {/* Crown removed */}
         </motion.div>
       </div>
 
@@ -147,7 +147,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       </svg>
 
       {/* Expression emoji */}
-      {emoji && (
+      {emoji && !anim.isDaydreaming && (
         <motion.span
           className="absolute -top-1 -right-1 z-40 text-xs pointer-events-none"
           initial={{ opacity: 0, scale: 0 }}
@@ -157,6 +157,13 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           {emoji}
         </motion.span>
       )}
+
+      {/* Daydream bubble */}
+      <FrogDaydream
+        size={size}
+        isDaydreaming={anim.isDaydreaming}
+        daydreamPhase={anim.daydreamPhase}
+      />
 
       {/* Hover tooltip */}
       {anim.isHovered && (

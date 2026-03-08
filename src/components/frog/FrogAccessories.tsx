@@ -38,23 +38,7 @@ export const FrogAccessories = memo(({ size, isWaving, expression, cheekBlush }:
         </svg>
       )}
 
-      {/* Waving arm */}
-      {isWaving && (
-        <motion.svg
-          className="absolute pointer-events-none z-40"
-          style={{ top: size * 0.42, right: -size * 0.1, width: size * 0.35, height: size * 0.35 }}
-          viewBox="0 0 50 50"
-          fill="none"
-          animate={{ rotate: [0, -20, 15, -20, 15, 0] }}
-          transition={{ duration: 1.8, ease: "easeInOut" }}
-        >
-          <path d="M10 40 Q15 25 25 15 Q30 10 35 8" stroke="#4ade80" strokeWidth="5" strokeLinecap="round" fill="none" />
-          <circle cx="35" cy="8" r="5" fill="#4ade80" />
-          <path d="M33 4 L31 1" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" />
-          <path d="M36 3 L36 0" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" />
-          <path d="M39 4 L41 1" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" />
-        </motion.svg>
-      )}
+      {/* Waving arm removed — replaced by daydream */}
 
       {/* Sleeping Z's */}
       {expression === "sleeping" && (

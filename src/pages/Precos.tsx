@@ -154,13 +154,15 @@ const Precos = () => {
               href="https://doutorpark.com.br/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-display font-black text-lg text-primary-foreground cursor-pointer"
+              className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-display font-black text-lg cursor-pointer border-2 border-transparent"
               style={{
-                background: 'linear-gradient(135deg, hsl(152 80% 45%), hsl(152 90% 55%), hsl(45 76% 52%))',
-                boxShadow: '0 0 30px hsl(152 80% 45% / 0.4), 0 0 60px hsl(45 76% 52% / 0.2)',
+                background: 'linear-gradient(135deg, hsl(45 100% 50%), hsl(30 100% 55%), hsl(15 100% 50%))',
+                color: '#1a0a00',
+                boxShadow: '0 0 30px hsl(45 100% 50% / 0.5), 0 0 60px hsl(30 100% 55% / 0.3), 0 4px 20px rgba(0,0,0,0.3)',
+                textShadow: '0 1px 2px rgba(255,255,255,0.3)',
               }}
-              whileHover={{ scale: 1.05, boxShadow: '0 0 50px hsl(152 80% 45% / 0.6), 0 0 80px hsl(45 76% 52% / 0.3)' }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.07, boxShadow: '0 0 50px hsl(45 100% 50% / 0.7), 0 0 80px hsl(30 100% 55% / 0.4), 0 8px 30px rgba(0,0,0,0.4)' }}
+              whileTap={{ scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
               🌿 Invista Em Cannabis Medicinal <ArrowRight size={22} />

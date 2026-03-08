@@ -67,12 +67,10 @@ export const FrogMascot = memo(({ onClick, size = 48, mood = "happy", enableJump
         x: (dx / (dist || 1)) * maxOff * factor,
         y: (dy / (dist || 1)) * maxOff * factor,
       });
-      // Head rotation towards mouse (max ±15 degrees)
-      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-      const headTilt = Math.max(-15, Math.min(15, dx / 15));
+      // Only head tilts towards mouse (max ±10 degrees)
+      const headTilt = Math.max(-10, Math.min(10, dx / 20));
       setHeadRotate(headTilt);
-      // Smile widens when mouse is closer
-      setSmileWidth(dist < 200 ? 1.3 : 1);
+      setSmileWidth(dist < 200 ? 1.2 : 1);
     };
 
     const onMouse = (e: MouseEvent) => handlePointer(e.clientX, e.clientY);

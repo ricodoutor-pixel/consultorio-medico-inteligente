@@ -111,8 +111,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
   // Random personality shifts — more love-focused
   useEffect(() => {
     const interval = setInterval(() => {
-      // 40% chance of love expression
-      const m = Math.random() < 0.4
+      // 55% chance of love expression — he's VERY in love
+      const m = Math.random() < 0.55
         ? "love"
         : ALL_MOODS[Math.floor(Math.random() * ALL_MOODS.length)];
       setAutoMood(m as FrogExpression);

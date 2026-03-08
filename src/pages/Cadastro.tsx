@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { validateCPF, validateCNPJ, formatCPF, formatCNPJ } from "@/lib/validators";
@@ -8,28 +9,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserPlus, Stethoscope, Building2, Leaf, ShoppingBag, Users, CheckCircle2, ArrowRight, Mail } from "lucide-react";
+import { UserPlus, Stethoscope, Building2, Leaf, Users, CheckCircle2, ArrowRight, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import { lovable } from "@/integrations/lovable/index";
+import { supabase } from "@/integrations/supabase/client";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
 type UserType = "paciente" | "medico" | "profissional" | "farmacia" | "produtor" | null;
 
 const userTypes = [
-  { id: "paciente" as UserType, label: "Paciente / Usuário", icon: Users, desc: "Busco consulta ou tratamento", color: "green" },
-  { id: "medico" as UserType, label: "Médico Prescritor", icon: Stethoscope, desc: "CRM ativo, prescrevo cannabis", color: "green" },
-  { id: "profissional" as UserType, label: "Profissional de Saúde", icon: UserPlus, desc: "Psicólogo, farmacêutico, TO, etc.", color: "purple" },
-  { id: "farmacia" as UserType, label: "Farmácia / Loja", icon: Building2, desc: "CNPJ + autorização ANVISA", color: "purple" },
-  { id: "produtor" as UserType, label: "Produtor / Cultivador", icon: Leaf, desc: "Autorização judicial ou ANVISA", color: "gold" },
+  { id: "paciente" as UserType, label: "Paciente / Usuário", icon: Users, desc: "Busco consulta ou tratamento", color: "green", dbType: "patient" },
+  { id: "medico" as UserType, label: "Médico Prescritor", icon: Stethoscope, desc: "CRM ativo, prescrevo cannabis", color: "green", dbType: "doctor" },
+  { id: "profissional" as UserType, label: "Profissional de Saúde", icon: UserPlus, desc: "Psicólogo, farmacêutico, TO, etc.", color: "purple", dbType: "professional" },
+  { id: "farmacia" as UserType, label: "Farmácia / Loja", icon: Building2, desc: "CNPJ + autorização ANVISA", color: "purple", dbType: "pharmacy" },
+  { id: "produtor" as UserType, label: "Produtor / Cultivador", icon: Leaf, desc: "Autorização judicial ou ANVISA", color: "gold", dbType: "producer" },
 ];
 
 const Cadastro = () => {
   const [type, setType] = useState<UserType>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleChange = (key: string, value: string) => setFormData({ ...formData, [key]: value });
 
@@ -37,12 +41,18 @@ const Cadastro = () => {
     if (!type) return false;
     const email = formData.email || "";
     const nome = formData.nome || "";
+    const senha = formData.senha || "";
+
     if (nome.length < 3 || nome.length > 100) {
       toast({ title: "Nome inválido", description: "O nome deve ter entre 3 e 100 caracteres.", variant: "destructive" });
       return false;
     }
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast({ title: "E-mail inválido", description: "Insira um e-mail válido.", variant: "destructive" });
+      return false;
+    }
+    if (senha.length < 6) {
+      toast({ title: "Senha muito curta", description: "Mínimo de 6 caracteres.", variant: "destructive" });
       return false;
     }
     const telefone = formData.telefone || "";
@@ -63,14 +73,66 @@ const Cadastro = () => {
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    setSubmitted(true);
-    toast({
-      title: "Cadastro enviado com sucesso! ✅",
-      description: "Seus dados foram enviados para análise. Entraremos em contato em até 24h.",
-    });
+    setLoading(true);
+
+    const selectedType = userTypes.find(u => u.id === type);
+    const dbType = selectedType?.dbType || "patient";
+
+    try {
+      // 1. Create auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.senha,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            full_name: formData.nome,
+          },
+        },
+      });
+
+      if (authError) {
+        if (authError.message.includes("already registered")) {
+          toast({ title: "E-mail já cadastrado", description: "Tente fazer login ou use outro e-mail.", variant: "destructive" });
+        } else {
+          toast({ title: "Erro no cadastro", description: authError.message, variant: "destructive" });
+        }
+        setLoading(false);
+        return;
+      }
+
+      // 2. Update profile with additional data
+      if (authData.user) {
+        await supabase.from("profiles").update({
+          full_name: formData.nome,
+          phone: formData.telefone || null,
+          cpf: formData.cpf || null,
+          user_type: dbType,
+          date_of_birth: formData.dataNascimento || null,
+        }).eq("id", authData.user.id);
+
+        // 3. If doctor, create doctor record
+        if (type === "medico" && formData.crm) {
+          await supabase.from("doctors").insert({
+            user_id: authData.user.id,
+            crm: formData.crm,
+            crm_state: formData.crmUf || "SP",
+            rqe: formData.rqe || null,
+            specialty: formData.especialidade || "Cannabis Medicinal",
+            bio: formData.bio || null,
+          });
+        }
+      }
+
+      setSubmitted(true);
+      toast({ title: "Cadastro realizado! ✅", description: "Verifique seu e-mail para confirmar a conta." });
+    } catch (err) {
+      toast({ title: "Erro", description: "Falha ao criar conta. Tente novamente.", variant: "destructive" });
+    }
+    setLoading(false);
   };
 
   if (submitted) {
@@ -81,16 +143,25 @@ const Cadastro = () => {
           <div className="container mx-auto px-4 relative z-10 flex justify-center">
             <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-md text-center">
               <CheckCircle2 size={64} className="text-primary mx-auto mb-6" />
-              <h1 className="text-3xl font-display font-black text-foreground mb-4">Cadastro Recebido!</h1>
-              <p className="text-muted-foreground mb-4">Seus dados foram enviados automaticamente para <span className="text-primary font-bold">drbezerramed@gmail.com</span>.</p>
-              <p className="text-sm text-muted-foreground mb-8">Nossa equipe analisará suas informações e entrará em contato em até 24 horas úteis.</p>
+              <h1 className="text-3xl font-display font-black text-foreground mb-4">Cadastro Realizado!</h1>
+              <p className="text-muted-foreground mb-4">
+                Enviamos um e-mail de confirmação para <span className="text-primary font-bold">{formData.email}</span>.
+              </p>
+              <p className="text-sm text-muted-foreground mb-8">
+                Clique no link do e-mail para ativar sua conta. Depois, faça login para acessar a plataforma.
+              </p>
               <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-gradient-green border border-green mb-6">
                 <Mail size={16} className="text-primary" />
-                <span className="text-sm font-bold text-foreground">drbezerramed@gmail.com</span>
+                <span className="text-sm font-bold text-foreground">Verifique sua caixa de entrada</span>
               </div>
-              <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
-                <a href="/">Voltar ao Início <ArrowRight size={16} className="ml-2" /></a>
-              </Button>
+              <div className="flex gap-3 justify-center">
+                <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
+                  <Link to="/login">Fazer Login <ArrowRight size={16} className="ml-2" /></Link>
+                </Button>
+                <Button variant="outline" className="font-bold rounded-2xl" asChild>
+                  <Link to="/">Voltar ao Início</Link>
+                </Button>
+              </div>
             </motion.div>
           </div>
         </section>
@@ -110,13 +181,14 @@ const Cadastro = () => {
               <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
                 <UserPlus size={24} className="text-primary" />
               </div>
-              <span className="text-sm font-bold text-primary">CADASTRO UNIFICADO</span>
+              <span className="text-sm font-bold text-primary">CRIAR CONTA</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground leading-tight mb-4">
               Faça parte da <span className="text-gradient-green">Planta & Raiz</span>
             </h1>
             <p className="text-muted-foreground max-w-2xl font-medium">
-              Cadastre-se como paciente, profissional de saúde, farmácia ou produtor. Seus dados serão analisados pela nossa equipe.
+              Crie sua conta para acessar consultas, prontuários e toda a plataforma.{" "}
+              <Link to="/login" className="text-primary font-bold hover:underline">Já tem conta? Faça login</Link>
             </p>
           </motion.div>
         </div>
@@ -127,24 +199,6 @@ const Cadastro = () => {
           {/* Type Selection */}
           {!type && (
             <div className="max-w-3xl mx-auto">
-              {/* Google Sign-in */}
-              <div className="mb-8 max-w-md mx-auto">
-                <Button
-                  variant="outline"
-                  className="w-full font-bold h-14 rounded-2xl border-border text-lg"
-                  onClick={async () => {
-                    await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-                  }}
-                >
-                  <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                  Entrar com Google
-                </Button>
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
-                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">ou cadastre-se manualmente</span></div>
-                </div>
-              </div>
-
               <h3 className="font-display font-black text-foreground mb-6">Selecione seu perfil</h3>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {userTypes.map((ut) => (
@@ -173,148 +227,118 @@ const Cadastro = () => {
           {/* Form */}
           {type && (
             <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-2xl mx-auto">
-              <Button variant="ghost" className="mb-4 text-muted-foreground" onClick={() => setType(null)}>
-                ← Voltar à seleção
-              </Button>
+              <button onClick={() => setType(null)} className="text-xs text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1">
+                ← Trocar perfil
+              </button>
 
               <Card className="border-border">
-                <CardContent className="p-8">
-                  <h3 className="font-display font-black text-foreground mb-6 flex items-center gap-2">
-                    <UserPlus size={18} className="text-primary" />
-                    Cadastro — {userTypes.find(u => u.id === type)?.label}
-                  </h3>
-
+                <CardContent className="p-6">
                   <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Common fields */}
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-sm font-bold">Nome completo *</Label>
-                        <Input required className="bg-muted border-border mt-1" onChange={(e) => handleChange("nome", e.target.value)} />
+                        <Label className="text-xs font-bold text-muted-foreground">Nome completo *</Label>
+                        <Input value={formData.nome || ""} onChange={(e) => handleChange("nome", e.target.value)} placeholder="Seu nome" className="bg-muted border-border" required />
                       </div>
                       <div>
-                        <Label className="text-sm font-bold">E-mail *</Label>
-                        <Input type="email" required className="bg-muted border-border mt-1" onChange={(e) => handleChange("email", e.target.value)} />
+                        <Label className="text-xs font-bold text-muted-foreground">E-mail *</Label>
+                        <Input type="email" value={formData.email || ""} onChange={(e) => handleChange("email", e.target.value)} placeholder="seu@email.com" className="bg-muted border-border" required />
                       </div>
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-sm font-bold">Telefone / WhatsApp *</Label>
-                        <Input required className="bg-muted border-border mt-1" placeholder="(11) 99999-9999" onChange={(e) => handleChange("telefone", e.target.value)} />
+                        <Label className="text-xs font-bold text-muted-foreground">Senha *</Label>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            value={formData.senha || ""}
+                            onChange={(e) => handleChange("senha", e.target.value)}
+                            placeholder="Mínimo 6 caracteres"
+                            className="bg-muted border-border pr-10"
+                            required
+                            minLength={6}
+                          />
+                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                          </button>
+                        </div>
                       </div>
                       <div>
-                        <Label className="text-sm font-bold">CPF *</Label>
-                        <Input required className="bg-muted border-border mt-1" placeholder="000.000.000-00" onChange={(e) => handleChange("cpf", e.target.value)} />
+                        <Label className="text-xs font-bold text-muted-foreground">Telefone</Label>
+                        <Input value={formData.telefone || ""} onChange={(e) => handleChange("telefone", e.target.value)} placeholder="(11) 99999-9999" className="bg-muted border-border" />
                       </div>
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-sm font-bold">Cidade *</Label>
-                        <Input required className="bg-muted border-border mt-1" onChange={(e) => handleChange("cidade", e.target.value)} />
+                        <Label className="text-xs font-bold text-muted-foreground">CPF</Label>
+                        <Input value={formData.cpf || ""} onChange={(e) => handleChange("cpf", formatCPF(e.target.value))} placeholder="000.000.000-00" className="bg-muted border-border" />
                       </div>
                       <div>
-                        <Label className="text-sm font-bold">Estado *</Label>
-                        <Select onValueChange={(v) => handleChange("estado", v)}>
-                          <SelectTrigger className="bg-muted border-border mt-1"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                          <SelectContent>
-                            {["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"].map(uf => (
-                              <SelectItem key={uf} value={uf}>{uf}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Label className="text-xs font-bold text-muted-foreground">Data de Nascimento</Label>
+                        <Input type="date" value={formData.dataNascimento || ""} onChange={(e) => handleChange("dataNascimento", e.target.value)} className="bg-muted border-border" />
                       </div>
                     </div>
 
-                    {/* Type-specific fields */}
-                    {(type === "medico" || type === "profissional") && (
+                    {/* Doctor-specific fields */}
+                    {type === "medico" && (
                       <>
-                        <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="grid sm:grid-cols-3 gap-4">
                           <div>
-                            <Label className="text-sm font-bold">Registro profissional (CRM/CRF/CRP) *</Label>
-                            <Input required className="bg-muted border-border mt-1" onChange={(e) => handleChange("registro", e.target.value)} />
+                            <Label className="text-xs font-bold text-muted-foreground">CRM *</Label>
+                            <Input value={formData.crm || ""} onChange={(e) => handleChange("crm", e.target.value)} placeholder="123456" className="bg-muted border-border" required />
                           </div>
                           <div>
-                            <Label className="text-sm font-bold">Especialidade *</Label>
-                            <Input required className="bg-muted border-border mt-1" onChange={(e) => handleChange("especialidade", e.target.value)} />
+                            <Label className="text-xs font-bold text-muted-foreground">UF do CRM</Label>
+                            <Select value={formData.crmUf || "SP"} onValueChange={(v) => handleChange("crmUf", v)}>
+                              <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                {["AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA","PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO"].map(uf => (
+                                  <SelectItem key={uf} value={uf}>{uf}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-xs font-bold text-muted-foreground">RQE</Label>
+                            <Input value={formData.rqe || ""} onChange={(e) => handleChange("rqe", e.target.value)} placeholder="Opcional" className="bg-muted border-border" />
                           </div>
                         </div>
                         <div>
-                          <Label className="text-sm font-bold">Experiência com cannabis medicinal</Label>
-                          <Textarea className="bg-muted border-border mt-1" placeholder="Descreva brevemente..." onChange={(e) => handleChange("experiencia", e.target.value)} />
+                          <Label className="text-xs font-bold text-muted-foreground">Especialidade</Label>
+                          <Input value={formData.especialidade || ""} onChange={(e) => handleChange("especialidade", e.target.value)} placeholder="Ex: Cannabis Medicinal, Neurologia..." className="bg-muted border-border" />
+                        </div>
+                        <div>
+                          <Label className="text-xs font-bold text-muted-foreground">Bio</Label>
+                          <Textarea value={formData.bio || ""} onChange={(e) => handleChange("bio", e.target.value)} placeholder="Breve descrição profissional..." className="bg-muted border-border" rows={3} />
                         </div>
                       </>
                     )}
 
+                    {/* Pharmacy fields */}
                     {type === "farmacia" && (
-                      <>
-                        <div className="grid sm:grid-cols-2 gap-4">
-                          <div>
-                            <Label className="text-sm font-bold">CNPJ *</Label>
-                            <Input required className="bg-muted border-border mt-1" onChange={(e) => handleChange("cnpj", e.target.value)} />
-                          </div>
-                          <div>
-                            <Label className="text-sm font-bold">Autorização ANVISA</Label>
-                            <Input className="bg-muted border-border mt-1" onChange={(e) => handleChange("anvisa", e.target.value)} />
-                          </div>
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-xs font-bold text-muted-foreground">CNPJ *</Label>
+                          <Input value={formData.cnpj || ""} onChange={(e) => handleChange("cnpj", formatCNPJ(e.target.value))} placeholder="00.000.000/0000-00" className="bg-muted border-border" required />
                         </div>
                         <div>
-                          <Label className="text-sm font-bold">Nome da farmácia / empresa *</Label>
-                          <Input required className="bg-muted border-border mt-1" onChange={(e) => handleChange("nomeEmpresa", e.target.value)} />
+                          <Label className="text-xs font-bold text-muted-foreground">Autorização ANVISA</Label>
+                          <Input value={formData.anvisaAuth || ""} onChange={(e) => handleChange("anvisaAuth", e.target.value)} placeholder="Número da autorização" className="bg-muted border-border" />
                         </div>
-                      </>
-                    )}
-
-                    {type === "produtor" && (
-                      <>
-                        <div>
-                          <Label className="text-sm font-bold">Tipo de autorização *</Label>
-                          <Select onValueChange={(v) => handleChange("tipoAutorizacao", v)}>
-                            <SelectTrigger className="bg-muted border-border mt-1"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="habeas_corpus">Habeas Corpus</SelectItem>
-                              <SelectItem value="anvisa">Autorização ANVISA</SelectItem>
-                              <SelectItem value="judicial">Autorização Judicial</SelectItem>
-                              <SelectItem value="outro">Outro</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label className="text-sm font-bold">Descrição do cultivo</Label>
-                          <Textarea className="bg-muted border-border mt-1" placeholder="Local, tipo de cultivo, variedades..." onChange={(e) => handleChange("descCultivo", e.target.value)} />
-                        </div>
-                      </>
-                    )}
-
-                    {type === "paciente" && (
-                      <div>
-                        <Label className="text-sm font-bold">Qual é seu interesse principal?</Label>
-                        <Select onValueChange={(v) => handleChange("interesse", v)}>
-                          <SelectTrigger className="bg-muted border-border mt-1"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="consulta">Consulta médica</SelectItem>
-                            <SelectItem value="informacao">Informação sobre tratamento</SelectItem>
-                            <SelectItem value="compra">Comprar produtos</SelectItem>
-                            <SelectItem value="outro">Outro</SelectItem>
-                          </SelectContent>
-                        </Select>
                       </div>
                     )}
 
-                    <div>
-                      <Label className="text-sm font-bold">Observações adicionais</Label>
-                      <Textarea className="bg-muted border-border mt-1" placeholder="Algo mais que queira informar..." onChange={(e) => handleChange("observacoes", e.target.value)} />
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-muted/30 border border-border">
-                      <p className="text-xs text-muted-foreground">
-                        ✅ Seus dados serão enviados automaticamente para <span className="text-primary font-bold">drbezerramed@gmail.com</span> e armazenados com segurança conforme a LGPD.
-                      </p>
-                    </div>
-
-                    <Button type="submit" size="lg" className="w-full font-black bg-primary text-primary-foreground rounded-2xl h-14">
-                      Enviar Cadastro <ArrowRight size={18} className="ml-2" />
+                    <Button type="submit" className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12" disabled={loading}>
+                      {loading ? <Loader2 size={16} className="animate-spin mr-2" /> : <UserPlus size={16} className="mr-2" />}
+                      Criar Conta
                     </Button>
+
+                    <p className="text-center text-xs text-muted-foreground">
+                      Já tem uma conta?{" "}
+                      <Link to="/login" className="text-primary font-bold hover:underline">Fazer login</Link>
+                    </p>
                   </form>
                 </CardContent>
               </Card>

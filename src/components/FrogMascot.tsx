@@ -277,6 +277,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           <path d="M30 17 L58 2 L58 32 Z" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
           <circle cx="30" cy="17" r="5" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
         </svg>
+        </motion.div>
       </motion.div>
 
       {/* Eyes + Smile SVG overlay */}

@@ -305,7 +305,8 @@ export const FrogChatModal = () => {
             disabled={isStreaming || !inputValue.trim()}
             className="rounded-xl bg-primary text-primary-foreground h-9 w-9"
           >
-            <Send size={16} />
+            <Send size={16} aria-hidden="true" />
+            <span className="sr-only">Enviar mensagem</span>
           </Button>
         </div>
       </motion.div>

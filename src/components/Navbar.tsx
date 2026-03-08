@@ -69,7 +69,7 @@ export const Navbar = () => {
         </div>
 
         {isOpen && (
-          <div className="lg:hidden py-4 space-y-3 border-t border-border">
+          <div id="mobile-menu" className="lg:hidden py-4 space-y-3 border-t border-border" role="menu" aria-label="Menu mobile">
             {links.map((link) => (
               <NavLink
                 key={link.to}

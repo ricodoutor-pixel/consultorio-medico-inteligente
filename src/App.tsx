@@ -52,39 +52,41 @@ const App = () => (
         <BrowserRouter>
           <FrogChatModal />
           <Suspense fallback={<Loading />}>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/como-funciona" element={<ComoFunciona />} />
-              <Route path="/profissionais" element={<Profissionais />} />
-              <Route path="/profissionais/:id" element={<Profissionais />} />
-              <Route path="/shopping" element={<Shopping />} />
-              <Route path="/shopping/:id" element={<Shopping />} />
-              <Route path="/planos" element={<Precos />} />
-              <Route path="/precos" element={<Precos />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/contato" element={<Contato />} />
-              <Route path="/pay" element={<Pay />} />
-              <Route path="/carteira" element={<Carteira />} />
-              <Route path="/cadastro-profissional" element={<CadastroProfissional />} />
-              <Route path="/cadastro" element={<Cadastro />} />
-              <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />
-              <Route path="/telemedicina" element={<Telemedicina />} />
-              <Route path="/indicacoes" element={<Indicacoes />} />
-              <Route path="/legal" element={<Legal />} />
-              <Route path="/termos" element={<Legal />} />
-              <Route path="/privacidade" element={<Legal />} />
-              <Route path="/pagamento" element={<ConsultationPayment />} />
-              <Route path="/dashboard-especialista" element={<SpecialistDashboard />} />
-              <Route path="/influenciadores" element={<InfluencerDashboard />} />
-              <Route path="/usuarios-online" element={<OnlineUsers />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/admin-login" element={<AdminLogin />} />
-              <Route path="/biblioteca" element={<BibliotecaCientifica />} />
-              <Route path="/download" element={<DownloadApp />} />
-              <Route path="/comunidade" element={<Comunidade />} />
-              <Route path="/dashboard" element={<DashboardPaciente />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <main id="main-content" role="main">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/como-funciona" element={<ComoFunciona />} />
+                <Route path="/profissionais" element={<Profissionais />} />
+                <Route path="/profissionais/:id" element={<Profissionais />} />
+                <Route path="/shopping" element={<Shopping />} />
+                <Route path="/shopping/:id" element={<Shopping />} />
+                <Route path="/planos" element={<Precos />} />
+                <Route path="/precos" element={<Precos />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/contato" element={<Contato />} />
+                <Route path="/pay" element={<Pay />} />
+                <Route path="/carteira" element={<Carteira />} />
+                <Route path="/cadastro-profissional" element={<CadastroProfissional />} />
+                <Route path="/cadastro" element={<Cadastro />} />
+                <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />
+                <Route path="/telemedicina" element={<Telemedicina />} />
+                <Route path="/indicacoes" element={<Indicacoes />} />
+                <Route path="/legal" element={<Legal />} />
+                <Route path="/termos" element={<Legal />} />
+                <Route path="/privacidade" element={<Legal />} />
+                <Route path="/pagamento" element={<ConsultationPayment />} />
+                <Route path="/dashboard-especialista" element={<SpecialistDashboard />} />
+                <Route path="/influenciadores" element={<InfluencerDashboard />} />
+                <Route path="/usuarios-online" element={<OnlineUsers />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin-login" element={<AdminLogin />} />
+                <Route path="/biblioteca" element={<BibliotecaCientifica />} />
+                <Route path="/download" element={<DownloadApp />} />
+                <Route path="/comunidade" element={<Comunidade />} />
+                <Route path="/dashboard" element={<DashboardPaciente />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
           </Suspense>
         </BrowserRouter>
       </TooltipProvider>

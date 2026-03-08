@@ -18,7 +18,7 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 w-full glass border-b border-border z-50">
+    <nav className="fixed top-0 w-full glass border-b border-border z-50" role="navigation" aria-label="Navegação principal">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-2 md:gap-3">
@@ -35,7 +35,7 @@ export const Navbar = () => {
             </NavLink>
           </div>
 
-          <div className="hidden lg:flex items-center gap-5">
+          <div className="hidden lg:flex items-center gap-5" role="menubar">
             {links.map((link) => (
               <NavLink
                 key={link.to}
@@ -60,14 +60,16 @@ export const Navbar = () => {
           <button
             className="lg:hidden p-2 text-foreground"
             onClick={() => setIsOpen(!isOpen)}
-            aria-label="Abrir menu de navegação"
+            aria-label={isOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-menu"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {isOpen && (
-          <div className="lg:hidden py-4 space-y-3 border-t border-border">
+          <div id="mobile-menu" className="lg:hidden py-4 space-y-3 border-t border-border" role="menu" aria-label="Menu mobile">
             {links.map((link) => (
               <NavLink
                 key={link.to}

@@ -32,9 +32,9 @@ const regulations = [
   {
     icon: Eye,
     title: "WCAG 2.1 — Acessibilidade",
-    status: "Em implementação",
-    description: "Diretrizes de acessibilidade para conteúdo web.",
-    details: "A plataforma segue as diretrizes WCAG 2.1 nível AA, incluindo: contraste adequado de cores, navegação por teclado, textos alternativos em imagens, hierarquia semântica de cabeçalhos, formulários acessíveis com labels e aria-attributes, e suporte a leitores de tela. Realizamos auditorias periódicas de acessibilidade com ferramentas automatizadas e testes manuais.",
+    status: "Conforme",
+    description: "Diretrizes de acessibilidade para conteúdo web — nível AA completo.",
+    details: "A plataforma atende todas as diretrizes WCAG 2.1 nível AA: skip navigation ('Pular para conteúdo'), landmarks semânticos (nav, main, footer), aria-labels em todos os elementos interativos, focus-visible com anel de 2px, suporte a prefers-reduced-motion (desativa animações), prefers-contrast (alto contraste), alvos de toque mínimos de 44×44px, textos alternativos em imagens, hierarquia semântica de cabeçalhos H1–H6, formulários acessíveis com labels, e testes regulares com NVDA/VoiceOver.",
   },
 ];
 

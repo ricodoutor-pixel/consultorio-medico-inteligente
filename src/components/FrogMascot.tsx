@@ -241,6 +241,18 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             </linearGradient>
           </defs>
         </svg>
+
+        {/* Bow tie */}
+        <svg
+          className="absolute pointer-events-none z-30"
+          style={{ top: size * 0.72, left: (size - size * 0.28) / 2, width: size * 0.28, height: size * 0.16 }}
+          viewBox="0 0 60 34"
+          fill="none"
+        >
+          <path d="M30 17 L2 2 L2 32 Z" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
+          <path d="M30 17 L58 2 L58 32 Z" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
+          <circle cx="30" cy="17" r="5" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
+        </svg>
       </motion.div>
 
       {/* Eyes + Smile SVG overlay */}

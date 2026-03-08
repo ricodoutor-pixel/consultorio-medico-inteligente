@@ -147,9 +147,13 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       case "thinking": return "💭";
       case "sleeping": return "💤";
       case "waving": return "👋";
+      case "confused": return "❓";
       default: return null;
     }
   };
+
+  const isSleeping = expression === "sleeping";
+  const isConfused = expression === "confused";
 
   const emoji = getExpressionEmoji();
   const pupilR = size * PUPIL_RADIUS_RATIO;

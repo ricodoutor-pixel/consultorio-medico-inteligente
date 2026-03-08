@@ -11,8 +11,9 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
   if (!isDaydreaming || !daydreamPhase) return null;
 
   const bubbleSize = size * 1.1;
-  const bubbleX = -bubbleSize * 0.15;
-  const bubbleY = -bubbleSize * 0.85;
+  // Position to the RIGHT of the frog
+  const bubbleX = size * 0.75;
+  const bubbleY = -bubbleSize * 0.55;
 
   return (
     <AnimatePresence>
@@ -25,11 +26,11 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
           exit={{ opacity: 0, scale: 0.3 }}
           transition={{ duration: 0.4, ease: "backOut" }}
         >
-          {/* Thought bubble trail */}
-          <svg className="absolute" style={{ bottom: -size * 0.1, left: bubbleSize * 0.35, width: 20, height: 20 }}>
-            <circle cx="10" cy="14" r="4" fill="white" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.8" />
-            <circle cx="6" cy="8" r="3" fill="white" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.7" />
-            <circle cx="3" cy="3" r="2" fill="white" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.6" />
+          {/* Thought bubble trail — from left side toward frog */}
+          <svg className="absolute" style={{ bottom: -size * 0.05, left: -12, width: 20, height: 24 }}>
+            <circle cx="14" cy="18" r="4" fill="white" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.8" />
+            <circle cx="8" cy="11" r="3" fill="white" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.7" />
+            <circle cx="4" cy="5" r="2" fill="white" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.6" />
           </svg>
 
           {/* Main thought bubble */}
@@ -41,10 +42,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
             }}
           >
             {/* Girlfriend frog inside bubble */}
-            <svg
-              viewBox="0 0 100 100"
-              className="absolute inset-0 w-full h-full"
-            >
+            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
               {/* Background hearts */}
               <circle cx="15" cy="20" r="3" fill="#ffb6c1" opacity="0.3">
                 <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2s" repeatCount="indefinite" />
@@ -54,7 +52,6 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               </circle>
 
               {/* Sapinha (girlfriend frog) */}
-              {/* Head */}
               <ellipse cx="50" cy="48" rx="22" ry="20" fill="#7dd87d" />
               <ellipse cx="50" cy="48" rx="20" ry="18" fill="#8ae68a" />
               
@@ -81,19 +78,8 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               <circle cx="67" cy="46" r="4" fill="#ff9cad" opacity="0.4" />
 
               {/* Red lipstick mouth */}
-              <path
-                d="M 42 52 Q 46 56 50 54 Q 54 56 58 52"
-                fill="#e74c3c"
-                stroke="#c0392b"
-                strokeWidth="0.8"
-              />
-              <path
-                d="M 42 52 Q 50 49 58 52"
-                fill="#ff4757"
-                stroke="#c0392b"
-                strokeWidth="0.5"
-              />
-              {/* Lip shine */}
+              <path d="M 42 52 Q 46 56 50 54 Q 54 56 58 52" fill="#e74c3c" stroke="#c0392b" strokeWidth="0.8" />
+              <path d="M 42 52 Q 50 49 58 52" fill="#ff4757" stroke="#c0392b" strokeWidth="0.5" />
               <ellipse cx="48" cy="51" rx="2" ry="0.8" fill="white" opacity="0.4" />
 
               {/* Bow/flower on head */}
@@ -103,7 +89,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               <circle cx="30" cy="22" r="3" fill="#ff6b81" />
               <circle cx="31" cy="26" r="2" fill="#ffd700" />
 
-              {/* Kiss mark (lipstick) on the side — during kiss phase */}
+              {/* Kiss mark during kiss phase */}
               {(daydreamPhase === "kiss" || daydreamPhase === "hearts") && (
                 <g opacity="0.9">
                   <motion.g
@@ -111,7 +97,6 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.3 }}
                   >
-                    {/* Kiss lips mark */}
                     <path
                       d="M 72 48 Q 74 45 77 46 Q 79 44 81 46 Q 82 48 80 50 Q 78 52 77 50 Q 75 52 73 50 Q 71 48 72 48"
                       fill="#e74c3c"
@@ -122,13 +107,9 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               )}
             </svg>
 
-            {/* Floating sparkles */}
+            {/* Floating kiss emojis */}
             {daydreamPhase === "kiss" && (
-              <motion.div
-                className="absolute inset-0"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
+              <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 {["💋", "💋"].map((emoji, i) => (
                   <motion.span
                     key={i}
@@ -148,17 +129,14 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
           {/* Hearts explosion */}
           {daydreamPhase === "hearts" && (
             <div className="absolute inset-0">
-              {Array.from({ length: 8 }).map((_, i) => {
-                const angle = (i / 8) * Math.PI * 2;
-                const dist = bubbleSize * 0.6;
+              {Array.from({ length: 10 }).map((_, i) => {
+                const angle = (i / 10) * Math.PI * 2;
+                const dist = bubbleSize * 0.7;
                 return (
                   <motion.span
                     key={i}
                     className="absolute text-sm pointer-events-none"
-                    style={{
-                      left: "50%",
-                      top: "50%",
-                    }}
+                    style={{ left: "50%", top: "50%" }}
                     initial={{ x: 0, y: 0, opacity: 1, scale: 0.5 }}
                     animate={{
                       x: Math.cos(angle) * dist,
@@ -168,7 +146,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
                     }}
                     transition={{ duration: 1.2, ease: "easeOut" }}
                   >
-                    ❤️
+                    {i % 3 === 0 ? "💕" : i % 3 === 1 ? "❤️" : "💖"}
                   </motion.span>
                 );
               })}

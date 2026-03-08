@@ -6,6 +6,7 @@ import { FrogEyes } from "./frog/FrogEyes";
 import { FrogMouth } from "./frog/FrogMouth";
 import { FrogAccessories } from "./frog/FrogAccessories";
 import { FrogDaydream } from "./frog/FrogDaydream";
+import { FrogCrown } from "./frog/FrogCrown";
 
 interface FrogMascotProps {
   onClick?: () => void;
@@ -119,7 +120,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             style={{ clipPath: `inset(0 0 ${size * 0.48}px 0)` }}
             draggable={false}
           />
-          {/* Crown removed */}
+          {/* Prince Crown */}
+          <FrogCrown size={size} isHovered={anim.isHovered} />
         </motion.div>
       </div>
 
@@ -146,6 +148,38 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         />
       </svg>
 
+      {/* Waving arm — right side */}
+      {anim.isWaving && (
+        <motion.svg
+          className="absolute z-30 pointer-events-none"
+          style={{
+            right: -size * 0.2,
+            top: size * 0.3,
+            width: size * 0.4,
+            height: size * 0.5,
+          }}
+          viewBox="0 0 40 50"
+          initial={{ rotate: 0 }}
+          animate={{ rotate: [0, -25, 15, -20, 10, 0] }}
+          transition={{ duration: 1.2, ease: "easeInOut" }}
+        >
+          {/* Arm */}
+          <path
+            d="M 5 45 Q 8 30 15 20 Q 18 15 22 10"
+            stroke="#5bb85b"
+            strokeWidth="6"
+            strokeLinecap="round"
+            fill="none"
+          />
+          {/* Hand */}
+          <circle cx="22" cy="10" r="5" fill="#6ecf6e" />
+          {/* Fingers */}
+          <path d="M 19 6 Q 17 3 18 1" stroke="#6ecf6e" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          <path d="M 22 5 Q 22 2 23 0" stroke="#6ecf6e" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          <path d="M 25 6 Q 27 3 28 1" stroke="#6ecf6e" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        </motion.svg>
+      )}
+
       {/* Expression emoji */}
       {emoji && !anim.isDaydreaming && (
         <motion.span
@@ -158,7 +192,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         </motion.span>
       )}
 
-      {/* Daydream bubble */}
+      {/* Daydream bubble — positioned to the RIGHT */}
       <FrogDaydream
         size={size}
         isDaydreaming={anim.isDaydreaming}

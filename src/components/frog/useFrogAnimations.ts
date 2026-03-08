@@ -148,15 +148,43 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => clearInterval(interval);
   }, [controls]);
 
-  // Wave every 30s
+  // Daydream sequence every 30s
   useEffect(() => {
-    const doWave = () => {
-      setIsWaving(true);
-      setExpression("waving");
-      setTimeout(() => { setIsWaving(false); setExpression(baseMood); }, 2000);
+    const doDaydream = () => {
+      // Phase 1: thinking — thought bubble appears
+      setIsDaydreaming(true);
+      setDaydreamPhase("thinking");
+      setExpression("love");
+      setCheekBlush(0.6);
+
+      // Phase 2: kiss — sapinha kisses
+      setTimeout(() => {
+        setDaydreamPhase("kiss");
+        setEyeSparkle(true);
+      }, 2000);
+
+      // Phase 3: hearts explosion
+      setTimeout(() => {
+        setDaydreamPhase("hearts");
+      }, 3500);
+
+      // Phase 4: wake up confused
+      setTimeout(() => {
+        setDaydreamPhase("wakeup");
+        setIsDaydreaming(false);
+        setExpression("confused");
+        setCheekBlush(0);
+        setEyeSparkle(false);
+      }, 5000);
+
+      // Back to normal
+      setTimeout(() => {
+        setDaydreamPhase(null);
+        setExpression(baseMood);
+      }, 7000);
     };
-    const timeout = setTimeout(doWave, 15000);
-    const interval = setInterval(doWave, 30000);
+    const timeout = setTimeout(doDaydream, 10000);
+    const interval = setInterval(doDaydream, 30000);
     return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [baseMood]);
 

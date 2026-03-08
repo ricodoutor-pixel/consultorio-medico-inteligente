@@ -52,6 +52,9 @@ const Telemedicina = () => {
   const [showPrescription, setShowPrescription] = useState(false);
   const [showWearables, setShowWearables] = useState(false);
   const [tcleAccepted, setTcleAccepted] = useState(false);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const { toast } = useToast();
   const [patientData, setPatientData] = useState({
     nome: "",
     cpf: "",

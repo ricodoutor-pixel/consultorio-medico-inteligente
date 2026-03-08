@@ -112,15 +112,15 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     if (!enableJumpToNav) return;
     const doNavJump = async () => {
       await controls.start({
-        x: [0, 60, 120, 180, 200],
-        y: [0, -15, 0, -15, 0],
-        transition: { duration: 1.2, ease: "easeInOut" },
+        x: [0, 25, 50, 70, 80],
+        y: [0, -10, 0, -10, 0],
+        transition: { duration: 1, ease: "easeInOut" },
       });
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 300));
       await controls.start({
-        x: [200, 140, 80, 30, 0],
-        y: [0, -15, 0, -12, 0],
-        transition: { duration: 1.2, ease: "easeInOut" },
+        x: [80, 55, 35, 15, 0],
+        y: [0, -10, 0, -8, 0],
+        transition: { duration: 1, ease: "easeInOut" },
       });
     };
     const timeout = setTimeout(doNavJump, 10000);

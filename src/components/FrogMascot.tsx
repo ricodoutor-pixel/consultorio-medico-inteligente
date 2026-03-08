@@ -204,12 +204,9 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         className="relative z-10"
         animate={{ 
           rotate: headRotation.x,
-          y: isSleeping ? [0, 2, 0] : headRotation.y * 0.3,
+          y: headRotation.y * 0.3,
         }}
-        transition={isSleeping 
-          ? { rotate: { type: "spring", stiffness: 200, damping: 12 }, y: { duration: 2, repeat: Infinity, ease: "easeInOut" } }
-          : { type: "spring", stiffness: 200, damping: 12 }
-        }
+        transition={{ type: "spring", stiffness: 200, damping: 12 }}
       >
         <img
           src={verdinhoImg}

@@ -123,8 +123,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         transition: { duration: 1.2, ease: "easeInOut" },
       });
     };
-    const timeout = setTimeout(doNavJump, 8000);
-    const interval = setInterval(doNavJump, 25000 + Math.random() * 10000);
+    const timeout = setTimeout(doNavJump, 10000);
+    const interval = setInterval(doNavJump, 20000);
     return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [controls, enableJumpToNav]);
 

@@ -80,6 +80,7 @@ type Tab = "dashboard" | "users" | "webhooks" | "alerts" | "analytics";
 const Admin = () => {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [live, setLive] = useState(generateLiveData());
+  const [timeFilter, setTimeFilter] = useState<"24h" | "7d" | "30d" | "90d">("30d");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -276,6 +277,23 @@ const Admin = () => {
           {/* Analytics */}
           {tab === "analytics" && (
             <div className="space-y-6">
+              {/* Time Filter */}
+              <div className="flex gap-2 flex-wrap">
+                {(["24h", "7d", "30d", "90d"] as const).map(f => (
+                  <button key={f} onClick={() => setTimeFilter(f)} className={`px-4 py-2 rounded-full text-xs font-bold border transition-colors ${timeFilter === f ? "border-gold bg-gradient-gold text-[hsl(45,76%,52%)]" : "border-border bg-card/50 text-muted-foreground hover:text-foreground"}`}>
+                    {f === "24h" ? "Últimas 24h" : f === "7d" ? "7 dias" : f === "30d" ? "30 dias" : "90 dias"}
+                  </button>
+                ))}
+                <Button variant="outline" size="sm" className="rounded-full text-xs ml-auto" onClick={() => {
+                  const data = JSON.stringify({ timeFilter, live, revenueData, trafficData, userDistribution }, null, 2);
+                  const blob = new Blob([data], { type: "application/json" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a"); a.href = url; a.download = `analytics-${timeFilter}-${new Date().toISOString().slice(0, 10)}.json`; a.click();
+                }}>
+                  📊 Exportar Dados
+                </Button>
+              </div>
+
               <div className="grid md:grid-cols-3 gap-4">
                 {[
                   { label: "CAC (Custo Aquisição)", value: "R$ 12,40", trend: "-8%", good: true },

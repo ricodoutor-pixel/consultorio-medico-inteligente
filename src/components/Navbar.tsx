@@ -41,7 +41,7 @@ export const Navbar = () => {
             {/* Verdinho mascot - next to logo, jumps along navbar */}
             <div className="ml-1">
               <FrogMascot
-                size={55}
+                size={60}
                 mood="happy"
                 onClick={openChat}
                 enableJumpToNav={true}

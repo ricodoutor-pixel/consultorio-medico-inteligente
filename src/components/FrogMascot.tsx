@@ -32,13 +32,13 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
 
   useEffect(() => { if (!autoMood) setExpression(mood); }, [mood, autoMood]);
 
-  // Eye + head tracking from mouse
+  // 3D head tracking (MetaMask-style perspective rotation)
   useEffect(() => {
     const handlePointer = (clientX: number, clientY: number) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height * 0.38;
+      const cy = rect.top + rect.height / 2;
       const dx = clientX - cx;
       const dy = clientY - cy;
       const dist = Math.sqrt(dx * dx + dy * dy);
@@ -48,10 +48,10 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         x: (dx / (dist || 1)) * maxOff * factor,
         y: (dy / (dist || 1)) * maxOff * factor,
       });
-      // Head follows mouse: tilt left/right and up/down
-      const headX = Math.max(-15, Math.min(15, (dx / 400) * 15));
-      const headY = Math.max(-8, Math.min(8, (dy / 400) * 8));
-      setHeadRotation({ x: headX, y: headY });
+      // 3D perspective head rotation — rotateY for left/right, rotateX for up/down
+      const rotY = Math.max(-25, Math.min(25, (dx / 300) * 25));
+      const rotX = Math.max(-15, Math.min(15, -(dy / 300) * 15));
+      setHeadRotation({ x: rotY, y: rotX });
     };
     const onMouse = (e: MouseEvent) => handlePointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => {
@@ -199,15 +199,19 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         />
       )}
 
-      {/* Mascot with head tilt */}
+      {/* 3D Head container — MetaMask-style perspective tilt, body stays still */}
       <motion.div
         className="relative z-10"
-        animate={{ 
-          rotate: headRotation.x,
-          y: headRotation.y * 0.3,
-        }}
-        transition={{ type: "spring", stiffness: 200, damping: 12 }}
+        style={{ perspective: 400, transformStyle: "preserve-3d" }}
       >
+        <motion.div
+          animate={{
+            rotateY: headRotation.x,
+            rotateX: headRotation.y,
+          }}
+          transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.8 }}
+          style={{ transformStyle: "preserve-3d" }}
+        >
         <img
           src={verdinhoImg}
           alt="Verdinho - Assistente IA"
@@ -273,6 +277,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           <path d="M30 17 L58 2 L58 32 Z" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
           <circle cx="30" cy="17" r="5" fill="white" stroke="#e0e0e0" strokeWidth="1.5" />
         </svg>
+        </motion.div>
       </motion.div>
 
       {/* Eyes + Smile SVG overlay */}

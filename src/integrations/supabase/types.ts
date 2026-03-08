@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      payment_webhooks: {
+        Row: {
+          action: string | null
+          amount: number | null
+          created_at: string
+          id: string
+          payer_email: string | null
+          payment_id: string
+          raw_data: Json | null
+          status: string
+        }
+        Insert: {
+          action?: string | null
+          amount?: number | null
+          created_at?: string
+          id?: string
+          payer_email?: string | null
+          payment_id: string
+          raw_data?: Json | null
+          status?: string
+        }
+        Update: {
+          action?: string | null
+          amount?: number | null
+          created_at?: string
+          id?: string
+          payer_email?: string | null
+          payment_id?: string
+          raw_data?: Json | null
+          status?: string
+        }
+        Relationships: []
+      }
       strain_images: {
         Row: {
           created_at: string

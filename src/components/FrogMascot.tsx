@@ -5,7 +5,7 @@ import verdinhoImg from "@/assets/verdinho-mascot.png";
 interface FrogMascotProps {
   onClick?: () => void;
   size?: number;
-  mood?: "happy" | "thinking" | "excited" | "sleeping" | "waving";
+  mood?: "happy" | "thinking" | "excited" | "sleeping" | "waving" | "confused";
   enableJumpToNav?: boolean;
   hasNewMessage?: boolean;
 }

@@ -39,6 +39,11 @@ const OnlineUsers = lazy(() => import("./pages/OnlineUsers"));
 const DownloadApp = lazy(() => import("./pages/DownloadApp"));
 const Comunidade = lazy(() => import("./pages/Comunidade"));
 const DashboardPaciente = lazy(() => import("./pages/DashboardPaciente"));
+const Agendamento = lazy(() => import("./pages/Agendamento"));
+const Prontuario = lazy(() => import("./pages/Prontuario"));
+const DashboardMedico = lazy(() => import("./pages/DashboardMedico"));
+const DashboardExecutivo = lazy(() => import("./pages/DashboardExecutivo"));
+const Notificacoes = lazy(() => import("./pages/Notificacoes"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();

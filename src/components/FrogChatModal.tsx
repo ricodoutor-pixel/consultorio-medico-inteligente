@@ -207,6 +207,9 @@ export const FrogChatModal = () => {
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 20, scale: 0.95 }}
+        role="dialog"
+        aria-label="Chat com Verdinho — Assistente IA"
+        aria-modal="true"
         className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[70vh] rounded-2xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
       >
         {/* Header */}

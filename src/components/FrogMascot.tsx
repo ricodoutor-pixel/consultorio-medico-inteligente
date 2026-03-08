@@ -253,8 +253,24 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         width={size}
         height={size}
       >
-        {/* Pupils */}
-        {!blink && (
+        {/* Sleeping eyes */}
+        {isSleeping && (
+          <>
+            <path d={`M ${size * LEFT_EYE.cx - pupilR * 1.5} ${size * LEFT_EYE.cy} Q ${size * LEFT_EYE.cx} ${size * LEFT_EYE.cy + pupilR} ${size * LEFT_EYE.cx + pupilR * 1.5} ${size * LEFT_EYE.cy}`} fill="none" stroke="#2d8a4e" strokeWidth={1.5} strokeLinecap="round" />
+            <path d={`M ${size * RIGHT_EYE.cx - pupilR * 1.5} ${size * RIGHT_EYE.cy} Q ${size * RIGHT_EYE.cx} ${size * RIGHT_EYE.cy + pupilR} ${size * RIGHT_EYE.cx + pupilR * 1.5} ${size * RIGHT_EYE.cy}`} fill="none" stroke="#2d8a4e" strokeWidth={1.5} strokeLinecap="round" />
+          </>
+        )}
+        {/* Confused spiral eyes */}
+        {isConfused && !blink && (
+          <>
+            <circle cx={size * LEFT_EYE.cx} cy={size * LEFT_EYE.cy} r={pupilR * 0.8} fill="none" stroke="#111" strokeWidth={1.2} />
+            <path d={`M ${size * LEFT_EYE.cx} ${size * LEFT_EYE.cy - pupilR * 0.4} A ${pupilR * 0.4} ${pupilR * 0.4} 0 1 1 ${size * LEFT_EYE.cx + pupilR * 0.4} ${size * LEFT_EYE.cy}`} fill="none" stroke="#111" strokeWidth={1} />
+            <circle cx={size * RIGHT_EYE.cx} cy={size * RIGHT_EYE.cy} r={pupilR * 0.8} fill="none" stroke="#111" strokeWidth={1.2} />
+            <path d={`M ${size * RIGHT_EYE.cx} ${size * RIGHT_EYE.cy - pupilR * 0.4} A ${pupilR * 0.4} ${pupilR * 0.4} 0 1 1 ${size * RIGHT_EYE.cx + pupilR * 0.4} ${size * RIGHT_EYE.cy}`} fill="none" stroke="#111" strokeWidth={1} />
+          </>
+        )}
+        {/* Normal pupils */}
+        {!blink && !isSleeping && !isConfused && (
           <>
             <circle cx={size * LEFT_EYE.cx + eyeOffset.x} cy={size * LEFT_EYE.cy + eyeOffset.y} r={pupilR} fill="#111" opacity="0.85" />
             <circle cx={size * LEFT_EYE.cx + eyeOffset.x * 0.3 - pupilR * 0.4} cy={size * LEFT_EYE.cy + eyeOffset.y * 0.3 - pupilR * 0.5} r={pupilR * 0.38} fill="white" opacity="0.9" />
@@ -263,14 +279,20 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           </>
         )}
         {/* Blink */}
-        {blink && (
+        {blink && !isSleeping && (
           <>
             <line x1={size * LEFT_EYE.cx - pupilR * 1.2} y1={size * LEFT_EYE.cy} x2={size * LEFT_EYE.cx + pupilR * 1.2} y2={size * LEFT_EYE.cy} stroke="#2d8a4e" strokeWidth={2} strokeLinecap="round" />
             <line x1={size * RIGHT_EYE.cx - pupilR * 1.2} y1={size * RIGHT_EYE.cy} x2={size * RIGHT_EYE.cx + pupilR * 1.2} y2={size * RIGHT_EYE.cy} stroke="#2d8a4e" strokeWidth={2} strokeLinecap="round" />
           </>
         )}
-        {/* Smile */}
-        {smileCurve && (
+        {/* Smile / confused mouth */}
+        {isConfused && (
+          <path
+            d={`M ${size * 0.43} ${size * 0.56} Q ${size * 0.47} ${size * 0.52} ${size * 0.53} ${size * 0.57} Q ${size * 0.56} ${size * 0.53} ${size * 0.58} ${size * 0.56}`}
+            fill="none" stroke="#2d8a4e" strokeWidth={1.5} strokeLinecap="round"
+          />
+        )}
+        {smileCurve && !isConfused && !isSleeping && (
           <path
             d={`M ${size * 0.4} ${size * 0.54} Q ${size * 0.5} ${size * 0.62} ${size * 0.6} ${size * 0.54}`}
             fill="none"

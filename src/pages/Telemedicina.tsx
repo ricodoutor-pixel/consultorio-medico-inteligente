@@ -405,7 +405,25 @@ const Telemedicina = () => {
                       <Button variant="outline" className="rounded-xl" onClick={() => setStep(step - 1)}>
                         <ArrowLeft size={16} className="mr-1" /> Voltar
                       </Button>
-                      <Button className="font-black bg-primary text-primary-foreground rounded-xl" onClick={() => setStep(step + 1)} disabled={!isAnswered()}>
+                      <Button className="font-black bg-primary text-primary-foreground rounded-xl" onClick={async () => {
+                        setStep(step + 1);
+                        if (step === 10) {
+                          // Trigger AI summary
+                          setAiLoading(true);
+                          try {
+                            const { data, error } = await supabase.functions.invoke("triage-summary", {
+                              body: { answers, patientData },
+                            });
+                            if (error) throw error;
+                            setAiSummary(data?.summary || null);
+                          } catch (err: any) {
+                            console.error("Triage AI error:", err);
+                            toast({ title: "Erro na análise IA", description: "A pré-análise não pôde ser gerada. Prossiga com o agendamento.", variant: "destructive" });
+                          } finally {
+                            setAiLoading(false);
+                          }
+                        }
+                      }} disabled={!isAnswered()}>
                         {step === 10 ? "Ver Resultado" : "Próxima"} <ArrowRight size={16} className="ml-1" />
                       </Button>
                     </div>

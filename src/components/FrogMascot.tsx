@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo, useCallback } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { motion, useAnimation, useMotionValue, useTransform } from "framer-motion";
 import verdinhoImg from "@/assets/verdinho-mascot.png";
 
@@ -7,29 +7,31 @@ interface FrogMascotProps {
   size?: number;
   mood?: "happy" | "thinking" | "excited" | "sleeping" | "waving";
   enableJumpToNav?: boolean;
+  hasNewMessage?: boolean;
 }
 
-// Eye overlay positions (relative to the image) - tuned to the mascot image
+// Eye positions relative to image
 const LEFT_EYE = { cx: 0.35, cy: 0.38 };
 const RIGHT_EYE = { cx: 0.65, cy: 0.38 };
-const EYE_RADIUS_RATIO = 0.065;
-const PUPIL_RADIUS_RATIO = 0.04;
+const PUPIL_RADIUS_RATIO = 0.045;
 const MAX_EYE_OFFSET = 0.025;
 
-export const FrogMascot = memo(({ onClick, size = 56, mood = "happy", enableJumpToNav = false }: FrogMascotProps) => {
+export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJumpToNav = false, hasNewMessage = false }: FrogMascotProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [eyeOffset, setEyeOffset] = useState({ x: 0, y: 0 });
   const [blink, setBlink] = useState(false);
+  const [smile, setSmile] = useState(false);
+  const [headTilt, setHeadTilt] = useState(0);
   const [expression, setExpression] = useState(mood);
+  const [messageBounce, setMessageBounce] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
   const bounceY = useMotionValue(0);
   const rotate = useTransform(bounceY, [-12, 0, 12], [-3, 0, 3]);
 
-  // Update expression when mood changes
   useEffect(() => setExpression(mood), [mood]);
 
-  // Eye tracking - follows mouse/touch
+  // Eye tracking
   useEffect(() => {
     const handlePointer = (clientX: number, clientY: number) => {
       if (!containerRef.current) return;
@@ -46,12 +48,10 @@ export const FrogMascot = memo(({ onClick, size = 56, mood = "happy", enableJump
         y: (dy / (dist || 1)) * maxOff * factor,
       });
     };
-
     const onMouse = (e: MouseEvent) => handlePointer(e.clientX, e.clientY);
     const onTouch = (e: TouchEvent) => {
       if (e.touches.length > 0) handlePointer(e.touches[0].clientX, e.touches[0].clientY);
     };
-
     window.addEventListener("mousemove", onMouse);
     window.addEventListener("touchmove", onTouch, { passive: true });
     return () => {
@@ -60,20 +60,39 @@ export const FrogMascot = memo(({ onClick, size = 56, mood = "happy", enableJump
     };
   }, [size]);
 
-  // Blinking
+  // Blinking every ~3s
   useEffect(() => {
     const interval = setInterval(() => {
       setBlink(true);
-      setTimeout(() => setBlink(false), 120);
-    }, 2500 + Math.random() * 2500);
+      setTimeout(() => setBlink(false), 130);
+    }, 2500 + Math.random() * 2000);
     return () => clearInterval(interval);
   }, []);
 
-  // Idle jump animation - small happy bounce
+  // Smile every 3s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSmile(true);
+      setTimeout(() => setSmile(false), 1200);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Head tilt left/right every ~4s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const direction = Math.random() > 0.5 ? 1 : -1;
+      setHeadTilt(direction * (4 + Math.random() * 4));
+      setTimeout(() => setHeadTilt(0), 800);
+    }, 4000 + Math.random() * 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Idle bounce
   useEffect(() => {
     const doJump = () => {
       controls.start({
-        y: [0, -10, -2, -8, 0],
+        y: [0, -12, -3, -9, 0],
         transition: { duration: 0.7, ease: "easeInOut", times: [0, 0.3, 0.5, 0.7, 1] },
       });
     };
@@ -81,19 +100,16 @@ export const FrogMascot = memo(({ onClick, size = 56, mood = "happy", enableJump
     return () => clearInterval(interval);
   }, [controls]);
 
-  // Jump-to-nav animation (frog hops along the navbar and comes back)
+  // Jump-to-nav
   useEffect(() => {
     if (!enableJumpToNav) return;
     const doNavJump = async () => {
-      // Hop right
       await controls.start({
         x: [0, 60, 120, 180, 200],
         y: [0, -15, 0, -15, 0],
         transition: { duration: 1.2, ease: "easeInOut" },
       });
-      // Pause
       await new Promise(r => setTimeout(r, 400));
-      // Hop back
       await controls.start({
         x: [200, 140, 80, 30, 0],
         y: [0, -15, 0, -12, 0],
@@ -102,13 +118,22 @@ export const FrogMascot = memo(({ onClick, size = 56, mood = "happy", enableJump
     };
     const timeout = setTimeout(doNavJump, 8000);
     const interval = setInterval(doNavJump, 25000 + Math.random() * 10000);
-    return () => {
-      clearTimeout(timeout);
-      clearInterval(interval);
-    };
+    return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [controls, enableJumpToNav]);
 
-  // Expression-based overlay effects
+  // New message micro-interaction
+  useEffect(() => {
+    if (hasNewMessage) {
+      setMessageBounce(true);
+      setExpression("excited");
+      const t = setTimeout(() => {
+        setMessageBounce(false);
+        setExpression(mood);
+      }, 1500);
+      return () => clearTimeout(t);
+    }
+  }, [hasNewMessage, mood]);
+
   const getExpressionEmoji = () => {
     switch (expression) {
       case "excited": return "✨";
@@ -120,8 +145,14 @@ export const FrogMascot = memo(({ onClick, size = 56, mood = "happy", enableJump
   };
 
   const emoji = getExpressionEmoji();
-  const eyeR = size * EYE_RADIUS_RATIO;
   const pupilR = size * PUPIL_RADIUS_RATIO;
+  const smileCurve = smile || isHovered;
+
+  // Crown dimensions
+  const crownW = size * 0.38;
+  const crownH = size * 0.22;
+  const crownX = (size - crownW) / 2;
+  const crownY = size * 0.02;
 
   return (
     <motion.button
@@ -133,109 +164,112 @@ export const FrogMascot = memo(({ onClick, size = 56, mood = "happy", enableJump
       aria-label="Pergunte ao Verdinho — Assistente IA"
       title="Pergunte ao Verdinho 🐸"
       whileTap={{ scale: 0.85, rotate: -8 }}
-      whileHover={{ scale: 1.18 }}
+      whileHover={{ scale: 1.15 }}
       animate={controls}
       style={{ width: size, height: size }}
     >
-      {/* Glow effect */}
+      {/* Glow */}
       <motion.div
         className="absolute inset-0 rounded-full bg-primary/20 blur-lg"
-        animate={{ 
-          scale: isHovered ? 1.5 : 1,
-          opacity: isHovered ? 0.6 : 0.2,
+        animate={{
+          scale: isHovered ? 1.6 : messageBounce ? 1.4 : 1,
+          opacity: isHovered ? 0.6 : messageBounce ? 0.5 : 0.2,
         }}
         transition={{ duration: 0.3 }}
       />
 
-      {/* Mascot image */}
-      <img
-        src={verdinhoImg}
-        alt="Verdinho - Assistente IA"
-        width={size}
-        height={size}
-        className="relative z-10 drop-shadow-lg pointer-events-none"
-        draggable={false}
-      />
+      {/* Message bounce pulse */}
+      {messageBounce && (
+        <motion.div
+          className="absolute inset-0 rounded-full border-2 border-primary/40"
+          initial={{ scale: 1, opacity: 0.8 }}
+          animate={{ scale: 2, opacity: 0 }}
+          transition={{ duration: 0.8, repeat: 2 }}
+        />
+      )}
 
-      {/* Eye overlay - invisible eye tracking layer */}
+      {/* Mascot with head tilt */}
+      <motion.div
+        className="relative z-10"
+        animate={{ rotate: headTilt }}
+        transition={{ type: "spring", stiffness: 200, damping: 12 }}
+      >
+        <img
+          src={verdinhoImg}
+          alt="Verdinho - Assistente IA"
+          width={size}
+          height={size}
+          className="drop-shadow-lg pointer-events-none"
+          draggable={false}
+        />
+
+        {/* Prince crown */}
+        <svg
+          className="absolute pointer-events-none z-30"
+          style={{ top: crownY, left: crownX, width: crownW, height: crownH }}
+          viewBox="0 0 100 60"
+          fill="none"
+        >
+          <path
+            d="M5 55 L5 25 L20 38 L35 12 L50 32 L65 12 L80 38 L95 25 L95 55 Z"
+            fill="url(#crownGold)"
+            stroke="#b8860b"
+            strokeWidth="2"
+          />
+          <circle cx="35" cy="20" r="4" fill="#e74c3c" />
+          <circle cx="50" cy="36" r="3" fill="#3498db" />
+          <circle cx="65" cy="20" r="4" fill="#2ecc71" />
+          <defs>
+            <linearGradient id="crownGold" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#ffd700" />
+              <stop offset="50%" stopColor="#ffb300" />
+              <stop offset="100%" stopColor="#e6a200" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </motion.div>
+
+      {/* Eyes + Smile SVG overlay */}
       <svg
         className="absolute inset-0 z-20 pointer-events-none"
         viewBox={`0 0 ${size} ${size}`}
         width={size}
         height={size}
       >
-        {/* Left eye pupil overlay */}
+        {/* Pupils */}
         {!blink && (
           <>
-            <circle
-              cx={size * LEFT_EYE.cx + eyeOffset.x}
-              cy={size * LEFT_EYE.cy + eyeOffset.y}
-              r={pupilR}
-              fill="#111"
-              opacity="0.85"
-            />
-            {/* Left eye shine */}
-            <circle
-              cx={size * LEFT_EYE.cx + eyeOffset.x * 0.3 - pupilR * 0.4}
-              cy={size * LEFT_EYE.cy + eyeOffset.y * 0.3 - pupilR * 0.5}
-              r={pupilR * 0.4}
-              fill="white"
-              opacity="0.9"
-            />
+            <circle cx={size * LEFT_EYE.cx + eyeOffset.x} cy={size * LEFT_EYE.cy + eyeOffset.y} r={pupilR} fill="#111" opacity="0.85" />
+            <circle cx={size * LEFT_EYE.cx + eyeOffset.x * 0.3 - pupilR * 0.4} cy={size * LEFT_EYE.cy + eyeOffset.y * 0.3 - pupilR * 0.5} r={pupilR * 0.38} fill="white" opacity="0.9" />
+            <circle cx={size * RIGHT_EYE.cx + eyeOffset.x} cy={size * RIGHT_EYE.cy + eyeOffset.y} r={pupilR} fill="#111" opacity="0.85" />
+            <circle cx={size * RIGHT_EYE.cx + eyeOffset.x * 0.3 - pupilR * 0.4} cy={size * RIGHT_EYE.cy + eyeOffset.y * 0.3 - pupilR * 0.5} r={pupilR * 0.38} fill="white" opacity="0.9" />
           </>
         )}
-        {/* Right eye pupil overlay */}
-        {!blink && (
-          <>
-            <circle
-              cx={size * RIGHT_EYE.cx + eyeOffset.x}
-              cy={size * RIGHT_EYE.cy + eyeOffset.y}
-              r={pupilR}
-              fill="#111"
-              opacity="0.85"
-            />
-            {/* Right eye shine */}
-            <circle
-              cx={size * RIGHT_EYE.cx + eyeOffset.x * 0.3 - pupilR * 0.4}
-              cy={size * RIGHT_EYE.cy + eyeOffset.y * 0.3 - pupilR * 0.5}
-              r={pupilR * 0.4}
-              fill="white"
-              opacity="0.9"
-            />
-          </>
-        )}
-        {/* Blink overlay */}
+        {/* Blink */}
         {blink && (
           <>
-            <line
-              x1={size * LEFT_EYE.cx - eyeR}
-              y1={size * LEFT_EYE.cy}
-              x2={size * LEFT_EYE.cx + eyeR}
-              y2={size * LEFT_EYE.cy}
-              stroke="#2d8a4e"
-              strokeWidth={2}
-              strokeLinecap="round"
-            />
-            <line
-              x1={size * RIGHT_EYE.cx - eyeR}
-              y1={size * RIGHT_EYE.cy}
-              x2={size * RIGHT_EYE.cx + eyeR}
-              y2={size * RIGHT_EYE.cy}
-              stroke="#2d8a4e"
-              strokeWidth={2}
-              strokeLinecap="round"
-            />
+            <line x1={size * LEFT_EYE.cx - pupilR * 1.2} y1={size * LEFT_EYE.cy} x2={size * LEFT_EYE.cx + pupilR * 1.2} y2={size * LEFT_EYE.cy} stroke="#2d8a4e" strokeWidth={2} strokeLinecap="round" />
+            <line x1={size * RIGHT_EYE.cx - pupilR * 1.2} y1={size * RIGHT_EYE.cy} x2={size * RIGHT_EYE.cx + pupilR * 1.2} y2={size * RIGHT_EYE.cy} stroke="#2d8a4e" strokeWidth={2} strokeLinecap="round" />
           </>
+        )}
+        {/* Smile */}
+        {smileCurve && (
+          <path
+            d={`M ${size * 0.4} ${size * 0.54} Q ${size * 0.5} ${size * 0.62} ${size * 0.6} ${size * 0.54}`}
+            fill="none"
+            stroke="#2d8a4e"
+            strokeWidth={2}
+            strokeLinecap="round"
+          />
         )}
       </svg>
 
       {/* Expression emoji */}
       {emoji && (
         <motion.span
-          className="absolute -top-1 -right-1 z-30 text-xs pointer-events-none"
+          className="absolute -top-1 -right-1 z-40 text-xs pointer-events-none"
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0 }}
           key={expression}
         >
           {emoji}
@@ -245,7 +279,7 @@ export const FrogMascot = memo(({ onClick, size = 56, mood = "happy", enableJump
       {/* Hover tooltip */}
       {isHovered && (
         <motion.div
-          className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full text-[9px] font-bold pointer-events-none bg-primary/20 border border-primary/30 text-primary z-40"
+          className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full text-[9px] font-bold pointer-events-none bg-primary/20 border border-primary/30 text-primary z-50"
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
         >

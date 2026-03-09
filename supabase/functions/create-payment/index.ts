@@ -9,7 +9,31 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { appointmentId, doctorName, amount, patientEmail, description } = await req.json();
+    // --- JWT Authentication ---
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const anonClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: authData, error: authError } = await anonClient.auth.getUser();
+    if (authError || !authData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const userId = authData.user.id;
+
+    const { appointmentId, doctorName, patientEmail, description } = await req.json();
 
     const MP_ACCESS_TOKEN = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
     if (!MP_ACCESS_TOKEN) {
@@ -19,15 +43,46 @@ Deno.serve(async (req) => {
       });
     }
 
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    // --- Server-side amount lookup ---
+    let amount = 49.90; // default for non-appointment payments
+    if (appointmentId) {
+      const { data: appt, error: apptError } = await supabase
+        .from("appointments")
+        .select("amount, patient_id")
+        .eq("id", appointmentId)
+        .single();
+
+      if (apptError || !appt) {
+        return new Response(JSON.stringify({ error: "Consulta não encontrada" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Verify the caller is the patient
+      if (appt.patient_id !== userId) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      amount = Number(appt.amount) || 49.90;
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 
-    // Create Mercado Pago preference
     const preference = {
       items: [
         {
           title: description || `Consulta com ${doctorName || "Especialista"}`,
           quantity: 1,
-          unit_price: Number(amount) || 49.90,
+          unit_price: amount,
           currency_id: "BRL",
         },
       ],
@@ -69,13 +124,7 @@ Deno.serve(async (req) => {
 
     const mpData = await mpResponse.json();
 
-    // Update appointment with payment preference if appointmentId exists
     if (appointmentId) {
-      const supabase = createClient(
-        Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-      );
-
       await supabase
         .from("appointments")
         .update({
@@ -95,7 +144,7 @@ Deno.serve(async (req) => {
     });
   } catch (e) {
     console.error("create-payment error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro" }), {
+    return new Response(JSON.stringify({ error: "Erro interno" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

@@ -96,6 +96,15 @@ Deno.serve(async (req) => {
 
       if (webhook) {
         if (webhook.status === "approved") {
+          // Validate paid amount matches expected appointment amount
+          if (webhook.amount != null && Number(webhook.amount) < Number(appt.amount)) {
+            console.error(`Payment amount mismatch: paid ${webhook.amount}, expected ${appt.amount}`);
+            return new Response(JSON.stringify({ error: "Valor pago inferior ao valor da consulta", status: "amount_mismatch" }), {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+
           await supabase
             .from("appointments")
             .update({ payment_status: "paid", payment_id: paymentId, status: "confirmed" })

@@ -63,6 +63,9 @@ export const Navbar = () => {
           </div>
 
           <div className="hidden lg:flex items-center gap-3">
+            <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5" asChild>
+              <NavLink to="/login"><LogIn size={16} /> Fazer Login</NavLink>
+            </Button>
             <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary" asChild>
               <NavLink to="/cadastro">Cadastro</NavLink>
             </Button>

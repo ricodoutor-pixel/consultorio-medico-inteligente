@@ -9,10 +9,34 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const anonClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: authData, error: authError } = await anonClient.auth.getUser();
+    const user = authData?.user;
+
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { appointmentId, paymentId } = await req.json();
 
-    if (!appointmentId && !paymentId) {
-      return new Response(JSON.stringify({ error: "ID necessário" }), {
+    if (!appointmentId) {
+      return new Response(JSON.stringify({ error: "appointmentId necessário" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -23,40 +47,67 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Check payment_webhooks for latest status
+    const { data: appt } = await supabase
+      .from("appointments")
+      .select("id, patient_id, doctor_id, payment_status, status, payment_id, scheduled_at")
+      .eq("id", appointmentId)
+      .maybeSingle();
+
+    if (!appt) {
+      return new Response(JSON.stringify({ error: "Consulta não encontrada" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const isPatient = appt.patient_id === user.id;
+
+    const { data: doctorRow } = await supabase
+      .from("doctors")
+      .select("id")
+      .eq("id", appt.doctor_id)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    const { data: adminRole } = await supabase
+      .from("user_roles")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    const isAuthorized = isPatient || !!doctorRow || !!adminRole;
+
+    if (!isAuthorized) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (paymentId) {
       const { data: webhook } = await supabase
         .from("payment_webhooks")
-        .select("*")
+        .select("status, amount")
         .eq("payment_id", paymentId)
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (webhook) {
-        // If approved, update appointment
-        if (webhook.status === "approved" && appointmentId) {
+        if (webhook.status === "approved") {
           await supabase
             .from("appointments")
             .update({ payment_status: "paid", payment_id: paymentId, status: "confirmed" })
             .eq("id", appointmentId);
 
-          // Create notification for patient
-          const { data: appt } = await supabase
-            .from("appointments")
-            .select("patient_id, scheduled_at")
-            .eq("id", appointmentId)
-            .single();
-
-          if (appt) {
-            await supabase.from("notifications").insert({
-              user_id: appt.patient_id,
-              title: "✅ Pagamento confirmado!",
-              message: `Sua consulta foi confirmada para ${new Date(appt.scheduled_at).toLocaleDateString("pt-BR")}.`,
-              type: "payment",
-              action_url: "/dashboard",
-            });
-          }
+          await supabase.from("notifications").insert({
+            user_id: appt.patient_id,
+            title: "✅ Pagamento confirmado!",
+            message: `Sua consulta foi confirmada para ${new Date(appt.scheduled_at).toLocaleDateString("pt-BR")}.`,
+            type: "payment",
+            action_url: "/dashboard",
+          });
         }
 
         return new Response(JSON.stringify({
@@ -70,30 +121,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Check appointment payment status directly
-    if (appointmentId) {
-      const { data: appt } = await supabase
-        .from("appointments")
-        .select("payment_status, status, payment_id")
-        .eq("id", appointmentId)
-        .single();
-
-      return new Response(JSON.stringify({
-        status: appt?.payment_status || "pending",
-        appointmentStatus: appt?.status || "scheduled",
-      }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    return new Response(JSON.stringify({ status: "unknown" }), {
+    return new Response(JSON.stringify({
+      status: appt.payment_status || "pending",
+      appointmentStatus: appt.status || "scheduled",
+    }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("check-payment error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro" }), {
+    return new Response(JSON.stringify({ error: "Erro interno" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

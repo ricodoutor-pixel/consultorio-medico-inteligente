@@ -33,40 +33,56 @@ export const FrogEyes = memo(({ size, expression, blink, eyeOffset, eyeSparkle }
     );
   }
 
-  // Love eyes — enhanced white/black pupils with sparkle and glow effects
+  // Love eyes — enhanced white/black pupils with extra sparkle effects (NO black heart shape)
   if (isLove && !blink) {
-    const eyeWhiteR = pupilR * 2.4;
+    const eyeWhiteR = pupilR * 2.6;
     return (
       <>
         {[LEFT_EYE, RIGHT_EYE].map((eye, i) => (
           <g key={i}>
-            {/* Outer glow effect */}
-            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR * 1.15} fill="none" stroke="rgba(255, 182, 193, 0.6)" strokeWidth={2}>
-              <animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.2s" repeatCount="indefinite" />
+            {/* Outer magical glow ring */}
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR * 1.25} fill="none" stroke="rgba(255, 182, 193, 0.5)" strokeWidth={2.5}>
+              <animate attributeName="opacity" values="0.3;0.7;0.3" dur="1.5s" repeatCount="indefinite" />
+              <animate attributeName="r" values={`${eyeWhiteR * 1.2};${eyeWhiteR * 1.35};${eyeWhiteR * 1.2}`} dur="1.5s" repeatCount="indefinite" />
             </circle>
-            {/* White sclera with subtle pink tint */}
+            {/* Inner pink aura */}
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR * 1.1} fill="rgba(255, 200, 220, 0.2)" />
+            {/* Clean white sclera */}
             <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="white" opacity="0.98" />
-            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="rgba(255, 200, 210, 0.15)" />
-            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="none" stroke="#2d8a4e" strokeWidth={0.6} opacity="0.25" />
-            {/* Larger, expressive pupil */}
-            <circle cx={size * eye.cx} cy={size * eye.cy - pupilR * 0.15} r={pupilR * 1.3} fill="#111" opacity="0.95">
-              <animate attributeName="r" values={`${pupilR * 1.25};${pupilR * 1.35};${pupilR * 1.25}`} dur="0.8s" repeatCount="indefinite" />
+            {/* Subtle pink tint gradient */}
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR * 0.95} fill="url(#lovePinkGradient)" opacity="0.15" />
+            {/* Green eye rim */}
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="none" stroke="#2d8a4e" strokeWidth={0.8} opacity="0.3" />
+            {/* Large expressive black pupil with pulsing animation */}
+            <circle cx={size * eye.cx} cy={size * eye.cy - pupilR * 0.1} r={pupilR * 1.4} fill="#111" opacity="0.95">
+              <animate attributeName="r" values={`${pupilR * 1.35};${pupilR * 1.5};${pupilR * 1.35}`} dur="1s" repeatCount="indefinite" />
             </circle>
-            {/* Main highlight */}
-            <circle cx={size * eye.cx - pupilR * 0.5} cy={size * eye.cy - pupilR * 0.6} r={pupilR * 0.45} fill="white" opacity="0.95" />
+            {/* Primary highlight - large */}
+            <circle cx={size * eye.cx - pupilR * 0.55} cy={size * eye.cy - pupilR * 0.65} r={pupilR * 0.5} fill="white" opacity="0.98" />
             {/* Secondary highlight */}
-            <circle cx={size * eye.cx + pupilR * 0.3} cy={size * eye.cy - pupilR * 0.3} r={pupilR * 0.2} fill="white" opacity="0.8" />
-            {/* Golden love sparkle */}
-            <circle cx={size * eye.cx + pupilR * 0.6} cy={size * eye.cy - pupilR * 0.8} r={pupilR * 0.25} fill="#ffd700" opacity="0.9">
-              <animate attributeName="r" values={`${pupilR * 0.2};${pupilR * 0.35};${pupilR * 0.2}`} dur="0.6s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.7;1;0.7" dur="0.6s" repeatCount="indefinite" />
+            <circle cx={size * eye.cx + pupilR * 0.35} cy={size * eye.cy - pupilR * 0.35} r={pupilR * 0.25} fill="white" opacity="0.85" />
+            {/* Golden sparkle - top right */}
+            <circle cx={size * eye.cx + pupilR * 0.7} cy={size * eye.cy - pupilR * 0.9} r={pupilR * 0.3} fill="#ffd700">
+              <animate attributeName="r" values={`${pupilR * 0.25};${pupilR * 0.4};${pupilR * 0.25}`} dur="0.7s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.6;1;0.6" dur="0.7s" repeatCount="indefinite" />
             </circle>
-            {/* Pink love sparkle */}
-            <circle cx={size * eye.cx - pupilR * 0.7} cy={size * eye.cy + pupilR * 0.4} r={pupilR * 0.18} fill="#ff69b4" opacity="0.85">
-              <animate attributeName="r" values={`${pupilR * 0.15};${pupilR * 0.22};${pupilR * 0.15}`} dur="0.9s" repeatCount="indefinite" />
+            {/* Pink sparkle - bottom left */}
+            <circle cx={size * eye.cx - pupilR * 0.8} cy={size * eye.cy + pupilR * 0.5} r={pupilR * 0.22} fill="#ff69b4" opacity="0.9">
+              <animate attributeName="r" values={`${pupilR * 0.18};${pupilR * 0.28};${pupilR * 0.18}`} dur="0.9s" repeatCount="indefinite" />
+            </circle>
+            {/* Extra tiny white sparkle */}
+            <circle cx={size * eye.cx + pupilR * 0.2} cy={size * eye.cy + pupilR * 0.6} r={pupilR * 0.12} fill="white" opacity="0.7">
+              <animate attributeName="opacity" values="0.5;1;0.5" dur="0.5s" repeatCount="indefinite" />
             </circle>
           </g>
         ))}
+        {/* Gradient definition */}
+        <defs>
+          <radialGradient id="lovePinkGradient" cx="50%" cy="30%" r="70%">
+            <stop offset="0%" stopColor="#ffb6c1" />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
+        </defs>
       </>
     );
   }

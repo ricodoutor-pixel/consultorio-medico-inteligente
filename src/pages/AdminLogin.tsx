@@ -44,8 +44,6 @@ const AdminLogin = () => {
         .maybeSingle();
 
       if (roleData) {
-        sessionStorage.setItem("admin_auth", "true");
-        sessionStorage.setItem("admin_user_id", data.user.id);
         toast({ title: "Acesso autorizado", description: "Bem-vindo ao painel administrativo." });
         navigate("/admin");
       } else {

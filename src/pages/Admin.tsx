@@ -86,10 +86,16 @@ const Admin = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user || sessionStorage.getItem("admin_auth") !== "true") {
-        navigate("/admin-login");
-        return;
-      }
+      if (!user) { navigate("/admin-login"); return; }
+
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (!roleData) { navigate("/admin-login"); return; }
     };
     checkAuth();
     const interval = setInterval(() => setLive(generateLiveData()), 5000);
@@ -97,8 +103,6 @@ const Admin = () => {
   }, [navigate]);
 
   const handleLogout = async () => {
-    sessionStorage.removeItem("admin_auth");
-    sessionStorage.removeItem("admin_user_id");
     await supabase.auth.signOut();
     navigate("/admin-login");
   };

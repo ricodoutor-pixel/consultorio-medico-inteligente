@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, Leaf } from "lucide-react";
+import { Menu, X, Leaf, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
@@ -63,6 +63,9 @@ export const Navbar = () => {
           </div>
 
           <div className="hidden lg:flex items-center gap-3">
+            <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5" asChild>
+              <NavLink to="/login"><LogIn size={16} /> Fazer Login</NavLink>
+            </Button>
             <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary" asChild>
               <NavLink to="/cadastro">Cadastro</NavLink>
             </Button>
@@ -94,13 +97,18 @@ export const Navbar = () => {
                 {link.label}
               </NavLink>
             ))}
-            <div className="flex gap-2 pt-2">
-              <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary" asChild>
-                <NavLink to="/cadastro" onClick={() => setIsOpen(false)}>Cadastro</NavLink>
+            <div className="flex flex-col gap-2 pt-2">
+              <Button variant="ghost" className="w-full font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5 justify-start" asChild>
+                <NavLink to="/login" onClick={() => setIsOpen(false)}><LogIn size={16} /> Fazer Login</NavLink>
               </Button>
-              <Button className="flex-1 bg-primary text-primary-foreground font-black rounded-xl" asChild>
-                <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>Consulta</NavLink>
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary" asChild>
+                  <NavLink to="/cadastro" onClick={() => setIsOpen(false)}>Cadastro</NavLink>
+                </Button>
+                <Button className="flex-1 bg-primary text-primary-foreground font-black rounded-xl" asChild>
+                  <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>Consulta</NavLink>
+                </Button>
+              </div>
             </div>
           </div>
         )}

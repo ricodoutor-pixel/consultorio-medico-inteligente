@@ -126,13 +126,19 @@ export const FrogEyes = memo(({ size, expression, blink, eyeOffset, eyeSparkle }
     );
   }
 
-  // Default eyes with tracking + sparkle
+  // Default eyes with tracking + sparkle — clean white sclera
+  const eyeWhiteR = pupilR * 2.2;
   return (
     <>
       {[LEFT_EYE, RIGHT_EYE].map((eye, i) => (
         <g key={i}>
-          <circle cx={size * eye.cx + eyeOffset.x} cy={size * eye.cy + eyeOffset.y} r={pupilR} fill="#111" opacity="0.85" />
-          <circle cx={size * eye.cx + eyeOffset.x * 0.3 - pupilR * 0.4} cy={size * eye.cy + eyeOffset.y * 0.3 - pupilR * 0.5} r={pupilR * 0.38} fill="white" opacity="0.9" />
+          {/* Clean white eye background */}
+          <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="white" opacity="0.95" />
+          <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="none" stroke="#2d8a4e" strokeWidth={0.8} opacity="0.3" />
+          {/* Pupil */}
+          <circle cx={size * eye.cx + eyeOffset.x} cy={size * eye.cy + eyeOffset.y} r={pupilR} fill="#111" opacity="0.9" />
+          {/* Highlight */}
+          <circle cx={size * eye.cx + eyeOffset.x * 0.3 - pupilR * 0.35} cy={size * eye.cy + eyeOffset.y * 0.3 - pupilR * 0.45} r={pupilR * 0.35} fill="white" opacity="0.95" />
           {eyeSparkle && (
             <circle cx={size * eye.cx + pupilR * 0.3} cy={size * eye.cy - pupilR * 0.6} r={pupilR * 0.2} fill="#ffd700" opacity="0.8">
               <animate attributeName="r" values={`${pupilR * 0.15};${pupilR * 0.25};${pupilR * 0.15}`} dur="0.6s" repeatCount="indefinite" />

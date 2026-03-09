@@ -135,8 +135,15 @@ serve(async (req) => {
       });
     }
 
+    const ALLOWED_ROLES = ["user", "assistant"];
     for (const msg of messages) {
-      if (!msg.role || !msg.content || typeof msg.content !== "string" || msg.content.length > 3000) {
+      if (!ALLOWED_ROLES.includes(msg.role)) {
+        return new Response(JSON.stringify({ error: "Role inválido" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (!msg.content || typeof msg.content !== "string" || msg.content.length > 3000) {
         return new Response(JSON.stringify({ error: "Formato de mensagem inválido" }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -53,27 +53,6 @@ export const FrogAccessories = memo(({ size, isWaving, expression, cheekBlush }:
         </g>
       </svg>
 
-      {/* Floating mini hearts around kiss mark when in love — away from eyes */}
-      {(expression === "love" || cheekBlush > 0) && (
-        <svg
-          className="absolute inset-0 pointer-events-none z-35"
-          viewBox={`0 0 ${size} ${size}`}
-          width={size}
-          height={size}
-        >
-          <text x={size * 0.78} y={size * 0.58} fontSize={size * 0.05} opacity="0.7">
-            💕
-            <animate attributeName="y" values={`${size * 0.58};${size * 0.42}`} dur="2s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.7;0" dur="2s" repeatCount="indefinite" />
-          </text>
-          <text x={size * 0.82} y={size * 0.62} fontSize={size * 0.035} opacity="0.5">
-            ❤️
-            <animate attributeName="y" values={`${size * 0.62};${size * 0.46}`} dur="2.5s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.5;0" dur="2.5s" repeatCount="indefinite" />
-          </text>
-        </svg>
-      )}
-
       {/* Cheek blush */}
       {cheekBlush > 0 && (
         <svg

@@ -7,6 +7,7 @@ import { FrogMouth } from "./frog/FrogMouth";
 import { FrogAccessories } from "./frog/FrogAccessories";
 import { FrogDaydream } from "./frog/FrogDaydream";
 import { FrogCrown } from "./frog/FrogCrown";
+import { FrogLoveHearts } from "./frog/FrogLoveHearts";
 
 interface FrogMascotProps {
   onClick?: () => void;
@@ -192,7 +193,13 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         </motion.span>
       )}
 
-      {/* Daydream bubble — positioned to the RIGHT */}
+      {/* Love hearts floating from eyes when remembering the princess */}
+      <FrogLoveHearts
+        size={size}
+        show={anim.expression === "love" || anim.isDaydreaming}
+      />
+
+      {/* Daydream bubble — the princess kissing Verdinho's cheek */}
       <FrogDaydream
         size={size}
         isDaydreaming={anim.isDaydreaming}

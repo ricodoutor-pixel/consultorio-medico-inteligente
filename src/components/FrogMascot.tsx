@@ -155,51 +155,61 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         <motion.svg
           className="absolute z-30 pointer-events-none"
           style={{
-            right: -size * 0.18,
-            top: size * 0.28,
-            width: size * 0.45,
-            height: size * 0.55,
+            right: -size * 0.15,
+            top: size * 0.3,
+            width: size * 0.4,
+            height: size * 0.5,
           }}
-          viewBox="0 0 45 55"
+          viewBox="0 0 40 50"
           initial={{ rotate: 0 }}
-          animate={{ rotate: [0, -25, 15, -20, 10, 0] }}
+          animate={{ rotate: [0, -20, 12, -15, 8, 0] }}
           transition={{ duration: 1.2, ease: "easeInOut" }}
         >
-          {/* Upper arm with volume */}
+          {/* Arm with thickness and shading */}
           <path
-            d="M 6 48 Q 4 38 8 30 Q 10 25 14 20 Q 17 16 20 12"
-            stroke="#4a9e4a"
-            strokeWidth="9"
+            d="M 5 44 Q 4 34 7 26 Q 9 21 12 17 Q 15 13 18 10"
+            stroke="#3d8b3d"
+            strokeWidth="10"
             strokeLinecap="round"
             fill="none"
           />
           <path
-            d="M 6 48 Q 4 38 8 30 Q 10 25 14 20 Q 17 16 20 12"
+            d="M 5 44 Q 4 34 7 26 Q 9 21 12 17 Q 15 13 18 10"
+            stroke="#5bb85b"
+            strokeWidth="8"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M 5 44 Q 4 34 7 26 Q 9 21 12 17 Q 15 13 18 10"
             stroke="#6ecf6e"
-            strokeWidth="7"
+            strokeWidth="5"
             strokeLinecap="round"
             fill="none"
           />
-          {/* Highlight on arm */}
+          {/* Highlight */}
           <path
-            d="M 7 44 Q 6 36 9 28 Q 12 22 16 17"
+            d="M 6 40 Q 5 32 8 24 Q 11 19 14 14"
             stroke="#8de88d"
-            strokeWidth="2.5"
+            strokeWidth="2"
             strokeLinecap="round"
             fill="none"
-            opacity="0.5"
+            opacity="0.45"
           />
-          {/* Hand — rounder, frog-like */}
-          <ellipse cx="21" cy="11" rx="6.5" ry="5.5" fill="#6ecf6e" />
-          <ellipse cx="21" cy="11" rx="5" ry="4" fill="#7ed87e" opacity="0.6" />
-          {/* Frog fingers — rounded webbed tips */}
-          <ellipse cx="16" cy="5" rx="2.5" ry="3" fill="#6ecf6e" transform="rotate(-15 16 5)" />
-          <ellipse cx="21" cy="3.5" rx="2.5" ry="3.2" fill="#6ecf6e" />
-          <ellipse cx="26" cy="5" rx="2.5" ry="3" fill="#6ecf6e" transform="rotate(15 26 5)" />
-          {/* Finger pads */}
-          <circle cx="16" cy="3.5" r="1.5" fill="#5bb85b" opacity="0.7" />
-          <circle cx="21" cy="2" r="1.5" fill="#5bb85b" opacity="0.7" />
-          <circle cx="26" cy="3.5" r="1.5" fill="#5bb85b" opacity="0.7" />
+          {/* Hand — round frog palm */}
+          <ellipse cx="19" cy="9" rx="6" ry="5" fill="#5bb85b" />
+          <ellipse cx="19" cy="9" rx="4.5" ry="3.5" fill="#6ecf6e" opacity="0.7" />
+          {/* Webbed frog fingers */}
+          <ellipse cx="14" cy="4" rx="2.2" ry="2.8" fill="#5bb85b" transform="rotate(-12 14 4)" />
+          <ellipse cx="19" cy="2.5" rx="2.2" ry="3" fill="#5bb85b" />
+          <ellipse cx="24" cy="4" rx="2.2" ry="2.8" fill="#5bb85b" transform="rotate(12 24 4)" />
+          {/* Finger pads — round suction cups */}
+          <circle cx="14" cy="2.5" r="1.4" fill="#4a9e4a" opacity="0.8" />
+          <circle cx="19" cy="1" r="1.4" fill="#4a9e4a" opacity="0.8" />
+          <circle cx="24" cy="2.5" r="1.4" fill="#4a9e4a" opacity="0.8" />
+          {/* Webbing between fingers */}
+          <path d="M 15 5 Q 16.5 6 18 4.5" stroke="#4a9e4a" strokeWidth="0.6" fill="none" opacity="0.3" />
+          <path d="M 20 4.5 Q 21.5 6 23 5" stroke="#4a9e4a" strokeWidth="0.6" fill="none" opacity="0.3" />
         </motion.svg>
       )}
 

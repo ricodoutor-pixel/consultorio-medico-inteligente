@@ -11,12 +11,28 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Não autorizado" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Verify JWT authenticity
+    const anonClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: authData, error: authError } = await anonClient.auth.getUser();
+    if (authError || !authData?.user) {
+      return new Response(JSON.stringify({ error: "Não autorizado" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const userId = authData.user.id;
 
     const { answers, patientData, appointmentId } = await req.json();
 
@@ -115,24 +131,37 @@ Responda APENAS com o resumo clínico, sem comentários adicionais. Máximo 400 
     const aiData = await aiResponse.json();
     const summary = aiData.choices?.[0]?.message?.content || "Resumo não disponível.";
 
-    // Optionally save to medical_records if user is authenticated and appointmentId provided
+    // Optionally save to medical_records if appointmentId provided — verify ownership first
     if (appointmentId) {
       const supabase = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
       );
 
+      const { data: appt } = await supabase
+        .from("appointments")
+        .select("id, patient_id, doctor_id")
+        .eq("id", appointmentId)
+        .maybeSingle();
+
+      if (!appt || appt.patient_id !== userId) {
+        return new Response(JSON.stringify({ error: "Consulta não encontrada ou não autorizada" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       await supabase.from("medical_records").upsert({
         appointment_id: appointmentId,
-        patient_id: patientData.userId || "00000000-0000-0000-0000-000000000000",
-        doctor_id: patientData.doctorId || "00000000-0000-0000-0000-000000000000",
+        patient_id: appt.patient_id,
+        doctor_id: appt.doctor_id,
         chief_complaint: answers[1] || "",
         notes: summary,
         diagnosis_cid: null,
         vitals: {
           triage_answers: answers,
           triage_date: new Date().toISOString(),
-          patient_info: { nome: patientData.nome, cpf: patientData.cpf },
+          patient_info: { nome: patientData.nome },
         },
       }, { onConflict: "appointment_id" });
     }
@@ -143,7 +172,7 @@ Responda APENAS com o resumo clínico, sem comentários adicionais. Máximo 400 
     });
   } catch (e) {
     console.error("triage-summary error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
+    return new Response(JSON.stringify({ error: "Erro interno" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

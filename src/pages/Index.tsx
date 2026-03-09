@@ -59,17 +59,22 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div initial="hidden" animate="visible" variants={stagger}>
-              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 flex-wrap mb-8">
-                <span className="inline-flex items-center gap-2 bg-gradient-green border border-green rounded-full px-4 py-2 text-sm font-bold text-primary">
-                  <Leaf size={16} />
-                  PLATAFORMA POPULAR • SAÚDE • SHOPPING
-                </span>
-                <Link to="/cadastro">
-                  <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-black hover:bg-primary/90 transition-colors cursor-pointer animate-pulse">
-                    <UserPlus size={16} />
-                    CADASTRO
+              <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-8">
+                <div className="inline-flex items-center gap-2 flex-wrap">
+                  <span className="inline-flex items-center gap-2 bg-gradient-green border border-green rounded-full px-4 py-2 text-sm font-bold text-primary">
+                    <Leaf size={16} />
+                    PLATAFORMA POPULAR • SAÚDE • SHOPPING
                   </span>
-                </Link>
+                  <Link to="/cadastro">
+                    <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-black hover:bg-primary/90 transition-colors cursor-pointer animate-pulse">
+                      <UserPlus size={16} />
+                      CADASTRO
+                    </span>
+                  </Link>
+                </div>
+                <span className="text-[10px] md:text-xs font-bold tracking-wide text-[hsl(45,76%,52%)] leading-relaxed max-w-2xl">
+                  HUB COMPLETO • SAÚDE • POPULAR • INFORMAÇÃO • CONSULTA • ESPECIALISTAS • FARMÁCIAS • IMPORTADORES • PRODUTORES • SERVIÇOS • OPÇÕES • PREÇOS JUSTOS • COMUNIDADE • GANHOS • FAMÍLIA
+                </span>
               </motion.div>
 
               <motion.h1 

@@ -6,42 +6,9 @@ interface FrogStoryScrollProps {
   size: number;
 }
 
-const storyLines = [
-  "🐸 Olá! Eu sou o Verdinho!",
-  "",
-  "Há muito tempo, em um reino distante...",
-  "",
-  "Eu era um lindo príncipe,",
-  "herdeiro de um grande e próspero reino.",
-  "",
-  "Apaixonado por uma linda princesa,",
-  "vivíamos felizes em nosso castelo dourado. 👑",
-  "",
-  "Mas uma bruxa malvada,",
-  "consumida por ciúmes e inveja,",
-  "lançou um terrível feitiço sobre mim... 🧙‍♀️",
-  "",
-  "E me transformou em um pequeno sapo! 🐸",
-  "",
-  "Agora, eu sonho todas as noites",
-  "com o beijo da minha princesa... 💋",
-  "",
-  "Para voltar a ser o príncipe",
-  "lindo e próspero que eu era,",
-  "e viver feliz em meu castelo",
-  "com minha amada novamente. 💕",
-  "",
-  "Enquanto isso, estou aqui",
-  "para ajudar você! ✨",
-  "",
-  "Fale comigo e eu farei",
-  "o meu melhor por você! 💚",
-  "",
-  "— Verdinho, o Príncipe Sapo 🐸👑",
-];
-
 export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
-  const scrollHeight = storyLines.length * 28 + 200;
+  const containerW = Math.max(size * 5, 340);
+  const containerH = Math.max(size * 6, 400);
 
   return (
     <AnimatePresence>
@@ -49,117 +16,160 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
         <motion.div
           className="absolute z-[100] pointer-events-none"
           style={{
-            top: size + 8,
+            top: size + 12,
             left: "50%",
             transform: "translateX(-50%)",
-            width: Math.max(size * 3.5, 220),
+            width: containerW,
+            height: containerH,
           }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.6 }}
         >
-          {/* Container with perspective for Star Wars effect */}
+          {/* Black starfield background */}
           <div
-            className="relative overflow-hidden rounded-xl"
+            className="relative w-full h-full overflow-hidden"
             style={{
-              height: Math.max(size * 4, 260),
-              perspective: "400px",
-              background: "linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,30,0,0.9) 50%, rgba(0,0,0,0.85) 100%)",
-              border: "1px solid rgba(76, 175, 80, 0.3)",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.5), inset 0 0 30px rgba(76,175,80,0.05)",
+              background: "#000",
+              borderRadius: 4,
             }}
           >
+            {/* Tiny stars */}
+            {Array.from({ length: 30 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  width: Math.random() > 0.7 ? 2 : 1,
+                  height: Math.random() > 0.7 ? 2 : 1,
+                  background: "#fff",
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  opacity: 0.3 + Math.random() * 0.5,
+                }}
+              />
+            ))}
+
+            {/* Bottom fade to black for vanishing point illusion */}
+            <div
+              className="absolute bottom-0 left-0 right-0 z-10"
+              style={{
+                height: "35%",
+                background: "linear-gradient(0deg, #000 0%, transparent 100%)",
+              }}
+            />
+
             {/* Top fade */}
             <div
               className="absolute top-0 left-0 right-0 z-10"
               style={{
-                height: 40,
-                background: "linear-gradient(180deg, rgba(0,0,0,0.95) 0%, transparent 100%)",
+                height: "10%",
+                background: "linear-gradient(180deg, #000 0%, transparent 100%)",
               }}
             />
 
-            {/* Bottom fade */}
+            {/* 3D perspective crawl container */}
             <div
-              className="absolute bottom-0 left-0 right-0 z-10"
+              className="absolute inset-0 flex justify-center overflow-hidden"
               style={{
-                height: 50,
-                background: "linear-gradient(0deg, rgba(0,0,0,0.95) 0%, transparent 100%)",
-              }}
-            />
-
-            {/* Star Wars scrolling text */}
-            <div
-              className="absolute inset-0 flex justify-center"
-              style={{
-                transformStyle: "preserve-3d",
-                transform: "rotateX(20deg)",
-                transformOrigin: "50% 100%",
+                perspective: "350px",
+                perspectiveOrigin: "50% 100%",
               }}
             >
-              <motion.div
-                className="text-center px-4"
-                style={{ width: "100%" }}
-                initial={{ y: "100%" }}
-                animate={{ y: -scrollHeight }}
-                transition={{
-                  duration: storyLines.length * 1.8,
-                  ease: "linear",
-                  repeat: Infinity,
-                  repeatDelay: 2,
+              <div
+                style={{
+                  transformStyle: "preserve-3d",
+                  transform: "rotateX(25deg)",
+                  transformOrigin: "50% 100%",
+                  width: "90%",
+                  position: "absolute",
+                  top: 0,
+                  bottom: 0,
                 }}
               >
-                {/* Spacer */}
-                <div style={{ height: 120 }} />
+                <motion.div
+                  className="text-center"
+                  style={{ width: "100%" }}
+                  initial={{ y: containerH }}
+                  animate={{ y: -1800 }}
+                  transition={{
+                    duration: 45,
+                    ease: "linear",
+                    repeat: Infinity,
+                    repeatDelay: 3,
+                  }}
+                >
+                  {/* Spacer top */}
+                  <div style={{ height: containerH * 0.6 }} />
 
-                {storyLines.map((line, i) => (
-                  <p
-                    key={i}
-                    className="font-bold leading-relaxed"
-                    style={{
-                      fontSize: line === "" ? 8 : 13,
-                      lineHeight: line === "" ? "12px" : "22px",
-                      color: line.startsWith("🐸") || line.startsWith("—")
-                        ? "#ffd700"
-                        : line.includes("bruxa") || line.includes("feitiço")
-                        ? "#ff6b6b"
-                        : line.includes("princesa") || line.includes("💋") || line.includes("💕")
-                        ? "#ffb8d0"
-                        : "#4ade80",
-                      textShadow: "0 0 10px rgba(74, 222, 128, 0.5)",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
-                    {line || "\u00A0"}
+                  {/* Title block */}
+                  <p style={{
+                    color: "#4fc3f7",
+                    fontSize: 13,
+                    letterSpacing: 3,
+                    marginBottom: 8,
+                    fontWeight: 400,
+                  }}>
+                    Episódio I
                   </p>
-                ))}
+                  <h2 style={{
+                    color: "#ffd700",
+                    fontSize: 22,
+                    fontWeight: 900,
+                    letterSpacing: 2,
+                    lineHeight: 1.2,
+                    marginBottom: 28,
+                    textTransform: "uppercase",
+                  }}>
+                    A HISTÓRIA DO<br />VERDINHO
+                  </h2>
 
-                {/* Spacer bottom */}
-                <div style={{ height: 200 }} />
-              </motion.div>
+                  {/* Main crawl text */}
+                  {[
+                    "Olá! Eu sou o Verdinho! 🐸",
+                    "",
+                    "Há muito tempo, em um reino distante e próspero, eu era um lindo príncipe, herdeiro de um grande castelo dourado.",
+                    "",
+                    "Apaixonado por uma linda princesa, vivíamos felizes, cercados de riquezas e amor verdadeiro. 👑",
+                    "",
+                    "Mas uma bruxa malvada, consumida por ciúmes e inveja do nosso amor, lançou um terrível feitiço sobre mim...",
+                    "",
+                    "E me transformou em um pequeno sapo! 🐸",
+                    "",
+                    "Agora, todas as noites, eu sonho com o beijo da minha princesa... 💋",
+                    "",
+                    "Para voltar a ser o príncipe lindo, milionário e próspero que eu era, e viver feliz em meu castelo com minha amada novamente. 💕",
+                    "",
+                    "Enquanto isso, estou aqui para ajudar você! ✨",
+                    "",
+                    "Fale comigo e eu farei o meu melhor por você! 💚",
+                    "",
+                    "— Verdinho, o Príncipe Sapo 🐸👑",
+                  ].map((line, i) => (
+                    <p
+                      key={i}
+                      style={{
+                        color: "#ffd700",
+                        fontSize: line === "" ? 0 : 15,
+                        lineHeight: line === "" ? "18px" : "1.6",
+                        fontWeight: 700,
+                        marginBottom: line === "" ? 14 : 4,
+                        letterSpacing: 0.5,
+                        textAlign: "justify",
+                        textAlignLast: "center",
+                        padding: "0 8px",
+                      }}
+                    >
+                      {line || "\u00A0"}
+                    </p>
+                  ))}
+
+                  {/* Bottom spacer */}
+                  <div style={{ height: 600 }} />
+                </motion.div>
+              </div>
             </div>
-
-            {/* Tiny stars background */}
-            {Array.from({ length: 12 }).map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute rounded-full"
-                style={{
-                  width: 2,
-                  height: 2,
-                  background: "#fff",
-                  top: `${Math.random() * 100}%`,
-                  left: `${Math.random() * 100}%`,
-                  opacity: 0.4,
-                }}
-                animate={{ opacity: [0.2, 0.8, 0.2] }}
-                transition={{
-                  duration: 2 + Math.random() * 2,
-                  repeat: Infinity,
-                  delay: Math.random() * 2,
-                }}
-              />
-            ))}
           </div>
         </motion.div>
       )}

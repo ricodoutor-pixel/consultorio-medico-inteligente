@@ -97,13 +97,18 @@ export const Navbar = () => {
                 {link.label}
               </NavLink>
             ))}
-            <div className="flex gap-2 pt-2">
-              <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary" asChild>
-                <NavLink to="/cadastro" onClick={() => setIsOpen(false)}>Cadastro</NavLink>
+            <div className="flex flex-col gap-2 pt-2">
+              <Button variant="ghost" className="w-full font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5 justify-start" asChild>
+                <NavLink to="/login" onClick={() => setIsOpen(false)}><LogIn size={16} /> Fazer Login</NavLink>
               </Button>
-              <Button className="flex-1 bg-primary text-primary-foreground font-black rounded-xl" asChild>
-                <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>Consulta</NavLink>
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary" asChild>
+                  <NavLink to="/cadastro" onClick={() => setIsOpen(false)}>Cadastro</NavLink>
+                </Button>
+                <Button className="flex-1 bg-primary text-primary-foreground font-black rounded-xl" asChild>
+                  <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>Consulta</NavLink>
+                </Button>
+              </div>
             </div>
           </div>
         )}

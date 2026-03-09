@@ -52,7 +52,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       aria-label="Pergunte ao Verdinho — Assistente IA"
       title="Pergunte ao Verdinho 🐸"
       whileTap={{ scale: 0.85, rotate: -8 }}
-      whileHover={{ scale: 3 }}
+      whileHover={{ scale: 2.5 }}
       animate={anim.controls}
       style={{ width: size, height: size }}
     >

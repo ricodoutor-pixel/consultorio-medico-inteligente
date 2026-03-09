@@ -1,11 +1,71 @@
-import { useState } from "react";
-import { Menu, X, Leaf, LogIn } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, Leaf, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<{ id: string; email?: string; fullName?: string; avatarUrl?: string } | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", session.user.id)
+          .maybeSingle();
+
+        setUser({
+          id: session.user.id,
+          email: session.user.email,
+          fullName: profile?.full_name || session.user.email?.split("@")[0] || "Usuário",
+          avatarUrl: profile?.avatar_url || undefined,
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", session.user.id)
+          .maybeSingle();
+
+        setUser({
+          id: session.user.id,
+          email: session.user.email,
+          fullName: profile?.full_name || session.user.email?.split("@")[0] || "Usuário",
+          avatarUrl: profile?.avatar_url || undefined,
+        });
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
+
+  const getInitials = (name: string) => {
+    return name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
+  };
 
   const links = [
     { to: "/", label: "Início" },
@@ -19,6 +79,30 @@ export const Navbar = () => {
   ];
 
   const openChat = () => window.dispatchEvent(new Event("open-frog-chat"));
+
+  const UserMenu = ({ compact = false }: { compact?: boolean }) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" variant="ghost" className="gap-2 font-bold rounded-xl text-muted-foreground hover:text-foreground">
+          <Avatar className="h-7 w-7">
+            <AvatarImage src={user?.avatarUrl} />
+            <AvatarFallback className="bg-primary/20 text-primary text-xs font-bold">
+              {getInitials(user?.fullName || "U")}
+            </AvatarFallback>
+          </Avatar>
+          {!compact && <span className="max-w-[120px] truncate">{user?.fullName}</span>}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onClick={() => navigate("/dashboard")} className="gap-2 cursor-pointer">
+          <User size={14} /> Meu Painel
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout} className="gap-2 cursor-pointer text-destructive">
+          <LogOut size={14} /> Sair
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
     <nav className="fixed top-0 w-full glass border-b border-border z-50" role="navigation" aria-label="Navegação principal">
@@ -38,7 +122,6 @@ export const Navbar = () => {
               </div>
             </NavLink>
 
-            {/* Verdinho mascot - next to logo, jumps along navbar */}
             <div className="ml-1">
               <FrogMascot
                 size={60}
@@ -62,22 +145,34 @@ export const Navbar = () => {
             ))}
           </div>
 
+          {/* Desktop auth area */}
           <div className="hidden lg:flex items-center gap-3">
-            <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5" asChild>
-              <NavLink to="/login"><LogIn size={16} /> Fazer Login</NavLink>
-            </Button>
-            <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary" asChild>
-              <NavLink to="/cadastro">Cadastro</NavLink>
-            </Button>
+            {user ? (
+              <UserMenu />
+            ) : (
+              <>
+                <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5" asChild>
+                  <NavLink to="/login"><LogIn size={16} /> Fazer Login</NavLink>
+                </Button>
+                <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary" asChild>
+                  <NavLink to="/cadastro">Cadastro</NavLink>
+                </Button>
+              </>
+            )}
             <Button size="sm" className="bg-primary text-primary-foreground font-black rounded-xl" asChild>
               <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
             </Button>
           </div>
 
+          {/* Mobile auth + hamburger */}
           <div className="lg:hidden flex items-center gap-2">
-            <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5" asChild>
-              <NavLink to="/login"><LogIn size={16} /> Login</NavLink>
-            </Button>
+            {user ? (
+              <UserMenu compact />
+            ) : (
+              <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5" asChild>
+                <NavLink to="/login"><LogIn size={16} /> Login</NavLink>
+              </Button>
+            )}
             <button
               className="p-2 text-foreground"
               onClick={() => setIsOpen(!isOpen)}
@@ -104,9 +199,11 @@ export const Navbar = () => {
             ))}
             <div className="flex flex-col gap-2 pt-2">
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary" asChild>
-                  <NavLink to="/cadastro" onClick={() => setIsOpen(false)}>Cadastro</NavLink>
-                </Button>
+                {!user && (
+                  <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary" asChild>
+                    <NavLink to="/cadastro" onClick={() => setIsOpen(false)}>Cadastro</NavLink>
+                  </Button>
+                )}
                 <Button className="flex-1 bg-primary text-primary-foreground font-black rounded-xl" asChild>
                   <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>Consulta</NavLink>
                 </Button>

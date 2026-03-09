@@ -11,9 +11,8 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
   if (!isDaydreaming || !daydreamPhase) return null;
 
   const bubbleSize = size * 1.1;
-  // Position to the RIGHT of the frog
   const bubbleX = size * 0.75;
-  const bubbleY = -bubbleSize * 0.55;
+  const bubbleY = -bubbleSize * 0.25;
 
   return (
     <AnimatePresence>
@@ -26,7 +25,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
           exit={{ opacity: 0, scale: 0.3 }}
           transition={{ duration: 0.4, ease: "backOut" }}
         >
-          {/* Thought bubble trail — from left side toward frog */}
+          {/* Thought bubble trail */}
           <svg className="absolute" style={{ bottom: -size * 0.05, left: -12, width: 20, height: 24 }}>
             <circle cx="14" cy="18" r="4" fill="white" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.8" />
             <circle cx="8" cy="11" r="3" fill="white" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.7" />
@@ -41,80 +40,119 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               boxShadow: "0 4px 20px rgba(255,105,180,0.2), inset 0 2px 10px rgba(255,255,255,0.5)",
             }}
           >
-            {/* Girlfriend frog inside bubble */}
             <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
-              {/* Background hearts */}
-              <circle cx="15" cy="20" r="3" fill="#ffb6c1" opacity="0.3">
-                <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2s" repeatCount="indefinite" />
+              {/* Sparkles background */}
+              <circle cx="12" cy="18" r="1.5" fill="#ffd700" opacity="0.6">
+                <animate attributeName="opacity" values="0.3;0.8;0.3" dur="1.5s" repeatCount="indefinite" />
               </circle>
-              <circle cx="85" cy="25" r="2.5" fill="#ffb6c1" opacity="0.3">
-                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="1.8s" repeatCount="indefinite" />
+              <circle cx="88" cy="22" r="1.5" fill="#ffd700" opacity="0.5">
+                <animate attributeName="opacity" values="0.4;0.9;0.4" dur="1.8s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="18" cy="78" r="1" fill="#ffd700" opacity="0.4">
+                <animate attributeName="opacity" values="0.2;0.7;0.2" dur="2s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="82" cy="75" r="1" fill="#ffd700" opacity="0.4">
+                <animate attributeName="opacity" values="0.3;0.8;0.3" dur="1.6s" repeatCount="indefinite" />
               </circle>
 
-              {/* Sapinha (girlfriend frog) */}
-              <ellipse cx="50" cy="48" rx="22" ry="20" fill="#7dd87d" />
-              <ellipse cx="50" cy="48" rx="20" ry="18" fill="#8ae68a" />
-              
-              {/* Eye bumps */}
-              <ellipse cx="40" cy="36" rx="8" ry="7" fill="#8ae68a" />
-              <ellipse cx="60" cy="36" rx="8" ry="7" fill="#8ae68a" />
-              
-              {/* Eyes */}
-              <ellipse cx="40" cy="36" rx="5" ry="5.5" fill="white" />
-              <ellipse cx="60" cy="36" rx="5" ry="5.5" fill="white" />
-              <circle cx="41" cy="36" r="3" fill="#2d1b69" />
-              <circle cx="61" cy="36" r="3" fill="#2d1b69" />
-              <circle cx="39.5" cy="34.5" r="1.2" fill="white" opacity="0.9" />
-              <circle cx="59.5" cy="34.5" r="1.2" fill="white" opacity="0.9" />
+              {/* === PRINCESS === */}
+              {/* Long blonde hair */}
+              <ellipse cx="62" cy="42" rx="18" ry="22" fill="#f5d76e" />
+              <ellipse cx="62" cy="50" rx="16" ry="20" fill="#f7dc6f" />
+              {/* Hair flowing down */}
+              <path d="M 46 42 Q 42 55 44 68 Q 46 72 50 70" fill="#f5d76e" />
+              <path d="M 78 42 Q 82 55 80 68 Q 78 72 74 70" fill="#f5d76e" />
 
+              {/* Princess head */}
+              <ellipse cx="62" cy="42" rx="12" ry="13" fill="#fde8d0" />
+
+              {/* Princess crown */}
+              <polygon points="52,32 54,24 57,30 60,22 63,30 66,24 69,30 72,26 72,33" fill="#ffd700" stroke="#daa520" strokeWidth="0.5" />
+              <circle cx="57" cy="28" r="1.2" fill="#e74c3c" />
+              <circle cx="63" cy="26" r="1.2" fill="#3498db" />
+              <circle cx="69" cy="28" r="1.2" fill="#2ecc71" />
+
+              {/* Princess eyes (closed, kissing) */}
+              <path d="M 57 40 Q 59 38 61 40" stroke="#2d1b69" strokeWidth="1.2" fill="none" strokeLinecap="round" />
               {/* Long eyelashes */}
-              <line x1="35" y1="32" x2="33" y2="29" stroke="#2d1b69" strokeWidth="1" strokeLinecap="round" />
-              <line x1="37" y1="31" x2="36" y2="28" stroke="#2d1b69" strokeWidth="1" strokeLinecap="round" />
-              <line x1="55" y1="31" x2="54" y2="28" stroke="#2d1b69" strokeWidth="1" strokeLinecap="round" />
-              <line x1="57" y1="32" x2="55" y2="29" stroke="#2d1b69" strokeWidth="1" strokeLinecap="round" />
+              <line x1="56" y1="39" x2="54" y2="37" stroke="#2d1b69" strokeWidth="0.8" strokeLinecap="round" />
+              <line x1="58" y1="38" x2="57" y2="36" stroke="#2d1b69" strokeWidth="0.8" strokeLinecap="round" />
 
-              {/* Cheek blush */}
-              <circle cx="33" cy="46" r="4" fill="#ff9cad" opacity="0.4" />
-              <circle cx="67" cy="46" r="4" fill="#ff9cad" opacity="0.4" />
+              {/* Princess cheek blush */}
+              <circle cx="68" cy="44" r="3" fill="#ff9cad" opacity="0.5" />
 
-              {/* Red lipstick mouth */}
-              <path d="M 42 52 Q 46 56 50 54 Q 54 56 58 52" fill="#e74c3c" stroke="#c0392b" strokeWidth="0.8" />
-              <path d="M 42 52 Q 50 49 58 52" fill="#ff4757" stroke="#c0392b" strokeWidth="0.5" />
-              <ellipse cx="48" cy="51" rx="2" ry="0.8" fill="white" opacity="0.4" />
+              {/* Princess red lips (puckered for kiss) */}
+              <ellipse cx="56" cy="47" rx="3" ry="2.5" fill="#e74c3c" />
+              <path d="M 53.5 46.5 Q 56 44.5 58.5 46.5" fill="#ff4757" />
+              <ellipse cx="55.5" cy="46" rx="1" ry="0.5" fill="white" opacity="0.4" />
 
-              {/* Bow/flower on head */}
-              <circle cx="32" cy="28" r="4" fill="#ff6b81" />
-              <circle cx="28" cy="25" r="3" fill="#ff6b81" />
-              <circle cx="34" cy="24" r="3" fill="#ff6b81" />
-              <circle cx="30" cy="22" r="3" fill="#ff6b81" />
-              <circle cx="31" cy="26" r="2" fill="#ffd700" />
+              {/* Princess dress hint */}
+              <path d="M 55 55 Q 52 62 48 72 Q 62 75 76 72 Q 72 62 69 55" fill="#ff69b4" />
+              <path d="M 55 55 Q 52 62 48 72 Q 62 75 76 72 Q 72 62 69 55" fill="url(#dressGradient)" />
+              <defs>
+                <linearGradient id="dressGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#ff69b4" />
+                  <stop offset="100%" stopColor="#ff1493" />
+                </linearGradient>
+              </defs>
 
-              {/* Kiss mark during kiss phase */}
+              {/* === VERDINHO (small frog prince) === */}
+              {/* Frog body */}
+              <ellipse cx="38" cy="52" rx="14" ry="12" fill="#5bb85b" />
+              <ellipse cx="38" cy="52" rx="12" ry="10" fill="#6ecf6e" />
+
+              {/* Frog eye bumps */}
+              <ellipse cx="32" cy="42" rx="5" ry="5" fill="#6ecf6e" />
+              <ellipse cx="44" cy="42" rx="5" ry="5" fill="#6ecf6e" />
+
+              {/* Frog eyes (closed, happy receiving kiss) */}
+              <path d="M 30 42 Q 32 40 34 42" stroke="#2d1b69" strokeWidth="1" fill="none" strokeLinecap="round" />
+              <path d="M 42 42 Q 44 40 46 42" stroke="#2d1b69" strokeWidth="1" fill="none" strokeLinecap="round" />
+
+              {/* Frog blush */}
+              <circle cx="28" cy="50" r="3" fill="#ff9cad" opacity="0.5" />
+
+              {/* Frog happy mouth */}
+              <path d="M 32 54 Q 38 58 44 54" stroke="#2d6b2d" strokeWidth="1" fill="none" strokeLinecap="round" />
+
+              {/* Tiny crown on frog (future prince!) */}
+              <polygon points="33,38 34,34 36,37 38,33 40,37 42,34 43,38" fill="#ffd700" stroke="#daa520" strokeWidth="0.3" />
+
+              {/* Kiss mark between them */}
               {(daydreamPhase === "kiss" || daydreamPhase === "hearts") && (
-                <g opacity="0.9">
+                <g>
                   <motion.g
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.3 }}
                   >
-                    <path
-                      d="M 72 48 Q 74 45 77 46 Q 79 44 81 46 Q 82 48 80 50 Q 78 52 77 50 Q 75 52 73 50 Q 71 48 72 48"
-                      fill="#e74c3c"
-                      opacity="0.8"
-                    />
+                    {/* Kiss sparkle */}
+                    <circle cx="50" cy="47" r="2" fill="#ffd700" opacity="0.8">
+                      <animate attributeName="r" values="1;3;1" dur="0.8s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.4;1;0.4" dur="0.8s" repeatCount="indefinite" />
+                    </circle>
+                    <path d="M 48 46 L 49 44 L 50 46 L 51 44 L 52 46" stroke="#ffd700" strokeWidth="0.5" fill="none" />
                   </motion.g>
                 </g>
               )}
+
+              {/* Magic transformation sparkles */}
+              <circle cx="30" cy="60" r="1" fill="#ffd700" opacity="0.5">
+                <animate attributeName="opacity" values="0;1;0" dur="1.2s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="46" cy="58" r="1" fill="#ffd700" opacity="0.5">
+                <animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite" begin="0.4s" />
+              </circle>
             </svg>
 
             {/* Floating kiss emojis */}
             {daydreamPhase === "kiss" && (
               <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                {["💋", "💋"].map((emoji, i) => (
+                {["💋", "✨", "👑"].map((emoji, i) => (
                   <motion.span
                     key={i}
                     className="absolute text-xs"
-                    style={{ left: `${25 + i * 30}%`, top: `${60 + i * 10}%` }}
+                    style={{ left: `${20 + i * 25}%`, top: `${55 + i * 8}%` }}
                     initial={{ opacity: 0, y: 0 }}
                     animate={{ opacity: [0, 1, 0], y: -15 }}
                     transition={{ delay: i * 0.3, duration: 1 }}
@@ -146,7 +184,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
                     }}
                     transition={{ duration: 1.2, ease: "easeOut" }}
                   >
-                    {i % 3 === 0 ? "💕" : i % 3 === 1 ? "❤️" : "💖"}
+                    {i % 4 === 0 ? "💕" : i % 4 === 1 ? "👑" : i % 4 === 2 ? "✨" : "💖"}
                   </motion.span>
                 );
               })}

@@ -82,8 +82,8 @@ export const FrogAccessories = memo(({ size, isWaving, expression, cheekBlush }:
           width={size}
           height={size}
         >
-          <circle cx={size * 0.28} cy={size * 0.52} r={size * 0.035} fill="#ff6b6b" opacity={cheekBlush * 0.4} />
-          <circle cx={size * 0.72} cy={size * 0.52} r={size * 0.035} fill="#ff6b6b" opacity={cheekBlush * 0.4} />
+          <circle cx={size * 0.28} cy={size * 0.56} r={size * 0.03} fill="#ff6b6b" opacity={cheekBlush * 0.35} />
+          <circle cx={size * 0.72} cy={size * 0.56} r={size * 0.03} fill="#ff6b6b" opacity={cheekBlush * 0.35} />
         </svg>
       )}
 

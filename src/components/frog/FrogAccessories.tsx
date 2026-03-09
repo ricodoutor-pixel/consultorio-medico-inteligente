@@ -25,14 +25,14 @@ export const FrogAccessories = memo(({ size, isWaving, expression, cheekBlush }:
         <circle cx="28" cy="15" r="1.5" fill="white" opacity="0.8" />
       </svg>
 
-      {/* Lipstick kiss mark on right cheek — PERMANENT & VISIBLE */}
+      {/* Lipstick kiss mark on right cheek — lower, away from eyes */}
       <svg
         className="absolute inset-0 pointer-events-none z-30"
         viewBox={`0 0 ${size} ${size}`}
         width={size}
         height={size}
       >
-        <g transform={`translate(${size * 0.72}, ${size * 0.46}) rotate(-12) scale(${size * 0.0025})`}>
+        <g transform={`translate(${size * 0.74}, ${size * 0.54}) rotate(-12) scale(${size * 0.002})`}>
           {/* Upper lip */}
           <path
             d="M-10 0 Q-8 -12 -2 -6 Q0 -4 2 -6 Q8 -12 10 0"

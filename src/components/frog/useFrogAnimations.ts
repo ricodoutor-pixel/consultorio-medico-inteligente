@@ -116,7 +116,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       setAutoMood(m as FrogExpression);
       setExpression(m as FrogExpression);
 
-      if (m === "love") { setCheekBlush(0.8); setEyeSparkle(true); }
+      if (m === "surprised") { setCheekBlush(0.4); setEyeSparkle(true); }
       if (m === "surprised") setEyeSparkle(true);
       if (m === "sneeze") setSneezing(true);
       if (m === "laughing") setIsBouncing(true);

@@ -33,20 +33,40 @@ export const FrogEyes = memo(({ size, expression, blink, eyeOffset, eyeSparkle }
     );
   }
 
-  // Love eyes — hearts
+  // Love eyes — enhanced white/black pupils with sparkle and glow effects
   if (isLove && !blink) {
-    const heartPath = (cx: number, cy: number) => {
-      const s = pupilR * 1.2;
-      return `M ${cx} ${cy + s * 0.4} C ${cx - s} ${cy - s * 0.6} ${cx - s * 0.3} ${cy - s} ${cx} ${cy - s * 0.3} C ${cx + s * 0.3} ${cy - s} ${cx + s} ${cy - s * 0.6} ${cx} ${cy + s * 0.4} Z`;
-    };
+    const eyeWhiteR = pupilR * 2.4;
     return (
       <>
-        <path d={heartPath(size * LEFT_EYE.cx, size * LEFT_EYE.cy)} fill="#e74c3c" opacity="0.9">
-          <animate attributeName="opacity" values="0.7;1;0.7" dur="0.8s" repeatCount="indefinite" />
-        </path>
-        <path d={heartPath(size * RIGHT_EYE.cx, size * RIGHT_EYE.cy)} fill="#e74c3c" opacity="0.9">
-          <animate attributeName="opacity" values="0.7;1;0.7" dur="0.8s" repeatCount="indefinite" />
-        </path>
+        {[LEFT_EYE, RIGHT_EYE].map((eye, i) => (
+          <g key={i}>
+            {/* Outer glow effect */}
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR * 1.15} fill="none" stroke="rgba(255, 182, 193, 0.6)" strokeWidth={2}>
+              <animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.2s" repeatCount="indefinite" />
+            </circle>
+            {/* White sclera with subtle pink tint */}
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="white" opacity="0.98" />
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="rgba(255, 200, 210, 0.15)" />
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="none" stroke="#2d8a4e" strokeWidth={0.6} opacity="0.25" />
+            {/* Larger, expressive pupil */}
+            <circle cx={size * eye.cx} cy={size * eye.cy - pupilR * 0.15} r={pupilR * 1.3} fill="#111" opacity="0.95">
+              <animate attributeName="r" values={`${pupilR * 1.25};${pupilR * 1.35};${pupilR * 1.25}`} dur="0.8s" repeatCount="indefinite" />
+            </circle>
+            {/* Main highlight */}
+            <circle cx={size * eye.cx - pupilR * 0.5} cy={size * eye.cy - pupilR * 0.6} r={pupilR * 0.45} fill="white" opacity="0.95" />
+            {/* Secondary highlight */}
+            <circle cx={size * eye.cx + pupilR * 0.3} cy={size * eye.cy - pupilR * 0.3} r={pupilR * 0.2} fill="white" opacity="0.8" />
+            {/* Golden love sparkle */}
+            <circle cx={size * eye.cx + pupilR * 0.6} cy={size * eye.cy - pupilR * 0.8} r={pupilR * 0.25} fill="#ffd700" opacity="0.9">
+              <animate attributeName="r" values={`${pupilR * 0.2};${pupilR * 0.35};${pupilR * 0.2}`} dur="0.6s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.7;1;0.7" dur="0.6s" repeatCount="indefinite" />
+            </circle>
+            {/* Pink love sparkle */}
+            <circle cx={size * eye.cx - pupilR * 0.7} cy={size * eye.cy + pupilR * 0.4} r={pupilR * 0.18} fill="#ff69b4" opacity="0.85">
+              <animate attributeName="r" values={`${pupilR * 0.15};${pupilR * 0.22};${pupilR * 0.15}`} dur="0.9s" repeatCount="indefinite" />
+            </circle>
+          </g>
+        ))}
       </>
     );
   }

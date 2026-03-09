@@ -7,8 +7,8 @@ interface FrogStoryScrollProps {
 }
 
 export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
-  const containerW = Math.max(size * 5, 340);
-  const containerH = Math.max(size * 6, 400);
+  const containerW = Math.max(size * 3.5, 260);
+  const containerH = Math.max(size * 3.5, 240);
 
   return (
     <AnimatePresence>

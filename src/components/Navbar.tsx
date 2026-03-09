@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, Leaf } from "lucide-react";
+import { Menu, X, Leaf, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";

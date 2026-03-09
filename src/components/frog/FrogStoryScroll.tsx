@@ -109,8 +109,8 @@ const storyLines = [
 ];
 
 export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
-  const w = 155;
-  const h = 130;
+  const w = 124;
+  const h = 104;
 
   return (
     <AnimatePresence>
@@ -118,7 +118,7 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
         <motion.div
           className="absolute z-[100] pointer-events-none"
           style={{
-            top: size + 8,
+            top: size + 6,
             left: "50%",
             transform: "translateX(-50%)",
             width: w,
@@ -132,41 +132,41 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
           <div
             className="relative w-full h-full overflow-hidden"
             style={{
-              background: "#000",
-              borderRadius: 6,
-              border: "1px solid rgba(255,215,0,0.15)",
+              background: "linear-gradient(180deg, #0a0a14 0%, #000 100%)",
+              borderRadius: 5,
+              border: "1px solid rgba(255,215,0,0.12)",
             }}
           >
             {/* Stars */}
-            {Array.from({ length: 15 }).map((_, i) => (
+            {Array.from({ length: 10 }).map((_, i) => (
               <div
                 key={i}
                 className="absolute rounded-full"
                 style={{
-                  width: Math.random() > 0.7 ? 2 : 1,
-                  height: Math.random() > 0.7 ? 2 : 1,
+                  width: Math.random() > 0.7 ? 1.5 : 1,
+                  height: Math.random() > 0.7 ? 1.5 : 1,
                   background: "#fff",
                   top: `${Math.random() * 100}%`,
                   left: `${Math.random() * 100}%`,
-                  opacity: 0.2 + Math.random() * 0.4,
+                  opacity: 0.15 + Math.random() * 0.3,
                 }}
               />
             ))}
 
-            {/* Top fade */}
+            {/* Top fade - smaller */}
             <div
               className="absolute top-0 left-0 right-0 z-10"
               style={{
-                height: "12%",
-                background: "linear-gradient(180deg, #000 0%, transparent 100%)",
+                height: "8%",
+                background: "linear-gradient(180deg, #0a0a14 0%, transparent 100%)",
               }}
             />
 
-            {/* Bottom fade */}
+            {/* Bottom fade - smaller */}
             <div
               className="absolute bottom-0 left-0 right-0 z-10"
               style={{
-                height: "20%",
+                height: "12%",
                 background: "linear-gradient(0deg, #000 0%, transparent 100%)",
               }}
             />
@@ -175,16 +175,16 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
             <div
               className="absolute inset-0 flex justify-center overflow-hidden"
               style={{
-                perspective: "250px",
+                perspective: "220px",
                 perspectiveOrigin: "50% 100%",
               }}
             >
               <div
                 style={{
                   transformStyle: "preserve-3d",
-                  transform: "rotateX(22deg)",
+                  transform: "rotateX(18deg)",
                   transformOrigin: "50% 100%",
-                  width: "90%",
+                  width: "92%",
                   position: "absolute",
                   top: 0,
                   bottom: 0,
@@ -195,31 +195,34 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
                   initial={{ y: h }}
                   animate={{ y: -3000 }}
                   transition={{
-                    duration: 90,
+                    duration: 120,
                     ease: "linear",
                     repeat: Infinity,
-                    repeatDelay: 2,
+                    repeatDelay: 3,
                   }}
                 >
                   {/* Top spacer */}
-                  <div style={{ height: h * 0.4 }} />
+                  <div style={{ height: h * 0.35 }} />
 
                   <p style={{
                     color: "#4fc3f7",
-                    fontSize: 7,
+                    fontSize: 6,
                     letterSpacing: 2,
-                    marginBottom: 4,
+                    marginBottom: 3,
+                    fontFamily: "'Segoe UI', system-ui, sans-serif",
                   }}>
                     Episódio I
                   </p>
                   <p style={{
                     color: "#ffd700",
-                    fontSize: 9,
+                    fontSize: 8,
                     fontWeight: 900,
                     letterSpacing: 1,
                     lineHeight: 1.2,
-                    marginBottom: 10,
+                    marginBottom: 8,
                     textTransform: "uppercase",
+                    textShadow: "0 0 6px rgba(255,215,0,0.4)",
+                    fontFamily: "'Segoe UI', system-ui, sans-serif",
                   }}>
                     A HISTÓRIA DO<br />VERDINHO
                   </p>
@@ -228,12 +231,17 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
                     <p
                       key={i}
                       style={{
-                        color: "#ffd700",
-                        fontSize: line === "" ? 0 : 7.5,
-                        lineHeight: line === "" ? "6px" : "1.45",
-                        fontWeight: 600,
-                        marginBottom: line === "" ? 5 : 1,
-                        padding: "0 3px",
+                        color: line.startsWith("🩺") || line.startsWith("📋") || line.startsWith("🛒") || line.startsWith("👥") || line.startsWith("📚") || line.startsWith("💳") || line.startsWith("🎯") || line.startsWith("📊")
+                          ? "#4fc3f7"
+                          : "#ffd700",
+                        fontSize: line === "" ? 0 : 6.5,
+                        lineHeight: line === "" ? "5px" : "1.5",
+                        fontWeight: line.startsWith("🩺") || line.startsWith("📋") || line.startsWith("🛒") || line.startsWith("👥") || line.startsWith("📚") || line.startsWith("💳") || line.startsWith("🎯") || line.startsWith("📊") ? 700 : 500,
+                        marginBottom: line === "" ? 4 : 1,
+                        padding: "0 2px",
+                        textShadow: "0 0 3px rgba(255,215,0,0.2)",
+                        fontFamily: "'Segoe UI', system-ui, sans-serif",
+                        letterSpacing: "0.3px",
                       }}
                     >
                       {line || "\u00A0"}

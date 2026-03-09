@@ -108,17 +108,15 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Random personality shifts — more love-focused
+  // Random personality shifts — varied expressions
   useEffect(() => {
     const interval = setInterval(() => {
-      // 55% chance of love expression — he's VERY in love
-      const m = Math.random() < 0.55
-        ? "love"
-        : ALL_MOODS[Math.floor(Math.random() * ALL_MOODS.length)];
+      const moodsNoLove = ALL_MOODS.filter(mood => mood !== "love");
+      const m = moodsNoLove[Math.floor(Math.random() * moodsNoLove.length)];
       setAutoMood(m as FrogExpression);
       setExpression(m as FrogExpression);
 
-      if (m === "love") { setCheekBlush(0.8); setEyeSparkle(true); }
+      if (m === "surprised") { setCheekBlush(0.4); setEyeSparkle(true); }
       if (m === "surprised") setEyeSparkle(true);
       if (m === "sneeze") setSneezing(true);
       if (m === "laughing") setIsBouncing(true);

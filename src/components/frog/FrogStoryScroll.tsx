@@ -9,43 +9,108 @@ interface FrogStoryScrollProps {
 const storyLines = [
   "Olá! Eu sou o Verdinho! 🐸",
   "",
-  "Há muito tempo, em um reino",
-  "distante e próspero, eu era",
-  "um lindo príncipe, herdeiro",
-  "de um grande castelo dourado.",
+  "Estou muito feliz aqui",
+  "trabalhando com a equipe",
+  "da Planta & Raiz! 🌿",
   "",
-  "Apaixonado por uma linda",
-  "princesa, vivíamos felizes,",
-  "cercados de riquezas e",
-  "amor verdadeiro. 👑",
+  "Enquanto minha princesa",
+  "não chega para me salvar",
+  "com um beijo mágico... 💋",
   "",
-  "Mas uma bruxa malvada,",
-  "consumida por ciúmes e",
-  "inveja do nosso amor,",
-  "lançou um terrível feitiço",
-  "sobre mim...",
+  "Eu ajudo a salvar vidas",
+  "todos os dias por aqui! 💚",
   "",
-  "E me transformou em",
-  "um pequeno sapo! 🐸",
+  "A Planta & Raiz é a primeira",
+  "Mega Clínica Digital do mundo!",
+  "Um ecossistema clínico 100%",
+  "autônomo e revolucionário. 🏥",
   "",
-  "Agora, todas as noites,",
-  "eu sonho com o beijo",
-  "da minha princesa... 💋",
+  "Nossas funcionalidades:",
   "",
-  "Para voltar a ser o príncipe",
-  "lindo e próspero que eu era,",
-  "e viver feliz em meu castelo",
-  "com minha amada. 💕",
+  "🩺 Telemedicina Avançada",
+  "Consultas online com os",
+  "melhores médicos prescritores",
+  "de cannabis medicinal.",
   "",
-  "Enquanto isso, estou aqui",
-  "para ajudar você! ✨",
+  "📋 Receita Digital",
+  "Prescrições eletrônicas",
+  "seguras e validadas pela",
+  "ANVISA em tempo real.",
+  "",
+  "🛒 Shopping & Marketplace",
+  "O maior marketplace de",
+  "produtos à base de cannabis",
+  "medicinal do Brasil!",
+  "",
+  "👥 Comunidade de Pacientes",
+  "Fóruns organizados por",
+  "condição de saúde para",
+  "troca de experiências.",
+  "",
+  "📚 Biblioteca Científica",
+  "A maior enciclopédia de",
+  "strains e estudos sobre",
+  "cannabis medicinal.",
+  "",
+  "💳 Carteira Digital",
+  "Gerencie seus documentos,",
+  "receitas e autorizações",
+  "em um só lugar.",
+  "",
+  "🎯 Programa de Indicações",
+  "Indique amigos e ganhe",
+  "recompensas incríveis!",
+  "",
+  "📊 Dashboard Inteligente",
+  "Painéis personalizados para",
+  "pacientes, médicos, farmácias",
+  "e produtores.",
+  "",
+  "Tenho muito orgulho de",
+  "fazer parte de um projeto",
+  "tão importante para a",
+  "humanidade! 🌍",
+  "",
+  "A Planta & Raiz democratiza",
+  "o acesso a medicamentos",
+  "à base de cannabis para",
+  "todo o mundo! 🌎",
+  "",
+  "Somos a plataforma número 1",
+  "do mercado! Completa,",
+  "segura e inovadora! 🏆",
+  "",
+  "Nosso DNA é feito de:",
+  "💚 Compaixão",
+  "🔬 Ciência",
+  "🤝 Acessibilidade",
+  "🌱 Sustentabilidade",
+  "⚡ Inovação",
+  "",
+  "Cada paciente que ajudamos",
+  "é uma vida transformada.",
+  "Cada médico conectado é",
+  "mais saúde para todos! 🩺",
+  "",
+  "A cannabis medicinal é",
+  "esperança, é ciência,",
+  "é qualidade de vida! 🌿",
+  "",
+  "E eu, Verdinho, estarei",
+  "sempre aqui para te guiar",
+  "nessa jornada incrível! ✨",
+  "",
+  "Planta & Raiz — Democratizando",
+  "o acesso à saúde! 💚🐸👑",
+  "",
   "",
   "— Verdinho, o Príncipe Sapo 👑",
+  "   Mascote da Planta & Raiz",
 ];
 
 export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
-  const w = 220;
-  const h = 180;
+  const w = 155;
+  const h = 130;
 
   return (
     <AnimatePresence>
@@ -73,7 +138,7 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
             }}
           >
             {/* Stars */}
-            {Array.from({ length: 20 }).map((_, i) => (
+            {Array.from({ length: 15 }).map((_, i) => (
               <div
                 key={i}
                 className="absolute rounded-full"
@@ -92,7 +157,7 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
             <div
               className="absolute top-0 left-0 right-0 z-10"
               style={{
-                height: "15%",
+                height: "12%",
                 background: "linear-gradient(180deg, #000 0%, transparent 100%)",
               }}
             />
@@ -101,7 +166,7 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
             <div
               className="absolute bottom-0 left-0 right-0 z-10"
               style={{
-                height: "25%",
+                height: "20%",
                 background: "linear-gradient(0deg, #000 0%, transparent 100%)",
               }}
             />
@@ -110,16 +175,16 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
             <div
               className="absolute inset-0 flex justify-center overflow-hidden"
               style={{
-                perspective: "300px",
+                perspective: "250px",
                 perspectiveOrigin: "50% 100%",
               }}
             >
               <div
                 style={{
                   transformStyle: "preserve-3d",
-                  transform: "rotateX(20deg)",
+                  transform: "rotateX(22deg)",
                   transformOrigin: "50% 100%",
-                  width: "88%",
+                  width: "90%",
                   position: "absolute",
                   top: 0,
                   bottom: 0,
@@ -128,32 +193,32 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
                 <motion.div
                   style={{ width: "100%", textAlign: "center" }}
                   initial={{ y: h }}
-                  animate={{ y: -1200 }}
+                  animate={{ y: -3000 }}
                   transition={{
-                    duration: 40,
+                    duration: 90,
                     ease: "linear",
                     repeat: Infinity,
                     repeatDelay: 2,
                   }}
                 >
                   {/* Top spacer */}
-                  <div style={{ height: h * 0.5 }} />
+                  <div style={{ height: h * 0.4 }} />
 
                   <p style={{
                     color: "#4fc3f7",
-                    fontSize: 10,
+                    fontSize: 7,
                     letterSpacing: 2,
-                    marginBottom: 6,
+                    marginBottom: 4,
                   }}>
                     Episódio I
                   </p>
                   <p style={{
                     color: "#ffd700",
-                    fontSize: 14,
+                    fontSize: 9,
                     fontWeight: 900,
                     letterSpacing: 1,
                     lineHeight: 1.2,
-                    marginBottom: 16,
+                    marginBottom: 10,
                     textTransform: "uppercase",
                   }}>
                     A HISTÓRIA DO<br />VERDINHO
@@ -164,18 +229,18 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
                       key={i}
                       style={{
                         color: "#ffd700",
-                        fontSize: line === "" ? 0 : 11,
-                        lineHeight: line === "" ? "10px" : "1.5",
+                        fontSize: line === "" ? 0 : 7.5,
+                        lineHeight: line === "" ? "6px" : "1.45",
                         fontWeight: 600,
-                        marginBottom: line === "" ? 8 : 2,
-                        padding: "0 4px",
+                        marginBottom: line === "" ? 5 : 1,
+                        padding: "0 3px",
                       }}
                     >
                       {line || "\u00A0"}
                     </p>
                   ))}
 
-                  <div style={{ height: 400 }} />
+                  <div style={{ height: 600 }} />
                 </motion.div>
               </div>
             </div>

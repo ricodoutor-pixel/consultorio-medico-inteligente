@@ -7,6 +7,7 @@ import { FrogMouth } from "./frog/FrogMouth";
 import { FrogAccessories } from "./frog/FrogAccessories";
 import { FrogDaydream } from "./frog/FrogDaydream";
 import { FrogCrown } from "./frog/FrogCrown";
+import { FrogLoveHearts } from "./frog/FrogLoveHearts";
 
 interface FrogMascotProps {
   onClick?: () => void;

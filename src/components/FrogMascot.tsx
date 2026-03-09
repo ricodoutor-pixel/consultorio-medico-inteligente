@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import verdinhoImg from "@/assets/verdinho-mascot.png";
 import { useFrogAnimations, FrogExpression } from "./frog/useFrogAnimations";
@@ -41,30 +41,67 @@ const getExpressionEmoji = (expression: FrogExpression) => {
 export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJumpToNav = false, hasNewMessage = false }: FrogMascotProps) => {
   const anim = useFrogAnimations(mood, hasNewMessage, size);
   const emoji = getExpressionEmoji(anim.expression);
+  const [isTouched, setIsTouched] = useState(false);
+  const lastTapRef = useRef(0);
+  const touchTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // Double-tap/double-click to open chat; single tap enlarges on mobile
+  const handleInteraction = useCallback(() => {
+    const now = Date.now();
+    const delta = now - lastTapRef.current;
+    lastTapRef.current = now;
+
+    if (delta < 400) {
+      // Double tap/click → open chat
+      onClick?.();
+      setIsTouched(false);
+    } else {
+      // Single tap → enlarge temporarily
+      setIsTouched(true);
+      if (touchTimeoutRef.current) clearTimeout(touchTimeoutRef.current);
+      touchTimeoutRef.current = setTimeout(() => setIsTouched(false), 2500);
+    }
+  }, [onClick]);
+
+  const displaySize = isTouched ? size * 2.2 : size;
 
   return (
     <motion.button
       ref={anim.containerRef as any}
-      onClick={onClick}
+      onClick={handleInteraction}
       onMouseEnter={anim.onHoverStart}
       onMouseLeave={anim.onHoverEnd}
       className="cursor-pointer select-none focus:outline-none relative"
-      aria-label="Pergunte ao Verdinho — Assistente IA"
-      title="Pergunte ao Verdinho 🐸"
-      whileTap={{ scale: 0.85, rotate: -8 }}
+      aria-label="Toque duas vezes para falar com o Verdinho — Assistente IA"
+      title="Toque 2x para conversar com o Verdinho 🐸"
+      whileTap={{ scale: 0.9, rotate: -5 }}
       whileHover={{ scale: 2.5 }}
-      animate={anim.controls}
-      style={{ width: size, height: size }}
+      animate={{
+        width: displaySize,
+        height: displaySize,
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      style={{ width: displaySize, height: displaySize }}
     >
       {/* Glow */}
       <motion.div
         className="absolute inset-0 rounded-full bg-primary/20 blur-lg"
         animate={{
-          scale: anim.isHovered ? 1.6 : anim.messageBounce ? 1.4 : 1,
-          opacity: anim.isHovered ? 0.6 : anim.messageBounce ? 0.5 : 0.2,
+          scale: isTouched ? 1.8 : anim.isHovered ? 1.6 : anim.messageBounce ? 1.4 : 1,
+          opacity: isTouched ? 0.7 : anim.isHovered ? 0.6 : anim.messageBounce ? 0.5 : 0.2,
         }}
         transition={{ duration: 0.3 }}
       />
+
+      {/* Touch indicator ring */}
+      {isTouched && (
+        <motion.div
+          className="absolute inset-0 rounded-full border-4 border-primary/60"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1.2, opacity: [0, 1, 0] }}
+          transition={{ duration: 0.6, repeat: 2 }}
+        />
+      )}
 
       {/* Message bounce pulse */}
       {anim.messageBounce && (
@@ -86,15 +123,15 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         <img
           src={verdinhoImg}
           alt=""
-          width={size}
-          height={size}
+          width={displaySize}
+          height={displaySize}
           className="drop-shadow-lg pointer-events-none"
-          style={{ clipPath: `inset(${size * 0.45}px 0 0 0)` }}
+          style={{ clipPath: `inset(${displaySize * 0.45}px 0 0 0)` }}
           draggable={false}
         />
 
         <FrogAccessories
-          size={size}
+          size={displaySize}
           isWaving={anim.isWaving}
           expression={anim.expression}
           cheekBlush={anim.cheekBlush}
@@ -116,36 +153,36 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           <img
             src={verdinhoImg}
             alt="Verdinho - Assistente IA"
-            width={size}
-            height={size}
+            width={displaySize}
+            height={displaySize}
             className="drop-shadow-lg pointer-events-none"
-            style={{ clipPath: `inset(0 0 ${size * 0.48}px 0)` }}
+            style={{ clipPath: `inset(0 0 ${displaySize * 0.48}px 0)` }}
             draggable={false}
           />
           {/* Prince Crown */}
-          <FrogCrown size={size} isHovered={anim.isHovered} />
+          <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />
         </motion.div>
       </div>
 
       {/* Eyes + Mouth SVG overlay */}
       <svg
         className="absolute inset-0 z-20 pointer-events-none"
-        viewBox={`0 0 ${size} ${size}`}
-        width={size}
-        height={size}
+        viewBox={`0 0 ${displaySize} ${displaySize}`}
+        width={displaySize}
+        height={displaySize}
       >
         <FrogEyes
-          size={size}
+          size={displaySize}
           expression={anim.expression}
           blink={anim.blink}
           eyeOffset={anim.eyeOffset}
           eyeSparkle={anim.eyeSparkle}
         />
         <FrogMouth
-          size={size}
+          size={displaySize}
           expression={anim.expression}
           smile={anim.smile}
-          isHovered={anim.isHovered}
+          isHovered={anim.isHovered || isTouched}
           tongueOut={anim.tongueOut}
         />
       </svg>
@@ -155,17 +192,16 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         <motion.svg
           className="absolute z-30 pointer-events-none"
           style={{
-            right: -size * 0.15,
-            top: size * 0.3,
-            width: size * 0.4,
-            height: size * 0.5,
+            right: -displaySize * 0.15,
+            top: displaySize * 0.3,
+            width: displaySize * 0.4,
+            height: displaySize * 0.5,
           }}
           viewBox="0 0 40 50"
           initial={{ rotate: 0 }}
           animate={{ rotate: [0, -20, 12, -15, 8, 0] }}
           transition={{ duration: 1.2, ease: "easeInOut" }}
         >
-          {/* Arm with thickness and shading */}
           <path
             d="M 5 44 Q 4 34 7 26 Q 9 21 12 17 Q 15 13 18 10"
             stroke="#3d8b3d"
@@ -187,7 +223,6 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             strokeLinecap="round"
             fill="none"
           />
-          {/* Highlight */}
           <path
             d="M 6 40 Q 5 32 8 24 Q 11 19 14 14"
             stroke="#8de88d"
@@ -196,18 +231,14 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             fill="none"
             opacity="0.45"
           />
-          {/* Hand — round frog palm */}
           <ellipse cx="19" cy="9" rx="6" ry="5" fill="#5bb85b" />
           <ellipse cx="19" cy="9" rx="4.5" ry="3.5" fill="#6ecf6e" opacity="0.7" />
-          {/* Webbed frog fingers */}
           <ellipse cx="14" cy="4" rx="2.2" ry="2.8" fill="#5bb85b" transform="rotate(-12 14 4)" />
           <ellipse cx="19" cy="2.5" rx="2.2" ry="3" fill="#5bb85b" />
           <ellipse cx="24" cy="4" rx="2.2" ry="2.8" fill="#5bb85b" transform="rotate(12 24 4)" />
-          {/* Finger pads — round suction cups */}
           <circle cx="14" cy="2.5" r="1.4" fill="#4a9e4a" opacity="0.8" />
           <circle cx="19" cy="1" r="1.4" fill="#4a9e4a" opacity="0.8" />
           <circle cx="24" cy="2.5" r="1.4" fill="#4a9e4a" opacity="0.8" />
-          {/* Webbing between fingers */}
           <path d="M 15 5 Q 16.5 6 18 4.5" stroke="#4a9e4a" strokeWidth="0.6" fill="none" opacity="0.3" />
           <path d="M 20 4.5 Q 21.5 6 23 5" stroke="#4a9e4a" strokeWidth="0.6" fill="none" opacity="0.3" />
         </motion.svg>
@@ -225,21 +256,33 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         </motion.span>
       )}
 
-      {/* Love hearts floating — only during daydream, not randomly */}
+      {/* Love hearts floating — only during daydream */}
       <FrogLoveHearts
-        size={size}
+        size={displaySize}
         show={anim.isDaydreaming}
       />
 
-      {/* Daydream bubble — the princess kissing Verdinho's cheek */}
+      {/* Daydream bubble — princess kissing Verdinho's cheek */}
       <FrogDaydream
-        size={size}
+        size={displaySize}
         isDaydreaming={anim.isDaydreaming}
         daydreamPhase={anim.daydreamPhase}
       />
 
       {/* Star Wars story scroll on hover */}
-      <FrogStoryScroll show={anim.isHovered} size={size} />
+      <FrogStoryScroll show={anim.isHovered || isTouched} size={displaySize} />
+
+      {/* Tooltip hint for double-tap */}
+      {isTouched && (
+        <motion.div
+          className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-sm text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap z-50 border border-border"
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+        >
+          Toque 2x para conversar 💬
+        </motion.div>
+      )}
     </motion.button>
   );
 });

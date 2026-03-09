@@ -10,7 +10,7 @@ interface FrogDaydreamProps {
 export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDaydreamProps) => {
   if (!isDaydreaming || !daydreamPhase) return null;
 
-  const bubbleSize = size * 1.3;
+  const bubbleSize = size * 1.17;
   const bubbleX = size * 0.55;
   const bubbleY = -bubbleSize * 0.15;
 

@@ -207,16 +207,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         daydreamPhase={anim.daydreamPhase}
       />
 
-      {/* Hover tooltip */}
-      {anim.isHovered && (
-        <motion.div
-          className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full text-[9px] font-bold pointer-events-none bg-primary/20 border border-primary/30 text-primary z-50"
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          Fale comigo! 🐸
-        </motion.div>
-      )}
+      {/* Star Wars story scroll on hover */}
+      <FrogStoryScroll show={anim.isHovered} size={size} />
     </motion.button>
   );
 });

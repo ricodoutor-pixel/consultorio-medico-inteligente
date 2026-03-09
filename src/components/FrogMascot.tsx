@@ -8,6 +8,7 @@ import { FrogAccessories } from "./frog/FrogAccessories";
 import { FrogDaydream } from "./frog/FrogDaydream";
 import { FrogCrown } from "./frog/FrogCrown";
 import { FrogLoveHearts } from "./frog/FrogLoveHearts";
+import { FrogStoryScroll } from "./frog/FrogStoryScroll";
 
 interface FrogMascotProps {
   onClick?: () => void;
@@ -51,7 +52,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       aria-label="Pergunte ao Verdinho — Assistente IA"
       title="Pergunte ao Verdinho 🐸"
       whileTap={{ scale: 0.85, rotate: -8 }}
-      whileHover={{ scale: 3 }}
+      whileHover={{ scale: 2.5 }}
       animate={anim.controls}
       style={{ width: size, height: size }}
     >
@@ -206,16 +207,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         daydreamPhase={anim.daydreamPhase}
       />
 
-      {/* Hover tooltip */}
-      {anim.isHovered && (
-        <motion.div
-          className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full text-[9px] font-bold pointer-events-none bg-primary/20 border border-primary/30 text-primary z-50"
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          Fale comigo! 🐸
-        </motion.div>
-      )}
+      {/* Star Wars story scroll on hover */}
+      <FrogStoryScroll show={anim.isHovered} size={size} />
     </motion.button>
   );
 });

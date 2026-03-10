@@ -31,6 +31,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
   const [eyeSparkle, setEyeSparkle] = useState(false);
   const [headTilt, setHeadTilt] = useState(0);
   const [sneezing, setSneezing] = useState(false);
+  const [showCrown, setShowCrown] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
 

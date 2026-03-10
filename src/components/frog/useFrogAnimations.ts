@@ -171,7 +171,11 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       setCheekBlush(0.8);
       setEyeSparkle(true);
 
-      setTimeout(() => { setDaydreamPhase("kiss"); }, 2000);
+      setTimeout(() => {
+        setDaydreamPhase("kiss");
+        setShowCrown(true);
+        setTimeout(() => setShowCrown(false), 2000);
+      }, 2000);
 
       setTimeout(() => { setDaydreamPhase("hearts"); }, 3500);
 

@@ -71,9 +71,9 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
             <motion.img
               src={princessImg}
               alt="Princesa beijando o sapo"
-              className="w-[88%] h-[88%] object-contain relative z-10"
+              className="w-[90%] h-[90%] object-contain relative z-10"
               style={{
-                filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.2)) saturate(1.15) brightness(1.08) contrast(1.05)",
+                filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.25)) saturate(1.25) brightness(1.12) contrast(1.08)",
               }}
               animate={
                 daydreamPhase === "kiss"

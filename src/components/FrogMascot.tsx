@@ -266,10 +266,10 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         </motion.span>
       )}
 
-      {/* Love hearts floating — only during daydream */}
+      {/* Love hearts floating — only during daydream, NOT in doctor mode */}
       <FrogLoveHearts
         size={displaySize}
-        show={anim.isDaydreaming}
+        show={anim.isDaydreaming && !anim.isDoctorMode}
       />
 
       {/* Daydream bubble — princess kissing Verdinho's cheek */}

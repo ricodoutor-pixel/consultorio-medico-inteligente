@@ -3,7 +3,7 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, ArrowRight, Users } from "lucide-react";
+import { CheckCircle2, ArrowRight, Users, Stethoscope } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 

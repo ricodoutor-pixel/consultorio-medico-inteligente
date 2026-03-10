@@ -7,7 +7,7 @@ export type FrogExpression =
   | "singing" | "laughing" | "crying" | "cool" | "sneeze";
 
 const ALL_MOODS: FrogExpression[] = [
-  "happy", "thinking", "confused", "sleeping", "excited",
+  "happy", "thinking", "sleeping", "excited",
   "love", "dizzy", "surprised", "singing", "laughing",
   "crying", "cool", "sneeze"
 ];
@@ -184,10 +184,18 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
 
       setTimeout(() => { setDaydreamPhase("hearts"); }, 3500);
 
+      // 3 bounces when receiving the kiss
+      setTimeout(() => {
+        controls.start({
+          y: [0, -18, 0, -12, 0, -8, 0],
+          transition: { duration: 0.9, ease: "easeInOut", times: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 1] },
+        });
+      }, 2500);
+
       setTimeout(() => {
         setDaydreamPhase("wakeup");
         setIsDaydreaming(false);
-        setExpression("confused");
+        setExpression("happy");
         setCheekBlush(0);
         setEyeSparkle(false);
       }, 5000);

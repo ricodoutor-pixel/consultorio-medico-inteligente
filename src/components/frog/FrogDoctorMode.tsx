@@ -69,51 +69,27 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             </defs>
           </svg>
 
-          {/* Stethoscope draped around neck — positioned at collar level */}
+          {/* Black executive tie — horizontal */}
           <svg
             className="absolute pointer-events-none"
             style={{
-              top: size * 0.58,
-              left: size * 0.28,
-              width: size * 0.44,
-              height: size * 0.22,
+              top: size * 0.62,
+              left: size * 0.35,
+              width: size * 0.30,
+              height: size * 0.08,
             }}
-            viewBox="0 0 100 50"
+            viewBox="0 0 80 20"
             fill="none"
           >
-            {/* Tube left side going down */}
-            <path
-              d="M25 4 Q20 12 22 22 Q24 32 32 38"
-              stroke="#555"
-              strokeWidth="2.8"
-              strokeLinecap="round"
-              fill="none"
-            />
-            {/* Tube right side going down */}
-            <path
-              d="M75 4 Q80 12 78 22 Q76 32 68 38"
-              stroke="#555"
-              strokeWidth="2.8"
-              strokeLinecap="round"
-              fill="none"
-            />
-            {/* Y-junction */}
-            <path
-              d="M32 38 Q40 44 50 46 Q60 44 68 38"
-              stroke="#555"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              fill="none"
-            />
-            {/* Chest piece (diaphragm) */}
-            <circle cx="50" cy="46" r="5" fill="#999" stroke="#555" strokeWidth="1.2" />
-            <circle cx="50" cy="46" r="2.8" fill="#bbb" />
-            <circle cx="48.5" cy="44.5" r="1" fill="#ddd" opacity="0.7" />
-            {/* Earpieces at top */}
-            <circle cx="25" cy="4" r="3" fill="#666" stroke="#444" strokeWidth="0.8" />
-            <circle cx="25" cy="4" r="1.5" fill="#888" />
-            <circle cx="75" cy="4" r="3" fill="#666" stroke="#444" strokeWidth="0.8" />
-            <circle cx="75" cy="4" r="1.5" fill="#888" />
+            {/* Tie knot */}
+            <polygon points="37,3 43,3 44,8 36,8" fill="#1a1a1a" />
+            {/* Tie body — horizontal spread */}
+            <polygon points="36,8 44,8 52,16 28,16" fill="#111" />
+            {/* Subtle shine on knot */}
+            <polygon points="38,4 42,4 42.5,6 37.5,6" fill="#333" opacity="0.6" />
+            {/* Collar wings behind tie */}
+            <path d="M30 5 L37 3 L36 9 L26 12 Z" fill="#f0f0f0" stroke="#ccc" strokeWidth="0.5" />
+            <path d="M50 5 L43 3 L44 9 L54 12 Z" fill="#f0f0f0" stroke="#ccc" strokeWidth="0.5" />
           </svg>
 
           {/* Head mirror on forehead */}

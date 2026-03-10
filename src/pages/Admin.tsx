@@ -7,8 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
-import { Users, ShoppingBag, Stethoscope, DollarSign, TrendingUp, Shield, CheckCircle2, XCircle, Clock, AlertTriangle, Activity, Globe, Eye, UserPlus, LogOut, RefreshCw, Wallet, HeartPulse, BarChart3, Bell } from "lucide-react";
+import { Users, ShoppingBag, Stethoscope, DollarSign, TrendingUp, Shield, CheckCircle2, XCircle, Clock, AlertTriangle, Activity, Globe, Eye, UserPlus, LogOut, RefreshCw, Wallet, HeartPulse, BarChart3, Bell, Bitcoin, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -75,13 +76,32 @@ const alerts = [
   { type: "info", msg: "Novo vendedor cadastrado: Cannabis Pharma", time: "3h" },
 ];
 
-type Tab = "dashboard" | "users" | "webhooks" | "alerts" | "analytics";
+type Tab = "dashboard" | "users" | "webhooks" | "alerts" | "analytics" | "subscriptions";
 
 const Admin = () => {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [live, setLive] = useState(generateLiveData());
   const [timeFilter, setTimeFilter] = useState<"24h" | "7d" | "30d" | "90d">("30d");
+  const [btcSubs, setBtcSubs] = useState<any[]>([]);
+  const [loadingBtc, setLoadingBtc] = useState(false);
   const navigate = useNavigate();
+
+  const fetchBtcSubs = async () => {
+    setLoadingBtc(true);
+    const { data, error } = await supabase.from("btc_subscriptions" as any).select("*").order("created_at", { ascending: false });
+    if (data) setBtcSubs(data as any[]);
+    setLoadingBtc(false);
+  };
+
+  const handleBtcAction = async (id: string, status: "approved" | "rejected") => {
+    const { error } = await supabase.from("btc_subscriptions" as any).update({ status, updated_at: new Date().toISOString() } as any).eq("id", id);
+    if (error) {
+      toast.error("Erro ao atualizar");
+      return;
+    }
+    toast.success(status === "approved" ? "✅ Acesso liberado!" : "❌ Acesso negado");
+    fetchBtcSubs();
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -143,6 +163,7 @@ const Admin = () => {
             {([
               { key: "dashboard" as Tab, label: "Dashboard", icon: BarChart3 },
               { key: "analytics" as Tab, label: "Analytics", icon: TrendingUp },
+              { key: "subscriptions" as Tab, label: "Assinaturas BTC", icon: Bitcoin },
               { key: "users" as Tab, label: "Usuários", icon: Users },
               { key: "webhooks" as Tab, label: "Webhooks", icon: Activity },
               { key: "alerts" as Tab, label: "Alertas", icon: Bell },
@@ -493,6 +514,96 @@ const Admin = () => {
                   </Card>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* BTC Subscriptions */}
+          {tab === "subscriptions" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <h2 className="font-display font-black text-foreground flex items-center gap-2">
+                    <Bitcoin size={20} className="text-amber-500" /> Assinaturas via Bitcoin
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Gerencie pagamentos BTC. Libere ou negue acesso após confirmar o comprovante.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/30 text-xs">
+                    {btcSubs.filter((s: any) => s.status === "pending").length} pendentes
+                  </Badge>
+                  <Button variant="outline" size="sm" className="rounded-xl text-xs" onClick={fetchBtcSubs}>
+                    <RefreshCw size={14} className="mr-1" /> Atualizar
+                  </Button>
+                </div>
+              </div>
+
+              {loadingBtc ? (
+                <p className="text-sm text-muted-foreground py-8 text-center">Carregando...</p>
+              ) : btcSubs.length === 0 ? (
+                <Card className="border-border">
+                  <CardContent className="p-8 text-center">
+                    <Bitcoin size={40} className="text-muted-foreground mx-auto mb-3 opacity-40" />
+                    <p className="text-sm text-muted-foreground">Nenhuma solicitação BTC ainda.</p>
+                    <Button variant="outline" size="sm" className="mt-3 rounded-xl text-xs" onClick={fetchBtcSubs}>
+                      Carregar solicitações
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-3">
+                  {btcSubs.map((sub: any) => (
+                    <Card key={sub.id} className={`border-border ${sub.status === "pending" ? "border-l-2 border-l-amber-500" : sub.status === "approved" ? "border-l-2 border-l-primary" : "border-l-2 border-l-destructive"}`}>
+                      <CardContent className="p-4 flex items-center justify-between flex-wrap gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                            sub.status === "pending" ? "bg-amber-500/10" : sub.status === "approved" ? "bg-primary/10" : "bg-destructive/10"
+                          }`}>
+                            {sub.status === "pending" ? <Clock size={16} className="text-amber-500" /> :
+                             sub.status === "approved" ? <CheckCircle2 size={16} className="text-primary" /> :
+                             <XCircle size={16} className="text-destructive" />}
+                          </div>
+                          <div>
+                            <p className="font-black text-sm text-foreground">{sub.plan_name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {sub.email} • R$ {Number(sub.amount).toFixed(2)} •{" "}
+                              {new Date(sub.created_at).toLocaleDateString("pt-BR")} {new Date(sub.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={`text-xs ${
+                            sub.status === "pending" ? "text-amber-500 border-amber-500/40" :
+                            sub.status === "approved" ? "text-primary border-green" : "text-destructive border-destructive"
+                          }`}>
+                            {sub.status === "pending" ? "Pendente" : sub.status === "approved" ? "Liberado" : "Negado"}
+                          </Badge>
+                          {sub.status === "pending" && (
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                className="h-8 text-xs rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-black"
+                                onClick={() => handleBtcAction(sub.id, "approved")}
+                              >
+                                <CheckCircle2 size={12} className="mr-1" /> Acesso Liberado
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-xs rounded-lg border-destructive text-destructive hover:bg-destructive/10 font-black"
+                                onClick={() => handleBtcAction(sub.id, "rejected")}
+                              >
+                                <XCircle size={12} className="mr-1" /> Acesso Negado
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

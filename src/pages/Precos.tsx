@@ -4,17 +4,19 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, ArrowRight, Users, Stethoscope, Loader2 } from "lucide-react";
+import { CheckCircle2, ArrowRight, Users, Stethoscope, Loader2, Bitcoin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 const Precos = () => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [btcModal, setBtcModal] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
   const plans = [
     {
       id: "essencial",
@@ -206,6 +208,13 @@ const Precos = () => {
                         </a>
                       </Button>
                     )}
+                    <Button
+                      variant="outline"
+                      className="w-full mt-2 font-black rounded-2xl border-amber-500/40 text-amber-500 hover:bg-amber-500/10 text-xs h-9"
+                      onClick={() => setBtcModal({ open: true, planName: plan.name, planId: plan.id, amount: plan.price })}
+                    >
+                      <Bitcoin size={14} className="mr-1" /> Pague com BTC
+                    </Button>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -286,6 +295,13 @@ const Precos = () => {
       </section>
 
       <Footer />
+      <BTCPaymentModal
+        open={btcModal.open}
+        onClose={() => setBtcModal({ ...btcModal, open: false })}
+        planName={btcModal.planName}
+        planId={btcModal.planId}
+        amount={btcModal.amount}
+      />
     </div>
   );
 };

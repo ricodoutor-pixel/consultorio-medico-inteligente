@@ -231,6 +231,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       setIsWaving(false);
       setExpression("thinking");
       setLookingAtChart(true);
+      // Eyes look toward the chart (right side)
+      setEyeOffset({ x: size * 0.025, y: size * 0.01 });
 
       // 3 bounces when entering doctor mode
       controls.start({

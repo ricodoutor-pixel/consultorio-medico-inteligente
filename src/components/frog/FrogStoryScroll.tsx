@@ -204,10 +204,10 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
           <div
             className="relative w-full h-full overflow-hidden"
             style={{
-              background: "linear-gradient(180deg, #0a0a14 0%, #000 100%)",
-              borderRadius: 5,
-              border: "1px solid rgba(255,215,0,0.2)",
-              boxShadow: "0 0 15px rgba(255,215,0,0.1), inset 0 0 30px rgba(0,0,0,0.5)",
+              background: "linear-gradient(180deg, #0a0a14 0%, #050510 100%)",
+              borderRadius: 8,
+              border: "1px solid rgba(255,215,0,0.25)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.5), 0 0 15px rgba(255,215,0,0.1), inset 0 0 30px rgba(0,0,0,0.5)",
             }}
           >
             {/* Stars background */}

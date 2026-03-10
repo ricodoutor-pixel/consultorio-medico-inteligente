@@ -194,8 +194,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         />
       </svg>
 
-      {/* Waving arm */}
-      {anim.isWaving && (
+      {/* Waving arm — hidden during doctor mode */}
+      {anim.isWaving && !anim.isDoctorMode && (
         <motion.svg
           className="absolute z-30 pointer-events-none"
           style={{

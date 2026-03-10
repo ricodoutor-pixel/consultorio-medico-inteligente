@@ -181,8 +181,8 @@ const SparkleText = memo(({ text, color, fontSize, fontWeight, isHeading }: {
 SparkleText.displayName = "SparkleText";
 
 export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
-  const w = 140;
-  const h = 120;
+  const w = 180;
+  const h = 140;
 
   return (
     <AnimatePresence>
@@ -204,10 +204,10 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
           <div
             className="relative w-full h-full overflow-hidden"
             style={{
-              background: "linear-gradient(180deg, #0a0a14 0%, #000 100%)",
-              borderRadius: 5,
-              border: "1px solid rgba(255,215,0,0.2)",
-              boxShadow: "0 0 15px rgba(255,215,0,0.1), inset 0 0 30px rgba(0,0,0,0.5)",
+              background: "linear-gradient(180deg, #0a0a14 0%, #050510 100%)",
+              borderRadius: 8,
+              border: "1px solid rgba(255,215,0,0.25)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.5), 0 0 15px rgba(255,215,0,0.1), inset 0 0 30px rgba(0,0,0,0.5)",
             }}
           >
             {/* Stars background */}
@@ -286,19 +286,19 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
 
                   <p style={{
                     color: "#4fc3f7",
-                    fontSize: 7,
+                    fontSize: 9,
                     letterSpacing: 3,
-                    marginBottom: 4,
+                    marginBottom: 6,
                     fontFamily: "'Segoe UI', system-ui, sans-serif",
                     textShadow: "0 0 6px rgba(79,195,247,0.5)",
                   }}>
                     Episódio I
                   </p>
-                  <div style={{ marginBottom: 10 }}>
+                  <div style={{ marginBottom: 12 }}>
                     <SparkleText
                       text="A HISTÓRIA DO VERDINHO"
                       color="#ffd700"
-                      fontSize={9}
+                      fontSize={11}
                       fontWeight={900}
                       isHeading
                     />
@@ -306,15 +306,15 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
 
                   {storyLines.map((line, i) => {
                     if (line === "") {
-                      return <div key={i} style={{ height: 6 }} />;
+                      return <div key={i} style={{ height: 8 }} />;
                     }
                     const isSection = /^[🩺📋🛒👥📚💳🎯📊]/.test(line);
                     return (
-                      <div key={i} style={{ marginBottom: 1.5, padding: "0 3px" }}>
+                      <div key={i} style={{ marginBottom: 2, padding: "0 6px" }}>
                         <SparkleText
                           text={line}
                           color={isSection ? "#4fc3f7" : "#ffd700"}
-                          fontSize={7}
+                          fontSize={isSection ? 9 : 8}
                           fontWeight={isSection ? 700 : 500}
                         />
                       </div>

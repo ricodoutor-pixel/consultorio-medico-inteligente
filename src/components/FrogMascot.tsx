@@ -160,12 +160,19 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             style={{ clipPath: `inset(0 0 ${displaySize * 0.48}px 0)` }}
             draggable={false}
           />
-          {/* Prince Crown — only appears after princess kiss */}
+          {/* Prince Crown — only appears after princess kiss, NOT in doctor mode */}
           <AnimatePresence>
-            {anim.showCrown && <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />}
+            {anim.showCrown && !anim.isDoctorMode && <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />}
           </AnimatePresence>
         </motion.div>
       </div>
+
+      {/* Doctor Mode overlay */}
+      <FrogDoctorMode
+        size={displaySize}
+        isDoctor={anim.isDoctorMode}
+        lookingAtChart={anim.lookingAtChart}
+      />
 
       {/* Eyes + Mouth SVG overlay */}
       <svg

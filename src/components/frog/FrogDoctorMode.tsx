@@ -86,38 +86,38 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             <ellipse cx="48" cy="10" rx="2" ry="1.5" fill="#444" opacity="0.5" />
           </svg>
 
-          {/* Stethoscope on LEFT side — white with gold */}
+          {/* Stethoscope on LEFT side — blue, closer to body */}
           <svg
             className="absolute pointer-events-none"
             style={{
-              top: size * 0.15,
-              left: -size * 0.08,
-              width: size * 0.35,
-              height: size * 0.55,
+              top: size * 0.18,
+              left: size * 0.02,
+              width: size * 0.28,
+              height: size * 0.45,
             }}
             viewBox="0 0 60 90"
             fill="none"
           >
             {/* Earpiece tubes */}
-            <path d="M30 8 Q20 8 16 16 Q12 24 14 36" stroke="#c9a84c" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-            <path d="M30 8 Q40 8 42 16 Q44 24 40 36" stroke="#c9a84c" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+            <path d="M30 8 Q20 8 16 16 Q12 24 14 36" stroke="#3b82f6" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+            <path d="M30 8 Q40 8 42 16 Q44 24 40 36" stroke="#3b82f6" strokeWidth="2.5" fill="none" strokeLinecap="round" />
             {/* Y-connector */}
-            <circle cx="30" cy="8" r="3" fill="#c9a84c" stroke="#b8942e" strokeWidth="1" />
+            <circle cx="30" cy="8" r="3" fill="#60a5fa" stroke="#2563eb" strokeWidth="1" />
             {/* Main tube going down */}
-            <path d="M27 36 Q22 50 24 62 Q26 72 30 78" stroke="#f0f0f0" strokeWidth="3.5" fill="none" strokeLinecap="round" />
-            <path d="M27 36 Q22 50 24 62 Q26 72 30 78" stroke="#ffffff" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
+            <path d="M27 36 Q22 50 24 62 Q26 72 30 78" stroke="#93c5fd" strokeWidth="3.5" fill="none" strokeLinecap="round" />
+            <path d="M27 36 Q22 50 24 62 Q26 72 30 78" stroke="#bfdbfe" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
             {/* Chest piece / diaphragm */}
-            <circle cx="30" cy="80" r="7" fill="url(#stethoGrad)" stroke="#c9a84c" strokeWidth="1.5" />
-            <circle cx="30" cy="80" r="4.5" fill="#e8e8e8" stroke="#c9a84c" strokeWidth="0.8" />
+            <circle cx="30" cy="80" r="7" fill="url(#stethoGradBlue)" stroke="#3b82f6" strokeWidth="1.5" />
+            <circle cx="30" cy="80" r="4.5" fill="#dbeafe" stroke="#3b82f6" strokeWidth="0.8" />
             <circle cx="28" cy="78" r="1.5" fill="white" opacity="0.5" />
             {/* Earpieces */}
-            <circle cx="14" cy="36" r="2.5" fill="#c9a84c" stroke="#b8942e" strokeWidth="0.8" />
-            <circle cx="40" cy="36" r="2.5" fill="#c9a84c" stroke="#b8942e" strokeWidth="0.8" />
+            <circle cx="14" cy="36" r="2.5" fill="#60a5fa" stroke="#2563eb" strokeWidth="0.8" />
+            <circle cx="40" cy="36" r="2.5" fill="#60a5fa" stroke="#2563eb" strokeWidth="0.8" />
             <defs>
-              <radialGradient id="stethoGrad" cx="40%" cy="35%">
-                <stop offset="0%" stopColor="#ffffff" />
-                <stop offset="60%" stopColor="#f0f0f0" />
-                <stop offset="100%" stopColor="#d4d4d4" />
+              <radialGradient id="stethoGradBlue" cx="40%" cy="35%">
+                <stop offset="0%" stopColor="#eff6ff" />
+                <stop offset="60%" stopColor="#dbeafe" />
+                <stop offset="100%" stopColor="#93c5fd" />
               </radialGradient>
             </defs>
           </svg>

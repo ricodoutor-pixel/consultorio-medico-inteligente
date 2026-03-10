@@ -1,0 +1,132 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  try {
+    const { planId, payerEmail } = await req.json();
+
+    const MP_ACCESS_TOKEN = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
+    if (!MP_ACCESS_TOKEN) {
+      return new Response(JSON.stringify({ error: "Token Mercado Pago não configurado" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Plan configurations
+    const plans: Record<string, { title: string; amount: number; frequency: number; frequency_type: string }> = {
+      "consultorio-virtual": {
+        title: "Consultório Virtual - Plano Médico",
+        amount: 150,
+        frequency: 1,
+        frequency_type: "months",
+      },
+      "essencial": {
+        title: "Plano Essencial",
+        amount: 50,
+        frequency: 1,
+        frequency_type: "months",
+      },
+      "acesso": {
+        title: "Plano Acesso",
+        amount: 100,
+        frequency: 1,
+        frequency_type: "months",
+      },
+      "familia": {
+        title: "Plano Família",
+        amount: 250,
+        frequency: 1,
+        frequency_type: "months",
+      },
+      "empresas": {
+        title: "Plano Empresas & Parceiros",
+        amount: 300,
+        frequency: 1,
+        frequency_type: "months",
+      },
+    };
+
+    const plan = plans[planId];
+    if (!plan) {
+      return new Response(JSON.stringify({ error: "Plano não encontrado" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const siteUrl = "https://consultorio-medico-inteligente.lovable.app";
+
+    // Create a checkout preference with PIX + credit card
+    const preference = {
+      items: [
+        {
+          title: plan.title,
+          quantity: 1,
+          unit_price: plan.amount,
+          currency_id: "BRL",
+        },
+      ],
+      payer: {
+        email: payerEmail || "",
+      },
+      back_urls: {
+        success: `${siteUrl}/dashboard?payment=success&plan=${planId}`,
+        failure: `${siteUrl}/planos?status=failure`,
+        pending: `${siteUrl}/planos?status=pending`,
+      },
+      auto_return: "approved",
+      notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
+      external_reference: `subscription-${planId}-${Date.now()}`,
+      statement_descriptor: "PLANTA E RAIZ",
+      payment_methods: {
+        excluded_payment_types: [],
+        installments: 1,
+      },
+    };
+
+    const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${MP_ACCESS_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(preference),
+    });
+
+    if (!mpResponse.ok) {
+      const errText = await mpResponse.text();
+      console.error("[create-subscription] Mercado Pago error:", mpResponse.status, errText);
+      return new Response(JSON.stringify({ error: "Erro ao criar pagamento no Mercado Pago", details: errText }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const mpData = await mpResponse.json();
+
+    return new Response(JSON.stringify({
+      init_point: mpData.init_point,
+      sandbox_init_point: mpData.sandbox_init_point,
+      preference_id: mpData.id,
+      plan: planId,
+      amount: plan.amount,
+    }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    console.error("[create-subscription] error:", e);
+    return new Response(JSON.stringify({ error: "Erro interno" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

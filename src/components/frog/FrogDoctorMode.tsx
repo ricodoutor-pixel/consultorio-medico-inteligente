@@ -66,11 +66,11 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             </defs>
           </svg>
 
-          {/* Stethoscope around neck — proportional */}
+          {/* Stethoscope around neck — proportional, lowered 20% */}
           <svg
             className="absolute pointer-events-none"
             style={{
-              top: size * 0.44,
+              top: size * 0.528,
               left: size * 0.32,
               width: size * 0.36,
               height: size * 0.13,

@@ -254,8 +254,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         </motion.svg>
       )}
 
-      {/* Expression emoji */}
-      {emoji && !anim.isDaydreaming && (
+      {/* Expression emoji — not during doctor mode */}
+      {emoji && !anim.isDaydreaming && !anim.isDoctorMode && (
         <motion.span
           className="absolute -top-1 -right-1 z-40 text-xs pointer-events-none"
           initial={{ opacity: 0, scale: 0 }}

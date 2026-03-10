@@ -151,19 +151,20 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => clearInterval(interval);
   }, [controls]);
 
-  // Waving arm every 20s
+  // Waving arm every 20s — skip during doctor mode
   useEffect(() => {
     const doWave = () => {
+      if (isDoctorMode) return;
       setIsWaving(true);
       setExpression("waving");
       setTimeout(() => {
         setIsWaving(false);
-        setExpression(baseMood);
+        if (!isDoctorMode) setExpression(baseMood);
       }, 1800);
     };
     const interval = setInterval(doWave, 20000);
     return () => clearInterval(interval);
-  }, [baseMood]);
+  }, [baseMood, isDoctorMode]);
 
   // Daydream sequence every 30s
   useEffect(() => {

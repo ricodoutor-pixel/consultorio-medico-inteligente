@@ -192,8 +192,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         setExpression(baseMood);
       }, 7000);
     };
-    const timeout = setTimeout(doDaydream, 10000);
-    const interval = setInterval(doDaydream, 30000);
+    const timeout = setTimeout(doDaydream, 5000);
+    const interval = setInterval(doDaydream, 5000);
     return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [baseMood]);
 

@@ -9,6 +9,7 @@ import { FrogDaydream } from "./frog/FrogDaydream";
 import { FrogCrown } from "./frog/FrogCrown";
 import { FrogLoveHearts } from "./frog/FrogLoveHearts";
 import { FrogStoryScroll } from "./frog/FrogStoryScroll";
+import { FrogDoctorMode } from "./frog/FrogDoctorMode";
 
 interface FrogMascotProps {
   onClick?: () => void;
@@ -159,12 +160,19 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             style={{ clipPath: `inset(0 0 ${displaySize * 0.48}px 0)` }}
             draggable={false}
           />
-          {/* Prince Crown — only appears after princess kiss */}
+          {/* Prince Crown — only appears after princess kiss, NOT in doctor mode */}
           <AnimatePresence>
-            {anim.showCrown && <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />}
+            {anim.showCrown && !anim.isDoctorMode && <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />}
           </AnimatePresence>
         </motion.div>
       </div>
+
+      {/* Doctor Mode overlay */}
+      <FrogDoctorMode
+        size={displaySize}
+        isDoctor={anim.isDoctorMode}
+        lookingAtChart={anim.lookingAtChart}
+      />
 
       {/* Eyes + Mouth SVG overlay */}
       <svg
@@ -246,8 +254,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         </motion.svg>
       )}
 
-      {/* Expression emoji */}
-      {emoji && !anim.isDaydreaming && (
+      {/* Expression emoji — not during doctor mode */}
+      {emoji && !anim.isDaydreaming && !anim.isDoctorMode && (
         <motion.span
           className="absolute -top-1 -right-1 z-40 text-xs pointer-events-none"
           initial={{ opacity: 0, scale: 0 }}
@@ -258,10 +266,10 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         </motion.span>
       )}
 
-      {/* Love hearts floating — only during daydream */}
+      {/* Love hearts floating — only during daydream, NOT in doctor mode */}
       <FrogLoveHearts
         size={displaySize}
-        show={anim.isDaydreaming}
+        show={anim.isDaydreaming && !anim.isDoctorMode}
       />
 
       {/* Daydream bubble — princess kissing Verdinho's cheek */}

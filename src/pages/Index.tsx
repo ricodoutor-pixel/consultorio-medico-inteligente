@@ -196,7 +196,7 @@ const Index = () => {
               { icon: BookOpen, label: "Biblioteca", to: "/biblioteca", color: "purple" },
               { icon: ShoppingBag, label: "Shopping", to: "/shopping", color: "green" },
               { icon: Users, label: "Comunidade", to: "/comunidade", color: "purple" },
-              { icon: Gift, label: "Indicações", to: "/indicacoes", color: "gold" },
+              { icon: Gift, label: "Afiliados", to: "/afiliados", color: "gold" },
               { icon: HeartPulse, label: "Meu Painel", to: "/dashboard", color: "green" },
             ].map((hub, i) => (
               <motion.div key={i} variants={fadeUp}>

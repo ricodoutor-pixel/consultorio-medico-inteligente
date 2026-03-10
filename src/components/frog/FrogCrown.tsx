@@ -10,7 +10,7 @@ export const FrogCrown = memo(({ size, isHovered }: FrogCrownProps) => {
   const crownW = size * 0.38;
   const crownH = size * 0.22;
   const crownX = (size - crownW) / 2;
-  const crownY = -size * 0.08;
+  const crownY = size * 0.02;
 
   return (
     <motion.svg

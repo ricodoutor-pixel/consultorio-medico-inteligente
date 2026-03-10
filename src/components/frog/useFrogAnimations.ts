@@ -31,6 +31,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
   const [eyeSparkle, setEyeSparkle] = useState(false);
   const [headTilt, setHeadTilt] = useState(0);
   const [sneezing, setSneezing] = useState(false);
+  const [showCrown, setShowCrown] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
 
@@ -170,7 +171,11 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       setCheekBlush(0.8);
       setEyeSparkle(true);
 
-      setTimeout(() => { setDaydreamPhase("kiss"); }, 2000);
+      setTimeout(() => {
+        setDaydreamPhase("kiss");
+        setShowCrown(true);
+        setTimeout(() => setShowCrown(false), 2000);
+      }, 2000);
 
       setTimeout(() => { setDaydreamPhase("hearts"); }, 3500);
 
@@ -187,8 +192,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         setExpression(baseMood);
       }, 7000);
     };
-    const timeout = setTimeout(doDaydream, 10000);
-    const interval = setInterval(doDaydream, 30000);
+    const timeout = setTimeout(doDaydream, 5000);
+    const interval = setInterval(doDaydream, 5000);
     return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [baseMood]);
 
@@ -229,6 +234,6 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     containerRef, controls, isHovered, eyeOffset, headRotation, blink, smile,
     expression, messageBounce, isWaving, isBouncing, breathScale, tongueOut,
     cheekBlush, eyeSparkle, headTilt, sneezing, isDaydreaming, daydreamPhase,
-    onHoverStart, onHoverEnd,
+    showCrown, onHoverStart, onHoverEnd,
   };
 }

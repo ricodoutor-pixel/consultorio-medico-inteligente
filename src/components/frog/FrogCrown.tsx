@@ -10,11 +10,15 @@ export const FrogCrown = memo(({ size, isHovered }: FrogCrownProps) => {
   const crownW = size * 0.38;
   const crownH = size * 0.22;
   const crownX = (size - crownW) / 2;
-  const crownY = -size * 0.08;
+  const crownY = -size * 0.02;
 
   return (
     <motion.svg
       className="absolute pointer-events-none z-30"
+      initial={{ opacity: 0, y: -10, scale: 0.8 }}
+      animate={{ opacity: 1, y: 0, scale: isHovered ? 1.08 : 1 }}
+      exit={{ opacity: 0, y: -10, scale: 0.8 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
       style={{
         top: crownY - size * 0.02,
         left: crownX - size * 0.02,
@@ -24,8 +28,6 @@ export const FrogCrown = memo(({ size, isHovered }: FrogCrownProps) => {
           ? "drop-shadow(0 0 8px rgba(255,215,0,0.8)) drop-shadow(0 0 16px rgba(255,215,0,0.4))"
           : "drop-shadow(0 1px 2px rgba(0,0,0,0.3))",
       }}
-      animate={{ scale: isHovered ? 1.08 : 1 }}
-      transition={{ duration: 0.3 }}
       viewBox="0 0 120 70"
       fill="none"
     >

@@ -1,5 +1,5 @@
 import { memo, useState, useCallback, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import verdinhoImg from "@/assets/verdinho-mascot.png";
 import { useFrogAnimations, FrogExpression } from "./frog/useFrogAnimations";
 import { FrogEyes } from "./frog/FrogEyes";
@@ -159,8 +159,10 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             style={{ clipPath: `inset(0 0 ${displaySize * 0.48}px 0)` }}
             draggable={false}
           />
-          {/* Prince Crown */}
-          <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />
+          {/* Prince Crown — only appears after princess kiss */}
+          <AnimatePresence>
+            {anim.showCrown && <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />}
+          </AnimatePresence>
         </motion.div>
       </div>
 

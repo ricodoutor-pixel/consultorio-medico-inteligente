@@ -76,7 +76,7 @@ const alerts = [
   { type: "info", msg: "Novo vendedor cadastrado: Cannabis Pharma", time: "3h" },
 ];
 
-type Tab = "dashboard" | "users" | "webhooks" | "alerts" | "analytics";
+type Tab = "dashboard" | "users" | "webhooks" | "alerts" | "analytics" | "subscriptions";
 
 const Admin = () => {
   const [tab, setTab] = useState<Tab>("dashboard");

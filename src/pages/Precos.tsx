@@ -295,6 +295,13 @@ const Precos = () => {
       </section>
 
       <Footer />
+      <BTCPaymentModal
+        open={btcModal.open}
+        onClose={() => setBtcModal({ ...btcModal, open: false })}
+        planName={btcModal.planName}
+        planId={btcModal.planId}
+        amount={btcModal.amount}
+      />
     </div>
   );
 };

@@ -7,8 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
-import { Users, ShoppingBag, Stethoscope, DollarSign, TrendingUp, Shield, CheckCircle2, XCircle, Clock, AlertTriangle, Activity, Globe, Eye, UserPlus, LogOut, RefreshCw, Wallet, HeartPulse, BarChart3, Bell } from "lucide-react";
+import { Users, ShoppingBag, Stethoscope, DollarSign, TrendingUp, Shield, CheckCircle2, XCircle, Clock, AlertTriangle, Activity, Globe, Eye, UserPlus, LogOut, RefreshCw, Wallet, HeartPulse, BarChart3, Bell, Bitcoin, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 

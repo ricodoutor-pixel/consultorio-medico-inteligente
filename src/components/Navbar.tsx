@@ -75,6 +75,7 @@ export const Navbar = () => {
     { to: "/biblioteca", label: "Biblioteca" },
     { to: "/comunidade", label: "Comunidade" },
     { to: "/dashboard", label: "Meu Painel" },
+    { to: "/indicacoes", label: "Indicações" },
     { to: "/planos", label: "Planos" },
   ];
 

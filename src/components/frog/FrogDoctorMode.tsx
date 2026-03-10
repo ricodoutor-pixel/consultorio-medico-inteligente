@@ -135,10 +135,10 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
           <motion.svg
             className="absolute pointer-events-none"
             style={{
-              left: -size * 0.12,
-              top: size * 0.3,
+              left: -size * 0.08,
+              top: size * 0.32,
               width: size * 0.25,
-              height: size * 0.35,
+              height: size * 0.315,
             }}
             viewBox="0 0 40 55"
             fill="none"

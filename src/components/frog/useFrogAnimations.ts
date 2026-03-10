@@ -242,7 +242,12 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
 
       // Look at chart for 3s, then look at patient for 3s, repeat
       const chartCycle = setInterval(() => {
-        setLookingAtChart(prev => !prev);
+        setLookingAtChart(prev => {
+          const next = !prev;
+          // Eyes follow the chart direction
+          setEyeOffset(next ? { x: size * 0.025, y: size * 0.01 } : { x: -size * 0.01, y: 0 });
+          return next;
+        });
       }, 3000);
 
       setTimeout(() => {

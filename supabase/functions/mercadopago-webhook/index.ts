@@ -78,6 +78,7 @@ Deno.serve(async (req) => {
           });
         }
         console.log("Webhook signature verified successfully");
+      }
     }
 
     // Fetch payment details from Mercado Pago API

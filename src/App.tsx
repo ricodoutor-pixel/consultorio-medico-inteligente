@@ -88,7 +88,7 @@ const App = () => (
                 <Route path="/dashboard-especialista" element={<SpecialistDashboard />} />
                 <Route path="/influenciadores" element={<InfluencerDashboard />} />
                 <Route path="/usuarios-online" element={<OnlineUsers />} />
-                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/biblioteca" element={<BibliotecaCientifica />} />
                 <Route path="/download" element={<DownloadApp />} />

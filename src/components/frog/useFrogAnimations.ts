@@ -166,9 +166,10 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => clearInterval(interval);
   }, [baseMood, isDoctorMode]);
 
-  // Daydream sequence every 30s
+  // Daydream sequence every 30s — skip during doctor mode
   useEffect(() => {
     const doDaydream = () => {
+      if (isDoctorMode) return;
       setIsDaydreaming(true);
       setDaydreamPhase("thinking");
       setExpression("love");
@@ -193,13 +194,13 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
 
       setTimeout(() => {
         setDaydreamPhase(null);
-        setExpression(baseMood);
+        if (!isDoctorMode) setExpression(baseMood);
       }, 7000);
     };
     const timeout = setTimeout(doDaydream, 8000);
     const interval = setInterval(doDaydream, 25000);
     return () => { clearTimeout(timeout); clearInterval(interval); };
-  }, [baseMood]);
+  }, [baseMood, isDoctorMode]);
 
   // Tongue flick every 20s (not during doctor mode)
   useEffect(() => {

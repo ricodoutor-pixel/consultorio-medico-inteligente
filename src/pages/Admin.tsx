@@ -82,7 +82,26 @@ const Admin = () => {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [live, setLive] = useState(generateLiveData());
   const [timeFilter, setTimeFilter] = useState<"24h" | "7d" | "30d" | "90d">("30d");
+  const [btcSubs, setBtcSubs] = useState<any[]>([]);
+  const [loadingBtc, setLoadingBtc] = useState(false);
   const navigate = useNavigate();
+
+  const fetchBtcSubs = async () => {
+    setLoadingBtc(true);
+    const { data, error } = await supabase.from("btc_subscriptions" as any).select("*").order("created_at", { ascending: false });
+    if (data) setBtcSubs(data as any[]);
+    setLoadingBtc(false);
+  };
+
+  const handleBtcAction = async (id: string, status: "approved" | "rejected") => {
+    const { error } = await supabase.from("btc_subscriptions" as any).update({ status, updated_at: new Date().toISOString() } as any).eq("id", id);
+    if (error) {
+      toast.error("Erro ao atualizar");
+      return;
+    }
+    toast.success(status === "approved" ? "✅ Acesso liberado!" : "❌ Acesso negado");
+    fetchBtcSubs();
+  };
 
   useEffect(() => {
     const checkAuth = async () => {

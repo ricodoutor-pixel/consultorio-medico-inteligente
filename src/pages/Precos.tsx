@@ -16,6 +16,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 const Precos = () => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [btcModal, setBtcModal] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
   const plans = [
     {
       id: "essencial",

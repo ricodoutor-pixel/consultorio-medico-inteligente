@@ -88,6 +88,29 @@ const Precos = () => {
       highlighted: false,
       checkoutUrl: "https://mpago.la/1JsFwQs",
     },
+    {
+      id: "consultorio-virtual",
+      name: "Consultório Virtual",
+      price: "R$ 150",
+      priceValue: 15000,
+      period: "/mês",
+      tag: "PARA MÉDICOS",
+      description: "Plataforma completa de telemedicina para médicos de todo o mundo. Atenda, publique e cresça.",
+      features: [
+        "Uso irrestrito da telemedicina",
+        "Publicação de estudos na Biblioteca Científica",
+        "Acesso total à Comunidade Científica",
+        "Link de referência para pacientes agendarem",
+        "Consultório virtual para atendimentos externos",
+        "Prontuário digital ilimitado",
+        "Receitas digitais com assinatura",
+        "Painel de ganhos e indicações",
+        "Suporte dedicado para médicos",
+      ],
+      highlighted: false,
+      checkoutUrl: "https://link.mercadopago.com.br/consultoriovirtualmedico",
+      isDoctor: true,
+    },
   ];
 
   return (

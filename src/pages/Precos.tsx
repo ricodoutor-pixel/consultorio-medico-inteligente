@@ -184,14 +184,28 @@ const Precos = () => {
                         </li>
                       ))}
                     </ul>
-                    <Button
-                      className={`w-full font-black rounded-2xl ${isDoctor ? 'bg-blue-500 text-white hover:bg-blue-600' : plan.id === 'empresas' ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' : plan.highlighted ? 'bg-primary text-primary-foreground' : 'bg-gradient-green border border-green text-primary hover:bg-primary/20'}`}
-                      asChild
-                    >
-                      <a href={plan.checkoutUrl} target="_blank" rel="noopener noreferrer">
-                        {isDoctor ? 'Assinar Consultório' : 'Assinar Agora'} <ArrowRight size={16} className="ml-2" />
-                      </a>
-                    </Button>
+                    {(plan as any).useDynamicCheckout ? (
+                      <Button
+                        className={`w-full font-black rounded-2xl bg-blue-500 text-white hover:bg-blue-600`}
+                        onClick={() => handleDynamicCheckout(plan.id)}
+                        disabled={loadingPlan === plan.id}
+                      >
+                        {loadingPlan === plan.id ? (
+                          <><Loader2 size={16} className="mr-2 animate-spin" /> Gerando link...</>
+                        ) : (
+                          <>Assinar Consultório <ArrowRight size={16} className="ml-2" /></>
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        className={`w-full font-black rounded-2xl ${plan.id === 'empresas' ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' : plan.highlighted ? 'bg-primary text-primary-foreground' : 'bg-gradient-green border border-green text-primary hover:bg-primary/20'}`}
+                        asChild
+                      >
+                        <a href={plan.checkoutUrl} target="_blank" rel="noopener noreferrer">
+                          Assinar Agora <ArrowRight size={16} className="ml-2" />
+                        </a>
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>

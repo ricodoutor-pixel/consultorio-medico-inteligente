@@ -198,12 +198,12 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         setExpression("happy");
         setCheekBlush(0);
         setEyeSparkle(false);
-      }, 5000);
+      }, 10000);
 
       setTimeout(() => {
         setDaydreamPhase(null);
         if (!isDoctorMode) setExpression(baseMood);
-      }, 7000);
+      }, 12000);
     };
     const timeout = setTimeout(doDaydream, 8000);
     const interval = setInterval(doDaydream, 25000);

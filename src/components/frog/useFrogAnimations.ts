@@ -135,7 +135,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         setIsBouncing(false);
         setHeadTilt(0);
       }, 4000);
-    }, 12000 + Math.random() * 8000);
+    }, 20000 + Math.random() * 12000);
     return () => clearInterval(interval);
   }, [baseMood, isDoctorMode]);
 

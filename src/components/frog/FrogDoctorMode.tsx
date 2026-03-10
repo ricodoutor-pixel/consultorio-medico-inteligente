@@ -39,17 +39,25 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
               stroke="#d0d0d0"
               strokeWidth="0.8"
             />
+            {/* Collar / lapels */}
             <path d="M35 0 L50 18 L42 0 Z" fill="#e8e8e8" opacity="0.6" />
             <path d="M65 0 L50 18 L58 0 Z" fill="#e8e8e8" opacity="0.6" />
             <path d="M30 0 Q35 8 50 10 Q65 8 70 0" stroke="#ccc" strokeWidth="1.2" fill="none" />
+            {/* Pocket */}
             <rect x="60" y="25" width="18" height="14" rx="2" fill="#f0f0f0" stroke="#d0d0d0" strokeWidth="0.6" />
+            {/* Pen in pocket */}
             <rect x="66" y="20" width="2" height="10" rx="1" fill="#2563eb" />
             <circle cx="67" cy="20" r="1.5" fill="#1d4ed8" />
+            {/* Buttons */}
             <circle cx="50" cy="22" r="2" fill="#e0e0e0" stroke="#bbb" strokeWidth="0.5" />
             <circle cx="50" cy="34" r="2" fill="#e0e0e0" stroke="#bbb" strokeWidth="0.5" />
             <circle cx="50" cy="46" r="2" fill="#e0e0e0" stroke="#bbb" strokeWidth="0.5" />
+            {/* Name badge */}
             <rect x="18" y="15" width="22" height="10" rx="2" fill="#dbeafe" stroke="#93c5fd" strokeWidth="0.5" />
             <text x="29" y="22" textAnchor="middle" fontSize="4" fill="#1e40af" fontWeight="bold">Dr. Verdinho</text>
+            {/* Green cross medical symbol on pocket */}
+            <rect x="66" y="29" width="6" height="2" rx="0.5" fill="#22c55e" />
+            <rect x="68" y="27" width="2" height="6" rx="0.5" fill="#22c55e" />
             <defs>
               <linearGradient id="coatGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#ffffff" />
@@ -58,71 +66,76 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             </defs>
           </svg>
 
-          {/* Small stethoscope around neck */}
+          {/* Stethoscope around neck — proportional */}
           <svg
             className="absolute pointer-events-none"
             style={{
-              top: size * 0.42,
-              left: size * 0.3,
-              width: size * 0.4,
-              height: size * 0.15,
+              top: size * 0.44,
+              left: size * 0.32,
+              width: size * 0.36,
+              height: size * 0.13,
             }}
-            viewBox="0 0 80 35"
+            viewBox="0 0 80 30"
             fill="none"
           >
+            {/* Left tube */}
             <path
-              d="M20 2 Q16 10 18 18 Q20 26 28 28"
-              stroke="#555"
-              strokeWidth="2"
+              d="M22 2 Q18 8 19 14 Q20 20 26 24"
+              stroke="#666"
+              strokeWidth="2.2"
               strokeLinecap="round"
               fill="none"
             />
+            {/* Right tube */}
             <path
-              d="M60 2 Q64 10 62 18 Q60 26 52 28"
-              stroke="#555"
-              strokeWidth="2"
+              d="M58 2 Q62 8 61 14 Q60 20 54 24"
+              stroke="#666"
+              strokeWidth="2.2"
               strokeLinecap="round"
               fill="none"
             />
-            <circle cx="28" cy="28" r="3" fill="#666" stroke="#444" strokeWidth="0.8" />
-            <circle cx="28" cy="28" r="1.5" fill="#888" />
-            <circle cx="52" cy="28" r="3" fill="#666" stroke="#444" strokeWidth="0.8" />
-            <circle cx="52" cy="28" r="1.5" fill="#888" />
+            {/* Left earpiece */}
+            <circle cx="26" cy="24" r="2.5" fill="#555" stroke="#444" strokeWidth="0.6" />
+            <circle cx="26" cy="24" r="1.2" fill="#777" />
+            {/* Right earpiece */}
+            <circle cx="54" cy="24" r="2.5" fill="#555" stroke="#444" strokeWidth="0.6" />
+            <circle cx="54" cy="24" r="1.2" fill="#777" />
+            {/* Chest piece hanging */}
+            <path d="M40 14 L40 26" stroke="#666" strokeWidth="1.8" strokeLinecap="round" />
+            <circle cx="40" cy="27" r="3.5" fill="#888" stroke="#555" strokeWidth="1" />
+            <circle cx="40" cy="27" r="1.8" fill="#aaa" />
           </svg>
 
-          {/* Glasses on eyes */}
+          {/* Head mirror on forehead */}
           <svg
             className="absolute pointer-events-none"
             style={{
-              top: size * 0.22,
-              left: size * 0.18,
-              width: size * 0.64,
-              height: size * 0.18,
+              top: size * 0.12,
+              left: size * 0.38,
+              width: size * 0.24,
+              height: size * 0.1,
             }}
-            viewBox="0 0 80 22"
+            viewBox="0 0 50 20"
             fill="none"
           >
-            {/* Left lens */}
-            <ellipse cx="22" cy="11" rx="14" ry="9" fill="none" stroke="#333" strokeWidth="2" />
-            <ellipse cx="22" cy="11" rx="14" ry="9" fill="hsl(200 80% 90%)" opacity="0.15" />
-            {/* Right lens */}
-            <ellipse cx="58" cy="11" rx="14" ry="9" fill="none" stroke="#333" strokeWidth="2" />
-            <ellipse cx="58" cy="11" rx="14" ry="9" fill="hsl(200 80% 90%)" opacity="0.15" />
-            {/* Bridge */}
-            <path d="M36 11 Q40 7 44 11" stroke="#333" strokeWidth="2" fill="none" />
-            {/* Temple arms */}
-            <line x1="8" y1="8" x2="0" y2="6" stroke="#333" strokeWidth="2" strokeLinecap="round" />
-            <line x1="72" y1="8" x2="80" y2="6" stroke="#333" strokeWidth="2" strokeLinecap="round" />
-            {/* Lens shine */}
-            <ellipse cx="17" cy="8" rx="4" ry="2.5" fill="white" opacity="0.3" transform="rotate(-15 17 8)" />
-            <ellipse cx="53" cy="8" rx="4" ry="2.5" fill="white" opacity="0.3" transform="rotate(-15 53 8)" />
+            {/* Band */}
+            <path d="M5 12 Q25 4 45 12" stroke="#888" strokeWidth="1.5" fill="none" />
+            {/* Mirror disc */}
+            <circle cx="25" cy="8" r="6" fill="url(#mirrorGrad)" stroke="#999" strokeWidth="1" />
+            <circle cx="23" cy="6" r="2" fill="white" opacity="0.6" />
+            <defs>
+              <radialGradient id="mirrorGrad" cx="40%" cy="35%">
+                <stop offset="0%" stopColor="#f0f0f0" />
+                <stop offset="100%" stopColor="#c0c0c0" />
+              </radialGradient>
+            </defs>
           </svg>
 
-          {/* Clipboard/chart in right hand — frog looks at it */}
+          {/* Clipboard/chart in LEFT hand */}
           <motion.svg
             className="absolute pointer-events-none"
             style={{
-              right: -size * 0.2,
+              left: -size * 0.22,
               top: size * 0.25,
               width: size * 0.3,
               height: size * 0.4,
@@ -132,7 +145,7 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             animate={{
               opacity: lookingAtChart ? 1 : 0.5,
               scale: lookingAtChart ? 1.05 : 0.95,
-              rotate: lookingAtChart ? -3 : 0,
+              rotate: lookingAtChart ? 3 : 0,
             }}
             transition={{ duration: 0.8 }}
           >

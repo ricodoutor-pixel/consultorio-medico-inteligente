@@ -1,16 +1,20 @@
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, ArrowRight, Users, Stethoscope } from "lucide-react";
+import { CheckCircle2, ArrowRight, Users, Stethoscope, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 const Precos = () => {
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const plans = [
     {
       id: "essencial",
@@ -108,10 +112,33 @@ const Precos = () => {
         "Suporte dedicado para médicos",
       ],
       highlighted: false,
-      checkoutUrl: "https://link.mercadopago.com.br/consultoriovirtualmedico",
+      checkoutUrl: "",
       isDoctor: true,
+      useDynamicCheckout: true,
     },
   ];
+
+  const handleDynamicCheckout = async (planId: string) => {
+    setLoadingPlan(planId);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-subscription", {
+        body: { planId, payerEmail: "" },
+      });
+
+      if (error) throw error;
+
+      if (data?.init_point) {
+        window.open(data.init_point, "_blank");
+      } else {
+        toast.error("Erro ao gerar link de pagamento");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      toast.error("Erro ao processar. Tente novamente.");
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -157,14 +184,28 @@ const Precos = () => {
                         </li>
                       ))}
                     </ul>
-                    <Button
-                      className={`w-full font-black rounded-2xl ${isDoctor ? 'bg-blue-500 text-white hover:bg-blue-600' : plan.id === 'empresas' ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' : plan.highlighted ? 'bg-primary text-primary-foreground' : 'bg-gradient-green border border-green text-primary hover:bg-primary/20'}`}
-                      asChild
-                    >
-                      <a href={plan.checkoutUrl} target="_blank" rel="noopener noreferrer">
-                        {isDoctor ? 'Assinar Consultório' : 'Assinar Agora'} <ArrowRight size={16} className="ml-2" />
-                      </a>
-                    </Button>
+                    {(plan as any).useDynamicCheckout ? (
+                      <Button
+                        className={`w-full font-black rounded-2xl bg-blue-500 text-white hover:bg-blue-600`}
+                        onClick={() => handleDynamicCheckout(plan.id)}
+                        disabled={loadingPlan === plan.id}
+                      >
+                        {loadingPlan === plan.id ? (
+                          <><Loader2 size={16} className="mr-2 animate-spin" /> Gerando link...</>
+                        ) : (
+                          <>Assinar Consultório <ArrowRight size={16} className="ml-2" /></>
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        className={`w-full font-black rounded-2xl ${plan.id === 'empresas' ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' : plan.highlighted ? 'bg-primary text-primary-foreground' : 'bg-gradient-green border border-green text-primary hover:bg-primary/20'}`}
+                        asChild
+                      >
+                        <a href={plan.checkoutUrl} target="_blank" rel="noopener noreferrer">
+                          Assinar Agora <ArrowRight size={16} className="ml-2" />
+                        </a>
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>

@@ -111,9 +111,10 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Random personality shifts — varied expressions (every 12-20s, lasts 4s)
+  // Random personality shifts — varied expressions (every 12-20s, lasts 4s) — skip during doctor mode
   useEffect(() => {
     const interval = setInterval(() => {
+      if (isDoctorMode) return;
       const safeMoods = ALL_MOODS.filter(mood => mood !== "love" && mood !== "angry");
       const m = safeMoods[Math.floor(Math.random() * safeMoods.length)];
       setAutoMood(m as FrogExpression);
@@ -127,7 +128,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
 
       setTimeout(() => {
         setAutoMood(null);
-        setExpression(baseMood);
+        if (!isDoctorMode) setExpression(baseMood);
         setCheekBlush(0);
         setEyeSparkle(false);
         setSneezing(false);
@@ -136,7 +137,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       }, 4000);
     }, 12000 + Math.random() * 8000);
     return () => clearInterval(interval);
-  }, [baseMood]);
+  }, [baseMood, isDoctorMode]);
 
   // Idle bounce
   useEffect(() => {

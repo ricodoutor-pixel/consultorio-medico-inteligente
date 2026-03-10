@@ -99,7 +99,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <section className="pt-28 pb-20 hero-glow">
+      <section className="pt-24 pb-16 md:pt-32 hero-glow">
         <div className="container mx-auto px-4 flex justify-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} className="w-full max-w-md">
             <div className="flex items-center gap-3 mb-6 justify-center">

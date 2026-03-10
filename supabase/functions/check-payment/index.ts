@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
 
     const { data: appt } = await supabase
       .from("appointments")
-      .select("id, patient_id, doctor_id, payment_status, status, payment_id, scheduled_at")
+      .select("id, patient_id, doctor_id, payment_status, status, payment_id, scheduled_at, amount")
       .eq("id", appointmentId)
       .maybeSingle();
 

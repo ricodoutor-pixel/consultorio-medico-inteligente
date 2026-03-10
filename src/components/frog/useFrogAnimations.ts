@@ -199,14 +199,44 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [baseMood]);
 
-  // Tongue flick every 20s
+  // Tongue flick every 20s (not during doctor mode)
   useEffect(() => {
     const interval = setInterval(() => {
-      setTongueOut(true);
-      setTimeout(() => setTongueOut(false), 600);
+      if (!isDoctorMode) {
+        setTongueOut(true);
+        setTimeout(() => setTongueOut(false), 600);
+      }
     }, 20000 + Math.random() * 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isDoctorMode]);
+
+  // Doctor mode — every 30s, lasts 10s
+  useEffect(() => {
+    const doDoctorMode = () => {
+      setIsDoctorMode(true);
+      setShowCrown(false);
+      setIsDaydreaming(false);
+      setDaydreamPhase(null);
+      setIsWaving(false);
+      setExpression("thinking");
+      setLookingAtChart(true);
+
+      // Look at chart for 3s, then look at patient for 3s, repeat
+      const chartCycle = setInterval(() => {
+        setLookingAtChart(prev => !prev);
+      }, 3000);
+
+      setTimeout(() => {
+        clearInterval(chartCycle);
+        setIsDoctorMode(false);
+        setLookingAtChart(false);
+        setExpression(baseMood);
+      }, 10000);
+    };
+
+    const interval = setInterval(doDoctorMode, 30000);
+    return () => clearInterval(interval);
+  }, [baseMood]);
 
   // New message bounce
   useEffect(() => {

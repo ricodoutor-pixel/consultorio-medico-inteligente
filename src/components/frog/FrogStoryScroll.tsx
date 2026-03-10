@@ -306,7 +306,7 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
 
                   {storyLines.map((line, i) => {
                     if (line === "") {
-                      return <div key={i} style={{ height: 6 }} />;
+                      return <div key={i} style={{ height: 8 }} />;
                     }
                     const isSection = /^[🩺📋🛒👥📚💳🎯📊]/.test(line);
                     return (

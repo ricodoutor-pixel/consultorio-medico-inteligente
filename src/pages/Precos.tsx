@@ -112,10 +112,33 @@ const Precos = () => {
         "Suporte dedicado para médicos",
       ],
       highlighted: false,
-      checkoutUrl: "https://link.mercadopago.com.br/consultoriovirtualmedico",
+      checkoutUrl: "",
       isDoctor: true,
+      useDynamicCheckout: true,
     },
   ];
+
+  const handleDynamicCheckout = async (planId: string) => {
+    setLoadingPlan(planId);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-subscription", {
+        body: { planId, payerEmail: "" },
+      });
+
+      if (error) throw error;
+
+      if (data?.init_point) {
+        window.open(data.init_point, "_blank");
+      } else {
+        toast.error("Erro ao gerar link de pagamento");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      toast.error("Erro ao processar. Tente novamente.");
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">

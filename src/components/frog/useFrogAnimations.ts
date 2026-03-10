@@ -198,12 +198,12 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         setExpression("happy");
         setCheekBlush(0);
         setEyeSparkle(false);
-      }, 5000);
+      }, 10000);
 
       setTimeout(() => {
         setDaydreamPhase(null);
         if (!isDoctorMode) setExpression(baseMood);
-      }, 7000);
+      }, 12000);
     };
     const timeout = setTimeout(doDaydream, 8000);
     const interval = setInterval(doDaydream, 25000);
@@ -231,6 +231,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       setIsWaving(false);
       setExpression("thinking");
       setLookingAtChart(true);
+      // Eyes look toward the chart (right side)
+      setEyeOffset({ x: size * 0.025, y: size * 0.01 });
 
       // 3 bounces when entering doctor mode
       controls.start({
@@ -240,7 +242,12 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
 
       // Look at chart for 3s, then look at patient for 3s, repeat
       const chartCycle = setInterval(() => {
-        setLookingAtChart(prev => !prev);
+        setLookingAtChart(prev => {
+          const next = !prev;
+          // Eyes follow the chart direction
+          setEyeOffset(next ? { x: size * 0.025, y: size * 0.01 } : { x: -size * 0.01, y: 0 });
+          return next;
+        });
       }, 3000);
 
       setTimeout(() => {

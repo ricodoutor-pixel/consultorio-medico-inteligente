@@ -159,8 +159,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             style={{ clipPath: `inset(0 0 ${displaySize * 0.48}px 0)` }}
             draggable={false}
           />
-          {/* Prince Crown */}
-          <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />
+          {/* Prince Crown — only appears after princess kiss */}
+          {anim.showCrown && <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />}
         </motion.div>
       </div>
 

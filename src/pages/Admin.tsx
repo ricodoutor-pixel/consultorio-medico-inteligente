@@ -163,6 +163,7 @@ const Admin = () => {
             {([
               { key: "dashboard" as Tab, label: "Dashboard", icon: BarChart3 },
               { key: "analytics" as Tab, label: "Analytics", icon: TrendingUp },
+              { key: "subscriptions" as Tab, label: "Assinaturas BTC", icon: Bitcoin },
               { key: "users" as Tab, label: "Usuários", icon: Users },
               { key: "webhooks" as Tab, label: "Webhooks", icon: Activity },
               { key: "alerts" as Tab, label: "Alertas", icon: Bell },

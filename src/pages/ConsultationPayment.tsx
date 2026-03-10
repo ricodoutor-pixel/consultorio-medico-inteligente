@@ -22,7 +22,27 @@ const ConsultationPayment = () => {
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const commission = pro.priceValue * 0.1;
+  const [isExempt, setIsExempt] = useState(false);
+
+  // Check if the doctor has an active Consultório Virtual subscription (exempt from 7% fee)
+  useEffect(() => {
+    const checkExemption = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.email) return;
+      const { data } = await supabase
+        .from("btc_subscriptions")
+        .select("status, plan_id")
+        .eq("email", session.user.email)
+        .eq("plan_id", "consultorio-virtual")
+        .eq("status", "approved")
+        .limit(1);
+      if (data && data.length > 0) setIsExempt(true);
+    };
+    checkExemption();
+  }, []);
+
+  const feeRate = isExempt ? 0 : 0.07;
+  const commission = pro.priceValue * feeRate;
   const total = pro.priceValue;
 
   // Create Mercado Pago payment preference on mount

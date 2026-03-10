@@ -174,7 +174,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       setTimeout(() => {
         setDaydreamPhase("kiss");
         setShowCrown(true);
-        setTimeout(() => setShowCrown(false), 2000);
+        setTimeout(() => setShowCrown(false), 10000);
       }, 2000);
 
       setTimeout(() => { setDaydreamPhase("hearts"); }, 3500);
@@ -193,7 +193,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       }, 7000);
     };
     const timeout = setTimeout(doDaydream, 5000);
-    const interval = setInterval(doDaydream, 5000);
+    const interval = setInterval(doDaydream, 15000);
     return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [baseMood]);
 

@@ -111,7 +111,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Random personality shifts — varied expressions
+  // Random personality shifts — varied expressions (every 12-20s, lasts 4s)
   useEffect(() => {
     const interval = setInterval(() => {
       const safeMoods = ALL_MOODS.filter(mood => mood !== "love" && mood !== "angry");
@@ -133,8 +133,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         setSneezing(false);
         setIsBouncing(false);
         setHeadTilt(0);
-      }, 3000);
-    }, 8000 + Math.random() * 7000);
+      }, 4000);
+    }, 12000 + Math.random() * 8000);
     return () => clearInterval(interval);
   }, [baseMood]);
 
@@ -150,7 +150,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => clearInterval(interval);
   }, [controls]);
 
-  // Waving arm every 15s
+  // Waving arm every 20s
   useEffect(() => {
     const doWave = () => {
       setIsWaving(true);
@@ -158,9 +158,9 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       setTimeout(() => {
         setIsWaving(false);
         setExpression(baseMood);
-      }, 1500);
+      }, 1800);
     };
-    const interval = setInterval(doWave, 15000);
+    const interval = setInterval(doWave, 20000);
     return () => clearInterval(interval);
   }, [baseMood]);
 
@@ -194,8 +194,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         setExpression(baseMood);
       }, 7000);
     };
-    const timeout = setTimeout(doDaydream, 5000);
-    const interval = setInterval(doDaydream, 15000);
+    const timeout = setTimeout(doDaydream, 8000);
+    const interval = setInterval(doDaydream, 25000);
     return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [baseMood]);
 
@@ -234,7 +234,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       }, 10000);
     };
 
-    const interval = setInterval(doDoctorMode, 30000);
+    const interval = setInterval(doDoctorMode, 40000);
     return () => clearInterval(interval);
   }, [baseMood]);
 

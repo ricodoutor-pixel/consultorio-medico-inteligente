@@ -181,8 +181,8 @@ const SparkleText = memo(({ text, color, fontSize, fontWeight, isHeading }: {
 SparkleText.displayName = "SparkleText";
 
 export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
-  const w = 140;
-  const h = 120;
+  const w = 180;
+  const h = 140;
 
   return (
     <AnimatePresence>

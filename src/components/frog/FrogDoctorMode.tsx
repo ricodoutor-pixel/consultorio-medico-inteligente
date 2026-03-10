@@ -178,13 +178,13 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             <ellipse cx="10" cy="8" rx="6" ry="4.5" fill="#6ecf6e" opacity="0.7" />
           </svg>
 
-          {/* Stethoscope emoji floating */}
+          {/* Doctor briefcase emoji floating */}
           <motion.span
             className="absolute -top-1 -right-1 text-sm z-40"
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
-            🩺
+            👔
           </motion.span>
         </motion.div>
       )}

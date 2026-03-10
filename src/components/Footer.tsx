@@ -27,7 +27,7 @@ export const Footer = () => {
                 { to: "/profissionais", label: "Profissionais" },
                 { to: "/shopping", label: "Shopping" },
                 { to: "/biblioteca", label: "Biblioteca" },
-                { to: "/indicacoes", label: "Indicações" },
+                { to: "/afiliados", label: "Afiliados" },
                 { to: "/planos", label: "Planos" },
                 { to: "/cadastro", label: "Cadastro" },
               ].map((link) => (

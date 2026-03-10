@@ -26,70 +26,59 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
           exit={{ opacity: 0, scale: 0.2, rotate: 10 }}
           transition={{ duration: 0.5, ease: "backOut" }}
         >
-          {/* Thought bubble trail — more elegant */}
-          <svg className="absolute" style={{ bottom: -size * 0.1, left: -16, width: 24, height: 32 }}>
-            <circle cx="18" cy="25" r="4.5" fill="white" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.9">
-              <animate attributeName="r" values="4;5;4" dur="2s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="10" cy="15" r="3.5" fill="white" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.8">
-              <animate attributeName="r" values="3;4;3" dur="2.2s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="5" cy="6" r="2.5" fill="white" stroke="hsl(var(--border))" strokeWidth="0.5" opacity="0.7">
-              <animate attributeName="r" values="2;3;2" dur="2.4s" repeatCount="indefinite" />
-            </circle>
+          {/* Comic-style thought bubble trail */}
+          <svg className="absolute" style={{ bottom: -size * 0.12, left: -20, width: 30, height: 40 }}>
+            <circle cx="22" cy="32" r="6" fill="white" stroke="#222" strokeWidth="1.5" />
+            <circle cx="13" cy="20" r="4.5" fill="white" stroke="#222" strokeWidth="1.5" />
+            <circle cx="6" cy="9" r="3" fill="white" stroke="#222" strokeWidth="1.5" />
           </svg>
 
-          {/* Main thought cloud — dreamy romantic scene */}
+          {/* Main comic thought cloud */}
           <motion.div
             className="relative w-full h-full overflow-hidden flex items-center justify-center"
             style={{
-              borderRadius: "50% 50% 48% 45%",
-              background: "radial-gradient(ellipse at 30% 25%, rgba(255,255,255,0.99), rgba(255,235,245,0.96) 40%, rgba(255,200,230,0.9) 70%, rgba(255,182,220,0.85))",
+              borderRadius: "50% 45% 48% 52% / 48% 50% 45% 52%",
+              background: "radial-gradient(ellipse at 35% 30%, #ffffff, #fff8fc 50%, #fff0f6 80%, #ffe8f0)",
               boxShadow: `
-                0 8px 40px rgba(255,105,180,0.4), 
-                inset 0 4px 20px rgba(255,255,255,0.85), 
-                0 0 60px rgba(255,182,193,0.35),
-                0 0 100px rgba(255,105,180,0.2)
+                0 0 0 3px #222,
+                0 0 0 5px white,
+                0 8px 30px rgba(0,0,0,0.25),
+                inset 0 4px 20px rgba(255,255,255,0.9)
               `,
-              border: "2px solid rgba(255,200,220,0.5)",
+              border: "3px solid #333",
             }}
           >
-            {/* Animated magical aura */}
+            {/* Comic-style inner bumps (cloud shape illusion) */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+              borderRadius: "50% 45% 48% 52% / 48% 50% 45% 52%",
+              boxShadow: `
+                inset 8px -4px 0 -2px rgba(255,255,255,0.6),
+                inset -6px 6px 0 -2px rgba(255,255,255,0.4)
+              `,
+            }} />
+
+            {/* Soft golden glow */}
             <motion.div
               className="absolute inset-0 rounded-full"
               style={{
-                background: "radial-gradient(circle at 50% 50%, rgba(255,215,0,0.2), rgba(255,182,193,0.15), transparent 65%)",
+                background: "radial-gradient(circle at 50% 50%, rgba(255,215,0,0.12), transparent 60%)",
               }}
-              animate={{ 
-                scale: [1, 1.08, 1], 
-                opacity: [0.4, 0.8, 0.4],
-                rotate: [0, 5, 0],
-              }}
+              animate={{ opacity: [0.3, 0.7, 0.3] }}
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             />
 
-            {/* Secondary purple aura */}
-            <motion.div
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: "radial-gradient(circle at 70% 70%, rgba(139,92,246,0.1), transparent 50%)",
-              }}
-              animate={{ opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            />
-
-            {/* Princess image with enhanced romantic effects */}
+            {/* Princess image — clear and bright */}
             <motion.img
               src={princessImg}
               alt="Princesa beijando o sapo"
-              className="w-[92%] h-[92%] object-contain relative z-10"
+              className="w-[88%] h-[88%] object-contain relative z-10"
               style={{
-                filter: "drop-shadow(0 6px 16px rgba(255,105,180,0.5)) drop-shadow(0 0 12px rgba(255,215,0,0.4)) saturate(1.1) brightness(1.05)",
+                filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.2)) saturate(1.15) brightness(1.08) contrast(1.05)",
               }}
               animate={
                 daydreamPhase === "kiss"
-                  ? { 
-                      scale: [1, 1.1, 1.05, 1.1, 1], 
+                  ? {
+                      scale: [1, 1.1, 1.05, 1.1, 1],
                       rotate: [0, -3, 3, -2, 0],
                       y: [0, -3, 0, -2, 0],
                     }
@@ -98,29 +87,23 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             />
 
-            {/* Sparkles overlay — more dynamic */}
+            {/* Comic sparkles — small and clean */}
             {[
-              { cx: "6%", cy: "10%", dur: "1.3s", emoji: "✨", size: "9px" },
-              { cx: "92%", cy: "14%", dur: "1.6s", emoji: "⭐", size: "10px" },
-              { cx: "8%", cy: "85%", dur: "1.8s", emoji: "✨", size: "8px" },
-              { cx: "88%", cy: "82%", dur: "1.4s", emoji: "💫", size: "9px" },
-              { cx: "50%", cy: "5%", dur: "2s", emoji: "👑", size: "11px" },
-              { cx: "20%", cy: "20%", dur: "1.2s", emoji: "✨", size: "7px" },
-              { cx: "78%", cy: "25%", dur: "1.5s", emoji: "✨", size: "8px" },
-              { cx: "15%", cy: "60%", dur: "1.7s", emoji: "💖", size: "8px" },
-              { cx: "85%", cy: "55%", dur: "1.9s", emoji: "💕", size: "7px" },
+              { cx: "8%", cy: "10%", dur: "1.3s", emoji: "✨", size: "9px" },
+              { cx: "90%", cy: "12%", dur: "1.6s", emoji: "⭐", size: "9px" },
+              { cx: "10%", cy: "85%", dur: "1.8s", emoji: "✨", size: "8px" },
+              { cx: "88%", cy: "80%", dur: "1.4s", emoji: "💫", size: "8px" },
+              { cx: "50%", cy: "6%", dur: "2s", emoji: "👑", size: "10px" },
             ].map((s, i) => (
               <motion.div
                 key={i}
                 className="absolute"
                 style={{ left: s.cx, top: s.cy, fontSize: s.size }}
-                animate={{ 
-                  opacity: [0.2, 1, 0.2], 
-                  scale: [0.6, 1.4, 0.6], 
-                  rotate: [0, 180, 360],
-                  y: [0, -3, 0],
+                animate={{
+                  opacity: [0.2, 1, 0.2],
+                  scale: [0.6, 1.3, 0.6],
                 }}
-                transition={{ duration: parseFloat(s.dur), repeat: Infinity, delay: i * 0.12 }}
+                transition={{ duration: parseFloat(s.dur), repeat: Infinity, delay: i * 0.15 }}
               >
                 {s.emoji}
               </motion.div>
@@ -147,27 +130,18 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
                 >
                   💕
                 </motion.div>
-                <motion.div
-                  className="absolute"
-                  style={{ top: "20%", right: "8%", fontSize: "9px" }}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: [0, 1.1, 0.9] }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                >
-                  💗
-                </motion.div>
               </>
             )}
 
-            {/* Floating hearts around princess during kiss */}
+            {/* Floating hearts during kiss */}
             {daydreamPhase === "kiss" && (
               <>
                 {[0, 1, 2, 3].map((i) => (
                   <motion.span
                     key={`float-heart-${i}`}
                     className="absolute"
-                    style={{ 
-                      left: `${20 + i * 18}%`, 
+                    style={{
+                      left: `${20 + i * 18}%`,
                       bottom: "55%",
                       fontSize: "10px",
                     }}
@@ -180,17 +154,9 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
                 ))}
               </>
             )}
-
-            {/* Soft vignette overlay */}
-            <div 
-              className="absolute inset-0 rounded-full pointer-events-none"
-              style={{
-                background: "radial-gradient(circle at 50% 50%, transparent 40%, rgba(255,182,220,0.2) 100%)",
-              }}
-            />
           </motion.div>
 
-          {/* Hearts explosion phase — more dramatic */}
+          {/* Hearts explosion phase */}
           {daydreamPhase === "hearts" && (
             <div className="absolute inset-0">
               {Array.from({ length: 10 }).map((_, i) => {

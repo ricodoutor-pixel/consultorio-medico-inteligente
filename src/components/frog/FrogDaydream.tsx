@@ -13,7 +13,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
 
   const bubbleSize = size * 0.86;
   const bubbleX = size * 1.05;
-  const bubbleY = -bubbleSize * 0.15;
+  const bubbleY = -bubbleSize * 0.05;
 
   return (
     <AnimatePresence>

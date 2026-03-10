@@ -160,7 +160,9 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             draggable={false}
           />
           {/* Prince Crown — only appears after princess kiss */}
-          {anim.showCrown && <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />}
+          <AnimatePresence>
+            {anim.showCrown && <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />}
+          </AnimatePresence>
         </motion.div>
       </div>
 

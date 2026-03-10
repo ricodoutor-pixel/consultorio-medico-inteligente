@@ -74,10 +74,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       title="Toque 2x para conversar com o Verdinho 🐸"
       whileTap={{ scale: 0.9, rotate: -5 }}
       whileHover={{ scale: 2 }}
-      animate={{
-        width: displaySize,
-        height: displaySize,
-      }}
+      animate={anim.controls}
+      initial={{ width: displaySize, height: displaySize }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       style={{ width: displaySize, height: displaySize }}
     >

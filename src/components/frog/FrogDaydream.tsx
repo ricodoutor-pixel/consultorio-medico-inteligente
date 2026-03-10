@@ -33,7 +33,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
             <circle cx="6" cy="9" r="3" fill="white" stroke="#222" strokeWidth="1.5" />
           </svg>
 
-          {/* Main comic thought cloud */}
+          {/* Main comic thought cloud — princess only */}
           <motion.div
             className="relative w-full h-full overflow-hidden flex items-center justify-center"
             style={{
@@ -48,15 +48,6 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               border: "3px solid #333",
             }}
           >
-            {/* Comic-style inner bumps (cloud shape illusion) */}
-            <div className="absolute inset-0 pointer-events-none" style={{
-              borderRadius: "50% 45% 48% 52% / 48% 50% 45% 52%",
-              boxShadow: `
-                inset 8px -4px 0 -2px rgba(255,255,255,0.6),
-                inset -6px 6px 0 -2px rgba(255,255,255,0.4)
-              `,
-            }} />
-
             {/* Soft golden glow */}
             <motion.div
               className="absolute inset-0 rounded-full"
@@ -67,7 +58,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             />
 
-            {/* Princess image — clear and bright */}
+            {/* Princess image — only element inside bubble */}
             <motion.img
               src={princessImg}
               alt="Princesa beijando o sapo"
@@ -86,104 +77,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               }
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             />
-
-            {/* Comic sparkles — small and clean */}
-            {[
-              { cx: "8%", cy: "10%", dur: "1.3s", emoji: "✨", size: "9px" },
-              { cx: "90%", cy: "12%", dur: "1.6s", emoji: "⭐", size: "9px" },
-              { cx: "10%", cy: "85%", dur: "1.8s", emoji: "✨", size: "8px" },
-              { cx: "88%", cy: "80%", dur: "1.4s", emoji: "💫", size: "8px" },
-              { cx: "50%", cy: "6%", dur: "2s", emoji: "👑", size: "10px" },
-            ].map((s, i) => (
-              <motion.div
-                key={i}
-                className="absolute"
-                style={{ left: s.cx, top: s.cy, fontSize: s.size }}
-                animate={{
-                  opacity: [0.2, 1, 0.2],
-                  scale: [0.6, 1.3, 0.6],
-                }}
-                transition={{ duration: parseFloat(s.dur), repeat: Infinity, delay: i * 0.15 }}
-              >
-                {s.emoji}
-              </motion.div>
-            ))}
-
-            {/* Kiss marks during kiss phase */}
-            {(daydreamPhase === "kiss" || daydreamPhase === "hearts") && (
-              <>
-                <motion.div
-                  className="absolute"
-                  style={{ bottom: "15%", left: "10%", fontSize: "14px" }}
-                  initial={{ scale: 0, rotate: -25 }}
-                  animate={{ scale: [0, 1.4, 1.1], rotate: [-25, 0, -8] }}
-                  transition={{ duration: 0.6 }}
-                >
-                  💋
-                </motion.div>
-                <motion.div
-                  className="absolute"
-                  style={{ bottom: "28%", left: "5%", fontSize: "10px" }}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: [0, 1.2, 1], opacity: [0, 1, 0.85] }}
-                  transition={{ duration: 0.7, delay: 0.15 }}
-                >
-                  💕
-                </motion.div>
-              </>
-            )}
-
-            {/* Floating hearts during kiss */}
-            {daydreamPhase === "kiss" && (
-              <>
-                {[0, 1, 2, 3].map((i) => (
-                  <motion.span
-                    key={`float-heart-${i}`}
-                    className="absolute"
-                    style={{
-                      left: `${20 + i * 18}%`,
-                      bottom: "55%",
-                      fontSize: "10px",
-                    }}
-                    initial={{ y: 0, opacity: 0, scale: 0.5 }}
-                    animate={{ y: -25, opacity: [0, 1, 0], scale: [0.5, 1.2, 0.8] }}
-                    transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.35 }}
-                  >
-                    {i % 2 === 0 ? "💗" : "💕"}
-                  </motion.span>
-                ))}
-              </>
-            )}
           </motion.div>
-
-          {/* Hearts explosion phase */}
-          {daydreamPhase === "hearts" && (
-            <div className="absolute inset-0">
-              {Array.from({ length: 10 }).map((_, i) => {
-                const angle = (i / 10) * Math.PI * 2;
-                const dist = bubbleSize * 0.75;
-                const emojis = ["💕", "👑", "✨", "💋", "💗", "⭐", "💖", "🌸", "💫", "🦋"];
-                return (
-                  <motion.span
-                    key={i}
-                    className="absolute pointer-events-none"
-                    style={{ left: "50%", top: "50%", fontSize: "12px" }}
-                    initial={{ x: 0, y: 0, opacity: 1, scale: 0.4, rotate: 0 }}
-                    animate={{
-                      x: Math.cos(angle) * dist,
-                      y: Math.sin(angle) * dist,
-                      opacity: 0,
-                      scale: 1.5,
-                      rotate: 180,
-                    }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
-                  >
-                    {emojis[i]}
-                  </motion.span>
-                );
-              })}
-            </div>
-          )}
         </motion.div>
       )}
     </AnimatePresence>

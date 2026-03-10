@@ -46,18 +46,15 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
   const lastTapRef = useRef(0);
   const touchTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // Double-tap/double-click to open chat; single tap enlarges on mobile
   const handleInteraction = useCallback(() => {
     const now = Date.now();
     const delta = now - lastTapRef.current;
     lastTapRef.current = now;
 
     if (delta < 400) {
-      // Double tap/click → open chat
       onClick?.();
       setIsTouched(false);
     } else {
-      // Single tap → enlarge temporarily
       setIsTouched(true);
       if (touchTimeoutRef.current) clearTimeout(touchTimeoutRef.current);
       touchTimeoutRef.current = setTimeout(() => setIsTouched(false), 2500);
@@ -114,96 +111,90 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         />
       )}
 
-      {/* BODY layer — breathing scale (hidden in doctor mode) */}
-      {!anim.isDoctorMode && (
+      {/* BODY layer — breathing scale (always visible, doctor overlays on top) */}
+      <motion.div
+        className="relative z-10"
+        animate={{ scaleY: anim.breathScale }}
+        transition={{ duration: 0 }}
+        style={{ transformOrigin: "50% 100%" }}
+      >
+        <img
+          src={verdinhoImg}
+          alt=""
+          width={displaySize}
+          height={displaySize}
+          className="drop-shadow-lg pointer-events-none"
+          style={{ clipPath: `inset(${displaySize * 0.45}px 0 0 0)` }}
+          draggable={false}
+        />
+
+        <FrogAccessories
+          size={displaySize}
+          isWaving={anim.isWaving}
+          expression={anim.expression}
+          cheekBlush={anim.cheekBlush}
+        />
+      </motion.div>
+
+      {/* HEAD layer — 3D perspective (always visible) */}
+      <div className="absolute inset-0 z-20" style={{ perspective: 600 }}>
         <motion.div
-          className="relative z-10"
-          animate={{ scaleY: anim.breathScale }}
-          transition={{ duration: 0 }}
-          style={{ transformOrigin: "50% 100%" }}
+          className="w-full h-full"
+          animate={{
+            rotateY: anim.headRotation.x,
+            rotateX: anim.headRotation.y,
+            rotate: anim.headTilt,
+          }}
+          transition={{ type: "spring", stiffness: 120, damping: 14, mass: 0.6 }}
+          style={{ transformStyle: "preserve-3d", transformOrigin: "50% 55%" }}
         >
           <img
             src={verdinhoImg}
-            alt=""
+            alt="Verdinho - Assistente IA"
             width={displaySize}
             height={displaySize}
             className="drop-shadow-lg pointer-events-none"
-            style={{ clipPath: `inset(${displaySize * 0.45}px 0 0 0)` }}
+            style={{ clipPath: `inset(0 0 ${displaySize * 0.48}px 0)` }}
             draggable={false}
           />
-
-          <FrogAccessories
-            size={displaySize}
-            isWaving={anim.isWaving}
-            expression={anim.expression}
-            cheekBlush={anim.cheekBlush}
-          />
+          {/* Prince Crown — only appears after princess kiss, NOT in doctor mode */}
+          <AnimatePresence>
+            {anim.showCrown && !anim.isDoctorMode && <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />}
+          </AnimatePresence>
         </motion.div>
-      )}
+      </div>
 
-      {/* HEAD layer — 3D perspective (hidden in doctor mode) */}
-      {!anim.isDoctorMode && (
-        <div className="absolute inset-0 z-20" style={{ perspective: 600 }}>
-          <motion.div
-            className="w-full h-full"
-            animate={{
-              rotateY: anim.headRotation.x,
-              rotateX: anim.headRotation.y,
-              rotate: anim.headTilt,
-            }}
-            transition={{ type: "spring", stiffness: 120, damping: 14, mass: 0.6 }}
-            style={{ transformStyle: "preserve-3d", transformOrigin: "50% 55%" }}
-          >
-            <img
-              src={verdinhoImg}
-              alt="Verdinho - Assistente IA"
-              width={displaySize}
-              height={displaySize}
-              className="drop-shadow-lg pointer-events-none"
-              style={{ clipPath: `inset(0 0 ${displaySize * 0.48}px 0)` }}
-              draggable={false}
-            />
-            {/* Prince Crown — only appears after princess kiss, NOT in doctor mode */}
-            <AnimatePresence>
-              {anim.showCrown && <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />}
-            </AnimatePresence>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Doctor Mode overlay */}
+      {/* Doctor Mode overlay (coat, stethoscope, clipboard — on top of frog) */}
       <FrogDoctorMode
         size={displaySize}
         isDoctor={anim.isDoctorMode}
         lookingAtChart={anim.lookingAtChart}
       />
 
-      {/* Eyes + Mouth SVG overlay (hidden in doctor mode) */}
-      {!anim.isDoctorMode && (
-        <svg
-          className="absolute inset-0 z-20 pointer-events-none"
-          viewBox={`0 0 ${displaySize} ${displaySize}`}
-          width={displaySize}
-          height={displaySize}
-        >
-          <FrogEyes
-            size={displaySize}
-            expression={anim.expression}
-            blink={anim.blink}
-            eyeOffset={anim.eyeOffset}
-            eyeSparkle={anim.eyeSparkle}
-          />
-          <FrogMouth
-            size={displaySize}
-            expression={anim.expression}
-            smile={anim.smile}
-            isHovered={anim.isHovered || isTouched}
-            tongueOut={anim.tongueOut}
-          />
-        </svg>
-      )}
+      {/* Eyes + Mouth SVG overlay */}
+      <svg
+        className="absolute inset-0 z-20 pointer-events-none"
+        viewBox={`0 0 ${displaySize} ${displaySize}`}
+        width={displaySize}
+        height={displaySize}
+      >
+        <FrogEyes
+          size={displaySize}
+          expression={anim.expression}
+          blink={anim.blink}
+          eyeOffset={anim.eyeOffset}
+          eyeSparkle={anim.eyeSparkle}
+        />
+        <FrogMouth
+          size={displaySize}
+          expression={anim.expression}
+          smile={anim.smile}
+          isHovered={anim.isHovered || isTouched}
+          tongueOut={anim.tongueOut}
+        />
+      </svg>
 
-      {/* Waving arm — right side, organic frog arm */}
+      {/* Waving arm */}
       {anim.isWaving && (
         <motion.svg
           className="absolute z-30 pointer-events-none"
@@ -218,35 +209,10 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           animate={{ rotate: [0, -20, 12, -15, 8, 0] }}
           transition={{ duration: 1.2, ease: "easeInOut" }}
         >
-          <path
-            d="M 5 44 Q 4 34 7 26 Q 9 21 12 17 Q 15 13 18 10"
-            stroke="#3d8b3d"
-            strokeWidth="10"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <path
-            d="M 5 44 Q 4 34 7 26 Q 9 21 12 17 Q 15 13 18 10"
-            stroke="#5bb85b"
-            strokeWidth="8"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <path
-            d="M 5 44 Q 4 34 7 26 Q 9 21 12 17 Q 15 13 18 10"
-            stroke="#6ecf6e"
-            strokeWidth="5"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <path
-            d="M 6 40 Q 5 32 8 24 Q 11 19 14 14"
-            stroke="#8de88d"
-            strokeWidth="2"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.45"
-          />
+          <path d="M 5 44 Q 4 34 7 26 Q 9 21 12 17 Q 15 13 18 10" stroke="#3d8b3d" strokeWidth="10" strokeLinecap="round" fill="none" />
+          <path d="M 5 44 Q 4 34 7 26 Q 9 21 12 17 Q 15 13 18 10" stroke="#5bb85b" strokeWidth="8" strokeLinecap="round" fill="none" />
+          <path d="M 5 44 Q 4 34 7 26 Q 9 21 12 17 Q 15 13 18 10" stroke="#6ecf6e" strokeWidth="5" strokeLinecap="round" fill="none" />
+          <path d="M 6 40 Q 5 32 8 24 Q 11 19 14 14" stroke="#8de88d" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.45" />
           <ellipse cx="19" cy="9" rx="6" ry="5" fill="#5bb85b" />
           <ellipse cx="19" cy="9" rx="4.5" ry="3.5" fill="#6ecf6e" opacity="0.7" />
           <ellipse cx="14" cy="4" rx="2.2" ry="2.8" fill="#5bb85b" transform="rotate(-12 14 4)" />
@@ -255,12 +221,10 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           <circle cx="14" cy="2.5" r="1.4" fill="#4a9e4a" opacity="0.8" />
           <circle cx="19" cy="1" r="1.4" fill="#4a9e4a" opacity="0.8" />
           <circle cx="24" cy="2.5" r="1.4" fill="#4a9e4a" opacity="0.8" />
-          <path d="M 15 5 Q 16.5 6 18 4.5" stroke="#4a9e4a" strokeWidth="0.6" fill="none" opacity="0.3" />
-          <path d="M 20 4.5 Q 21.5 6 23 5" stroke="#4a9e4a" strokeWidth="0.6" fill="none" opacity="0.3" />
         </motion.svg>
       )}
 
-      {/* Expression emoji — not during doctor mode */}
+      {/* Expression emoji */}
       {emoji && !anim.isDaydreaming && !anim.isDoctorMode && (
         <motion.span
           className="absolute -top-1 -right-1 z-40 text-xs pointer-events-none"
@@ -272,18 +236,11 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         </motion.span>
       )}
 
-      {/* Love hearts floating — only during daydream, NOT in doctor mode */}
-      <FrogLoveHearts
-        size={displaySize}
-        show={anim.isDaydreaming && !anim.isDoctorMode}
-      />
+      {/* Love hearts */}
+      <FrogLoveHearts size={displaySize} show={anim.isDaydreaming && !anim.isDoctorMode} />
 
-      {/* Daydream bubble — princess kissing Verdinho's cheek */}
-      <FrogDaydream
-        size={displaySize}
-        isDaydreaming={anim.isDaydreaming}
-        daydreamPhase={anim.daydreamPhase}
-      />
+      {/* Daydream bubble */}
+      <FrogDaydream size={displaySize} isDaydreaming={anim.isDaydreaming} daydreamPhase={anim.daydreamPhase} />
 
       {/* Star Wars story scroll on hover */}
       <FrogStoryScroll show={anim.isHovered || isTouched} size={displaySize} />

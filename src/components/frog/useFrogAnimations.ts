@@ -234,7 +234,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       }, 10000);
     };
 
-    const interval = setInterval(doDoctorMode, 30000);
+    const interval = setInterval(doDoctorMode, 40000);
     return () => clearInterval(interval);
   }, [baseMood]);
 

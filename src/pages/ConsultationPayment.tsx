@@ -256,9 +256,16 @@ const ConsultationPayment = () => {
                         <span className="text-foreground font-bold">{pro.price}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Taxa da plataforma (10%)</span>
-                        <span className="text-foreground font-bold">R$ {commission.toFixed(2)}</span>
+                        <span className="text-muted-foreground">
+                          {isExempt ? "Taxa administrativa (isento — Consultório Virtual)" : "Taxa administrativa (7%)"}
+                        </span>
+                        <span className={`text-foreground font-bold ${isExempt ? "line-through text-muted-foreground" : ""}`}>
+                          {isExempt ? "R$ 0,00" : `R$ ${commission.toFixed(2)}`}
+                        </span>
                       </div>
+                      {isExempt && (
+                        <p className="text-xs text-primary font-semibold">✅ Assinante Consultório Virtual — isento da taxa de 7%</p>
+                      )}
                       <div className="border-t border-border pt-2 flex justify-between">
                         <span className="font-black text-foreground">Total</span>
                         <span className="font-display font-black text-gradient-green text-xl">R$ {total.toFixed(2)}</span>

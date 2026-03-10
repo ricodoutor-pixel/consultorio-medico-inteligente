@@ -286,19 +286,19 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
 
                   <p style={{
                     color: "#4fc3f7",
-                    fontSize: 7,
+                    fontSize: 9,
                     letterSpacing: 3,
-                    marginBottom: 4,
+                    marginBottom: 6,
                     fontFamily: "'Segoe UI', system-ui, sans-serif",
                     textShadow: "0 0 6px rgba(79,195,247,0.5)",
                   }}>
                     Episódio I
                   </p>
-                  <div style={{ marginBottom: 10 }}>
+                  <div style={{ marginBottom: 12 }}>
                     <SparkleText
                       text="A HISTÓRIA DO VERDINHO"
                       color="#ffd700"
-                      fontSize={9}
+                      fontSize={11}
                       fontWeight={900}
                       isHeading
                     />

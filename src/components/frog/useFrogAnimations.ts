@@ -150,7 +150,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => clearInterval(interval);
   }, [controls]);
 
-  // Waving arm every 15s
+  // Waving arm every 20s
   useEffect(() => {
     const doWave = () => {
       setIsWaving(true);
@@ -158,9 +158,9 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       setTimeout(() => {
         setIsWaving(false);
         setExpression(baseMood);
-      }, 1500);
+      }, 1800);
     };
-    const interval = setInterval(doWave, 15000);
+    const interval = setInterval(doWave, 20000);
     return () => clearInterval(interval);
   }, [baseMood]);
 

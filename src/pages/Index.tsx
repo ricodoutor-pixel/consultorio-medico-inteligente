@@ -419,8 +419,8 @@ const Index = () => {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="font-black h-14 px-8 border-border rounded-2xl" asChild>
-                <Link to="/indicacoes">
-                  Indique e Ganhe <Gift size={18} className="ml-2" />
+                <Link to="/afiliados">
+                  Seja Afiliado <Gift size={18} className="ml-2" />
                 </Link>
               </Button>
             </div>

@@ -310,11 +310,11 @@ export const FrogStoryScroll = memo(({ show, size }: FrogStoryScrollProps) => {
                     }
                     const isSection = /^[🩺📋🛒👥📚💳🎯📊]/.test(line);
                     return (
-                      <div key={i} style={{ marginBottom: 1.5, padding: "0 3px" }}>
+                      <div key={i} style={{ marginBottom: 2, padding: "0 6px" }}>
                         <SparkleText
                           text={line}
                           color={isSection ? "#4fc3f7" : "#ffd700"}
-                          fontSize={7}
+                          fontSize={isSection ? 9 : 8}
                           fontWeight={isSection ? 700 : 500}
                         />
                       </div>

@@ -178,28 +178,30 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         lookingAtChart={anim.lookingAtChart}
       />
 
-      {/* Eyes + Mouth SVG overlay */}
-      <svg
-        className="absolute inset-0 z-20 pointer-events-none"
-        viewBox={`0 0 ${displaySize} ${displaySize}`}
-        width={displaySize}
-        height={displaySize}
-      >
-        <FrogEyes
-          size={displaySize}
-          expression={anim.expression}
-          blink={anim.blink}
-          eyeOffset={anim.eyeOffset}
-          eyeSparkle={anim.eyeSparkle}
-        />
-        <FrogMouth
-          size={displaySize}
-          expression={anim.expression}
-          smile={anim.smile}
-          isHovered={anim.isHovered || isTouched}
-          tongueOut={anim.tongueOut}
-        />
-      </svg>
+      {/* Eyes + Mouth SVG overlay (hidden in doctor mode) */}
+      {!anim.isDoctorMode && (
+        <svg
+          className="absolute inset-0 z-20 pointer-events-none"
+          viewBox={`0 0 ${displaySize} ${displaySize}`}
+          width={displaySize}
+          height={displaySize}
+        >
+          <FrogEyes
+            size={displaySize}
+            expression={anim.expression}
+            blink={anim.blink}
+            eyeOffset={anim.eyeOffset}
+            eyeSparkle={anim.eyeSparkle}
+          />
+          <FrogMouth
+            size={displaySize}
+            expression={anim.expression}
+            smile={anim.smile}
+            isHovered={anim.isHovered || isTouched}
+            tongueOut={anim.tongueOut}
+          />
+        </svg>
+      )}
 
       {/* Waving arm — right side, organic frog arm */}
       {anim.isWaving && (

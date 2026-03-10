@@ -109,6 +109,45 @@ export type Database = {
         }
         Relationships: []
       }
+      btc_subscriptions: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          email: string
+          id: string
+          plan_id: string
+          plan_name: string
+          status: string
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          email: string
+          id?: string
+          plan_id: string
+          plan_name: string
+          status?: string
+          updated_at?: string
+          wallet_address?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          email?: string
+          id?: string
+          plan_id?: string
+          plan_name?: string
+          status?: string
+          updated_at?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
       doctors: {
         Row: {
           available_hours: Json | null

@@ -246,7 +246,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       {/* Tooltip hint for double-tap */}
       {isTouched && (
         <motion.div
-          className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-sm text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap z-50 border border-border"
+          className="absolute -bottom-16 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-sm text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap z-50 border border-border"
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}

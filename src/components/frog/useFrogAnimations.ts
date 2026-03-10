@@ -7,7 +7,7 @@ export type FrogExpression =
   | "singing" | "laughing" | "crying" | "cool" | "sneeze";
 
 const ALL_MOODS: FrogExpression[] = [
-  "happy", "thinking", "confused", "sleeping", "excited",
+  "happy", "thinking", "sleeping", "excited",
   "love", "dizzy", "surprised", "singing", "laughing",
   "crying", "cool", "sneeze"
 ];

@@ -111,7 +111,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Random personality shifts — varied expressions
+  // Random personality shifts — varied expressions (every 12-20s, lasts 4s)
   useEffect(() => {
     const interval = setInterval(() => {
       const safeMoods = ALL_MOODS.filter(mood => mood !== "love" && mood !== "angry");
@@ -133,8 +133,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         setSneezing(false);
         setIsBouncing(false);
         setHeadTilt(0);
-      }, 3000);
-    }, 8000 + Math.random() * 7000);
+      }, 4000);
+    }, 12000 + Math.random() * 8000);
     return () => clearInterval(interval);
   }, [baseMood]);
 

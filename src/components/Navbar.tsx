@@ -125,7 +125,7 @@ export const Navbar = () => {
 
             <div className="ml-1">
               <FrogMascot
-                size={48}
+                size={60}
                 mood="happy"
                 onClick={openChat}
                 enableJumpToNav={true}

@@ -115,9 +115,9 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             className="absolute pointer-events-none"
             style={{
               right: -size * 0.12,
-              top: size * 0.35,
+              top: size * 0.45,
               width: size * 0.30,
-              height: size * 0.174,
+              height: size * 0.29,
             }}
             viewBox="0 0 45 60"
             fill="none"

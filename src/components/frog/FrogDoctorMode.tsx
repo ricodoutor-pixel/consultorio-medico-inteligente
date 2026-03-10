@@ -131,14 +131,14 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             </defs>
           </svg>
 
-          {/* Clipboard/chart in LEFT hand */}
+          {/* Clipboard/chart in LEFT hand — closer to body */}
           <motion.svg
             className="absolute pointer-events-none"
             style={{
-              left: -size * 0.22,
-              top: size * 0.25,
-              width: size * 0.3,
-              height: size * 0.4,
+              left: -size * 0.12,
+              top: size * 0.3,
+              width: size * 0.25,
+              height: size * 0.35,
             }}
             viewBox="0 0 40 55"
             fill="none"

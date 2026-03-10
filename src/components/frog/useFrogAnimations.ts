@@ -111,8 +111,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
   // Random personality shifts — varied expressions
   useEffect(() => {
     const interval = setInterval(() => {
-      const moodsNoLove = ALL_MOODS.filter(mood => mood !== "love");
-      const m = moodsNoLove[Math.floor(Math.random() * moodsNoLove.length)];
+      const safeMoods = ALL_MOODS.filter(mood => mood !== "love" && mood !== "angry");
+      const m = safeMoods[Math.floor(Math.random() * safeMoods.length)];
       setAutoMood(m as FrogExpression);
       setExpression(m as FrogExpression);
 

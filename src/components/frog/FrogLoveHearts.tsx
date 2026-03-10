@@ -14,12 +14,10 @@ export const FrogLoveHearts = memo(({ size, show }: FrogLoveHeartsProps) => {
   if (!show) return null;
 
   const hearts = [
-    { delay: 0, startX: size * 0.32, color: "#ff6b81" },
-    { delay: 0.15, startX: size * 0.38, color: "#e74c3c" },
-    { delay: 0.3, startX: size * 0.62, color: "#ff6b81" },
-    { delay: 0.45, startX: size * 0.68, color: "#e74c3c" },
-    { delay: 0.6, startX: size * 0.35, color: "#ff4757" },
-    { delay: 0.75, startX: size * 0.65, color: "#ff4757" },
+    { delay: 0, startX: size * 0.32, color: "#ffb6c1" },
+    { delay: 0.2, startX: size * 0.5, color: "#ffd700" },
+    { delay: 0.4, startX: size * 0.65, color: "#ffb6c1" },
+    { delay: 0.6, startX: size * 0.45, color: "#ffd700" },
   ];
 
   return (

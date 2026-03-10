@@ -75,7 +75,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       aria-label="Toque duas vezes para falar com o Verdinho — Assistente IA"
       title="Toque 2x para conversar com o Verdinho 🐸"
       whileTap={{ scale: 0.9, rotate: -5 }}
-      whileHover={{ scale: 2.5 }}
+      whileHover={{ scale: 2 }}
       animate={{
         width: displaySize,
         height: displaySize,

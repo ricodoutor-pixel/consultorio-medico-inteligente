@@ -55,7 +55,7 @@ const Index = () => {
       <WhatsAppButton />
 
       {/* Hero */}
-      <section className="hero-glow pt-24 pb-16 md:pt-32 md:pb-28">
+      <section className="hero-glow pt-20 pb-16 md:pt-28 md:pb-28">
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div initial="hidden" animate="visible" variants={stagger}>

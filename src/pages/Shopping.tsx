@@ -37,7 +37,13 @@ const ProductDetail = ({ id }: { id: string }) => {
             <Star size={14} className="text-primary fill-primary" />
             <span className="text-sm font-bold">{product.rating}</span>
           </div>
-          <p className="text-muted-foreground leading-relaxed mb-6">{product.description}</p>
+          <p className="text-muted-foreground leading-relaxed mb-4">{product.description}</p>
+          {(product as any).benefits && (
+            <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 mb-6">
+              <p className="text-xs font-bold text-primary mb-1">🔬 Benefícios Científicos</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{(product as any).benefits}</p>
+            </div>
+          )}
           <div className="flex flex-wrap gap-2 mb-6">
             {product.tags.map((t) => (
               <span key={t} className="px-2 py-1 rounded-full text-xs font-bold border border-border text-muted-foreground">{t}</span>

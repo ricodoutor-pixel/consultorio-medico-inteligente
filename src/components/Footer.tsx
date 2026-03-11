@@ -15,7 +15,7 @@ export const Footer = () => {
               <span className="font-display font-bold text-foreground">Planta & Raiz</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              A maior clínica de telemedicina + marketplace de cannabis medicinal. Democratizando o acesso com segurança e tecnologia IA.
+              A maior clínica de telemedicina + Shopping de cannabis medicinal. Democratizando o acesso com segurança e tecnologia IA.
             </p>
           </div>
 

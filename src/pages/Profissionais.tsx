@@ -5,12 +5,28 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, ArrowRight, ArrowLeft, Clock, CheckCircle2, MessageSquare } from "lucide-react";
+import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 import { professionals, categories } from "@/data/professionals";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
+
+const WhatsAppContactButton = ({ whatsapp, name, className = "" }: { whatsapp: string; name: string; className?: string }) => {
+  const message = encodeURIComponent(`Olá! Encontrei seu perfil na Planta & Raiz e gostaria de agendar uma consulta com ${name}.`);
+  return (
+    <a
+      href={`https://wa.me/${whatsapp}?text=${message}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={className}
+    >
+      <Button variant="outline" className="w-full text-sm font-black border-[hsl(142,70%,45%)] text-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,45%)]/10 rounded-xl gap-2">
+        <Phone size={14} /> Contato WhatsApp
+      </Button>
+    </a>
+  );
+};
 
 const ProfessionalDetail = ({ id }: { id: string }) => {
   const pro = professionals.find((p) => p.id === id);
@@ -42,11 +58,14 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
               </div>
               <p className="text-xs text-muted-foreground mb-1">Experiência: {pro.experience}</p>
               <p className="text-2xl font-display font-black text-gradient-green mb-4">{pro.price} <span className="text-sm text-muted-foreground font-normal">/ consulta</span></p>
-              <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl mb-2" asChild>
-                <Link to={`/falar-com-especialista?pro=${pro.id}`}>
-                  <MessageSquare size={16} className="mr-2" /> Falar com Especialista
-                </Link>
-              </Button>
+              <div className="space-y-2">
+                <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl" asChild>
+                  <Link to={`/falar-com-especialista?pro=${pro.id}`}>
+                    <MessageSquare size={16} className="mr-2" /> Falar com Especialista
+                  </Link>
+                </Button>
+                <WhatsAppContactButton whatsapp={pro.whatsapp} name={pro.name} />
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -138,25 +157,28 @@ const Profissionais = () => {
               <span className="text-gradient-green">Profissionais</span> Verificados
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl font-medium">
-              Escolha uma categoria e clique em "Falar com especialista" para iniciar a pré-entrevista.
+              {professionals.length} especialistas em 6 categorias. Escolha, agende e pague via Pix.
             </p>
           </motion.div>
 
           {/* Tabs */}
           <div className="flex flex-wrap gap-2 mb-10">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2.5 rounded-full text-sm font-black border transition-colors ${
-                  activeCategory === cat
-                    ? "border-green bg-gradient-green text-primary"
-                    : "border-border bg-card/50 text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+            {categories.map((cat) => {
+              const count = professionals.filter(p => p.category === cat).length;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-4 py-2.5 rounded-full text-sm font-black border transition-colors ${
+                    activeCategory === cat
+                      ? "border-green bg-gradient-green text-primary"
+                      : "border-border bg-card/50 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {cat} ({count})
+                </button>
+              );
+            })}
           </div>
 
           {/* Cards */}
@@ -186,15 +208,26 @@ const Profissionais = () => {
                       </div>
                       <span className="text-lg font-display font-black text-gradient-green">{p.price}</span>
                     </div>
-                    <div className="flex gap-2">
-                      <Button className="flex-1 bg-primary text-primary-foreground text-sm font-black rounded-xl" asChild>
-                        <Link to={`/falar-com-especialista?pro=${p.id}`}>
-                          Falar com Especialista
-                        </Link>
-                      </Button>
-                      <Button variant="outline" className="flex-1 text-sm font-black border-border rounded-xl" asChild>
-                        <Link to={`/profissionais/${p.id}`}>Ver Perfil</Link>
-                      </Button>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2">
+                        <Button className="flex-1 bg-primary text-primary-foreground text-sm font-black rounded-xl" asChild>
+                          <Link to={`/falar-com-especialista?pro=${p.id}`}>
+                            Falar com Especialista
+                          </Link>
+                        </Button>
+                        <Button variant="outline" className="text-sm font-black border-border rounded-xl" asChild>
+                          <Link to={`/profissionais/${p.id}`}>Perfil</Link>
+                        </Button>
+                      </div>
+                      <a
+                        href={`https://wa.me/${p.whatsapp}?text=${encodeURIComponent(`Olá! Vi o perfil de ${p.name} na Planta & Raiz e gostaria de mais informações.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button variant="outline" size="sm" className="w-full text-xs font-bold border-[hsl(142,70%,45%)]/40 text-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,45%)]/10 rounded-xl gap-1.5">
+                          <Phone size={12} /> Contato WhatsApp
+                        </Button>
+                      </a>
                     </div>
                   </CardContent>
                 </Card>

@@ -14,6 +14,8 @@ export interface CannabisStrain {
   rendimento: string;
   avaliacao: number;
   imagem: string;
+  terpenos?: string[];
+  aplicacoesMedicas?: { condicao: string; eficacia: "baixa" | "média" | "alta"; evidencia: "anedótica" | "preliminar" | "estabelecida" }[];
 }
 
 // Local AI-generated cannabis flower images by type
@@ -40,7 +42,7 @@ const aiImg = (name: string, type: string) => {
   const t = type.toLowerCase();
   if (t.includes("indica")) return indicaImages[seed % 3];
   if (t.includes("sativa")) return sativaImages[seed % 3];
-  if (t.includes("cbd")) return cbdImages[seed % 3];
+  if (t.includes("cbd") || t.includes("medicinal")) return cbdImages[seed % 3];
   return hybridImages[seed % 3];
 };
 
@@ -51,11 +53,41 @@ export const getPlantImage = (id: number) => {
 
 export const getPlantImageFallback = (_id: number) => "/placeholder.svg";
 
+// Terpene profiles by strain type
+const terpenosIndica = ["Mirceno", "Linalol", "β-Cariofileno", "Humuleno"];
+const terpenosSativa = ["Limoneno", "Pineno", "Terpinoleno", "Ocimeno"];
+const terpenosHibrida = ["Mirceno", "Limoneno", "β-Cariofileno", "Pineno"];
+const terpenosCBD = ["Mirceno", "β-Cariofileno", "Bisabolol", "Guaiol"];
+const terpenosMedicinal = ["β-Cariofileno", "Mirceno", "Linalol", "Bisabolol"];
+
+export const getTerpenosByType = (tipo: string): string[] => {
+  const t = tipo.toLowerCase();
+  if (t.includes("medicinal") || t.includes("especializada")) return terpenosMedicinal;
+  if (t.includes("cbd")) return terpenosCBD;
+  if (t.includes("indica")) return terpenosIndica;
+  if (t.includes("sativa")) return terpenosSativa;
+  return terpenosHibrida;
+};
+
+export const terpenoInfo: Record<string, { cor: string; efeito: string }> = {
+  "Mirceno": { cor: "hsl(142,70%,45%)", efeito: "Relaxamento, sedação, anti-inflamatório" },
+  "Limoneno": { cor: "hsl(45,76%,52%)", efeito: "Energia, humor, ansiolítico" },
+  "Linalol": { cor: "hsl(270,60%,60%)", efeito: "Calmante, ansiolítico, analgésico" },
+  "β-Cariofileno": { cor: "hsl(25,80%,50%)", efeito: "Anti-inflamatório, analgésico" },
+  "Pineno": { cor: "hsl(160,50%,45%)", efeito: "Alerta, anti-inflamatório, broncodilatador" },
+  "Humuleno": { cor: "hsl(35,60%,45%)", efeito: "Supressor de apetite, anti-inflamatório" },
+  "Terpinoleno": { cor: "hsl(200,50%,55%)", efeito: "Sedativo, antioxidante, antibacteriano" },
+  "Ocimeno": { cor: "hsl(180,50%,50%)", efeito: "Anti-inflamatório, antifúngico" },
+  "Bisabolol": { cor: "hsl(300,40%,60%)", efeito: "Anti-irritação, anti-inflamatório" },
+  "Guaiol": { cor: "hsl(120,30%,55%)", efeito: "Anti-inflamatório, antimicrobiano" },
+};
+
 export const strainCategories = [
   { nome: "Alto CBD", emoji: "💚", descricao: "Fins terapêuticos" },
   { nome: "Sativa", emoji: "☀️", descricao: "Energia e criatividade" },
   { nome: "Indica", emoji: "🌙", descricao: "Relaxamento profundo" },
   { nome: "Híbrida", emoji: "🌿", descricao: "Efeitos balanceados" },
+  { nome: "Medicinal", emoji: "🏥", descricao: "Uso farmacêutico" },
 ];
 
 export const strains: CannabisStrain[] = [
@@ -861,5 +893,144 @@ export const strains: CannabisStrain[] = [
     sabores: ["Herbal", "Doce", "Frutado"],
     beneficiosSaude: ["Depressão", "Estresse", "Ansiedade social", "Fadiga"],
     origem: "Holanda — Barney's Farm", florescimento: "10-12 semanas", dificuldade: "Moderada", rendimento: "500-600g/m²", avaliacao: 4.7, imagem: aiImg("Laughing Buddha", "Sativa"),
+  },
+
+  // === 101-110: MEDICINAIS ESPECIALIZADAS ===
+  {
+    id: 101, nome: "Avidekel", tipo: "Medicinal Especializada", thc: "8% - 12%", cbd: "8% - 12%",
+    descricao: "Desenvolvida pela Tikun Olam em Israel, é uma das variedades medicinais mais estudadas do mundo. Utilizada em ensaios clínicos para TEPT, dor crônica e inflamação intestinal. Proporção 1:1 THC:CBD.",
+    efeitos: ["Balanceado", "Alívio de dor", "Clareza mental"],
+    sabores: ["Terroso", "Herbal", "Leve especiaria"],
+    beneficiosSaude: ["TEPT", "Doença de Crohn", "Dor crônica", "Inflamação"],
+    origem: "Israel — Tikun Olam", florescimento: "8-10 semanas", dificuldade: "Moderada", rendimento: "350-450g/m²", avaliacao: 4.9, imagem: aiImg("Avidekel", "Medicinal CBD"),
+    terpenos: ["β-Cariofileno", "Mirceno", "Linalol", "Bisabolol"],
+    aplicacoesMedicas: [
+      { condicao: "TEPT", eficacia: "alta", evidencia: "estabelecida" },
+      { condicao: "Doença de Crohn", eficacia: "alta", evidencia: "preliminar" },
+      { condicao: "Dor crônica", eficacia: "alta", evidencia: "estabelecida" },
+    ],
+  },
+  {
+    id: 102, nome: "Bedrocan", tipo: "Medicinal Especializada", thc: "22%", cbd: "<1%",
+    descricao: "Variedade farmacêutica padronizada produzida pela Bedrocan na Holanda. Utilizada em programas médicos governamentais na Europa. Padrão ouro para cannabis medicinal com THC controlado.",
+    efeitos: ["Relaxamento profundo", "Alívio de dor intensa", "Sedação"],
+    sabores: ["Terroso", "Pinho", "Amadeirado"],
+    beneficiosSaude: ["Dor severa", "Espasticidade", "Insônia", "Caquexia"],
+    origem: "Holanda — Bedrocan BV", florescimento: "8-9 semanas", dificuldade: "Controlada", rendimento: "Padronizado", avaliacao: 4.8, imagem: aiImg("Bedrocan", "Medicinal"),
+    terpenos: ["Mirceno", "β-Cariofileno", "Humuleno", "Pineno"],
+    aplicacoesMedicas: [
+      { condicao: "Dor oncológica", eficacia: "alta", evidencia: "estabelecida" },
+      { condicao: "Esclerose múltipla", eficacia: "alta", evidencia: "estabelecida" },
+      { condicao: "Caquexia", eficacia: "média", evidencia: "preliminar" },
+    ],
+  },
+  {
+    id: 103, nome: "Bediol", tipo: "Medicinal Especializada", thc: "6% - 8%", cbd: "6% - 8%",
+    descricao: "Variedade 1:1 da Bedrocan, prescrita para pacientes que necessitam de efeito balanceado. Amplamente utilizada em programas médicos na Holanda, Alemanha e Itália.",
+    efeitos: ["Balanceado suave", "Relaxamento", "Clareza"],
+    sabores: ["Herbal", "Terroso", "Floral"],
+    beneficiosSaude: ["Dor moderada", "Ansiedade", "Inflamação", "Náusea"],
+    origem: "Holanda — Bedrocan BV", florescimento: "8-9 semanas", dificuldade: "Controlada", rendimento: "Padronizado", avaliacao: 4.7, imagem: aiImg("Bediol", "Medicinal CBD"),
+    terpenos: ["Linalol", "Mirceno", "β-Cariofileno", "Bisabolol"],
+    aplicacoesMedicas: [
+      { condicao: "Ansiedade", eficacia: "alta", evidencia: "estabelecida" },
+      { condicao: "Dor neuropática", eficacia: "média", evidencia: "preliminar" },
+    ],
+  },
+  {
+    id: 104, nome: "Pedanios 22/1", tipo: "Medicinal Especializada", thc: "22%", cbd: "1%",
+    descricao: "Produzida pela Aurora Cannabis para o mercado farmacêutico alemão. Prescrita pelo sistema de saúde alemão (Krankenkasse) para dor crônica e espasticidade.",
+    efeitos: ["Relaxamento intenso", "Alívio de dor", "Sedação"],
+    sabores: ["Terroso", "Pinho", "Especiarias"],
+    beneficiosSaude: ["Dor crônica", "Espasticidade", "Insônia", "Estresse severo"],
+    origem: "Alemanha — Aurora Cannabis", florescimento: "8-10 semanas", dificuldade: "Controlada", rendimento: "Padronizado", avaliacao: 4.7, imagem: aiImg("Pedanios", "Medicinal"),
+    terpenos: ["Mirceno", "Humuleno", "β-Cariofileno", "Pineno"],
+    aplicacoesMedicas: [
+      { condicao: "Dor crônica", eficacia: "alta", evidencia: "estabelecida" },
+      { condicao: "Espasticidade", eficacia: "alta", evidencia: "estabelecida" },
+    ],
+  },
+  {
+    id: 105, nome: "Tilray T25", tipo: "Medicinal Especializada", thc: "25%", cbd: "<1%",
+    descricao: "Cannabis medicinal de grau farmacêutico da Tilray. Produzida em instalações GMP (Good Manufacturing Practice) no Canadá. Utilizada em programas de acesso compassivo em 20+ países.",
+    efeitos: ["Potente relaxamento", "Alívio intenso de dor", "Sono profundo"],
+    sabores: ["Terroso", "Amendoado", "Especiarias"],
+    beneficiosSaude: ["Dor oncológica", "Insônia severa", "Espasmos musculares", "TEPT"],
+    origem: "Canadá — Tilray", florescimento: "9-10 semanas", dificuldade: "Controlada", rendimento: "Padronizado", avaliacao: 4.8, imagem: aiImg("Tilray T25", "Medicinal"),
+    terpenos: ["Mirceno", "β-Cariofileno", "Linalol", "Humuleno"],
+    aplicacoesMedicas: [
+      { condicao: "Dor oncológica", eficacia: "alta", evidencia: "estabelecida" },
+      { condicao: "TEPT", eficacia: "alta", evidencia: "preliminar" },
+      { condicao: "Insônia severa", eficacia: "alta", evidencia: "estabelecida" },
+    ],
+  },
+  {
+    id: 106, nome: "Pennywise 1:1", tipo: "Medicinal Especializada", thc: "5% - 8%", cbd: "5% - 8%",
+    descricao: "Cruzamento de Harlequin com Jack the Ripper. Proporção 1:1 ideal para pacientes que necessitam de efeito entourage sem psicoatividade excessiva. Amplamente prescrita para epilepsia e TEPT.",
+    efeitos: ["Balanceado", "Clareza", "Relaxamento suave"],
+    sabores: ["Café", "Pimenta", "Terroso"],
+    beneficiosSaude: ["Epilepsia", "TEPT", "Ansiedade", "Dor neuropática"],
+    origem: "EUA — TGA Subcool Seeds", florescimento: "8-9 semanas", dificuldade: "Moderada", rendimento: "400-500g/m²", avaliacao: 4.8, imagem: aiImg("Pennywise", "Medicinal CBD"),
+    terpenos: ["β-Cariofileno", "Mirceno", "Guaiol", "Bisabolol"],
+    aplicacoesMedicas: [
+      { condicao: "Epilepsia", eficacia: "alta", evidencia: "preliminar" },
+      { condicao: "TEPT", eficacia: "alta", evidencia: "preliminar" },
+      { condicao: "Ansiedade", eficacia: "alta", evidencia: "estabelecida" },
+    ],
+  },
+  {
+    id: 107, nome: "Spectrum Red No.2", tipo: "Medicinal Especializada", thc: "18%", cbd: "<1%",
+    descricao: "Da linha Spectrum da Canopy Growth. Sistema de cores para facilitar prescrição médica. Red indica alto THC para dor intensa. Utilizada no programa canadense de cannabis medicinal.",
+    efeitos: ["Relaxamento", "Alívio de dor", "Sedação"],
+    sabores: ["Terroso", "Herbal", "Pinho"],
+    beneficiosSaude: ["Dor intensa", "Insônia", "Espasmos", "Náusea quimio"],
+    origem: "Canadá — Canopy Growth", florescimento: "8-9 semanas", dificuldade: "Controlada", rendimento: "Padronizado", avaliacao: 4.6, imagem: aiImg("Spectrum Red", "Medicinal"),
+    terpenos: ["Mirceno", "β-Cariofileno", "Humuleno", "Linalol"],
+    aplicacoesMedicas: [
+      { condicao: "Dor intensa", eficacia: "alta", evidencia: "estabelecida" },
+      { condicao: "Náusea por quimioterapia", eficacia: "alta", evidencia: "estabelecida" },
+    ],
+  },
+  {
+    id: 108, nome: "Ringo's Gift", tipo: "Medicinal Especializada", thc: "5% - 8%", cbd: "10% - 15%",
+    descricao: "Nomeada em homenagem a Lawrence Ringo, pioneiro do movimento CBD. Cruzamento de ACDC com Harle-Tsu. Uma das variedades medicinais mais prescritas nos EUA para dor e inflamação.",
+    efeitos: ["Relaxamento sem psicoatividade", "Clareza", "Bem-estar"],
+    sabores: ["Menta", "Pinho", "Terroso"],
+    beneficiosSaude: ["Dor crônica", "Inflamação", "Artrite", "Ansiedade"],
+    origem: "EUA — SoHum Seeds", florescimento: "8-9 semanas", dificuldade: "Fácil", rendimento: "450-550g/m²", avaliacao: 4.8, imagem: aiImg("Ringos Gift", "Medicinal CBD"),
+    terpenos: ["Mirceno", "β-Cariofileno", "Bisabolol", "Pineno"],
+    aplicacoesMedicas: [
+      { condicao: "Artrite", eficacia: "alta", evidencia: "preliminar" },
+      { condicao: "Fibromialgia", eficacia: "média", evidencia: "preliminar" },
+      { condicao: "Inflamação", eficacia: "alta", evidencia: "estabelecida" },
+    ],
+  },
+  {
+    id: 109, nome: "Sour Tsunami", tipo: "Medicinal Especializada", thc: "1% - 3%", cbd: "11% - 14%",
+    descricao: "Uma das primeiras variedades cultivadas especificamente para alto CBD. Desenvolvida por Lawrence Ringo. Revolucionou a cannabis medicinal ao provar que plantas com alto CBD e baixo THC eram possíveis.",
+    efeitos: ["Sem psicoatividade", "Alívio de dor", "Anti-inflamatório"],
+    sabores: ["Diesel", "Chocolate", "Terroso"],
+    beneficiosSaude: ["Dor crônica", "Inflamação", "Convulsões", "Ansiedade"],
+    origem: "EUA — Southern Humboldt", florescimento: "9-10 semanas", dificuldade: "Moderada", rendimento: "400-500g/m²", avaliacao: 4.7, imagem: aiImg("Sour Tsunami", "Medicinal CBD"),
+    terpenos: ["Mirceno", "β-Cariofileno", "Guaiol", "Linalol"],
+    aplicacoesMedicas: [
+      { condicao: "Convulsões", eficacia: "alta", evidencia: "preliminar" },
+      { condicao: "Dor crônica", eficacia: "alta", evidencia: "estabelecida" },
+      { condicao: "Inflamação", eficacia: "alta", evidencia: "estabelecida" },
+    ],
+  },
+  {
+    id: 110, nome: "Remedy", tipo: "Medicinal Especializada", thc: "0.5% - 1%", cbd: "10% - 15%",
+    descricao: "Desenvolvida especificamente para uso medicinal com THC quase zero. Ideal para pacientes que não toleram nenhum efeito psicoativo. Amplamente prescrita para crianças com epilepsia e idosos com dor crônica.",
+    efeitos: ["Zero psicoatividade", "Relaxamento suave", "Bem-estar"],
+    sabores: ["Limão", "Pinho", "Menta"],
+    beneficiosSaude: ["Epilepsia pediátrica", "Dor em idosos", "Ansiedade severa", "Insônia"],
+    origem: "EUA — Dutch Treat Seeds", florescimento: "8-9 semanas", dificuldade: "Fácil", rendimento: "400-500g/m²", avaliacao: 4.9, imagem: aiImg("Remedy", "Medicinal CBD"),
+    terpenos: ["Mirceno", "Bisabolol", "Linalol", "β-Cariofileno"],
+    aplicacoesMedicas: [
+      { condicao: "Epilepsia pediátrica", eficacia: "alta", evidencia: "preliminar" },
+      { condicao: "Dor em idosos", eficacia: "alta", evidencia: "preliminar" },
+      { condicao: "Ansiedade severa", eficacia: "alta", evidencia: "estabelecida" },
+    ],
   },
 ];

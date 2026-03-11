@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { strains, strainCategories, type CannabisStrain } from "@/data/strains";
-import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye } from "lucide-react";
+import { strains, strainCategories, getTerpenosByType, terpenoInfo, type CannabisStrain } from "@/data/strains";
+import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { StrainImage } from "@/components/StrainImage";
@@ -17,6 +17,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.03 } } };
 
 const getTipoCategory = (tipo: string) => {
   const t = tipo.toLowerCase();
+  if (t.includes("medicinal") || t.includes("especializada")) return "medicinal";
   if (t.includes("cbd")) return "cbd";
   if (t.includes("sativa")) return "sativa";
   if (t.includes("indica")) return "indica";
@@ -28,6 +29,7 @@ const tipoColor = (tipo: string) => {
   if (cat === "sativa") return "text-primary border-green bg-gradient-green";
   if (cat === "indica") return "text-secondary border-purple bg-gradient-purple";
   if (cat === "cbd") return "text-emerald-500 border-emerald-500/30 bg-emerald-500/10";
+  if (cat === "medicinal") return "text-blue-400 border-blue-400/30 bg-blue-400/10";
   return "text-[hsl(45,76%,52%)] border-gold bg-gradient-gold";
 };
 
@@ -36,6 +38,7 @@ const tipoBadgeStyle = (tipo: string) => {
   if (cat === "sativa") return "bg-primary/20 text-primary border-primary/30";
   if (cat === "indica") return "bg-secondary/20 text-secondary border-secondary/30";
   if (cat === "cbd") return "bg-emerald-500/20 text-emerald-500 border-emerald-500/30";
+  if (cat === "medicinal") return "bg-blue-400/20 text-blue-400 border-blue-400/30";
   return "bg-[hsl(45,76%,52%)]/20 text-[hsl(45,76%,52%)] border-[hsl(45,76%,52%)]/30";
 };
 
@@ -130,20 +133,23 @@ const BibliotecaCientifica = () => {
       {/* Categories */}
       <section className="py-6">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {strainCategories.map((cat) => (
-              <Card
-                key={cat.nome}
-                className={`border-border hover:border-primary/30 transition-all cursor-pointer group ${filterTipo === cat.nome ? "border-primary/50 glow-green" : ""}`}
-                onClick={() => setFilterTipo(filterTipo === cat.nome ? null : cat.nome)}
-              >
-                <CardContent className="p-4 text-center">
-                  <span className="text-2xl mb-2 block group-hover:scale-110 transition-transform">{cat.emoji}</span>
-                  <p className="font-bold text-sm text-foreground">{cat.nome}</p>
-                  <p className="text-xs text-muted-foreground">{cat.descricao}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {strainCategories.map((cat) => {
+              const catKey = cat.nome === "Alto CBD" ? "cbd" : cat.nome === "Híbrida" ? "hibrida" : cat.nome.toLowerCase();
+              return (
+                <Card
+                  key={cat.nome}
+                  className={`border-border hover:border-primary/30 transition-all cursor-pointer group ${filterTipo === catKey ? "border-primary/50 glow-green" : ""}`}
+                  onClick={() => setFilterTipo(filterTipo === catKey ? null : catKey)}
+                >
+                  <CardContent className="p-4 text-center">
+                    <span className="text-2xl mb-2 block group-hover:scale-110 transition-transform">{cat.emoji}</span>
+                    <p className="font-bold text-sm text-foreground">{cat.nome}</p>
+                    <p className="text-xs text-muted-foreground">{cat.descricao}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -167,6 +173,7 @@ const BibliotecaCientifica = () => {
                 { key: "sativa", label: "Sativa" },
                 { key: "indica", label: "Indica" },
                 { key: "hibrida", label: "Híbrida" },
+                { key: "medicinal", label: "Medicinal" },
               ].map((t) => (
                 <button
                   key={t.key}
@@ -480,6 +487,56 @@ const BibliotecaCientifica = () => {
                   <p className="text-sm font-bold text-foreground">{selected.rendimento}</p>
                 </div>
               </div>
+
+              {/* Terpenes */}
+              {(() => {
+                const terpenos = selected.terpenos || getTerpenosByType(selected.tipo);
+                return (
+                  <div className="mb-4">
+                    <h4 className="font-display font-bold text-foreground mb-2 flex items-center gap-2">
+                      <Beaker size={16} className="text-primary" /> Perfil de Terpenos
+                    </h4>
+                    <div className="space-y-2">
+                      {terpenos.map((t) => {
+                        const info = terpenoInfo[t];
+                        return (
+                          <div key={t} className="flex items-center gap-3 p-2 rounded-lg bg-muted/30 border border-border">
+                            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: info?.cor || "hsl(var(--primary))" }} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-foreground">{t}</p>
+                              <p className="text-[10px] text-muted-foreground">{info?.efeito || ""}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Medical Applications */}
+              {selected.aplicacoesMedicas && selected.aplicacoesMedicas.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="font-display font-bold text-foreground mb-2 flex items-center gap-2">
+                    <ShieldCheck size={16} className="text-primary" /> Aplicações Médicas
+                  </h4>
+                  <div className="space-y-2">
+                    {selected.aplicacoesMedicas.map((app, i) => (
+                      <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-muted/30 border border-border">
+                        <span className="text-xs font-bold text-foreground">{app.condicao}</span>
+                        <div className="flex items-center gap-2">
+                          <Badge className={`text-[9px] ${app.eficacia === "alta" ? "bg-primary/20 text-primary" : app.eficacia === "média" ? "bg-[hsl(45,76%,52%)]/20 text-[hsl(45,76%,52%)]" : "bg-muted text-muted-foreground"}`}>
+                            {app.eficacia}
+                          </Badge>
+                          <Badge variant="outline" className="text-[9px]">
+                            {app.evidencia}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* CTA */}
               <Button className="w-full bg-primary text-primary-foreground font-black rounded-xl" asChild>

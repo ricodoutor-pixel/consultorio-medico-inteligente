@@ -69,14 +69,14 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
                 <motion.img
                   src={princessImg}
                   alt="Princesa beijando o sapo"
-                  className="w-[85%] h-[85%] object-contain relative z-10"
+                  className="w-[88%] h-[88%] object-contain relative z-10"
                   style={{
-                    filter: "drop-shadow(0 6px 20px rgba(0,0,0,0.35)) saturate(1.45) brightness(1.18) contrast(1.15)",
+                    filter: "drop-shadow(0 4px 12px rgba(255, 105, 180, 0.4)) drop-shadow(0 8px 25px rgba(0,0,0,0.3)) saturate(1.5) brightness(1.22) contrast(1.18)",
                   }}
-                  initial={{ opacity: 0, scale: 0.7 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.3 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  initial={{ opacity: 0, scale: 0.6, rotate: -5 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.3, rotate: 5 }}
+                  transition={{ duration: 0.6, ease: "backOut" }}
                 />
               )}
             </AnimatePresence>

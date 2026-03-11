@@ -33,29 +33,42 @@ export const FrogEyes = memo(({ size, expression, blink, eyeOffset, eyeSparkle }
     );
   }
 
-  // Love eyes — gentle dreamy sparkle (NO red/black, NO pink aura)
+  // Love eyes — dreamy white & black with sparkle effects (NO colored pupils)
   if (isLove && !blink) {
-    const eyeWhiteR = pupilR * 2.4;
+    const eyeWhiteR = pupilR * 2.6;
     return (
       <>
         {[LEFT_EYE, RIGHT_EYE].map((eye, i) => (
           <g key={i}>
-            {/* Clean white sclera */}
-            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="white" opacity="0.97" />
-            {/* Green eye rim */}
-            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="none" stroke="#2d8a4e" strokeWidth={0.8} opacity="0.3" />
-            {/* Normal black pupil with gentle pulse */}
-            <circle cx={size * eye.cx} cy={size * eye.cy - pupilR * 0.1} r={pupilR * 1.2} fill="#111" opacity="0.9">
-              <animate attributeName="r" values={`${pupilR * 1.15};${pupilR * 1.3};${pupilR * 1.15}`} dur="1.5s" repeatCount="indefinite" />
+            {/* Outer glow ring */}
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR * 1.15} fill="none" stroke="#ffd700" strokeWidth={0.6} opacity="0.4">
+              <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2s" repeatCount="indefinite" />
             </circle>
-            {/* Primary highlight */}
-            <circle cx={size * eye.cx - pupilR * 0.5} cy={size * eye.cy - pupilR * 0.6} r={pupilR * 0.45} fill="white" opacity="0.95" />
+            {/* Clean white sclera — larger & brighter */}
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="white" opacity="0.98" />
+            {/* Green eye rim */}
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={eyeWhiteR} fill="none" stroke="#2d8a4e" strokeWidth={1} opacity="0.35" />
+            {/* Small black pupil — pulsing gently */}
+            <circle cx={size * eye.cx} cy={size * eye.cy} r={pupilR * 0.7} fill="#111" opacity="0.85">
+              <animate attributeName="r" values={`${pupilR * 0.65};${pupilR * 0.8};${pupilR * 0.65}`} dur="1.8s" repeatCount="indefinite" />
+            </circle>
+            {/* Primary highlight — large */}
+            <circle cx={size * eye.cx - pupilR * 0.4} cy={size * eye.cy - pupilR * 0.5} r={pupilR * 0.5} fill="white" opacity="0.95" />
             {/* Secondary highlight */}
-            <circle cx={size * eye.cx + pupilR * 0.3} cy={size * eye.cy - pupilR * 0.3} r={pupilR * 0.22} fill="white" opacity="0.8" />
-            {/* Golden sparkle */}
-            <circle cx={size * eye.cx + pupilR * 0.6} cy={size * eye.cy - pupilR * 0.8} r={pupilR * 0.25} fill="#ffd700">
-              <animate attributeName="r" values={`${pupilR * 0.2};${pupilR * 0.32};${pupilR * 0.2}`} dur="0.8s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.5;0.9;0.5" dur="0.8s" repeatCount="indefinite" />
+            <circle cx={size * eye.cx + pupilR * 0.35} cy={size * eye.cy - pupilR * 0.25} r={pupilR * 0.25} fill="white" opacity="0.85" />
+            {/* Golden sparkle top-right */}
+            <circle cx={size * eye.cx + pupilR * 0.7} cy={size * eye.cy - pupilR * 0.9} r={pupilR * 0.22} fill="#ffd700">
+              <animate attributeName="r" values={`${pupilR * 0.18};${pupilR * 0.3};${pupilR * 0.18}`} dur="0.7s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.4;1;0.4" dur="0.7s" repeatCount="indefinite" />
+            </circle>
+            {/* Golden sparkle bottom-left */}
+            <circle cx={size * eye.cx - pupilR * 0.8} cy={size * eye.cy + pupilR * 0.5} r={pupilR * 0.18} fill="#ffd700">
+              <animate attributeName="r" values={`${pupilR * 0.14};${pupilR * 0.24};${pupilR * 0.14}`} dur="0.9s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.3;0.8;0.3" dur="0.9s" repeatCount="indefinite" />
+            </circle>
+            {/* Tiny white star sparkle */}
+            <circle cx={size * eye.cx + pupilR * 0.1} cy={size * eye.cy - pupilR * 0.9} r={pupilR * 0.15} fill="white">
+              <animate attributeName="opacity" values="0;1;0" dur="1.2s" repeatCount="indefinite" />
             </circle>
           </g>
         ))}

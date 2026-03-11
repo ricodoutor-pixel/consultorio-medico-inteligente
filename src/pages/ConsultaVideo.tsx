@@ -27,12 +27,15 @@ type ChatMessage = {
 
 const ConsultaVideo = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { log } = useAuditLog();
   const [searchParams] = useSearchParams();
   const appointmentId = searchParams.get("appointment");
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showAISidebar, setShowAISidebar] = useState(false);
+  const [showPEP, setShowPEP] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -41,6 +44,8 @@ const ConsultaVideo = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isDoctor, setIsDoctor] = useState(false);
+  const [tcleAccepted, setTcleAccepted] = useState(false);
+  const [showTCLE, setShowTCLE] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,6 +53,18 @@ const ConsultaVideo = () => {
     const interval = setInterval(() => setElapsedSeconds(s => s + 1), 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleTCLEAccept = () => {
+    setTcleAccepted(true);
+    setShowTCLE(false);
+    log("tcle_accepted", "appointments", appointmentId || "unknown", null, { timestamp: new Date().toISOString() });
+    toast({ title: "TCLE aceito ✅", description: "Você pode iniciar a teleconsulta." });
+  };
+
+  const handleTCLEDecline = () => {
+    toast({ title: "TCLE recusado", description: "Não é possível iniciar a consulta sem aceitar o TCLE.", variant: "destructive" });
+    navigate(-1);
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });

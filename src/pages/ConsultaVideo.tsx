@@ -184,6 +184,12 @@ const ConsultaVideo = () => {
         <div className="flex flex-1 overflow-hidden">
           {/* Video area */}
           <div className="flex-1 flex flex-col relative bg-black/90">
+            {/* rPPG Vital Signs Overlay (doctor only) */}
+            {isDoctor && <VitalSignsOverlay enabled={tcleAccepted} />}
+
+            {/* Biometric Shield */}
+            <BiometricShield enabled={tcleAccepted} isDoctor={isDoctor} />
+
             {/* Main video (remote) */}
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">

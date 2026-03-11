@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { Video, Mic, MicOff, VideoOff, Phone, MessageSquare, FileText, Shield, Send, Paperclip, Clock, Brain, Loader2, X, Maximize2, Minimize2, ClipboardList, Wifi } from "lucide-react";
+import { Video, Mic, MicOff, VideoOff, Phone, MessageSquare, FileText, Shield, Send, Paperclip, Clock, Brain, Loader2, X, Maximize2, Minimize2, ClipboardList, Wifi, ScanFace, Link2, Stethoscope, Heart } from "lucide-react";
 import { NetworkQualityIndicator } from "@/components/NetworkQualityIndicator";
 import { motion } from "framer-motion";
 import { useSearchParams, useNavigate } from "react-router-dom";
@@ -15,6 +15,11 @@ import { TCLEConsentModal } from "@/components/TCLEConsentModal";
 import { ProntuarioSidebar } from "@/components/ProntuarioSidebar";
 import { useAuditLog } from "@/hooks/useAuditLog";
 import { CbdThcAISuggestionPanel } from "@/components/CbdThcAISuggestionPanel";
+import { VitalSignsOverlay } from "@/components/consultation/VitalSignsOverlay";
+import { BiometricShield } from "@/components/consultation/BiometricShield";
+import { AIScribeCoding } from "@/components/consultation/AIScribeCoding";
+import { SmartPrescriptionDTx } from "@/components/consultation/SmartPrescriptionDTx";
+import { BlockchainConsent } from "@/components/consultation/BlockchainConsent";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 

@@ -61,19 +61,23 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             />
 
-            {/* Lipstick kiss mark — appears first, grows, then fades before princess */}
+            {/* Lipstick kiss mark — between princess and Verdinho (bottom-left of bubble) */}
             <AnimatePresence>
               {showKissMark && (
                 <motion.div
-                  className="absolute inset-0 flex items-center justify-center z-20"
+                  className="absolute z-20"
+                  style={{
+                    bottom: bubbleSize * 0.08,
+                    left: bubbleSize * 0.02,
+                  }}
                   initial={{ opacity: 0, scale: 0.1 }}
-                  animate={{ opacity: [0, 1, 1, 0], scale: [0.1, 0.4, 0.7, 0.9] }}
-                  exit={{ opacity: 0, scale: 0.3 }}
-                  transition={{ duration: 1.8, times: [0, 0.3, 0.7, 1], ease: "easeOut" }}
+                  animate={{ opacity: [0, 1, 1, 0.8, 0], scale: [0.1, 0.35, 0.55, 0.65, 0.7] }}
+                  exit={{ opacity: 0, scale: 0.2 }}
+                  transition={{ duration: 2.5, times: [0, 0.2, 0.5, 0.8, 1], ease: "easeOut" }}
                 >
                   <svg
-                    width={bubbleSize * 0.5}
-                    height={bubbleSize * 0.4}
+                    width={bubbleSize * 0.35}
+                    height={bubbleSize * 0.3}
                     viewBox="0 0 60 50"
                     style={{ filter: "drop-shadow(0 2px 8px rgba(200,0,50,0.3))" }}
                   >

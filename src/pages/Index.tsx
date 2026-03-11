@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { testimonials } from "@/data/testimonials";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
-import heroPhoneMockup from "@/assets/hero-phone-mockup.png";
+import heroPhoneMockup from "@/assets/hero-hand-phone.png";
 import triagemPatient from "@/assets/triagem-patient.png";
 import consultaChat from "@/assets/consulta-chat.png";
 import triagemForm from "@/assets/triagem-form.png";

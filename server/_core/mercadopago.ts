@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 const MERCADO_PAGO_API = 'https://api.mercadopago.com/v1';
-const ACCESS_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+
+function getAccessToken() {
+  return process.env.MERCADO_PAGO_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN || '';
+}
 
 interface PaymentRequest {
   amount: number;

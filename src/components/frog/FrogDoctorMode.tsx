@@ -58,9 +58,9 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             <circle cx="23" cy="31" r="1" fill="#3b82f6" />
 
             {/* Buttons */}
-            <circle cx="50" cy="28" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
-            <circle cx="50" cy="42" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
-            <circle cx="50" cy="56" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
+            <circle cx="50" cy="22" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
+            <circle cx="50" cy="36" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
+            <circle cx="50" cy="50" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
 
             {/* Name badge */}
             <rect x="72" y="38" width="28" height="12" rx="2.5" fill="#dbeafe" stroke="#93c5fd" strokeWidth="0.6" />

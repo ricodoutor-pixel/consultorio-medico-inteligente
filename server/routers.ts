@@ -43,6 +43,7 @@ export const appRouter = router({
   sentimentDashboard: sentimentDashboardRouter,
   monitoring: monitoringRouter,
   referral: referralRouter,
+  recommendations: recommendationsRouter,
   // marketplace: marketplaceRouter, // TODO: Fix marketplace router
 });
 

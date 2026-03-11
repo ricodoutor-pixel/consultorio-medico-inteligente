@@ -104,6 +104,9 @@ const App = () => (
                 <Route path="/dashboard-medico" element={<DashboardMedico />} />
                 <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />
                 <Route path="/notificacoes" element={<Notificacoes />} />
+                <Route path="/sala-espera" element={<SalaEspera />} />
+                <Route path="/consulta-video" element={<ConsultaVideo />} />
+                <Route path="/ripd" element={<RIPD />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

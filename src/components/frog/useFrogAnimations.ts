@@ -150,7 +150,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     };
     const interval = setInterval(doJump, 4000 + Math.random() * 3000);
     return () => clearInterval(interval);
-  }, [controls]);
+  }, [controls, isDoctorMode]);
 
   // Waving arm every 20s — skip during doctor mode
   useEffect(() => {

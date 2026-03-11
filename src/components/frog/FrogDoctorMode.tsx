@@ -75,14 +75,14 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             </defs>
           </svg>
 
-           {/* Head mirror on forehead — lowered 20% more */}
+           {/* Head mirror — lowered 40% more + 30% bigger */}
           <svg
             className="absolute pointer-events-none"
             style={{
-              top: size * 0.173,
-              left: size * 0.345,
-              width: size * 0.308,
-              height: size * 0.121,
+              top: size * 0.242,
+              left: size * 0.31,
+              width: size * 0.4,
+              height: size * 0.157,
             }}
             viewBox="0 0 60 22"
             fill="none"

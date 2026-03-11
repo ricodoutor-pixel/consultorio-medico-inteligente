@@ -17,7 +17,7 @@ export const FrogChestHeart = memo(({ size, show }: FrogChestHeartProps) => {
         <motion.div
           className="absolute pointer-events-none"
           style={{
-            top: size * 0.55,
+            top: size * 0.50,
             left: size * 0.43,
             zIndex: 45,
           }}
@@ -27,8 +27,8 @@ export const FrogChestHeart = memo(({ size, show }: FrogChestHeartProps) => {
           transition={{ duration: 0.4, ease: "backOut" }}
         >
           <motion.svg
-            width={size * 0.13}
-            height={size * 0.13}
+            width={size * 0.143}
+            height={size * 0.143}
             viewBox="0 0 24 24"
             animate={{
               scale: [1, 1.35, 1, 1.3, 1],

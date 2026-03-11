@@ -81,7 +81,7 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             className="absolute pointer-events-none"
             style={{
               right: -size * 0.12,
-              top: size * 0.50,
+              top: size * 0.575,
               width: size * 0.33,
               height: size * 0.319,
             }}

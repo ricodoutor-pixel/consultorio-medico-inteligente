@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle } from "lucide-react";
+import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -136,6 +136,30 @@ const DashboardMedico = () => {
                     <p className="text-xs text-muted-foreground font-bold">{kpi.label}</p>
                   </CardContent>
                 </Card>
+              ))}
+            </div>
+
+            {/* Quick Access — Cannabis & Clinical Tools */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+              {[
+                { label: "Treatment Tracker", desc: "Pacientes em tratamento", icon: Activity, to: "/treatment-tracker", color: "text-primary" },
+                { label: "Dispensário", desc: "Receitas & farmácia", icon: Leaf, to: "/dispensario", color: "text-secondary" },
+                { label: "IoMT Hub", desc: "Wearables HL7 FHIR", icon: Watch, to: "/iomt", color: "text-blue-400" },
+                { label: "Conformidade", desc: "LGPD/HIPAA/CFM", icon: Shield, to: "/compliance", color: "text-yellow-400" },
+              ].map((item, i) => (
+                <Link key={i} to={item.to}>
+                  <Card className="border-border hover:border-primary/30 transition-all cursor-pointer group">
+                    <CardContent className="p-3 flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
+                        <item.icon size={16} className={item.color} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-foreground">{item.label}</p>
+                        <p className="text-[10px] text-muted-foreground">{item.desc}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
 

@@ -339,40 +339,21 @@ const ConsultaVideo = () => {
               </div>
 
               <div className="flex-1 overflow-y-auto p-3 space-y-4">
-                {/* Speech-to-text area */}
-                <div>
-                  <p className="text-xs font-bold text-muted-foreground mb-2">🎤 Transcrição Speech-to-Text</p>
-                  <Textarea
-                    value={aiTranscript}
-                    onChange={(e) => setAiTranscript(e.target.value)}
-                    placeholder="A transcrição automática da conversa aparecerá aqui durante a consulta... (ou digite notas manualmente)"
-                    className="bg-muted border-border text-xs min-h-[150px]"
-                  />
-                  <p className="text-[10px] text-muted-foreground mt-1">
-                    ℹ️ Integração Speech-to-Text disponível via API ElevenLabs
-                  </p>
-                </div>
+                {/* AI Scribe & Auto-Coding */}
+                <AIScribeCoding onApplyToEHR={(output) => {
+                  setAiTranscript(output.hda);
+                  setAiSummary(`QP: ${output.chiefComplaint}\n\nAvaliação: ${output.assessment}\n\nPlano: ${output.plan}`);
+                }} />
 
-                {/* Generate summary */}
-                <Button
-                  className="w-full bg-secondary text-secondary-foreground font-bold rounded-xl text-xs"
-                  onClick={generateAISummary}
-                  disabled={aiLoading}
-                >
-                  {aiLoading ? <Loader2 size={14} className="animate-spin mr-1" /> : <FileText size={14} className="mr-1" />}
-                  Gerar Resumo Clínico IA
-                </Button>
+                {/* Digital Therapeutics */}
+                <SmartPrescriptionDTx diagnosisCid="M54.5" />
 
-                {/* AI Summary */}
-                {aiSummary && (
-                  <div className="bg-muted/30 border border-border rounded-xl p-3">
-                    <p className="text-xs font-bold text-foreground mb-2">📋 Resumo Clínico IA</p>
-                    <p className="text-xs text-muted-foreground whitespace-pre-wrap">{aiSummary}</p>
-                    <p className="text-[10px] text-muted-foreground mt-2 border-t border-border pt-2">
-                      ⚠️ Resumo gerado por IA — revisão médica obrigatória (CFM 2454/2026)
-                    </p>
-                  </div>
-                )}
+                {/* Blockchain Consent */}
+                <BlockchainConsent
+                  documentContent={`TCLE-${appointmentId}-${Date.now()}`}
+                  documentType="TCLE"
+                  signerRole={isDoctor ? "doctor" : "patient"}
+                />
 
                 {/* CID-10 Quick search */}
                 <div>

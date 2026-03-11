@@ -15,10 +15,11 @@ export const FrogChestHeart = memo(({ size, show }: FrogChestHeartProps) => {
     <AnimatePresence>
       {show && (
         <motion.div
-          className="absolute z-35 pointer-events-none"
+          className="absolute pointer-events-none"
           style={{
-            top: size * 0.58,
-            left: size * 0.44,
+            top: size * 0.55,
+            left: size * 0.43,
+            zIndex: 45,
           }}
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}

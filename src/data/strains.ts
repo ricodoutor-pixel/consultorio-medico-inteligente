@@ -22,28 +22,65 @@ export interface CannabisStrain {
 import indicaPurple from "@/assets/strains/indica-purple.jpg";
 import indicaDeep from "@/assets/strains/indica-deep.jpg";
 import indicaPink from "@/assets/strains/indica-pink.jpg";
+import indicaGold from "@/assets/strains/indica-gold.jpg";
+import indicaDark from "@/assets/strains/indica-dark.jpg";
 import sativaGreen from "@/assets/strains/sativa-green.jpg";
 import sativaLime from "@/assets/strains/sativa-lime.jpg";
 import sativaForest from "@/assets/strains/sativa-forest.jpg";
+import sativaYellow from "@/assets/strains/sativa-yellow.jpg";
+import sativaAmber from "@/assets/strains/sativa-amber.jpg";
 import hybridOrange from "@/assets/strains/hybrid-orange.jpg";
 import hybridGold from "@/assets/strains/hybrid-gold.jpg";
 import hybridRed from "@/assets/strains/hybrid-red.jpg";
+import hybridBlue from "@/assets/strains/hybrid-blue.jpg";
+import hybridMagenta from "@/assets/strains/hybrid-magenta.jpg";
 import cbdFrosty from "@/assets/strains/cbd-frosty.jpg";
 import cbdEmerald from "@/assets/strains/cbd-emerald.jpg";
 import cbdSilver from "@/assets/strains/cbd-silver.jpg";
+import cbdWhite from "@/assets/strains/cbd-white.jpg";
+import medicinalPurple from "@/assets/strains/medicinal-purple.jpg";
+import medicinalSilver from "@/assets/strains/medicinal-silver.jpg";
+// Named strain images
+import imgCharlottesWeb from "@/assets/strains/charlottes-web.jpg";
+import imgACDC from "@/assets/strains/acdc.jpg";
+import imgHarlequin from "@/assets/strains/harlequin.jpg";
+import imgCannatonic from "@/assets/strains/cannatonic.jpg";
+import imgBlueDream from "@/assets/strains/blue-dream.jpg";
+import imgOGKush from "@/assets/strains/og-kush.jpg";
+import imgGranddaddyPurple from "@/assets/strains/granddaddy-purple.jpg";
+import imgNorthernLights from "@/assets/strains/northern-lights.jpg";
+import imgSourDiesel from "@/assets/strains/sour-diesel.jpg";
 
-const indicaImages = [indicaPurple, indicaDeep, indicaPink];
-const sativaImages = [sativaGreen, sativaLime, sativaForest];
-const hybridImages = [hybridOrange, hybridGold, hybridRed];
-const cbdImages = [cbdFrosty, cbdEmerald, cbdSilver];
+// Named strain map — direct 1:1 images for known strains
+const namedStrainImages: Record<string, string> = {
+  "Charlotte's Web": imgCharlottesWeb,
+  "ACDC": imgACDC,
+  "Harlequin": imgHarlequin,
+  "Cannatonic": imgCannatonic,
+  "Blue Dream": imgBlueDream,
+  "OG Kush": imgOGKush,
+  "Granddaddy Purple": imgGranddaddyPurple,
+  "Northern Lights": imgNorthernLights,
+  "Sour Diesel": imgSourDiesel,
+};
+
+const indicaImages = [indicaPurple, indicaDeep, indicaPink, indicaGold, indicaDark];
+const sativaImages = [sativaGreen, sativaLime, sativaForest, sativaYellow, sativaAmber];
+const hybridImages = [hybridOrange, hybridGold, hybridRed, hybridBlue, hybridMagenta];
+const cbdImages = [cbdFrosty, cbdEmerald, cbdSilver, cbdWhite];
+const medicinalImages = [medicinalPurple, medicinalSilver, cbdWhite, cbdFrosty];
 
 const aiImg = (name: string, type: string) => {
+  // First check for named strain images
+  if (namedStrainImages[name]) return namedStrainImages[name];
+  
   const seed = Math.abs([...name].reduce((h, c) => ((h << 5) - h) + c.charCodeAt(0), 0));
   const t = type.toLowerCase();
-  if (t.includes("indica")) return indicaImages[seed % 3];
-  if (t.includes("sativa")) return sativaImages[seed % 3];
-  if (t.includes("cbd") || t.includes("medicinal")) return cbdImages[seed % 3];
-  return hybridImages[seed % 3];
+  if (t.includes("medicinal") || t.includes("especializada")) return medicinalImages[seed % medicinalImages.length];
+  if (t.includes("indica")) return indicaImages[seed % indicaImages.length];
+  if (t.includes("sativa")) return sativaImages[seed % sativaImages.length];
+  if (t.includes("cbd")) return cbdImages[seed % cbdImages.length];
+  return hybridImages[seed % hybridImages.length];
 };
 
 export const getPlantImage = (id: number) => {

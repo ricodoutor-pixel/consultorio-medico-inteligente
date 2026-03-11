@@ -17,8 +17,9 @@ export const FrogChestHeart = memo(({ size, show }: FrogChestHeartProps) => {
         <motion.div
           className="absolute pointer-events-none"
           style={{
-            top: size * 0.50,
-            left: size * 0.43,
+            top: size * 0.68,
+            left: "50%",
+            transform: "translateX(-50%)",
             zIndex: 45,
           }}
           initial={{ opacity: 0, scale: 0 }}

@@ -15,9 +15,9 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
   const bubbleX = size * 1.155;
   const bubbleY = -bubbleSize * 0.05;
 
-  // Kiss mark appears in "thinking" phase, princess appears in "kiss" phase
-  const showKissMark = daydreamPhase === "thinking";
-  const showPrincess = daydreamPhase === "kiss" || daydreamPhase === "hearts";
+  // Princess visible the entire daydream; kiss mark appears briefly then fades
+  const showKissMark = daydreamPhase === "thinking" || daydreamPhase === "kiss";
+  const showPrincess = daydreamPhase !== null && daydreamPhase !== "wakeup";
 
   return (
     <AnimatePresence>

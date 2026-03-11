@@ -149,7 +149,9 @@ export const Navbar = () => {
           </div>
 
           {/* Desktop auth area */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
+            <GlobalComplianceBadge />
+            <LanguageSwitcher />
             {user ? (
               <UserMenu />
             ) : (

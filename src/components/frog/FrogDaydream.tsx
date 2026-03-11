@@ -26,11 +26,11 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
           exit={{ opacity: 0, scale: 0.2, rotate: 10 }}
           transition={{ duration: 0.5, ease: "backOut" }}
         >
-          {/* Comic-style thought bubble trail */}
+          {/* Comic-style thought bubble trail — no dark outlines */}
           <svg className="absolute" style={{ bottom: -size * 0.12, left: -20, width: 30, height: 40 }}>
-            <circle cx="22" cy="32" r="6" fill="white" stroke="#222" strokeWidth="1.5" />
-            <circle cx="13" cy="20" r="4.5" fill="white" stroke="#222" strokeWidth="1.5" />
-            <circle cx="6" cy="9" r="3" fill="white" stroke="#222" strokeWidth="1.5" />
+            <circle cx="22" cy="32" r="6" fill="white" stroke="#ddd" strokeWidth="1" />
+            <circle cx="13" cy="20" r="4.5" fill="white" stroke="#ddd" strokeWidth="1" />
+            <circle cx="6" cy="9" r="3" fill="white" stroke="#ddd" strokeWidth="1" />
           </svg>
 
           {/* Main comic thought cloud — princess only */}

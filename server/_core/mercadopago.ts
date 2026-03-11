@@ -179,7 +179,7 @@ export async function createSubscription(request: any): Promise<any> {
 
     const response = await axios.post(`${MERCADO_PAGO_API}/preapproval`, payload, {
       headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
+         Authorization: `Bearer ${getAccessToken()}`,
         'Content-Type': 'application/json',
       },
     });

@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 const MERCADO_PAGO_API = 'https://api.mercadopago.com/v1';
-const ACCESS_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+
+function getAccessToken() {
+  return process.env.MERCADO_PAGO_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN || '';
+}
 
 interface PaymentRequest {
   amount: number;
@@ -46,7 +49,7 @@ export async function createPayment(request: PaymentRequest): Promise<PaymentRes
 
     const response = await axios.post(`${MERCADO_PAGO_API}/checkout/preferences`, payload, {
       headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
+         Authorization: `Bearer ${getAccessToken()}`,
         'Content-Type': 'application/json',
       },
     });
@@ -81,7 +84,7 @@ export async function createPixPayment(request: PaymentRequest): Promise<Payment
 
     const response = await axios.post(`${MERCADO_PAGO_API}/payments`, payload, {
       headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
+         Authorization: `Bearer ${getAccessToken()}`,
         'Content-Type': 'application/json',
       },
     });
@@ -103,7 +106,7 @@ export async function getPaymentStatus(paymentId: string): Promise<any> {
   try {
     const response = await axios.get(`${MERCADO_PAGO_API}/payments/${paymentId}`, {
       headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
+         Authorization: `Bearer ${getAccessToken()}`,
       },
     });
 
@@ -131,7 +134,7 @@ export async function refundPayment(paymentId: string, amount?: number): Promise
       payload,
       {
         headers: {
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
+           Authorization: `Bearer ${getAccessToken()}`,
           'Content-Type': 'application/json',
         },
       }
@@ -176,7 +179,7 @@ export async function createSubscription(request: any): Promise<any> {
 
     const response = await axios.post(`${MERCADO_PAGO_API}/preapproval`, payload, {
       headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
+         Authorization: `Bearer ${getAccessToken()}`,
         'Content-Type': 'application/json',
       },
     });
@@ -199,7 +202,7 @@ export async function cancelSubscription(subscriptionId: string): Promise<any> {
       { status: 'cancelled' },
       {
         headers: {
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${getAccessToken()}`,
           'Content-Type': 'application/json',
         },
       }

@@ -6,10 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { Video, Mic, MicOff, VideoOff, Phone, MessageSquare, FileText, Shield, Send, Paperclip, Clock, Brain, Loader2, X, Maximize2, Minimize2 } from "lucide-react";
+import { Video, Mic, MicOff, VideoOff, Phone, MessageSquare, FileText, Shield, Send, Paperclip, Clock, Brain, Loader2, X, Maximize2, Minimize2, ClipboardList } from "lucide-react";
 import { motion } from "framer-motion";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { TCLEConsentModal } from "@/components/TCLEConsentModal";
+import { ProntuarioSidebar } from "@/components/ProntuarioSidebar";
+import { useAuditLog } from "@/hooks/useAuditLog";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 

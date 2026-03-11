@@ -48,6 +48,9 @@ const Prontuario = lazy(() => import("./pages/Prontuario"));
 const DashboardMedico = lazy(() => import("./pages/DashboardMedico"));
 const DashboardExecutivo = lazy(() => import("./pages/DashboardExecutivo"));
 const Notificacoes = lazy(() => import("./pages/Notificacoes"));
+const SalaEspera = lazy(() => import("./pages/SalaEspera"));
+const ConsultaVideo = lazy(() => import("./pages/ConsultaVideo"));
+const RIPD = lazy(() => import("./pages/RIPD"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -101,6 +104,9 @@ const App = () => (
                 <Route path="/dashboard-medico" element={<DashboardMedico />} />
                 <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />
                 <Route path="/notificacoes" element={<Notificacoes />} />
+                <Route path="/sala-espera" element={<SalaEspera />} />
+                <Route path="/consulta-video" element={<ConsultaVideo />} />
+                <Route path="/ripd" element={<RIPD />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

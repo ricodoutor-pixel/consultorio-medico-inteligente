@@ -51,6 +51,7 @@ const Notificacoes = lazy(() => import("./pages/Notificacoes"));
 const SalaEspera = lazy(() => import("./pages/SalaEspera"));
 const ConsultaVideo = lazy(() => import("./pages/ConsultaVideo"));
 const RIPD = lazy(() => import("./pages/RIPD"));
+const LGPDDireitos = lazy(() => import("./pages/LGPDDireitos"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -107,6 +108,8 @@ const App = () => (
                 <Route path="/sala-espera" element={<SalaEspera />} />
                 <Route path="/consulta-video" element={<ConsultaVideo />} />
                 <Route path="/ripd" element={<RIPD />} />
+                <Route path="/lgpd" element={<LGPDDireitos />} />
+                <Route path="/meus-dados" element={<LGPDDireitos />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

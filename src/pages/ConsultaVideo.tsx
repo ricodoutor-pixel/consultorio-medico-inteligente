@@ -6,10 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { Video, Mic, MicOff, VideoOff, Phone, MessageSquare, FileText, Shield, Send, Paperclip, Clock, Brain, Loader2, X, Maximize2, Minimize2 } from "lucide-react";
+import { Video, Mic, MicOff, VideoOff, Phone, MessageSquare, FileText, Shield, Send, Paperclip, Clock, Brain, Loader2, X, Maximize2, Minimize2, ClipboardList } from "lucide-react";
 import { motion } from "framer-motion";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { TCLEConsentModal } from "@/components/TCLEConsentModal";
+import { ProntuarioSidebar } from "@/components/ProntuarioSidebar";
+import { useAuditLog } from "@/hooks/useAuditLog";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
@@ -24,12 +27,15 @@ type ChatMessage = {
 
 const ConsultaVideo = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { log } = useAuditLog();
   const [searchParams] = useSearchParams();
   const appointmentId = searchParams.get("appointment");
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showAISidebar, setShowAISidebar] = useState(false);
+  const [showPEP, setShowPEP] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -38,6 +44,8 @@ const ConsultaVideo = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isDoctor, setIsDoctor] = useState(false);
+  const [tcleAccepted, setTcleAccepted] = useState(false);
+  const [showTCLE, setShowTCLE] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,6 +53,18 @@ const ConsultaVideo = () => {
     const interval = setInterval(() => setElapsedSeconds(s => s + 1), 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleTCLEAccept = () => {
+    setTcleAccepted(true);
+    setShowTCLE(false);
+    log("tcle_accepted", "appointments", appointmentId || "unknown", null, { timestamp: new Date().toISOString() });
+    toast({ title: "TCLE aceito ✅", description: "Você pode iniciar a teleconsulta." });
+  };
+
+  const handleTCLEDecline = () => {
+    toast({ title: "TCLE recusado", description: "Não é possível iniciar a consulta sem aceitar o TCLE.", variant: "destructive" });
+    navigate(-1);
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -130,6 +150,7 @@ const ConsultaVideo = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <TCLEConsentModal open={showTCLE && !tcleAccepted} onAccept={handleTCLEAccept} onDecline={handleTCLEDecline} />
       {!isFullscreen && <Navbar />}
 
       <div className={`${isFullscreen ? "" : "pt-16"} flex flex-col h-screen`}>
@@ -206,14 +227,24 @@ const ConsultaVideo = () => {
                 <MessageSquare size={20} />
               </Button>
               {isDoctor && (
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className={`rounded-full w-12 h-12 ${showAISidebar ? "ring-2 ring-secondary" : ""}`}
-                  onClick={() => setShowAISidebar(!showAISidebar)}
-                >
-                  <Brain size={20} />
-                </Button>
+                <>
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className={`rounded-full w-12 h-12 ${showPEP ? "ring-2 ring-primary" : ""}`}
+                    onClick={() => setShowPEP(!showPEP)}
+                  >
+                    <ClipboardList size={20} />
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className={`rounded-full w-12 h-12 ${showAISidebar ? "ring-2 ring-secondary" : ""}`}
+                    onClick={() => setShowAISidebar(!showAISidebar)}
+                  >
+                    <Brain size={20} />
+                  </Button>
+                </>
               )}
               <Button
                 variant="destructive"
@@ -336,6 +367,11 @@ const ConsultaVideo = () => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* PEP Sidebar (doctor only) */}
+          {showPEP && isDoctor && (
+            <ProntuarioSidebar appointmentId={appointmentId} onClose={() => setShowPEP(false)} />
           )}
         </div>
       </div>

@@ -119,6 +119,9 @@ const App = () => (
                 <Route path="/meus-dados" element={<LGPDDireitos />} />
                 <Route path="/compliance" element={<GlobalCompliance />} />
                 <Route path="/conformidade-global" element={<GlobalCompliance />} />
+                <Route path="/treatment-tracker" element={<TreatmentTracker />} />
+                <Route path="/acompanhamento" element={<TreatmentTracker />} />
+                <Route path="/dispensario" element={<Dispensario />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

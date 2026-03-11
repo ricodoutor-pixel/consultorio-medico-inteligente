@@ -242,8 +242,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       {/* Love hearts */}
       <FrogLoveHearts size={displaySize} show={anim.isDaydreaming && !anim.isDoctorMode} />
 
-      {/* Pulsing chest heart during daydream */}
-      <FrogChestHeart size={displaySize} show={anim.isDaydreaming && !anim.isDoctorMode} />
+      {/* Pulsing chest heart — appears with princess, stays until she disappears */}
+      <FrogChestHeart size={displaySize} show={(anim.daydreamPhase === "kiss" || anim.daydreamPhase === "hearts") && !anim.isDoctorMode} />
 
       {/* Daydream bubble */}
       <FrogDaydream size={displaySize} isDaydreaming={anim.isDaydreaming} daydreamPhase={anim.daydreamPhase} />

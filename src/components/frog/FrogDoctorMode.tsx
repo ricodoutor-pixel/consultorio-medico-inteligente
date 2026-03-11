@@ -139,21 +139,6 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             />
           </motion.svg>
 
-          {/* Green frog hand holding clipboard — lowered */}
-          <svg
-            className="absolute pointer-events-none"
-            style={{
-              right: -size * 0.02,
-              top: size * 0.78,
-              width: size * 0.12,
-              height: size * 0.1,
-            }}
-            viewBox="0 0 20 16"
-            fill="none"
-          >
-            <ellipse cx="10" cy="8" rx="8" ry="6" fill="#5bb85b" />
-            <ellipse cx="10" cy="8" rx="6" ry="4.5" fill="#6ecf6e" opacity="0.7" />
-          </svg>
 
           {/* Doctor emoji floating */}
           <motion.span

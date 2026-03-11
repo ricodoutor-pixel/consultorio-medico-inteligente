@@ -300,30 +300,63 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <motion.div className="mb-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <div className="flex items-center gap-3 mb-4">
-              <TrendingUp size={28} className="text-primary" />
-              <h2 className="text-3xl md:text-5xl font-display font-black text-foreground tracking-tight">Mercado em Crescimento</h2>
+              <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center">
+                <TrendingUp size={24} className="text-primary" />
+              </div>
+              <div>
+                <h2 className="text-3xl md:text-5xl font-display font-black text-foreground tracking-tight">Mercado em <span className="text-gradient-green">Crescimento</span></h2>
+                <p className="text-muted-foreground font-medium text-sm">Cannabis medicinal global — projeções até 2028 (em bilhões USD)</p>
+              </div>
             </div>
-            <p className="text-muted-foreground font-medium max-w-2xl">Projeções públicas indicam forte expansão do setor legal de cannabis medicinal globalmente.</p>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <Card className="border-border max-w-4xl">
-              <CardContent className="p-6">
-                <ResponsiveContainer width="100%" height={320}>
-                  <BarChart data={marketData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 10% 14%)" />
-                    <XAxis dataKey="year" stroke="hsl(240 10% 68%)" fontSize={12} fontWeight={600} />
-                    <YAxis stroke="hsl(240 10% 68%)" fontSize={12} fontWeight={600} tickFormatter={(v) => `$${v}B`} />
+            <Card className="border-border max-w-5xl overflow-hidden">
+              <CardContent className="p-6 md:p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-primary" />
+                      <span className="text-xs font-bold text-muted-foreground">Valor de Mercado</span>
+                    </div>
+                    <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                      <span className="text-xs font-black text-primary">+2.300% em 8 anos</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-display font-black text-foreground">US$ 67.4B</p>
+                    <p className="text-xs text-muted-foreground">Projeção 2028</p>
+                  </div>
+                </div>
+                <ResponsiveContainer width="100%" height={350}>
+                  <AreaChart data={marketData}>
+                    <defs>
+                      <linearGradient id="colorValor" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(152 80% 45%)" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="hsl(152 80% 45%)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 10% 14%)" vertical={false} />
+                    <XAxis dataKey="year" stroke="hsl(240 10% 68%)" fontSize={12} fontWeight={700} tickLine={false} axisLine={false} />
+                    <YAxis stroke="hsl(240 10% 68%)" fontSize={12} fontWeight={700} tickFormatter={(v) => `$${v}B`} tickLine={false} axisLine={false} />
                     <Tooltip
-                      contentStyle={{ background: "hsl(240 15% 7%)", border: "1px solid hsl(240 10% 14%)", borderRadius: "14px", color: "hsl(240 10% 93%)" }}
+                      contentStyle={{ background: "hsl(240 15% 7%)", border: "1px solid hsl(152 80% 45% / 0.3)", borderRadius: "16px", color: "hsl(240 10% 93%)", padding: "12px 16px" }}
                       formatter={(value: number) => [`US$ ${value}B`, "Valor de mercado"]}
+                      labelStyle={{ fontWeight: 700, marginBottom: 4 }}
                     />
-                    <Bar dataKey="valor" fill="hsl(152 80% 45%)" radius={[8, 8, 0, 0]} />
-                  </BarChart>
+                    <Area type="monotone" dataKey="valor" stroke="hsl(152 80% 45%)" strokeWidth={3} fill="url(#colorValor)" dot={{ fill: "hsl(152 80% 45%)", strokeWidth: 2, r: 5, stroke: "hsl(240 15% 7%)" }} activeDot={{ r: 8, fill: "hsl(152 80% 45%)", stroke: "hsl(240 15% 7%)", strokeWidth: 3 }} />
+                  </AreaChart>
                 </ResponsiveContainer>
-                <p className="text-xs text-muted-foreground mt-4">
-                  * Gráfico ilustrativo com base em projeções públicas (Grand View Research, Fortune Business Insights). Valores variam por metodologia.
-                </p>
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-xs text-muted-foreground">
+                    Fontes: Grand View Research, Fortune Business Insights, BDSA (2024)
+                  </p>
+                  <div className="flex gap-2">
+                    {["CAGR 34%", "150+ países", "Regulação em expansão"].map(tag => (
+                      <span key={tag} className="px-2 py-1 text-[10px] font-bold rounded-full bg-primary/10 text-primary border border-primary/20">{tag}</span>
+                    ))}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </motion.div>

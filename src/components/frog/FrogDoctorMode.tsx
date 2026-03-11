@@ -42,14 +42,14 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             <path d="M82 0 L60 22 L72 0 Z" fill="#e8e8e8" opacity="0.7" />
             <path d="M32 0 Q40 10 60 13 Q80 10 88 0" stroke="#bbb" strokeWidth="1.5" fill="none" />
 
-            {/* Dark vertical tie (gravata vertical escura) */}
-            <rect x="57" y="13" width="6" height="55" rx="2" fill="#1a1a1a" />
-            <rect x="58" y="14" width="4" height="53" rx="1.5" fill="#222" opacity="0.8" />
+            {/* Dark vertical tie (gravata vertical escura) — raised 10% */}
+            <rect x="57" y="7" width="6" height="55" rx="2" fill="#1a1a1a" />
+            <rect x="58" y="8" width="4" height="53" rx="1.5" fill="#222" opacity="0.8" />
             {/* Tie knot */}
-            <path d="M55 12 L60 18 L65 12 Z" fill="#111" />
-            <rect x="56" y="11" width="8" height="4" rx="1.5" fill="#1a1a1a" />
+            <path d="M55 6 L60 12 L65 6 Z" fill="#111" />
+            <rect x="56" y="5" width="8" height="4" rx="1.5" fill="#1a1a1a" />
             {/* Tie tip */}
-            <path d="M57 68 L60 74 L63 68 Z" fill="#1a1a1a" />
+            <path d="M57 62 L60 68 L63 62 Z" fill="#1a1a1a" />
 
             {/* Left pocket with pen */}
             <rect x="15" y="38" width="18" height="14" rx="2.5" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="0.8" />

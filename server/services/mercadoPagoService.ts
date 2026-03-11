@@ -2,8 +2,14 @@ import axios from 'axios';
 import crypto from 'crypto';
 
 const MP_API_BASE = 'https://api.mercadopago.com';
-const ACCESS_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-const PUBLIC_KEY = process.env.MERCADO_PAGO_PUBLIC_KEY;
+
+function getAccessToken() {
+  return process.env.MERCADO_PAGO_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN || '';
+}
+
+function getPublicKey() {
+  return process.env.MERCADO_PAGO_PUBLIC_KEY || '';
+}
 
 interface PIXPaymentRequest {
   amount: number;

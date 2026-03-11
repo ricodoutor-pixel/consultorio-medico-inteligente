@@ -57,7 +57,7 @@ export async function createPixPayment(request: PIXPaymentRequest): Promise<PIXQ
       paymentData,
       {
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${getAccessToken()}`,
           'Content-Type': 'application/json',
         },
       }
@@ -84,7 +84,7 @@ export async function getPaymentInfo(paymentId: string) {
       `${MP_API_BASE}/v1/payments/${paymentId}`,
       {
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${getAccessToken()}`,
         },
       }
     );
@@ -147,7 +147,7 @@ export async function createRecurringPayment(request: PIXPaymentRequest) {
       },
       {
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${getAccessToken()}`,
           'Content-Type': 'application/json',
         },
       }
@@ -186,7 +186,6 @@ export function calculateAffiliateCommission(amount: number, level: 1 | 2 | 3) {
   return amount * commissionRates[level];
 }
 
-
 /**
  * Cria transferencia PIX para especialista/farmacia
  */
@@ -207,7 +206,7 @@ export async function createPixTransfer(data: {
       },
       {
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${getAccessToken()}`,
           'Content-Type': 'application/json',
         },
       }
@@ -234,7 +233,7 @@ export async function getTransferStatus(transferId: string) {
       `${MP_API_BASE}/v1/transfers/${transferId}`,
       {
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${getAccessToken()}`,
         },
       }
     );
@@ -262,7 +261,7 @@ export async function refundPayment(paymentId: string, amount?: number) {
       amount ? { amount } : {},
       {
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${getAccessToken()}`,
           'Content-Type': 'application/json',
         },
       }
@@ -305,14 +304,12 @@ export async function processPaymentWithSplit(data: {
   pharmacyId?: string;
 }) {
   try {
-    // Cria pagamento
     const payment = await createPixPayment({
       amount: data.amount,
       description: data.description,
       externalReference: data.externalReference,
     });
 
-    // Calcula comissao
     const commission = calculatePlatformCommission(data.amount);
 
     return {
@@ -323,5 +320,88 @@ export async function processPaymentWithSplit(data: {
   } catch (error) {
     console.error('Erro ao processar pagamento com split:', error);
     throw error;
+  }
+}
+
+/**
+ * Classe MercadoPagoService - Interface orientada a objeto
+ * Compatível com testes de integração
+ */
+export class MercadoPagoService {
+  private accessToken: string;
+  private apiBase: string;
+
+  constructor(accessToken?: string) {
+    this.accessToken = accessToken || getAccessToken();
+    this.apiBase = MP_API_BASE;
+  }
+
+  async createPayment(amount: number, description: string, email: string) {
+    const response = await axios.post(
+      `${this.apiBase}/v1/payments`,
+      {
+        transaction_amount: amount,
+        description,
+        payment_method_id: 'pix',
+        payer: { email },
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  }
+
+  async getPaymentStatus(paymentId: string) {
+    const response = await axios.get(
+      `${this.apiBase}/v1/payments/${paymentId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  async createRefund(paymentId: string, amount?: number) {
+    const response = await axios.post(
+      `${this.apiBase}/v1/payments/${paymentId}/refunds`,
+      amount ? { amount } : {},
+      {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  }
+
+  async createTransfer(amount: number, receiverId: string, description: string) {
+    const response = await axios.post(
+      `${this.apiBase}/v1/transfers`,
+      { amount, receiver_id: receiverId, description },
+      {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  }
+
+  getCredentials() {
+    return {
+      configured: !!this.accessToken && !!getPublicKey(),
+      hasAccessToken: !!this.accessToken,
+      hasPublicKey: !!getPublicKey(),
+      hasClientId: !!process.env.MERCADO_PAGO_CLIENT_ID,
+      hasClientSecret: !!process.env.MERCADO_PAGO_CLIENT_SECRET,
+    };
   }
 }

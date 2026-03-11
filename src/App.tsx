@@ -115,12 +115,15 @@ const App = () => (
                 <Route path="/ripd" element={<RIPD />} />
                 <Route path="/lgpd" element={<LGPDDireitos />} />
                 <Route path="/meus-dados" element={<LGPDDireitos />} />
+                <Route path="/compliance" element={<GlobalCompliance />} />
+                <Route path="/conformidade-global" element={<GlobalCompliance />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
           </Suspense>
         </BrowserRouter>
       </TooltipProvider>
+    </LanguageProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 );

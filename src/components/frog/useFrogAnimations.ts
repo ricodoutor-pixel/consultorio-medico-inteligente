@@ -142,6 +142,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
   // Idle bounce
   useEffect(() => {
     const doJump = () => {
+      if (isDoctorMode) return;
       controls.start({
         y: [0, -14, -4, -10, 0],
         transition: { duration: 0.7, ease: "easeInOut", times: [0, 0.3, 0.5, 0.7, 1] },

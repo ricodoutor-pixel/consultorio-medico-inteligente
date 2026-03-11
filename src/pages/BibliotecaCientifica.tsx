@@ -131,20 +131,23 @@ const BibliotecaCientifica = () => {
       {/* Categories */}
       <section className="py-6">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {strainCategories.map((cat) => (
-              <Card
-                key={cat.nome}
-                className={`border-border hover:border-primary/30 transition-all cursor-pointer group ${filterTipo === cat.nome ? "border-primary/50 glow-green" : ""}`}
-                onClick={() => setFilterTipo(filterTipo === cat.nome ? null : cat.nome)}
-              >
-                <CardContent className="p-4 text-center">
-                  <span className="text-2xl mb-2 block group-hover:scale-110 transition-transform">{cat.emoji}</span>
-                  <p className="font-bold text-sm text-foreground">{cat.nome}</p>
-                  <p className="text-xs text-muted-foreground">{cat.descricao}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {strainCategories.map((cat) => {
+              const catKey = cat.nome === "Alto CBD" ? "cbd" : cat.nome === "Híbrida" ? "hibrida" : cat.nome.toLowerCase();
+              return (
+                <Card
+                  key={cat.nome}
+                  className={`border-border hover:border-primary/30 transition-all cursor-pointer group ${filterTipo === catKey ? "border-primary/50 glow-green" : ""}`}
+                  onClick={() => setFilterTipo(filterTipo === catKey ? null : catKey)}
+                >
+                  <CardContent className="p-4 text-center">
+                    <span className="text-2xl mb-2 block group-hover:scale-110 transition-transform">{cat.emoji}</span>
+                    <p className="font-bold text-sm text-foreground">{cat.nome}</p>
+                    <p className="text-xs text-muted-foreground">{cat.descricao}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </section>

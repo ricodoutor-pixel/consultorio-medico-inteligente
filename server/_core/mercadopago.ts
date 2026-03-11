@@ -202,7 +202,7 @@ export async function cancelSubscription(subscriptionId: string): Promise<any> {
       { status: 'cancelled' },
       {
         headers: {
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
+          Authorization: `Bearer ${getAccessToken()}`,
           'Content-Type': 'application/json',
         },
       }

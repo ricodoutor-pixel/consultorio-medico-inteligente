@@ -8,6 +8,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FrogChatModal } from "./components/FrogChatModal";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { AdminRoute } from "@/components/AdminRoute";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
 
 const Loading = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">

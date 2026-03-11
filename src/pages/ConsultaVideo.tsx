@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TCLEConsentModal } from "@/components/TCLEConsentModal";
 import { ProntuarioSidebar } from "@/components/ProntuarioSidebar";
 import { useAuditLog } from "@/hooks/useAuditLog";
+import { CbdThcAISuggestionPanel } from "@/components/CbdThcAISuggestionPanel";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 

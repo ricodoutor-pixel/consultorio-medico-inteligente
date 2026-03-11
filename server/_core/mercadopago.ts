@@ -134,7 +134,7 @@ export async function refundPayment(paymentId: string, amount?: number): Promise
       payload,
       {
         headers: {
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
+           Authorization: `Bearer ${getAccessToken()}`,
           'Content-Type': 'application/json',
         },
       }

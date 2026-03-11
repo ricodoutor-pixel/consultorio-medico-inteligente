@@ -171,6 +171,7 @@ const BibliotecaCientifica = () => {
                 { key: "sativa", label: "Sativa" },
                 { key: "indica", label: "Indica" },
                 { key: "hibrida", label: "Híbrida" },
+                { key: "medicinal", label: "Medicinal" },
               ].map((t) => (
                 <button
                   key={t.key}

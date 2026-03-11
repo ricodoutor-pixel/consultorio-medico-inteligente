@@ -29,6 +29,7 @@ const tipoColor = (tipo: string) => {
   if (cat === "sativa") return "text-primary border-green bg-gradient-green";
   if (cat === "indica") return "text-secondary border-purple bg-gradient-purple";
   if (cat === "cbd") return "text-emerald-500 border-emerald-500/30 bg-emerald-500/10";
+  if (cat === "medicinal") return "text-blue-400 border-blue-400/30 bg-blue-400/10";
   return "text-[hsl(45,76%,52%)] border-gold bg-gradient-gold";
 };
 
@@ -37,6 +38,7 @@ const tipoBadgeStyle = (tipo: string) => {
   if (cat === "sativa") return "bg-primary/20 text-primary border-primary/30";
   if (cat === "indica") return "bg-secondary/20 text-secondary border-secondary/30";
   if (cat === "cbd") return "bg-emerald-500/20 text-emerald-500 border-emerald-500/30";
+  if (cat === "medicinal") return "bg-blue-400/20 text-blue-400 border-blue-400/30";
   return "bg-[hsl(45,76%,52%)]/20 text-[hsl(45,76%,52%)] border-[hsl(45,76%,52%)]/30";
 };
 

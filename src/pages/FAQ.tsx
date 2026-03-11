@@ -37,7 +37,7 @@ const FAQ = () => {
     {
       category: "Shopping",
       questions: [
-        { q: "O que é o Shopping?", a: "É um marketplace multi-vendor com lojas verificadas, produtos de bem-estar e preços populares. Checkout via Pix." },
+        { q: "O que é o Shopping?", a: "É um Shopping multi-vendor com lojas verificadas, produtos de bem-estar e preços populares. Checkout via Pix." },
         { q: "Como garantir qualidade?", a: "Vendedores com verificação (CNPJ/CPF), produtos com laudos/COA, política de devolução e moderação." },
         { q: "Os produtos são legais?", a: "Sim! Todos seguem legislação vigente. Produtos controlados só com prescrição válida." },
       ],

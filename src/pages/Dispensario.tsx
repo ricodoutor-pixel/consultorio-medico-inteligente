@@ -146,7 +146,7 @@ const Dispensario = () => {
           <div>
             <h1 className="text-2xl font-bold text-foreground">Dispensário Medicinal</h1>
             <p className="text-sm text-muted-foreground">
-              Marketplace autorizado — Prescrição validada
+              Shopping autorizado — Prescrição validada
             </p>
           </div>
           <Badge className="ml-auto bg-primary/20 text-primary border-primary/30">

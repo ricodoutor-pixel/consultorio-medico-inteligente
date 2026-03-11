@@ -5,8 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Save, Shield, X, Search, Pill, Stethoscope, ClipboardList } from "lucide-react";
+import { FileText, Save, Shield, X, Search, Pill, Stethoscope, ClipboardList, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { CID10_TO_ICD11_MAP, ICD11_CODES } from "@/data/icd11";
 
 const CID10_COMMON = [
   { code: "F41.1", name: "Ansiedade generalizada" },

@@ -48,6 +48,9 @@ const Prontuario = lazy(() => import("./pages/Prontuario"));
 const DashboardMedico = lazy(() => import("./pages/DashboardMedico"));
 const DashboardExecutivo = lazy(() => import("./pages/DashboardExecutivo"));
 const Notificacoes = lazy(() => import("./pages/Notificacoes"));
+const SalaEspera = lazy(() => import("./pages/SalaEspera"));
+const ConsultaVideo = lazy(() => import("./pages/ConsultaVideo"));
+const RIPD = lazy(() => import("./pages/RIPD"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();

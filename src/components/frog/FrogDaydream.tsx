@@ -71,15 +71,10 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
                   style={{
                     filter: "drop-shadow(0 6px 20px rgba(0,0,0,0.35)) saturate(1.45) brightness(1.18) contrast(1.15)",
                   }}
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{
-                    opacity: 1,
-                    scale: [1, 1.1, 1.05, 1.1, 1],
-                    rotate: [0, -3, 3, -2, 0],
-                    y: [0, -3, 0, -2, 0],
-                  }}
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.3 }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
                 />
               )}
             </AnimatePresence>

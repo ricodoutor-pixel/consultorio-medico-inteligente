@@ -142,6 +142,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
   // Idle bounce
   useEffect(() => {
     const doJump = () => {
+      if (isDoctorMode) return;
       controls.start({
         y: [0, -14, -4, -10, 0],
         transition: { duration: 0.7, ease: "easeInOut", times: [0, 0.3, 0.5, 0.7, 1] },
@@ -149,7 +150,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     };
     const interval = setInterval(doJump, 4000 + Math.random() * 3000);
     return () => clearInterval(interval);
-  }, [controls]);
+  }, [controls, isDoctorMode]);
 
   // Waving arm every 20s — skip during doctor mode
   useEffect(() => {
@@ -233,12 +234,6 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       setLookingAtChart(true);
       // Eyes look toward the chart (right side)
       setEyeOffset({ x: size * 0.025, y: size * 0.01 });
-
-      // 3 bounces when entering doctor mode
-      controls.start({
-        y: [0, -16, 0, -10, 0, -6, 0],
-        transition: { duration: 0.8, ease: "easeInOut", times: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 1] },
-      });
 
       // Look at chart for 3s, then look at patient for 3s, repeat
       const chartCycle = setInterval(() => {

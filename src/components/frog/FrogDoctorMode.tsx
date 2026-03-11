@@ -20,11 +20,11 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
           exit={{ opacity: 0, scale: 0.8 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          {/* White doctor coat with dark blue horizontal tie and pocket with pen */}
+          {/* White doctor coat with vertical dark tie and pocket with pen */}
           <svg
             className="absolute pointer-events-none"
             style={{
-              bottom: size * 0.02,
+              bottom: size * 0.10,
               left: (size - coatW) / 2,
               width: coatW,
               height: coatH,
@@ -42,24 +42,25 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             <path d="M82 0 L60 22 L72 0 Z" fill="#e8e8e8" opacity="0.7" />
             <path d="M32 0 Q40 10 60 13 Q80 10 88 0" stroke="#bbb" strokeWidth="1.5" fill="none" />
 
-            {/* Dark blue horizontal tie (gravata horizontal azul escuro) */}
-            <rect x="30" y="14" width="60" height="7" rx="2" fill="#1e3a5f" />
-            <rect x="32" y="15" width="56" height="5" rx="1.5" fill="#1a3050" opacity="0.7" />
+            {/* Dark vertical tie (gravata vertical escura) */}
+            <rect x="57" y="13" width="6" height="55" rx="2" fill="#1a1a1a" />
+            <rect x="58" y="14" width="4" height="53" rx="1.5" fill="#222" opacity="0.8" />
             {/* Tie knot */}
-            <rect x="55" y="13" width="10" height="9" rx="2" fill="#162d4a" />
-            <rect x="57" y="14.5" width="6" height="6" rx="1.5" fill="#1e3a5f" />
+            <path d="M55 12 L60 18 L65 12 Z" fill="#111" />
+            <rect x="56" y="11" width="8" height="4" rx="1.5" fill="#1a1a1a" />
+            {/* Tie tip */}
+            <path d="M57 68 L60 74 L63 68 Z" fill="#1a1a1a" />
 
             {/* Left pocket with pen */}
             <rect x="15" y="38" width="18" height="14" rx="2.5" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="0.8" />
-            {/* Pen in pocket */}
             <rect x="22" y="32" width="2" height="12" rx="0.8" fill="#1a1a1a" />
             <rect x="22" y="31" width="2" height="3" rx="0.5" fill="#2563eb" />
             <circle cx="23" cy="31" r="1" fill="#3b82f6" />
 
             {/* Buttons */}
-            <circle cx="60" cy="28" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
-            <circle cx="60" cy="42" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
-            <circle cx="60" cy="56" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
+            <circle cx="50" cy="28" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
+            <circle cx="50" cy="42" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
+            <circle cx="50" cy="56" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
 
             {/* Name badge */}
             <rect x="72" y="38" width="28" height="12" rx="2.5" fill="#dbeafe" stroke="#93c5fd" strokeWidth="0.6" />

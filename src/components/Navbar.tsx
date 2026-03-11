@@ -168,7 +168,6 @@ export const Navbar = () => {
               <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
             </Button>
           </div>
-          </div>
 
           {/* Mobile auth + hamburger */}
           <div className="lg:hidden flex items-center gap-2">

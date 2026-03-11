@@ -14,6 +14,8 @@ export interface CannabisStrain {
   rendimento: string;
   avaliacao: number;
   imagem: string;
+  terpenos?: string[];
+  aplicacoesMedicas?: { condicao: string; eficacia: "baixa" | "média" | "alta"; evidencia: "anedótica" | "preliminar" | "estabelecida" }[];
 }
 
 // Local AI-generated cannabis flower images by type
@@ -40,7 +42,7 @@ const aiImg = (name: string, type: string) => {
   const t = type.toLowerCase();
   if (t.includes("indica")) return indicaImages[seed % 3];
   if (t.includes("sativa")) return sativaImages[seed % 3];
-  if (t.includes("cbd")) return cbdImages[seed % 3];
+  if (t.includes("cbd") || t.includes("medicinal")) return cbdImages[seed % 3];
   return hybridImages[seed % 3];
 };
 
@@ -51,11 +53,41 @@ export const getPlantImage = (id: number) => {
 
 export const getPlantImageFallback = (_id: number) => "/placeholder.svg";
 
+// Terpene profiles by strain type
+const terpenosIndica = ["Mirceno", "Linalol", "β-Cariofileno", "Humuleno"];
+const terpenosSativa = ["Limoneno", "Pineno", "Terpinoleno", "Ocimeno"];
+const terpenosHibrida = ["Mirceno", "Limoneno", "β-Cariofileno", "Pineno"];
+const terpenosCBD = ["Mirceno", "β-Cariofileno", "Bisabolol", "Guaiol"];
+const terpenosMedicinal = ["β-Cariofileno", "Mirceno", "Linalol", "Bisabolol"];
+
+export const getTerpenosByType = (tipo: string): string[] => {
+  const t = tipo.toLowerCase();
+  if (t.includes("medicinal") || t.includes("especializada")) return terpenosMedicinal;
+  if (t.includes("cbd")) return terpenosCBD;
+  if (t.includes("indica")) return terpenosIndica;
+  if (t.includes("sativa")) return terpenosSativa;
+  return terpenosHibrida;
+};
+
+export const terpenoInfo: Record<string, { cor: string; efeito: string }> = {
+  "Mirceno": { cor: "hsl(142,70%,45%)", efeito: "Relaxamento, sedação, anti-inflamatório" },
+  "Limoneno": { cor: "hsl(45,76%,52%)", efeito: "Energia, humor, ansiolítico" },
+  "Linalol": { cor: "hsl(270,60%,60%)", efeito: "Calmante, ansiolítico, analgésico" },
+  "β-Cariofileno": { cor: "hsl(25,80%,50%)", efeito: "Anti-inflamatório, analgésico" },
+  "Pineno": { cor: "hsl(160,50%,45%)", efeito: "Alerta, anti-inflamatório, broncodilatador" },
+  "Humuleno": { cor: "hsl(35,60%,45%)", efeito: "Supressor de apetite, anti-inflamatório" },
+  "Terpinoleno": { cor: "hsl(200,50%,55%)", efeito: "Sedativo, antioxidante, antibacteriano" },
+  "Ocimeno": { cor: "hsl(180,50%,50%)", efeito: "Anti-inflamatório, antifúngico" },
+  "Bisabolol": { cor: "hsl(300,40%,60%)", efeito: "Anti-irritação, anti-inflamatório" },
+  "Guaiol": { cor: "hsl(120,30%,55%)", efeito: "Anti-inflamatório, antimicrobiano" },
+};
+
 export const strainCategories = [
   { nome: "Alto CBD", emoji: "💚", descricao: "Fins terapêuticos" },
   { nome: "Sativa", emoji: "☀️", descricao: "Energia e criatividade" },
   { nome: "Indica", emoji: "🌙", descricao: "Relaxamento profundo" },
   { nome: "Híbrida", emoji: "🌿", descricao: "Efeitos balanceados" },
+  { nome: "Medicinal", emoji: "🏥", descricao: "Uso farmacêutico" },
 ];
 
 export const strains: CannabisStrain[] = [

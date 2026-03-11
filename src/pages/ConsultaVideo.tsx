@@ -150,6 +150,7 @@ const ConsultaVideo = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <TCLEConsentModal open={showTCLE && !tcleAccepted} onAccept={handleTCLEAccept} onDecline={handleTCLEDecline} />
       {!isFullscreen && <Navbar />}
 
       <div className={`${isFullscreen ? "" : "pt-16"} flex flex-col h-screen`}>

@@ -164,7 +164,8 @@ const ConsultaVideo = () => {
               <Shield size={8} className="mr-1" /> E2E Encrypted
             </Badge>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <NetworkQualityIndicator />
             <span className="text-xs font-mono text-muted-foreground flex items-center gap-1">
               <Clock size={10} /> {formatTime(elapsedSeconds)}
             </span>

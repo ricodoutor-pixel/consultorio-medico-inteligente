@@ -42,14 +42,14 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             <path d="M82 0 L60 22 L72 0 Z" fill="#e8e8e8" opacity="0.7" />
             <path d="M32 0 Q40 10 60 13 Q80 10 88 0" stroke="#bbb" strokeWidth="1.5" fill="none" />
 
-            {/* Dark vertical tie (gravata vertical escura) */}
-            <rect x="57" y="13" width="6" height="55" rx="2" fill="#1a1a1a" />
-            <rect x="58" y="14" width="4" height="53" rx="1.5" fill="#222" opacity="0.8" />
+            {/* Dark vertical tie (gravata vertical escura) — raised 10% */}
+            <rect x="57" y="7" width="6" height="55" rx="2" fill="#1a1a1a" />
+            <rect x="58" y="8" width="4" height="53" rx="1.5" fill="#222" opacity="0.8" />
             {/* Tie knot */}
-            <path d="M55 12 L60 18 L65 12 Z" fill="#111" />
-            <rect x="56" y="11" width="8" height="4" rx="1.5" fill="#1a1a1a" />
+            <path d="M55 6 L60 12 L65 6 Z" fill="#111" />
+            <rect x="56" y="5" width="8" height="4" rx="1.5" fill="#1a1a1a" />
             {/* Tie tip */}
-            <path d="M57 68 L60 74 L63 68 Z" fill="#1a1a1a" />
+            <path d="M57 62 L60 68 L63 62 Z" fill="#1a1a1a" />
 
             {/* Left pocket with pen */}
             <rect x="15" y="38" width="18" height="14" rx="2.5" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="0.8" />
@@ -58,9 +58,9 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             <circle cx="23" cy="31" r="1" fill="#3b82f6" />
 
             {/* Buttons */}
-            <circle cx="50" cy="28" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
-            <circle cx="50" cy="42" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
-            <circle cx="50" cy="56" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
+            <circle cx="50" cy="22" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
+            <circle cx="50" cy="36" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
+            <circle cx="50" cy="50" r="2.5" fill="#e0e0e0" stroke="#aaa" strokeWidth="0.6" />
 
             {/* Name badge */}
             <rect x="72" y="38" width="28" height="12" rx="2.5" fill="#dbeafe" stroke="#93c5fd" strokeWidth="0.6" />
@@ -75,11 +75,11 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             </defs>
           </svg>
 
-          {/* Head mirror on forehead — lowered 20% + 10% bigger */}
+           {/* Head mirror on forehead — lowered 20% more */}
           <svg
             className="absolute pointer-events-none"
             style={{
-              top: size * 0.144,
+              top: size * 0.173,
               left: size * 0.345,
               width: size * 0.308,
               height: size * 0.121,
@@ -119,8 +119,8 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             <rect x="2" y="6" width="40" height="52" rx="3" fill="#f5f0e0" stroke="#c4a44a" strokeWidth="1.5" />
             <rect x="14" y="1" width="18" height="9" rx="2.5" fill="#8B7355" stroke="#6b5a3e" strokeWidth="1" />
             <circle cx="23" cy="5.5" r="2.2" fill="#c4a44a" />
-            <rect x="6" y="13" width="30" height="5" rx="1" fill="#e8f5e9" />
-            <text x="21" y="17" textAnchor="middle" fontSize="3.5" fill="#2e7d32" fontWeight="bold">Paciente</text>
+            <rect x="6" y="13" width="30" height="5" rx="1" fill="#f5f0e0" />
+            <text x="21" y="17" textAnchor="middle" fontSize="3.5" fill="#8B7355" fontWeight="bold">Paciente</text>
             <line x1="6" y1="22" x2="36" y2="22" stroke="#ccc" strokeWidth="0.8" />
             <line x1="6" y1="27" x2="32" y2="27" stroke="#ccc" strokeWidth="0.8" />
             <line x1="6" y1="32" x2="34" y2="32" stroke="#ccc" strokeWidth="0.8" />

@@ -12,7 +12,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
   if (!isDaydreaming || !daydreamPhase) return null;
 
   const bubbleSize = size * 0.86;
-  const bubbleX = size * 1.05;
+  const bubbleX = size * 1.155;
   const bubbleY = -bubbleSize * 0.05;
 
   return (
@@ -26,11 +26,11 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
           exit={{ opacity: 0, scale: 0.2, rotate: 10 }}
           transition={{ duration: 0.5, ease: "backOut" }}
         >
-          {/* Comic-style thought bubble trail */}
+          {/* Comic-style thought bubble trail — no dark outlines */}
           <svg className="absolute" style={{ bottom: -size * 0.12, left: -20, width: 30, height: 40 }}>
-            <circle cx="22" cy="32" r="6" fill="white" stroke="#222" strokeWidth="1.5" />
-            <circle cx="13" cy="20" r="4.5" fill="white" stroke="#222" strokeWidth="1.5" />
-            <circle cx="6" cy="9" r="3" fill="white" stroke="#222" strokeWidth="1.5" />
+            <circle cx="22" cy="32" r="6" fill="white" stroke="#ddd" strokeWidth="1" />
+            <circle cx="13" cy="20" r="4.5" fill="white" stroke="#ddd" strokeWidth="1" />
+            <circle cx="6" cy="9" r="3" fill="white" stroke="#ddd" strokeWidth="1" />
           </svg>
 
           {/* Main comic thought cloud — princess only */}
@@ -40,12 +40,11 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               borderRadius: "50% 45% 48% 52% / 48% 50% 45% 52%",
               background: "radial-gradient(ellipse at 35% 30%, #ffffff, #fff8fc 50%, #fff0f6 80%, #ffe8f0)",
               boxShadow: `
-                0 0 0 3px #222,
-                0 0 0 5px white,
-                0 8px 30px rgba(0,0,0,0.25),
+                0 0 0 2px #e0c0d0,
+                0 8px 30px rgba(0,0,0,0.15),
                 inset 0 4px 20px rgba(255,255,255,0.9)
               `,
-              border: "3px solid #333",
+              border: "2px solid #d4a0b8",
             }}
           >
             {/* Soft golden glow */}
@@ -64,7 +63,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               alt="Princesa beijando o sapo"
               className="w-[90%] h-[90%] object-contain relative z-10"
               style={{
-                filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.25)) saturate(1.25) brightness(1.12) contrast(1.08)",
+                filter: "drop-shadow(0 6px 20px rgba(0,0,0,0.35)) saturate(1.45) brightness(1.18) contrast(1.15)",
               }}
               animate={
                 daydreamPhase === "kiss"

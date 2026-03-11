@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle } from "lucide-react";
+import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";

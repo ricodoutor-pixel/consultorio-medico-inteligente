@@ -108,26 +108,26 @@ export const Navbar = () => {
   );
 
   return (
-    <nav className="fixed top-0 w-full glass border-b border-border z-50" role="navigation" aria-label="Navegação principal">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+    <nav className="fixed top-0 left-0 right-0 glass border-b border-border z-50 will-change-transform" role="navigation" aria-label="Navegação principal" style={{ WebkitBackfaceVisibility: 'hidden' }}>
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="flex items-center justify-between h-16 md:h-[72px]">
           {/* Logo + Verdinho mascot */}
-          <div className="flex items-center gap-1 md:gap-2">
-            <NavLink to="/" className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green">
-                <Leaf size={20} className="text-primary-foreground" />
+          <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+            <NavLink to="/" className="flex items-center gap-1.5 md:gap-2">
+              <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
+                <Leaf size={18} className="text-primary-foreground" />
               </div>
-              <div className="leading-tight">
-                <span className="text-sm font-display font-black text-foreground block">
+              <div className="leading-tight hidden xs:block">
+                <span className="text-xs md:text-sm font-display font-black text-foreground block whitespace-nowrap">
                   Planta <span className="text-gradient-purple">&</span> Raiz
                 </span>
-                <span className="text-[10px] text-muted-foreground font-semibold">Mega Clínica Digital</span>
+                <span className="text-[9px] md:text-[10px] text-muted-foreground font-semibold block">Mega Clínica Digital</span>
               </div>
             </NavLink>
 
-            <div className="ml-1">
+            <div className="ml-0.5 md:ml-1 flex-shrink-0">
               <FrogMascot
-                size={60}
+                size={48}
                 mood="happy"
                 onClick={openChat}
                 enableJumpToNav={true}
@@ -135,12 +135,12 @@ export const Navbar = () => {
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center gap-5" role="menubar">
+          <div className="hidden xl:flex items-center gap-1 2xl:gap-3 flex-shrink" role="menubar">
             {links.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
-                className="text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
+                className="text-xs 2xl:text-sm font-bold text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1.5 2xl:px-2 py-1"
                 activeClassName="text-primary font-black"
               >
                 {link.label}
@@ -149,67 +149,67 @@ export const Navbar = () => {
           </div>
 
           {/* Desktop auth area */}
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden xl:flex items-center gap-1.5 flex-shrink-0">
             <GlobalComplianceBadge />
             <LanguageSwitcher />
             {user ? (
               <UserMenu />
             ) : (
               <>
-                <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5" asChild>
-                  <NavLink to="/login"><LogIn size={16} /> Fazer Login</NavLink>
+                <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5 text-xs h-9 px-3" asChild>
+                  <NavLink to="/login"><LogIn size={14} /> Fazer Login</NavLink>
                 </Button>
-                <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary" asChild>
+                <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary text-xs h-9 px-3" asChild>
                   <NavLink to="/cadastro">Cadastro</NavLink>
                 </Button>
               </>
             )}
-            <Button size="sm" className="bg-primary text-primary-foreground font-black rounded-xl" asChild>
+            <Button size="sm" className="bg-primary text-primary-foreground font-black rounded-xl text-xs h-9 px-4" asChild>
               <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
             </Button>
           </div>
 
-          {/* Mobile auth + hamburger */}
-          <div className="lg:hidden flex items-center gap-2">
+          {/* Mobile/Tablet auth + hamburger */}
+          <div className="xl:hidden flex items-center gap-1.5">
             {user ? (
               <UserMenu compact />
             ) : (
-              <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5" asChild>
-                <NavLink to="/login"><LogIn size={16} /> Login</NavLink>
+              <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1 text-xs h-9 px-2" asChild>
+                <NavLink to="/login"><LogIn size={14} /> Login</NavLink>
               </Button>
             )}
             <button
-              className="p-2 text-foreground"
+              className="p-2 text-foreground flex-shrink-0"
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
               aria-expanded={isOpen}
               aria-controls="mobile-menu"
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+              {isOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
 
         {isOpen && (
-          <div id="mobile-menu" className="lg:hidden py-4 space-y-3 border-t border-border" role="menu" aria-label="Menu mobile">
+          <div id="mobile-menu" className="xl:hidden py-3 space-y-1 border-t border-border animate-in slide-in-from-top-2 duration-200" role="menu" aria-label="Menu mobile">
             {links.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
-                className="block py-2 text-muted-foreground hover:text-foreground transition-colors font-bold text-sm"
+                className="block py-2.5 px-3 text-muted-foreground hover:text-foreground transition-colors font-bold text-sm rounded-lg hover:bg-muted/50"
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}
               </NavLink>
             ))}
-            <div className="flex flex-col gap-2 pt-2">
+            <div className="flex flex-col gap-2 pt-2 border-t border-border mt-1">
               <div className="flex gap-2">
                 {!user && (
-                  <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary" asChild>
+                  <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary h-11" asChild>
                     <NavLink to="/cadastro" onClick={() => setIsOpen(false)}>Cadastro</NavLink>
                   </Button>
                 )}
-                <Button className="flex-1 bg-primary text-primary-foreground font-black rounded-xl" asChild>
+                <Button className="flex-1 bg-primary text-primary-foreground font-black rounded-xl h-11" asChild>
                   <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>Consulta</NavLink>
                 </Button>
               </div>

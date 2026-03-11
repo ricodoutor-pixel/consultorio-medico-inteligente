@@ -106,7 +106,7 @@ export async function getPaymentStatus(paymentId: string): Promise<any> {
   try {
     const response = await axios.get(`${MERCADO_PAGO_API}/payments/${paymentId}`, {
       headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
+         Authorization: `Bearer ${getAccessToken()}`,
       },
     });
 

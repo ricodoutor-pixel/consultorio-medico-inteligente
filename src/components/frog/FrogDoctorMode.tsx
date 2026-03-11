@@ -75,28 +75,6 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             </defs>
           </svg>
 
-           {/* Head mirror — lowered further */}
-          <svg
-            className="absolute pointer-events-none"
-            style={{
-              top: size * 0.492,
-              left: size * 0.29,
-              width: size * 0.46,
-              height: size * 0.18,
-            }}
-            viewBox="0 0 60 22"
-            fill="none"
-          >
-            <path d="M5 14 Q30 4 55 14" stroke="#999" strokeWidth="1.8" fill="none" />
-            <circle cx="30" cy="9" r="7" fill="url(#mirrorGrad2)" stroke="#aaa" strokeWidth="1.2" />
-            <circle cx="27" cy="7" r="2.5" fill="white" opacity="0.65" />
-            <defs>
-              <radialGradient id="mirrorGrad2" cx="38%" cy="33%">
-                <stop offset="0%" stopColor="#f8f8f8" />
-                <stop offset="100%" stopColor="#b8b8b8" />
-              </radialGradient>
-            </defs>
-          </svg>
 
           {/* Clipboard/chart — lowered 10% more + 10% bigger */}
           <motion.svg

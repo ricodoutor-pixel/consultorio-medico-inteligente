@@ -486,6 +486,56 @@ const BibliotecaCientifica = () => {
                 </div>
               </div>
 
+              {/* Terpenes */}
+              {(() => {
+                const terpenos = selected.terpenos || getTerpenosByType(selected.tipo);
+                return (
+                  <div className="mb-4">
+                    <h4 className="font-display font-bold text-foreground mb-2 flex items-center gap-2">
+                      <Beaker size={16} className="text-primary" /> Perfil de Terpenos
+                    </h4>
+                    <div className="space-y-2">
+                      {terpenos.map((t) => {
+                        const info = terpenoInfo[t];
+                        return (
+                          <div key={t} className="flex items-center gap-3 p-2 rounded-lg bg-muted/30 border border-border">
+                            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: info?.cor || "hsl(var(--primary))" }} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-foreground">{t}</p>
+                              <p className="text-[10px] text-muted-foreground">{info?.efeito || ""}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Medical Applications */}
+              {selected.aplicacoesMedicas && selected.aplicacoesMedicas.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="font-display font-bold text-foreground mb-2 flex items-center gap-2">
+                    <ShieldCheck size={16} className="text-primary" /> Aplicações Médicas
+                  </h4>
+                  <div className="space-y-2">
+                    {selected.aplicacoesMedicas.map((app, i) => (
+                      <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-muted/30 border border-border">
+                        <span className="text-xs font-bold text-foreground">{app.condicao}</span>
+                        <div className="flex items-center gap-2">
+                          <Badge className={`text-[9px] ${app.eficacia === "alta" ? "bg-primary/20 text-primary" : app.eficacia === "média" ? "bg-[hsl(45,76%,52%)]/20 text-[hsl(45,76%,52%)]" : "bg-muted text-muted-foreground"}`}>
+                            {app.eficacia}
+                          </Badge>
+                          <Badge variant="outline" className="text-[9px]">
+                            {app.evidencia}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* CTA */}
               <Button className="w-full bg-primary text-primary-foreground font-black rounded-xl" asChild>
                 <Link to="/profissionais">

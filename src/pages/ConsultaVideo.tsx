@@ -227,14 +227,24 @@ const ConsultaVideo = () => {
                 <MessageSquare size={20} />
               </Button>
               {isDoctor && (
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className={`rounded-full w-12 h-12 ${showAISidebar ? "ring-2 ring-secondary" : ""}`}
-                  onClick={() => setShowAISidebar(!showAISidebar)}
-                >
-                  <Brain size={20} />
-                </Button>
+                <>
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className={`rounded-full w-12 h-12 ${showPEP ? "ring-2 ring-primary" : ""}`}
+                    onClick={() => setShowPEP(!showPEP)}
+                  >
+                    <ClipboardList size={20} />
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className={`rounded-full w-12 h-12 ${showAISidebar ? "ring-2 ring-secondary" : ""}`}
+                    onClick={() => setShowAISidebar(!showAISidebar)}
+                  >
+                    <Brain size={20} />
+                  </Button>
+                </>
               )}
               <Button
                 variant="destructive"

@@ -119,8 +119,8 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
             <rect x="2" y="6" width="40" height="52" rx="3" fill="#f5f0e0" stroke="#c4a44a" strokeWidth="1.5" />
             <rect x="14" y="1" width="18" height="9" rx="2.5" fill="#8B7355" stroke="#6b5a3e" strokeWidth="1" />
             <circle cx="23" cy="5.5" r="2.2" fill="#c4a44a" />
-            <rect x="6" y="13" width="30" height="5" rx="1" fill="#e8f5e9" />
-            <text x="21" y="17" textAnchor="middle" fontSize="3.5" fill="#2e7d32" fontWeight="bold">Paciente</text>
+            <rect x="6" y="13" width="30" height="5" rx="1" fill="#f5f0e0" />
+            <text x="21" y="17" textAnchor="middle" fontSize="3.5" fill="#8B7355" fontWeight="bold">Paciente</text>
             <line x1="6" y1="22" x2="36" y2="22" stroke="#ccc" strokeWidth="0.8" />
             <line x1="6" y1="27" x2="32" y2="27" stroke="#ccc" strokeWidth="0.8" />
             <line x1="6" y1="32" x2="34" y2="32" stroke="#ccc" strokeWidth="0.8" />

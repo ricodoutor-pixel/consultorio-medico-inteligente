@@ -63,7 +63,7 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               alt="Princesa beijando o sapo"
               className="w-[90%] h-[90%] object-contain relative z-10"
               style={{
-                filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.25)) saturate(1.25) brightness(1.12) contrast(1.08)",
+                filter: "drop-shadow(0 6px 20px rgba(0,0,0,0.35)) saturate(1.45) brightness(1.18) contrast(1.15)",
               }}
               animate={
                 daydreamPhase === "kiss"

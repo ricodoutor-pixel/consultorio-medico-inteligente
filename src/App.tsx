@@ -51,6 +51,7 @@ const Notificacoes = lazy(() => import("./pages/Notificacoes"));
 const SalaEspera = lazy(() => import("./pages/SalaEspera"));
 const ConsultaVideo = lazy(() => import("./pages/ConsultaVideo"));
 const RIPD = lazy(() => import("./pages/RIPD"));
+const LGPDDireitos = lazy(() => import("./pages/LGPDDireitos"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();

@@ -368,6 +368,11 @@ const ConsultaVideo = () => {
               </div>
             </div>
           )}
+
+          {/* PEP Sidebar (doctor only) */}
+          {showPEP && isDoctor && (
+            <ProntuarioSidebar appointmentId={appointmentId} onClose={() => setShowPEP(false)} />
+          )}
         </div>
       </div>
     </div>

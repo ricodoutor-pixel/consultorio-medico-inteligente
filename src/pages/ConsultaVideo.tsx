@@ -368,6 +368,11 @@ const ConsultaVideo = () => {
                   <p className="text-xs font-bold text-muted-foreground mb-2">🔍 Busca Rápida CID-10</p>
                   <CID10QuickSearch />
                 </div>
+
+                {/* CBD/THC AI Suggestion */}
+                <div className="border-t border-border pt-4">
+                  <CbdThcAISuggestionPanel />
+                </div>
               </div>
             </div>
           )}

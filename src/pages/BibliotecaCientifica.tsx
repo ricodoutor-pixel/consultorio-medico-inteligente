@@ -17,6 +17,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.03 } } };
 
 const getTipoCategory = (tipo: string) => {
   const t = tipo.toLowerCase();
+  if (t.includes("medicinal") || t.includes("especializada")) return "medicinal";
   if (t.includes("cbd")) return "cbd";
   if (t.includes("sativa")) return "sativa";
   if (t.includes("indica")) return "indica";

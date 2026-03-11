@@ -28,8 +28,8 @@ export const FrogChestHeart = memo(({ size, show }: FrogChestHeartProps) => {
           transition={{ duration: 0.4, ease: "backOut" }}
         >
           <motion.svg
-            width={size * 0.143}
-            height={size * 0.143}
+            width={size * 0.17}
+            height={size * 0.17}
             viewBox="0 0 24 24"
             animate={{
               scale: [1, 1.35, 1, 1.3, 1],

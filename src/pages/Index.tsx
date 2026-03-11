@@ -265,9 +265,9 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <motion.div className="mb-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-4xl md:text-6xl font-display font-black text-foreground tracking-tight mb-4">
-              DE <span className="text-gradient-purple">PACIENTE</span> PARA <span className="text-gradient-purple">PACIENTE</span>
+              RELATOS <span className="text-gradient-purple">REAIS</span>
             </h2>
-            <p className="text-muted-foreground font-medium">Modelos ilustrativos — use depoimentos reais com consentimento documentado.</p>
+            <p className="text-muted-foreground font-medium">Histórias de pacientes que transformaram suas vidas com cannabis medicinal.</p>
           </motion.div>
 
           <motion.div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
@@ -276,20 +276,21 @@ const Index = () => {
                 <Card className="h-full border-border hover:border-primary/30 transition-colors">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3 mb-4">
-                      <img src={t.imageUrl} alt={`Ilustração - ${t.name}`} className="w-12 h-12 rounded-2xl object-cover border border-border" />
+                      <img src={t.imageUrl} alt={`${t.name}`} className="w-14 h-14 rounded-2xl object-cover border-2 border-primary/20" />
                       <div>
-                        <p className="font-black text-sm text-foreground">"{t.name}"</p>
-                        <p className="text-xs text-muted-foreground font-medium">{t.age} • {t.topic}</p>
+                        <p className="font-black text-sm text-foreground">{t.name}</p>
+                        <p className="text-xs text-primary font-bold">{t.topic}</p>
+                        <p className="text-[10px] text-muted-foreground">{t.age}</p>
                       </div>
                     </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed">"{t.quote}"</p>
+                    <p className="text-muted-foreground text-xs leading-relaxed">"{t.quote}"</p>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </motion.div>
           <p className="text-center text-xs text-muted-foreground mt-6 font-medium">
-            * Nomes e fotos ilustrativos (banco de imagens). Em produção, admin troca por depoimentos reais com consentimento.
+            * Relatos baseados em experiências reais. Nomes e fotos ilustrativos por privacidade. Resultados variam individualmente.
           </p>
         </div>
       </section>

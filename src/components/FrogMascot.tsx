@@ -155,8 +155,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             className={`pointer-events-none ${anim.isDoctorMode ? '' : 'drop-shadow-lg'}`}
             style={{ 
             clipPath: anim.isDoctorMode 
-                ? `inset(${displaySize * 0.15}px 0 ${displaySize * 0.48}px 0)` 
-                : `inset(0 0 ${displaySize * 0.48}px 0)` 
+                ? `inset(${displaySize * 0.22}px 0 ${displaySize * 0.48}px 0)` 
+                : `inset(0 0 ${displaySize * 0.48}px 0)`
             }}
             draggable={false}
           />

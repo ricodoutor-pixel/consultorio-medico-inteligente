@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TCLEConsentModal } from "@/components/TCLEConsentModal";
 import { ProntuarioSidebar } from "@/components/ProntuarioSidebar";
 import { useAuditLog } from "@/hooks/useAuditLog";
+import { CbdThcAISuggestionPanel } from "@/components/CbdThcAISuggestionPanel";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
@@ -366,6 +367,11 @@ const ConsultaVideo = () => {
                 <div>
                   <p className="text-xs font-bold text-muted-foreground mb-2">🔍 Busca Rápida CID-10</p>
                   <CID10QuickSearch />
+                </div>
+
+                {/* CBD/THC AI Suggestion */}
+                <div className="border-t border-border pt-4">
+                  <CbdThcAISuggestionPanel />
                 </div>
               </div>
             </div>

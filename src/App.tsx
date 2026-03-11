@@ -55,6 +55,8 @@ const ConsultaVideo = lazy(() => import("./pages/ConsultaVideo"));
 const RIPD = lazy(() => import("./pages/RIPD"));
 const LGPDDireitos = lazy(() => import("./pages/LGPDDireitos"));
 const GlobalCompliance = lazy(() => import("./pages/GlobalCompliance"));
+const TreatmentTracker = lazy(() => import("./pages/TreatmentTracker"));
+const Dispensario = lazy(() => import("./pages/Dispensario"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -117,6 +119,9 @@ const App = () => (
                 <Route path="/meus-dados" element={<LGPDDireitos />} />
                 <Route path="/compliance" element={<GlobalCompliance />} />
                 <Route path="/conformidade-global" element={<GlobalCompliance />} />
+                <Route path="/treatment-tracker" element={<TreatmentTracker />} />
+                <Route path="/acompanhamento" element={<TreatmentTracker />} />
+                <Route path="/dispensario" element={<Dispensario />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

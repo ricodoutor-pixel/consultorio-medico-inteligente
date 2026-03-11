@@ -49,7 +49,7 @@ export async function createPayment(request: PaymentRequest): Promise<PaymentRes
 
     const response = await axios.post(`${MERCADO_PAGO_API}/checkout/preferences`, payload, {
       headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
+         Authorization: `Bearer ${getAccessToken()}`,
         'Content-Type': 'application/json',
       },
     });

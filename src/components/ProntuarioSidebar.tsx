@@ -158,9 +158,18 @@ export const ProntuarioSidebar = ({ onClose, onSave }: ProntuarioSidebarProps) =
               </div>
             )}
             {data.diagnosisCid && (
-              <Badge variant="outline" className="mt-1.5 text-[10px] border-primary/30">
-                {data.diagnosisCid} — {data.diagnosisText}
-              </Badge>
+              <div className="mt-1.5 space-y-1">
+                <Badge variant="outline" className="text-[10px] border-primary/30">
+                  CID-10: {data.diagnosisCid} — {data.diagnosisText}
+                </Badge>
+                {CID10_TO_ICD11_MAP[data.diagnosisCid] && (
+                  <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-600 flex items-center gap-1">
+                    <Globe size={8} /> ICD-11: {CID10_TO_ICD11_MAP[data.diagnosisCid]} — {
+                      ICD11_CODES.find(c => c.code === CID10_TO_ICD11_MAP[data.diagnosisCid])?.name_pt || ""
+                    }
+                  </Badge>
+                )}
+              </div>
             )}
           </div>
 

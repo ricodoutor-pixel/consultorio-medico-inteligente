@@ -40,12 +40,11 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
               borderRadius: "50% 45% 48% 52% / 48% 50% 45% 52%",
               background: "radial-gradient(ellipse at 35% 30%, #ffffff, #fff8fc 50%, #fff0f6 80%, #ffe8f0)",
               boxShadow: `
-                0 0 0 3px #222,
-                0 0 0 5px white,
-                0 8px 30px rgba(0,0,0,0.25),
+                0 0 0 2px #e0c0d0,
+                0 8px 30px rgba(0,0,0,0.15),
                 inset 0 4px 20px rgba(255,255,255,0.9)
               `,
-              border: "3px solid #333",
+              border: "2px solid #d4a0b8",
             }}
           >
             {/* Soft golden glow */}

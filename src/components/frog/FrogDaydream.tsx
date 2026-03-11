@@ -42,13 +42,15 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
             className="relative w-full h-full overflow-visible flex items-center justify-center"
             style={{
               borderRadius: "50% 45% 48% 52% / 48% 50% 45% 52%",
-              background: "radial-gradient(ellipse at 35% 30%, #ffffff, #fff8fc 50%, #fff0f6 80%, #ffe8f0)",
+              background: "radial-gradient(ellipse at 35% 30%, #ffffff, #fff8fc 40%, #ffe8f4 65%, #ffd6ec 85%, #ffc8e4)",
               boxShadow: `
-                0 0 0 2px #e0c0d0,
-                0 8px 30px rgba(0,0,0,0.15),
-                inset 0 4px 20px rgba(255,255,255,0.9)
+                0 0 0 2.5px #d4a0b8,
+                0 0 20px rgba(255, 105, 180, 0.25),
+                0 8px 35px rgba(0,0,0,0.18),
+                inset 0 4px 25px rgba(255,255,255,0.95),
+                inset 0 -4px 15px rgba(255, 182, 193, 0.15)
               `,
-              border: "2px solid #d4a0b8",
+              border: "2.5px solid #c990a8",
             }}
           >
             {/* Soft golden glow */}

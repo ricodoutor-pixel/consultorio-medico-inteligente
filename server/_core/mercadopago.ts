@@ -84,7 +84,7 @@ export async function createPixPayment(request: PaymentRequest): Promise<Payment
 
     const response = await axios.post(`${MERCADO_PAGO_API}/payments`, payload, {
       headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
+         Authorization: `Bearer ${getAccessToken()}`,
         'Content-Type': 'application/json',
       },
     });

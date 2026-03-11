@@ -62,13 +62,15 @@ const queryClient = new QueryClient();
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <FrogChatModal />
-          <Suspense fallback={<Loading />}>
-            <main id="main-content" role="main">
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AccessibilitySkipLink />
+            <FrogChatModal />
+            <Suspense fallback={<Loading />}>
+              <main id="main-content" role="main">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/como-funciona" element={<ComoFunciona />} />

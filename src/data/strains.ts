@@ -24,22 +24,34 @@ import indicaDeep from "@/assets/strains/indica-deep.jpg";
 import indicaPink from "@/assets/strains/indica-pink.jpg";
 import indicaGold from "@/assets/strains/indica-gold.jpg";
 import indicaDark from "@/assets/strains/indica-dark.jpg";
+import indicaEmerald from "@/assets/strains/indica-emerald.jpg";
+import indicaLavender from "@/assets/strains/indica-lavender.jpg";
+import indicaRoyal from "@/assets/strains/indica-royal.jpg";
 import sativaGreen from "@/assets/strains/sativa-green.jpg";
 import sativaLime from "@/assets/strains/sativa-lime.jpg";
 import sativaForest from "@/assets/strains/sativa-forest.jpg";
 import sativaYellow from "@/assets/strains/sativa-yellow.jpg";
 import sativaAmber from "@/assets/strains/sativa-amber.jpg";
+import sativaCitrus from "@/assets/strains/sativa-citrus.jpg";
+import sativaRuby from "@/assets/strains/sativa-ruby.jpg";
+import sativaNeon from "@/assets/strains/sativa-neon.jpg";
 import hybridOrange from "@/assets/strains/hybrid-orange.jpg";
 import hybridGold from "@/assets/strains/hybrid-gold.jpg";
 import hybridRed from "@/assets/strains/hybrid-red.jpg";
 import hybridBlue from "@/assets/strains/hybrid-blue.jpg";
 import hybridMagenta from "@/assets/strains/hybrid-magenta.jpg";
+import hybridAmber from "@/assets/strains/hybrid-amber.jpg";
+import hybridTeal from "@/assets/strains/hybrid-teal.jpg";
+import hybridSunset from "@/assets/strains/hybrid-sunset.jpg";
 import cbdFrosty from "@/assets/strains/cbd-frosty.jpg";
 import cbdEmerald from "@/assets/strains/cbd-emerald.jpg";
 import cbdSilver from "@/assets/strains/cbd-silver.jpg";
 import cbdWhite from "@/assets/strains/cbd-white.jpg";
+import cbdMint from "@/assets/strains/cbd-mint.jpg";
 import medicinalPurple from "@/assets/strains/medicinal-purple.jpg";
 import medicinalSilver from "@/assets/strains/medicinal-silver.jpg";
+import medicinalGold from "@/assets/strains/medicinal-gold.jpg";
+import medicinalRose from "@/assets/strains/medicinal-rose.jpg";
 // Named strain images
 import imgCharlottesWeb from "@/assets/strains/charlottes-web.jpg";
 import imgACDC from "@/assets/strains/acdc.jpg";
@@ -64,11 +76,11 @@ const namedStrainImages: Record<string, string> = {
   "Sour Diesel": imgSourDiesel,
 };
 
-const indicaImages = [indicaPurple, indicaDeep, indicaPink, indicaGold, indicaDark];
-const sativaImages = [sativaGreen, sativaLime, sativaForest, sativaYellow, sativaAmber];
-const hybridImages = [hybridOrange, hybridGold, hybridRed, hybridBlue, hybridMagenta];
-const cbdImages = [cbdFrosty, cbdEmerald, cbdSilver, cbdWhite];
-const medicinalImages = [medicinalPurple, medicinalSilver, cbdWhite, cbdFrosty];
+const indicaImages = [indicaPurple, indicaDeep, indicaPink, indicaGold, indicaDark, indicaEmerald, indicaLavender, indicaRoyal];
+const sativaImages = [sativaGreen, sativaLime, sativaForest, sativaYellow, sativaAmber, sativaCitrus, sativaRuby, sativaNeon];
+const hybridImages = [hybridOrange, hybridGold, hybridRed, hybridBlue, hybridMagenta, hybridAmber, hybridTeal, hybridSunset];
+const cbdImages = [cbdFrosty, cbdEmerald, cbdSilver, cbdWhite, cbdMint];
+const medicinalImages = [medicinalPurple, medicinalSilver, medicinalGold, medicinalRose];
 
 const aiImg = (name: string, type: string) => {
   // First check for named strain images

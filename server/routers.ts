@@ -13,6 +13,7 @@ import { sentimentRouter } from "./routers/sentimentRouter";
 import { sentimentDashboardRouter } from "./routers/sentimentDashboardRouter";
 import { monitoringRouter } from "./routers/monitoring";
 import { referralRouter } from "./routers/referral";
+import { recommendationsRouter } from "./routers/recommendations";
 // import { marketplaceRouter } from "./routers/marketplaceRouter"; // TODO: Fix marketplace router
 
 const COOKIE_NAME = "auth-token";

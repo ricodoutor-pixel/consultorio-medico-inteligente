@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { Video, Mic, MicOff, VideoOff, Phone, MessageSquare, FileText, Shield, Send, Paperclip, Clock, Brain, Loader2, X, Maximize2, Minimize2, ClipboardList } from "lucide-react";
+import { Video, Mic, MicOff, VideoOff, Phone, MessageSquare, FileText, Shield, Send, Paperclip, Clock, Brain, Loader2, X, Maximize2, Minimize2, ClipboardList, Wifi } from "lucide-react";
+import { NetworkQualityIndicator } from "@/components/NetworkQualityIndicator";
 import { motion } from "framer-motion";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -163,7 +164,8 @@ const ConsultaVideo = () => {
               <Shield size={8} className="mr-1" /> E2E Encrypted
             </Badge>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <NetworkQualityIndicator />
             <span className="text-xs font-mono text-muted-foreground flex items-center gap-1">
               <Clock size={10} /> {formatTime(elapsedSeconds)}
             </span>

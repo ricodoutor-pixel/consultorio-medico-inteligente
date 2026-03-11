@@ -6,6 +6,8 @@ import { FrogMascot } from "@/components/FrogMascot";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -147,7 +149,9 @@ export const Navbar = () => {
           </div>
 
           {/* Desktop auth area */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
+            <GlobalComplianceBadge />
+            <LanguageSwitcher />
             {user ? (
               <UserMenu />
             ) : (

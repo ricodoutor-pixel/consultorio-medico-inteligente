@@ -8,6 +8,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FrogChatModal } from "./components/FrogChatModal";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { AdminRoute } from "@/components/AdminRoute";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
 
 const Loading = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
@@ -52,6 +54,7 @@ const SalaEspera = lazy(() => import("./pages/SalaEspera"));
 const ConsultaVideo = lazy(() => import("./pages/ConsultaVideo"));
 const RIPD = lazy(() => import("./pages/RIPD"));
 const LGPDDireitos = lazy(() => import("./pages/LGPDDireitos"));
+const GlobalCompliance = lazy(() => import("./pages/GlobalCompliance"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -59,13 +62,15 @@ const queryClient = new QueryClient();
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <FrogChatModal />
-          <Suspense fallback={<Loading />}>
-            <main id="main-content" role="main">
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AccessibilitySkipLink />
+            <FrogChatModal />
+            <Suspense fallback={<Loading />}>
+              <main id="main-content" role="main">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/como-funciona" element={<ComoFunciona />} />
@@ -110,12 +115,15 @@ const App = () => (
                 <Route path="/ripd" element={<RIPD />} />
                 <Route path="/lgpd" element={<LGPDDireitos />} />
                 <Route path="/meus-dados" element={<LGPDDireitos />} />
+                <Route path="/compliance" element={<GlobalCompliance />} />
+                <Route path="/conformidade-global" element={<GlobalCompliance />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
           </Suspense>
         </BrowserRouter>
       </TooltipProvider>
+    </LanguageProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 );

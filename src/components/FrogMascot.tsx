@@ -10,6 +10,7 @@ import { FrogCrown } from "./frog/FrogCrown";
 import { FrogLoveHearts } from "./frog/FrogLoveHearts";
 import { FrogStoryScroll } from "./frog/FrogStoryScroll";
 import { FrogDoctorMode } from "./frog/FrogDoctorMode";
+import { FrogChestHeart } from "./frog/FrogChestHeart";
 
 interface FrogMascotProps {
   onClick?: () => void;
@@ -240,6 +241,9 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
 
       {/* Love hearts */}
       <FrogLoveHearts size={displaySize} show={anim.isDaydreaming && !anim.isDoctorMode} />
+
+      {/* Pulsing chest heart during daydream */}
+      <FrogChestHeart size={displaySize} show={anim.isDaydreaming && !anim.isDoctorMode} />
 
       {/* Daydream bubble */}
       <FrogDaydream size={displaySize} isDaydreaming={anim.isDaydreaming} daydreamPhase={anim.daydreamPhase} />

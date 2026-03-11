@@ -120,7 +120,7 @@ export const FrogDoctorMode = ({ size, isDoctor, lookingAtChart }: FrogDoctorMod
 
           {/* Doctor emoji floating */}
           <motion.span
-            className="absolute top-[40%] right-[-8%] text-lg z-40"
+            className="absolute top-[40%] left-[-8%] text-lg z-40"
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >

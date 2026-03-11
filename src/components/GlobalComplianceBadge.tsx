@@ -1,4 +1,3 @@
-import { forwardRef } from "react";
 import { Shield, Globe, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -14,27 +13,19 @@ const REGION_CONFIG = {
   latam: { label: "GDPR-like + E-Sign", icon: "🌎", color: "border-purple-500/30 text-purple-600" },
 };
 
-const ComplianceBadgeInner = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & Props>(
-  ({ region = "br", ...props }, ref) => {
-    const cfg = REGION_CONFIG[region];
-    return (
-      <Badge ref={ref} variant="outline" className={`gap-1 text-[10px] cursor-default ${cfg.color}`} {...props}>
-        <Shield size={10} />
-        <span>{cfg.icon}</span>
-        <span className="hidden sm:inline">{cfg.label}</span>
-      </Badge>
-    );
-  }
-);
-ComplianceBadgeInner.displayName = "ComplianceBadgeInner";
-
 export const GlobalComplianceBadge = ({ region = "br" }: Props) => {
   const cfg = REGION_CONFIG[region];
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <ComplianceBadgeInner region={region} />
+        <button type="button" className="inline-flex" aria-label={`Conformidade: ${cfg.label}`}>
+          <Badge variant="outline" className={`gap-1 text-[10px] cursor-default ${cfg.color}`}>
+            <Shield size={10} />
+            <span>{cfg.icon}</span>
+            <span className="hidden sm:inline">{cfg.label}</span>
+          </Badge>
+        </button>
       </TooltipTrigger>
       <TooltipContent className="text-xs max-w-[240px]">
         <div className="space-y-1">

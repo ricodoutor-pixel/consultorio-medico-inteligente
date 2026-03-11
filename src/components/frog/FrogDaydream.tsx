@@ -42,13 +42,15 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
             className="relative w-full h-full overflow-visible flex items-center justify-center"
             style={{
               borderRadius: "50% 45% 48% 52% / 48% 50% 45% 52%",
-              background: "radial-gradient(ellipse at 35% 30%, #ffffff, #fff8fc 50%, #fff0f6 80%, #ffe8f0)",
+              background: "radial-gradient(ellipse at 35% 30%, #ffffff, #fff8fc 40%, #ffe8f4 65%, #ffd6ec 85%, #ffc8e4)",
               boxShadow: `
-                0 0 0 2px #e0c0d0,
-                0 8px 30px rgba(0,0,0,0.15),
-                inset 0 4px 20px rgba(255,255,255,0.9)
+                0 0 0 2.5px #d4a0b8,
+                0 0 20px rgba(255, 105, 180, 0.25),
+                0 8px 35px rgba(0,0,0,0.18),
+                inset 0 4px 25px rgba(255,255,255,0.95),
+                inset 0 -4px 15px rgba(255, 182, 193, 0.15)
               `,
-              border: "2px solid #d4a0b8",
+              border: "2.5px solid #c990a8",
             }}
           >
             {/* Soft golden glow */}
@@ -67,14 +69,14 @@ export const FrogDaydream = memo(({ size, isDaydreaming, daydreamPhase }: FrogDa
                 <motion.img
                   src={princessImg}
                   alt="Princesa beijando o sapo"
-                  className="w-[85%] h-[85%] object-contain relative z-10"
+                  className="w-[88%] h-[88%] object-contain relative z-10"
                   style={{
-                    filter: "drop-shadow(0 6px 20px rgba(0,0,0,0.35)) saturate(1.45) brightness(1.18) contrast(1.15)",
+                    filter: "drop-shadow(0 4px 12px rgba(255, 105, 180, 0.4)) drop-shadow(0 8px 25px rgba(0,0,0,0.3)) saturate(1.5) brightness(1.22) contrast(1.18)",
                   }}
-                  initial={{ opacity: 0, scale: 0.7 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.3 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  initial={{ opacity: 0, scale: 0.6, rotate: -5 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.3, rotate: 5 }}
+                  transition={{ duration: 0.6, ease: "backOut" }}
                 />
               )}
             </AnimatePresence>

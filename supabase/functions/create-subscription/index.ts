@@ -2,14 +2,48 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { planId, payerEmail } = await req.json();
+    // Authenticate user
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Não autorizado" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Não autorizado" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const userEmail = claimsData.claims.email as string;
+
+    const { planId } = await req.json();
+
+    // Validate planId
+    if (!planId || typeof planId !== "string") {
+      return new Response(JSON.stringify({ error: "planId é obrigatório" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const MP_ACCESS_TOKEN = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
     if (!MP_ACCESS_TOKEN) {
@@ -19,38 +53,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Plan configurations
+    // Server-controlled plan pricing — user cannot override amounts
     const plans: Record<string, { title: string; amount: number; frequency: number; frequency_type: string }> = {
-      "consultorio-virtual": {
-        title: "Consultório Virtual - Plano Médico",
-        amount: 150,
-        frequency: 1,
-        frequency_type: "months",
-      },
-      "essencial": {
-        title: "Plano Essencial",
-        amount: 50,
-        frequency: 1,
-        frequency_type: "months",
-      },
-      "acesso": {
-        title: "Plano Acesso",
-        amount: 100,
-        frequency: 1,
-        frequency_type: "months",
-      },
-      "familia": {
-        title: "Plano Família",
-        amount: 250,
-        frequency: 1,
-        frequency_type: "months",
-      },
-      "empresas": {
-        title: "Plano Empresas & Parceiros",
-        amount: 300,
-        frequency: 1,
-        frequency_type: "months",
-      },
+      "consultorio-virtual": { title: "Consultório Virtual - Plano Médico", amount: 150, frequency: 1, frequency_type: "months" },
+      "essencial": { title: "Plano Essencial", amount: 50, frequency: 1, frequency_type: "months" },
+      "acesso": { title: "Plano Acesso", amount: 100, frequency: 1, frequency_type: "months" },
+      "familia": { title: "Plano Família", amount: 250, frequency: 1, frequency_type: "months" },
+      "empresas": { title: "Plano Empresas & Parceiros", amount: 300, frequency: 1, frequency_type: "months" },
     };
 
     const plan = plans[planId];
@@ -61,10 +70,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const siteUrl = "https://consultorio-medico-inteligente.lovable.app";
 
-    // Create a checkout preference with PIX + credit card
     const preference = {
       items: [
         {
@@ -75,7 +82,7 @@ Deno.serve(async (req) => {
         },
       ],
       payer: {
-        email: payerEmail || "",
+        email: userEmail,
       },
       back_urls: {
         success: `${siteUrl}/dashboard?payment=success&plan=${planId}`,
@@ -104,7 +111,7 @@ Deno.serve(async (req) => {
     if (!mpResponse.ok) {
       const errText = await mpResponse.text();
       console.error("[create-subscription] Mercado Pago error:", mpResponse.status, errText);
-      return new Response(JSON.stringify({ error: "Erro ao criar pagamento no Mercado Pago", details: errText }), {
+      return new Response(JSON.stringify({ error: "Erro ao criar pagamento no Mercado Pago" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

@@ -14,6 +14,7 @@ import triagemPatient from "@/assets/triagem-patient.png";
 import consultaChat from "@/assets/consulta-chat.png";
 import triagemForm from "@/assets/triagem-form.png";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
+import { useEffect } from "react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -29,6 +30,10 @@ const steps = [
 ];
 
 const Index = () => {
+  useEffect(() => {
+    document.title = "Planta y Raiz - Mega Clínica Digital";
+  }, []);
+
   return (
     <div className="min-h-screen bg-background w-full overflow-x-hidden">
       <Navbar />
@@ -42,6 +47,15 @@ const Index = () => {
             {/* Text Content */}
             <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col">
               
+              {/* Mobile Only: Iniciar Consulta no Topo */}
+              <motion.div variants={fadeUp} className="md:hidden mb-6 w-full">
+                 <Link to="/telemedicina" className="w-full">
+                  <Button className="w-full bg-secondary text-secondary-foreground font-black py-8 rounded-2xl text-xl shadow-2xl animate-pulse border-4 border-background">
+                    <Video className="mr-3 w-6 h-6" /> INICIAR CONSULTA
+                  </Button>
+                </Link>
+              </motion.div>
+
               {/* Selo CFM Acima da Frase */}
               <motion.div variants={fadeUp} className="mb-6">
                 <GlobalComplianceBadge variant="hero" />
@@ -127,10 +141,10 @@ const Index = () => {
                   <div className="absolute -inset-10 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-full blur-[100px] opacity-50 group-hover:opacity-80 transition duration-1000"></div>
                   <img
                     src={heroPhoneMockup}
-                    alt="Planta & Raiz App"
+                    alt="Planta y Raiz App"
                     className="w-[450px] md:w-[600px] lg:w-[750px] xl:w-[900px] 2xl:w-[1100px] drop-shadow-[0_45px_45px_rgba(0,0,0,0.6)] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
                     loading="eager"
-                    fetchPriority="high" // Prioridade máxima para o LCP
+                    fetchPriority="high"
                     decoding="async"
                   />
                 </div>
@@ -140,7 +154,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Live Stats - Lazy Loading Implicito pelo Viewport */}
+      {/* Live Stats */}
       <section className="py-12 md:py-16 border-b border-border bg-card/20 backdrop-blur-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>

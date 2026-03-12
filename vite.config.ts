@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     mode === "production" &&
-      viteObfuscateFile({
+      obfuscatorPlugin({
           compact: true,
           controlFlowFlattening: true,
           controlFlowFlatteningThreshold: 0.5,

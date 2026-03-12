@@ -464,7 +464,7 @@ const Index = () => {
       </section>
 
       <div className="border-t border-border">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 py-4">
           <p className="text-xs text-muted-foreground text-center font-medium">
             ⚠️ Conteúdo educativo. Prescrição e conduta clínica dependem de avaliação individual por profissional habilitado.
           </p>

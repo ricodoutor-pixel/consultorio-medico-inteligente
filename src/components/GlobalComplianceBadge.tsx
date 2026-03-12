@@ -19,11 +19,13 @@ export const GlobalComplianceBadge = ({ region = "br" }: Props) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Badge variant="outline" className={`gap-1 text-[10px] cursor-default ${cfg.color}`}>
-          <Shield size={10} />
-          <span>{cfg.icon}</span>
-          <span className="hidden sm:inline">{cfg.label}</span>
-        </Badge>
+        <button type="button" className="inline-flex" aria-label={`Conformidade: ${cfg.label}`}>
+          <Badge variant="outline" className={`gap-1 text-[10px] cursor-default ${cfg.color}`}>
+            <Shield size={10} />
+            <span>{cfg.icon}</span>
+            <span className="hidden sm:inline">{cfg.label}</span>
+          </Badge>
+        </button>
       </TooltipTrigger>
       <TooltipContent className="text-xs max-w-[240px]">
         <div className="space-y-1">

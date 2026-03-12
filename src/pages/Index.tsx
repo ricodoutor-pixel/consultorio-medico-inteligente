@@ -277,7 +277,7 @@ const Index = () => {
                 <Card className="h-full border-border hover:border-primary/30 transition-colors">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3 mb-4">
-                      <img src={t.imageUrl} alt={`${t.name}`} className="w-14 h-14 rounded-2xl object-cover border-2 border-primary/20" />
+                      <img src={t.imageUrl} alt={`${t.name}`} className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-cover border-2 border-primary/20 flex-shrink-0" loading="lazy" />
                       <div>
                         <p className="font-black text-sm text-foreground">{t.name}</p>
                         <p className="text-xs text-primary font-bold">{t.topic}</p>

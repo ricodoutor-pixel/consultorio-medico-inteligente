@@ -260,6 +260,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "medical_records_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+          {
             foreignKeyName: "medical_records_doctor_id_fkey"
             columns: ["doctor_id"]
             isOneToOne: false
@@ -404,6 +411,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "prescriptions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+          {
             foreignKeyName: "prescriptions_doctor_id_fkey"
             columns: ["doctor_id"]
             isOneToOne: false
@@ -479,6 +493,48 @@ export type Database = {
         }
         Relationships: []
       }
+      strains_library: {
+        Row: {
+          category: string | null
+          content: string | null
+          created_at: string | null
+          id: string
+          image_url: string | null
+          indications: string[] | null
+          name: string
+          slug: string
+          terpenes: string[] | null
+          thc_cbd_ratio: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          indications?: string[] | null
+          name: string
+          slug: string
+          terpenes?: string[] | null
+          thc_cbd_ratio?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          indications?: string[] | null
+          name?: string
+          slug?: string
+          terpenes?: string[] | null
+          thc_cbd_ratio?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -499,7 +555,53 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      financial_reports: {
+        Row: {
+          appointment_id: string | null
+          created_at: string | null
+          doctor_id: string | null
+          doctor_payout: number | null
+          patient_id: string | null
+          payment_status: string | null
+          platform_revenue: number | null
+          scheduled_at: string | null
+          status: string | null
+          total_value: number | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string | null
+          doctor_id?: string | null
+          doctor_payout?: never
+          patient_id?: string | null
+          payment_status?: string | null
+          platform_revenue?: never
+          scheduled_at?: string | null
+          status?: string | null
+          total_value?: number | null
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string | null
+          doctor_id?: string | null
+          doctor_payout?: never
+          patient_id?: string | null
+          payment_status?: string | null
+          platform_revenue?: never
+          scheduled_at?: string | null
+          status?: string | null
+          total_value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       has_role: {

@@ -222,7 +222,7 @@ const Index = () => {
 
       {/* Step by step — with visual images */}
       <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div className="mb-16" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-4xl md:text-6xl font-display font-black text-foreground tracking-tight leading-tight">
               SIGA O <span className="text-gradient-green">PASSO A PASSO</span>

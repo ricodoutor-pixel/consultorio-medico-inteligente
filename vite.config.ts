@@ -14,8 +14,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     mode === "production" &&
-      obfuscatorPlugin({
-        options: {
+      viteObfuscateFile({
           compact: true,
           controlFlowFlattening: true,
           controlFlowFlatteningThreshold: 0.5,
@@ -43,8 +42,7 @@ export default defineConfig(({ mode }) => ({
           stringArrayThreshold: 0.75,
           transformObjectKeys: true,
           unicodeEscapeSequence: false,
-        },
-      }),
+        }),
   ].filter(Boolean),
   resolve: {
     alias: {

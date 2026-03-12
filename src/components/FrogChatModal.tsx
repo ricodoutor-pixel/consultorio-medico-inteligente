@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FrogMascot } from "@/components/FrogMascot";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   id: string;

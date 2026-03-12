@@ -56,7 +56,7 @@ const Index = () => {
 
       {/* Hero */}
       <section className="hero-glow pt-24 pb-16 md:pt-32 md:pb-28">
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <motion.div initial="hidden" animate="visible" variants={stagger}>
               <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-8">

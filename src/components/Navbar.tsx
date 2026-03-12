@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { Menu, X, Leaf, LogIn, LogOut, User } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
@@ -19,6 +19,22 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<{ id: string; email?: string; fullName?: string; avatarUrl?: string } | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Close menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -81,7 +97,9 @@ export const Navbar = () => {
     { to: "/planos", label: "Planos" },
   ];
 
-  const openChat = () => window.dispatchEvent(new Event("open-frog-chat"));
+  const openChat = useCallback(() => window.dispatchEvent(new Event("open-frog-chat")), []);
+
+  const closeMenu = useCallback(() => setIsOpen(false), []);
 
   const UserMenu = ({ compact = false }: { compact?: boolean }) => (
     <DropdownMenu>
@@ -108,115 +126,134 @@ export const Navbar = () => {
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 glass border-b border-border z-50 will-change-transform" role="navigation" aria-label="Navegação principal" style={{ WebkitBackfaceVisibility: 'hidden' }}>
-      <div className="container mx-auto px-3 sm:px-4 lg:px-6">
-        <div className="flex items-center justify-between h-16 md:h-[72px]">
-          {/* Logo + Verdinho mascot */}
-          <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
-            <NavLink to="/" className="flex items-center gap-1.5 md:gap-2">
-              <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
-                <Leaf size={18} className="text-primary-foreground" />
-              </div>
-              <div className="leading-tight hidden xs:block">
-                <span className="text-xs md:text-sm font-display font-black text-foreground block whitespace-nowrap">
-                  Planta <span className="text-gradient-purple">&</span> Raiz
-                </span>
-                <span className="text-[9px] md:text-[10px] text-muted-foreground font-semibold block">Mega Clínica Digital</span>
-              </div>
-            </NavLink>
-
-            <div className="ml-0.5 md:ml-1 flex-shrink-0">
-              <FrogMascot
-                size={48}
-                mood="happy"
-                onClick={openChat}
-                enableJumpToNav={true}
-              />
-            </div>
-          </div>
-
-          <div className="hidden xl:flex items-center gap-1 2xl:gap-3 flex-shrink" role="menubar">
-            {links.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className="text-xs 2xl:text-sm font-bold text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1.5 2xl:px-2 py-1"
-                activeClassName="text-primary font-black"
-              >
-                {link.label}
+    <>
+      <nav
+        className="fixed top-0 left-0 right-0 glass border-b border-border z-50 will-change-transform"
+        role="navigation"
+        aria-label="Navegação principal"
+        style={{ WebkitBackfaceVisibility: "hidden" }}
+      >
+        <div className="container mx-auto px-3 sm:px-4 lg:px-6">
+          <div className="flex items-center justify-between h-16 md:h-[72px]">
+            {/* Logo + Verdinho */}
+            <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+              <NavLink to="/" className="flex items-center gap-1.5 md:gap-2">
+                <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
+                  <Leaf size={18} className="text-primary-foreground" />
+                </div>
+                <div className="leading-tight hidden xs:block">
+                  <span className="text-xs md:text-sm font-display font-black text-foreground block whitespace-nowrap">
+                    Planta <span className="text-gradient-purple">&</span> Raiz
+                  </span>
+                  <span className="text-[9px] md:text-[10px] text-muted-foreground font-semibold block">Mega Clínica Digital</span>
+                </div>
               </NavLink>
-            ))}
-          </div>
+              <div className="ml-0.5 md:ml-1 flex-shrink-0">
+                <FrogMascot size={48} mood="happy" onClick={openChat} enableJumpToNav={true} />
+              </div>
+            </div>
 
-          {/* Desktop auth area */}
-          <div className="hidden xl:flex items-center gap-1.5 flex-shrink-0">
-            <GlobalComplianceBadge />
-            <LanguageSwitcher />
-            {user ? (
-              <UserMenu />
-            ) : (
-              <>
-                <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5 text-xs h-9 px-3" asChild>
-                  <NavLink to="/login"><LogIn size={14} /> Fazer Login</NavLink>
-                </Button>
-                <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary text-xs h-9 px-3" asChild>
-                  <NavLink to="/cadastro">Cadastro</NavLink>
-                </Button>
-              </>
-            )}
-            <Button size="sm" className="bg-primary text-primary-foreground font-black rounded-xl text-xs h-9 px-4" asChild>
-              <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
-            </Button>
-          </div>
+            {/* Desktop Links */}
+            <div className="hidden xl:flex items-center gap-1 2xl:gap-3 flex-shrink" role="menubar">
+              {links.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className="text-xs 2xl:text-sm font-bold text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1.5 2xl:px-2 py-1"
+                  activeClassName="text-primary font-black"
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </div>
 
-          {/* Mobile/Tablet auth + hamburger */}
-          <div className="xl:hidden flex items-center gap-1.5">
-            {user ? (
-              <UserMenu compact />
-            ) : (
-              <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1 text-xs h-9 px-2" asChild>
-                <NavLink to="/login"><LogIn size={14} /> Login</NavLink>
+            {/* Desktop Auth */}
+            <div className="hidden xl:flex items-center gap-1.5 flex-shrink-0">
+              <GlobalComplianceBadge />
+              <LanguageSwitcher />
+              {user ? (
+                <UserMenu />
+              ) : (
+                <>
+                  <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5 text-xs h-9 px-3" asChild>
+                    <NavLink to="/login"><LogIn size={14} /> Fazer Login</NavLink>
+                  </Button>
+                  <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary text-xs h-9 px-3" asChild>
+                    <NavLink to="/cadastro">Cadastro</NavLink>
+                  </Button>
+                </>
+              )}
+              <Button size="sm" className="bg-primary text-primary-foreground font-black rounded-xl text-xs h-9 px-4" asChild>
+                <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
               </Button>
-            )}
-            <button
-              className="p-2 text-foreground flex-shrink-0"
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label={isOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
-              aria-expanded={isOpen}
-              aria-controls="mobile-menu"
-            >
-              {isOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
+            </div>
+
+            {/* Mobile Auth + Hamburger */}
+            <div className="xl:hidden flex items-center gap-1.5">
+              {user ? (
+                <UserMenu compact />
+              ) : (
+                <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1 text-xs h-9 px-2" asChild>
+                  <NavLink to="/login"><LogIn size={14} /> Login</NavLink>
+                </Button>
+              )}
+              <button
+                className="p-2 text-foreground flex-shrink-0 relative z-[60]"
+                onClick={() => setIsOpen(!isOpen)}
+                aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
+                aria-expanded={isOpen}
+                aria-controls="mobile-menu"
+              >
+                {isOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
           </div>
         </div>
+      </nav>
 
-        {isOpen && (
-          <div id="mobile-menu" className="xl:hidden py-3 space-y-1 border-t border-border animate-in slide-in-from-top-2 duration-200" role="menu" aria-label="Menu mobile">
-            {links.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className="block py-2.5 px-3 text-muted-foreground hover:text-foreground transition-colors font-bold text-sm rounded-lg hover:bg-muted/50"
-                onClick={() => setIsOpen(false)}
-              >
-                {link.label}
-              </NavLink>
-            ))}
-            <div className="flex flex-col gap-2 pt-2 border-t border-border mt-1">
-              <div className="flex gap-2">
-                {!user && (
-                  <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary h-11" asChild>
-                    <NavLink to="/cadastro" onClick={() => setIsOpen(false)}>Cadastro</NavLink>
-                  </Button>
-                )}
-                <Button className="flex-1 bg-primary text-primary-foreground font-black rounded-xl h-11" asChild>
-                  <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>Consulta</NavLink>
+      {/* ── MOBILE FULLSCREEN OVERLAY MENU ── */}
+      {isOpen && (
+        <div
+          id="mobile-menu"
+          className="fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl xl:hidden flex flex-col pt-20 pb-8 overflow-y-auto"
+          role="menu"
+          aria-label="Menu mobile"
+        >
+          <div className="container mx-auto px-4 flex flex-col flex-1">
+            {/* Navigation Links */}
+            <div className="space-y-1 flex-1">
+              {links.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className="flex items-center justify-between py-3.5 px-4 text-foreground hover:text-primary transition-colors font-bold text-base rounded-xl hover:bg-muted/50 group"
+                  activeClassName="text-primary bg-primary/5"
+                  onClick={closeMenu}
+                >
+                  <span>{link.label}</span>
+                  <ChevronRight size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                </NavLink>
+              ))}
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="space-y-3 pt-6 border-t border-border mt-4">
+              {!user && (
+                <Button variant="outline" className="w-full font-bold rounded-xl border-primary/30 text-primary h-12 text-sm" asChild>
+                  <NavLink to="/cadastro" onClick={closeMenu}>Cadastre-se Grátis</NavLink>
                 </Button>
+              )}
+              <Button className="w-full bg-primary text-primary-foreground font-black rounded-xl h-12 text-sm" asChild>
+                <NavLink to="/telemedicina" onClick={closeMenu}>Iniciar Consulta</NavLink>
+              </Button>
+              <div className="flex items-center justify-center gap-3 pt-2">
+                <GlobalComplianceBadge />
+                <LanguageSwitcher />
               </div>
             </div>
           </div>
-        )}
-      </div>
-    </nav>
+        </div>
+      )}
+    </>
   );
 };

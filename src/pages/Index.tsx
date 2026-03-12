@@ -312,7 +312,7 @@ const Index = () => {
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <Card className="border-border max-w-5xl overflow-hidden">
+            <Card className="border-border overflow-hidden">
               <CardContent className="p-6 md:p-8">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">

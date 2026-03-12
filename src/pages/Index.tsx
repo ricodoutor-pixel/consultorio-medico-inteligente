@@ -55,9 +55,9 @@ const Index = () => {
       <WhatsAppButton />
 
       {/* Hero */}
-      <section className="hero-glow pt-20 pb-16 md:pt-28 md:pb-28">
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <section className="hero-glow pt-24 pb-16 md:pt-32 md:pb-28">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <motion.div initial="hidden" animate="visible" variants={stagger}>
               <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-8">
                 <div className="inline-flex items-center gap-2 flex-wrap">
@@ -149,7 +149,8 @@ const Index = () => {
               <img
                 src={heroPhoneMockup}
                 alt="Planta & Raiz — App de consulta e medicamentos à base de cannabis"
-                className="w-[340px] xl:w-[400px] drop-shadow-2xl"
+                className="w-[280px] lg:w-[340px] xl:w-[400px] drop-shadow-2xl mx-auto"
+                loading="eager"
               />
             </motion.div>
           </div>
@@ -157,8 +158,8 @@ const Index = () => {
       </section>
 
       {/* Live Stats */}
-      <section className="py-12 border-b border-border">
-        <div className="container mx-auto px-4">
+      <section className="py-12 md:py-16 border-b border-border">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {[
               { value: "45K+", label: "Usuários Ativos", icon: Users },
@@ -181,8 +182,8 @@ const Index = () => {
       </section>
 
       {/* Hub Navigation */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div className="mb-10" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-3xl md:text-5xl font-display font-black text-foreground tracking-tight">
               Ecossistema <span className="text-gradient-purple">Completo</span>
@@ -222,7 +223,7 @@ const Index = () => {
 
       {/* Step by step — with visual images */}
       <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div className="mb-16" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-4xl md:text-6xl font-display font-black text-foreground tracking-tight leading-tight">
               SIGA O <span className="text-gradient-green">PASSO A PASSO</span>
@@ -233,13 +234,13 @@ const Index = () => {
             {steps.map((s, i) => (
               <motion.div key={s.n} variants={fadeUp} className="space-y-4">
                 {i === 0 && (
-                  <img src={triagemPatient} alt="Paciente usando a plataforma" className="w-full h-32 object-cover rounded-2xl border border-border mb-2" />
+                  <img src={triagemPatient} alt="Paciente usando a plataforma" className="w-full h-36 md:h-40 object-cover rounded-2xl border border-border mb-3" loading="lazy" />
                 )}
                 {i === 1 && (
-                  <img src={triagemForm} alt="Triagem emocional" className="w-full h-32 object-cover object-top rounded-2xl border border-border mb-2" />
+                  <img src={triagemForm} alt="Triagem emocional" className="w-full h-36 md:h-40 object-cover object-top rounded-2xl border border-border mb-3" loading="lazy" />
                 )}
                 {i === 3 && (
-                  <img src={consultaChat} alt="Consulta com especialista" className="w-full h-32 object-cover rounded-2xl border border-border mb-2" />
+                  <img src={consultaChat} alt="Consulta com especialista" className="w-full h-36 md:h-40 object-cover rounded-2xl border border-border mb-3" loading="lazy" />
                 )}
                 <div className="step-number">{s.n}</div>
                 <h3 className="text-lg font-display font-black text-primary">{s.title}</h3>
@@ -262,7 +263,7 @@ const Index = () => {
       {/* Testimonials */}
       <section className="py-20 md:py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-purple pointer-events-none opacity-30" />
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div className="mb-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-4xl md:text-6xl font-display font-black text-foreground tracking-tight mb-4">
               RELATOS <span className="text-gradient-purple">REAIS</span>
@@ -276,7 +277,7 @@ const Index = () => {
                 <Card className="h-full border-border hover:border-primary/30 transition-colors">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3 mb-4">
-                      <img src={t.imageUrl} alt={`${t.name}`} className="w-14 h-14 rounded-2xl object-cover border-2 border-primary/20" />
+                      <img src={t.imageUrl} alt={`${t.name}`} className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-cover border-2 border-primary/20 flex-shrink-0" loading="lazy" />
                       <div>
                         <p className="font-black text-sm text-foreground">{t.name}</p>
                         <p className="text-xs text-primary font-bold">{t.topic}</p>
@@ -297,7 +298,7 @@ const Index = () => {
 
       {/* Market Chart */}
       <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div className="mb-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center">
@@ -366,7 +367,7 @@ const Index = () => {
       {/* Features */}
       <section className="py-20 md:py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-green pointer-events-none opacity-20" />
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div className="mb-16" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-4xl md:text-5xl font-display font-black text-foreground tracking-tight mb-4">Ecossistema Completo</h2>
             <p className="text-muted-foreground font-medium text-lg">Tudo que você precisa em um só lugar.</p>
@@ -399,7 +400,7 @@ const Index = () => {
 
       {/* FAQ Accordion */}
       <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div className="mb-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-4xl md:text-5xl font-display font-black text-foreground tracking-tight mb-4">Dúvidas Frequentes</h2>
           </motion.div>
@@ -433,7 +434,7 @@ const Index = () => {
 
       {/* CTA */}
       <section className="py-20 md:py-28 hero-glow">
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div className="max-w-3xl" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-4xl md:text-6xl font-display font-black text-foreground tracking-tight mb-6 leading-tight">
               Comece sua jornada <span className="text-gradient-green">agora</span>

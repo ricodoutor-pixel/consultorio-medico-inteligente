@@ -13,6 +13,7 @@ export type Professional = {
   avatar: string;
   imageUrl: string;
   paymentLink: string;
+  online?: boolean; // Campo de status Online/Offline
   services: { name: string; price: string; desc: string }[];
   slots: string[];
   reviews: { name: string; rating: number; text: string }[];
@@ -44,6 +45,7 @@ export const professionals: Professional[] = [
     consults: 1250,
     avatar: "EB",
     imageUrl: "/src/assets/profiles/dr-edilson-bezerra.jpg",
+    online: true, // Dr. Edilson sempre Online como exemplo
     services: [
       { name: "Consulta Técnica", price: "R$ 150,00", desc: "Avaliação completa + plano terapêutico personalizado" },
       { name: "Auditoria de Caso", price: "R$ 200,00", desc: "Revisão técnica de protocolos e tratamentos" },

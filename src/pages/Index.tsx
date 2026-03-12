@@ -263,7 +263,7 @@ const Index = () => {
       {/* Testimonials */}
       <section className="py-20 md:py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-purple pointer-events-none opacity-30" />
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div className="mb-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-4xl md:text-6xl font-display font-black text-foreground tracking-tight mb-4">
               RELATOS <span className="text-gradient-purple">REAIS</span>

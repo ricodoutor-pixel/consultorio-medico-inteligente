@@ -400,12 +400,12 @@ const Index = () => {
 
       {/* FAQ Accordion */}
       <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <motion.div className="mb-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-4xl md:text-5xl font-display font-black text-foreground tracking-tight mb-4">Dúvidas Frequentes</h2>
           </motion.div>
 
-          <motion.div className="max-w-3xl" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+          <motion.div className="max-w-4xl" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <Accordion type="single" collapsible className="space-y-3">
               {faqs.map((faq, i) => (
                 <AccordionItem

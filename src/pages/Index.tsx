@@ -157,8 +157,8 @@ const Index = () => {
       </section>
 
       {/* Live Stats */}
-      <section className="py-12 border-b border-border">
-        <div className="container mx-auto px-4">
+      <section className="py-12 md:py-16 border-b border-border">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {[
               { value: "45K+", label: "Usuários Ativos", icon: Users },

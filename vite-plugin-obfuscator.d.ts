@@ -1,7 +1,5 @@
 declare module 'vite-plugin-obfuscator' {
   import { Plugin } from 'vite';
-  interface ObfuscatorOptions {
-    options?: Record<string, any>;
-  }
-  export default function obfuscator(options?: ObfuscatorOptions): Plugin;
+  export function viteObfuscateFile(options?: Record<string, any>): Plugin;
+  export default viteObfuscateFile;
 }

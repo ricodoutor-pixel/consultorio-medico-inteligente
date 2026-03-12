@@ -21,12 +21,10 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Close menu on route change
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
 
-  // Prevent body scroll when menu is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -99,8 +97,6 @@ export const Navbar = () => {
 
   const openChat = useCallback(() => window.dispatchEvent(new Event("open-frog-chat")), []);
 
-  const closeMenu = useCallback(() => setIsOpen(false), []);
-
   const UserMenu = ({ compact = false }: { compact?: boolean }) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -134,9 +130,9 @@ export const Navbar = () => {
         style={{ WebkitBackfaceVisibility: "hidden" }}
       >
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
-          <div className="flex items-center justify-between h-16 md:h-[72px]">
-            {/* Logo + Verdinho */}
-            <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+          <div className="flex items-center h-16 md:h-[72px]">
+            {/* Logo + Verdinho (Espaço Amplo) */}
+            <div className="flex items-center gap-4 flex-shrink-0">
               <NavLink to="/" className="flex items-center gap-1.5 md:gap-2">
                 <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
                   <Leaf size={18} className="text-primary-foreground" />
@@ -148,19 +144,22 @@ export const Navbar = () => {
                   <span className="text-[9px] md:text-[10px] text-muted-foreground font-semibold block">Mega Clínica Digital</span>
                 </div>
               </NavLink>
-              <div className="ml-0.5 md:ml-1 flex-shrink-0">
-                <FrogMascot size={48} mood="happy" onClick={openChat} enableJumpToNav={true} />
+              <div className="ml-2 flex-shrink-0">
+                <FrogMascot size={56} mood="happy" onClick={openChat} enableJumpToNav={true} />
               </div>
             </div>
 
-            {/* Desktop Links */}
-            <div className="hidden xl:flex items-center gap-1 2xl:gap-3 flex-shrink" role="menubar">
+            {/* Spacer para empurrar menu para a direita */}
+            <div className="flex-grow"></div>
+
+            {/* Desktop Links (Colados no Login) */}
+            <div className="hidden xl:flex items-center gap-2 2xl:gap-4 mr-6" role="menubar">
               {links.map((link) => (
                 <NavLink
                   key={link.to}
                   to={link.to}
-                  className="text-xs 2xl:text-sm font-bold text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1.5 2xl:px-2 py-1"
-                  activeClassName="text-primary font-black"
+                  className="text-xs 2xl:text-sm font-bold text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1 py-1"
+                  activeClassName="text-primary font-black border-b-2 border-primary"
                 >
                   {link.label}
                 </NavLink>
@@ -169,7 +168,6 @@ export const Navbar = () => {
 
             {/* Desktop Auth */}
             <div className="hidden xl:flex items-center gap-1.5 flex-shrink-0">
-              <GlobalComplianceBadge />
               <LanguageSwitcher />
               {user ? (
                 <UserMenu />
@@ -183,7 +181,7 @@ export const Navbar = () => {
                   </Button>
                 </>
               )}
-              <Button size="sm" className="bg-primary text-primary-foreground font-black rounded-xl text-xs h-9 px-4" asChild>
+              <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-xl text-xs h-9 px-4 hover:scale-105 transition-transform" asChild>
                 <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
               </Button>
             </div>
@@ -220,7 +218,6 @@ export const Navbar = () => {
           aria-label="Menu mobile"
         >
           <div className="container mx-auto px-4 flex flex-col flex-1">
-            {/* Navigation Links */}
             <div className="space-y-1 flex-1">
               {links.map((link) => (
                 <NavLink
@@ -228,7 +225,7 @@ export const Navbar = () => {
                   to={link.to}
                   className="flex items-center justify-between py-3.5 px-4 text-foreground hover:text-primary transition-colors font-bold text-base rounded-xl hover:bg-muted/50 group"
                   activeClassName="text-primary bg-primary/5"
-                  onClick={closeMenu}
+                  onClick={() => setIsOpen(false)}
                 >
                   <span>{link.label}</span>
                   <ChevronRight size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
@@ -236,15 +233,14 @@ export const Navbar = () => {
               ))}
             </div>
 
-            {/* Bottom Actions */}
             <div className="space-y-3 pt-6 border-t border-border mt-4">
               {!user && (
                 <Button variant="outline" className="w-full font-bold rounded-xl border-primary/30 text-primary h-12 text-sm" asChild>
-                  <NavLink to="/cadastro" onClick={closeMenu}>Cadastre-se Grátis</NavLink>
+                  <NavLink to="/cadastro" onClick={() => setIsOpen(false)}>Cadastre-se Grátis</NavLink>
                 </Button>
               )}
-              <Button className="w-full bg-primary text-primary-foreground font-black rounded-xl h-12 text-sm" asChild>
-                <NavLink to="/telemedicina" onClick={closeMenu}>Iniciar Consulta</NavLink>
+              <Button className="w-full bg-secondary text-secondary-foreground font-black rounded-xl h-12 text-sm" asChild>
+                <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>Iniciar Consulta</NavLink>
               </Button>
               <div className="flex items-center justify-center gap-3 pt-2">
                 <GlobalComplianceBadge />

@@ -367,7 +367,7 @@ const Index = () => {
       {/* Features */}
       <section className="py-20 md:py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-green pointer-events-none opacity-20" />
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10">
           <motion.div className="mb-16" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-4xl md:text-5xl font-display font-black text-foreground tracking-tight mb-4">Ecossistema Completo</h2>
             <p className="text-muted-foreground font-medium text-lg">Tudo que você precisa em um só lugar.</p>

@@ -183,7 +183,7 @@ const Index = () => {
 
       {/* Hub Navigation */}
       <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <motion.div className="mb-10" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-3xl md:text-5xl font-display font-black text-foreground tracking-tight">
               Ecossistema <span className="text-gradient-purple">Completo</span>

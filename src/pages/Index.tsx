@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import { testimonials } from "@/data/testimonials";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
-import heroPhoneMockup from "@/assets/hero-hand-phone.png";
+import heroPhoneMockup from "@/assets/hero-phone-mockup.png"; // Alterado para a versão limpa
 import triagemPatient from "@/assets/triagem-patient.png";
 import consultaChat from "@/assets/consulta-chat.png";
 import triagemForm from "@/assets/triagem-form.png";
@@ -115,28 +115,14 @@ const Index = () => {
               </motion.div>
             </motion.div>
 
-            {/* Phone Mockup Area */}
+            {/* Phone Mockup Area - Versão Limpa sem Dedos */}
             <motion.div
               className="relative flex justify-center items-center"
               initial={{ opacity: 0, scale: 0.8, y: 100 }}
-              animate={{ opacity: 1, scale: 1, y: -220 }} // Sobe ~40% em relação ao centro
+              animate={{ opacity: 1, scale: 1, y: -220 }} 
               transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
             >
               <div className="relative group w-full flex flex-col items-center">
-                
-                {/* Botão Consultar ACIMA do Celular */}
-                <motion.div 
-                  className="mb-8 z-20"
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <Link to="/telemedicina">
-                    <Button className="bg-secondary text-secondary-foreground font-black px-10 py-8 rounded-full text-xl shadow-[0_20px_50px_rgba(157,78,221,0.4)] hover:scale-110 transition-all border-4 border-background group">
-                      <Video className="mr-3 w-6 h-6 group-hover:animate-pulse" /> CONSULTAR AGORA
-                    </Button>
-                  </Link>
-                </motion.div>
-
                 <div className="relative">
                   <div className="absolute -inset-10 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-full blur-[100px] opacity-50 group-hover:opacity-80 transition duration-1000"></div>
                   <img

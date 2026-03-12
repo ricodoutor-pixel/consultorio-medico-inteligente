@@ -131,11 +131,11 @@ export const Navbar = () => {
       >
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex items-center h-16 md:h-[72px]">
-            {/* Logo + Verdinho (Espaço Amplo) */}
-            <div className="flex items-center gap-4 flex-shrink-0">
+            {/* Logo + Verdinho (Máximo de Espaço) */}
+            <div className="flex items-center gap-6 flex-shrink-0">
               <NavLink to="/" className="flex items-center gap-1.5 md:gap-2">
-                <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
-                  <Leaf size={18} className="text-primary-foreground" />
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
+                  <Leaf size={20} className="text-primary-foreground" />
                 </div>
                 <div className="leading-tight hidden xs:block">
                   <span className="text-xs md:text-sm font-display font-black text-foreground block whitespace-nowrap">
@@ -144,21 +144,21 @@ export const Navbar = () => {
                   <span className="text-[9px] md:text-[10px] text-muted-foreground font-semibold block">Mega Clínica Digital</span>
                 </div>
               </NavLink>
-              <div className="ml-2 flex-shrink-0">
-                <FrogMascot size={56} mood="happy" onClick={openChat} enableJumpToNav={true} />
+              <div className="ml-4 flex-shrink-0">
+                <FrogMascot size={64} mood="happy" onClick={openChat} enableJumpToNav={true} />
               </div>
             </div>
 
-            {/* Spacer para empurrar menu para a direita */}
+            {/* Spacer Gigante para empurrar menu totalmente para a direita */}
             <div className="flex-grow"></div>
 
             {/* Desktop Links (Colados no Login) */}
-            <div className="hidden xl:flex items-center gap-2 2xl:gap-4 mr-6" role="menubar">
+            <div className="hidden xl:flex items-center gap-2 2xl:gap-3 mr-4" role="menubar">
               {links.map((link) => (
                 <NavLink
                   key={link.to}
                   to={link.to}
-                  className="text-xs 2xl:text-sm font-bold text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1 py-1"
+                  className="text-[11px] 2xl:text-xs font-bold text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1 py-1"
                   activeClassName="text-primary font-black border-b-2 border-primary"
                 >
                   {link.label}
@@ -166,22 +166,28 @@ export const Navbar = () => {
               ))}
             </div>
 
-            {/* Desktop Auth */}
-            <div className="hidden xl:flex items-center gap-1.5 flex-shrink-0">
-              <LanguageSwitcher />
-              {user ? (
-                <UserMenu />
-              ) : (
-                <>
-                  <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5 text-xs h-9 px-3" asChild>
-                    <NavLink to="/login"><LogIn size={14} /> Fazer Login</NavLink>
-                  </Button>
-                  <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary text-xs h-9 px-3" asChild>
-                    <NavLink to="/cadastro">Cadastro</NavLink>
-                  </Button>
-                </>
-              )}
-              <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-xl text-xs h-9 px-4 hover:scale-105 transition-transform" asChild>
+            {/* Desktop Auth + Idioma (Verticalmente Alinhados) */}
+            <div className="hidden xl:flex items-center gap-3 flex-shrink-0">
+              <div className="flex flex-col items-center gap-1">
+                {user ? (
+                  <UserMenu />
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1.5 text-[11px] h-8 px-2" asChild>
+                      <NavLink to="/login"><LogIn size={12} /> Login</NavLink>
+                    </Button>
+                    <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary text-[11px] h-8 px-3" asChild>
+                      <NavLink to="/cadastro">Cadastro</NavLink>
+                    </Button>
+                  </div>
+                )}
+                {/* Idioma abaixo de Cadastro/Login */}
+                <div className="scale-75 origin-top">
+                  <LanguageSwitcher />
+                </div>
+              </div>
+              
+              <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-xl text-xs h-10 px-5 hover:scale-105 transition-transform shadow-lg shadow-secondary/20" asChild>
                 <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
               </Button>
             </div>
@@ -242,9 +248,9 @@ export const Navbar = () => {
               <Button className="w-full bg-secondary text-secondary-foreground font-black rounded-xl h-12 text-sm" asChild>
                 <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>Iniciar Consulta</NavLink>
               </Button>
-              <div className="flex items-center justify-center gap-3 pt-2">
-                <GlobalComplianceBadge />
+              <div className="flex flex-col items-center gap-2 pt-2">
                 <LanguageSwitcher />
+                <GlobalComplianceBadge />
               </div>
             </div>
           </div>

@@ -434,7 +434,7 @@ const Index = () => {
 
       {/* CTA */}
       <section className="py-20 md:py-28 hero-glow">
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div className="max-w-3xl" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <h2 className="text-4xl md:text-6xl font-display font-black text-foreground tracking-tight mb-6 leading-tight">
               Comece sua jornada <span className="text-gradient-green">agora</span>

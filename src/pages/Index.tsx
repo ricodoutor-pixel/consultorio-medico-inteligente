@@ -234,13 +234,13 @@ const Index = () => {
             {steps.map((s, i) => (
               <motion.div key={s.n} variants={fadeUp} className="space-y-4">
                 {i === 0 && (
-                  <img src={triagemPatient} alt="Paciente usando a plataforma" className="w-full h-32 object-cover rounded-2xl border border-border mb-2" />
+                  <img src={triagemPatient} alt="Paciente usando a plataforma" className="w-full h-36 md:h-40 object-cover rounded-2xl border border-border mb-3" loading="lazy" />
                 )}
                 {i === 1 && (
-                  <img src={triagemForm} alt="Triagem emocional" className="w-full h-32 object-cover object-top rounded-2xl border border-border mb-2" />
+                  <img src={triagemForm} alt="Triagem emocional" className="w-full h-36 md:h-40 object-cover object-top rounded-2xl border border-border mb-3" loading="lazy" />
                 )}
                 {i === 3 && (
-                  <img src={consultaChat} alt="Consulta com especialista" className="w-full h-32 object-cover rounded-2xl border border-border mb-2" />
+                  <img src={consultaChat} alt="Consulta com especialista" className="w-full h-36 md:h-40 object-cover rounded-2xl border border-border mb-3" loading="lazy" />
                 )}
                 <div className="step-number">{s.n}</div>
                 <h3 className="text-lg font-display font-black text-primary">{s.title}</h3>

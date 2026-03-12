@@ -149,7 +149,8 @@ const Index = () => {
               <img
                 src={heroPhoneMockup}
                 alt="Planta & Raiz — App de consulta e medicamentos à base de cannabis"
-                className="w-[340px] xl:w-[400px] drop-shadow-2xl"
+                className="w-[280px] lg:w-[340px] xl:w-[400px] drop-shadow-2xl mx-auto"
+                loading="eager"
               />
             </motion.div>
           </div>

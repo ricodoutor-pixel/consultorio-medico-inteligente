@@ -28,7 +28,34 @@ export const categories = [
 ];
 
 export const professionals: Professional[] = [
-  // ═══════ Médicos Prescritores (5) ═══════
+  // ═══════ Médicos Prescritores (6) ═══════
+  {
+    id: "med-0",
+    name: "Dr. Edilson Bezerra",
+    category: "Médicos Prescritores",
+    bio: "Médico prescritor de cannabis medicinal com ampla experiência em dor crônica, neurologia e cuidados integrativos. Referência na plataforma Planta & Raiz, atua com protocolo individualizado de canabinoides para tratamento de fibromialgia, epilepsia, ansiedade e dor oncológica. Formação sólida e compromisso com o acesso popular à saúde.",
+    experience: "15 anos",
+    tags: ["Cannabis Medicinal", "Dor Crônica", "Neurologia"],
+    price: "R$ 49,90",
+    priceValue: 49.9,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 5.0,
+    consults: 620,
+    avatar: "EB",
+    imageUrl: "/src/assets/dr-edilson-bezerra.jpg",
+    services: [
+      { name: "Consulta Inicial", price: "R$ 49,90", desc: "Avaliação completa + plano terapêutico canábico" },
+      { name: "Retorno", price: "R$ 35,00", desc: "Acompanhamento e ajuste de dosagem" },
+      { name: "Laudo ANVISA", price: "R$ 50,00", desc: "Documentação para importação ou uso compassivo" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
+    reviews: [
+      { name: "Carlos S.", rating: 5, text: "Profissional excepcional, mudou minha vida com o tratamento." },
+      { name: "Maria A.", rating: 5, text: "Atencioso, acessível e muito competente. Recomendo!" },
+      { name: "José R.", rating: 5, text: "Finalmente encontrei um médico que entende cannabis medicinal de verdade." },
+    ],
+  },
   {
     id: "med-1",
     name: "Dr. Felipe Andrade",

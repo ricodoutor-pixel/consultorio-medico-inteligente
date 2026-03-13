@@ -133,16 +133,16 @@ export const Navbar = () => {
         aria-label="Navegação principal"
         style={{ WebkitBackfaceVisibility: "hidden" }}
       >
-        <div className="container mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="w-full px-3 sm:px-4 lg:px-6 xl:px-10 2xl:px-16">
           <div className="flex items-center justify-between h-16 md:h-[72px]">
             {/* Logo + Verdinho */}
-            <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
-              <NavLink to="/" className="flex items-center gap-1.5 md:gap-2">
+            <div className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-0">
+              <NavLink to="/" className="flex items-center gap-1.5 md:gap-2 min-w-0">
                 <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
                   <Leaf size={18} className="text-primary-foreground" />
                 </div>
-                <div className="leading-tight hidden xs:block">
-                  <span className="text-xs md:text-sm font-display font-black text-foreground block whitespace-nowrap">
+                <div className="leading-tight hidden xs:block min-w-0">
+                  <span className="text-xs md:text-sm font-display font-black text-foreground block whitespace-nowrap truncate max-w-[120px] sm:max-w-none">
                     Planta <span className="text-gradient-purple">&</span> Raiz
                   </span>
                   <span className="text-[9px] md:text-[10px] text-muted-foreground font-semibold block">Mega Clínica Digital</span>
@@ -154,7 +154,7 @@ export const Navbar = () => {
             </div>
 
             {/* Desktop Links */}
-            <div className="hidden xl:flex items-center gap-1 2xl:gap-3 flex-shrink" role="menubar">
+            <div className="hidden xl:flex items-center gap-1 2xl:gap-3 flex-shrink min-w-0" role="menubar">
               {links.map((link) => (
                 <NavLink
                   key={link.to}
@@ -189,12 +189,15 @@ export const Navbar = () => {
             </div>
 
             {/* Mobile Auth + Hamburger */}
-            <div className="xl:hidden flex items-center gap-1.5">
+            <div className="xl:hidden flex items-center gap-1 flex-shrink-0">
+              <Button size="sm" className="bg-primary text-primary-foreground font-black rounded-xl text-[10px] sm:text-xs h-8 sm:h-9 px-2 sm:px-3" asChild>
+                <NavLink to="/telemedicina">Consulta</NavLink>
+              </Button>
               {user ? (
                 <UserMenu compact />
               ) : (
                 <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1 text-xs h-9 px-2" asChild>
-                  <NavLink to="/login"><LogIn size={14} /> Login</NavLink>
+                  <NavLink to="/login"><LogIn size={14} /></NavLink>
                 </Button>
               )}
               <button

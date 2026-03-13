@@ -27,6 +27,11 @@ img, video, svg {
   display: block;
 }
 
+/* Logos and brand images contain within container */
+img.logo, .navbar-logo img {
+  object-fit: contain;
+}
+
 input, button, textarea, select {
   font: inherit;
   -webkit-appearance: none;

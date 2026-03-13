@@ -42,6 +42,7 @@ const ConsultationPayment = lazy(() => import("./pages/ConsultationPayment"));
 const SpecialistDashboard = lazy(() => import("./pages/SpecialistDashboard"));
 const InfluencerDashboard = lazy(() => import("./pages/InfluencerDashboard"));
 const OnlineUsers = lazy(() => import("./pages/OnlineUsers"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const DownloadApp = lazy(() => import("./pages/DownloadApp"));
 const Comunidade = lazy(() => import("./pages/Comunidade"));
 const DashboardPaciente = lazy(() => import("./pages/DashboardPaciente"));
@@ -102,6 +103,7 @@ const App = () => (
                 <Route path="/dashboard-especialista" element={<SpecialistDashboard />} />
                 <Route path="/influenciadores" element={<InfluencerDashboard />} />
                 <Route path="/usuarios-online" element={<OnlineUsers />} />
+                <Route path="/admin-ceo" element={<AdminDashboard />} />
                 <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/biblioteca" element={<BibliotecaCientifica />} />

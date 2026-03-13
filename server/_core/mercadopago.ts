@@ -68,6 +68,11 @@ export async function createPayment(request: PaymentRequest): Promise<PaymentRes
 
 export async function createPixPayment(request: PaymentRequest): Promise<PaymentResponse> {
   try {
+    // Cálculo de Split de Pagamento (Manus CEO Logic)
+    // 5% para Lojistas (product), 7% para Profissionais (consultation/subscription)
+    const taxRate = request.type === 'product' ? 0.05 : 0.07;
+    const applicationFee = Number((request.amount * taxRate).toFixed(2));
+
     const payload = {
       transaction_amount: request.amount,
       description: request.description,
@@ -80,6 +85,8 @@ export async function createPixPayment(request: PaymentRequest): Promise<Payment
         },
       },
       external_reference: request.externalReference,
+      // Configuração de Marketplace / Split
+      application_fee: applicationFee,
     };
 
     const response = await axios.post(`${MERCADO_PAGO_API}/payments`, payload, {

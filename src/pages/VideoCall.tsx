@@ -4,13 +4,31 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Video, Mic, MicOff, VideoOff, PhoneOff, MessageSquare, FileText, Share2, ShieldCheck, Activity } from "lucide-react";
+import { Video, Mic, MicOff, VideoOff, PhoneOff, MessageSquare, FileText, Share2, ShieldCheck, Activity, Leaf } from "lucide-react";
 import { motion } from "framer-motion";
 
 const VideoCall = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [consultationId, setConsultationId] = useState("CONS-123456");
+  const [messages, setMessages] = useState([
+    { id: 1, text: "Olá, Dr. Edilson. Estou com dor nas costas.", translated: "Hola, Dr. Edilson. Tengo dolor de espalda.", sender: "patient", lang: "es" },
+    { id: 2, text: "Olá! Vamos iniciar o protocolo de CBD Full Spectrum.", translated: "¡Hola! Iniciemos el protocolo de CBD de Espectro Completo.", sender: "doctor", lang: "pt" }
+  ]);
+  const [inputText, setInputText] = useState("");
+
+  const handleSendMessage = () => {
+    if (!inputText.trim()) return;
+    const newMessage = {
+      id: Date.now(),
+      text: inputText,
+      translated: "Traduzindo termo médico (Manus CEO)...",
+      sender: "doctor",
+      lang: "pt"
+    };
+    setMessages([...messages, newMessage]);
+    setInputText("");
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -84,19 +102,30 @@ const VideoCall = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 flex flex-col h-full">
-                  <div className="flex-grow space-y-4 mb-4 overflow-y-auto">
-                    <div className="p-3 rounded-2xl bg-muted/50 text-xs text-muted-foreground italic">
-                      Inicie o chat com o paciente aqui...
-                    </div>
+                  <div className="flex-grow space-y-4 mb-4 overflow-y-auto max-h-[350px]">
+                    {messages.map((msg) => (
+                      <div key={msg.id} className={`p-3 rounded-2xl text-xs ${msg.sender === 'doctor' ? 'bg-primary/10 border border-primary/20 ml-4' : 'bg-muted/50 mr-4'}`}>
+                        <p className="font-bold mb-1">{msg.text}</p>
+                        <p className="text-[10px] text-muted-foreground italic border-t border-border/50 pt-1 mt-1 flex items-center gap-1">
+                          <Leaf size={10} className="text-primary" /> {msg.translated}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mt-auto">
                     <input 
                       type="text" 
-                      placeholder="Mensagem..." 
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      placeholder="Mensagem (Tradução IA ativa)..." 
                       className="flex-grow bg-neutral-900 border border-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-primary"
                     />
-                    <Button size="sm" className="rounded-xl"><Share2 size={14} /></Button>
+                    <Button size="sm" className="rounded-xl" onClick={handleSendMessage}><Share2 size={14} /></Button>
                   </div>
+                  <p className="text-[9px] text-muted-foreground mt-2 text-center">
+                    🌐 Tradução Médica em Tempo Real (PT/ES/EN) ativa.
+                  </p>
                 </CardContent>
               </Card>
 

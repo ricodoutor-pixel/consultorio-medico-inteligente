@@ -11,6 +11,7 @@ import { appRouter } from '../routers';
 import { createContext } from './context';
 import { iniciarManusCEO } from '../manus-ceo-autonomous';
 import cors from 'cors';
+import whatsappWebhookRouter from '../routers/whatsappWebhook';
 
 const app = express();
 
@@ -55,16 +56,24 @@ app.use(
 );
 
 // ============================================================================
+// WEBHOOK WHATSAPP
+// ============================================================================
+
+app.use('/', whatsappWebhookRouter);
+
+// ============================================================================
 // INICIAR MANUS CEO
 // ============================================================================
 
 app.listen(3000, async () => {
   console.log('🚀 Servidor Express iniciado na porta 3000');
+  console.log('📱 Webhook WhatsApp ativo em /api/webhooks/whatsapp');
   
   // Iniciar Manus CEO
   await iniciarManusCEO();
   
   console.log('✅ Plataforma pronta para operação 24/7');
+  console.log('🤖 Manus CEO operando 24/7 com alertas WhatsApp ativos');
 });
 
 export default app;

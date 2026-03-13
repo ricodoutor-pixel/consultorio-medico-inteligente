@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, Video } from "lucide-react";
+import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
@@ -131,8 +131,8 @@ export const Navbar = () => {
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
-            {/* Logo + Verdinho (Máximo de Espaço) */}
-            <div className="flex items-center gap-4 md:gap-8 flex-shrink-0">
+            {/* Logo + Verdinho (Repisicionado 50% mais próximo) */}
+            <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
               <NavLink to="/" className="flex items-center gap-1.5 md:gap-3">
                 <div className="w-8 h-8 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
                   <Leaf size={22} className="text-primary-foreground" />
@@ -145,30 +145,20 @@ export const Navbar = () => {
                 </div>
               </NavLink>
               
-              {/* Espaço Generoso para o Verdinho no Desktop */}
-              <div className="hidden md:block ml-4 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">
-                <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
+              {/* Verdinho mais próximo do nome */}
+              <div className="hidden md:block ml-1 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">
+                <FrogMascot size={64} mood="happy" onClick={openChat} enableJumpToNav={true} />
               </div>
             </div>
 
-            {/* Mobile: Iniciar Consulta no Topo + Selo */}
-            <div className="flex md:hidden items-center gap-2">
-               <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-lg text-[10px] h-8 px-2 animate-pulse" asChild>
-                <NavLink to="/telemedicina">INICIAR CONSULTA</NavLink>
-              </Button>
-              <div className="scale-75 origin-right">
-                <GlobalComplianceBadge region="br" />
-              </div>
-            </div>
-
-            {/* Desktop: Menu Alinhado ao Idioma/Login */}
-            <div className="hidden xl:flex items-center gap-6">
-              <div className="flex items-center gap-3 2xl:gap-5" role="menubar">
+            {/* Desktop: Menu Centralizado */}
+            <div className="hidden xl:flex items-center gap-4 2xl:gap-6">
+              <div className="flex items-center gap-2 2xl:gap-4" role="menubar">
                 {links.map((link) => (
                   <NavLink
                     key={link.to}
                     to={link.to}
-                    className="text-[11px] 2xl:text-xs font-black text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1 py-1 uppercase tracking-tight"
+                    className="text-[10px] 2xl:text-xs font-black text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1 py-1 uppercase tracking-tight"
                     activeClassName="text-primary border-b-2 border-primary"
                   >
                     {link.label}
@@ -176,8 +166,17 @@ export const Navbar = () => {
                 ))}
               </div>
 
-              <div className="flex items-center gap-3 border-l border-border pl-6">
-                <div className="flex flex-col items-center gap-0.5">
+              <div className="flex items-center gap-3 border-l border-border pl-4">
+                <div className="flex items-center gap-3">
+                  <div className="scale-90">
+                    <LanguageSwitcher />
+                  </div>
+                  
+                  {/* Botão Iniciar Consulta ao lado do Idioma */}
+                  <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-xl text-xs h-9 px-4 hover:scale-105 transition-all shadow-lg shadow-secondary/20" asChild>
+                    <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
+                  </Button>
+
                   {user ? (
                     <UserMenu />
                   ) : (
@@ -190,19 +189,15 @@ export const Navbar = () => {
                       </Button>
                     </div>
                   )}
-                  <div className="scale-90">
-                    <LanguageSwitcher />
-                  </div>
                 </div>
-                
-                <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-xl text-xs h-10 px-5 hover:scale-105 transition-all shadow-lg shadow-secondary/20" asChild>
-                  <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
-                </Button>
               </div>
             </div>
 
-            {/* Hamburger Mobile */}
-            <div className="xl:hidden flex items-center">
+            {/* Mobile Actions */}
+            <div className="xl:hidden flex items-center gap-2">
+               <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-lg text-[10px] h-8 px-2 animate-pulse" asChild>
+                <NavLink to="/telemedicina">INICIAR CONSULTA</NavLink>
+              </Button>
               <button
                 className="p-2 text-foreground flex-shrink-0 relative z-[60]"
                 onClick={() => setIsOpen(!isOpen)}

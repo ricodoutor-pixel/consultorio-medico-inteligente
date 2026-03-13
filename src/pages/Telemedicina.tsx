@@ -253,6 +253,10 @@ const Telemedicina = () => {
                         <Label className="text-xs font-bold uppercase">WhatsApp</Label>
                         <Input placeholder="(11) 99999-9999" value={patientData.telefone} onChange={(e) => setPatientData({...patientData, telefone: e.target.value})} className="h-12 rounded-xl" />
                       </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-bold uppercase">E-mail</Label>
+                        <Input placeholder="seu@email.com" value={patientData.email} onChange={(e) => setPatientData({...patientData, email: e.target.value})} className="h-12 rounded-xl" />
+                      </div>
                     </div>
                     <Button 
                       className="w-full h-14 bg-primary text-primary-foreground font-black rounded-2xl text-lg"

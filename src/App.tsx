@@ -62,6 +62,7 @@ const IoMTHub = lazy(() => import("./pages/IoMTHub"));
 const Blog = lazy(() => import("./pages/Blog"));
 const ShoppingDashboard = lazy(() => import("./pages/ShoppingDashboard"));
 const InvestorDashboard = lazy(() => import("./pages/InvestorDashboard"));
+const VideoCall = lazy(() => import("./pages/VideoCall"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -133,6 +134,7 @@ const App = () => (
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/dashboard-loja" element={<ShoppingDashboard />} />
                 <Route path="/investidores" element={<InvestorDashboard />} />
+                <Route path="/videochamada" element={<VideoCall />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

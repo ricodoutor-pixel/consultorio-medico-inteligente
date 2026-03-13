@@ -5,6 +5,7 @@ import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { whatsappWebhook } from "../whatsapp-controller";
+import { deployWebhook } from "../deploy-webhook";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -39,6 +40,9 @@ async function startServer() {
   
   // WhatsApp Webhook
   app.all("/api/whatsapp/webhook", whatsappWebhook);
+
+  // GitHub CI/CD Webhook
+  app.post("/api/deploy/webhook", deployWebhook);
 
   // tRPC API
   app.use(

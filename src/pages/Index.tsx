@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
+import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -51,6 +52,10 @@ const faqs = [
 const Index = () => {
   return (
     <div className="min-h-[100dvh] w-full bg-background overflow-x-hidden">
+      <SEO 
+        title="Planta y Raiz - Mega Clínica Digital de Cannabis Medicinal"
+        description="Acesso democrático à saúde com telemedicina especializada em cannabis medicinal, triagem por IA e acompanhamento vital 24/7."
+      />
       <Navbar />
       <WhatsAppButton />
 

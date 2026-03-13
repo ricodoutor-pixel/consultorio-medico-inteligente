@@ -92,6 +92,7 @@ export const Navbar = () => {
     { to: "/shopping", label: "Shopping" },
     { to: "/biblioteca", label: "Biblioteca" },
     { to: "/comunidade", label: "Comunidade" },
+    { to: "/blog", label: "Blog" },
     { to: "/iomt", label: "IoMT Hub" },
     { to: "/dashboard", label: "Meu Painel" },
     { to: "/afiliados", label: "Afiliados" },

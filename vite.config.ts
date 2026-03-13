@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    base: "/",
     minify: "terser",
     terserOptions: {
       compress: {

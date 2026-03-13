@@ -14,12 +14,23 @@ interface CRMValidationResult {
   error?: string;
 }
 
-export const validateCRM = async (crm: string, uf: string): Promise<CRMValidationResult> => {
-  console.log(`⚖️ [Manus CEO] Validando CRM: ${crm}-${uf}...`);
+export const validateCRM = async (crm: string, uf: string, country: string = 'BR'): Promise<CRMValidationResult> => {
+  console.log(`⚖️ [Manus CEO] Validando Registro Médico: ${crm}-${uf} [País: ${country}]...`);
 
   try {
-    // Simulação de chamada para API de conselhos médicos (CFM/Portal do Médico)
-    // Em produção, integraríamos com serviços de consulta de CRM oficiais
+    // Lógica de Auditoria Global Manus CEO
+    if (country !== 'BR') {
+      console.log(`🌍 [Manus CEO] Iniciando Auditoria Internacional para ${country}...`);
+      // Simulação de Auditoria em conselhos internacionais (ex: Colégio Médico da Bolívia)
+      return {
+        valid: true,
+        name: "Dr. Edilson Bezerra (International)",
+        status: "Ativo/Verificado",
+        specialty: "Medicina Geral / Cannabis Specialist"
+      };
+    }
+
+    // Simulação para Brasil
     const mockValidation = {
       valid: true,
       name: "Dr. Edilson Bezerra",

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -50,11 +51,12 @@ const faqs = [
 ];
 
 const Index = () => {
+  const { t } = useLanguage();
   return (
     <div className="min-h-[100dvh] w-full bg-background overflow-x-hidden">
       <SEO 
-        title="Planta y Raiz - Mega Clínica Digital de Cannabis Medicinal"
-        description="Acesso democrático à saúde com telemedicina especializada em cannabis medicinal, triagem por IA e acompanhamento vital 24/7."
+        title={t('hero.title')}
+        description={t('hero.subtitle')}
       />
       <Navbar />
       <WhatsAppButton />
@@ -93,22 +95,11 @@ const Index = () => {
                 variants={fadeUp} 
                 className="text-2xl xs:text-3xl md:text-5xl lg:text-6xl font-display font-black leading-[1.1] mb-6 md:mb-8 tracking-tight"
               >
-                <span className="text-foreground">Democratizando o </span>
-                <span className="text-gradient-green">Acesso</span>
-                <span className="text-foreground"> a </span>
-                <span className="text-gradient-purple">Telemedicina</span>
-                <span className="text-foreground">, </span>
-                <span className="text-gradient-gold">Suprimentos</span>
-                <span className="text-foreground"> e </span>
-                <span className="text-gradient-green">Medicamentos</span>
-                <span className="text-foreground"> à Base De </span>
-                <span className="text-gradient-purple">Cannabis</span>
-                <span className="text-foreground"> Em Todo </span>
-                <span className="text-gradient-gold">el Mundo</span>
+                <span className="text-foreground">{t('hero.title')}</span>
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-3xl mb-10 leading-relaxed font-medium">
-                Conectamos pacientes a profissionais habilitados, usamos o que há de mais novo em tecnologia — inteligência artificial e teleatendimento via vídeo e chat, direto na plataforma — aliado ao Shopping de bem-estar com preços populares. Você escolhe o especialista, faz uma pré-entrevista, paga via Pix seguro Mercado Pago e segue para o atendimento. Receba sua receita e volte ao Shopping, com centenas de farmácias e produtores autorizados pela ANVISA, oferecendo os melhores preços com frete grátis para todo o Brasil.
+                {t('hero.subtitle')}
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4 mb-10">

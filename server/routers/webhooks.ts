@@ -2,6 +2,7 @@ import { router, publicProcedure } from '../_core/trpc';
 import { z } from 'zod';
 import { handlePaymentApproved, validateWebhook } from '../services/mercadoPagoIntegration';
 import { notifyDepositConfirmed } from '../services/notificationsService';
+import { ClickSignService } from '../services/clicksignService';
 
 export const webhookRouter = router({
   /**
@@ -85,6 +86,22 @@ export const webhookRouter = router({
           success: false,
           error: 'Erro ao processar saque',
         };
+      }
+    }),
+
+  /**
+   * Webhook da ClickSign para assinaturas
+   */
+  clicksign: publicProcedure
+    .input(z.any())
+    .mutation(async ({ input }) => {
+      try {
+        console.log('[Webhook] Recebido webhook da ClickSign:', input);
+        await ClickSignService.handleWebhook(input);
+        return { success: true };
+      } catch (error) {
+        console.error('[Webhook] Erro ao processar webhook ClickSign:', error);
+        return { success: false, error: 'Erro ao processar webhook ClickSign' };
       }
     }),
 

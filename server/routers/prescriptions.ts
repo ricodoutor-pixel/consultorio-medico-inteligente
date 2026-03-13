@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { publicProcedure, protectedProcedure, router } from '../_core/trpc';
 import digitalPrescriptionService, { DigitalPrescription, MedicationPrescription } from '../services/digitalPrescriptionService';
+import { ClickSignService } from '../services/clicksignService';
 
 /**
  * Router tRPC para Prescrições Digitais
@@ -63,28 +64,42 @@ export const prescriptionsRouter = router({
     }),
 
   /**
-   * Assina prescrição com certificado ICP-Brasil
+   * Assina prescrição com certificado ICP-Brasil (Via ClickSign API)
    */
   sign: protectedProcedure
     .input(
       z.object({
         prescriptionId: z.string(),
         prescription: z.any(),
-        certificateSerialNumber: z.string(),
+        doctorEmail: z.string().email(),
+        doctorName: z.string(),
       })
     )
     .mutation(async ({ input }) => {
       try {
-        const signedPrescription = await digitalPrescriptionService.signPrescription(
-          input.prescription,
-          input.certificateSerialNumber
+        console.log('[Prescription] Iniciando assinatura via ClickSign para:', input.prescriptionId);
+        
+        // 1. Gerar o PDF (Base64)
+        const pdfBuffer = await digitalPrescriptionService.generatePDF(input.prescription);
+        const pdfBase64 = pdfBuffer.toString('base64');
+
+        // 2. Enviar para ClickSign
+        const medications = input.prescription.medications.map((m: any) => m.medicationName);
+        const clicksignResult = await ClickSignService.createPrescriptionSignature(
+          input.doctorEmail,
+          input.doctorName,
+          input.prescription.patientName,
+          medications,
+          pdfBase64
         );
+
         return {
           success: true,
-          prescription: signedPrescription,
-          message: 'Prescrição assinada com sucesso',
+          clicksign: clicksignResult,
+          message: 'Processo de assinatura ClickSign iniciado. O médico receberá um e-mail para assinar.',
         };
       } catch (error) {
+        console.error('[Prescription] Erro na assinatura ClickSign:', error);
         return {
           success: false,
           error: (error as Error).message,

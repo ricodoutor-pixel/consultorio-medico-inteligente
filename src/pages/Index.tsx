@@ -106,18 +106,18 @@ const Index = () => {
                 Conectamos pacientes a profissionais habilitados, usamos o que há de mais novo em tecnologia — inteligência artificial e teleatendimento via vídeo e chat, direto na plataforma — aliado ao Shopping de bem-estar com preços populares. Você escolhe o especialista, faz uma pré-entrevista, paga via Pix seguro Mercado Pago e segue para o atendimento. Receba sua receita e volte ao Shopping, com centenas de farmácias e produtores autorizados pela ANVISA, oferecendo os melhores preços com frete grátis para todo o Brasil.
               </motion.p>
 
-              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 mb-10">
-                <Button size="lg" className="text-base font-black h-14 px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl" asChild>
+              <motion.div variants={fadeUp} className="flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4 mb-10">
+                <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl w-full xs:w-auto" asChild>
                   <Link to="/profissionais">
                     Ver Profissionais <ArrowRight size={20} className="ml-2" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="text-base font-black h-14 px-8 border-border hover:bg-muted rounded-2xl" asChild>
+                <Button size="lg" variant="outline" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 border-border hover:bg-muted rounded-2xl w-full xs:w-auto" asChild>
                   <Link to="/shopping">
                     Abrir Shopping <ShoppingBag size={18} className="ml-2" />
                   </Link>
                 </Button>
-                <Button size="lg" className="text-base font-black h-14 px-8 bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-2xl" asChild>
+                <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-2xl w-full xs:w-auto" asChild>
                   <Link to="/planos">
                     Começar agora <ArrowRight size={20} className="ml-2" />
                   </Link>

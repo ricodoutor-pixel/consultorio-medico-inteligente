@@ -25,6 +25,10 @@ img, video, svg {
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+/* Logos and brand images contain within container */
+img.logo, .navbar-logo img {
   object-fit: contain;
 }
 

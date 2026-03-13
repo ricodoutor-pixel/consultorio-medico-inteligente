@@ -348,11 +348,11 @@ const Index = () => {
                     <Area type="monotone" dataKey="valor" stroke="hsl(152 80% 45%)" strokeWidth={3} fill="url(#colorValor)" dot={{ fill: "hsl(152 80% 45%)", strokeWidth: 2, r: 5, stroke: "hsl(240 15% 7%)" }} activeDot={{ r: 8, fill: "hsl(152 80% 45%)", stroke: "hsl(240 15% 7%)", strokeWidth: 3 }} />
                   </AreaChart>
                 </ResponsiveContainer>
-                <div className="flex items-center justify-between mt-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-3">
                   <p className="text-xs text-muted-foreground">
                     Fontes: Grand View Research, Fortune Business Insights, BDSA (2024)
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {["CAGR 34%", "150+ países", "Regulação em expansão"].map(tag => (
                       <span key={tag} className="px-2 py-1 text-[10px] font-bold rounded-full bg-primary/10 text-primary border border-primary/20">{tag}</span>
                     ))}

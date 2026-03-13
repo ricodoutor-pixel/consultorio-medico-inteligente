@@ -691,11 +691,18 @@ const Telemedicina = () => {
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-lg font-display font-black text-primary">{pro.price}</span>
-                          <Button size="sm" className="font-black bg-primary text-primary-foreground rounded-xl" asChild>
-                            <Link to={`/pay?type=appointment&proId=${pro.id}&amount=${pro.priceValue}`}>
-                              Agendar <ArrowRight size={14} className="ml-1" />
-                            </Link>
-                          </Button>
+                          <div className="flex flex-col gap-2">
+                            <Button size="sm" className="font-black bg-primary text-primary-foreground rounded-xl" asChild>
+                              <Link to={`/pay?type=appointment&proId=${pro.id}&amount=${pro.priceValue}`}>
+                                Agendar (BRL) <ArrowRight size={14} className="ml-1" />
+                              </Link>
+                            </Button>
+                            <Button size="sm" variant="outline" className="font-black border-primary text-primary hover:bg-primary/10 rounded-xl" asChild>
+                              <Link to={`/pay?type=appointment&proId=${pro.id}&amount=${(pro.priceValue / 5.5).toFixed(2)}&currency=USD`}>
+                                Pay with PayPal (USD)
+                              </Link>
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>

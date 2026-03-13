@@ -17,6 +17,19 @@ module.exports = {
       error_file: './logs/err.log',
       out_file: './logs/out.log',
       merge_logs: true
+    },
+    {
+      name: 'planta-y-raiz-cron-reports',
+      script: './server/cron-scheduler.ts',
+      interpreter: 'ts-node',
+      watch: false,
+      autorestart: true,
+      env: {
+        NODE_ENV: 'production'
+      },
+      log_date_format: 'YYYY-MM-DD HH:mm:ss',
+      error_file: './logs/cron-err.log',
+      out_file: './logs/cron-out.log'
     }
   ]
 };

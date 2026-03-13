@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { SEO } from "@/components/SEO";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -51,19 +49,14 @@ const faqs = [
 ];
 
 const Index = () => {
-  const { t } = useLanguage();
   return (
-    <div className="min-h-[100dvh] w-full bg-background overflow-x-hidden">
-      <SEO 
-        title={t('hero.title')}
-        description={t('hero.subtitle')}
-      />
+    <div className="min-h-screen bg-background">
       <Navbar />
       <WhatsAppButton />
 
       {/* Hero */}
-      <section className="hero-glow pt-20 pb-12 sm:pt-24 sm:pb-16 md:pt-32 md:pb-28 w-full">
-        <div className="container mx-auto relative z-10">
+      <section className="hero-glow pt-24 pb-16 md:pt-32 md:pb-28">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <motion.div initial="hidden" animate="visible" variants={stagger}>
               <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-8">
@@ -93,37 +86,38 @@ const Index = () => {
 
               <motion.h1 
                 variants={fadeUp} 
-                className="text-2xl xs:text-3xl md:text-5xl lg:text-6xl font-display font-black leading-[1.1] mb-6 md:mb-8 tracking-tight"
+                className="text-3xl md:text-5xl lg:text-6xl font-display font-black leading-[1.1] mb-8 tracking-tight"
               >
-                <span className="text-foreground">{t('hero.title')}</span>
+                <span className="text-foreground">Democratizando o </span>
+                <span className="text-gradient-green">Acesso</span>
+                <span className="text-foreground"> a </span>
+                <span className="text-gradient-purple">Telemedicina</span>
+                <span className="text-foreground">, </span>
+                <span className="text-gradient-gold">Suprimentos</span>
+                <span className="text-foreground"> e </span>
+                <span className="text-gradient-green">Medicamentos</span>
+                <span className="text-foreground"> à Base De </span>
+                <span className="text-gradient-purple">Cannabis</span>
+                <span className="text-foreground"> Em Todo </span>
+                <span className="text-gradient-gold">el Mundo</span>
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-3xl mb-10 leading-relaxed font-medium">
-                {t('hero.subtitle')}
+                Conectamos pacientes a profissionais habilitados, usamos o que há de mais novo em tecnologia — inteligência artificial e teleatendimento via vídeo e chat, direto na plataforma — aliado ao Shopping de bem-estar com preços populares. Você escolhe o especialista, faz uma pré-entrevista, paga via Pix seguro Mercado Pago e segue para o atendimento. Receba sua receita e volte ao Shopping, com centenas de farmácias e produtores autorizados pela ANVISA, oferecendo os melhores preços com frete grátis para todo o Brasil.
               </motion.p>
 
-              {/* Mobile CTA: Botão no topo conforme Estatuto */}
-              <motion.div variants={fadeUp} className="flex flex-col gap-3 mb-6 md:hidden">
-                <Button size="lg" className="text-lg font-black h-14 rounded-2xl bg-primary text-primary-foreground shadow-xl shadow-primary/20 w-full" asChild>
-                  <Link to="/telemedicina">
-                    INICIAR CONSULTA <ArrowRight size={20} className="ml-2" />
-                  </Link>
-                </Button>
-                <GlobalComplianceBadge variant="hero" />
-              </motion.div>
-
-              <motion.div variants={fadeUp} className="hidden md:flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4 mb-10">
-                <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl w-full xs:w-auto" asChild>
+              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 mb-10">
+                <Button size="lg" className="text-base font-black h-14 px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl" asChild>
                   <Link to="/profissionais">
                     Ver Profissionais <ArrowRight size={20} className="ml-2" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 border-border hover:bg-muted rounded-2xl w-full xs:w-auto" asChild>
+                <Button size="lg" variant="outline" className="text-base font-black h-14 px-8 border-border hover:bg-muted rounded-2xl" asChild>
                   <Link to="/shopping">
                     Abrir Shopping <ShoppingBag size={18} className="ml-2" />
                   </Link>
                 </Button>
-                <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-2xl w-full xs:w-auto" asChild>
+                <Button size="lg" className="text-base font-black h-14 px-8 bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-2xl" asChild>
                   <Link to="/planos">
                     Começar agora <ArrowRight size={20} className="ml-2" />
                   </Link>
@@ -141,9 +135,6 @@ const Index = () => {
               <motion.div variants={fadeUp} className="mt-6 px-4 py-3 rounded-2xl border border-primary/20 bg-primary/5 max-w-3xl">
                 <p className="text-xs text-muted-foreground font-medium">
                   ⚠️ Conteúdo educativo. Prescrição e conduta clínica dependem de avaliação individual por profissional habilitado.
-                </p>
-                <p className="text-[10px] text-muted-foreground font-bold mt-1 uppercase">
-                  Plataforma popular de saúde 100% segura e regulamentada.
                 </p>
               </motion.div>
             </motion.div>
@@ -168,8 +159,8 @@ const Index = () => {
 
       {/* Live Stats */}
       <section className="py-12 md:py-16 border-b border-border">
-        <div className="container mx-auto">
-          <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+        <div className="container mx-auto px-4 sm:px-6">
+          <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {[
               { value: "45K+", label: "Usuários Ativos", icon: Users },
               { value: "4.9★", label: "Avaliação Média", icon: Star },
@@ -321,7 +312,7 @@ const Index = () => {
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <Card className="border-border w-full overflow-hidden">
+            <Card className="border-border max-w-5xl overflow-hidden">
               <CardContent className="p-6 md:p-8">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
@@ -338,7 +329,7 @@ const Index = () => {
                     <p className="text-xs text-muted-foreground">Projeção 2028</p>
                   </div>
                 </div>
-                <ResponsiveContainer width="100%" height={280}>
+                <ResponsiveContainer width="100%" height={350}>
                   <AreaChart data={marketData}>
                     <defs>
                       <linearGradient id="colorValor" x1="0" y1="0" x2="0" y2="1">
@@ -357,11 +348,11 @@ const Index = () => {
                     <Area type="monotone" dataKey="valor" stroke="hsl(152 80% 45%)" strokeWidth={3} fill="url(#colorValor)" dot={{ fill: "hsl(152 80% 45%)", strokeWidth: 2, r: 5, stroke: "hsl(240 15% 7%)" }} activeDot={{ r: 8, fill: "hsl(152 80% 45%)", stroke: "hsl(240 15% 7%)", strokeWidth: 3 }} />
                   </AreaChart>
                 </ResponsiveContainer>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-3">
+                <div className="flex items-center justify-between mt-4">
                   <p className="text-xs text-muted-foreground">
                     Fontes: Grand View Research, Fortune Business Insights, BDSA (2024)
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex gap-2">
                     {["CAGR 34%", "150+ países", "Regulação em expansão"].map(tag => (
                       <span key={tag} className="px-2 py-1 text-[10px] font-bold rounded-full bg-primary/10 text-primary border border-primary/20">{tag}</span>
                     ))}

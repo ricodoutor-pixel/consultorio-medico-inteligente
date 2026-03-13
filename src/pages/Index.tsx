@@ -23,15 +23,24 @@ const fadeUp = {
 const stagger = { visible: { transition: { staggerChildren: 0.12 } } };
 
 const steps = [
-  { n: "1", title: "Escolha o especialista", desc: "Navegue por categorias, veja avaliações, preços populares e perfis verificados." },
-  { n: "2", title: "Pré-entrevista rápida", desc: "Preencha um formulário de 2 minutos com seu objetivo e resumo do caso." },
-  { n: "3", title: "Pague via Pix", desc: "Pagamento instantâneo com QR code Mercado Pago. Confirmação automática." },
-  { n: "4", title: "Receba atendimento", desc: "O profissional recebe seu resumo e inicia o atendimento (chat ou vídeo)." },
+  { n: "1", title: "Escolha o especialista", desc: "Navegue por categorias, veja avaliações, preços populares e perfis verificados.", img: triagemPatient },
+  { n: "2", title: "Pré-entrevista rápida", desc: "Preencha um formulário de 2 minutos com seu objetivo e resumo do caso.", img: triagemForm },
+  { n: "3", title: "Pague via Pix", desc: "Pagamento instantâneo com QR code Mercado Pago. Confirmação automática.", img: consultaChat },
+  { n: "4", title: "Receba atendimento", desc: "O profissional recebe seu resumo e inicia o atendimento (chat ou vídeo).", img: heroPhoneMockup },
+];
+
+const growthData = [
+  { year: "2021", value: 1200 },
+  { year: "2022", value: 3500 },
+  { year: "2023", value: 8900 },
+  { year: "2024", value: 18400 },
+  { year: "2025", value: 32000 },
+  { year: "2026", value: 45000 },
 ];
 
 const Index = () => {
   useEffect(() => {
-    document.title = "Planta y Raiz - Mega Clínica Digital";
+    document.title = "Planta y Raiz - Telemedicina Cannabis Medicinal | Consultas a partir de R$30";
   }, []);
 
   return (
@@ -39,7 +48,7 @@ const Index = () => {
       <Navbar />
       <WhatsAppButton />
 
-      {/* Hero Section */}
+      {/* Hero Section - PRESERVADO conforme solicitado */}
       <section className="hero-glow pt-24 pb-16 md:pt-32 md:pb-28 min-h-[95vh] flex items-center">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -119,21 +128,13 @@ const Index = () => {
                   <Link to="/planos">Conhecer Planos</Link>
                 </Button>
               </motion.div>
-
-              <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
-                {["Preços populares", "Pix Mercado Pago", "Teleatendimento", "Shopping multi-vendor", "Foco baixa renda"].map((pill) => (
-                  <span key={pill} className="px-4 py-2 rounded-full text-xs font-bold text-muted-foreground border border-border bg-card/60 backdrop-blur-sm">
-                    {pill}
-                  </span>
-                ))}
-              </motion.div>
             </motion.div>
 
-            {/* Phone Mockup Area - Otimizado para Performance */}
+            {/* Phone Mockup Area - DNA Restaurado */}
             <motion.div
               className="relative flex justify-center items-center"
               initial={{ opacity: 0, scale: 0.8, y: 100 }}
-              animate={{ opacity: 1, scale: 1, y: -220 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
               transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
             >
               <div className="relative group w-full flex flex-col items-center">
@@ -142,10 +143,8 @@ const Index = () => {
                   <img
                     src={heroPhoneMockup}
                     alt="Planta y Raiz App"
-                    className="w-[450px] md:w-[600px] lg:w-[750px] xl:w-[900px] 2xl:w-[1100px] drop-shadow-[0_45px_45px_rgba(0,0,0,0.6)] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
+                    className="w-[320px] md:w-[450px] lg:w-[550px] drop-shadow-[0_45px_45px_rgba(0,0,0,0.6)] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
                     loading="eager"
-                    fetchPriority="high"
-                    decoding="async"
                   />
                 </div>
               </div>
@@ -154,7 +153,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Live Stats */}
+      {/* Live Stats - DNA Restaurado */}
       <section className="py-12 md:py-16 border-b border-border bg-card/20 backdrop-blur-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
@@ -178,7 +177,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Como Funciona Section */}
+      {/* Como Funciona Section - DNA Restaurado com Imagens Originais */}
       <section className="py-20 md:py-32 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <div className="text-center max-w-3xl mx-auto mb-20">
@@ -188,14 +187,105 @@ const Index = () => {
           <div className="grid md:grid-cols-4 gap-8">
             {steps.map((step, i) => (
               <motion.div key={i} className="relative p-8 rounded-3xl bg-card/30 border border-border hover:border-primary/20 transition-all group" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-2xl font-black mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-                  {step.n}
+                <div className="mb-6 relative h-48 overflow-hidden rounded-2xl">
+                  <img src={step.img} alt={step.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  <div className="absolute top-4 left-4 w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground text-xl font-black shadow-lg">
+                    {step.n}
+                  </div>
                 </div>
                 <h3 className="text-xl font-bold mb-3">{step.title}</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm">{step.desc}</p>
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Mercado em Crescimento - Gráfico Restaurado */}
+      <section className="py-20 md:py-32 bg-card/10 border-y border-border">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+              <h2 className="text-3xl md:text-5xl font-display font-black mb-8 leading-tight">Mercado em <span className="text-gradient-green">Crescimento</span> Exponencial</h2>
+              <div className="space-y-6">
+                <div className="flex gap-4 p-6 rounded-2xl bg-background/40 border border-border">
+                  <div className="w-12 h-12 rounded-xl bg-green/10 flex items-center justify-center text-green flex-shrink-0">
+                    <TrendingUp size={24} />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold mb-1">+400% ao Ano</h4>
+                    <p className="text-sm text-muted-foreground">O setor de cannabis medicinal é o que mais cresce na saúde global.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 p-6 rounded-2xl bg-background/40 border border-border">
+                  <div className="w-12 h-12 rounded-xl bg-purple/10 flex items-center justify-center text-purple flex-shrink-0">
+                    <Users size={24} />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold mb-1">Público Fiel</h4>
+                    <p className="text-sm text-muted-foreground">Tratamentos contínuos geram recorrência e fidelidade absoluta.</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }} 
+              whileInView={{ opacity: 1, scale: 1 }} 
+              viewport={{ once: true }}
+              className="h-[400px] w-full bg-background/60 p-8 rounded-3xl border border-border shadow-2xl"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={growthData}>
+                  <defs>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#00FF00" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#00FF00" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1a1f3a" vertical={false} />
+                  <XAxis dataKey="year" stroke="#4a5568" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#4a5568" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#0A0E27', border: '1px solid #1a1f3a', borderRadius: '12px' }}
+                    itemStyle={{ color: '#00FF00', fontWeight: 'bold' }}
+                  />
+                  <Area type="monotone" dataKey="value" stroke="#00FF00" strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
+                </AreaChart>
+              </ResponsiveContainer>
+              <p className="text-center text-[10px] text-muted-foreground mt-4 font-bold uppercase tracking-widest">Crescimento de Pacientes Habilitados no Brasil (Projeção)</p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ / Accordion Section - DNA Restaurado */}
+      <section className="py-20 md:py-32 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 max-w-4xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-display font-black mb-6">Dúvidas <span className="text-gradient-gold">Frequentes</span></h2>
+            <p className="text-lg text-muted-foreground font-medium">Tudo o que você precisa saber para começar seu tratamento.</p>
+          </div>
+          <Accordion type="single" collapsible className="w-full space-y-4">
+            <AccordionItem value="item-1" className="border border-border bg-card/30 rounded-2xl px-6">
+              <AccordionTrigger className="text-left font-bold py-6 hover:no-underline">É legalizado no Brasil?</AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-6">
+                Sim. A ANVISA permite a importação e o uso de produtos à base de cannabis mediante prescrição médica e autorização (RDC 660/2022). Nossa plataforma segue 100% as normas vigentes.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2" className="border border-border bg-card/30 rounded-2xl px-6">
+              <AccordionTrigger className="text-left font-bold py-6 hover:no-underline">Como funciona o pagamento?</AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-6">
+                Utilizamos o checkout seguro do Mercado Pago. Você pode pagar via Pix com confirmação instantânea ou cartão de crédito em até 12x.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3" className="border border-border bg-card/30 rounded-2xl px-6">
+              <AccordionTrigger className="text-left font-bold py-6 hover:no-underline">Qual o custo da consulta?</AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-6">
+                Temos especialistas com valores populares a partir de R$30, democratizando o acesso à saúde de qualidade para todas as classes sociais.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </section>
 

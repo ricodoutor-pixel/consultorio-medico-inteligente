@@ -60,6 +60,7 @@ const TreatmentTracker = lazy(() => import("./pages/TreatmentTracker"));
 const Dispensario = lazy(() => import("./pages/Dispensario"));
 const IoMTHub = lazy(() => import("./pages/IoMTHub"));
 const Blog = lazy(() => import("./pages/Blog"));
+const ShoppingDashboard = lazy(() => import("./pages/ShoppingDashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -129,6 +130,7 @@ const App = () => (
                 <Route path="/iomt" element={<IoMTHub />} />
                 <Route path="/dispositivos" element={<IoMTHub />} />
                 <Route path="/blog" element={<Blog />} />
+                <Route path="/dashboard-loja" element={<ShoppingDashboard />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

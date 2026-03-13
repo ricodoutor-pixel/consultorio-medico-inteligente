@@ -45,7 +45,7 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 620,
     avatar: "EB",
-    imageUrl: "/src/assets/dr-edilson-bezerra.jpg",
+    imageUrl: drEdilsonBezerra,
     services: [
       { name: "Consulta Inicial", price: "R$ 49,90", desc: "Avaliação completa + plano terapêutico canábico" },
       { name: "Retorno", price: "R$ 35,00", desc: "Acompanhamento e ajuste de dosagem" },

@@ -17,7 +17,6 @@ const AUTHORIZED_DOMAINS = [
   'lovable.app',        // preview domains
   'lovableproject.com',  // lovable dev
   'webcontainer.io',     // stackblitz
-  'manus.computer',     // manus
 ];
 
 const BRAND_FINGERPRINT = 'PR_v2_' + btoa('PlantaERaiz2026').slice(0, 12);

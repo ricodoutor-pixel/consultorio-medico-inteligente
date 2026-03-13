@@ -64,10 +64,7 @@ const Telemedicina = () => {
 
   const currentQ = interviewQuestions[step - 1];
   const progress = step <= 0 ? 0 : step > 10 ? 100 : Math.round((step / 10) * 100);
-  // Priorizar médicos online no topo
-  const medicos = professionals
-    .filter(p => p.category === "Médicos Prescritores")
-    .sort((a, b) => (a.online === b.online ? 0 : a.online ? -1 : 1));
+  const medicos = professionals.filter(p => p.category === "Médicos Prescritores");
 
   const handleCheckbox = (option: string, checked: boolean) => {
     const current = (answers[step] as string[]) || [];
@@ -642,22 +639,12 @@ const Telemedicina = () => {
                 <h3 className="font-display font-black text-foreground">Escolha seu Especialista</h3>
                 <div className="space-y-3">
                   {medicos.map((pro) => (
-                    <Card key={pro.id} className={`border-border hover:border-primary/20 transition-colors ${pro.online ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/5" : ""}`}>
+                    <Card key={pro.id} className="border-border hover:border-primary/20 transition-colors">
                       <CardContent className="p-4 flex items-center justify-between flex-wrap gap-3">
                         <div className="flex items-center gap-3">
-                          <div className="relative">
-                            <img src={pro.imageUrl} alt={`Foto do ${pro.name}`} className="w-12 h-12 rounded-xl object-cover border border-border" />
-                            {/* Indicador Online/Offline Pulsante */}
-                            <div className={`absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-background flex items-center justify-center ${pro.online ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" : "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"}`}>
-                              <div className={`w-1.5 h-1.5 rounded-full bg-white ${pro.online ? "animate-ping" : ""}`} />
-                            </div>
-                          </div>
+                          <img src={pro.imageUrl} alt={`Foto do ${pro.name}`} className="w-12 h-12 rounded-xl object-cover border border-border" />
                           <div>
-                            <div className="flex items-center gap-2">
-                              <p className="font-black text-sm text-foreground">{pro.name}</p>
-                              {pro.online && <Badge className="bg-green-500 text-[8px] h-3.5 px-1.5 font-black uppercase tracking-tighter animate-pulse">Online</Badge>}
-                              {!pro.online && <Badge variant="destructive" className="bg-red-500 text-[8px] h-3.5 px-1.5 font-black uppercase tracking-tighter opacity-70">Offline</Badge>}
-                            </div>
+                            <p className="font-black text-sm text-foreground">{pro.name}</p>
                             <p className="text-xs text-muted-foreground">{pro.tags.join(" • ")}</p>
                           </div>
                         </div>

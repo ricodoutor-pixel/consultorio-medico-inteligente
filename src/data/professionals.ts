@@ -13,7 +13,6 @@ export type Professional = {
   avatar: string;
   imageUrl: string;
   paymentLink: string;
-  online?: boolean; // Campo de status Online/Offline
   services: { name: string; price: string; desc: string }[];
   slots: string[];
   reviews: { name: string; rating: number; text: string }[];
@@ -29,34 +28,7 @@ export const categories = [
 ];
 
 export const professionals: Professional[] = [
-  // ═══════ Médicos Prescritores (6) ═══════
-  {
-    id: "med-edilson",
-    name: "Dr. Edilson Bezerra",
-    category: "Médicos Prescritores",
-    bio: "Responsável Técnico da Planta y Raiz. Clínico Geral com vasta experiência internacional e prescritor de cannabis medicinal desde 2018. Especialista em gestão de saúde e auditoria clínica.",
-    experience: "18 anos",
-    tags: ["Responsável Técnico", "Clínica Geral", "Prescritor 2018"],
-    price: "R$ 150,00",
-    priceValue: 150,
-    paymentLink: "https://mpago.la/12KAwmH",
-    whatsapp: "5511987131241",
-    rating: 5.0,
-    consults: 1250,
-    avatar: "EB",
-    imageUrl: "/src/assets/profiles/dr-edilson-bezerra.jpg",
-    online: true, // Dr. Edilson sempre Online como exemplo
-    services: [
-      { name: "Consulta Técnica", price: "R$ 150,00", desc: "Avaliação completa + plano terapêutico personalizado" },
-      { name: "Auditoria de Caso", price: "R$ 200,00", desc: "Revisão técnica de protocolos e tratamentos" },
-      { name: "Acompanhamento VIP", price: "R$ 120,00", desc: "Follow-up exclusivo para pacientes da plataforma" },
-    ],
-    slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
-    reviews: [
-      { name: "Admin", rating: 5, text: "Liderança técnica exemplar e compromisso com a ética médica." },
-      { name: "Paciente P.", rating: 5, text: "Atendimento humano e extremamente competente." },
-    ],
-  },
+  // ═══════ Médicos Prescritores (5) ═══════
   {
     id: "med-1",
     name: "Dr. Felipe Andrade",

@@ -107,14 +107,14 @@ const App = () => (
                 <Route path="/biblioteca" element={<BibliotecaCientifica />} />
                 <Route path="/download" element={<DownloadApp />} />
                 <Route path="/comunidade" element={<Comunidade />} />
-                <Route path="/dashboard" element={<PrivateRoute><DashboardPaciente /></PrivateRoute>} />
-                <Route path="/agendamento" element={<PrivateRoute><Agendamento /></PrivateRoute>} />
-                <Route path="/prontuario" element={<PrivateRoute><Prontuario /></PrivateRoute>} />
-                <Route path="/dashboard-medico" element={<PrivateRoute><DashboardMedico /></PrivateRoute>} />
-                <Route path="/dashboard-executivo" element={<PrivateRoute><DashboardExecutivo /></PrivateRoute>} />
-                <Route path="/notificacoes" element={<PrivateRoute><Notificacoes /></PrivateRoute>} />
-                <Route path="/sala-espera" element={<PrivateRoute><SalaEspera /></PrivateRoute>} />
-                <Route path="/consulta-video" element={<PrivateRoute><ConsultaVideo /></PrivateRoute>} />
+                <Route path="/dashboard" element={<DashboardPaciente />} />
+                <Route path="/agendamento" element={<Agendamento />} />
+                <Route path="/prontuario" element={<Prontuario />} />
+                <Route path="/dashboard-medico" element={<DashboardMedico />} />
+                <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />
+                <Route path="/notificacoes" element={<Notificacoes />} />
+                <Route path="/sala-espera" element={<SalaEspera />} />
+                <Route path="/consulta-video" element={<ConsultaVideo />} />
                 <Route path="/ripd" element={<RIPD />} />
                 <Route path="/lgpd" element={<LGPDDireitos />} />
                 <Route path="/meus-dados" element={<LGPDDireitos />} />

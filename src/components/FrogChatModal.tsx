@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { FrogMascot } from "@/components/FrogMascot";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   id: string;
@@ -27,17 +26,11 @@ async function streamChat({
   onError: (err: string) => void;
 }) {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      onError("Faça login para usar o chat. 🐸");
-      return;
-    }
-
     const resp = await fetch(CHAT_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.access_token}`,
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
       body: JSON.stringify({ messages }),
     });

@@ -128,12 +128,12 @@ export const Navbar = () => {
   return (
     <>
       <nav
-        className="fixed top-0 left-0 right-0 glass border-b border-border z-50 will-change-transform"
+        className="fixed top-0 left-0 right-0 w-full glass border-b border-border z-50 will-change-transform"
         role="navigation"
         aria-label="Navegação principal"
-        style={{ WebkitBackfaceVisibility: "hidden" }}
+        style={{ WebkitBackfaceVisibility: "hidden", position: "sticky" as any }}
       >
-        <div className="w-full px-3 sm:px-4 lg:px-6 xl:px-10 2xl:px-16">
+        <div className="w-full px-3 sm:px-4 lg:px-6 xl:px-10 2xl:px-16 max-w-[100vw]">
           <div className="flex items-center justify-between h-16 md:h-[72px]">
             {/* Logo + Verdinho */}
             <div className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-0">

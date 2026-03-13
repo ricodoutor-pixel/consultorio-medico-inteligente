@@ -138,9 +138,7 @@ export const Navbar = () => {
             {/* Logo + Verdinho */}
             <div className="flex items-center gap-1 md:gap-2 flex-shrink-0 min-w-0">
               <NavLink to="/" className="flex items-center gap-1.5 md:gap-2 min-w-0">
-                <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
-                  <Leaf size={18} className="text-primary-foreground" />
-                </div>
+                <img src="/src/assets/verdinho-doctor.png" alt="Logo Planta y Raiz" className="w-10 h-10 object-contain glow-green flex-shrink-0" />
                 <div className="leading-tight hidden xs:block min-w-0">
                   <span className="text-xs md:text-sm font-display font-black text-foreground block whitespace-nowrap truncate max-w-[120px] sm:max-w-none">
                     Planta <span className="text-gradient-purple">&</span> Raiz

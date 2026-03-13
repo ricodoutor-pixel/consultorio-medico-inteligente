@@ -144,10 +144,10 @@ export const Navbar = () => {
               <NavLink to="/" className="flex items-center gap-1.5 md:gap-2 min-w-0">
                 <img src="/src/assets/verdinho-doctor.png" alt="Logo Planta y Raiz" className="w-10 h-10 object-contain glow-green flex-shrink-0" />
                 <div className="leading-tight hidden xs:block min-w-0">
-                  <span className="text-xs md:text-sm font-display font-black text-foreground block whitespace-nowrap truncate max-w-[120px] sm:max-w-none">
-                    Planta <span className="text-gradient-purple">&</span> Raiz
+                  <span className="text-xs md:text-sm font-display font-black text-foreground block whitespace-nowrap truncate max-w-[120px] sm:max-w-none uppercase">
+                    Planta y Raiz
                   </span>
-                  <span className="text-[9px] md:text-[10px] text-muted-foreground font-semibold block">Mega Clínica Digital</span>
+                  <span className="text-[9px] md:text-[10px] text-primary font-bold block tracking-tighter uppercase">Mega Clínica Digital</span>
                 </div>
               </NavLink>
               <div className="ml-0.5 md:ml-1 flex-shrink-0">
@@ -155,8 +155,8 @@ export const Navbar = () => {
               </div>
             </div>
 
-            {/* Desktop Links */}
-            <div className="hidden xl:flex items-center gap-1 2xl:gap-3 flex-shrink min-w-0" role="menubar">
+            {/* Desktop Links - Alinhados à direita para dar espaço ao Verdinho */}
+            <div className="hidden xl:flex items-center gap-1 2xl:gap-3 ml-auto mr-4 flex-shrink min-w-0" role="menubar">
               {links.map((link) => (
                 <NavLink
                   key={link.to}

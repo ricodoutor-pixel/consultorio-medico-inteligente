@@ -66,12 +66,19 @@ export async function createPayment(request: PaymentRequest): Promise<PaymentRes
   }
 }
 
-export async function createPixPayment(request: PaymentRequest): Promise<PaymentResponse> {
+export async function createPixPayment(request: PaymentRequest, isSubscriber: boolean = false): Promise<PaymentResponse> {
   try {
     // Cálculo de Split de Pagamento (Manus CEO Logic)
-    // 5% para Lojistas (product), 7% para Profissionais (consultation/subscription)
-    const taxRate = request.type === 'product' ? 0.05 : 0.07;
-    const applicationFee = Number((request.amount * taxRate).toFixed(2));
+    // Pilar III do Estatuto 2026-2030: Assinantes possuem isenção de taxas administrativas
+    let applicationFee = 0;
+    if (!isSubscriber) {
+      // 5% para Lojistas (product), 7% para Profissionais (consultation/subscription)
+      const taxRate = request.type === 'product' ? 0.05 : 0.07;
+      applicationFee = Number((request.amount * taxRate).toFixed(2));
+      console.log(`📊 [Manus CEO] Cálculo de Split: Bruto ${request.amount} -> Taxa (${taxRate*100}%): ${applicationFee}`);
+    } else {
+      console.log(`💎 [Manus CEO] Assinante Identificado: Isenção de Taxa Aplicada (0%)`);
+    }
 
     const payload = {
       transaction_amount: request.amount,

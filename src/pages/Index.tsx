@@ -102,7 +102,17 @@ const Index = () => {
                 {t('hero.subtitle')}
               </motion.p>
 
-              <motion.div variants={fadeUp} className="flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4 mb-10">
+              {/* Mobile CTA: Botão no topo conforme Estatuto */}
+              <motion.div variants={fadeUp} className="flex flex-col gap-3 mb-6 md:hidden">
+                <Button size="lg" className="text-lg font-black h-14 rounded-2xl bg-primary text-primary-foreground shadow-xl shadow-primary/20 w-full" asChild>
+                  <Link to="/telemedicina">
+                    INICIAR CONSULTA <ArrowRight size={20} className="ml-2" />
+                  </Link>
+                </Button>
+                <GlobalComplianceBadge variant="hero" />
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="hidden md:flex flex-col xs:flex-row flex-wrap gap-3 sm:gap-4 mb-10">
                 <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl w-full xs:w-auto" asChild>
                   <Link to="/profissionais">
                     Ver Profissionais <ArrowRight size={20} className="ml-2" />
@@ -131,6 +141,9 @@ const Index = () => {
               <motion.div variants={fadeUp} className="mt-6 px-4 py-3 rounded-2xl border border-primary/20 bg-primary/5 max-w-3xl">
                 <p className="text-xs text-muted-foreground font-medium">
                   ⚠️ Conteúdo educativo. Prescrição e conduta clínica dependem de avaliação individual por profissional habilitado.
+                </p>
+                <p className="text-[10px] text-muted-foreground font-bold mt-1 uppercase">
+                  Plataforma popular de saúde 100% segura e regulamentada.
                 </p>
               </motion.div>
             </motion.div>

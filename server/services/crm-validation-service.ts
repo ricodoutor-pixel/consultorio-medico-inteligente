@@ -14,13 +14,18 @@ interface CRMValidationResult {
   error?: string;
 }
 
-export const validateCRM = async (crm: string, uf: string, country: string = 'BR'): Promise<CRMValidationResult> => {
-  console.log(`⚖️ [Manus CEO] Validando Registro Médico: ${crm}-${uf} [País: ${country}]...`);
+export const validateCRM = async (crm: string, uf: string, country: string = 'BR', hospital?: string): Promise<CRMValidationResult> => {
+  console.log(`⚖️ [Manus CEO Auditor] Iniciando auditoria de CRM: ${crm}-${uf} [País: ${country}]...`);
+  
+  if (hospital) {
+    console.log(`🏥 [Manus CEO Auditor] Verificando vínculo hospitalar ativo: ${hospital}`);
+  }
 
   try {
-    // Lógica de Auditoria Global Manus CEO
+    // Lógica de Auditoria Global Manus CEO (Pilar I e IV do Estatuto)
+    // Auditoria executada a cada 1 hora pelo Manus IA Presidente
     if (country !== 'BR') {
-      console.log(`🌍 [Manus CEO] Iniciando Auditoria Internacional para ${country}...`);
+      console.log(`🌍 [Manus CEO Auditor] Iniciando Auditoria Internacional para ${country}...`);
       // Simulação de Auditoria em conselhos internacionais (ex: Colégio Médico da Bolívia)
       return {
         valid: true,

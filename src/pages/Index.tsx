@@ -56,7 +56,7 @@ const Index = () => {
             {/* Text Content */}
             <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col">
               <motion.div variants={fadeUp} className="mb-6">
-                <GlobalComplianceBadge variant="hero" />
+                <GlobalComplianceBadge />
               </motion.div>
 
               <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-8">

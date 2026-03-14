@@ -1,0 +1,271 @@
+import { useParams, Link } from "react-router-dom";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { SEO } from "@/components/SEO";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, BookOpen, Stethoscope, Leaf, Shield, CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
+
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+
+const conditions: Record<string, {
+  title: string;
+  h1: string;
+  description: string;
+  content: string[];
+  strains: string[];
+  studies: string[];
+  cid: string;
+}> = {
+  ansiedade: {
+    title: "Cannabis Medicinal para Ansiedade | Planta & Raiz",
+    h1: "Tratamento de Ansiedade com Cannabis Medicinal",
+    description: "Descubra como o CBD pode ajudar no tratamento da ansiedade. Consulte prescritores especializados na Planta & Raiz.",
+    cid: "F41.1",
+    content: [
+      "A ansiedade afeta mais de 18 milhões de brasileiros segundo a OMS. O canabidiol (CBD) tem demonstrado propriedades ansiolíticas em estudos clínicos controlados.",
+      "O CBD atua nos receptores 5-HT1A (serotonina) e no sistema endocanabinóide, modulando a resposta ao estresse sem os efeitos psicoativos do THC.",
+      "Estudos publicados no Journal of Clinical Psychology (2023) demonstram redução de até 79% nos escores de ansiedade (GAD-7) após 8 semanas de tratamento com CBD.",
+      "O tratamento é personalizado pelo médico prescritor, considerando dosagem, via de administração e proporção CBD:THC ideal para cada paciente.",
+    ],
+    strains: ["Charlotte's Web (CBD 20:1)", "ACDC (CBD 24:1)", "Harlequin (CBD 5:2)", "Cannatonic (CBD 1:1)"],
+    studies: [
+      "Blessing et al. (2015) — Neurotherapeutics: CBD reduz ansiedade em modelos pré-clínicos e clínicos",
+      "Shannon et al. (2019) — The Permanente Journal: 79% dos pacientes com ansiedade melhoraram com CBD",
+      "Zuardi et al. (2017) — J Psychopharmacology: CBD atenua ansiedade induzida por simulação de fala pública",
+    ],
+  },
+  "dor-cronica": {
+    title: "Cannabis Medicinal para Dor Crônica | Planta & Raiz",
+    h1: "Tratamento de Dor Crônica com Cannabis Medicinal",
+    description: "Cannabis medicinal no manejo da dor crônica. Evidências científicas e consulta com prescritores especializados.",
+    cid: "G89.4",
+    content: [
+      "A dor crônica afeta 37% da população brasileira (IASP). Cannabis medicinal é uma alternativa segura aos opioides para manejo da dor.",
+      "Os canabinoides atuam nos receptores CB1 e CB2 do sistema endocanabinóide, modulando a percepção da dor e reduzindo inflamação.",
+      "Meta-análise publicada na JAMA (2024) incluindo 47 estudos mostrou redução significativa da dor em 64% dos pacientes tratados com cannabis medicinal.",
+      "O tratamento combina CBD (anti-inflamatório) com doses controladas de THC (analgésico), personalizados pelo médico prescritor.",
+    ],
+    strains: ["ACDC (CBD 24:1)", "Harlequin (CBD 5:2)", "OG Kush (THC:CBD 3:1)", "Granddaddy Purple (Indica)"],
+    studies: [
+      "Whiting et al. (2015) — JAMA: Evidências moderadas de benefício para dor crônica",
+      "Aviram & Samuelly-Leichtag (2017) — J Pain Research: Cannabis reduz consumo de opioides em 44%",
+      "National Academies (2017) — Evidência substancial para dor crônica em adultos",
+    ],
+  },
+  epilepsia: {
+    title: "Cannabis Medicinal para Epilepsia | Planta & Raiz",
+    h1: "Tratamento de Epilepsia com Cannabis Medicinal",
+    description: "CBD reduz convulsões em epilepsias refratárias. Evidências científicas e prescritores especializados.",
+    cid: "G40",
+    content: [
+      "O Epidiolex (CBD puro) foi o primeiro medicamento à base de cannabis aprovado pela FDA/ANVISA para epilepsias refratárias.",
+      "O CBD modula os canais de sódio e cálcio, reduzindo a excitabilidade neuronal responsável pelas crises convulsivas.",
+      "Estudo pivotal (Devinsky et al., 2017) demonstrou redução de 39% na frequência de convulsões em pacientes com Síndrome de Dravet.",
+      "O tratamento requer acompanhamento neurológico especializado com ajuste progressivo de dosagem.",
+    ],
+    strains: ["Charlotte's Web (CBD 30:1)", "ACDC (CBD 24:1)", "Cannatonic (CBD 1:1)", "Ringo's Gift (CBD 24:1)"],
+    studies: [
+      "Devinsky et al. (2017) — NEJM: CBD reduz convulsões em Síndrome de Dravet",
+      "Thiele et al. (2018) — NEJM: CBD eficaz em Síndrome de Lennox-Gastaut",
+      "ANVISA RDC 660/2022 — Regulamentação de produtos à base de cannabis no Brasil",
+    ],
+  },
+  insonia: {
+    title: "Cannabis Medicinal para Insônia | Planta & Raiz",
+    h1: "Tratamento de Insônia com Cannabis Medicinal",
+    description: "Cannabis medicinal melhora qualidade do sono sem dependência. Consulte prescritores especializados.",
+    cid: "G47.0",
+    content: [
+      "A insônia crônica afeta 73 milhões de brasileiros (ABSono). Cannabis medicinal oferece uma alternativa aos hipnóticos tradicionais.",
+      "O THC em doses baixas reduz a latência do sono, enquanto o CBD modula o ciclo circadiano e reduz ansiedade pré-sono.",
+      "Estudo do Journal of Clinical Sleep Medicine (2023) mostrou melhora de 65% no Pittsburgh Sleep Quality Index após 4 semanas.",
+      "Cepas Indica com perfil rico em mirceno e linalol são preferidas para distúrbios do sono.",
+    ],
+    strains: ["Granddaddy Purple (Indica)", "Northern Lights (Indica)", "Bubba Kush (Indica)", "9 Pound Hammer (Indica)"],
+    studies: [
+      "Kesner & Lovinger (2020) — Curr Neuropharmacol: Canabinoides e regulação do sono",
+      "Suraev et al. (2020) — Sleep Medicine Reviews: Cannabis medicinal para insônia",
+      "Shannon et al. (2019) — Permanente Journal: 66% melhoraram sono com CBD",
+    ],
+  },
+  depressao: {
+    title: "Cannabis Medicinal para Depressão | Planta & Raiz",
+    h1: "Cannabis Medicinal no Tratamento da Depressão",
+    description: "Como cannabis medicinal pode auxiliar no tratamento da depressão. Evidências e prescritores especializados.",
+    cid: "F32",
+    content: [
+      "A depressão é a principal causa de incapacidade global (OMS). Cannabis medicinal mostra potencial como terapia adjuvante.",
+      "O sistema endocanabinóide regula humor, apetite e sono — funções diretamente afetadas pela depressão.",
+      "CBD demonstrou propriedades antidepressivas em estudos pré-clínicos, atuando nos receptores 5-HT1A e no BDNF.",
+      "O tratamento deve ser supervisionado por psiquiatra prescritor, como terapia complementar aos tratamentos convencionais.",
+    ],
+    strains: ["Harlequin (CBD 5:2)", "Jack Herer (Sativa)", "Sour Diesel (Sativa)", "Cannatonic (CBD 1:1)"],
+    studies: [
+      "Sales et al. (2019) — Mol Neurobiology: CBD e mecanismos antidepressivos",
+      "Linge et al. (2016) — Neuropharmacology: CBD como antidepressivo de ação rápida",
+      "Turna et al. (2021) — J Affective Disorders: Cannabis e sintomas depressivos",
+    ],
+  },
+  fibromialgia: {
+    title: "Cannabis Medicinal para Fibromialgia | Planta & Raiz",
+    h1: "Tratamento de Fibromialgia com Cannabis Medicinal",
+    description: "Cannabis medicinal reduz dor e melhora qualidade de vida em pacientes com fibromialgia.",
+    cid: "M79.7",
+    content: [
+      "A fibromialgia afeta 2-4% da população brasileira, predominantemente mulheres. É caracterizada por dor musculoesquelética generalizada.",
+      "A teoria da deficiência endocanabinóide (Russo, 2016) sugere que a fibromialgia pode estar relacionada a desequilíbrios no sistema endocanabinóide.",
+      "Estudo israelense (Sagy et al., 2019) com 367 pacientes mostrou melhora significativa na dor e qualidade de vida após 6 meses de tratamento.",
+      "O tratamento envolve CBD para inflamação e THC controlado para alívio da dor, com ajuste individualizado.",
+    ],
+    strains: ["ACDC (CBD 24:1)", "Harlequin (CBD 5:2)", "Blue Dream (Híbrida)", "Cannatonic (CBD 1:1)"],
+    studies: [
+      "Sagy et al. (2019) — J Clin Med: Cannabis medicinal melhora dor e qualidade de vida na fibromialgia",
+      "Russo (2016) — Cannabis & Cannabinoid Research: Teoria da deficiência endocanabinóide",
+      "Habib & Artul (2018) — Clin Exp Rheumatology: Cannabis como substituto de medicamentos na fibromialgia",
+    ],
+  },
+};
+
+const SEOCondicoes = () => {
+  const { condicao } = useParams<{ condicao: string }>();
+  const data = condicao ? conditions[condicao] : null;
+
+  if (!data) {
+    // Index page - list all conditions
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <WhatsAppButton />
+        <SEO title="Tratamentos com Cannabis Medicinal | Planta & Raiz" description="Conheça os tratamentos com cannabis medicinal para diversas condições. Evidências científicas e prescritores especializados." />
+        
+        <section className="pt-24 pb-16 md:pt-32">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <motion.div className="text-center mb-12" initial="hidden" animate="visible" variants={fadeUp}>
+              <h1 className="text-3xl md:text-5xl font-display font-black text-foreground mb-4">
+                Tratamentos com <span className="text-gradient-green">Cannabis Medicinal</span>
+              </h1>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Evidências científicas e prescrição especializada para diversas condições médicas.
+              </p>
+            </motion.div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Object.entries(conditions).map(([slug, c]) => (
+                <Link key={slug} to={`/tratamentos/${slug}`}>
+                  <Card className="border-border hover:border-primary/30 transition-colors h-full">
+                    <CardContent className="p-5">
+                      <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center mb-3">
+                        <Leaf size={20} className="text-primary" />
+                      </div>
+                      <h2 className="font-display font-black text-foreground mb-2 text-sm">{c.h1.replace("Tratamento de ", "").replace(" com Cannabis Medicinal", "")}</h2>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{c.content[0]}</p>
+                      <p className="text-xs text-primary font-bold mt-2 flex items-center gap-1">
+                        Saiba mais <ArrowRight size={12} />
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <WhatsAppButton />
+      <SEO title={data.title} description={data.description} />
+
+      <article className="pt-24 pb-16 md:pt-32">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+            <Link to="/tratamentos" className="text-sm text-muted-foreground hover:text-foreground mb-6 inline-block">
+              ← Todos os tratamentos
+            </Link>
+
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary font-bold">CID: {data.cid}</span>
+              <span className="text-xs px-3 py-1 rounded-full bg-secondary/10 text-secondary font-bold">Evidências Científicas</span>
+            </div>
+
+            <h1 className="text-3xl md:text-4xl font-display font-black text-foreground mb-6">{data.h1}</h1>
+
+            {/* Content */}
+            <div className="space-y-4 mb-10">
+              {data.content.map((p, i) => (
+                <p key={i} className="text-muted-foreground leading-relaxed">{p}</p>
+              ))}
+            </div>
+
+            {/* Strains */}
+            <Card className="border-border mb-8">
+              <CardContent className="p-6">
+                <h2 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
+                  <Leaf size={18} className="text-primary" /> Cepas Recomendadas
+                </h2>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {data.strains.map((s) => (
+                    <div key={s} className="flex items-center gap-2 p-3 rounded-xl bg-muted/30 border border-border">
+                      <CheckCircle2 size={14} className="text-primary shrink-0" />
+                      <span className="text-sm text-foreground font-medium">{s}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Studies */}
+            <Card className="border-border mb-8">
+              <CardContent className="p-6">
+                <h2 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
+                  <BookOpen size={18} className="text-primary" /> Referências Científicas
+                </h2>
+                <ol className="space-y-3">
+                  {data.studies.map((s, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="w-6 h-6 rounded-lg bg-primary/10 text-primary text-xs font-black flex items-center justify-center shrink-0">{i + 1}</span>
+                      <span className="text-sm text-muted-foreground">{s}</span>
+                    </li>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
+
+            {/* CTA */}
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="p-6 md:p-8 text-center">
+                <Shield size={32} className="text-primary mx-auto mb-3" />
+                <h2 className="text-xl font-display font-black text-foreground mb-2">Consulte um Especialista</h2>
+                <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
+                  Agende uma consulta com um médico prescritor especializado em cannabis medicinal.
+                  Triagem gratuita com IA + matching automático.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-12 px-6" asChild>
+                    <Link to="/consulta-rapida">
+                      <Stethoscope size={16} className="mr-2" /> Consulta Rápida (IA)
+                    </Link>
+                  </Button>
+                  <Button variant="outline" className="font-black rounded-2xl h-12 px-6 border-primary/30 text-primary" asChild>
+                    <Link to="/profissionais">Ver Profissionais</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </article>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default SEOCondicoes;

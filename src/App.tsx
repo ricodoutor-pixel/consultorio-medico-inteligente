@@ -63,6 +63,8 @@ const Blog = lazy(() => import("./pages/Blog"));
 const ShoppingDashboard = lazy(() => import("./pages/ShoppingDashboard"));
 const InvestorDashboard = lazy(() => import("./pages/InvestorDashboard"));
 const VideoCall = lazy(() => import("./pages/VideoCall"));
+const ConsultaRapida = lazy(() => import("./pages/ConsultaRapida"));
+const SEOCondicoes = lazy(() => import("./pages/SEOCondicoes"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -135,6 +137,9 @@ const App = () => (
                 <Route path="/dashboard-loja" element={<ShoppingDashboard />} />
                 <Route path="/investidores" element={<InvestorDashboard />} />
                 <Route path="/videochamada" element={<VideoCall />} />
+                <Route path="/consulta-rapida" element={<ConsultaRapida />} />
+                <Route path="/tratamentos" element={<SEOCondicoes />} />
+                <Route path="/tratamentos/:condicao" element={<SEOCondicoes />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

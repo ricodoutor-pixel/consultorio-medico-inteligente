@@ -137,6 +137,9 @@ const App = () => (
                 <Route path="/dashboard-loja" element={<ShoppingDashboard />} />
                 <Route path="/investidores" element={<InvestorDashboard />} />
                 <Route path="/videochamada" element={<VideoCall />} />
+                <Route path="/consulta-rapida" element={<ConsultaRapida />} />
+                <Route path="/tratamentos" element={<SEOCondicoes />} />
+                <Route path="/tratamentos/:condicao" element={<SEOCondicoes />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

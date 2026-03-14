@@ -63,6 +63,8 @@ const Blog = lazy(() => import("./pages/Blog"));
 const ShoppingDashboard = lazy(() => import("./pages/ShoppingDashboard"));
 const InvestorDashboard = lazy(() => import("./pages/InvestorDashboard"));
 const VideoCall = lazy(() => import("./pages/VideoCall"));
+const ConsultaRapida = lazy(() => import("./pages/ConsultaRapida"));
+const SEOCondicoes = lazy(() => import("./pages/SEOCondicoes"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();

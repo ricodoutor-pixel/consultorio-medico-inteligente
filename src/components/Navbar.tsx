@@ -236,7 +236,7 @@ export const Navbar = () => {
               </Button>
               <div className="flex flex-col items-center gap-4">
                 <LanguageSwitcher />
-                <GlobalComplianceBadge variant="hero" />
+                <GlobalComplianceBadge />
               </div>
             </div>
           </div>

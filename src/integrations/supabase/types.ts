@@ -316,30 +316,39 @@ export type Database = {
           action: string | null
           amount: number | null
           created_at: string
+          doctor_payout: number | null
           id: string
           payer_email: string | null
           payment_id: string
+          platform_fee: number | null
           raw_data: Json | null
+          split_processed: boolean | null
           status: string
         }
         Insert: {
           action?: string | null
           amount?: number | null
           created_at?: string
+          doctor_payout?: number | null
           id?: string
           payer_email?: string | null
           payment_id: string
+          platform_fee?: number | null
           raw_data?: Json | null
+          split_processed?: boolean | null
           status?: string
         }
         Update: {
           action?: string | null
           amount?: number | null
           created_at?: string
+          doctor_payout?: number | null
           id?: string
           payer_email?: string | null
           payment_id?: string
+          platform_fee?: number | null
           raw_data?: Json | null
+          split_processed?: boolean | null
           status?: string
         }
         Relationships: []

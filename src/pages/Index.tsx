@@ -3,16 +3,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Leaf, Stethoscope, ShoppingBag, Users, Star, Shield, Zap, ArrowRight, TrendingUp, MessageSquare, ClipboardList, Smartphone, Gift, BookOpen, Video, UserPlus, Globe, Download, HeartPulse } from "lucide-react";
+import { Leaf, Stethoscope, ShoppingBag, Users, Star, Shield, Zap, ArrowRight, TrendingUp, MessageSquare, ClipboardList, Smartphone, Gift, BookOpen, Video, UserPlus, Globe, Download, HeartPulse, Quote } from "lucide-react";
 import { motion } from "framer-motion";
-import { testimonials } from "@/data/testimonials";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
 import heroPhoneMockup from "@/assets/hero-phone-mockup.png"; 
 import triagemPatient from "@/assets/triagem-patient.png";
 import consultaChat from "@/assets/consulta-chat.png";
 import triagemForm from "@/assets/triagem-form.png";
+import testimonialMaria from "@/assets/testimonial-maria.jpg";
+import testimonialRoberto from "@/assets/testimonial-roberto.jpg";
+import testimonialJuliana from "@/assets/testimonial-juliana.jpg";
+import testimonialAntonio from "@/assets/testimonial-antonio.jpg";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
 import { useEffect } from "react";
 
@@ -27,6 +29,38 @@ const steps = [
   { n: "2", title: "Pré-entrevista rápida", desc: "Preencha um formulário de 2 minutos com seu objetivo e resumo do caso.", img: triagemForm },
   { n: "3", title: "Pague via Pix", desc: "Pagamento instantâneo com QR code Mercado Pago. Confirmação automática.", img: consultaChat },
   { n: "4", title: "Receba atendimento", desc: "O profissional recebe seu resumo e inicia o atendimento (chat ou vídeo).", img: heroPhoneMockup },
+  { n: "5", title: "Compre seu tratamento", desc: "Acesse nossas lojas parceiras e compre seus medicamentos com receita digital e frete grátis.", img: triagemPatient },
+];
+
+const testimonialData = [
+  {
+    name: "Dona Maria",
+    age: "62 anos",
+    condition: "Artrite Reumatoide",
+    quote: "Depois de 8 anos sofrendo com artrite, o óleo de CBD mudou minha vida. Reduzi 70% dos analgésicos e voltei a fazer crochê.",
+    image: testimonialMaria,
+  },
+  {
+    name: "Roberto",
+    age: "45 anos",
+    condition: "Epilepsia do filho",
+    quote: "Meu filho tinha 15 crises por semana. Com o tratamento prescrito aqui, as crises reduziram para 2 por mês. Divisor de águas!",
+    image: testimonialRoberto,
+  },
+  {
+    name: "Juliana",
+    age: "34 anos",
+    condition: "Ansiedade e Insônia",
+    quote: "Tomava 3 remédios para dormir. A psiquiatra da plataforma ajustou meu protocolo com CBD e em 3 meses consegui dormir naturalmente.",
+    image: testimonialJuliana,
+  },
+  {
+    name: "Sr. Antônio",
+    age: "71 anos",
+    condition: "Parkinson",
+    quote: "Os tremores melhoraram muito. Consigo comer sozinho de novo. A telemedicina facilitou porque não preciso sair de casa.",
+    image: testimonialAntonio,
+  },
 ];
 
 const growthData = [
@@ -162,23 +196,23 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Como Funciona Section */}
+      {/* Como Funciona — 5 Passos */}
       <section className="py-20 md:py-32 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-3xl md:text-5xl font-display font-black mb-6">Tratamento em <span className="text-gradient-purple">4 Passos</span></h2>
-            <p className="text-lg text-muted-foreground font-medium">Sua jornada completa, do diagnóstico à entrega, com economia e segurança total.</p>
+            <h2 className="text-3xl md:text-5xl font-display font-black mb-6">Tratamento em <span className="text-gradient-purple">5 Passos</span></h2>
+            <p className="text-lg text-muted-foreground font-medium">Sua jornada completa, do diagnóstico à entrega do medicamento, com economia e segurança total.</p>
           </div>
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-5 gap-6">
             {steps.map((step, i) => (
-              <motion.div key={i} className="relative p-8 rounded-3xl bg-card/30 border border-border hover:border-primary/20 transition-all group" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-                <div className="mb-6 relative h-48 overflow-hidden rounded-2xl">
+              <motion.div key={i} className="relative p-6 rounded-3xl bg-card/30 border border-border hover:border-primary/20 transition-all group" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+                <div className="mb-4 relative h-40 overflow-hidden rounded-2xl">
                   <img src={step.img} alt={step.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  <div className="absolute top-4 left-4 w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground text-xl font-black shadow-lg">
+                  <div className="absolute top-3 left-3 w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-primary-foreground text-lg font-black shadow-lg">
                     {step.n}
                   </div>
                 </div>
-                <h3 className="text-xl font-bold mb-3">{step.title}</h3>
+                <h3 className="text-lg font-bold mb-2">{step.title}</h3>
                 <p className="text-muted-foreground leading-relaxed text-sm">{step.desc}</p>
               </motion.div>
             ))}
@@ -186,13 +220,49 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Mercado em Crescimento - Gráfico Restaurado */}
+      {/* Depoimentos Reais */}
       <section className="py-20 md:py-32 bg-card/10 border-y border-border">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-5xl font-display font-black mb-6">Histórias <span className="text-gradient-green">Reais</span></h2>
+            <p className="text-lg text-muted-foreground font-medium">Vidas transformadas pela cannabis medicinal com acompanhamento profissional.</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {testimonialData.map((t, i) => (
+              <motion.div 
+                key={i} 
+                className="relative p-6 rounded-3xl bg-background/60 border border-border hover:border-primary/30 transition-all backdrop-blur-sm"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
+              >
+                <Quote size={24} className="text-primary/30 mb-4" />
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6 italic">"{t.quote}"</p>
+                <div className="flex items-center gap-3">
+                  <img 
+                    src={t.image} 
+                    alt={t.name} 
+                    className="w-12 h-12 rounded-full object-cover border-2 border-primary/30"
+                  />
+                  <div>
+                    <p className="text-sm font-bold text-foreground">{t.name}, {t.age}</p>
+                    <p className="text-xs text-primary font-semibold">{t.condition}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Mercado em Crescimento */}
+      <section className="py-20 md:py-32 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
               <h2 className="text-3xl md:text-5xl font-display font-black mb-8 leading-tight">Mercado em <span className="text-gradient-green">Expansão</span></h2>
-              <p className="text-lg text-muted-foreground mb-8 font-medium">A Planta y Raiz lidera a democratização do acesso, com crescimento exponencial projetado para os próximos anos. Nosso ecossistema une saúde, tecnologia e economia circular.</p>
+              <p className="text-lg text-muted-foreground mb-8 font-medium">A Planta y Raiz lidera a democratização do acesso, com crescimento exponencial projetado para os próximos anos.</p>
               <div className="space-y-4">
                 {[
                   { label: "Crescimento de Usuários", val: "280% ao ano" },

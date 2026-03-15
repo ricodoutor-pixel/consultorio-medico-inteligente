@@ -112,14 +112,24 @@ Deno.serve(async (req) => {
       payer_email: payment.payer?.email,
     }));
 
-    // Store webhook event in database
+    // Calculate split
+    const totalAmount = payment.transaction_amount || 0;
+    const metadata = payment.metadata || {};
+    const feeRate = metadata.type === "marketplace" ? 0.05 : 0.07;
+    const platformFee = Math.round(totalAmount * feeRate * 100) / 100;
+    const doctorPayout = Math.round((totalAmount - platformFee) * 100) / 100;
+
+    // Store webhook event with split info
     const { error: insertError } = await supabase.from("payment_webhooks").insert({
       payment_id: String(payment.id),
       status: payment.status,
-      amount: payment.transaction_amount,
+      amount: totalAmount,
       payer_email: payment.payer?.email || "unknown",
       raw_data: payment,
       action: action,
+      platform_fee: platformFee,
+      doctor_payout: doctorPayout,
+      split_processed: payment.status === "approved",
     });
 
     if (insertError) {
@@ -127,12 +137,42 @@ Deno.serve(async (req) => {
     }
 
     // Handle payment status
-    if (payment.status === "approved") {
-      console.log(`Payment ${paymentId} approved — R$ ${payment.transaction_amount}`);
-      // Here you would: activate subscription, confirm order, etc.
-      // Based on external_reference or metadata from the payment
+    const appointmentId = payment.external_reference || metadata.appointment_id;
+
+    if (payment.status === "approved" && appointmentId) {
+      console.log(`Payment ${paymentId} approved — R$ ${totalAmount} | Platform: R$ ${platformFee} | Doctor: R$ ${doctorPayout}`);
+
+      // Update appointment status
+      await supabase
+        .from("appointments")
+        .update({ payment_status: "paid", status: "confirmed" })
+        .eq("id", appointmentId);
+
+      // Fetch appointment to get patient_id for notification
+      const { data: appt } = await supabase
+        .from("appointments")
+        .select("patient_id, doctor_id")
+        .eq("id", appointmentId)
+        .single();
+
+      if (appt) {
+        // Notify patient that payment was confirmed
+        await supabase.from("notifications").insert({
+          user_id: appt.patient_id,
+          title: "Pagamento Confirmado ✅",
+          message: `Seu pagamento de R$ ${totalAmount.toFixed(2)} foi confirmado. Sua consulta está agendada!`,
+          type: "payment_confirmed",
+          action_url: "/dashboard",
+        });
+      }
     } else if (payment.status === "rejected") {
       console.log(`Payment ${paymentId} rejected`);
+      if (appointmentId) {
+        await supabase
+          .from("appointments")
+          .update({ payment_status: "rejected" })
+          .eq("id", appointmentId);
+      }
     } else if (payment.status === "pending") {
       console.log(`Payment ${paymentId} pending`);
     }

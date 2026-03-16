@@ -1,5 +1,6 @@
 import drEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draJulianaImg from "@/assets/dra-juliana-ferreira.jpg";
+import drEduardoImg from "@/assets/dr-eduardo-nascimento.jpg";
 
 export type Professional = {
   id: string;
@@ -187,7 +188,7 @@ export const professionals: Professional[] = [
     rating: 4.8,
     consults: 520,
     avatar: "EN",
-    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face",
+    imageUrl: drEduardoImg,
     services: [
       { name: "Consulta Oncológica", price: "R$ 85,00", desc: "Avaliação + plano paliativo canábico" },
       { name: "Acompanhamento", price: "R$ 60", desc: "Follow-up quinzenal" },

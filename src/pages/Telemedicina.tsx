@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import brisaImg from "@/assets/brisa-enfermeira.png";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";

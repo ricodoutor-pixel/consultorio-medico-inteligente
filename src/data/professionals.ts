@@ -1,3 +1,4 @@
+import drEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 
 export type Professional = {
   id: string;

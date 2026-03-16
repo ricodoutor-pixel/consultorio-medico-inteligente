@@ -160,7 +160,7 @@ export const professionals: Professional[] = [
     rating: 4.9,
     consults: 295,
     avatar: "JF",
-    imageUrl: "https://images.unsplash.com/photo-1594824476967-48c8b964ac31?w=200&h=200&fit=crop&crop=face",
+    imageUrl: draJulianaImg,
     services: [
       { name: "Consulta Reumatológica", price: "R$ 110,00", desc: "Avaliação completa + protocolo CBD/THC" },
       { name: "Retorno", price: "R$ 75", desc: "Ajuste de dosagem e acompanhamento" },

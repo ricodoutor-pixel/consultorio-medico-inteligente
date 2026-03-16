@@ -52,9 +52,9 @@ const BrisaAvatar = () => {
         <div className="absolute -inset-4 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="w-32 h-32 rounded-full border-4 border-primary/30 overflow-hidden bg-muted shadow-2xl relative z-10">
           <img 
-            src="https://images.unsplash.com/photo-1594824476967-48c8b964ac31?w=400&h=400&fit=crop&crop=face" 
+            src={brisaImg} 
             alt="Brisa - Enfermeira IA" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
           />
           <AnimatePresence>
             {mood === "happy" && (

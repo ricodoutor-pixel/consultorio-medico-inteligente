@@ -93,7 +93,7 @@ const BrisaAvatar = () => {
             <div className="bg-primary p-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full border border-white/20 overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1594824476967-48c8b964ac31?w=100&h=100&fit=crop&crop=face" alt="Brisa" />
+                  <img src={brisaImg} alt="Brisa" className="w-full h-full object-cover object-center" />
                 </div>
                 <span className="text-white font-black text-sm">Brisa - Suporte IA</span>
               </div>

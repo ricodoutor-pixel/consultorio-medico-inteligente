@@ -1,5 +1,6 @@
 import drEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draJulianaImg from "@/assets/dra-juliana-ferreira.jpg";
+import drEduardoImg from "@/assets/dr-eduardo-nascimento.jpg";
 
 export type Professional = {
   id: string;

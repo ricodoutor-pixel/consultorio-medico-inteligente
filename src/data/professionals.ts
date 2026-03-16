@@ -1,3 +1,4 @@
+import drEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 
 export type Professional = {
   id: string;
@@ -48,7 +49,7 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 850,
     avatar: "EB",
-    imageUrl: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face",
+    imageUrl: drEdilsonImg,
     online: true,
     crm: "10963 - Bolívia",
     hospital: "Beneficência Portuguesa (SP) / Hospital Menino Jesus",

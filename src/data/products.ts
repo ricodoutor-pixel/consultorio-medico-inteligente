@@ -1,3 +1,13 @@
+import cbdOilIsolado from "@/assets/products/cbd-oil-isolado.jpg";
+import cbdCapsulas from "@/assets/products/cbd-capsulas.jpg";
+import tinturaFullSpectrum from "@/assets/products/tintura-full-spectrum.jpg";
+import spraySublingual from "@/assets/products/spray-sublingual.jpg";
+import gomasMelatonina from "@/assets/products/gomas-melatonina.jpg";
+import oleoSono from "@/assets/products/oleo-sono.jpg";
+import cremeTopico from "@/assets/products/creme-topico.jpg";
+import gelMuscular from "@/assets/products/gel-muscular.jpg";
+import omega3Cbd from "@/assets/products/omega3-cbd.jpg";
+
 export type Product = {
   id: string;
   title: string;
@@ -10,6 +20,8 @@ export type Product = {
   rating: number;
   imageUrl: string;
   tags: string[];
+  freeShipping?: boolean;
+  photos?: string[];
 };
 
 export const productCategories = ["Bem-estar", "Sono", "Tópicos", "Vitaminas"];
@@ -26,8 +38,9 @@ export const products: Product[] = [
     category: "Bem-estar",
     vendor: "Verde Vida Farmácia",
     rating: 4.8,
-    imageUrl: "https://images.unsplash.com/photo-1616671276441-2f2c277b8bf6?w=600&h=450&fit=crop",
+    imageUrl: cbdOilIsolado,
     tags: ["CBD", "Óleo", "Popular"],
+    freeShipping: true,
   },
   {
     id: "prod-2",
@@ -39,8 +52,9 @@ export const products: Product[] = [
     category: "Bem-estar",
     vendor: "Cannabis Pharma BR",
     rating: 4.7,
-    imageUrl: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&h=450&fit=crop",
+    imageUrl: cbdCapsulas,
     tags: ["CBD", "Cápsulas", "Prático"],
+    freeShipping: true,
   },
   {
     id: "prod-3",
@@ -52,8 +66,9 @@ export const products: Product[] = [
     category: "Bem-estar",
     vendor: "Nature Lab Canábica",
     rating: 4.9,
-    imageUrl: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=600&h=450&fit=crop",
+    imageUrl: tinturaFullSpectrum,
     tags: ["Full Spectrum", "Tintura"],
+    freeShipping: true,
   },
   {
     id: "prod-13",
@@ -65,11 +80,12 @@ export const products: Product[] = [
     category: "Bem-estar",
     vendor: "Botânica Medicinal",
     rating: 4.8,
-    imageUrl: "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?w=600&h=450&fit=crop",
+    imageUrl: spraySublingual,
     tags: ["Spray", "Sublingual", "Rápido"],
+    freeShipping: true,
   },
 
-  // ═══════ Sono (4 produtos) ═══════
+  // ═══════ Sono (2 produtos) ═══════
   {
     id: "prod-4",
     title: "Gomas de Melatonina + Cânhamo",
@@ -80,8 +96,9 @@ export const products: Product[] = [
     category: "Sono",
     vendor: "Sleep Well Brasil",
     rating: 4.6,
-    imageUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&h=450&fit=crop",
+    imageUrl: gomasMelatonina,
     tags: ["Melatonina", "Sono", "Gomas"],
+    freeShipping: true,
   },
   {
     id: "prod-6",
@@ -93,11 +110,12 @@ export const products: Product[] = [
     category: "Sono",
     vendor: "Verde Vida Farmácia",
     rating: 4.8,
-    imageUrl: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&h=450&fit=crop",
+    imageUrl: oleoSono,
     tags: ["CBD", "Sono", "Óleo"],
+    freeShipping: true,
   },
 
-  // ═══════ Tópicos (4 produtos) ═══════
+  // ═══════ Tópicos (2 produtos) ═══════
   {
     id: "prod-7",
     title: "Creme Tópico Hemp 120g",
@@ -108,8 +126,9 @@ export const products: Product[] = [
     category: "Tópicos",
     vendor: "Nature Lab Canábica",
     rating: 4.7,
-    imageUrl: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&h=450&fit=crop",
+    imageUrl: cremeTopico,
     tags: ["Tópico", "Creme", "Popular"],
+    freeShipping: true,
   },
   {
     id: "prod-8",
@@ -121,11 +140,12 @@ export const products: Product[] = [
     category: "Tópicos",
     vendor: "Cannabis Pharma BR",
     rating: 4.6,
-    imageUrl: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&h=450&fit=crop",
+    imageUrl: gelMuscular,
     tags: ["Gel", "Muscular", "CBD"],
+    freeShipping: true,
   },
 
-  // ═══════ Vitaminas (3 produtos) ═══════
+  // ═══════ Vitaminas (1 produto) ═══════
   {
     id: "prod-11",
     title: "Ômega 3 + CBD (60 cáps)",
@@ -136,7 +156,8 @@ export const products: Product[] = [
     category: "Vitaminas",
     vendor: "Verde Vida Farmácia",
     rating: 4.8,
-    imageUrl: "https://images.unsplash.com/photo-1577174881658-0f30ed549adc?w=600&h=450&fit=crop",
+    imageUrl: omega3Cbd,
     tags: ["Ômega 3", "CBD", "Saúde"],
+    freeShipping: true,
   },
 ];

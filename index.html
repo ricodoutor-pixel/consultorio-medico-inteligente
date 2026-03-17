@@ -3,44 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id=GTM-MKSBS7P';f.parentNode.insertBefore(j,f );
-    })(window,document,'script','dataLayer','GTM-MKSBS7P');</script>
+
+    <!-- =========================
+         GOOGLE TAG MANAGER
+    ========================== -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({
+          "gtm.start": new Date().getTime(),
+          event: "gtm.js",
+        });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l !== "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-MKSBS7P");
+    </script>
     <!-- End Google Tag Manager -->
 
-    <!-- Google Analytics 4 (gtag.js) -->
+    <!-- =========================
+         GOOGLE ANALYTICS 4
+    ========================== -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QY3HFCG64L"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag( ){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-QY3HFCG64L', {
-        'page_path': window.location.pathname,
-        'page_title': document.title
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-QY3HFCG64L", {
+        page_path: window.location.pathname,
+        page_title: document.title,
+        anonymize_ip: true
       });
     </script>
 
-    <!-- Meta Tags -->
+    <!-- =========================
+         META BÁSICAS
+    ========================== -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="theme-color" content="#0A0E27" />
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-    
-    <!-- Title & Description -->
-    <title>Planta & Raiz — Telemedicina Cannabis Medicinal | Consultas a partir de R$30</title>
-    <meta name="description" content="Planta & Raiz: Telemedicina especializada em cannabis medicinal com IA, marketplace, biblioteca científica 100+ variedades, comunidade de médicos. Conforme ANVISA/CFM/LGPD. Taxa 7% - Menor do mercado!" />
     <meta name="author" content="Planta & Raiz" />
+    <meta name="description" content="Planta & Raiz é uma plataforma de telemedicina especializada em cannabis medicinal, com médicos habilitados, triagem com IA, prescrição digital, shopping integrado e biblioteca científica." />
+    <meta name="keywords" content="cannabis medicinal, telemedicina, consulta online, prescrição digital, médicos cannabis, planta e raiz, shopping medicinal, biblioteca científica" />
     <meta name="copyright" content="© 2026 Planta & Raiz. Todos os direitos reservados." />
-    
-    <!-- Canonical URL -->
+
+    <!-- =========================
+         TÍTULO
+    ========================== -->
+    <title>Planta & Raiz — Telemedicina Cannabis Medicinal</title>
+
+    <!-- =========================
+         CANONICAL
+    ========================== -->
     <link rel="canonical" href="https://plantayraiz.com.br/" />
 
-    <!-- Open Graph Tags -->
+    <!-- =========================
+         OPEN GRAPH
+    ========================== -->
     <meta property="og:title" content="Planta & Raiz — Telemedicina Cannabis Medicinal" />
     <meta property="og:description" content="Consulte especialistas em cannabis medicinal online. Prescrição digital ANVISA, integração com farmácias, taxa 7% - menor do mercado!" />
     <meta property="og:type" content="website" />
@@ -51,7 +77,9 @@
     <meta property="og:locale" content="pt_BR" />
     <meta property="og:site_name" content="Planta & Raiz" />
 
-    <!-- Twitter Card Tags -->
+    <!-- =========================
+         TWITTER CARD
+    ========================== -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Planta & Raiz — Telemedicina Cannabis Medicinal" />
     <meta name="twitter:description" content="Telemedicina especializada em cannabis medicinal. Médicos habilitados, prescrição digital, integração com farmácias." />
@@ -59,21 +87,30 @@
     <meta name="twitter:site" content="@plantayraiz" />
     <meta name="twitter:creator" content="@plantayraiz" />
 
-    <!-- Favicon -->
+    <!-- =========================
+         FAVICON & MANIFEST
+    ========================== -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Preconnect to External Resources -->
+    <!-- =========================
+         PRECONNECT & DNS PREFETCH
+    ========================== -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://api.mercadopago.com" />
-    <link rel="preconnect" href="https://meet.jitsi.si" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://meet.jitsi.si" />
 
-    <!-- Google Fonts -->
+    <!-- =========================
+         GOOGLE FONTS
+    ========================== -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-    <!-- Structured Data (Schema.org ) -->
+    <!-- =========================
+         STRUCTURED DATA
+    ========================== -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -106,22 +143,14 @@
         {
           "@type": "MedicalProcedure",
           "name": "Chat On-Demand",
-          "description": "Chat imediato com médico (resposta em 30-60 segundos )"
-        },
-        {
-          "@type": "MedicalProcedure",
-          "name": "Videochamada Google Meet",
-          "description": "Videoconsulta profissional com gravação automática"
+          "description": "Chat imediato com médico (resposta em 30-60 segundos)"
         }
       ],
       "image": "https://plantayraiz.com.br/og-image.png",
-      "priceRange": "R$30 - R$500",
-      "ratingValue": "4.8",
-      "reviewCount": "2500"
+      "priceRange": "R$30 - R$500"
     }
     </script>
 
-    <!-- Additional Structured Data - Organization -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -149,18 +178,10 @@
     }
     </script>
 
-    <!-- Preload Critical Resources -->
-    <link rel="preload" as="script" href="/src/main.tsx" />
-    <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" type="font/woff2" crossorigin />
-
-    <!-- DNS Prefetch for External APIs -->
-    <link rel="dns-prefetch" href="https://api.mercadopago.com" />
-    <link rel="dns-prefetch" href="https://meet.jitsi.si" />
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-
-    <!-- Styles -->
+    <!-- =========================
+         CRITICAL STYLES
+    ========================== -->
     <style>
-      /* Planta & Raiz DNA Colors */
       :root {
         --color-primary: #0A0E27;
         --color-secondary: #1a1f3a;
@@ -171,11 +192,7 @@
         --color-gray: #9CA3AF;
       }
 
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
 
       html {
         scroll-behavior: smooth;
@@ -185,104 +202,50 @@
 
       body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background-color: var(--color-primary );
+        background-color: var(--color-primary);
         color: var(--color-white);
         line-height: 1.6;
       }
 
-      /* Skip to Content Link */
       .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border-width: 0;
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
       }
 
       .sr-only:focus {
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        z-index: 100;
-        width: auto;
-        height: auto;
-        padding: 0.5rem 1rem;
-        margin: 0;
-        overflow: visible;
-        clip: auto;
-        white-space: normal;
-        border-radius: 0.75rem;
-        background-color: var(--color-accent);
-        color: var(--color-primary);
-        font-weight: bold;
-        font-size: 0.875rem;
-        outline: none;
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        position: fixed; top: 1rem; left: 1rem; z-index: 100;
+        width: auto; height: auto; padding: 0.5rem 1rem; margin: 0;
+        overflow: visible; clip: auto; white-space: normal;
+        border-radius: 0.75rem; background-color: var(--color-accent);
+        color: var(--color-primary); font-weight: bold; font-size: 0.875rem;
+        outline: none; box-shadow: 0 0 20px rgba(0,255,0,0.3);
       }
 
-      /* Scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: var(--color-secondary); }
+      ::-webkit-scrollbar-thumb { background: var(--color-accent); border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--color-accent-light); }
 
-      ::-webkit-scrollbar-track {
-        background: var(--color-secondary);
-      }
+      ::selection { background-color: var(--color-accent); color: var(--color-primary); }
 
-      ::-webkit-scrollbar-thumb {
-        background: var(--color-accent);
-        border-radius: 4px;
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background: var(--color-accent-light);
-      }
-
-      /* Selection */
-      ::selection {
-        background-color: var(--color-accent);
-        color: var(--color-primary);
-      }
-
-      /* Full screen usage */
-      html, body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-      }
-
-      #root {
-        min-height: 100vh;
-        min-height: 100dvh;
-        width: 100%;
-      }
+      html, body { width: 100%; height: 100%; overflow-x: hidden; }
+      #root { min-height: 100vh; min-height: 100dvh; width: 100%; }
     </style>
   </head>
-
 
   <body>
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MKSBS7P"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
+
     <!-- Accessibility: Skip to Main Content -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-xl focus:bg-primary focus:text-primary-foreground focus:font-bold focus:text-sm focus:outline-none focus:ring-2 focus:ring-ring">
-      Pular para o conteúdo principal
-    </a>
+    <a href="#main-content" class="sr-only">Pular para o conteúdo principal</a>
 
     <!-- React Root -->
     <div id="root"></div>
 
     <!-- Main Application Script -->
     <script type="module" src="/src/main.tsx"></script>
-
-    <!-- App Config (injected at runtime by React) -->
   </body>
 </html>

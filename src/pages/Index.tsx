@@ -99,23 +99,7 @@ const Index = () => {
                     <Leaf size={16} />
                     PLATAFORMA POPULAR • SAÚDE • SHOPPING
                   </span>
-                  <Link to="/cadastro">
-                    <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer animate-pulse">
-                      <UserPlus size={16} />
-                      CADASTRO GRATUITO
-                    </span>
-                  </Link>
                 </div>
-                <motion.span 
-                  animate={{ 
-                    textShadow: ["0px 0px 4px rgba(218, 165, 32, 0.3)", "0px 0px 12px rgba(218, 165, 32, 0.8)", "0px 0px 4px rgba(218, 165, 32, 0.3)"],
-                    opacity: [0.8, 1, 0.8]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                 className="text-[10px] md:text-xs font-bold tracking-wide text-[hsl(var(--gold))] leading-relaxed max-w-2xl mt-2"
-                >
-                  HUB COMPLETO • SAÚDE • POPULAR • INFORMAÇÃO • CONSULTA • ESPECIALISTAS • FARMÁCIAS • IMPORTADORES • PRODUTORES • SERVIÇOS • OPÇÕES • PREÇOS JUSTOS • COMUNIDADE • GANHOS • FAMÍLIA
-                </motion.span>
               </motion.div>
 
               <motion.h1 

@@ -406,19 +406,19 @@ export class LoyaltyProgramService {
   ): {
     currentTotalLTV: number;
     projectedTotalLTV: number;
-    ltv Increase: number;
+    ltvIncrease: number;
     additionalRevenue: number;
   } {
     const currentTotalLTV = currentLTV * estimatedUsersInProgram;
     const projectedLTV = currentLTV * (1 + conversionRateIncrease);
     const projectedTotalLTV = projectedLTV * estimatedUsersInProgram;
-    const ltv Increase = projectedLTV - currentLTV;
-    const additionalRevenue = ltv Increase * estimatedUsersInProgram;
+    const ltvIncrease = projectedLTV - currentLTV;
+    const additionalRevenue = ltvIncrease * estimatedUsersInProgram;
 
     return {
       currentTotalLTV,
       projectedTotalLTV,
-      ltv Increase,
+      ltvIncrease,
       additionalRevenue,
     };
   }

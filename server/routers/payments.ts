@@ -197,7 +197,7 @@ export const paymentsRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        if (ctx.user?.id !== input.patientId) {
+        if (String(ctx.user?.id) !== input.patientId) {
           return { success: false, error: 'Sem permissão' };
         }
         const payment = await paymentService.processPayment(input);
@@ -224,7 +224,7 @@ export const paymentsRouter = router({
     .input(z.object({ doctorId: z.string() }))
     .query(async ({ input, ctx }) => {
       try {
-        if (ctx.user?.role !== 'admin' && ctx.user?.id !== input.doctorId) {
+        if (ctx.user?.role !== 'admin' && String(ctx.user?.id) !== input.doctorId) {
           return { success: false, error: 'Sem permissão' };
         }
         const dashboard = await paymentService.dashboardService.getDoctorDashboard(input.doctorId);

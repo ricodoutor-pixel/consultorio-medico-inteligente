@@ -167,8 +167,6 @@ export const paymentsRouter = router({
         method: 'PIX',
       };
     }),
-});
-
 
   // ========================================================================
   // DYNAMIC PRICING ENDPOINTS

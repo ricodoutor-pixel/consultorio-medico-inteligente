@@ -45,11 +45,11 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Phone size={14} className="text-primary" />
-                <a href="https://wa.me/5511987131241" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">(11) 98713-1241</a>
+                <a href="https://wa.me/5511991363154" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">(11) 99136-3154</a>
               </li>
               <li className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Mail size={14} className="text-primary" />
-                <a href="mailto:drbezerramed@gmail.com" className="hover:text-primary transition-colors">drbezerramed@gmail.com</a>
+                <a href="mailto:contato@plantayraiz.com.br" className="hover:text-primary transition-colors">contato@plantayraiz.com.br</a>
               </li>
               <li className="flex items-start gap-2 text-muted-foreground text-sm">
                 <MapPin size={14} className="text-primary mt-0.5" />

@@ -99,12 +99,6 @@ const Index = () => {
                     <Leaf size={16} />
                     PLATAFORMA POPULAR • SAÚDE • SHOPPING
                   </span>
-                  <Link to="/cadastro">
-                    <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer animate-pulse">
-                      <UserPlus size={16} />
-                      CADASTRO GRATUITO
-                    </span>
-                  </Link>
                 </div>
                 <motion.span 
                   animate={{ 
@@ -152,18 +146,30 @@ const Index = () => {
 
             {/* Phone Mockup Area */}
             <motion.div
-              className="relative flex justify-center items-center"
+              className="relative flex flex-col justify-center items-center gap-6"
               initial={{ opacity: 0, scale: 0.8, y: 100 }}
               animate={{ opacity: 1, scale: 1, y: 0 }} 
               transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
             >
+              {/* Cadastro Gratuito Button - Above Phone */}
+              <Link to="/cadastro">
+                <motion.span 
+                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-8 py-3 text-base font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer shadow-xl shadow-primary/30"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <UserPlus size={20} />
+                  CADASTRO GRATUITO
+                </motion.span>
+              </Link>
+
               <div className="relative group w-full flex flex-col items-center">
                 <div className="relative">
-                  <div className="absolute -inset-10 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-full blur-[100px] opacity-50 group-hover:opacity-80 transition duration-1000"></div>
+                  <div className="absolute -inset-10 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-[80px] opacity-40 group-hover:opacity-70 transition duration-1000"></div>
                   <img
                     src={heroPhoneMockup}
-                    alt="Planta y Raiz App"
-                    className="w-[320px] md:w-[450px] lg:w-[550px] drop-shadow-[0_45px_45px_rgba(0,0,0,0.6)] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
+                    alt="Planta y Raiz App - Diretório de Profissionais e Crescimento da Indústria Cannabis no Brasil"
+                    className="w-[280px] md:w-[380px] lg:w-[440px] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
                   />
                 </div>
               </div>

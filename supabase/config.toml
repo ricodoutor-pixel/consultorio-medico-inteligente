@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.create-payment-split]
 verify_jwt = false
+
+[functions.guardiao-anvisa]
+verify_jwt = false

@@ -3,17 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Planta & Raiz — Telemedicina Cannabis Medicinal com IA</title>
 
-    <!-- =========================
-         GOOGLE TAG MANAGER
-    ========================== -->
     <script>
       (function (w, d, s, l, i) {
         w[l] = w[l] || [];
-        w[l].push({
-          "gtm.start": new Date().getTime(),
-          event: "gtm.js",
-        });
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
         var f = d.getElementsByTagName(s)[0],
           j = d.createElement(s),
           dl = l !== "dataLayer" ? "&l=" + l : "";
@@ -21,435 +16,58 @@
         j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
         f.parentNode.insertBefore(j, f);
       })(window, document, "script", "dataLayer", "GTM-MKSBS7P");
-    </script>
-    <!-- End Google Tag Manager -->
 
-    <!-- =========================
-         GOOGLE ANALYTICS 4
-    ========================== -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QY3HFCG64L"></script>
-    <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
+      function gtag() { dataLayer.push(arguments); }
       gtag("js", new Date());
-      gtag("config", "G-QY3HFCG64L", {
-        page_path: window.location.pathname,
-        page_title: document.title,
-        anonymize_ip: true
-      });
+      gtag("config", "G-QY3HFCG64L", { anonymize_ip: true });
     </script>
 
-    <!-- =========================
-         META BÁSICAS
-    ========================== -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="theme-color" content="#0A0E27" />
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="description" content="Planta & Raiz: Telemedicina especializada em cannabis medicinal. Triagem com IA, prescrição digital ANVISA e suporte completo." />
+    <meta name="keywords" content="cannabis medicinal, telemedicina, consulta online, ANVISA, Planta e Raiz" />
     <meta name="author" content="Planta & Raiz" />
-    <meta name="description" content="Planta & Raiz é uma plataforma de telemedicina especializada em cannabis medicinal, com médicos habilitados, triagem com IA, prescrição digital, shopping integrado, biblioteca científica, sistema de afiliados multinível e gestão financeira automatizada." />
-    <meta name="keywords" content="cannabis medicinal, telemedicina, consulta online, prescrição digital, médicos cannabis, planta e raiz, shopping medicinal, biblioteca científica, afiliados, telemedicina IA, Enfermeira Brisa, Manus CEO, ANVISA" />
-    <meta name="copyright" content="© 2026 Planta & Raiz. Todos os direitos reservados." />
-
-    <!-- =========================
-         TÍTULO
-    ========================== -->
-    <title>Planta & Raiz — Telemedicina Cannabis Medicinal com IA</title>
-
-    <!-- =========================
-         CANONICAL
-    ========================== -->
+    <meta name="theme-color" content="#0A0E27" />
+    <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://plantayraiz.com.br/" />
 
-    <!-- =========================
-         OPEN GRAPH
-    ========================== -->
-    <meta property="og:title" content="Planta & Raiz — Telemedicina Cannabis Medicinal com IA" />
-    <meta property="og:description" content="Consulte especialistas em cannabis medicinal online. Prescrição digital ANVISA, triagem com IA, integração com farmácias, sistema de afiliados, taxa 5% - menor do mercado!" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://plantayraiz.com.br/" />
+    <meta property="og:title" content="Planta & Raiz — Telemedicina Cannabis Medicinal" />
+    <meta property="og:description" content="Consulte especialistas em cannabis medicinal online. Prescrição digital e triagem inteligente." />
     <meta property="og:image" content="https://plantayraiz.com.br/og-image.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:locale" content="pt_BR" />
-    <meta property="og:site_name" content="Planta & Raiz" />
+    <meta property="og:url" content="https://plantayraiz.com.br/" />
 
-    <!-- =========================
-         TWITTER CARD
-    ========================== -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Planta & Raiz — Telemedicina Cannabis Medicinal com IA" />
-    <meta name="twitter:description" content="Telemedicina especializada em cannabis medicinal com IA. Médicos habilitados, prescrição digital, integração com farmácias, sistema de afiliados." />
-    <meta name="twitter:image" content="https://plantayraiz.com.br/og-image.png" />
-    <meta name="twitter:site" content="@plantayraiz" />
-    <meta name="twitter:creator" content="@plantayraiz" />
-
-    <!-- =========================
-         FAVICON & MANIFEST
-    ========================== -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/manifest.json" />
-
-    <!-- =========================
-         PRECONNECT & DNS PREFETCH
-    ========================    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://api.mercadopago.com" />
-    <link rel="preconnect" href="https://api.twilio.com" />
-    <link rel="preconnect" href="https://meet.jitsi.si" />
-    <link rel="preconnect" href="https://api.clicksign.com" />
-    <link rel="preconnect" href="https://maps.googleapis.com" />
+    <link rel="preconnect" href="https://sdk.mercadopago.com" />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-    <link rel="dns-prefetch" href="https://prometheus.plantayraiz.com.br" />
 
-    <!-- =========================
-         GOOGLE FONTS
-    ========================== -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
-    <!-- =========================
-         STRUCTURED DATA
-    ========================== -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "MedicalBusiness",
-      "name": "Planta & Raiz",
-      "description": "Plataforma de telemedicina especializada em cannabis medicinal com IA, marketplace, biblioteca científica e sistema de afiliados multinível",
-      "url": "https://plantayraiz.com.br",
-      "telephone": "+55 11 98713-1241",
-      "email": "contato@plantayraiz.com.br",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Av. Paulista, 1000",
-        "addressLocality": "São Paulo",
-        "addressRegion": "SP",
-        "postalCode": "01311-100",
-        "addressCountry": "BR"
-      },
-      "medicalSpecialty": "Cannabis Medicinal",
-      "availableService": [
-        {
-          "@type": "MedicalProcedure",
-          "name": "Teleconsulta Cannabis Medicinal",
-          "description": "Consulta online com médico especialista em cannabis medicinal via Jitsi"
-        },
-        {
-          "@type": "MedicalProcedure",
-          "name": "Prescrição Digital ANVISA",
-          "description": "Prescrição digital com validade legal conforme RDC 660 da ANVISA"
-        },
-        {
-          "@type": "MedicalProcedure",
-          "name": "Triagem com IA (Enfermeira Brisa)",
-          "description": "Triagem clínica automatizada com IA para matching geográfico de médicos"
-        },
-        {
-          "@type": "MedicalProcedure",
-          "name": "Chat On-Demand",
-          "description": "Chat imediato com médico (resposta em 30-60 segundos)"
-        },
-        {
-          "@type": "MedicalProcedure",
-          "name": "Shopping Integrado",
-          "description": "Marketplace de medicamentos com 3 melhores preços e entrega"
-        }
-      ],
-      "image": "https://plantayraiz.com.br/og-image.png",
-      "priceRange": "R$29 - R$500",
-      "areaServed": "BR"
-    }
-    </script>
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Planta & Raiz",
-      "url": "https://plantayraiz.com.br",
-      "logo": "https://plantayraiz.com.br/logo.png",
-      "description": "Telemedicina especializada em cannabis medicinal com IA, marketplace e sistema de afiliados",
-      "foundingDate": "2024",
-      "founder": {
-        "@type": "Person",
-        "name": "Dr. Edilson Bezerra da Silva"
-      },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "Customer Service",
-        "telephone": "+55 11 98713-1241",
-        "email": "contato@plantayraiz.com.br",
-        "areaServed": "BR"
-      },
-      "sameAs": [
-        "https://www.facebook.com/plantayraiz",
-        "https://www.instagram.com/plantayraiz",
-        "https://www.linkedin.com/company/plantayraiz"
-      ]
-    }
-    </script>
-
-    <!-- =========================
-         STRUCTURED DATA - BREADCRUMB
-    ========================== -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://plantayraiz.com.br/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Planos SaaS",
-          "item": "https://plantayraiz.com.br/plans"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "Dashboard",
-          "item": "https://plantayraiz.com.br/dashboard"
-        }
-      ]
-    }
-    </script>
-
-    <!-- =========================
-         CRITICAL STYLES
-    ========================== -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
     <style>
       :root {
-        --color-primary: #0A0E27;
-        --color-secondary: #1a1f3a;
-        --color-tertiary: #2d3748;
-        --color-accent: #00FF00;
-        --color-accent-light: #39FF14;
-        --color-accent-dark: #00CC00;
-        --color-purple: #9D4EDD;
-        --color-cyan: #00D9FF;
-        --color-white: #FFFFFF;
-        --color-gray: #9CA3AF;
-        --color-gray-dark: #6B7280;
-        --color-success: #10B981;
-        --color-warning: #F59E0B;
-        --color-error: #EF4444;
-        --color-info: #3B82F6;
-        
-        /* Spacing */
-        --spacing-xs: 0.25rem;
-        --spacing-sm: 0.5rem;
-        --spacing-md: 1rem;
-        --spacing-lg: 1.5rem;
-        --spacing-xl: 2rem;
-        --spacing-2xl: 3rem;
-        
-        /* Border Radius */
-        --radius-sm: 0.375rem;
-        --radius-md: 0.5rem;
-        --radius-lg: 0.75rem;
-        --radius-xl: 1rem;
-        --radius-2xl: 1.5rem;
-        
-        /* Shadows */
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        --shadow-neon: 0 0 20px rgba(0, 255, 0, 0.3);
-        
-        /* Z-Index */
-        --z-dropdown: 1000;
-        --z-sticky: 1020;
-        --z-fixed: 1030;
-        --z-modal-backdrop: 1040;
-        --z-modal: 1050;
-        --z-popover: 1060;
-        --z-tooltip: 1070;
+        --color-primary: #0A0E27; --color-secondary: #1a1f3a;
+        --color-accent: #00FF00; --color-accent-light: #39FF14;
+        --color-white: #FFFFFF; --color-gray: #9CA3AF;
+        --radius-lg: 0.75rem; --radius-xl: 1rem;
+        --shadow-neon: 0 0 20px rgba(0, 255, 0, 0.2);
       }
 
       * { margin: 0; padding: 0; box-sizing: border-box; }
-
-      html {
-        scroll-behavior: smooth;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-
+      html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
       body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: 'Inter', sans-serif;
         background-color: var(--color-primary);
         color: var(--color-white);
         line-height: 1.6;
         overflow-x: hidden;
       }
 
+      /* Acessibilidade */
       .sr-only {
         position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-        overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
+        overflow: hidden; clip: rect(0,0,0,0); border: 0;
       }
 
-      .sr-only:focus {
-        position: fixed; 
-        top: 1rem; 
-        left: 1rem; 
-        z-index: var(--z-tooltip);
-        width: auto; 
-        height: auto; 
-        padding: 0.5rem 1rem; 
-        margin: 0;
-        overflow: visible; 
-        clip: auto; 
-        white-space: normal;
-        border-radius: var(--radius-lg); 
-        background-color: var(--color-accent);
-        color: var(--color-primary); 
-        font-weight: bold; 
-        font-size: 0.875rem;
-        outline: none; 
-        box-shadow: var(--shadow-neon);
-      }
-
-      /* Scrollbar */
-      ::-webkit-scrollbar { 
-        width: 8px; 
-        height: 8px; 
-      }
-      
-      ::-webkit-scrollbar-track { 
-        background: var(--color-secondary); 
-      }
-      
-      ::-webkit-scrollbar-thumb { 
-        background: var(--color-accent); 
-        border-radius: 4px; 
-      }
-      
-      ::-webkit-scrollbar-thumb:hover { 
-        background: var(--color-accent-light); 
-      }
-
-      /* Selection */
-      ::selection { 
-        background-color: var(--color-accent); 
-        color: var(--color-primary); 
-      }
-
-      /* Layout */
-      html, body { 
-        width: 100%; 
-        height: 100%; 
-        overflow-x: hidden; 
-      }
-      
-      #root { 
-        min-height: 100vh; 
-        min-height: 100dvh; 
-        width: 100%; 
-      }
-
-      /* Animations */
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-
-      @keyframes slideInUp {
-        from { 
-          opacity: 0; 
-          transform: translateY(20px); 
-        }
-        to { 
-          opacity: 1; 
-          transform: translateY(0); 
-        }
-      }
-
-      @keyframes slideInDown {
-        from { 
-          opacity: 0; 
-          transform: translateY(-20px); 
-        }
-        to { 
-          opacity: 1; 
-          transform: translateY(0); 
-        }
-      }
-
-      @keyframes slideInLeft {
-        from { 
-          opacity: 0; 
-          transform: translateX(-20px); 
-        }
-        to { 
-          opacity: 1; 
-          transform: translateX(0); 
-        }
-      }
-
-      @keyframes slideInRight {
-        from { 
-          opacity: 0; 
-          transform: translateX(20px); 
-        }
-        to { 
-          opacity: 1; 
-          transform: translateX(0); 
-        }
-      }
-
-      @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-      }
-
-      @keyframes glow {
-        0%, 100% { 
-          box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); 
-        }
-        50% { 
-          box-shadow: 0 0 40px rgba(0, 255, 0, 0.6); 
-        }
-      }
-
-      /* Utility Classes */
-      .fade-in {
-        animation: fadeIn 0.3s ease-in-out;
-      }
-
-      .slide-in-up {
-        animation: slideInUp 0.3s ease-out;
-      }
-
-      .slide-in-down {
-        animation: slideInDown 0.3s ease-out;
-      }
-
-      .slide-in-left {
-        animation: slideInLeft 0.3s ease-out;
-      }
-
-      .slide-in-right {
-        animation: slideInRight 0.3s ease-out;
-      }
-
-      .pulse {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-      }
-
-      .glow {
-        animation: glow 2s ease-in-out infinite;
-      }
-
-      /* Glassmorphism */
+      /* Utilitários Visuais (Mantidos) */
       .glass {
         background: rgba(26, 31, 58, 0.7);
         backdrop-filter: blur(10px);
@@ -457,137 +75,60 @@
         border-radius: var(--radius-xl);
       }
 
-      .glass-sm {
-        background: rgba(26, 31, 58, 0.5);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(0, 255, 0, 0.05);
-        border-radius: var(--radius-lg);
-      }
-
-      /* Gradients */
-      .gradient-primary {
-        background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-cyan) 100%);
-      }
-
-      .gradient-secondary {
-        background: linear-gradient(135deg, var(--color-purple) 0%, var(--color-accent) 100%);
-      }
-
       .gradient-text {
-        background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-cyan) 100%);
+        background: linear-gradient(135deg, var(--color-accent) 0%, #00D9FF 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
       }
+
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-thumb { background: var(--color-accent); border-radius: 10px; }
     </style>
 
-    <!-- =========================
-         THIRD-PARTY INTEGRATIONS
-    ========================== -->
-    
-    <!-- Mercado Pago SDK -->
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
-
-    <!-- Twilio SDK -->
-    <script src="https://sdk.twilio.com/js/v1/twilio.min.js"></script>
-
-    <!-- Jitsi Meet API -->
-    <script src="https://meet.jitsi.si/external_api.js"></script>
-
-    <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places,geometry,drawing"></script>
-
-    <!-- Monitoring & Analytics -->
-    <script>
-      // Performance Monitoring
-      if (window.PerformanceObserver) {
-        const observer = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            if (entry.entryType === 'navigation') {
-              gtag('event', 'page_load', {
-                'page_path': window.location.pathname,
-                'page_title': document.title,
-                'ttfb': entry.responseStart - entry.fetchStart,
-                'fcp': entry.domContentLoadedEventEnd - entry.fetchStart
-              });
-            }
-          }
-        });
-        observer.observe({ entryTypes: ['navigation', 'paint', 'largest-contentful-paint'] });
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MedicalBusiness",
+      "name": "Planta & Raiz",
+      "url": "https://plantayraiz.com.br",
+      "logo": "https://plantayraiz.com.br/logo.png",
+      "medicalSpecialty": "Cannabis Medicinal",
+      "priceRange": "R$29 - R$500",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "São Paulo",
+        "addressCountry": "BR"
       }
-
-      // Error Tracking
-      window.addEventListener('error', (event) => {
-        gtag('event', 'exception', {
-          'description': event.message,
-          'fatal': false
-        });
-      });
-
-      // Unhandled Promise Rejection Tracking
-      window.addEventListener('unhandledrejection', (event) => {
-        gtag('event', 'exception', {
-          'description': event.reason,
-          'fatal': false
-        });
-      });
+    }
     </script>
   </head>
 
   <body>
-    <!-- Google Tag Manager (noscript) -->
     <noscript>
-      <iframe 
-        src="https://www.googletagmanager.com/ns.html?id=GTM-MKSBS7P"
-        height="0" 
-        width="0" 
-        style="display:none;visibility:hidden">
-      </iframe>
+      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MKSBS7P" height="0" width="0" style="display:none;visibility:hidden"></iframe>
     </noscript>
-    <!-- End Google Tag Manager (noscript) -->
 
-    <!-- Accessibility: Skip to Main Content -->
-    <a href="#main-content" class="sr-only">Pular para o conteúdo principal</a>
+    <a href="#root" class="sr-only">Pular para o conteúdo principal</a>
 
-    <!-- React Root -->
     <div id="root"></div>
 
-    <!-- Main Application Script -->
+    <script src="https://sdk.mercadopago.com/js/v2" defer></script>
+    <script src="https://meet.jitsi.si/external_api.js" defer></script>
+    
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- Service Worker Registration -->
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js').catch(() => {
-            // Service Worker registration failed, app will still work
-          });
-        });
-      }
-    </script>
-
-    <!-- Monitoring Script -->
-    <script>
-      // Send performance metrics to monitoring system
+      // Monitoramento de Performance Simples
       window.addEventListener('load', () => {
-        if (window.performance && window.performance.timing) {
-          const perfData = window.performance.timing;
-          const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
-          
-          // Send to Prometheus/Grafana
-          fetch('/api/metrics/page-load', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              page: window.location.pathname,
-              loadTime: pageLoadTime,
-              timestamp: new Date().toISOString()
-            })
-          }).catch(() => {
-            // Metrics endpoint not available, continue normally
-          });
+        if ('connection' in navigator) {
+          console.log('Rede:', navigator.connection.effectiveType);
         }
       });
+
+      // Registro de Service Worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+      }
     </script>
   </body>
 </html>

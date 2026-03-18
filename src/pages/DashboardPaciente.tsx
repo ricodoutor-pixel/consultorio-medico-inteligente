@@ -6,9 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, Package } from "lucide-react";
-import { LegalDisclaimer } from "@/components/LegalDisclaimer";
-import { DeliveryConfirmation } from "@/components/DeliveryConfirmation";
+import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +32,6 @@ const DashboardPaciente = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [escrows, setEscrows] = useState<any[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
   const recommendedPros = professionals.filter(p => p.category === "Médicos Prescritores").slice(0, 3);
@@ -52,17 +49,15 @@ const DashboardPaciente = () => {
 
     const userId = session.user.id;
 
-    const [profileRes, apptsRes, notifRes, escrowRes] = await Promise.all([
+    const [profileRes, apptsRes, notifRes] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).single(),
       supabase.from("appointments").select("*").eq("patient_id", userId).order("scheduled_at", { ascending: false }).limit(20),
       supabase.from("notifications").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(10),
-      supabase.from("escrow_transactions").select("*").eq("patient_id", userId).eq("status", "held").order("created_at", { ascending: false }),
     ]);
 
     if (profileRes.data) setProfile(profileRes.data);
     if (apptsRes.data) setAppointments(apptsRes.data);
     if (notifRes.data) setNotifications(notifRes.data);
-    if (escrowRes.data) setEscrows(escrowRes.data);
     setLoading(false);
   };
 
@@ -216,9 +211,6 @@ const DashboardPaciente = () => {
                   </Card>
                 )}
 
-                {/* Delivery Confirmation - Escrow Release */}
-                <DeliveryConfirmation escrows={escrows} onConfirmed={fetchData} />
-
                 <Card className="border-border">
                   <CardContent className="p-5">
                     <h3 className="font-display font-black text-foreground text-sm mb-4 flex items-center gap-2">
@@ -351,7 +343,6 @@ const DashboardPaciente = () => {
         </div>
       </section>
 
-      <LegalDisclaimer />
       <Footer />
     </div>
   );

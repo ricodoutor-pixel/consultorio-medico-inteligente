@@ -8,9 +8,6 @@ import { motion } from "framer-motion";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
 import heroPhoneMockup from "@/assets/hero-phone-mockup.png"; 
-import drEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
-import draJulianaImg from "@/assets/dra-juliana-ferreira.jpg";
-import drEduardoImg from "@/assets/dr-eduardo-nascimento.jpg";
 import triagemPatient from "@/assets/triagem-patient.png";
 import consultaChat from "@/assets/consulta-chat.png";
 import triagemForm from "@/assets/triagem-form.png";
@@ -102,7 +99,23 @@ const Index = () => {
                     <Leaf size={16} />
                     PLATAFORMA POPULAR • SAÚDE • SHOPPING
                   </span>
+                  <Link to="/cadastro">
+                    <span className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer animate-pulse">
+                      <UserPlus size={16} />
+                      CADASTRO GRATUITO
+                    </span>
+                  </Link>
                 </div>
+                <motion.span 
+                  animate={{ 
+                    textShadow: ["0px 0px 4px rgba(218, 165, 32, 0.3)", "0px 0px 12px rgba(218, 165, 32, 0.8)", "0px 0px 4px rgba(218, 165, 32, 0.3)"],
+                    opacity: [0.8, 1, 0.8]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                 className="text-[10px] md:text-xs font-bold tracking-wide text-[hsl(var(--gold))] leading-relaxed max-w-2xl mt-2"
+                >
+                  HUB COMPLETO • SAÚDE • POPULAR • INFORMAÇÃO • CONSULTA • ESPECIALISTAS • FARMÁCIAS • IMPORTADORES • PRODUTORES • SERVIÇOS • OPÇÕES • PREÇOS JUSTOS • COMUNIDADE • GANHOS • FAMÍLIA
+                </motion.span>
               </motion.div>
 
               <motion.h1 
@@ -144,51 +157,14 @@ const Index = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }} 
               transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
             >
-              <div className="relative group w-full flex flex-col items-center gap-4">
-                {/* Cadastro button above phone */}
-                <Link to="/cadastro">
-                  <motion.span 
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-4 py-1.5 text-xs font-black hover:bg-primary/90 transition-all cursor-pointer shadow-lg shadow-primary/30"
-                  >
-                    <UserPlus size={14} />
-                    CADASTRO GRATUITO
-                  </motion.span>
-                </Link>
-
-                {/* Phone frame with doctors inside */}
+              <div className="relative group w-full flex flex-col items-center">
                 <div className="relative">
                   <div className="absolute -inset-10 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-full blur-[100px] opacity-50 group-hover:opacity-80 transition duration-1000"></div>
-                  <div className="relative z-10 w-[260px] md:w-[320px] lg:w-[380px] rounded-[2.5rem] border-[6px] border-muted/40 overflow-hidden shadow-2xl bg-background">
-                    {/* Phone status bar */}
-                    <div className="h-6 bg-muted/20 flex items-center justify-center">
-                      <div className="w-16 h-1 rounded-full bg-muted/40"></div>
-                    </div>
-                    {/* Doctors inside phone */}
-                    <div className="p-3 space-y-2">
-                      <p className="text-[9px] font-black text-primary text-center uppercase tracking-wider">Médicos Prescritores Online</p>
-                      {[
-                        { name: "Dr. Edilson Bezerra", spec: "Neurologia Canábica", img: drEdilsonImg },
-                        { name: "Dra. Juliana Ferreira", spec: "Psiquiatria Canábica", img: draJulianaImg },
-                        { name: "Dr. Eduardo Nascimento", spec: "Dor Crônica & Cannabis", img: drEduardoImg },
-                      ].map((doc, i) => (
-                        <div key={i} className="flex items-center gap-2 p-2 rounded-xl bg-card/50 border border-border/50">
-                          <img src={doc.img} alt={doc.name} className="w-9 h-9 rounded-full object-cover border border-primary/30" />
-                          <div className="min-w-0">
-                            <p className="text-[10px] font-bold text-foreground truncate">{doc.name}</p>
-                            <p className="text-[8px] text-muted-foreground">{doc.spec}</p>
-                          </div>
-                          <div className="ml-auto w-2 h-2 rounded-full bg-green-500 shrink-0"></div>
-                        </div>
-                      ))}
-                      <Link to="/profissionais" className="block">
-                        <div className="mt-1 py-2 rounded-xl bg-primary/10 border border-primary/20 text-center">
-                          <span className="text-[9px] font-bold text-primary">Ver todos os especialistas →</span>
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
+                  <img
+                    src={heroPhoneMockup}
+                    alt="Planta y Raiz App"
+                    className="w-[320px] md:w-[450px] lg:w-[550px] drop-shadow-[0_45px_45px_rgba(0,0,0,0.6)] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
+                  />
                 </div>
               </div>
             </motion.div>

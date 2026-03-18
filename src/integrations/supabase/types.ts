@@ -14,53 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      affiliate_commissions: {
-        Row: {
-          amount: number
-          created_at: string
-          id: string
-          level: number
-          paid_at: string | null
-          rate: number
-          referred_id: string
-          referrer_id: string
-          source_transaction_id: string | null
-          status: string
-        }
-        Insert: {
-          amount?: number
-          created_at?: string
-          id?: string
-          level: number
-          paid_at?: string | null
-          rate: number
-          referred_id: string
-          referrer_id: string
-          source_transaction_id?: string | null
-          status?: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          id?: string
-          level?: number
-          paid_at?: string | null
-          rate?: number
-          referred_id?: string
-          referrer_id?: string
-          source_transaction_id?: string | null
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "affiliate_commissions_source_transaction_id_fkey"
-            columns: ["source_transaction_id"]
-            isOneToOne: false
-            referencedRelation: "escrow_transactions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       appointments: {
         Row: {
           amount: number
@@ -198,38 +151,6 @@ export type Database = {
         }
         Relationships: []
       }
-      delivery_confirmations: {
-        Row: {
-          confirmed_at: string
-          escrow_id: string
-          id: string
-          patient_id: string
-          payout_triggered: boolean
-        }
-        Insert: {
-          confirmed_at?: string
-          escrow_id: string
-          id?: string
-          patient_id: string
-          payout_triggered?: boolean
-        }
-        Update: {
-          confirmed_at?: string
-          escrow_id?: string
-          id?: string
-          patient_id?: string
-          payout_triggered?: boolean
-        }
-        Relationships: [
-          {
-            foreignKeyName: "delivery_confirmations_escrow_id_fkey"
-            columns: ["escrow_id"]
-            isOneToOne: false
-            referencedRelation: "escrow_transactions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       doctors: {
         Row: {
           available_hours: Json | null
@@ -283,78 +204,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      escrow_transactions: {
-        Row: {
-          amount: number
-          appointment_id: string | null
-          confirmed_at: string | null
-          created_at: string
-          doctor_id: string | null
-          doctor_payout: number | null
-          id: string
-          order_id: string | null
-          patient_id: string
-          platform_fee: number
-          released_at: string | null
-          status: string
-          type: string
-          updated_at: string
-          vendor_id: string | null
-          vendor_payout: number | null
-        }
-        Insert: {
-          amount: number
-          appointment_id?: string | null
-          confirmed_at?: string | null
-          created_at?: string
-          doctor_id?: string | null
-          doctor_payout?: number | null
-          id?: string
-          order_id?: string | null
-          patient_id: string
-          platform_fee?: number
-          released_at?: string | null
-          status?: string
-          type?: string
-          updated_at?: string
-          vendor_id?: string | null
-          vendor_payout?: number | null
-        }
-        Update: {
-          amount?: number
-          appointment_id?: string | null
-          confirmed_at?: string | null
-          created_at?: string
-          doctor_id?: string | null
-          doctor_payout?: number | null
-          id?: string
-          order_id?: string | null
-          patient_id?: string
-          platform_fee?: number
-          released_at?: string | null
-          status?: string
-          type?: string
-          updated_at?: string
-          vendor_id?: string | null
-          vendor_payout?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "escrow_transactions_appointment_id_fkey"
-            columns: ["appointment_id"]
-            isOneToOne: false
-            referencedRelation: "appointments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "escrow_transactions_appointment_id_fkey"
-            columns: ["appointment_id"]
-            isOneToOne: false
-            referencedRelation: "financial_reports"
-            referencedColumns: ["appointment_id"]
-          },
-        ]
       }
       medical_records: {
         Row: {
@@ -629,45 +478,6 @@ export type Database = {
         }
         Relationships: []
       }
-      referral_links: {
-        Row: {
-          code: string
-          created_at: string
-          id: string
-          level1_referrer: string | null
-          level2_referrer: string | null
-          level3_referrer: string | null
-          referred_by: string | null
-          total_earnings: number | null
-          total_referrals: number | null
-          user_id: string
-        }
-        Insert: {
-          code: string
-          created_at?: string
-          id?: string
-          level1_referrer?: string | null
-          level2_referrer?: string | null
-          level3_referrer?: string | null
-          referred_by?: string | null
-          total_earnings?: number | null
-          total_referrals?: number | null
-          user_id: string
-        }
-        Update: {
-          code?: string
-          created_at?: string
-          id?: string
-          level1_referrer?: string | null
-          level2_referrer?: string | null
-          level3_referrer?: string | null
-          referred_by?: string | null
-          total_earnings?: number | null
-          total_referrals?: number | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       strain_images: {
         Row: {
           created_at: string
@@ -748,45 +558,6 @@ export type Database = {
         Update: {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
-      withdrawal_requests: {
-        Row: {
-          amount: number
-          created_at: string
-          fee: number
-          id: string
-          net_amount: number
-          pix_key: string
-          processed_at: string | null
-          status: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          fee?: number
-          id?: string
-          net_amount?: number
-          pix_key: string
-          processed_at?: string | null
-          status?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          fee?: number
-          id?: string
-          net_amount?: number
-          pix_key?: string
-          processed_at?: string | null
-          status?: string
-          updated_at?: string
           user_id?: string
         }
         Relationships: []

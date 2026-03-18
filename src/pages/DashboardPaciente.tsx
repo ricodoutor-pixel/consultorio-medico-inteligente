@@ -351,6 +351,7 @@ const DashboardPaciente = () => {
         </div>
       </section>
 
+      <LegalDisclaimer />
       <Footer />
     </div>
   );

@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "94db9969-bf51-4a0f-9ba0-2c8c3e963851",
-  "prevId": "38a4e1e6-d7d2-45ee-a670-6e46bc5f39fc",
+  "id": "6db74acb-8e21-476c-a925-e20ce587fa01",
+  "prevId": "0bc466ad-684b-4c0a-bd62-764d71cdecd4",
   "tables": {
     "affiliates": {
       "name": "affiliates",
@@ -14,197 +14,79 @@
           "notNull": true,
           "autoincrement": true
         },
-        "user_id": {
-          "name": "user_id",
+        "userId": {
+          "name": "userId",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "referral_code": {
-          "name": "referral_code",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "total_referrals": {
-          "name": "total_referrals",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "total_commissions": {
-          "name": "total_commissions",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "commission_rate": {
-          "name": "commission_rate",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 10
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "affiliates_user_id_users_id_fk": {
-          "name": "affiliates_user_id_users_id_fk",
-          "tableFrom": "affiliates",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "affiliates_id": {
-          "name": "affiliates_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {
-        "affiliates_user_id_unique": {
-          "name": "affiliates_user_id_unique",
-          "columns": [
-            "user_id"
-          ]
-        },
-        "affiliates_referral_code_unique": {
-          "name": "affiliates_referral_code_unique",
-          "columns": [
-            "referral_code"
-          ]
-        }
-      },
-      "checkConstraint": {}
-    },
-    "investment_plans": {
-      "name": "investment_plans",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
+        "referralCode": {
+          "name": "referralCode",
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "min_amount": {
-          "name": "min_amount",
-          "type": "int",
+        "referralLink": {
+          "name": "referralLink",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "max_amount": {
-          "name": "max_amount",
+        "parentAffiliateId": {
+          "name": "parentAffiliateId",
           "type": "int",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
-        "daily_return_percentage": {
-          "name": "daily_return_percentage",
+        "level": {
+          "name": "level",
           "type": "int",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false,
-          "default": "(now())"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "investment_plans_id": {
-          "name": "investment_plans_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "investments": {
-      "name": "investments",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
+          "default": 1
         },
-        "user_id": {
-          "name": "user_id",
+        "totalReferrals": {
+          "name": "totalReferrals",
           "type": "int",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "plan_id": {
-          "name": "plan_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "amount": {
-          "name": "amount",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "accumulated_returns": {
-          "name": "accumulated_returns",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false,
           "default": 0
         },
+        "totalCommissions": {
+          "name": "totalCommissions",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0'"
+        },
+        "withdrawnAmount": {
+          "name": "withdrawnAmount",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0'"
+        },
+        "pendingAmount": {
+          "name": "pendingAmount",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0'"
+        },
         "status": {
           "name": "status",
-          "type": "enum('active','completed','cancelled')",
+          "type": "enum('active','inactive','suspended')",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false,
           "default": "'active'"
         },
@@ -227,47 +109,33 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "investments_user_id_users_id_fk": {
-          "name": "investments_user_id_users_id_fk",
-          "tableFrom": "investments",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "investments_plan_id_investment_plans_id_fk": {
-          "name": "investments_plan_id_investment_plans_id_fk",
-          "tableFrom": "investments",
-          "tableTo": "investment_plans",
-          "columnsFrom": [
-            "plan_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {
-        "investments_id": {
-          "name": "investments_id",
+        "affiliates_id": {
+          "name": "affiliates_id",
           "columns": [
             "id"
           ]
         }
       },
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "affiliates_userId_unique": {
+          "name": "affiliates_userId_unique",
+          "columns": [
+            "userId"
+          ]
+        },
+        "affiliates_referralCode_unique": {
+          "name": "affiliates_referralCode_unique",
+          "columns": [
+            "referralCode"
+          ]
+        }
+      },
       "checkConstraint": {}
     },
-    "notifications": {
-      "name": "notifications",
+    "anvisa_validations": {
+      "name": "anvisa_validations",
       "columns": {
         "id": {
           "name": "id",
@@ -276,41 +144,78 @@
           "notNull": true,
           "autoincrement": true
         },
-        "user_id": {
-          "name": "user_id",
+        "userId": {
+          "name": "userId",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "type": {
-          "name": "type",
-          "type": "enum('deposit','withdrawal','earnings','commission','system')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
+        "receiptImageUrl": {
+          "name": "receiptImageUrl",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
-        "message": {
-          "name": "message",
+        "ocrText": {
+          "name": "ocrText",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
-        "read": {
-          "name": "read",
-          "type": "int",
+        "doctorName": {
+          "name": "doctorName",
+          "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "doctorCRM": {
+          "name": "doctorCRM",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "crmValidated": {
+          "name": "crmValidated",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false,
-          "default": 0
+          "default": false
+        },
+        "productCompliance": {
+          "name": "productCompliance",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "validationStatus": {
+          "name": "validationStatus",
+          "type": "enum('pending','approved','rejected','manual_review')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "validationDate": {
+          "name": "validationDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "createdAt": {
           "name": "createdAt",
@@ -322,24 +227,10 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "notifications_user_id_users_id_fk": {
-          "name": "notifications_user_id_users_id_fk",
-          "tableFrom": "notifications",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {
-        "notifications_id": {
-          "name": "notifications_id",
+        "anvisa_validations_id": {
+          "name": "anvisa_validations_id",
           "columns": [
             "id"
           ]
@@ -348,8 +239,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "platform_settings": {
-      "name": "platform_settings",
+    "brisa_triages": {
+      "name": "brisa_triages",
       "columns": {
         "id": {
           "name": "id",
@@ -358,19 +249,402 @@
           "notNull": true,
           "autoincrement": true
         },
-        "key": {
-          "name": "key",
+        "userId": {
+          "name": "userId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "symptoms": {
+          "name": "symptoms",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "medicalHistory": {
+          "name": "medicalHistory",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "location": {
+          "name": "location",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "matchedDoctors": {
+          "name": "matchedDoctors",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "recommendedProducts": {
+          "name": "recommendedProducts",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "triageDate": {
+          "name": "triageDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "followUpDate": {
+          "name": "followUpDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "brisa_triages_id": {
+          "name": "brisa_triages_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "commissions": {
+      "name": "commissions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "affiliateId": {
+          "name": "affiliateId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "referredUserId": {
+          "name": "referredUserId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "level": {
+          "name": "level",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "commissionRate": {
+          "name": "commissionRate",
+          "type": "decimal(5,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "transactionAmount": {
+          "name": "transactionAmount",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "commissionAmount": {
+          "name": "commissionAmount",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('pending','approved','paid','cancelled')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "transactionDate": {
+          "name": "transactionDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "paidDate": {
+          "name": "paidDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "commissions_id": {
+          "name": "commissions_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "saas_plans": {
+      "name": "saas_plans",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
           "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "value": {
-          "name": "value",
-          "type": "text",
+        "slug": {
+          "name": "slug",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "monthlyPrice": {
+          "name": "monthlyPrice",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "benefits": {
+          "name": "benefits",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "taxFreeCheckout": {
+          "name": "taxFreeCheckout",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "withdrawalTaxExemption": {
+          "name": "withdrawalTaxExemption",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "maxProfiles": {
+          "name": "maxProfiles",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 1
+        },
+        "verificationBadge": {
+          "name": "verificationBadge",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "recommendationHighlight": {
+          "name": "recommendationHighlight",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "consultationRevenueSplit": {
+          "name": "consultationRevenueSplit",
+          "type": "decimal(5,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0'"
+        },
+        "bannerAdvertising": {
+          "name": "bannerAdvertising",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "marketReports": {
+          "name": "marketReports",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "saas_plans_id": {
+          "name": "saas_plans_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "saas_plans_slug_unique": {
+          "name": "saas_plans_slug_unique",
+          "columns": [
+            "slug"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "smart_refills": {
+      "name": "smart_refills",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "productId": {
+          "name": "productId",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "medicationName": {
+          "name": "medicationName",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "dosage": {
+          "name": "dosage",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "frequency": {
+          "name": "frequency",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lastRefillDate": {
+          "name": "lastRefillDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nextRefillDate": {
+          "name": "nextRefillDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "autoRefillEnabled": {
+          "name": "autoRefillEnabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": true
+        },
+        "refillDaysBeforeExpiry": {
+          "name": "refillDaysBeforeExpiry",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 5
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -385,25 +659,18 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "platform_settings_id": {
-          "name": "platform_settings_id",
+        "smart_refills_id": {
+          "name": "smart_refills_id",
           "columns": [
             "id"
           ]
         }
       },
-      "uniqueConstraints": {
-        "platform_settings_key_unique": {
-          "name": "platform_settings_key_unique",
-          "columns": [
-            "key"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "referrals": {
-      "name": "referrals",
+    "subscriptions": {
+      "name": "subscriptions",
       "columns": {
         "id": {
           "name": "id",
@@ -412,29 +679,15 @@
           "notNull": true,
           "autoincrement": true
         },
-        "referrer_id": {
-          "name": "referrer_id",
+        "userId": {
+          "name": "userId",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "referred_id": {
-          "name": "referred_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "deposit_amount": {
-          "name": "deposit_amount",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "commission_earned": {
-          "name": "commission_earned",
+        "planId": {
+          "name": "planId",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
@@ -442,11 +695,48 @@
         },
         "status": {
           "name": "status",
-          "type": "enum('pending','completed','cancelled')",
+          "type": "enum('active','paused','cancelled','expired')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'active'"
+        },
+        "startDate": {
+          "name": "startDate",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'pending'"
+          "default": "(now())"
+        },
+        "endDate": {
+          "name": "endDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "renewalDate": {
+          "name": "renewalDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentMethodId": {
+          "name": "paymentMethodId",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "autoRenew": {
+          "name": "autoRenew",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": true
         },
         "createdAt": {
           "name": "createdAt",
@@ -455,40 +745,121 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "referrals_referrer_id_users_id_fk": {
-          "name": "referrals_referrer_id_users_id_fk",
-          "tableFrom": "referrals",
-          "tableTo": "users",
-          "columnsFrom": [
-            "referrer_id"
-          ],
-          "columnsTo": [
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "subscriptions_id": {
+          "name": "subscriptions_id",
+          "columns": [
             "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "referrals_referred_id_users_id_fk": {
-          "name": "referrals_referred_id_users_id_fk",
-          "tableFrom": "referrals",
-          "tableTo": "users",
-          "columnsFrom": [
-            "referred_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          ]
         }
       },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "support_tickets": {
+      "name": "support_tickets",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "subject": {
+          "name": "subject",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "category": {
+          "name": "category",
+          "type": "enum('technical','billing','account','product','logistics','other')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "priority": {
+          "name": "priority",
+          "type": "enum('low','medium','high','urgent')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'medium'"
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('open','in_progress','waiting_user','resolved','closed')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'open'"
+        },
+        "assignedTo": {
+          "name": "assignedTo",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        },
+        "resolvedAt": {
+          "name": "resolvedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {
-        "referrals_id": {
-          "name": "referrals_id",
+        "support_tickets_id": {
+          "name": "support_tickets_id",
           "columns": [
             "id"
           ]
@@ -507,8 +878,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "user_id": {
-          "name": "user_id",
+        "userId": {
+          "name": "userId",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
@@ -516,36 +887,58 @@
         },
         "type": {
           "name": "type",
-          "type": "enum('deposit','withdrawal','earnings','commission')",
+          "type": "enum('subscription','commission','withdrawal','refund','admin_fee')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "amount": {
           "name": "amount",
-          "type": "int",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fee": {
+          "name": "fee",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0'"
+        },
+        "netAmount": {
+          "name": "netAmount",
+          "type": "decimal(12,2)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "status": {
           "name": "status",
-          "type": "enum('pending','completed','failed','cancelled')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'pending'"
-        },
-        "mercado_pago_id": {
-          "name": "mercado_pago_id",
-          "type": "varchar(255)",
+          "type": "enum('pending','completed','failed','refunded')",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "'pending'"
         },
         "description": {
           "name": "description",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentMethodId": {
+          "name": "paymentMethodId",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "externalTransactionId": {
+          "name": "externalTransactionId",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -569,21 +962,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "transactions_user_id_users_id_fk": {
-          "name": "transactions_user_id_users_id_fk",
-          "tableFrom": "transactions",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {
         "transactions_id": {
           "name": "transactions_id",
@@ -593,91 +972,6 @@
         }
       },
       "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "user_balances": {
-      "name": "user_balances",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "available_balance": {
-          "name": "available_balance",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "invested_amount": {
-          "name": "invested_amount",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "total_earnings": {
-          "name": "total_earnings",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true,
-          "default": "(now())"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "user_balances_user_id_users_id_fk": {
-          "name": "user_balances_user_id_users_id_fk",
-          "tableFrom": "user_balances",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "user_balances_id": {
-          "name": "user_balances_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {
-        "user_balances_user_id_unique": {
-          "name": "user_balances_user_id_unique",
-          "columns": [
-            "user_id"
-          ]
-        }
-      },
       "checkConstraint": {}
     },
     "users": {
@@ -711,6 +1005,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "loginMethod": {
           "name": "loginMethod",
           "type": "varchar(64)",
@@ -720,11 +1021,57 @@
         },
         "role": {
           "name": "role",
-          "type": "enum('user','admin')",
+          "type": "enum('user','doctor','store','affiliate','admin')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "'user'"
+        },
+        "userType": {
+          "name": "userType",
+          "type": "enum('individual','clinic','pharmacy','partner')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'individual'"
+        },
+        "emailVerified": {
+          "name": "emailVerified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "whatsappVerified": {
+          "name": "whatsappVerified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "verificationCode": {
+          "name": "verificationCode",
+          "type": "varchar(6)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "verificationCodeExpiry": {
+          "name": "verificationCodeExpiry",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "profileComplete": {
+          "name": "profileComplete",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
         },
         "createdAt": {
           "name": "createdAt",
@@ -768,12 +1115,18 @@
           "columns": [
             "openId"
           ]
+        },
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "columns": [
+            "email"
+          ]
         }
       },
       "checkConstraint": {}
     },
-    "withdrawal_requests": {
-      "name": "withdrawal_requests",
+    "withdrawals": {
+      "name": "withdrawals",
       "columns": {
         "id": {
           "name": "id",
@@ -782,8 +1135,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "user_id": {
-          "name": "user_id",
+        "userId": {
+          "name": "userId",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
@@ -791,36 +1144,52 @@
         },
         "amount": {
           "name": "amount",
-          "type": "int",
+          "type": "decimal(12,2)",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "fee": {
+          "name": "fee",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0'"
+        },
+        "netAmount": {
+          "name": "netAmount",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bankAccount": {
+          "name": "bankAccount",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "status": {
           "name": "status",
-          "type": "enum('pending','approved','rejected','processed','failed')",
+          "type": "enum('pending','processing','completed','failed','cancelled')",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false,
           "default": "'pending'"
         },
-        "bank_data": {
-          "name": "bank_data",
-          "type": "text",
+        "requestDate": {
+          "name": "requestDate",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
         },
-        "mercado_pago_id": {
-          "name": "mercado_pago_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "rejection_reason": {
-          "name": "rejection_reason",
-          "type": "text",
+        "completedDate": {
+          "name": "completedDate",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -832,36 +1201,13 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(now())"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true,
-          "default": "(now())"
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "withdrawal_requests_user_id_users_id_fk": {
-          "name": "withdrawal_requests_user_id_users_id_fk",
-          "tableFrom": "withdrawal_requests",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {
-        "withdrawal_requests_id": {
-          "name": "withdrawal_requests_id",
+        "withdrawals_id": {
+          "name": "withdrawals_id",
           "columns": [
             "id"
           ]

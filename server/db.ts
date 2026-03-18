@@ -1,9 +1,7 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, saasPlans, subscriptions, affiliates, commissions, transactions } from "../drizzle/schema";
 import { ENV } from './_core/env';
-import type { InsertUserBalance, InsertInvestment, InsertTransaction, InsertReferral, InsertWithdrawalRequest, InsertNotification } from "../drizzle/schema";
-import { userBalances, investments, transactions, affiliates, referrals, withdrawalRequests, notifications, platformSettings, investmentPlans } from "../drizzle/schema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -91,207 +89,110 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-/**
- * Investment Plans
- */
-export async function getInvestmentPlans() {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(investmentPlans).orderBy(investmentPlans.minAmount);
-}
-
-export async function getInvestmentPlanById(planId: number) {
+export async function getUserByEmail(email: string) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(investmentPlans).where(eq(investmentPlans.id, planId)).limit(1);
-  return result[0];
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
 }
 
-/**
- * User Balances
- */
-export async function getUserBalance(userId: number) {
+export async function updateUserVerification(userId: number, emailVerified: boolean, whatsappVerified: boolean) {
   const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(userBalances).where(eq(userBalances.userId, userId)).limit(1);
-  return result[0];
-}
-
-export async function createUserBalance(userId: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  await db.insert(userBalances).values({
-    userId,
-    availableBalance: 0,
-    investedAmount: 0,
-    totalEarnings: 0,
-  });
-  return getUserBalance(userId);
-}
-
-export async function updateUserBalance(userId: number, updates: Partial<InsertUserBalance>) {
-  const db = await getDb();
-  if (!db) return undefined;
-  await db.update(userBalances).set(updates).where(eq(userBalances.userId, userId));
-  return getUserBalance(userId);
-}
-
-/**
- * Investments
- */
-export async function getUserInvestments(userId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(investments).where(eq(investments.userId, userId)).orderBy(investments.createdAt);
-}
-
-export async function createInvestment(investment: InsertInvestment) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.insert(investments).values(investment);
-  return result;
-}
-
-/**
- * Transactions
- */
-export async function getUserTransactions(userId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(transactions).where(eq(transactions.userId, userId)).orderBy(transactions.createdAt);
-}
-
-export async function createTransaction(transaction: InsertTransaction) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.insert(transactions).values(transaction);
-  return result;
-}
-
-export async function getTransactionByMercadoPagoId(mercadoPagoId: string) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(transactions).where(eq(transactions.mercadoPagoId, mercadoPagoId)).limit(1);
-  return result[0];
-}
-
-export async function updateTransaction(id: number, updates: Partial<InsertTransaction>) {
-  const db = await getDb();
-  if (!db) return undefined;
-  await db.update(transactions).set(updates).where(eq(transactions.id, id));
-}
-
-/**
- * Affiliates
- */
-export async function getOrCreateAffiliate(userId: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-  
-  let affiliate = await db.select().from(affiliates).where(eq(affiliates.userId, userId)).limit(1);
-  
-  if (affiliate.length === 0) {
-    const referralCode = generateReferralCode();
-    await db.insert(affiliates).values({
-      userId,
-      referralCode,
-      totalReferrals: 0,
-      totalCommissions: 0,
-      commissionRate: 10,
-    });
-    affiliate = await db.select().from(affiliates).where(eq(affiliates.userId, userId)).limit(1);
+  if (!db) return false;
+  try {
+    await db.update(users)
+      .set({ emailVerified, whatsappVerified, profileComplete: emailVerified && whatsappVerified })
+      .where(eq(users.id, userId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to update user verification:", error);
+    return false;
   }
+}
+
+// Planos SaaS
+export async function getSaasPlans() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(saasPlans).orderBy(saasPlans.monthlyPrice);
+}
+
+export async function getSaasPlanBySlug(slug: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(saasPlans).where(eq(saasPlans.slug, slug)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// Assinaturas
+export async function getUserSubscription(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(subscriptions)
+    .where(eq(subscriptions.userId, userId))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// Afiliados
+export async function getAffiliateByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(affiliates)
+    .where(eq(affiliates.userId, userId))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAffiliateByReferralCode(code: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(affiliates)
+    .where(eq(affiliates.referralCode, code))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// Transações
+export async function getUserTransactions(userId: number, limit = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(transactions)
+    .where(eq(transactions.userId, userId))
+    .orderBy(transactions.createdAt)
+    .limit(limit);
+}
+
+// Comissões
+export async function getAffiliateCommissions(affiliateId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(commissions)
+    .where(eq(commissions.affiliateId, affiliateId))
+    .orderBy(commissions.transactionDate);
+}
+
+
+// Calculo de comissoes
+export function calculateCommission(amount: number, level: number): number {
+  const rates: Record<number, number> = {
+    1: 0.50,  // 50%
+    2: 0.05,  // 5%
+    3: 0.02,  // 2%
+  };
   
-  return affiliate[0];
+  const rate = rates[level] || 0;
+  return amount * rate;
 }
 
-export async function getAffiliateByReferralCode(referralCode: string) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(affiliates).where(eq(affiliates.referralCode, referralCode)).limit(1);
-  return result[0];
+// Calculo de taxa de administracao
+export function calculateAdminFee(amount: number, isSubscriber: boolean): number {
+  if (isSubscriber) return 0; // Sem taxa para assinantes
+  return amount * 0.05; // 5% para nao-assinantes
 }
 
-/**
- * Referrals
- */
-export async function createReferral(referral: InsertReferral) {
-  const db = await getDb();
-  if (!db) return undefined;
-  return await db.insert(referrals).values(referral);
+// Calculo de taxa de saque
+export function calculateWithdrawalFee(amount: number, hasWithdrawalExemption: boolean): number {
+  if (hasWithdrawalExemption) return 0; // Sem taxa para Clinica Familia
+  return amount * 0.05; // 5% para outros
 }
-
-export async function getReferralsForUser(referrerId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(referrals).where(eq(referrals.referrerId, referrerId)).orderBy(referrals.createdAt);
-}
-
-/**
- * Withdrawal Requests
- */
-export async function createWithdrawalRequest(request: InsertWithdrawalRequest) {
-  const db = await getDb();
-  if (!db) return undefined;
-  return await db.insert(withdrawalRequests).values(request);
-}
-
-export async function getUserWithdrawalRequests(userId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(withdrawalRequests).where(eq(withdrawalRequests.userId, userId)).orderBy(withdrawalRequests.createdAt);
-}
-
-export async function getPendingWithdrawalRequests() {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(withdrawalRequests).where(eq(withdrawalRequests.status, "pending")).orderBy(withdrawalRequests.createdAt);
-}
-
-export async function updateWithdrawalRequest(id: number, updates: Partial<InsertWithdrawalRequest>) {
-  const db = await getDb();
-  if (!db) return undefined;
-  await db.update(withdrawalRequests).set(updates).where(eq(withdrawalRequests.id, id));
-}
-
-/**
- * Notifications
- */
-export async function createNotification(notification: InsertNotification) {
-  const db = await getDb();
-  if (!db) return undefined;
-  return await db.insert(notifications).values(notification);
-}
-
-export async function getUserNotifications(userId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(notifications).where(eq(notifications.userId, userId)).orderBy(notifications.createdAt);
-}
-
-/**
- * Platform Settings
- */
-export async function getPlatformSetting(key: string) {
-  const db = await getDb();
-  if (!db) return undefined;
-  const result = await db.select().from(platformSettings).where(eq(platformSettings.key, key)).limit(1);
-  return result[0]?.value;
-}
-
-export async function setPlatformSetting(key: string, value: string) {
-  const db = await getDb();
-  if (!db) return undefined;
-  await db.insert(platformSettings).values({ key, value }).onDuplicateKeyUpdate({
-    set: { value },
-  });
-}
-
-/**
- * Helper function to generate referral codes
- */
-function generateReferralCode(): string {
-  return Math.random().toString(36).substring(2, 10).toUpperCase();
-}
-
-

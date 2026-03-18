@@ -1,25 +1,12 @@
+import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
-import { investmentRouter } from "./routers/investments";
-import { affiliateRouter } from "./routers/affiliates";
-import { transactionRouter } from "./routers/transactions";
-import { adminRouter } from "./routers/admin";
-import { webhookRouter } from "./routers/webhooks";
-import { mercadopagoRouter } from "./routers/mercadopago";
-import { consultationRouter } from "./routers/consultation";
-import { verdinhoChatRouter } from "./routers/verdinhoChatRouter";
-import { sentimentRouter } from "./routers/sentimentRouter";
-import { sentimentDashboardRouter } from "./routers/sentimentDashboardRouter";
-import { monitoringRouter } from "./routers/monitoring";
-import { referralRouter } from "./routers/referral";
-import { recommendationsRouter } from "./routers/recommendations";
-// import { marketplaceRouter } from "./routers/marketplaceRouter"; // TODO: Fix marketplace router
-
-const COOKIE_NAME = "auth-token";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { getSaasPlans, getSaasPlanBySlug, getUserSubscription, getAffiliateByUserId } from "./db";
+import { z } from "zod";
 
 export const appRouter = router({
-  // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
+    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -31,20 +18,32 @@ export const appRouter = router({
       } as const;
     }),
   }),
-  investments: investmentRouter,
-  affiliates: affiliateRouter,
-  transactions: transactionRouter,
-  admin: adminRouter,
-  webhooks: webhookRouter,
-  mercadopago: mercadopagoRouter,
-  consultation: consultationRouter,
-  verdinho: verdinhoChatRouter,
-  sentiment: sentimentRouter,
-  sentimentDashboard: sentimentDashboardRouter,
-  monitoring: monitoringRouter,
-  referral: referralRouter,
-  recommendations: recommendationsRouter,
-  // marketplace: marketplaceRouter, // TODO: Fix marketplace router
+
+  // Planos SaaS
+  plans: router({
+    list: publicProcedure.query(async () => {
+      return getSaasPlans();
+    }),
+    getBySlug: publicProcedure
+      .input(z.object({ slug: z.string() }))
+      .query(async ({ input }) => {
+        return getSaasPlanBySlug(input.slug);
+      }),
+  }),
+
+  // Assinaturas
+  subscriptions: router({
+    getCurrent: protectedProcedure.query(async ({ ctx }) => {
+      return getUserSubscription(ctx.user.id);
+    }),
+  }),
+
+  // Afiliados
+  affiliates: router({
+    getProfile: protectedProcedure.query(async ({ ctx }) => {
+      return getAffiliateByUserId(ctx.user.id);
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

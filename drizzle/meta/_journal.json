@@ -5,36 +5,15 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1770408753104,
-      "tag": "0000_pink_chameleon",
+      "when": 1773816733516,
+      "tag": "0000_robust_moon_knight",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "5",
-      "when": 1770409242428,
-      "tag": "0001_remarkable_ink",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1772131812528,
-      "tag": "0002_flawless_green_goblin",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1772151348505,
-      "tag": "0003_cold_monster_badoon",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1772154692228,
-      "tag": "0004_petite_roland_deschain",
+      "when": 1773816892356,
+      "tag": "0001_youthful_iron_fist",
       "breakpoints": true
     }
   ]

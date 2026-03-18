@@ -17,3 +17,9 @@ verify_jwt = false
 
 [functions.create-subscription]
 verify_jwt = false
+
+[functions.process-payout]
+verify_jwt = false
+
+[functions.create-payment-split]
+verify_jwt = false

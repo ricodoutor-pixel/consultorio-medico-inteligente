@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { LegalDisclaimer } from "@/components/LegalDisclaimer";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 const tooltipStyle = { background: "hsl(240 15% 7%)", border: "1px solid hsl(240 10% 14%)", borderRadius: "14px", color: "hsl(240 10% 93%)" };
@@ -288,6 +289,7 @@ const DashboardMedico = () => {
           </motion.div>
         </div>
       </section>
+      <LegalDisclaimer />
       <Footer />
     </div>
   );

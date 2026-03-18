@@ -114,7 +114,7 @@ const Index = () => {
 
               <motion.h1 
                 variants={fadeUp} 
-                className="text-4xl md:text-6xl lg:text-7xl font-display font-black leading-[1.05] mb-8 tracking-tight"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black leading-[1.1] mb-6 tracking-tight"
               >
                 <span className="text-foreground">Acesso </span>
                 <span className="text-gradient-green">Democratizado</span>

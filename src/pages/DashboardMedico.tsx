@@ -289,6 +289,7 @@ const DashboardMedico = () => {
           </motion.div>
         </div>
       </section>
+      <LegalDisclaimer />
       <Footer />
     </div>
   );

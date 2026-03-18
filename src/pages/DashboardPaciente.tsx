@@ -216,6 +216,9 @@ const DashboardPaciente = () => {
                   </Card>
                 )}
 
+                {/* Delivery Confirmation - Escrow Release */}
+                <DeliveryConfirmation escrows={escrows} onConfirmed={fetchData} />
+
                 <Card className="border-border">
                   <CardContent className="p-5">
                     <h3 className="font-display font-black text-foreground text-sm mb-4 flex items-center gap-2">

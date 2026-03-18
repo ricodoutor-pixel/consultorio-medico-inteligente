@@ -169,7 +169,7 @@ const Index = () => {
                   <img
                     src={heroPhoneMockup}
                     alt="Planta y Raiz App - Diretório de Profissionais e Crescimento da Indústria Cannabis no Brasil"
-                    className="w-[280px] md:w-[380px] lg:w-[440px] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
+                    className="w-[364px] md:w-[494px] lg:w-[572px] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
                   />
                 </div>
               </div>

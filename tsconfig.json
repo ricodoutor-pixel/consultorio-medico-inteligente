@@ -1,42 +1,24 @@
 {
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
-    "esModuleInterop": true,
-    "incremental": true,
-    "jsx": "preserve",
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable"
-    ],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "noEmit": true,
+    "allowJs": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "paths": {
       "@/*": [
-        "./client/src/*"
-      ],
-      "@shared/*": [
-        "./shared/*"
+        "./src/*"
       ]
     },
     "skipLibCheck": true,
-    "strict": true,
-    "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
-    "types": [
-      "node",
-      "vite/client"
-    ]
+    "strictNullChecks": false
   },
-  "exclude": [
-    "node_modules",
-    "build",
-    "dist",
-    "**/*.test.ts"
-  ],
-  "include": [
-    "client/src/**/*",
-    "shared/**/*",
-    "server/**/*"
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
   ]
 }

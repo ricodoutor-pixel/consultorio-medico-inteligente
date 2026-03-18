@@ -197,7 +197,7 @@ export const paymentsRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        if (ctx.user?.id !== input.patientId) {
+        if (String(ctx.user?.id) !== input.patientId) {
           return { success: false, error: 'Sem permissão' };
         }
         const payment = await paymentService.processPayment(input);

@@ -1,3 +1,14 @@
+import cbdOilTincture from "@/assets/products/cbd-oil-tincture.jpg";
+import cbdCapsules from "@/assets/products/cbd-capsules.jpg";
+import fullSpectrumOil from "@/assets/products/full-spectrum-oil.jpg";
+import cbdSpray from "@/assets/products/cbd-spray.jpg";
+import cbdGummiesSleep from "@/assets/products/cbd-gummies-sleep.jpg";
+import cbdSleepOil from "@/assets/products/cbd-sleep-oil.jpg";
+import cbdCreamTopical from "@/assets/products/cbd-cream-topical.jpg";
+import cbdMuscleGel from "@/assets/products/cbd-muscle-gel.jpg";
+import cbdOmega3 from "@/assets/products/cbd-omega3.jpg";
+import cbdPatches from "@/assets/products/cbd-patches.jpg";
+
 export type Product = {
   id: string;
   title: string;
@@ -10,133 +21,157 @@ export type Product = {
   rating: number;
   imageUrl: string;
   tags: string[];
+  freeShipping?: boolean;
 };
 
-export const productCategories = ["Bem-estar", "Sono", "Tópicos", "Vitaminas"];
+export const productCategories = ["Bem-estar", "Sono", "Tópicos", "Vitaminas", "Medicinais"];
 
 export const products: Product[] = [
-  // ═══════ Bem-estar (4 produtos) ═══════
+  // ═══════ Bem-estar ═══════
   {
     id: "prod-1",
-    title: "Óleo CBD Isolado 10ml",
-    description: "Uso comum em protocolos de bem-estar sob orientação profissional. Acompanha laudo COA.",
-    benefits: "Estudos publicados no Journal of Clinical Psychology (2019) demonstram que o CBD isolado reduz significativamente sintomas de ansiedade em 79% dos pacientes. Possui propriedades anti-inflamatórias e neuroprotetoras comprovadas.",
-    price: "R$ 69,90",
-    priceValue: 69.9,
+    title: "Óleo CBD Isolado 1000mg",
+    description: "Óleo CBD de alta concentração com laudo COA. Conta-gotas calibrado para dosagem precisa.",
+    benefits: "Estudos do Journal of Clinical Psychology (2019) demonstram redução de ansiedade em 79% dos pacientes. Propriedades anti-inflamatórias e neuroprotetoras comprovadas.",
+    price: "R$ 189,90",
+    priceValue: 189.9,
     category: "Bem-estar",
     vendor: "Verde Vida Farmácia",
-    rating: 4.8,
-    imageUrl: "https://images.unsplash.com/photo-1616671276441-2f2c277b8bf6?w=600&h=450&fit=crop",
-    tags: ["CBD", "Óleo", "Popular"],
+    rating: 4.9,
+    imageUrl: cbdOilTincture,
+    tags: ["CBD", "Óleo", "1000mg", "Popular"],
+    freeShipping: true,
   },
   {
     id: "prod-2",
     title: "Cápsulas CBD 25mg (30un)",
-    description: "Cápsulas de fácil administração. Ideal para quem busca praticidade no dia a dia.",
-    benefits: "A biodisponibilidade oral do CBD em cápsulas garante absorção gradual e constante. Pesquisas da Universidade de São Paulo (USP) indicam eficácia no controle de dor neuropática e espasticidade muscular.",
-    price: "R$ 59,90",
-    priceValue: 59.9,
+    description: "Cápsulas softgel de fácil administração. Ideal para quem busca praticidade no dia a dia.",
+    benefits: "Biodisponibilidade oral garante absorção gradual e constante. Pesquisas da USP indicam eficácia no controle de dor neuropática e espasticidade muscular.",
+    price: "R$ 129,90",
+    priceValue: 129.9,
     category: "Bem-estar",
     vendor: "Cannabis Pharma BR",
     rating: 4.7,
-    imageUrl: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&h=450&fit=crop",
+    imageUrl: cbdCapsules,
     tags: ["CBD", "Cápsulas", "Prático"],
+    freeShipping: true,
   },
   {
     id: "prod-3",
     title: "Tintura Full Spectrum 30ml",
-    description: "Fórmula completa com espectro total. Laudos de qualidade disponíveis.",
-    benefits: "O efeito entourage do Full Spectrum potencializa a ação terapêutica. Estudos no British Journal of Pharmacology confirmam que a combinação natural de canabinoides e terpenos é até 4x mais eficaz que o CBD isolado para dor crônica.",
-    price: "R$ 89,90",
-    priceValue: 89.9,
+    description: "Fórmula completa com espectro total de canabinoides. Laudos de qualidade disponíveis.",
+    benefits: "O efeito entourage potencializa a ação terapêutica. Combinação natural de canabinoides e terpenos é até 4x mais eficaz que CBD isolado para dor crônica.",
+    price: "R$ 249,90",
+    priceValue: 249.9,
     category: "Bem-estar",
     vendor: "Nature Lab Canábica",
     rating: 4.9,
-    imageUrl: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=600&h=450&fit=crop",
-    tags: ["Full Spectrum", "Tintura"],
+    imageUrl: fullSpectrumOil,
+    tags: ["Full Spectrum", "Tintura", "Premium"],
+    freeShipping: true,
   },
   {
-    id: "prod-13",
+    id: "prod-4",
     title: "Spray Sublingual CBD 500mg",
-    description: "Spray sublingual de rápida absorção. Ideal para crises de ansiedade e dor aguda. Laudo COA incluso.",
-    benefits: "A via sublingual oferece biodisponibilidade de até 35%, superior à oral (6-15%). Pesquisa da Universidade do Colorado (2021) demonstra alívio em 5-15 minutos, ideal para crises agudas de ansiedade e episódios de dor.",
-    price: "R$ 79,90",
-    priceValue: 79.9,
+    description: "Spray sublingual de rápida absorção. Ideal para crises de ansiedade e dor aguda.",
+    benefits: "Via sublingual oferece biodisponibilidade de até 35%. Alívio em 5-15 minutos, ideal para crises agudas de ansiedade.",
+    price: "R$ 159,90",
+    priceValue: 159.9,
     category: "Bem-estar",
     vendor: "Botânica Medicinal",
     rating: 4.8,
-    imageUrl: "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?w=600&h=450&fit=crop",
+    imageUrl: cbdSpray,
     tags: ["Spray", "Sublingual", "Rápido"],
+    freeShipping: true,
   },
 
-  // ═══════ Sono (4 produtos) ═══════
+  // ═══════ Sono ═══════
   {
-    id: "prod-4",
-    title: "Gomas de Melatonina + Cânhamo",
-    description: "Linha de sono e bem-estar. Uso responsável com orientação profissional.",
-    benefits: "A combinação de melatonina com extrato de cânhamo atua em receptores CB1 do sistema endocanabinoide, regulando o ciclo circadiano. Estudos do Sleep Medicine Reviews mostram melhora de 65% na latência do sono.",
-    price: "R$ 39,90",
-    priceValue: 39.9,
+    id: "prod-5",
+    title: "Gomas CBD + Melatonina (30un)",
+    description: "Gomas mastigáveis com CBD e melatonina para indução natural do sono.",
+    benefits: "Combinação de melatonina com CBD atua em receptores CB1, regulando o ciclo circadiano. Melhora de 65% na latência do sono.",
+    price: "R$ 89,90",
+    priceValue: 89.9,
     category: "Sono",
     vendor: "Sleep Well Brasil",
-    rating: 4.6,
-    imageUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&h=450&fit=crop",
+    rating: 4.8,
+    imageUrl: cbdGummiesSleep,
     tags: ["Melatonina", "Sono", "Gomas"],
+    freeShipping: true,
   },
   {
     id: "prod-6",
-    title: "Óleo para Sono CBD 500mg",
-    description: "Formulação específica para rotina noturna. Acompanha conta-gotas calibrado.",
-    benefits: "CBD em dosagem noturna de 25-75mg demonstra melhora significativa na qualidade do sono em 66,7% dos pacientes, segundo estudo do Permanente Journal. Reduz o tempo para adormecer e aumenta o sono profundo (estágio N3).",
-    price: "R$ 79,90",
-    priceValue: 79.9,
+    title: "Óleo CBD Sleep 500mg",
+    description: "Formulação noturna com lavanda e CBD. Conta-gotas calibrado incluso.",
+    benefits: "CBD em dosagem noturna demonstra melhora na qualidade do sono em 66,7% dos pacientes. Reduz tempo para adormecer.",
+    price: "R$ 179,90",
+    priceValue: 179.9,
     category: "Sono",
     vendor: "Verde Vida Farmácia",
-    rating: 4.8,
-    imageUrl: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&h=450&fit=crop",
-    tags: ["CBD", "Sono", "Óleo"],
+    rating: 4.9,
+    imageUrl: cbdSleepOil,
+    tags: ["CBD", "Sono", "Óleo", "Noturno"],
+    freeShipping: true,
   },
 
-  // ═══════ Tópicos (4 produtos) ═══════
+  // ═══════ Tópicos ═══════
   {
     id: "prod-7",
-    title: "Creme Tópico Hemp 120g",
-    description: "Bem-estar muscular e pele. Transparência de composição e laudos disponíveis.",
-    benefits: "O CBD tópico interage diretamente com receptores CB2 na pele, proporcionando ação anti-inflamatória localizada. Pesquisa publicada na Clinical Therapeutics (2020) comprova redução de dor articular em 70% dos participantes.",
-    price: "R$ 29,90",
-    priceValue: 29.9,
+    title: "Creme Tópico CBD 120g",
+    description: "Creme para alívio localizado de dores musculares e articulares. Grau farmacêutico.",
+    benefits: "CBD tópico interage com receptores CB2 na pele, proporcionando ação anti-inflamatória localizada. Redução de dor articular em 70% dos participantes.",
+    price: "R$ 99,90",
+    priceValue: 99.9,
     category: "Tópicos",
     vendor: "Nature Lab Canábica",
     rating: 4.7,
-    imageUrl: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&h=450&fit=crop",
-    tags: ["Tópico", "Creme", "Popular"],
+    imageUrl: cbdCreamTopical,
+    tags: ["Tópico", "Creme", "Articular"],
+    freeShipping: true,
   },
   {
     id: "prod-8",
     title: "Gel Muscular CBD 100ml",
-    description: "Para uso tópico localizado. Composição transparente com COA.",
-    benefits: "Ação rápida em 15-30 minutos por absorção transdérmica. Estudos em atletas demonstram recuperação muscular 40% mais rápida. O mentol combinado com CBD potencializa o efeito analgésico sem efeitos sistêmicos.",
-    price: "R$ 44,90",
-    priceValue: 44.9,
+    description: "Gel de recuperação muscular com CBD e mentol. Ação rápida em 15-30 minutos.",
+    benefits: "Absorção transdérmica com recuperação muscular 40% mais rápida. Mentol + CBD potencializa efeito analgésico sem efeitos sistêmicos.",
+    price: "R$ 79,90",
+    priceValue: 79.9,
     category: "Tópicos",
     vendor: "Cannabis Pharma BR",
     rating: 4.6,
-    imageUrl: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&h=450&fit=crop",
-    tags: ["Gel", "Muscular", "CBD"],
+    imageUrl: cbdMuscleGel,
+    tags: ["Gel", "Muscular", "Esportivo"],
+    freeShipping: true,
+  },
+  {
+    id: "prod-9",
+    title: "Adesivos Transdérmicos CBD (10un)",
+    description: "Patches de liberação prolongada de CBD. Até 12h de efeito contínuo por adesivo.",
+    benefits: "Liberação controlada e constante de CBD por via transdérmica. Ideal para dor crônica que requer ação contínua ao longo do dia.",
+    price: "R$ 119,90",
+    priceValue: 119.9,
+    category: "Tópicos",
+    vendor: "Botânica Medicinal",
+    rating: 4.8,
+    imageUrl: cbdPatches,
+    tags: ["Patches", "Transdérmico", "12h"],
+    freeShipping: true,
   },
 
-  // ═══════ Vitaminas (3 produtos) ═══════
+  // ═══════ Vitaminas ═══════
   {
-    id: "prod-11",
+    id: "prod-10",
     title: "Ômega 3 + CBD (60 cáps)",
-    description: "Combinação de ômega 3 com CBD para saúde cardiovascular e bem-estar.",
-    benefits: "O ômega-3 (EPA/DHA) combinado com CBD atua sinergicamente na neuroproteção. Publicação no Journal of Neurochemistry demonstra redução de neuroinflamação e melhora cognitiva. Benéfico para saúde cardiovascular e cerebral.",
-    price: "R$ 49,90",
-    priceValue: 49.9,
+    description: "Combinação sinérgica de ômega-3 (EPA/DHA) com CBD para saúde cerebral e cardiovascular.",
+    benefits: "Ômega-3 combinado com CBD atua na neuroproteção. Redução de neuroinflamação e melhora cognitiva comprovada.",
+    price: "R$ 109,90",
+    priceValue: 109.9,
     category: "Vitaminas",
     vendor: "Verde Vida Farmácia",
     rating: 4.8,
-    imageUrl: "https://images.unsplash.com/photo-1577174881658-0f30ed549adc?w=600&h=450&fit=crop",
-    tags: ["Ômega 3", "CBD", "Saúde"],
+    imageUrl: cbdOmega3,
+    tags: ["Ômega 3", "CBD", "Neuro"],
+    freeShipping: true,
   },
 ];

@@ -114,7 +114,7 @@ const Index = () => {
 
               <motion.h1 
                 variants={fadeUp} 
-                className="text-4xl md:text-6xl lg:text-7xl font-display font-black leading-[1.05] mb-8 tracking-tight"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black leading-[1.1] mb-6 tracking-tight"
               >
                 <span className="text-foreground">Acesso </span>
                 <span className="text-gradient-green">Democratizado</span>
@@ -126,7 +126,7 @@ const Index = () => {
                 <span className="text-gradient-green">Mundo</span>
               </motion.h1>
 
-              <motion.p variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-3xl mb-10 leading-relaxed font-medium">
+              <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-2xl mb-8 leading-relaxed font-medium">
                 Conectamos você aos melhores especialistas via vídeo e chat. Pré-entrevista rápida, pagamento seguro via Pix Mercado Pago e acesso direto ao nosso Shopping de bem-estar com preços populares e frete grátis para todo o Brasil.
               </motion.p>
 
@@ -154,7 +154,7 @@ const Index = () => {
               {/* Cadastro Gratuito Button - Above Phone */}
               <Link to="/cadastro">
                 <motion.span 
-                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-8 py-3 text-base font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer shadow-xl shadow-primary/30"
+                  className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer shadow-xl shadow-primary/30"
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 >
@@ -169,7 +169,7 @@ const Index = () => {
                   <img
                     src={heroPhoneMockup}
                     alt="Planta y Raiz App - Diretório de Profissionais e Crescimento da Indústria Cannabis no Brasil"
-                    className="w-[280px] md:w-[380px] lg:w-[440px] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
+                    className="w-[364px] md:w-[494px] lg:w-[572px] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
                   />
                 </div>
               </div>

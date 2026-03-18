@@ -1,0 +1,351 @@
+# Prometheus Alert Rules - Planta & Raiz 2030
+# Alertas de Performance, Infraestrutura e Negócio
+
+groups:
+  # ============================================
+  # ALERTAS CRÍTICOS (P1)
+  # ============================================
+  - name: critical_alerts
+    interval: 1m
+    rules:
+      # Taxa de Erro 5xx > 1%
+      - alert: CriticalErrorRate5xx
+        expr: |
+          (sum(rate(http_requests_total{status=~"5.."}[5m])) /
+           sum(rate(http_requests_total[5m]))) > 0.01
+        for: 1m
+        labels:
+          severity: critical
+          component: backend
+        annotations:
+          summary: "Taxa de erro crítica (5xx > 1%)"
+          description: "{{ $value | humanizePercentage }} de requisições retornando erro 5xx"
+          dashboard: "http://grafana:3000/d/backend"
+
+      # Latência P95 > 1 segundo
+      - alert: CriticalHighLatency
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: critical
+          component: backend
+        annotations:
+          summary: "Latência crítica (P95 > 1s)"
+          description: "P95 latência: {{ $value | humanizeDuration }}"
+          dashboard: "http://grafana:3000/d/backend"
+
+      # Banco de Dados Indisponível
+      - alert: DatabaseDown
+        expr: up{job="mysql"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Banco de dados indisponível"
+          description: "MySQL está down por mais de 1 minuto"
+          runbook: "https://wiki.plantaraiz.com/runbooks/database-down"
+
+      # CPU > 90%
+      - alert: CriticalHighCPU
+        expr: node_cpu_usage > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "CPU crítica (> 90%)"
+          description: "CPU em {{ $value | humanizePercentage }} no {{ $labels.instance }}"
+          dashboard: "http://grafana:3000/d/infrastructure"
+
+      # Memória > 95%
+      - alert: CriticalHighMemory
+        expr: node_memory_usage > 0.95
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Memória crítica (> 95%)"
+          description: "Memória em {{ $value | humanizePercentage }} no {{ $labels.instance }}"
+          dashboard: "http://grafana:3000/d/infrastructure"
+
+      # Disco > 90%
+      - alert: CriticalHighDisk
+        expr: node_disk_usage > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Disco crítico (> 90%)"
+          description: "Disco em {{ $value | humanizePercentage }} no {{ $labels.instance }}"
+          runbook: "https://wiki.plantaraiz.com/runbooks/disk-full"
+
+      # Uptime < 95%
+      - alert: CriticalLowUptime
+        expr: |
+          (sum(increase(http_requests_total{status=~"2.."}[1h])) /
+           sum(increase(http_requests_total[1h]))) < 0.95
+        for: 10m
+        labels:
+          severity: critical
+          component: application
+        annotations:
+          summary: "Uptime crítico (< 95%)"
+          description: "Uptime: {{ $value | humanizePercentage }}"
+          dashboard: "http://grafana:3000/d/overview"
+
+  # ============================================
+  # ALERTAS ALTOS (P2)
+  # ============================================
+  - name: high_alerts
+    interval: 5m
+    rules:
+      # Taxa de Erro 5xx > 0.5%
+      - alert: HighErrorRate5xx
+        expr: |
+          (sum(rate(http_requests_total{status=~"5.."}[5m])) /
+           sum(rate(http_requests_total[5m]))) > 0.005
+        for: 5m
+        labels:
+          severity: high
+          component: backend
+        annotations:
+          summary: "Taxa de erro alta (5xx > 0.5%)"
+          description: "{{ $value | humanizePercentage }} de requisições retornando erro 5xx"
+
+      # Latência P95 > 500ms
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 0.5
+        for: 10m
+        labels:
+          severity: high
+          component: backend
+        annotations:
+          summary: "Latência alta (P95 > 500ms)"
+          description: "P95 latência: {{ $value | humanizeDuration }}"
+
+      # CPU > 80%
+      - alert: HighCPU
+        expr: node_cpu_usage > 0.8
+        for: 10m
+        labels:
+          severity: high
+          component: infrastructure
+        annotations:
+          summary: "CPU alta (> 80%)"
+          description: "CPU em {{ $value | humanizePercentage }} no {{ $labels.instance }}"
+
+      # Memória > 85%
+      - alert: HighMemory
+        expr: node_memory_usage > 0.85
+        for: 10m
+        labels:
+          severity: high
+          component: infrastructure
+        annotations:
+          summary: "Memória alta (> 85%)"
+          description: "Memória em {{ $value | humanizePercentage }} no {{ $labels.instance }}"
+
+      # Conexões DB > 150
+      - alert: HighDatabaseConnections
+        expr: mysql_global_status_threads_connected > 150
+        for: 10m
+        labels:
+          severity: high
+          component: database
+        annotations:
+          summary: "Conexões de BD altas (> 150)"
+          description: "{{ $value }} conexões ativas no MySQL"
+
+      # Slow Queries > 5%
+      - alert: HighSlowQueries
+        expr: |
+          (sum(rate(mysql_global_status_slow_queries[5m])) /
+           sum(rate(mysql_global_status_questions[5m]))) > 0.05
+        for: 15m
+        labels:
+          severity: high
+          component: database
+        annotations:
+          summary: "Slow queries altas (> 5%)"
+          description: "{{ $value | humanizePercentage }} de queries são lentas"
+
+      # Replicação Lag > 5s
+      - alert: HighReplicationLag
+        expr: mysql_slave_status_seconds_behind_master > 5
+        for: 5m
+        labels:
+          severity: high
+          component: database
+        annotations:
+          summary: "Replicação lag alta (> 5s)"
+          description: "Replicação lag: {{ $value | humanizeDuration }}"
+
+  # ============================================
+  # ALERTAS MÉDIOS (P3)
+  # ============================================
+  - name: medium_alerts
+    interval: 15m
+    rules:
+      # Taxa de Erro 4xx > 5%
+      - alert: MediumErrorRate4xx
+        expr: |
+          (sum(rate(http_requests_total{status=~"4.."}[5m])) /
+           sum(rate(http_requests_total[5m]))) > 0.05
+        for: 15m
+        labels:
+          severity: medium
+          component: backend
+        annotations:
+          summary: "Taxa de erro 4xx alta (> 5%)"
+          description: "{{ $value | humanizePercentage }} de requisições retornando erro 4xx"
+
+      # TTFB > 300ms
+      - alert: HighTimeToFirstByte
+        expr: http_request_ttfb_seconds > 0.3
+        for: 15m
+        labels:
+          severity: medium
+          component: frontend
+        annotations:
+          summary: "TTFB alta (> 300ms)"
+          description: "TTFB: {{ $value | humanizeDuration }}"
+
+      # Disco > 80%
+      - alert: MediumHighDisk
+        expr: node_disk_usage > 0.8
+        for: 15m
+        labels:
+          severity: medium
+          component: infrastructure
+        annotations:
+          summary: "Disco alto (> 80%)"
+          description: "Disco em {{ $value | humanizePercentage }} no {{ $labels.instance }}"
+
+      # Cache Hit Rate < 50%
+      - alert: LowCacheHitRate
+        expr: |
+          (sum(rate(redis_keyspace_hits_total[5m])) /
+           (sum(rate(redis_keyspace_hits_total[5m])) + sum(rate(redis_keyspace_misses_total[5m])))) < 0.5
+        for: 15m
+        labels:
+          severity: medium
+          component: cache
+        annotations:
+          summary: "Cache hit rate baixa (< 50%)"
+          description: "Cache hit rate: {{ $value | humanizePercentage }}"
+
+      # Taxa de Conversão < 60%
+      - alert: LowConversionRate
+        expr: business_conversion_rate < 0.6
+        for: 30m
+        labels:
+          severity: medium
+          component: business
+        annotations:
+          summary: "Taxa de conversão baixa (< 60%)"
+          description: "Taxa de conversão: {{ $value | humanizePercentage }}"
+
+  # ============================================
+  # ALERTAS DE INTEGRAÇÕES
+  # ============================================
+  - name: integration_alerts
+    interval: 5m
+    rules:
+      # Twilio Down
+      - alert: TwilioIntegrationDown
+        expr: up{job="twilio"} == 0
+        for: 5m
+        labels:
+          severity: high
+          component: integration
+        annotations:
+          summary: "Integração Twilio indisponível"
+          description: "Twilio API está indisponível"
+
+      # Mercado Pago Down
+      - alert: MercadoPagoIntegrationDown
+        expr: up{job="mercado_pago"} == 0
+        for: 5m
+        labels:
+          severity: high
+          component: integration
+        annotations:
+          summary: "Integração Mercado Pago indisponível"
+          description: "Mercado Pago API está indisponível"
+
+      # Jitsi Down
+      - alert: JitsiIntegrationDown
+        expr: up{job="jitsi"} == 0
+        for: 5m
+        labels:
+          severity: high
+          component: integration
+        annotations:
+          summary: "Integração Jitsi indisponível"
+          description: "Jitsi API está indisponível"
+
+      # Google Maps Down
+      - alert: GoogleMapsIntegrationDown
+        expr: up{job="google_maps"} == 0
+        for: 5m
+        labels:
+          severity: high
+          component: integration
+        annotations:
+          summary: "Integração Google Maps indisponível"
+          description: "Google Maps API está indisponível"
+
+  # ============================================
+  # ALERTAS DE AGENTES IA
+  # ============================================
+  - name: agent_alerts
+    interval: 5m
+    rules:
+      # Brisa Down
+      - alert: BrisaAgentDown
+        expr: up{job="agent_brisa"} == 0
+        for: 5m
+        labels:
+          severity: high
+          component: agent
+        annotations:
+          summary: "Agente Brisa indisponível"
+          description: "Enfermeira Brisa está offline"
+
+      # CEO Down
+      - alert: CEOAgentDown
+        expr: up{job="agent_ceo"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          component: agent
+        annotations:
+          summary: "Agente CEO indisponível"
+          description: "Manus CEO está offline (processamento financeiro afetado)"
+
+      # ANVISA Down
+      - alert: ANVISAAgentDown
+        expr: up{job="agent_anvisa"} == 0
+        for: 5m
+        labels:
+          severity: high
+          component: agent
+        annotations:
+          summary: "Agente ANVISA indisponível"
+          description: "Guardião ANVISA está offline (validações afetadas)"
+
+      # Verdinho Down
+      - alert: VerdhinhoAgentDown
+        expr: up{job="agent_verdinho"} == 0
+        for: 5m
+        labels:
+          severity: high
+          component: agent
+        annotations:
+          summary: "Agente Verdinho indisponível"
+          description: "Verdinho está offline (suporte afetado)"

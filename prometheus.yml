@@ -1,0 +1,109 @@
+# Prometheus Configuration - Planta & Raiz 2030
+# Monitoramento de Performance em Produção
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: 'production'
+    application: 'planta-raiz'
+    version: '1.0.0'
+
+# Alertmanager Configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+
+# Load Rules
+rule_files:
+  - 'alerts.yml'
+  - 'recording_rules.yml'
+
+# Scrape Configurations
+scrape_configs:
+  # Prometheus Self-Monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporter (Infrastructure Metrics)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  # MySQL Exporter (Database Metrics)
+  - job_name: 'mysql'
+    static_configs:
+      - targets: ['localhost:3306']
+    metrics_path: '/metrics'
+    params:
+      collect[]:
+        - 'global_status'
+        - 'global_variables'
+        - 'slave_status'
+        - 'info_schema.innodb_trx'
+        - 'info_schema.innodb_locks'
+
+  # Application Metrics (Node.js)
+  - job_name: 'application'
+    static_configs:
+      - targets: ['localhost:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'planta-raiz-api'
+
+  # Redis Exporter (Cache Metrics)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['localhost:6379']
+    metrics_path: '/metrics'
+
+  # Nginx Exporter (Load Balancer)
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['localhost:9113']
+    metrics_path: '/metrics'
+
+  # Docker Container Metrics
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['localhost:9323']
+    metrics_path: '/metrics'
+
+  # Blackbox Exporter (External Service Monitoring)
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - 'https://plantayraiz.com.br'
+          - 'https://api.plantayraiz.com.br'
+          - 'https://twilio.com'
+          - 'https://api.mercadopago.com'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 'localhost:9115'
+
+  # Consul Service Discovery (Optional)
+  - job_name: 'consul'
+    consul_sd_configs:
+      - server: 'localhost:8500'
+    relabel_configs:
+      - source_labels: [__meta_consul_service]
+        target_label: service
+      - source_labels: [__meta_consul_node]
+        target_label: node

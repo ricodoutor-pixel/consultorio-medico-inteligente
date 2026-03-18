@@ -12,9 +12,6 @@ const ALL_MOODS: FrogExpression[] = [
   "crying", "cool", "sneeze"
 ];
 
-// Detect Android for performance optimizations
-const isAndroid = typeof navigator !== "undefined" && /android/i.test(navigator.userAgent);
-
 export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boolean, size: number) {
   const [isHovered, setIsHovered] = useState(false);
   const [eyeOffset, setEyeOffset] = useState({ x: 0, y: 0 });
@@ -44,17 +41,9 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
 
   useEffect(() => { if (!autoMood) setExpression(baseMood); }, [baseMood, autoMood]);
 
-  // 3D head tracking — throttled on Android
+  // 3D head tracking
   useEffect(() => {
-    let rafId: number | null = null;
-    let lastUpdate = 0;
-    const throttleMs = isAndroid ? 100 : 16; // Android: 10fps, Desktop: 60fps
-
     const handlePointer = (clientX: number, clientY: number) => {
-      const now = Date.now();
-      if (now - lastUpdate < throttleMs) return;
-      lastUpdate = now;
-
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
@@ -77,7 +66,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     const onTouch = (e: TouchEvent) => {
       if (e.touches.length > 0) handlePointer(e.touches[0].clientX, e.touches[0].clientY);
     };
-    window.addEventListener("mousemove", onMouse, { passive: true });
+    window.addEventListener("mousemove", onMouse);
     window.addEventListener("touchmove", onTouch, { passive: true });
     return () => {
       window.removeEventListener("mousemove", onMouse);
@@ -109,17 +98,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => clearInterval(interval);
   }, []);
 
-  // Breathing animation — CSS-based on Android, rAF on desktop
+  // Breathing animation
   useEffect(() => {
-    if (isAndroid) {
-      // Use simpler interval-based breathing on Android to save CPU
-      const interval = setInterval(() => {
-        const t = Date.now() / 1000;
-        setBreathScale(1 + Math.sin(t * 1.2) * 0.015);
-      }, 200); // 5fps is enough for subtle breathing
-      return () => clearInterval(interval);
-    }
-
     let frame: number;
     let start = Date.now();
     const animate = () => {
@@ -131,10 +111,8 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Random personality shifts — longer intervals on Android
+  // Random personality shifts — varied expressions (every 12-20s, lasts 4s) — skip during doctor mode
   useEffect(() => {
-    const baseInterval = isAndroid ? 25000 : 20000;
-    const randomExtra = isAndroid ? 15000 : 12000;
     const interval = setInterval(() => {
       if (isDoctorMode) return;
       const safeMoods = ALL_MOODS.filter(mood => mood !== "love" && mood !== "angry");
@@ -143,6 +121,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       setExpression(m as FrogExpression);
 
       if (m === "surprised") { setCheekBlush(0.4); setEyeSparkle(true); }
+      if (m === "surprised") setEyeSparkle(true);
       if (m === "sneeze") setSneezing(true);
       if (m === "laughing") setIsBouncing(true);
       if (m === "cool") setHeadTilt(-5);
@@ -156,13 +135,12 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         setIsBouncing(false);
         setHeadTilt(0);
       }, 4000);
-    }, baseInterval + Math.random() * randomExtra);
+    }, 20000 + Math.random() * 12000);
     return () => clearInterval(interval);
   }, [baseMood, isDoctorMode]);
 
-  // Idle bounce — less frequent on Android
+  // Idle bounce
   useEffect(() => {
-    const baseInterval = isAndroid ? 6000 : 4000;
     const doJump = () => {
       if (isDoctorMode) return;
       controls.start({
@@ -170,13 +148,12 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         transition: { duration: 0.7, ease: "easeInOut", times: [0, 0.3, 0.5, 0.7, 1] },
       });
     };
-    const interval = setInterval(doJump, baseInterval + Math.random() * 3000);
+    const interval = setInterval(doJump, 4000 + Math.random() * 3000);
     return () => clearInterval(interval);
   }, [controls, isDoctorMode]);
 
-  // Waving arm — less frequent on Android
+  // Waving arm every 20s — skip during doctor mode
   useEffect(() => {
-    const waveInterval = isAndroid ? 30000 : 20000;
     const doWave = () => {
       if (isDoctorMode) return;
       setIsWaving(true);
@@ -186,14 +163,12 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         if (!isDoctorMode) setExpression(baseMood);
       }, 1800);
     };
-    const interval = setInterval(doWave, waveInterval);
+    const interval = setInterval(doWave, 20000);
     return () => clearInterval(interval);
   }, [baseMood, isDoctorMode]);
 
-  // Daydream sequence — longer intervals on Android
+  // Daydream sequence every 30s — skip during doctor mode
   useEffect(() => {
-    const daydreamInterval = isAndroid ? 35000 : 25000;
-    const initialDelay = isAndroid ? 12000 : 8000;
     const doDaydream = () => {
       if (isDoctorMode) return;
       setIsDaydreaming(true);
@@ -231,26 +206,24 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
         if (!isDoctorMode) setExpression(baseMood);
       }, 12000);
     };
-    const timeout = setTimeout(doDaydream, initialDelay);
-    const interval = setInterval(doDaydream, daydreamInterval);
+    const timeout = setTimeout(doDaydream, 8000);
+    const interval = setInterval(doDaydream, 25000);
     return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [baseMood, isDoctorMode]);
 
-  // Tongue flick — less frequent on Android
+  // Tongue flick every 20s (not during doctor mode)
   useEffect(() => {
-    const baseInterval = isAndroid ? 30000 : 20000;
     const interval = setInterval(() => {
       if (!isDoctorMode) {
         setTongueOut(true);
         setTimeout(() => setTongueOut(false), 600);
       }
-    }, baseInterval + Math.random() * 10000);
+    }, 20000 + Math.random() * 10000);
     return () => clearInterval(interval);
   }, [isDoctorMode]);
 
-  // Doctor mode — less frequent on Android
+  // Doctor mode — every 30s, lasts 10s
   useEffect(() => {
-    const doctorInterval = isAndroid ? 50000 : 40000;
     const doDoctorMode = () => {
       setIsDoctorMode(true);
       setShowCrown(false);
@@ -259,11 +232,14 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       setIsWaving(false);
       setExpression("thinking");
       setLookingAtChart(true);
+      // Eyes look toward the chart (right side)
       setEyeOffset({ x: size * 0.025, y: size * 0.01 });
 
+      // Look at chart for 3s, then look at patient for 3s, repeat
       const chartCycle = setInterval(() => {
         setLookingAtChart(prev => {
           const next = !prev;
+          // Eyes follow the chart direction
           setEyeOffset(next ? { x: size * 0.025, y: size * 0.01 } : { x: -size * 0.01, y: 0 });
           return next;
         });
@@ -277,7 +253,7 @@ export function useFrogAnimations(baseMood: FrogExpression, hasNewMessage: boole
       }, 10000);
     };
 
-    const interval = setInterval(doDoctorMode, doctorInterval);
+    const interval = setInterval(doDoctorMode, 40000);
     return () => clearInterval(interval);
   }, [baseMood]);
 

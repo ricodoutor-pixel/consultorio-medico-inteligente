@@ -68,13 +68,9 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     <motion.button
       ref={anim.containerRef as any}
       onClick={handleInteraction}
-      onTouchStart={(e) => {
-        // Prevent ghost clicks and delay on Android
-        e.stopPropagation();
-      }}
       onMouseEnter={anim.onHoverStart}
       onMouseLeave={anim.onHoverEnd}
-      className="cursor-pointer select-none focus:outline-none relative touch-manipulation"
+      className="cursor-pointer select-none focus:outline-none relative"
       aria-label="Toque duas vezes para falar com o Verdinho — Assistente IA"
       title="Toque 2x para conversar com o Verdinho 🐸"
       whileTap={{ scale: 0.9, rotate: -5 }}
@@ -82,7 +78,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       animate={anim.controls}
       initial={{ width: displaySize, height: displaySize }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      style={{ width: displaySize, height: displaySize, WebkitTapHighlightColor: "transparent" }}
+      style={{ width: displaySize, height: displaySize }}
     >
       {/* Glow */}
       <motion.div

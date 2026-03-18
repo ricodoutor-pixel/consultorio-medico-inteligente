@@ -137,11 +137,11 @@ export const Navbar = () => {
                 <div className="w-8 h-8 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
                   <Leaf size={22} className="text-primary-foreground" />
                 </div>
-                <div className="leading-tight">
-                  <span className="text-[11px] xs:text-sm md:text-lg font-display font-black text-foreground block whitespace-nowrap">
+                <div className="leading-tight hidden xs:block">
+                  <span className="text-sm md:text-lg font-display font-black text-foreground block whitespace-nowrap">
                     Planta <span className="text-gradient-purple">y</span> Raiz
                   </span>
-                  <span className="text-[8px] xs:text-[10px] md:text-xs text-muted-foreground font-bold block uppercase tracking-tighter">Mega Clínica Digital</span>
+                  <span className="text-[10px] md:text-xs text-muted-foreground font-bold block uppercase tracking-tighter">Mega Clínica Digital</span>
                 </div>
               </NavLink>
               

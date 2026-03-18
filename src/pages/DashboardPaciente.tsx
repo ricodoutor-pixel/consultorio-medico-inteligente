@@ -52,15 +52,17 @@ const DashboardPaciente = () => {
 
     const userId = session.user.id;
 
-    const [profileRes, apptsRes, notifRes] = await Promise.all([
+    const [profileRes, apptsRes, notifRes, escrowRes] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).single(),
       supabase.from("appointments").select("*").eq("patient_id", userId).order("scheduled_at", { ascending: false }).limit(20),
       supabase.from("notifications").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(10),
+      supabase.from("escrow_transactions").select("*").eq("patient_id", userId).eq("status", "held").order("created_at", { ascending: false }),
     ]);
 
     if (profileRes.data) setProfile(profileRes.data);
     if (apptsRes.data) setAppointments(apptsRes.data);
     if (notifRes.data) setNotifications(notifRes.data);
+    if (escrowRes.data) setEscrows(escrowRes.data);
     setLoading(false);
   };
 

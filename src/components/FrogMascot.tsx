@@ -101,8 +101,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
   return (
     <motion.div
       ref={anim.containerRef as any}
-      onClick={handleInteraction}
-      onTouchEnd={handleInteraction}
+      onClick={handleClick}
+      onTouchEnd={handleTouchEnd}
       onMouseEnter={anim.onHoverStart}
       onMouseLeave={() => { anim.onHoverEnd(); }}
       className="cursor-pointer select-none focus:outline-none relative"

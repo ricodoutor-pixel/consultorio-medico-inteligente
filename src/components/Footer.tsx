@@ -73,7 +73,7 @@ export const Footer = () => {
 
         <div className="border-t border-border mt-8 pt-8 text-center">
           <p className="text-muted-foreground text-sm flex items-center justify-center gap-2">
-            © {new Date().getFullYear()} Planta & Raiz. Feito com
+            © {new Date().getFullYear()} Planta y Raiz. Feito com
             <Link to="/admin-login" className="hover:scale-125 transition-transform" title="Área administrativa">
               <Heart size={14} className="text-destructive fill-destructive cursor-pointer" />
             </Link>

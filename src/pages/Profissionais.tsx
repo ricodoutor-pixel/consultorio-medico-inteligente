@@ -43,7 +43,10 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
         <div className="lg:col-span-1">
           <Card className="border-border sticky top-24">
             <CardContent className="p-6">
-              <img src={pro.imageUrl} alt={`Ilustração - ${pro.name}`} className="w-20 h-20 rounded-2xl object-cover border border-border mb-4" />
+              <div className="relative">
+                <img src={pro.imageUrl} alt={`Ilustração - ${pro.name}`} className="w-20 h-20 rounded-2xl object-cover border border-border mb-4" />
+                <OnlineStatusIndicator online={pro.online} size="lg" className="absolute -bottom-1 -right-1" />
+              </div>
               <h1 className="text-xl font-display font-black text-foreground">{pro.name}</h1>
               <p className="text-sm text-muted-foreground mb-2">{pro.category}</p>
               <div className="flex items-center gap-2 mb-4">

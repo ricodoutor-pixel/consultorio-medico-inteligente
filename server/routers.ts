@@ -14,6 +14,7 @@ import { sentimentDashboardRouter } from "./routers/sentimentDashboardRouter";
 import { monitoringRouter } from "./routers/monitoring";
 import { referralRouter } from "./routers/referral";
 import { recommendationsRouter } from "./routers/recommendations";
+import { checkpointSyncRouter } from "./routers/checkpointSync";
 // import { marketplaceRouter } from "./routers/marketplaceRouter"; // TODO: Fix marketplace router
 
 const COOKIE_NAME = "auth-token";
@@ -44,6 +45,7 @@ export const appRouter = router({
   monitoring: monitoringRouter,
   referral: referralRouter,
   recommendations: recommendationsRouter,
+  checkpointSync: checkpointSyncRouter,
   // marketplace: marketplaceRouter, // TODO: Fix marketplace router
 });
 

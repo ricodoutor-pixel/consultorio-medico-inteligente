@@ -12,7 +12,7 @@ export const Footer = () => {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-secondary to-primary flex items-center justify-center">
                 <Leaf size={16} className="text-primary-foreground" />
               </div>
-              <span className="font-display font-bold text-foreground">Planta & Raiz</span>
+              <span className="font-display font-bold text-foreground">Planta y Raiz</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
               A maior clínica de telemedicina + Shopping de cannabis medicinal. Democratizando o acesso com segurança e tecnologia IA.
@@ -73,7 +73,7 @@ export const Footer = () => {
 
         <div className="border-t border-border mt-8 pt-8 text-center">
           <p className="text-muted-foreground text-sm flex items-center justify-center gap-2">
-            © {new Date().getFullYear()} Planta & Raiz. Feito com
+            © {new Date().getFullYear()} Planta y Raiz. Feito com
             <Link to="/admin-login" className="hover:scale-125 transition-transform" title="Área administrativa">
               <Heart size={14} className="text-destructive fill-destructive cursor-pointer" />
             </Link>

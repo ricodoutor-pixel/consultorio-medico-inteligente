@@ -56,11 +56,9 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     };
   }, []);
 
-  const handleInteraction = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    // Prevent ghost clicks on Android
-    e.preventDefault();
-    e.stopPropagation();
+  const touchFiredRef = useRef(false);
 
+  const handleTap = useCallback(() => {
     const now = Date.now();
     const delta = now - lastTapRef.current;
     lastTapRef.current = now;
@@ -78,19 +76,33 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
     singleTapTimerRef.current = setTimeout(() => {
       setShowStory(true);
-      // Auto-hide story after 15 seconds
       if (storyTimeoutRef.current) clearTimeout(storyTimeoutRef.current);
       storyTimeoutRef.current = setTimeout(() => setShowStory(false), 15000);
     }, 420);
   }, [onClick]);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    touchFiredRef.current = true;
+    handleTap();
+    // Reset after 300ms to allow future click events (desktop)
+    setTimeout(() => { touchFiredRef.current = false; }, 300);
+  }, [handleTap]);
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    // Skip if touch already handled this (prevents double-fire on Android)
+    if (touchFiredRef.current) return;
+    e.preventDefault();
+    handleTap();
+  }, [handleTap]);
 
   const displaySize = showStory ? size * 1.8 : size;
 
   return (
     <motion.div
       ref={anim.containerRef as any}
-      onClick={handleInteraction}
-      onTouchEnd={handleInteraction}
+      onClick={handleClick}
+      onTouchEnd={handleTouchEnd}
       onMouseEnter={anim.onHoverStart}
       onMouseLeave={() => { anim.onHoverEnd(); }}
       className="cursor-pointer select-none focus:outline-none relative"

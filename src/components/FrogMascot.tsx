@@ -1,4 +1,4 @@
-import { memo, useState, useCallback, useRef } from "react";
+import { memo, useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import verdinhoImg from "@/assets/verdinho-mascot.png";
 import { useFrogAnimations, FrogExpression } from "./frog/useFrogAnimations";
@@ -43,55 +43,87 @@ const getExpressionEmoji = (expression: FrogExpression) => {
 export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJumpToNav = false, hasNewMessage = false }: FrogMascotProps) => {
   const anim = useFrogAnimations(mood, hasNewMessage, size);
   const emoji = getExpressionEmoji(anim.expression);
-  const [isTouched, setIsTouched] = useState(false);
+  const [showStory, setShowStory] = useState(false);
   const lastTapRef = useRef(0);
-  const touchTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const singleTapTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const storyTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
-  const handleInteraction = useCallback(() => {
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
+      if (storyTimeoutRef.current) clearTimeout(storyTimeoutRef.current);
+    };
+  }, []);
+
+  const handleInteraction = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    // Prevent ghost clicks on Android
+    e.preventDefault();
+    e.stopPropagation();
+
     const now = Date.now();
     const delta = now - lastTapRef.current;
     lastTapRef.current = now;
 
+    // Double tap → open chat
     if (delta < 400) {
+      if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
+      if (storyTimeoutRef.current) clearTimeout(storyTimeoutRef.current);
+      setShowStory(false);
       onClick?.();
-      setIsTouched(false);
-    } else {
-      setIsTouched(true);
-      if (touchTimeoutRef.current) clearTimeout(touchTimeoutRef.current);
-      touchTimeoutRef.current = setTimeout(() => setIsTouched(false), 2500);
+      return;
     }
+
+    // Single tap → show story with delay to distinguish from double tap
+    if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
+    singleTapTimerRef.current = setTimeout(() => {
+      setShowStory(true);
+      // Auto-hide story after 15 seconds
+      if (storyTimeoutRef.current) clearTimeout(storyTimeoutRef.current);
+      storyTimeoutRef.current = setTimeout(() => setShowStory(false), 15000);
+    }, 420);
   }, [onClick]);
 
-  const displaySize = isTouched ? size * 2.2 : size;
+  const displaySize = showStory ? size * 1.8 : size;
 
   return (
-    <motion.button
+    <motion.div
       ref={anim.containerRef as any}
       onClick={handleInteraction}
+      onTouchEnd={handleInteraction}
       onMouseEnter={anim.onHoverStart}
-      onMouseLeave={anim.onHoverEnd}
+      onMouseLeave={() => { anim.onHoverEnd(); }}
       className="cursor-pointer select-none focus:outline-none relative"
-      aria-label="Toque duas vezes para falar com o Verdinho — Assistente IA"
-      title="Toque 2x para conversar com o Verdinho 🐸"
+      style={{
+        width: displaySize,
+        height: displaySize,
+        touchAction: "manipulation",
+        WebkitTapHighlightColor: "transparent",
+        WebkitUserSelect: "none",
+        userSelect: "none",
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label="Toque para ver a história do Verdinho. Toque 2x para conversar."
+      title="1 toque = história 🐸 | 2 toques = chat 💬"
       whileTap={{ scale: 0.9, rotate: -5 }}
-      whileHover={{ scale: 2 }}
+      whileHover={{ scale: 1.5 }}
       animate={anim.controls}
-      initial={{ width: displaySize, height: displaySize }}
+      layout
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      style={{ width: displaySize, height: displaySize }}
     >
       {/* Glow */}
       <motion.div
         className="absolute inset-0 rounded-full bg-primary/20 blur-lg"
         animate={{
-          scale: isTouched ? 1.8 : anim.isHovered ? 1.6 : anim.messageBounce ? 1.4 : 1,
-          opacity: isTouched ? 0.7 : anim.isHovered ? 0.6 : anim.messageBounce ? 0.5 : 0.2,
+          scale: showStory ? 1.8 : anim.isHovered ? 1.6 : anim.messageBounce ? 1.4 : 1,
+          opacity: showStory ? 0.7 : anim.isHovered ? 0.6 : anim.messageBounce ? 0.5 : 0.2,
         }}
         transition={{ duration: 0.3 }}
       />
 
-      {/* Touch indicator ring */}
-      {isTouched && (
+      {/* Touch ring on story mode */}
+      {showStory && (
         <motion.div
           className="absolute inset-0 rounded-full border-4 border-primary/60"
           initial={{ scale: 0.8, opacity: 0 }}
@@ -110,7 +142,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         />
       )}
 
-      {/* BODY layer — breathing scale (always visible, doctor overlays on top) */}
+      {/* BODY layer — breathing scale */}
       <motion.div
         className="relative z-10"
         animate={{ scaleY: anim.breathScale }}
@@ -126,7 +158,6 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           style={{ clipPath: `inset(${displaySize * 0.45}px 0 0 0)` }}
           draggable={false}
         />
-
         <FrogAccessories
           size={displaySize}
           isWaving={anim.isWaving}
@@ -135,7 +166,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         />
       </motion.div>
 
-      {/* HEAD layer — 3D perspective (always visible) */}
+      {/* HEAD layer — 3D perspective */}
       <div className="absolute inset-0 z-20" style={{ perspective: 600 }}>
         <motion.div
           className="w-full h-full"
@@ -153,21 +184,20 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             width={displaySize}
             height={displaySize}
             className={`pointer-events-none ${anim.isDoctorMode ? '' : 'drop-shadow-lg'}`}
-            style={{ 
-            clipPath: anim.isDoctorMode 
-                ? `inset(${displaySize * 0.22}px 0 ${displaySize * 0.48}px 0)` 
+            style={{
+              clipPath: anim.isDoctorMode
+                ? `inset(${displaySize * 0.22}px 0 ${displaySize * 0.48}px 0)`
                 : `inset(0 0 ${displaySize * 0.48}px 0)`
             }}
             draggable={false}
           />
-          {/* Prince Crown — only appears after princess kiss, NOT in doctor mode */}
           <AnimatePresence>
-            {anim.showCrown && !anim.isDoctorMode && <FrogCrown size={displaySize} isHovered={anim.isHovered || isTouched} />}
+            {anim.showCrown && !anim.isDoctorMode && <FrogCrown size={displaySize} isHovered={anim.isHovered || showStory} />}
           </AnimatePresence>
         </motion.div>
       </div>
 
-      {/* Doctor Mode overlay (coat, stethoscope, clipboard — on top of frog) */}
+      {/* Doctor Mode overlay */}
       <FrogDoctorMode
         size={displaySize}
         isDoctor={anim.isDoctorMode}
@@ -192,12 +222,12 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           size={displaySize}
           expression={anim.expression}
           smile={anim.smile}
-          isHovered={anim.isHovered || isTouched}
+          isHovered={anim.isHovered || showStory}
           tongueOut={anim.tongueOut}
         />
       </svg>
 
-      {/* Waving arm — hidden during doctor mode */}
+      {/* Waving arm */}
       {anim.isWaving && !anim.isDoctorMode && (
         <motion.svg
           className="absolute z-30 pointer-events-none"
@@ -242,28 +272,28 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       {/* Love hearts */}
       <FrogLoveHearts size={displaySize} show={anim.isDaydreaming && !anim.isDoctorMode} />
 
-      {/* Pulsing chest heart — appears with princess, stays until she disappears */}
+      {/* Pulsing chest heart */}
       <FrogChestHeart size={displaySize} show={anim.isDaydreaming && !anim.isDoctorMode} />
 
       {/* Daydream bubble */}
       <FrogDaydream size={displaySize} isDaydreaming={anim.isDaydreaming} daydreamPhase={anim.daydreamPhase} />
 
-      {/* Star Wars story scroll on hover */}
-      <FrogStoryScroll show={anim.isHovered || isTouched} size={displaySize} />
+      {/* Star Wars story scroll — shown on single tap */}
+      <FrogStoryScroll show={showStory} size={displaySize} />
 
-      {/* Tooltip hint for double-tap */}
-      {isTouched && (
+      {/* Tooltip hint for interactions */}
+      {showStory && (
         <motion.div
-          className="absolute -bottom-24 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-sm text-foreground text-[11px] font-bold px-4 py-2 rounded-full shadow-xl whitespace-nowrap z-50 border border-primary/30"
+          className="absolute -bottom-20 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-sm text-foreground text-[10px] font-bold px-3 py-1.5 rounded-full shadow-xl whitespace-nowrap z-50 border border-primary/30"
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
           style={{ textShadow: "0 1px 2px rgba(0,0,0,0.1)" }}
         >
-          Toque 2x para conversar com nosso assistente IA Verdinho 💬🐸
+          Toque 2x para conversar 💬🐸
         </motion.div>
       )}
-    </motion.button>
+    </motion.div>
   );
 });
 

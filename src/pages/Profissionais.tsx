@@ -191,13 +191,19 @@ const Profissionais = () => {
               <motion.div key={p.id} variants={fadeUp}>
                 <Card className="border-border hover:border-primary/30 transition-all hover:-translate-y-1">
                   <CardContent className="p-5">
-                    <div className="flex items-center gap-4 mb-4">
-                      <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" />
-                      <div>
-                        <h3 className="font-black text-foreground">{p.name}</h3>
-                        <p className="text-sm text-muted-foreground">{p.category}</p>
-                      </div>
-                    </div>
+                     <div className="flex items-center gap-4 mb-4">
+                       <div className="relative">
+                         <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" />
+                         <OnlineStatusIndicator online={p.online} size="md" className="absolute -bottom-0.5 -right-0.5" />
+                       </div>
+                       <div>
+                         <h3 className="font-black text-foreground">{p.name}</h3>
+                         <div className="flex items-center gap-2">
+                           <p className="text-sm text-muted-foreground">{p.category}</p>
+                           <OnlineStatusIndicator online={p.online} size="sm" showLabel />
+                         </div>
+                       </div>
+                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-2">{p.bio}</p>
                     <div className="flex flex-wrap gap-1 mb-3">
                       {p.tags.map((t) => (

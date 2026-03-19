@@ -6,6 +6,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone } from "lucide-react";
+import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { motion } from "framer-motion";
 import { professionals, categories } from "@/data/professionals";
 

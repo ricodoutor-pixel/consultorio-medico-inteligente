@@ -12,7 +12,7 @@ export const Footer = () => {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-secondary to-primary flex items-center justify-center">
                 <Leaf size={16} className="text-primary-foreground" />
               </div>
-              <span className="font-display font-bold text-foreground">Planta & Raiz</span>
+              <span className="font-display font-bold text-foreground">Planta y Raiz</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
               A maior clínica de telemedicina + Shopping de cannabis medicinal. Democratizando o acesso com segurança e tecnologia IA.

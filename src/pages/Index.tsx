@@ -89,8 +89,23 @@ const Index = () => {
             
             {/* Text Content */}
             <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col">
-              <motion.div variants={fadeUp} className="mb-6">
+              <motion.div variants={fadeUp} className="mb-6 flex flex-col gap-4">
                 <GlobalComplianceBadge />
+                
+                {/* Dr. Edilson Badge */}
+                <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600/10 to-blue-600/10 border border-green-500/30 rounded-full px-5 py-3 w-fit">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">👨‍⚕️</span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-foreground">Dr. Edilson Bezerra</span>
+                      <span className="text-xs text-muted-foreground">Supervisor Técnico</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 ml-2 pl-2 border-l border-green-500/30">
+                    <span className="text-xl">🇧🇷</span>
+                    <span className="text-xl">🇧🇴</span>
+                  </div>
+                </div>
               </motion.div>
 
               <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-8">
@@ -114,31 +129,26 @@ const Index = () => {
 
               <motion.h1 
                 variants={fadeUp} 
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black leading-[1.1] mb-6 tracking-tight"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-8 tracking-tight"
               >
-                <span className="text-foreground">Acesso </span>
-                <span className="text-gradient-green">Democratizado</span>
-                <span className="text-foreground"> à </span>
-                <span className="text-gradient-purple">Telemedicina</span>
-                <span className="text-foreground"> e </span>
-                <span className="text-gradient-gold">Medicamentos</span>
-                <span className="text-foreground"> de Cannabis em Todo o </span>
-                <span className="text-gradient-green">Mundo</span>
+                <span className="text-gradient-green">Saúde</span>
+                <span className="text-foreground"> & </span>
+                <span className="text-gradient-purple">Liberdade</span>
               </motion.h1>
 
-              <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-2xl mb-8 leading-relaxed font-medium">
-                Sob supervisão técnica do Dr. Edilson Bezerra, conectamos você aos melhores especialistas via vídeo e chat. Pré-entrevista rápida, pagamento seguro via Pix ou PayPal e acesso direto ao nosso Shopping de bem-estar com preços populares e frete grátis para todo o Brasil.
+              <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-2xl mb-10 leading-relaxed font-medium">
+                Acesso democratizado a telemedicina, suplementos e medicamentos de cannabis sob supervisão técnica do Dr. Edilson Bezerra. Conectamos você aos melhores especialistas via vídeo e chat. Pré-entrevista rápida, pagamento seguro via Pix ou PayPal e acesso direto ao nosso Shopping de bem-estar com preços populares e frete grátis para todo o Brasil.
               </motion.p>
 
-              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-4 mb-10">
-                <Button size="lg" className="text-base font-black h-16 px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20" asChild>
+              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-5 mb-12">
+                <Button size="lg" className="text-base font-black h-16 px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
                   <Link to="/profissionais">
-                    Ver Especialistas <ArrowRight size={20} className="ml-2" />
+                    🎯 Iniciar Consulta <ArrowRight size={20} className="ml-2" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="text-base font-black h-16 px-8 border-border hover:bg-muted rounded-2xl" asChild>
+                <Button size="lg" variant="outline" className="text-base font-black h-16 px-10 border-border hover:bg-muted rounded-2xl transition-all hover:scale-105" asChild>
                   <Link to="/shopping">
-                    Abrir Shopping <ShoppingBag size={18} className="ml-2" />
+                    🛍️ Abrir Shopping <ShoppingBag size={18} className="ml-2" />
                   </Link>
                 </Button>
               </motion.div>

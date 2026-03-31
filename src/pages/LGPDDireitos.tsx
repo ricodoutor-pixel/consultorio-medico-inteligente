@@ -145,9 +145,9 @@ const LGPDDireitos = () => {
               className="bg-muted border-border text-sm min-h-[80px] mb-3"
             />
             <p className="text-[10px] text-muted-foreground">
-              Encarregado de Dados (DPO): dpo@plantaeraiz.com.br • 
-              ANPD: www.gov.br/anpd • 
-              Prazo legal: 15 dias úteis (Art. 18, §5º, LGPD)
+Encarregado de Dados (DPO): contato@plantayraiz.com.br • 
+	              ANPD: www.gov.br/anpd • 
+	              Prazo legal: 15 dias úteis (Art. 18, §5º, LGPD)
             </p>
           </CardContent>
         </Card>

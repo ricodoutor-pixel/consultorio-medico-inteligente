@@ -184,7 +184,7 @@ const Telemedicina = () => {
               Consulta <span className="text-gradient-green">Inteligente</span>
             </h1>
             <p className="text-muted-foreground max-w-2xl font-medium">
-              Triagem conduzida pela Brisa IA + análise clínica + receita digital ANVISA.
+              Triagem conduzida pela Brisa IA + análise clínica + receita digital ANVISA sob supervisão técnica do Dr. Edilson Bezerra.
             </p>
           </motion.div>
         </div>

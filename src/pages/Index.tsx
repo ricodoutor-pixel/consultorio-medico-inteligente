@@ -127,7 +127,7 @@ const Index = () => {
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-2xl mb-8 leading-relaxed font-medium">
-                Conectamos você aos melhores especialistas via vídeo e chat. Pré-entrevista rápida, pagamento seguro via Pix Mercado Pago e acesso direto ao nosso Shopping de bem-estar com preços populares e frete grátis para todo o Brasil.
+                Sob supervisão técnica do Dr. Edilson Bezerra, conectamos você aos melhores especialistas via vídeo e chat. Pré-entrevista rápida, pagamento seguro via Pix ou PayPal e acesso direto ao nosso Shopping de bem-estar com preços populares e frete grátis para todo o Brasil.
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-4 mb-10">

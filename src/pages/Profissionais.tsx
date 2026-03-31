@@ -161,7 +161,7 @@ const Profissionais = () => {
               <span className="text-gradient-green">Profissionais</span> Verificados
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl font-medium">
-              {professionals.length} especialistas em 6 categorias. Escolha, agende e pague via Pix.
+              {professionals.length} especialistas em 6 categorias sob supervisão técnica do Dr. Edilson Bezerra. Escolha, agende e pague via Pix ou PayPal.
             </p>
           </motion.div>
 

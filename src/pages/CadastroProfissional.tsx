@@ -105,7 +105,7 @@ const CadastroProfissional = () => {
                   <a href="/profissionais">Ver Profissionais <ArrowRight size={16} className="ml-2" /></a>
                 </Button>
                 <Button variant="outline" className="font-black border-border rounded-2xl" asChild>
-                  <a href="https://wa.me/5511987131241?text=Olá!%20Enviei%20meu%20cadastro%20de%20profissional" target="_blank" rel="noopener noreferrer">
+                  <a href="https://wa.me/5511991363154?text=Olá!%20Enviei%20meu%20cadastro%20de%20profissional" target="_blank" rel="noopener noreferrer">
                     Falar com Suporte
                   </a>
                 </Button>

@@ -19,13 +19,13 @@ const Contato = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const message = `Olá! Meu nome é ${formData.name}.%0A%0AEmail: ${formData.email}%0ATelefone: ${formData.phone}%0A%0AMensagem: ${formData.message}`;
-    window.open(`https://wa.me/5511987131241?text=${message}`, "_blank");
+    window.open(`https://wa.me/5511991363154?text=${message}`, "_blank");
     toast({ title: "Redirecionando para WhatsApp", description: "Você será direcionado para conversar conosco!" });
   };
 
   const contactInfo = [
-    { icon: Phone, title: "WhatsApp", value: "(11) 98713-1241", href: "https://wa.me/5511987131241", color: "primary" },
-    { icon: Mail, title: "Email", value: "drbezerramed@gmail.com", href: "mailto:drbezerramed@gmail.com", color: "secondary" },
+    { icon: Phone, title: "WhatsApp", value: "(11) 99136-3154", href: "https://wa.me/5511991363154", color: "primary" },
+    { icon: Mail, title: "Email", value: "contato@plantayraiz.com.br", href: "mailto:contato@plantayraiz.com.br", color: "secondary" },
     { icon: MapPin, title: "Localização", value: "São Paulo, SP", color: "primary" },
     { icon: Clock, title: "Atendimento", value: "Seg-Sex: 9h às 18h | Sáb: 9h às 13h", color: "secondary" },
   ];

@@ -17,6 +17,7 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  subscriptionPlan: mysqlEnum("subscription_plan", ["free", "usuario", "lojista_pro", "medico_vip", "empresa_parceiros", "clinica_familia"]).default("free").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -85,6 +86,7 @@ export const affiliates = mysqlTable("affiliates", {
   totalReferrals: int("total_referrals").default(0).notNull(),
   totalCommissions: int("total_commissions").default(0).notNull(), // in cents
   commissionRate: int("commission_rate").default(10).notNull(), // percentage (10 = 10%)
+  uplineId: int("upline_id").references(() => users.id),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
@@ -128,9 +130,11 @@ export type InsertUserBalance = typeof userBalances.$inferInsert;
 export const withdrawalRequests = mysqlTable("withdrawal_requests", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("user_id").notNull().references(() => users.id),
-  amount: int("amount").notNull(), // in cents
   status: mysqlEnum("status", ["pending", "approved", "rejected", "processed", "failed"]).default("pending").notNull(),
   bankData: text("bank_data"), // JSON with bank account details
+  requestedAmount: int("requested_amount").notNull(), // in cents (requested amount)
+  netAmount: int("net_amount").notNull(), // in cents (after fee)
+  fee: int("fee").default(0).notNull(), // in cents
   mercadoPagoId: varchar("mercado_pago_id", { length: 255 }),
   rejectionReason: text("rejection_reason"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

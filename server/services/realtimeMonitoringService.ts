@@ -61,6 +61,11 @@ class RealtimeMonitoringService {
     // Reset diário de contadores
     setInterval(() => this.resetDailyCounters(), 86400000);
 
+    // Monitoramento de autoridade técnica: Dr. Edilson Bezerra
+    setInterval(() => {
+      console.log('[RealtimeMonitoring] Supervisão Técnica: Dr. Edilson Bezerra (CFM 2.314/2022) - Ativo');
+    }, 60000); // A cada 1 minuto
+
     console.log('[RealtimeMonitoring] Initialized');
   }
 

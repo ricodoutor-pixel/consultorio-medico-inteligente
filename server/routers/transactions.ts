@@ -65,16 +65,27 @@ export const transactionRouter = router({
         }),
       })
     )
-    .mutation(async ({ ctx, input }) => {
+      .mutation(async ({ ctx, input }) => {
       try {
         const balance = await getUserBalance(ctx.user.id);
         if (!balance || balance.availableBalance < input.amount) {
           return { success: false, error: 'Saldo insuficiente para saque' };
         }
 
+        // ========================================================================
+        // TAXA DE SAQUE (DOSSIÊ 2026-2030)
+        // Taxa de 5% sobre o valor solicitado (exceto para Plano Clínica Família)
+        // ========================================================================
+        const WITHDRAWAL_FEE_RATE = 0.05;
+        const isClinicaFamilia = ctx.user.subscriptionPlan === 'clinica_familia';
+        const withdrawalFee = isClinicaFamilia ? 0 : Math.floor(input.amount * WITHDRAWAL_FEE_RATE);
+        const netWithdrawalAmount = input.amount - withdrawalFee;
+
         const result = await createWithdrawalRequest({
           userId: ctx.user.id,
-          amount: input.amount,
+          requestedAmount: input.amount,
+          netAmount: netWithdrawalAmount,
+          fee: withdrawalFee,
           status: 'pending',
           bankData: JSON.stringify(input.bankData),
         });

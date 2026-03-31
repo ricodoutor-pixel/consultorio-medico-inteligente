@@ -29,9 +29,9 @@ const FAQ = () => {
     {
       category: "Pagamentos",
       questions: [
-        { q: "Como funciona o Pix Mercado Pago?", a: "Geramos cobrança Pix pela API. Você recebe QR code e/ou copia e cola. Confirmação automática via webhook." },
+        { q: "Como funcionam os pagamentos?", a: "Geramos cobrança Pix (Mercado Pago) ou PayPal (USD). Você recebe QR code, link ou instrução de pagamento. Confirmação automática via webhook." },
         { q: "Posso cancelar assinatura?", a: "Sim! Cancelamento a qualquer momento sem taxas ou burocracia." },
-        { q: "O pagamento é seguro?", a: "Sim! Usamos Mercado Pago com criptografia e conformidade PCI DSS." },
+        { q: "O pagamento é seguro?", a: "Sim! Usamos Mercado Pago e PayPal com criptografia e conformidade PCI DSS." },
       ],
     },
     {
@@ -95,7 +95,7 @@ const FAQ = () => {
           <div className="mt-16 text-center">
             <p className="text-muted-foreground mb-6">Não encontrou o que procurava?</p>
             <Button size="lg" className="font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground" asChild>
-              <a href="https://wa.me/5511987131241?text=Olá!%20Tenho%20uma%20dúvida%20sobre%20a%20Planta%20%26%20Raiz" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/5511991363154?text=Olá!%20Tenho%20uma%20dúvida%20sobre%20a%20Planta%20%26%20Raiz" target="_blank" rel="noopener noreferrer">
                 Falar com Nossa Equipe <ArrowRight size={20} className="ml-2" />
               </a>
             </Button>

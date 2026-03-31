@@ -20,7 +20,7 @@ const regulations = [
     title: "LGPD — Lei Geral de Proteção de Dados",
     status: "Conforme",
     description: "Proteção integral dos dados pessoais e sensíveis dos usuários.",
-    details: "A Planta & Raiz implementa todas as medidas exigidas pela Lei 13.709/2018 (LGPD). Dados pessoais são coletados com consentimento explícito do titular, armazenados com criptografia AES-256, e processados apenas para as finalidades declaradas. O encarregado de dados (DPO) pode ser contatado pelo e-mail drbezerramed@gmail.com. Dados de saúde são tratados como dados sensíveis com proteções adicionais, incluindo acesso restrito por função (RBAC) e logs de auditoria completos.",
+    details: "A Planta & Raiz implementa todas as medidas exigidas pela Lei 13.709/2018 (LGPD). Dados pessoais são coletados com consentimento explícito do titular, armazenados com criptografia AES-256, e processados apenas para as finalidades declaradas. O encarregado de dados (DPO) pode ser contatado pelo e-mail contato@plantayraiz.com.br. Dados de saúde são tratados como dados sensíveis com proteções adicionais, incluindo acesso restrito por função (RBAC) e logs de auditoria completos.",
   },
   {
     icon: Scale,
@@ -49,7 +49,7 @@ const termos = [
   },
   {
     title: "3. Pagamentos e Comissões",
-    content: "Todos os pagamentos são processados via PIX através do Mercado Pago. A plataforma cobra uma comissão de 10% sobre o valor de cada transação realizada. Os valores são repassados automaticamente aos profissionais e vendedores, deduzida a comissão, em até 5 dias úteis.",
+    content: "Todos os pagamentos são processados via PIX através do Mercado Pago. A plataforma opera com um modelo de comissões multinível (50% Nível 1, 5% Nível 2, 2% Nível 3) e uma taxa de administração de 5% sobre vendas de não-assinantes. Saques estão sujeitos a uma taxa de 5%, exceto para o plano Clínica Família. Os repasses são processados automaticamente conforme as regras do plano contratado.",
   },
   {
     title: "4. Proteção de Dados",

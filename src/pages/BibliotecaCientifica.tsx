@@ -106,7 +106,7 @@ const BibliotecaCientifica = () => {
             </h2>
 
             <p className="text-base md:text-lg text-muted-foreground max-w-3xl leading-relaxed font-medium mb-6">
-              A <span className="text-primary font-bold">Planta y Raiz</span> conecta milhares de pacientes e usuários de cannabis curiosos e conscientes com as diversas variedades, produtos e fornecedores que melhor atendem às suas necessidades. Seja você um dispensário, uma marca de produtos ou um profissional de saúde, a parceria com a Plataforma Planta y Raiz oferece a oportunidade de alcançar um público cada vez mais crescente, altamente engajado, informado e personalizado — exatamente quando ele está pronto para explorar, ser atendido e comprar.
+              A <span className="text-primary font-bold">Planta y Raiz</span>, sob supervisão técnica do Dr. Edilson Bezerra, conecta milhares de pacientes e usuários de cannabis curiosos e conscientes com as diversas variedades, produtos e fornecedores que melhor atendem às suas necessidades. Seja você um dispensário, uma marca de produtos ou um profissional de saúde, a parceria com a Plataforma Planta y Raiz oferece a oportunidade de alcançar um público cada vez mais crescente, altamente engajado, informado e personalizado — exatamente quando ele está pronto para explorar, ser atendido e comprar.
             </p>
 
             {/* Stats */}

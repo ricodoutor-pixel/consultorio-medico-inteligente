@@ -103,7 +103,7 @@ const Agendamento = () => {
             <h1 className="text-3xl md:text-4xl font-display font-black text-foreground mb-2">
               Agendar <span className="text-gradient-green">Consulta</span>
             </h1>
-            <p className="text-muted-foreground mb-8">Sistema de agendamento inteligente — CFM 2.314/2022</p>
+            <p className="text-muted-foreground mb-8">Sistema de agendamento inteligente — CFM 2.314/2022 | Suporte: (11) 99136-3154</p>
 
             {/* Progress */}
             <div className="flex items-center gap-2 mb-8">
@@ -261,7 +261,7 @@ const Agendamento = () => {
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground font-bold uppercase">Pagamento</p>
-                        <p className="text-sm font-bold text-foreground">PIX via Mercado Pago</p>
+                        <p className="text-sm font-bold text-foreground">PIX (Mercado Pago) ou PayPal (USD)</p>
                       </div>
                     </div>
 

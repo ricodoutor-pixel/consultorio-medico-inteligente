@@ -45,49 +45,70 @@ export async function trackNewReferral(
       return { success: false, error: 'Afiliado não encontrado' };
     }
 
-    // Calculate commission (10% default)
-    const commissionRate = referrerAffiliate.commissionRate / 100;
-    const commissionEarned = Math.floor(depositAmount * commissionRate);
+    // ========================================================================
+    // LÓGICA DE COMISSÕES MULTINÍVEL (DOSSIÊ 2026-2030)
+    // Nível 1: 50% | Nível 2: 5% | Nível 3: 2%
+    // Taxa de Administração: 5% (Retido sobre vendas de não-assinantes)
+    // ========================================================================
 
-    // Create referral record
-    const referral: Referral = {
-      id: 0, // Will be auto-generated
-      referrerId,
-      referredId: referredUserId,
-      depositAmount,
-      commissionEarned,
-      status: 'completed',
-      createdAt: new Date(),
-    };
+    const ADMIN_FEE_RATE = 0.05;
+    const adminFee = Math.floor(depositAmount * ADMIN_FEE_RATE);
+    const netAmount = depositAmount - adminFee;
 
-    await createReferral(referral);
+    const COMMISSION_RATES = [0.50, 0.05, 0.02]; // Nível 1, 2, 3
+    let currentReferrerId: number | null = referrerId;
+    let level = 0;
 
-    // Credit commission to referrer
-    const referrerBalance = await getUserBalance(referrerId);
-    if (referrerBalance) {
-      await updateUserBalance(referrerId, {
-        availableBalance: referrerBalance.availableBalance + commissionEarned,
-        totalEarnings: referrerBalance.totalEarnings + commissionEarned,
+    while (currentReferrerId && level < COMMISSION_RATES.length) {
+      const rate = COMMISSION_RATES[level];
+      const commissionEarned = Math.floor(netAmount * rate);
+
+      // Create referral record for this level
+      const referral: Referral = {
+        id: 0,
+        referrerId: currentReferrerId,
+        referredId: referredUserId,
+        depositAmount,
+        commissionEarned,
+        status: 'completed',
+        createdAt: new Date(),
+      };
+      await createReferral(referral);
+
+      // Credit commission
+      const balance = await getUserBalance(currentReferrerId);
+      if (balance) {
+        await updateUserBalance(currentReferrerId, {
+          availableBalance: balance.availableBalance + commissionEarned,
+          totalEarnings: balance.totalEarnings + commissionEarned,
+        });
+      }
+
+      // Create transaction
+      await createTransaction({
+        userId: currentReferrerId,
+        type: 'commission',
+        amount: commissionEarned,
+        status: 'completed',
+        description: `Comissão Nível ${level + 1} por indicação`,
       });
+
+      // Notify
+      await createNotification({
+        userId: currentReferrerId,
+        type: 'commission',
+        title: `Comissão Nível ${level + 1} Recebida`,
+        message: `Você recebeu R$ ${(commissionEarned / 100).toFixed(2)} de comissão (Nível ${level + 1})`,
+        read: 0,
+      });
+
+      // Move to next level referrer (upline)
+      const currentAffiliate = await getOrCreateAffiliate(currentReferrerId);
+      currentReferrerId = currentAffiliate?.uplineId || null;
+      level++;
     }
 
-    // Create transaction for commission
-    await createTransaction({
-      userId: referrerId,
-      type: 'commission',
-      amount: commissionEarned,
-      status: 'completed',
-      description: `Comissão por indicação de novo usuário`,
-    });
 
-    // Create notification
-    await createNotification({
-      userId: referrerId,
-      type: 'commission',
-      title: 'Comissão Recebida',
-      message: `Você recebeu R$ ${(commissionEarned / 100).toFixed(2)} de comissão por indicação`,
-      read: 0,
-    });
 
     return { success: true };
   } catch (error) {

@@ -150,9 +150,14 @@ const Cadastro = () => {
               <p className="text-sm text-muted-foreground mb-8">
                 Clique no link do e-mail para ativar sua conta. Depois, faça login para acessar a plataforma.
               </p>
-              <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-gradient-green border border-green mb-6">
-                <Mail size={16} className="text-primary" />
-                <span className="text-sm font-bold text-foreground">Verifique sua caixa de entrada</span>
+                      <div className="flex flex-col gap-2 p-4 rounded-xl bg-gradient-green border border-green mb-6">
+                <div className="flex items-center justify-center gap-2">
+                  <Mail size={16} className="text-primary" />
+                  <span className="text-sm font-bold text-foreground">Verifique sua caixa de entrada</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Dúvidas? Entre em contato: contato@plantayraiz.com.br ou (11) 99136-3154
+                </p>
               </div>
               <div className="flex gap-3 justify-center">
                 <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>

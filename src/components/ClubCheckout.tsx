@@ -54,6 +54,19 @@ export const ClubCheckout: React.FC<CheckoutProps> = ({
     }, 0);
   };
 
+  // Calcular frete (gratis para assinantes)
+  const calculateShipping = () => {
+    if (userMembershipLevel === 'member' || userMembershipLevel === 'vip') {
+      return 0; // Frete gratis para assinantes
+    }
+    return calculateTotal() > 100 ? 0 : 15.90; // Frete gratis acima de R$100
+  };
+
+  // Calcular total final com frete
+  const calculateFinalTotal = () => {
+    return calculateTotal() + calculateShipping();
+  };
+
   // Adicionar item ao carrinho
   const addToCart = (product: ClubProduct) => {
     const existingItem = cart.find((item) => item.product.id === product.id);

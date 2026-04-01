@@ -145,6 +145,11 @@ const App = () => (
                 <Route path="/consulta-rapida" element={<ConsultaRapida />} />
                 <Route path="/tratamentos" element={<SEOCondicoes />} />
                 <Route path="/tratamentos/:condicao" element={<SEOCondicoes />} />
+                <Route path="/club" element={<Club />} />
+                <Route path="/deposits" element={<Deposits />} />
+                <Route path="/payment/success" element={<PaymentSuccess />} />
+                <Route path="/payment/failure" element={<PaymentFailure />} />
+                <Route path="/payment/pending" element={<PaymentPending />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

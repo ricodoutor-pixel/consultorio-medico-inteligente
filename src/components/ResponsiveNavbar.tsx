@@ -133,7 +133,7 @@ export const ResponsiveNavbar = () => {
           <div className="bg-white border-t border-gray-200 px-4 py-4 space-y-4">
             {/* Mascote */}
             <div className="flex justify-center py-4 border-b border-gray-200">
-              <FrogMascot size="small" />
+              <FrogMascot size={40} />
             </div>
 
             {/* Links do Menu */}

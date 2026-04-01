@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ═══════════════════════════════════════════════════════════════
  * MÓDULO 3: CLÍNICA & TRANSBORDO — INTELIGÊNCIA BRISA

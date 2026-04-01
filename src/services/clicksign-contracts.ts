@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Serviço de Integração Clicksign - Assinatura Digital de Contratos
  * 

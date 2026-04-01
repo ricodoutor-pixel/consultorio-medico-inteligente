@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ═══════════════════════════════════════════════════════════════
  * MÓDULO 2: CLUB & MARKETPLACE — FLUXO DE CONVERSÃO

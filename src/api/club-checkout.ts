@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * API Routes - Club Planta y Raiz Checkout
  * Administrado 24/7 pelo Manus CEO

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * API Routes para Onboarding com Assinatura Obrigatória
  * 

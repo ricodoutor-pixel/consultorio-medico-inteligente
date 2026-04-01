@@ -65,6 +65,11 @@ const InvestorDashboard = lazy(() => import("./pages/InvestorDashboard"));
 const VideoCall = lazy(() => import("./pages/VideoCall"));
 const ConsultaRapida = lazy(() => import("./pages/ConsultaRapida"));
 const SEOCondicoes = lazy(() => import("./pages/SEOCondicoes"));
+const Club = lazy(() => import("./pages/Club"));
+const Deposits = lazy(() => import("./pages/Deposits"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PaymentFailure = lazy(() => import("./pages/PaymentFailure"));
+const PaymentPending = lazy(() => import("./pages/PaymentPending"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();

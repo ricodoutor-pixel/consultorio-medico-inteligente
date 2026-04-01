@@ -61,6 +61,93 @@ export type Database = {
           },
         ]
       }
+      ai_events: {
+        Row: {
+          action: string | null
+          ai_name: string
+          compliance: Json | null
+          created_at: string
+          duration_ms: number | null
+          event_type: string
+          id: string
+          input_data: Json | null
+          output_data: Json | null
+          session_id: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          action?: string | null
+          ai_name: string
+          compliance?: Json | null
+          created_at?: string
+          duration_ms?: number | null
+          event_type: string
+          id?: string
+          input_data?: Json | null
+          output_data?: Json | null
+          session_id?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string | null
+          ai_name?: string
+          compliance?: Json | null
+          created_at?: string
+          duration_ms?: number | null
+          event_type?: string
+          id?: string
+          input_data?: Json | null
+          output_data?: Json | null
+          session_id?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ai_registry: {
+        Row: {
+          capabilities: string[] | null
+          config: Json | null
+          created_at: string
+          id: string
+          last_heartbeat: string | null
+          name: string
+          permission_level: string
+          rate_limit_rpm: number | null
+          status: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          capabilities?: string[] | null
+          config?: Json | null
+          created_at?: string
+          id?: string
+          last_heartbeat?: string | null
+          name: string
+          permission_level?: string
+          rate_limit_rpm?: number | null
+          status?: string
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          capabilities?: string[] | null
+          config?: Json | null
+          created_at?: string
+          id?: string
+          last_heartbeat?: string | null
+          name?: string
+          permission_level?: string
+          rate_limit_rpm?: number | null
+          status?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           amount: number
@@ -156,6 +243,71 @@ export type Database = {
         }
         Relationships: []
       }
+      brisa_triages: {
+        Row: {
+          category: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          matched_doctor_id: string | null
+          patient_id: string
+          patient_info: Json | null
+          pre_record: string | null
+          session_id: string
+          specialty: string | null
+          status: string
+          suggested_conditions: string[] | null
+          symptoms: string
+          triage_result: string | null
+          updated_at: string
+          urgency: string | null
+        }
+        Insert: {
+          category?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          matched_doctor_id?: string | null
+          patient_id: string
+          patient_info?: Json | null
+          pre_record?: string | null
+          session_id?: string
+          specialty?: string | null
+          status?: string
+          suggested_conditions?: string[] | null
+          symptoms: string
+          triage_result?: string | null
+          updated_at?: string
+          urgency?: string | null
+        }
+        Update: {
+          category?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          matched_doctor_id?: string | null
+          patient_id?: string
+          patient_info?: Json | null
+          pre_record?: string | null
+          session_id?: string
+          specialty?: string | null
+          status?: string
+          suggested_conditions?: string[] | null
+          symptoms?: string
+          triage_result?: string | null
+          updated_at?: string
+          urgency?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brisa_triages_matched_doctor_id_fkey"
+            columns: ["matched_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       btc_subscriptions: {
         Row: {
           admin_notes: string | null
@@ -195,6 +347,191 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
           wallet_address?: string
+        }
+        Relationships: []
+      }
+      club_comment_likes: {
+        Row: {
+          comment_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_comment_likes_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "club_post_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          post_id: string | null
+          title: string
+          triggered_by_user_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          post_id?: string | null
+          title: string
+          triggered_by_user_id?: string | null
+          type?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          post_id?: string | null
+          title?: string
+          triggered_by_user_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "club_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_post_comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          likes_count: number | null
+          post_id: string
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          post_id: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          post_id?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "club_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_post_likes: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "club_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_posts: {
+        Row: {
+          comment_count: number | null
+          content: string
+          created_at: string | null
+          id: string
+          images: string[] | null
+          likes_count: number | null
+          share_count: number | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          comment_count?: number | null
+          content: string
+          created_at?: string | null
+          id?: string
+          images?: string[] | null
+          likes_count?: number | null
+          share_count?: number | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          comment_count?: number | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          images?: string[] | null
+          likes_count?: number | null
+          share_count?: number | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -734,6 +1071,96 @@ export type Database = {
         }
         Relationships: []
       }
+      treatment_logs: {
+        Row: {
+          anxiety_level: number
+          cbd_pct: number
+          created_at: string
+          dosage_mg: number
+          id: string
+          logged_at: string
+          mood_level: number
+          notes: string | null
+          pain_level: number
+          product: string
+          route: string
+          side_effects: string[] | null
+          sleep_quality: number
+          thc_pct: number
+          user_id: string
+        }
+        Insert: {
+          anxiety_level?: number
+          cbd_pct?: number
+          created_at?: string
+          dosage_mg?: number
+          id?: string
+          logged_at?: string
+          mood_level?: number
+          notes?: string | null
+          pain_level?: number
+          product: string
+          route?: string
+          side_effects?: string[] | null
+          sleep_quality?: number
+          thc_pct?: number
+          user_id: string
+        }
+        Update: {
+          anxiety_level?: number
+          cbd_pct?: number
+          created_at?: string
+          dosage_mg?: number
+          id?: string
+          logged_at?: string
+          mood_level?: number
+          notes?: string | null
+          pain_level?: number
+          product?: string
+          route?: string
+          side_effects?: string[] | null
+          sleep_quality?: number
+          thc_pct?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_experiences: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          id: string
+          image_urls: string[] | null
+          likes_count: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          content: string
+          created_at?: string
+          id?: string
+          image_urls?: string[] | null
+          likes_count?: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          image_urls?: string[] | null
+          likes_count?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -749,6 +1176,69 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      verdinho_conversations: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          sentiment: string | null
+          session_id: string
+          topic: string | null
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          sentiment?: string | null
+          session_id?: string
+          topic?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          sentiment?: string | null
+          session_id?: string
+          topic?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      verdinho_knowledge: {
+        Row: {
+          answer: string
+          category: string
+          created_at: string
+          id: string
+          last_asked_at: string
+          question: string
+          times_asked: number
+        }
+        Insert: {
+          answer: string
+          category?: string
+          created_at?: string
+          id?: string
+          last_asked_at?: string
+          question: string
+          times_asked?: number
+        }
+        Update: {
+          answer?: string
+          category?: string
+          created_at?: string
+          id?: string
+          last_asked_at?: string
+          question?: string
+          times_asked?: number
         }
         Relationships: []
       }
@@ -806,30 +1296,6 @@ export type Database = {
           status: string | null
           total_value: number | null
         }
-        Insert: {
-          appointment_id?: string | null
-          created_at?: string | null
-          doctor_id?: string | null
-          doctor_payout?: never
-          patient_id?: string | null
-          payment_status?: string | null
-          platform_revenue?: never
-          scheduled_at?: string | null
-          status?: string | null
-          total_value?: number | null
-        }
-        Update: {
-          appointment_id?: string | null
-          created_at?: string | null
-          doctor_id?: string | null
-          doctor_payout?: never
-          patient_id?: string | null
-          payment_status?: string | null
-          platform_revenue?: never
-          scheduled_at?: string | null
-          status?: string | null
-          total_value?: number | null
-        }
         Relationships: [
           {
             foreignKeyName: "appointments_doctor_id_fkey"
@@ -839,6 +1305,21 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      referral_codes_public: {
+        Row: {
+          code: string | null
+          user_id: string | null
+        }
+        Insert: {
+          code?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          code?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
     }
     Functions: {

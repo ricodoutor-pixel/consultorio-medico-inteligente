@@ -78,7 +78,7 @@ export const ResponsiveNavbar = () => {
 
         {/* Espaço para Mascote */}
         <div className="flex-1 flex justify-center items-center mx-4 h-16">
-          <FrogMascot size="small" />
+          <FrogMascot size={40} />
         </div>
 
         {/* Direita: Idiomas e CTA */}

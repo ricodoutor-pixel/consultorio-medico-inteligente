@@ -1,0 +1,40 @@
+version: 1
+
+# Configuração de Build para Hostinger
+build:
+  # Comando de build
+  command: "npm install --legacy-peer-deps && npm run build"
+  
+  # Diretório de saída
+  outputDirectory: "dist"
+  
+  # Node version
+  nodeVersion: "18.17.0"
+  
+  # Timeout (30 minutos)
+  timeout: 1800
+  
+  # Memória máxima
+  memory: "2048"
+
+# Variáveis de ambiente
+env:
+  NODE_ENV: "production"
+  NODE_OPTIONS: "--max-old-space-size=2048"
+  VITE_APP_TITLE: "Planta & Raiz"
+
+# Cache
+cache:
+  enabled: true
+  directories:
+    - "node_modules"
+    - ".vite"
+    - "dist"
+
+# Retries
+retries: 3
+
+# Logs
+logs:
+  level: "info"
+  verbose: true

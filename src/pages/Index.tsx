@@ -92,20 +92,6 @@ const Index = () => {
               <motion.div variants={fadeUp} className="mb-6 flex flex-col gap-4">
                 <GlobalComplianceBadge />
                 
-                {/* Dr. Edilson Badge */}
-                <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600/10 to-blue-600/10 border border-green-500/30 rounded-full px-5 py-3 w-fit">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">👨‍⚕️</span>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-foreground">Dr. Edilson Bezerra</span>
-                      <span className="text-xs text-muted-foreground">Supervisor Técnico</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-1 ml-2 pl-2 border-l border-green-500/30">
-                    <span className="text-xl">🇧🇷</span>
-                    <span className="text-xl">🇧🇴</span>
-                  </div>
-                </div>
               </motion.div>
 
               <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-8">

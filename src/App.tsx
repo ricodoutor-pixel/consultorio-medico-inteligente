@@ -6,9 +6,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FrogChatModal } from "./components/FrogChatModal";
+import { ShoppingCart } from "./components/ShoppingCart";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { AdminRoute } from "@/components/AdminRoute";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { useCart } from "@/store/cart";
 import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
 
 const Loading = () => (
@@ -67,6 +69,7 @@ const ConsultaRapida = lazy(() => import("./pages/ConsultaRapida"));
 const SEOCondicoes = lazy(() => import("./pages/SEOCondicoes"));
 const Club = lazy(() => import("./pages/Club"));
 const Deposits = lazy(() => import("./pages/Deposits"));
+const CartCheckout = lazy(() => import("./pages/CartCheckout"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const PaymentFailure = lazy(() => import("./pages/PaymentFailure"));
 const PaymentPending = lazy(() => import("./pages/PaymentPending"));
@@ -84,6 +87,7 @@ const App = () => (
           <BrowserRouter>
             <AccessibilitySkipLink />
             <FrogChatModal />
+            <ShoppingCart />
             <Suspense fallback={<Loading />}>
               <main id="main-content" role="main">
               <Routes>
@@ -147,6 +151,7 @@ const App = () => (
                 <Route path="/tratamentos/:condicao" element={<SEOCondicoes />} />
                 <Route path="/club" element={<Club />} />
                 <Route path="/deposits" element={<Deposits />} />
+                <Route path="/cart-checkout" element={<CartCheckout />} />
                 <Route path="/payment/success" element={<PaymentSuccess />} />
                 <Route path="/payment/failure" element={<PaymentFailure />} />
                 <Route path="/payment/pending" element={<PaymentPending />} />

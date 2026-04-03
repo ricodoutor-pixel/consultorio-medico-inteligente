@@ -138,10 +138,10 @@ export const Navbar = () => {
                   <Leaf size={20} className="text-primary-foreground" />
                 </div>
                 <div className="leading-tight">
-                  <span className="text-sm md:text-lg font-display font-black text-foreground block whitespace-nowrap">
+                  <span className="text-[clamp(0.75rem,2.5vw,1.125rem)] font-display font-black text-foreground block whitespace-nowrap">
                     Planta <span className="text-gradient-purple">y</span> Raiz
                   </span>
-                  <span className="text-[10px] md:text-xs text-muted-foreground font-bold block uppercase tracking-tighter">Mega Clínica Digital</span>
+                  <span className="text-[clamp(0.5rem,1.8vw,0.75rem)] text-muted-foreground font-bold block uppercase tracking-tighter">Mega Clínica Digital</span>
                 </div>
               </NavLink>
               

@@ -1,0 +1,25 @@
+{
+  "backup_version": "1.0",
+  "created_at": "2026-04-03T00:00:00Z",
+  "backup_strategy": "automatic_on_every_change",
+  "storage_locations": [
+    "github_releases",
+    "local_snapshots",
+    "compressed_archives"
+  ],
+  "includes": [
+    "client/src",
+    "server",
+    "drizzle/schema.ts",
+    "drizzle/migrations",
+    "package.json",
+    "package-lock.json",
+    "vite.config.ts",
+    "tsconfig.json"
+  ],
+  "retention_policy": {
+    "keep_all_versions": true,
+    "retention_years": 5,
+    "compression": "gzip"
+  }
+}

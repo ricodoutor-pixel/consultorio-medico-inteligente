@@ -1,0 +1,28 @@
+{
+  "backup_name": "plantayraiz_backup_20260403_101013",
+  "timestamp": "20260403_101013",
+  "timestamp_iso": "2026-04-03T14:10:13Z",
+  "backup_file": "/home/ubuntu/planta-e-raiz/.backup/plantayraiz_backup_20260403_101013.tar.gz",
+  "file_size_bytes": 5217655,
+  "git_commit": "e867f6723192065b048737451345f783081e942f",
+  "git_branch": "main",
+  "backup_type": "automatic",
+  "includes": [
+    "client/src",
+    "server",
+    "drizzle/schema.ts",
+    "drizzle/migrations",
+    "package.json",
+    "package-lock.json",
+    "vite.config.ts",
+    "tsconfig.json"
+  ],
+  "excludes": [
+    "node_modules",
+    ".next",
+    "dist",
+    ".git",
+    ".env"
+  ],
+  "retention_until": "2031-04-03T14:10:13Z"
+}

@@ -134,10 +134,10 @@ export const Navbar = () => {
             {/* Logo + Verdinho (Repisicionado 50% mais próximo) */}
             <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
               <NavLink to="/" className="flex items-center gap-1.5 md:gap-3">
-                <div className="w-8 h-8 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
-                  <Leaf size={22} className="text-primary-foreground" />
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
+                  <Leaf size={20} className="text-primary-foreground" />
                 </div>
-                <div className="leading-tight hidden xs:block">
+                <div className="leading-tight">
                   <span className="text-sm md:text-lg font-display font-black text-foreground block whitespace-nowrap">
                     Planta <span className="text-gradient-purple">y</span> Raiz
                   </span>
@@ -146,8 +146,8 @@ export const Navbar = () => {
               </NavLink>
               
               {/* Verdinho mais próximo do nome */}
-              <div className="hidden md:block ml-1 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">
-                <FrogMascot size={64} mood="happy" onClick={openChat} enableJumpToNav={true} />
+              <div className="hidden sm:block ml-1 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">
+                <FrogMascot size={48} mood="happy" onClick={openChat} enableJumpToNav={true} />
               </div>
             </div>
 
@@ -211,37 +211,39 @@ export const Navbar = () => {
       </nav>
 
       {/* MOBILE MENU OVERLAY */}
-      {isOpen && (
-        <div className="fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl xl:hidden flex flex-col pt-20 pb-8 overflow-y-auto">
-          <div className="container mx-auto px-4 flex flex-col flex-1">
-            <div className="flex justify-center mb-8">
-               <FrogMascot size={120} mood="happy" onClick={openChat} />
-            </div>
-            <div className="space-y-1 flex-1">
-              {links.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  className="flex items-center justify-between py-4 px-4 text-foreground font-black text-lg rounded-xl hover:bg-muted/50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <span>{link.label}</span>
-                  <ChevronRight size={20} className="text-primary" />
-                </NavLink>
-              ))}
-            </div>
-            <div className="pt-6 border-t border-border mt-4 space-y-4">
-              <Button className="w-full bg-secondary text-secondary-foreground font-black rounded-xl h-14 text-lg shadow-xl" asChild>
-                <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>INICIAR CONSULTA AGORA</NavLink>
-              </Button>
-              <div className="flex flex-col items-center gap-4">
-                <LanguageSwitcher />
-                <GlobalComplianceBadge />
-              </div>
+      <div 
+        className={`fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl xl:hidden flex flex-col pt-20 pb-8 overflow-y-auto transition-all duration-300 ease-in-out ${
+          isOpen ? "opacity-100 pointer-events-auto translate-x-0" : "opacity-0 pointer-events-none translate-x-full"
+        }`}
+      >
+        <div className="container mx-auto px-4 flex flex-col flex-1">
+          <div className="flex justify-center mb-8">
+             <FrogMascot size={120} mood="happy" onClick={openChat} />
+          </div>
+          <div className="space-y-1 flex-1">
+            {links.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className="flex items-center justify-between py-4 px-4 text-foreground font-black text-lg rounded-xl hover:bg-muted/50"
+                onClick={() => setIsOpen(false)}
+              >
+                <span>{link.label}</span>
+                <ChevronRight size={20} className="text-primary" />
+              </NavLink>
+            ))}
+          </div>
+          <div className="pt-6 border-t border-border mt-4 space-y-4">
+            <Button className="w-full bg-secondary text-secondary-foreground font-black rounded-xl h-14 text-lg shadow-xl" asChild>
+              <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>INICIAR CONSULTA AGORA</NavLink>
+            </Button>
+            <div className="flex flex-col items-center gap-4">
+              <LanguageSwitcher />
+              <GlobalComplianceBadge />
             </div>
           </div>
         </div>
-      )}
+      </div>
     </>
   );
 };

@@ -1,5 +1,11 @@
 import drEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draJulianaImg from "@/assets/dra-juliana-ferreira.jpg";
+import drMarcosImg from "@/assets/dr-marcos-oliveira.jpg";
+import draIsabellaImg from "@/assets/dra-isabella-moreno.jpg";
+import drAntonioImg from "@/assets/dr-antonio-silva.jpg";
+import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
+import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
+import draRenataImg from "@/assets/dra-renata-costa.jpg";
 
 export type Professional = {
   id: string;
@@ -23,6 +29,7 @@ export type Professional = {
   crm?: string;
   hospital?: string;
   hospitalUrl?: string;
+  flags?: string[];
 };
 
 export const categories = [
@@ -41,6 +48,7 @@ export const professionals: Professional[] = [
     name: "Dr. Edilson Bezerra",
     category: "Médicos Prescritores",
     bio: "Responsável Técnico e Jurídico da Planta y Raiz. Médico prescritor de cannabis medicinal com ampla experiência em dor crônica, neurologia e cuidados integrativos. Atua como responsável técnico pela hemodinâmica na Beneficência Portuguesa (SP) e no Hospital Menino Jesus. Referência soberana na plataforma Planta & Raiz.",
+    flags: ["🇧🇷", "🇧🇴"],
     experience: "18 anos",
     tags: ["Responsável Técnico", "Hemodinâmica BP", "Cannabis Medicinal", "Dor Crônica"],
     price: "R$ 49,90",
@@ -249,6 +257,173 @@ export const professionals: Professional[] = [
     slots: ["10:00", "11:00", "14:00", "15:00", "16:00"],
     reviews: [
       { name: "Fernanda R.", rating: 5, text: "Salvou meu casamento, excelente mediador." },
+    ],
+  },
+
+  // ═══════ 6 Novos Especialistas com Bandeiras ═══════
+  {
+    id: "med-6",
+    name: "Dr. Marcos Oliveira",
+    category: "Médicos Prescritores",
+    bio: "Geriatra especializado em medicina canábica para idosos. Pioneiro no uso de CBD para Alzheimer e Parkinson no Brasil. Membro da SBGG e da IACM. Atende pacientes no Brasil e Portugal.",
+    experience: "14 anos",
+    tags: ["Geriatria", "Alzheimer", "Parkinson", "CBD"],
+    price: "R$ 95,00",
+    priceValue: 95,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 380,
+    avatar: "MO",
+    imageUrl: drMarcosImg,
+    flags: ["🇧🇷", "🇵🇹"],
+    services: [
+      { name: "Consulta Geriátrica", price: "R$ 95,00", desc: "Avaliação completa + protocolo canábico" },
+      { name: "Retorno", price: "R$ 65", desc: "Acompanhamento mensal" },
+      { name: "Laudo ANVISA", price: "R$ 55", desc: "Documentação para importação" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Helena R.", rating: 5, text: "Devolveu qualidade de vida à minha mãe com Alzheimer." },
+      { name: "Antônio P.", rating: 5, text: "Profissional humanizado e muito competente." },
+    ],
+  },
+  {
+    id: "med-7",
+    name: "Dra. Isabella Moreno",
+    category: "Médicos Prescritores",
+    bio: "Dermatologista venezuelana-brasileira especializada em tratamentos canábicos para psoríase, dermatite e dor neuropática cutânea. Formada pela UCV com pós-graduação no Hospital das Clínicas (SP).",
+    experience: "9 anos",
+    tags: ["Dermatologia", "Psoríase", "Dor Neuropática"],
+    price: "R$ 120,00",
+    priceValue: 120,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.8,
+    consults: 210,
+    avatar: "IM",
+    imageUrl: draIsabellaImg,
+    flags: ["🇧🇷", "🇻🇪"],
+    services: [
+      { name: "Consulta Dermatológica", price: "R$ 120,00", desc: "Avaliação + protocolo tópico canábico" },
+      { name: "Retorno", price: "R$ 80", desc: "Acompanhamento e ajuste" },
+      { name: "Receita Especial", price: "R$ 60", desc: "Prescrição de fitocanabinoides tópicos" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Patrícia L.", rating: 5, text: "Minha psoríase melhorou 90% em 3 meses!" },
+      { name: "Rafael S.", rating: 5, text: "Atenciosa e muito qualificada." },
+    ],
+  },
+  {
+    id: "med-8",
+    name: "Dr. António Silva",
+    category: "Médicos Prescritores",
+    bio: "Neurologista português com 20 anos de experiência em epilepsia refratária e esclerose múltipla. Referência em cannabis medicinal na Europa e América Latina. Professor visitante na FMUSP.",
+    experience: "20 anos",
+    tags: ["Neurologia", "Epilepsia", "Esclerose Múltipla"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 5.0,
+    consults: 620,
+    avatar: "AS",
+    imageUrl: drAntonioImg,
+    flags: ["🇵🇹", "🇧🇷"],
+    services: [
+      { name: "Consulta Neurológica", price: "R$ 150,00", desc: "Avaliação completa + plano terapêutico" },
+      { name: "Segunda Opinião", price: "R$ 120", desc: "Revisão de caso e protocolo" },
+      { name: "Laudo Internacional", price: "R$ 90", desc: "Documentação para importação UE/BR" },
+    ],
+    slots: ["10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Manuel F.", rating: 5, text: "O melhor neurologista que já consultei." },
+      { name: "Sandra M.", rating: 5, text: "Excelência médica com humanismo." },
+      { name: "Jorge C.", rating: 5, text: "Reduziu minhas crises epilépticas em 95%." },
+    ],
+  },
+  {
+    id: "psi-3",
+    name: "Dra. Yuki Tanaka",
+    category: "Psicologia & Terapias",
+    bio: "Psicóloga clínica nipo-brasileira especializada em mindfulness e terapia integrativa com acompanhamento canábico. Formada pela USP com mestrado em Kyoto. Atua com pacientes no Brasil e Japão.",
+    experience: "11 anos",
+    tags: ["Mindfulness", "Terapia Integrativa", "Ansiedade"],
+    price: "R$ 110,00",
+    priceValue: 110,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 290,
+    avatar: "YT",
+    imageUrl: draYukiImg,
+    flags: ["🇧🇷", "🇯🇵"],
+    services: [
+      { name: "Sessão Integrativa", price: "R$ 110,00", desc: "Mindfulness + acompanhamento canábico" },
+      { name: "Sessão de Meditação", price: "R$ 80", desc: "Sessão guiada 45 min" },
+      { name: "Avaliação Psicológica", price: "R$ 130", desc: "Avaliação completa" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Luciana K.", rating: 5, text: "Abordagem única e transformadora." },
+      { name: "Eduardo M.", rating: 5, text: "Encontrei equilíbrio com o tratamento da Dra. Yuki." },
+    ],
+  },
+  {
+    id: "farm-1",
+    name: "Dr. Pablo Quispe",
+    category: "Farmácia Clínica",
+    bio: "Farmacêutico clínico boliviano-brasileiro especializado em fitoterapia canábica e formulação magistral. Doutor em farmacognosia pela UFRJ. Consultor de farmácias magistrais no Brasil e Bolívia.",
+    experience: "13 anos",
+    tags: ["Fitoterapia", "Formulação Magistral", "Farmacognosia"],
+    price: "R$ 75,00",
+    priceValue: 75,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.7,
+    consults: 195,
+    avatar: "PQ",
+    imageUrl: drPabloImg,
+    flags: ["🇧🇴", "🇧🇷"],
+    crm: "CRF-12345",
+    services: [
+      { name: "Orientação Farmacêutica", price: "R$ 75,00", desc: "Ajuste de dose e interações medicamentosas" },
+      { name: "Revisão de Prescrição", price: "R$ 50", desc: "Análise de compatibilidade canábica" },
+      { name: "Formulação Personalizada", price: "R$ 90", desc: "Planejamento de fórmula magistral" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Marcos V.", rating: 5, text: "Entende tudo sobre dosagens e interações." },
+      { name: "Carla B.", rating: 4, text: "Muito atencioso e detalhista." },
+    ],
+  },
+  {
+    id: "farm-2",
+    name: "Dra. Renata Costa",
+    category: "Farmácia Clínica",
+    bio: "Farmacêutica clínica brasileira com especialização em endocannabinologia. Consultora de importação ANVISA e formulação de óleos full-spectrum. Atende pacientes no Brasil e Portugal.",
+    experience: "7 anos",
+    tags: ["Endocannabinologia", "Importação ANVISA", "Full-Spectrum"],
+    price: "R$ 80,00",
+    priceValue: 80,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.8,
+    consults: 165,
+    avatar: "RC",
+    imageUrl: draRenataImg,
+    flags: ["🇧🇷", "🇵🇹"],
+    crm: "CRF-67890",
+    services: [
+      { name: "Consultoria de Importação", price: "R$ 80,00", desc: "Orientação completa para importação ANVISA" },
+      { name: "Análise de Produto", price: "R$ 60", desc: "Avaliação de qualidade e pureza" },
+      { name: "Acompanhamento", price: "R$ 50", desc: "Follow-up mensal de tratamento" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Juliana M.", rating: 5, text: "Me ajudou a importar meu óleo CBD sem dor de cabeça." },
+      { name: "Roberto L.", rating: 5, text: "Profissional indispensável no tratamento canábico." },
     ],
   },
 ];

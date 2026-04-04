@@ -83,7 +83,7 @@ const Index = () => {
       <WhatsAppButton />
 
       {/* Hero Section */}
-      <section className="hero-glow pt-24 pb-16 md:pt-32 md:pb-28 min-h-[95vh] flex items-center overflow-hidden">
+      <section className="hero-glow pb-16 md:pb-28 min-h-[95vh] flex items-center overflow-hidden" style={{ paddingTop: 'clamp(80px, 12vh, 100px)' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             

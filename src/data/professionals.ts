@@ -1,5 +1,11 @@
 import drEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draJulianaImg from "@/assets/dra-juliana-ferreira.jpg";
+import drMarcosImg from "@/assets/dr-marcos-oliveira.jpg";
+import draIsabellaImg from "@/assets/dra-isabella-moreno.jpg";
+import drAntonioImg from "@/assets/dr-antonio-silva.jpg";
+import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
+import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
+import draRenataImg from "@/assets/dra-renata-costa.jpg";
 
 export type Professional = {
   id: string;
@@ -23,6 +29,7 @@ export type Professional = {
   crm?: string;
   hospital?: string;
   hospitalUrl?: string;
+  flags?: string[];
 };
 
 export const categories = [

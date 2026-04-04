@@ -20,8 +20,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    base: "/",
     minify: "terser",
+    chunkSizeWarningLimit: 1000,
     terserOptions: {
       compress: {
         drop_debugger: true,
@@ -36,7 +36,10 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['framer-motion', 'recharts'],
+        },
       },
     },
   },

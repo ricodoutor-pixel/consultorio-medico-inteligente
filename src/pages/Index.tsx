@@ -107,13 +107,13 @@ const Index = () => {
                 variants={fadeUp} 
                 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-6 tracking-tight"
               >
-                <span className="text-gradient-green">Saúde</span>
-                <span className="text-foreground"> & </span>
-                <span className="text-gradient-purple">Liberdade</span>
+                <span className="text-gradient-green">Mais que Acesso,</span>
+                <br />
+                <span className="text-gradient-purple">Equidade.</span>
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-2xl mb-10 leading-relaxed font-medium">
-                Acesso democratizado a telemedicina, suplementos e medicamentos de cannabis sob supervisão técnica do Dr. Edilson Bezerra. Conectamos você aos melhores especialistas via vídeo e chat. Pré-entrevista rápida, pagamento seguro via Pix ou PayPal e acesso direto ao nosso Shopping de bem-estar com preços populares e frete grátis para todo o Brasil.
+                Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-5 mb-12">

@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     minify: "terser",
+    cssMinify: false,
     chunkSizeWarningLimit: 1000,
     terserOptions: {
       compress: {
@@ -36,9 +37,12 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['framer-motion', 'recharts'],
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'vendor';
+            if (id.includes('framer-motion') || id.includes('recharts')) return 'ui';
+            return 'vendor';
+          }
         },
       },
     },

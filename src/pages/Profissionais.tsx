@@ -193,8 +193,14 @@ const Profissionais = () => {
                   <CardContent className="p-5">
                      <div className="flex items-center gap-4 mb-4">
                        <div className="relative">
-                         <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" />
+                         <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" loading="lazy" />
                          <OnlineStatusIndicator online={p.online} size="md" className="absolute -bottom-0.5 -right-0.5" />
+                         {p.flags && p.flags.length >= 2 && (
+                           <>
+                             <span className="absolute -top-1.5 -left-1.5 text-sm drop-shadow-md">{p.flags[0]}</span>
+                             <span className="absolute -top-1.5 -right-1.5 text-sm drop-shadow-md">{p.flags[1]}</span>
+                           </>
+                         )}
                        </div>
                        <div>
                          <h3 className="font-black text-foreground">{p.name}</h3>

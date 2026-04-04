@@ -9,7 +9,12 @@ import { Trash2, Plus, Minus, ShoppingCart as CartIcon } from 'lucide-react';
 export function ShoppingCart() {
   const { items, removeItem, updateQty, clearCart, getSubtotal, getTax, getShipping, getFinalTotal } = useCart();
   const [showCart, setShowCart] = useState(false);
+  const location = useLocation();
 
+  const allowedPaths = ['/shopping', '/planos', '/precos'];
+  const isVisible = allowedPaths.some(p => location.pathname.startsWith(p));
+
+  if (!isVisible) return null;
   if (!showCart) {
     return (
       <button

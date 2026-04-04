@@ -3,13 +3,13 @@ version: 1
 # Configuração de Build para Hostinger
 build:
   # Comando de build
-  command: "npm install --legacy-peer-deps && npm run build"
+  command: "npm install --legacy-peer-deps --prefer-offline --no-audit && npm run build"
   
   # Diretório de saída
   outputDirectory: "dist"
   
   # Node version
-  nodeVersion: "18.17.0"
+  nodeVersion: "20.x"
   
   # Timeout (30 minutos)
   timeout: 1800

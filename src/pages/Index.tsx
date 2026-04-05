@@ -83,29 +83,15 @@ const Index = () => {
       <WhatsAppButton />
 
       {/* Hero Section */}
-      <section className="hero-glow pt-24 pb-16 md:pt-32 md:pb-28 min-h-[95vh] flex items-center">
+      <section className="hero-glow pb-16 md:pb-28 min-h-[95dvh] flex items-center overflow-hidden" style={{ paddingTop: 'clamp(100px, 15vh, 140px)' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             
             {/* Text Content */}
             <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col">
               <motion.div variants={fadeUp} className="mb-6 flex flex-col gap-4">
                 <GlobalComplianceBadge />
                 
-                {/* Dr. Edilson Badge */}
-                <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600/10 to-blue-600/10 border border-green-500/30 rounded-full px-5 py-3 w-fit">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">👨‍⚕️</span>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-foreground">Dr. Edilson Bezerra</span>
-                      <span className="text-xs text-muted-foreground">Supervisor Técnico</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-1 ml-2 pl-2 border-l border-green-500/30">
-                    <span className="text-xl">🇧🇷</span>
-                    <span className="text-xl">🇧🇴</span>
-                  </div>
-                </div>
               </motion.div>
 
               <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-8">
@@ -115,29 +101,19 @@ const Index = () => {
                     PLATAFORMA POPULAR • SAÚDE • SHOPPING
                   </span>
                 </div>
-                <motion.span 
-                  animate={{ 
-                    textShadow: ["0px 0px 4px rgba(218, 165, 32, 0.3)", "0px 0px 12px rgba(218, 165, 32, 0.8)", "0px 0px 4px rgba(218, 165, 32, 0.3)"],
-                    opacity: [0.8, 1, 0.8]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                 className="text-[10px] md:text-xs font-bold tracking-wide text-[hsl(var(--gold))] leading-relaxed max-w-2xl mt-2"
-                >
-                  HUB COMPLETO • SAÚDE • POPULAR • INFORMAÇÃO • CONSULTA • ESPECIALISTAS • FARMÁCIAS • IMPORTADORES • PRODUTORES • SERVIÇOS • OPÇÕES • PREÇOS JUSTOS • COMUNIDADE • GANHOS • FAMÍLIA
-                </motion.span>
               </motion.div>
 
               <motion.h1 
                 variants={fadeUp} 
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-8 tracking-tight"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-6 tracking-tight"
               >
-                <span className="text-gradient-green">Saúde</span>
-                <span className="text-foreground"> & </span>
-                <span className="text-gradient-purple">Liberdade</span>
+                <span className="text-gradient-green">Mais que Acesso,</span>
+                <br />
+                <span className="text-gradient-purple">Equidade.</span>
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-2xl mb-10 leading-relaxed font-medium">
-                Acesso democratizado a telemedicina, suplementos e medicamentos de cannabis sob supervisão técnica do Dr. Edilson Bezerra. Conectamos você aos melhores especialistas via vídeo e chat. Pré-entrevista rápida, pagamento seguro via Pix ou PayPal e acesso direto ao nosso Shopping de bem-estar com preços populares e frete grátis para todo o Brasil.
+                Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-5 mb-12">

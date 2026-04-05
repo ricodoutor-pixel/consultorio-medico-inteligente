@@ -1,5 +1,21 @@
 import drEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draJulianaImg from "@/assets/dra-juliana-ferreira.jpg";
+import drMarcosImg from "@/assets/dr-marcos-oliveira.jpg";
+import draIsabellaImg from "@/assets/dra-isabella-moreno.jpg";
+import drAntonioImg from "@/assets/dr-antonio-silva.jpg";
+import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
+import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
+import draRenataImg from "@/assets/dra-renata-costa.jpg";
+import drLucasImg from "@/assets/dr-lucas-ferreira.jpg";
+import draSofiaImg from "@/assets/dra-sofia-santos.jpg";
+import drCarlosImg from "@/assets/dr-carlos-herrera.jpg";
+import draValentinaImg from "@/assets/dra-valentina-reyes.jpg";
+import drMateoImg from "@/assets/dr-mateo-lopez.jpg";
+import draSarahImg from "@/assets/dra-sarah-miller.jpg";
+import drJamesImg from "@/assets/dr-james-wilson.jpg";
+import draAmandaImg from "@/assets/dra-amanda-lima.jpg";
+import drAlejandroImg from "@/assets/dr-alejandro-garcia.jpg";
+import draEmilyImg from "@/assets/dra-emily-carter.jpg";
 
 export type Professional = {
   id: string;
@@ -23,6 +39,7 @@ export type Professional = {
   crm?: string;
   hospital?: string;
   hospitalUrl?: string;
+  flags?: string[];
 };
 
 export const categories = [
@@ -41,6 +58,7 @@ export const professionals: Professional[] = [
     name: "Dr. Edilson Bezerra",
     category: "Médicos Prescritores",
     bio: "Responsável Técnico e Jurídico da Planta y Raiz. Médico prescritor de cannabis medicinal com ampla experiência em dor crônica, neurologia e cuidados integrativos. Atua como responsável técnico pela hemodinâmica na Beneficência Portuguesa (SP) e no Hospital Menino Jesus. Referência soberana na plataforma Planta & Raiz.",
+    flags: ["🇧🇷", "🇧🇴"],
     experience: "18 anos",
     tags: ["Responsável Técnico", "Hemodinâmica BP", "Cannabis Medicinal", "Dor Crônica"],
     price: "R$ 49,90",
@@ -69,7 +87,7 @@ export const professionals: Professional[] = [
   },
   {
     id: "med-1",
-    name: "Dr. Felipe Andrade",
+    name: "Dr. Lucas Ferreira",
     category: "Médicos Prescritores",
     bio: "Neurologista com 12 anos de experiência em tratamentos com cannabis medicinal. Especialista em dor crônica e epilepsia refratária. Formado pela UNIFESP com residência no Hospital Albert Einstein.",
     experience: "12 anos",
@@ -80,8 +98,9 @@ export const professionals: Professional[] = [
     whatsapp: "5511987131241",
     rating: 4.9,
     consults: 340,
-    avatar: "FA",
-    imageUrl: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200&h=200&fit=crop&crop=face",
+    avatar: "LF",
+    imageUrl: drLucasImg,
+    flags: ["🇧🇷", "🇵🇹"],
     services: [
       { name: "Consulta Inicial", price: "R$ 130,00", desc: "Avaliação completa + plano terapêutico" },
       { name: "Retorno", price: "R$ 80", desc: "Acompanhamento e ajuste de dosagem" },
@@ -96,9 +115,9 @@ export const professionals: Professional[] = [
   },
   {
     id: "med-2",
-    name: "Dra. Camila Rocha",
+    name: "Dra. Sofia Santos",
     category: "Médicos Prescritores",
-    bio: "Psiquiatra focada em ansiedade, insônia e TEPT. Abordagem integrativa com cannabis medicinal há 8 anos. Membro da SBEC e palestrante internacional.",
+    bio: "Psiquiatra portuguesa-brasileira focada em ansiedade, insônia e TEPT. Abordagem integrativa com cannabis medicinal há 8 anos. Membro da SBEC e palestrante internacional.",
     experience: "8 anos",
     tags: ["Psiquiatria", "Ansiedade", "Insônia"],
     price: "R$ 90,00",
@@ -107,8 +126,9 @@ export const professionals: Professional[] = [
     whatsapp: "5511987131241",
     rating: 4.8,
     consults: 275,
-    avatar: "CR",
-    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face",
+    avatar: "SS",
+    imageUrl: draSofiaImg,
+    flags: ["🇵🇹", "🇧🇷"],
     services: [
       { name: "Consulta Inicial", price: "R$ 90,00", desc: "Avaliação psiquiátrica + orientação" },
       { name: "Retorno", price: "R$ 75", desc: "Acompanhamento mensal" },
@@ -122,9 +142,9 @@ export const professionals: Professional[] = [
   },
   {
     id: "med-3",
-    name: "Dr. Ricardo Mendes",
+    name: "Dr. Carlos Herrera",
     category: "Médicos Prescritores",
-    bio: "Clínico geral com pós em medicina da dor. Atende pacientes oncológicos e com fibromialgia. 15 anos de experiência no Hospital Sírio-Libanês.",
+    bio: "Clínico geral mexicano com pós em medicina da dor. Atende pacientes oncológicos e com fibromialgia. 15 anos de experiência entre México e Brasil.",
     experience: "15 anos",
     tags: ["Clínica da Dor", "Oncologia", "Fibromialgia"],
     price: "R$ 49,90",
@@ -133,8 +153,9 @@ export const professionals: Professional[] = [
     whatsapp: "5511987131241",
     rating: 4.7,
     consults: 410,
-    avatar: "RM",
-    imageUrl: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=200&h=200&fit=crop&crop=face",
+    avatar: "CH",
+    imageUrl: drCarlosImg,
+    flags: ["🇲🇽", "🇧🇷"],
     services: [
       { name: "Consulta Inicial", price: "R$ 49,90", desc: "Avaliação geral + plano" },
       { name: "Retorno", price: "R$ 70", desc: "Acompanhamento" },
@@ -175,9 +196,9 @@ export const professionals: Professional[] = [
   },
   {
     id: "med-5",
-    name: "Dr. Eduardo Nascimento",
+    name: "Dra. Valentina Reyes",
     category: "Médicos Prescritores",
-    bio: "Oncologista com foco em cuidados paliativos e manejo de dor oncológica com cannabis medicinal. Mestre pela USP com experiência no ICESP. Defensor do acesso universal à cannabis medicinal.",
+    bio: "Oncologista colombiana com foco em cuidados paliativos e manejo de dor oncológica com cannabis medicinal. Formada pela Universidad Nacional de Colombia com experiência no ICESP-SP.",
     experience: "18 anos",
     tags: ["Oncologia", "Paliativos", "Dor Oncológica"],
     price: "R$ 85,00",
@@ -186,8 +207,9 @@ export const professionals: Professional[] = [
     whatsapp: "5511987131241",
     rating: 4.8,
     consults: 520,
-    avatar: "EN",
-    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face",
+    avatar: "VR",
+    imageUrl: draValentinaImg,
+    flags: ["🇨🇴", "🇧🇷"],
     services: [
       { name: "Consulta Oncológica", price: "R$ 85,00", desc: "Avaliação + plano paliativo canábico" },
       { name: "Acompanhamento", price: "R$ 60", desc: "Follow-up quinzenal" },
@@ -215,7 +237,8 @@ export const professionals: Professional[] = [
     rating: 4.9,
     consults: 310,
     avatar: "LM",
-    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face",
+    imageUrl: draAmandaImg,
+    flags: ["🇧🇷", "🇵🇹"],
     services: [
       { name: "Sessão de Psicoterapia", price: "R$ 90", desc: "Sessão individual 50 min" },
       { name: "Avaliação Psicológica", price: "R$ 120", desc: "Avaliação completa" },
@@ -241,7 +264,8 @@ export const professionals: Professional[] = [
     rating: 4.8,
     consults: 250,
     avatar: "GR",
-    imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face",
+    imageUrl: drMateoImg,
+    flags: ["🇦🇷", "🇧🇷"],
     services: [
       { name: "Terapia de Casal", price: "R$ 150", desc: "Sessão conjunta 80 min" },
       { name: "Terapia Individual", price: "R$ 100", desc: "Sessão individual 50 min" },
@@ -249,6 +273,283 @@ export const professionals: Professional[] = [
     slots: ["10:00", "11:00", "14:00", "15:00", "16:00"],
     reviews: [
       { name: "Fernanda R.", rating: 5, text: "Salvou meu casamento, excelente mediador." },
+    ],
+  },
+
+  // ═══════ 6 Novos Especialistas com Bandeiras ═══════
+  {
+    id: "med-6",
+    name: "Dr. Marcos Oliveira",
+    category: "Médicos Prescritores",
+    bio: "Geriatra especializado em medicina canábica para idosos. Pioneiro no uso de CBD para Alzheimer e Parkinson no Brasil. Membro da SBGG e da IACM. Atende pacientes no Brasil e Portugal.",
+    experience: "14 anos",
+    tags: ["Geriatria", "Alzheimer", "Parkinson", "CBD"],
+    price: "R$ 95,00",
+    priceValue: 95,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 380,
+    avatar: "MO",
+    imageUrl: drMarcosImg,
+    flags: ["🇧🇷", "🇵🇹"],
+    services: [
+      { name: "Consulta Geriátrica", price: "R$ 95,00", desc: "Avaliação completa + protocolo canábico" },
+      { name: "Retorno", price: "R$ 65", desc: "Acompanhamento mensal" },
+      { name: "Laudo ANVISA", price: "R$ 55", desc: "Documentação para importação" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Helena R.", rating: 5, text: "Devolveu qualidade de vida à minha mãe com Alzheimer." },
+      { name: "Antônio P.", rating: 5, text: "Profissional humanizado e muito competente." },
+    ],
+  },
+  {
+    id: "med-7",
+    name: "Dra. Isabella Moreno",
+    category: "Médicos Prescritores",
+    bio: "Dermatologista venezuelana-brasileira especializada em tratamentos canábicos para psoríase, dermatite e dor neuropática cutânea. Formada pela UCV com pós-graduação no Hospital das Clínicas (SP).",
+    experience: "9 anos",
+    tags: ["Dermatologia", "Psoríase", "Dor Neuropática"],
+    price: "R$ 120,00",
+    priceValue: 120,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.8,
+    consults: 210,
+    avatar: "IM",
+    imageUrl: draIsabellaImg,
+    flags: ["🇧🇷", "🇻🇪"],
+    services: [
+      { name: "Consulta Dermatológica", price: "R$ 120,00", desc: "Avaliação + protocolo tópico canábico" },
+      { name: "Retorno", price: "R$ 80", desc: "Acompanhamento e ajuste" },
+      { name: "Receita Especial", price: "R$ 60", desc: "Prescrição de fitocanabinoides tópicos" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Patrícia L.", rating: 5, text: "Minha psoríase melhorou 90% em 3 meses!" },
+      { name: "Rafael S.", rating: 5, text: "Atenciosa e muito qualificada." },
+    ],
+  },
+  {
+    id: "med-8",
+    name: "Dr. António Silva",
+    category: "Médicos Prescritores",
+    bio: "Neurologista português com 20 anos de experiência em epilepsia refratária e esclerose múltipla. Referência em cannabis medicinal na Europa e América Latina. Professor visitante na FMUSP.",
+    experience: "20 anos",
+    tags: ["Neurologia", "Epilepsia", "Esclerose Múltipla"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 5.0,
+    consults: 620,
+    avatar: "AS",
+    imageUrl: drAntonioImg,
+    flags: ["🇵🇹", "🇧🇷"],
+    services: [
+      { name: "Consulta Neurológica", price: "R$ 150,00", desc: "Avaliação completa + plano terapêutico" },
+      { name: "Segunda Opinião", price: "R$ 120", desc: "Revisão de caso e protocolo" },
+      { name: "Laudo Internacional", price: "R$ 90", desc: "Documentação para importação UE/BR" },
+    ],
+    slots: ["10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Manuel F.", rating: 5, text: "O melhor neurologista que já consultei." },
+      { name: "Sandra M.", rating: 5, text: "Excelência médica com humanismo." },
+      { name: "Jorge C.", rating: 5, text: "Reduziu minhas crises epilépticas em 95%." },
+    ],
+  },
+  {
+    id: "psi-3",
+    name: "Dra. Yuki Tanaka",
+    category: "Psicologia & Terapias",
+    bio: "Psicóloga clínica nipo-brasileira especializada em mindfulness e terapia integrativa com acompanhamento canábico. Formada pela USP com mestrado em Kyoto. Atua com pacientes no Brasil e Japão.",
+    experience: "11 anos",
+    tags: ["Mindfulness", "Terapia Integrativa", "Ansiedade"],
+    price: "R$ 110,00",
+    priceValue: 110,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 290,
+    avatar: "YT",
+    imageUrl: draYukiImg,
+    flags: ["🇧🇷", "🇯🇵"],
+    services: [
+      { name: "Sessão Integrativa", price: "R$ 110,00", desc: "Mindfulness + acompanhamento canábico" },
+      { name: "Sessão de Meditação", price: "R$ 80", desc: "Sessão guiada 45 min" },
+      { name: "Avaliação Psicológica", price: "R$ 130", desc: "Avaliação completa" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Luciana K.", rating: 5, text: "Abordagem única e transformadora." },
+      { name: "Eduardo M.", rating: 5, text: "Encontrei equilíbrio com o tratamento da Dra. Yuki." },
+    ],
+  },
+  {
+    id: "farm-1",
+    name: "Dr. Pablo Quispe",
+    category: "Farmácia Clínica",
+    bio: "Farmacêutico clínico boliviano-brasileiro especializado em fitoterapia canábica e formulação magistral. Doutor em farmacognosia pela UFRJ. Consultor de farmácias magistrais no Brasil e Bolívia.",
+    experience: "13 anos",
+    tags: ["Fitoterapia", "Formulação Magistral", "Farmacognosia"],
+    price: "R$ 75,00",
+    priceValue: 75,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.7,
+    consults: 195,
+    avatar: "PQ",
+    imageUrl: drPabloImg,
+    flags: ["🇧🇴", "🇧🇷"],
+    crm: "CRF-12345",
+    services: [
+      { name: "Orientação Farmacêutica", price: "R$ 75,00", desc: "Ajuste de dose e interações medicamentosas" },
+      { name: "Revisão de Prescrição", price: "R$ 50", desc: "Análise de compatibilidade canábica" },
+      { name: "Formulação Personalizada", price: "R$ 90", desc: "Planejamento de fórmula magistral" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Marcos V.", rating: 5, text: "Entende tudo sobre dosagens e interações." },
+      { name: "Carla B.", rating: 4, text: "Muito atencioso e detalhista." },
+    ],
+  },
+  {
+    id: "farm-2",
+    name: "Dra. Renata Costa",
+    category: "Farmácia Clínica",
+    bio: "Farmacêutica clínica brasileira com especialização em endocannabinologia. Consultora de importação ANVISA e formulação de óleos full-spectrum. Atende pacientes no Brasil e Portugal.",
+    experience: "7 anos",
+    tags: ["Endocannabinologia", "Importação ANVISA", "Full-Spectrum"],
+    price: "R$ 80,00",
+    priceValue: 80,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.8,
+    consults: 165,
+    avatar: "RC",
+    imageUrl: draRenataImg,
+    flags: ["🇧🇷", "🇵🇹"],
+    crm: "CRF-67890",
+    services: [
+      { name: "Consultoria de Importação", price: "R$ 80,00", desc: "Orientação completa para importação ANVISA" },
+      { name: "Análise de Produto", price: "R$ 60", desc: "Avaliação de qualidade e pureza" },
+      { name: "Acompanhamento", price: "R$ 50", desc: "Follow-up mensal de tratamento" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Juliana M.", rating: 5, text: "Me ajudou a importar meu óleo CBD sem dor de cabeça." },
+      { name: "Roberto L.", rating: 5, text: "Profissional indispensável no tratamento canábico." },
+    ],
+  },
+
+  // ═══════ 4 Novos Prescritores Internacionais ═══════
+  {
+    id: "med-9",
+    name: "Dra. Sarah Miller",
+    category: "Médicos Prescritores",
+    bio: "Médica americana especializada em medicina funcional e cannabis medicinal. Formada pela Johns Hopkins com 16 anos de experiência em dor crônica e fibromialgia. Atende pacientes nos EUA e Brasil.",
+    experience: "16 anos",
+    tags: ["Medicina Funcional", "Fibromialgia", "Dor Crônica"],
+    price: "R$ 140,00",
+    priceValue: 140,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 450,
+    avatar: "SM",
+    imageUrl: draSarahImg,
+    flags: ["🇺🇸", "🇧🇷"],
+    services: [
+      { name: "Consulta Internacional", price: "R$ 140,00", desc: "Avaliação completa em inglês/português" },
+      { name: "Retorno", price: "R$ 90", desc: "Acompanhamento mensal" },
+      { name: "Second Opinion", price: "R$ 120", desc: "Revisão de caso internacional" },
+    ],
+    slots: ["10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Patricia W.", rating: 5, text: "Finally found a doctor who understands cannabis medicine." },
+      { name: "Renato B.", rating: 5, text: "Excelente atendimento bilíngue." },
+    ],
+  },
+  {
+    id: "med-10",
+    name: "Dr. James Wilson",
+    category: "Médicos Prescritores",
+    bio: "Neurologista britânico com 20 anos de experiência em epilepsia e esclerose múltipla. Referência em cannabis medicinal na Europa. Professor visitante na UCL e consultor no NHS.",
+    experience: "20 anos",
+    tags: ["Neurologia", "Epilepsia", "Esclerose Múltipla"],
+    price: "R$ 160,00",
+    priceValue: 160,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 5.0,
+    consults: 680,
+    avatar: "JW",
+    imageUrl: drJamesImg,
+    flags: ["🇬🇧", "🇺🇸"],
+    services: [
+      { name: "Consulta Especializada", price: "R$ 160,00", desc: "Avaliação neurológica avançada" },
+      { name: "Telemedicina Internacional", price: "R$ 130", desc: "Atendimento remoto em inglês" },
+      { name: "Laudo Internacional", price: "R$ 100", desc: "Documentação para importação UK/BR" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "15:00", "16:00"],
+    reviews: [
+      { name: "David M.", rating: 5, text: "World-class neurologist with deep cannabis expertise." },
+      { name: "Helena S.", rating: 5, text: "Reduziu minhas crises em 90%." },
+    ],
+  },
+  {
+    id: "med-11",
+    name: "Dr. Alejandro García",
+    category: "Médicos Prescritores",
+    bio: "Psiquiatra espanhol especializado em TEPT e transtornos de humor com cannabis medicinal. Doutor pela Universidad Complutense de Madrid. Atende em espanhol e português.",
+    experience: "14 anos",
+    tags: ["Psiquiatria", "TEPT", "Transtornos de Humor"],
+    price: "R$ 115,00",
+    priceValue: 115,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.8,
+    consults: 320,
+    avatar: "AG",
+    imageUrl: drAlejandroImg,
+    flags: ["🇪🇸", "🇧🇷"],
+    services: [
+      { name: "Consulta Psiquiátrica", price: "R$ 115,00", desc: "Avaliação completa + protocolo canábico" },
+      { name: "Retorno", price: "R$ 80", desc: "Acompanhamento quinzenal" },
+      { name: "Laudo Médico", price: "R$ 70", desc: "Documentação para importação ES/BR" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Miguel R.", rating: 5, text: "Un profesional excepcional, cambió mi vida." },
+      { name: "Fernanda L.", rating: 5, text: "Atende com muita empatia e competência." },
+    ],
+  },
+  {
+    id: "med-12",
+    name: "Dra. Emily Carter",
+    category: "Médicos Prescritores",
+    bio: "Reumatologista americana com especialização em terapias canabinoides para artrite e lúpus. Formada pela Stanford com fellowship em cannabis medicinal. Bilíngue inglês-português.",
+    experience: "11 anos",
+    tags: ["Reumatologia", "Artrite", "Lúpus"],
+    price: "R$ 135,00",
+    priceValue: 135,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 280,
+    avatar: "EC",
+    imageUrl: draEmilyImg,
+    flags: ["🇺🇸", "🇬🇧"],
+    services: [
+      { name: "Consulta Reumatológica", price: "R$ 135,00", desc: "Avaliação + protocolo CBD/THC" },
+      { name: "Follow-up", price: "R$ 85", desc: "Acompanhamento mensal" },
+      { name: "Laudo Internacional", price: "R$ 80", desc: "Documentação para importação US/BR" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Jessica T.", rating: 5, text: "Best rheumatologist I've ever consulted." },
+      { name: "Marcos A.", rating: 5, text: "Tratamento revolucionário para minha artrite." },
     ],
   },
 ];

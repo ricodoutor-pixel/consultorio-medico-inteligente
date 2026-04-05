@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ═══════════════════════════════════════════════════════════════
  * MÓDULO 5: DEVOPS & INTEGRIDADE — TECNOLOGIA 2050

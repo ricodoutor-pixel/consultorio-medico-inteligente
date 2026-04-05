@@ -193,11 +193,16 @@ const Profissionais = () => {
                   <CardContent className="p-5">
                      <div className="flex items-center gap-4 mb-4">
                        <div className="relative">
-                         <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" />
+                         <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" loading="lazy" />
                          <OnlineStatusIndicator online={p.online} size="md" className="absolute -bottom-0.5 -right-0.5" />
                        </div>
                        <div>
-                         <h3 className="font-black text-foreground">{p.name}</h3>
+                         <div className="flex items-center gap-1.5">
+                           <h3 className="font-black text-foreground">{p.name}</h3>
+                           {p.flags && p.flags.map((flag, i) => (
+                             <span key={i} className="text-sm">{flag}</span>
+                           ))}
+                         </div>
                          <div className="flex items-center gap-2">
                            <p className="text-sm text-muted-foreground">{p.category}</p>
                            <OnlineStatusIndicator online={p.online} size="sm" showLabel />

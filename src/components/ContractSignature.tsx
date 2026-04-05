@@ -50,7 +50,7 @@ export const ContractSignature: React.FC<ContractSignatureProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [accepted, setAccepted] = useState(false);
-  const [pollInterval, setPollInterval] = useState<NodeJS.Timeout | null>(null);
+  const [pollInterval, setPollInterval] = useState<ReturnType<typeof setInterval> | null>(null);
 
   // Gerar e enviar contrato para assinatura
   const handleGenerateContract = async () => {

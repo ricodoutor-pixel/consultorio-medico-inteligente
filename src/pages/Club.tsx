@@ -9,19 +9,69 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+import clubCamisetaVerdinho from "@/assets/club-camiseta-verdinho.jpg";
+import clubCanecaNatureza from "@/assets/club-caneca-natureza.jpg";
+import clubBoneTrucker from "@/assets/club-bone-trucker.jpg";
+import clubCamisetaBrisa from "@/assets/club-camiseta-brisa.jpg";
+import clubEcobag from "@/assets/club-ecobag.jpg";
+import clubChapeuPraia from "@/assets/club-chapeu-praia.jpg";
+import clubSqueeze from "@/assets/club-squeeze.jpg";
+import clubCamisetaEdilson from "@/assets/club-camiseta-edilson.jpg";
+import clubAdesivos from "@/assets/club-adesivos.jpg";
+import clubMoletom from "@/assets/club-moletom.jpg";
+import clubPostCachoeira from "@/assets/club-post-cachoeira.jpg";
+import clubPostTrilha from "@/assets/club-post-trilha.jpg";
+import clubPostPraia from "@/assets/club-post-praia.jpg";
+
 const WHATSAPP_BRISA = "https://wa.me/5511991363154";
 
 const clubProducts = [
-  { id: 1, name: "Camiseta Verdinho Explorer", price: 89.90, image: "🐸", desc: "100% algodão orgânico com estampa exclusiva do Verdinho" },
-  { id: 2, name: "Caneca Térmica Natureza", price: 59.90, image: "☕", desc: "Caneca térmica 450ml com arte botânica" },
-  { id: 3, name: "Boné Trucker Roots", price: 69.90, image: "🧢", desc: "Boné ajustável com bordado Planta y Raiz" },
-  { id: 4, name: "Camiseta Enfermeira Brisa", price: 89.90, image: "👩‍⚕️", desc: "Estampa exclusiva da Enfermeira Brisa IA" },
-  { id: 5, name: "Ecobag Cannabis Medicinal", price: 39.90, image: "🌿", desc: "Sacola ecológica reutilizável com arte verde" },
-  { id: 6, name: "Chapéu de Praia Tropical", price: 79.90, image: "🏖️", desc: "Proteção UV com estilo tropical exclusivo" },
-  { id: 7, name: "Squeeze 750ml Hydra", price: 49.90, image: "💧", desc: "Garrafa térmica com logo Planta y Raiz" },
-  { id: 8, name: "Camiseta Dr. Edilson Edition", price: 99.90, image: "👨‍⚕️", desc: "Edição limitada com assinatura digital" },
-  { id: 9, name: "Kit Adesivos Verdinho", price: 24.90, image: "🎨", desc: "10 adesivos vinil premium do Verdinho" },
-  { id: 10, name: "Moletom Premium Club", price: 159.90, image: "🧥", desc: "Moletom canguru bordado edição Club" },
+  { id: 1, name: "Camiseta Verdinho Explorer", price: 89.90, image: clubCamisetaVerdinho, desc: "100% algodão orgânico com estampa exclusiva do Verdinho" },
+  { id: 2, name: "Caneca Térmica Natureza", price: 59.90, image: clubCanecaNatureza, desc: "Caneca térmica 450ml com arte botânica" },
+  { id: 3, name: "Boné Trucker Roots", price: 69.90, image: clubBoneTrucker, desc: "Boné ajustável com bordado Planta y Raiz" },
+  { id: 4, name: "Camiseta Enfermeira Brisa", price: 89.90, image: clubCamisetaBrisa, desc: "Estampa exclusiva da Enfermeira Brisa IA" },
+  { id: 5, name: "Ecobag Cannabis Medicinal", price: 39.90, image: clubEcobag, desc: "Sacola ecológica reutilizável com arte verde" },
+  { id: 6, name: "Chapéu de Praia Tropical", price: 79.90, image: clubChapeuPraia, desc: "Proteção UV com estilo tropical exclusivo" },
+  { id: 7, name: "Squeeze 750ml Hydra", price: 49.90, image: clubSqueeze, desc: "Garrafa térmica com logo Planta y Raiz" },
+  { id: 8, name: "Camiseta Dr. Edilson Edition", price: 99.90, image: clubCamisetaEdilson, desc: "Edição limitada com assinatura digital" },
+  { id: 9, name: "Kit Adesivos Verdinho", price: 24.90, image: clubAdesivos, desc: "10 adesivos vinil premium do Verdinho" },
+  { id: 10, name: "Moletom Premium Club", price: 159.90, image: clubMoletom, desc: "Moletom canguru bordado edição Club" },
+];
+
+const staticPosts = [
+  {
+    id: "static-1",
+    content: "Que manhã perfeita na Cachoeira do Poço Verde! A água estava tão cristalina... 💚 Já quero voltar!",
+    images: [clubPostCachoeira],
+    likes_count: 342,
+    comment_count: 28,
+    share_count: 15,
+    user_id: "static",
+    status: "active",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "static-2",
+    content: "Trilha da Serra da Mantiqueira no amanhecer... Nada se compara! 🏔️✨ O nascer do sol lá é transformador.",
+    images: [clubPostTrilha],
+    likes_count: 567,
+    comment_count: 45,
+    share_count: 32,
+    user_id: "static",
+    status: "active",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "static-3",
+    content: "Dia de praia em Jericoacoara! O pôr do sol aqui é de outro mundo 🌅 Recomendo demais para relaxar!",
+    images: [clubPostPraia],
+    likes_count: 678,
+    comment_count: 67,
+    share_count: 41,
+    user_id: "static",
+    status: "active",
+    created_at: new Date().toISOString(),
+  },
 ];
 
 const Club = () => {
@@ -52,7 +102,11 @@ const Club = () => {
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .limit(20);
-    if (data) setPosts(data);
+    if (data && data.length > 0) {
+      setPosts(data);
+    } else {
+      setPosts(staticPosts);
+    }
   };
 
   const loadNotifications = async () => {
@@ -218,7 +272,7 @@ const Club = () => {
             {clubProducts.map((product) => (
               <Card key={product.id} className="bg-card border-border hover:border-primary/50 transition-all group">
                 <CardContent className="p-6">
-                  <div className="text-6xl text-center mb-4">{product.image}</div>
+                  <img src={product.image} alt={product.name} className="w-full h-48 object-cover rounded-lg mb-4" loading="lazy" />
                   <h3 className="font-bold text-foreground text-lg mb-2">{product.name}</h3>
                   <p className="text-sm text-muted-foreground mb-4">{product.desc}</p>
                   <div className="flex items-center justify-between">

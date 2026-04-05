@@ -102,7 +102,11 @@ const Club = () => {
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .limit(20);
-    if (data) setPosts(data);
+    if (data && data.length > 0) {
+      setPosts(data);
+    } else {
+      setPosts(staticPosts);
+    }
   };
 
   const loadNotifications = async () => {

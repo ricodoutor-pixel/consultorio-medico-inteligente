@@ -196,9 +196,9 @@ export const professionals: Professional[] = [
   },
   {
     id: "med-5",
-    name: "Dr. Eduardo Nascimento",
+    name: "Dra. Valentina Reyes",
     category: "Médicos Prescritores",
-    bio: "Oncologista com foco em cuidados paliativos e manejo de dor oncológica com cannabis medicinal. Mestre pela USP com experiência no ICESP. Defensor do acesso universal à cannabis medicinal.",
+    bio: "Oncologista colombiana com foco em cuidados paliativos e manejo de dor oncológica com cannabis medicinal. Formada pela Universidad Nacional de Colombia com experiência no ICESP-SP.",
     experience: "18 anos",
     tags: ["Oncologia", "Paliativos", "Dor Oncológica"],
     price: "R$ 85,00",
@@ -207,8 +207,9 @@ export const professionals: Professional[] = [
     whatsapp: "5511987131241",
     rating: 4.8,
     consults: 520,
-    avatar: "EN",
-    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face",
+    avatar: "VR",
+    imageUrl: draValentinaImg,
+    flags: ["🇨🇴", "🇧🇷"],
     services: [
       { name: "Consulta Oncológica", price: "R$ 85,00", desc: "Avaliação + plano paliativo canábico" },
       { name: "Acompanhamento", price: "R$ 60", desc: "Follow-up quinzenal" },

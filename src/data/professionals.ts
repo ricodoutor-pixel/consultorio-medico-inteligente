@@ -87,7 +87,7 @@ export const professionals: Professional[] = [
   },
   {
     id: "med-1",
-    name: "Dr. Felipe Andrade",
+    name: "Dr. Lucas Ferreira",
     category: "Médicos Prescritores",
     bio: "Neurologista com 12 anos de experiência em tratamentos com cannabis medicinal. Especialista em dor crônica e epilepsia refratária. Formado pela UNIFESP com residência no Hospital Albert Einstein.",
     experience: "12 anos",
@@ -98,8 +98,9 @@ export const professionals: Professional[] = [
     whatsapp: "5511987131241",
     rating: 4.9,
     consults: 340,
-    avatar: "FA",
-    imageUrl: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200&h=200&fit=crop&crop=face",
+    avatar: "LF",
+    imageUrl: drLucasImg,
+    flags: ["🇧🇷", "🇵🇹"],
     services: [
       { name: "Consulta Inicial", price: "R$ 130,00", desc: "Avaliação completa + plano terapêutico" },
       { name: "Retorno", price: "R$ 80", desc: "Acompanhamento e ajuste de dosagem" },

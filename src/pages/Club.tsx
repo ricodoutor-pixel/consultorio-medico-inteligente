@@ -272,7 +272,7 @@ const Club = () => {
             {clubProducts.map((product) => (
               <Card key={product.id} className="bg-card border-border hover:border-primary/50 transition-all group">
                 <CardContent className="p-6">
-                  <div className="text-6xl text-center mb-4">{product.image}</div>
+                  <img src={product.image} alt={product.name} className="w-full h-48 object-cover rounded-lg mb-4" loading="lazy" />
                   <h3 className="font-bold text-foreground text-lg mb-2">{product.name}</h3>
                   <p className="text-sm text-muted-foreground mb-4">{product.desc}</p>
                   <div className="flex items-center justify-between">

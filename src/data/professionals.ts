@@ -237,7 +237,8 @@ export const professionals: Professional[] = [
     rating: 4.9,
     consults: 310,
     avatar: "LM",
-    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face",
+    imageUrl: draAmandaImg,
+    flags: ["🇧🇷", "🇵🇹"],
     services: [
       { name: "Sessão de Psicoterapia", price: "R$ 90", desc: "Sessão individual 50 min" },
       { name: "Avaliação Psicológica", price: "R$ 120", desc: "Avaliação completa" },

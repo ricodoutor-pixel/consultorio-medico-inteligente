@@ -115,9 +115,9 @@ export const professionals: Professional[] = [
   },
   {
     id: "med-2",
-    name: "Dra. Camila Rocha",
+    name: "Dra. Sofia Santos",
     category: "Médicos Prescritores",
-    bio: "Psiquiatra focada em ansiedade, insônia e TEPT. Abordagem integrativa com cannabis medicinal há 8 anos. Membro da SBEC e palestrante internacional.",
+    bio: "Psiquiatra portuguesa-brasileira focada em ansiedade, insônia e TEPT. Abordagem integrativa com cannabis medicinal há 8 anos. Membro da SBEC e palestrante internacional.",
     experience: "8 anos",
     tags: ["Psiquiatria", "Ansiedade", "Insônia"],
     price: "R$ 90,00",
@@ -126,8 +126,9 @@ export const professionals: Professional[] = [
     whatsapp: "5511987131241",
     rating: 4.8,
     consults: 275,
-    avatar: "CR",
-    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face",
+    avatar: "SS",
+    imageUrl: draSofiaImg,
+    flags: ["🇵🇹", "🇧🇷"],
     services: [
       { name: "Consulta Inicial", price: "R$ 90,00", desc: "Avaliação psiquiátrica + orientação" },
       { name: "Retorno", price: "R$ 75", desc: "Acompanhamento mensal" },

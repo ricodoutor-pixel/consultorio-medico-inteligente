@@ -142,9 +142,9 @@ export const professionals: Professional[] = [
   },
   {
     id: "med-3",
-    name: "Dr. Ricardo Mendes",
+    name: "Dr. Carlos Herrera",
     category: "Médicos Prescritores",
-    bio: "Clínico geral com pós em medicina da dor. Atende pacientes oncológicos e com fibromialgia. 15 anos de experiência no Hospital Sírio-Libanês.",
+    bio: "Clínico geral mexicano com pós em medicina da dor. Atende pacientes oncológicos e com fibromialgia. 15 anos de experiência entre México e Brasil.",
     experience: "15 anos",
     tags: ["Clínica da Dor", "Oncologia", "Fibromialgia"],
     price: "R$ 49,90",
@@ -153,8 +153,9 @@ export const professionals: Professional[] = [
     whatsapp: "5511987131241",
     rating: 4.7,
     consults: 410,
-    avatar: "RM",
-    imageUrl: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=200&h=200&fit=crop&crop=face",
+    avatar: "CH",
+    imageUrl: drCarlosImg,
+    flags: ["🇲🇽", "🇧🇷"],
     services: [
       { name: "Consulta Inicial", price: "R$ 49,90", desc: "Avaliação geral + plano" },
       { name: "Retorno", price: "R$ 70", desc: "Acompanhamento" },

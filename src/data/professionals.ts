@@ -264,7 +264,8 @@ export const professionals: Professional[] = [
     rating: 4.8,
     consults: 250,
     avatar: "GR",
-    imageUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face",
+    imageUrl: drMateoImg,
+    flags: ["🇦🇷", "🇧🇷"],
     services: [
       { name: "Terapia de Casal", price: "R$ 150", desc: "Sessão conjunta 80 min" },
       { name: "Terapia Individual", price: "R$ 100", desc: "Sessão individual 50 min" },

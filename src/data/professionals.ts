@@ -6,6 +6,16 @@ import drAntonioImg from "@/assets/dr-antonio-silva.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
 import draRenataImg from "@/assets/dra-renata-costa.jpg";
+import drLucasImg from "@/assets/dr-lucas-ferreira.jpg";
+import draSofiaImg from "@/assets/dra-sofia-santos.jpg";
+import drCarlosImg from "@/assets/dr-carlos-herrera.jpg";
+import draValentinaImg from "@/assets/dra-valentina-reyes.jpg";
+import drMateoImg from "@/assets/dr-mateo-lopez.jpg";
+import draSarahImg from "@/assets/dra-sarah-miller.jpg";
+import drJamesImg from "@/assets/dr-james-wilson.jpg";
+import draAmandaImg from "@/assets/dra-amanda-lima.jpg";
+import drAlejandroImg from "@/assets/dr-alejandro-garcia.jpg";
+import draEmilyImg from "@/assets/dra-emily-carter.jpg";
 
 export type Professional = {
   id: string;

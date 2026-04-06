@@ -41,16 +41,16 @@ import prod10a from "@/assets/club/prod10-a.jpg";
 import prod10b from "@/assets/club/prod10-b.jpg";
 import prod10c from "@/assets/club/prod10-c.jpg";
 
-// Feed images - AI generated
-import feedCachoeira from "@/assets/club/feed-cachoeira.jpg";
-import feedCachoeira2 from "@/assets/club/feed-cachoeira2.jpg";
-import feedCachoeira3 from "@/assets/club/feed-cachoeira3.jpg";
-import feedTrilha from "@/assets/club/feed-trilha.jpg";
-import feedTrilha2 from "@/assets/club/feed-trilha2.jpg";
-import feedTrilha3 from "@/assets/club/feed-trilha3.jpg";
-import feedPraia from "@/assets/club/feed-praia.jpg";
-import feedPraia2 from "@/assets/club/feed-praia2.jpg";
-import feedPraia3 from "@/assets/club/feed-praia3.jpg";
+// Feed images - pessoas reais em lugares incríveis
+import feedPersonCachoeira1 from "@/assets/club/feed-person-cachoeira1.jpg";
+import feedPersonCachoeira2 from "@/assets/club/feed-person-cachoeira2.jpg";
+import feedPersonCachoeira3 from "@/assets/club/feed-person-cachoeira3.jpg";
+import feedPersonTrilha1 from "@/assets/club/feed-person-trilha1.jpg";
+import feedPersonTrilha2 from "@/assets/club/feed-person-trilha2.jpg";
+import feedPersonTrilha3 from "@/assets/club/feed-person-trilha3.jpg";
+import feedPersonPraia1 from "@/assets/club/feed-person-praia1.jpg";
+import feedPersonPraia2 from "@/assets/club/feed-person-praia2.jpg";
+import feedPersonPraia3 from "@/assets/club/feed-person-praia3.jpg";
 
 const WHATSAPP_BRISA = "https://wa.me/5511991363154";
 
@@ -90,7 +90,7 @@ const staticPosts = [
   {
     id: "static-1",
     content: "Que manhã perfeita na Cachoeira do Poço Verde! A água estava tão cristalina que dava pra ver os peixes nadando... 💚 Experiência transformadora, já quero voltar! plantayraiz.com.br",
-    images: [feedCachoeira, feedCachoeira2, feedCachoeira3],
+    images: [feedPersonCachoeira1, feedPersonCachoeira2, feedPersonCachoeira3],
     likes_count: 342, comment_count: 28, share_count: 15,
     user_id: "static", author: "Marina Silva", avatar: "👩‍🦱", location: "Cachoeira do Poço Verde, RJ",
     status: "active", created_at: new Date().toISOString(),
@@ -98,7 +98,7 @@ const staticPosts = [
   {
     id: "static-2",
     content: "Trilha da Serra da Mantiqueira no amanhecer... Nada se compara! 🏔️✨ O nascer do sol lá de cima é de tirar o fôlego. Obrigado Planta y Raiz pela nova qualidade de vida!",
-    images: [feedTrilha, feedTrilha2, feedTrilha3],
+    images: [feedPersonTrilha1, feedPersonTrilha2, feedPersonTrilha3],
     likes_count: 567, comment_count: 45, share_count: 32,
     user_id: "static", author: "Lucas Oliveira", avatar: "👨‍🦱", location: "Serra da Mantiqueira, SP",
     status: "active", created_at: new Date().toISOString(),
@@ -106,7 +106,7 @@ const staticPosts = [
   {
     id: "static-3",
     content: "Dia de praia em Jericoacoara com a galera! 🌅 O pôr do sol aqui é de outro mundo. Desde que comecei o tratamento, minha qualidade de vida mudou completamente!",
-    images: [feedPraia, feedPraia2, feedPraia3],
+    images: [feedPersonPraia1, feedPersonPraia2, feedPersonPraia3],
     likes_count: 678, comment_count: 67, share_count: 41,
     user_id: "static", author: "Felipe Santos", avatar: "👨‍🦲", location: "Jericoacoara, CE",
     status: "active", created_at: new Date().toISOString(),

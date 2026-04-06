@@ -226,8 +226,8 @@ export const Navbar = () => {
             <X size={22} className="text-primary" />
             <span>Fechar Menu</span>
           </button>
-          <div className="flex justify-center mb-8">
-             <FrogMascot size={120} mood="happy" onClick={openChat} />
+          <div className="flex justify-center mb-8 relative" style={{ minHeight: 180 }}>
+             <FrogMascot size={80} mood="happy" onClick={openChat} />
           </div>
           <div className="space-y-1 flex-1">
             {links.map((link) => (

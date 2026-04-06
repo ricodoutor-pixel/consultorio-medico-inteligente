@@ -234,18 +234,32 @@ const Index = () => {
           </div>
           <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
             {[
-              "Alcoolismo", "Alzheimer", "Perda de peso", "Obesidade", "Anorexia",
-              "Ansiedade", "Autismo", "Crohn", "Depressão", "Dores",
-              "Epilepsia", "Enxaqueca", "Fibromialgia", "Insônia",
-              "Intestino irritável", "Tabagismo", "TDAH", "Parkinson"
-            ].map((condition) => (
+              { name: "Alcoolismo", bg: "bg-emerald-600", shadow: "shadow-emerald-600/30" },
+              { name: "Alzheimer", bg: "bg-violet-600", shadow: "shadow-violet-600/30" },
+              { name: "Perda de peso", bg: "bg-amber-500", shadow: "shadow-amber-500/30" },
+              { name: "Obesidade", bg: "bg-orange-600", shadow: "shadow-orange-600/30" },
+              { name: "Anorexia", bg: "bg-rose-500", shadow: "shadow-rose-500/30" },
+              { name: "Ansiedade", bg: "bg-sky-500", shadow: "shadow-sky-500/30" },
+              { name: "Autismo", bg: "bg-indigo-500", shadow: "shadow-indigo-500/30" },
+              { name: "Crohn", bg: "bg-teal-600", shadow: "shadow-teal-600/30" },
+              { name: "Depressão", bg: "bg-blue-600", shadow: "shadow-blue-600/30" },
+              { name: "Dores", bg: "bg-red-500", shadow: "shadow-red-500/30" },
+              { name: "Epilepsia", bg: "bg-purple-600", shadow: "shadow-purple-600/30" },
+              { name: "Enxaqueca", bg: "bg-fuchsia-500", shadow: "shadow-fuchsia-500/30" },
+              { name: "Fibromialgia", bg: "bg-pink-500", shadow: "shadow-pink-500/30" },
+              { name: "Insônia", bg: "bg-cyan-600", shadow: "shadow-cyan-600/30" },
+              { name: "Intestino irritável", bg: "bg-lime-600", shadow: "shadow-lime-600/30" },
+              { name: "Tabagismo", bg: "bg-yellow-600", shadow: "shadow-yellow-600/30" },
+              { name: "TDAH", bg: "bg-blue-500", shadow: "shadow-blue-500/30" },
+              { name: "Parkinson", bg: "bg-green-700", shadow: "shadow-green-700/30" },
+            ].map((item) => (
               <Link
-                key={condition}
+                key={item.name}
                 to={`/consulta-rapida`}
-                onClick={() => sessionStorage.setItem("triage_condition", condition)}
-                className="px-5 py-3 rounded-full bg-primary text-primary-foreground font-bold text-sm shadow-lg hover:shadow-primary/40 hover:scale-105 transition-all duration-300 animate-pulse hover:animate-none"
+                onClick={() => sessionStorage.setItem("triage_condition", item.name)}
+                className={`px-5 py-3 rounded-full ${item.bg} text-white font-bold text-sm shadow-lg ${item.shadow} hover:scale-105 transition-all duration-300 animate-[pulse_4s_cubic-bezier(0.4,0,0.6,1)_infinite] hover:animate-none`}
               >
-                {condition}
+                {item.name}
               </Link>
             ))}
           </div>

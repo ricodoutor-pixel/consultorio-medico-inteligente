@@ -208,9 +208,26 @@ const Club = () => {
   const handleCreatePost = async () => {
     if (!user) { toast({ title: "Login necessário", variant: "destructive" }); return; }
     if (!newPost.trim()) return;
-    await supabase.from("club_posts").insert({ user_id: user.id, content: newPost });
-    setNewPost(""); loadPosts();
+    await supabase.from("club_posts").insert({ user_id: user.id, content: newPost, images: postImages.length > 0 ? postImages : [] });
+    setNewPost(""); setPostImages([]); loadPosts();
     toast({ title: "Post criado! 🌿" });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || !user) return;
+    const remaining = 3 - postImages.length;
+    const filesToUpload = Array.from(files).slice(0, remaining);
+    
+    for (const file of filesToUpload) {
+      const ext = file.name.split(".").pop();
+      const path = `club-posts/${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("experience-images").upload(path, file);
+      if (!error) {
+        const { data: urlData } = supabase.storage.from("experience-images").getPublicUrl(path);
+        setPostImages((prev) => [...prev, urlData.publicUrl]);
+      }
+    }
   };
 
   const handleLikePost = async (postId: string, currentLikes: number) => {

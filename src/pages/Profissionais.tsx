@@ -13,17 +13,19 @@ import { professionals, categories } from "@/data/professionals";
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
-const WhatsAppContactButton = ({ whatsapp, name, className = "" }: { whatsapp: string; name: string; className?: string }) => {
-  const message = encodeURIComponent(`Olá! Encontrei seu perfil na Planta & Raiz e gostaria de agendar uma consulta com ${name}.`);
+const BRISA_WHATSAPP = "5511991363154";
+
+const WhatsAppContactButton = ({ name, className = "" }: { name: string; className?: string }) => {
+  const message = encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${name}`);
   return (
     <a
-      href={`https://wa.me/${whatsapp}?text=${message}`}
+      href={`https://wa.me/${BRISA_WHATSAPP}?text=${message}`}
       target="_blank"
       rel="noopener noreferrer"
       className={className}
     >
       <Button variant="outline" className="w-full text-sm font-black border-[hsl(142,70%,45%)] text-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,45%)]/10 rounded-xl gap-2">
-        <Phone size={14} /> Contato WhatsApp
+        <Phone size={14} /> Agendar via WhatsApp
       </Button>
     </a>
   );

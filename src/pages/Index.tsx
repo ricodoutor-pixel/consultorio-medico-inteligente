@@ -89,12 +89,7 @@ const Index = () => {
             
             {/* Text Content */}
             <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col">
-              <motion.div variants={fadeUp} className="mb-6 flex flex-col gap-4">
-                <GlobalComplianceBadge />
-                
-              </motion.div>
-
-              <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-8">
+              <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-4">
                 <div className="inline-flex items-center gap-2 flex-wrap">
                   <span className="inline-flex items-center gap-2 bg-gradient-green border border-green rounded-full px-4 py-2 text-sm font-bold text-primary shadow-lg shadow-green/20">
                     <Leaf size={16} />
@@ -105,14 +100,18 @@ const Index = () => {
 
               <motion.h1 
                 variants={fadeUp} 
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-6 tracking-tight"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-3 tracking-tight"
               >
                 <span className="text-gradient-green">Mais que Acesso,</span>
                 <br />
                 <span className="text-gradient-purple">Equidade.</span>
               </motion.h1>
 
-              <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-2xl mb-10 leading-relaxed font-medium">
+              <motion.div variants={fadeUp} className="mb-4">
+                <GlobalComplianceBadge />
+              </motion.div>
+
+              <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-2xl mb-8 leading-relaxed font-medium">
                 Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎
               </motion.p>
 

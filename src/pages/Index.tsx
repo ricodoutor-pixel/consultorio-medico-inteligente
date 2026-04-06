@@ -209,6 +209,39 @@ const Index = () => {
           </div>
         </div>
       </section>
+      {/* Seleção de Patologias */}
+      <section className="py-20 md:py-28 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
+          <div className="text-center max-w-3xl mx-auto mb-10">
+            <h2 className="text-3xl md:text-5xl font-display font-black mb-4">
+              Selecione as suas <span className="text-gradient-green">patologias</span>
+            </h2>
+            <p className="text-lg text-muted-foreground font-medium">
+              Inicie seu tratamento com cannabis medicinal ainda hoje!
+            </p>
+            <p className="text-base text-muted-foreground mt-2">
+              Para qual condição você busca um tratamento?
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
+            {[
+              "Alcoolismo", "Alzheimer", "Perda de peso", "Obesidade", "Anorexia",
+              "Ansiedade", "Autismo", "Crohn", "Depressão", "Dores",
+              "Epilepsia", "Enxaqueca", "Fibromialgia", "Insônia",
+              "Intestino irritável", "Tabagismo", "TDAH", "Parkinson"
+            ].map((condition) => (
+              <Link
+                key={condition}
+                to={`/consulta-rapida`}
+                onClick={() => sessionStorage.setItem("triage_condition", condition)}
+                className="px-5 py-3 rounded-full bg-primary text-primary-foreground font-bold text-sm shadow-lg hover:shadow-primary/40 hover:scale-105 transition-all duration-300 animate-pulse hover:animate-none"
+              >
+                {condition}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Depoimentos Reais */}
       <section className="py-20 md:py-32 bg-card/10 border-y border-border">

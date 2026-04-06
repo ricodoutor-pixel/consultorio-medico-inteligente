@@ -28,7 +28,11 @@ type MatchResult = {
 const ConsultaRapida = () => {
   const { toast } = useToast();
   const [step, setStep] = useState<"symptoms" | "matching" | "result">("symptoms");
-  const [symptoms, setSymptoms] = useState("");
+  const [symptoms, setSymptoms] = useState(() => {
+    const saved = sessionStorage.getItem("triage_condition");
+    if (saved) sessionStorage.removeItem("triage_condition");
+    return saved || "";
+  });
   const [loading, setLoading] = useState(false);
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
   const [preRecord, setPreRecord] = useState("");

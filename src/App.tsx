@@ -160,6 +160,11 @@ const App = () => (
                 <Route path="/payment/success" element={<PaymentSuccess />} />
                 <Route path="/payment/failure" element={<PaymentFailure />} />
                 <Route path="/payment/pending" element={<PaymentPending />} />
+                <Route path="/cursos" element={<Cursos />} />
+                <Route path="/forum" element={<Forum />} />
+                <Route path="/webinars" element={<Webinars />} />
+                <Route path="/voluntarios" element={<Voluntarios />} />
+                <Route path="/impacto" element={<ImpactoSocial />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

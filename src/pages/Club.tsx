@@ -455,9 +455,33 @@ const Club = () => {
 
             {user ? (
               <div className="mb-8 bg-card border border-border rounded-xl p-4">
-                <textarea value={newPost} onChange={(e) => setNewPost(e.target.value)} placeholder="Compartilhe sua experiência..."
+                <textarea value={newPost} onChange={(e) => setNewPost(e.target.value)} placeholder="Compartilhe sua experiência em cachoeiras, praias, trilhas, montanhas..."
                   className="w-full bg-transparent text-foreground placeholder:text-muted-foreground border-none outline-none resize-none text-sm min-h-[80px]" />
-                <div className="flex justify-end mt-2">
+                
+                {/* Image previews */}
+                {postImages.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    {postImages.map((img, i) => (
+                      <div key={i} className="relative">
+                        <img src={img} alt="" className="w-full h-24 object-cover rounded-lg" />
+                        <button onClick={() => setPostImages((prev) => prev.filter((_, idx) => idx !== i))}
+                          className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5">
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center mt-3">
+                  {postImages.length < 3 && (
+                    <label className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary cursor-pointer transition">
+                      <Camera size={16} />
+                      <span>Fotos ({postImages.length}/3)</span>
+                      <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
+                    </label>
+                  )}
+                  {postImages.length >= 3 && <span className="text-xs text-primary font-medium">✓ 3 fotos adicionadas</span>}
                   <Button size="sm" onClick={handleCreatePost}><Send size={14} className="mr-1" /> Publicar</Button>
                 </div>
               </div>

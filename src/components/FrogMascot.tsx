@@ -44,15 +44,18 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
   const anim = useFrogAnimations(mood, hasNewMessage, size);
   const emoji = getExpressionEmoji(anim.expression);
   const [showStory, setShowStory] = useState(false);
+  const [isEnlarged, setIsEnlarged] = useState(false);
   const lastTapRef = useRef(0);
   const singleTapTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const storyTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const enlargeTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Cleanup timers on unmount
   useEffect(() => {
     return () => {
       if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
       if (storyTimeoutRef.current) clearTimeout(storyTimeoutRef.current);
+      if (enlargeTimeoutRef.current) clearTimeout(enlargeTimeoutRef.current);
     };
   }, []);
 
@@ -68,16 +71,21 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
       if (storyTimeoutRef.current) clearTimeout(storyTimeoutRef.current);
       setShowStory(false);
+      setIsEnlarged(false);
       onClick?.();
       return;
     }
 
-    // Single tap → show story with delay to distinguish from double tap
+    // Single tap → show story + enlarge 3x
     if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
     singleTapTimerRef.current = setTimeout(() => {
       setShowStory(true);
+      setIsEnlarged(true);
       if (storyTimeoutRef.current) clearTimeout(storyTimeoutRef.current);
-      storyTimeoutRef.current = setTimeout(() => setShowStory(false), 15000);
+      storyTimeoutRef.current = setTimeout(() => {
+        setShowStory(false);
+        setIsEnlarged(false);
+      }, 15000);
     }, 420);
   }, [onClick]);
 
@@ -85,26 +93,38 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     e.preventDefault();
     touchFiredRef.current = true;
     handleTap();
-    // Reset after 300ms to allow future click events (desktop)
     setTimeout(() => { touchFiredRef.current = false; }, 300);
   }, [handleTap]);
 
   const handleClick = useCallback((e: React.MouseEvent) => {
-    // Skip if touch already handled this (prevents double-fire on Android)
     if (touchFiredRef.current) return;
     e.preventDefault();
     handleTap();
   }, [handleTap]);
 
-  const displaySize = showStory ? size * 1.8 : size;
+  // Hover → enlarge 3x (desktop only, via mouse)
+  const handleMouseEnter = useCallback(() => {
+    anim.onHoverStart();
+    setIsEnlarged(true);
+  }, [anim]);
+
+  const handleMouseLeave = useCallback(() => {
+    anim.onHoverEnd();
+    // Only shrink if story is not showing
+    if (!showStory) {
+      setIsEnlarged(false);
+    }
+  }, [anim, showStory]);
+
+  const displaySize = isEnlarged ? size * 3 : showStory ? size * 1.8 : size;
 
   return (
     <motion.div
       ref={anim.containerRef as any}
       onClick={handleClick}
       onTouchEnd={handleTouchEnd}
-      onMouseEnter={anim.onHoverStart}
-      onMouseLeave={() => { anim.onHoverEnd(); }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className="cursor-pointer select-none focus:outline-none relative"
       style={{
         width: displaySize,
@@ -113,13 +133,13 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         WebkitTapHighlightColor: "transparent",
         WebkitUserSelect: "none",
         userSelect: "none",
+        zIndex: isEnlarged ? 60 : undefined,
       }}
       role="button"
       tabIndex={0}
       aria-label="Toque para ver a história do Verdinho. Toque 2x para conversar."
       title="1 toque = história 🐸 | 2 toques = chat 💬"
       whileTap={{ scale: 0.9, rotate: -5 }}
-      whileHover={{ scale: 1.5 }}
       animate={anim.controls}
       layout
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -128,8 +148,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       <motion.div
         className="absolute inset-0 rounded-full bg-primary/20 blur-lg"
         animate={{
-          scale: showStory ? 1.8 : anim.isHovered ? 1.6 : anim.messageBounce ? 1.4 : 1,
-          opacity: showStory ? 0.7 : anim.isHovered ? 0.6 : anim.messageBounce ? 0.5 : 0.2,
+          scale: isEnlarged ? 1.4 : anim.messageBounce ? 1.4 : 1,
+          opacity: isEnlarged ? 0.7 : anim.messageBounce ? 0.5 : 0.2,
         }}
         transition={{ duration: 0.3 }}
       />
@@ -204,7 +224,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             draggable={false}
           />
           <AnimatePresence>
-            {anim.showCrown && !anim.isDoctorMode && <FrogCrown size={displaySize} isHovered={anim.isHovered || showStory} />}
+            {anim.showCrown && !anim.isDoctorMode && <FrogCrown size={displaySize} isHovered={isEnlarged || showStory} />}
           </AnimatePresence>
         </motion.div>
       </div>
@@ -234,7 +254,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           size={displaySize}
           expression={anim.expression}
           smile={anim.smile}
-          isHovered={anim.isHovered || showStory}
+          isHovered={isEnlarged || showStory}
           tongueOut={anim.tongueOut}
         />
       </svg>
@@ -272,7 +292,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       {/* Expression emoji */}
       {emoji && !anim.isDaydreaming && !anim.isDoctorMode && (
         <motion.span
-          className="absolute -top-1 -right-1 z-40 text-xs pointer-events-none"
+          className="absolute -top-1 -right-1 z-40 pointer-events-none"
+          style={{ fontSize: isEnlarged ? size * 0.3 : size * 0.2 }}
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           key={anim.expression}
@@ -294,15 +315,15 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       <FrogStoryScroll show={showStory} size={displaySize} />
 
       {/* Tooltip hint for interactions */}
-      {showStory && (
+      {(showStory || isEnlarged) && (
         <motion.div
-          className="absolute -bottom-20 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-sm text-foreground text-[10px] font-bold px-3 py-1.5 rounded-full shadow-xl whitespace-nowrap z-50 border border-primary/30"
+          className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-sm text-foreground text-[10px] font-bold px-3 py-1.5 rounded-full shadow-xl whitespace-nowrap z-50 border border-primary/30"
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
           style={{ textShadow: "0 1px 2px rgba(0,0,0,0.1)" }}
         >
-          Toque 2x para conversar 💬🐸
+          {showStory ? "Toque 2x para conversar 💬🐸" : "1 toque = história 🐸 | 2 toques = chat 💬"}
         </motion.div>
       )}
     </motion.div>

@@ -217,6 +217,15 @@ export const Navbar = () => {
         }`}
       >
         <div className="container mx-auto px-4 flex flex-col flex-1">
+          {/* Botão seta para fechar o menu mobile */}
+          <button
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground font-bold text-sm mb-6 self-start"
+            aria-label="Fechar menu"
+          >
+            <X size={22} className="text-primary" />
+            <span>Fechar Menu</span>
+          </button>
           <div className="flex justify-center mb-8">
              <FrogMascot size={120} mood="happy" onClick={openChat} />
           </div>

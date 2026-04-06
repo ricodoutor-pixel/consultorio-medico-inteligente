@@ -7,7 +7,7 @@ import { Leaf, ShoppingBag, Users, Star, ArrowRight, TrendingUp, UserPlus, Downl
 import { motion } from "framer-motion";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
-import heroPhoneMockup from "@/assets/hero-phone-mockup.png"; 
+import { HeroCarousel } from "@/components/HeroCarousel"; 
 import triagemPatient from "@/assets/triagem-patient.png";
 import consultaChat from "@/assets/consulta-chat.png";
 import triagemForm from "@/assets/triagem-form.png";
@@ -28,7 +28,7 @@ const steps = [
   { n: "1", title: "Escolha o especialista", desc: "Navegue por categorias, veja avaliações, preços populares e perfis verificados.", img: triagemPatient },
   { n: "2", title: "Pré-entrevista rápida", desc: "Preencha um formulário de 2 minutos com seu objetivo e resumo do caso.", img: triagemForm },
   { n: "3", title: "Pague via Pix", desc: "Pagamento instantâneo com QR code Mercado Pago. Confirmação automática.", img: consultaChat },
-  { n: "4", title: "Receba atendimento", desc: "O profissional recebe seu resumo e inicia o atendimento (chat ou vídeo).", img: heroPhoneMockup },
+  { n: "4", title: "Receba atendimento", desc: "O profissional recebe seu resumo e inicia o atendimento (chat ou vídeo).", img: triagemPatient },
   { n: "5", title: "Compre seu tratamento", desc: "Acesse nossas lojas parceiras e compre seus medicamentos com receita digital e frete grátis.", img: triagemPatient },
 ];
 
@@ -152,11 +152,9 @@ const Index = () => {
               <div className="relative group w-full flex flex-col items-center">
                 <div className="relative">
                   <div className="absolute -inset-10 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-[80px] opacity-40 group-hover:opacity-70 transition duration-1000"></div>
-                  <img
-                    src={heroPhoneMockup}
-                    alt="Planta y Raiz App - Diretório de Profissionais e Crescimento da Indústria Cannabis no Brasil"
-                    className="w-[364px] md:w-[494px] lg:w-[572px] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
-                  />
+                  <div className="relative z-10">
+                    <HeroCarousel />
+                  </div>
                 </div>
               </div>
             </motion.div>

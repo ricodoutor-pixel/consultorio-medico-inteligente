@@ -107,10 +107,14 @@ const Index = () => {
                 <span className="text-gradient-purple">Equidade.</span>
               </motion.h1>
 
-              <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-2xl mb-8 leading-relaxed font-medium inline-flex items-center flex-wrap gap-2">
-                Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎
-                <GlobalComplianceBadge />
-              </motion.p>
+              <motion.div variants={fadeUp} className="max-w-2xl mb-8">
+                <div className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium inline-flex items-center flex-wrap gap-2">
+                  <span>
+                    Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎
+                  </span>
+                  <GlobalComplianceBadge />
+                </div>
+              </motion.div>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-5 mb-12">
                 <Button size="lg" className="text-base font-black h-16 px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>

@@ -9,6 +9,7 @@ import carousel4 from "@/assets/carousel-4.jpg";
 import carousel5 from "@/assets/carousel-5.jpg";
 import carousel6 from "@/assets/carousel-6.jpg";
 import carousel7 from "@/assets/carousel-7.jpg";
+import carousel8 from "@/assets/carousel-8.jpg";
 
 const slides = [
   { src: carousel1, alt: "Teleconsulta médica via smartphone" },
@@ -18,6 +19,7 @@ const slides = [
   { src: carousel5, alt: "Prescrição digital cannabis" },
   { src: carousel6, alt: "Comunidade de saúde e bem-estar" },
   { src: carousel7, alt: "Consulta médica cannabis medicinal online" },
+  { src: carousel8, alt: "Dr. Verdinho - Mascote Planta y Raiz" },
 ];
 
 export function HeroCarousel() {

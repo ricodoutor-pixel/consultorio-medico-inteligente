@@ -237,12 +237,12 @@ const Profissionais = () => {
                         </Button>
                       </div>
                       <a
-                        href={`https://wa.me/${p.whatsapp}?text=${encodeURIComponent(`Olá! Vi o perfil de ${p.name} na Planta & Raiz e gostaria de mais informações.`)}`}
+                        href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${p.name}`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
                         <Button variant="outline" size="sm" className="w-full text-xs font-bold border-[hsl(142,70%,45%)]/40 text-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,45%)]/10 rounded-xl gap-1.5">
-                          <Phone size={12} /> Contato WhatsApp
+                          <Phone size={12} /> Agendar via WhatsApp
                         </Button>
                       </a>
                     </div>

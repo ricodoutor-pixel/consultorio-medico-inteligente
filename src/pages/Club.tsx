@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, MessageCircle, Share2, ShoppingCart, Bell, Check, Send, X, Star, Filter, ChevronLeft, ChevronRight, Minus, Plus, Trash2, Package, MapPin } from "lucide-react";
+import { Heart, MessageCircle, Share2, ShoppingCart, Bell, Check, Send, X, Star, Filter, ChevronLeft, ChevronRight, Minus, Plus, Trash2, Package, MapPin, Camera, Image as ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -41,17 +41,16 @@ import prod10a from "@/assets/club/prod10-a.jpg";
 import prod10b from "@/assets/club/prod10-b.jpg";
 import prod10c from "@/assets/club/prod10-c.jpg";
 
-// Post images
-import post1b from "@/assets/club/post1-b.jpg";
-import post1c from "@/assets/club/post1-c.jpg";
-import post2b from "@/assets/club/post2-b.jpg";
-import post2c from "@/assets/club/post2-c.jpg";
-import post3b from "@/assets/club/post3-b.jpg";
-import post3c from "@/assets/club/post3-c.jpg";
-
-import clubPostCachoeira from "@/assets/club-post-cachoeira.jpg";
-import clubPostTrilha from "@/assets/club-post-trilha.jpg";
-import clubPostPraia from "@/assets/club-post-praia.jpg";
+// Feed images - AI generated
+import feedCachoeira from "@/assets/club/feed-cachoeira.jpg";
+import feedCachoeira2 from "@/assets/club/feed-cachoeira2.jpg";
+import feedCachoeira3 from "@/assets/club/feed-cachoeira3.jpg";
+import feedTrilha from "@/assets/club/feed-trilha.jpg";
+import feedTrilha2 from "@/assets/club/feed-trilha2.jpg";
+import feedTrilha3 from "@/assets/club/feed-trilha3.jpg";
+import feedPraia from "@/assets/club/feed-praia.jpg";
+import feedPraia2 from "@/assets/club/feed-praia2.jpg";
+import feedPraia3 from "@/assets/club/feed-praia3.jpg";
 
 const WHATSAPP_BRISA = "https://wa.me/5511991363154";
 
@@ -90,24 +89,24 @@ const clubProducts: Product[] = [
 const staticPosts = [
   {
     id: "static-1",
-    content: "Que manhã perfeita na Cachoeira do Poço Verde! A água estava tão cristalina... 💚 Já quero voltar!",
-    images: [clubPostCachoeira, post1b, post1c],
+    content: "Que manhã perfeita na Cachoeira do Poço Verde! A água estava tão cristalina que dava pra ver os peixes nadando... 💚 Experiência transformadora, já quero voltar! plantayraiz.com.br",
+    images: [feedCachoeira, feedCachoeira2, feedCachoeira3],
     likes_count: 342, comment_count: 28, share_count: 15,
     user_id: "static", author: "Marina Silva", avatar: "👩‍🦱", location: "Cachoeira do Poço Verde, RJ",
     status: "active", created_at: new Date().toISOString(),
   },
   {
     id: "static-2",
-    content: "Trilha da Serra da Mantiqueira no amanhecer... Nada se compara! 🏔️✨ O nascer do sol lá é transformador.",
-    images: [clubPostTrilha, post2b, post2c],
+    content: "Trilha da Serra da Mantiqueira no amanhecer... Nada se compara! 🏔️✨ O nascer do sol lá de cima é de tirar o fôlego. Obrigado Planta y Raiz pela nova qualidade de vida!",
+    images: [feedTrilha, feedTrilha2, feedTrilha3],
     likes_count: 567, comment_count: 45, share_count: 32,
     user_id: "static", author: "Lucas Oliveira", avatar: "👨‍🦱", location: "Serra da Mantiqueira, SP",
     status: "active", created_at: new Date().toISOString(),
   },
   {
     id: "static-3",
-    content: "Dia de praia em Jericoacoara! O pôr do sol aqui é de outro mundo 🌅 Recomendo demais para relaxar!",
-    images: [clubPostPraia, post3b, post3c],
+    content: "Dia de praia em Jericoacoara com a galera! 🌅 O pôr do sol aqui é de outro mundo. Desde que comecei o tratamento, minha qualidade de vida mudou completamente!",
+    images: [feedPraia, feedPraia2, feedPraia3],
     likes_count: 678, comment_count: 67, share_count: 41,
     user_id: "static", author: "Felipe Santos", avatar: "👨‍🦲", location: "Jericoacoara, CE",
     status: "active", created_at: new Date().toISOString(),
@@ -164,6 +163,7 @@ const Club = () => {
   const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>(staticPosts);
   const [newPost, setNewPost] = useState("");
+  const [postImages, setPostImages] = useState<string[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [commentModal, setCommentModal] = useState<string | null>(null);
@@ -208,9 +208,26 @@ const Club = () => {
   const handleCreatePost = async () => {
     if (!user) { toast({ title: "Login necessário", variant: "destructive" }); return; }
     if (!newPost.trim()) return;
-    await supabase.from("club_posts").insert({ user_id: user.id, content: newPost });
-    setNewPost(""); loadPosts();
+    await supabase.from("club_posts").insert({ user_id: user.id, content: newPost, images: postImages.length > 0 ? postImages : [] });
+    setNewPost(""); setPostImages([]); loadPosts();
     toast({ title: "Post criado! 🌿" });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || !user) return;
+    const remaining = 3 - postImages.length;
+    const filesToUpload = Array.from(files).slice(0, remaining);
+    
+    for (const file of filesToUpload) {
+      const ext = file.name.split(".").pop();
+      const path = `club-posts/${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("experience-images").upload(path, file);
+      if (!error) {
+        const { data: urlData } = supabase.storage.from("experience-images").getPublicUrl(path);
+        setPostImages((prev) => [...prev, urlData.publicUrl]);
+      }
+    }
   };
 
   const handleLikePost = async (postId: string, currentLikes: number) => {
@@ -438,9 +455,33 @@ const Club = () => {
 
             {user ? (
               <div className="mb-8 bg-card border border-border rounded-xl p-4">
-                <textarea value={newPost} onChange={(e) => setNewPost(e.target.value)} placeholder="Compartilhe sua experiência..."
+                <textarea value={newPost} onChange={(e) => setNewPost(e.target.value)} placeholder="Compartilhe sua experiência em cachoeiras, praias, trilhas, montanhas..."
                   className="w-full bg-transparent text-foreground placeholder:text-muted-foreground border-none outline-none resize-none text-sm min-h-[80px]" />
-                <div className="flex justify-end mt-2">
+                
+                {/* Image previews */}
+                {postImages.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    {postImages.map((img, i) => (
+                      <div key={i} className="relative">
+                        <img src={img} alt="" className="w-full h-24 object-cover rounded-lg" />
+                        <button onClick={() => setPostImages((prev) => prev.filter((_, idx) => idx !== i))}
+                          className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5">
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center mt-3">
+                  {postImages.length < 3 && (
+                    <label className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary cursor-pointer transition">
+                      <Camera size={16} />
+                      <span>Fotos ({postImages.length}/3)</span>
+                      <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
+                    </label>
+                  )}
+                  {postImages.length >= 3 && <span className="text-xs text-primary font-medium">✓ 3 fotos adicionadas</span>}
                   <Button size="sm" onClick={handleCreatePost}><Send size={14} className="mr-1" /> Publicar</Button>
                 </div>
               </div>

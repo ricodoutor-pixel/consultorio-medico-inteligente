@@ -163,7 +163,7 @@ const Club = () => {
   const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>(staticPosts);
   const [newPost, setNewPost] = useState("");
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [postImages, setPostImages] = useState<string[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [commentModal, setCommentModal] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");

@@ -13,17 +13,19 @@ import { professionals, categories } from "@/data/professionals";
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
-const WhatsAppContactButton = ({ whatsapp, name, className = "" }: { whatsapp: string; name: string; className?: string }) => {
-  const message = encodeURIComponent(`Olá! Encontrei seu perfil na Planta & Raiz e gostaria de agendar uma consulta com ${name}.`);
+const BRISA_WHATSAPP = "5511991363154";
+
+const WhatsAppContactButton = ({ name, className = "" }: { name: string; className?: string }) => {
+  const message = encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${name}`);
   return (
     <a
-      href={`https://wa.me/${whatsapp}?text=${message}`}
+      href={`https://wa.me/${BRISA_WHATSAPP}?text=${message}`}
       target="_blank"
       rel="noopener noreferrer"
       className={className}
     >
       <Button variant="outline" className="w-full text-sm font-black border-[hsl(142,70%,45%)] text-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,45%)]/10 rounded-xl gap-2">
-        <Phone size={14} /> Contato WhatsApp
+        <Phone size={14} /> Agendar via WhatsApp
       </Button>
     </a>
   );
@@ -68,7 +70,7 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
                     <MessageSquare size={16} className="mr-2" /> Falar com Especialista
                   </Link>
                 </Button>
-                <WhatsAppContactButton whatsapp={pro.whatsapp} name={pro.name} />
+                <WhatsAppContactButton name={pro.name} />
               </div>
             </CardContent>
           </Card>
@@ -235,12 +237,12 @@ const Profissionais = () => {
                         </Button>
                       </div>
                       <a
-                        href={`https://wa.me/${p.whatsapp}?text=${encodeURIComponent(`Olá! Vi o perfil de ${p.name} na Planta & Raiz e gostaria de mais informações.`)}`}
+                        href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${p.name}`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
                         <Button variant="outline" size="sm" className="w-full text-xs font-bold border-[hsl(142,70%,45%)]/40 text-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,45%)]/10 rounded-xl gap-1.5">
-                          <Phone size={12} /> Contato WhatsApp
+                          <Phone size={12} /> Agendar via WhatsApp
                         </Button>
                       </a>
                     </div>

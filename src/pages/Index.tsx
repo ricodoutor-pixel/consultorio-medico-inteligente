@@ -252,12 +252,15 @@ const Index = () => {
               { name: "Tabagismo", bg: "bg-yellow-600", shadow: "shadow-yellow-600/30" },
               { name: "TDAH", bg: "bg-blue-500", shadow: "shadow-blue-500/30" },
               { name: "Parkinson", bg: "bg-green-700", shadow: "shadow-green-700/30" },
-            ].map((item) => (
+            ].map((item, index) => (
               <Link
                 key={item.name}
                 to={`/consulta-rapida`}
                 onClick={() => sessionStorage.setItem("triage_condition", item.name)}
-                className={`px-5 py-3 rounded-full ${item.bg} text-white font-bold text-sm shadow-lg ${item.shadow} hover:scale-105 transition-all duration-300 animate-[pulse_4s_cubic-bezier(0.4,0,0.6,1)_infinite] hover:animate-none`}
+                className={`px-5 py-3 rounded-full ${item.bg} text-white font-bold text-sm shadow-lg ${item.shadow} hover:scale-105 transition-all duration-300 hover:animate-none`}
+                style={{
+                  animation: `twinkle ${6 + (index % 5) * 1.5}s ease-in-out ${(index * 0.8) % 7}s infinite`,
+                }}
               >
                 {item.name}
               </Link>

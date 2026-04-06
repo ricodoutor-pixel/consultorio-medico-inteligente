@@ -90,7 +90,7 @@ const staticPosts = [
   {
     id: "static-1",
     content: "Que manhã perfeita na Cachoeira do Poço Verde! A água estava tão cristalina que dava pra ver os peixes nadando... 💚 Experiência transformadora, já quero voltar! plantayraiz.com.br",
-    images: [feedCachoeira, feedCachoeira2, feedCachoeira3],
+    images: [feedPersonCachoeira1, feedPersonCachoeira2, feedPersonCachoeira3],
     likes_count: 342, comment_count: 28, share_count: 15,
     user_id: "static", author: "Marina Silva", avatar: "👩‍🦱", location: "Cachoeira do Poço Verde, RJ",
     status: "active", created_at: new Date().toISOString(),
@@ -98,7 +98,7 @@ const staticPosts = [
   {
     id: "static-2",
     content: "Trilha da Serra da Mantiqueira no amanhecer... Nada se compara! 🏔️✨ O nascer do sol lá de cima é de tirar o fôlego. Obrigado Planta y Raiz pela nova qualidade de vida!",
-    images: [feedTrilha, feedTrilha2, feedTrilha3],
+    images: [feedPersonTrilha1, feedPersonTrilha2, feedPersonTrilha3],
     likes_count: 567, comment_count: 45, share_count: 32,
     user_id: "static", author: "Lucas Oliveira", avatar: "👨‍🦱", location: "Serra da Mantiqueira, SP",
     status: "active", created_at: new Date().toISOString(),
@@ -106,7 +106,7 @@ const staticPosts = [
   {
     id: "static-3",
     content: "Dia de praia em Jericoacoara com a galera! 🌅 O pôr do sol aqui é de outro mundo. Desde que comecei o tratamento, minha qualidade de vida mudou completamente!",
-    images: [feedPraia, feedPraia2, feedPraia3],
+    images: [feedPersonPraia1, feedPersonPraia2, feedPersonPraia3],
     likes_count: 678, comment_count: 67, share_count: 41,
     user_id: "static", author: "Felipe Santos", avatar: "👨‍🦲", location: "Jericoacoara, CE",
     status: "active", created_at: new Date().toISOString(),

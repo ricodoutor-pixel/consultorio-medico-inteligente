@@ -71,21 +71,6 @@ export function HeroCarousel() {
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-28 h-1 bg-foreground/30 rounded-full z-20" />
       </div>
 
-      {/* Dots */}
-      <div className="flex justify-center gap-2 mt-4">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            className={`w-2 h-2 rounded-full transition-all ${
-              i === selectedIndex
-                ? "bg-primary w-6"
-                : "bg-muted-foreground/30"
-            }`}
-            onClick={() => emblaApi?.scrollTo(i)}
-            aria-label={`Slide ${i + 1}`}
-          />
-        ))}
-      </div>
     </div>
   );
 }

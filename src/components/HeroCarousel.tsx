@@ -10,6 +10,7 @@ import carousel5 from "@/assets/carousel-5.jpg";
 import carousel6 from "@/assets/carousel-6.jpg";
 import carousel7 from "@/assets/carousel-7.jpg";
 import carousel8 from "@/assets/carousel-8.jpg";
+import carousel9 from "@/assets/carousel-9.jpg";
 
 const slides = [
   { src: carousel1, alt: "Teleconsulta médica via smartphone" },
@@ -20,6 +21,7 @@ const slides = [
   { src: carousel6, alt: "Comunidade de saúde e bem-estar" },
   { src: carousel7, alt: "Consulta médica cannabis medicinal online" },
   { src: carousel8, alt: "Dr. Verdinho - Mascote Planta y Raiz" },
+  { src: carousel9, alt: "Brisa - Enfermeira Chefe IA Planta y Raiz" },
 ];
 
 export function HeroCarousel() {

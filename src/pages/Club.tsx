@@ -41,16 +41,16 @@ import prod10a from "@/assets/club/prod10-a.jpg";
 import prod10b from "@/assets/club/prod10-b.jpg";
 import prod10c from "@/assets/club/prod10-c.jpg";
 
-// Feed images - AI generated
-import feedCachoeira from "@/assets/club/feed-cachoeira.jpg";
-import feedCachoeira2 from "@/assets/club/feed-cachoeira2.jpg";
-import feedCachoeira3 from "@/assets/club/feed-cachoeira3.jpg";
-import feedTrilha from "@/assets/club/feed-trilha.jpg";
-import feedTrilha2 from "@/assets/club/feed-trilha2.jpg";
-import feedTrilha3 from "@/assets/club/feed-trilha3.jpg";
-import feedPraia from "@/assets/club/feed-praia.jpg";
-import feedPraia2 from "@/assets/club/feed-praia2.jpg";
-import feedPraia3 from "@/assets/club/feed-praia3.jpg";
+// Feed images - pessoas reais em lugares incríveis
+import feedPersonCachoeira1 from "@/assets/club/feed-person-cachoeira1.jpg";
+import feedPersonCachoeira2 from "@/assets/club/feed-person-cachoeira2.jpg";
+import feedPersonCachoeira3 from "@/assets/club/feed-person-cachoeira3.jpg";
+import feedPersonTrilha1 from "@/assets/club/feed-person-trilha1.jpg";
+import feedPersonTrilha2 from "@/assets/club/feed-person-trilha2.jpg";
+import feedPersonTrilha3 from "@/assets/club/feed-person-trilha3.jpg";
+import feedPersonPraia1 from "@/assets/club/feed-person-praia1.jpg";
+import feedPersonPraia2 from "@/assets/club/feed-person-praia2.jpg";
+import feedPersonPraia3 from "@/assets/club/feed-person-praia3.jpg";
 
 const WHATSAPP_BRISA = "https://wa.me/5511991363154";
 

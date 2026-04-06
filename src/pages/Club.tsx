@@ -41,17 +41,16 @@ import prod10a from "@/assets/club/prod10-a.jpg";
 import prod10b from "@/assets/club/prod10-b.jpg";
 import prod10c from "@/assets/club/prod10-c.jpg";
 
-// Post images
-import post1b from "@/assets/club/post1-b.jpg";
-import post1c from "@/assets/club/post1-c.jpg";
-import post2b from "@/assets/club/post2-b.jpg";
-import post2c from "@/assets/club/post2-c.jpg";
-import post3b from "@/assets/club/post3-b.jpg";
-import post3c from "@/assets/club/post3-c.jpg";
-
-import clubPostCachoeira from "@/assets/club-post-cachoeira.jpg";
-import clubPostTrilha from "@/assets/club-post-trilha.jpg";
-import clubPostPraia from "@/assets/club-post-praia.jpg";
+// Feed images - AI generated
+import feedCachoeira from "@/assets/club/feed-cachoeira.jpg";
+import feedCachoeira2 from "@/assets/club/feed-cachoeira2.jpg";
+import feedCachoeira3 from "@/assets/club/feed-cachoeira3.jpg";
+import feedTrilha from "@/assets/club/feed-trilha.jpg";
+import feedTrilha2 from "@/assets/club/feed-trilha2.jpg";
+import feedTrilha3 from "@/assets/club/feed-trilha3.jpg";
+import feedPraia from "@/assets/club/feed-praia.jpg";
+import feedPraia2 from "@/assets/club/feed-praia2.jpg";
+import feedPraia3 from "@/assets/club/feed-praia3.jpg";
 
 const WHATSAPP_BRISA = "https://wa.me/5511991363154";
 

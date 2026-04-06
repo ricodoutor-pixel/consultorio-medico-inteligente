@@ -157,12 +157,13 @@ const Index = () => {
                   </div>
                 </div>
                 {/* Texto institucional abaixo do carrossel */}
-                <p className="mt-6 text-center leading-relaxed font-display font-bold text-[clamp(0.85rem,2.2vw,1.25rem)] max-w-2xl mx-auto px-4">
+                <p className="mt-6 text-center leading-relaxed font-display font-bold text-[clamp(0.95rem,2.5vw,1.5rem)] max-w-full lg:max-w-5xl mx-auto px-4 lg:px-8">
                   <span className="text-[hsl(var(--primary))]">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
                   <span className="text-[hsl(25,95%,60%)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
-                  <span className="text-[hsl(280,80%,65%)]">E Realmente democratizando o acesso ao tratamento,</span>{' '}
+                  <span className="text-[hsl(280,80%,65%)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}
                   <span className="text-[hsl(190,90%,50%)]">Canabinoide oferecendo consultas com especialistas</span>{' '}
-                  <span className="text-[hsl(45,90%,55%)]">por apenas R$30</span>
+                  <span className="text-[hsl(45,90%,55%)]">por apenas R$30.</span>{' '}
+                  <span className="text-[hsl(340,85%,60%)]">Venha Você Também Fazer Parte de Milhões de Pessoas que Mudaram a Sua Qualidade de Vida!</span>
                 </p>
               </div>
             </motion.div>

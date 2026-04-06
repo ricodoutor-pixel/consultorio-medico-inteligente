@@ -8,6 +8,7 @@ import carousel3 from "@/assets/carousel-3.jpg";
 import carousel4 from "@/assets/carousel-4.jpg";
 import carousel5 from "@/assets/carousel-5.jpg";
 import carousel6 from "@/assets/carousel-6.jpg";
+import carousel7 from "@/assets/carousel-7.jpg";
 
 const slides = [
   { src: carousel1, alt: "Teleconsulta médica via smartphone" },
@@ -16,6 +17,7 @@ const slides = [
   { src: carousel4, alt: "Marketplace cannabis medicinal" },
   { src: carousel5, alt: "Prescrição digital cannabis" },
   { src: carousel6, alt: "Comunidade de saúde e bem-estar" },
+  { src: carousel7, alt: "Consulta médica cannabis medicinal online" },
 ];
 
 export function HeroCarousel() {

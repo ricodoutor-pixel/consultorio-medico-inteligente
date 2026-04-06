@@ -152,11 +152,9 @@ const Index = () => {
               <div className="relative group w-full flex flex-col items-center">
                 <div className="relative">
                   <div className="absolute -inset-10 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-[80px] opacity-40 group-hover:opacity-70 transition duration-1000"></div>
-                  <img
-                    src={heroPhoneMockup}
-                    alt="Planta y Raiz App - Diretório de Profissionais e Crescimento da Indústria Cannabis no Brasil"
-                    className="w-[364px] md:w-[494px] lg:w-[572px] relative z-10 transition-transform duration-700 hover:scale-[1.03]"
-                  />
+                  <div className="relative z-10">
+                    <HeroCarousel />
+                  </div>
                 </div>
               </div>
             </motion.div>

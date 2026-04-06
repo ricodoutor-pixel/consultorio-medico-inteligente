@@ -70,7 +70,7 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
                     <MessageSquare size={16} className="mr-2" /> Falar com Especialista
                   </Link>
                 </Button>
-                <WhatsAppContactButton whatsapp={pro.whatsapp} name={pro.name} />
+                <WhatsAppContactButton name={pro.name} />
               </div>
             </CardContent>
           </Card>

@@ -1,0 +1,249 @@
+================================================================================
+PROMPT COMPLETO PARA LOVABLE.DEV - CLÍNICA DIGITAL ROBUSTA
+COPIA E COLA - PRONTO PARA USAR
+================================================================================
+
+OBJETIVO: Desenvolver o MVP da Planta & Raiz, uma clínica digital robusta de telemedicina especializada em terapias canabinoides e clínica geral, com segurança LGPD, prescrição médica RDC 660 e estética profissional.
+
+---
+
+CONFIGURAÇÕES TÉCNICAS:
+
+Tech Stack: React 19, Tailwind CSS 4, Lucide Icons, Node.js + Express + tRPC, MySQL/TiDB, Manus OAuth + JWT, WebRTC/Jitsi, Mercado Pago, S3 CDN.
+
+Design System:
+- Paleta Primária: Verde Floresta (#10B981, #059669, #047857)
+- Paleta Secundária: Branco Off-white (#F9FAFB, #F3F4F6)
+- Acentos: Azul Médico (#0EA5E9), Vermelho Alerta (#EF4444), Amarelo (#FBBF24)
+- Tipografia: Poppins (Headlines), Inter (Body), JetBrains Mono (Código)
+- Ícones: Lucide React (24px, 32px, 48px)
+
+Responsividade: Mobile-first (320px - 640px), Tablet (640px - 1024px), Desktop (1024px+)
+
+---
+
+FUNCIONALIDADE 1: DASHBOARD DO PACIENTE
+
+Layout:
+- Header com Logo, "Minhas Consultas", Menu
+- Welcome Card: "Bem-vindo, [Nome]" + Próxima Consulta
+- Seção: Próximas Consultas (Cards com data, hora, médico, botão "Entrar")
+- Seção: Histórico de Consultas (Lista com data, médico, duração, status)
+- Seção: Minhas Prescrições (Cards com medicamento, dosagem, botão "Visualizar PDF")
+- Seção: Upload de Documentos (Drag-and-drop para exames, históricos)
+- Seção: Educação ao Paciente (Cards sobre ANVISA, uso terapêutico)
+
+Dados Exibidos: Nome, Email, Telefone (mascarado), Data de Nascimento, CPF (mascarado), Próximas Consultas (máx 3), Histórico (últimas 10), Prescrições Ativas, Documentos Enviados.
+
+---
+
+FUNCIONALIDADE 2: MÓDULO DE PRESCRIÇÃO RDC 660
+
+Interface do Médico:
+- Campo: Paciente (Seletor com busca por nome/CPF)
+- Campo: Data (Date picker)
+- Campo: Validade (30/60/90 dias)
+- Campo: Tipo de Medicamento (Óleo, Flor, Cápsula, Tópico, Sublingual)
+- Campo: Canabinoides (Sliders: THC 0-30%, CBD 0-30%)
+- Campo: Concentração (Numérico em mg/mL)
+- Campo: Dosagem (Numérico em mg + Frequência em horas)
+- Campo: Quantidade (Numérico + Unidade: mL, g, cápsulas)
+- Campo: Via de Administração (Oral, Tópica, Sublingual, Inalação)
+- Campo: Indicação Clínica (Textarea com sugestões: epilepsia, dor, ansiedade, etc)
+- Campo: Observações (Textarea)
+- Checkbox: Termo de Responsabilidade (Obrigatório + link para termo completo)
+- Campo: Assinatura Digital (Médico)
+
+Botões: [Gerar PDF] [Enviar por Email] [Salvar]
+
+Exportação: PDF profissional com logo, dados do paciente, medicamento, dosagem, termo. Email automático para paciente + cópia para médico. Histórico salvo no banco com data/hora/médico.
+
+Validações: Paciente selecionado, Medicamento preenchido, Dosagem válida, Termo aceito, Médico autenticado.
+
+---
+
+FUNCIONALIDADE 3: SISTEMA DE AGENDAMENTO
+
+Interface:
+- Campo: Especialidade (Seletor: Clínica Geral, Cannabis Medicinal, Neurologia, etc)
+- Campo: Médico (Cards com foto, nome, especialidade, avaliação)
+- Campo: Data (Calendário com datas livres dos próximos 30 dias)
+- Campo: Horário (Slots disponíveis: 09:00, 09:30, 10:00, etc)
+- Campo: Tipo de Consulta (Presencial ou Telemedicina)
+- Campo: Motivo da Consulta (Textarea para descrever queixa principal)
+- Seção: Triagem de Saúde (Perguntas sobre condições atuais, medicamentos, alergias, histórico familiar)
+
+Botões: [Confirmar] [Cancelar]
+
+Integração: Após confirmar, redirecionar para checkout Mercado Pago. Valores: Consulta Inicial (R$ 150), Retorno (R$ 100), Prescrição (R$ 80). Após pagamento, enviar email com link para telemedicina.
+
+Notificações: Email de confirmação + link. SMS lembrete 24h antes (opcional). Push 15min antes (se app mobile).
+
+---
+
+FUNCIONALIDADE 4: SALA DE TELEMEDICINA
+
+Layout:
+- Coluna Esquerda: Vídeo do Médico (WebRTC/Jitsi em full HD)
+  Botões: Mute, Câmera, Compartilhar Tela, Encerrar
+- Coluna Direita: 
+  - Chat Lateral (Mensagens em tempo real, emojis, arquivos)
+  - Anotações do Médico (Área para notas durante consulta)
+  - Prontuário Eletrônico (Acesso ao histórico do paciente)
+  - Botão para Gerar Prescrição
+
+Funcionalidades: Vídeo HD com baixa latência, Chat com suporte a emojis e arquivos, Compartilhamento de tela, Gravação (com consentimento), Prescrição em tempo real, Anotações sincronizadas.
+
+Segurança: Conexão criptografada (HTTPS/WSS), Autenticação de paciente e médico, Timeout automático após 30 min de inatividade, Logs de acesso.
+
+---
+
+FUNCIONALIDADE 5: SEGURANÇA LGPD
+
+Banners de Consentimento:
+"Ao usar esta plataforma, você concorda com nossa Política de Privacidade. Seus dados são protegidos conforme a Lei Geral de Proteção de Dados (LGPD)."
+Botões: [Li e Aceito] [Política] [Contato]
+
+Máscaras de Privacidade:
+- CPF: 123.456.789-** (últimos 2 dígitos ocultos)
+- Telefone: (11) 9****-**** (últimos 4 dígitos ocultos)
+- Email: user@emai****.com (domínio parcialmente oculto)
+- Cartão: **** **** **** 1234 (últimos 4 dígitos visíveis)
+
+Políticas: Política de Privacidade (link footer), Termos de Uso (link footer), Termo de Consentimento LGPD (banner primeiro acesso), Direito de Acesso aos Dados (página de dados pessoais), Direito de Exclusão (botão "Deletar Conta"), Direito de Portabilidade (botão "Exportar Dados").
+
+Criptografia: Dados sensíveis criptografados no banco, Conexão HTTPS/TLS 1.3, Tokens JWT com expiração, Senhas com hash bcrypt.
+
+---
+
+FLUXOS DE USUÁRIO:
+
+FLUXO 1 - ONBOARDING DO PACIENTE:
+1. Paciente acessa plantayraiz.com.br
+2. Clica em "Criar Conta"
+3. Preenche: Nome, Email, Telefone, Data de Nascimento, CPF
+4. Aceita Termos + LGPD
+5. Preenche Triagem: Condições de saúde, Medicamentos, Alergias, Histórico familiar, Motivo da consulta
+6. Seleciona especialidade e médico
+7. Escolhe data/hora disponível
+8. Confirma agendamento
+9. Redireciona para checkout Mercado Pago
+10. Após pagamento, acesso ao dashboard
+11. Email com link para telemedicina (se consulta hoje)
+
+FLUXO 2 - CONSULTA TELEMEDICINA:
+1. Paciente clica "Entrar na Consulta"
+2. Verifica câmera e microfone
+3. Entra na sala de telemedicina
+4. Médico entra na sala
+5. Consulta com Vídeo HD, Chat, Anotações
+6. Médico gera prescrição (se necessário)
+7. Prescrição enviada para paciente por email
+8. Consulta encerrada
+9. Paciente recebe feedback e avaliação
+
+FLUXO 3 - PRESCRIÇÃO RDC 660:
+1. Médico acessa "Nova Prescrição"
+2. Seleciona paciente
+3. Preenche dados do medicamento (tipo, canabinoides, concentração, dosagem, quantidade, via)
+4. Preenche indicação clínica
+5. Aceita termo de responsabilidade
+6. Clica "Gerar PDF"
+7. PDF gerado com assinatura digital
+8. Prescrição enviada para paciente por email
+9. Prescrição salva no histórico do paciente
+
+---
+
+INSTRUÇÕES DE DESIGN:
+
+Cores: Use Verde Floresta (#10B981) para botões e links principais. Use Branco Off-white (#F9FAFB) para fundos. Use Azul (#0EA5E9) para informações e Vermelho (#EF4444) para alertas.
+
+Componentes: Botões com Verde + hover mais escuro, texto branco. Cards com fundo off-white e borda cinza clara. Inputs com borda cinza, foco verde. Headers com Verde e ícones brancos. Badges com Verde claro e texto verde escuro.
+
+Tipografia: Headlines em Poppins Bold (32px, 28px, 24px). Subtítulos em Poppins SemiBold (20px, 18px). Body em Inter Regular (16px, 14px). Small em Inter Regular (12px, 11px). Código em JetBrains Mono.
+
+Ícones: Lucide React 24px padrão, 32px para destaque. Cores: Verde primária, cinza para desabilitado. Espaçamento: 8px entre ícone e texto.
+
+Responsividade: Mobile (320-640px): Stack vertical, botões full-width, texto 14px, menu hamburger, modais fullscreen. Tablet (640-1024px): 2 colunas, botões padding reduzido, texto 16px, menu horizontal. Desktop (1024px+): 3+ colunas, botões padding normal, texto 16px, menu horizontal completo.
+
+---
+
+INSTRUÇÕES ESPECÍFICAS:
+
+"Crie um fluxo de onboarding onde o paciente preenche uma triagem inicial sobre suas condições de saúde antes de confirmar o agendamento."
+
+"O cabeçalho deve ser simples, com acesso rápido ao botão 'Minhas Consultas' e 'Nova Prescrição'."
+
+"Inclua uma seção de 'Educação ao Paciente' no dashboard com cards sobre regulamentação da Anvisa e uso terapêutico."
+
+"Implemente máscaras de privacidade para CPF, Telefone, Email e Cartão conforme LGPD."
+
+"A prescrição RDC 660 deve ser exportável em PDF com assinatura digital do médico."
+
+"A sala de telemedicina deve ter vídeo HD, chat lateral e anotações do médico em tempo real."
+
+"Todos os dados sensíveis devem ser criptografados e protegidos conforme LGPD."
+
+"O checkout deve integrar com Mercado Pago para pagamento das consultas."
+
+"Após agendamento confirmado e pagamento realizado, enviar email com link para telemedicina."
+
+"O design deve ser profissional, moderno e inspirado em Verde Floresta + Off-white."
+
+"Responsividade mobile-first: foco total em pacientes que acessam pelo celular."
+
+---
+
+INTEGRAÇÃO COM BACKEND:
+
+Após o Lovable gerar a interface, conecte com o backend Node.js já implementado em: https://github.com/ricodoutor-pixel/consultorio-medico-inteligente
+
+O backend inclui:
+- 12 funcionalidades tRPC (onboarding, prescrição, telemedicina, etc)
+- Schema MySQL com todas as tabelas
+- Autenticação Manus OAuth + JWT
+- Integração com Mercado Pago
+- Armazenamento em S3
+
+Para integrar:
+1. Clone o repositório
+2. Copie o código do Lovable para client/src/
+3. Execute: pnpm install && pnpm dev
+4. Teste os fluxos
+5. Deploy: pnpm build && git push
+
+---
+
+PRÓXIMOS PASSOS:
+
+1. Gerar interface no Lovable (copie e cole este prompt)
+2. Revisar e ajustar conforme necessário
+3. Integrar com backend Node.js
+4. Testar todos os fluxos
+5. Deploy em Hostinger
+6. Promover para médicos prescritores
+
+---
+
+RESULTADO ESPERADO:
+
+Após gerar no Lovable, você terá:
+✓ Dashboard do paciente funcional
+✓ Módulo de prescrição RDC 660
+✓ Sistema de agendamento completo
+✓ Sala de telemedicina integrada
+✓ Segurança LGPD implementada
+✓ Design profissional e moderno
+✓ Responsividade perfeita (mobile/tablet/desktop)
+✓ Pronto para integrar com backend
+✓ Pronto para deploy em Hostinger
+✓ Pronto para promover aos médicos
+
+---
+
+TRANSFORME ISSO NA #1 CLÍNICA DIGITAL DO BRASIL! 🏥🚀
+
+================================================================================
+FIM DO PROMPT - COPIA E COLA COMPLETO PARA LOVABLE.DEV
+================================================================================

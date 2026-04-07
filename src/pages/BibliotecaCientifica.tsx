@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { strains, strainCategories, getTerpenosByType, terpenoInfo, type CannabisStrain } from "@/data/strains";
-import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck } from "lucide-react";
+import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck, Download } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { StrainImage } from "@/components/StrainImage";
@@ -91,7 +91,7 @@ const BibliotecaCientifica = () => {
         <div className="container mx-auto px-4 relative z-10">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-green border border-green flex items-center justify-center">
                 <Leaf size={24} className="text-primary" />
               </div>
               <span className="text-sm font-bold text-primary tracking-wider">BIBLIOTECA CIENTÍFICA</span>
@@ -126,6 +126,36 @@ const BibliotecaCientifica = () => {
                 </div>
               ))}
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* E-book Download Banner */}
+      <section className="py-4 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-b border-primary/20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-card/50 border border-primary/20 backdrop-blur-sm"
+          >
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">📚</div>
+              <div>
+                <h3 className="font-bold text-primary text-lg">E-book Exclusivo</h3>
+                <p className="text-sm text-muted-foreground">Cannabis Medicinal para Médicos e Estudantes</p>
+              </div>
+            </div>
+            <a
+              href="https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/curYHVvSuqFvKkkY.pdf"
+              download="EBOOK_CANNABIS_MEDICINAL_CURSO_COMPLETO.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-lg hover:shadow-lg hover:shadow-primary/50 transition-all duration-300 transform hover:scale-105 whitespace-nowrap"
+            >
+              <Download size={20} />
+              Baixar E-book (PDF - 698 KB)
+            </a>
           </motion.div>
         </div>
       </section>

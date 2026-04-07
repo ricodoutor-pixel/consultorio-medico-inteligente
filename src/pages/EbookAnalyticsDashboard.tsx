@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -8,30 +6,76 @@ import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Cart
 import { Download, TrendingUp, Users, Globe, Smartphone } from "lucide-react";
 
 export default function EbookAnalyticsDashboard() {
-  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Redirect if not admin - handled by AdminRoute component
+  // Mock data for analytics
+  const mockSummary = {
+    totalDownloads: 1250,
+    uniqueEmails: 890,
+    uniqueCountries: 45,
+    deviceBreakdown: {
+      "Desktop": 650,
+      "Mobile": 450,
+      "Tablet": 150
+    },
+    professionBreakdown: {
+      "Médico": 380,
+      "Enfermeiro": 250,
+      "Estudante": 320,
+      "Farmacêutico": 150,
+      "Outro": 150
+    },
+    sourceBreakdown: {
+      "Google": 450,
+      "Facebook": 320,
+      "Direct": 280,
+      "Email": 200
+    }
+  };
 
-  // Fetch analytics data
-  const summaryQuery = trpc.ebookAnalytics.getSummary.useQuery();
-  const byProfessionQuery = trpc.ebookAnalytics.getByProfession.useQuery();
-  const byCountryQuery = trpc.ebookAnalytics.getByCountry.useQuery();
-  const bySourceQuery = trpc.ebookAnalytics.getBySource.useQuery();
-  const byDeviceQuery = trpc.ebookAnalytics.getByDevice.useQuery();
-  const trendsQuery = trpc.ebookAnalytics.getTrends.useQuery({ days: 30 });
-  const topCountriesQuery = trpc.ebookAnalytics.getTopCountries.useQuery({ limit: 10 });
-  const topProfessionsQuery = trpc.ebookAnalytics.getTopProfessions.useQuery({ limit: 10 });
-  const exportMutation = trpc.ebookAnalytics.exportCSV.useMutation();
+  const mockProfessions = [
+    { profession: "Médico", downloads: 380, uniqueEmails: 280, percentage: 30.4 },
+    { profession: "Estudante", downloads: 320, uniqueEmails: 240, percentage: 25.6 },
+    { profession: "Enfermeiro", downloads: 250, uniqueEmails: 190, percentage: 20.0 },
+    { profession: "Farmacêutico", downloads: 150, uniqueEmails: 120, percentage: 12.0 },
+    { profession: "Outro", downloads: 150, uniqueEmails: 60, percentage: 12.0 }
+  ];
 
-  const handleExport = async () => {
+  const mockCountries = [
+    { country: "Brasil", downloads: 850, percentage: 68.0 },
+    { country: "Portugal", downloads: 180, percentage: 14.4 },
+    { country: "Angola", downloads: 90, percentage: 7.2 },
+    { country: "Moçambique", downloads: 60, percentage: 4.8 },
+    { country: "Outros", downloads: 70, percentage: 5.6 }
+  ];
+
+  const mockTrends = [
+    { date: "01 Abr", downloads: 45 },
+    { date: "02 Abr", downloads: 52 },
+    { date: "03 Abr", downloads: 48 },
+    { date: "04 Abr", downloads: 61 },
+    { date: "05 Abr", downloads: 55 },
+    { date: "06 Abr", downloads: 67 },
+    { date: "07 Abr", downloads: 72 }
+  ];
+
+  const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
+
+  const handleExport = () => {
     try {
-      const result = await exportMutation.mutateAsync();
+      // Create CSV content
+      const csvContent = [
+        ["Profissão", "Downloads", "Emails Únicos", "Percentual"],
+        ...mockProfessions.map(p => [p.profession, p.downloads, p.uniqueEmails, p.percentage])
+      ]
+        .map(row => row.join(","))
+        .join("\n");
+
       // Create and download CSV
       const element = document.createElement("a");
-      const file = new Blob([result.csv], { type: "text/csv" });
+      const file = new Blob([csvContent], { type: "text/csv" });
       element.href = URL.createObjectURL(file);
-      element.download = result.filename;
+      element.download = `ebook-analytics-${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(element);
       element.click();
       document.body.removeChild(element);
@@ -39,19 +83,6 @@ export default function EbookAnalyticsDashboard() {
       console.error("Export failed:", error);
     }
   };
-
-  const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
-
-  if (!user || user.role !== "admin") {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Acesso Negado</h1>
-          <p className="text-muted-foreground">Você não tem permissão para acessar este dashboard.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -70,7 +101,7 @@ export default function EbookAnalyticsDashboard() {
               <Download className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{summaryQuery.data?.totalDownloads || 0}</div>
+              <div className="text-2xl font-bold">{mockSummary.totalDownloads}</div>
               <p className="text-xs text-muted-foreground">Todos os tempos</p>
             </CardContent>
           </Card>
@@ -81,7 +112,7 @@ export default function EbookAnalyticsDashboard() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{summaryQuery.data?.uniqueEmails || 0}</div>
+              <div className="text-2xl font-bold">{mockSummary.uniqueEmails}</div>
               <p className="text-xs text-muted-foreground">Usuários únicos</p>
             </CardContent>
           </Card>
@@ -92,7 +123,7 @@ export default function EbookAnalyticsDashboard() {
               <Globe className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{summaryQuery.data?.uniqueCountries || 0}</div>
+              <div className="text-2xl font-bold">{mockSummary.uniqueCountries}</div>
               <p className="text-xs text-muted-foreground">Regiões geográficas</p>
             </CardContent>
           </Card>
@@ -103,12 +134,18 @@ export default function EbookAnalyticsDashboard() {
               <Smartphone className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {Object.keys(summaryQuery.data?.deviceBreakdown || {}).length}
-              </div>
+              <div className="text-2xl font-bold">{Object.keys(mockSummary.deviceBreakdown).length}</div>
               <p className="text-xs text-muted-foreground">Tipos de dispositivo</p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Export Button */}
+        <div className="mb-8 flex justify-end">
+          <Button onClick={handleExport} className="gap-2">
+            <Download className="h-4 w-4" />
+            Exportar CSV
+          </Button>
         </div>
 
         {/* Tabs */}
@@ -134,7 +171,7 @@ export default function EbookAnalyticsDashboard() {
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
-                        data={Object.entries(summaryQuery.data?.professionBreakdown || {}).map(([name, value]) => ({
+                        data={Object.entries(mockSummary.professionBreakdown).map(([name, value]) => ({
                           name,
                           value,
                         }))}
@@ -165,7 +202,7 @@ export default function EbookAnalyticsDashboard() {
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
-                        data={Object.entries(summaryQuery.data?.deviceBreakdown || {}).map(([name, value]) => ({
+                        data={Object.entries(mockSummary.deviceBreakdown).map(([name, value]) => ({
                           name,
                           value,
                         }))}
@@ -195,7 +232,7 @@ export default function EbookAnalyticsDashboard() {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={Object.entries(summaryQuery.data?.sourceBreakdown || {}).map(([name, value]) => ({ name, value }))}>
+                  <BarChart data={Object.entries(mockSummary.sourceBreakdown).map(([name, value]) => ({ name, value }))}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
@@ -215,7 +252,7 @@ export default function EbookAnalyticsDashboard() {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={topProfessionsQuery.data || []}>
+                  <BarChart data={mockProfessions}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="profession" />
                     <YAxis />
@@ -241,17 +278,15 @@ export default function EbookAnalyticsDashboard() {
                         <th className="text-left py-2 px-4">Downloads</th>
                         <th className="text-left py-2 px-4">Emails Únicos</th>
                         <th className="text-left py-2 px-4">Percentual</th>
-                        <th className="text-left py-2 px-4">Top Países</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {byProfessionQuery.data?.map((prof: any) => (
+                      {mockProfessions.map((prof) => (
                         <tr key={prof.profession} className="border-b hover:bg-muted/50">
                           <td className="py-2 px-4">{prof.profession}</td>
-                          <td className="py-2 px-4">{prof.totalDownloads}</td>
+                          <td className="py-2 px-4">{prof.downloads}</td>
                           <td className="py-2 px-4">{prof.uniqueEmails}</td>
                           <td className="py-2 px-4">{prof.percentage}%</td>
-                          <td className="py-2 px-4">{prof.topCountries?.join(", ") || "N/A"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -269,7 +304,7 @@ export default function EbookAnalyticsDashboard() {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={topCountriesQuery.data || []}>
+                  <BarChart data={mockCountries}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="country" />
                     <YAxis />
@@ -293,19 +328,15 @@ export default function EbookAnalyticsDashboard() {
                       <tr className="border-b">
                         <th className="text-left py-2 px-4">País</th>
                         <th className="text-left py-2 px-4">Downloads</th>
-                        <th className="text-left py-2 px-4">Emails Únicos</th>
                         <th className="text-left py-2 px-4">Percentual</th>
-                        <th className="text-left py-2 px-4">Top Profissões</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {byCountryQuery.data?.map((country: any) => (
+                      {mockCountries.map((country) => (
                         <tr key={country.country} className="border-b hover:bg-muted/50">
                           <td className="py-2 px-4">{country.country}</td>
-                          <td className="py-2 px-4">{country.totalDownloads}</td>
-                          <td className="py-2 px-4">{country.uniqueEmails}</td>
+                          <td className="py-2 px-4">{country.downloads}</td>
                           <td className="py-2 px-4">{country.percentage}%</td>
-                          <td className="py-2 px-4">{country.topProfessions?.join(", ") || "N/A"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -319,33 +350,18 @@ export default function EbookAnalyticsDashboard() {
           <TabsContent value="sources" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Análise de Fontes de Tráfego</CardTitle>
+                <CardTitle>Downloads por Fonte</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-2 px-4">Fonte</th>
-                        <th className="text-left py-2 px-4">Downloads</th>
-                        <th className="text-left py-2 px-4">Emails Únicos</th>
-                        <th className="text-left py-2 px-4">Percentual</th>
-                        <th className="text-left py-2 px-4">Top Países</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {bySourceQuery.data?.map((source: any) => (
-                        <tr key={source.source} className="border-b hover:bg-muted/50">
-                          <td className="py-2 px-4 font-medium">{source.source}</td>
-                          <td className="py-2 px-4">{source.totalDownloads}</td>
-                          <td className="py-2 px-4">{source.uniqueEmails}</td>
-                          <td className="py-2 px-4">{source.percentage}%</td>
-                          <td className="py-2 px-4">{source.topCountries?.join(", ") || "N/A"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={Object.entries(mockSummary.sourceBreakdown).map(([name, value]) => ({ name, value }))}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#ef4444" />
+                  </BarChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
           </TabsContent>
@@ -354,33 +370,18 @@ export default function EbookAnalyticsDashboard() {
           <TabsContent value="devices" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Análise de Dispositivos</CardTitle>
+                <CardTitle>Distribuição por Dispositivo</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-2 px-4">Dispositivo</th>
-                        <th className="text-left py-2 px-4">Downloads</th>
-                        <th className="text-left py-2 px-4">Emails Únicos</th>
-                        <th className="text-left py-2 px-4">Percentual</th>
-                        <th className="text-left py-2 px-4">Top Browsers</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {byDeviceQuery.data?.map((device: any) => (
-                        <tr key={device.deviceType} className="border-b hover:bg-muted/50">
-                          <td className="py-2 px-4 font-medium">{device.deviceType}</td>
-                          <td className="py-2 px-4">{device.totalDownloads}</td>
-                          <td className="py-2 px-4">{device.uniqueEmails}</td>
-                          <td className="py-2 px-4">{device.percentage}%</td>
-                          <td className="py-2 px-4">{device.topBrowsers?.join(", ") || "N/A"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={Object.entries(mockSummary.deviceBreakdown).map(([name, value]) => ({ name, value }))}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#8b5cf6" />
+                  </BarChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
           </TabsContent>
@@ -389,31 +390,23 @@ export default function EbookAnalyticsDashboard() {
           <TabsContent value="trends" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Tendências de Downloads (Últimos 30 dias)</CardTitle>
+                <CardTitle>Tendências (Últimos 7 dias)</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
-                  <LineChart data={trendsQuery.data || []}>
+                  <LineChart data={mockTrends}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="downloads" stroke="#3b82f6" strokeWidth={2} name="Downloads" />
+                    <Line type="monotone" dataKey="downloads" stroke="#3b82f6" name="Downloads" />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-
-        {/* Export Button */}
-        <div className="mt-8 flex justify-end">
-          <Button onClick={handleExport} disabled={exportMutation.isPending} className="gap-2">
-            <Download className="h-4 w-4" />
-            {exportMutation.isPending ? "Exportando..." : "Exportar CSV"}
-          </Button>
-        </div>
       </div>
     </div>
   );

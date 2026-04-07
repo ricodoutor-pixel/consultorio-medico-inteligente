@@ -78,6 +78,8 @@ const Forum = lazy(() => import("./pages/Forum"));
 const Webinars = lazy(() => import("./pages/Webinars"));
 const Voluntarios = lazy(() => import("./pages/Voluntarios"));
 const ImpactoSocial = lazy(() => import("./pages/ImpactoSocial"));
+const EbookLanding = lazy(() => import("./pages/EbookLanding"));
+const EbookAnalyticsDashboard = lazy(() => import("./pages/EbookAnalyticsDashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -165,6 +167,9 @@ const App = () => (
                 <Route path="/webinars" element={<Webinars />} />
                 <Route path="/voluntarios" element={<Voluntarios />} />
                 <Route path="/impacto" element={<ImpactoSocial />} />
+                <Route path="/ebook" element={<EbookLanding />} />
+                <Route path="/ebook-gratis" element={<EbookLanding />} />
+                <Route path="/admin/ebook-analytics" element={<AdminRoute><EbookAnalyticsDashboard /></AdminRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

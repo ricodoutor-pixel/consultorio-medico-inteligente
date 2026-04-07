@@ -15,6 +15,8 @@ import { monitoringRouter } from "./routers/monitoring";
 import { referralRouter } from "./routers/referral";
 import { recommendationsRouter } from "./routers/recommendations";
 import { checkpointSyncRouter } from "./routers/checkpointSync";
+import { ebookRouter } from "./routers/ebook";
+import { ebookAnalyticsRouter } from "./routers/ebookAnalytics";
 // import { marketplaceRouter } from "./routers/marketplaceRouter"; // TODO: Fix marketplace router
 
 const COOKIE_NAME = "auth-token";
@@ -46,6 +48,8 @@ export const appRouter = router({
   referral: referralRouter,
   recommendations: recommendationsRouter,
   checkpointSync: checkpointSyncRouter,
+  ebook: ebookRouter,
+  ebookAnalytics: ebookAnalyticsRouter,
   // marketplace: marketplaceRouter, // TODO: Fix marketplace router
 });
 

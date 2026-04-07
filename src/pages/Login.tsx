@@ -103,7 +103,7 @@ const Login = () => {
         <div className="container mx-auto px-4 flex justify-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} className="w-full max-w-md">
             <div className="flex items-center gap-3 mb-6 justify-center">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
                 <Leaf size={24} className="text-primary" />
               </div>
               <h1 className="text-2xl font-display font-black text-foreground">

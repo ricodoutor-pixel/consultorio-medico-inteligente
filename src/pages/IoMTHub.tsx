@@ -31,7 +31,7 @@ const IoMTHub = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <header className="mb-10">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary glow-green">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary glow-green">
                 <Watch size={24} />
               </div>
               <span className="text-sm font-bold text-primary tracking-widest uppercase">IoMT Hub - Internet das Coisas Médicas</span>
@@ -90,7 +90,7 @@ const IoMTHub = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card className="border-border bg-card/50">
                       <CardContent className="p-6 flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary">
+                        <div className="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary">
                           <Moon size={24} />
                         </div>
                         <div>
@@ -102,7 +102,7 @@ const IoMTHub = () => {
                     </Card>
                     <Card className="border-border bg-card/50">
                       <CardContent className="p-6 flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                           <Activity size={24} />
                         </div>
                         <div>

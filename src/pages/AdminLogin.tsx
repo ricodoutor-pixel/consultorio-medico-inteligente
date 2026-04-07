@@ -70,7 +70,7 @@ const AdminLogin = () => {
             <Card className="border-border">
               <CardContent className="p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-gold border border-gold flex items-center justify-center glow-gold">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-gold border border-gold flex items-center justify-center glow-gold">
                     <Shield size={24} className="text-[hsl(45,76%,52%)]" />
                   </div>
                   <div>
@@ -110,7 +110,7 @@ const AdminLogin = () => {
                       />
                     </div>
                   </div>
-                  <Button type="submit" className="w-full font-black h-12 bg-primary text-primary-foreground rounded-xl" disabled={loading}>
+                  <Button type="submit" className="w-full font-black h-10 bg-primary text-primary-foreground rounded-xl" disabled={loading}>
                     {loading ? "Verificando..." : "Entrar"}
                   </Button>
 
@@ -122,7 +122,7 @@ const AdminLogin = () => {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full font-bold h-12 rounded-xl border-border"
+                    className="w-full font-bold h-10 rounded-xl border-border"
                     onClick={async () => {
                       await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
                     }}

@@ -77,17 +77,17 @@ const VideoCall = () => {
               <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20">
                 <Button 
                   onClick={() => setIsMuted(!isMuted)}
-                  className={`w-12 h-12 rounded-full border-none shadow-xl ${isMuted ? 'bg-red-500 hover:bg-red-600' : 'bg-neutral-800 hover:bg-neutral-700'}`}
+                  className={`w-10 h-10 rounded-full border-none shadow-xl ${isMuted ? 'bg-red-500 hover:bg-red-600' : 'bg-neutral-800 hover:bg-neutral-700'}`}
                 >
                   {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
                 </Button>
                 <Button 
                   onClick={() => setIsVideoOff(!isVideoOff)}
-                  className={`w-12 h-12 rounded-full border-none shadow-xl ${isVideoOff ? 'bg-red-500 hover:bg-red-600' : 'bg-neutral-800 hover:bg-neutral-700'}`}
+                  className={`w-10 h-10 rounded-full border-none shadow-xl ${isVideoOff ? 'bg-red-500 hover:bg-red-600' : 'bg-neutral-800 hover:bg-neutral-700'}`}
                 >
                   {isVideoOff ? <VideoOff size={20} /> : <Video size={20} />}
                 </Button>
-                <Button className="w-16 h-12 rounded-full bg-red-600 hover:bg-red-700 border-none shadow-xl">
+                <Button className="w-16 h-10 rounded-full bg-red-600 hover:bg-red-700 border-none shadow-xl">
                   <PhoneOff size={24} />
                 </Button>
               </div>

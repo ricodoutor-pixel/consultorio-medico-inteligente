@@ -193,7 +193,7 @@ const FalarComEspecialista = () => {
                           <Textarea id="resumoCaso" placeholder="Descreva brevemente sua situação, sintomas e o que busca..." rows={4} value={form.resumoCaso} onChange={(e) => handleChange("resumoCaso", e.target.value)} required />
                         </div>
 
-                        <Button type="submit" disabled={loading} className="w-full font-black bg-primary text-primary-foreground h-12 rounded-2xl">
+                        <Button type="submit" disabled={loading} className="w-full font-black bg-primary text-primary-foreground h-10 rounded-2xl">
                           {loading ? "Enviando..." : "Gerar Resumo"}
                         </Button>
 
@@ -240,7 +240,7 @@ const FalarComEspecialista = () => {
                         </div>
                       </div>
 
-                      <Button className="w-full font-black bg-primary text-primary-foreground h-12 text-lg rounded-2xl" asChild>
+                      <Button className="w-full font-black bg-primary text-primary-foreground h-10 text-lg rounded-2xl" asChild>
                         <a href={pro.paymentLink} target="_blank" rel="noopener noreferrer">
                           <CreditCard size={20} className="mr-2" /> Pagar Agora <ArrowRight size={18} className="ml-2" />
                         </a>

@@ -116,7 +116,7 @@ const Pay = () => {
                   <div className="p-4 rounded-2xl bg-muted/30 border border-border">
                     {pro && (
                       <div className="flex items-center gap-3 mb-3">
-                        <img src={pro.imageUrl} alt={pro.name} className="w-12 h-12 rounded-2xl object-cover border border-border" />
+                        <img src={pro.imageUrl} alt={pro.name} className="w-10 h-10 rounded-2xl object-cover border border-border" />
                         <div>
                           <p className="font-black text-foreground">{pro.name}</p>
                           <p className="text-xs text-muted-foreground">{pro.category}</p>

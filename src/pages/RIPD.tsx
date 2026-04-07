@@ -100,7 +100,7 @@ const RIPD = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-purple border border-purple flex items-center justify-center">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-purple border border-purple flex items-center justify-center">
                 <Shield size={24} className="text-secondary" />
               </div>
               <div>

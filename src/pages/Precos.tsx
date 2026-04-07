@@ -131,31 +131,12 @@ const Precos = () => {
   const handleDynamicCheckout = async (planId: string) => {
     setLoadingPlan(planId);
     try {
-      // Check if user is authenticated first
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Faça login para assinar um plano.", {
-          action: { label: "Login", onClick: () => window.location.href = "/login" },
-        });
-        setLoadingPlan(null);
-        return;
-      }
-
       const { data, error } = await supabase.functions.invoke("create-subscription", {
-        body: { planId },
+        body: { planId, payerEmail: "" },
       });
-
-      if (error) {
-        console.error("Checkout error:", error);
-        toast.error("Erro ao processar pagamento. Tente novamente.");
-        return;
-      }
-
+      if (error) throw error;
       if (data?.init_point) {
         window.open(data.init_point, "_blank");
-        toast.success("Redirecionando para o Mercado Pago...");
-      } else if (data?.error) {
-        toast.error(data.error);
       } else {
         toast.error("Erro ao gerar link de pagamento");
       }

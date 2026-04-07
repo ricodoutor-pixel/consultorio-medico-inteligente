@@ -156,7 +156,7 @@ const AdminDashboard = () => {
                         <TrendingUp size={10} /> {kpi.trend}
                       </p>
                     </div>
-                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center shrink-0 ${kpi.color}`}>
+                    <div className={`w-10 h-10 md:w-10 md:h-10 rounded-2xl flex items-center justify-center shrink-0 ${kpi.color}`}>
                       <kpi.icon size={20} />
                     </div>
                   </div>

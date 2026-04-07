@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import brisaImg from "@/assets/brisa-enfermeira.png";
+// import brisaImg from "@/assets/brisa-enfermeira.png"; // Removido - imagem será gerada dinamicamente
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -175,7 +175,7 @@ const Telemedicina = () => {
         <div className="container mx-auto px-4 relative z-10">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
                 <Stethoscope size={24} className="text-primary" />
               </div>
               <span className="text-sm font-bold text-primary">TELEMEDICINA AVANÇADA</span>
@@ -238,25 +238,25 @@ const Telemedicina = () => {
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label className="text-xs font-bold uppercase">Nome Completo</Label>
-                        <Input placeholder="Seu nome" value={patientData.nome} onChange={(e) => setPatientData({...patientData, nome: e.target.value})} className="h-12 rounded-xl" />
+                        <Input placeholder="Seu nome" value={patientData.nome} onChange={(e) => setPatientData({...patientData, nome: e.target.value})} className="h-10 rounded-xl" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label className="text-xs font-bold uppercase">CPF</Label>
-                          <Input placeholder="000.000.000-00" value={patientData.cpf} onChange={(e) => setPatientData({...patientData, cpf: e.target.value})} className="h-12 rounded-xl" />
+                          <Input placeholder="000.000.000-00" value={patientData.cpf} onChange={(e) => setPatientData({...patientData, cpf: e.target.value})} className="h-10 rounded-xl" />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-xs font-bold uppercase">Nascimento</Label>
-                          <Input type="date" value={patientData.dataNascimento} onChange={(e) => setPatientData({...patientData, dataNascimento: e.target.value})} className="h-12 rounded-xl" />
+                          <Input type="date" value={patientData.dataNascimento} onChange={(e) => setPatientData({...patientData, dataNascimento: e.target.value})} className="h-10 rounded-xl" />
                         </div>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-xs font-bold uppercase">WhatsApp</Label>
-                        <Input placeholder="(11) 99999-9999" value={patientData.telefone} onChange={(e) => setPatientData({...patientData, telefone: e.target.value})} className="h-12 rounded-xl" />
+                        <Input placeholder="(11) 99999-9999" value={patientData.telefone} onChange={(e) => setPatientData({...patientData, telefone: e.target.value})} className="h-10 rounded-xl" />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-xs font-bold uppercase">E-mail</Label>
-                        <Input placeholder="seu@email.com" value={patientData.email} onChange={(e) => setPatientData({...patientData, email: e.target.value})} className="h-12 rounded-xl" />
+                        <Input placeholder="seu@email.com" value={patientData.email} onChange={(e) => setPatientData({...patientData, email: e.target.value})} className="h-10 rounded-xl" />
                       </div>
                     </div>
                     <Button 
@@ -287,11 +287,11 @@ const Telemedicina = () => {
                     )}
                     {/* ... (Demais tipos de input seguem a lógica anterior) */}
                     <div className="flex gap-4 mt-8">
-                      <Button variant="ghost" onClick={() => setStep(step - 1)} className="h-12 rounded-xl font-bold">
+                      <Button variant="ghost" onClick={() => setStep(step - 1)} className="h-10 rounded-xl font-bold">
                         <ArrowLeft className="mr-2" /> Voltar
                       </Button>
                       <Button 
-                        className="flex-1 h-12 bg-primary text-primary-foreground font-black rounded-xl"
+                        className="flex-1 h-10 bg-primary text-primary-foreground font-black rounded-xl"
                         onClick={() => setStep(step + 1)}
                       >
                         Próximo <ArrowRight className="ml-2" />
@@ -315,7 +315,7 @@ const Telemedicina = () => {
                         <Card key={med.id} className="border-border hover:border-primary/50 transition-all">
                           <CardContent className="p-4 flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                              <img src={med.imageUrl} className="w-12 h-12 rounded-xl object-cover" />
+                              <img src={med.imageUrl} className="w-10 h-10 rounded-xl object-cover" />
                               <div className="text-left">
                                 <p className="font-black text-sm">{med.name}</p>
                                 <p className="text-xs text-muted-foreground">{med.category}</p>

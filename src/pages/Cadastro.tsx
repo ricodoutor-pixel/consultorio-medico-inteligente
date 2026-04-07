@@ -183,7 +183,7 @@ const Cadastro = () => {
         <div className="container mx-auto px-4 relative z-10">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
                 <UserPlus size={24} className="text-primary" />
               </div>
               <span className="text-sm font-bold text-primary">CRIAR CONTA</span>
@@ -335,7 +335,7 @@ const Cadastro = () => {
                       </div>
                     )}
 
-                    <Button type="submit" className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12" disabled={loading}>
+                    <Button type="submit" className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-10" disabled={loading}>
                       {loading ? <Loader2 size={16} className="animate-spin mr-2" /> : <UserPlus size={16} className="mr-2" />}
                       Criar Conta
                     </Button>

@@ -246,7 +246,7 @@ const CadastroProfissional = () => {
                   </div>
 
                   <div className="pt-2">
-                    <Button type="submit" disabled={loading} className="w-full font-black bg-primary text-primary-foreground text-lg h-12 rounded-2xl">
+                    <Button type="submit" disabled={loading} className="w-full font-black bg-primary text-primary-foreground text-lg h-10 rounded-2xl">
                       {loading ? "Enviando..." : "Enviar Cadastro"}
                     </Button>
                   </div>

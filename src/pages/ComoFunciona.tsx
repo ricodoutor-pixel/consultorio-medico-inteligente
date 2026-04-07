@@ -116,7 +116,7 @@ const ComoFunciona = () => {
               <motion.div key={i} variants={fadeUp}>
                 <Card className="h-full border-border">
                   <CardContent className="p-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-gold border border-gold flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-gold border border-gold flex items-center justify-center mb-4">
                       <e.icon size={24} className="text-primary" />
                     </div>
                     <h3 className="text-lg font-display font-bold text-foreground mb-2">{e.title}</h3>

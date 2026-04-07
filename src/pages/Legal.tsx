@@ -74,7 +74,7 @@ const Legal = () => {
         <div className="container mx-auto px-4 relative z-10">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-gold border border-gold flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-gold border border-gold flex items-center justify-center">
                 <Scale size={24} className="text-[hsl(45,76%,52%)]" />
               </div>
               <span className="text-sm font-bold text-[hsl(45,76%,52%)]">CONFORMIDADE & LEGAL</span>

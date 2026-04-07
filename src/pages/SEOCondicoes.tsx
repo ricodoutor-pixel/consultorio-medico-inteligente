@@ -248,12 +248,12 @@ const SEOCondicoes = () => {
                   Triagem gratuita com IA + matching automático.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-10 px-6" asChild>
+                  <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-12 px-6" asChild>
                     <Link to="/consulta-rapida">
                       <Stethoscope size={16} className="mr-2" /> Consulta Rápida (IA)
                     </Link>
                   </Button>
-                  <Button variant="outline" className="font-black rounded-2xl h-10 px-6 border-primary/30 text-primary" asChild>
+                  <Button variant="outline" className="font-black rounded-2xl h-12 px-6 border-primary/30 text-primary" asChild>
                     <Link to="/profissionais">Ver Profissionais</Link>
                   </Button>
                 </div>

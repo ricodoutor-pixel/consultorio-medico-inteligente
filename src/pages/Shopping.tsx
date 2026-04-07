@@ -113,7 +113,7 @@ const CartDrawer = () => {
         <div className="space-y-3 mb-4">
           {items.map((item) => (
             <div key={item.product.id} className="flex items-center gap-3 p-2 rounded-xl bg-muted/30 border border-border">
-              <img src={item.product.imageUrl} alt={item.product.title} className="w-10 h-10 rounded-lg object-cover" />
+              <img src={item.product.imageUrl} alt={item.product.title} className="w-12 h-12 rounded-lg object-cover" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-foreground truncate">{item.product.title}</p>
                 <p className="text-xs text-gradient-gold font-bold">{item.product.price}</p>
@@ -183,10 +183,10 @@ const Shopping = () => {
                 placeholder="Buscar produtos medicinais..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-10 rounded-full border-border bg-background text-base font-medium"
+                className="pl-12 h-12 rounded-full border-border bg-background text-base font-medium"
               />
             </div>
-            <Button className="h-10 px-6 rounded-full bg-primary text-primary-foreground font-bold">
+            <Button className="h-12 px-6 rounded-full bg-primary text-primary-foreground font-bold">
               <Search size={18} />
             </Button>
           </div>

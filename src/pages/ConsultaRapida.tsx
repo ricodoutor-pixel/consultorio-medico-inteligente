@@ -28,7 +28,11 @@ type MatchResult = {
 const ConsultaRapida = () => {
   const { toast } = useToast();
   const [step, setStep] = useState<"symptoms" | "matching" | "result">("symptoms");
-  const [symptoms, setSymptoms] = useState("");
+  const [symptoms, setSymptoms] = useState(() => {
+    const saved = sessionStorage.getItem("triage_condition");
+    if (saved) sessionStorage.removeItem("triage_condition");
+    return saved || "";
+  });
   const [loading, setLoading] = useState(false);
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
   const [preRecord, setPreRecord] = useState("");
@@ -168,7 +172,7 @@ const ConsultaRapida = () => {
                       ))}
                     </div>
 
-                    <Button onClick={handleMatch} className="w-full font-black bg-primary text-primary-foreground h-10 rounded-2xl text-base">
+                    <Button onClick={handleMatch} className="w-full font-black bg-primary text-primary-foreground h-12 rounded-2xl text-base">
                       <Brain size={18} className="mr-2" /> Iniciar Triagem com Brisa
                     </Button>
                   </CardContent>
@@ -280,7 +284,7 @@ const ConsultaRapida = () => {
                               <span className="text-sm font-black text-primary">{matchResult.bestMatch.score}%</span>
                             </div>
                           </div>
-                          <Button className="w-full mt-4 font-black bg-primary text-primary-foreground h-10 rounded-2xl" asChild>
+                          <Button className="w-full mt-4 font-black bg-primary text-primary-foreground h-12 rounded-2xl" asChild>
                             <Link to="/pagamento">
                               Confirmar Consulta <ArrowRight size={16} className="ml-2" />
                             </Link>

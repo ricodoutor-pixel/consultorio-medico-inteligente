@@ -219,7 +219,7 @@ const ConsultaVideo = () => {
               <Button
                 variant={isMuted ? "destructive" : "secondary"}
                 size="lg"
-                className="rounded-full w-10 h-10"
+                className="rounded-full w-12 h-12"
                 onClick={() => setIsMuted(!isMuted)}
               >
                 {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
@@ -227,7 +227,7 @@ const ConsultaVideo = () => {
               <Button
                 variant={isVideoOff ? "destructive" : "secondary"}
                 size="lg"
-                className="rounded-full w-10 h-10"
+                className="rounded-full w-12 h-12"
                 onClick={() => setIsVideoOff(!isVideoOff)}
               >
                 {isVideoOff ? <VideoOff size={20} /> : <Video size={20} />}
@@ -235,7 +235,7 @@ const ConsultaVideo = () => {
               <Button
                 variant="secondary"
                 size="lg"
-                className={`rounded-full w-10 h-10 ${showChat ? "ring-2 ring-primary" : ""}`}
+                className={`rounded-full w-12 h-12 ${showChat ? "ring-2 ring-primary" : ""}`}
                 onClick={() => setShowChat(!showChat)}
               >
                 <MessageSquare size={20} />
@@ -245,7 +245,7 @@ const ConsultaVideo = () => {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className={`rounded-full w-10 h-10 ${showPEP ? "ring-2 ring-primary" : ""}`}
+                    className={`rounded-full w-12 h-12 ${showPEP ? "ring-2 ring-primary" : ""}`}
                     onClick={() => setShowPEP(!showPEP)}
                   >
                     <ClipboardList size={20} />
@@ -253,7 +253,7 @@ const ConsultaVideo = () => {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className={`rounded-full w-10 h-10 ${showAISidebar ? "ring-2 ring-secondary" : ""}`}
+                    className={`rounded-full w-12 h-12 ${showAISidebar ? "ring-2 ring-secondary" : ""}`}
                     onClick={() => setShowAISidebar(!showAISidebar)}
                   >
                     <Brain size={20} />
@@ -263,7 +263,7 @@ const ConsultaVideo = () => {
               <Button
                 variant="destructive"
                 size="lg"
-                className="rounded-full w-10 h-10"
+                className="rounded-full w-12 h-12"
                 onClick={endConsultation}
               >
                 <Phone size={20} className="rotate-[135deg]" />

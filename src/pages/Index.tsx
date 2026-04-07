@@ -7,7 +7,7 @@ import { Leaf, ShoppingBag, Users, Star, ArrowRight, TrendingUp, UserPlus, Downl
 import { motion } from "framer-motion";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
-import heroPhoneMockup from "@/assets/hero-phone-mockup.png"; 
+import { HeroCarousel } from "@/components/HeroCarousel"; 
 import triagemPatient from "@/assets/triagem-patient.png";
 import consultaChat from "@/assets/consulta-chat.png";
 import triagemForm from "@/assets/triagem-form.png";
@@ -16,7 +16,6 @@ import testimonialRoberto from "@/assets/testimonial-roberto.jpg";
 import testimonialJuliana from "@/assets/testimonial-juliana.jpg";
 import testimonialAntonio from "@/assets/testimonial-antonio.jpg";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
-import { HeroCarousel } from "@/components/HeroCarousel";
 import { useEffect } from "react";
 
 const fadeUp = {
@@ -29,7 +28,7 @@ const steps = [
   { n: "1", title: "Escolha o especialista", desc: "Navegue por categorias, veja avaliações, preços populares e perfis verificados.", img: triagemPatient },
   { n: "2", title: "Pré-entrevista rápida", desc: "Preencha um formulário de 2 minutos com seu objetivo e resumo do caso.", img: triagemForm },
   { n: "3", title: "Pague via Pix", desc: "Pagamento instantâneo com QR code Mercado Pago. Confirmação automática.", img: consultaChat },
-  { n: "4", title: "Receba atendimento", desc: "O profissional recebe seu resumo e inicia o atendimento (chat ou vídeo).", img: heroPhoneMockup },
+  { n: "4", title: "Receba atendimento", desc: "O profissional recebe seu resumo e inicia o atendimento (chat ou vídeo).", img: triagemPatient },
   { n: "5", title: "Compre seu tratamento", desc: "Acesse nossas lojas parceiras e compre seus medicamentos com receita digital e frete grátis.", img: triagemPatient },
 ];
 
@@ -84,62 +83,38 @@ const Index = () => {
       <WhatsAppButton />
 
       {/* Hero Section */}
-      <section className="hero-glow pt-24 pb-16 md:pt-32 md:pb-28 min-h-[95vh] flex items-center">
+      <section className="hero-glow pb-16 md:pb-28 min-h-[95dvh] flex items-center overflow-hidden" style={{ paddingTop: 'clamp(100px, 15vh, 140px)' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             
             {/* Text Content */}
             <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col">
-              <motion.div variants={fadeUp} className="mb-6 flex flex-col gap-4">
-                <GlobalComplianceBadge />
-                
-                {/* Dr. Edilson Badge */}
-                <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600/10 to-blue-600/10 border border-green-500/30 rounded-full px-5 py-3 w-fit">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">👨‍⚕️</span>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-foreground">Dr. Edilson Bezerra</span>
-                      <span className="text-xs text-muted-foreground">Supervisor Técnico</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-1 ml-2 pl-2 border-l border-green-500/30">
-                    <span className="text-xl">🇧🇷</span>
-                    <span className="text-xl">🇧🇴</span>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-8">
+              <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-4">
                 <div className="inline-flex items-center gap-2 flex-wrap">
                   <span className="inline-flex items-center gap-2 bg-gradient-green border border-green rounded-full px-4 py-2 text-sm font-bold text-primary shadow-lg shadow-green/20">
                     <Leaf size={16} />
                     PLATAFORMA POPULAR • SAÚDE • SHOPPING
                   </span>
                 </div>
-                <motion.span 
-                  animate={{ 
-                    textShadow: ["0px 0px 4px rgba(218, 165, 32, 0.3)", "0px 0px 12px rgba(218, 165, 32, 0.8)", "0px 0px 4px rgba(218, 165, 32, 0.3)"],
-                    opacity: [0.8, 1, 0.8]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                 className="text-[10px] md:text-xs font-bold tracking-wide text-[hsl(var(--gold))] leading-relaxed max-w-2xl mt-2"
-                >
-                  HUB COMPLETO • SAÚDE • POPULAR • INFORMAÇÃO • CONSULTA • ESPECIALISTAS • FARMÁCIAS • IMPORTADORES • PRODUTORES • SERVIÇOS • OPÇÕES • PREÇOS JUSTOS • COMUNIDADE • GANHOS • FAMÍLIA
-                </motion.span>
               </motion.div>
 
               <motion.h1 
                 variants={fadeUp} 
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-8 tracking-tight"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-3 tracking-tight"
               >
-                <span className="text-gradient-green">Saúde</span>
-                <span className="text-foreground"> & </span>
-                <span className="text-gradient-purple">Liberdade</span>
+                <span className="text-gradient-green">Mais que Acesso,</span>
+                <br />
+                <span className="text-gradient-purple">Equidade.</span>
               </motion.h1>
 
-              <motion.p variants={fadeUp} className="text-base md:text-lg text-muted-foreground max-w-2xl mb-10 leading-relaxed font-medium">
-                Acesso democratizado a telemedicina, suplementos e medicamentos de cannabis sob supervisão técnica do Dr. Edilson Bezerra. Conectamos você aos melhores especialistas via vídeo e chat. Pré-entrevista rápida, pagamento seguro via Pix ou PayPal e acesso direto ao nosso Shopping de bem-estar com preços populares e frete grátis para todo o Brasil.
-              </motion.p>
+              <motion.div variants={fadeUp} className="max-w-2xl mb-8">
+                <div className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium inline-flex items-center flex-wrap gap-2">
+                  <span>
+                    Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎
+                  </span>
+                  <GlobalComplianceBadge />
+                </div>
+              </motion.div>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-5 mb-12">
                 <Button size="lg" className="text-base font-black h-16 px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
@@ -155,14 +130,14 @@ const Index = () => {
               </motion.div>
             </motion.div>
 
-            {/* Hero Carousel Section */}
+            {/* Phone Mockup Area */}
             <motion.div
               className="relative flex flex-col justify-center items-center gap-6"
               initial={{ opacity: 0, scale: 0.8, y: 100 }}
               animate={{ opacity: 1, scale: 1, y: 0 }} 
               transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
             >
-              {/* Cadastro Gratuito Button - Above Carousel */}
+              {/* Cadastro Gratuito Button - Above Phone */}
               <Link to="/cadastro">
                 <motion.span 
                   className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer shadow-xl shadow-primary/30"
@@ -174,18 +149,22 @@ const Index = () => {
                 </motion.span>
               </Link>
 
-              {/* HeroCarousel with Glow Effect */}
               <div className="relative group w-full flex flex-col items-center">
-                <div className="absolute -inset-10 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-[80px] opacity-40 group-hover:opacity-70 transition duration-1000 z-0"></div>
-                <div className="relative z-10 w-full max-w-2xl">
-                  <HeroCarousel 
-                    autoplay={true}
-                    autoplayDelay={5000}
-                    loop={true}
-                    showNavigation={true}
-                    showPagination={true}
-                  />
+                <div className="relative">
+                  <div className="absolute -inset-10 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-[80px] opacity-40 group-hover:opacity-70 transition duration-1000"></div>
+                  <div className="relative z-10">
+                    <HeroCarousel />
+                  </div>
                 </div>
+                {/* Texto institucional abaixo do carrossel */}
+                <p className="mt-6 text-center leading-relaxed font-display font-bold text-[clamp(0.95rem,2.5vw,1.5rem)] max-w-full lg:max-w-5xl mx-auto px-4 lg:px-8">
+                  <span className="text-[hsl(var(--primary))]">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
+                  <span className="text-[hsl(25,95%,60%)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
+                  <span className="text-[hsl(280,80%,65%)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}
+                  <span className="text-[hsl(190,90%,50%)]">Canabinoide oferecendo consultas com especialistas</span>{' '}
+                  <span className="text-[hsl(45,90%,55%)]">por apenas R$30.</span>{' '}
+                  <span className="text-[hsl(340,85%,60%)]">Venha Você Também Fazer Parte de Milhões de Pessoas que Mudaram a Sua Qualidade de Vida!</span>
+                </p>
               </div>
             </motion.div>
           </div>
@@ -239,6 +218,56 @@ const Index = () => {
           </div>
         </div>
       </section>
+      {/* Seleção de Patologias */}
+      <section className="py-20 md:py-28 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
+          <div className="text-center max-w-3xl mx-auto mb-10">
+            <h2 className="text-3xl md:text-5xl font-display font-black mb-4">
+              Selecione as suas <span className="text-gradient-green">patologias</span>
+            </h2>
+            <p className="text-lg text-muted-foreground font-medium">
+              Inicie seu tratamento com cannabis medicinal ainda hoje!
+            </p>
+            <p className="text-base text-muted-foreground mt-2">
+              Para qual condição você busca um tratamento?
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
+            {[
+              { name: "Alcoolismo", bg: "bg-emerald-600", shadow: "shadow-emerald-600/30" },
+              { name: "Alzheimer", bg: "bg-violet-600", shadow: "shadow-violet-600/30" },
+              { name: "Perda de peso", bg: "bg-amber-500", shadow: "shadow-amber-500/30" },
+              { name: "Obesidade", bg: "bg-orange-600", shadow: "shadow-orange-600/30" },
+              { name: "Anorexia", bg: "bg-rose-500", shadow: "shadow-rose-500/30" },
+              { name: "Ansiedade", bg: "bg-sky-500", shadow: "shadow-sky-500/30" },
+              { name: "Autismo", bg: "bg-indigo-500", shadow: "shadow-indigo-500/30" },
+              { name: "Crohn", bg: "bg-teal-600", shadow: "shadow-teal-600/30" },
+              { name: "Depressão", bg: "bg-blue-600", shadow: "shadow-blue-600/30" },
+              { name: "Dores", bg: "bg-red-500", shadow: "shadow-red-500/30" },
+              { name: "Epilepsia", bg: "bg-purple-600", shadow: "shadow-purple-600/30" },
+              { name: "Enxaqueca", bg: "bg-fuchsia-500", shadow: "shadow-fuchsia-500/30" },
+              { name: "Fibromialgia", bg: "bg-pink-500", shadow: "shadow-pink-500/30" },
+              { name: "Insônia", bg: "bg-cyan-600", shadow: "shadow-cyan-600/30" },
+              { name: "Intestino irritável", bg: "bg-lime-600", shadow: "shadow-lime-600/30" },
+              { name: "Tabagismo", bg: "bg-yellow-600", shadow: "shadow-yellow-600/30" },
+              { name: "TDAH", bg: "bg-blue-500", shadow: "shadow-blue-500/30" },
+              { name: "Parkinson", bg: "bg-green-700", shadow: "shadow-green-700/30" },
+            ].map((item, index) => (
+              <Link
+                key={item.name}
+                to={`/consulta-rapida`}
+                onClick={() => sessionStorage.setItem("triage_condition", item.name)}
+                className={`px-5 py-3 rounded-full ${item.bg} text-white font-bold text-sm shadow-lg ${item.shadow} hover:scale-105 transition-all duration-300 hover:animate-none`}
+                style={{
+                  animation: `twinkle ${6 + (index % 5) * 1.5}s ease-in-out ${(index * 0.8) % 7}s infinite`,
+                }}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Depoimentos Reais */}
       <section className="py-20 md:py-32 bg-card/10 border-y border-border">
@@ -263,7 +292,7 @@ const Index = () => {
                   <img 
                     src={t.image} 
                     alt={t.name} 
-                    className="w-10 h-10 rounded-full object-cover border-2 border-primary/30"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-primary/30"
                   />
                   <div>
                     <p className="text-sm font-bold text-foreground">{t.name}, {t.age}</p>

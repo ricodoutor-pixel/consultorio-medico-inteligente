@@ -69,7 +69,7 @@ const Admin = () => {
         <div className="container mx-auto px-4">
           <motion.div className="mb-8 flex items-center justify-between flex-wrap gap-4" initial="hidden" animate="visible" variants={fadeUp}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-gold border border-gold flex items-center justify-center glow-gold">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-gold border border-gold flex items-center justify-center glow-gold">
                 <Shield size={24} className="text-[hsl(45,76%,52%)]" />
               </div>
               <div>
@@ -182,9 +182,9 @@ const Admin = () => {
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  className="rounded-xl h-10"
+                  className="rounded-xl h-12"
                 />
-                <Button onClick={handleSendMessage} className="h-10 w-10 rounded-xl bg-primary text-white">
+                <Button onClick={handleSendMessage} className="h-12 w-12 rounded-xl bg-primary text-white">
                   <Send size={18} />
                 </Button>
               </div>

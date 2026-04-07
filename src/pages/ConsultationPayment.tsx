@@ -274,7 +274,7 @@ const ConsultationPayment = () => {
 
                     {/* Pay button */}
                     <Button
-                      className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-10"
+                      className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12"
                       asChild
                     >
                       <a href={checkoutUrl || pro.paymentLink} target="_blank" rel="noopener noreferrer">

@@ -27,7 +27,7 @@ const InvestorDashboard = () => {
           <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary glow-green">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary glow-green">
                   <Briefcase size={24} />
                 </div>
                 <span className="text-sm font-bold text-primary tracking-widest uppercase">Investor Relations • Planta y Raiz</span>
@@ -38,7 +38,7 @@ const InvestorDashboard = () => {
               </p>
             </div>
             <div className="flex gap-3">
-              <Button className="bg-primary text-primary-foreground font-black rounded-2xl px-6 h-10">
+              <Button className="bg-primary text-primary-foreground font-black rounded-2xl px-6 h-12">
                 <Download size={18} className="mr-2" /> Exportar PDF Mensal
               </Button>
             </div>

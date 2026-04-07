@@ -26,7 +26,7 @@ const ShoppingDashboard = () => {
           <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-2xl bg-secondary/10 border border-secondary/20 flex items-center justify-center text-secondary glow-purple">
+                <div className="w-12 h-12 rounded-2xl bg-secondary/10 border border-secondary/20 flex items-center justify-center text-secondary glow-purple">
                   <ShoppingBag size={24} />
                 </div>
                 <span className="text-sm font-bold text-secondary tracking-widest uppercase">Portal do Lojista • Planta y Raiz</span>
@@ -37,7 +37,7 @@ const ShoppingDashboard = () => {
               </p>
             </div>
             <div className="flex gap-3">
-              <Button className="bg-secondary text-secondary-foreground font-black rounded-2xl px-6 h-10">
+              <Button className="bg-secondary text-secondary-foreground font-black rounded-2xl px-6 h-12">
                 <Plus size={18} className="mr-2" /> Novo Produto
               </Button>
             </div>

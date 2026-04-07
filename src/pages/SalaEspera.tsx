@@ -115,7 +115,7 @@ const SalaEspera = () => {
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             {/* Header */}
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
                 <Users size={24} className="text-primary" />
               </div>
               <div>
@@ -184,7 +184,7 @@ const SalaEspera = () => {
                         <CardContent className="p-5">
                           <div className="flex items-center justify-between flex-wrap gap-3">
                             <div className="flex items-center gap-4">
-                              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${isInProgress ? "bg-primary/10" : "bg-muted"}`}>
+                              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isInProgress ? "bg-primary/10" : "bg-muted"}`}>
                                 {isInProgress ? (
                                   <Video size={20} className="text-primary" />
                                 ) : (

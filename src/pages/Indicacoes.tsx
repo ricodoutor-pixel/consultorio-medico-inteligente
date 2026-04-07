@@ -174,7 +174,7 @@ const Indicacoes = () => {
         <div className="container mx-auto px-4 relative z-10">
           <motion.div initial="hidden" animate="visible" variants={stagger}>
             <motion.div variants={fadeUp} className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
                 <Crown size={24} className="text-primary" />
               </div>
               <div>
@@ -240,7 +240,7 @@ const Indicacoes = () => {
       <section className="py-4">
         <div className="container mx-auto px-4">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="w-full grid grid-cols-4 h-10 mb-6">
+            <TabsList className="w-full grid grid-cols-4 h-12 mb-6">
               <TabsTrigger value="painel" className="font-bold text-xs">
                 <BarChart3 size={14} className="mr-1" /> Painel
               </TabsTrigger>
@@ -500,7 +500,7 @@ const Indicacoes = () => {
                         { step: "4", title: "Rede cresce", desc: "Seus indicados também indicam e você ganha nos níveis 2 e 3!", icon: TrendingUp },
                       ].map((s) => (
                         <div key={s.step} className="text-center">
-                          <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-2">
                             <s.icon size={20} className="text-primary" />
                           </div>
                           <div className="step-number mx-auto mb-2">{s.step}</div>

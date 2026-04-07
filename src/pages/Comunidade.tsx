@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -202,7 +203,7 @@ const Comunidade = () => {
         <div className="container mx-auto px-4 relative z-10">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-purple border border-purple flex items-center justify-center glow-purple">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-purple border border-purple flex items-center justify-center glow-purple">
                 <Users size={24} className="text-secondary" />
               </div>
               <span className="text-sm font-bold text-secondary">COMUNIDADE</span>
@@ -210,9 +211,12 @@ const Comunidade = () => {
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground leading-tight mb-4">
               Comunidade <span className="text-gradient-purple">Planta & Raiz</span>
             </h1>
-            <p className="text-muted-foreground max-w-2xl font-medium">
+            <p className="text-muted-foreground max-w-2xl font-medium mb-6">
               Troque experiências com outros pacientes e profissionais. Compartilhe relatos, tire dúvidas e acesse estudos científicos.
             </p>
+            <Link to="/club" className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-transform">
+              🌿 Acessar Club Planta y Raiz <ChevronRight size={18} />
+            </Link>
           </motion.div>
         </div>
       </section>

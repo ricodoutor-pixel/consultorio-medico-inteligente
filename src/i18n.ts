@@ -15,7 +15,7 @@ export const translations = {
     shopping: "Shopping",
     online_status: "Online agora",
     cfm_badge: "CFM 2314 + LGPD",
-    responsible_tech: "Responsável Técnico e Jurídico",
+    responsible_tech: "Supervisionado por IA de última geração 24×7",
   },
   es: {
     hero_title: "Planta y Raiz - Mega Clínica Digital",

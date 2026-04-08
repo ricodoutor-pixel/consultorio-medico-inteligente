@@ -29,7 +29,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "hero.subtitle": "Democratizando o acesso à saúde e bem-estar através da tecnologia e cannabis medicinal.",
     "hero.start_consultation": "Iniciar Consulta",
     "hero.online_now": "Online agora",
-    "hero.responsible_tech": "Responsável Técnico e Jurídico",
+    "hero.responsible_tech": "Supervisionado por IA de última geração 24×7",
     // Common
     "common.save": "Salvar",
     "common.cancel": "Cancelar",

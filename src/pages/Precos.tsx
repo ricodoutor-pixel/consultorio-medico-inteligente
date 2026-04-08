@@ -100,7 +100,7 @@ const Precos = () => {
         "SLA garantido 99.9%",
       ],
       highlighted: false,
-      checkoutUrl: "https://mpago.la/1JsFwQs",
+      
     },
     {
       id: "clinica-familia",

@@ -178,8 +178,7 @@ const App = () => (
               </Routes>
             </main>
             
-            {/* Mascote Verdinho Global */}
-            <MascotVerdinho />
+            
             
             {/* WhatsApp Brisa Button */}
             <WhatsAppButton />

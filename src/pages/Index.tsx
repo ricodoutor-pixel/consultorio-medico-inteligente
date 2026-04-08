@@ -172,7 +172,7 @@ const Index = () => {
             <h2 className="text-3xl md:text-5xl font-display font-black mb-6">Tratamento em <span className="text-gradient-purple">5 Passos</span></h2>
             <p className="text-lg text-muted-foreground font-medium">Sua jornada completa, do diagnóstico à entrega do medicamento, com economia e segurança total.</p>
           </div>
-          <div className="grid md:grid-cols-5 gap-6">
+          <div className="grid md:grid-cols-5 gap-6 mb-10">
             {steps.map((step, i) => (
               <motion.div key={i} className="relative p-6 rounded-3xl bg-card/30 border border-border hover:border-primary/20 transition-all group" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
                 <div className="mb-4 relative h-40 overflow-hidden rounded-2xl">
@@ -185,6 +185,13 @@ const Index = () => {
                 <p className="text-muted-foreground leading-relaxed text-sm">{step.desc}</p>
               </motion.div>
             ))}
+          </div>
+          <div className="flex justify-center">
+            <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
+              <Link to="/profissionais">
+                🎯 Iniciar Consulta <ArrowRight size={18} className="ml-2" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

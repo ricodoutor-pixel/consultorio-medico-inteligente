@@ -35,7 +35,7 @@ export const translations = {
     shopping: "Shopping",
     online_status: "Online now",
     cfm_badge: "CFM 2314 + LGPD",
-    responsible_tech: "Technical and Legal Director",
+    responsible_tech: "Supervised by cutting-edge AI 24×7",
   }
 };
 

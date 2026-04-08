@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { Leaf, ShoppingBag, Users, Star, ArrowRight, TrendingUp, UserPlus, Download, Quote } from "lucide-react";
+import { Leaf, Users, Star, ArrowRight, TrendingUp, UserPlus, Download, Quote } from "lucide-react";
 import { motion } from "framer-motion";
 import CannabisMarketChart from "@/components/CannabisMarketChart";
 import { Link } from "react-router-dom";

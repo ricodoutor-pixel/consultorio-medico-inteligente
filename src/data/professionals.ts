@@ -28,6 +28,11 @@ import draNataliaImg from "@/assets/dra-natalia-souza.jpg";
 import drBrunoImg from "@/assets/dr-bruno-tavares.jpg";
 import draMeiImg from "@/assets/dra-mei-lin.jpg";
 import profRicardoImg from "@/assets/prof-ricardo-campos.jpg";
+import draCarolinaImg from "@/assets/dra-carolina-vasconcelos.jpg";
+import drFernandoImg from "@/assets/dr-fernando-ribeiro.jpg";
+import draPriscilaImg from "@/assets/dra-priscila-andrade.jpg";
+import drPauloImg from "@/assets/dr-paulo-nakamura.jpg";
+import profLeticiaImg from "@/assets/profa-leticia-verde.jpg";
 
 export type Professional = {
   id: string;

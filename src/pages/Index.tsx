@@ -97,6 +97,16 @@ const Index = () => {
                   Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎<span className="inline-flex align-middle ml-1"><GlobalComplianceBadge /></span>
                 </div>
               </motion.div>
+
+              {/* Texto institucional - visível apenas em desktop */}
+              <motion.p variants={fadeUp} className="hidden lg:block leading-relaxed font-display font-bold text-[clamp(0.9rem,1.1vw,1.15rem)] max-w-2xl mb-2">
+                <span className="text-primary">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
+                <span className="text-[hsl(25,95%,60%)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
+                <span className="text-[hsl(280,80%,65%)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}
+                <span className="text-[hsl(190,90%,50%)]">Canabinoide oferecendo consultas com especialistas</span>{' '}
+                <span className="text-[hsl(45,90%,55%)]">por apenas R$30.</span>{' '}
+                <span className="text-[hsl(340,85%,60%)]">Venha Você Também Fazer Parte!</span>
+              </motion.p>
             </motion.div>
 
             {/* Phone Mockup Area */}

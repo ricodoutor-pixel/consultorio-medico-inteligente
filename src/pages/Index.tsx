@@ -199,6 +199,9 @@ const Index = () => {
       {/* Seleção de Patologias */}
       <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
+          <div className="flex justify-center mb-8">
+            <GlobalComplianceBadge />
+          </div>
           <div className="text-center max-w-3xl mx-auto mb-10">
             <h2 className="text-3xl md:text-5xl font-display font-black mb-4">
               Selecione as suas <span className="text-gradient-green">patologias</span>

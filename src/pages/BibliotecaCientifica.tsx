@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -54,6 +55,28 @@ const BibliotecaCientifica = () => {
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [downloadCount, setDownloadCount] = useState(8000);
 
+  // Fetch persistent counter from database
+  useEffect(() => {
+    const fetchCount = async () => {
+      const { data } = await supabase
+        .from('site_counters' as any)
+        .select('count')
+        .eq('id', 'ebook_downloads')
+        .single();
+      if (data) setDownloadCount((data as any).count);
+    };
+    fetchCount();
+  }, []);
+
+  const incrementCounter = async () => {
+    const newCount = downloadCount + 1;
+    setDownloadCount(newCount);
+    await supabase
+      .from('site_counters' as any)
+      .update({ count: newCount, updated_at: new Date().toISOString() } as any)
+      .eq('id', 'ebook_downloads');
+  };
+
   const toggleFavorite = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setFavorites(prev => {
@@ -103,7 +126,7 @@ const BibliotecaCientifica = () => {
               </div>
               <Link to="/ebook-medicina-canabinoide">
                 <Button
-                  onClick={() => setDownloadCount(prev => prev + 1)}
+                  onClick={incrementCounter}
                   className="whitespace-nowrap font-bold text-xs bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl"
                 >
                   ACESSAR CURSO COMPLETO EM E-BOOK <ArrowRight size={14} className="ml-1" />

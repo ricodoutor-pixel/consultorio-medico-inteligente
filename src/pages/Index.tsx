@@ -99,14 +99,20 @@ const Index = () => {
               </motion.div>
 
               {/* Texto institucional - visível apenas em desktop */}
-              <motion.p variants={fadeUp} className="hidden lg:block leading-relaxed font-display font-bold text-[clamp(0.9rem,1.1vw,1.15rem)] max-w-2xl mb-2">
-                <span className="text-primary">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
-                <span className="text-[hsl(25,95%,60%)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
-                <span className="text-[hsl(280,80%,65%)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}
-                <span className="text-[hsl(190,90%,50%)]">Canabinoide oferecendo consultas com especialistas</span>{' '}
-                <span className="text-[hsl(45,90%,55%)]">por apenas R$30.</span>{' '}
-                <span className="text-[hsl(340,85%,60%)]">Venha Você Também Fazer Parte!</span>
-              </motion.p>
+              <motion.div 
+                variants={fadeUp} 
+                className="hidden lg:block max-w-2xl mb-2 relative"
+              >
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary/10 via-[hsl(280,80%,65%)]/8 to-[hsl(190,90%,50%)]/10 rounded-2xl blur-xl"></div>
+                <p className="relative leading-[1.8] font-display font-bold text-lg xl:text-xl tracking-wide">
+                  <span className="text-primary drop-shadow-[0_0_8px_hsl(142,70%,45%/0.4)]">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
+                  <span className="text-[hsl(25,95%,60%)] drop-shadow-[0_0_8px_hsl(25,95%,60%/0.3)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
+                  <span className="text-[hsl(280,80%,65%)] drop-shadow-[0_0_8px_hsl(280,80%,65%/0.3)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}
+                  <span className="text-[hsl(190,90%,50%)] drop-shadow-[0_0_8px_hsl(190,90%,50%/0.3)]">Canabinoide oferecendo consultas com especialistas</span>{' '}
+                  <span className="text-[hsl(45,90%,55%)] drop-shadow-[0_0_8px_hsl(45,90%,55%/0.3)]">por apenas R$30.</span>{' '}
+                  <span className="text-[hsl(340,85%,60%)] drop-shadow-[0_0_10px_hsl(340,85%,60%/0.4)]">Venha Você Também Fazer Parte!</span>
+                </p>
+              </motion.div>
             </motion.div>
 
             {/* Phone Mockup Area */}

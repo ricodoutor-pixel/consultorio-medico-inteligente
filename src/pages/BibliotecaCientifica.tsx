@@ -59,11 +59,11 @@ const BibliotecaCientifica = () => {
   useEffect(() => {
     const fetchCount = async () => {
       const { data } = await supabase
-        .from('site_counters')
+        .from('site_counters' as any)
         .select('count')
         .eq('id', 'ebook_downloads')
         .single();
-      if (data) setDownloadCount(data.count);
+      if (data) setDownloadCount((data as any).count);
     };
     fetchCount();
   }, []);

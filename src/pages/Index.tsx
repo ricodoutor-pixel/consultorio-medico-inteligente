@@ -76,26 +76,35 @@ const Index = () => {
       <WhatsAppButton />
 
       {/* Hero Section */}
-      <section className="hero-glow pb-16 md:pb-20 min-h-[90dvh] flex items-start overflow-hidden pt-20 md:pt-24">
+      <section className="hero-glow pb-12 md:pb-16 min-h-[60dvh] lg:min-h-[80dvh] flex items-start overflow-hidden pt-20 md:pt-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-14 items-start">
             
             {/* Text Content */}
-            <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col">
+            <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col justify-center">
 
               <motion.h1 
                 variants={fadeUp} 
-                className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-3 tracking-tight"
+                className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-4 tracking-tight"
               >
                 <span className="text-gradient-green">Mais que Acesso,</span>
                 <br />
                 <span className="text-gradient-purple animate-[starPulse_3s_ease-in-out_infinite] hover:scale-[2] transition-transform duration-700 ease-in-out origin-left inline-block cursor-pointer drop-shadow-[0_0_20px_hsl(280,80%,65%)] hover:drop-shadow-[0_0_40px_hsl(280,80%,75%)]">Equidade.</span>
               </motion.h1>
 
-              <motion.div variants={fadeUp} className="max-w-2xl mb-8">
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium">
-                  Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎 <GlobalComplianceBadge />
+              <motion.div variants={fadeUp} className="max-w-2xl mb-6">
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium inline-flex items-center flex-wrap gap-1.5">
+                  <span>Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎</span>
+                  <GlobalComplianceBadge />
                 </p>
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="flex flex-wrap gap-3 mb-4">
+                <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
+                  <Link to="/profissionais">
+                    🎯 Iniciar Consulta <ArrowRight size={18} className="ml-2" />
+                  </Link>
+                </Button>
               </motion.div>
             </motion.div>
 
@@ -126,13 +135,13 @@ const Index = () => {
                   </div>
                 </div>
                 {/* Texto institucional abaixo do carrossel */}
-                <p className="mt-6 text-center leading-relaxed font-display font-bold text-[clamp(0.95rem,2.5vw,1.5rem)] max-w-full lg:max-w-5xl mx-auto px-4 lg:px-8">
-                  <span className="text-[hsl(var(--primary))]">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
+                <p className="mt-4 text-center leading-relaxed font-display font-bold text-[clamp(0.85rem,2vw,1.25rem)] max-w-full lg:max-w-4xl mx-auto px-2 lg:px-6">
+                  <span className="text-primary">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
                   <span className="text-[hsl(25,95%,60%)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
                   <span className="text-[hsl(280,80%,65%)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}
                   <span className="text-[hsl(190,90%,50%)]">Canabinoide oferecendo consultas com especialistas</span>{' '}
                   <span className="text-[hsl(45,90%,55%)]">por apenas R$30.</span>{' '}
-                  <span className="text-[hsl(340,85%,60%)]">Venha Você Também Fazer Parte de Milhões de Pessoas que Mudaram a Sua Qualidade de Vida!</span>
+                  <span className="text-[hsl(340,85%,60%)]">Venha Você Também Fazer Parte!</span>
                 </p>
               </div>
             </motion.div>
@@ -191,13 +200,6 @@ const Index = () => {
       {/* Seleção de Patologias */}
       <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
-          <div className="flex justify-center mb-8">
-            <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-16 px-6 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
-              <Link to="/profissionais">
-                🎯 Iniciar Consulta <ArrowRight size={18} className="ml-2" />
-              </Link>
-            </Button>
-          </div>
           <div className="text-center max-w-3xl mx-auto mb-10">
             <h2 className="text-3xl md:text-5xl font-display font-black mb-4">
               Selecione as suas <span className="text-gradient-green">patologias</span>

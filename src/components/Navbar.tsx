@@ -153,7 +153,7 @@ export const Navbar = () => {
             </div>
 
             {/* Desktop: Menu Centralizado */}
-            <div className="hidden xl:flex items-center gap-4 2xl:gap-6">
+            <div className="hidden xl:flex items-center gap-2 2xl:gap-4">
               <div className="flex items-center gap-2 2xl:gap-4" role="menubar">
                 {links.map((link) => (
                   <NavLink
@@ -167,8 +167,8 @@ export const Navbar = () => {
                 ))}
               </div>
 
-              <div className="flex items-center gap-3 border-l border-border pl-4">
-                <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 border-l border-border pl-3">
+                <div className="flex items-center gap-1.5">
                   <div className="scale-90">
                     <LanguageSwitcher />
                   </div>

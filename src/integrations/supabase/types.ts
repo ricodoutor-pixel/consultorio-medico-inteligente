@@ -1005,6 +1005,24 @@ export type Database = {
         }
         Relationships: []
       }
+      site_counters: {
+        Row: {
+          count: number
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          count?: number
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          count?: number
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       strain_images: {
         Row: {
           created_at: string

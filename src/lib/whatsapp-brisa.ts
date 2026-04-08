@@ -82,8 +82,8 @@ export function trackWhatsAppClick(
   userName?: string,
   doctorName?: string
 ): void {
-  if (typeof window !== "undefined" && window.gtag) {
-    window.gtag("event", "whatsapp_click", {
+  if (typeof window !== "undefined" && (window as any).gtag) {
+    (window as any).gtag("event", "whatsapp_click", {
       source,
       user_name: userName,
       doctor_name: doctorName,

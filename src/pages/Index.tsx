@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Leaf, ShoppingBag, Users, Star, ArrowRight, TrendingUp, UserPlus, Download, Quote } from "lucide-react";
 import { motion } from "framer-motion";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import CannabisMarketChart from "@/components/CannabisMarketChart";
 import { Link } from "react-router-dom";
 import { HeroCarousel } from "@/components/HeroCarousel"; 
 import triagemPatient from "@/assets/triagem-patient.png";

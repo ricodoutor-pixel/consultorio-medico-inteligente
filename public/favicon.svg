@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Verdinho Favicon - Green Frog Doctor -->
-  <circle cx="32" cy="32" r="30" fill="#22c55e"/>
+  <!-- Verdinho Favicon - Green Frog Doctor (Full Size) -->
+  <circle cx="32" cy="30" r="32" fill="#22c55e"/>
   <!-- Eyes -->
-  <circle cx="22" cy="24" r="8" fill="white"/>
-  <circle cx="42" cy="24" r="8" fill="white"/>
-  <circle cx="22" cy="24" r="4" fill="#1a1a2e"/>
-  <circle cx="42" cy="24" r="4" fill="#1a1a2e"/>
-  <circle cx="23" cy="23" r="1.5" fill="white"/>
-  <circle cx="43" cy="23" r="1.5" fill="white"/>
+  <circle cx="20" cy="22" r="10" fill="white"/>
+  <circle cx="44" cy="22" r="10" fill="white"/>
+  <circle cx="20" cy="22" r="5" fill="#1a1a2e"/>
+  <circle cx="44" cy="22" r="5" fill="#1a1a2e"/>
+  <circle cx="21.5" cy="20.5" r="2" fill="white"/>
+  <circle cx="45.5" cy="20.5" r="2" fill="white"/>
   <!-- Smile -->
-  <path d="M20 38 Q32 48 44 38" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M16 40 Q32 54 48 40" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/>
   <!-- Doctor coat collar -->
-  <path d="M22 50 L32 56 L42 50" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M18 54 L32 62 L46 54" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
   <!-- Stethoscope hint -->
-  <circle cx="32" cy="54" r="2" fill="#00ff00"/>
+  <circle cx="32" cy="60" r="3" fill="#00ff00"/>
 </svg>

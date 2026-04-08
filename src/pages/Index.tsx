@@ -97,7 +97,7 @@ const Index = () => {
               >
                 <span className="text-gradient-green">Mais que Acesso,</span>
                 <br />
-                <span className="text-gradient-purple">Equidade.</span>
+                <span className="text-gradient-purple animate-pulse hover:scale-[3] transition-transform duration-500 ease-in-out origin-left inline-block cursor-pointer">Equidade.</span>
               </motion.h1>
 
               <motion.div variants={fadeUp} className="max-w-2xl mb-8">

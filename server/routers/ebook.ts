@@ -67,7 +67,7 @@ export const ebookRouter = router({
           success: true,
           message: "Download registrado com sucesso",
           downloadUrl:
-            "https://d2xsxph8kpxj0f.cloudfront.net/310519663065229674/XQPvBCLCnwZajUp4KoE3Kh/EBOOK_CANNABIS_MEDICINAL_CURSO_COMPLETO_c416c55e.pdf",
+            "https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/fnbZJMGCJUpGmwzl.pdf",
         };
       } catch (error) {
         console.error("Erro ao registrar download:", error);

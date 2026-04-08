@@ -52,6 +52,7 @@ const BibliotecaCientifica = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [sortMode, setSortMode] = useState<SortMode>("relevancia");
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
+  const [downloadCount, setDownloadCount] = useState(8000);
 
   const toggleFavorite = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();

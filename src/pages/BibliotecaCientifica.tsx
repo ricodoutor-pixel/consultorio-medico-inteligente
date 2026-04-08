@@ -69,12 +69,11 @@ const BibliotecaCientifica = () => {
   }, []);
 
   const incrementCounter = async () => {
-    setDownloadCount(prev => prev + 1);
-    await supabase.rpc('increment_counter' as never, { counter_id: 'ebook_downloads' } as never).then(() => {});
-    // Fallback: direct update
+    const newCount = downloadCount + 1;
+    setDownloadCount(newCount);
     await supabase
-      .from('site_counters')
-      .update({ count: downloadCount + 1, updated_at: new Date().toISOString() })
+      .from('site_counters' as any)
+      .update({ count: newCount, updated_at: new Date().toISOString() } as any)
       .eq('id', 'ebook_downloads');
   };
 

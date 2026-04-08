@@ -58,7 +58,7 @@ const Precos = () => {
         "Selo de loja verificada",
       ],
       highlighted: false,
-      checkoutUrl: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=9d541916b1324a15a78155fa74371013",
+      
     },
     {
       id: "medico-vip",

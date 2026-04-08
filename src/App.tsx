@@ -170,6 +170,7 @@ const App = () => (
                 <Route path="/impacto" element={<ImpactoSocial />} />
                 <Route path="/ebook" element={<EbookLanding />} />
                 <Route path="/ebook-gratis" element={<EbookLanding />} />
+                <Route path="/ebook-medicina-canabinoide" element={<EbookMedicinaCanabinoide />} />
                 <Route path="/admin/ebook-analytics" element={<AdminRoute><EbookAnalyticsDashboard /></AdminRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

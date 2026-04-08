@@ -86,8 +86,30 @@ const BibliotecaCientifica = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
+      {/* Ebook Callout Banner */}
+      <section className="pt-24 md:pt-32">
+        <div className="container mx-auto px-4">
+          <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/5 via-card to-secondary/5 p-4 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                <BookOpen size={20} className="text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-foreground">Quer se aprofundar na Clínica?</p>
+                <p className="text-xs text-muted-foreground">Curso completo de Medicina Canabinoide em PDF gratuito.</p>
+              </div>
+            </div>
+            <Link to="/ebook-medicina-canabinoide">
+              <Button className="whitespace-nowrap font-bold text-xs bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl">
+                ACESSAR CURSO COMPLETO EM E-BOOK <ArrowRight size={14} className="ml-1" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Hero */}
-      <section className="pt-24 pb-8 md:pt-32 hero-glow">
+      <section className="pt-8 pb-8 hero-glow">
         <div className="container mx-auto px-4 relative z-10">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <div className="flex items-center gap-3 mb-4">

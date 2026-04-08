@@ -225,27 +225,16 @@ const Profissionais = () => {
                       </div>
                       <span className="text-lg font-display font-black text-gradient-green">{p.price}</span>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <div className="flex gap-2">
-                        <Button className="flex-1 bg-primary text-primary-foreground text-sm font-black rounded-xl" asChild>
-                          <Link to={`/falar-com-especialista?pro=${p.id}`}>
-                            Falar com Especialista
-                          </Link>
-                        </Button>
-                        <Button variant="outline" className="text-sm font-black border-border rounded-xl" asChild>
-                          <Link to={`/profissionais/${p.id}`}>Perfil</Link>
-                        </Button>
-                      </div>
-                      <a
-                        href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${p.name}`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Button variant="outline" size="sm" className="w-full text-xs font-bold border-[hsl(142,70%,45%)]/40 text-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,45%)]/10 rounded-xl gap-1.5">
-                          <Phone size={12} /> Agendar via WhatsApp
-                        </Button>
-                      </a>
-                    </div>
+                    <a
+                      href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${p.name}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <Button className="w-full bg-primary text-primary-foreground text-sm font-black rounded-xl gap-2 animate-pulse">
+                        <Phone size={14} /> Agendar Consulta
+                      </Button>
+                    </a>
                   </CardContent>
                 </Card>
               </motion.div>

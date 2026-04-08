@@ -89,21 +89,41 @@ const BibliotecaCientifica = () => {
       {/* Ebook Callout Banner */}
       <section className="pt-24 md:pt-32">
         <div className="container mx-auto px-4">
-          <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/5 via-card to-secondary/5 p-4 md:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                <BookOpen size={20} className="text-primary" />
+          <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/5 via-card to-secondary/5 p-4 md:p-6 flex flex-col items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                  <BookOpen size={20} className="text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-foreground">Quer se aprofundar na Clínica?</p>
+                  <p className="text-xs text-muted-foreground">Curso completo de Medicina Canabinoide em PDF gratuito.</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-bold text-foreground">Quer se aprofundar na Clínica?</p>
-                <p className="text-xs text-muted-foreground">Curso completo de Medicina Canabinoide em PDF gratuito.</p>
-              </div>
+              <Link to="/ebook-medicina-canabinoide">
+                <Button
+                  onClick={() => setDownloadCount(prev => prev + 1)}
+                  className="whitespace-nowrap font-bold text-xs bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl"
+                >
+                  ACESSAR CURSO COMPLETO EM E-BOOK <ArrowRight size={14} className="ml-1" />
+                </Button>
+              </Link>
             </div>
-            <Link to="/ebook-medicina-canabinoide">
-              <Button className="whitespace-nowrap font-bold text-xs bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl">
-                ACESSAR CURSO COMPLETO EM E-BOOK <ArrowRight size={14} className="ml-1" />
-              </Button>
-            </Link>
+            <div className="flex items-center gap-1.5 text-sm font-bold">
+              <span className="text-muted-foreground">📥</span>
+              {downloadCount.toLocaleString().split('').map((char, i) => (
+                <span
+                  key={i}
+                  className={`inline-block text-lg font-black transition-colors ${
+                    char === '.' || char === ',' ? 'text-muted-foreground' :
+                    ['text-primary', 'text-yellow-400', 'text-cyan-400', 'text-pink-400', 'text-orange-400', 'text-violet-400', 'text-emerald-400', 'text-red-400'][i % 8]
+                  }`}
+                >
+                  {char}
+                </span>
+              ))}
+              <span className="text-xs text-muted-foreground ml-1">downloads efetuados</span>
+            </div>
           </div>
         </div>
       </section>

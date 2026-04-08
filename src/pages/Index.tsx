@@ -84,7 +84,7 @@ const Index = () => {
       <WhatsAppButton />
 
       {/* Hero Section */}
-      <section className="hero-glow pb-16 md:pb-20 min-h-[90dvh] flex items-start overflow-hidden" style={{ paddingTop: 'clamp(16px, 3vh, 32px)' }}>
+      <section className="hero-glow pb-16 md:pb-20 min-h-[90dvh] flex items-start overflow-hidden pt-20 md:pt-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-14 items-start">
             

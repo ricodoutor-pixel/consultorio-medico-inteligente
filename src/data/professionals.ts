@@ -16,6 +16,12 @@ import drJamesImg from "@/assets/dr-james-wilson.jpg";
 import draAmandaImg from "@/assets/dra-amanda-lima.jpg";
 import drAlejandroImg from "@/assets/dr-alejandro-garcia.jpg";
 import draEmilyImg from "@/assets/dra-emily-carter.jpg";
+import drRafaelImg from "@/assets/dr-rafael-mendes.jpg";
+import draCamilaImg from "@/assets/dra-camila-duarte.jpg";
+import drWeiImg from "@/assets/dr-wei-chen.jpg";
+import draKeikoImg from "@/assets/dra-keiko-yamamoto.jpg";
+import profThiagoImg from "@/assets/prof-thiago-verde.jpg";
+import profDanielaImg from "@/assets/prof-daniela-rojas.jpg";
 
 export type Professional = {
   id: string;
@@ -550,6 +556,174 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Jessica T.", rating: 5, text: "Best rheumatologist I've ever consulted." },
       { name: "Marcos A.", rating: 5, text: "Tratamento revolucionário para minha artrite." },
+    ],
+  },
+
+  // ═══════ Saúde Ocupacional (2) ═══════
+  {
+    id: "ocu-1",
+    name: "Dr. Rafael Mendes",
+    category: "Saúde Ocupacional",
+    bio: "Médico do trabalho com especialização em ergonomia e manejo de dor ocupacional com cannabis medicinal. Formado pela USP com 10 anos de experiência em empresas de grande porte.",
+    experience: "10 anos",
+    tags: ["Medicina do Trabalho", "Ergonomia", "Dor Ocupacional"],
+    price: "R$ 85,00",
+    priceValue: 85,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 4.8,
+    consults: 220,
+    avatar: "RM",
+    imageUrl: drRafaelImg,
+    flags: ["🇧🇷"],
+    services: [
+      { name: "Avaliação Ocupacional", price: "R$ 85,00", desc: "Avaliação completa + orientação canábica" },
+      { name: "Laudo Ergonômico", price: "R$ 120", desc: "Análise de posto de trabalho" },
+      { name: "Retorno", price: "R$ 60", desc: "Acompanhamento mensal" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00"],
+    reviews: [
+      { name: "André L.", rating: 5, text: "Me ajudou com minha LER crônica usando CBD." },
+      { name: "Patrícia S.", rating: 5, text: "Profissional atualizado e muito humano." },
+    ],
+  },
+  {
+    id: "ocu-2",
+    name: "Dra. Camila Duarte",
+    category: "Saúde Ocupacional",
+    bio: "Terapeuta ocupacional especializada em reabilitação com abordagem canábica. Mestre em saúde coletiva pela UFMG. Atua com burnout, estresse laboral e reintegração profissional.",
+    experience: "8 anos",
+    tags: ["Reabilitação", "Burnout", "Estresse Laboral"],
+    price: "R$ 75,00",
+    priceValue: 75,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 180,
+    avatar: "CD",
+    imageUrl: draCamilaImg,
+    flags: ["🇧🇷", "🇵🇹"],
+    services: [
+      { name: "Terapia Ocupacional", price: "R$ 75,00", desc: "Sessão individual 50 min" },
+      { name: "Plano de Reabilitação", price: "R$ 100", desc: "Programa personalizado" },
+      { name: "Avaliação Funcional", price: "R$ 90", desc: "Análise de capacidade laboral" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Fernanda R.", rating: 5, text: "Saí do burnout graças ao tratamento integrado." },
+      { name: "João M.", rating: 5, text: "Excelente abordagem humanizada." },
+    ],
+  },
+
+  // ═══════ Acupuntura (2) ═══════
+  {
+    id: "acu-1",
+    name: "Dr. Wei Chen",
+    category: "Acupuntura",
+    bio: "Acupunturista sino-brasileiro com 22 anos de prática. Especialista em acupuntura clássica chinesa combinada com fitoterapia canábica. Formado pela Beijing University of Chinese Medicine.",
+    experience: "22 anos",
+    tags: ["Acupuntura Clássica", "MTC", "Fitoterapia Canábica"],
+    price: "R$ 90,00",
+    priceValue: 90,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 5.0,
+    consults: 480,
+    avatar: "WC",
+    imageUrl: drWeiImg,
+    flags: ["🇧🇷", "🇨🇳"],
+    services: [
+      { name: "Sessão de Acupuntura", price: "R$ 90,00", desc: "Sessão completa 60 min" },
+      { name: "Acupuntura + Moxabustão", price: "R$ 110", desc: "Tratamento combinado" },
+      { name: "Avaliação MTC", price: "R$ 70", desc: "Diagnóstico pela Medicina Tradicional Chinesa" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Luciana F.", rating: 5, text: "Mestre na arte da acupuntura, transformou minha dor." },
+      { name: "Roberto C.", rating: 5, text: "Combinação perfeita de acupuntura e cannabis." },
+    ],
+  },
+  {
+    id: "acu-2",
+    name: "Dra. Keiko Yamamoto",
+    category: "Acupuntura",
+    bio: "Acupunturista nipo-brasileira especializada em auriculoterapia e eletroacupuntura. Formada pela Escola Paulista de Medicina com certificação em acupuntura integrativa com cannabis medicinal.",
+    experience: "15 anos",
+    tags: ["Auriculoterapia", "Eletroacupuntura", "Dor Crônica"],
+    price: "R$ 80,00",
+    priceValue: 80,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 350,
+    avatar: "KY",
+    imageUrl: draKeikoImg,
+    flags: ["🇧🇷", "🇯🇵"],
+    services: [
+      { name: "Auriculoterapia", price: "R$ 80,00", desc: "Sessão auricular 45 min" },
+      { name: "Eletroacupuntura", price: "R$ 100", desc: "Estímulo elétrico + agulhas" },
+      { name: "Protocolo Dor Crônica", price: "R$ 120", desc: "Programa completo 4 sessões" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Marina S.", rating: 5, text: "Minha enxaqueca desapareceu após 3 sessões." },
+      { name: "Carlos E.", rating: 5, text: "Profissional dedicada e muito competente." },
+    ],
+  },
+
+  // ═══════ Jardineiros & Cultivo (2) ═══════
+  {
+    id: "jar-1",
+    name: "Prof. Thiago Verde",
+    category: "Jardineiros & Cultivo",
+    bio: "Engenheiro agrônomo e consultor de cultivo medicinal autorizado. Especialista em genética canábica, cultivo indoor/outdoor e boas práticas agrícolas. Consultor de associações pacientes no Brasil.",
+    experience: "8 anos",
+    tags: ["Cultivo Indoor", "Genética Canábica", "Boas Práticas"],
+    price: "R$ 60,00",
+    priceValue: 60,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 4.8,
+    consults: 150,
+    avatar: "TV",
+    imageUrl: profThiagoImg,
+    flags: ["🇧🇷"],
+    services: [
+      { name: "Consultoria de Cultivo", price: "R$ 60,00", desc: "Orientação inicial completa" },
+      { name: "Plano de Cultivo", price: "R$ 120", desc: "Projeto personalizado indoor/outdoor" },
+      { name: "Análise de Solo/Substrato", price: "R$ 80", desc: "Avaliação técnica" },
+    ],
+    slots: ["10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Pedro H.", rating: 5, text: "Ótima orientação para meu cultivo autorizado." },
+      { name: "Renata M.", rating: 4, text: "Muito didático e paciente." },
+    ],
+  },
+  {
+    id: "jar-2",
+    name: "Profa. Daniela Rojas",
+    category: "Jardineiros & Cultivo",
+    bio: "Botânica colombiana-brasileira especialista em fitoquímica canábica e cultivo orgânico. Mestre em botânica pela Universidad Nacional de Colombia. Consultora de cooperativas e associações.",
+    experience: "11 anos",
+    tags: ["Fitoquímica", "Cultivo Orgânico", "Terpenos"],
+    price: "R$ 70,00",
+    priceValue: 70,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 200,
+    avatar: "DR",
+    imageUrl: profDanielaImg,
+    flags: ["🇨🇴", "🇧🇷"],
+    services: [
+      { name: "Consultoria Botânica", price: "R$ 70,00", desc: "Análise de variedades e terpenos" },
+      { name: "Cultivo Orgânico", price: "R$ 100", desc: "Planejamento de cultivo sustentável" },
+      { name: "Curso de Fitoquímica", price: "R$ 150", desc: "Workshop de 2 horas" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Amanda L.", rating: 5, text: "Conhecimento impressionante sobre terpenos." },
+      { name: "Lucas V.", rating: 5, text: "Melhor consultora de cultivo que já tive." },
     ],
   },
 ];

@@ -135,8 +135,8 @@ const Index = () => {
                     <HeroCarousel />
                   </div>
                 </div>
-                {/* Texto institucional abaixo do carrossel */}
-                <p className="mt-4 text-center leading-relaxed font-display font-bold text-[clamp(0.85rem,2vw,1.25rem)] max-w-full lg:max-w-4xl mx-auto px-2 lg:px-6">
+                {/* Texto institucional abaixo do carrossel - apenas mobile */}
+                <p className="mt-4 text-center leading-relaxed font-display font-bold text-[clamp(0.85rem,2vw,1.25rem)] max-w-full lg:hidden mx-auto px-2">
                   <span className="text-primary">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
                   <span className="text-[hsl(25,95%,60%)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
                   <span className="text-[hsl(280,80%,65%)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}

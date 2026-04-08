@@ -37,7 +37,7 @@ const Precos = () => {
         "Recomendações personalizadas",
       ],
       highlighted: false,
-      checkoutUrl: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=71c153e9de1147f796c4e9354cbaa88a",
+      
     },
     {
       id: "lojista-pro",

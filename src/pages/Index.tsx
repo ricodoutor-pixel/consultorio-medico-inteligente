@@ -131,9 +131,9 @@ const Index = () => {
               transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
             >
               {/* Cadastro Gratuito Button - Above Phone */}
-              <Link to="/cadastro">
+              <Link to="/cadastro" className="self-center">
                 <motion.span 
-                  className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer shadow-xl shadow-primary/30"
+                  className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground rounded-full px-6 py-2.5 text-sm font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer shadow-xl shadow-primary/30"
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 >

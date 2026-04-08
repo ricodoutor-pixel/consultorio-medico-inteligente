@@ -1206,7 +1206,7 @@ export type Database = {
           sentiment: string | null
           session_id: string
           topic: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           content: string
@@ -1216,7 +1216,7 @@ export type Database = {
           sentiment?: string | null
           session_id?: string
           topic?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           content?: string
@@ -1226,7 +1226,7 @@ export type Database = {
           sentiment?: string | null
           session_id?: string
           topic?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }

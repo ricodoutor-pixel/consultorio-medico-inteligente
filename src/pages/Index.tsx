@@ -195,7 +195,11 @@ const Index = () => {
       <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <div className="flex justify-center mb-8">
-            <GlobalComplianceBadge />
+            <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-16 px-6 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
+              <Link to="/profissionais">
+                🎯 Iniciar Consulta <ArrowRight size={18} className="ml-2" />
+              </Link>
+            </Button>
           </div>
           <div className="text-center max-w-3xl mx-auto mb-10">
             <h2 className="text-3xl md:text-5xl font-display font-black mb-4">

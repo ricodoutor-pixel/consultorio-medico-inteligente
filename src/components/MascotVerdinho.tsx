@@ -159,27 +159,37 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
 
       {/* Chat IA Modal */}
       {showChat && (
-        <div className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center md:justify-end p-0 md:p-4 bg-black/30 backdrop-blur-sm">
-          <div className="bg-card rounded-t-2xl md:rounded-2xl shadow-2xl w-full md:w-96 md:max-w-md flex flex-col border border-border" style={{ maxHeight: "85dvh" }}>
+        <div className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center md:justify-end p-0 md:p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-card rounded-t-3xl md:rounded-2xl shadow-2xl w-full h-[100dvh] md:h-auto md:w-96 md:max-w-md flex flex-col border border-border md:max-h-[85dvh]">
             {/* Header */}
-            <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white p-4 flex items-center justify-between rounded-t-2xl md:rounded-t-2xl flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                  <span className="text-emerald-600 font-black text-lg">V</span>
+            <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-3 md:px-4 md:py-4 flex items-center gap-3 rounded-t-3xl md:rounded-t-2xl flex-shrink-0 safe-area-top">
+              <button
+                onClick={() => setShowChat(false)}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 active:scale-95 transition-all"
+                aria-label="Sair do chat"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-emerald-600 font-black text-base">V</span>
                 </div>
-                <div>
-                  <div className="font-bold text-base">Verdinho IA</div>
-                  <div className="text-xs opacity-80">Assistente Cannabis Medicinal</div>
+                <div className="min-w-0">
+                  <div className="font-bold text-sm leading-tight">Verdinho IA</div>
+                  <div className="text-[11px] opacity-80 truncate">Assistente Cannabis Medicinal</div>
                 </div>
               </div>
-              <button onClick={() => setShowChat(false)} className="flex items-center gap-2 p-2 hover:bg-white/20 rounded-lg transition">
-                <ArrowLeft className="w-5 h-5" />
-                <span className="text-sm font-medium">Sair</span>
+              <button
+                onClick={() => setShowChat(false)}
+                className="w-8 h-8 hidden md:flex items-center justify-center rounded-full hover:bg-white/20 transition"
+                aria-label="Fechar"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[200px]" style={{ maxHeight: "60dvh" }}>
+            <div className="flex-1 p-3 md:p-4 overflow-y-auto space-y-3 min-h-0">
               {chatMessages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div
@@ -214,7 +224,7 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
               />
               <button
                 onClick={handleSendMessage}
-                className="bg-primary text-primary-foreground rounded-xl px-4 py-2.5 hover:bg-primary/90 transition flex-shrink-0"
+                className="bg-primary text-primary-foreground rounded-xl px-4 py-2.5 hover:bg-primary/90 active:scale-95 transition flex-shrink-0"
               >
                 <Send className="w-4 h-4" />
               </button>

@@ -90,14 +90,6 @@ const Index = () => {
             
             {/* Text Content */}
             <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col">
-              <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-4">
-                <div className="inline-flex items-center gap-2 flex-wrap">
-                  <span className="inline-flex items-center gap-2 bg-gradient-green border border-green rounded-full px-4 py-2 text-sm font-bold text-primary shadow-lg shadow-green/20">
-                    <Leaf size={16} />
-                    PLATAFORMA POPULAR • SAÚDE • SHOPPING
-                  </span>
-                </div>
-              </motion.div>
 
               <motion.h1 
                 variants={fadeUp} 

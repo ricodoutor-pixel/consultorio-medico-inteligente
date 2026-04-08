@@ -37,7 +37,7 @@ const Precos = () => {
         "Recomendações personalizadas",
       ],
       highlighted: false,
-      checkoutUrl: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=71c153e9de1147f796c4e9354cbaa88a",
+      
     },
     {
       id: "lojista-pro",
@@ -58,7 +58,7 @@ const Precos = () => {
         "Selo de loja verificada",
       ],
       highlighted: false,
-      checkoutUrl: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=9d541916b1324a15a78155fa74371013",
+      
     },
     {
       id: "medico-vip",
@@ -80,8 +80,6 @@ const Precos = () => {
         "Suporte dedicado 24/7",
       ],
       highlighted: true,
-      checkoutUrl: "",
-      useDynamicCheckout: true,
     },
     {
       id: "empresa-parceiros",
@@ -102,7 +100,7 @@ const Precos = () => {
         "SLA garantido 99.9%",
       ],
       highlighted: false,
-      checkoutUrl: "https://mpago.la/1JsFwQs",
+      
     },
     {
       id: "clinica-familia",
@@ -124,7 +122,7 @@ const Precos = () => {
         "Gerente de conta dedicado",
       ],
       highlighted: false,
-      checkoutUrl: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=97dee2a0d53c462f95296d83a1e1ce61",
+      
     },
   ];
 
@@ -230,33 +228,22 @@ const Precos = () => {
                           </li>
                         ))}
                       </ul>
-                      {(plan as any).useDynamicCheckout ? (
-                        <Button
-                          className="w-full font-black rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm"
-                          onClick={() => handleDynamicCheckout(plan.id)}
-                          disabled={loadingPlan === plan.id}
-                        >
-                          {loadingPlan === plan.id ? (
-                            <><Loader2 size={14} className="mr-2 animate-spin" /> Gerando...</>
-                          ) : (
-                            <>Assinar <ArrowRight size={14} className="ml-1" /></>
-                          )}
-                        </Button>
-                      ) : (
-                        <Button
-                          className={`w-full font-black rounded-2xl text-sm ${
-                            plan.id === 'clinica-familia' ? 'bg-amber-500 text-black hover:bg-amber-400' :
-                            plan.id === 'empresa-parceiros' ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' :
-                            plan.highlighted ? 'bg-primary text-primary-foreground' :
-                            'bg-gradient-green border border-green text-primary hover:bg-primary/20'
-                          }`}
-                          asChild
-                        >
-                          <a href={plan.checkoutUrl} target="_blank" rel="noopener noreferrer">
-                            Assinar <ArrowRight size={14} className="ml-1" />
-                          </a>
-                        </Button>
-                      )}
+                      <Button
+                        className={`w-full font-black rounded-2xl text-sm ${
+                          plan.id === 'clinica-familia' ? 'bg-amber-500 text-black hover:bg-amber-400' :
+                          plan.id === 'empresa-parceiros' ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' :
+                          plan.highlighted ? 'bg-primary text-primary-foreground hover:bg-primary/90' :
+                          'bg-gradient-green border border-green text-primary hover:bg-primary/20'
+                        }`}
+                        onClick={() => handleDynamicCheckout(plan.id)}
+                        disabled={loadingPlan === plan.id}
+                      >
+                        {loadingPlan === plan.id ? (
+                          <><Loader2 size={14} className="mr-2 animate-spin" /> Gerando...</>
+                        ) : (
+                          <>Assinar <ArrowRight size={14} className="ml-1" /></>
+                        )}
+                      </Button>
                       <Button
                         variant="outline"
                         className="w-full mt-2 font-black rounded-2xl border-amber-500/40 text-amber-500 hover:bg-amber-500/10 text-xs h-8"

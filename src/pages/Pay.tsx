@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { QrCode, Copy, CheckCircle2, Clock, ArrowRight, ShoppingCart, AlertCircle, Stethoscope, Star } from "lucide-react";
+import { QrCode, Copy, CheckCircle2, ArrowRight, ShoppingCart, AlertCircle, Stethoscope, Star, Loader2, ExternalLink } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
 import { professionals } from "@/data/professionals";
+import { supabase } from "@/integrations/supabase/client";
 
-const PIX_PLACEHOLDER = "00020126580014br.gov.bcb.pix0136plantaeraiz-pix-placeholder5204000053039865802BR";
+const BRISA_WHATSAPP = "5511991363154";
 
 const plans: Record<string, { name: string; price: number }> = {
   essencial: { name: "Essencial", price: 19.9 },
@@ -27,46 +28,85 @@ const Pay = () => {
 
   const { items, total, clearCart, count } = useCart();
   const { toast } = useToast();
-  const [status, setStatus] = useState<"pending" | "processing" | "approved">("pending");
+  const [status, setStatus] = useState<"pending" | "loading" | "approved">("loading");
   const [copied, setCopied] = useState(false);
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
 
   const pro = proId ? professionals.find((p) => p.id === proId) : null;
   const plan = planId ? plans[planId] : null;
 
   let paymentAmount = 0;
   let paymentLabel = "";
-  let paymentLink = "";
   if (payType === "intake" || payType === "appointment") {
     paymentAmount = amountParam ? parseFloat(amountParam) : (pro?.priceValue || 0);
     paymentLabel = pro ? `Consulta com ${pro.name}` : "Consulta";
-    paymentLink = pro?.paymentLink || "https://link.mercadopago.com.br/assinaturaplantaerai";
   } else if (payType === "subscription") {
     paymentAmount = plan?.price || 0;
     paymentLabel = plan ? `Assinatura ${plan.name}` : "Assinatura";
-    paymentLink = "https://link.mercadopago.com.br/assinaturaplantaerai";
   } else {
     paymentAmount = total();
     paymentLabel = `Pedido Shopping (${count()} itens)`;
-    paymentLink = "https://link.mercadopago.com.br/assinaturaplantaerai";
   }
 
+  useEffect(() => {
+    createDynamicPayment();
+  }, []);
+
+  const createDynamicPayment = async () => {
+    setStatus("loading");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: "Faça login para pagar", description: "Redirecionando...", variant: "destructive" });
+        setTimeout(() => window.location.href = "/login", 1500);
+        return;
+      }
+
+      if (payType === "order" && items.length > 0) {
+        const cartItems = items.map(item => ({
+          title: item.product.title,
+          quantity: item.qty,
+          price: item.product.priceValue,
+        }));
+        const { data, error } = await supabase.functions.invoke("create-cart-payment", {
+          body: { items: cartItems, total: total(), description: paymentLabel },
+        });
+        if (error) throw error;
+        if (data?.init_point) { setCheckoutUrl(data.init_point); setStatus("pending"); }
+      } else if (payType === "subscription" && planId) {
+        const { data, error } = await supabase.functions.invoke("create-subscription", {
+          body: { planId },
+        });
+        if (error) throw error;
+        if (data?.init_point) { setCheckoutUrl(data.init_point); setStatus("pending"); }
+      } else if ((payType === "intake" || payType === "appointment") && paymentAmount > 0) {
+        const { data, error } = await supabase.functions.invoke("create-payment", {
+          body: {
+            doctorName: pro?.name || "Especialista",
+            patientEmail: session.user.email || "",
+            description: paymentLabel,
+          },
+        });
+        if (error) throw error;
+        if (data?.init_point) { setCheckoutUrl(data.init_point); setStatus("pending"); }
+      } else {
+        setStatus("pending");
+      }
+    } catch (err) {
+      console.error("Payment creation error:", err);
+      setStatus("pending");
+      toast({ title: "Erro ao gerar link", description: "Use o botão para tentar novamente." });
+    }
+  };
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(paymentLink);
-    setCopied(true);
-    toast({ title: "Link copiado!", description: "Cole no navegador para pagar." });
-    setTimeout(() => setCopied(false), 3000);
+    if (checkoutUrl) {
+      navigator.clipboard.writeText(checkoutUrl);
+      setCopied(true);
+      toast({ title: "Link copiado!", description: "Cole no navegador para pagar." });
+      setTimeout(() => setCopied(false), 3000);
+    }
   };
-
-  const simulatePayment = () => {
-    setStatus("processing");
-    setTimeout(() => {
-      setStatus("approved");
-      if (payType === "order") clearCart();
-      toast({ title: "Pagamento aprovado!", description: "Seu acesso foi liberado." });
-    }, 3000);
-  };
-
-  const canPay = paymentAmount > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -76,7 +116,7 @@ const Pay = () => {
       <section className="pt-24 pb-16 md:pt-32">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl md:text-5xl font-display font-black text-foreground mb-4 tracking-tight">
-            Pagamento <span className="text-gradient-green">Pix</span>
+            Pagamento <span className="text-gradient-green">Mercado Pago</span>
           </h1>
           <p className="text-muted-foreground mb-10 font-medium">Pague e receba acesso automaticamente</p>
 
@@ -139,7 +179,7 @@ const Pay = () => {
             <Card className="border-border">
               <CardContent className="p-6">
                 <h2 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                  <QrCode size={18} /> Pague com Pix
+                  <QrCode size={18} /> Pagamento Seguro
                 </h2>
 
                 {status === "approved" ? (
@@ -157,62 +197,49 @@ const Pay = () => {
                       <Link to="/carteira">Ver Meus Pedidos <ArrowRight size={16} className="ml-2" /></Link>
                     </Button>
                   </div>
+                ) : status === "loading" ? (
+                  <div className="text-center py-12">
+                    <Loader2 size={48} className="text-primary animate-spin mx-auto mb-4" />
+                    <p className="text-muted-foreground">Gerando link de pagamento personalizado...</p>
+                  </div>
                 ) : (
                   <>
-                    <div className="border border-green/30 rounded-2xl p-6 bg-gradient-green text-center mb-4">
-                      <div className="w-40 h-40 mx-auto rounded-2xl border-2 border-dashed border-green/50 flex items-center justify-center bg-card mb-3">
-                        <QrCode size={64} className="text-primary" />
+                    {checkoutUrl && (
+                      <div className="mb-4">
+                        <label className="text-xs font-black text-muted-foreground block mb-2">Link de Pagamento</label>
+                        <div className="flex gap-2">
+                          <code className="flex-1 p-3 rounded-xl bg-muted border border-border text-xs text-foreground break-all font-mono truncate">
+                            {checkoutUrl}
+                          </code>
+                          <Button variant="outline" size="sm" onClick={handleCopy} className="shrink-0 rounded-xl">
+                            {copied ? <CheckCircle2 size={16} className="text-primary" /> : <Copy size={16} />}
+                          </Button>
+                        </div>
                       </div>
-                      <p className="text-xs text-muted-foreground">QR code gerado pelo Mercado Pago (produção)</p>
-                    </div>
-
-                    <div className="mb-4">
-                      <label className="text-xs font-black text-muted-foreground block mb-2">Link de Pagamento (Copia e Cola)</label>
-                      <div className="flex gap-2">
-                        <code className="flex-1 p-3 rounded-xl bg-muted border border-border text-xs text-foreground break-all font-mono">
-                          {paymentLink}
-                        </code>
-                        <Button variant="outline" size="sm" onClick={handleCopy} className="shrink-0 rounded-xl" aria-label="Copiar link de pagamento">
-                          {copied ? <CheckCircle2 size={16} className="text-primary" /> : <Copy size={16} />}
-                        </Button>
-                      </div>
-                    </div>
-
+                    )}
                     <div className="flex items-center gap-2 p-3 rounded-2xl bg-muted/30 border border-border mb-4">
-                      {status === "processing" ? (
-                        <>
-                          <Clock size={16} className="text-primary animate-spin" />
-                          <span className="text-sm text-muted-foreground">Verificando pagamento...</span>
-                        </>
-                      ) : (
-                        <>
-                          <AlertCircle size={16} className="text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">Aguardando pagamento</span>
-                        </>
-                      )}
+                      <AlertCircle size={16} className="text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Aguardando pagamento</span>
                     </div>
-
-                    <Button
-                      className="w-full font-black bg-primary text-primary-foreground rounded-2xl mb-2"
-                      asChild
-                    >
-                      <a href={paymentLink} target="_blank" rel="noopener noreferrer">
-                        Pagar Agora no Mercado Pago <ArrowRight size={16} className="ml-2" />
-                      </a>
-                    </Button>
-
-                    <Button
-                      className="w-full font-black rounded-2xl"
-                      variant="outline"
-                      onClick={simulatePayment}
-                      disabled={status === "processing" || !canPay}
-                    >
-                      {status === "processing" ? "Processando..." : "Simular Pagamento Aprovado"}
-                    </Button>
-
-                    <p className="text-xs text-muted-foreground mt-4">
-                      Pagamento seguro via Mercado Pago. Confirmação automática.
-                    </p>
+                    {checkoutUrl ? (
+                      <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl mb-2" asChild>
+                        <a href={checkoutUrl} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink size={16} className="mr-2" /> Pagar R$ {paymentAmount.toFixed(2).replace(".", ",")} no Mercado Pago
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl mb-2" onClick={createDynamicPayment}>
+                        Gerar Link de Pagamento
+                      </Button>
+                    )}
+                    {(payType === "intake" || payType === "appointment") && (
+                      <Button className="w-full font-black rounded-2xl mt-2" variant="outline" asChild>
+                        <a href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, acabei de pagar a consulta com ${pro?.name || 'o especialista'}.`)}`} target="_blank" rel="noopener noreferrer">
+                          Confirmar com Enfermeira Brisa 💬
+                        </a>
+                      </Button>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-4">Pagamento seguro via Mercado Pago. Valor: R$ {paymentAmount.toFixed(2).replace(".", ",")}</p>
                   </>
                 )}
               </CardContent>

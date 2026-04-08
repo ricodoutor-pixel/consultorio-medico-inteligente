@@ -86,7 +86,7 @@ export const professionals: Professional[] = [
     hospital: "Beneficência Portuguesa (SP) / Hospital Menino Jesus",
     hospitalUrl: "https://www.beneficencia.org.br",
     services: [
-      { name: "Consulta Inicial", price: "R$ 49,90", desc: "Avaliação completa + plano terapêutico canábico" },
+      { name: "Consulta Inicial", price: "R$ 30,00", desc: "Avaliação completa + plano terapêutico canábico" },
       { name: "Retorno", price: "R$ 35,00", desc: "Acompanhamento e ajuste de dosagem" },
       { name: "Laudo ANVISA", price: "R$ 50,00", desc: "Documentação para importação ou uso compassivo" },
     ],

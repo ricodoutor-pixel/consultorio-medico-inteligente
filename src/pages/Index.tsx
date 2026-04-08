@@ -291,52 +291,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Mercado em Crescimento */}
-      <section className="py-20 md:py-32 bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <h2 className="text-3xl md:text-5xl font-display font-black mb-8 leading-tight">Mercado em <span className="text-gradient-green">Expansão</span></h2>
-              <p className="text-lg text-muted-foreground mb-8 font-medium">A Planta y Raiz lidera a democratização do acesso, com crescimento exponencial projetado para os próximos anos.</p>
-              <div className="space-y-4">
-                {[
-                  { label: "Crescimento de Usuários", val: "280% ao ano" },
-                  { label: "Economia Gerada para Pacientes", val: "R$ 1.2M em 2024" },
-                  { label: "Taxa de Retenção", val: "92% de satisfação" }
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <CheckCircle2 className="text-primary w-5 h-5" />
-                    <span className="text-sm font-bold text-foreground">{item.label}: <span className="text-primary">{item.val}</span></span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-            <Card className="p-6 border-border bg-background/50 backdrop-blur-sm">
-              <h3 className="text-sm font-black mb-6 uppercase tracking-widest text-muted-foreground">Projeção de Usuários (2021-2026)</h3>
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={growthData}>
-                    <defs>
-                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="year" stroke="rgba(255,255,255,0.3)" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis hide />
-                    <Tooltip 
-                      contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "12px" }}
-                      itemStyle={{ color: "hsl(var(--primary))", fontWeight: "bold" }}
-                    />
-                    <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
+      {/* Mercado Cannabis Medicinal - Projeção Interativa */}
+      <CannabisMarketChart />
 
       <Footer />
     </div>

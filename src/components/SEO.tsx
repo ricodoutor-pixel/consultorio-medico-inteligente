@@ -12,7 +12,7 @@ interface SEOProps {
 export const SEO = ({
   title = "Planta y Raiz - Mega Clínica Digital de Cannabis Medicinal",
   description = "Acesso democrático à saúde com telemedicina especializada em cannabis medicinal, triagem por IA e acompanhamento vital 24/7.",
-  keywords = "cannabis medicinal, telemedicina, CBD, THC, saúde digital, triagem IA, Dr. Edilson Bezerra",
+  keywords = "cannabis medicinal, telemedicina, CBD, THC, saúde digital, triagem IA, supervisão IA 24x7",
   image = "/src/assets/verdinho-doctor.png",
   url = "https://plantayraiz.com.br",
   type = "medical_clinic"

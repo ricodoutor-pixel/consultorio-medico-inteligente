@@ -15,7 +15,7 @@ export const translations = {
     shopping: "Shopping",
     online_status: "Online agora",
     cfm_badge: "CFM 2314 + LGPD",
-    responsible_tech: "Responsável Técnico e Jurídico",
+    responsible_tech: "Supervisionado por IA de última geração 24×7",
   },
   es: {
     hero_title: "Planta y Raiz - Mega Clínica Digital",
@@ -25,7 +25,7 @@ export const translations = {
     shopping: "Tienda",
     online_status: "En línea ahora",
     cfm_badge: "CFM 2314 + LGPD",
-    responsible_tech: "Responsable Técnico y Jurídico",
+    responsible_tech: "Supervisado por IA de última generación 24×7",
   },
   en: {
     hero_title: "Planta y Raiz - Mega Digital Clinic",
@@ -35,7 +35,7 @@ export const translations = {
     shopping: "Shopping",
     online_status: "Online now",
     cfm_badge: "CFM 2314 + LGPD",
-    responsible_tech: "Technical and Legal Director",
+    responsible_tech: "Supervised by cutting-edge AI 24×7",
   }
 };
 

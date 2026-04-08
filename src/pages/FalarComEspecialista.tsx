@@ -93,7 +93,7 @@ const FalarComEspecialista = () => {
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground mb-3 tracking-tight">
               Falar com <span className="text-gradient-green">Especialista</span>
             </h1>
-            <p className="text-muted-foreground text-lg font-medium">Preencha a pré-entrevista e pague via Pix ou PayPal para liberar o atendimento sob supervisão do Dr. Edilson Bezerra.</p>
+            <p className="text-muted-foreground text-lg font-medium">Preencha a pré-entrevista e pague via Pix ou PayPal para liberar o atendimento — supervisionado por IA de última geração 24×7.</p>
           </motion.div>
 
           <div className="grid lg:grid-cols-3 gap-6">

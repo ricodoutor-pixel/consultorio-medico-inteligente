@@ -153,7 +153,7 @@ const IoMTHub = () => {
                     </CardHeader>
                     <CardContent>
                       <p className="text-[11px] text-muted-foreground leading-relaxed">
-                        Monitoramento ativo para taquicardia (FC {'>'} 110 BPM). Em caso de desvio crítico, o Dr. Edilson Bezerra será notificado automaticamente.
+                        Monitoramento ativo para taquicardia (FC {'>'} 110 BPM). Em caso de desvio crítico, a equipe médica será notificada automaticamente pela IA 24×7.
                       </p>
                     </CardContent>
                   </Card>

@@ -79,6 +79,7 @@ const Webinars = lazy(() => import("./pages/Webinars"));
 const Voluntarios = lazy(() => import("./pages/Voluntarios"));
 const ImpactoSocial = lazy(() => import("./pages/ImpactoSocial"));
 const EbookLanding = lazy(() => import("./pages/EbookLanding"));
+const EbookMedicinaCanabinoide = lazy(() => import("./pages/EbookMedicinaCanabinoide"));
 const EbookAnalyticsDashboard = lazy(() => import("./pages/EbookAnalyticsDashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -169,6 +170,7 @@ const App = () => (
                 <Route path="/impacto" element={<ImpactoSocial />} />
                 <Route path="/ebook" element={<EbookLanding />} />
                 <Route path="/ebook-gratis" element={<EbookLanding />} />
+                <Route path="/ebook-medicina-canabinoide" element={<EbookMedicinaCanabinoide />} />
                 <Route path="/admin/ebook-analytics" element={<AdminRoute><EbookAnalyticsDashboard /></AdminRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

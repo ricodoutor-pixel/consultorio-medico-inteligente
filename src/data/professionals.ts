@@ -28,6 +28,11 @@ import draNataliaImg from "@/assets/dra-natalia-souza.jpg";
 import drBrunoImg from "@/assets/dr-bruno-tavares.jpg";
 import draMeiImg from "@/assets/dra-mei-lin.jpg";
 import profRicardoImg from "@/assets/prof-ricardo-campos.jpg";
+import draCarolinaImg from "@/assets/dra-carolina-vasconcelos.jpg";
+import drFernandoImg from "@/assets/dr-fernando-ribeiro.jpg";
+import draPriscilaImg from "@/assets/dra-priscila-andrade.jpg";
+import drPauloImg from "@/assets/dr-paulo-nakamura.jpg";
+import profLeticiaImg from "@/assets/profa-leticia-verde.jpg";
 
 export type Professional = {
   id: string;
@@ -895,6 +900,144 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Thiago B.", rating: 5, text: "Montou meu setup indoor perfeito." },
       { name: "Ana P.", rating: 4, text: "Muito didático e prático nas orientações." },
+    ],
+  },
+
+  // ═══════ Novos Profissionais com Imagens IA ═══════
+  {
+    id: "psi-6",
+    name: "Dra. Carolina Vasconcelos",
+    category: "Psicologia & Terapias",
+    bio: "Psicóloga clínica com especialização em terapia sistêmica familiar e acompanhamento de pacientes em tratamento canábico. Formada pela USP com pós em neurociências aplicadas. Atende famílias e adolescentes.",
+    experience: "10 anos",
+    tags: ["Terapia Familiar", "Adolescentes", "Sistêmica"],
+    price: "R$ 85,00",
+    priceValue: 85,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 245,
+    avatar: "CV",
+    imageUrl: draCarolinaImg,
+    flags: ["🇧🇷"],
+    services: [
+      { name: "Terapia Familiar", price: "R$ 130", desc: "Sessão familiar 80 min" },
+      { name: "Terapia Individual", price: "R$ 85,00", desc: "Sessão individual 50 min" },
+      { name: "Orientação Parental", price: "R$ 100", desc: "Sessão com pais/responsáveis" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Mariana G.", rating: 5, text: "Salvou minha família, profissional incrível." },
+      { name: "Roberto T.", rating: 5, text: "Minha filha adolescente evoluiu muito." },
+    ],
+  },
+  {
+    id: "farm-4",
+    name: "Dr. Fernando Ribeiro",
+    category: "Farmácia Clínica",
+    bio: "Farmacêutico clínico com doutorado em farmacotécnica pela UNESP. Especialista em formulação de óleos canábicos, tinturas e cápsulas magistrais. Consultor de laboratórios farmacêuticos e associações.",
+    experience: "14 anos",
+    tags: ["Farmacotécnica", "Óleos Canábicos", "Cápsulas Magistrais"],
+    price: "R$ 80,00",
+    priceValue: 80,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 4.8,
+    consults: 190,
+    avatar: "FR",
+    imageUrl: drFernandoImg,
+    flags: ["🇧🇷"],
+    crm: "CRF-45678",
+    services: [
+      { name: "Consultoria Magistral", price: "R$ 80,00", desc: "Orientação de formulação personalizada" },
+      { name: "Análise de Qualidade", price: "R$ 100", desc: "Avaliação de produto canábico" },
+      { name: "Acompanhamento", price: "R$ 60", desc: "Follow-up mensal de tratamento" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Cláudia M.", rating: 5, text: "Formulação personalizada que mudou meu tratamento." },
+      { name: "Eduardo S.", rating: 5, text: "Muito competente e acessível." },
+    ],
+  },
+  {
+    id: "ocu-4",
+    name: "Dra. Priscila Andrade",
+    category: "Saúde Ocupacional",
+    bio: "Médica do trabalho especializada em saúde mental corporativa e prevenção de burnout com abordagem integrativa canábica. Formada pela UFMG com MBA em gestão de saúde empresarial.",
+    experience: "9 anos",
+    tags: ["Saúde Mental Corporativa", "Prevenção de Burnout", "Gestão de Saúde"],
+    price: "R$ 80,00",
+    priceValue: 80,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 200,
+    avatar: "PA",
+    imageUrl: draPriscilaImg,
+    flags: ["🇧🇷"],
+    services: [
+      { name: "Avaliação Ocupacional", price: "R$ 80,00", desc: "Avaliação completa de saúde laboral" },
+      { name: "Programa Anti-Burnout", price: "R$ 150", desc: "Programa de 4 sessões" },
+      { name: "Palestra Corporativa", price: "R$ 200", desc: "Palestra sobre saúde mental no trabalho" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Fernanda K.", rating: 5, text: "Programa anti-burnout salvou minha carreira." },
+      { name: "João P.", rating: 5, text: "Profissional fantástica e acolhedora." },
+    ],
+  },
+  {
+    id: "acu-4",
+    name: "Dr. Paulo Nakamura",
+    category: "Acupuntura",
+    bio: "Acupunturista nipo-brasileiro com 25 anos de prática em medicina integrativa. Especialista em cromoacupuntura e tratamento de dor neuropática com protocolos canábicos. Professor da ABMA.",
+    experience: "25 anos",
+    tags: ["Cromoacupuntura", "Dor Neuropática", "Medicina Integrativa"],
+    price: "R$ 95,00",
+    priceValue: 95,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 5.0,
+    consults: 600,
+    avatar: "PN",
+    imageUrl: drPauloImg,
+    flags: ["🇧🇷", "🇯🇵"],
+    services: [
+      { name: "Cromoacupuntura", price: "R$ 95,00", desc: "Sessão com cores e agulhas 60 min" },
+      { name: "Acupuntura Integrativa", price: "R$ 110", desc: "Combinação de técnicas orientais" },
+      { name: "Protocolo Dor Neuropática", price: "R$ 130", desc: "Programa de 6 sessões" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Sônia M.", rating: 5, text: "25 anos de experiência fazem toda diferença." },
+      { name: "Marcos L.", rating: 5, text: "Melhor acupunturista que já conheci." },
+    ],
+  },
+  {
+    id: "jar-4",
+    name: "Profa. Letícia Verde",
+    category: "Jardineiros & Cultivo",
+    bio: "Bióloga e educadora ambiental especializada em permacultura canábica e cultivo sustentável. Mestre em ecologia pela UFSC. Consultora de projetos de cultivo comunitário e associações de pacientes.",
+    experience: "7 anos",
+    tags: ["Permacultura", "Cultivo Sustentável", "Educação Ambiental"],
+    price: "R$ 50,00",
+    priceValue: 50,
+    paymentLink: "https://link.mercadopago.com.br/assinaturaplantaerai",
+    whatsapp: "5511987131241",
+    rating: 4.8,
+    consults: 140,
+    avatar: "LV",
+    imageUrl: profLeticiaImg,
+    flags: ["🇧🇷"],
+    services: [
+      { name: "Consultoria de Permacultura", price: "R$ 50,00", desc: "Orientação de cultivo sustentável" },
+      { name: "Projeto Comunitário", price: "R$ 100", desc: "Planejamento de horta medicinal" },
+      { name: "Workshop de Cultivo", price: "R$ 80", desc: "Aula prática de 2 horas" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Beatriz S.", rating: 5, text: "Abordagem sustentável incrível." },
+      { name: "Lucas R.", rating: 5, text: "Aprendi muito sobre permacultura canábica." },
     ],
   },
 ];

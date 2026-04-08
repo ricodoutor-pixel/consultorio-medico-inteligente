@@ -80,8 +80,6 @@ const Precos = () => {
         "Suporte dedicado 24/7",
       ],
       highlighted: true,
-      checkoutUrl: "",
-      useDynamicCheckout: true,
     },
     {
       id: "empresa-parceiros",

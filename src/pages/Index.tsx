@@ -172,6 +172,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Equity Banner */}
+      <EquityBanner />
+
       {/* Live Stats */}
       <section className="py-12 md:py-16 border-b border-border bg-card/20 backdrop-blur-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">

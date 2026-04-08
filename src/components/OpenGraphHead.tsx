@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation } from 'react-router-dom';
 import { getOpenGraphConfig, updateOpenGraphTags } from '@/lib/open-graph';
 
 /**

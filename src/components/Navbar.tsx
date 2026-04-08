@@ -3,7 +3,7 @@ import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft } from "luc
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
-import { FrogChatModal } from "@/components/FrogChatModal";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

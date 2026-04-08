@@ -231,52 +231,45 @@ const Profissionais = () => {
           <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} key={activeCategory}>
             {filtered.map((p) => (
               <motion.div key={p.id} variants={fadeUp}>
-                <Card className="border-border hover:border-primary/30 transition-all hover:-translate-y-1">
-                  <CardContent className="p-5">
-                     <div className="flex items-center gap-4 mb-4">
-                       <div className="relative">
-                         <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" loading="lazy" />
-                         <OnlineStatusIndicator online={p.online} size="md" className="absolute -bottom-0.5 -right-0.5" />
-                       </div>
-                       <div>
-                         <div className="flex items-center gap-1.5">
-                           <h3 className="font-black text-foreground">{p.name}</h3>
-                           {p.flags && p.flags.map((flag, i) => (
-                             <span key={i} className="text-sm">{flag}</span>
-                           ))}
+                <Link to={`/profissionais/${p.id}`}>
+                  <Card className="border-border hover:border-primary/30 transition-all hover:-translate-y-1 cursor-pointer">
+                    <CardContent className="p-5">
+                       <div className="flex items-center gap-4 mb-4">
+                         <div className="relative">
+                           <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" loading="lazy" />
+                           <OnlineStatusIndicator online={p.online} size="md" className="absolute -bottom-0.5 -right-0.5" />
                          </div>
-                         <div className="flex items-center gap-2">
-                           <p className="text-sm text-muted-foreground">{p.category}</p>
-                           <OnlineStatusIndicator online={p.online} size="sm" showLabel />
+                         <div>
+                           <div className="flex items-center gap-1.5">
+                             <h3 className="font-black text-foreground">{p.name}</h3>
+                             {p.flags && p.flags.map((flag, i) => (
+                               <span key={i} className="text-sm">{flag}</span>
+                             ))}
+                           </div>
+                           <div className="flex items-center gap-2">
+                             <p className="text-sm text-muted-foreground">{p.category}</p>
+                             <OnlineStatusIndicator online={p.online} size="sm" showLabel />
+                           </div>
                          </div>
                        </div>
-                     </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-2">{p.bio}</p>
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {p.tags.map((t) => (
-                        <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-border text-muted-foreground">{t}</span>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-1">
-                        <Star size={14} className="text-primary fill-primary" />
-                        <span className="text-sm font-black text-foreground">{p.rating}</span>
-                        <span className="text-xs text-muted-foreground ml-1">{p.consults} consultas</span>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-2">{p.bio}</p>
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {p.tags.map((t) => (
+                          <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-border text-muted-foreground">{t}</span>
+                        ))}
                       </div>
-                      <span className="text-lg font-display font-black text-gradient-green">{p.price}</span>
-                    </div>
-                    <a
-                      href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${p.name}`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
-                    >
-                      <Button className="w-full bg-primary text-primary-foreground text-sm font-black rounded-xl gap-2 animate-pulse">
-                        <Phone size={14} /> Agendar Consulta
-                      </Button>
-                    </a>
-                  </CardContent>
-                </Card>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <Star size={14} className="text-primary fill-primary" />
+                          <span className="text-sm font-black text-foreground">{p.rating}</span>
+                          <span className="text-xs text-muted-foreground ml-1">{p.consults} consultas</span>
+                        </div>
+                        <span className="text-lg font-display font-black text-gradient-green">{p.price}</span>
+                      </div>
+                      <p className="text-xs text-center text-muted-foreground mt-3">Toque para ver perfil e serviços →</p>
+                    </CardContent>
+                  </Card>
+                </Link>
               </motion.div>
             ))}
           </motion.div>

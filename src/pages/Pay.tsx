@@ -113,10 +113,12 @@ const Pay = () => {
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(paymentLink);
-    setCopied(true);
-    toast({ title: "Link copiado!", description: "Cole no navegador para pagar." });
-    setTimeout(() => setCopied(false), 3000);
+    if (checkoutUrl) {
+      navigator.clipboard.writeText(checkoutUrl);
+      setCopied(true);
+      toast({ title: "Link copiado!", description: "Cole no navegador para pagar." });
+      setTimeout(() => setCopied(false), 3000);
+    }
   };
 
   const simulatePayment = () => {

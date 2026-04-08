@@ -14,12 +14,10 @@ export const OnlineStatusIndicator = ({ online = false, size = "md", showLabel =
   return (
     <div className={cn("flex items-center gap-1.5", className)}>
       <span className="relative flex items-center justify-center">
-        {online && (
-          <span className={cn("absolute rounded-full opacity-40 animate-ping", ringMap[size], "bg-emerald-400")} />
-        )}
+        <span className={cn("absolute rounded-full opacity-30 animate-pulse", ringMap[size], online ? "bg-emerald-400" : "bg-red-400")} />
         <span
           className={cn(
-            "relative rounded-full border-2 border-background shadow-sm",
+            "relative rounded-full border-2 border-background shadow-sm animate-pulse",
             sizeMap[size],
             online ? "bg-emerald-500" : "bg-red-500"
           )}

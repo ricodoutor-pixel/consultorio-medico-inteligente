@@ -64,14 +64,6 @@ const testimonialData = [
   },
 ];
 
-const growthData = [
-  { year: "2021", value: 1200 },
-  { year: "2022", value: 3500 },
-  { year: "2023", value: 8900 },
-  { year: "2024", value: 18400 },
-  { year: "2025", value: 32000 },
-  { year: "2026", value: 45000 },
-];
 
 const Index = () => {
   useEffect(() => {

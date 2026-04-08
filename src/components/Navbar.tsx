@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight } from "lucide-react";
+import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
+import MascotVerdinho from "@/components/MascotVerdinho";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -217,18 +218,21 @@ export const Navbar = () => {
         }`}
       >
         <div className="container mx-auto px-4 flex flex-col flex-1">
-          {/* Botão seta para fechar o menu mobile */}
+          {/* Botão seta para sair do menu mobile */}
           <button
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground font-bold text-sm mb-6 self-start"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground font-bold text-sm mb-4 self-start p-2 -ml-2 rounded-xl hover:bg-muted/50 transition active:scale-95"
             aria-label="Fechar menu"
           >
-            <X size={22} className="text-primary" />
-            <span>Fechar Menu</span>
+            <ArrowLeft size={22} className="text-primary" />
+            <span>Voltar</span>
           </button>
-          <div className="flex justify-center mb-8 relative" style={{ minHeight: 180 }}>
-             <FrogMascot size={80} mood="happy" onClick={openChat} />
+
+          {/* Verdinho dentro do menu mobile — todas as funções disponíveis */}
+          <div className="flex justify-center mb-6 relative" style={{ minHeight: 100 }}>
+            <MascotVerdinho inline={true} onChatOpen={() => setIsOpen(false)} />
           </div>
+
           <div className="space-y-1 flex-1">
             {links.map((link) => (
               <NavLink
@@ -243,6 +247,22 @@ export const Navbar = () => {
             ))}
           </div>
           <div className="pt-6 border-t border-border mt-4 space-y-4">
+            {user ? (
+              <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl mb-3">
+                <UserMenu compact={false} />
+              </div>
+            ) : (
+              <div className="flex gap-2 mb-3">
+                <Button variant="outline" className="flex-1 font-bold rounded-xl border-primary/30 text-primary" asChild>
+                  <NavLink to="/login" onClick={() => setIsOpen(false)}>
+                    <LogIn size={16} className="mr-1" /> Login
+                  </NavLink>
+                </Button>
+                <Button className="flex-1 font-bold rounded-xl bg-primary text-primary-foreground" asChild>
+                  <NavLink to="/cadastro" onClick={() => setIsOpen(false)}>Cadastro</NavLink>
+                </Button>
+              </div>
+            )}
             <Button className="w-full bg-secondary text-secondary-foreground font-black rounded-xl h-14 text-lg shadow-xl" asChild>
               <NavLink to="/telemedicina" onClick={() => setIsOpen(false)}>INICIAR CONSULTA AGORA</NavLink>
             </Button>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Globe, Shield, X } from "lucide-react";
+import { Globe, Shield, X, ArrowRight, ShoppingBag } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface EquityBannerProps {
   className?: string;

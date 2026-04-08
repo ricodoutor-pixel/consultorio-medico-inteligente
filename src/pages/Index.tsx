@@ -16,7 +16,7 @@ import testimonialRoberto from "@/assets/testimonial-roberto.jpg";
 import testimonialJuliana from "@/assets/testimonial-juliana.jpg";
 import testimonialAntonio from "@/assets/testimonial-antonio.jpg";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
-import EquityBanner from "@/components/EquityBanner";
+
 import { useEffect } from "react";
 
 const fadeUp = {
@@ -164,8 +164,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Equity Banner */}
-      <EquityBanner />
 
       {/* Live Stats */}
       <section className="py-12 md:py-16 border-b border-border bg-card/20 backdrop-blur-md">

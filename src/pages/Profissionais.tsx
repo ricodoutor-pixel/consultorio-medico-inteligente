@@ -196,28 +196,28 @@ const Profissionais = () => {
       <Navbar />
       <WhatsAppButton />
 
-      <section className="pt-24 pb-16 md:pt-32 hero-glow">
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="mb-12" initial="hidden" animate="visible" variants={fadeUp}>
-            <h1 className="text-4xl md:text-6xl font-display font-black text-foreground mb-4 tracking-tight">
+      <section className="pt-20 pb-12 md:pt-32 md:pb-16 hero-glow">
+        <div className="container mx-auto px-3 md:px-4 relative z-10">
+          <motion.div className="mb-8 md:mb-12" initial="hidden" animate="visible" variants={fadeUp}>
+            <h1 className="text-3xl md:text-6xl font-display font-black text-foreground mb-3 md:mb-4 tracking-tight">
               <span className="text-gradient-green">Profissionais</span> Verificados
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl font-medium">
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl font-medium">
               {professionals.length} especialistas em 6 categorias — supervisionado por IA de última geração 24×7. Escolha, agende e pague via Pix ou PayPal.
             </p>
           </motion.div>
 
-          {/* Tabs */}
-          <div className="flex flex-wrap gap-2 mb-10">
+          {/* Tabs - scroll horizontal no mobile */}
+          <div className="flex gap-2 mb-8 md:mb-10 overflow-x-auto pb-2 -mx-3 px-3 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
             {categories.map((cat) => {
               const count = professionals.filter(p => p.category === cat).length;
               return (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-2.5 rounded-full text-sm font-black border transition-colors ${
+                  className={`px-4 py-2.5 rounded-full text-sm font-black border transition-colors whitespace-nowrap flex-shrink-0 ${
                     activeCategory === cat
-                      ? "border-green bg-gradient-green text-primary"
+                      ? "border-primary bg-primary/10 text-primary"
                       : "border-border bg-card/50 text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -227,43 +227,61 @@ const Profissionais = () => {
             })}
           </div>
 
-          {/* Cards */}
-          <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} key={activeCategory}>
+          {/* Cards - Redesign moderno */}
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} key={activeCategory}>
             {filtered.map((p) => (
               <motion.div key={p.id} variants={fadeUp}>
                 <Link to={`/profissionais/${p.id}`}>
-                  <Card className="border-border hover:border-primary/30 transition-all hover:-translate-y-1 cursor-pointer">
-                    <CardContent className="p-5">
-                       <div className="flex items-center gap-4 mb-4">
-                         <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" loading="lazy" />
-                         <div>
-                           <div className="flex items-center gap-1.5">
-                             <h3 className="font-black text-foreground">{p.name}</h3>
-                             {p.flags && p.flags.map((flag, i) => (
-                               <span key={i} className="text-sm">{flag}</span>
-                             ))}
-                           </div>
-                           <div className="flex items-center gap-2">
-                             <p className="text-sm text-muted-foreground">{p.category}</p>
-                             <OnlineStatusIndicator online={p.online} size="sm" showLabel />
-                           </div>
-                         </div>
-                       </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-2">{p.bio}</p>
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {p.tags.map((t) => (
-                          <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-border text-muted-foreground">{t}</span>
-                        ))}
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1">
-                          <Star size={14} className="text-primary fill-primary" />
-                          <span className="text-sm font-black text-foreground">{p.rating}</span>
-                          <span className="text-xs text-muted-foreground ml-1">{p.consults} consultas</span>
+                  <Card className="group border-border hover:border-primary/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5 cursor-pointer overflow-hidden">
+                    <CardContent className="p-0">
+                      {/* Header com gradiente */}
+                      <div className="relative bg-gradient-to-br from-primary/5 to-primary/10 p-4 pb-3">
+                        <div className="flex items-start gap-3">
+                          <div className="relative flex-shrink-0">
+                            <img
+                              src={p.imageUrl}
+                              alt={`${p.name}`}
+                              className="w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                              width={64}
+                              height={64}
+                            />
+                            <OnlineStatusIndicator online={p.online} size="sm" className="absolute -bottom-0.5 -right-0.5" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <h3 className="font-black text-foreground text-sm md:text-base truncate">{p.name}</h3>
+                              {p.flags && p.flags.map((flag, i) => (
+                                <span key={i} className="text-sm flex-shrink-0">{flag}</span>
+                              ))}
+                            </div>
+                            <p className="text-xs text-primary font-bold mt-0.5">{p.category}</p>
+                            <div className="flex items-center gap-1 mt-1">
+                              <Star size={12} className="text-primary fill-primary" />
+                              <span className="text-xs font-black text-foreground">{p.rating}</span>
+                              <span className="text-[10px] text-muted-foreground">• {p.consults} consultas</span>
+                            </div>
+                          </div>
                         </div>
-                        <span className="text-lg font-display font-black text-gradient-green">{p.price}</span>
                       </div>
-                      <p className="text-xs text-center text-muted-foreground mt-3">Toque para ver perfil e serviços →</p>
+
+                      {/* Body */}
+                      <div className="px-4 py-3">
+                        <p className="text-xs md:text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">{p.bio}</p>
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {p.tags.slice(0, 3).map((t) => (
+                            <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-primary/20 bg-primary/5 text-primary">{t}</span>
+                          ))}
+                        </div>
+
+                        {/* Footer do card */}
+                        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                          <span className="text-lg font-display font-black text-gradient-green">{p.price}</span>
+                          <span className="text-[10px] text-primary font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+                            Ver perfil <ArrowRight size={12} />
+                          </span>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 </Link>
@@ -271,19 +289,19 @@ const Profissionais = () => {
             ))}
           </motion.div>
 
-          <p className="text-xs text-muted-foreground text-center mt-8">
+          <p className="text-xs text-muted-foreground text-center mt-6 md:mt-8">
             ⚠️ Perfis ilustrativos. Prescrição e conduta dependem de avaliação individual.
           </p>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20 md:py-28 relative overflow-hidden">
+      <section className="py-16 md:py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-purple pointer-events-none opacity-20" />
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="text-3xl md:text-5xl font-display font-black text-foreground mb-6 tracking-tight">É Profissional de Saúde?</h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto font-medium">Cadastre-se e atenda pacientes de todo o Brasil com preços populares</p>
-          <Button size="lg" className="font-black bg-secondary text-secondary-foreground rounded-2xl h-14 px-8" asChild>
+          <h2 className="text-2xl md:text-5xl font-display font-black text-foreground mb-4 md:mb-6 tracking-tight">É Profissional de Saúde?</h2>
+          <p className="text-base md:text-lg text-muted-foreground mb-6 md:mb-8 max-w-xl mx-auto font-medium">Cadastre-se e atenda pacientes de todo o Brasil com preços populares</p>
+          <Button size="lg" className="font-black bg-secondary text-secondary-foreground rounded-2xl h-12 md:h-14 px-6 md:px-8 text-sm md:text-base" asChild>
             <Link to="/cadastro-profissional">
               Cadastrar como Profissional <ArrowRight size={20} className="ml-2" />
             </Link>

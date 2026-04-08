@@ -230,33 +230,22 @@ const Precos = () => {
                           </li>
                         ))}
                       </ul>
-                      {(plan as any).useDynamicCheckout ? (
-                        <Button
-                          className="w-full font-black rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm"
-                          onClick={() => handleDynamicCheckout(plan.id)}
-                          disabled={loadingPlan === plan.id}
-                        >
-                          {loadingPlan === plan.id ? (
-                            <><Loader2 size={14} className="mr-2 animate-spin" /> Gerando...</>
-                          ) : (
-                            <>Assinar <ArrowRight size={14} className="ml-1" /></>
-                          )}
-                        </Button>
-                      ) : (
-                        <Button
-                          className={`w-full font-black rounded-2xl text-sm ${
-                            plan.id === 'clinica-familia' ? 'bg-amber-500 text-black hover:bg-amber-400' :
-                            plan.id === 'empresa-parceiros' ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' :
-                            plan.highlighted ? 'bg-primary text-primary-foreground' :
-                            'bg-gradient-green border border-green text-primary hover:bg-primary/20'
-                          }`}
-                          asChild
-                        >
-                          <a href={plan.checkoutUrl} target="_blank" rel="noopener noreferrer">
-                            Assinar <ArrowRight size={14} className="ml-1" />
-                          </a>
-                        </Button>
-                      )}
+                      <Button
+                        className={`w-full font-black rounded-2xl text-sm ${
+                          plan.id === 'clinica-familia' ? 'bg-amber-500 text-black hover:bg-amber-400' :
+                          plan.id === 'empresa-parceiros' ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' :
+                          plan.highlighted ? 'bg-primary text-primary-foreground hover:bg-primary/90' :
+                          'bg-gradient-green border border-green text-primary hover:bg-primary/20'
+                        }`}
+                        onClick={() => handleDynamicCheckout(plan.id)}
+                        disabled={loadingPlan === plan.id}
+                      >
+                        {loadingPlan === plan.id ? (
+                          <><Loader2 size={14} className="mr-2 animate-spin" /> Gerando...</>
+                        ) : (
+                          <>Assinar <ArrowRight size={14} className="ml-1" /></>
+                        )}
+                      </Button>
                       <Button
                         variant="outline"
                         className="w-full mt-2 font-black rounded-2xl border-amber-500/40 text-amber-500 hover:bg-amber-500/10 text-xs h-8"

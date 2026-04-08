@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { QrCode, Copy, CheckCircle2, Clock, ArrowRight, ShoppingCart, AlertCircle, Stethoscope, Star } from "lucide-react";
+import { QrCode, Copy, CheckCircle2, Clock, ArrowRight, ShoppingCart, AlertCircle, Stethoscope, Star, Loader2, ExternalLink } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
 import { professionals } from "@/data/professionals";
+import { supabase } from "@/integrations/supabase/client";
 
-const PIX_PLACEHOLDER = "00020126580014br.gov.bcb.pix0136plantaeraiz-pix-placeholder5204000053039865802BR";
+const BRISA_WHATSAPP = "5511991363154";
 
 const plans: Record<string, { name: string; price: number }> = {
   essencial: { name: "Essencial", price: 19.9 },
@@ -27,28 +28,89 @@ const Pay = () => {
 
   const { items, total, clearCart, count } = useCart();
   const { toast } = useToast();
-  const [status, setStatus] = useState<"pending" | "processing" | "approved">("pending");
+  const [status, setStatus] = useState<"pending" | "loading" | "processing" | "approved">("loading");
   const [copied, setCopied] = useState(false);
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
 
   const pro = proId ? professionals.find((p) => p.id === proId) : null;
   const plan = planId ? plans[planId] : null;
 
   let paymentAmount = 0;
   let paymentLabel = "";
-  let paymentLink = "";
   if (payType === "intake" || payType === "appointment") {
     paymentAmount = amountParam ? parseFloat(amountParam) : (pro?.priceValue || 0);
     paymentLabel = pro ? `Consulta com ${pro.name}` : "Consulta";
-    paymentLink = pro?.paymentLink || "https://link.mercadopago.com.br/assinaturaplantaerai";
   } else if (payType === "subscription") {
     paymentAmount = plan?.price || 0;
     paymentLabel = plan ? `Assinatura ${plan.name}` : "Assinatura";
-    paymentLink = "https://link.mercadopago.com.br/assinaturaplantaerai";
   } else {
     paymentAmount = total();
     paymentLabel = `Pedido Shopping (${count()} itens)`;
-    paymentLink = "https://link.mercadopago.com.br/assinaturaplantaerai";
   }
+
+  // Create dynamic Mercado Pago checkout on mount
+  useEffect(() => {
+    createDynamicPayment();
+  }, []);
+
+  const createDynamicPayment = async () => {
+    setStatus("loading");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: "Faça login para pagar", description: "Redirecionando...", variant: "destructive" });
+        setTimeout(() => window.location.href = "/login", 1500);
+        return;
+      }
+
+      if (payType === "order" && items.length > 0) {
+        // Shopping cart payment
+        const cartItems = items.map(item => ({
+          title: item.product.title,
+          quantity: item.qty,
+          price: item.product.priceValue,
+        }));
+        const { data, error } = await supabase.functions.invoke("create-cart-payment", {
+          body: { items: cartItems, total: total(), description: paymentLabel },
+        });
+        if (error) throw error;
+        if (data?.init_point) {
+          setCheckoutUrl(data.init_point);
+          setStatus("pending");
+        }
+      } else if (payType === "subscription" && planId) {
+        // Subscription payment
+        const { data, error } = await supabase.functions.invoke("create-subscription", {
+          body: { planId },
+        });
+        if (error) throw error;
+        if (data?.init_point) {
+          setCheckoutUrl(data.init_point);
+          setStatus("pending");
+        }
+      } else if ((payType === "intake" || payType === "appointment") && paymentAmount > 0) {
+        // Consultation payment
+        const { data, error } = await supabase.functions.invoke("create-payment", {
+          body: {
+            doctorName: pro?.name || "Especialista",
+            patientEmail: session.user.email || "",
+            description: paymentLabel,
+          },
+        });
+        if (error) throw error;
+        if (data?.init_point) {
+          setCheckoutUrl(data.init_point);
+          setStatus("pending");
+        }
+      } else {
+        setStatus("pending");
+      }
+    } catch (err) {
+      console.error("Payment creation error:", err);
+      setStatus("pending");
+      toast({ title: "Erro ao gerar link", description: "Use o botão para tentar novamente." });
+    }
+  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(paymentLink);

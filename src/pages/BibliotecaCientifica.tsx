@@ -55,6 +55,29 @@ const BibliotecaCientifica = () => {
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [downloadCount, setDownloadCount] = useState(8000);
 
+  // Fetch persistent counter from database
+  useEffect(() => {
+    const fetchCount = async () => {
+      const { data } = await supabase
+        .from('site_counters')
+        .select('count')
+        .eq('id', 'ebook_downloads')
+        .single();
+      if (data) setDownloadCount(data.count);
+    };
+    fetchCount();
+  }, []);
+
+  const incrementCounter = async () => {
+    setDownloadCount(prev => prev + 1);
+    await supabase.rpc('increment_counter' as never, { counter_id: 'ebook_downloads' } as never).then(() => {});
+    // Fallback: direct update
+    await supabase
+      .from('site_counters')
+      .update({ count: downloadCount + 1, updated_at: new Date().toISOString() })
+      .eq('id', 'ebook_downloads');
+  };
+
   const toggleFavorite = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setFavorites(prev => {

@@ -235,10 +235,7 @@ const Profissionais = () => {
                   <Card className="border-border hover:border-primary/30 transition-all hover:-translate-y-1 cursor-pointer">
                     <CardContent className="p-5">
                        <div className="flex items-center gap-4 mb-4">
-                         <div className="relative">
-                           <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" loading="lazy" />
-                           <OnlineStatusIndicator online={p.online} size="md" className="absolute -bottom-0.5 -right-0.5" />
-                         </div>
+                         <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" loading="lazy" />
                          <div>
                            <div className="flex items-center gap-1.5">
                              <h3 className="font-black text-foreground">{p.name}</h3>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from "react";
-import { MessageCircle, X, Send } from "lucide-react";
+import { MessageCircle, X, Send, ArrowLeft } from "lucide-react";
 
 interface MascotVerdinhoProps {
   onChatOpen?: () => void;
@@ -172,8 +172,9 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
                   <div className="text-xs opacity-80">Assistente Cannabis Medicinal</div>
                 </div>
               </div>
-              <button onClick={() => setShowChat(false)} className="p-2 hover:bg-white/20 rounded-lg transition">
-                <X className="w-5 h-5" />
+              <button onClick={() => setShowChat(false)} className="flex items-center gap-2 p-2 hover:bg-white/20 rounded-lg transition">
+                <ArrowLeft className="w-5 h-5" />
+                <span className="text-sm font-medium">Sair</span>
               </button>
             </div>
 

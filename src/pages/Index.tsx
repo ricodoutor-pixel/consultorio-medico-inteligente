@@ -109,7 +109,7 @@ const Index = () => {
                 </div>
               </motion.div>
 
-              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-5 mb-12">
+              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-5 mb-8 md:mb-12">
                 <Button size="lg" className="text-base font-black h-16 px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
                   <Link to="/profissionais">
                     🎯 Iniciar Consulta <ArrowRight size={20} className="ml-2" />

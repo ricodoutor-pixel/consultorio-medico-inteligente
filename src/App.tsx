@@ -12,6 +12,8 @@ import { AdminRoute } from "@/components/AdminRoute";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { useCart } from "@/store/cart";
 import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
+import MascotVerdinho from "@/components/MascotVerdinho";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 const Loading = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
@@ -175,6 +177,12 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
+            
+            {/* Mascote Verdinho Global */}
+            <MascotVerdinho />
+            
+            {/* WhatsApp Brisa Button */}
+            <WhatsAppButton />
           </Suspense>
         </BrowserRouter>
       </TooltipProvider>

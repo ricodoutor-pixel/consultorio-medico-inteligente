@@ -12,6 +12,8 @@ import { createContext } from './context';
 import { iniciarManusCEO } from '../manus-ceo-autonomous';
 import cors from 'cors';
 import whatsappWebhookRouter from '../routers/whatsappWebhook';
+import { initializeSecurityMiddlewares } from './security-headers';
+import { initializeCompressionMiddlewares } from './compression';
 
 const app = express();
 
@@ -19,6 +21,13 @@ const app = express();
 // MIDDLEWARE
 // ============================================================================
 
+// Inicializar middlewares de segurança
+initializeSecurityMiddlewares(app);
+
+// Inicializar middlewares de compressão
+initializeCompressionMiddlewares(app);
+
+// CORS seguro (já configurado em security-headers.ts)
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

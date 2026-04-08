@@ -164,8 +164,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Equity Banner */}
-      <EquityBanner />
 
       {/* Live Stats */}
       <section className="py-12 md:py-16 border-b border-border bg-card/20 backdrop-blur-md">

@@ -15,6 +15,7 @@ import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
 import MascotVerdinho from "@/components/MascotVerdinho";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { OpenGraphHead } from "@/components/OpenGraphHead";
+import { SearchEngineOptimization } from "@/components/SearchEngineOptimization";
 
 const Loading = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
@@ -97,6 +98,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <OpenGraphHead />
+            <SearchEngineOptimization />
             <AccessibilitySkipLink />
             <FrogChatModal />
             <ShoppingCart />

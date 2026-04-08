@@ -84,9 +84,9 @@ const Index = () => {
       <WhatsAppButton />
 
       {/* Hero Section */}
-      <section className="hero-glow pb-16 md:pb-28 min-h-[95dvh] flex items-center overflow-hidden" style={{ paddingTop: 'clamp(80px, 10vh, 100px)' }}>
+      <section className="hero-glow pb-16 md:pb-20 min-h-[90dvh] flex items-start overflow-hidden" style={{ paddingTop: 'clamp(24px, 4vh, 48px)' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-14 items-start">
             
             {/* Text Content */}
             <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col">
@@ -131,9 +131,9 @@ const Index = () => {
               transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
             >
               {/* Cadastro Gratuito Button - Above Phone */}
-              <Link to="/cadastro">
+              <Link to="/cadastro" className="self-center">
                 <motion.span 
-                  className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer shadow-xl shadow-primary/30"
+                  className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground rounded-full px-6 py-2.5 text-sm font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer shadow-xl shadow-primary/30"
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 >

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation } from 'react-router-dom';
 import { getSchemaOrgByRoute, generateSchemaOrgTags } from '@/lib/schema-org';
 import { getPinterestConfig, generatePinterestTags } from '@/lib/pinterest-tags';
 
@@ -8,15 +8,15 @@ import { getPinterestConfig, generatePinterestTags } from '@/lib/pinterest-tags'
  * Deve ser incluído no App.tsx dentro do ThemeProvider
  */
 export function SearchEngineOptimization() {
-  const [location] = useLocation();
+  const location = useLocation();
 
   useEffect(() => {
     // Obter Schema.org baseado na rota
-    const schemas = getSchemaOrgByRoute(location);
+    const schemas = getSchemaOrgByRoute(location.pathname);
     const schemaHtml = generateSchemaOrgTags(schemas);
 
     // Obter Pinterest config baseado na rota
-    const pinterestConfig = getPinterestConfig(location);
+    const pinterestConfig = getPinterestConfig(location.pathname);
     const pinterestHtml = generatePinterestTags(pinterestConfig);
 
     // Remover tags antigas
@@ -38,7 +38,7 @@ export function SearchEngineOptimization() {
     pinterestTemplate.innerHTML = pinterestHtml;
     const pinterestFragment = pinterestTemplate.content;
     head.appendChild(pinterestFragment);
-  }, [location]);
+  }, [location.pathname]);
 
   return null; // Este componente não renderiza nada visível
 }
@@ -47,14 +47,14 @@ export function SearchEngineOptimization() {
  * Hook para usar Schema.org config em componentes
  */
 export function useSchemaOrg() {
-  const [location] = useLocation();
-  return getSchemaOrgByRoute(location);
+  const location = useLocation();
+  return getSchemaOrgByRoute(location.pathname);
 }
 
 /**
  * Hook para usar Pinterest config em componentes
  */
 export function usePinterest() {
-  const [location] = useLocation();
-  return getPinterestConfig(location);
+  const location = useLocation();
+  return getPinterestConfig(location.pathname);
 }

@@ -16,6 +16,7 @@ import testimonialRoberto from "@/assets/testimonial-roberto.jpg";
 import testimonialJuliana from "@/assets/testimonial-juliana.jpg";
 import testimonialAntonio from "@/assets/testimonial-antonio.jpg";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
+import EquityBanner from "@/components/EquityBanner";
 import { useEffect } from "react";
 
 const fadeUp = {

@@ -79,6 +79,7 @@ const Webinars = lazy(() => import("./pages/Webinars"));
 const Voluntarios = lazy(() => import("./pages/Voluntarios"));
 const ImpactoSocial = lazy(() => import("./pages/ImpactoSocial"));
 const EbookLanding = lazy(() => import("./pages/EbookLanding"));
+const EbookMedicinaCanabinoide = lazy(() => import("./pages/EbookMedicinaCanabinoide"));
 const EbookAnalyticsDashboard = lazy(() => import("./pages/EbookAnalyticsDashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 

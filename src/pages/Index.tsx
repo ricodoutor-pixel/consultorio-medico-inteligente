@@ -84,20 +84,12 @@ const Index = () => {
       <WhatsAppButton />
 
       {/* Hero Section */}
-      <section className="hero-glow pb-16 md:pb-28 min-h-[95dvh] flex items-center overflow-hidden" style={{ paddingTop: 'clamp(100px, 15vh, 140px)' }}>
+      <section className="hero-glow pb-16 md:pb-28 min-h-[95dvh] flex items-center overflow-hidden" style={{ paddingTop: 'clamp(80px, 10vh, 100px)' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             
             {/* Text Content */}
             <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col">
-              <motion.div variants={fadeUp} className="flex flex-col gap-2 mb-4">
-                <div className="inline-flex items-center gap-2 flex-wrap">
-                  <span className="inline-flex items-center gap-2 bg-gradient-green border border-green rounded-full px-4 py-2 text-sm font-bold text-primary shadow-lg shadow-green/20">
-                    <Leaf size={16} />
-                    PLATAFORMA POPULAR • SAÚDE • SHOPPING
-                  </span>
-                </div>
-              </motion.div>
 
               <motion.h1 
                 variants={fadeUp} 

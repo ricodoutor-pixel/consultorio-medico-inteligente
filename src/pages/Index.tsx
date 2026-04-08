@@ -93,12 +93,9 @@ const Index = () => {
               </motion.h1>
 
               <motion.div variants={fadeUp} className="max-w-2xl mb-8">
-                <div className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium inline-flex items-center flex-wrap gap-2">
-                  <span>
-                    Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎
-                  </span>
-                  <GlobalComplianceBadge />
-                </div>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium">
+                  Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎 <GlobalComplianceBadge />
+                </p>
               </motion.div>
             </motion.div>
 

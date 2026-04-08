@@ -116,7 +116,9 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     }
   }, [anim, showStory]);
 
-  const displaySize = isEnlarged ? size * 3 : showStory ? size * 1.8 : size;
+  // On mobile (small size), limit enlargement to 2x to prevent overflow
+  const maxScale = size <= 56 ? 2 : 3;
+  const displaySize = isEnlarged ? size * maxScale : showStory ? size * 1.8 : size;
 
   return (
     <motion.div

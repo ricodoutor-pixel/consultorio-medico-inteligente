@@ -3,7 +3,7 @@ import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft } from "luc
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
-import MascotVerdinho from "@/components/MascotVerdinho";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -228,9 +228,9 @@ export const Navbar = () => {
             <span>Voltar</span>
           </button>
 
-          {/* Verdinho dentro do menu mobile — todas as funções disponíveis */}
-          <div className="flex justify-center mb-6 relative" style={{ minHeight: 100 }}>
-            <MascotVerdinho inline={true} onChatOpen={() => setIsOpen(false)} />
+          {/* Verdinho dentro do menu mobile — versão completa com todas as animações */}
+          <div className="flex justify-center mb-6 relative" style={{ minHeight: 120 }}>
+            <FrogMascot size={56} mood="happy" onClick={() => { setIsOpen(false); openChat(); }} enableJumpToNav={false} />
           </div>
 
           <div className="space-y-1 flex-1">

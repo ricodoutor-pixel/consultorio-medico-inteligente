@@ -14,6 +14,7 @@ import { useCart } from "@/store/cart";
 import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
 import MascotVerdinho from "@/components/MascotVerdinho";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { OpenGraphHead } from "@/components/OpenGraphHead";
 
 const Loading = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
@@ -95,6 +96,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <OpenGraphHead />
             <AccessibilitySkipLink />
             <FrogChatModal />
             <ShoppingCart />

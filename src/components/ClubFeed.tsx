@@ -18,7 +18,8 @@ interface ClubFeedProps {
   className?: string;
 }
 
-// Posts de exemplo com imagens de alta fidelidade (IA geradas)\nexport const SAMPLE_POSTS: FeedPost[] = [
+// Posts de exemplo com imagens de alta fidelidade (IA geradas)
+export const SAMPLE_POSTS: FeedPost[] = [
   {
     id: "1",
     author: "Maria Silva",
@@ -103,38 +104,29 @@ export default function ClubFeed({ className = "" }: ClubFeedProps) {
   const [posts, setPosts] = useState<FeedPost[]>(SAMPLE_POSTS);
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
 
-  // Lidar com like
   const handleLike = (postId: string) => {
     const newLiked = new Set(likedPosts);
-    const post = posts.find((p) => p.id === postId);
-
-    if (!post) return;
-
-    if (newLiked.has(postId)) {
-      newLiked.delete(postId);
-      post.likes--;
-    } else {
-      newLiked.add(postId);
-      post.likes++;
-    }
-
+    const updatedPosts = posts.map((p) => {
+      if (p.id !== postId) return p;
+      if (newLiked.has(postId)) {
+        newLiked.delete(postId);
+        return { ...p, likes: p.likes - 1 };
+      } else {
+        newLiked.add(postId);
+        return { ...p, likes: p.likes + 1 };
+      }
+    });
     setLikedPosts(newLiked);
-    setPosts([...posts]);
+    setPosts(updatedPosts);
   };
 
-  // Compartilhar
   const handleShare = (post: FeedPost) => {
     const text = `"${post.testimonial}" - ${post.author} (${post.profession}) via Planta & Raiz`;
     const url = `https://plantayraiz.com.br/club`;
 
     if (navigator.share) {
-      navigator.share({
-        title: "Planta & Raiz",
-        text,
-        url,
-      });
+      navigator.share({ title: "Planta & Raiz", text, url });
     } else {
-      // Fallback: copiar para clipboard
       navigator.clipboard.writeText(`${text}\n${url}`);
       alert("Link copiado para clipboard!");
     }
@@ -164,6 +156,7 @@ export default function ClubFeed({ className = "" }: ClubFeedProps) {
                   src={post.avatar}
                   alt={post.author}
                   className="w-12 h-12 rounded-full object-cover"
+                  loading="lazy"
                 />
                 <div>
                   <div className="font-bold text-gray-900">{post.author}</div>
@@ -183,8 +176,8 @@ export default function ClubFeed({ className = "" }: ClubFeedProps) {
                 src={post.image}
                 alt={post.author}
                 className="w-full h-full object-cover hover:scale-105 transition duration-300"
+                loading="lazy"
               />
-              {/* Branding Overlay (discreto) */}
               <div className="absolute bottom-3 right-3 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
                 Planta & Raiz
               </div>
@@ -192,10 +185,8 @@ export default function ClubFeed({ className = "" }: ClubFeedProps) {
 
             {/* Conteúdo */}
             <div className="p-4 space-y-3">
-              {/* Depoimento */}
               <p className="text-gray-800 leading-relaxed">{post.testimonial}</p>
 
-              {/* Engagement Stats */}
               <div className="flex items-center gap-4 text-sm text-gray-600 py-2 border-t border-b border-gray-100">
                 <div className="flex items-center gap-1">
                   <Heart className="w-4 h-4" />
@@ -207,7 +198,6 @@ export default function ClubFeed({ className = "" }: ClubFeedProps) {
                 </div>
               </div>
 
-              {/* Ações */}
               <div className="flex gap-2">
                 <button
                   onClick={() => handleLike(post.id)}

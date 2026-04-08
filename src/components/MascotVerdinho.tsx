@@ -12,7 +12,7 @@ export default function MascotVerdinho({ onChatOpen, className = "" }: MascotVer
   const [touchCount, setTouchCount] = useState(0);
   const [showChat, setShowChat] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const touchTimeoutRef = useRef<NodeJS.Timeout>();
+  const touchTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const mascotRef = useRef<HTMLDivElement>(null);
 
   // Detectar scroll tipo Star Wars

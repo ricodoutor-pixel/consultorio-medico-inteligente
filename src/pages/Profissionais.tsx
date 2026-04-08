@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone } from "lucide-react";
+import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck } from "lucide-react";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { motion } from "framer-motion";
 import { professionals, categories } from "@/data/professionals";
@@ -14,6 +14,15 @@ const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, tra
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
 const BRISA_WHATSAPP = "5511991363154";
+
+const SERVICE_TIERS = [
+  { name: "Mentoria", price: "R$ 30", value: 30, icon: Zap, desc: "Orientação rápida de 15 min", highlight: false },
+  { name: "Consulta Chat", price: "R$ 50", value: 50, icon: MessageSquare, desc: "Consulta por chat completa", highlight: false },
+  { name: "Consulta Vídeo", price: "R$ 80", value: 80, icon: Video, desc: "Teleconsulta por vídeo 30 min", highlight: false },
+  { name: "Consulta + Receita", price: "R$ 100", value: 100, icon: FileText, desc: "Consulta com prescrição canábica", highlight: true },
+  { name: "Combo ANVISA Chat", price: "R$ 120", value: 120, icon: ShieldCheck, desc: "Consulta + laudo + receita ANVISA", highlight: false },
+  { name: "Combo Full Vídeo", price: "R$ 150", value: 150, icon: Star, desc: "Vídeo + receita + laudo completo", highlight: false },
+];
 
 const WhatsAppContactButton = ({ name, className = "" }: { name: string; className?: string }) => {
   const message = encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${name}`);
@@ -24,10 +33,53 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
       rel="noopener noreferrer"
       className={className}
     >
-      <Button variant="outline" className="w-full text-sm font-black border-[hsl(142,70%,45%)] text-[hsl(142,70%,45%)] hover:bg-[hsl(142,70%,45%)]/10 rounded-xl gap-2">
+      <Button variant="outline" className="w-full text-sm font-black border-primary text-primary hover:bg-primary/10 rounded-xl gap-2">
         <Phone size={14} /> Agendar via WhatsApp
       </Button>
     </a>
+  );
+};
+
+const ServicePricingGrid = ({ doctorName }: { doctorName: string }) => {
+  const handleSelectService = (service: typeof SERVICE_TIERS[0]) => {
+    const message = encodeURIComponent(
+      `Olá Brisa, confirmei o pagamento do ${service.name} de ${service.price}. Meu nome é ___ e quero seguir com ${doctorName}.`
+    );
+    window.open(`https://wa.me/${BRISA_WHATSAPP}?text=${message}`, "_blank");
+  };
+
+  return (
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {SERVICE_TIERS.map((tier) => {
+        const Icon = tier.icon;
+        return (
+          <Card
+            key={tier.name}
+            className={`border-border hover:border-primary/50 transition-all cursor-pointer hover:-translate-y-1 ${
+              tier.highlight ? "ring-2 ring-primary border-primary relative" : ""
+            }`}
+            onClick={() => handleSelectService(tier)}
+          >
+            {tier.highlight && (
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-black px-3 py-1 rounded-full">
+                Mais Popular
+              </span>
+            )}
+            <CardContent className="p-5 text-center">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                <Icon size={22} className="text-primary" />
+              </div>
+              <h4 className="font-black text-foreground text-sm mb-1">{tier.name}</h4>
+              <p className="text-xs text-muted-foreground mb-3">{tier.desc}</p>
+              <p className="text-2xl font-display font-black text-gradient-green mb-3">{tier.price}</p>
+              <Button size="sm" className="w-full font-black bg-primary text-primary-foreground rounded-xl text-xs">
+                Contratar Agora
+              </Button>
+            </CardContent>
+          </Card>
+        );
+      })}
+    </div>
   );
 };
 
@@ -51,6 +103,8 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
               </div>
               <h1 className="text-xl font-display font-black text-foreground">{pro.name}</h1>
               <p className="text-sm text-muted-foreground mb-2">{pro.category}</p>
+              {pro.crm && <p className="text-xs text-muted-foreground mb-1">CRM: {pro.crm}</p>}
+              {pro.hospital && <p className="text-xs text-muted-foreground mb-1">{pro.hospital}</p>}
               <div className="flex items-center gap-2 mb-4">
                 <Star size={14} className="text-primary fill-primary" />
                 <span className="text-sm font-black">{pro.rating}</span>
@@ -63,13 +117,8 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mb-1">Experiência: {pro.experience}</p>
-              <p className="text-2xl font-display font-black text-gradient-green mb-4">{pro.price} <span className="text-sm text-muted-foreground font-normal">/ consulta</span></p>
+              <p className="text-2xl font-display font-black text-gradient-green mb-4">a partir de R$ 30 <span className="text-sm text-muted-foreground font-normal">/ serviço</span></p>
               <div className="space-y-2">
-                <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl" asChild>
-                  <Link to={`/falar-com-especialista?pro=${pro.id}`}>
-                    <MessageSquare size={16} className="mr-2" /> Falar com Especialista
-                  </Link>
-                </Button>
                 <WhatsAppContactButton name={pro.name} />
               </div>
             </CardContent>
@@ -77,6 +126,14 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
         </div>
 
         <div className="lg:col-span-2 space-y-6">
+          {/* Pricing Grid */}
+          <Card className="border-border">
+            <CardContent className="p-6">
+              <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2">💳 Serviços & Valores</h2>
+              <ServicePricingGrid doctorName={pro.name} />
+            </CardContent>
+          </Card>
+
           <Card className="border-border">
             <CardContent className="p-6">
               <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2"><Clock size={18} /> Agenda Disponível</h2>
@@ -86,23 +143,6 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
                   <Button key={slot} variant="outline" size="sm" className="border-border hover:border-primary/50 hover:bg-primary/10 text-sm rounded-xl" asChild>
                     <Link to={`/falar-com-especialista?pro=${pro.id}`}>{slot}</Link>
                   </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border">
-            <CardContent className="p-6">
-              <h2 className="text-lg font-display font-black text-foreground mb-4">Serviços</h2>
-              <div className="space-y-3">
-                {pro.services.map((s, i) => (
-                  <div key={i} className="flex items-start justify-between p-3 rounded-2xl bg-muted/30 border border-border">
-                    <div>
-                      <p className="font-black text-sm text-foreground">{s.name}</p>
-                      <p className="text-xs text-muted-foreground">{s.desc}</p>
-                    </div>
-                    <span className="text-sm font-black text-gradient-green whitespace-nowrap ml-4">{s.price}</span>
-                  </div>
                 ))}
               </div>
             </CardContent>
@@ -191,52 +231,45 @@ const Profissionais = () => {
           <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} key={activeCategory}>
             {filtered.map((p) => (
               <motion.div key={p.id} variants={fadeUp}>
-                <Card className="border-border hover:border-primary/30 transition-all hover:-translate-y-1">
-                  <CardContent className="p-5">
-                     <div className="flex items-center gap-4 mb-4">
-                       <div className="relative">
-                         <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" loading="lazy" />
-                         <OnlineStatusIndicator online={p.online} size="md" className="absolute -bottom-0.5 -right-0.5" />
-                       </div>
-                       <div>
-                         <div className="flex items-center gap-1.5">
-                           <h3 className="font-black text-foreground">{p.name}</h3>
-                           {p.flags && p.flags.map((flag, i) => (
-                             <span key={i} className="text-sm">{flag}</span>
-                           ))}
+                <Link to={`/profissionais/${p.id}`}>
+                  <Card className="border-border hover:border-primary/30 transition-all hover:-translate-y-1 cursor-pointer">
+                    <CardContent className="p-5">
+                       <div className="flex items-center gap-4 mb-4">
+                         <div className="relative">
+                           <img src={p.imageUrl} alt={`Ilustração - ${p.name}`} className="w-14 h-14 rounded-2xl object-cover border border-border" loading="lazy" />
+                           <OnlineStatusIndicator online={p.online} size="md" className="absolute -bottom-0.5 -right-0.5" />
                          </div>
-                         <div className="flex items-center gap-2">
-                           <p className="text-sm text-muted-foreground">{p.category}</p>
-                           <OnlineStatusIndicator online={p.online} size="sm" showLabel />
+                         <div>
+                           <div className="flex items-center gap-1.5">
+                             <h3 className="font-black text-foreground">{p.name}</h3>
+                             {p.flags && p.flags.map((flag, i) => (
+                               <span key={i} className="text-sm">{flag}</span>
+                             ))}
+                           </div>
+                           <div className="flex items-center gap-2">
+                             <p className="text-sm text-muted-foreground">{p.category}</p>
+                             <OnlineStatusIndicator online={p.online} size="sm" showLabel />
+                           </div>
                          </div>
                        </div>
-                     </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-2">{p.bio}</p>
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {p.tags.map((t) => (
-                        <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-border text-muted-foreground">{t}</span>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-1">
-                        <Star size={14} className="text-primary fill-primary" />
-                        <span className="text-sm font-black text-foreground">{p.rating}</span>
-                        <span className="text-xs text-muted-foreground ml-1">{p.consults} consultas</span>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-2">{p.bio}</p>
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {p.tags.map((t) => (
+                          <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-border text-muted-foreground">{t}</span>
+                        ))}
                       </div>
-                      <span className="text-lg font-display font-black text-gradient-green">{p.price}</span>
-                    </div>
-                    <a
-                      href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${p.name}`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
-                    >
-                      <Button className="w-full bg-primary text-primary-foreground text-sm font-black rounded-xl gap-2 animate-pulse">
-                        <Phone size={14} /> Agendar Consulta
-                      </Button>
-                    </a>
-                  </CardContent>
-                </Card>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <Star size={14} className="text-primary fill-primary" />
+                          <span className="text-sm font-black text-foreground">{p.rating}</span>
+                          <span className="text-xs text-muted-foreground ml-1">{p.consults} consultas</span>
+                        </div>
+                        <span className="text-lg font-display font-black text-gradient-green">{p.price}</span>
+                      </div>
+                      <p className="text-xs text-center text-muted-foreground mt-3">Toque para ver perfil e serviços →</p>
+                    </CardContent>
+                  </Card>
+                </Link>
               </motion.div>
             ))}
           </motion.div>

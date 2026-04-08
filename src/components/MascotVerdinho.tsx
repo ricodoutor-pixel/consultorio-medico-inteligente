@@ -82,11 +82,11 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
       <div
         className={wrapperClasses}
         style={{
-          transformOrigin: inline ? "center center" : "bottom right",
+          transformOrigin: inline ? "center center" : "bottom left",
           transform: `scale(${scale})`,
           zIndex: isHovered ? 9999 : inline ? "auto" : 40,
           bottom: !inline ? `max(1.5rem, env(safe-area-inset-bottom))` : undefined,
-          right: !inline ? `max(1.5rem, env(safe-area-inset-right))` : undefined,
+          left: !inline ? `max(1.5rem, env(safe-area-inset-left))` : undefined,
         }}
         onClick={handleInteraction}
         onMouseEnter={() => setIsHovered(true)}

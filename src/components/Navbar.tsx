@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight } from "lucide-react";
+import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
+import MascotVerdinho from "@/components/MascotVerdinho";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

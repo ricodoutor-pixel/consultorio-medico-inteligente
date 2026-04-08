@@ -84,16 +84,16 @@ const Index = () => {
       <WhatsAppButton />
 
       {/* Hero Section */}
-      <section className="hero-glow pb-16 md:pb-20 min-h-[90dvh] flex items-start overflow-hidden" style={{ paddingTop: 'clamp(24px, 4vh, 48px)' }}>
+      <section className="hero-glow pb-16 md:pb-20 min-h-[90dvh] flex items-start overflow-hidden pt-20 md:pt-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-14 items-start">
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-14 items-start">
             
             {/* Text Content */}
             <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col">
 
               <motion.h1 
                 variants={fadeUp} 
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-3 tracking-tight"
+                className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.1] mb-3 tracking-tight"
               >
                 <span className="text-gradient-green">Mais que Acesso,</span>
                 <br />
@@ -109,15 +109,15 @@ const Index = () => {
                 </div>
               </motion.div>
 
-              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-5 mb-12">
-                <Button size="lg" className="text-base font-black h-16 px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
+              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-5 mb-8 md:mb-12">
+                <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-16 px-6 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
                   <Link to="/profissionais">
-                    🎯 Iniciar Consulta <ArrowRight size={20} className="ml-2" />
+                    🎯 Iniciar Consulta <ArrowRight size={18} className="ml-2" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="text-base font-black h-16 px-10 border-border hover:bg-muted rounded-2xl transition-all hover:scale-105" asChild>
+                <Button size="lg" variant="outline" className="text-sm sm:text-base font-black h-12 sm:h-16 px-6 sm:px-10 border-border hover:bg-muted rounded-2xl transition-all hover:scale-105" asChild>
                   <Link to="/shopping">
-                    🛍️ Abrir Shopping <ShoppingBag size={18} className="ml-2" />
+                    🛍️ Abrir Shopping <ShoppingBag size={16} className="ml-2" />
                   </Link>
                 </Button>
               </motion.div>

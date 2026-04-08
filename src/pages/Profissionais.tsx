@@ -197,25 +197,25 @@ const Profissionais = () => {
       <WhatsAppButton />
 
       <section className="pt-20 pb-12 md:pt-32 md:pb-16 hero-glow">
-        <div className="container mx-auto px-3 md:px-4 relative z-10">
-          <motion.div className="mb-8 md:mb-12" initial="hidden" animate="visible" variants={fadeUp}>
-            <h1 className="text-3xl md:text-6xl font-display font-black text-foreground mb-3 md:mb-4 tracking-tight">
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div className="mb-6 md:mb-12" initial="hidden" animate="visible" variants={fadeUp}>
+            <h1 className="text-2xl sm:text-3xl md:text-6xl font-display font-black text-foreground mb-2 md:mb-4 tracking-tight">
               <span className="text-gradient-green">Profissionais</span> Verificados
             </h1>
-            <p className="text-base md:text-lg text-muted-foreground max-w-2xl font-medium">
-              {professionals.length} especialistas em 6 categorias — supervisionado por IA de última geração 24×7. Escolha, agende e pague via Pix ou PayPal.
+            <p className="text-sm md:text-lg text-muted-foreground max-w-2xl font-medium">
+              {professionals.length} especialistas em 6 categorias — supervisionado por IA de última geração 24×7.
             </p>
           </motion.div>
 
           {/* Tabs - scroll horizontal no mobile */}
-          <div className="flex gap-2 mb-8 md:mb-10 overflow-x-auto pb-2 -mx-3 px-3 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
+          <div className="flex gap-1.5 md:gap-2 mb-6 md:mb-10 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
             {categories.map((cat) => {
               const count = professionals.filter(p => p.category === cat).length;
               return (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-2.5 rounded-full text-sm font-black border transition-colors whitespace-nowrap flex-shrink-0 ${
+                  className={`px-3 md:px-4 py-2 md:py-2.5 rounded-full text-xs md:text-sm font-black border transition-colors whitespace-nowrap flex-shrink-0 min-h-[44px] ${
                     activeCategory === cat
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border bg-card/50 text-muted-foreground hover:text-foreground"
@@ -227,8 +227,8 @@ const Profissionais = () => {
             })}
           </div>
 
-          {/* Cards - Redesign moderno */}
-          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} key={activeCategory}>
+          {/* Cards - grid responsivo */}
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} key={activeCategory}>
             {filtered.map((p) => (
               <motion.div key={p.id} variants={fadeUp}>
                 <Link to={`/profissionais/${p.id}`}>

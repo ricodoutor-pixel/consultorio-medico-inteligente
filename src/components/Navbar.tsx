@@ -153,7 +153,7 @@ export const Navbar = () => {
             </div>
 
             {/* Desktop: Menu Centralizado */}
-            <div className="hidden xl:flex items-center gap-4 2xl:gap-6">
+            <div className="hidden xl:flex items-center gap-2 2xl:gap-4">
               <div className="flex items-center gap-2 2xl:gap-4" role="menubar">
                 {links.map((link) => (
                   <NavLink

@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { Leaf, ShoppingBag, Users, Star, ArrowRight, TrendingUp, UserPlus, Download, Quote } from "lucide-react";
+import { Leaf, Users, Star, ArrowRight, TrendingUp, UserPlus, Download, Quote } from "lucide-react";
 import { motion } from "framer-motion";
 import CannabisMarketChart from "@/components/CannabisMarketChart";
 import { Link } from "react-router-dom";
@@ -92,24 +92,16 @@ const Index = () => {
                 <span className="text-gradient-purple animate-[starPulse_3s_ease-in-out_infinite] hover:scale-[2] transition-transform duration-700 ease-in-out origin-left inline-block cursor-pointer drop-shadow-[0_0_20px_hsl(280,80%,65%)] hover:drop-shadow-[0_0_40px_hsl(280,80%,75%)]">Equidade.</span>
               </motion.h1>
 
-              <motion.div variants={fadeUp} className="max-w-2xl mb-8">
-                <div className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium inline-flex items-center flex-wrap gap-2">
-                  <span>
-                    Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎
-                  </span>
-                  <GlobalComplianceBadge />
-                </div>
+              <motion.div variants={fadeUp} className="max-w-2xl mb-6">
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium">
+                  Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎
+                </p>
               </motion.div>
 
-              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-5 mb-8 md:mb-12">
+              <motion.div variants={fadeUp} className="mb-8 md:mb-12">
                 <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-16 px-6 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
                   <Link to="/profissionais">
                     🎯 Iniciar Consulta <ArrowRight size={18} className="ml-2" />
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" className="text-sm sm:text-base font-black h-12 sm:h-16 px-6 sm:px-10 border-border hover:bg-muted rounded-2xl transition-all hover:scale-105" asChild>
-                  <Link to="/shopping">
-                    🛍️ Abrir Shopping <ShoppingBag size={16} className="ml-2" />
                   </Link>
                 </Button>
               </motion.div>
@@ -207,6 +199,9 @@ const Index = () => {
       {/* Seleção de Patologias */}
       <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
+          <div className="flex justify-center mb-8">
+            <GlobalComplianceBadge />
+          </div>
           <div className="text-center max-w-3xl mx-auto mb-10">
             <h2 className="text-3xl md:text-5xl font-display font-black mb-4">
               Selecione as suas <span className="text-gradient-green">patologias</span>

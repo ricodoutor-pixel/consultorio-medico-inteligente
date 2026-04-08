@@ -92,18 +92,13 @@ const Index = () => {
                 <span className="text-gradient-purple animate-[starPulse_3s_ease-in-out_infinite] hover:scale-[2] transition-transform duration-700 ease-in-out origin-left inline-block cursor-pointer drop-shadow-[0_0_20px_hsl(280,80%,65%)] hover:drop-shadow-[0_0_40px_hsl(280,80%,75%)]">Equidade.</span>
               </motion.h1>
 
-              <motion.div variants={fadeUp} className="max-w-2xl mb-6">
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium">
-                  Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎
-                </p>
-              </motion.div>
-
-              <motion.div variants={fadeUp} className="mb-8 md:mb-12">
-                <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-16 px-6 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
-                  <Link to="/profissionais">
-                    🎯 Iniciar Consulta <ArrowRight size={18} className="ml-2" />
-                  </Link>
-                </Button>
+              <motion.div variants={fadeUp} className="max-w-2xl mb-8">
+                <div className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium inline-flex items-center flex-wrap gap-2">
+                  <span>
+                    Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎
+                  </span>
+                  <GlobalComplianceBadge />
+                </div>
               </motion.div>
             </motion.div>
 

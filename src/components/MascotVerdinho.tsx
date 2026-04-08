@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from "react";
-import { MessageCircle, X, Send } from "lucide-react";
+import { MessageCircle, X, Send, ArrowLeft } from "lucide-react";
 
 interface MascotVerdinhoProps {
   onChatOpen?: () => void;

@@ -88,12 +88,17 @@ export default {
           "0%, 100%": { boxShadow: "0 0 20px hsl(152 80% 45% / 0.2)" },
           "50%": { boxShadow: "0 0 40px hsl(152 80% 45% / 0.4)" },
         },
+        "starPulse": {
+          "0%, 100%": { opacity: "0.85", transform: "scale(1)", filter: "brightness(1)" },
+          "50%": { opacity: "1", transform: "scale(1.08)", filter: "brightness(1.4)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 6s ease-in-out infinite",
         "pulse-glow": "pulse-glow 3s ease-in-out infinite",
+        "starPulse": "starPulse 3s ease-in-out infinite",
       },
     },
   },

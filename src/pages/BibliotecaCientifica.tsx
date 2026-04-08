@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { strains, strainCategories, getTerpenosByType, terpenoInfo, type CannabisStrain } from "@/data/strains";
-import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck } from "lucide-react";
+import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { StrainImage } from "@/components/StrainImage";

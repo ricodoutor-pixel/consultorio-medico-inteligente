@@ -122,7 +122,7 @@ const Precos = () => {
         "Gerente de conta dedicado",
       ],
       highlighted: false,
-      checkoutUrl: "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=97dee2a0d53c462f95296d83a1e1ce61",
+      
     },
   ];
 

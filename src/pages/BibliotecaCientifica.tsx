@@ -127,7 +127,7 @@ const BibliotecaCientifica = () => {
               </div>
               <Link to="/ebook-medicina-canabinoide">
                 <Button
-                  onClick={() => setDownloadCount(prev => prev + 1)}
+                  onClick={incrementCounter}
                   className="whitespace-nowrap font-bold text-xs bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl"
                 >
                   ACESSAR CURSO COMPLETO EM E-BOOK <ArrowRight size={14} className="ml-1" />

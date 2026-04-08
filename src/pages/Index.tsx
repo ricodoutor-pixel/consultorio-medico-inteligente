@@ -110,14 +110,14 @@ const Index = () => {
               </motion.div>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-5 mb-8 md:mb-12">
-                <Button size="lg" className="text-base font-black h-16 px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
+                <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-16 px-6 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
                   <Link to="/profissionais">
-                    🎯 Iniciar Consulta <ArrowRight size={20} className="ml-2" />
+                    🎯 Iniciar Consulta <ArrowRight size={18} className="ml-2" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="text-base font-black h-16 px-10 border-border hover:bg-muted rounded-2xl transition-all hover:scale-105" asChild>
+                <Button size="lg" variant="outline" className="text-sm sm:text-base font-black h-12 sm:h-16 px-6 sm:px-10 border-border hover:bg-muted rounded-2xl transition-all hover:scale-105" asChild>
                   <Link to="/shopping">
-                    🛍️ Abrir Shopping <ShoppingBag size={18} className="ml-2" />
+                    🛍️ Abrir Shopping <ShoppingBag size={16} className="ml-2" />
                   </Link>
                 </Button>
               </motion.div>

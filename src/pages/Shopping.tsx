@@ -52,6 +52,7 @@ const ProductDetail = ({ id }: { id: string }) => {
   const product = products.find((p) => p.id === id);
   const { addItem } = useCart();
   const { toast } = useToast();
+  const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
 
   if (!product) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Produto não encontrado.</div>;
 
@@ -110,7 +111,7 @@ const ProductDetail = ({ id }: { id: string }) => {
           <div className="flex gap-3">
             <Button
               className="flex-1 font-bold h-14 text-base bg-primary text-primary-foreground hover:bg-primary/90"
-              onClick={() => handleBuyNowProduct(product, toast)}
+              onClick={() => handleBuyNowProduct(product, toast, showModal)}
             >
               Comprar Agora 💳
             </Button>

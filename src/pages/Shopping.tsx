@@ -6,11 +6,38 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ShoppingBag, Star, ShoppingCart, Plus, Minus, ArrowLeft, ArrowRight, Store, CreditCard, Truck, Search, Shield, Grid3X3, List, ChevronRight, Tag, Percent, Package } from "lucide-react";
+import { ShoppingBag, Star, ShoppingCart, Plus, Minus, ArrowLeft, ArrowRight, Store, CreditCard, Truck, Search, Shield, Grid3X3, List, ChevronRight, Tag, Percent, Package, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { products, productCategories } from "@/data/products";
+import { products, productCategories, Product } from "@/data/products";
 import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+const handleBuyNowProduct = async (product: Product, toast: any) => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({ title: "Faça login para comprar", variant: "destructive" });
+      setTimeout(() => window.location.href = "/login", 1500);
+      return;
+    }
+    const { data, error } = await supabase.functions.invoke("create-cart-payment", {
+      body: {
+        items: [{ title: product.title, quantity: 1, price: product.priceValue }],
+        total: product.priceValue,
+        description: `Planta y Raiz Ltda - ${product.title}`,
+      },
+    });
+    if (error) throw error;
+    if (data?.init_point) {
+      window.open(data.init_point, "_blank");
+      toast({ title: "Redirecionando para pagamento... 💳" });
+    }
+  } catch (err) {
+    console.error(err);
+    toast({ title: "Erro ao gerar pagamento", variant: "destructive" });
+  }
+};
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };

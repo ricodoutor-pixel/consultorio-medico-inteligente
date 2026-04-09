@@ -131,7 +131,7 @@ const RevenueDistribution = () => {
 
                 {/* Subscription Plans */}
                 <div className="mb-8">
-                  <DoctorSubscriptionPlans doctorId={doctorId} currentTier={currentTier} />
+                  <DoctorSubscriptionPlans doctorId={doctorId} currentTier={currentTier} onTierChange={setSimulatedTier} />
                 </div>
 
                 {/* Fraud Detection Info */}

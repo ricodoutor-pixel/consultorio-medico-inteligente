@@ -169,6 +169,9 @@ const AdminMaster = () => {
       .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, () => loadDashboardData())
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "payment_webhooks" }, () => loadDashboardData())
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "profiles" }, () => loadDashboardData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "vendor_transactions" }, () => loadDashboardData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "escrow_transactions" }, () => loadDashboardData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, () => loadDashboardData())
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [loadDashboardData]);

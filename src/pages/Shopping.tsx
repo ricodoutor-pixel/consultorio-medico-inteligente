@@ -334,6 +334,7 @@ const Shopping = () => {
   const { toast } = useToast();
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
   const [btcModal, setBtcModal] = useState({ open: false, planName: "", planId: "", amount: "" });
+  const [rxModal, setRxModal] = useState<{ open: boolean; productName: string; pendingProduct: VendorProduct | null }>({ open: false, productName: "", pendingProduct: null });
 
   const { toggle: toggleFav, isFav } = useFavorites();
 
@@ -364,6 +365,13 @@ const Shopping = () => {
   if (sortBy === "sold") filtered = [...filtered].sort((a, b) => b.sold_count - a.sold_count);
 
   const handleBuyProduct = (p: VendorProduct) => {
+    setRxModal({ open: true, productName: p.name, pendingProduct: p });
+  };
+
+  const proceedWithPurchaseMain = () => {
+    const p = rxModal.pendingProduct;
+    setRxModal({ open: false, productName: "", pendingProduct: null });
+    if (!p) return;
     showModal(
       { type: "compra", productName: p.name, value: p.price } as WhatsAppContext,
       async () => {

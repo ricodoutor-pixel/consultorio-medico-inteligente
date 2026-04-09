@@ -183,6 +183,23 @@ const Telemedicina = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
+      {/* TCLE Modal - Shown on entry */}
+      <TCLEConsentModal
+        open={showTCLE && !tcleAccepted}
+        onAccept={() => {
+          setTcleAccepted(true);
+          setShowTCLE(false);
+          setStep(0);
+          toast({ title: "TCLE aceito com sucesso!", description: "Prossiga com a identificação." });
+        }}
+        onDecline={() => {
+          setShowTCLE(false);
+          navigate("/");
+          toast({ title: "Consentimento recusado", description: "Você foi redirecionado à página inicial.", variant: "destructive" });
+        }}
+        patientName={patientData.nome || "Paciente"}
+      />
+
       <section className="pt-24 pb-8 md:pt-32 hero-glow">
         <div className="container mx-auto px-4 relative z-10">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>

@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield } from "lucide-react";
 import { motion } from "framer-motion";
+import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
+import { DoctorSubscriptionPlans } from "@/components/doctor/DoctorSubscriptionPlans";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";

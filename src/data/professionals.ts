@@ -1359,7 +1359,7 @@ export const professionals: Professional[] = [
     rating: 4.8,
     consults: 185,
     avatar: "AB",
-    imageUrl: auxEnfMariaImg,
+    imageUrl: auxEnfAnaImg,
     flags: ["🇧🇷"],
     services: [
       { name: "Acompanhamento Pediátrico", price: "R$ 45,00", desc: "Cuidados infantis especializados" },
@@ -1386,7 +1386,7 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 280,
     avatar: "FS",
-    imageUrl: auxEnfJoseImg,
+    imageUrl: auxEnfFranciscaImg,
     flags: ["🇧🇷"],
     services: [
       { name: "Cuidados Paliativos", price: "R$ 50,00", desc: "Acompanhamento humanizado" },
@@ -1413,7 +1413,7 @@ export const professionals: Professional[] = [
     rating: 4.8,
     consults: 195,
     avatar: "CR",
-    imageUrl: auxEnfMariaImg,
+    imageUrl: auxEnfClaudiaImg,
     flags: ["🇧🇷"],
     services: [
       { name: "Acompanhamento Psiquiátrico", price: "R$ 42,00", desc: "Suporte a pacientes em tratamento" },
@@ -1523,7 +1523,7 @@ export const professionals: Professional[] = [
     rating: 4.7,
     consults: 180,
     avatar: "MV",
-    imageUrl: enfRodrigoImg,
+    imageUrl: enfMarcosImg,
     flags: ["🇧🇷"],
     services: [
       { name: "Consulta de Enfermagem", price: "R$ 65,00", desc: "Avaliação e orientação" },
@@ -1549,7 +1549,7 @@ export const professionals: Professional[] = [
     rating: 4.9,
     consults: 310,
     avatar: "FB",
-    imageUrl: enfPatriciaImg,
+    imageUrl: enfFernandaImg,
     flags: ["🇧🇷"],
     services: [
       { name: "Avaliação de Feridas", price: "R$ 70,00", desc: "Avaliação + protocolo de cuidados" },
@@ -1576,7 +1576,7 @@ export const professionals: Professional[] = [
     rating: 4.8,
     consults: 265,
     avatar: "LT",
-    imageUrl: enfClaudiaImg,
+    imageUrl: enfLucianaImg,
     flags: ["🇧🇷"],
     services: [
       { name: "Avaliação Geriátrica", price: "R$ 75,00", desc: "Avaliação funcional do idoso" },
@@ -1603,7 +1603,7 @@ export const professionals: Professional[] = [
     rating: 4.7,
     consults: 195,
     avatar: "DS",
-    imageUrl: enfRodrigoImg,
+    imageUrl: enfDiegoImg,
     flags: ["🇧🇷"],
     services: [
       { name: "Avaliação Psiquiátrica", price: "R$ 68,00", desc: "Avaliação de enfermagem em saúde mental" },
@@ -1686,7 +1686,7 @@ export const professionals: Professional[] = [
     rating: 4.9,
     consults: 390,
     avatar: "RD",
-    imageUrl: tecEnfLucianaImg,
+    imageUrl: tecEnfRosangelaImg,
     flags: ["🇧🇷"],
     services: [
       { name: "Suporte em Hemodiálise", price: "R$ 55,00", desc: "Acompanhamento durante sessão" },
@@ -1713,7 +1713,7 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 310,
     avatar: "AG",
-    imageUrl: tecEnfCarlosImg,
+    imageUrl: tecEnfAdrianaImg,
     flags: ["🇧🇷"],
     services: [
       { name: "Suporte Oncológico", price: "R$ 58,00", desc: "Acompanhamento durante quimio" },

@@ -287,7 +287,7 @@ const Profissionais = () => {
                               width={64}
                               height={64}
                             />
-                            <OnlineStatusIndicator online={p.online} size="sm" className="absolute -bottom-0.5 -right-0.5" />
+                            
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">

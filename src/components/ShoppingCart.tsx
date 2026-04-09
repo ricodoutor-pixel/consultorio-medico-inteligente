@@ -19,7 +19,7 @@ export function ShoppingCart() {
     return (
       <button
         onClick={() => setShowCart(true)}
-        className="fixed bottom-6 right-6 bg-primary text-primary-foreground rounded-full p-4 shadow-lg hover:opacity-90 transition-all z-40"
+        className="fixed bottom-6 left-6 bg-primary text-primary-foreground rounded-full p-4 shadow-lg hover:opacity-90 transition-all z-40"
         title="Abrir carrinho"
       >
         <CartIcon size={24} />

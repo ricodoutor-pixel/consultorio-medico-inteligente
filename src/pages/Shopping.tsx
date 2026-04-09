@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductAlertBell } from "@/components/ProductAlertBell";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
+import { PrescriptionVerificationModal } from "@/components/PrescriptionVerificationModal";
 
 // Import product images
 import oleoCbd1 from "@/assets/products/oleo-cbd-1.jpg";
@@ -186,6 +187,7 @@ const ProductDetail = ({ id }: { id: string }) => {
   const { toast } = useToast();
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
   const [btcModal, setBtcModal] = useState({ open: false, planName: "", planId: "", amount: "" });
+  const [rxModal, setRxModal] = useState({ open: false, productName: "" });
 
   useEffect(() => {
     (async () => {
@@ -203,6 +205,11 @@ const ProductDetail = ({ id }: { id: string }) => {
   const priceStr = fmtPrice(product.price);
 
   const handleBuy = () => {
+    setRxModal({ open: true, productName: product.name });
+  };
+
+  const proceedWithPurchase = () => {
+    setRxModal({ open: false, productName: "" });
     showModal(
       { type: "compra", productName: product.name, value: product.price } as WhatsAppContext,
       async () => {
@@ -303,6 +310,13 @@ const ProductDetail = ({ id }: { id: string }) => {
 
       <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
       <BTCPaymentModal open={btcModal.open} onClose={() => setBtcModal({ ...btcModal, open: false })} planName={btcModal.planName} planId={btcModal.planId} amount={btcModal.amount} />
+      <PrescriptionVerificationModal
+        open={rxModal.open}
+        onClose={() => setRxModal({ open: false, productName: "" })}
+        productName={rxModal.productName}
+        onHasPrescription={proceedWithPurchase}
+        onNeedsPrescription={() => { setRxModal({ open: false, productName: "" }); window.location.href = "/profissionais"; }}
+      />
     </div>
   );
 };
@@ -320,6 +334,7 @@ const Shopping = () => {
   const { toast } = useToast();
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
   const [btcModal, setBtcModal] = useState({ open: false, planName: "", planId: "", amount: "" });
+  const [rxModal, setRxModal] = useState<{ open: boolean; productName: string; pendingProduct: VendorProduct | null }>({ open: false, productName: "", pendingProduct: null });
 
   const { toggle: toggleFav, isFav } = useFavorites();
 
@@ -350,6 +365,13 @@ const Shopping = () => {
   if (sortBy === "sold") filtered = [...filtered].sort((a, b) => b.sold_count - a.sold_count);
 
   const handleBuyProduct = (p: VendorProduct) => {
+    setRxModal({ open: true, productName: p.name, pendingProduct: p });
+  };
+
+  const proceedWithPurchaseMain = () => {
+    const p = rxModal.pendingProduct;
+    setRxModal({ open: false, productName: "", pendingProduct: null });
+    if (!p) return;
     showModal(
       { type: "compra", productName: p.name, value: p.price } as WhatsAppContext,
       async () => {
@@ -729,6 +751,13 @@ const Shopping = () => {
 
       <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
       <BTCPaymentModal open={btcModal.open} onClose={() => setBtcModal({ ...btcModal, open: false })} planName={btcModal.planName} planId={btcModal.planId} amount={btcModal.amount} />
+      <PrescriptionVerificationModal
+        open={rxModal.open}
+        onClose={() => setRxModal({ open: false, productName: "", pendingProduct: null })}
+        productName={rxModal.productName}
+        onHasPrescription={proceedWithPurchaseMain}
+        onNeedsPrescription={() => { setRxModal({ open: false, productName: "", pendingProduct: null }); window.location.href = "/profissionais"; }}
+      />
       <Footer />
     </div>
   );

@@ -8,6 +8,7 @@ import { Heart, MessageCircle, Share2, ShoppingCart, Bell, Check, Send, X, Star,
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 
 // Product images
 import prod1a from "@/assets/club/prod1-a.jpg";
@@ -283,8 +284,9 @@ const Club = () => {
   });
 
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
 
-  const handleCheckout = async () => {
+  const executeCheckout = async () => {
     setCheckoutLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();

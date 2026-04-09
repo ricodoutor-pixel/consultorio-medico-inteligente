@@ -71,10 +71,10 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
     }, 800);
   };
 
-  const scale = isHovered ? 3 : 1;
+  const scale = isHovered ? 2.5 : 1;
   const wrapperClasses = inline
     ? `relative cursor-pointer transition-all duration-500 ease-out ${className}`
-    : `fixed bottom-6 left-6 z-40 cursor-pointer transition-all duration-500 ease-out ${className}`;
+    : `fixed bottom-20 left-4 z-40 cursor-pointer transition-all duration-500 ease-out ${className}`;
 
   return (
     <>
@@ -85,8 +85,8 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
           transformOrigin: inline ? "center center" : "bottom left",
           transform: `scale(${scale})`,
           zIndex: isHovered ? 9999 : inline ? "auto" : 40,
-          bottom: !inline ? `max(1.5rem, env(safe-area-inset-bottom))` : undefined,
-          left: !inline ? `max(1.5rem, env(safe-area-inset-left))` : undefined,
+          bottom: !inline ? `max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem))` : undefined,
+          left: !inline ? `max(1rem, env(safe-area-inset-left))` : undefined,
         }}
         onClick={handleInteraction}
         onMouseEnter={() => setIsHovered(true)}
@@ -94,7 +94,7 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
         onTouchStart={() => setIsHovered(true)}
         onTouchEnd={() => setTimeout(() => setIsHovered(false), 1500)}
       >
-        <div className="relative w-16 h-16 md:w-20 md:h-20">
+        <div className="relative w-12 h-12 md:w-16 md:h-16">
           <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="35" r="20" fill="#10b981" />
             <circle cx="42" cy="30" r="3" fill="#ffffff" />

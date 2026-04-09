@@ -119,9 +119,7 @@ export const ClubCheckout: React.FC<CheckoutProps> = ({
       const newOrderId = `ORD-${Date.now()}`;
       setOrderId(newOrderId);
 
-      console.log(`💳 Manus CEO: Criando pedido ${newOrderId}`);
-      console.log(`📦 Itens:`, cart);
-      console.log(`💰 Total: R$ ${calculateTotal().toFixed(2)}`);
+      // Order tracking handled by backend audit system
 
       // Simular chamada à API para criar preferência de pagamento
       const response = await fetch('/api/club/checkout', {

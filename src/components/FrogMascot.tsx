@@ -144,7 +144,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       role="button"
       tabIndex={0}
       aria-label="Toque para ver a história do Verdinho. Toque 2x para conversar."
-      title="1 toque = história 🐸 | 2 toques = chat 💬"
+      
       whileTap={{ scale: 0.9, rotate: -5 }}
       animate={anim.controls}
       layout

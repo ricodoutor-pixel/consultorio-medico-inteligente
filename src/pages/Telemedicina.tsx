@@ -14,7 +14,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { Stethoscope, ArrowRight, ArrowLeft, CheckCircle2, Brain, Heart, Activity, Shield, Leaf, Watch, FileText, Download, Printer, UserCheck, Scale, AlertTriangle, Loader2, MessageCircle, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { TCLEConsentModal } from "@/components/TCLEConsentModal";
 import { professionals } from "@/data/professionals";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
@@ -120,6 +121,8 @@ const BrisaAvatar = () => {
 };
 
 const Telemedicina = () => {
+  const navigate = useNavigate();
+  const [showTCLE, setShowTCLE] = useState(true);
   const [step, setStep] = useState(-1);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [sliderValue, setSliderValue] = useState([50]);
@@ -129,6 +132,7 @@ const Telemedicina = () => {
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const { toast } = useToast();
+  const [selectedPathology, setSelectedPathology] = useState("");
   const [patientData, setPatientData] = useState({
     nome: "",
     cpf: "",
@@ -136,6 +140,16 @@ const Telemedicina = () => {
     email: "",
     telefone: "",
   });
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem("triage_condition");
+    if (saved) {
+      setSelectedPathology(saved);
+      // Pre-fill first triage question with the pathology
+      setAnswers(prev => ({ ...prev, 1: `Condição principal: ${saved}. ` }));
+      sessionStorage.removeItem("triage_condition");
+    }
+  }, []);
 
   const currentQ = interviewQuestions[step - 1];
   const progress = step <= 0 ? 0 : step > 10 ? 100 : Math.round((step / 10) * 100);
@@ -170,6 +184,23 @@ const Telemedicina = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+
+      {/* TCLE Modal - Shown on entry */}
+      <TCLEConsentModal
+        open={showTCLE && !tcleAccepted}
+        onAccept={() => {
+          setTcleAccepted(true);
+          setShowTCLE(false);
+          setStep(0);
+          toast({ title: "TCLE aceito com sucesso!", description: "Prossiga com a identificação." });
+        }}
+        onDecline={() => {
+          setShowTCLE(false);
+          navigate("/");
+          toast({ title: "Consentimento recusado", description: "Você foi redirecionado à página inicial.", variant: "destructive" });
+        }}
+        patientName={patientData.nome || "Paciente"}
+      />
 
       <section className="pt-24 pb-8 md:pt-32 hero-glow">
         <div className="container mx-auto px-4 relative z-10">
@@ -210,20 +241,19 @@ const Telemedicina = () => {
           )}
 
           <div className="max-w-2xl mx-auto">
-            {/* Conteúdo do Questionário (Mantendo a lógica original) */}
-            {step === -1 && (
+            {/* Waiting for TCLE acceptance */}
+            {step === -1 && !showTCLE && !tcleAccepted && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp}>
                 <Card className="border-border">
-                  <CardContent className="p-8">
-                    <h2 className="text-xl font-display font-black text-foreground mb-6">Termo de Consentimento</h2>
-                    <div className="bg-muted/30 border border-border rounded-2xl p-5 mb-6 max-h-[300px] overflow-y-auto text-sm">
-                      <p>Aceito realizar a teleconsulta conforme as normas do CFM e ANVISA...</p>
-                    </div>
+                  <CardContent className="p-8 text-center">
+                    <Shield size={48} className="text-primary mx-auto mb-4" />
+                    <h2 className="text-xl font-display font-black text-foreground mb-4">Consentimento Necessário</h2>
+                    <p className="text-muted-foreground mb-6">Você precisa aceitar o Termo de Consentimento (TCLE) para prosseguir com a teleconsulta.</p>
                     <Button 
                       className="w-full h-14 bg-primary text-primary-foreground font-black rounded-2xl text-lg"
-                      onClick={() => setStep(0)}
+                      onClick={() => setShowTCLE(true)}
                     >
-                      Aceitar e Continuar <ArrowRight className="ml-2" />
+                      <FileText className="mr-2" /> Ler e Aceitar o TCLE
                     </Button>
                   </CardContent>
                 </Card>
@@ -234,7 +264,26 @@ const Telemedicina = () => {
               <motion.div initial="hidden" animate="visible" variants={fadeUp}>
                 <Card className="border-border">
                   <CardContent className="p-8 space-y-6">
-                    <h2 className="text-xl font-display font-black text-foreground">Identificação do Paciente</h2>
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-xl font-display font-black text-foreground">Identificação do Paciente</h2>
+                      <Badge variant="outline" className="border-primary/30 text-primary text-[10px]">
+                        <CheckCircle2 size={10} className="mr-1" /> TCLE Aceito
+                      </Badge>
+                    </div>
+
+                    {/* Pathology Badge */}
+                    {selectedPathology && (
+                      <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                          <Brain size={20} className="text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Patologia Selecionada</p>
+                          <p className="text-sm font-black text-primary">{selectedPathology}</p>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label className="text-xs font-bold uppercase">Nome Completo</Label>

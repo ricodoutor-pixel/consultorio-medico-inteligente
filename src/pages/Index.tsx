@@ -246,7 +246,7 @@ const Index = () => {
             ].map((item, index) => (
               <Link
                 key={item.name}
-                to={`/consulta-rapida`}
+                to={`/telemedicina`}
                 onClick={() => sessionStorage.setItem("triage_condition", item.name)}
                 className={`px-5 py-3 rounded-full ${item.bg} text-white font-bold text-sm shadow-lg ${item.shadow} hover:scale-105 transition-all duration-300 hover:animate-none`}
                 style={{

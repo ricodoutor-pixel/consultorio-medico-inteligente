@@ -763,7 +763,13 @@ const Club = () => {
         )}
       </AnimatePresence>
 
-      <WhatsAppProofModal
+      <BTCPaymentModal
+        open={btcModal.open}
+        onClose={() => setBtcModal({ ...btcModal, open: false })}
+        planName={btcModal.planName}
+        planId={btcModal.planId}
+        amount={btcModal.amount}
+      />
         open={modalState.open}
         onOpenChange={setModalOpen}
         context={modalState.context}

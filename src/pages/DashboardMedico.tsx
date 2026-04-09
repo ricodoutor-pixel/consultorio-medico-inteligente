@@ -25,6 +25,7 @@ const DashboardMedico = () => {
   const [doctorData, setDoctorData] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
+  const [currentTier, setCurrentTier] = useState("basic");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

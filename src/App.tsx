@@ -87,6 +87,7 @@ const EbookMedicinaCanabinoide = lazy(() => import("./pages/EbookMedicinaCanabin
 const EbookAnalyticsDashboard = lazy(() => import("./pages/EbookAnalyticsDashboard"));
 const RevenueDistribution = lazy(() => import("./pages/RevenueDistribution"));
 const ProfessionalDashboard = lazy(() => import("./pages/ProfessionalDashboard"));
+const AdminMaster = lazy(() => import("./pages/AdminMaster"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -183,6 +184,7 @@ const App = () => (
                 <Route path="/distribuicao-renda" element={<RevenueDistribution />} />
                 <Route path="/revenue-distribution" element={<RevenueDistribution />} />
                 <Route path="/dashboard/professional" element={<PrivateRoute><ProfessionalDashboard /></PrivateRoute>} />
+                <Route path="/admin-master" element={<AdminRoute><AdminMaster /></AdminRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

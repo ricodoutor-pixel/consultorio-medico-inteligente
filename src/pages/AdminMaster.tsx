@@ -106,6 +106,13 @@ const AdminMaster = () => {
   const [recentPayments, setRecentPayments] = useState<any[]>([]);
   const [aiEvents, setAiEvents] = useState<any[]>([]);
   const [alertSubscribers, setAlertSubscribers] = useState(0);
+  // Sales tracking
+  const [vendorTxs, setVendorTxs] = useState<any[]>([]);
+  const [escrowTxs, setEscrowTxs] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [salesFilter, setSalesFilter] = useState<"all" | "marketplace" | "consultation" | "club">("all");
+  const [salesSearch, setSalesSearch] = useState("");
+  const [salesTab, setSalesTab] = useState("todas");
 
   const loadDashboardData = useCallback(async () => {
     const [

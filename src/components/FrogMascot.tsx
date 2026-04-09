@@ -144,42 +144,12 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       role="button"
       tabIndex={0}
       aria-label="Toque para ver a história do Verdinho. Toque 2x para conversar."
-      title="1 toque = história 🐸 | 2 toques = chat 💬"
+      
       whileTap={{ scale: 0.9, rotate: -5 }}
       animate={anim.controls}
       layout
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      {/* Persistent ping ring — indicates tappable */}
-      {!isEnlarged && !showStory && (
-        <>
-          <motion.div
-            className="absolute inset-0 rounded-full border-2 border-primary/60 pointer-events-none"
-            animate={{
-              scale: [1, 1.5, 1.8],
-              opacity: [0.7, 0.3, 0],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeOut",
-            }}
-          />
-          <motion.div
-            className="absolute inset-0 rounded-full border border-primary/40 pointer-events-none"
-            animate={{
-              scale: [1, 1.3, 1.6],
-              opacity: [0.5, 0.2, 0],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeOut",
-              delay: 0.5,
-            }}
-          />
-        </>
-      )}
 
       {/* Glow */}
       <motion.div
@@ -351,18 +321,6 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       {/* Star Wars story scroll — shown on single tap */}
       <FrogStoryScroll show={showStory} size={displaySize} />
 
-      {/* Tooltip hint for interactions */}
-      {(showStory || isEnlarged) && (
-        <motion.div
-          className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-card/95 backdrop-blur-sm text-foreground text-[10px] font-bold px-3 py-1.5 rounded-full shadow-xl whitespace-nowrap z-50 border border-primary/30"
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          style={{ textShadow: "0 1px 2px rgba(0,0,0,0.1)" }}
-        >
-          {showStory ? "Toque 2x para conversar 💬🐸" : "1 toque = história 🐸 | 2 toques = chat 💬"}
-        </motion.div>
-      )}
     </motion.div>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="bg-card border-primary/30 text-foreground font-semibold text-xs">

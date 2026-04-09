@@ -3,38 +3,47 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   DollarSign, Users, Activity, Shield, Wifi, WifiOff,
   Clock, TrendingUp, AlertTriangle, Bot, Terminal, Search,
-  ChevronDown, Bell, LogOut, Stethoscope, Eye, MessageSquare,
+  Bell, LogOut, Stethoscope, Eye, MessageSquare,
   ShoppingBag, CreditCard, ArrowUpRight, ArrowDownRight, Zap,
   Globe, Server, Database, Cpu, Heart, RefreshCw, Filter,
   Download, Package, Truck, FileText, Calendar, BarChart3,
   CheckCircle2, XCircle, AlertCircle, Flame, ThermometerSun,
-  Smile, Frown, Meh, Volume2, TrendingDown
+  Smile, Frown, Meh, Volume2, TrendingDown, Megaphone, Scale,
+  Headphones, Target, PieChart as PieChartIcon
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "framer-motion";
 import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  Marker,
+  ComposableMap, Geographies, Geography, Marker,
 } from "react-simple-maps";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
   ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, BarChart, Bar,
-  FunnelChart, Funnel, LabelList, RadarChart, Radar, PolarGrid,
-  PolarAngleAxis, PolarRadiusAxis
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from "recharts";
+import { toast } from "sonner";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-/* ═══════════════════════════════════════════════════
-   SIMULATED DATA GENERATORS
-   ═══════════════════════════════════════════════════ */
+/* ═══ TYPES ═══ */
+type Department = "overview" | "financeiro" | "operacional" | "logistica" | "juridico" | "marketing";
+type AlertZone = "green" | "yellow" | "red";
 
+const DEPARTMENT_CONFIG: Record<Department, { label: string; icon: any; color: string; roles: string[] }> = {
+  overview:     { label: "Visão Geral",  icon: Globe,        color: "#39FF14", roles: ["admin"] },
+  financeiro:   { label: "Financeiro",   icon: DollarSign,   color: "#39FF14", roles: ["admin", "financeiro"] },
+  operacional:  { label: "SAC / Vendas", icon: Headphones,   color: "#00D4FF", roles: ["admin", "operacional", "vendas"] },
+  logistica:    { label: "Logística",    icon: Truck,        color: "#FF6B35", roles: ["admin", "logistica"] },
+  juridico:     { label: "Compliance",   icon: Scale,        color: "#A855F7", roles: ["admin", "juridico"] },
+  marketing:    { label: "Marketing",    icon: Megaphone,    color: "#FF6B9D", roles: ["admin", "marketing"] },
+};
+
+/* ═══ SIMULATED DATA ═══ */
 const CITIES_BASE = [
   { name: "São Paulo", coordinates: [-46.63, -23.55] as [number, number], users: 1240 },
   { name: "Rio de Janeiro", coordinates: [-43.17, -22.91] as [number, number], users: 890 },
@@ -48,48 +57,61 @@ const CITIES_BASE = [
   { name: "Fortaleza", coordinates: [-38.52, -3.73] as [number, number], users: 267 },
   { name: "Lisboa", coordinates: [-9.14, 38.74] as [number, number], users: 78 },
   { name: "Miami", coordinates: [-80.19, 25.76] as [number, number], users: 45 },
-  { name: "Buenos Aires", coordinates: [-58.38, -34.6] as [number, number], users: 67 },
-  { name: "Bogotá", coordinates: [-74.07, 4.71] as [number, number], users: 34 },
-  { name: "Cidade do México", coordinates: [-99.13, 19.43] as [number, number], users: 23 },
 ];
 
-// 1. Heatmap pathology data per city
 const PATHOLOGY_DATA: Record<string, { condition: string; intensity: number; color: string }[]> = {
-  "São Paulo": [{ condition: "Ansiedade", intensity: 92, color: "#FF4444" }, { condition: "Insônia", intensity: 78, color: "#FF6B35" }],
-  "Rio de Janeiro": [{ condition: "Dor Crônica", intensity: 85, color: "#FF4444" }, { condition: "Epilepsia", intensity: 45, color: "#FFB800" }],
-  "Curitiba": [{ condition: "Ansiedade", intensity: 95, color: "#FF4444" }, { condition: "TEPT", intensity: 60, color: "#FF6B35" }],
-  "Recife": [{ condition: "Dor Crônica", intensity: 88, color: "#FF4444" }, { condition: "Fibromialgia", intensity: 72, color: "#FF6B35" }],
-  "Belo Horizonte": [{ condition: "Insônia", intensity: 70, color: "#FF6B35" }, { condition: "Ansiedade", intensity: 65, color: "#FFB800" }],
-  "Salvador": [{ condition: "Epilepsia", intensity: 55, color: "#FFB800" }, { condition: "Dor Crônica", intensity: 50, color: "#FFB800" }],
-  "Porto Alegre": [{ condition: "Parkinson", intensity: 40, color: "#39FF14" }, { condition: "Insônia", intensity: 68, color: "#FF6B35" }],
-  "Brasília": [{ condition: "Ansiedade", intensity: 75, color: "#FF6B35" }, { condition: "TDAH", intensity: 42, color: "#FFB800" }],
-  "Manaus": [{ condition: "Dor Crônica", intensity: 35, color: "#39FF14" }],
-  "Fortaleza": [{ condition: "Fibromialgia", intensity: 62, color: "#FF6B35" }, { condition: "Ansiedade", intensity: 58, color: "#FFB800" }],
+  "São Paulo": [{ condition: "Ansiedade", intensity: 92, color: "#FF4444" }],
+  "Rio de Janeiro": [{ condition: "Dor Crônica", intensity: 85, color: "#FF4444" }],
+  "Curitiba": [{ condition: "Ansiedade", intensity: 95, color: "#FF4444" }],
+  "Recife": [{ condition: "Dor Crônica", intensity: 88, color: "#FF4444" }],
+  "Belo Horizonte": [{ condition: "Insônia", intensity: 70, color: "#FF6B35" }],
+  "Salvador": [{ condition: "Epilepsia", intensity: 55, color: "#FFB800" }],
+  "Porto Alegre": [{ condition: "Parkinson", intensity: 40, color: "#39FF14" }],
+  "Brasília": [{ condition: "Ansiedade", intensity: 75, color: "#FF6B35" }],
 };
 
-const generateUserMarkers = () =>
-  CITIES_BASE.map(c => ({
-    ...c,
-    online: Math.random() > 0.4,
-    recentLogin: Math.random() > 0.6,
-    heatIntensity: (PATHOLOGY_DATA[c.name]?.[0]?.intensity || 20) + Math.floor(Math.random() * 10 - 5),
-    topCondition: PATHOLOGY_DATA[c.name]?.[0]?.condition || "Geral",
-  }));
+const generateMarkers = () => CITIES_BASE.map(c => ({
+  ...c, online: Math.random() > 0.4, recentLogin: Math.random() > 0.6,
+  heatIntensity: (PATHOLOGY_DATA[c.name]?.[0]?.intensity || 20) + Math.floor(Math.random() * 10 - 5),
+  topCondition: PATHOLOGY_DATA[c.name]?.[0]?.condition || "Geral",
+}));
 
 const generateRevenueData = () => {
   const days = [];
   for (let i = 30; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    days.push({
-      date: d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
-      receita: Math.floor(3000 + Math.random() * 12000),
-      consultas: Math.floor(800 + Math.random() * 5000),
-      marketplace: Math.floor(400 + Math.random() * 3000),
-    });
+    const d = new Date(); d.setDate(d.getDate() - i);
+    days.push({ date: d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }), receita: Math.floor(3000 + Math.random() * 12000), consultas: Math.floor(800 + Math.random() * 5000), marketplace: Math.floor(400 + Math.random() * 3000) });
   }
   return days;
 };
+
+const generateFunnelData = () => [
+  { name: "Home", value: 1000 + Math.floor(Math.random() * 500), fill: "#39FF14" },
+  { name: "Página de Serviço", value: 650 + Math.floor(Math.random() * 200), fill: "#00D4FF" },
+  { name: "Clicou Agendar", value: 320 + Math.floor(Math.random() * 100), fill: "#A855F7" },
+  { name: "Página Pagamento", value: 180 + Math.floor(Math.random() * 60), fill: "#FF6B35" },
+  { name: "Pagamento OK", value: 85 + Math.floor(Math.random() * 30), fill: "#39FF14" },
+];
+
+const generateSentimentData = () => {
+  const hours = [];
+  for (let i = 23; i >= 0; i--) {
+    const h = new Date(); h.setHours(h.getHours() - i);
+    hours.push({ hora: `${h.getHours().toString().padStart(2, "0")}h`, positivo: Math.floor(40 + Math.random() * 45), neutro: Math.floor(20 + Math.random() * 25), negativo: Math.floor(2 + Math.random() * 18) });
+  }
+  return hours;
+};
+
+const generateSecurityLogs = () => [
+  { time: "agora", msg: "[AUTH] Login admin — IP 187.45.xx.xx", level: "info" },
+  { time: "2m", msg: "[RLS] Acesso negado — tabela: medical_records", level: "warn" },
+  { time: "5m", msg: "[ANVISA] Prescrição #RX-4521 validada — SHA-256 OK", level: "info" },
+  { time: "8m", msg: "[PAYMENT] Webhook MP — R$ 150 — split processado", level: "info" },
+  { time: "12m", msg: "[FRAUD] Score anomalia: 0.12 — TXN-8821", level: "info" },
+  { time: "15m", msg: "[BRISA] Triagem emergencial — urgência: ALTA", level: "warn" },
+  { time: "18m", msg: "[SYSTEM] Health OK — latência 42ms — uptime 99.97%", level: "info" },
+  { time: "22m", msg: "[LGPD] Portabilidade processada — uid: ****-7f3a", level: "info" },
+];
 
 const salesByPlan = [
   { name: "Consultas", value: 45, color: "#39FF14" },
@@ -98,118 +120,81 @@ const salesByPlan = [
   { name: "Assinaturas", value: 10, color: "#A855F7" },
 ];
 
-const generateSecurityLogs = () => [
-  { time: "agora", msg: "[AUTH] Login admin: contato@plantayraiz.com.br — IP 187.45.xx.xx", level: "info" },
-  { time: "2m", msg: "[RLS] Tentativa de acesso negado — tabela: medical_records — uid: anon", level: "warn" },
-  { time: "5m", msg: "[ANVISA] Prescrição #RX-4521 validada — Hash SHA-256 OK", level: "info" },
-  { time: "8m", msg: "[PAYMENT] Webhook MP recebido — R$ 150,00 — split processado", level: "info" },
-  { time: "12m", msg: "[FRAUD] Score anomalia: 0.12 (baixo) — transação #TXN-8821", level: "info" },
-  { time: "15m", msg: "[BRISA] Triagem emergencial — paciente encaminhado — urgência: ALTA", level: "warn" },
-  { time: "18m", msg: "[SYSTEM] Health check OK — latência: 42ms — uptime: 99.97%", level: "info" },
-  { time: "22m", msg: "[AI] Verdinho respondeu 847 interações (últimas 24h) — satisfação: 94%", level: "info" },
-  { time: "25m", msg: "[LGPD] Solicitação de portabilidade processada — uid: ****-7f3a", level: "info" },
-  { time: "30m", msg: "[RLS] Policy audit completo — 27 tabelas — 0 violações", level: "info" },
+const leadsOriginData = [
+  { source: "Google Orgânico", leads: 420, cost: 0, color: "#39FF14" },
+  { source: "Instagram Ads", leads: 285, cost: 3200, color: "#FF6B9D" },
+  { source: "WhatsApp", leads: 180, cost: 0, color: "#25D366" },
+  { source: "Referral", leads: 145, cost: 500, color: "#00D4FF" },
+  { source: "Facebook Ads", leads: 95, cost: 1800, color: "#3483fa" },
+  { source: "TikTok", leads: 60, cost: 900, color: "#A855F7" },
 ];
 
-// 4. Sentiment keywords simulation
 const SENTIMENT_KEYWORDS = {
-  positive: ["ótimo", "excelente", "obrigado", "ajudou", "recomendo", "maravilhoso", "melhorou", "parabéns"],
-  neutral: ["consulta", "receita", "produto", "quando", "como", "preço", "plano", "agenda"],
-  negative: ["erro", "lentidão", "não consigo", "demora", "caro", "problema", "cancelar", "ruim"],
+  positive: ["ótimo", "excelente", "obrigado", "ajudou", "recomendo"],
+  negative: ["erro", "lentidão", "não consigo", "demora", "cancelar"],
 };
 
-const generateSentimentData = () => {
-  const hours = [];
-  for (let i = 23; i >= 0; i--) {
-    const h = new Date();
-    h.setHours(h.getHours() - i);
-    hours.push({
-      hora: `${h.getHours().toString().padStart(2, "0")}h`,
-      positivo: Math.floor(40 + Math.random() * 45),
-      neutro: Math.floor(20 + Math.random() * 25),
-      negativo: Math.floor(2 + Math.random() * 18),
-    });
-  }
-  return hours;
+/* ═══ HELPERS ═══ */
+const fmtCurrency = (v: number) => `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+const heatColor = (i: number) => i > 80 ? "#FF000099" : i > 60 ? "#FF6B3580" : i > 40 ? "#FFB80060" : "#39FF1430";
+
+const exportCSV = (headers: string[], rows: string[][], filename: string) => {
+  const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = `${filename}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast.success(`${filename}.csv exportado com sucesso!`);
 };
 
-// 5. Conversion funnel data
-const generateFunnelData = () => [
-  { name: "Home", value: 1000 + Math.floor(Math.random() * 500), fill: "#39FF14" },
-  { name: "Página de Serviço", value: 650 + Math.floor(Math.random() * 200), fill: "#00D4FF" },
-  { name: "Clicou Agendar", value: 320 + Math.floor(Math.random() * 100), fill: "#A855F7" },
-  { name: "Página Pagamento", value: 180 + Math.floor(Math.random() * 60), fill: "#FF6B35" },
-  { name: "Pagamento Concluído", value: 85 + Math.floor(Math.random() * 30), fill: "#39FF14" },
-];
-
-/* ═══════════════════════════════════════════════════
-   MAIN COMPONENT
-   ═══════════════════════════════════════════════════ */
+/* ═══ MAIN COMPONENT ═══ */
 const AdminMaster = () => {
-  const [markers, setMarkers] = useState(generateUserMarkers());
+  const [activeTab, setActiveTab] = useState<Department>("overview");
+  const [userRole] = useState<string>("admin"); // Future: fetch from user_roles
+  const [markers, setMarkers] = useState(generateMarkers());
   const [revenueData] = useState(generateRevenueData());
   const [securityLogs] = useState(generateSecurityLogs());
   const [hoveredMarker, setHoveredMarker] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
   const [pulsePhase, setPulsePhase] = useState(0);
   const [mapMode, setMapMode] = useState<"users" | "heatmap">("users");
+  const [sentimentData] = useState(generateSentimentData());
+  const [funnelData, setFunnelData] = useState(generateFunnelData());
 
-  // Real data from Supabase
+  // Real data
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalDoctors, setTotalDoctors] = useState(0);
   const [onlineDoctors, setOnlineDoctors] = useState(0);
   const [doctorsList, setDoctorsList] = useState<any[]>([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [recentPayments, setRecentPayments] = useState<any[]>([]);
-  const [aiEvents, setAiEvents] = useState<any[]>([]);
-  const [alertSubscribers, setAlertSubscribers] = useState(0);
-  // Sales tracking
   const [vendorTxs, setVendorTxs] = useState<any[]>([]);
   const [escrowTxs, setEscrowTxs] = useState<any[]>([]);
   const [appointments, setAppointments] = useState<any[]>([]);
-  const [salesFilter, setSalesFilter] = useState<"all" | "marketplace" | "consultation" | "club">("all");
+  const [vendorProducts, setVendorProducts] = useState<any[]>([]);
+  const [alertSubscribers, setAlertSubscribers] = useState(0);
   const [salesSearch, setSalesSearch] = useState("");
   const [salesTab, setSalesTab] = useState("todas");
-  // New intelligence layers
-  const [sentimentData] = useState(generateSentimentData());
-  const [funnelData, setFunnelData] = useState(generateFunnelData());
-  const [sentimentAlert, setSentimentAlert] = useState(false);
-  const [vendorProducts, setVendorProducts] = useState<any[]>([]);
 
   const loadDashboardData = useCallback(async () => {
     const [
-      { count: usersCount },
-      { data: doctors },
-      { data: escrows },
-      { data: payments },
-      { data: events },
-      { count: subsCount },
-      { data: vTxs },
-      { data: allEscrows },
-      { data: appts },
-      { data: vProducts },
+      { count: usersCount }, { data: doctors }, { data: escrows }, { data: payments },
+      { count: subsCount }, { data: vTxs }, { data: allEscrows }, { data: appts }, { data: vProducts },
     ] = await Promise.all([
       supabase.from("profiles").select("*", { count: "exact", head: true }),
       supabase.from("doctors").select("id, user_id, specialty, is_online, is_verified, rating, total_consultations, crm, crm_state").order("is_online", { ascending: false }),
       supabase.from("escrow_transactions").select("amount, status, type, created_at").eq("status", "released"),
       supabase.from("payment_webhooks").select("*").order("created_at", { ascending: false }).limit(10),
-      supabase.from("ai_events").select("*").order("created_at", { ascending: false }).limit(5),
       supabase.from("product_alert_subscriptions").select("*", { count: "exact", head: true }).eq("is_active", true),
       supabase.from("vendor_transactions").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("escrow_transactions").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("appointments").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("vendor_products").select("id, name, stock, sold_count, is_active, category, vendor_id").order("stock", { ascending: true }).limit(20),
     ]);
-
     setTotalUsers(usersCount || 0);
-    if (doctors) {
-      setTotalDoctors(doctors.length);
-      setOnlineDoctors(doctors.filter(d => d.is_online).length);
-      setDoctorsList(doctors);
-    }
+    if (doctors) { setTotalDoctors(doctors.length); setOnlineDoctors(doctors.filter(d => d.is_online).length); setDoctorsList(doctors); }
     if (escrows) setTotalRevenue(escrows.reduce((s, e) => s + Number(e.amount), 0));
     if (payments) setRecentPayments(payments);
-    if (events) setAiEvents(events);
     setAlertSubscribers(subsCount || 0);
     if (vTxs) setVendorTxs(vTxs);
     if (allEscrows) setEscrowTxs(allEscrows);
@@ -221,95 +206,74 @@ const AdminMaster = () => {
   useEffect(() => {
     loadDashboardData();
     const interval = setInterval(() => {
-      setMarkers(generateUserMarkers());
+      setMarkers(generateMarkers());
       setPulsePhase(p => p + 1);
       setFunnelData(generateFunnelData());
-      // Check sentiment alert
-      const lastSentiment = sentimentData[sentimentData.length - 1];
-      if (lastSentiment && lastSentiment.negativo > 15) {
-        setSentimentAlert(true);
-      }
     }, 5000);
     return () => clearInterval(interval);
-  }, [loadDashboardData, sentimentData]);
+  }, [loadDashboardData]);
 
-  // Real-time subscriptions
   useEffect(() => {
-    const channel = supabase
-      .channel("admin-master-realtime")
+    const ch = supabase.channel("admin-master-rt")
       .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, () => loadDashboardData())
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "payment_webhooks" }, () => loadDashboardData())
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "profiles" }, () => loadDashboardData())
       .on("postgres_changes", { event: "*", schema: "public", table: "vendor_transactions" }, () => loadDashboardData())
-      .on("postgres_changes", { event: "*", schema: "public", table: "escrow_transactions" }, () => loadDashboardData())
-      .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, () => loadDashboardData())
       .on("postgres_changes", { event: "*", schema: "public", table: "vendor_products" }, () => loadDashboardData())
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { supabase.removeChannel(ch); };
   }, [loadDashboardData]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
-  };
+  const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = "/"; };
 
-  const fmtCurrency = (v: number) => `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
   const simulatedMonthlyRevenue = 47850 + totalRevenue;
-  const simulatedAnnualRevenue = simulatedMonthlyRevenue * 12;
   const conversionRate = totalUsers > 0 ? ((totalDoctors * 3.2 / totalUsers) * 100).toFixed(1) : "0";
 
-  // Doctor burnout simulation
-  const doctorPerformance = useMemo(() => {
-    return doctorsList.map(doc => {
-      const hoursOnline = Math.floor(Math.random() * 10);
-      const avgResponseMin = Math.floor(1 + Math.random() * 8);
-      const avgConsultMin = Math.floor(15 + Math.random() * 30);
-      const nps = Math.floor(60 + Math.random() * 40);
-      const isBurnout = hoursOnline >= 6;
-      const npsDropping = nps < 70;
-      return {
-        ...doc,
-        hoursOnline,
-        avgResponseMin,
-        avgConsultMin,
-        nps,
-        isBurnout,
-        npsDropping,
-        fatigueLevel: isBurnout ? "critical" : hoursOnline >= 4 ? "warning" : "ok",
-      };
-    });
-  }, [doctorsList]);
+  /* ═══ ALERT ZONE CALCULATION ═══ */
+  const alertZone = useMemo<AlertZone>(() => {
+    const openSACCount = Math.floor(Math.random() * 20); // simulated
+    const paymentFailing = recentPayments.some(p => p.status === "rejected" || p.status === "refunded");
+    const longQueueDoctor = doctorsList.some(d => d.is_online && (d.total_consultations || 0) > 50);
+    if (paymentFailing || longQueueDoctor) return "red";
+    const lowStock = vendorProducts.filter(p => p.stock <= 5 && p.is_active).length > 0;
+    if (openSACCount > 10 || lowStock) return "yellow";
+    return "green";
+  }, [recentPayments, doctorsList, vendorProducts]);
 
-  // Sentiment totals
+  const zoneStyles: Record<AlertZone, { bg: string; border: string; label: string; icon: any }> = {
+    green:  { bg: "#39FF1410", border: "#39FF1440", label: "OPERAÇÃO NORMAL", icon: CheckCircle2 },
+    yellow: { bg: "#FFB80010", border: "#FFB80040", label: "ATENÇÃO — SAC/ESTOQUE", icon: AlertTriangle },
+    red:    { bg: "#FF444410", border: "#FF444440", label: "CRÍTICO — AÇÃO IMEDIATA", icon: XCircle },
+  };
+
+  const doctorPerformance = useMemo(() => doctorsList.map(doc => {
+    const hoursOnline = Math.floor(Math.random() * 10);
+    const nps = Math.floor(60 + Math.random() * 40);
+    return { ...doc, hoursOnline, avgResponseMin: Math.floor(1 + Math.random() * 8), avgConsultMin: Math.floor(15 + Math.random() * 30), nps, isBurnout: hoursOnline >= 6, fatigueLevel: hoursOnline >= 6 ? "critical" : hoursOnline >= 4 ? "warning" : "ok" };
+  }), [doctorsList]);
+
   const sentimentTotals = useMemo(() => {
     const last = sentimentData.slice(-6);
     const pos = last.reduce((s, d) => s + d.positivo, 0);
     const neu = last.reduce((s, d) => s + d.neutro, 0);
     const neg = last.reduce((s, d) => s + d.negativo, 0);
     const total = pos + neu + neg;
-    return {
-      positive: total ? Math.round((pos / total) * 100) : 0,
-      neutral: total ? Math.round((neu / total) * 100) : 0,
-      negative: total ? Math.round((neg / total) * 100) : 0,
-      mood: neg > pos ? "critical" : neg > neu ? "warning" : "positive",
-    };
+    return { positive: total ? Math.round((pos / total) * 100) : 0, neutral: total ? Math.round((neu / total) * 100) : 0, negative: total ? Math.round((neg / total) * 100) : 0, mood: neg > pos ? "critical" : neg > neu ? "warning" : "positive" as string };
   }, [sentimentData]);
 
-  // Low stock alerts
-  const lowStockProducts = useMemo(() => {
-    return vendorProducts.filter(p => p.stock <= 5 && p.is_active);
-  }, [vendorProducts]);
-
-  // Supply chain stages (simulated)
+  const lowStockProducts = useMemo(() => vendorProducts.filter(p => p.stock <= 5 && p.is_active), [vendorProducts]);
   const supplyChain = useMemo(() => {
     const paid = vendorTxs.filter(t => t.status === "completed" || t.status === "approved").length || 12;
-    const separating = Math.floor(paid * 0.6);
-    const shipped = Math.floor(paid * 0.35);
-    const delivered = Math.floor(paid * 0.2);
-    return { paid, separating, shipped, delivered, total: paid };
+    return { paid, separating: Math.floor(paid * 0.6), shipped: Math.floor(paid * 0.35), delivered: Math.floor(paid * 0.2), total: paid };
   }, [vendorTxs]);
 
-  /* ─── Sales tracking helpers ─── */
+  const canAccess = (dept: Department) => {
+    const config = DEPARTMENT_CONFIG[dept];
+    return config.roles.includes(userRole);
+  };
+
+  const visibleDepts = (Object.keys(DEPARTMENT_CONFIG) as Department[]).filter(canAccess);
+
   const statusBadge = (status: string) => {
     const map: Record<string, { bg: string; color: string; label: string }> = {
       approved: { bg: "#39FF1420", color: "#39FF14", label: "Aprovado" },
@@ -326,816 +290,699 @@ const AdminMaster = () => {
     return <span className="text-[9px] px-2 py-0.5 rounded-full font-medium" style={{ background: s.bg, color: s.color }}>{s.label}</span>;
   };
 
-  const txRow = (id: string, type: string, typeColor: string, amount: number, fee: number, status: string, date: string) => (
-    <div key={id} className="grid grid-cols-2 md:grid-cols-7 gap-2 px-3 py-2.5 rounded-lg items-center hover:scale-[1.005] transition-all" style={{ background: "#0A0E2790" }}>
-      <span className="text-[10px] font-mono truncate text-white">{id.slice(0, 8)}...</span>
-      <span className="text-[10px] font-medium" style={{ color: typeColor }}>{type}</span>
-      <span className="text-xs font-bold text-white">{fmtCurrency(amount)}</span>
-      <span className="text-[10px]" style={{ color: "#FF6B35" }}>{fmtCurrency(fee)}</span>
-      <span>{statusBadge(status)}</span>
-      <span className="text-[10px]" style={{ color: "#ffffff50" }}>{new Date(date).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
-      <span className="flex gap-1">
-        <button className="p-1 rounded hover:bg-white/5" title="Detalhes"><Eye size={12} style={{ color: "#00D4FF" }} /></button>
-        <button className="p-1 rounded hover:bg-white/5" title="Exportar"><FileText size={12} style={{ color: "#39FF14" }} /></button>
-      </span>
+  /* ═══ EXPORT HELPERS ═══ */
+  const exportFinanceiro = () => exportCSV(
+    ["Tipo", "Valor", "Taxa", "Status", "Data"],
+    [...vendorTxs.map(t => ["Marketplace", String(t.amount), String(t.platform_fee), t.status, t.created_at]),
+     ...escrowTxs.map(t => [t.type, String(t.amount), String(t.platform_fee), t.status, t.created_at])],
+    `financeiro_${new Date().toISOString().slice(0, 10)}`
+  );
+  const exportLogistica = () => exportCSV(
+    ["Produto", "Estoque", "Vendidos", "Categoria", "Ativo"],
+    vendorProducts.map(p => [p.name, String(p.stock), String(p.sold_count), p.category, p.is_active ? "Sim" : "Não"]),
+    `logistica_${new Date().toISOString().slice(0, 10)}`
+  );
+  const exportCompliance = () => exportCSV(
+    ["Médico CRM", "Estado", "Especialidade", "Verificado", "Online"],
+    doctorsList.map(d => [`CRM ${d.crm}`, d.crm_state, d.specialty, d.is_verified ? "Sim" : "Não", d.is_online ? "Sim" : "Não"]),
+    `compliance_${new Date().toISOString().slice(0, 10)}`
+  );
+
+  /* ═══ RENDER SECTIONS ═══ */
+  const renderZoneBanner = () => {
+    const z = zoneStyles[alertZone];
+    return (
+      <motion.div animate={alertZone === "red" ? { opacity: [1, 0.7, 1] } : {}} transition={{ repeat: Infinity, duration: 1.5 }}
+        className="flex items-center gap-3 px-4 py-2.5 rounded-xl" style={{ background: z.bg, border: `1px solid ${z.border}` }}>
+        <z.icon size={18} style={{ color: z.border.replace("40", "") }} />
+        <div>
+          <p className="text-xs font-bold" style={{ color: z.border.replace("40", "") }}>{z.label}</p>
+          <p className="text-[10px]" style={{ color: "#ffffff50" }}>
+            {alertZone === "green" && "Todos os sistemas operando normalmente."}
+            {alertZone === "yellow" && "Verifique SAC ou estoque com níveis baixos."}
+            {alertZone === "red" && "Falha de pagamento ou fila médica longa detectada!"}
+          </p>
+        </div>
+      </motion.div>
+    );
+  };
+
+  const renderKPIs = () => (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {[
+        { label: "Faturamento Mensal", value: fmtCurrency(simulatedMonthlyRevenue), icon: DollarSign, change: "+12.5%", up: true, color: "#39FF14" },
+        { label: "Usuários Total", value: totalUsers.toLocaleString(), icon: Users, change: `+${Math.floor(totalUsers * 0.08)}`, up: true, color: "#00D4FF" },
+        { label: "Médicos Online", value: `${onlineDoctors}/${totalDoctors}`, icon: Stethoscope, change: onlineDoctors > 0 ? "Ativos" : "Offline", up: onlineDoctors > 0, color: "#FF6B35" },
+        { label: "Conversão", value: `${conversionRate}%`, icon: TrendingUp, change: "Meta: 35%", up: Number(conversionRate) > 20, color: "#A855F7" },
+      ].map((kpi, i) => (
+        <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
+          <Card className="border-0 shadow-2xl" style={{ background: "#0F1340", borderLeft: `3px solid ${kpi.color}` }}>
+            <CardContent className="p-3 md:p-4">
+              <div className="flex items-start justify-between mb-1">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${kpi.color}15` }}>
+                  <kpi.icon size={16} style={{ color: kpi.color }} />
+                </div>
+                <span className={`text-[10px] flex items-center gap-0.5 ${kpi.up ? "text-green-400" : "text-red-400"}`}>
+                  {kpi.up ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}{kpi.change}
+                </span>
+              </div>
+              <p className="text-lg font-bold text-white">{kpi.value}</p>
+              <p className="text-[10px]" style={{ color: "#ffffff50" }}>{kpi.label}</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      ))}
     </div>
   );
 
-  const filterTx = (items: any[], searchFields: string[]) => {
-    if (!salesSearch) return items;
-    const q = salesSearch.toLowerCase();
-    return items.filter(item => searchFields.some(f => String(item[f] || "").toLowerCase().includes(q)));
+  const renderMap = () => (
+    <Card className="border-0" style={{ background: "#0F1340" }}>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#39FF14" }}>
+            <Globe size={16} /> {mapMode === "users" ? "Geolocalização" : "🌡️ Heatmap Patologias"}
+          </CardTitle>
+          <Button size="sm" variant="ghost" onClick={() => setMapMode(m => m === "users" ? "heatmap" : "users")} className="text-[10px] gap-1 h-7" style={{ color: mapMode === "heatmap" ? "#FF6B35" : "#39FF14", background: "#ffffff08" }}>
+            <ThermometerSun size={12} /> {mapMode === "users" ? "Heatmap" : "Usuários"}
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="p-0 md:p-2">
+        <div style={{ background: "#080B20" }}>
+          <ComposableMap projection="geoMercator" projectionConfig={{ scale: 150, center: [-45, -10] }} style={{ width: "100%", height: "auto", maxHeight: 380 }}>
+            <Geographies geography={GEO_URL}>
+              {({ geographies }) => geographies.map(geo => (
+                <Geography key={geo.rsmKey || geo.id} geography={geo} fill="#1a1f4e" stroke="#39FF1420" strokeWidth={0.5} style={{ hover: { fill: "#252b66" } }} />
+              ))}
+            </Geographies>
+            {markers.map((m, i) => (
+              <Marker key={m.name} coordinates={m.coordinates} onMouseEnter={() => setHoveredMarker(m.name)} onMouseLeave={() => setHoveredMarker(null)}>
+                {mapMode === "heatmap" ? (
+                  <>
+                    <circle r={Math.max(12, m.heatIntensity / 4)} fill={heatColor(m.heatIntensity)} opacity={0.5 + Math.sin(pulsePhase + i) * 0.15} />
+                    <circle r={Math.max(6, m.heatIntensity / 8)} fill={heatColor(m.heatIntensity)} opacity={0.8} />
+                  </>
+                ) : (
+                  <>
+                    {m.online && <circle r={8 + Math.sin(pulsePhase + i) * 2} fill="none" stroke={m.recentLogin ? "#00D4FF" : "#39FF14"} strokeWidth={1} opacity={0.4} />}
+                    <circle r={Math.max(3, Math.min(m.users / 100, 8))} fill={m.recentLogin ? "#00D4FF" : m.online ? "#39FF14" : "#FF4444"} opacity={m.online ? 0.9 : 0.5} style={{ cursor: "pointer" }} />
+                  </>
+                )}
+                {hoveredMarker === m.name && (
+                  <g><rect x={12} y={-22} width={170} height={36} rx={6} fill="#0A0E27" stroke="#39FF14" strokeWidth={0.5} />
+                    <text x={18} y={-6} fontSize={10} fill="#39FF14" fontWeight="bold">{m.name}</text>
+                    <text x={18} y={8} fontSize={9} fill="#ffffff80">{mapMode === "heatmap" ? `🔥 ${m.topCondition} ${m.heatIntensity}%` : `${m.users} usuários`}</text>
+                  </g>
+                )}
+              </Marker>
+            ))}
+          </ComposableMap>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  /* ═══ TAB: OVERVIEW ═══ */
+  const renderOverview = () => (
+    <div className="space-y-4">
+      {renderKPIs()}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div className="xl:col-span-2">{renderMap()}</div>
+        {/* Doctors Sidebar */}
+        <Card className="border-0" style={{ background: "#0F1340" }}>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#00D4FF" }}><Stethoscope size={16} /> Profissionais ({totalDoctors})</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            <ScrollArea className="h-[340px] px-4 pb-3">
+              {doctorsList.map(doc => (
+                <div key={doc.id} className="flex items-center gap-3 p-2 rounded-lg mb-1" style={{ background: doc.is_online ? "#39FF1408" : "#ffffff05" }}>
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: "#1a1f4e", color: doc.is_online ? "#39FF14" : "#ffffff40" }}>{doc.specialty?.charAt(0) || "M"}</div>
+                    <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 ${doc.is_online ? "animate-pulse" : ""}`} style={{ borderColor: "#0F1340", background: doc.is_online ? "#39FF14" : "#666" }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-medium text-white truncate">CRM {doc.crm}/{doc.crm_state}</p>
+                    <p className="text-[9px] truncate" style={{ color: "#ffffff50" }}>{doc.specialty} • ⭐ {doc.rating || "5.0"}</p>
+                  </div>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: doc.is_online ? "#39FF1420" : "#ffffff10", color: doc.is_online ? "#39FF14" : "#ffffff40" }}>{doc.is_online ? "Online" : "Offline"}</span>
+                </div>
+              ))}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+      {/* System Health + Logs + Payments */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="border-0" style={{ background: "#0F1340" }}>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#00D4FF" }}><Bot size={16} /> Saúde do Sistema</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            {[
+              { name: "Brisa IA", status: "Ativa", color: "#39FF14", icon: Heart },
+              { name: "Verdinho", status: "Ativo", color: "#39FF14", icon: Bot },
+              { name: "Mercado Pago", status: "Conectado", color: "#39FF14", icon: CreditCard },
+              { name: "Supabase RT", status: "Online", color: "#39FF14", icon: Database },
+              { name: "Twilio", status: "Ativo", color: "#39FF14", icon: MessageSquare },
+            ].map(sys => (
+              <div key={sys.name} className="flex items-center gap-2 p-2 rounded-lg" style={{ background: "#ffffff05" }}>
+                <sys.icon size={13} style={{ color: sys.color }} />
+                <span className="flex-1 text-[11px] text-white">{sys.name}</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: `${sys.color}15`, color: sys.color }}>{sys.status}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+        <Card className="border-0" style={{ background: "#0F1340" }}>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#FF6B35" }}><Terminal size={16} /> Logs de Segurança</CardTitle></CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[200px]">
+              <div className="font-mono text-[10px] space-y-1" style={{ color: "#ffffff80" }}>
+                {securityLogs.map((l, i) => (
+                  <div key={i} className="flex gap-2"><span style={{ color: "#39FF1460" }}>[{l.time}]</span><span style={{ color: l.level === "warn" ? "#FFB800" : "#ffffff60" }}>{l.msg}</span></div>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+        <Card className="border-0" style={{ background: "#0F1340" }}>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#39FF14" }}><CreditCard size={16} /> Pagamentos Recentes</CardTitle></CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[200px]">
+              {(recentPayments.length === 0 ? [
+                { status: "approved", amount: 150, payer_email: "p***@gmail.com", created_at: new Date().toISOString() },
+                { status: "approved", amount: 89.90, payer_email: "m***@outlook.com", created_at: new Date().toISOString() },
+                { status: "approved", amount: 299, payer_email: "c***@yahoo.com", created_at: new Date().toISOString() },
+              ] : recentPayments).map((p: any, i: number) => (
+                <div key={i} className="flex items-center justify-between p-2 rounded-lg mb-1" style={{ background: "#ffffff05" }}>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ background: p.status === "approved" ? "#39FF14" : "#FFB800" }} />
+                    <span className="text-[10px] text-white">{p.payer_email || "—"}</span>
+                  </div>
+                  <span className="text-xs font-medium" style={{ color: "#39FF14" }}>{fmtCurrency(Number(p.amount || 0))}</span>
+                </div>
+              ))}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  /* ═══ TAB: FINANCEIRO ═══ */
+  const renderFinanceiro = () => {
+    const totalVendorSales = vendorTxs.reduce((s, t) => s + Number(t.amount), 0);
+    const totalEscrowVal = escrowTxs.reduce((s, t) => s + Number(t.amount), 0);
+    const platformFees = vendorTxs.reduce((s, t) => s + Number(t.platform_fee), 0) + escrowTxs.reduce((s, t) => s + Number(t.platform_fee), 0);
+    const doctorPayout = escrowTxs.reduce((s, t) => s + Number(t.doctor_payout || 0), 0);
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold" style={{ color: "#39FF14" }}>💰 Painel Financeiro</h2>
+          <Button size="sm" variant="ghost" onClick={exportFinanceiro} className="gap-1 text-[10px]" style={{ color: "#39FF14" }}><Download size={12} /> Exportar CSV</Button>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { label: "Receita Bruta", value: fmtCurrency(simulatedMonthlyRevenue), color: "#39FF14" },
+            { label: "Repasse Médicos", value: fmtCurrency(doctorPayout || simulatedMonthlyRevenue * 0.93), color: "#00D4FF" },
+            { label: "Taxas Plataforma (7%)", value: fmtCurrency(platformFees || simulatedMonthlyRevenue * 0.07), color: "#FF6B35" },
+            { label: "Saldo em Conta", value: fmtCurrency(platformFees || simulatedMonthlyRevenue * 0.07), color: "#A855F7" },
+          ].map((c, i) => (
+            <Card key={i} className="border-0" style={{ background: "#0F1340", borderLeft: `3px solid ${c.color}` }}>
+              <CardContent className="p-3"><p className="text-[10px]" style={{ color: "#ffffff50" }}>{c.label}</p><p className="text-lg font-bold text-white">{c.value}</p></CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Card className="border-0" style={{ background: "#0F1340" }}>
+            <CardHeader className="pb-2"><CardTitle className="text-sm" style={{ color: "#39FF14" }}>Receita Diária (30d)</CardTitle></CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={240}>
+                <AreaChart data={revenueData}>
+                  <defs><linearGradient id="gGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#39FF14" stopOpacity={0.3} /><stop offset="100%" stopColor="#39FF14" stopOpacity={0} /></linearGradient></defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+                  <XAxis dataKey="date" tick={{ fill: "#ffffff30", fontSize: 9 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: "#ffffff30", fontSize: 9 }} axisLine={false} tickLine={false} tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
+                  <RechartsTooltip contentStyle={{ background: "#0A0E27", border: "1px solid #39FF1440", borderRadius: 8, fontSize: 11 }} />
+                  <Area type="monotone" dataKey="receita" stroke="#39FF14" strokeWidth={2} fill="url(#gGrad)" />
+                  <Area type="monotone" dataKey="consultas" stroke="#00D4FF" strokeWidth={1} fill="none" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+          <Card className="border-0" style={{ background: "#0F1340" }}>
+            <CardHeader className="pb-0"><CardTitle className="text-sm" style={{ color: "#A855F7" }}>Distribuição de Vendas</CardTitle></CardHeader>
+            <CardContent className="flex flex-col items-center">
+              <ResponsiveContainer width="100%" height={180}>
+                <PieChart><Pie data={salesByPlan} cx="50%" cy="50%" innerRadius={50} outerRadius={75} dataKey="value" stroke="none">{salesByPlan.map((e, i) => <Cell key={i} fill={e.color} />)}</Pie><RechartsTooltip contentStyle={{ background: "#0A0E27", border: "1px solid #39FF1440", borderRadius: 8, fontSize: 11 }} /></PieChart>
+              </ResponsiveContainer>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-1">{salesByPlan.map(s => (
+                <div key={s.name} className="flex items-center gap-1.5 text-[10px]"><span className="w-2 h-2 rounded-full" style={{ background: s.color }} /><span style={{ color: "#ffffff80" }}>{s.name} ({s.value}%)</span></div>
+              ))}</div>
+            </CardContent>
+          </Card>
+        </div>
+        {/* Transaction List */}
+        <Card className="border-0" style={{ background: "#0F1340" }}>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#39FF14" }}><BarChart3 size={16} /> Todas as Transações</CardTitle>
+              <div className="relative"><Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2" style={{ color: "#ffffff40" }} />
+                <input value={salesSearch} onChange={e => setSalesSearch(e.target.value)} placeholder="Buscar..." className="pl-7 pr-3 py-1.5 rounded-md text-[11px] w-40 outline-none" style={{ background: "#1a1f4e", color: "#fff", border: "1px solid #ffffff15" }} />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={salesTab} onValueChange={setSalesTab}>
+              <TabsList className="mb-2 border-0" style={{ background: "#0A0E27" }}>
+                <TabsTrigger value="todas" className="text-[10px] data-[state=active]:text-black data-[state=active]:bg-[#39FF14]">Todas</TabsTrigger>
+                <TabsTrigger value="marketplace" className="text-[10px] data-[state=active]:text-black data-[state=active]:bg-[#3483fa]">Marketplace</TabsTrigger>
+                <TabsTrigger value="escrow" className="text-[10px] data-[state=active]:text-black data-[state=active]:bg-[#00D4FF]">Escrow</TabsTrigger>
+              </TabsList>
+              <ScrollArea className="h-[300px]">
+                <div className="hidden md:grid grid-cols-6 gap-2 px-3 py-1.5 text-[9px] font-semibold" style={{ color: "#ffffff40" }}>
+                  <span>ID</span><span>Tipo</span><span>Valor</span><span>Taxa</span><span>Status</span><span>Data</span>
+                </div>
+                <TabsContent value="todas" className="mt-0 space-y-0.5">
+                  {[...vendorTxs.map(t => ({ ...t, _label: "🛒 MKT", _color: "#3483fa" })), ...escrowTxs.map(t => ({ ...t, _label: "🩺 ESC", _color: "#00D4FF" }))]
+                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                    .filter(t => !salesSearch || JSON.stringify(t).toLowerCase().includes(salesSearch.toLowerCase()))
+                    .slice(0, 40).map((t, i) => (
+                      <div key={`${t.id}-${i}`} className="grid grid-cols-3 md:grid-cols-6 gap-2 px-3 py-2 rounded-lg" style={{ background: "#0A0E2790" }}>
+                        <span className="text-[9px] font-mono text-white truncate">{t.id.slice(0, 8)}…</span>
+                        <span className="text-[9px]" style={{ color: t._color }}>{t._label}</span>
+                        <span className="text-[10px] font-bold text-white">{fmtCurrency(Number(t.amount))}</span>
+                        <span className="text-[9px]" style={{ color: "#FF6B35" }}>{fmtCurrency(Number(t.platform_fee))}</span>
+                        {statusBadge(t.status)}
+                        <span className="text-[9px]" style={{ color: "#ffffff40" }}>{new Date(t.created_at).toLocaleDateString("pt-BR")}</span>
+                      </div>
+                    ))}
+                </TabsContent>
+                <TabsContent value="marketplace" className="mt-0 space-y-0.5">
+                  {vendorTxs.slice(0, 30).map((t, i) => (
+                    <div key={i} className="grid grid-cols-3 md:grid-cols-6 gap-2 px-3 py-2 rounded-lg" style={{ background: "#0A0E2790" }}>
+                      <span className="text-[9px] font-mono text-white truncate">{t.id.slice(0, 8)}…</span><span className="text-[9px]" style={{ color: "#3483fa" }}>🛒</span>
+                      <span className="text-[10px] font-bold text-white">{fmtCurrency(Number(t.amount))}</span><span className="text-[9px]" style={{ color: "#FF6B35" }}>{fmtCurrency(Number(t.platform_fee))}</span>
+                      {statusBadge(t.status)}<span className="text-[9px]" style={{ color: "#ffffff40" }}>{new Date(t.created_at).toLocaleDateString("pt-BR")}</span>
+                    </div>
+                  ))}
+                </TabsContent>
+                <TabsContent value="escrow" className="mt-0 space-y-0.5">
+                  {escrowTxs.slice(0, 30).map((t, i) => (
+                    <div key={i} className="grid grid-cols-3 md:grid-cols-6 gap-2 px-3 py-2 rounded-lg" style={{ background: "#0A0E2790" }}>
+                      <span className="text-[9px] font-mono text-white truncate">{t.id.slice(0, 8)}…</span><span className="text-[9px]" style={{ color: "#00D4FF" }}>🩺</span>
+                      <span className="text-[10px] font-bold text-white">{fmtCurrency(Number(t.amount))}</span><span className="text-[9px]" style={{ color: "#FF6B35" }}>{fmtCurrency(Number(t.platform_fee))}</span>
+                      {statusBadge(t.status)}<span className="text-[9px]" style={{ color: "#ffffff40" }}>{new Date(t.created_at).toLocaleDateString("pt-BR")}</span>
+                    </div>
+                  ))}
+                </TabsContent>
+              </ScrollArea>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    );
   };
 
-  const renderVendorTransactions = () => {
-    const filtered = filterTx(vendorTxs, ["id", "status", "type"]);
-    if (filtered.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhuma transação marketplace</p>;
-    return filtered.map(t => txRow(t.id, "🛒 Marketplace", "#3483fa", t.amount, t.platform_fee, t.status, t.created_at));
-  };
+  /* ═══ TAB: OPERACIONAL (SAC/VENDAS) ═══ */
+  const renderOperacional = () => (
+    <div className="space-y-4">
+      <h2 className="text-sm font-bold" style={{ color: "#00D4FF" }}>📞 SAC / Vendas — Operacional</h2>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { label: "Atendimentos Ativos", value: `${Math.floor(3 + Math.random() * 12)}`, color: "#00D4FF" },
+          { label: "Tempo Médio Resposta", value: `${Math.floor(2 + Math.random() * 6)} min`, color: "#39FF14" },
+          { label: "Tickets Abertos", value: `${Math.floor(1 + Math.random() * 8)}`, color: "#FFB800" },
+          { label: "NPS Geral", value: `${Math.floor(75 + Math.random() * 20)}`, color: "#A855F7" },
+        ].map((c, i) => (
+          <Card key={i} className="border-0" style={{ background: "#0F1340", borderLeft: `3px solid ${c.color}` }}>
+            <CardContent className="p-3"><p className="text-[10px]" style={{ color: "#ffffff50" }}>{c.label}</p><p className="text-xl font-bold text-white">{c.value}</p></CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Live Feed */}
+        <Card className="border-0" style={{ background: "#0F1340" }}>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#00D4FF" }}><Activity size={16} /> Live Feed de Atendimentos</CardTitle></CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[280px]">
+              {[
+                { user: "Maria S.", type: "Chat Brisa", time: "agora", status: "Em andamento" },
+                { user: "João P.", type: "Agendamento", time: "2min", status: "Concluído" },
+                { user: "Ana R.", type: "Suporte Pagamento", time: "5min", status: "Esperando" },
+                { user: "Carlos M.", type: "Dúvida Receita", time: "8min", status: "Em andamento" },
+                { user: "Patrícia L.", type: "Cancelamento", time: "12min", status: "Resolvido" },
+                { user: "Roberto A.", type: "Bug Report", time: "15min", status: "Escalado" },
+                { user: "Fernanda C.", type: "Assinatura Club", time: "18min", status: "Concluído" },
+              ].map((a, i) => (
+                <div key={i} className="flex items-center justify-between p-2.5 rounded-lg mb-1" style={{ background: "#0A0E2790" }}>
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold" style={{ background: "#1a1f4e", color: "#00D4FF" }}>{a.user.charAt(0)}</div>
+                    <div><p className="text-[10px] text-white font-medium">{a.user}</p><p className="text-[9px]" style={{ color: "#ffffff40" }}>{a.type} • {a.time}</p></div>
+                  </div>
+                  <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: a.status === "Em andamento" ? "#00D4FF20" : a.status === "Concluído" || a.status === "Resolvido" ? "#39FF1420" : "#FFB80020", color: a.status === "Em andamento" ? "#00D4FF" : a.status === "Concluído" || a.status === "Resolvido" ? "#39FF14" : "#FFB800" }}>{a.status}</span>
+                </div>
+              ))}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+        {/* Funil de Vendas */}
+        <Card className="border-0" style={{ background: "#0F1340" }}>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#39FF14" }}><TrendingDown size={16} /> Funil de Conversão Live</CardTitle></CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {funnelData.map((stage, i) => {
+                const prevValue = i === 0 ? stage.value : funnelData[i - 1].value;
+                const dropRate = i === 0 ? 0 : Math.round(((prevValue - stage.value) / prevValue) * 100);
+                const pct = Math.round((stage.value / funnelData[0].value) * 100);
+                return (
+                  <div key={stage.name}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] text-white">{stage.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold text-white">{stage.value}</span>
+                        {dropRate > 0 && <span className="text-[9px] px-1 py-0.5 rounded-full" style={{ background: dropRate > 50 ? "#FF444420" : "#FFB80020", color: dropRate > 50 ? "#FF4444" : "#FFB800" }}>-{dropRate}%</span>}
+                      </div>
+                    </div>
+                    <div className="w-full h-4 rounded-md" style={{ background: "#0A0E27" }}>
+                      <motion.div className="h-full rounded-md" style={{ background: `${stage.fill}40`, borderRight: `2px solid ${stage.fill}`, width: `${pct}%` }} initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1 }} />
+                    </div>
+                    {dropRate > 50 && <p className="text-[8px] mt-0.5 text-red-400 flex items-center gap-1"><AlertTriangle size={9} /> Gargalo!</p>}
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      {/* Sentiment */}
+      <Card className="border-0" style={{ background: "#0F1340" }}>
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#A855F7" }}>{sentimentTotals.mood === "positive" ? <Smile size={16} /> : <Frown size={16} />} Mood da Plataforma</CardTitle></CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3 mb-3">
+            <div className="text-center p-2 rounded-lg" style={{ background: "#39FF1410" }}><p className="text-lg font-bold text-white">{sentimentTotals.positive}%</p><p className="text-[9px]" style={{ color: "#39FF14" }}>Positivo</p></div>
+            <div className="text-center p-2 rounded-lg" style={{ background: "#FFB80010" }}><p className="text-lg font-bold text-white">{sentimentTotals.neutral}%</p><p className="text-[9px]" style={{ color: "#FFB800" }}>Neutro</p></div>
+            <div className="text-center p-2 rounded-lg" style={{ background: "#FF444410" }}><p className="text-lg font-bold text-white">{sentimentTotals.negative}%</p><p className="text-[9px]" style={{ color: "#FF4444" }}>Negativo</p></div>
+          </div>
+          <ResponsiveContainer width="100%" height={150}>
+            <AreaChart data={sentimentData.slice(-12)}>
+              <defs><linearGradient id="sp2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#39FF14" stopOpacity={0.3} /><stop offset="100%" stopColor="#39FF14" stopOpacity={0} /></linearGradient></defs>
+              <XAxis dataKey="hora" tick={{ fill: "#ffffff30", fontSize: 9 }} axisLine={false} tickLine={false} />
+              <Area type="monotone" dataKey="positivo" stroke="#39FF14" fill="url(#sp2)" strokeWidth={1.5} />
+              <Area type="monotone" dataKey="negativo" stroke="#FF4444" fill="none" strokeWidth={1.5} />
+              <RechartsTooltip contentStyle={{ background: "#0A0E27", border: "1px solid #ffffff20", borderRadius: 8, fontSize: 10 }} />
+            </AreaChart>
+          </ResponsiveContainer>
+          <div className="flex flex-wrap gap-1 mt-2">
+            {SENTIMENT_KEYWORDS.positive.slice(0, 3).map(w => <span key={w} className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: "#39FF1415", color: "#39FF14" }}>+{w}</span>)}
+            {SENTIMENT_KEYWORDS.negative.slice(0, 3).map(w => <span key={w} className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: "#FF444415", color: "#FF4444" }}>-{w}</span>)}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
-  const renderEscrowTransactions = () => {
-    const filtered = filterTx(escrowTxs, ["id", "status", "type"]);
-    if (filtered.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhuma transação escrow</p>;
-    return filtered.map(t => txRow(t.id, t.type === "consultation" ? "🩺 Consulta" : "📦 Pedido", "#00D4FF", t.amount, t.platform_fee, t.status, t.created_at));
-  };
+  /* ═══ TAB: LOGÍSTICA ═══ */
+  const renderLogistica = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-bold" style={{ color: "#FF6B35" }}>📦 Logística & Reposição</h2>
+        <Button size="sm" variant="ghost" onClick={exportLogistica} className="gap-1 text-[10px]" style={{ color: "#FF6B35" }}><Download size={12} /> Exportar CSV</Button>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { label: "Pedidos Pagos", value: supplyChain.paid, icon: CreditCard, color: "#39FF14" },
+          { label: "Em Separação", value: supplyChain.separating, icon: Package, color: "#00D4FF" },
+          { label: "Enviados", value: supplyChain.shipped, icon: Truck, color: "#FF6B35" },
+          { label: "Entregues", value: supplyChain.delivered, icon: CheckCircle2, color: "#A855F7" },
+        ].map((s, i) => (
+          <Card key={i} className="border-0" style={{ background: "#0F1340", borderLeft: `3px solid ${s.color}` }}>
+            <CardContent className="p-3 flex items-center gap-3">
+              <s.icon size={18} style={{ color: s.color }} />
+              <div><p className="text-[10px]" style={{ color: "#ffffff50" }}>{s.label}</p><p className="text-xl font-bold text-white">{s.value}</p></div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      {/* Pipeline Progress */}
+      <Card className="border-0" style={{ background: "#0F1340" }}>
+        <CardHeader className="pb-2"><CardTitle className="text-sm" style={{ color: "#FF6B35" }}>Pipeline de Pedidos</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          {[
+            { label: "Pagos → Separação", value: supplyChain.separating, total: supplyChain.paid, color: "#39FF14" },
+            { label: "Separação → Envio", value: supplyChain.shipped, total: supplyChain.separating, color: "#00D4FF" },
+            { label: "Envio → Entrega", value: supplyChain.delivered, total: supplyChain.shipped, color: "#A855F7" },
+          ].map((s, i) => (
+            <div key={i}>
+              <div className="flex justify-between text-[10px] mb-1"><span className="text-white">{s.label}</span><span style={{ color: s.color }}>{s.total > 0 ? Math.round((s.value / s.total) * 100) : 0}%</span></div>
+              <div className="w-full h-3 rounded-full" style={{ background: "#0A0E27" }}>
+                <motion.div className="h-full rounded-full" style={{ background: s.color, width: `${s.total > 0 ? (s.value / s.total) * 100 : 0}%` }} initial={{ width: 0 }} animate={{ width: `${s.total > 0 ? (s.value / s.total) * 100 : 0}%` }} transition={{ duration: 1, delay: i * 0.2 }} />
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+      {/* Low Stock Alerts */}
+      <Card className="border-0" style={{ background: "#0F1340", border: lowStockProducts.length > 0 ? "1px solid #FF444430" : "none" }}>
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#FF4444" }}><AlertTriangle size={16} /> Alertas de Ruptura ({lowStockProducts.length})</CardTitle></CardHeader>
+        <CardContent>
+          {lowStockProducts.length === 0 ? (
+            <p className="text-xs text-center py-4" style={{ color: "#39FF14" }}>✅ Estoque normalizado</p>
+          ) : (
+            <ScrollArea className="h-[200px]">
+              {lowStockProducts.map(p => (
+                <div key={p.id} className="flex items-center justify-between p-2.5 rounded-lg mb-1" style={{ background: "#FF444410" }}>
+                  <div><p className="text-[10px] text-white font-medium">{p.name}</p><p className="text-[9px]" style={{ color: "#ffffff40" }}>{p.category}</p></div>
+                  <span className="text-xs font-bold" style={{ color: p.stock === 0 ? "#FF4444" : "#FFB800" }}>{p.stock === 0 ? "ESGOTADO" : `${p.stock} un.`}</span>
+                </div>
+              ))}
+            </ScrollArea>
+          )}
+        </CardContent>
+      </Card>
+      {/* All Products */}
+      <Card className="border-0" style={{ background: "#0F1340" }}>
+        <CardHeader className="pb-2"><CardTitle className="text-sm" style={{ color: "#00D4FF" }}>Inventário Completo</CardTitle></CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[250px]">
+            <div className="hidden md:grid grid-cols-5 gap-2 px-3 py-1.5 text-[9px] font-semibold" style={{ color: "#ffffff40" }}><span>Produto</span><span>Categoria</span><span>Estoque</span><span>Vendidos</span><span>Status</span></div>
+            {vendorProducts.map(p => (
+              <div key={p.id} className="grid grid-cols-3 md:grid-cols-5 gap-2 px-3 py-2 rounded-lg mb-0.5" style={{ background: "#0A0E2790" }}>
+                <span className="text-[10px] text-white truncate">{p.name}</span>
+                <span className="text-[9px]" style={{ color: "#ffffff50" }}>{p.category}</span>
+                <span className="text-[10px] font-bold" style={{ color: p.stock <= 5 ? "#FF4444" : p.stock <= 20 ? "#FFB800" : "#39FF14" }}>{p.stock}</span>
+                <span className="text-[10px] text-white">{p.sold_count}</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: p.is_active ? "#39FF1420" : "#FF444420", color: p.is_active ? "#39FF14" : "#FF4444" }}>{p.is_active ? "Ativo" : "Inativo"}</span>
+              </div>
+            ))}
+          </ScrollArea>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
-  const renderAppointmentTransactions = () => {
-    const filtered = filterTx(appointments, ["id", "status", "payment_status"]);
-    if (filtered.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhum agendamento</p>;
-    return filtered.map(a => txRow(a.id, "📅 Agendamento", "#FF6B35", a.amount, a.amount * 0.07, a.payment_status || a.status, a.created_at));
-  };
+  /* ═══ TAB: JURÍDICO/COMPLIANCE ═══ */
+  const renderJuridico = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-bold" style={{ color: "#A855F7" }}>⚖️ Compliance & Jurídico</h2>
+        <Button size="sm" variant="ghost" onClick={exportCompliance} className="gap-1 text-[10px]" style={{ color: "#A855F7" }}><Download size={12} /> Exportar CSV</Button>
+      </div>
+      {/* Doctor CRM Approval */}
+      <Card className="border-0" style={{ background: "#0F1340" }}>
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#A855F7" }}><FileText size={16} /> Aprovação de Receitas & CRM</CardTitle></CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[300px]">
+            <div className="hidden md:grid grid-cols-6 gap-2 px-3 py-1.5 text-[9px] font-semibold" style={{ color: "#ffffff40" }}>
+              <span>Médico</span><span>CRM/UF</span><span>Especialidade</span><span>Verificado</span><span>Receitas</span><span>Status CRM</span>
+            </div>
+            {doctorsList.map(doc => {
+              const crmExpiring = Math.random() > 0.8;
+              return (
+                <div key={doc.id} className="grid grid-cols-3 md:grid-cols-6 gap-2 px-3 py-2.5 rounded-lg mb-0.5 items-center" style={{ background: crmExpiring ? "#FFB80008" : "#0A0E2790", border: crmExpiring ? "1px solid #FFB80025" : "none" }}>
+                  <span className="text-[10px] text-white font-medium">{doc.specialty?.charAt(0)} Dr.</span>
+                  <span className="text-[10px] font-mono" style={{ color: "#00D4FF" }}>{doc.crm}/{doc.crm_state}</span>
+                  <span className="text-[9px]" style={{ color: "#ffffff50" }}>{doc.specialty}</span>
+                  <span>{doc.is_verified
+                    ? <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "#39FF1420", color: "#39FF14" }}>✅ Verificado</span>
+                    : <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "#FF444420", color: "#FF4444" }}>❌ Pendente</span>}
+                  </span>
+                  <span className="text-[10px] text-white">{doc.total_consultations || 0}</span>
+                  <span>{crmExpiring
+                    ? <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "#FFB80020", color: "#FFB800" }}>⚠️ Vencendo</motion.span>
+                    : <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "#39FF1420", color: "#39FF14" }}>Válido</span>}
+                  </span>
+                </div>
+              );
+            })}
+          </ScrollArea>
+        </CardContent>
+      </Card>
+      {/* Burnout Table */}
+      <Card className="border-0" style={{ background: "#0F1340" }}>
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#FF6B35" }}><Flame size={16} /> Performance & Burnout</CardTitle></CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[250px]">
+            <div className="hidden md:grid grid-cols-7 gap-2 px-3 py-1.5 text-[9px] font-semibold" style={{ color: "#ffffff40" }}>
+              <span>Médico</span><span>Especialidade</span><span>Horas Online</span><span>Resp. Média</span><span>NPS</span><span>Fadiga</span><span>Ação</span>
+            </div>
+            {doctorPerformance.map(doc => (
+              <div key={doc.id} className="grid grid-cols-3 md:grid-cols-7 gap-2 px-3 py-2 rounded-lg mb-0.5 items-center" style={{ background: doc.isBurnout ? "#FF444410" : "#0A0E2790" }}>
+                <span className="text-[10px] text-white">CRM {doc.crm}/{doc.crm_state}</span>
+                <span className="text-[9px]" style={{ color: "#ffffff50" }}>{doc.specialty}</span>
+                <span className="text-[10px] font-bold" style={{ color: doc.isBurnout ? "#FF4444" : doc.fatigueLevel === "warning" ? "#FFB800" : "#39FF14" }}>{doc.hoursOnline}h</span>
+                <span className="text-[9px]" style={{ color: "#ffffff70" }}>{doc.avgResponseMin}min</span>
+                <span className="text-[10px] font-bold" style={{ color: doc.nps >= 80 ? "#39FF14" : doc.nps >= 60 ? "#FFB800" : "#FF4444" }}>{doc.nps}</span>
+                <span>{doc.isBurnout
+                  ? <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: "#FF444430", color: "#FF4444" }}>⚠️ FADIGA</motion.span>
+                  : <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "#39FF1420", color: "#39FF14" }}>OK</span>}
+                </span>
+                <Button size="sm" variant="ghost" className="h-6 text-[9px]" style={{ color: "#00D4FF" }}><MessageSquare size={10} /></Button>
+              </div>
+            ))}
+          </ScrollArea>
+        </CardContent>
+      </Card>
+      {/* Security Logs */}
+      <Card className="border-0" style={{ background: "#0F1340" }}>
+        <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#FF6B35" }}><Terminal size={16} /> Logs LGPD / ANVISA</CardTitle></CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[180px]">
+            <div className="font-mono text-[10px] space-y-1 p-2 rounded-lg" style={{ background: "#080B20", color: "#ffffff70" }}>
+              {securityLogs.map((l, i) => (
+                <div key={i} className="flex gap-2"><span style={{ color: "#39FF1460" }}>[{l.time}]</span><span style={{ color: l.level === "warn" ? "#FFB800" : "#ffffff50" }}>{l.msg}</span></div>
+              ))}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+    </div>
+  );
 
-  const renderAllTransactions = () => {
-    const all = [
-      ...vendorTxs.map(t => ({ ...t, _type: "marketplace", _typeLabel: "🛒 Marketplace", _typeColor: "#3483fa", _fee: t.platform_fee })),
-      ...escrowTxs.map(t => ({ ...t, _type: "escrow", _typeLabel: t.type === "consultation" ? "🩺 Consulta" : "📦 Pedido", _typeColor: "#00D4FF", _fee: t.platform_fee })),
-      ...appointments.map(a => ({ ...a, _type: "appointment", _typeLabel: "📅 Agendamento", _typeColor: "#FF6B35", amount: a.amount, _fee: a.amount * 0.07, status: a.payment_status || a.status })),
-    ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    const filtered = salesFilter === "all" ? all
-      : salesFilter === "marketplace" ? all.filter(t => t._type === "marketplace")
-      : salesFilter === "consultation" ? all.filter(t => t._type === "escrow" || t._type === "appointment")
-      : all;
-    const searched = salesSearch ? filtered.filter(t => JSON.stringify(t).toLowerCase().includes(salesSearch.toLowerCase())) : filtered;
-    if (searched.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhuma transação encontrada</p>;
-    return searched.slice(0, 50).map((t, i) => (
-      <div key={`${t.id}-${i}`}>{txRow(t.id, t._typeLabel, t._typeColor, Number(t.amount), Number(t._fee), t.status, t.created_at)}</div>
-    ));
-  };
+  /* ═══ TAB: MARKETING ═══ */
+  const renderMarketing = () => (
+    <div className="space-y-4">
+      <h2 className="text-sm font-bold" style={{ color: "#FF6B9D" }}>📣 Marketing & Leads</h2>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { label: "Leads Total", value: leadsOriginData.reduce((s, l) => s + l.leads, 0).toString(), color: "#FF6B9D" },
+          { label: "Custo Total Ads", value: fmtCurrency(leadsOriginData.reduce((s, l) => s + l.cost, 0)), color: "#FF6B35" },
+          { label: "CPL Médio", value: fmtCurrency(leadsOriginData.reduce((s, l) => s + l.cost, 0) / leadsOriginData.reduce((s, l) => s + l.leads, 0)), color: "#00D4FF" },
+          { label: "Alertas Inscritos", value: alertSubscribers.toString(), color: "#39FF14" },
+        ].map((c, i) => (
+          <Card key={i} className="border-0" style={{ background: "#0F1340", borderLeft: `3px solid ${c.color}` }}>
+            <CardContent className="p-3"><p className="text-[10px]" style={{ color: "#ffffff50" }}>{c.label}</p><p className="text-lg font-bold text-white">{c.value}</p></CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Lead Origins Chart */}
+        <Card className="border-0" style={{ background: "#0F1340" }}>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#FF6B9D" }}><Target size={16} /> Origem dos Leads</CardTitle></CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={leadsOriginData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+                <XAxis type="number" tick={{ fill: "#ffffff30", fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="source" tick={{ fill: "#ffffff60", fontSize: 9 }} axisLine={false} tickLine={false} width={100} />
+                <RechartsTooltip contentStyle={{ background: "#0A0E27", border: "1px solid #ffffff20", borderRadius: 8, fontSize: 10 }} />
+                <Bar dataKey="leads" radius={[0, 4, 4, 0]}>{leadsOriginData.map((e, i) => <Cell key={i} fill={e.color} />)}</Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        {/* Cost Per Conversion */}
+        <Card className="border-0" style={{ background: "#0F1340" }}>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#00D4FF" }}><PieChartIcon size={16} /> Custo por Conversão</CardTitle></CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[240px]">
+              {leadsOriginData.filter(l => l.cost > 0).map((l, i) => {
+                const cpl = l.leads > 0 ? l.cost / l.leads : 0;
+                return (
+                  <div key={i} className="flex items-center justify-between p-2.5 rounded-lg mb-1.5" style={{ background: "#0A0E2790" }}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ background: l.color }} />
+                      <div><p className="text-[10px] text-white">{l.source}</p><p className="text-[9px]" style={{ color: "#ffffff40" }}>{l.leads} leads</p></div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs font-bold" style={{ color: cpl < 15 ? "#39FF14" : cpl < 30 ? "#FFB800" : "#FF4444" }}>{fmtCurrency(cpl)}/lead</p>
+                      <p className="text-[9px]" style={{ color: "#ffffff30" }}>Total: {fmtCurrency(l.cost)}</p>
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="mt-3 p-3 rounded-lg" style={{ background: "#39FF1408" }}>
+                <p className="text-[10px] font-bold" style={{ color: "#39FF14" }}>💡 Canais Orgânicos (Custo Zero)</p>
+                {leadsOriginData.filter(l => l.cost === 0).map((l, i) => (
+                  <div key={i} className="flex items-center justify-between mt-1">
+                    <span className="text-[9px] text-white">{l.source}</span>
+                    <span className="text-[9px] font-bold" style={{ color: "#39FF14" }}>{l.leads} leads</span>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 
-  /* ═══ HEATMAP COLOR HELPER ═══ */
-  const heatColor = (intensity: number) => {
-    if (intensity > 80) return "#FF000099";
-    if (intensity > 60) return "#FF6B3580";
-    if (intensity > 40) return "#FFB80060";
-    return "#39FF1430";
-  };
-
+  /* ═══ MAIN RENDER ═══ */
   return (
     <div className="min-h-screen" style={{ background: "#0A0E27" }}>
       {/* Header */}
       <header className="sticky top-0 z-50 border-b backdrop-blur-xl" style={{ borderColor: "#39FF1420", background: "#0A0E27EE" }}>
-        <div className="flex items-center justify-between px-4 md:px-8 h-16">
+        <div className="flex items-center justify-between px-4 md:px-6 h-14">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #39FF14, #00D4FF)" }}>
-              <Shield size={20} className="text-black" />
-            </div>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #39FF14, #00D4FF)" }}><Shield size={18} className="text-black" /></div>
             <div>
-              <h1 className="text-sm md:text-base font-bold" style={{ color: "#39FF14" }}>MANUS CEO — ADMIN MASTER</h1>
-              <p className="text-[10px] md:text-xs" style={{ color: "#39FF1480" }}>Centro de Comando 360° • Planta y Raiz</p>
+              <h1 className="text-sm font-bold" style={{ color: "#39FF14" }}>MANUS CEO — COMMAND CENTER</h1>
+              <p className="text-[9px]" style={{ color: "#39FF1460" }}>360° • Planta y Raiz • RBAC: {userRole.toUpperCase()}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 md:gap-4">
-            {sentimentAlert && (
-              <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="flex items-center gap-1 px-2 py-1 rounded-full" style={{ background: "#FF444430" }}>
-                <Volume2 size={12} className="text-red-400" />
-                <span className="text-[10px] text-red-400 font-bold">ALERTA SENTIMENTO</span>
-              </motion.div>
-            )}
-            <div className="hidden md:flex items-center gap-2 text-xs" style={{ color: "#39FF1480" }}>
+          <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-1.5 text-[10px]" style={{ color: "#39FF1460" }}>
               <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#39FF14" }} />
               Ao vivo • {lastRefresh.toLocaleTimeString("pt-BR")}
             </div>
-            <Button size="sm" variant="ghost" onClick={loadDashboardData} className="gap-1" style={{ color: "#39FF14" }}>
-              <RefreshCw size={14} /> <span className="hidden md:inline">Atualizar</span>
-            </Button>
-            <Button size="sm" variant="ghost" onClick={handleLogout} className="gap-1 text-red-400 hover:text-red-300">
-              <LogOut size={14} /> <span className="hidden md:inline">Sair</span>
-            </Button>
+            <Button size="sm" variant="ghost" onClick={loadDashboardData} className="gap-1 h-8" style={{ color: "#39FF14" }}><RefreshCw size={13} /></Button>
+            <Button size="sm" variant="ghost" onClick={handleLogout} className="gap-1 h-8 text-red-400 hover:text-red-300"><LogOut size={13} /></Button>
           </div>
         </div>
       </header>
 
-      <div className="p-3 md:p-6 space-y-4 md:space-y-6 max-w-[1920px] mx-auto">
-        {/* KPI Cards Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-          {[
-            { label: "Faturamento Mensal", value: fmtCurrency(simulatedMonthlyRevenue), icon: DollarSign, change: "+12.5%", up: true, color: "#39FF14" },
-            { label: "Usuários Total", value: totalUsers.toLocaleString(), icon: Users, change: `+${Math.floor(totalUsers * 0.08)}`, up: true, color: "#00D4FF" },
-            { label: "Médicos Online", value: `${onlineDoctors}/${totalDoctors}`, icon: Stethoscope, change: onlineDoctors > 0 ? "Ativos" : "Offline", up: onlineDoctors > 0, color: "#FF6B35" },
-            { label: "Conversão", value: `${conversionRate}%`, icon: TrendingUp, change: "Meta: 35%", up: Number(conversionRate) > 20, color: "#A855F7" },
-          ].map((kpi, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-              <Card className="border-0 shadow-2xl" style={{ background: "#0F1340", borderLeft: `3px solid ${kpi.color}` }}>
-                <CardContent className="p-3 md:p-5">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg flex items-center justify-center" style={{ background: `${kpi.color}15` }}>
-                      <kpi.icon size={18} style={{ color: kpi.color }} />
-                    </div>
-                    <span className={`text-[10px] md:text-xs flex items-center gap-0.5 ${kpi.up ? "text-green-400" : "text-red-400"}`}>
-                      {kpi.up ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                      {kpi.change}
-                    </span>
-                  </div>
-                  <p className="text-lg md:text-2xl font-bold text-white">{kpi.value}</p>
-                  <p className="text-[10px] md:text-xs mt-1" style={{ color: "#ffffff60" }}>{kpi.label}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+      <div className="p-3 md:p-5 max-w-[1920px] mx-auto space-y-4">
+        {/* Alert Zone Banner */}
+        {renderZoneBanner()}
 
-        {/* ═══ 1. MAP WITH HEATMAP TOGGLE + SIDEBAR ═══ */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
-          <motion.div className="xl:col-span-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-            <Card className="border-0 overflow-hidden" style={{ background: "#0F1340" }}>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <CardTitle className="text-sm md:text-base flex items-center gap-2" style={{ color: "#39FF14" }}>
-                    <Globe size={18} /> {mapMode === "users" ? "Mapa de Usuários" : "🌡️ Heatmap de Patologias"}
-                  </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm" variant="ghost"
-                      onClick={() => setMapMode(m => m === "users" ? "heatmap" : "users")}
-                      className="text-[10px] gap-1 h-7"
-                      style={{ color: mapMode === "heatmap" ? "#FF6B35" : "#39FF14", background: "#ffffff08" }}
-                    >
-                      <ThermometerSun size={12} />
-                      {mapMode === "users" ? "Heatmap" : "Usuários"}
-                    </Button>
-                    <div className="flex items-center gap-3 text-[10px]">
-                      {mapMode === "users" ? (
-                        <>
-                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full animate-pulse bg-green-400" /> Online</span>
-                          <span className="flex items-center gap-1 text-red-400"><span className="w-2 h-2 rounded-full bg-red-500" /> Offline</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#FF0000" }} /> Alta</span>
-                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#FFB800" }} /> Média</span>
-                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#39FF14" }} /> Baixa</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0 md:p-2">
-                <div className="relative" style={{ background: "#080B20" }}>
-                  <ComposableMap
-                    projection="geoMercator"
-                    projectionConfig={{ scale: 150, center: [-45, -10] }}
-                    style={{ width: "100%", height: "auto", maxHeight: 450 }}
-                  >
-                    <Geographies geography={GEO_URL}>
-                      {({ geographies }) =>
-                        geographies.map((geo) => (
-                          <Geography
-                            key={geo.rpiKey || geo.id || geo.properties?.name}
-                            geography={geo}
-                            fill="#1a1f4e"
-                            stroke="#39FF1420"
-                            strokeWidth={0.5}
-                            style={{ hover: { fill: "#252b66" } }}
-                          />
-                        ))
-                      }
-                    </Geographies>
-                    {markers.map((m, i) => (
-                      <Marker
-                        key={m.name}
-                        coordinates={m.coordinates}
-                        onMouseEnter={() => setHoveredMarker(m.name)}
-                        onMouseLeave={() => setHoveredMarker(null)}
-                      >
-                        {mapMode === "heatmap" ? (
-                          <>
-                            {/* Heatmap glow rings */}
-                            <circle r={Math.max(12, m.heatIntensity / 4)} fill={heatColor(m.heatIntensity)} opacity={0.5 + Math.sin(pulsePhase + i) * 0.15} />
-                            <circle r={Math.max(6, m.heatIntensity / 8)} fill={heatColor(m.heatIntensity)} opacity={0.8} />
-                          </>
-                        ) : (
-                          <>
-                            {m.online && (
-                              <circle r={8 + Math.sin(pulsePhase + i) * 2} fill="none" stroke={m.recentLogin ? "#00D4FF" : "#39FF14"} strokeWidth={1} opacity={0.4} />
-                            )}
-                            <circle
-                              r={Math.max(3, Math.min(m.users / 100, 8))}
-                              fill={m.recentLogin ? "#00D4FF" : m.online ? "#39FF14" : "#FF4444"}
-                              opacity={m.online ? 0.9 : 0.5}
-                              style={{ cursor: "pointer" }}
-                            />
-                          </>
-                        )}
-                        {hoveredMarker === m.name && (
-                          <g>
-                            <rect x={12} y={-28} width={180} height={48} rx={6} fill="#0A0E27" stroke={mapMode === "heatmap" ? "#FF6B35" : "#39FF14"} strokeWidth={0.5} />
-                            <text x={18} y={-12} fontSize={10} fill={mapMode === "heatmap" ? "#FF6B35" : "#39FF14"} fontWeight="bold">{m.name}</text>
-                            <text x={18} y={2} fontSize={9} fill="#ffffff80">
-                              {mapMode === "heatmap" ? `🔥 ${m.topCondition} — Intensidade: ${m.heatIntensity}%` : `${m.users} usuários • ${m.online ? "Online" : "Offline"}`}
-                            </text>
-                            {mapMode === "heatmap" && PATHOLOGY_DATA[m.name] && (
-                              <text x={18} y={14} fontSize={8} fill="#ffffff50">
-                                {PATHOLOGY_DATA[m.name].map(p => p.condition).join(", ")}
-                              </text>
-                            )}
-                          </g>
-                        )}
-                      </Marker>
-                    ))}
-                  </ComposableMap>
-                </div>
-                {/* Heatmap legend bar */}
-                {mapMode === "heatmap" && (
-                  <div className="px-4 py-2 flex flex-wrap gap-2">
-                    {Object.entries(PATHOLOGY_DATA).slice(0, 6).map(([city, conditions]) => (
-                      <div key={city} className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]" style={{ background: "#ffffff08" }}>
-                        <span className="w-2 h-2 rounded-full" style={{ background: conditions[0]?.color || "#39FF14" }} />
-                        <span className="text-white font-medium">{city}:</span>
-                        <span style={{ color: "#ffffff60" }}>{conditions.map(c => c.condition).join(", ")}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
+        {/* Department Tabs */}
+        <Tabs value={activeTab} onValueChange={v => setActiveTab(v as Department)}>
+          <TabsList className="w-full justify-start overflow-x-auto border-0 h-auto p-1 flex-wrap gap-1" style={{ background: "#0F1340" }}>
+            {visibleDepts.map(dept => {
+              const cfg = DEPARTMENT_CONFIG[dept];
+              return (
+                <TabsTrigger
+                  key={dept}
+                  value={dept}
+                  className="text-[10px] md:text-[11px] gap-1.5 px-3 py-2 data-[state=active]:text-black rounded-lg transition-all"
+                  style={{ ["--tw-shadow" as any]: "none" }}
+                  data-active-bg={cfg.color}
+                >
+                  <cfg.icon size={13} />
+                  {cfg.label}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
 
-          {/* Sidebar: Doctors Online */}
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}>
-            <Card className="border-0 h-full" style={{ background: "#0F1340" }}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#00D4FF" }}>
-                  <Stethoscope size={16} /> Profissionais ({totalDoctors})
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
-                {doctorsList.length === 0 && (
-                  <p className="text-xs text-center py-4" style={{ color: "#ffffff40" }}>Nenhum profissional cadastrado</p>
-                )}
-                {doctorsList.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="flex items-center gap-3 p-2.5 rounded-lg transition-all hover:scale-[1.01]"
-                    style={{ background: doc.is_online ? "#39FF1408" : "#ffffff05" }}
-                  >
-                    <div className="relative">
-                      <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: "#1a1f4e", color: doc.is_online ? "#39FF14" : "#ffffff40" }}>
-                        {doc.specialty?.charAt(0) || "M"}
-                      </div>
-                      <span
-                        className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 ${doc.is_online ? "animate-pulse" : ""}`}
-                        style={{ borderColor: "#0F1340", background: doc.is_online ? "#39FF14" : doc.is_verified ? "#FFB800" : "#666" }}
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-white truncate">CRM {doc.crm}/{doc.crm_state}</p>
-                      <p className="text-[10px] truncate" style={{ color: "#ffffff50" }}>{doc.specialty} • ⭐ {doc.rating || "5.0"}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{
-                        background: doc.is_online ? "#39FF1420" : "#ffffff10",
-                        color: doc.is_online ? "#39FF14" : "#ffffff40"
-                      }}>
-                        {doc.is_online ? "Online" : "Offline"}
-                      </span>
-                      <span className="text-[9px]" style={{ color: "#ffffff30" }}>{doc.total_consultations || 0} consultas</span>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
+          <TabsContent value="overview" className="mt-4">{renderOverview()}</TabsContent>
+          <TabsContent value="financeiro" className="mt-4">{renderFinanceiro()}</TabsContent>
+          <TabsContent value="operacional" className="mt-4">{renderOperacional()}</TabsContent>
+          <TabsContent value="logistica" className="mt-4">{renderLogistica()}</TabsContent>
+          <TabsContent value="juridico" className="mt-4">{renderJuridico()}</TabsContent>
+          <TabsContent value="marketing" className="mt-4">{renderMarketing()}</TabsContent>
+        </Tabs>
 
-        {/* ═══ 2. DOCTOR BURNOUT & PERFORMANCE ═══ */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
-          <Card className="border-0" style={{ background: "#0F1340" }}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm md:text-base flex items-center gap-2" style={{ color: "#FF6B35" }}>
-                <Flame size={18} /> Performance & Burnout Médico
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {doctorPerformance.length === 0 ? (
-                <p className="text-center text-xs py-4" style={{ color: "#ffffff30" }}>Nenhum médico cadastrado</p>
-              ) : (
-                <>
-                  {/* Table Header */}
-                  <div className="hidden md:grid grid-cols-8 gap-2 px-3 py-2 rounded-t-lg text-[10px] font-semibold" style={{ background: "#0A0E27", color: "#ffffff50" }}>
-                    <span>Médico</span><span>Especialidade</span><span>Tempo Online</span><span>Resp. Média</span>
-                    <span>Consulta Média</span><span>NPS</span><span>Status Fadiga</span><span>Ação</span>
-                  </div>
-                  <div className="space-y-1 max-h-[300px] overflow-y-auto">
-                    {doctorPerformance.map(doc => (
-                      <div
-                        key={doc.id}
-                        className="grid grid-cols-2 md:grid-cols-8 gap-2 px-3 py-2.5 rounded-lg items-center"
-                        style={{
-                          background: doc.isBurnout ? "#FF444410" : doc.fatigueLevel === "warning" ? "#FFB80008" : "#0A0E2790",
-                          border: doc.isBurnout ? "1px solid #FF444430" : "none",
-                        }}
-                      >
-                        <span className="text-[10px] text-white font-medium">CRM {doc.crm}/{doc.crm_state}</span>
-                        <span className="text-[10px]" style={{ color: "#ffffff60" }}>{doc.specialty}</span>
-                        <span className="text-[10px] font-bold" style={{ color: doc.isBurnout ? "#FF4444" : doc.fatigueLevel === "warning" ? "#FFB800" : "#39FF14" }}>
-                          {doc.hoursOnline}h
-                        </span>
-                        <span className="text-[10px]" style={{ color: "#ffffff80" }}>{doc.avgResponseMin}min</span>
-                        <span className="text-[10px]" style={{ color: "#ffffff80" }}>{doc.avgConsultMin}min</span>
-                        <div className="flex items-center gap-1">
-                          <span className="text-[10px] font-bold" style={{ color: doc.nps >= 80 ? "#39FF14" : doc.nps >= 60 ? "#FFB800" : "#FF4444" }}>{doc.nps}</span>
-                          {doc.npsDropping && <TrendingDown size={10} className="text-red-400" />}
-                        </div>
-                        <div>
-                          {doc.isBurnout ? (
-                            <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="text-[9px] px-2 py-0.5 rounded-full font-bold" style={{ background: "#FF444430", color: "#FF4444" }}>
-                              ⚠️ FADIGA
-                            </motion.span>
-                          ) : doc.fatigueLevel === "warning" ? (
-                            <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: "#FFB80020", color: "#FFB800" }}>⚡ Atenção</span>
-                          ) : (
-                            <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: "#39FF1420", color: "#39FF14" }}>✅ OK</span>
-                          )}
-                        </div>
-                        <Button size="sm" variant="ghost" className="h-6 text-[9px]" style={{ color: "#00D4FF" }}>
-                          <MessageSquare size={10} /> Chat
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* ═══ 3. SUPPLY CHAIN + 4. SENTIMENT + 5. FUNNEL ═══ */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-
-          {/* 3. Supply Chain / Marketplace Logistics */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-            <Card className="border-0 h-full" style={{ background: "#0F1340" }}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#00D4FF" }}>
-                  <Package size={16} /> Logística Marketplace
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Pipeline Progress */}
-                {[
-                  { label: "Pedidos Pagos", value: supplyChain.paid, icon: CreditCard, color: "#39FF14" },
-                  { label: "Em Separação", value: supplyChain.separating, icon: Package, color: "#FFB800" },
-                  { label: "Enviados", value: supplyChain.shipped, icon: Truck, color: "#00D4FF" },
-                  { label: "Entregues", value: supplyChain.delivered, icon: CheckCircle2, color: "#A855F7" },
-                ].map((stage, i) => (
-                  <div key={stage.label}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] flex items-center gap-1.5" style={{ color: stage.color }}>
-                        <stage.icon size={12} /> {stage.label}
-                      </span>
-                      <span className="text-[10px] font-bold text-white">{stage.value}</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full" style={{ background: "#0A0E27" }}>
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{ background: stage.color, width: `${(stage.value / supplyChain.total) * 100}%` }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${(stage.value / supplyChain.total) * 100}%` }}
-                        transition={{ duration: 1, delay: i * 0.2 }}
-                      />
-                    </div>
-                  </div>
-                ))}
-
-                {/* Low Stock Alerts */}
-                <div className="pt-3 border-t" style={{ borderColor: "#ffffff10" }}>
-                  <p className="text-[10px] font-bold mb-2 flex items-center gap-1" style={{ color: "#FF4444" }}>
-                    <AlertTriangle size={12} /> Alerta de Ruptura ({lowStockProducts.length})
-                  </p>
-                  {lowStockProducts.length === 0 ? (
-                    <p className="text-[9px]" style={{ color: "#ffffff30" }}>Estoque normalizado ✅</p>
-                  ) : (
-                    lowStockProducts.slice(0, 4).map(p => (
-                      <div key={p.id} className="flex items-center justify-between px-2 py-1.5 rounded mb-1" style={{ background: "#FF444410" }}>
-                        <span className="text-[9px] text-white truncate max-w-[60%]">{p.name}</span>
-                        <span className="text-[9px] font-bold" style={{ color: p.stock === 0 ? "#FF4444" : "#FFB800" }}>
-                          {p.stock === 0 ? "ESGOTADO" : `${p.stock} un.`}
-                        </span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* 4. Sentiment Analysis */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
-            <Card className="border-0 h-full" style={{ background: "#0F1340", border: sentimentTotals.mood === "critical" ? "1px solid #FF444440" : "none" }}>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm flex items-center gap-2" style={{ color: sentimentTotals.mood === "critical" ? "#FF4444" : "#A855F7" }}>
-                    {sentimentTotals.mood === "positive" ? <Smile size={16} /> : sentimentTotals.mood === "warning" ? <Meh size={16} /> : <Frown size={16} />}
-                    Mood da Plataforma
-                  </CardTitle>
-                  {sentimentTotals.mood === "critical" && (
-                    <motion.span animate={{ opacity: [1, 0.3, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="text-[9px] px-2 py-0.5 rounded-full font-bold" style={{ background: "#FF444430", color: "#FF4444" }}>
-                      🚨 CRÍTICO
-                    </motion.span>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Sentiment Distribution */}
-                <div className="grid grid-cols-3 gap-2 mb-3">
-                  <div className="text-center p-2 rounded-lg" style={{ background: "#39FF1410" }}>
-                    <Smile size={14} className="mx-auto mb-1" style={{ color: "#39FF14" }} />
-                    <p className="text-lg font-bold text-white">{sentimentTotals.positive}%</p>
-                    <p className="text-[9px]" style={{ color: "#39FF14" }}>Positivo</p>
-                  </div>
-                  <div className="text-center p-2 rounded-lg" style={{ background: "#FFB80010" }}>
-                    <Meh size={14} className="mx-auto mb-1" style={{ color: "#FFB800" }} />
-                    <p className="text-lg font-bold text-white">{sentimentTotals.neutral}%</p>
-                    <p className="text-[9px]" style={{ color: "#FFB800" }}>Neutro</p>
-                  </div>
-                  <div className="text-center p-2 rounded-lg" style={{ background: "#FF444410" }}>
-                    <Frown size={14} className="mx-auto mb-1" style={{ color: "#FF4444" }} />
-                    <p className="text-lg font-bold text-white">{sentimentTotals.negative}%</p>
-                    <p className="text-[9px]" style={{ color: "#FF4444" }}>Negativo</p>
-                  </div>
-                </div>
-
-                {/* Sentiment Over Time Chart */}
-                <ResponsiveContainer width="100%" height={130}>
-                  <AreaChart data={sentimentData.slice(-12)}>
-                    <defs>
-                      <linearGradient id="sentPos" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#39FF14" stopOpacity={0.3} /><stop offset="100%" stopColor="#39FF14" stopOpacity={0} /></linearGradient>
-                      <linearGradient id="sentNeg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FF4444" stopOpacity={0.3} /><stop offset="100%" stopColor="#FF4444" stopOpacity={0} /></linearGradient>
-                    </defs>
-                    <XAxis dataKey="hora" tick={{ fill: "#ffffff30", fontSize: 9 }} axisLine={false} tickLine={false} />
-                    <Area type="monotone" dataKey="positivo" stroke="#39FF14" fill="url(#sentPos)" strokeWidth={1.5} />
-                    <Area type="monotone" dataKey="negativo" stroke="#FF4444" fill="url(#sentNeg)" strokeWidth={1.5} />
-                    <RechartsTooltip contentStyle={{ background: "#0A0E27", border: "1px solid #ffffff20", borderRadius: 8, fontSize: 10 }} />
-                  </AreaChart>
-                </ResponsiveContainer>
-
-                {/* Trending Keywords */}
-                <div className="pt-2 border-t mt-2" style={{ borderColor: "#ffffff10" }}>
-                  <p className="text-[9px] mb-1.5 font-bold" style={{ color: "#ffffff50" }}>Palavras em Destaque</p>
-                  <div className="flex flex-wrap gap-1">
-                    {SENTIMENT_KEYWORDS.positive.slice(0, 3).map(w => (
-                      <span key={w} className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: "#39FF1415", color: "#39FF14" }}>+{w}</span>
-                    ))}
-                    {SENTIMENT_KEYWORDS.negative.slice(0, 3).map(w => (
-                      <span key={w} className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: "#FF444415", color: "#FF4444" }}>-{w}</span>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* 5. Conversion Funnel (Leak Detector) */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
-            <Card className="border-0 h-full" style={{ background: "#0F1340" }}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#39FF14" }}>
-                  <TrendingDown size={16} /> Funil de Conversão Live
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {funnelData.map((stage, i) => {
-                    const prevValue = i === 0 ? stage.value : funnelData[i - 1].value;
-                    const dropRate = i === 0 ? 0 : Math.round(((prevValue - stage.value) / prevValue) * 100);
-                    const pct = Math.round((stage.value / funnelData[0].value) * 100);
-                    return (
-                      <div key={stage.name}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] text-white font-medium">{stage.name}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-white">{stage.value}</span>
-                            {dropRate > 0 && (
-                              <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{
-                                background: dropRate > 50 ? "#FF444420" : dropRate > 30 ? "#FFB80020" : "#ffffff10",
-                                color: dropRate > 50 ? "#FF4444" : dropRate > 30 ? "#FFB800" : "#ffffff60",
-                              }}>
-                                -{dropRate}%
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="relative">
-                          <div className="w-full h-5 rounded-md overflow-hidden" style={{ background: "#0A0E27" }}>
-                            <motion.div
-                              className="h-full rounded-md flex items-center justify-end pr-2"
-                              style={{ background: `${stage.fill}40`, borderRight: `2px solid ${stage.fill}` }}
-                              initial={{ width: 0 }}
-                              animate={{ width: `${pct}%` }}
-                              transition={{ duration: 1.2, delay: i * 0.15 }}
-                            >
-                              <span className="text-[8px] font-bold" style={{ color: stage.fill }}>{pct}%</span>
-                            </motion.div>
-                          </div>
-                        </div>
-                        {dropRate > 50 && (
-                          <motion.p animate={{ opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="text-[8px] mt-0.5 flex items-center gap-1" style={{ color: "#FF4444" }}>
-                            <AlertTriangle size={9} /> Gargalo detectado! Verificar checkout
-                          </motion.p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="pt-3 mt-3 border-t" style={{ borderColor: "#ffffff10" }}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px]" style={{ color: "#ffffff40" }}>Taxa conversão total</span>
-                    <span className="text-sm font-bold" style={{ color: funnelData[4]?.value / funnelData[0]?.value > 0.08 ? "#39FF14" : "#FF4444" }}>
-                      {((funnelData[4]?.value / funnelData[0]?.value) * 100).toFixed(1)}%
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Revenue Charts + Sales Distribution */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-          <motion.div className="lg:col-span-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-            <Card className="border-0" style={{ background: "#0F1340" }}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#39FF14" }}>
-                  <TrendingUp size={16} /> Receita Diária (30 dias)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={260}>
-                  <AreaChart data={revenueData}>
-                    <defs>
-                      <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#39FF14" stopOpacity={0.3} />
-                        <stop offset="100%" stopColor="#39FF14" stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.2} />
-                        <stop offset="100%" stopColor="#00D4FF" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
-                    <XAxis dataKey="date" tick={{ fill: "#ffffff40", fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fill: "#ffffff40", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
-                    <RechartsTooltip
-                      contentStyle={{ background: "#0A0E27", border: "1px solid #39FF1440", borderRadius: 8, fontSize: 12 }}
-                      labelStyle={{ color: "#39FF14" }}
-                      formatter={(v: number) => [`R$ ${v.toLocaleString("pt-BR")}`, ""]}
-                    />
-                    <Area type="monotone" dataKey="receita" stroke="#39FF14" strokeWidth={2} fill="url(#greenGrad)" name="Total" />
-                    <Area type="monotone" dataKey="consultas" stroke="#00D4FF" strokeWidth={1.5} fill="url(#blueGrad)" name="Consultas" />
-                    <Area type="monotone" dataKey="marketplace" stroke="#FF6B35" strokeWidth={1} fill="none" name="Marketplace" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
-            <Card className="border-0 h-full" style={{ background: "#0F1340" }}>
-              <CardHeader className="pb-0">
-                <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#A855F7" }}>
-                  <ShoppingBag size={16} /> Distribuição de Vendas
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col items-center justify-center">
-                <ResponsiveContainer width="100%" height={180}>
-                  <PieChart>
-                    <Pie data={salesByPlan} cx="50%" cy="50%" innerRadius={50} outerRadius={75} dataKey="value" stroke="none">
-                      {salesByPlan.map((entry, i) => (
-                        <Cell key={i} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip
-                      contentStyle={{ background: "#0A0E27", border: "1px solid #39FF1440", borderRadius: 8, fontSize: 12 }}
-                      formatter={(v: number, name: string) => [`${v}%`, name]}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-1">
-                  {salesByPlan.map(s => (
-                    <div key={s.name} className="flex items-center gap-1.5 text-[10px]">
-                      <span className="w-2 h-2 rounded-full" style={{ background: s.color }} />
-                      <span style={{ color: "#ffffff80" }}>{s.name} ({s.value}%)</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Bottom: System Health + Security Logs + Recent Payments */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-          <Card className="border-0" style={{ background: "#0F1340" }}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#00D4FF" }}>
-                <Bot size={16} /> Saúde do Sistema
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {[
-                { name: "Brisa IA (Triagem)", status: "Ativa", color: "#39FF14", icon: Heart },
-                { name: "Verdinho (Chatbot)", status: "Ativo", color: "#39FF14", icon: Bot },
-                { name: "Mercado Pago", status: "Conectado", color: "#39FF14", icon: CreditCard },
-                { name: "Supabase Realtime", status: "Online", color: "#39FF14", icon: Database },
-                { name: "Jitsi Meet", status: "Standby", color: "#FFB800", icon: Activity },
-                { name: "Twilio WhatsApp", status: "Ativo", color: "#39FF14", icon: MessageSquare },
-              ].map(sys => (
-                <div key={sys.name} className="flex items-center gap-3 p-2 rounded-lg" style={{ background: "#ffffff05" }}>
-                  <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: `${sys.color}15` }}>
-                    <sys.icon size={14} style={{ color: sys.color }} />
-                  </div>
-                  <span className="flex-1 text-xs text-white">{sys.name}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: `${sys.color}15`, color: sys.color }}>{sys.status}</span>
-                </div>
-              ))}
-              <div className="pt-2 border-t" style={{ borderColor: "#ffffff10" }}>
-                <div className="flex items-center justify-between text-[10px]" style={{ color: "#ffffff40" }}>
-                  <span>🔔 Inscritos Alertas: {alertSubscribers}</span>
-                  <span>Uptime: 99.97%</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0" style={{ background: "#0F1340" }}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#FF6B35" }}>
-                <Terminal size={16} /> Logs de Segurança
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-lg p-3 font-mono text-[10px] md:text-[11px] space-y-1.5 max-h-[320px] overflow-y-auto" style={{ background: "#080B20" }}>
-                {securityLogs.map((log, i) => (
-                  <div key={i} className="flex gap-2">
-                    <span style={{ color: "#ffffff30" }}>{log.time}</span>
-                    <span style={{ color: log.level === "warn" ? "#FFB800" : "#39FF14" }}>{log.msg}</span>
-                  </div>
-                ))}
-                <div className="flex items-center gap-1 pt-2" style={{ color: "#39FF1460" }}>
-                  <span className="animate-pulse">▌</span> Monitorando em tempo real...
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0" style={{ background: "#0F1340" }}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#39FF14" }}>
-                <CreditCard size={16} /> Pagamentos Recentes
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 max-h-[320px] overflow-y-auto">
-              {recentPayments.length === 0 ? (
-                <div className="text-center py-6">
-                  <p className="text-xs" style={{ color: "#ffffff30" }}>Aguardando pagamentos...</p>
-                  {[
-                    { status: "approved", amount: 150, email: "p***@gmail.com", time: "há 2min" },
-                    { status: "approved", amount: 89.90, email: "m***@outlook.com", time: "há 8min" },
-                    { status: "approved", amount: 299, email: "c***@yahoo.com", time: "há 15min" },
-                    { status: "pending", amount: 49.90, email: "r***@gmail.com", time: "há 22min" },
-                    { status: "approved", amount: 450, email: "a***@hotmail.com", time: "há 30min" },
-                  ].map((p, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 rounded-lg mt-2" style={{ background: "#ffffff05" }}>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full" style={{ background: p.status === "approved" ? "#39FF14" : "#FFB800" }} />
-                        <span className="text-[10px] text-white">{p.email}</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-xs font-medium" style={{ color: "#39FF14" }}>R$ {p.amount.toFixed(2)}</span>
-                        <p className="text-[9px]" style={{ color: "#ffffff30" }}>{p.time}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                recentPayments.map((p, i) => (
-                  <div key={i} className="flex items-center justify-between p-2 rounded-lg" style={{ background: "#ffffff05" }}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ background: p.status === "approved" ? "#39FF14" : "#FFB800" }} />
-                      <span className="text-[10px] text-white">{p.payer_email || "—"}</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs font-medium" style={{ color: "#39FF14" }}>R$ {(p.amount || 0).toFixed(2)}</span>
-                      <p className="text-[9px]" style={{ color: "#ffffff30" }}>{new Date(p.created_at).toLocaleTimeString("pt-BR")}</p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* ═══ SALES TRACKING SECTION ═══ */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
-          <Card className="border-0" style={{ background: "#0F1340" }}>
-            <CardHeader className="pb-3">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <CardTitle className="text-sm md:text-base flex items-center gap-2" style={{ color: "#39FF14" }}>
-                  <BarChart3 size={18} /> Rastreamento de Vendas — Todas as Transações
-                </CardTitle>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="relative">
-                    <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2" style={{ color: "#ffffff40" }} />
-                    <input
-                      value={salesSearch}
-                      onChange={e => setSalesSearch(e.target.value)}
-                      placeholder="Buscar ID, status..."
-                      className="pl-7 pr-3 py-1.5 rounded-md text-[11px] w-40 md:w-52 outline-none"
-                      style={{ background: "#1a1f4e", color: "#fff", border: "1px solid #ffffff15" }}
-                    />
-                  </div>
-                  <select
-                    value={salesFilter}
-                    onChange={e => setSalesFilter(e.target.value as any)}
-                    className="px-2 py-1.5 rounded-md text-[11px] outline-none cursor-pointer"
-                    style={{ background: "#1a1f4e", color: "#fff", border: "1px solid #ffffff15" }}
-                  >
-                    <option value="all">Todos os Tipos</option>
-                    <option value="marketplace">Marketplace</option>
-                    <option value="consultation">Consultas</option>
-                    <option value="club">Club / Assinaturas</option>
-                  </select>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {(() => {
-                const totalVendorSales = vendorTxs.reduce((s, t) => s + Number(t.amount), 0);
-                const totalEscrowVal = escrowTxs.reduce((s, t) => s + Number(t.amount), 0);
-                const totalConsultations = appointments.length;
-                const paidConsultations = appointments.filter(a => a.payment_status === "paid" || a.payment_status === "approved").length;
-                const platformFees = vendorTxs.reduce((s, t) => s + Number(t.platform_fee), 0) + escrowTxs.reduce((s, t) => s + Number(t.platform_fee), 0);
-                return (
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-                    {[
-                      { label: "Vendas Marketplace", value: fmtCurrency(totalVendorSales), icon: ShoppingBag, color: "#3483fa" },
-                      { label: "Escrow (Consultas)", value: fmtCurrency(totalEscrowVal), icon: Shield, color: "#00D4FF" },
-                      { label: "Consultas Pagas", value: `${paidConsultations}/${totalConsultations}`, icon: Stethoscope, color: "#39FF14" },
-                      { label: "Taxas Plataforma", value: fmtCurrency(platformFees), icon: DollarSign, color: "#FF6B35" },
-                      { label: "Total Transações", value: `${vendorTxs.length + escrowTxs.length + appointments.length}`, icon: Activity, color: "#A855F7" },
-                    ].map((m, i) => (
-                      <div key={i} className="p-3 rounded-lg" style={{ background: "#0A0E27", border: `1px solid ${m.color}25` }}>
-                        <div className="flex items-center gap-2 mb-1">
-                          <m.icon size={13} style={{ color: m.color }} />
-                          <span className="text-[9px] font-medium" style={{ color: "#ffffff60" }}>{m.label}</span>
-                        </div>
-                        <p className="text-sm md:text-base font-bold text-white">{m.value}</p>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })()}
-
-              <Tabs value={salesTab} onValueChange={setSalesTab}>
-                <TabsList className="mb-3 border-0" style={{ background: "#0A0E27" }}>
-                  <TabsTrigger value="todas" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#39FF14]">Todas</TabsTrigger>
-                  <TabsTrigger value="marketplace" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#3483fa]">Marketplace</TabsTrigger>
-                  <TabsTrigger value="escrow" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#00D4FF]">Escrow</TabsTrigger>
-                  <TabsTrigger value="consultas" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#FF6B35]">Consultas</TabsTrigger>
-                </TabsList>
-
-                <div className="hidden md:grid grid-cols-7 gap-2 px-3 py-2 rounded-t-lg text-[10px] font-semibold" style={{ background: "#0A0E27", color: "#ffffff50" }}>
-                  <span>ID</span><span>Tipo</span><span>Valor</span><span>Taxa</span><span>Status</span><span>Data</span><span>Ações</span>
-                </div>
-
-                <div className="max-h-[400px] overflow-y-auto space-y-1">
-                  <TabsContent value="todas" className="mt-0 space-y-1">{renderAllTransactions()}</TabsContent>
-                  <TabsContent value="marketplace" className="mt-0 space-y-1">{renderVendorTransactions()}</TabsContent>
-                  <TabsContent value="escrow" className="mt-0 space-y-1">{renderEscrowTransactions()}</TabsContent>
-                  <TabsContent value="consultas" className="mt-0 space-y-1">{renderAppointmentTransactions()}</TabsContent>
-                </div>
-              </Tabs>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Footer Stats */}
-        <div className="text-center py-4">
-          <p className="text-[10px]" style={{ color: "#ffffff20" }}>
-            MANUS CEO Admin v6.0 • Planta y Raiz Ltda • Dados atualizados: {lastRefresh.toLocaleString("pt-BR")} •
-            Faturamento Anual Estimado: {fmtCurrency(simulatedAnnualRevenue)}
-          </p>
+        {/* Footer */}
+        <div className="text-center py-3">
+          <p className="text-[9px]" style={{ color: "#ffffff15" }}>MANUS CEO Admin v7.0 • Planta y Raiz Ltda • {lastRefresh.toLocaleString("pt-BR")} • Faturamento Anual: {fmtCurrency(simulatedMonthlyRevenue * 12)}</p>
         </div>
       </div>
     </div>

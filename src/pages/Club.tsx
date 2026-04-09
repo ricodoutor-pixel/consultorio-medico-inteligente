@@ -770,6 +770,7 @@ const Club = () => {
         planId={btcModal.planId}
         amount={btcModal.amount}
       />
+      <WhatsAppProofModal
         open={modalState.open}
         onOpenChange={setModalOpen}
         context={modalState.context}

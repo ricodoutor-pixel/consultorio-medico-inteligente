@@ -490,9 +490,14 @@ const Club = () => {
                         <div className="flex items-center justify-between mt-3">
                           <span className="text-lg font-black text-primary">R$ {product.price.toFixed(2)}</span>
                         </div>
-                        <Button size="sm" className="w-full mt-2 gap-1" onClick={() => addToCart(product)}>
-                          <ShoppingCart size={14} /> Comprar
-                        </Button>
+                        <div className="flex gap-2 mt-2">
+                          <Button size="sm" className="flex-1 gap-1" onClick={() => addToCart(product)}>
+                            <ShoppingCart size={14} /> Carrinho
+                          </Button>
+                          <Button size="sm" variant="outline" className="flex-1 gap-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => handleBuyNow(product)}>
+                            Comprar Agora
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}

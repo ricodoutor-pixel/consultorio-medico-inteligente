@@ -287,7 +287,7 @@ const Profissionais = () => {
                               width={64}
                               height={64}
                             />
-                            <OnlineStatusIndicator online={p.online} size="sm" className="absolute -bottom-0.5 -right-0.5" />
+                            
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
@@ -296,7 +296,13 @@ const Profissionais = () => {
                                 <span key={i} className="text-sm flex-shrink-0">{flag}</span>
                               ))}
                             </div>
-                            <p className="text-xs text-primary font-bold mt-0.5">{p.category}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <p className="text-xs text-primary font-bold">{p.category}</p>
+                              <span className={`inline-flex items-center gap-1 text-[10px] font-bold ${p.online ? 'text-green-500' : 'text-muted-foreground'}`}>
+                                <span className={`w-2 h-2 rounded-full ${p.online ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground'}`} />
+                                {p.online ? 'Online' : 'Offline'}
+                              </span>
+                            </div>
                             <div className="flex items-center gap-1 mt-1">
                               <Star size={12} className="text-primary fill-primary" />
                               <span className="text-xs font-black text-foreground">{p.rating}</span>

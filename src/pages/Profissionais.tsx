@@ -277,7 +277,7 @@ const Profissionais = () => {
               <span className="text-muted-foreground">FreeLancer</span>{" "}
               <span className="text-green-400 font-semibold">Home Office</span>{" "}
               <span className="text-muted-foreground">ou</span>{" "}
-              <span className="text-amber-400 font-semibold">Presencial</span>{" "}
+              <span className="text-amber-400 font-semibold">Presencial,</span>{" "}
               <span className="text-muted-foreground">Via Agendamento Prévio, Divididos em</span>{" "}
               <span className="text-primary font-bold">10 Categorias</span>{" "}
               <span className="text-muted-foreground">— Tudo Supervisionado Por</span>{" "}

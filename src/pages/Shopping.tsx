@@ -101,15 +101,24 @@ const ProductDetail = ({ id }: { id: string }) => {
             <div className="flex items-center gap-2 text-xs text-muted-foreground"><Shield size={14} className="text-primary" /> Compra 100% Segura • Escrow até Confirmação</div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground"><Package size={14} className="text-primary" /> Entrega rastreada com prazo de 3-7 dias úteis</div>
           </div>
-          <Button
-            className="w-full font-bold h-14 text-base bg-primary text-primary-foreground hover:bg-primary/90"
-            onClick={() => {
-              addItem(product);
-              toast({ title: "Adicionado ao carrinho!", description: product.title });
-            }}
-          >
-            <ShoppingCart size={20} className="mr-2" /> Comprar agora
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              className="flex-1 font-bold h-14 text-base bg-primary text-primary-foreground hover:bg-primary/90"
+              onClick={() => handleBuyNowProduct(product, toast)}
+            >
+              Comprar Agora 💳
+            </Button>
+            <Button
+              variant="outline"
+              className="h-14 px-6 border-primary text-primary hover:bg-primary/10"
+              onClick={() => {
+                addItem(product);
+                toast({ title: "Adicionado ao carrinho!", description: product.title });
+              }}
+            >
+              <ShoppingCart size={20} />
+            </Button>
+          </div>
           <p className="text-[10px] text-muted-foreground mt-4 text-center">⚠️ A Planta & Raiz é uma infraestrutura tecnológica autônoma. A responsabilidade técnica pelo produto cabe exclusivamente ao lojista cadastrado.</p>
         </div>
       </div>

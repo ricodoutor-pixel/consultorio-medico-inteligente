@@ -1,17 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="leaf" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#10B981"/>
-      <stop offset="100%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-  <!-- Leaf icon matching the navbar logo -->
-  <g transform="translate(32,32)" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M-8 8C-8 8-12-8 0-20C12-8 8 8 8 8" fill="white" stroke="none"/>
-    <path d="M-8 8C-8 8-12-8 0-20C12-8 8 8 8 8"/>
-    <line x1="0" y1="-14" x2="0" y2="8"/>
-    <path d="M0-6L-5-1"/>
-    <path d="M0-2L5 3"/>
+  <rect width="64" height="64" rx="14" fill="#0A0E27"/>
+  <g transform="translate(32,34)" fill="url(#leaf)">
+    <!-- Center leaf -->
+    <ellipse cx="0" cy="-12" rx="4" ry="12"/>
+    <!-- Left leaves -->
+    <ellipse cx="-8" cy="-6" rx="3.5" ry="10" transform="rotate(30 -8 -6)"/>
+    <ellipse cx="-14" cy="0" rx="3" ry="8" transform="rotate(55 -14 0)"/>
+    <!-- Right leaves -->
+    <ellipse cx="8" cy="-6" rx="3.5" ry="10" transform="rotate(-30 8 -6)"/>
+    <ellipse cx="14" cy="0" rx="3" ry="8" transform="rotate(-55 14 0)"/>
+    <!-- Stem -->
+    <rect x="-1" y="4" width="2" height="10" rx="1"/>
   </g>
 </svg>

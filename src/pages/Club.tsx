@@ -180,6 +180,7 @@ const Club = () => {
   const [showCart, setShowCart] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState<"shop" | "feed">("shop");
+  const [btcModal, setBtcModal] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
 
   useEffect(() => {
     document.title = "Club Planta y Raiz - Lifestyle & Comunidade";

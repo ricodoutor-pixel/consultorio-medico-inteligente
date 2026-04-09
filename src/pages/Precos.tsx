@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
+import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
@@ -17,6 +18,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 const Precos = () => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [btcModal, setBtcModal] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
+  const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
 
   const plans = [
     {

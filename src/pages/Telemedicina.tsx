@@ -121,6 +121,8 @@ const BrisaAvatar = () => {
 };
 
 const Telemedicina = () => {
+  const navigate = useNavigate();
+  const [showTCLE, setShowTCLE] = useState(true);
   const [step, setStep] = useState(-1);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [sliderValue, setSliderValue] = useState([50]);
@@ -130,6 +132,7 @@ const Telemedicina = () => {
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const { toast } = useToast();
+  const [selectedPathology, setSelectedPathology] = useState("");
   const [patientData, setPatientData] = useState({
     nome: "",
     cpf: "",
@@ -137,6 +140,14 @@ const Telemedicina = () => {
     email: "",
     telefone: "",
   });
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem("triage_condition");
+    if (saved) {
+      setSelectedPathology(saved);
+      sessionStorage.removeItem("triage_condition");
+    }
+  }, []);
 
   const currentQ = interviewQuestions[step - 1];
   const progress = step <= 0 ? 0 : step > 10 ? 100 : Math.round((step / 10) * 100);

@@ -145,6 +145,8 @@ const Telemedicina = () => {
     const saved = sessionStorage.getItem("triage_condition");
     if (saved) {
       setSelectedPathology(saved);
+      // Pre-fill first triage question with the pathology
+      setAnswers(prev => ({ ...prev, 1: `Condição principal: ${saved}. ` }));
       sessionStorage.removeItem("triage_condition");
     }
   }, []);

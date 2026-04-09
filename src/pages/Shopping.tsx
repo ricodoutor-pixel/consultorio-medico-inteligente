@@ -219,20 +219,20 @@ const Shopping = () => {
       <WhatsAppButton />
 
       {/* Search Header - Mercado Livre style */}
-      <section className="pt-24 md:pt-28 pb-4 bg-primary/5 border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-4 max-w-3xl mx-auto">
+      <section className="pt-20 md:pt-28 pb-3 sm:pb-4 bg-primary/5 border-b border-border">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex items-center gap-2 sm:gap-4 max-w-3xl mx-auto">
             <div className="relative flex-1">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Search size={16} className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Buscar produtos medicinais..."
+                placeholder="Buscar produtos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 rounded-full border-border bg-background text-base font-medium"
+                className="pl-9 sm:pl-12 h-10 sm:h-12 rounded-full border-border bg-background text-sm sm:text-base font-medium"
               />
             </div>
-            <Button className="h-12 px-6 rounded-full bg-primary text-primary-foreground font-bold">
-              <Search size={18} />
+            <Button className="h-10 sm:h-12 px-4 sm:px-6 rounded-full bg-primary text-primary-foreground font-bold">
+              <Search size={16} />
             </Button>
           </div>
           {/* Breadcrumb */}

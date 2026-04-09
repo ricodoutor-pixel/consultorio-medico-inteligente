@@ -97,7 +97,7 @@ const RevenueDistribution = () => {
               <>
                 {/* Performance + Formula */}
                 <div className="grid lg:grid-cols-2 gap-6 mb-8">
-                  <DoctorPerformanceWidget doctorId={doctorId} />
+                  <DoctorPerformanceWidget doctorId={doctorId} simulatedTier={simulatedTier} />
 
                   <Card className="border-border">
                     <CardContent className="p-6">

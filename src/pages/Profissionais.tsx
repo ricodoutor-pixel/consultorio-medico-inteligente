@@ -273,7 +273,7 @@ const Profissionais = () => {
               <span className="text-gradient-green">Profissionais</span> Verificados
             </h1>
             <p className="text-sm md:text-lg text-muted-foreground max-w-2xl font-medium">
-              {professionals.length} especialistas em 6 categorias — supervisionado por IA de última geração 24×7.
+              {professionals.length} especialistas em 10 categorias — supervisionado por IA de última geração 24×7.
             </p>
           </motion.div>
 

@@ -310,6 +310,13 @@ const ProductDetail = ({ id }: { id: string }) => {
 
       <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
       <BTCPaymentModal open={btcModal.open} onClose={() => setBtcModal({ ...btcModal, open: false })} planName={btcModal.planName} planId={btcModal.planId} amount={btcModal.amount} />
+      <PrescriptionVerificationModal
+        open={rxModal.open}
+        onClose={() => setRxModal({ open: false, productName: "" })}
+        productName={rxModal.productName}
+        onHasPrescription={proceedWithPurchase}
+        onNeedsPrescription={() => { setRxModal({ open: false, productName: "" }); window.location.href = "/profissionais"; }}
+      />
     </div>
   );
 };

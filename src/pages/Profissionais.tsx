@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2 } from "lucide-react";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { motion } from "framer-motion";
-import { professionals, categories } from "@/data/professionals";
+import { professionals as allProfessionals, categories, Professional } from "@/data/professionals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -16,6 +16,33 @@ const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, tra
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
 const BRISA_WHATSAPP = "5511991363154";
+
+/**
+ * Always keep exactly 3 professionals "online".
+ * Dr. Edilson (med-0) is ALWAYS online.
+ * The other 2 rotate every 60 minutes based on the current hour.
+ */
+function useRotatingOnline(base: Professional[]): Professional[] {
+  const [tick, setTick] = useState(() => Math.floor(Date.now() / 3600000));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick(Math.floor(Date.now() / 3600000));
+    }, 60000); // check every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  return useMemo(() => {
+    const others = base.filter(p => p.id !== "med-0");
+    // deterministic rotation based on hour tick
+    const idx1 = tick % others.length;
+    const idx2 = (tick + Math.floor(others.length / 2)) % others.length;
+    const onlineIds = new Set(["med-0", others[idx1]?.id, others[idx2]?.id]);
+
+    return base.map(p => ({ ...p, online: onlineIds.has(p.id) }));
+  }, [base, tick]);
+}
+
 
 const SERVICE_TIERS = [
   { name: "Mentoria", price: "R$ 30", value: 30, icon: Zap, desc: "Orientação rápida de 15 min", highlight: false },
@@ -125,7 +152,7 @@ const ServicePricingGrid = ({ doctorName }: { doctorName: string }) => {
 };
 
 const ProfessionalDetail = ({ id }: { id: string }) => {
-  const pro = professionals.find((p) => p.id === id);
+  const pro = allProfessionals.find((p) => p.id === id);
   if (!pro) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Profissional não encontrado.</div>;
 
   return (
@@ -218,6 +245,7 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
 const Profissionais = () => {
   const { id } = useParams();
   const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const professionals = useRotatingOnline(allProfessionals);
 
   if (id) {
     return (
@@ -298,8 +326,8 @@ const Profissionais = () => {
                             </div>
                             <div className="flex items-center gap-1.5 mt-0.5">
                               <p className="text-xs text-primary font-bold">{p.category}</p>
-                              <span className={`inline-flex items-center gap-1 text-[10px] font-bold ${p.online ? 'text-green-500' : 'text-muted-foreground'}`}>
-                                <span className={`w-2 h-2 rounded-full ${p.online ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground'}`} />
+                              <span className={`inline-flex items-center gap-1 text-[10px] font-bold ${p.online ? 'text-green-500' : 'text-red-500'}`}>
+                                <span className={`w-2.5 h-2.5 rounded-full ${p.online ? 'bg-green-500 animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.6)]' : 'bg-red-500 animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.6)]'}`} />
                                 {p.online ? 'Online' : 'Offline'}
                               </span>
                             </div>

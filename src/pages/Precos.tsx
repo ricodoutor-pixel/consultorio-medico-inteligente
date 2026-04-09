@@ -128,10 +128,9 @@ const Precos = () => {
     },
   ];
 
-  const handleDynamicCheckout = async (planId: string) => {
+  const executeDynamicCheckout = async (planId: string) => {
     setLoadingPlan(planId);
     try {
-      // Check if user is authenticated first
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast.error("Faça login para assinar um plano.", {
@@ -165,6 +164,15 @@ const Precos = () => {
     } finally {
       setLoadingPlan(null);
     }
+  };
+
+  const handleDynamicCheckout = (planId: string) => {
+    const plan = plans.find(p => p.id === planId);
+    if (!plan) return;
+    showModal(
+      { type: "assinatura", planName: plan.name, value: plan.priceValue / 100 },
+      () => executeDynamicCheckout(planId)
+    );
   };
 
   return (

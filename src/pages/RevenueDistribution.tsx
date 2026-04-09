@@ -15,6 +15,7 @@ const COLORS = ["hsl(152 80% 45%)", "hsl(45 90% 55%)", "hsl(270 60% 60%)", "hsl(
 const RevenueDistribution = () => {
   const [doctorId, setDoctorId] = useState<string | null>(null);
   const [currentTier, setCurrentTier] = useState("basic");
+  const [simulatedTier, setSimulatedTier] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

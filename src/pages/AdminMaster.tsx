@@ -186,6 +186,83 @@ const AdminMaster = () => {
   const simulatedAnnualRevenue = simulatedMonthlyRevenue * 12;
   const conversionRate = totalUsers > 0 ? ((totalDoctors * 3.2 / totalUsers) * 100).toFixed(1) : "0";
 
+  const statusBadge = (status: string) => {
+    const map: Record<string, { bg: string; color: string; label: string }> = {
+      approved: { bg: "#39FF1420", color: "#39FF14", label: "Aprovado" },
+      paid: { bg: "#39FF1420", color: "#39FF14", label: "Pago" },
+      released: { bg: "#39FF1420", color: "#39FF14", label: "Liberado" },
+      completed: { bg: "#39FF1420", color: "#39FF14", label: "Concluído" },
+      pending: { bg: "#FFB80020", color: "#FFB800", label: "Pendente" },
+      held: { bg: "#FFB80020", color: "#FFB800", label: "Retido" },
+      scheduled: { bg: "#00D4FF20", color: "#00D4FF", label: "Agendado" },
+      cancelled: { bg: "#FF444420", color: "#FF4444", label: "Cancelado" },
+      refunded: { bg: "#FF444420", color: "#FF4444", label: "Reembolsado" },
+    };
+    const s = map[status] || { bg: "#ffffff10", color: "#ffffff60", label: status };
+    return <span className="text-[9px] px-2 py-0.5 rounded-full font-medium" style={{ background: s.bg, color: s.color }}>{s.label}</span>;
+  };
+
+  const txRow = (id: string, type: string, typeColor: string, amount: number, fee: number, status: string, date: string) => (
+    <div className="grid grid-cols-2 md:grid-cols-7 gap-2 px-3 py-2.5 rounded-lg items-center hover:scale-[1.005] transition-all" style={{ background: "#0A0E2790" }}>
+      <span className="text-[10px] font-mono truncate text-white">{id.slice(0, 8)}...</span>
+      <span className="text-[10px] font-medium" style={{ color: typeColor }}>{type}</span>
+      <span className="text-xs font-bold text-white">{fmtCurrency(amount)}</span>
+      <span className="text-[10px]" style={{ color: "#FF6B35" }}>{fmtCurrency(fee)}</span>
+      <span>{statusBadge(status)}</span>
+      <span className="text-[10px]" style={{ color: "#ffffff50" }}>{new Date(date).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+      <span className="flex gap-1">
+        <button className="p-1 rounded hover:bg-white/5" title="Detalhes"><Eye size={12} style={{ color: "#00D4FF" }} /></button>
+        <button className="p-1 rounded hover:bg-white/5" title="Exportar"><FileText size={12} style={{ color: "#39FF14" }} /></button>
+      </span>
+    </div>
+  );
+
+  const filterTx = (items: any[], searchFields: string[]) => {
+    if (!salesSearch) return items;
+    const q = salesSearch.toLowerCase();
+    return items.filter(item => searchFields.some(f => String(item[f] || "").toLowerCase().includes(q)));
+  };
+
+  const renderVendorTransactions = () => {
+    const filtered = filterTx(vendorTxs, ["id", "status", "type"]);
+    if (filtered.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhuma transação marketplace</p>;
+    return filtered.map(t => txRow(t.id, "🛒 Marketplace", "#3483fa", t.amount, t.platform_fee, t.status, t.created_at));
+  };
+
+  const renderEscrowTransactions = () => {
+    const filtered = filterTx(escrowTxs, ["id", "status", "type"]);
+    if (filtered.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhuma transação escrow</p>;
+    return filtered.map(t => txRow(t.id, t.type === "consultation" ? "🩺 Consulta" : "📦 Pedido", "#00D4FF", t.amount, t.platform_fee, t.status, t.created_at));
+  };
+
+  const renderAppointmentTransactions = () => {
+    const filtered = filterTx(appointments, ["id", "status", "payment_status"]);
+    if (filtered.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhum agendamento</p>;
+    return filtered.map(a => txRow(a.id, "📅 Agendamento", "#FF6B35", a.amount, a.amount * 0.07, a.payment_status || a.status, a.created_at));
+  };
+
+  const renderAllTransactions = () => {
+    const all = [
+      ...vendorTxs.map(t => ({ ...t, _type: "marketplace", _typeLabel: "🛒 Marketplace", _typeColor: "#3483fa", _fee: t.platform_fee })),
+      ...escrowTxs.map(t => ({ ...t, _type: "escrow", _typeLabel: t.type === "consultation" ? "🩺 Consulta" : "📦 Pedido", _typeColor: "#00D4FF", _fee: t.platform_fee })),
+      ...appointments.map(a => ({ ...a, _type: "appointment", _typeLabel: "📅 Agendamento", _typeColor: "#FF6B35", amount: a.amount, _fee: a.amount * 0.07, status: a.payment_status || a.status })),
+    ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    const filtered = salesFilter === "all" ? all
+      : salesFilter === "marketplace" ? all.filter(t => t._type === "marketplace")
+      : salesFilter === "consultation" ? all.filter(t => t._type === "escrow" || t._type === "appointment")
+      : all.filter(t => t._type === "marketplace"); // club filter
+
+    const searched = salesSearch
+      ? filtered.filter(t => JSON.stringify(t).toLowerCase().includes(salesSearch.toLowerCase()))
+      : filtered;
+
+    if (searched.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhuma transação encontrada</p>;
+    return searched.slice(0, 50).map((t, i) => (
+      <div key={`${t.id}-${i}`}>{txRow(t.id, t._typeLabel, t._typeColor, Number(t.amount), Number(t._fee), t.status, t.created_at)}</div>
+    ));
+  };
+
   return (
     <div className="min-h-screen" style={{ background: "#0A0E27" }}>
       {/* Header */}

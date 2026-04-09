@@ -133,7 +133,7 @@ const ProductDetail = ({ id }: { id: string }) => {
             className="w-full mt-2 font-bold border-amber-500/40 text-amber-500 hover:bg-amber-500/10 gap-1 h-10"
             onClick={() => setBtcModal({ open: true, planName: product.title, planId: product.id, amount: product.price })}
           >
-            <Bitcoin size={14} /> Pagar com BTC
+            <Bitcoin size={14} /> Pague Com BTC
           </Button>
           <p className="text-[10px] text-muted-foreground mt-4 text-center">⚠️ A Planta & Raiz é uma infraestrutura tecnológica autônoma. A responsabilidade técnica pelo produto cabe exclusivamente ao lojista cadastrado.</p>
         </div>
@@ -379,7 +379,7 @@ const Shopping = () => {
                               className="w-full text-[10px] font-bold mt-1.5 border-amber-500/40 text-amber-500 hover:bg-amber-500/10 h-7"
                               onClick={() => setBtcModalShopping({ open: true, planName: p.title, planId: p.id, amount: p.price })}
                             >
-                              <Bitcoin size={10} className="mr-1" /> Depositar BTC
+                              <Bitcoin size={10} className="mr-1" /> Pague Com BTC
                             </Button>
                           </div>
                         </CardContent>

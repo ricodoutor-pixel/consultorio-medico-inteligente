@@ -515,7 +515,7 @@ const Club = () => {
                         </div>
                         <Button size="sm" variant="outline" className="w-full gap-1 text-[10px] sm:text-xs h-6 sm:h-7 mt-1 border-amber-500/40 text-amber-500 hover:bg-amber-500/10"
                           onClick={() => setBtcModal({ open: true, planName: product.name, planId: String(product.id), amount: `R$ ${product.price.toFixed(2)}` })}>
-                          <Bitcoin size={10} /> Depositar BTC
+                          <Bitcoin size={10} /> Pague Com BTC
                         </Button>
                       </CardContent>
                     </Card>
@@ -676,7 +676,7 @@ const Club = () => {
                   </Button>
                   <Button variant="outline" className="w-full border-amber-500/40 text-amber-500 hover:bg-amber-500/10 font-bold gap-1"
                     onClick={() => setBtcModal({ open: true, planName: cart.map(i => i.product.name).join(", "), planId: "club-cart", amount: `R$ ${cartTotal.toFixed(2)}` })}>
-                    <Bitcoin size={14} /> Pagar com BTC
+                    <Bitcoin size={14} /> Pague Com BTC
                   </Button>
                   <Button variant="outline" className="w-full" onClick={() => setCart([])}>Limpar Carrinho</Button>
                 </div>

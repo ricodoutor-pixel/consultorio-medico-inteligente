@@ -140,11 +140,11 @@ const ProfessionalDashboard = () => {
   // ── Online Timer ─────────────────────────────────────────────────────
   useEffect(() => {
     if (isOnline) {
-      timerRef.current = setInterval(() => setOnlineTimer(prev => prev + 1), 1000);
+      timerRef2.current = setInterval(() => setOnlineTimer(prev => prev + 1), 1000);
     } else {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef2.current) clearInterval(timerRef2.current);
     }
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    return () => { if (timerRef2.current) clearInterval(timerRef2.current); };
   }, [isOnline]);
 
   const toggleOnline = async () => {

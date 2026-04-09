@@ -322,6 +322,19 @@ const Profissionais = () => {
                             Ver perfil <ArrowRight size={12} />
                           </span>
                         </div>
+
+                        {/* Botão Agendar Consulta via WhatsApp */}
+                        <a
+                          href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${p.name}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="mt-3 block"
+                        >
+                          <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-black rounded-xl gap-2 text-sm h-10">
+                            <Phone size={14} /> Agendar Consulta
+                          </Button>
+                        </a>
                       </div>
                     </CardContent>
                   </Card>

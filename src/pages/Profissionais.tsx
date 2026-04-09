@@ -272,8 +272,17 @@ const Profissionais = () => {
             <h1 className="text-2xl sm:text-3xl md:text-6xl font-display font-black text-foreground mb-2 md:mb-4 tracking-tight">
               <span className="text-gradient-green">Profissionais</span> Verificados
             </h1>
-            <p className="text-sm md:text-lg text-muted-foreground max-w-2xl font-medium">
-              {professionals.length} especialistas em 10 categorias — supervisionado por IA de última geração 24×7.
+            <p className="text-sm md:text-lg max-w-3xl font-medium leading-relaxed">
+              <span className="text-primary font-bold">{professionals.length} Especialistas</span>{" "}
+              <span className="text-muted-foreground">FreeLancer</span>{" "}
+              <span className="text-green-400 font-semibold">Home Office</span>{" "}
+              <span className="text-muted-foreground">ou</span>{" "}
+              <span className="text-amber-400 font-semibold">Presencial</span>{" "}
+              <span className="text-muted-foreground">Via Agendamento Prévio, Divididos em</span>{" "}
+              <span className="text-primary font-bold">10 Categorias</span>{" "}
+              <span className="text-muted-foreground">— Tudo Supervisionado Por</span>{" "}
+              <span className="text-cyan-400 font-bold">IA de Última Geração 24×7</span>.{" "}
+              <span className="text-emerald-300 font-medium">Contacte e Contrate Profissionais Qualificados Por Breve Período.</span>
             </p>
           </motion.div>
 

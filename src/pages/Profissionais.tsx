@@ -328,8 +328,12 @@ const Profissionais = () => {
                             </div>
                             <div className="flex items-center gap-1.5 mt-0.5">
                               <p className="text-xs text-primary font-bold">{p.category}</p>
-                              <span className={`inline-flex items-center gap-1 text-[10px] font-bold ${p.online ? 'text-green-500' : 'text-red-500'}`}>
-                                <span className={`w-2.5 h-2.5 rounded-full ${p.online ? 'bg-green-500 animate-[pulse_3s_cubic-bezier(0.4,0,0.6,1)_infinite] shadow-[0_0_8px_rgba(34,197,94,0.7)]' : 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.5)]'}`} />
+                              <span className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-wide ${p.online ? 'text-green-400' : 'text-red-400'}`}>
+                                <span className="relative flex items-center justify-center">
+                                  <span className={`absolute w-5 h-5 rounded-full animate-ping ${p.online ? 'bg-green-400/40' : 'bg-red-400/40'}`} style={{ animationDuration: '2s' }} />
+                                  <span className={`absolute w-4 h-4 rounded-full animate-pulse ${p.online ? 'bg-green-400/25' : 'bg-red-400/25'}`} style={{ animationDuration: '1.5s' }} />
+                                  <span className={`relative w-3 h-3 rounded-full border-2 border-background ${p.online ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8),0_0_20px_rgba(34,197,94,0.4)]' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8),0_0_20px_rgba(239,68,68,0.4)]'}`} />
+                                </span>
                                 {p.online ? 'Online' : 'Offline'}
                               </span>
                             </div>

@@ -539,7 +539,7 @@ const Club = () => {
       {cartCount > 0 && !showCart && (
         <motion.button initial={{ y: 100 }} animate={{ y: 0 }}
           onClick={() => setShowCart(true)}
-          className="fixed bottom-6 right-6 z-40 bg-primary text-primary-foreground rounded-full p-4 shadow-2xl hover:scale-105 transition-transform">
+          className="fixed bottom-20 right-6 z-40 bg-primary text-primary-foreground rounded-full p-4 shadow-2xl hover:scale-105 transition-transform">
           <ShoppingCart size={24} />
           <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">{cartCount}</span>
         </motion.button>

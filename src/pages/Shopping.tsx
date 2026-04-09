@@ -751,6 +751,13 @@ const Shopping = () => {
 
       <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
       <BTCPaymentModal open={btcModal.open} onClose={() => setBtcModal({ ...btcModal, open: false })} planName={btcModal.planName} planId={btcModal.planId} amount={btcModal.amount} />
+      <PrescriptionVerificationModal
+        open={rxModal.open}
+        onClose={() => setRxModal({ open: false, productName: "", pendingProduct: null })}
+        productName={rxModal.productName}
+        onHasPrescription={proceedWithPurchaseMain}
+        onNeedsPrescription={() => { setRxModal({ open: false, productName: "", pendingProduct: null }); window.location.href = "/profissionais"; }}
+      />
       <Footer />
     </div>
   );

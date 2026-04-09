@@ -150,8 +150,9 @@ const Precos = () => {
       }
 
       if (data?.init_point) {
-        window.open(data.init_point, "_blank");
         toast.success("Redirecionando para o Mercado Pago...");
+        window.location.href = data.init_point;
+        return;
       } else if (data?.error) {
         toast.error(data.error);
       } else {

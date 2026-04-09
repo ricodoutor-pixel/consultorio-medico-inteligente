@@ -191,8 +191,7 @@ const App = () => (
             
             
             
-            {/* Mascote Verdinho */}
-            <MascotVerdinho />
+            {/* Mascote Verdinho removido — presente apenas na Navbar */}
             {/* WhatsApp Brisa Button */}
             <WhatsAppButton />
           </Suspense>

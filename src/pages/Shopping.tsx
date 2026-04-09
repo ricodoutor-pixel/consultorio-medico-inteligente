@@ -583,26 +583,24 @@ const Shopping = () => {
                                 <Link to={`/shopping/${p.id}`} className="block">
                                   <ImageCarousel images={images} alt={p.name} />
                                 </Link>
-                                {/* Badges row - no overlap */}
-                                <div className="absolute top-1.5 left-1.5 right-1.5 flex items-start justify-between pointer-events-none">
-                                  <div className="flex flex-col gap-1">
-                                    {discount > 0 && (
-                                      <span className="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-md bg-destructive text-destructive-foreground font-bold shadow-sm w-fit">
-                                        {discount}% OFF
-                                      </span>
-                                    )}
-                                    <span className="text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded-md bg-primary/90 text-primary-foreground font-bold shadow-sm w-fit">
-                                      FRETE GRÁTIS
+                                {/* Badges - left side stacked */}
+                                <div className="absolute top-1.5 left-1.5 flex flex-col gap-1 pointer-events-none">
+                                  {discount > 0 && (
+                                    <span className="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-md bg-destructive text-destructive-foreground font-bold shadow-sm w-fit">
+                                      {discount}% OFF
                                     </span>
-                                  </div>
-                                  {/* Favorite heart */}
-                                  <button
-                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(p.id); }}
-                                    className="pointer-events-auto w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-md hover:scale-110 transition-transform"
-                                  >
-                                    <Heart size={16} className={isFav(p.id) ? "text-red-500 fill-red-500" : "text-muted-foreground"} />
-                                  </button>
+                                  )}
+                                  <span className="text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded-md bg-primary/90 text-primary-foreground font-bold shadow-sm w-fit">
+                                    FRETE GRÁTIS
+                                  </span>
                                 </div>
+                                {/* Favorite heart - outside Link */}
+                                <button
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(p.id); }}
+                                  className="absolute top-1.5 right-1.5 z-10 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-md hover:scale-110 transition-transform"
+                                >
+                                  <Heart size={16} className={isFav(p.id) ? "text-red-500 fill-red-500" : "text-muted-foreground"} />
+                                </button>
                               </div>
 
                               <div className="p-2.5 sm:p-3">

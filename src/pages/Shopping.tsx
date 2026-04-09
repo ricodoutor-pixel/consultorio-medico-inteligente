@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductAlertBell } from "@/components/ProductAlertBell";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
+import { PrescriptionVerificationModal } from "@/components/PrescriptionVerificationModal";
 
 // Import product images
 import oleoCbd1 from "@/assets/products/oleo-cbd-1.jpg";

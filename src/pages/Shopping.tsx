@@ -207,6 +207,7 @@ const Shopping = () => {
   const { toast } = useToast();
   const [showCart, setShowCart] = useState(false);
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
+  const [btcModalShopping, setBtcModalShopping] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
 
   if (id) {
     return (

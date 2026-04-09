@@ -207,6 +207,7 @@ const Shopping = () => {
   const { toast } = useToast();
   const [showCart, setShowCart] = useState(false);
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
+  const [btcModalShopping, setBtcModalShopping] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
 
   if (id) {
     return (
@@ -372,6 +373,14 @@ const Shopping = () => {
                             >
                               <Plus size={14} className="mr-1" /> Adicionar
                             </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full text-[10px] font-bold mt-1.5 border-amber-500/40 text-amber-500 hover:bg-amber-500/10 h-7"
+                              onClick={() => setBtcModalShopping({ open: true, planName: p.title, planId: p.id, amount: p.price })}
+                            >
+                              <Bitcoin size={10} className="mr-1" /> Depositar BTC
+                            </Button>
                           </div>
                         </CardContent>
                       </Card>
@@ -391,22 +400,32 @@ const Shopping = () => {
                               <div className="flex items-center gap-1 mb-2">
                                 {[1,2,3,4,5].map(s => <Star key={s} size={10} className={s <= Math.round(p.rating) ? "text-primary fill-primary" : "text-muted-foreground/20"} />)}
                               </div>
-                              <div className="flex items-center justify-between">
+                              <div className="flex items-center justify-between flex-wrap gap-2">
                                 <div>
                                   <p className="text-xl font-display font-bold text-gradient-gold">{p.price}</p>
                                   <p className="text-[10px] text-secondary font-bold">Frete Grátis • 12x s/ juros</p>
                                 </div>
-                                <Button
-                                  size="sm"
-                                  className="text-xs font-bold bg-primary text-primary-foreground"
-                                  onClick={() => {
-                                    addItem(p);
-                                    toast({ title: "Adicionado!", description: p.title });
-                                    setShowCart(true);
-                                  }}
-                                >
-                                  <Plus size={14} className="mr-1" /> Comprar
-                                </Button>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    className="text-xs font-bold bg-primary text-primary-foreground"
+                                    onClick={() => {
+                                      addItem(p);
+                                      toast({ title: "Adicionado!", description: p.title });
+                                      setShowCart(true);
+                                    }}
+                                  >
+                                    <Plus size={14} className="mr-1" /> Comprar
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-[10px] font-bold border-amber-500/40 text-amber-500 hover:bg-amber-500/10"
+                                    onClick={() => setBtcModalShopping({ open: true, planName: p.title, planId: p.id, amount: p.price })}
+                                  >
+                                    <Bitcoin size={10} className="mr-1" /> BTC
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -476,6 +495,7 @@ const Shopping = () => {
       </section>
 
       <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
+      <BTCPaymentModal open={btcModalShopping.open} onClose={() => setBtcModalShopping({ ...btcModalShopping, open: false })} planName={btcModalShopping.planName} planId={btcModalShopping.planId} amount={btcModalShopping.amount} />
       <Footer />
     </div>
   );

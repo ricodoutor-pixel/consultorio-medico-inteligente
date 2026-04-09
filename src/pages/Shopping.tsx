@@ -10,7 +10,7 @@ import {
   ShoppingBag, Star, ArrowLeft, ArrowRight,
   Store, CreditCard, Truck, Search, Shield, Grid3X3, List, ChevronRight,
   Tag, Package, Bitcoin, Clock, ChevronLeft,
-  BadgeCheck, Flame, Filter, X, SlidersHorizontal
+  BadgeCheck, Flame, Filter, X, SlidersHorizontal, Heart
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/store/cart";

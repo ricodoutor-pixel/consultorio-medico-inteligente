@@ -239,20 +239,19 @@ const Telemedicina = () => {
           )}
 
           <div className="max-w-2xl mx-auto">
-            {/* Conteúdo do Questionário (Mantendo a lógica original) */}
-            {step === -1 && (
+            {/* Waiting for TCLE acceptance */}
+            {step === -1 && !showTCLE && !tcleAccepted && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp}>
                 <Card className="border-border">
-                  <CardContent className="p-8">
-                    <h2 className="text-xl font-display font-black text-foreground mb-6">Termo de Consentimento</h2>
-                    <div className="bg-muted/30 border border-border rounded-2xl p-5 mb-6 max-h-[300px] overflow-y-auto text-sm">
-                      <p>Aceito realizar a teleconsulta conforme as normas do CFM e ANVISA...</p>
-                    </div>
+                  <CardContent className="p-8 text-center">
+                    <Shield size={48} className="text-primary mx-auto mb-4" />
+                    <h2 className="text-xl font-display font-black text-foreground mb-4">Consentimento Necessário</h2>
+                    <p className="text-muted-foreground mb-6">Você precisa aceitar o Termo de Consentimento (TCLE) para prosseguir com a teleconsulta.</p>
                     <Button 
                       className="w-full h-14 bg-primary text-primary-foreground font-black rounded-2xl text-lg"
-                      onClick={() => setStep(0)}
+                      onClick={() => setShowTCLE(true)}
                     >
-                      Aceitar e Continuar <ArrowRight className="ml-2" />
+                      <FileText className="mr-2" /> Ler e Aceitar o TCLE
                     </Button>
                   </CardContent>
                 </Card>
@@ -263,7 +262,26 @@ const Telemedicina = () => {
               <motion.div initial="hidden" animate="visible" variants={fadeUp}>
                 <Card className="border-border">
                   <CardContent className="p-8 space-y-6">
-                    <h2 className="text-xl font-display font-black text-foreground">Identificação do Paciente</h2>
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-xl font-display font-black text-foreground">Identificação do Paciente</h2>
+                      <Badge variant="outline" className="border-primary/30 text-primary text-[10px]">
+                        <CheckCircle2 size={10} className="mr-1" /> TCLE Aceito
+                      </Badge>
+                    </div>
+
+                    {/* Pathology Badge */}
+                    {selectedPathology && (
+                      <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                          <Brain size={20} className="text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Patologia Selecionada</p>
+                          <p className="text-sm font-black text-primary">{selectedPathology}</p>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label className="text-xs font-bold uppercase">Nome Completo</Label>

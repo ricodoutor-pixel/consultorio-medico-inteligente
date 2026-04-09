@@ -5,8 +5,12 @@ import {
   Clock, TrendingUp, AlertTriangle, Bot, Terminal, Search,
   ChevronDown, Bell, LogOut, Stethoscope, Eye, MessageSquare,
   ShoppingBag, CreditCard, ArrowUpRight, ArrowDownRight, Zap,
-  Globe, Server, Database, Cpu, Heart, RefreshCw
+  Globe, Server, Database, Cpu, Heart, RefreshCw, Filter,
+  Download, Package, Truck, FileText, Calendar, BarChart3,
+  CheckCircle2, XCircle, AlertCircle
 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -102,6 +106,13 @@ const AdminMaster = () => {
   const [recentPayments, setRecentPayments] = useState<any[]>([]);
   const [aiEvents, setAiEvents] = useState<any[]>([]);
   const [alertSubscribers, setAlertSubscribers] = useState(0);
+  // Sales tracking
+  const [vendorTxs, setVendorTxs] = useState<any[]>([]);
+  const [escrowTxs, setEscrowTxs] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [salesFilter, setSalesFilter] = useState<"all" | "marketplace" | "consultation" | "club">("all");
+  const [salesSearch, setSalesSearch] = useState("");
+  const [salesTab, setSalesTab] = useState("todas");
 
   const loadDashboardData = useCallback(async () => {
     const [
@@ -111,6 +122,9 @@ const AdminMaster = () => {
       { data: payments },
       { data: events },
       { count: subsCount },
+      { data: vTxs },
+      { data: allEscrows },
+      { data: appts },
     ] = await Promise.all([
       supabase.from("profiles").select("*", { count: "exact", head: true }),
       supabase.from("doctors").select("id, user_id, specialty, is_online, is_verified, rating, total_consultations, crm, crm_state").order("is_online", { ascending: false }),
@@ -118,6 +132,9 @@ const AdminMaster = () => {
       supabase.from("payment_webhooks").select("*").order("created_at", { ascending: false }).limit(10),
       supabase.from("ai_events").select("*").order("created_at", { ascending: false }).limit(5),
       supabase.from("product_alert_subscriptions").select("*", { count: "exact", head: true }).eq("is_active", true),
+      supabase.from("vendor_transactions").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("escrow_transactions").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("appointments").select("*").order("created_at", { ascending: false }).limit(100),
     ]);
 
     setTotalUsers(usersCount || 0);
@@ -130,6 +147,9 @@ const AdminMaster = () => {
     if (payments) setRecentPayments(payments);
     if (events) setAiEvents(events);
     setAlertSubscribers(subsCount || 0);
+    if (vTxs) setVendorTxs(vTxs);
+    if (allEscrows) setEscrowTxs(allEscrows);
+    if (appts) setAppointments(appts);
     setLastRefresh(new Date());
   }, []);
 
@@ -149,6 +169,9 @@ const AdminMaster = () => {
       .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, () => loadDashboardData())
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "payment_webhooks" }, () => loadDashboardData())
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "profiles" }, () => loadDashboardData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "vendor_transactions" }, () => loadDashboardData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "escrow_transactions" }, () => loadDashboardData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, () => loadDashboardData())
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [loadDashboardData]);
@@ -162,6 +185,83 @@ const AdminMaster = () => {
   const simulatedMonthlyRevenue = 47850 + totalRevenue;
   const simulatedAnnualRevenue = simulatedMonthlyRevenue * 12;
   const conversionRate = totalUsers > 0 ? ((totalDoctors * 3.2 / totalUsers) * 100).toFixed(1) : "0";
+
+  const statusBadge = (status: string) => {
+    const map: Record<string, { bg: string; color: string; label: string }> = {
+      approved: { bg: "#39FF1420", color: "#39FF14", label: "Aprovado" },
+      paid: { bg: "#39FF1420", color: "#39FF14", label: "Pago" },
+      released: { bg: "#39FF1420", color: "#39FF14", label: "Liberado" },
+      completed: { bg: "#39FF1420", color: "#39FF14", label: "Concluído" },
+      pending: { bg: "#FFB80020", color: "#FFB800", label: "Pendente" },
+      held: { bg: "#FFB80020", color: "#FFB800", label: "Retido" },
+      scheduled: { bg: "#00D4FF20", color: "#00D4FF", label: "Agendado" },
+      cancelled: { bg: "#FF444420", color: "#FF4444", label: "Cancelado" },
+      refunded: { bg: "#FF444420", color: "#FF4444", label: "Reembolsado" },
+    };
+    const s = map[status] || { bg: "#ffffff10", color: "#ffffff60", label: status };
+    return <span className="text-[9px] px-2 py-0.5 rounded-full font-medium" style={{ background: s.bg, color: s.color }}>{s.label}</span>;
+  };
+
+  const txRow = (id: string, type: string, typeColor: string, amount: number, fee: number, status: string, date: string) => (
+    <div className="grid grid-cols-2 md:grid-cols-7 gap-2 px-3 py-2.5 rounded-lg items-center hover:scale-[1.005] transition-all" style={{ background: "#0A0E2790" }}>
+      <span className="text-[10px] font-mono truncate text-white">{id.slice(0, 8)}...</span>
+      <span className="text-[10px] font-medium" style={{ color: typeColor }}>{type}</span>
+      <span className="text-xs font-bold text-white">{fmtCurrency(amount)}</span>
+      <span className="text-[10px]" style={{ color: "#FF6B35" }}>{fmtCurrency(fee)}</span>
+      <span>{statusBadge(status)}</span>
+      <span className="text-[10px]" style={{ color: "#ffffff50" }}>{new Date(date).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+      <span className="flex gap-1">
+        <button className="p-1 rounded hover:bg-white/5" title="Detalhes"><Eye size={12} style={{ color: "#00D4FF" }} /></button>
+        <button className="p-1 rounded hover:bg-white/5" title="Exportar"><FileText size={12} style={{ color: "#39FF14" }} /></button>
+      </span>
+    </div>
+  );
+
+  const filterTx = (items: any[], searchFields: string[]) => {
+    if (!salesSearch) return items;
+    const q = salesSearch.toLowerCase();
+    return items.filter(item => searchFields.some(f => String(item[f] || "").toLowerCase().includes(q)));
+  };
+
+  const renderVendorTransactions = () => {
+    const filtered = filterTx(vendorTxs, ["id", "status", "type"]);
+    if (filtered.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhuma transação marketplace</p>;
+    return filtered.map(t => txRow(t.id, "🛒 Marketplace", "#3483fa", t.amount, t.platform_fee, t.status, t.created_at));
+  };
+
+  const renderEscrowTransactions = () => {
+    const filtered = filterTx(escrowTxs, ["id", "status", "type"]);
+    if (filtered.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhuma transação escrow</p>;
+    return filtered.map(t => txRow(t.id, t.type === "consultation" ? "🩺 Consulta" : "📦 Pedido", "#00D4FF", t.amount, t.platform_fee, t.status, t.created_at));
+  };
+
+  const renderAppointmentTransactions = () => {
+    const filtered = filterTx(appointments, ["id", "status", "payment_status"]);
+    if (filtered.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhum agendamento</p>;
+    return filtered.map(a => txRow(a.id, "📅 Agendamento", "#FF6B35", a.amount, a.amount * 0.07, a.payment_status || a.status, a.created_at));
+  };
+
+  const renderAllTransactions = () => {
+    const all = [
+      ...vendorTxs.map(t => ({ ...t, _type: "marketplace", _typeLabel: "🛒 Marketplace", _typeColor: "#3483fa", _fee: t.platform_fee })),
+      ...escrowTxs.map(t => ({ ...t, _type: "escrow", _typeLabel: t.type === "consultation" ? "🩺 Consulta" : "📦 Pedido", _typeColor: "#00D4FF", _fee: t.platform_fee })),
+      ...appointments.map(a => ({ ...a, _type: "appointment", _typeLabel: "📅 Agendamento", _typeColor: "#FF6B35", amount: a.amount, _fee: a.amount * 0.07, status: a.payment_status || a.status })),
+    ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    const filtered = salesFilter === "all" ? all
+      : salesFilter === "marketplace" ? all.filter(t => t._type === "marketplace")
+      : salesFilter === "consultation" ? all.filter(t => t._type === "escrow" || t._type === "appointment")
+      : all.filter(t => t._type === "marketplace"); // club filter
+
+    const searched = salesSearch
+      ? filtered.filter(t => JSON.stringify(t).toLowerCase().includes(salesSearch.toLowerCase()))
+      : filtered;
+
+    if (searched.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhuma transação encontrada</p>;
+    return searched.slice(0, 50).map((t, i) => (
+      <div key={`${t.id}-${i}`}>{txRow(t.id, t._typeLabel, t._typeColor, Number(t.amount), Number(t._fee), t.status, t.created_at)}</div>
+    ));
+  };
 
   return (
     <div className="min-h-screen" style={{ background: "#0A0E27" }}>
@@ -518,6 +618,100 @@ const AdminMaster = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* ═══ SALES TRACKING SECTION ═══ */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
+          <Card className="border-0" style={{ background: "#0F1340" }}>
+            <CardHeader className="pb-3">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <CardTitle className="text-sm md:text-base flex items-center gap-2" style={{ color: "#39FF14" }}>
+                  <BarChart3 size={18} /> Rastreamento de Vendas — Todas as Transações
+                </CardTitle>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="relative">
+                    <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2" style={{ color: "#ffffff40" }} />
+                    <input
+                      value={salesSearch}
+                      onChange={e => setSalesSearch(e.target.value)}
+                      placeholder="Buscar ID, status..."
+                      className="pl-7 pr-3 py-1.5 rounded-md text-[11px] w-40 md:w-52 outline-none"
+                      style={{ background: "#1a1f4e", color: "#fff", border: "1px solid #ffffff15" }}
+                    />
+                  </div>
+                  <select
+                    value={salesFilter}
+                    onChange={e => setSalesFilter(e.target.value as any)}
+                    className="px-2 py-1.5 rounded-md text-[11px] outline-none cursor-pointer"
+                    style={{ background: "#1a1f4e", color: "#fff", border: "1px solid #ffffff15" }}
+                  >
+                    <option value="all">Todos os Tipos</option>
+                    <option value="marketplace">Marketplace</option>
+                    <option value="consultation">Consultas</option>
+                    <option value="club">Club / Assinaturas</option>
+                  </select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {/* Sales Summary KPIs */}
+              {(() => {
+                const totalVendorSales = vendorTxs.reduce((s, t) => s + Number(t.amount), 0);
+                const totalEscrowVal = escrowTxs.reduce((s, t) => s + Number(t.amount), 0);
+                const totalConsultations = appointments.length;
+                const paidConsultations = appointments.filter(a => a.payment_status === "paid" || a.payment_status === "approved").length;
+                const platformFees = vendorTxs.reduce((s, t) => s + Number(t.platform_fee), 0) + escrowTxs.reduce((s, t) => s + Number(t.platform_fee), 0);
+                return (
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+                    {[
+                      { label: "Vendas Marketplace", value: fmtCurrency(totalVendorSales), icon: ShoppingBag, color: "#3483fa" },
+                      { label: "Escrow (Consultas)", value: fmtCurrency(totalEscrowVal), icon: Shield, color: "#00D4FF" },
+                      { label: "Consultas Pagas", value: `${paidConsultations}/${totalConsultations}`, icon: Stethoscope, color: "#39FF14" },
+                      { label: "Taxas Plataforma", value: fmtCurrency(platformFees), icon: DollarSign, color: "#FF6B35" },
+                      { label: "Total Transações", value: `${vendorTxs.length + escrowTxs.length + appointments.length}`, icon: Activity, color: "#A855F7" },
+                    ].map((m, i) => (
+                      <div key={i} className="p-3 rounded-lg" style={{ background: "#0A0E27", border: `1px solid ${m.color}25` }}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <m.icon size={13} style={{ color: m.color }} />
+                          <span className="text-[9px] font-medium" style={{ color: "#ffffff60" }}>{m.label}</span>
+                        </div>
+                        <p className="text-sm md:text-base font-bold text-white">{m.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              <Tabs value={salesTab} onValueChange={setSalesTab}>
+                <TabsList className="mb-3 border-0" style={{ background: "#0A0E27" }}>
+                  <TabsTrigger value="todas" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#39FF14]">Todas</TabsTrigger>
+                  <TabsTrigger value="marketplace" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#3483fa]">Marketplace</TabsTrigger>
+                  <TabsTrigger value="escrow" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#00D4FF]">Escrow</TabsTrigger>
+                  <TabsTrigger value="consultas" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#FF6B35]">Consultas</TabsTrigger>
+                </TabsList>
+
+                {/* Table Header */}
+                <div className="hidden md:grid grid-cols-7 gap-2 px-3 py-2 rounded-t-lg text-[10px] font-semibold" style={{ background: "#0A0E27", color: "#ffffff50" }}>
+                  <span>ID</span><span>Tipo</span><span>Valor</span><span>Taxa</span><span>Status</span><span>Data</span><span>Ações</span>
+                </div>
+
+                <div className="max-h-[400px] overflow-y-auto space-y-1">
+                  <TabsContent value="todas" className="mt-0 space-y-1">
+                    {renderAllTransactions()}
+                  </TabsContent>
+                  <TabsContent value="marketplace" className="mt-0 space-y-1">
+                    {renderVendorTransactions()}
+                  </TabsContent>
+                  <TabsContent value="escrow" className="mt-0 space-y-1">
+                    {renderEscrowTransactions()}
+                  </TabsContent>
+                  <TabsContent value="consultas" className="mt-0 space-y-1">
+                    {renderAppointmentTransactions()}
+                  </TabsContent>
+                </div>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Footer Stats */}
         <div className="text-center py-4">

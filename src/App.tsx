@@ -179,6 +179,8 @@ const App = () => (
                 <Route path="/ebook-gratis" element={<EbookLanding />} />
                 <Route path="/ebook-medicina-canabinoide" element={<EbookMedicinaCanabinoide />} />
                 <Route path="/admin/ebook-analytics" element={<AdminRoute><EbookAnalyticsDashboard /></AdminRoute>} />
+                <Route path="/distribuicao-renda" element={<RevenueDistribution />} />
+                <Route path="/revenue-distribution" element={<RevenueDistribution />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

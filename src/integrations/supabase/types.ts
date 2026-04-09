@@ -1317,6 +1317,185 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_products: {
+        Row: {
+          category: string
+          compare_price: number | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          image_url_2: string | null
+          image_url_3: string | null
+          is_active: boolean
+          name: string
+          price: number
+          rating: number | null
+          review_count: number
+          sold_count: number
+          stock: number
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          category?: string
+          compare_price?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          image_url_2?: string | null
+          image_url_3?: string | null
+          is_active?: boolean
+          name: string
+          price: number
+          rating?: number | null
+          review_count?: number
+          sold_count?: number
+          stock?: number
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          category?: string
+          compare_price?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          image_url_2?: string | null
+          image_url_3?: string | null
+          is_active?: boolean
+          name?: string
+          price?: number
+          rating?: number | null
+          review_count?: number
+          sold_count?: number
+          stock?: number
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_transactions: {
+        Row: {
+          amount: number
+          buyer_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          payment_id: string | null
+          payment_method: string | null
+          platform_fee: number
+          product_id: string | null
+          status: string
+          type: string
+          vendor_amount: number
+          vendor_id: string
+        }
+        Insert: {
+          amount: number
+          buyer_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_id?: string | null
+          payment_method?: string | null
+          platform_fee?: number
+          product_id?: string | null
+          status?: string
+          type?: string
+          vendor_amount?: number
+          vendor_id: string
+        }
+        Update: {
+          amount?: number
+          buyer_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_id?: string | null
+          payment_method?: string | null
+          platform_fee?: number
+          product_id?: string | null
+          status?: string
+          type?: string
+          vendor_amount?: number
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_transactions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_transactions_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendors: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          is_active: boolean
+          rating: number | null
+          store_banner_url: string | null
+          store_description: string | null
+          store_logo_url: string | null
+          store_name: string
+          total_products: number
+          total_sales: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          rating?: number | null
+          store_banner_url?: string | null
+          store_description?: string | null
+          store_logo_url?: string | null
+          store_name: string
+          total_products?: number
+          total_sales?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          rating?: number | null
+          store_banner_url?: string | null
+          store_description?: string | null
+          store_logo_url?: string | null
+          store_name?: string
+          total_products?: number
+          total_sales?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       verdinho_conversations: {
         Row: {
           content: string

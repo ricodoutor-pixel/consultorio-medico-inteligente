@@ -30,7 +30,7 @@ const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 min
 
 const usePrivacyLayer = () => {
   const [isLocked, setIsLocked] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const resetTimer = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -94,7 +94,7 @@ const ProfessionalDashboard = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
   const [notifications, setNotifications] = useState<any[]>([]);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef2 = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Fetch Doctor Data ────────────────────────────────────────────────
   useEffect(() => {

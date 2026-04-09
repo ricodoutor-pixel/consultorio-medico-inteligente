@@ -12,31 +12,37 @@ import { products, productCategories, Product } from "@/data/products";
 import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 
-const handleBuyNowProduct = async (product: Product, toast: any) => {
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast({ title: "Faça login para comprar", variant: "destructive" });
-      setTimeout(() => window.location.href = "/login", 1500);
-      return;
+const handleBuyNowProduct = async (product: Product, toast: any, showModal: any) => {
+  showModal(
+    { type: "compra", productName: product.title, value: product.priceValue } as WhatsAppContext,
+    async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          toast({ title: "Faça login para comprar", variant: "destructive" });
+          setTimeout(() => window.location.href = "/login", 1500);
+          return;
+        }
+        const { data, error } = await supabase.functions.invoke("create-cart-payment", {
+          body: {
+            items: [{ title: product.title, quantity: 1, price: product.priceValue }],
+            total: product.priceValue,
+            description: `Planta y Raiz Ltda - ${product.title}`,
+          },
+        });
+        if (error) throw error;
+        if (data?.init_point) {
+          window.open(data.init_point, "_blank");
+          toast({ title: "Redirecionando para pagamento... 💳" });
+        }
+      } catch (err) {
+        console.error(err);
+        toast({ title: "Erro ao gerar pagamento", variant: "destructive" });
+      }
     }
-    const { data, error } = await supabase.functions.invoke("create-cart-payment", {
-      body: {
-        items: [{ title: product.title, quantity: 1, price: product.priceValue }],
-        total: product.priceValue,
-        description: `Planta y Raiz Ltda - ${product.title}`,
-      },
-    });
-    if (error) throw error;
-    if (data?.init_point) {
-      window.open(data.init_point, "_blank");
-      toast({ title: "Redirecionando para pagamento... 💳" });
-    }
-  } catch (err) {
-    console.error(err);
-    toast({ title: "Erro ao gerar pagamento", variant: "destructive" });
-  }
+  );
 };
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
@@ -46,6 +52,7 @@ const ProductDetail = ({ id }: { id: string }) => {
   const product = products.find((p) => p.id === id);
   const { addItem } = useCart();
   const { toast } = useToast();
+  const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
 
   if (!product) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Produto não encontrado.</div>;
 
@@ -104,7 +111,7 @@ const ProductDetail = ({ id }: { id: string }) => {
           <div className="flex gap-3">
             <Button
               className="flex-1 font-bold h-14 text-base bg-primary text-primary-foreground hover:bg-primary/90"
-              onClick={() => handleBuyNowProduct(product, toast)}
+              onClick={() => handleBuyNowProduct(product, toast, showModal)}
             >
               Comprar Agora 💳
             </Button>
@@ -122,6 +129,7 @@ const ProductDetail = ({ id }: { id: string }) => {
           <p className="text-[10px] text-muted-foreground mt-4 text-center">⚠️ A Planta & Raiz é uma infraestrutura tecnológica autônoma. A responsabilidade técnica pelo produto cabe exclusivamente ao lojista cadastrado.</p>
         </div>
       </div>
+      <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
     </div>
   );
 };
@@ -188,6 +196,7 @@ const Shopping = () => {
   const { addItem, count } = useCart();
   const { toast } = useToast();
   const [showCart, setShowCart] = useState(false);
+  const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
 
   if (id) {
     return (
@@ -456,6 +465,7 @@ const Shopping = () => {
         </div>
       </section>
 
+      <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
       <Footer />
     </div>
   );

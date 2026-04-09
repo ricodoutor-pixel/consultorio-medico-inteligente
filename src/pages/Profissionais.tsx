@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2 } from "lucide-react";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { motion } from "framer-motion";
-import { professionals, categories } from "@/data/professionals";
+import { professionals as allProfessionals, categories, Professional } from "@/data/professionals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -16,6 +16,33 @@ const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, tra
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
 const BRISA_WHATSAPP = "5511991363154";
+
+/**
+ * Always keep exactly 3 professionals "online".
+ * Dr. Edilson (med-0) is ALWAYS online.
+ * The other 2 rotate every 60 minutes based on the current hour.
+ */
+function useRotatingOnline(base: Professional[]): Professional[] {
+  const [tick, setTick] = useState(() => Math.floor(Date.now() / 3600000));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick(Math.floor(Date.now() / 3600000));
+    }, 60000); // check every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  return useMemo(() => {
+    const others = base.filter(p => p.id !== "med-0");
+    // deterministic rotation based on hour tick
+    const idx1 = tick % others.length;
+    const idx2 = (tick + Math.floor(others.length / 2)) % others.length;
+    const onlineIds = new Set(["med-0", others[idx1]?.id, others[idx2]?.id]);
+
+    return base.map(p => ({ ...p, online: onlineIds.has(p.id) }));
+  }, [base, tick]);
+}
+
 
 const SERVICE_TIERS = [
   { name: "Mentoria", price: "R$ 30", value: 30, icon: Zap, desc: "Orientação rápida de 15 min", highlight: false },

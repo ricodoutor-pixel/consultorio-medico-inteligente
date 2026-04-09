@@ -122,6 +122,9 @@ const AdminMaster = () => {
       { data: payments },
       { data: events },
       { count: subsCount },
+      { data: vTxs },
+      { data: allEscrows },
+      { data: appts },
     ] = await Promise.all([
       supabase.from("profiles").select("*", { count: "exact", head: true }),
       supabase.from("doctors").select("id, user_id, specialty, is_online, is_verified, rating, total_consultations, crm, crm_state").order("is_online", { ascending: false }),
@@ -129,6 +132,9 @@ const AdminMaster = () => {
       supabase.from("payment_webhooks").select("*").order("created_at", { ascending: false }).limit(10),
       supabase.from("ai_events").select("*").order("created_at", { ascending: false }).limit(5),
       supabase.from("product_alert_subscriptions").select("*", { count: "exact", head: true }).eq("is_active", true),
+      supabase.from("vendor_transactions").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("escrow_transactions").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("appointments").select("*").order("created_at", { ascending: false }).limit(100),
     ]);
 
     setTotalUsers(usersCount || 0);
@@ -141,6 +147,9 @@ const AdminMaster = () => {
     if (payments) setRecentPayments(payments);
     if (events) setAiEvents(events);
     setAlertSubscribers(subsCount || 0);
+    if (vTxs) setVendorTxs(vTxs);
+    if (allEscrows) setEscrowTxs(allEscrows);
+    if (appts) setAppointments(appts);
     setLastRefresh(new Date());
   }, []);
 

@@ -69,12 +69,8 @@ const BibliotecaCientifica = () => {
   }, []);
 
   const incrementCounter = async () => {
-    const newCount = downloadCount + 1;
-    setDownloadCount(newCount);
-    await supabase
-      .from('site_counters' as any)
-      .update({ count: newCount, updated_at: new Date().toISOString() } as any)
-      .eq('id', 'ebook_downloads');
+    setDownloadCount(prev => prev + 1);
+    await supabase.rpc('increment_site_counter', { _counter_id: 'ebook_downloads' });
   };
 
   const toggleFavorite = (id: number, e: React.MouseEvent) => {

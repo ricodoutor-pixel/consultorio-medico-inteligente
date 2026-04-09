@@ -49,6 +49,17 @@ const DashboardMedico = () => {
 
       if (apptRes.data) setAppointments(apptRes.data);
       if (rxRes.data) setPrescriptions(rxRes.data);
+
+      // Fetch subscription tier
+      const { data: sub } = await supabase
+        .from("medical_subscriptions")
+        .select("plan_tier")
+        .eq("doctor_id", doctor.id)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (sub?.plan_tier) setCurrentTier(sub.plan_tier);
     }
     setLoading(false);
   };

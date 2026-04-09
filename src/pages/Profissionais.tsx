@@ -245,6 +245,7 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
 const Profissionais = () => {
   const { id } = useParams();
   const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const professionals = useRotatingOnline(allProfessionals);
 
   if (id) {
     return (

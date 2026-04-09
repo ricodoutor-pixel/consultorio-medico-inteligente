@@ -542,6 +542,100 @@ const AdminMaster = () => {
           </Card>
         </div>
 
+        {/* ═══ SALES TRACKING SECTION ═══ */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
+          <Card className="border-0" style={{ background: "#0F1340" }}>
+            <CardHeader className="pb-3">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <CardTitle className="text-sm md:text-base flex items-center gap-2" style={{ color: "#39FF14" }}>
+                  <BarChart3 size={18} /> Rastreamento de Vendas — Todas as Transações
+                </CardTitle>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="relative">
+                    <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2" style={{ color: "#ffffff40" }} />
+                    <input
+                      value={salesSearch}
+                      onChange={e => setSalesSearch(e.target.value)}
+                      placeholder="Buscar ID, status..."
+                      className="pl-7 pr-3 py-1.5 rounded-md text-[11px] w-40 md:w-52 outline-none"
+                      style={{ background: "#1a1f4e", color: "#fff", border: "1px solid #ffffff15" }}
+                    />
+                  </div>
+                  <select
+                    value={salesFilter}
+                    onChange={e => setSalesFilter(e.target.value as any)}
+                    className="px-2 py-1.5 rounded-md text-[11px] outline-none cursor-pointer"
+                    style={{ background: "#1a1f4e", color: "#fff", border: "1px solid #ffffff15" }}
+                  >
+                    <option value="all">Todos os Tipos</option>
+                    <option value="marketplace">Marketplace</option>
+                    <option value="consultation">Consultas</option>
+                    <option value="club">Club / Assinaturas</option>
+                  </select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {/* Sales Summary KPIs */}
+              {(() => {
+                const totalVendorSales = vendorTxs.reduce((s, t) => s + Number(t.amount), 0);
+                const totalEscrowVal = escrowTxs.reduce((s, t) => s + Number(t.amount), 0);
+                const totalConsultations = appointments.length;
+                const paidConsultations = appointments.filter(a => a.payment_status === "paid" || a.payment_status === "approved").length;
+                const platformFees = vendorTxs.reduce((s, t) => s + Number(t.platform_fee), 0) + escrowTxs.reduce((s, t) => s + Number(t.platform_fee), 0);
+                return (
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+                    {[
+                      { label: "Vendas Marketplace", value: fmtCurrency(totalVendorSales), icon: ShoppingBag, color: "#3483fa" },
+                      { label: "Escrow (Consultas)", value: fmtCurrency(totalEscrowVal), icon: Shield, color: "#00D4FF" },
+                      { label: "Consultas Pagas", value: `${paidConsultations}/${totalConsultations}`, icon: Stethoscope, color: "#39FF14" },
+                      { label: "Taxas Plataforma", value: fmtCurrency(platformFees), icon: DollarSign, color: "#FF6B35" },
+                      { label: "Total Transações", value: `${vendorTxs.length + escrowTxs.length + appointments.length}`, icon: Activity, color: "#A855F7" },
+                    ].map((m, i) => (
+                      <div key={i} className="p-3 rounded-lg" style={{ background: "#0A0E27", border: `1px solid ${m.color}25` }}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <m.icon size={13} style={{ color: m.color }} />
+                          <span className="text-[9px] font-medium" style={{ color: "#ffffff60" }}>{m.label}</span>
+                        </div>
+                        <p className="text-sm md:text-base font-bold text-white">{m.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              <Tabs value={salesTab} onValueChange={setSalesTab}>
+                <TabsList className="mb-3 border-0" style={{ background: "#0A0E27" }}>
+                  <TabsTrigger value="todas" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#39FF14]">Todas</TabsTrigger>
+                  <TabsTrigger value="marketplace" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#3483fa]">Marketplace</TabsTrigger>
+                  <TabsTrigger value="escrow" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#00D4FF]">Escrow</TabsTrigger>
+                  <TabsTrigger value="consultas" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#FF6B35]">Consultas</TabsTrigger>
+                </TabsList>
+
+                {/* Table Header */}
+                <div className="hidden md:grid grid-cols-7 gap-2 px-3 py-2 rounded-t-lg text-[10px] font-semibold" style={{ background: "#0A0E27", color: "#ffffff50" }}>
+                  <span>ID</span><span>Tipo</span><span>Valor</span><span>Taxa</span><span>Status</span><span>Data</span><span>Ações</span>
+                </div>
+
+                <div className="max-h-[400px] overflow-y-auto space-y-1">
+                  <TabsContent value="todas" className="mt-0 space-y-1">
+                    {renderAllTransactions()}
+                  </TabsContent>
+                  <TabsContent value="marketplace" className="mt-0 space-y-1">
+                    {renderVendorTransactions()}
+                  </TabsContent>
+                  <TabsContent value="escrow" className="mt-0 space-y-1">
+                    {renderEscrowTransactions()}
+                  </TabsContent>
+                  <TabsContent value="consultas" className="mt-0 space-y-1">
+                    {renderAppointmentTransactions()}
+                  </TabsContent>
+                </div>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </motion.div>
+
         {/* Footer Stats */}
         <div className="text-center py-4">
           <p className="text-[10px]" style={{ color: "#ffffff20" }}>

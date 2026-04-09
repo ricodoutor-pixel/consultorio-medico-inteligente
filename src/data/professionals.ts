@@ -41,6 +41,16 @@ import draSakuraImg from "@/assets/dra-sakura-ito.jpg";
 import drRaviImg from "@/assets/dr-ravi-sharma.jpg";
 import profDiegoImg from "@/assets/prof-diego-santos.jpg";
 import profaJuliaImg from "@/assets/profa-julia-oliveira.jpg";
+import auxEnfMariaImg from "@/assets/aux-enf-maria.jpg";
+import auxEnfJoseImg from "@/assets/aux-enf-jose.jpg";
+import enfPatriciaImg from "@/assets/enf-patricia.jpg";
+import enfRodrigoImg from "@/assets/enf-rodrigo.jpg";
+import enfClaudiaImg from "@/assets/enf-claudia.jpg";
+import tecEnfLucianaImg from "@/assets/tec-enf-luciana.jpg";
+import tecEnfCarlosImg from "@/assets/tec-enf-carlos.jpg";
+import cuidHelenaImg from "@/assets/cuid-helena.jpg";
+import cuidJorgeImg from "@/assets/cuid-jorge.jpg";
+import cuidSandraImg from "@/assets/cuid-sandra.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -73,6 +83,10 @@ export const categories = [
   "Saúde Ocupacional",
   "Acupuntura",
   "Jardineiros & Cultivo",
+  "Aux. de Enfermagem",
+  "Enfermagem",
+  "Téc. Enfermagem",
+  "Cuidadores de Idosos",
 ];
 
 export const professionals: Professional[] = [

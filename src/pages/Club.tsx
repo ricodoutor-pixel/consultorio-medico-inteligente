@@ -282,9 +282,70 @@ const Club = () => {
     return true;
   });
 
-  const handleCheckout = () => {
-    const items = cart.map((i) => `${i.qty}x ${i.product.name}`).join(", ");
-    window.open(`${WHATSAPP_BRISA}?text=Olá! Quero comprar: ${items} - Total: R$ ${cartTotal.toFixed(2)}`, "_blank");
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  const handleCheckout = async () => {
+    setCheckoutLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: "Faça login para comprar", description: "Redirecionando...", variant: "destructive" });
+        setTimeout(() => window.location.href = "/login", 1500);
+        setCheckoutLoading(false);
+        return;
+      }
+
+      const cartItems = cart.map(i => ({
+        title: i.product.name,
+        quantity: i.qty,
+        price: i.product.price,
+      }));
+
+      const { data, error } = await supabase.functions.invoke("create-cart-payment", {
+        body: { items: cartItems, total: cartTotal, description: `Club Planta y Raiz - ${cart.length} itens` },
+      });
+
+      if (error) throw error;
+      if (data?.init_point) {
+        window.open(data.init_point, "_blank");
+        toast({ title: "Redirecionando para o Mercado Pago... 💳" });
+      } else {
+        toast({ title: "Erro ao gerar link", variant: "destructive" });
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      toast({ title: "Erro ao processar pagamento", variant: "destructive" });
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
+  const handleBuyNow = async (product: Product) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: "Faça login para comprar", variant: "destructive" });
+        setTimeout(() => window.location.href = "/login", 1500);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("create-cart-payment", {
+        body: {
+          items: [{ title: product.name, quantity: 1, price: product.price }],
+          total: product.price,
+          description: `Planta y Raiz Ltda - ${product.name}`,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.init_point) {
+        window.open(data.init_point, "_blank");
+        toast({ title: "Redirecionando para pagamento... 💳" });
+      }
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Erro ao gerar pagamento", variant: "destructive" });
+    }
   };
 
   return (
@@ -586,7 +647,9 @@ const Club = () => {
                 <div className="border-t border-border p-5 space-y-3">
                   <div className="flex justify-between text-sm"><span className="text-muted-foreground">Frete:</span><span className="text-primary font-semibold">Grátis 🎉</span></div>
                   <div className="flex justify-between"><span className="font-bold text-foreground">Total:</span><span className="text-xl font-black text-primary">R$ {cartTotal.toFixed(2)}</span></div>
-                  <Button className="w-full py-5" onClick={handleCheckout}>Finalizar via WhatsApp 📱</Button>
+                  <Button className="w-full py-5" onClick={handleCheckout} disabled={checkoutLoading}>
+                    {checkoutLoading ? <><Loader2 size={16} className="mr-2 animate-spin" /> Gerando...</> : "Comprar Agora 💳"}
+                  </Button>
                   <Button variant="outline" className="w-full" onClick={() => setCart([])}>Limpar Carrinho</Button>
                 </div>
               )}

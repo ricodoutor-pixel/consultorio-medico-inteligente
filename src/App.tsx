@@ -85,6 +85,7 @@ const ImpactoSocial = lazy(() => import("./pages/ImpactoSocial"));
 const EbookLanding = lazy(() => import("./pages/EbookLanding"));
 const EbookMedicinaCanabinoide = lazy(() => import("./pages/EbookMedicinaCanabinoide"));
 const EbookAnalyticsDashboard = lazy(() => import("./pages/EbookAnalyticsDashboard"));
+const RevenueDistribution = lazy(() => import("./pages/RevenueDistribution"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();

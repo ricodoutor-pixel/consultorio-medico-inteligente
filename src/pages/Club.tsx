@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, MessageCircle, Share2, ShoppingCart, Bell, Check, Send, X, Star, Filter, ChevronLeft, ChevronRight, Minus, Plus, Trash2, Package, MapPin, Camera, Image as ImageIcon } from "lucide-react";
+import { Heart, MessageCircle, Share2, ShoppingCart, Bell, Check, Send, X, Star, Filter, ChevronLeft, ChevronRight, Minus, Plus, Trash2, Package, MapPin, Camera, Image as ImageIcon, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -282,9 +282,70 @@ const Club = () => {
     return true;
   });
 
-  const handleCheckout = () => {
-    const items = cart.map((i) => `${i.qty}x ${i.product.name}`).join(", ");
-    window.open(`${WHATSAPP_BRISA}?text=Olá! Quero comprar: ${items} - Total: R$ ${cartTotal.toFixed(2)}`, "_blank");
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  const handleCheckout = async () => {
+    setCheckoutLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: "Faça login para comprar", description: "Redirecionando...", variant: "destructive" });
+        setTimeout(() => window.location.href = "/login", 1500);
+        setCheckoutLoading(false);
+        return;
+      }
+
+      const cartItems = cart.map(i => ({
+        title: i.product.name,
+        quantity: i.qty,
+        price: i.product.price,
+      }));
+
+      const { data, error } = await supabase.functions.invoke("create-cart-payment", {
+        body: { items: cartItems, total: cartTotal, description: `Club Planta y Raiz - ${cart.length} itens` },
+      });
+
+      if (error) throw error;
+      if (data?.init_point) {
+        window.open(data.init_point, "_blank");
+        toast({ title: "Redirecionando para o Mercado Pago... 💳" });
+      } else {
+        toast({ title: "Erro ao gerar link", variant: "destructive" });
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      toast({ title: "Erro ao processar pagamento", variant: "destructive" });
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
+  const handleBuyNow = async (product: Product) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: "Faça login para comprar", variant: "destructive" });
+        setTimeout(() => window.location.href = "/login", 1500);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("create-cart-payment", {
+        body: {
+          items: [{ title: product.name, quantity: 1, price: product.price }],
+          total: product.price,
+          description: `Planta y Raiz Ltda - ${product.name}`,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.init_point) {
+        window.open(data.init_point, "_blank");
+        toast({ title: "Redirecionando para pagamento... 💳" });
+      }
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Erro ao gerar pagamento", variant: "destructive" });
+    }
   };
 
   return (
@@ -429,9 +490,14 @@ const Club = () => {
                         <div className="flex items-center justify-between mt-3">
                           <span className="text-lg font-black text-primary">R$ {product.price.toFixed(2)}</span>
                         </div>
-                        <Button size="sm" className="w-full mt-2 gap-1" onClick={() => addToCart(product)}>
-                          <ShoppingCart size={14} /> Comprar
-                        </Button>
+                        <div className="flex gap-2 mt-2">
+                          <Button size="sm" className="flex-1 gap-1" onClick={() => addToCart(product)}>
+                            <ShoppingCart size={14} /> Carrinho
+                          </Button>
+                          <Button size="sm" variant="outline" className="flex-1 gap-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => handleBuyNow(product)}>
+                            Comprar Agora
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -586,7 +652,9 @@ const Club = () => {
                 <div className="border-t border-border p-5 space-y-3">
                   <div className="flex justify-between text-sm"><span className="text-muted-foreground">Frete:</span><span className="text-primary font-semibold">Grátis 🎉</span></div>
                   <div className="flex justify-between"><span className="font-bold text-foreground">Total:</span><span className="text-xl font-black text-primary">R$ {cartTotal.toFixed(2)}</span></div>
-                  <Button className="w-full py-5" onClick={handleCheckout}>Finalizar via WhatsApp 📱</Button>
+                  <Button className="w-full py-5" onClick={handleCheckout} disabled={checkoutLoading}>
+                    {checkoutLoading ? <><Loader2 size={16} className="mr-2 animate-spin" /> Gerando...</> : "Comprar Agora 💳"}
+                  </Button>
                   <Button variant="outline" className="w-full" onClick={() => setCart([])}>Limpar Carrinho</Button>
                 </div>
               )}

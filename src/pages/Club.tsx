@@ -4,11 +4,12 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, MessageCircle, Share2, ShoppingCart, Bell, Check, Send, X, Star, Filter, ChevronLeft, ChevronRight, Minus, Plus, Trash2, Package, MapPin, Camera, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Heart, MessageCircle, Share2, ShoppingCart, Bell, Check, Send, X, Star, Filter, ChevronLeft, ChevronRight, Minus, Plus, Trash2, Package, MapPin, Camera, Image as ImageIcon, Loader2, Bitcoin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
+import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 
 // Product images
 import prod1a from "@/assets/club/prod1-a.jpg";
@@ -667,6 +668,10 @@ const Club = () => {
                   <div className="flex justify-between"><span className="font-bold text-foreground">Total:</span><span className="text-xl font-black text-primary">R$ {cartTotal.toFixed(2)}</span></div>
                   <Button className="w-full py-5" onClick={handleCheckout} disabled={checkoutLoading}>
                     {checkoutLoading ? <><Loader2 size={16} className="mr-2 animate-spin" /> Gerando...</> : "Comprar Agora 💳"}
+                  </Button>
+                  <Button variant="outline" className="w-full border-amber-500/40 text-amber-500 hover:bg-amber-500/10 font-bold gap-1"
+                    onClick={() => setBtcModal({ open: true, planName: cart.map(i => i.product.name).join(", "), planId: "club-cart", amount: `R$ ${cartTotal.toFixed(2)}` })}>
+                    <Bitcoin size={14} /> Pagar com BTC
                   </Button>
                   <Button variant="outline" className="w-full" onClick={() => setCart([])}>Limpar Carrinho</Button>
                 </div>

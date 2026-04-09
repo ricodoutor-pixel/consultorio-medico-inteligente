@@ -567,6 +567,54 @@ export type Database = {
           },
         ]
       }
+      doctor_performance_metrics: {
+        Row: {
+          average_rating: number
+          consultations_count: number
+          created_at: string
+          doctor_id: string
+          estimated_share: number
+          hours_online: number
+          id: string
+          month: number
+          performance_score: number
+          tier_multiplier: number
+          updated_at: string
+          weighted_score: number
+          year: number
+        }
+        Insert: {
+          average_rating?: number
+          consultations_count?: number
+          created_at?: string
+          doctor_id: string
+          estimated_share?: number
+          hours_online?: number
+          id?: string
+          month: number
+          performance_score?: number
+          tier_multiplier?: number
+          updated_at?: string
+          weighted_score?: number
+          year: number
+        }
+        Update: {
+          average_rating?: number
+          consultations_count?: number
+          created_at?: string
+          doctor_id?: string
+          estimated_share?: number
+          hours_online?: number
+          id?: string
+          month?: number
+          performance_score?: number
+          tier_multiplier?: number
+          updated_at?: string
+          weighted_score?: number
+          year?: number
+        }
+        Relationships: []
+      }
       doctors: {
         Row: {
           available_hours: Json | null
@@ -762,6 +810,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      medical_subscriptions: {
+        Row: {
+          amount: number
+          created_at: string
+          doctor_id: string
+          expires_at: string | null
+          id: string
+          mercadopago_subscription_id: string | null
+          plan_tier: string
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          doctor_id: string
+          expires_at?: string | null
+          id?: string
+          mercadopago_subscription_id?: string | null
+          plan_tier?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          doctor_id?: string
+          expires_at?: string | null
+          id?: string
+          mercadopago_subscription_id?: string | null
+          plan_tier?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -1002,6 +1089,39 @@ export type Database = {
           total_earnings?: number | null
           total_referrals?: number | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      revenue_distribution_pool: {
+        Row: {
+          created_at: string
+          distributed_amount: number
+          id: string
+          month: number
+          status: string
+          total_pool: number
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          distributed_amount?: number
+          id?: string
+          month: number
+          status?: string
+          total_pool?: number
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          distributed_amount?: number
+          id?: string
+          month?: number
+          status?: string
+          total_pool?: number
+          updated_at?: string
+          year?: number
         }
         Relationships: []
       }
@@ -1341,6 +1461,15 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_doctor_performance: {
+        Args: {
+          _consultations: number
+          _hours_online: number
+          _plan_tier: string
+          _rating: number
+        }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

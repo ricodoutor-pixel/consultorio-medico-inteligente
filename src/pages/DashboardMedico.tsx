@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield } from "lucide-react";
 import { motion } from "framer-motion";
+import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
+import { DoctorSubscriptionPlans } from "@/components/doctor/DoctorSubscriptionPlans";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
@@ -23,6 +25,7 @@ const DashboardMedico = () => {
   const [doctorData, setDoctorData] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
+  const [currentTier, setCurrentTier] = useState("basic");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,6 +49,17 @@ const DashboardMedico = () => {
 
       if (apptRes.data) setAppointments(apptRes.data);
       if (rxRes.data) setPrescriptions(rxRes.data);
+
+      // Fetch subscription tier
+      const { data: sub } = await supabase
+        .from("medical_subscriptions")
+        .select("plan_tier")
+        .eq("doctor_id", doctor.id)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (sub?.plan_tier) setCurrentTier(sub.plan_tier);
     }
     setLoading(false);
   };
@@ -199,6 +213,14 @@ const DashboardMedico = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Performance Widget + Subscription Plans */}
+            {doctorData && (
+              <div className="grid lg:grid-cols-2 gap-6 mb-8">
+                <DoctorPerformanceWidget doctorId={doctorData.id} />
+                <DoctorSubscriptionPlans doctorId={doctorData.id} currentTier={currentTier} />
+              </div>
+            )}
 
             {/* Today's Schedule + Recent Prescriptions */}
             <div className="grid lg:grid-cols-2 gap-6">

@@ -372,6 +372,14 @@ const Shopping = () => {
                             >
                               <Plus size={14} className="mr-1" /> Adicionar
                             </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full text-[10px] font-bold mt-1.5 border-amber-500/40 text-amber-500 hover:bg-amber-500/10 h-7"
+                              onClick={() => setBtcModalShopping({ open: true, planName: p.title, planId: p.id, amount: p.price })}
+                            >
+                              <Bitcoin size={10} className="mr-1" /> Depositar BTC
+                            </Button>
                           </div>
                         </CardContent>
                       </Card>

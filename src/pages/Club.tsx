@@ -513,6 +513,10 @@ const Club = () => {
                             Comprar
                           </Button>
                         </div>
+                        <Button size="sm" variant="outline" className="w-full gap-1 text-[10px] sm:text-xs h-6 sm:h-7 mt-1 border-amber-500/40 text-amber-500 hover:bg-amber-500/10"
+                          onClick={() => setBtcModal({ open: true, planName: product.name, planId: String(product.id), amount: `R$ ${product.price.toFixed(2)}` })}>
+                          <Bitcoin size={10} /> Depositar BTC
+                        </Button>
                       </CardContent>
                     </Card>
                   ))}

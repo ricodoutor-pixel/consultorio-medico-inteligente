@@ -10,7 +10,7 @@ import {
   ShoppingBag, Star, ArrowLeft, ArrowRight,
   Store, CreditCard, Truck, Search, Shield, Grid3X3, List, ChevronRight,
   Tag, Package, Bitcoin, Clock, ChevronLeft,
-  BadgeCheck, Flame, Filter, X, SlidersHorizontal
+  BadgeCheck, Flame, Filter, X, SlidersHorizontal, Heart
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/store/cart";
@@ -113,6 +113,27 @@ const fadeUp = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, tra
 const stagger = { visible: { transition: { staggerChildren: 0.05 } } };
 
 const fmtPrice = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
+
+/* ─── FAVORITES HOOK (localStorage) ─── */
+const useFavorites = () => {
+  const [favs, setFavs] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem("pyr_favorites");
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch { return new Set(); }
+  });
+
+  const toggle = (id: string) => {
+    setFavs(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      localStorage.setItem("pyr_favorites", JSON.stringify([...next]));
+      return next;
+    });
+  };
+
+  return { favs, toggle, isFav: (id: string) => favs.has(id) };
+};
 
 /* ─── IMAGE CAROUSEL ─── */
 const ImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
@@ -299,6 +320,8 @@ const Shopping = () => {
   const { toast } = useToast();
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
   const [btcModal, setBtcModal] = useState({ open: false, planName: "", planId: "", amount: "" });
+
+  const { toggle: toggleFav, isFav } = useFavorites();
 
   useEffect(() => {
     (async () => {
@@ -556,17 +579,29 @@ const Shopping = () => {
                         {viewMode === "grid" ? (
                           <Card className="border-border/30 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 bg-card/30 backdrop-blur-sm overflow-hidden group rounded-xl">
                             <CardContent className="p-0">
-                              <Link to={`/shopping/${p.id}`} className="relative block">
-                                <ImageCarousel images={images} alt={p.name} />
-                                {discount > 0 && (
-                                  <span className="absolute top-1.5 left-1.5 text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-md bg-destructive text-destructive-foreground font-bold shadow-sm">
-                                    {discount}% OFF
+                              <div className="relative">
+                                <Link to={`/shopping/${p.id}`} className="block">
+                                  <ImageCarousel images={images} alt={p.name} />
+                                </Link>
+                                {/* Badges - left side stacked */}
+                                <div className="absolute top-1.5 left-1.5 flex flex-col gap-1 pointer-events-none">
+                                  {discount > 0 && (
+                                    <span className="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-md bg-destructive text-destructive-foreground font-bold shadow-sm w-fit">
+                                      {discount}% OFF
+                                    </span>
+                                  )}
+                                  <span className="text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded-md bg-primary/90 text-primary-foreground font-bold shadow-sm w-fit">
+                                    FRETE GRÁTIS
                                   </span>
-                                )}
-                                <span className="absolute top-1.5 right-1.5 text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded-md bg-primary/90 text-primary-foreground font-bold shadow-sm">
-                                  FRETE GRÁTIS
-                                </span>
-                              </Link>
+                                </div>
+                                {/* Favorite heart - outside Link */}
+                                <button
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(p.id); }}
+                                  className="absolute top-1.5 right-1.5 z-10 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-md hover:scale-110 transition-transform"
+                                >
+                                  <Heart size={16} className={isFav(p.id) ? "text-red-500 fill-red-500" : "text-muted-foreground"} />
+                                </button>
+                              </div>
 
                               <div className="p-2.5 sm:p-3">
                                 <p className="text-[8px] sm:text-[9px] text-muted-foreground mb-0.5 flex items-center gap-1 truncate">
@@ -612,14 +647,24 @@ const Shopping = () => {
                           <Card className="border-border/30 hover:border-primary/30 transition-all bg-card/30 backdrop-blur-sm rounded-xl">
                             <CardContent className="p-0">
                               <div className="flex gap-3 p-3">
-                                <Link to={`/shopping/${p.id}`} className="shrink-0">
+                                <Link to={`/shopping/${p.id}`} className="shrink-0 relative">
                                   <img src={resolveImg(p.image_url)} alt={p.name} className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover" loading="lazy" />
                                 </Link>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-[8px] sm:text-[9px] text-muted-foreground mb-0.5 flex items-center gap-1"><Store size={9} className="text-primary" /> {vendorName}</p>
-                                  <Link to={`/shopping/${p.id}`}>
-                                    <h3 className="font-bold text-foreground hover:text-primary transition-colors text-xs sm:text-sm mb-0.5 line-clamp-1">{p.name}</h3>
-                                  </Link>
+                                  <div className="flex items-start justify-between">
+                                    <div className="min-w-0 flex-1">
+                                      <p className="text-[8px] sm:text-[9px] text-muted-foreground mb-0.5 flex items-center gap-1"><Store size={9} className="text-primary" /> {vendorName}</p>
+                                      <Link to={`/shopping/${p.id}`}>
+                                        <h3 className="font-bold text-foreground hover:text-primary transition-colors text-xs sm:text-sm mb-0.5 line-clamp-1">{p.name}</h3>
+                                      </Link>
+                                    </div>
+                                    <button
+                                      onClick={() => toggleFav(p.id)}
+                                      className="shrink-0 w-8 h-8 rounded-full bg-card/80 flex items-center justify-center hover:scale-110 transition-transform ml-2"
+                                    >
+                                      <Heart size={16} className={isFav(p.id) ? "text-red-500 fill-red-500" : "text-muted-foreground"} />
+                                    </button>
+                                  </div>
                                   <p className="text-[9px] sm:text-xs text-muted-foreground line-clamp-1 mb-1">{p.description}</p>
                                   <div className="flex items-center gap-0.5 mb-1">
                                     {[1,2,3,4,5].map(s => <Star key={s} size={9} className={s <= Math.round(p.rating || 5) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/20"} />)}

@@ -86,6 +86,7 @@ const EbookLanding = lazy(() => import("./pages/EbookLanding"));
 const EbookMedicinaCanabinoide = lazy(() => import("./pages/EbookMedicinaCanabinoide"));
 const EbookAnalyticsDashboard = lazy(() => import("./pages/EbookAnalyticsDashboard"));
 const RevenueDistribution = lazy(() => import("./pages/RevenueDistribution"));
+const ProfessionalDashboard = lazy(() => import("./pages/ProfessionalDashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -181,6 +182,7 @@ const App = () => (
                 <Route path="/admin/ebook-analytics" element={<AdminRoute><EbookAnalyticsDashboard /></AdminRoute>} />
                 <Route path="/distribuicao-renda" element={<RevenueDistribution />} />
                 <Route path="/revenue-distribution" element={<RevenueDistribution />} />
+                <Route path="/dashboard/professional" element={<PrivateRoute><ProfessionalDashboard /></PrivateRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

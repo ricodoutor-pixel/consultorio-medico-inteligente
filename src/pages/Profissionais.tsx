@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2 } from "lucide-react";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
+import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { motion } from "framer-motion";
 import { professionals as allProfessionals, categories, Professional } from "@/data/professionals";
 import { supabase } from "@/integrations/supabase/client";
@@ -320,6 +321,7 @@ const Profissionais = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <h3 className="font-black text-foreground text-sm md:text-base truncate">{p.name}</h3>
+                              {p.id === "med-0" && <DoctorVIPSeal tier="basic" />}
                               {p.flags && p.flags.map((flag, i) => (
                                 <span key={i} className="text-sm flex-shrink-0">{flag}</span>
                               ))}

@@ -3,23 +3,27 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown, Check, Zap, Building2, Stethoscope } from "lucide-react";
+import { Crown, Check, Zap, Building2, Stethoscope, ShieldCheck, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 
 const PLANS = [
   {
     id: "basic",
-    name: "Básico",
+    name: "Médico VIP",
     price: 99,
-    icon: Stethoscope,
-    color: "border-zinc-500/30",
-    highlight: false,
+    icon: ShieldCheck,
+    color: "border-primary/40",
+    highlight: true,
+    vip: true,
     multiplier: "1.0×",
+    tagline: "TAXA ZERO",
     features: [
-      "Perfil na plataforma",
+      "✨ Taxa de intermediação 0%",
+      "Retenha 100% dos honorários",
+      "Perfil verificado na plataforma",
       "Até 20 consultas/mês",
-      "Suporte por email",
+      "Suporte prioritário por email",
       "Participação base nos lucros",
     ],
   },
@@ -30,9 +34,11 @@ const PLANS = [
     icon: Zap,
     color: "border-blue-500/30",
     highlight: false,
+    vip: false,
     multiplier: "1.2×",
+    tagline: null,
     features: [
-      "Tudo do Básico",
+      "Tudo do VIP",
       "Consultas ilimitadas",
       "Destaque no ranking",
       "1.2× multiplicador de lucros",
@@ -45,13 +51,15 @@ const PLANS = [
     price: 599,
     icon: Crown,
     color: "border-amber-500/40",
-    highlight: true,
+    highlight: false,
+    vip: false,
     multiplier: "1.5×",
+    tagline: "RECOMENDADO",
     features: [
       "Tudo do Profissional",
-      "Prioridade na triagem",
+      "Prioridade na triagem Brisa IA",
       "1.5× multiplicador de lucros",
-      "Selo Premium no perfil",
+      "Selo Premium dourado no perfil",
       "Mentoria exclusiva",
       "API WhatsApp dedicada",
     ],
@@ -63,11 +71,13 @@ const PLANS = [
     icon: Building2,
     color: "border-purple-500/40",
     highlight: false,
+    vip: false,
     multiplier: "2.0×",
+    tagline: null,
     features: [
       "Tudo do Premium",
       "2.0× multiplicador de lucros",
-      "Gestão de clínica",
+      "Gestão de clínica completa",
       "Múltiplos profissionais",
       "SLA garantido",
       "Gerente de conta dedicado",
@@ -75,13 +85,13 @@ const PLANS = [
   },
 ];
 
-export const DoctorSubscriptionPlans = ({
-  doctorId,
-  currentTier,
-}: {
+interface Props {
   doctorId: string;
   currentTier: string;
-}) => {
+  onTierChange?: (tier: string) => void;
+}
+
+export const DoctorSubscriptionPlans = ({ doctorId, currentTier, onTierChange }: Props) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -102,7 +112,6 @@ export const DoctorSubscriptionPlans = ({
         return;
       }
 
-      // Call edge function to create Mercado Pago preference
       const { data, error } = await supabase.functions.invoke("create-doctor-subscription", {
         body: { planId, doctorId },
       });
@@ -118,6 +127,10 @@ export const DoctorSubscriptionPlans = ({
     }
   };
 
+  const simulateTierChange = (planId: string) => {
+    onTierChange?.(planId);
+  };
+
   return (
     <div>
       <h3 className="font-display font-black text-xl text-foreground mb-1 flex items-center gap-2">
@@ -131,13 +144,19 @@ export const DoctorSubscriptionPlans = ({
         {PLANS.map((plan) => {
           const isActive = plan.id === currentTier;
           return (
-            <motion.div key={plan.id} whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
+            <motion.div key={plan.id} whileHover={{ y: -4 }} transition={{ duration: 0.2 }}
+              onHoverStart={() => simulateTierChange(plan.id)}
+              onHoverEnd={() => simulateTierChange(currentTier)}
+            >
               <Card
                 className={`relative overflow-hidden transition-all ${plan.color} ${
-                  plan.highlight ? "ring-2 ring-amber-500/50 shadow-lg shadow-amber-500/10" : ""
+                  plan.highlight ? "ring-2 ring-primary/50 shadow-lg shadow-primary/10" : ""
                 } ${isActive ? "ring-2 ring-primary/60" : ""}`}
               >
-                {plan.highlight && (
+                {plan.vip && (
+                  <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary to-emerald-400" />
+                )}
+                {plan.tagline === "RECOMENDADO" && (
                   <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
                 )}
                 {isActive && (
@@ -145,11 +164,20 @@ export const DoctorSubscriptionPlans = ({
                     Atual
                   </Badge>
                 )}
+                {plan.tagline && !isActive && (
+                  <Badge className={`absolute top-3 right-3 text-[10px] font-black ${
+                    plan.vip ? "bg-primary/20 text-primary border-primary/30" : "bg-amber-500/20 text-amber-400 border-amber-500/30"
+                  }`}>
+                    {plan.tagline}
+                  </Badge>
+                )}
                 <CardContent className="p-5">
                   <plan.icon
                     size={28}
                     className={
-                      plan.id === "premium"
+                      plan.vip
+                        ? "text-primary"
+                        : plan.id === "premium"
                         ? "text-amber-400"
                         : plan.id === "enterprise"
                         ? "text-purple-400"
@@ -158,7 +186,10 @@ export const DoctorSubscriptionPlans = ({
                         : "text-muted-foreground"
                     }
                   />
-                  <h4 className="font-display font-black text-lg text-foreground mt-3">{plan.name}</h4>
+                  <h4 className="font-display font-black text-lg text-foreground mt-3 flex items-center gap-2">
+                    {plan.name}
+                    {plan.vip && <Sparkles size={14} className="text-primary" />}
+                  </h4>
                   <div className="mt-1 mb-4">
                     {plan.price ? (
                       <span className="text-2xl font-display font-black text-foreground">
@@ -176,20 +207,24 @@ export const DoctorSubscriptionPlans = ({
 
                   <ul className="space-y-2 mb-5">
                     {plan.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <li key={i} className={`flex items-start gap-2 text-xs ${
+                        f.startsWith("✨") ? "text-primary font-bold" : "text-muted-foreground"
+                      }`}>
                         <Check size={12} className="text-primary mt-0.5 shrink-0" />
-                        {f}
+                        {f.replace("✨ ", "")}
                       </li>
                     ))}
                   </ul>
 
                   <Button
                     className={`w-full rounded-xl text-sm font-bold ${
-                      plan.highlight
+                      plan.vip && !isActive
+                        ? "bg-gradient-to-r from-primary to-emerald-500 hover:from-emerald-600 hover:to-primary text-white"
+                        : plan.id === "premium" && !isActive
                         ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
                         : ""
                     }`}
-                    variant={plan.highlight ? "default" : isActive ? "outline" : "default"}
+                    variant={plan.vip || plan.id === "premium" ? "default" : isActive ? "outline" : "default"}
                     disabled={isActive || loading === plan.id}
                     onClick={() => handleSubscribe(plan.id, plan.price)}
                   >
@@ -206,6 +241,21 @@ export const DoctorSubscriptionPlans = ({
             </motion.div>
           );
         })}
+      </div>
+
+      {/* VIP Explanation */}
+      <div className="mt-6 bg-primary/5 border border-primary/20 rounded-2xl p-5">
+        <div className="flex items-start gap-3">
+          <ShieldCheck size={24} className="text-primary shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-display font-black text-foreground mb-1">Plano Médico VIP — Taxa Zero</h4>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              No Plano VIP, você retém <span className="text-primary font-bold">100% dos seus honorários</span>. 
+              A taxa de intermediação é <span className="text-primary font-bold">0%</span> — a tecnologia trabalha para você. 
+              Concentre-se no que importa: cuidar dos seus pacientes. A plataforma cuida do resto.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

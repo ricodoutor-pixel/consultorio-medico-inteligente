@@ -26,6 +26,7 @@ const DashboardMedico = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
   const [currentTier, setCurrentTier] = useState("basic");
+  const [simulatedTier, setSimulatedTier] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -217,8 +218,8 @@ const DashboardMedico = () => {
             {/* Performance Widget + Subscription Plans */}
             {doctorData && (
               <div className="grid lg:grid-cols-2 gap-6 mb-8">
-                <DoctorPerformanceWidget doctorId={doctorData.id} />
-                <DoctorSubscriptionPlans doctorId={doctorData.id} currentTier={currentTier} />
+                <DoctorPerformanceWidget doctorId={doctorData.id} simulatedTier={simulatedTier} />
+                <DoctorSubscriptionPlans doctorId={doctorData.id} currentTier={currentTier} onTierChange={setSimulatedTier} />
               </div>
             )}
 

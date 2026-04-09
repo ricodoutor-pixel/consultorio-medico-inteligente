@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, MessageCircle, Share2, ShoppingCart, Bell, Check, Send, X, Star, Filter, ChevronLeft, ChevronRight, Minus, Plus, Trash2, Package, MapPin, Camera, Image as ImageIcon, Loader2, Bitcoin } from "lucide-react";
@@ -367,7 +366,6 @@ const Club = () => {
   return (
     <div className="min-h-screen bg-background w-full overflow-x-hidden">
       <Navbar />
-      <WhatsAppButton />
 
       {/* Notification Bell */}
       {user && (

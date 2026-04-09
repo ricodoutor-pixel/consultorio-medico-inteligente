@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -58,7 +57,6 @@ const FalarComEspecialista = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <WhatsAppButton />
         <section className="pt-24 pb-16 md:pt-32">
           <div className="container mx-auto px-4 max-w-2xl text-center">
             <Stethoscope size={48} className="text-primary mx-auto mb-6" />
@@ -81,7 +79,6 @@ const FalarComEspecialista = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <WhatsAppButton />
 
       <section className="pt-24 pb-16 md:pt-32">
         <div className="container mx-auto px-4 max-w-4xl">

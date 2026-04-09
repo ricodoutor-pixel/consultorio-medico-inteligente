@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Leaf, Users, Star, ArrowRight, TrendingUp, UserPlus, Download, Quote } from "lucide-react";
 import { motion } from "framer-motion";
 import CannabisMarketChart from "@/components/CannabisMarketChart";
@@ -73,7 +72,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background w-full overflow-x-hidden">
       <Navbar />
-      <WhatsAppButton />
 
       {/* Hero Section */}
       <section className="hero-glow pb-12 md:pb-16 min-h-[60dvh] lg:min-h-[80dvh] flex items-start overflow-hidden pt-20 md:pt-24">

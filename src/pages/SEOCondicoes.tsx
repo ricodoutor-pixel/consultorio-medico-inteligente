@@ -1,7 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -138,7 +137,6 @@ const SEOCondicoes = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <WhatsAppButton />
         <SEO title="Tratamentos com Cannabis Medicinal | Planta & Raiz" description="Conheça os tratamentos com cannabis medicinal para diversas condições. Evidências científicas e prescritores especializados." />
         
         <section className="pt-24 pb-16 md:pt-32">
@@ -180,7 +178,6 @@ const SEOCondicoes = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <WhatsAppButton />
       <SEO title={data.title} description={data.description} />
 
       <article className="pt-24 pb-16 md:pt-32">

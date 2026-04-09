@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -336,7 +335,6 @@ const Shopping = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <WhatsAppButton />
         <ProductDetail id={id} />
         <Footer />
       </div>
@@ -369,7 +367,6 @@ const Shopping = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <WhatsAppButton />
 
       {/* Hero Search Bar */}
       <section className="pt-20 md:pt-28 pb-4 sm:pb-6 bg-gradient-to-b from-primary/8 to-background border-b border-border/50">

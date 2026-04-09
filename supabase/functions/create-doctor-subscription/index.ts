@@ -47,11 +47,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Server-controlled pricing
-    const plans: Record<string, { title: string; amount: number }> = {
-      basic:        { title: "Plano Médico Básico",        amount: 99 },
-      professional: { title: "Plano Médico Profissional",  amount: 299 },
-      premium:      { title: "Plano Médico Premium",       amount: 599 },
+    // Server-controlled pricing — VIP (basic) has 0% platform fee on consultations
+    const plans: Record<string, { title: string; amount: number; feeRate: number }> = {
+      basic:        { title: "Plano Médico VIP — Taxa Zero",  amount: 99,  feeRate: 0 },
+      professional: { title: "Plano Médico Profissional",     amount: 299, feeRate: 0.05 },
+      premium:      { title: "Plano Médico Premium",          amount: 599, feeRate: 0.03 },
     };
 
     const plan = plans[planId];

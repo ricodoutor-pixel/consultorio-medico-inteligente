@@ -1017,6 +1017,39 @@ export type Database = {
           },
         ]
       }
+      product_alert_subscriptions: {
+        Row: {
+          categories: string[]
+          channels: string[]
+          created_at: string
+          id: string
+          is_active: boolean
+          phone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          categories?: string[]
+          channels?: string[]
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          phone: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          categories?: string[]
+          channels?: string[]
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          phone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
+import { ProductAlertBell } from "@/components/ProductAlertBell";
 
 // Product images
 import prod1a from "@/assets/club/prod1-a.jpg";
@@ -412,7 +413,10 @@ const Club = () => {
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-2xl sm:text-4xl md:text-6xl font-display font-black mb-3 md:mb-4">
             <span className="text-gradient-green">Club</span> <span className="text-foreground">Planta y Raiz</span>
           </motion.h1>
-          <p className="text-muted-foreground text-sm sm:text-lg max-w-2xl mx-auto mb-4 md:mb-6">Lifestyle, comunidade e produtos exclusivos. Pagamento via PIX ou BTC.</p>
+          <p className="text-muted-foreground text-sm sm:text-lg max-w-2xl mx-auto mb-2">Lifestyle, comunidade e produtos exclusivos. Pagamento via PIX ou BTC.</p>
+          <div className="flex justify-center mb-3">
+            <ProductAlertBell category="club" />
+          </div>
 
           {/* Tab switcher */}
           <div className="flex justify-center gap-2">

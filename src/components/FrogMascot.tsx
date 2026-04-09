@@ -146,6 +146,14 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       layout
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
+      {/* Persistent ping ring — indicates tappable */}
+      {!isEnlarged && !showStory && (
+        <div
+          className="absolute inset-0 rounded-full border-2 border-primary/50 animate-ping pointer-events-none"
+          style={{ animationDuration: "2s" }}
+        />
+      )}
+
       {/* Glow */}
       <motion.div
         className="absolute inset-0 rounded-full bg-primary/20 blur-lg"

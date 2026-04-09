@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DollarSign, Users, Activity, Shield, Wifi, WifiOff,
@@ -7,13 +7,15 @@ import {
   ShoppingBag, CreditCard, ArrowUpRight, ArrowDownRight, Zap,
   Globe, Server, Database, Cpu, Heart, RefreshCw, Filter,
   Download, Package, Truck, FileText, Calendar, BarChart3,
-  CheckCircle2, XCircle, AlertCircle
+  CheckCircle2, XCircle, AlertCircle, Flame, ThermometerSun,
+  Smile, Frown, Meh, Volume2, TrendingDown
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { Progress } from "@/components/ui/progress";
+import { motion } from "framer-motion";
 import {
   ComposableMap,
   Geographies,
@@ -22,36 +24,57 @@ import {
 } from "react-simple-maps";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area
+  ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, BarChart, Bar,
+  FunnelChart, Funnel, LabelList, RadarChart, Radar, PolarGrid,
+  PolarAngleAxis, PolarRadiusAxis
 } from "recharts";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-/* ─── SIMULATED DATA ─── */
-const generateUserMarkers = () => {
-  const cities = [
-    { name: "São Paulo", coordinates: [-46.63, -23.55] as [number, number], users: 1240 },
-    { name: "Rio de Janeiro", coordinates: [-43.17, -22.91] as [number, number], users: 890 },
-    { name: "Belo Horizonte", coordinates: [-43.94, -19.92] as [number, number], users: 456 },
-    { name: "Curitiba", coordinates: [-49.27, -25.43] as [number, number], users: 320 },
-    { name: "Porto Alegre", coordinates: [-51.18, -30.03] as [number, number], users: 278 },
-    { name: "Salvador", coordinates: [-38.51, -12.97] as [number, number], users: 345 },
-    { name: "Recife", coordinates: [-34.88, -8.05] as [number, number], users: 234 },
-    { name: "Brasília", coordinates: [-47.93, -15.78] as [number, number], users: 189 },
-    { name: "Manaus", coordinates: [-60.02, -3.12] as [number, number], users: 98 },
-    { name: "Fortaleza", coordinates: [-38.52, -3.73] as [number, number], users: 267 },
-    { name: "Lisboa", coordinates: [-9.14, 38.74] as [number, number], users: 78 },
-    { name: "Miami", coordinates: [-80.19, 25.76] as [number, number], users: 45 },
-    { name: "Buenos Aires", coordinates: [-58.38, -34.6] as [number, number], users: 67 },
-    { name: "Bogotá", coordinates: [-74.07, 4.71] as [number, number], users: 34 },
-    { name: "Cidade do México", coordinates: [-99.13, 19.43] as [number, number], users: 23 },
-  ];
-  return cities.map(c => ({
+/* ═══════════════════════════════════════════════════
+   SIMULATED DATA GENERATORS
+   ═══════════════════════════════════════════════════ */
+
+const CITIES_BASE = [
+  { name: "São Paulo", coordinates: [-46.63, -23.55] as [number, number], users: 1240 },
+  { name: "Rio de Janeiro", coordinates: [-43.17, -22.91] as [number, number], users: 890 },
+  { name: "Belo Horizonte", coordinates: [-43.94, -19.92] as [number, number], users: 456 },
+  { name: "Curitiba", coordinates: [-49.27, -25.43] as [number, number], users: 320 },
+  { name: "Porto Alegre", coordinates: [-51.18, -30.03] as [number, number], users: 278 },
+  { name: "Salvador", coordinates: [-38.51, -12.97] as [number, number], users: 345 },
+  { name: "Recife", coordinates: [-34.88, -8.05] as [number, number], users: 234 },
+  { name: "Brasília", coordinates: [-47.93, -15.78] as [number, number], users: 189 },
+  { name: "Manaus", coordinates: [-60.02, -3.12] as [number, number], users: 98 },
+  { name: "Fortaleza", coordinates: [-38.52, -3.73] as [number, number], users: 267 },
+  { name: "Lisboa", coordinates: [-9.14, 38.74] as [number, number], users: 78 },
+  { name: "Miami", coordinates: [-80.19, 25.76] as [number, number], users: 45 },
+  { name: "Buenos Aires", coordinates: [-58.38, -34.6] as [number, number], users: 67 },
+  { name: "Bogotá", coordinates: [-74.07, 4.71] as [number, number], users: 34 },
+  { name: "Cidade do México", coordinates: [-99.13, 19.43] as [number, number], users: 23 },
+];
+
+// 1. Heatmap pathology data per city
+const PATHOLOGY_DATA: Record<string, { condition: string; intensity: number; color: string }[]> = {
+  "São Paulo": [{ condition: "Ansiedade", intensity: 92, color: "#FF4444" }, { condition: "Insônia", intensity: 78, color: "#FF6B35" }],
+  "Rio de Janeiro": [{ condition: "Dor Crônica", intensity: 85, color: "#FF4444" }, { condition: "Epilepsia", intensity: 45, color: "#FFB800" }],
+  "Curitiba": [{ condition: "Ansiedade", intensity: 95, color: "#FF4444" }, { condition: "TEPT", intensity: 60, color: "#FF6B35" }],
+  "Recife": [{ condition: "Dor Crônica", intensity: 88, color: "#FF4444" }, { condition: "Fibromialgia", intensity: 72, color: "#FF6B35" }],
+  "Belo Horizonte": [{ condition: "Insônia", intensity: 70, color: "#FF6B35" }, { condition: "Ansiedade", intensity: 65, color: "#FFB800" }],
+  "Salvador": [{ condition: "Epilepsia", intensity: 55, color: "#FFB800" }, { condition: "Dor Crônica", intensity: 50, color: "#FFB800" }],
+  "Porto Alegre": [{ condition: "Parkinson", intensity: 40, color: "#39FF14" }, { condition: "Insônia", intensity: 68, color: "#FF6B35" }],
+  "Brasília": [{ condition: "Ansiedade", intensity: 75, color: "#FF6B35" }, { condition: "TDAH", intensity: 42, color: "#FFB800" }],
+  "Manaus": [{ condition: "Dor Crônica", intensity: 35, color: "#39FF14" }],
+  "Fortaleza": [{ condition: "Fibromialgia", intensity: 62, color: "#FF6B35" }, { condition: "Ansiedade", intensity: 58, color: "#FFB800" }],
+};
+
+const generateUserMarkers = () =>
+  CITIES_BASE.map(c => ({
     ...c,
     online: Math.random() > 0.4,
     recentLogin: Math.random() > 0.6,
+    heatIntensity: (PATHOLOGY_DATA[c.name]?.[0]?.intensity || 20) + Math.floor(Math.random() * 10 - 5),
+    topCondition: PATHOLOGY_DATA[c.name]?.[0]?.condition || "Geral",
   }));
-};
 
 const generateRevenueData = () => {
   const days = [];
@@ -88,7 +111,40 @@ const generateSecurityLogs = () => [
   { time: "30m", msg: "[RLS] Policy audit completo — 27 tabelas — 0 violações", level: "info" },
 ];
 
-/* ─── MAIN COMPONENT ─── */
+// 4. Sentiment keywords simulation
+const SENTIMENT_KEYWORDS = {
+  positive: ["ótimo", "excelente", "obrigado", "ajudou", "recomendo", "maravilhoso", "melhorou", "parabéns"],
+  neutral: ["consulta", "receita", "produto", "quando", "como", "preço", "plano", "agenda"],
+  negative: ["erro", "lentidão", "não consigo", "demora", "caro", "problema", "cancelar", "ruim"],
+};
+
+const generateSentimentData = () => {
+  const hours = [];
+  for (let i = 23; i >= 0; i--) {
+    const h = new Date();
+    h.setHours(h.getHours() - i);
+    hours.push({
+      hora: `${h.getHours().toString().padStart(2, "0")}h`,
+      positivo: Math.floor(40 + Math.random() * 45),
+      neutro: Math.floor(20 + Math.random() * 25),
+      negativo: Math.floor(2 + Math.random() * 18),
+    });
+  }
+  return hours;
+};
+
+// 5. Conversion funnel data
+const generateFunnelData = () => [
+  { name: "Home", value: 1000 + Math.floor(Math.random() * 500), fill: "#39FF14" },
+  { name: "Página de Serviço", value: 650 + Math.floor(Math.random() * 200), fill: "#00D4FF" },
+  { name: "Clicou Agendar", value: 320 + Math.floor(Math.random() * 100), fill: "#A855F7" },
+  { name: "Página Pagamento", value: 180 + Math.floor(Math.random() * 60), fill: "#FF6B35" },
+  { name: "Pagamento Concluído", value: 85 + Math.floor(Math.random() * 30), fill: "#39FF14" },
+];
+
+/* ═══════════════════════════════════════════════════
+   MAIN COMPONENT
+   ═══════════════════════════════════════════════════ */
 const AdminMaster = () => {
   const [markers, setMarkers] = useState(generateUserMarkers());
   const [revenueData] = useState(generateRevenueData());
@@ -96,6 +152,7 @@ const AdminMaster = () => {
   const [hoveredMarker, setHoveredMarker] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
   const [pulsePhase, setPulsePhase] = useState(0);
+  const [mapMode, setMapMode] = useState<"users" | "heatmap">("users");
 
   // Real data from Supabase
   const [totalUsers, setTotalUsers] = useState(0);
@@ -113,6 +170,11 @@ const AdminMaster = () => {
   const [salesFilter, setSalesFilter] = useState<"all" | "marketplace" | "consultation" | "club">("all");
   const [salesSearch, setSalesSearch] = useState("");
   const [salesTab, setSalesTab] = useState("todas");
+  // New intelligence layers
+  const [sentimentData] = useState(generateSentimentData());
+  const [funnelData, setFunnelData] = useState(generateFunnelData());
+  const [sentimentAlert, setSentimentAlert] = useState(false);
+  const [vendorProducts, setVendorProducts] = useState<any[]>([]);
 
   const loadDashboardData = useCallback(async () => {
     const [
@@ -125,6 +187,7 @@ const AdminMaster = () => {
       { data: vTxs },
       { data: allEscrows },
       { data: appts },
+      { data: vProducts },
     ] = await Promise.all([
       supabase.from("profiles").select("*", { count: "exact", head: true }),
       supabase.from("doctors").select("id, user_id, specialty, is_online, is_verified, rating, total_consultations, crm, crm_state").order("is_online", { ascending: false }),
@@ -135,6 +198,7 @@ const AdminMaster = () => {
       supabase.from("vendor_transactions").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("escrow_transactions").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("appointments").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("vendor_products").select("id, name, stock, sold_count, is_active, category, vendor_id").order("stock", { ascending: true }).limit(20),
     ]);
 
     setTotalUsers(usersCount || 0);
@@ -150,6 +214,7 @@ const AdminMaster = () => {
     if (vTxs) setVendorTxs(vTxs);
     if (allEscrows) setEscrowTxs(allEscrows);
     if (appts) setAppointments(appts);
+    if (vProducts) setVendorProducts(vProducts);
     setLastRefresh(new Date());
   }, []);
 
@@ -158,9 +223,15 @@ const AdminMaster = () => {
     const interval = setInterval(() => {
       setMarkers(generateUserMarkers());
       setPulsePhase(p => p + 1);
+      setFunnelData(generateFunnelData());
+      // Check sentiment alert
+      const lastSentiment = sentimentData[sentimentData.length - 1];
+      if (lastSentiment && lastSentiment.negativo > 15) {
+        setSentimentAlert(true);
+      }
     }, 5000);
     return () => clearInterval(interval);
-  }, [loadDashboardData]);
+  }, [loadDashboardData, sentimentData]);
 
   // Real-time subscriptions
   useEffect(() => {
@@ -172,6 +243,7 @@ const AdminMaster = () => {
       .on("postgres_changes", { event: "*", schema: "public", table: "vendor_transactions" }, () => loadDashboardData())
       .on("postgres_changes", { event: "*", schema: "public", table: "escrow_transactions" }, () => loadDashboardData())
       .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, () => loadDashboardData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "vendor_products" }, () => loadDashboardData())
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [loadDashboardData]);
@@ -186,6 +258,58 @@ const AdminMaster = () => {
   const simulatedAnnualRevenue = simulatedMonthlyRevenue * 12;
   const conversionRate = totalUsers > 0 ? ((totalDoctors * 3.2 / totalUsers) * 100).toFixed(1) : "0";
 
+  // Doctor burnout simulation
+  const doctorPerformance = useMemo(() => {
+    return doctorsList.map(doc => {
+      const hoursOnline = Math.floor(Math.random() * 10);
+      const avgResponseMin = Math.floor(1 + Math.random() * 8);
+      const avgConsultMin = Math.floor(15 + Math.random() * 30);
+      const nps = Math.floor(60 + Math.random() * 40);
+      const isBurnout = hoursOnline >= 6;
+      const npsDropping = nps < 70;
+      return {
+        ...doc,
+        hoursOnline,
+        avgResponseMin,
+        avgConsultMin,
+        nps,
+        isBurnout,
+        npsDropping,
+        fatigueLevel: isBurnout ? "critical" : hoursOnline >= 4 ? "warning" : "ok",
+      };
+    });
+  }, [doctorsList]);
+
+  // Sentiment totals
+  const sentimentTotals = useMemo(() => {
+    const last = sentimentData.slice(-6);
+    const pos = last.reduce((s, d) => s + d.positivo, 0);
+    const neu = last.reduce((s, d) => s + d.neutro, 0);
+    const neg = last.reduce((s, d) => s + d.negativo, 0);
+    const total = pos + neu + neg;
+    return {
+      positive: total ? Math.round((pos / total) * 100) : 0,
+      neutral: total ? Math.round((neu / total) * 100) : 0,
+      negative: total ? Math.round((neg / total) * 100) : 0,
+      mood: neg > pos ? "critical" : neg > neu ? "warning" : "positive",
+    };
+  }, [sentimentData]);
+
+  // Low stock alerts
+  const lowStockProducts = useMemo(() => {
+    return vendorProducts.filter(p => p.stock <= 5 && p.is_active);
+  }, [vendorProducts]);
+
+  // Supply chain stages (simulated)
+  const supplyChain = useMemo(() => {
+    const paid = vendorTxs.filter(t => t.status === "completed" || t.status === "approved").length || 12;
+    const separating = Math.floor(paid * 0.6);
+    const shipped = Math.floor(paid * 0.35);
+    const delivered = Math.floor(paid * 0.2);
+    return { paid, separating, shipped, delivered, total: paid };
+  }, [vendorTxs]);
+
+  /* ─── Sales tracking helpers ─── */
   const statusBadge = (status: string) => {
     const map: Record<string, { bg: string; color: string; label: string }> = {
       approved: { bg: "#39FF1420", color: "#39FF14", label: "Aprovado" },
@@ -203,7 +327,7 @@ const AdminMaster = () => {
   };
 
   const txRow = (id: string, type: string, typeColor: string, amount: number, fee: number, status: string, date: string) => (
-    <div className="grid grid-cols-2 md:grid-cols-7 gap-2 px-3 py-2.5 rounded-lg items-center hover:scale-[1.005] transition-all" style={{ background: "#0A0E2790" }}>
+    <div key={id} className="grid grid-cols-2 md:grid-cols-7 gap-2 px-3 py-2.5 rounded-lg items-center hover:scale-[1.005] transition-all" style={{ background: "#0A0E2790" }}>
       <span className="text-[10px] font-mono truncate text-white">{id.slice(0, 8)}...</span>
       <span className="text-[10px] font-medium" style={{ color: typeColor }}>{type}</span>
       <span className="text-xs font-bold text-white">{fmtCurrency(amount)}</span>
@@ -247,20 +371,23 @@ const AdminMaster = () => {
       ...escrowTxs.map(t => ({ ...t, _type: "escrow", _typeLabel: t.type === "consultation" ? "🩺 Consulta" : "📦 Pedido", _typeColor: "#00D4FF", _fee: t.platform_fee })),
       ...appointments.map(a => ({ ...a, _type: "appointment", _typeLabel: "📅 Agendamento", _typeColor: "#FF6B35", amount: a.amount, _fee: a.amount * 0.07, status: a.payment_status || a.status })),
     ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
     const filtered = salesFilter === "all" ? all
       : salesFilter === "marketplace" ? all.filter(t => t._type === "marketplace")
       : salesFilter === "consultation" ? all.filter(t => t._type === "escrow" || t._type === "appointment")
-      : all.filter(t => t._type === "marketplace"); // club filter
-
-    const searched = salesSearch
-      ? filtered.filter(t => JSON.stringify(t).toLowerCase().includes(salesSearch.toLowerCase()))
-      : filtered;
-
+      : all;
+    const searched = salesSearch ? filtered.filter(t => JSON.stringify(t).toLowerCase().includes(salesSearch.toLowerCase())) : filtered;
     if (searched.length === 0) return <p className="text-center text-xs py-6" style={{ color: "#ffffff30" }}>Nenhuma transação encontrada</p>;
     return searched.slice(0, 50).map((t, i) => (
       <div key={`${t.id}-${i}`}>{txRow(t.id, t._typeLabel, t._typeColor, Number(t.amount), Number(t._fee), t.status, t.created_at)}</div>
     ));
+  };
+
+  /* ═══ HEATMAP COLOR HELPER ═══ */
+  const heatColor = (intensity: number) => {
+    if (intensity > 80) return "#FF000099";
+    if (intensity > 60) return "#FF6B3580";
+    if (intensity > 40) return "#FFB80060";
+    return "#39FF1430";
   };
 
   return (
@@ -278,6 +405,12 @@ const AdminMaster = () => {
             </div>
           </div>
           <div className="flex items-center gap-2 md:gap-4">
+            {sentimentAlert && (
+              <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="flex items-center gap-1 px-2 py-1 rounded-full" style={{ background: "#FF444430" }}>
+                <Volume2 size={12} className="text-red-400" />
+                <span className="text-[10px] text-red-400 font-bold">ALERTA SENTIMENTO</span>
+              </motion.div>
+            )}
             <div className="hidden md:flex items-center gap-2 text-xs" style={{ color: "#39FF1480" }}>
               <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#39FF14" }} />
               Ao vivo • {lastRefresh.toLocaleTimeString("pt-BR")}
@@ -321,20 +454,39 @@ const AdminMaster = () => {
           ))}
         </div>
 
-        {/* Main Grid: Map + Sidebar */}
+        {/* ═══ 1. MAP WITH HEATMAP TOGGLE + SIDEBAR ═══ */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
-          {/* World Map */}
           <motion.div className="xl:col-span-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
             <Card className="border-0 overflow-hidden" style={{ background: "#0F1340" }}>
               <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <CardTitle className="text-sm md:text-base flex items-center gap-2" style={{ color: "#39FF14" }}>
-                    <Globe size={18} /> Mapa de Usuários em Tempo Real
+                    <Globe size={18} /> {mapMode === "users" ? "Mapa de Usuários" : "🌡️ Heatmap de Patologias"}
                   </CardTitle>
-                  <div className="flex items-center gap-3 text-[10px]">
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full animate-pulse bg-green-400" /> Online</span>
-                    <span className="flex items-center gap-1 text-red-400"><span className="w-2 h-2 rounded-full bg-red-500" /> Offline</span>
-                    <span className="flex items-center gap-1 text-cyan-400"><span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" /> Novo</span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm" variant="ghost"
+                      onClick={() => setMapMode(m => m === "users" ? "heatmap" : "users")}
+                      className="text-[10px] gap-1 h-7"
+                      style={{ color: mapMode === "heatmap" ? "#FF6B35" : "#39FF14", background: "#ffffff08" }}
+                    >
+                      <ThermometerSun size={12} />
+                      {mapMode === "users" ? "Heatmap" : "Usuários"}
+                    </Button>
+                    <div className="flex items-center gap-3 text-[10px]">
+                      {mapMode === "users" ? (
+                        <>
+                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full animate-pulse bg-green-400" /> Online</span>
+                          <span className="flex items-center gap-1 text-red-400"><span className="w-2 h-2 rounded-full bg-red-500" /> Offline</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#FF0000" }} /> Alta</span>
+                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#FFB800" }} /> Média</span>
+                          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#39FF14" }} /> Baixa</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </CardHeader>
@@ -354,9 +506,7 @@ const AdminMaster = () => {
                             fill="#1a1f4e"
                             stroke="#39FF1420"
                             strokeWidth={0.5}
-                            style={{
-                              hover: { fill: "#252b66" },
-                            }}
+                            style={{ hover: { fill: "#252b66" } }}
                           />
                         ))
                       }
@@ -368,27 +518,55 @@ const AdminMaster = () => {
                         onMouseEnter={() => setHoveredMarker(m.name)}
                         onMouseLeave={() => setHoveredMarker(null)}
                       >
-                        {/* Pulse ring for online/recent */}
-                        {m.online && (
-                          <circle r={8 + Math.sin(pulsePhase + i) * 2} fill="none" stroke={m.recentLogin ? "#00D4FF" : "#39FF14"} strokeWidth={1} opacity={0.4} />
+                        {mapMode === "heatmap" ? (
+                          <>
+                            {/* Heatmap glow rings */}
+                            <circle r={Math.max(12, m.heatIntensity / 4)} fill={heatColor(m.heatIntensity)} opacity={0.5 + Math.sin(pulsePhase + i) * 0.15} />
+                            <circle r={Math.max(6, m.heatIntensity / 8)} fill={heatColor(m.heatIntensity)} opacity={0.8} />
+                          </>
+                        ) : (
+                          <>
+                            {m.online && (
+                              <circle r={8 + Math.sin(pulsePhase + i) * 2} fill="none" stroke={m.recentLogin ? "#00D4FF" : "#39FF14"} strokeWidth={1} opacity={0.4} />
+                            )}
+                            <circle
+                              r={Math.max(3, Math.min(m.users / 100, 8))}
+                              fill={m.recentLogin ? "#00D4FF" : m.online ? "#39FF14" : "#FF4444"}
+                              opacity={m.online ? 0.9 : 0.5}
+                              style={{ cursor: "pointer" }}
+                            />
+                          </>
                         )}
-                        <circle
-                          r={Math.max(3, Math.min(m.users / 100, 8))}
-                          fill={m.recentLogin ? "#00D4FF" : m.online ? "#39FF14" : "#FF4444"}
-                          opacity={m.online ? 0.9 : 0.5}
-                          style={{ cursor: "pointer" }}
-                        />
                         {hoveredMarker === m.name && (
                           <g>
-                            <rect x={12} y={-20} width={140} height={36} rx={6} fill="#0A0E27" stroke="#39FF14" strokeWidth={0.5} />
-                            <text x={18} y={-4} fontSize={10} fill="#39FF14" fontWeight="bold">{m.name}</text>
-                            <text x={18} y={10} fontSize={9} fill="#ffffff80">{m.users} usuários • {m.online ? "Online" : "Offline"}</text>
+                            <rect x={12} y={-28} width={180} height={48} rx={6} fill="#0A0E27" stroke={mapMode === "heatmap" ? "#FF6B35" : "#39FF14"} strokeWidth={0.5} />
+                            <text x={18} y={-12} fontSize={10} fill={mapMode === "heatmap" ? "#FF6B35" : "#39FF14"} fontWeight="bold">{m.name}</text>
+                            <text x={18} y={2} fontSize={9} fill="#ffffff80">
+                              {mapMode === "heatmap" ? `🔥 ${m.topCondition} — Intensidade: ${m.heatIntensity}%` : `${m.users} usuários • ${m.online ? "Online" : "Offline"}`}
+                            </text>
+                            {mapMode === "heatmap" && PATHOLOGY_DATA[m.name] && (
+                              <text x={18} y={14} fontSize={8} fill="#ffffff50">
+                                {PATHOLOGY_DATA[m.name].map(p => p.condition).join(", ")}
+                              </text>
+                            )}
                           </g>
                         )}
                       </Marker>
                     ))}
                   </ComposableMap>
                 </div>
+                {/* Heatmap legend bar */}
+                {mapMode === "heatmap" && (
+                  <div className="px-4 py-2 flex flex-wrap gap-2">
+                    {Object.entries(PATHOLOGY_DATA).slice(0, 6).map(([city, conditions]) => (
+                      <div key={city} className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]" style={{ background: "#ffffff08" }}>
+                        <span className="w-2 h-2 rounded-full" style={{ background: conditions[0]?.color || "#39FF14" }} />
+                        <span className="text-white font-medium">{city}:</span>
+                        <span style={{ color: "#ffffff60" }}>{conditions.map(c => c.condition).join(", ")}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -405,7 +583,7 @@ const AdminMaster = () => {
                 {doctorsList.length === 0 && (
                   <p className="text-xs text-center py-4" style={{ color: "#ffffff40" }}>Nenhum profissional cadastrado</p>
                 )}
-                {doctorsList.map((doc, i) => (
+                {doctorsList.map((doc) => (
                   <div
                     key={doc.id}
                     className="flex items-center gap-3 p-2.5 rounded-lg transition-all hover:scale-[1.01]"
@@ -435,6 +613,259 @@ const AdminMaster = () => {
                     </div>
                   </div>
                 ))}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        {/* ═══ 2. DOCTOR BURNOUT & PERFORMANCE ═══ */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+          <Card className="border-0" style={{ background: "#0F1340" }}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm md:text-base flex items-center gap-2" style={{ color: "#FF6B35" }}>
+                <Flame size={18} /> Performance & Burnout Médico
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {doctorPerformance.length === 0 ? (
+                <p className="text-center text-xs py-4" style={{ color: "#ffffff30" }}>Nenhum médico cadastrado</p>
+              ) : (
+                <>
+                  {/* Table Header */}
+                  <div className="hidden md:grid grid-cols-8 gap-2 px-3 py-2 rounded-t-lg text-[10px] font-semibold" style={{ background: "#0A0E27", color: "#ffffff50" }}>
+                    <span>Médico</span><span>Especialidade</span><span>Tempo Online</span><span>Resp. Média</span>
+                    <span>Consulta Média</span><span>NPS</span><span>Status Fadiga</span><span>Ação</span>
+                  </div>
+                  <div className="space-y-1 max-h-[300px] overflow-y-auto">
+                    {doctorPerformance.map(doc => (
+                      <div
+                        key={doc.id}
+                        className="grid grid-cols-2 md:grid-cols-8 gap-2 px-3 py-2.5 rounded-lg items-center"
+                        style={{
+                          background: doc.isBurnout ? "#FF444410" : doc.fatigueLevel === "warning" ? "#FFB80008" : "#0A0E2790",
+                          border: doc.isBurnout ? "1px solid #FF444430" : "none",
+                        }}
+                      >
+                        <span className="text-[10px] text-white font-medium">CRM {doc.crm}/{doc.crm_state}</span>
+                        <span className="text-[10px]" style={{ color: "#ffffff60" }}>{doc.specialty}</span>
+                        <span className="text-[10px] font-bold" style={{ color: doc.isBurnout ? "#FF4444" : doc.fatigueLevel === "warning" ? "#FFB800" : "#39FF14" }}>
+                          {doc.hoursOnline}h
+                        </span>
+                        <span className="text-[10px]" style={{ color: "#ffffff80" }}>{doc.avgResponseMin}min</span>
+                        <span className="text-[10px]" style={{ color: "#ffffff80" }}>{doc.avgConsultMin}min</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] font-bold" style={{ color: doc.nps >= 80 ? "#39FF14" : doc.nps >= 60 ? "#FFB800" : "#FF4444" }}>{doc.nps}</span>
+                          {doc.npsDropping && <TrendingDown size={10} className="text-red-400" />}
+                        </div>
+                        <div>
+                          {doc.isBurnout ? (
+                            <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="text-[9px] px-2 py-0.5 rounded-full font-bold" style={{ background: "#FF444430", color: "#FF4444" }}>
+                              ⚠️ FADIGA
+                            </motion.span>
+                          ) : doc.fatigueLevel === "warning" ? (
+                            <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: "#FFB80020", color: "#FFB800" }}>⚡ Atenção</span>
+                          ) : (
+                            <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: "#39FF1420", color: "#39FF14" }}>✅ OK</span>
+                          )}
+                        </div>
+                        <Button size="sm" variant="ghost" className="h-6 text-[9px]" style={{ color: "#00D4FF" }}>
+                          <MessageSquare size={10} /> Chat
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* ═══ 3. SUPPLY CHAIN + 4. SENTIMENT + 5. FUNNEL ═══ */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+
+          {/* 3. Supply Chain / Marketplace Logistics */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+            <Card className="border-0 h-full" style={{ background: "#0F1340" }}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#00D4FF" }}>
+                  <Package size={16} /> Logística Marketplace
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Pipeline Progress */}
+                {[
+                  { label: "Pedidos Pagos", value: supplyChain.paid, icon: CreditCard, color: "#39FF14" },
+                  { label: "Em Separação", value: supplyChain.separating, icon: Package, color: "#FFB800" },
+                  { label: "Enviados", value: supplyChain.shipped, icon: Truck, color: "#00D4FF" },
+                  { label: "Entregues", value: supplyChain.delivered, icon: CheckCircle2, color: "#A855F7" },
+                ].map((stage, i) => (
+                  <div key={stage.label}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] flex items-center gap-1.5" style={{ color: stage.color }}>
+                        <stage.icon size={12} /> {stage.label}
+                      </span>
+                      <span className="text-[10px] font-bold text-white">{stage.value}</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full" style={{ background: "#0A0E27" }}>
+                      <motion.div
+                        className="h-full rounded-full"
+                        style={{ background: stage.color, width: `${(stage.value / supplyChain.total) * 100}%` }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(stage.value / supplyChain.total) * 100}%` }}
+                        transition={{ duration: 1, delay: i * 0.2 }}
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                {/* Low Stock Alerts */}
+                <div className="pt-3 border-t" style={{ borderColor: "#ffffff10" }}>
+                  <p className="text-[10px] font-bold mb-2 flex items-center gap-1" style={{ color: "#FF4444" }}>
+                    <AlertTriangle size={12} /> Alerta de Ruptura ({lowStockProducts.length})
+                  </p>
+                  {lowStockProducts.length === 0 ? (
+                    <p className="text-[9px]" style={{ color: "#ffffff30" }}>Estoque normalizado ✅</p>
+                  ) : (
+                    lowStockProducts.slice(0, 4).map(p => (
+                      <div key={p.id} className="flex items-center justify-between px-2 py-1.5 rounded mb-1" style={{ background: "#FF444410" }}>
+                        <span className="text-[9px] text-white truncate max-w-[60%]">{p.name}</span>
+                        <span className="text-[9px] font-bold" style={{ color: p.stock === 0 ? "#FF4444" : "#FFB800" }}>
+                          {p.stock === 0 ? "ESGOTADO" : `${p.stock} un.`}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* 4. Sentiment Analysis */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+            <Card className="border-0 h-full" style={{ background: "#0F1340", border: sentimentTotals.mood === "critical" ? "1px solid #FF444440" : "none" }}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm flex items-center gap-2" style={{ color: sentimentTotals.mood === "critical" ? "#FF4444" : "#A855F7" }}>
+                    {sentimentTotals.mood === "positive" ? <Smile size={16} /> : sentimentTotals.mood === "warning" ? <Meh size={16} /> : <Frown size={16} />}
+                    Mood da Plataforma
+                  </CardTitle>
+                  {sentimentTotals.mood === "critical" && (
+                    <motion.span animate={{ opacity: [1, 0.3, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="text-[9px] px-2 py-0.5 rounded-full font-bold" style={{ background: "#FF444430", color: "#FF4444" }}>
+                      🚨 CRÍTICO
+                    </motion.span>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {/* Sentiment Distribution */}
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  <div className="text-center p-2 rounded-lg" style={{ background: "#39FF1410" }}>
+                    <Smile size={14} className="mx-auto mb-1" style={{ color: "#39FF14" }} />
+                    <p className="text-lg font-bold text-white">{sentimentTotals.positive}%</p>
+                    <p className="text-[9px]" style={{ color: "#39FF14" }}>Positivo</p>
+                  </div>
+                  <div className="text-center p-2 rounded-lg" style={{ background: "#FFB80010" }}>
+                    <Meh size={14} className="mx-auto mb-1" style={{ color: "#FFB800" }} />
+                    <p className="text-lg font-bold text-white">{sentimentTotals.neutral}%</p>
+                    <p className="text-[9px]" style={{ color: "#FFB800" }}>Neutro</p>
+                  </div>
+                  <div className="text-center p-2 rounded-lg" style={{ background: "#FF444410" }}>
+                    <Frown size={14} className="mx-auto mb-1" style={{ color: "#FF4444" }} />
+                    <p className="text-lg font-bold text-white">{sentimentTotals.negative}%</p>
+                    <p className="text-[9px]" style={{ color: "#FF4444" }}>Negativo</p>
+                  </div>
+                </div>
+
+                {/* Sentiment Over Time Chart */}
+                <ResponsiveContainer width="100%" height={130}>
+                  <AreaChart data={sentimentData.slice(-12)}>
+                    <defs>
+                      <linearGradient id="sentPos" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#39FF14" stopOpacity={0.3} /><stop offset="100%" stopColor="#39FF14" stopOpacity={0} /></linearGradient>
+                      <linearGradient id="sentNeg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FF4444" stopOpacity={0.3} /><stop offset="100%" stopColor="#FF4444" stopOpacity={0} /></linearGradient>
+                    </defs>
+                    <XAxis dataKey="hora" tick={{ fill: "#ffffff30", fontSize: 9 }} axisLine={false} tickLine={false} />
+                    <Area type="monotone" dataKey="positivo" stroke="#39FF14" fill="url(#sentPos)" strokeWidth={1.5} />
+                    <Area type="monotone" dataKey="negativo" stroke="#FF4444" fill="url(#sentNeg)" strokeWidth={1.5} />
+                    <RechartsTooltip contentStyle={{ background: "#0A0E27", border: "1px solid #ffffff20", borderRadius: 8, fontSize: 10 }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+
+                {/* Trending Keywords */}
+                <div className="pt-2 border-t mt-2" style={{ borderColor: "#ffffff10" }}>
+                  <p className="text-[9px] mb-1.5 font-bold" style={{ color: "#ffffff50" }}>Palavras em Destaque</p>
+                  <div className="flex flex-wrap gap-1">
+                    {SENTIMENT_KEYWORDS.positive.slice(0, 3).map(w => (
+                      <span key={w} className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: "#39FF1415", color: "#39FF14" }}>+{w}</span>
+                    ))}
+                    {SENTIMENT_KEYWORDS.negative.slice(0, 3).map(w => (
+                      <span key={w} className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: "#FF444415", color: "#FF4444" }}>-{w}</span>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* 5. Conversion Funnel (Leak Detector) */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+            <Card className="border-0 h-full" style={{ background: "#0F1340" }}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#39FF14" }}>
+                  <TrendingDown size={16} /> Funil de Conversão Live
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {funnelData.map((stage, i) => {
+                    const prevValue = i === 0 ? stage.value : funnelData[i - 1].value;
+                    const dropRate = i === 0 ? 0 : Math.round(((prevValue - stage.value) / prevValue) * 100);
+                    const pct = Math.round((stage.value / funnelData[0].value) * 100);
+                    return (
+                      <div key={stage.name}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] text-white font-medium">{stage.name}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-white">{stage.value}</span>
+                            {dropRate > 0 && (
+                              <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{
+                                background: dropRate > 50 ? "#FF444420" : dropRate > 30 ? "#FFB80020" : "#ffffff10",
+                                color: dropRate > 50 ? "#FF4444" : dropRate > 30 ? "#FFB800" : "#ffffff60",
+                              }}>
+                                -{dropRate}%
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="relative">
+                          <div className="w-full h-5 rounded-md overflow-hidden" style={{ background: "#0A0E27" }}>
+                            <motion.div
+                              className="h-full rounded-md flex items-center justify-end pr-2"
+                              style={{ background: `${stage.fill}40`, borderRight: `2px solid ${stage.fill}` }}
+                              initial={{ width: 0 }}
+                              animate={{ width: `${pct}%` }}
+                              transition={{ duration: 1.2, delay: i * 0.15 }}
+                            >
+                              <span className="text-[8px] font-bold" style={{ color: stage.fill }}>{pct}%</span>
+                            </motion.div>
+                          </div>
+                        </div>
+                        {dropRate > 50 && (
+                          <motion.p animate={{ opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="text-[8px] mt-0.5 flex items-center gap-1" style={{ color: "#FF4444" }}>
+                            <AlertTriangle size={9} /> Gargalo detectado! Verificar checkout
+                          </motion.p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="pt-3 mt-3 border-t" style={{ borderColor: "#ffffff10" }}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px]" style={{ color: "#ffffff40" }}>Taxa conversão total</span>
+                    <span className="text-sm font-bold" style={{ color: funnelData[4]?.value / funnelData[0]?.value > 0.08 ? "#39FF14" : "#FF4444" }}>
+                      {((funnelData[4]?.value / funnelData[0]?.value) * 100).toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
@@ -515,7 +946,6 @@ const AdminMaster = () => {
 
         {/* Bottom: System Health + Security Logs + Recent Payments */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-          {/* AI & System Health */}
           <Card className="border-0" style={{ background: "#0F1340" }}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#00D4FF" }}>
@@ -548,7 +978,6 @@ const AdminMaster = () => {
             </CardContent>
           </Card>
 
-          {/* Security Terminal */}
           <Card className="border-0" style={{ background: "#0F1340" }}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#FF6B35" }}>
@@ -570,7 +999,6 @@ const AdminMaster = () => {
             </CardContent>
           </Card>
 
-          {/* Recent Payments Feed */}
           <Card className="border-0" style={{ background: "#0F1340" }}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#39FF14" }}>
@@ -581,7 +1009,6 @@ const AdminMaster = () => {
               {recentPayments.length === 0 ? (
                 <div className="text-center py-6">
                   <p className="text-xs" style={{ color: "#ffffff30" }}>Aguardando pagamentos...</p>
-                  {/* Simulated feed */}
                   {[
                     { status: "approved", amount: 150, email: "p***@gmail.com", time: "há 2min" },
                     { status: "approved", amount: 89.90, email: "m***@outlook.com", time: "há 8min" },
@@ -653,7 +1080,6 @@ const AdminMaster = () => {
               </div>
             </CardHeader>
             <CardContent>
-              {/* Sales Summary KPIs */}
               {(() => {
                 const totalVendorSales = vendorTxs.reduce((s, t) => s + Number(t.amount), 0);
                 const totalEscrowVal = escrowTxs.reduce((s, t) => s + Number(t.amount), 0);
@@ -689,24 +1115,15 @@ const AdminMaster = () => {
                   <TabsTrigger value="consultas" className="text-[11px] data-[state=active]:text-black data-[state=active]:bg-[#FF6B35]">Consultas</TabsTrigger>
                 </TabsList>
 
-                {/* Table Header */}
                 <div className="hidden md:grid grid-cols-7 gap-2 px-3 py-2 rounded-t-lg text-[10px] font-semibold" style={{ background: "#0A0E27", color: "#ffffff50" }}>
                   <span>ID</span><span>Tipo</span><span>Valor</span><span>Taxa</span><span>Status</span><span>Data</span><span>Ações</span>
                 </div>
 
                 <div className="max-h-[400px] overflow-y-auto space-y-1">
-                  <TabsContent value="todas" className="mt-0 space-y-1">
-                    {renderAllTransactions()}
-                  </TabsContent>
-                  <TabsContent value="marketplace" className="mt-0 space-y-1">
-                    {renderVendorTransactions()}
-                  </TabsContent>
-                  <TabsContent value="escrow" className="mt-0 space-y-1">
-                    {renderEscrowTransactions()}
-                  </TabsContent>
-                  <TabsContent value="consultas" className="mt-0 space-y-1">
-                    {renderAppointmentTransactions()}
-                  </TabsContent>
+                  <TabsContent value="todas" className="mt-0 space-y-1">{renderAllTransactions()}</TabsContent>
+                  <TabsContent value="marketplace" className="mt-0 space-y-1">{renderVendorTransactions()}</TabsContent>
+                  <TabsContent value="escrow" className="mt-0 space-y-1">{renderEscrowTransactions()}</TabsContent>
+                  <TabsContent value="consultas" className="mt-0 space-y-1">{renderAppointmentTransactions()}</TabsContent>
                 </div>
               </Tabs>
             </CardContent>
@@ -716,7 +1133,7 @@ const AdminMaster = () => {
         {/* Footer Stats */}
         <div className="text-center py-4">
           <p className="text-[10px]" style={{ color: "#ffffff20" }}>
-            MANUS CEO Admin v5.0 • Planta y Raiz Ltda • Dados atualizados: {lastRefresh.toLocaleString("pt-BR")} •
+            MANUS CEO Admin v6.0 • Planta y Raiz Ltda • Dados atualizados: {lastRefresh.toLocaleString("pt-BR")} •
             Faturamento Anual Estimado: {fmtCurrency(simulatedAnnualRevenue)}
           </p>
         </div>

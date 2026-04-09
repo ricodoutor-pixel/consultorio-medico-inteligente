@@ -229,8 +229,11 @@ export const FrogChatModal = () => {
             <button onClick={clearChat} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground" title="Limpar conversa" aria-label="Limpar conversa">
               <Trash2 size={14} />
             </button>
-            <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground" aria-label="Fechar chat">
-              <X size={18} />
+            <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground" title="Minimizar chat" aria-label="Minimizar chat">
+              <Minimize2 size={16} />
+            </button>
+            <button onClick={() => setIsOpen(false)} className="p-2 rounded-lg hover:bg-destructive/20 transition-colors text-destructive font-bold" title="Fechar chat" aria-label="Fechar chat">
+              <X size={20} />
             </button>
           </div>
         </div>

@@ -321,6 +321,8 @@ const Shopping = () => {
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
   const [btcModal, setBtcModal] = useState({ open: false, planName: "", planId: "", amount: "" });
 
+  const { toggle: toggleFav, isFav } = useFavorites();
+
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from("vendor_products").select("*, vendors(id, store_name, rating)").eq("is_active", true);

@@ -6,13 +6,14 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ShoppingBag, Star, ShoppingCart, Plus, Minus, ArrowLeft, ArrowRight, Store, CreditCard, Truck, Search, Shield, Grid3X3, List, ChevronRight, Tag, Percent, Package, Loader2 } from "lucide-react";
+import { ShoppingBag, Star, ShoppingCart, Plus, Minus, ArrowLeft, ArrowRight, Store, CreditCard, Truck, Search, Shield, Grid3X3, List, ChevronRight, Tag, Percent, Package, Loader2, Bitcoin } from "lucide-react";
 import { motion } from "framer-motion";
 import { products, productCategories, Product } from "@/data/products";
 import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
+import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 
 const handleBuyNowProduct = async (product: Product, toast: any, showModal: any) => {
   showModal(
@@ -53,6 +54,7 @@ const ProductDetail = ({ id }: { id: string }) => {
   const { addItem } = useCart();
   const { toast } = useToast();
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
+  const [btcModal, setBtcModal] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
 
   if (!product) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Produto não encontrado.</div>;
 
@@ -126,10 +128,18 @@ const ProductDetail = ({ id }: { id: string }) => {
               <ShoppingCart size={20} />
             </Button>
           </div>
+          <Button
+            variant="outline"
+            className="w-full mt-2 font-bold border-amber-500/40 text-amber-500 hover:bg-amber-500/10 gap-1 h-10"
+            onClick={() => setBtcModal({ open: true, planName: product.title, planId: product.id, amount: product.price })}
+          >
+            <Bitcoin size={14} /> Pagar com BTC
+          </Button>
           <p className="text-[10px] text-muted-foreground mt-4 text-center">⚠️ A Planta & Raiz é uma infraestrutura tecnológica autônoma. A responsabilidade técnica pelo produto cabe exclusivamente ao lojista cadastrado.</p>
         </div>
       </div>
       <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
+      <BTCPaymentModal open={btcModal.open} onClose={() => setBtcModal({ ...btcModal, open: false })} planName={btcModal.planName} planId={btcModal.planId} amount={btcModal.amount} />
     </div>
   );
 };

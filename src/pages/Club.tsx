@@ -4,11 +4,12 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, MessageCircle, Share2, ShoppingCart, Bell, Check, Send, X, Star, Filter, ChevronLeft, ChevronRight, Minus, Plus, Trash2, Package, MapPin, Camera, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Heart, MessageCircle, Share2, ShoppingCart, Bell, Check, Send, X, Star, Filter, ChevronLeft, ChevronRight, Minus, Plus, Trash2, Package, MapPin, Camera, Image as ImageIcon, Loader2, Bitcoin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
+import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 
 // Product images
 import prod1a from "@/assets/club/prod1-a.jpg";
@@ -179,6 +180,7 @@ const Club = () => {
   const [showCart, setShowCart] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState<"shop" | "feed">("shop");
+  const [btcModal, setBtcModal] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
 
   useEffect(() => {
     document.title = "Club Planta y Raiz - Lifestyle & Comunidade";
@@ -668,6 +670,10 @@ const Club = () => {
                   <Button className="w-full py-5" onClick={handleCheckout} disabled={checkoutLoading}>
                     {checkoutLoading ? <><Loader2 size={16} className="mr-2 animate-spin" /> Gerando...</> : "Comprar Agora 💳"}
                   </Button>
+                  <Button variant="outline" className="w-full border-amber-500/40 text-amber-500 hover:bg-amber-500/10 font-bold gap-1"
+                    onClick={() => setBtcModal({ open: true, planName: cart.map(i => i.product.name).join(", "), planId: "club-cart", amount: `R$ ${cartTotal.toFixed(2)}` })}>
+                    <Bitcoin size={14} /> Pagar com BTC
+                  </Button>
                   <Button variant="outline" className="w-full" onClick={() => setCart([])}>Limpar Carrinho</Button>
                 </div>
               )}
@@ -757,6 +763,13 @@ const Club = () => {
         )}
       </AnimatePresence>
 
+      <BTCPaymentModal
+        open={btcModal.open}
+        onClose={() => setBtcModal({ ...btcModal, open: false })}
+        planName={btcModal.planName}
+        planId={btcModal.planId}
+        amount={btcModal.amount}
+      />
       <WhatsAppProofModal
         open={modalState.open}
         onOpenChange={setModalOpen}

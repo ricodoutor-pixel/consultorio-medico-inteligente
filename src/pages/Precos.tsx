@@ -259,7 +259,7 @@ const Precos = () => {
                         className="w-full mt-2 font-black rounded-2xl border-amber-500/40 text-amber-500 hover:bg-amber-500/10 text-xs h-8"
                         onClick={() => setBtcModal({ open: true, planName: plan.name, planId: plan.id, amount: plan.price })}
                       >
-                        <Bitcoin size={12} className="mr-1" /> Pagar BTC
+                        <Bitcoin size={12} className="mr-1" /> Pague Com BTC
                       </Button>
                     </CardContent>
                   </Card>

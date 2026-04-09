@@ -465,6 +465,7 @@ const Shopping = () => {
         </div>
       </section>
 
+      <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
       <Footer />
     </div>
   );

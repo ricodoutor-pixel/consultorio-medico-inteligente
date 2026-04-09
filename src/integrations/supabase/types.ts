@@ -1348,6 +1348,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_site_counter: {
+        Args: { _counter_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

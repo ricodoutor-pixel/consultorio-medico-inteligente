@@ -54,6 +54,7 @@ const ProductDetail = ({ id }: { id: string }) => {
   const { addItem } = useCart();
   const { toast } = useToast();
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
+  const [btcModal, setBtcModal] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
 
   if (!product) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Produto não encontrado.</div>;
 
@@ -127,10 +128,18 @@ const ProductDetail = ({ id }: { id: string }) => {
               <ShoppingCart size={20} />
             </Button>
           </div>
+          <Button
+            variant="outline"
+            className="w-full mt-2 font-bold border-amber-500/40 text-amber-500 hover:bg-amber-500/10 gap-1 h-10"
+            onClick={() => setBtcModal({ open: true, planName: product.title, planId: product.id, amount: product.price })}
+          >
+            <Bitcoin size={14} /> Pagar com BTC
+          </Button>
           <p className="text-[10px] text-muted-foreground mt-4 text-center">⚠️ A Planta & Raiz é uma infraestrutura tecnológica autônoma. A responsabilidade técnica pelo produto cabe exclusivamente ao lojista cadastrado.</p>
         </div>
       </div>
       <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
+      <BTCPaymentModal open={btcModal.open} onClose={() => setBtcModal({ ...btcModal, open: false })} planName={btcModal.planName} planId={btcModal.planId} amount={btcModal.amount} />
     </div>
   );
 };

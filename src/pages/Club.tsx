@@ -322,32 +322,43 @@ const Club = () => {
     }
   };
 
-  const handleBuyNow = async (product: Product) => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast({ title: "Faça login para comprar", variant: "destructive" });
-        setTimeout(() => window.location.href = "/login", 1500);
-        return;
+  const handleBuyNow = (product: Product) => {
+    showModal(
+      { type: "compra", productName: product.name, value: product.price },
+      async () => {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) {
+            toast({ title: "Faça login para comprar", variant: "destructive" });
+            setTimeout(() => window.location.href = "/login", 1500);
+            return;
+          }
+          const { data, error } = await supabase.functions.invoke("create-cart-payment", {
+            body: {
+              items: [{ title: product.name, quantity: 1, price: product.price }],
+              total: product.price,
+              description: `Planta y Raiz Ltda - ${product.name}`,
+            },
+          });
+          if (error) throw error;
+          if (data?.init_point) {
+            window.open(data.init_point, "_blank");
+            toast({ title: "Redirecionando para pagamento... 💳" });
+          }
+        } catch (err) {
+          console.error(err);
+          toast({ title: "Erro ao gerar pagamento", variant: "destructive" });
+        }
       }
+    );
+  };
 
-      const { data, error } = await supabase.functions.invoke("create-cart-payment", {
-        body: {
-          items: [{ title: product.name, quantity: 1, price: product.price }],
-          total: product.price,
-          description: `Planta y Raiz Ltda - ${product.name}`,
-        },
-      });
-
-      if (error) throw error;
-      if (data?.init_point) {
-        window.open(data.init_point, "_blank");
-        toast({ title: "Redirecionando para pagamento... 💳" });
-      }
-    } catch (err) {
-      console.error(err);
-      toast({ title: "Erro ao gerar pagamento", variant: "destructive" });
-    }
+  const handleCheckout = () => {
+    const productNames = cart.map(i => i.product.name).join(", ");
+    showModal(
+      { type: "compra", productName: productNames, value: cartTotal },
+      () => executeCheckout()
+    );
   };
 
   return (

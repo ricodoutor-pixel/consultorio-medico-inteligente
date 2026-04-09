@@ -549,14 +549,12 @@ const ShoppingDashboard = () => {
       </main>
       <Footer />
 
-      {whatsappModal && (
-        <WhatsAppProofModal
-          isOpen={whatsappModal.open}
-          onClose={() => setWhatsappModal(null)}
-          context={whatsappModal.ctx}
-          onProceed={() => setWhatsappModal(null)}
-        />
-      )}
+      <WhatsAppProofModal
+        open={!!whatsappModal?.open}
+        onOpenChange={(v) => { if (!v) setWhatsappModal(null); }}
+        context={whatsappModal?.ctx || ({ type: "compra", productName: "", value: 0 } as WhatsAppContext)}
+        onProceed={() => setWhatsappModal(null)}
+      />
     </div>
   );
 };

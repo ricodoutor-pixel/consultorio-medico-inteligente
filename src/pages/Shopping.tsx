@@ -196,6 +196,7 @@ const Shopping = () => {
   const { addItem, count } = useCart();
   const { toast } = useToast();
   const [showCart, setShowCart] = useState(false);
+  const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
 
   if (id) {
     return (

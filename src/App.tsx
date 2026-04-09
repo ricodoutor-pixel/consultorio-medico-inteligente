@@ -191,6 +191,8 @@ const App = () => (
             
             
             
+            {/* Mascote Verdinho */}
+            <MascotVerdinho />
             {/* WhatsApp Brisa Button */}
             <WhatsAppButton />
           </Suspense>

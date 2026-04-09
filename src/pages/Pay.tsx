@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { QrCode, Copy, CheckCircle2, ArrowRight, ShoppingCart, AlertCircle, Stethoscope, Star, Loader2, ExternalLink } from "lucide-react";
@@ -111,7 +110,6 @@ const Pay = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <WhatsAppButton />
 
       <section className="pt-24 pb-16 md:pt-32">
         <div className="container mx-auto px-4">

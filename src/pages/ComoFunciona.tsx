@@ -1,6 +1,5 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, Zap, Stethoscope, ShoppingBag, Shield, FileText, CheckCircle2, ArrowRight, MessageSquare, UserPlus } from "lucide-react";
@@ -47,7 +46,6 @@ const ComoFunciona = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <WhatsAppButton />
 
       <section className="pt-24 pb-16 md:pt-32 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">

@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2 } from "lucide-react";
@@ -252,7 +251,6 @@ const Profissionais = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <WhatsAppButton />
         <ProfessionalDetail id={id} />
         <Footer />
       </div>
@@ -264,7 +262,6 @@ const Profissionais = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <WhatsAppButton />
 
       <section className="pt-20 pb-12 md:pt-32 md:pb-16 hero-glow">
         <div className="container mx-auto px-4 relative z-10">

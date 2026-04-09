@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wallet, ShoppingBag, Stethoscope, Clock, CheckCircle2, FileText, ArrowRight } from "lucide-react";
@@ -35,7 +34,6 @@ const Carteira = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <WhatsAppButton />
 
       <section className="pt-24 pb-16 md:pt-32">
         <div className="container mx-auto px-4">

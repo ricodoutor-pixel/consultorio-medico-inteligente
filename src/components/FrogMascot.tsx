@@ -2,6 +2,7 @@ import { memo, useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import verdinhoImg from "@/assets/verdinho-mascot.png";
 import { useFrogAnimations, FrogExpression } from "./frog/useFrogAnimations";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { FrogEyes } from "./frog/FrogEyes";
 import { FrogMouth } from "./frog/FrogMouth";
 import { FrogAccessories } from "./frog/FrogAccessories";
@@ -121,6 +122,9 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
   const displaySize = isEnlarged ? size * maxScale : showStory ? size * 1.8 : size;
 
   return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
     <motion.div
       ref={anim.containerRef as any}
       onClick={handleClick}
@@ -360,6 +364,12 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         </motion.div>
       )}
     </motion.div>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="bg-card border-primary/30 text-foreground font-semibold text-xs">
+          <p>💬 Clique para conversar 🐸</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 });
 

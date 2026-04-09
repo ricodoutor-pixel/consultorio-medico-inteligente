@@ -114,6 +114,27 @@ const stagger = { visible: { transition: { staggerChildren: 0.05 } } };
 
 const fmtPrice = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
 
+/* ─── FAVORITES HOOK (localStorage) ─── */
+const useFavorites = () => {
+  const [favs, setFavs] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem("pyr_favorites");
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch { return new Set(); }
+  });
+
+  const toggle = (id: string) => {
+    setFavs(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      localStorage.setItem("pyr_favorites", JSON.stringify([...next]));
+      return next;
+    });
+  };
+
+  return { favs, toggle, isFav: (id: string) => favs.has(id) };
+};
+
 /* ─── IMAGE CAROUSEL ─── */
 const ImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
   const [idx, setIdx] = useState(0);

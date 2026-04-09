@@ -5,8 +5,12 @@ import {
   Clock, TrendingUp, AlertTriangle, Bot, Terminal, Search,
   ChevronDown, Bell, LogOut, Stethoscope, Eye, MessageSquare,
   ShoppingBag, CreditCard, ArrowUpRight, ArrowDownRight, Zap,
-  Globe, Server, Database, Cpu, Heart, RefreshCw
+  Globe, Server, Database, Cpu, Heart, RefreshCw, Filter,
+  Download, Package, Truck, FileText, Calendar, BarChart3,
+  CheckCircle2, XCircle, AlertCircle
 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";

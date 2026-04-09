@@ -471,9 +471,9 @@ const Club = () => {
               </aside>
 
               {/* Mobile Filter Button */}
-              <div className="lg:hidden fixed bottom-20 left-4 z-40">
-                <Button size="sm" onClick={() => setShowFilters(true)} className="rounded-full shadow-lg gap-1">
-                  <Filter size={14} /> Filtros
+              <div className="lg:hidden fixed bottom-24 left-3 z-40">
+                <Button size="sm" onClick={() => setShowFilters(true)} className="rounded-full shadow-lg gap-1 text-xs h-8 px-3">
+                  <Filter size={12} /> Filtros
                 </Button>
               </div>
 

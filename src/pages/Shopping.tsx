@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ProductAlertBell } from "@/components/ProductAlertBell";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 
@@ -377,7 +378,8 @@ const Shopping = () => {
             <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-foreground mb-1 sm:mb-2">
               🌿 Shopping Medicinal
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground">Produtos de cannabis medicinal verificados e auditados</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2">Produtos de cannabis medicinal verificados e auditados</p>
+            <ProductAlertBell category="shopping" />
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 max-w-2xl mx-auto">

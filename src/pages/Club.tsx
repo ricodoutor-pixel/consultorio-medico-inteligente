@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
+import { ProductAlertBell } from "@/components/ProductAlertBell";
 
 // Product images
 import prod1a from "@/assets/club/prod1-a.jpg";

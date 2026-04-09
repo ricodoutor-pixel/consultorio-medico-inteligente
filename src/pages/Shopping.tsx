@@ -6,13 +6,14 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ShoppingBag, Star, ShoppingCart, Plus, Minus, ArrowLeft, ArrowRight, Store, CreditCard, Truck, Search, Shield, Grid3X3, List, ChevronRight, Tag, Percent, Package, Loader2 } from "lucide-react";
+import { ShoppingBag, Star, ShoppingCart, Plus, Minus, ArrowLeft, ArrowRight, Store, CreditCard, Truck, Search, Shield, Grid3X3, List, ChevronRight, Tag, Percent, Package, Loader2, Bitcoin } from "lucide-react";
 import { motion } from "framer-motion";
 import { products, productCategories, Product } from "@/data/products";
 import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
+import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 
 const handleBuyNowProduct = async (product: Product, toast: any, showModal: any) => {
   showModal(

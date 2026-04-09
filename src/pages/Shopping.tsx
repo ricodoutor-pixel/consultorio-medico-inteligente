@@ -187,6 +187,7 @@ const ProductDetail = ({ id }: { id: string }) => {
   const { toast } = useToast();
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
   const [btcModal, setBtcModal] = useState({ open: false, planName: "", planId: "", amount: "" });
+  const [rxModal, setRxModal] = useState({ open: false, productName: "" });
 
   useEffect(() => {
     (async () => {
@@ -204,6 +205,11 @@ const ProductDetail = ({ id }: { id: string }) => {
   const priceStr = fmtPrice(product.price);
 
   const handleBuy = () => {
+    setRxModal({ open: true, productName: product.name });
+  };
+
+  const proceedWithPurchase = () => {
+    setRxModal({ open: false, productName: "" });
     showModal(
       { type: "compra", productName: product.name, value: product.price } as WhatsAppContext,
       async () => {

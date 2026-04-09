@@ -649,14 +649,24 @@ const Shopping = () => {
                           <Card className="border-border/30 hover:border-primary/30 transition-all bg-card/30 backdrop-blur-sm rounded-xl">
                             <CardContent className="p-0">
                               <div className="flex gap-3 p-3">
-                                <Link to={`/shopping/${p.id}`} className="shrink-0">
+                                <Link to={`/shopping/${p.id}`} className="shrink-0 relative">
                                   <img src={resolveImg(p.image_url)} alt={p.name} className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover" loading="lazy" />
                                 </Link>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-[8px] sm:text-[9px] text-muted-foreground mb-0.5 flex items-center gap-1"><Store size={9} className="text-primary" /> {vendorName}</p>
-                                  <Link to={`/shopping/${p.id}`}>
-                                    <h3 className="font-bold text-foreground hover:text-primary transition-colors text-xs sm:text-sm mb-0.5 line-clamp-1">{p.name}</h3>
-                                  </Link>
+                                  <div className="flex items-start justify-between">
+                                    <div className="min-w-0 flex-1">
+                                      <p className="text-[8px] sm:text-[9px] text-muted-foreground mb-0.5 flex items-center gap-1"><Store size={9} className="text-primary" /> {vendorName}</p>
+                                      <Link to={`/shopping/${p.id}`}>
+                                        <h3 className="font-bold text-foreground hover:text-primary transition-colors text-xs sm:text-sm mb-0.5 line-clamp-1">{p.name}</h3>
+                                      </Link>
+                                    </div>
+                                    <button
+                                      onClick={() => toggleFav(p.id)}
+                                      className="shrink-0 w-8 h-8 rounded-full bg-card/80 flex items-center justify-center hover:scale-110 transition-transform ml-2"
+                                    >
+                                      <Heart size={16} className={isFav(p.id) ? "text-red-500 fill-red-500" : "text-muted-foreground"} />
+                                    </button>
+                                  </div>
                                   <p className="text-[9px] sm:text-xs text-muted-foreground line-clamp-1 mb-1">{p.description}</p>
                                   <div className="flex items-center gap-0.5 mb-1">
                                     {[1,2,3,4,5].map(s => <Star key={s} size={9} className={s <= Math.round(p.rating || 5) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/20"} />)}

@@ -341,6 +341,7 @@ const Precos = () => {
         </div>
       </section>
 
+      <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
       <Footer />
       <BTCPaymentModal
         open={btcModal.open}

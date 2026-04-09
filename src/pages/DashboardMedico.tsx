@@ -214,6 +214,14 @@ const DashboardMedico = () => {
               </Card>
             </div>
 
+            {/* Performance Widget + Subscription Plans */}
+            {doctorData && (
+              <div className="grid lg:grid-cols-2 gap-6 mb-8">
+                <DoctorPerformanceWidget doctorId={doctorData.id} />
+                <DoctorSubscriptionPlans doctorId={doctorData.id} currentTier={currentTier} />
+              </div>
+            )}
+
             {/* Today's Schedule + Recent Prescriptions */}
             <div className="grid lg:grid-cols-2 gap-6">
               <Card className="border-border">

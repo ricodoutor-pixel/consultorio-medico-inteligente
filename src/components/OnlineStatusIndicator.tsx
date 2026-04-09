@@ -17,7 +17,7 @@ export const OnlineStatusIndicator = ({ online = false, size = "md", showLabel =
         <span className={cn("absolute rounded-full opacity-30 animate-pulse", ringMap[size], online ? "bg-emerald-400" : "bg-red-400")} />
         <span
           className={cn(
-            "relative rounded-full border-2 border-background shadow-sm",
+            "relative rounded-full border border-background/50 shadow-sm",
             online && "animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.6)]",
             !online && "animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.6)]",
             sizeMap[size],

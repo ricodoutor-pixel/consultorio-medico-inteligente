@@ -129,6 +129,7 @@ const ProductDetail = ({ id }: { id: string }) => {
           <p className="text-[10px] text-muted-foreground mt-4 text-center">⚠️ A Planta & Raiz é uma infraestrutura tecnológica autônoma. A responsabilidade técnica pelo produto cabe exclusivamente ao lojista cadastrado.</p>
         </div>
       </div>
+      <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
     </div>
   );
 };

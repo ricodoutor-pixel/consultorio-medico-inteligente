@@ -327,7 +327,7 @@ const Profissionais = () => {
                             <div className="flex items-center gap-1.5 mt-0.5">
                               <p className="text-xs text-primary font-bold">{p.category}</p>
                               <span className={`inline-flex items-center gap-1 text-[10px] font-bold ${p.online ? 'text-green-500' : 'text-red-500'}`}>
-                                <span className={`w-2.5 h-2.5 rounded-full ${p.online ? 'bg-green-500 animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.6)]' : 'bg-red-500 animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.6)]'}`} />
+                                <span className={`w-2.5 h-2.5 rounded-full ${p.online ? 'bg-green-500 animate-[pulse_3s_cubic-bezier(0.4,0,0.6,1)_infinite] shadow-[0_0_8px_rgba(34,197,94,0.7)]' : 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.5)]'}`} />
                                 {p.online ? 'Online' : 'Offline'}
                               </span>
                             </div>

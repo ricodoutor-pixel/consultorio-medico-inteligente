@@ -405,12 +405,12 @@ const Club = () => {
       )}
 
       {/* Hero */}
-      <section className="pt-28 pb-8 md:pt-36 md:pb-12">
-        <div className="container mx-auto px-4 text-center">
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-4xl md:text-6xl font-display font-black mb-4">
+      <section className="pt-24 pb-6 md:pt-36 md:pb-12">
+        <div className="container mx-auto px-3 sm:px-4 text-center">
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-2xl sm:text-4xl md:text-6xl font-display font-black mb-3 md:mb-4">
             <span className="text-gradient-green">Club</span> <span className="text-foreground">Planta y Raiz</span>
           </motion.h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">Lifestyle, comunidade e produtos exclusivos. Pagamento via PIX ou BTC.</p>
+          <p className="text-muted-foreground text-sm sm:text-lg max-w-2xl mx-auto mb-4 md:mb-6">Lifestyle, comunidade e produtos exclusivos. Pagamento via PIX ou BTC.</p>
 
           {/* Tab switcher */}
           <div className="flex justify-center gap-2">
@@ -489,26 +489,26 @@ const Club = () => {
                   ))}
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
                   {filteredProducts.map((product) => (
                     <Card key={product.id} className="bg-card border-border hover:border-primary/50 transition-all group overflow-hidden">
                       <ProductImageCarousel images={product.images} name={product.name} />
-                      <CardContent className="p-3 sm:p-4">
+                      <CardContent className="p-2 sm:p-4">
                         {product.isLimited && (
-                          <span className="inline-block text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary px-2 py-0.5 rounded-full mb-2">Edição Limitada</span>
+                          <span className="inline-block text-[8px] sm:text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary px-1.5 sm:px-2 py-0.5 rounded-full mb-1 sm:mb-2">Edição Limitada</span>
                         )}
-                        <h3 className="font-bold text-foreground text-sm leading-tight mb-1 line-clamp-2">{product.name}</h3>
-                        <p className="text-xs text-muted-foreground mb-2 line-clamp-2 hidden sm:block">{product.desc}</p>
+                        <h3 className="font-bold text-foreground text-xs sm:text-sm leading-tight mb-1 line-clamp-2">{product.name}</h3>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground mb-1 sm:mb-2 line-clamp-2 hidden sm:block">{product.desc}</p>
                         <StarRating rating={product.rating} reviews={product.reviews} />
-                        <div className="flex items-center justify-between mt-3">
-                          <span className="text-lg font-black text-primary">R$ {product.price.toFixed(2)}</span>
+                        <div className="mt-2 sm:mt-3">
+                          <span className="text-sm sm:text-lg font-black text-primary">R$ {product.price.toFixed(2)}</span>
                         </div>
-                        <div className="flex gap-2 mt-2">
-                          <Button size="sm" className="flex-1 gap-1" onClick={() => addToCart(product)}>
-                            <ShoppingCart size={14} /> Carrinho
+                        <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 mt-2">
+                          <Button size="sm" className="w-full gap-1 text-[10px] sm:text-xs h-7 sm:h-8" onClick={() => addToCart(product)}>
+                            <ShoppingCart size={12} /> Carrinho
                           </Button>
-                          <Button size="sm" variant="outline" className="flex-1 gap-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => handleBuyNow(product)}>
-                            Comprar Agora
+                          <Button size="sm" variant="outline" className="w-full gap-1 text-[10px] sm:text-xs h-7 sm:h-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => handleBuyNow(product)}>
+                            Comprar
                           </Button>
                         </div>
                       </CardContent>

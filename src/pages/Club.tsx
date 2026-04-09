@@ -757,6 +757,13 @@ const Club = () => {
         )}
       </AnimatePresence>
 
+      <WhatsAppProofModal
+        open={modalState.open}
+        onOpenChange={setModalOpen}
+        context={modalState.context}
+        onProceed={modalState.onProceed}
+      />
+
       <Footer />
     </div>
   );

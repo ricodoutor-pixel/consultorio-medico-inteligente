@@ -218,8 +218,8 @@ const DashboardMedico = () => {
             {/* Performance Widget + Subscription Plans */}
             {doctorData && (
               <div className="grid lg:grid-cols-2 gap-6 mb-8">
-                <DoctorPerformanceWidget doctorId={doctorData.id} />
-                <DoctorSubscriptionPlans doctorId={doctorData.id} currentTier={currentTier} />
+                <DoctorPerformanceWidget doctorId={doctorData.id} simulatedTier={simulatedTier} />
+                <DoctorSubscriptionPlans doctorId={doctorData.id} currentTier={currentTier} onTierChange={setSimulatedTier} />
               </div>
             )}
 

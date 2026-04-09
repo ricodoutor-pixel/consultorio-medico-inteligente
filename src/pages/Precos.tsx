@@ -180,18 +180,18 @@ const Precos = () => {
       <Navbar />
       <WhatsAppButton />
 
-      <section className="pt-24 pb-16 md:pt-32 hero-glow">
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="mb-16 text-center" initial="hidden" animate="visible" variants={fadeUp}>
-            <h1 className="text-4xl md:text-6xl font-display font-black text-foreground mb-4 tracking-tight">
+      <section className="pt-20 pb-10 md:pt-32 md:pb-16 hero-glow">
+        <div className="container mx-auto px-3 sm:px-4 relative z-10">
+          <motion.div className="mb-8 md:mb-16 text-center" initial="hidden" animate="visible" variants={fadeUp}>
+            <h1 className="text-2xl sm:text-4xl md:text-6xl font-display font-black text-foreground mb-3 md:mb-4 tracking-tight">
               Planos <span className="text-gradient-green">SaaS</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
+            <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
               Escolha o plano ideal para seu perfil. Pagamento via Pix (Mercado Pago), PayPal (USD) ou BTC.
             </p>
           </motion.div>
 
-          <motion.div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 max-w-7xl mx-auto" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 max-w-7xl mx-auto" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {plans.map((plan) => {
               const Icon = plan.icon;
               return (

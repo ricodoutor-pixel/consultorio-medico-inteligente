@@ -1416,6 +1416,13 @@ export type Database = {
             referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "vendor_products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       vendor_transactions: {
@@ -1477,6 +1484,13 @@ export type Database = {
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_transactions_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1668,6 +1682,42 @@ export type Database = {
         Update: {
           code?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      vendors_public: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          is_active: boolean | null
+          rating: number | null
+          store_banner_url: string | null
+          store_description: string | null
+          store_logo_url: string | null
+          store_name: string | null
+          total_products: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          rating?: number | null
+          store_banner_url?: string | null
+          store_description?: string | null
+          store_logo_url?: string | null
+          store_name?: string | null
+          total_products?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          rating?: number | null
+          store_banner_url?: string | null
+          store_description?: string | null
+          store_logo_url?: string | null
+          store_name?: string | null
+          total_products?: number | null
         }
         Relationships: []
       }

@@ -118,6 +118,9 @@ export const FrogChatModal = () => {
   const [leadCaptured, setLeadCaptured] = useState(() => {
     return localStorage.getItem("pr_lead_captured") === "true";
   });
+  const [leadName, setLeadName] = useState(() => {
+    return localStorage.getItem("pr_lead_name") || "";
+  });
   const [pendingMessage, setPendingMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

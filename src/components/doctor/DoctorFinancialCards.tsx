@@ -42,7 +42,7 @@ export const DoctorFinancialCards = ({ doctorId, currentTier }: Props) => {
     setLoading(false);
   };
 
-  const feeRate = currentTier === "basic" || currentTier === "enterprise" ? 0 : currentTier === "premium" ? 3 : 5;
+  const feeRate = currentTier === "basic" ? 0 : currentTier === "enterprise" ? 2 : currentTier === "premium" ? 3 : 5;
 
   const cards = [
     { icon: DollarSign, label: "Ganhos Acumulados", value: `R$ ${earnings.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, sub: "Total líquido recebido", color: "text-primary", glow: "shadow-primary/10", tooltip: "Soma de todos os honorários líquidos já recebidos via consultas e serviços na plataforma." },
@@ -53,7 +53,7 @@ export const DoctorFinancialCards = ({ doctorId, currentTier }: Props) => {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
           <Card key={i} className="border-border">
             <CardContent className="p-4 space-y-3">
@@ -70,7 +70,7 @@ export const DoctorFinancialCards = ({ doctorId, currentTier }: Props) => {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
             <Card className={`border-border hover:border-primary/20 transition-all ${card.glow ? `shadow-lg ${card.glow}` : ""}`}>

@@ -149,7 +149,7 @@ const DashboardMedico = () => {
             )}
 
             {/* KPIs */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {[
                 { icon: DollarSign, label: "Ganhos Total", value: `R$ ${totalEarnings.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, change: "+18%", color: "text-primary" },
                 { icon: Users, label: "Consultas Hoje", value: String(todayAppts.length), change: "", color: "text-primary" },

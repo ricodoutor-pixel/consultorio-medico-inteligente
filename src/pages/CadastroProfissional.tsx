@@ -31,6 +31,7 @@ const CadastroProfissional = () => {
     cidadeUF: "",
     atendimento: "chat",
     disponibilidade: "",
+    plano: "basic",
   });
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
@@ -201,6 +202,22 @@ const CadastroProfissional = () => {
                   <div className="space-y-2">
                     <Label htmlFor="disponibilidade">Disponibilidade</Label>
                     <Input id="disponibilidade" placeholder="Ex: Seg-Sex 9h-17h" value={form.disponibilidade} onChange={(e) => handleChange("disponibilidade", e.target.value)} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="plano">Plano de Assinatura</Label>
+                    <Select value={form.plano} onValueChange={(v) => handleChange("plano", v)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="basic">VIP — R$ 99/mês (Taxa Zero)</SelectItem>
+                        <SelectItem value="professional">Profissional — R$ 299/mês</SelectItem>
+                        <SelectItem value="premium">Premium — R$ 599/mês</SelectItem>
+                        <SelectItem value="enterprise">Enterprise — R$ 1.500/mês</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[10px] text-muted-foreground">O plano VIP garante 100% dos honorários sem taxa de intermediação.</p>
                   </div>
 
                   <div className="space-y-2">

@@ -20,8 +20,6 @@ Deno.serve(async (req) => {
     console.log("Webhook received:", JSON.stringify(body));
 
     const { type, data } = body;
-
-    // Mercado Pago sends notifications with action/type
     const action = body.action || type;
     const paymentId = data?.id || body.data?.id;
 
@@ -32,7 +30,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Verify MercadoPago webhook signature (mandatory)
+    // Verify MercadoPago webhook signature
     const mpWebhookSecret = Deno.env.get("MERCADOPAGO_WEBHOOK_SECRET");
     const xSignature = req.headers.get("x-signature");
     const xRequestId = req.headers.get("x-request-id");
@@ -85,7 +83,6 @@ Deno.serve(async (req) => {
     const mpAccessToken = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
     if (!mpAccessToken) {
       console.error("MERCADOPAGO_ACCESS_TOKEN not configured");
-      // Still acknowledge the webhook to prevent retries
       return new Response(JSON.stringify({ status: "received", warning: "MP token not configured" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -112,14 +109,16 @@ Deno.serve(async (req) => {
       payer_email: payment.payer?.email,
     }));
 
-    // Calculate split
+    // Calculate split - 7% platform fee for consultations, 5% for marketplace
     const totalAmount = payment.transaction_amount || 0;
     const metadata = payment.metadata || {};
-    const feeRate = metadata.type === "marketplace" ? 0.05 : 0.07;
+    const isMarketplace = metadata.type === "marketplace";
+    const feeRate = isMarketplace ? 0.05 : 0.07;
+    const mpFee = Math.round((totalAmount * 0.0299 + 0.30) * 100) / 100; // MP fee estimate
     const platformFee = Math.round(totalAmount * feeRate * 100) / 100;
     const doctorPayout = Math.round((totalAmount - platformFee) * 100) / 100;
 
-    // Store webhook event with split info
+    // Store webhook event
     const { error: insertError } = await supabase.from("payment_webhooks").insert({
       payment_id: String(payment.id),
       status: payment.status,
@@ -140,23 +139,38 @@ Deno.serve(async (req) => {
     const appointmentId = payment.external_reference || metadata.appointment_id;
 
     if (payment.status === "approved" && appointmentId) {
-      console.log(`Payment ${paymentId} approved — R$ ${totalAmount} | Platform: R$ ${platformFee} | Doctor: R$ ${doctorPayout}`);
+      console.log(`✅ Payment ${paymentId} approved — R$ ${totalAmount} | Platform: R$ ${platformFee} | Doctor: R$ ${doctorPayout}`);
 
-      // Update appointment status
-      await supabase
+      // 1. Update appointment status
+      const { error: updateErr } = await supabase
         .from("appointments")
         .update({ payment_status: "paid", status: "confirmed" })
         .eq("id", appointmentId);
 
-      // Fetch appointment to get patient_id for notification
+      if (updateErr) console.error("Appointment update error:", updateErr);
+
+      // 2. Fetch appointment details
       const { data: appt } = await supabase
         .from("appointments")
-        .select("patient_id, doctor_id")
+        .select("patient_id, doctor_id, scheduled_at, amount")
         .eq("id", appointmentId)
         .single();
 
       if (appt) {
-        // Notify patient that payment was confirmed
+        // 3. Record escrow transaction for revenue tracking
+        const { error: escrowErr } = await supabase.from("escrow_transactions").insert({
+          patient_id: appt.patient_id,
+          doctor_id: appt.doctor_id,
+          appointment_id: appointmentId,
+          amount: totalAmount,
+          platform_fee: platformFee,
+          doctor_payout: doctorPayout,
+          type: "consultation",
+          status: "held",
+        });
+        if (escrowErr) console.error("Escrow insert error:", escrowErr);
+
+        // 4. Notify PATIENT — payment confirmed
         await supabase.from("notifications").insert({
           user_id: appt.patient_id,
           title: "Pagamento Confirmado ✅",
@@ -164,17 +178,107 @@ Deno.serve(async (req) => {
           type: "payment_confirmed",
           action_url: "/dashboard",
         });
+
+        // 5. Notify DOCTOR — new confirmed consultation
+        const { data: doctorRecord } = await supabase
+          .from("doctors")
+          .select("user_id")
+          .eq("id", appt.doctor_id)
+          .single();
+
+        if (doctorRecord) {
+          const { data: patientProfile } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", appt.patient_id)
+            .single();
+
+          const patientName = patientProfile?.full_name || "Paciente";
+          const scheduledDate = appt.scheduled_at
+            ? new Date(appt.scheduled_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })
+            : "a definir";
+
+          await supabase.from("notifications").insert({
+            user_id: doctorRecord.user_id,
+            title: "Nova Consulta Confirmada 🩺",
+            message: `${patientName} confirmou pagamento de R$ ${totalAmount.toFixed(2)}. Consulta em ${scheduledDate}. Seus honorários: R$ ${doctorPayout.toFixed(2)}`,
+            type: "consultation_confirmed",
+            action_url: "/dashboard-medico",
+          });
+
+          console.log(`📩 Doctor ${doctorRecord.user_id} notified — payout R$ ${doctorPayout.toFixed(2)}`);
+        }
+
+        // 6. Schedule NPS — create a pending notification for 5min after scheduled_at
+        if (appt.scheduled_at) {
+          const consultEnd = new Date(appt.scheduled_at);
+          consultEnd.setMinutes(consultEnd.getMinutes() + 35); // 30min consult + 5min buffer
+
+          await supabase.from("notifications").insert({
+            user_id: appt.patient_id,
+            title: "Como foi sua consulta? ⭐",
+            message: "Avalie seu atendimento e ajude-nos a melhorar! Sua opinião é muito importante.",
+            type: "nps_request",
+            action_url: `/nps?consultation=${appointmentId}&doctor=${appt.doctor_id}`,
+            metadata: {
+              appointment_id: appointmentId,
+              doctor_id: appt.doctor_id,
+              nps_scheduled_for: consultEnd.toISOString(),
+            },
+          });
+        }
+
+        // 7. Notify admins
+        const { data: adminRoles } = await supabase
+          .from("user_roles")
+          .select("user_id")
+          .eq("role", "admin");
+
+        if (adminRoles) {
+          for (const admin of adminRoles) {
+            await supabase.from("notifications").insert({
+              user_id: admin.user_id,
+              title: "💰 Pagamento Recebido",
+              message: `R$ ${totalAmount.toFixed(2)} — Taxa plataforma: R$ ${platformFee.toFixed(2)} | Médico: R$ ${doctorPayout.toFixed(2)}`,
+              type: "payment_received",
+              action_url: "/admin-master",
+            });
+          }
+        }
       }
     } else if (payment.status === "rejected") {
-      console.log(`Payment ${paymentId} rejected`);
+      console.log(`❌ Payment ${paymentId} rejected`);
       if (appointmentId) {
         await supabase
           .from("appointments")
           .update({ payment_status: "rejected" })
           .eq("id", appointmentId);
+
+        // Notify patient about failed payment
+        const { data: appt } = await supabase
+          .from("appointments")
+          .select("patient_id")
+          .eq("id", appointmentId)
+          .single();
+
+        if (appt) {
+          await supabase.from("notifications").insert({
+            user_id: appt.patient_id,
+            title: "Pagamento Não Aprovado ❌",
+            message: "Seu pagamento não foi aprovado. Tente novamente ou use outro método de pagamento.",
+            type: "payment_failed",
+            action_url: `/pagamento?appointment=${appointmentId}`,
+          });
+        }
       }
     } else if (payment.status === "pending") {
-      console.log(`Payment ${paymentId} pending`);
+      console.log(`⏳ Payment ${paymentId} pending`);
+      if (appointmentId) {
+        await supabase
+          .from("appointments")
+          .update({ payment_status: "pending" })
+          .eq("id", appointmentId);
+      }
     }
 
     return new Response(JSON.stringify({ status: "processed", payment_status: payment.status }), {

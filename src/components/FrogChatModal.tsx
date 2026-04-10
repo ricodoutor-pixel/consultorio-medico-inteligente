@@ -113,6 +113,11 @@ export const FrogChatModal = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");
   const [frogMood, setFrogMood] = useState<"happy" | "thinking" | "excited">("happy");
+  const [showLeadGate, setShowLeadGate] = useState(false);
+  const [leadCaptured, setLeadCaptured] = useState(() => {
+    return localStorage.getItem("pr_lead_captured") === "true";
+  });
+  const [pendingMessage, setPendingMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

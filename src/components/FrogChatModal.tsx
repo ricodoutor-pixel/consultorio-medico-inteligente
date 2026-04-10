@@ -373,7 +373,7 @@ export const FrogChatModal = () => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
-            placeholder="Pergunte qualquer coisa ao Verdinho..."
+            placeholder={leadName ? `${leadName}, pergunte ao Verdinho...` : "Pergunte qualquer coisa ao Verdinho..."}
             disabled={isStreaming}
             aria-label="Digite sua mensagem"
             className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50"

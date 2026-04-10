@@ -86,32 +86,27 @@ export const LeadCaptureModal = ({
 
       const allTags = origem === "ebook" ? ["Origem_Ebook", ...tags] : ["Origem_Chat", ...tags];
 
-      // Save to database
-      await supabase.from("leads_contatos" as any).insert({
-        nome: nome.trim(),
-        telefone: phoneDigits,
-        origem,
-        tags: allTags,
+      // Send to edge function which handles both DB save and ManyChat
+      const resp = await fetch(MANYCHAT_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          subscriber: { name: nome.trim(), phone: phoneDigits },
+          data: { origem, tags: allTags },
+        }),
       });
 
-      // Send to ManyChat webhook
-      try {
-        await fetch(MANYCHAT_WEBHOOK_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            event: "subscriber.new",
-            subscriber: { name: nome.trim(), phone: phoneDigits },
-            data: { origem, tags: allTags },
-          }),
-        });
-      } catch {}
+      if (!resp.ok) {
+        const errData = await resp.json().catch(() => ({}));
+        throw new Error(errData.error || "Erro ao salvar");
+      }
 
       onSuccess({ nome: nome.trim(), telefone: phoneDigits });
-    } catch {
+    } catch (e) {
+      console.error("Lead capture error:", e);
       setError("Erro ao enviar. Tente novamente.");
     } finally {
       setIsSubmitting(false);

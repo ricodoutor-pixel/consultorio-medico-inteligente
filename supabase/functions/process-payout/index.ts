@@ -81,11 +81,50 @@ Deno.serve(async (req) => {
       payout_triggered: true,
     });
 
-    // 3. Calcular splits
+    // 3. Calcular splits com bônus NPS
     const totalAmount = Number(escrow.amount);
     const platformFee = Number(escrow.platform_fee);
-    const doctorPayout = Number(escrow.doctor_payout || 0);
+    let doctorPayout = Number(escrow.doctor_payout || 0);
     const vendorPayout = Number(escrow.vendor_payout || 0);
+
+    // 3.1 Apply NPS bonus multiplier to doctor payout
+    let npsBonus = 0;
+    let npsMultiplier = 1.0;
+    let npsScore: number | null = null;
+
+    if (escrow.doctor_id && escrow.type === "consultation") {
+      const { data: npsData } = await supabase
+        .from("nps_professional")
+        .select("nps_score")
+        .eq("professional_id", escrow.doctor_id)
+        .maybeSingle();
+
+      if (npsData?.nps_score !== null && npsData?.nps_score !== undefined) {
+        npsScore = npsData.nps_score;
+        // NPS Multiplier tiers: Bronze (80-84: 1x), Prata (85-89: 1.2x), Ouro (90-94: 1.35x), Platina (95+: 1.5x)
+        if (npsScore >= 95) npsMultiplier = 1.5;
+        else if (npsScore >= 90) npsMultiplier = 1.35;
+        else if (npsScore >= 85) npsMultiplier = 1.2;
+        else if (npsScore >= 80) npsMultiplier = 1.0;
+        else npsMultiplier = 1.0; // Below 80: no bonus
+
+        if (npsMultiplier > 1.0) {
+          npsBonus = Math.round((doctorPayout * (npsMultiplier - 1)) * 100) / 100;
+          doctorPayout = Math.round((doctorPayout + npsBonus) * 100) / 100;
+          console.log(`🏅 NPS Bonus applied: Score ${npsScore} → ${npsMultiplier}x → +R$${npsBonus}`);
+
+          // Record gamification bonus
+          await supabase.from("gamification_bonuses").insert({
+            professional_id: escrow.doctor_id,
+            bonus_type: "nps_multiplier",
+            amount: Math.round(npsBonus * 100), // Store as cents
+            reason: `NPS ${npsScore} → Multiplicador ${npsMultiplier}x sobre R$${(doctorPayout - npsBonus).toFixed(2)}`,
+            status: "distributed",
+            distributed_at: new Date().toISOString(),
+          });
+        }
+      }
+    }
 
     // 4. Atualizar escrow para "released"
     await supabase
@@ -94,6 +133,7 @@ Deno.serve(async (req) => {
         status: "released",
         released_at: new Date().toISOString(),
         confirmed_at: new Date().toISOString(),
+        doctor_payout: doctorPayout,
       })
       .eq("id", escrowId);
 
@@ -111,10 +151,13 @@ Deno.serve(async (req) => {
         .single();
 
       if (doctor?.user_id) {
+        const bonusMsg = npsBonus > 0
+          ? ` (inclui bônus NPS ${npsMultiplier}x: +R$ ${npsBonus.toFixed(2)})`
+          : "";
         await supabase.from("notifications").insert({
           user_id: doctor.user_id,
           title: "💰 Pagamento liberado!",
-          message: `Valor de R$ ${doctorPayout.toFixed(2)} liberado. O paciente confirmou o recebimento.`,
+          message: `Valor de R$ ${doctorPayout.toFixed(2)} liberado${bonusMsg}. O paciente confirmou o recebimento.`,
           type: "payment_confirmed",
           action_url: "/dashboard-medico",
         });

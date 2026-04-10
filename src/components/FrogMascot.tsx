@@ -19,6 +19,8 @@ interface FrogMascotProps {
   mood?: FrogExpression;
   enableJumpToNav?: boolean;
   hasNewMessage?: boolean;
+  /** When true, disables daydream/princess/doctor/story/crown overlays (used in chat header) */
+  compact?: boolean;
 }
 
 const getExpressionEmoji = (expression: FrogExpression) => {

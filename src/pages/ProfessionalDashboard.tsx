@@ -21,9 +21,11 @@ import {
   TrendingUp, Shield, Zap, Menu, X, ChevronRight, Phone,
   Stethoscope, Brain, Send, Paperclip, Lock, Eye, EyeOff,
   LogOut, Wifi, WifiOff, AlertTriangle, CheckCircle2, Loader2,
-  Search, Filter, MoreVertical, Mic, MicOff, VideoOff, Share2
+  Search, Filter, MoreVertical, Mic, MicOff, VideoOff, Share2,
+  Trophy
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { GamificationDashboard } from "@/components/GamificationDashboard";
 
 // ─── Privacy Layer (LGPD) ────────────────────────────────────────────────
 const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 min
@@ -194,6 +196,7 @@ const ProfessionalDashboard = () => {
     { id: "agenda", icon: Calendar, label: "Agenda" },
     { id: "patients", icon: Users, label: "Meus Pacientes" },
     { id: "teleconsulta", icon: Video, label: "Teleconsulta" },
+    { id: "gamification", icon: Trophy, label: "Conquistas e Metas" },
     { id: "library", icon: BookOpen, label: "Biblioteca" },
     { id: "financial", icon: DollarSign, label: "Financeiro" },
     { id: "settings", icon: Settings, label: "Configurações" },
@@ -647,12 +650,18 @@ const ProfessionalDashboard = () => {
     </div>
   );
 
+  const renderGamification = () => {
+    if (!doctorData) return <p className="text-muted-foreground text-sm">Carregando dados do profissional...</p>;
+    return <GamificationDashboard professionalId={doctorData.user_id} />;
+  };
+
   const renderContent = () => {
     switch (activeSection) {
       case "home": return renderHome();
       case "agenda": return renderAgenda();
       case "patients": return renderPatients();
       case "teleconsulta": return renderTeleconsulta();
+      case "gamification": return renderGamification();
       case "library": return renderLibrary();
       case "financial": return renderFinancial();
       case "settings": return renderSettings();

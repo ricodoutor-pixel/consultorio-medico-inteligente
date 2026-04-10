@@ -990,6 +990,33 @@ export type Database = {
         }
         Relationships: []
       }
+      leads_contatos: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          origem: string
+          tags: string[] | null
+          telefone: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          origem?: string
+          tags?: string[] | null
+          telefone: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          origem?: string
+          tags?: string[] | null
+          telefone?: string
+        }
+        Relationships: []
+      }
       medical_records: {
         Row: {
           appointment_id: string | null

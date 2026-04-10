@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { LeadCaptureModal } from "@/components/LeadCaptureModal";
 import { strains, strainCategories, getTerpenosByType, terpenoInfo, type CannabisStrain } from "@/data/strains";
-import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck, BookOpen } from "lucide-react";
+import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck, BookOpen, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { StrainImage } from "@/components/StrainImage";
@@ -54,7 +55,8 @@ const BibliotecaCientifica = () => {
   const [sortMode, setSortMode] = useState<SortMode>("relevancia");
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [downloadCount, setDownloadCount] = useState(8000);
-
+  const [showLeadGate, setShowLeadGate] = useState(false);
+  const [leadSuccess, setLeadSuccess] = useState(false);
   // Fetch persistent counter from database
   useEffect(() => {
     const fetchCount = async () => {
@@ -120,14 +122,19 @@ const BibliotecaCientifica = () => {
                   <p className="text-xs text-muted-foreground">Curso completo de Medicina Canabinoide em PDF gratuito.</p>
                 </div>
               </div>
-              <Link to="/ebook-medicina-canabinoide">
+              {leadSuccess ? (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/20 border border-primary/30">
+                  <CheckCircle size={16} className="text-primary" />
+                  <span className="text-sm font-bold text-primary">Sucesso! Verifique seu WhatsApp 💚</span>
+                </div>
+              ) : (
                 <Button
-                  onClick={incrementCounter}
+                  onClick={() => setShowLeadGate(true)}
                   className="whitespace-nowrap font-bold text-xs bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl"
                 >
                   ACESSAR CURSO COMPLETO EM E-BOOK <ArrowRight size={14} className="ml-1" />
                 </Button>
-              </Link>
+              )}
             </div>
             <div className="flex items-center gap-1.5 text-sm font-bold">
               <span className="text-muted-foreground">📥</span>
@@ -614,6 +621,22 @@ const BibliotecaCientifica = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <LeadCaptureModal
+        isOpen={showLeadGate}
+        onClose={() => setShowLeadGate(false)}
+        onSuccess={() => {
+          setShowLeadGate(false);
+          setLeadSuccess(true);
+          incrementCounter();
+          // Redirect to ebook after short delay
+          setTimeout(() => {
+            window.location.href = "/ebook-medicina-canabinoide";
+          }, 2000);
+        }}
+        origem="ebook"
+        tags={["Origem_Ebook"]}
+      />
 
       <Footer />
     </div>

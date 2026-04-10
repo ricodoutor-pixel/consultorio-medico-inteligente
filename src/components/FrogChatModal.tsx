@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { X, Send, Sparkles, Trash2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FrogMascot } from "@/components/FrogMascot";
+import { LeadCaptureModal } from "@/components/LeadCaptureModal";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
@@ -113,6 +114,11 @@ export const FrogChatModal = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");
   const [frogMood, setFrogMood] = useState<"happy" | "thinking" | "excited">("happy");
+  const [showLeadGate, setShowLeadGate] = useState(false);
+  const [leadCaptured, setLeadCaptured] = useState(() => {
+    return localStorage.getItem("pr_lead_captured") === "true";
+  });
+  const [pendingMessage, setPendingMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -125,7 +131,25 @@ export const FrogChatModal = () => {
     return () => window.removeEventListener("open-frog-chat", handler);
   }, []);
 
-  const sendMessage = useCallback((text: string) => {
+  const pendingMsgRef = useRef("");
+
+  const handleLeadSuccess = useCallback((data: { nome: string; telefone: string }) => {
+    setShowLeadGate(false);
+    setLeadCaptured(true);
+    localStorage.setItem("pr_lead_captured", "true");
+    // Will be processed after doSendMessage is available
+    const msg = pendingMsgRef.current;
+    setPendingMessage("");
+    pendingMsgRef.current = "";
+    // Defer to next tick so doSendMessage is available
+    if (msg) {
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("frog-chat-send", { detail: msg }));
+      }, 100);
+    }
+  }, []);
+
+  const doSendMessage = useCallback((text: string) => {
     if (!text.trim() || isStreaming) return;
 
     const userMsg: Message = {
@@ -182,6 +206,28 @@ export const FrogChatModal = () => {
       },
     });
   }, [isStreaming, messages]);
+
+  const sendMessage = useCallback((text: string) => {
+    if (!text.trim()) return;
+    if (!leadCaptured) {
+      setPendingMessage(text);
+      pendingMsgRef.current = text;
+      setInputValue("");
+      setShowLeadGate(true);
+      return;
+    }
+    doSendMessage(text);
+  }, [leadCaptured, doSendMessage]);
+
+  // Listen for deferred send after lead capture
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const msg = (e as CustomEvent).detail;
+      if (msg) doSendMessage(msg);
+    };
+    window.addEventListener("frog-chat-send", handler);
+    return () => window.removeEventListener("frog-chat-send", handler);
+  }, [doSendMessage]);
 
   const handleSendMessage = useCallback(() => {
     sendMessage(inputValue);
@@ -340,6 +386,16 @@ export const FrogChatModal = () => {
           </Button>
         </div>
       </motion.div>
+
+      <LeadCaptureModal
+        isOpen={showLeadGate}
+        onClose={() => {
+          setShowLeadGate(false);
+          setPendingMessage("");
+        }}
+        onSuccess={handleLeadSuccess}
+        origem="chat"
+      />
     </AnimatePresence>
   );
 };

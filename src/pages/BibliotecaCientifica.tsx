@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { LeadCaptureModal } from "@/components/LeadCaptureModal";
 import { strains, strainCategories, getTerpenosByType, terpenoInfo, type CannabisStrain } from "@/data/strains";
-import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck, BookOpen } from "lucide-react";
+import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck, BookOpen, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { StrainImage } from "@/components/StrainImage";
@@ -54,7 +55,8 @@ const BibliotecaCientifica = () => {
   const [sortMode, setSortMode] = useState<SortMode>("relevancia");
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [downloadCount, setDownloadCount] = useState(8000);
-
+  const [showLeadGate, setShowLeadGate] = useState(false);
+  const [leadSuccess, setLeadSuccess] = useState(false);
   // Fetch persistent counter from database
   useEffect(() => {
     const fetchCount = async () => {

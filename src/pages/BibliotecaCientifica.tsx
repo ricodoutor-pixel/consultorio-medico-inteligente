@@ -122,14 +122,19 @@ const BibliotecaCientifica = () => {
                   <p className="text-xs text-muted-foreground">Curso completo de Medicina Canabinoide em PDF gratuito.</p>
                 </div>
               </div>
-              <Link to="/ebook-medicina-canabinoide">
+              {leadSuccess ? (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/20 border border-primary/30">
+                  <CheckCircle size={16} className="text-primary" />
+                  <span className="text-sm font-bold text-primary">Sucesso! Verifique seu WhatsApp 💚</span>
+                </div>
+              ) : (
                 <Button
-                  onClick={incrementCounter}
+                  onClick={() => setShowLeadGate(true)}
                   className="whitespace-nowrap font-bold text-xs bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl"
                 >
                   ACESSAR CURSO COMPLETO EM E-BOOK <ArrowRight size={14} className="ml-1" />
                 </Button>
-              </Link>
+              )}
             </div>
             <div className="flex items-center gap-1.5 text-sm font-bold">
               <span className="text-muted-foreground">📥</span>

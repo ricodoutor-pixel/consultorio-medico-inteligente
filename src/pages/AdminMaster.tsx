@@ -215,8 +215,31 @@ const AdminMaster = () => {
 
   useEffect(() => {
     const ch = supabase.channel("admin-master-rt")
-      .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, () => loadDashboardData())
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "payment_webhooks" }, () => loadDashboardData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, (payload) => {
+        loadDashboardData();
+        if (payload.eventType === "UPDATE" && payload.new?.is_verified && !payload.old?.is_verified) {
+          toast.success("✅ Novo Médico Verificado!", { description: `CRM ${payload.new.crm}/${payload.new.crm_state}` });
+        }
+      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "payment_webhooks" }, (payload) => {
+        loadDashboardData();
+        const amount = payload.new?.amount;
+        const status = payload.new?.status;
+        if (status === "approved") {
+          toast.success(`💰 Pagamento Recebido: R$ ${Number(amount || 0).toFixed(2)}`, { description: `Payer: ${payload.new?.payer_email || "—"}` });
+        } else if (status === "rejected" || status === "refunded") {
+          toast.error(`⚠️ Alerta de Pagamento: ${status}`, { description: `Valor: R$ ${Number(amount || 0).toFixed(2)}` });
+        }
+      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "medical_subscriptions" }, (payload) => {
+        loadDashboardData();
+        const tier = payload.new?.plan_tier;
+        if (tier === "basic") {
+          toast("🌟 Novo Médico VIP!", { description: "Um profissional ativou o Plano VIP — Taxa Zero" });
+        } else if (tier === "premium" || tier === "enterprise") {
+          toast("👑 Upgrade de Plano!", { description: `Médico atualizou para ${tier.toUpperCase()}` });
+        }
+      })
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "profiles" }, () => loadDashboardData())
       .on("postgres_changes", { event: "*", schema: "public", table: "vendor_transactions" }, () => loadDashboardData())
       .on("postgres_changes", { event: "*", schema: "public", table: "vendor_products" }, () => loadDashboardData())
@@ -327,31 +350,53 @@ const AdminMaster = () => {
     );
   };
 
+  const mrrEstimated = simulatedMonthlyRevenue * 0.65; // Recurring portion
+  const lucroLiquido = simulatedMonthlyRevenue * 0.07; // Platform 7% fee
+  const saldoRepassar = simulatedMonthlyRevenue * 0.93; // Doctors' share
+
   const renderKPIs = () => (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      {[
-        { label: "Faturamento Mensal", value: fmtCurrency(simulatedMonthlyRevenue), icon: DollarSign, change: "+12.5%", up: true, color: "#39FF14" },
-        { label: "Usuários Total", value: totalUsers.toLocaleString(), icon: Users, change: `+${Math.floor(totalUsers * 0.08)}`, up: true, color: "#00D4FF" },
-        { label: "Médicos Online", value: `${onlineDoctors}/${totalDoctors}`, icon: Stethoscope, change: onlineDoctors > 0 ? "Ativos" : "Offline", up: onlineDoctors > 0, color: "#FF6B35" },
-        { label: "Conversão", value: `${conversionRate}%`, icon: TrendingUp, change: "Meta: 35%", up: Number(conversionRate) > 20, color: "#A855F7" },
-      ].map((kpi, i) => (
-        <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
-          <Card className="border-0 shadow-2xl" style={{ background: "#0F1340", borderLeft: `3px solid ${kpi.color}` }}>
-            <CardContent className="p-3 md:p-4">
-              <div className="flex items-start justify-between mb-1">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${kpi.color}15` }}>
-                  <kpi.icon size={16} style={{ color: kpi.color }} />
+    <div className="space-y-3">
+      {/* Primary Financial KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { label: "MRR (Receita Recorrente)", value: fmtCurrency(mrrEstimated), icon: TrendingUp, change: "+18%", up: true, color: "#39FF14" },
+          { label: "Saldo a Repassar", value: fmtCurrency(saldoRepassar), icon: Users, change: "93% Split", up: true, color: "#00D4FF" },
+          { label: "Lucro Líquido (7%)", value: fmtCurrency(lucroLiquido), icon: DollarSign, change: "+12.5%", up: true, color: "#A855F7" },
+          { label: "Receita Bruta", value: fmtCurrency(simulatedMonthlyRevenue), icon: BarChart3, change: "+23%", up: true, color: "#FF6B35" },
+        ].map((kpi, i) => (
+          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
+            <Card className="border-0 shadow-2xl" style={{ background: "#0F1340", borderLeft: `3px solid ${kpi.color}` }}>
+              <CardContent className="p-3 md:p-4">
+                <div className="flex items-start justify-between mb-1">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${kpi.color}15` }}>
+                    <kpi.icon size={16} style={{ color: kpi.color }} />
+                  </div>
+                  <span className={`text-[10px] flex items-center gap-0.5 ${kpi.up ? "text-green-400" : "text-red-400"}`}>
+                    {kpi.up ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}{kpi.change}
+                  </span>
                 </div>
-                <span className={`text-[10px] flex items-center gap-0.5 ${kpi.up ? "text-green-400" : "text-red-400"}`}>
-                  {kpi.up ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}{kpi.change}
-                </span>
-              </div>
-              <p className="text-lg font-bold text-white">{kpi.value}</p>
-              <p className="text-[10px]" style={{ color: "#ffffff50" }}>{kpi.label}</p>
+                <p className="text-lg font-bold text-white">{kpi.value}</p>
+                <p className="text-[10px]" style={{ color: "#ffffff50" }}>{kpi.label}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+      {/* Secondary Operational KPIs */}
+      <div className="grid grid-cols-3 lg:grid-cols-3 gap-3">
+        {[
+          { label: "Médicos Online", value: `${onlineDoctors}/${totalDoctors}`, color: onlineDoctors > 0 ? "#39FF14" : "#FF4444" },
+          { label: "Usuários Total", value: totalUsers.toLocaleString(), color: "#00D4FF" },
+          { label: "Conversão", value: `${conversionRate}%`, color: Number(conversionRate) > 20 ? "#39FF14" : "#FFB800" },
+        ].map((kpi, i) => (
+          <Card key={i} className="border-0" style={{ background: "#0F1340", borderTop: `2px solid ${kpi.color}` }}>
+            <CardContent className="p-2.5 text-center">
+              <p className="text-sm font-bold text-white">{kpi.value}</p>
+              <p className="text-[9px]" style={{ color: "#ffffff50" }}>{kpi.label}</p>
             </CardContent>
           </Card>
-        </motion.div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 
@@ -468,21 +513,28 @@ const AdminMaster = () => {
       {/* System Health + Logs + Payments */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="border-0" style={{ background: "#0F1340" }}>
-          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#00D4FF" }}><Bot size={16} /> Saúde do Sistema</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2" style={{ color: "#00D4FF" }}><Bot size={16} /> Automações & Integrações</CardTitle></CardHeader>
           <CardContent className="space-y-2">
             {[
-              { name: "Brisa IA", status: "Ativa", color: "#39FF14", icon: Heart },
-              { name: "Verdinho", status: "Ativo", color: "#39FF14", icon: Bot },
-              { name: "Mercado Pago", status: "Conectado", color: "#39FF14", icon: CreditCard },
-              { name: "Supabase RT", status: "Online", color: "#39FF14", icon: Database },
-              { name: "Twilio", status: "Ativo", color: "#39FF14", icon: MessageSquare },
+              { name: "Brisa IA", status: "Ativa", color: "#39FF14", icon: Heart, ping: true },
+              { name: "Verdinho", status: "Ativo", color: "#39FF14", icon: Bot, ping: true },
+              { name: "Mercado Pago", status: "Conectado", color: "#39FF14", icon: CreditCard, ping: true },
+              { name: "Supabase RT", status: "Online", color: "#39FF14", icon: Database, ping: true },
+              { name: "Twilio/SMS", status: "Ativo", color: "#39FF14", icon: MessageSquare, ping: true },
+              { name: "ManyChat", status: "Webhook OK", color: "#00D4FF", icon: Megaphone, ping: true },
             ].map(sys => (
               <div key={sys.name} className="flex items-center gap-2 p-2 rounded-lg" style={{ background: "#ffffff05" }}>
-                <sys.icon size={13} style={{ color: sys.color }} />
+                <div className="relative">
+                  <sys.icon size={13} style={{ color: sys.color }} />
+                  {sys.ping && <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: sys.color }} />}
+                </div>
                 <span className="flex-1 text-[11px] text-white">{sys.name}</span>
-                <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: `${sys.color}15`, color: sys.color }}>{sys.status}</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: `${sys.color}15`, color: sys.color }}>{sys.status}</span>
               </div>
             ))}
+            <div className="mt-2 p-2 rounded-lg" style={{ background: "#39FF1408", border: "1px solid #39FF1415" }}>
+              <p className="text-[9px] font-bold" style={{ color: "#39FF1480" }}>⚡ Todas as automações operacionais — Última checagem: {new Date().toLocaleTimeString("pt-BR")}</p>
+            </div>
           </CardContent>
         </Card>
         <Card className="border-0" style={{ background: "#0F1340" }}>

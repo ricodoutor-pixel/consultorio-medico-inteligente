@@ -748,7 +748,19 @@ const ProfessionalDashboard = () => {
             </button>
           )}
 
+          {/* VIP Seal in Header */}
+          {!isMobile && <DoctorVIPSeal tier={currentTier} size="lg" />}
+
           <div className="flex-1" />
+
+          {/* Earnings Quick Display */}
+          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/5 border border-primary/10">
+            <DollarSign size={14} className="text-primary" />
+            <div>
+              <p className="text-[9px] text-muted-foreground leading-none">Pool 10%</p>
+              <p className="text-xs font-black text-primary">Ativo</p>
+            </div>
+          </div>
 
           {/* Online Toggle */}
           <div className="flex items-center gap-2">

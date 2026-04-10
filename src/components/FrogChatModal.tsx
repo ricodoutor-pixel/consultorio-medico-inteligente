@@ -209,13 +209,13 @@ export const FrogChatModal = () => {
         role="dialog"
         aria-label="Chat com Verdinho — Assistente IA"
         aria-modal="true"
-        className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-50 w-full sm:w-[400px] sm:max-w-[calc(100vw-2rem)] h-[100dvh] sm:h-[560px] sm:max-h-[75vh] sm:rounded-2xl border-t sm:border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
+        className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-50 w-full sm:w-[400px] sm:max-w-[calc(100vw-2rem)] h-[85dvh] sm:h-[560px] sm:max-h-[75vh] rounded-t-2xl sm:rounded-2xl border-t sm:border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10">
+        <div className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-3 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <FrogMascot size={36} mood={frogMood} />
+            <FrogMascot size={28} mood={frogMood} />
             <div>
               <p className="font-display font-black text-sm text-foreground flex items-center gap-1">
                 Verdinho <Sparkles size={12} className="text-primary" /> <span className="text-[10px] font-normal text-muted-foreground">IA</span>

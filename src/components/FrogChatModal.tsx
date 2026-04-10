@@ -200,6 +200,18 @@ export const FrogChatModal = () => {
     });
   }, [isStreaming, messages]);
 
+  const sendMessage = useCallback((text: string) => {
+    if (!text.trim()) return;
+    // Lead Gate: intercept first message if not captured
+    if (!leadCaptured) {
+      setPendingMessage(text);
+      setInputValue("");
+      setShowLeadGate(true);
+      return;
+    }
+    doSendMessage(text);
+  }, [leadCaptured, doSendMessage]);
+
   const handleSendMessage = useCallback(() => {
     sendMessage(inputValue);
   }, [inputValue, sendMessage]);

@@ -214,8 +214,10 @@ export const FrogChatModal = () => {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-3 py-1.5 sm:px-4 sm:py-2 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 flex-shrink-0">
-          <div className="flex items-center gap-2 min-w-0">
-            <FrogMascot size={32} mood={frogMood} compact />
+          <div className="flex items-center gap-3 min-w-0 pl-2">
+            <div className="flex-shrink-0" style={{ marginLeft: '6px' }}>
+              <FrogMascot size={32} mood={frogMood} compact />
+            </div>
             <div className="min-w-0">
               <p className="font-display font-black text-sm text-foreground flex items-center gap-1 truncate">
                 Verdinho <Sparkles size={12} className="text-primary flex-shrink-0" /> <span className="text-[10px] font-normal text-muted-foreground">IA</span>

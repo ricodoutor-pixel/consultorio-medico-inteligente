@@ -118,6 +118,9 @@ export const FrogChatModal = () => {
   const [leadCaptured, setLeadCaptured] = useState(() => {
     return localStorage.getItem("pr_lead_captured") === "true";
   });
+  const [leadName, setLeadName] = useState(() => {
+    return localStorage.getItem("pr_lead_name") || "";
+  });
   const [pendingMessage, setPendingMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -136,12 +139,12 @@ export const FrogChatModal = () => {
   const handleLeadSuccess = useCallback((data: { nome: string; telefone: string }) => {
     setShowLeadGate(false);
     setLeadCaptured(true);
+    setLeadName(data.nome);
     localStorage.setItem("pr_lead_captured", "true");
-    // Will be processed after doSendMessage is available
+    localStorage.setItem("pr_lead_name", data.nome);
     const msg = pendingMsgRef.current;
     setPendingMessage("");
     pendingMsgRef.current = "";
-    // Defer to next tick so doSendMessage is available
     if (msg) {
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent("frog-chat-send", { detail: msg }));
@@ -370,7 +373,7 @@ export const FrogChatModal = () => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
-            placeholder="Pergunte qualquer coisa ao Verdinho..."
+            placeholder={leadName ? `${leadName}, pergunte ao Verdinho...` : "Pergunte qualquer coisa ao Verdinho..."}
             disabled={isStreaming}
             aria-label="Digite sua mensagem"
             className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50"

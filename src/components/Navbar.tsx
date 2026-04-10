@@ -228,9 +228,9 @@ export const Navbar = () => {
             <span>Voltar</span>
           </button>
 
-          {/* Verdinho dentro do menu mobile — versão completa com todas as animações */}
-          <div className="flex justify-center mb-6 relative" style={{ minHeight: 120 }}>
-            <FrogMascot size={56} mood="happy" onClick={() => { setIsOpen(false); openChat(); }} enableJumpToNav={false} />
+          {/* Verdinho dentro do menu mobile — versão 30% maior */}
+          <div className="flex justify-center mb-6 relative" style={{ minHeight: 156 }}>
+            <FrogMascot size={73} mood="happy" onClick={() => { setIsOpen(false); openChat(); }} enableJumpToNav={false} />
           </div>
 
           <div className="space-y-1 flex-1">

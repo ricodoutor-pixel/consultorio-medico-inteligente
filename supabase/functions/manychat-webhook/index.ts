@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
 
         if (subscriberId && tags.length > 0) {
           // Add tags to subscriber
-          await fetch(`${MANYCHAT_API_URL}/subscriber/addTag`, {
+          await fetch(`${MANYCHAT_API_URL}/subscriber/addTagByName`, {
             method: "POST",
             headers: {
               "Authorization": `Bearer ${MANYCHAT_API_KEY}`,

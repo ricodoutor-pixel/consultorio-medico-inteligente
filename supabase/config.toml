@@ -32,3 +32,9 @@ verify_jwt = false
 
 [functions.gamification-dashboard]
 verify_jwt = false
+
+[functions.revenue-distribution]
+verify_jwt = false
+
+[functions.auto-badge-check]
+verify_jwt = false

@@ -741,6 +741,238 @@ export type Database = {
           },
         ]
       }
+      gamification_achievements: {
+        Row: {
+          badge_id: string
+          id: string
+          notified_at: string | null
+          professional_id: string
+          unlocked_at: string
+        }
+        Insert: {
+          badge_id: string
+          id?: string
+          notified_at?: string | null
+          professional_id: string
+          unlocked_at?: string
+        }
+        Update: {
+          badge_id?: string
+          id?: string
+          notified_at?: string | null
+          professional_id?: string
+          unlocked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_achievements_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "gamification_badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_badges: {
+        Row: {
+          bonus_points: number
+          created_at: string
+          criteria: Json | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          rarity: string
+        }
+        Insert: {
+          bonus_points?: number
+          created_at?: string
+          criteria?: Json | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          rarity?: string
+        }
+        Update: {
+          bonus_points?: number
+          created_at?: string
+          criteria?: Json | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          rarity?: string
+        }
+        Relationships: []
+      }
+      gamification_bonuses: {
+        Row: {
+          amount: number
+          bonus_type: string
+          created_at: string
+          distributed_at: string | null
+          id: string
+          meta_id: string | null
+          professional_id: string
+          reason: string | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          bonus_type?: string
+          created_at?: string
+          distributed_at?: string | null
+          id?: string
+          meta_id?: string | null
+          professional_id: string
+          reason?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          bonus_type?: string
+          created_at?: string
+          distributed_at?: string | null
+          id?: string
+          meta_id?: string | null
+          professional_id?: string
+          reason?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_bonuses_meta_id_fkey"
+            columns: ["meta_id"]
+            isOneToOne: false
+            referencedRelation: "gamification_metas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_history: {
+        Row: {
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          points: number
+          professional_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          points?: number
+          professional_id: string
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          points?: number
+          professional_id?: string
+        }
+        Relationships: []
+      }
+      gamification_leaderboard: {
+        Row: {
+          achievement_count: number
+          id: string
+          nps_score: number
+          period: string
+          professional_id: string
+          rank: number
+          total_bonuses: number
+          updated_at: string
+        }
+        Insert: {
+          achievement_count?: number
+          id?: string
+          nps_score?: number
+          period?: string
+          professional_id: string
+          rank?: number
+          total_bonuses?: number
+          updated_at?: string
+        }
+        Update: {
+          achievement_count?: number
+          id?: string
+          nps_score?: number
+          period?: string
+          professional_id?: string
+          rank?: number
+          total_bonuses?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      gamification_metas: {
+        Row: {
+          bonus_amount: number
+          created_at: string
+          end_date: string | null
+          id: string
+          nps_target: number
+          period: string
+          professional_id: string
+          start_date: string | null
+          status: string
+        }
+        Insert: {
+          bonus_amount: number
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          nps_target: number
+          period?: string
+          professional_id: string
+          start_date?: string | null
+          status?: string
+        }
+        Update: {
+          bonus_amount?: number
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          nps_target?: number
+          period?: string
+          professional_id?: string
+          start_date?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      gamification_streak: {
+        Row: {
+          current_streak: number
+          id: string
+          last_updated_at: string
+          max_streak: number
+          professional_id: string
+          streak_broken_at: string | null
+        }
+        Insert: {
+          current_streak?: number
+          id?: string
+          last_updated_at?: string
+          max_streak?: number
+          professional_id: string
+          streak_broken_at?: string | null
+        }
+        Update: {
+          current_streak?: number
+          id?: string
+          last_updated_at?: string
+          max_streak?: number
+          professional_id?: string
+          streak_broken_at?: string | null
+        }
+        Relationships: []
+      }
       medical_records: {
         Row: {
           appointment_id: string | null
@@ -883,6 +1115,208 @@ export type Database = {
           title?: string
           type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      nps_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          message: string | null
+          professional_id: string
+          response_id: string
+          severity: string
+          status: string
+        }
+        Insert: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          professional_id: string
+          response_id: string
+          severity?: string
+          status?: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          professional_id?: string
+          response_id?: string
+          severity?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nps_alerts_response_id_fkey"
+            columns: ["response_id"]
+            isOneToOne: false
+            referencedRelation: "nps_responses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nps_analytics: {
+        Row: {
+          avg_score: number | null
+          created_at: string
+          detractors: number
+          id: string
+          nps_score: number | null
+          passives: number
+          period: string
+          period_date: string
+          promoters: number
+          response_rate: number | null
+          total_responses: number
+        }
+        Insert: {
+          avg_score?: number | null
+          created_at?: string
+          detractors?: number
+          id?: string
+          nps_score?: number | null
+          passives?: number
+          period: string
+          period_date: string
+          promoters?: number
+          response_rate?: number | null
+          total_responses?: number
+        }
+        Update: {
+          avg_score?: number | null
+          created_at?: string
+          detractors?: number
+          id?: string
+          nps_score?: number | null
+          passives?: number
+          period?: string
+          period_date?: string
+          promoters?: number
+          response_rate?: number | null
+          total_responses?: number
+        }
+        Relationships: []
+      }
+      nps_feedback_analysis: {
+        Row: {
+          action_items: Json | null
+          created_at: string
+          id: string
+          keywords: Json | null
+          response_id: string
+          sentiment: string | null
+          sentiment_score: number | null
+          topics: Json | null
+        }
+        Insert: {
+          action_items?: Json | null
+          created_at?: string
+          id?: string
+          keywords?: Json | null
+          response_id: string
+          sentiment?: string | null
+          sentiment_score?: number | null
+          topics?: Json | null
+        }
+        Update: {
+          action_items?: Json | null
+          created_at?: string
+          id?: string
+          keywords?: Json | null
+          response_id?: string
+          sentiment?: string | null
+          sentiment_score?: number | null
+          topics?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nps_feedback_analysis_response_id_fkey"
+            columns: ["response_id"]
+            isOneToOne: false
+            referencedRelation: "nps_responses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nps_professional: {
+        Row: {
+          avg_score: number | null
+          detractors: number
+          id: string
+          last_response_at: string | null
+          nps_score: number | null
+          passives: number
+          professional_id: string
+          promoters: number
+          total_responses: number
+          updated_at: string
+        }
+        Insert: {
+          avg_score?: number | null
+          detractors?: number
+          id?: string
+          last_response_at?: string | null
+          nps_score?: number | null
+          passives?: number
+          professional_id: string
+          promoters?: number
+          total_responses?: number
+          updated_at?: string
+        }
+        Update: {
+          avg_score?: number | null
+          detractors?: number
+          id?: string
+          last_response_at?: string | null
+          nps_score?: number | null
+          passives?: number
+          professional_id?: string
+          promoters?: number
+          total_responses?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      nps_responses: {
+        Row: {
+          category: string
+          consultation_id: string
+          created_at: string
+          feedback: string | null
+          id: string
+          patient_id: string
+          professional_id: string
+          score: number
+          sentiment: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          consultation_id: string
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          patient_id: string
+          professional_id: string
+          score: number
+          sentiment?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          consultation_id?: string
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          patient_id?: string
+          professional_id?: string
+          score?: number
+          sentiment?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

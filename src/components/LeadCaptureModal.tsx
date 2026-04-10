@@ -25,7 +25,7 @@ const isValidPhone = (value: string): boolean => {
   return digits.length === 10 || digits.length === 11;
 };
 
-const MANYCHAT_WEBHOOK_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manychat-webhook`;
+const WEBHOOK_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manychat-webhook`;
 
 export const LeadCaptureModal = ({
   isOpen,
@@ -78,6 +78,7 @@ export const LeadCaptureModal = ({
       const existingName = await checkExistingLead(phoneDigits);
       if (existingName) {
         setRecognized(existingName);
+        localStorage.setItem("pr_lead_name", existingName);
         setTimeout(() => {
           onSuccess({ nome: existingName, telefone: phoneDigits });
         }, 1500);
@@ -86,8 +87,8 @@ export const LeadCaptureModal = ({
 
       const allTags = origem === "ebook" ? ["Origem_Ebook", ...tags] : ["Origem_Chat", ...tags];
 
-      // Send to edge function which handles both DB save and ManyChat
-      const resp = await fetch(MANYCHAT_WEBHOOK_URL, {
+      // Send to edge function which saves to DB
+      const resp = await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -104,6 +105,7 @@ export const LeadCaptureModal = ({
         throw new Error(errData.error || "Erro ao salvar");
       }
 
+      localStorage.setItem("pr_lead_name", nome.trim());
       onSuccess({ nome: nome.trim(), telefone: phoneDigits });
     } catch (e) {
       console.error("Lead capture error:", e);
@@ -135,7 +137,6 @@ export const LeadCaptureModal = ({
 
           <div className="p-5">
             {recognized ? (
-              /* Recognition mode */
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}

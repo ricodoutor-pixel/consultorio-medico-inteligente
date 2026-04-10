@@ -11,6 +11,8 @@ import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, 
 import { motion } from "framer-motion";
 import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
 import { DoctorSubscriptionPlans } from "@/components/doctor/DoctorSubscriptionPlans";
+import { DoctorFinancialCards } from "@/components/doctor/DoctorFinancialCards";
+import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
@@ -112,9 +114,12 @@ const DashboardMedico = () => {
                 <h1 className="text-3xl md:text-4xl font-display font-black text-foreground">
                   Dashboard <span className="text-gradient-green">Médico</span>
                 </h1>
-                <p className="text-muted-foreground font-medium mt-1">
-                  {doctorData ? `CRM ${doctorData.crm}/${doctorData.crm_state} • ${doctorData.specialty}` : "Configure seu perfil médico"}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-muted-foreground font-medium">
+                    {doctorData ? `CRM ${doctorData.crm}/${doctorData.crm_state} • ${doctorData.specialty}` : "Configure seu perfil médico"}
+                  </p>
+                  <DoctorVIPSeal tier={currentTier} />
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <div className={`w-3 h-3 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-muted-foreground"}`} />
@@ -134,6 +139,13 @@ const DashboardMedico = () => {
                   <Button className="rounded-xl ml-auto" asChild><Link to="/cadastro-profissional">Cadastrar</Link></Button>
                 </CardContent>
               </Card>
+            )}
+
+            {/* Financial Cards - Revenue Distribution */}
+            {doctorData && (
+              <div className="mb-8">
+                <DoctorFinancialCards doctorId={doctorData.id} currentTier={currentTier} />
+              </div>
             )}
 
             {/* KPIs */}

@@ -139,12 +139,12 @@ export const FrogChatModal = () => {
   const handleLeadSuccess = useCallback((data: { nome: string; telefone: string }) => {
     setShowLeadGate(false);
     setLeadCaptured(true);
+    setLeadName(data.nome);
     localStorage.setItem("pr_lead_captured", "true");
-    // Will be processed after doSendMessage is available
+    localStorage.setItem("pr_lead_name", data.nome);
     const msg = pendingMsgRef.current;
     setPendingMessage("");
     pendingMsgRef.current = "";
-    // Defer to next tick so doSendMessage is available
     if (msg) {
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent("frog-chat-send", { detail: msg }));

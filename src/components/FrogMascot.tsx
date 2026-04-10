@@ -43,7 +43,7 @@ const getExpressionEmoji = (expression: FrogExpression) => {
   }
 };
 
-export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJumpToNav = false, hasNewMessage = false }: FrogMascotProps) => {
+export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJumpToNav = false, hasNewMessage = false, compact = false }: FrogMascotProps) => {
   const anim = useFrogAnimations(mood, hasNewMessage, size);
   const emoji = getExpressionEmoji(anim.expression);
   const [showStory, setShowStory] = useState(false);

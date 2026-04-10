@@ -622,6 +622,22 @@ const BibliotecaCientifica = () => {
         </DialogContent>
       </Dialog>
 
+      <LeadCaptureModal
+        isOpen={showLeadGate}
+        onClose={() => setShowLeadGate(false)}
+        onSuccess={() => {
+          setShowLeadGate(false);
+          setLeadSuccess(true);
+          incrementCounter();
+          // Redirect to ebook after short delay
+          setTimeout(() => {
+            window.location.href = "/ebook-medicina-canabinoide";
+          }, 2000);
+        }}
+        origem="ebook"
+        tags={["Origem_Ebook"]}
+      />
+
       <Footer />
     </div>
   );

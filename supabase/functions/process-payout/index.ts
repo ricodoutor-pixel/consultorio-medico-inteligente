@@ -151,10 +151,13 @@ Deno.serve(async (req) => {
         .single();
 
       if (doctor?.user_id) {
+        const bonusMsg = npsBonus > 0
+          ? ` (inclui bônus NPS ${npsMultiplier}x: +R$ ${npsBonus.toFixed(2)})`
+          : "";
         await supabase.from("notifications").insert({
           user_id: doctor.user_id,
           title: "💰 Pagamento liberado!",
-          message: `Valor de R$ ${doctorPayout.toFixed(2)} liberado. O paciente confirmou o recebimento.`,
+          message: `Valor de R$ ${doctorPayout.toFixed(2)} liberado${bonusMsg}. O paciente confirmou o recebimento.`,
           type: "payment_confirmed",
           action_url: "/dashboard-medico",
         });

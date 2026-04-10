@@ -209,15 +209,25 @@ export const FrogChatModal = () => {
 
   const sendMessage = useCallback((text: string) => {
     if (!text.trim()) return;
-    // Lead Gate: intercept first message if not captured
     if (!leadCaptured) {
       setPendingMessage(text);
+      pendingMsgRef.current = text;
       setInputValue("");
       setShowLeadGate(true);
       return;
     }
     doSendMessage(text);
   }, [leadCaptured, doSendMessage]);
+
+  // Listen for deferred send after lead capture
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const msg = (e as CustomEvent).detail;
+      if (msg) doSendMessage(msg);
+    };
+    window.addEventListener("frog-chat-send", handler);
+    return () => window.removeEventListener("frog-chat-send", handler);
+  }, [doSendMessage]);
 
   const handleSendMessage = useCallback(() => {
     sendMessage(inputValue);

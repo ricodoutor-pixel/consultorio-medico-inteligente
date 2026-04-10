@@ -369,6 +369,16 @@ export const FrogChatModal = () => {
           </Button>
         </div>
       </motion.div>
+
+      <LeadCaptureModal
+        isOpen={showLeadGate}
+        onClose={() => {
+          setShowLeadGate(false);
+          setPendingMessage("");
+        }}
+        onSuccess={handleLeadSuccess}
+        origem="chat"
+      />
     </AnimatePresence>
   );
 };

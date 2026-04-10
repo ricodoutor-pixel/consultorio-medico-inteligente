@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { X, Send, Sparkles, Trash2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FrogMascot } from "@/components/FrogMascot";
+import { LeadCaptureModal } from "@/components/LeadCaptureModal";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
@@ -130,7 +131,18 @@ export const FrogChatModal = () => {
     return () => window.removeEventListener("open-frog-chat", handler);
   }, []);
 
-  const sendMessage = useCallback((text: string) => {
+  const handleLeadSuccess = useCallback((data: { nome: string; telefone: string }) => {
+    setShowLeadGate(false);
+    setLeadCaptured(true);
+    localStorage.setItem("pr_lead_captured", "true");
+    // Now send the pending message
+    if (pendingMessage) {
+      doSendMessage(pendingMessage);
+      setPendingMessage("");
+    }
+  }, []);
+
+  const doSendMessage = useCallback((text: string) => {
     if (!text.trim() || isStreaming) return;
 
     const userMsg: Message = {

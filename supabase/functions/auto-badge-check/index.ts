@@ -68,6 +68,19 @@ Deno.serve(async (req: Request) => {
           points: badge.bonus_points,
           event_data: { badge_name: badge.name, badge_rarity: badge.rarity },
         });
+
+        // Send notification via ManyChat/Twilio
+        try {
+          await supabase.functions.invoke("notify-achievement", {
+            body: {
+              professionalId,
+              type: "badge_earned",
+              data: { badge_name: badge.name, badge_rarity: badge.rarity, bonus_points: badge.bonus_points },
+            },
+          });
+        } catch (notifErr) {
+          console.error("Notification dispatch failed:", notifErr);
+        }
       }
     }
 

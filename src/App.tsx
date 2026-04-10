@@ -88,6 +88,7 @@ const EbookAnalyticsDashboard = lazy(() => import("./pages/EbookAnalyticsDashboa
 const RevenueDistribution = lazy(() => import("./pages/RevenueDistribution"));
 const ProfessionalDashboard = lazy(() => import("./pages/ProfessionalDashboard"));
 const AdminMaster = lazy(() => import("./pages/AdminMaster"));
+const Badges = lazy(() => import("./pages/Badges"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -184,6 +185,8 @@ const App = () => (
                 <Route path="/distribuicao-renda" element={<RevenueDistribution />} />
                 <Route path="/revenue-distribution" element={<RevenueDistribution />} />
                 <Route path="/dashboard/professional" element={<PrivateRoute><ProfessionalDashboard /></PrivateRoute>} />
+                <Route path="/badges" element={<Badges />} />
+                <Route path="/conquistas" element={<Badges />} />
                 <Route path="/admin-master" element={<AdminRoute><AdminMaster /></AdminRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

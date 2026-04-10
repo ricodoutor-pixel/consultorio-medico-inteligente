@@ -205,6 +205,13 @@ export type Database = {
             referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       audit_log: {
@@ -304,6 +311,13 @@ export type Database = {
             columns: ["matched_doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brisa_triages_matched_doctor_id_fkey"
+            columns: ["matched_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1044,6 +1058,13 @@ export type Database = {
             referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "medical_records_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       medical_subscriptions: {
@@ -1422,6 +1443,13 @@ export type Database = {
             referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "payout_history_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       prescriptions: {
@@ -1502,6 +1530,13 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescriptions_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
             referencedColumns: ["id"]
           },
           {
@@ -2143,6 +2178,57 @@ export type Database = {
       }
     }
     Views: {
+      doctors_public: {
+        Row: {
+          available_hours: Json | null
+          bio: string | null
+          consultation_price: number | null
+          created_at: string | null
+          crm: string | null
+          crm_state: string | null
+          id: string | null
+          is_online: boolean | null
+          is_verified: boolean | null
+          rating: number | null
+          specialty: string | null
+          total_consultations: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          available_hours?: Json | null
+          bio?: string | null
+          consultation_price?: number | null
+          created_at?: string | null
+          crm?: string | null
+          crm_state?: string | null
+          id?: string | null
+          is_online?: boolean | null
+          is_verified?: boolean | null
+          rating?: number | null
+          specialty?: string | null
+          total_consultations?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          available_hours?: Json | null
+          bio?: string | null
+          consultation_price?: number | null
+          created_at?: string | null
+          crm?: string | null
+          crm_state?: string | null
+          id?: string | null
+          is_online?: boolean | null
+          is_verified?: boolean | null
+          rating?: number | null
+          specialty?: string | null
+          total_consultations?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       financial_reports: {
         Row: {
           appointment_id: string | null
@@ -2162,6 +2248,13 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
             referencedColumns: ["id"]
           },
         ]

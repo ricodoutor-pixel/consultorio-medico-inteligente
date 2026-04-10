@@ -652,7 +652,7 @@ const ProfessionalDashboard = () => {
 
   const renderGamification = () => {
     if (!doctorData) return <p className="text-muted-foreground text-sm">Carregando dados do profissional...</p>;
-    return <GamificationDashboard professionalId={doctorData.user_id} />;
+    return <GamificationDashboard professionalId={doctorData.user_id} doctorId={doctorData.id} />;
   };
 
   const renderContent = () => {

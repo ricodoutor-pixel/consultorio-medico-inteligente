@@ -17,3 +17,18 @@ verify_jwt = false
 
 [functions.create-subscription]
 verify_jwt = false
+
+[functions.nps-submit]
+verify_jwt = false
+
+[functions.nps-summary]
+verify_jwt = false
+
+[functions.nps-alerts]
+verify_jwt = false
+
+[functions.gamification-check-meta]
+verify_jwt = false
+
+[functions.gamification-dashboard]
+verify_jwt = false

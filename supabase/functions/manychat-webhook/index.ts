@@ -56,9 +56,9 @@ Deno.serve(async (req) => {
             first_name: nome.split(" ")[0],
             last_name: nome.split(" ").slice(1).join(" ") || "",
             phone: `+${whatsappPhone}`,
+            wa_id: whatsappPhone,
             whatsapp_phone: `+${whatsappPhone}`,
             has_opt_in_sms: true,
-            has_opt_in_email: false,
             consent_phrase: "Lead Gate Planta & Raiz",
           }),
         });

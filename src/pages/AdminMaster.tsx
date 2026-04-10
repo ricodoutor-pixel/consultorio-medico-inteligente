@@ -402,9 +402,44 @@ const AdminMaster = () => {
     </Card>
   );
 
+  /* ═══ NPS CRITICAL ALERTS ═══ */
+  const [npsAlerts, setNpsAlerts] = useState<any[]>([]);
+  useEffect(() => {
+    supabase.functions.invoke("nps-alerts").then(({ data }) => {
+      if (data?.alerts) setNpsAlerts(data.alerts.filter((a: any) => a.severity === "high" || a.severity === "critical"));
+    });
+  }, []);
+
+  const renderNPSAlerts = () => {
+    if (npsAlerts.length === 0) return null;
+    return (
+      <Card className="border-0 overflow-hidden" style={{ background: "#1a0505", borderLeft: "3px solid #FF4444" }}>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2" style={{ color: "#FF4444" }}>
+            <AlertTriangle size={16} className="animate-pulse" /> Alertas Críticos de NPS ({npsAlerts.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {npsAlerts.slice(0, 5).map((alert: any) => (
+            <div key={alert.id} className="p-2.5 rounded-lg animate-pulse" style={{ background: alert.severity === "critical" ? "#FF444420" : "#FF6B3520", border: `1px solid ${alert.severity === "critical" ? "#FF444440" : "#FF6B3540"}` }}>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: alert.severity === "critical" ? "#FF4444" : "#FF6B35", color: "#fff" }}>
+                  {alert.severity.toUpperCase()}
+                </span>
+                <span className="text-[9px]" style={{ color: "#ffffff60" }}>{new Date(alert.created_at).toLocaleString("pt-BR")}</span>
+              </div>
+              <p className="text-[11px] text-white">{alert.message}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
   /* ═══ TAB: OVERVIEW ═══ */
   const renderOverview = () => (
     <div className="space-y-4">
+      {renderNPSAlerts()}
       {renderKPIs()}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="xl:col-span-2">{renderMap()}</div>

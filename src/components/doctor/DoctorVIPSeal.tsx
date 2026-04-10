@@ -1,10 +1,10 @@
-import { ShieldCheck, Crown, Sparkles } from "lucide-react";
+import { ShieldCheck, Crown, Sparkles, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 
 type SealType = "vip" | "premium" | "enterprise" | null;
 
-export const DoctorVIPSeal = ({ tier, size = "sm" }: { tier?: string | null; size?: "sm" | "lg" }) => {
+export const DoctorVIPSeal = ({ tier, size = "sm", npsScore }: { tier?: string | null; size?: "sm" | "lg"; npsScore?: number | null }) => {
   if (!tier) return null;
 
   const isLarge = size === "lg";
@@ -54,4 +54,14 @@ export const DoctorVIPSeal = ({ tier, size = "sm" }: { tier?: string | null; siz
   }
 
   return null;
+};
+
+export const NPSScoreBadge = ({ score }: { score?: number | null }) => {
+  if (score === null || score === undefined) return null;
+  const color = score >= 70 ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" : score >= 30 ? "text-amber-400 border-amber-500/30 bg-amber-500/10" : "text-red-400 border-red-500/30 bg-red-500/10";
+  return (
+    <Badge variant="outline" className={`${color} text-[9px] font-bold gap-0.5`}>
+      <Star size={8} /> NPS {score}
+    </Badge>
+  );
 };

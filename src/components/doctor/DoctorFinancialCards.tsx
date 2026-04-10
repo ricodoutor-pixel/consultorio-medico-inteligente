@@ -42,7 +42,7 @@ export const DoctorFinancialCards = ({ doctorId, currentTier }: Props) => {
     setLoading(false);
   };
 
-  const feeRate = currentTier === "basic" || currentTier === "enterprise" ? 0 : currentTier === "premium" ? 3 : 5;
+  const feeRate = currentTier === "basic" ? 0 : currentTier === "enterprise" ? 2 : currentTier === "premium" ? 3 : 5;
 
   const cards = [
     { icon: DollarSign, label: "Ganhos Acumulados", value: `R$ ${earnings.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, sub: "Total líquido recebido", color: "text-primary", glow: "shadow-primary/10", tooltip: "Soma de todos os honorários líquidos já recebidos via consultas e serviços na plataforma." },

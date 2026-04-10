@@ -75,15 +75,15 @@ Deno.serve(async (req: Request) => {
       myDistribution = distribution.find((d) => d.doctor_id === doctorId) || null;
     }
 
-    // Update the pool record
-    await supabase.from("revenue_distribution_pool")
-      .upsert({
-        month,
-        year,
-        total_pool: Math.round(distributionPool * 100) / 100,
-        status: "active",
-      }, { onConflict: "month,year" })
-      .select();
+    // Update pool record if exists
+    const { data: existingPool } = await supabase.from("revenue_distribution_pool")
+      .select("id").eq("month", month).eq("year", year).maybeSingle();
+    
+    if (existingPool) {
+      await supabase.from("revenue_distribution_pool")
+        .update({ total_pool: Math.round(distributionPool * 100) / 100 })
+        .eq("id", existingPool.id);
+    }
 
     return new Response(
       JSON.stringify({

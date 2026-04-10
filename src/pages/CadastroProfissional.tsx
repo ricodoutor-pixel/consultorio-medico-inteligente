@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckCircle2, Upload, UserPlus, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -211,13 +212,20 @@ const CadastroProfissional = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="basic">VIP — R$ 99/mês (Taxa Zero)</SelectItem>
+                        <SelectItem value="basic">
+                          <span className="flex items-center gap-2">VIP — R$ 99/mês (Taxa Zero) <Badge className="bg-primary/15 text-primary text-[8px] px-1.5 py-0">MAIS POPULAR</Badge></span>
+                        </SelectItem>
                         <SelectItem value="professional">Profissional — R$ 299/mês</SelectItem>
                         <SelectItem value="premium">Premium — R$ 599/mês</SelectItem>
                         <SelectItem value="enterprise">Enterprise — R$ 1.500/mês</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-[10px] text-muted-foreground">O plano VIP garante 100% dos honorários sem taxa de intermediação.</p>
+                    {form.plano === "basic" && (
+                      <p className="text-[11px] text-primary font-bold mt-1">🎉 Parabéns! Você terá TAXA ZERO em todas as suas consultas.</p>
+                    )}
+                    {form.plano !== "basic" && (
+                      <p className="text-[10px] text-muted-foreground">O plano VIP garante 100% dos honorários sem taxa de intermediação.</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">

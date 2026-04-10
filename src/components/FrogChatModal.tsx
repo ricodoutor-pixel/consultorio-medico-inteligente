@@ -27,13 +27,14 @@ async function streamChat({
   onError: (err: string) => void;
 }) {
   try {
+    const leadName = localStorage.getItem("pr_lead_name") || "";
     const resp = await fetch(CHAT_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({ messages, leadName }),
     });
 
     if (!resp.ok) {

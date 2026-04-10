@@ -131,14 +131,21 @@ export const FrogChatModal = () => {
     return () => window.removeEventListener("open-frog-chat", handler);
   }, []);
 
+  const pendingMsgRef = useRef("");
+
   const handleLeadSuccess = useCallback((data: { nome: string; telefone: string }) => {
     setShowLeadGate(false);
     setLeadCaptured(true);
     localStorage.setItem("pr_lead_captured", "true");
-    // Now send the pending message
-    if (pendingMessage) {
-      doSendMessage(pendingMessage);
-      setPendingMessage("");
+    // Will be processed after doSendMessage is available
+    const msg = pendingMsgRef.current;
+    setPendingMessage("");
+    pendingMsgRef.current = "";
+    // Defer to next tick so doSendMessage is available
+    if (msg) {
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("frog-chat-send", { detail: msg }));
+      }, 100);
     }
   }, []);
 

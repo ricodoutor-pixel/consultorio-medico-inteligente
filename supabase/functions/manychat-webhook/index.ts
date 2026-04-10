@@ -64,6 +64,7 @@ Deno.serve(async (req) => {
         });
 
         const createData = await createRes.json();
+        console.log("ManyChat create:", createRes.status, JSON.stringify(createData));
         const subscriberId = createData?.data?.id;
 
         if (subscriberId && tags.length > 0) {

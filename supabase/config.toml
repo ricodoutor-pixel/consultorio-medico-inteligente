@@ -41,3 +41,12 @@ verify_jwt = false
 
 [functions.process-payout-distribution]
 verify_jwt = false
+
+[functions.system-cache]
+verify_jwt = false
+
+[functions.job-queue]
+verify_jwt = false
+
+[functions.system-monitor]
+verify_jwt = false

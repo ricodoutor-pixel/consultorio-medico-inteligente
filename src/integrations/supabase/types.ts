@@ -990,6 +990,48 @@ export type Database = {
         }
         Relationships: []
       }
+      job_queue: {
+        Row: {
+          attempts: number
+          completed_at: string | null
+          created_at: string
+          error_log: string | null
+          id: string
+          max_retries: number
+          payload: Json
+          queue: string
+          scheduled_for: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          error_log?: string | null
+          id?: string
+          max_retries?: number
+          payload?: Json
+          queue: string
+          scheduled_for?: string
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          error_log?: string | null
+          id?: string
+          max_retries?: number
+          payload?: Json
+          queue?: string
+          scheduled_for?: string
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       leads_contatos: {
         Row: {
           created_at: string
@@ -1797,6 +1839,108 @@ export type Database = {
           terpenes?: string[] | null
           thc_cbd_ratio?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      system_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          message: string
+          metric_value: number | null
+          resolved: boolean
+          resolved_at: string | null
+          severity: string
+          threshold_value: number | null
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          message: string
+          metric_value?: number | null
+          resolved?: boolean
+          resolved_at?: string | null
+          severity?: string
+          threshold_value?: number | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          message?: string
+          metric_value?: number | null
+          resolved?: boolean
+          resolved_at?: string | null
+          severity?: string
+          threshold_value?: number | null
+        }
+        Relationships: []
+      }
+      system_cache: {
+        Row: {
+          cache_key: string
+          cache_value: Json | null
+          created_at: string
+          expires_at: string
+          id: string
+          namespace: string
+          updated_at: string
+        }
+        Insert: {
+          cache_key: string
+          cache_value?: Json | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          namespace: string
+          updated_at?: string
+        }
+        Update: {
+          cache_key?: string
+          cache_value?: Json | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          namespace?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      system_errors: {
+        Row: {
+          context: Json | null
+          created_at: string
+          endpoint: string | null
+          error_message: string
+          id: string
+          resolved: boolean
+          resolved_at: string | null
+          stack: string | null
+          user_id: string | null
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string
+          endpoint?: string | null
+          error_message: string
+          id?: string
+          resolved?: boolean
+          resolved_at?: string | null
+          stack?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string
+          endpoint?: string | null
+          error_message?: string
+          id?: string
+          resolved?: boolean
+          resolved_at?: string | null
+          stack?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

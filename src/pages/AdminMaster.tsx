@@ -215,8 +215,31 @@ const AdminMaster = () => {
 
   useEffect(() => {
     const ch = supabase.channel("admin-master-rt")
-      .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, () => loadDashboardData())
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "payment_webhooks" }, () => loadDashboardData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, (payload) => {
+        loadDashboardData();
+        if (payload.eventType === "UPDATE" && payload.new?.is_verified && !payload.old?.is_verified) {
+          toast.success("✅ Novo Médico Verificado!", { description: `CRM ${payload.new.crm}/${payload.new.crm_state}` });
+        }
+      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "payment_webhooks" }, (payload) => {
+        loadDashboardData();
+        const amount = payload.new?.amount;
+        const status = payload.new?.status;
+        if (status === "approved") {
+          toast.success(`💰 Pagamento Recebido: R$ ${Number(amount || 0).toFixed(2)}`, { description: `Payer: ${payload.new?.payer_email || "—"}` });
+        } else if (status === "rejected" || status === "refunded") {
+          toast.error(`⚠️ Alerta de Pagamento: ${status}`, { description: `Valor: R$ ${Number(amount || 0).toFixed(2)}` });
+        }
+      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "medical_subscriptions" }, (payload) => {
+        loadDashboardData();
+        const tier = payload.new?.plan_tier;
+        if (tier === "basic") {
+          toast("🌟 Novo Médico VIP!", { description: "Um profissional ativou o Plano VIP — Taxa Zero" });
+        } else if (tier === "premium" || tier === "enterprise") {
+          toast("👑 Upgrade de Plano!", { description: `Médico atualizou para ${tier.toUpperCase()}` });
+        }
+      })
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "profiles" }, () => loadDashboardData())
       .on("postgres_changes", { event: "*", schema: "public", table: "vendor_transactions" }, () => loadDashboardData())
       .on("postgres_changes", { event: "*", schema: "public", table: "vendor_products" }, () => loadDashboardData())

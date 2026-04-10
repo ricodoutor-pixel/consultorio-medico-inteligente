@@ -19,6 +19,8 @@ interface FrogMascotProps {
   mood?: FrogExpression;
   enableJumpToNav?: boolean;
   hasNewMessage?: boolean;
+  /** When true, disables daydream/princess/doctor/story/crown overlays (used in chat header) */
+  compact?: boolean;
 }
 
 const getExpressionEmoji = (expression: FrogExpression) => {
@@ -41,7 +43,7 @@ const getExpressionEmoji = (expression: FrogExpression) => {
   }
 };
 
-export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJumpToNav = false, hasNewMessage = false }: FrogMascotProps) => {
+export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJumpToNav = false, hasNewMessage = false, compact = false }: FrogMascotProps) => {
   const anim = useFrogAnimations(mood, hasNewMessage, size);
   const emoji = getExpressionEmoji(anim.expression);
   const [showStory, setShowStory] = useState(false);
@@ -231,17 +233,19 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
             draggable={false}
           />
           <AnimatePresence>
-            {anim.showCrown && !anim.isDoctorMode && <FrogCrown size={displaySize} isHovered={isEnlarged || showStory} />}
+            {anim.showCrown && !anim.isDoctorMode && !compact && <FrogCrown size={displaySize} isHovered={isEnlarged || showStory} />}
           </AnimatePresence>
         </motion.div>
       </div>
 
       {/* Doctor Mode overlay */}
-      <FrogDoctorMode
-        size={displaySize}
-        isDoctor={anim.isDoctorMode}
-        lookingAtChart={anim.lookingAtChart}
-      />
+      {!compact && (
+        <FrogDoctorMode
+          size={displaySize}
+          isDoctor={anim.isDoctorMode}
+          lookingAtChart={anim.lookingAtChart}
+        />
+      )}
 
       {/* Eyes + Mouth SVG overlay */}
       <svg
@@ -310,16 +314,16 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       )}
 
       {/* Love hearts */}
-      <FrogLoveHearts size={displaySize} show={anim.isDaydreaming && !anim.isDoctorMode} />
+      {!compact && <FrogLoveHearts size={displaySize} show={anim.isDaydreaming && !anim.isDoctorMode} />}
 
       {/* Pulsing chest heart */}
-      <FrogChestHeart size={displaySize} show={anim.isDaydreaming && !anim.isDoctorMode} />
+      {!compact && <FrogChestHeart size={displaySize} show={anim.isDaydreaming && !anim.isDoctorMode} />}
 
       {/* Daydream bubble */}
-      <FrogDaydream size={displaySize} isDaydreaming={anim.isDaydreaming} daydreamPhase={anim.daydreamPhase} />
+      {!compact && <FrogDaydream size={displaySize} isDaydreaming={anim.isDaydreaming} daydreamPhase={anim.daydreamPhase} />}
 
       {/* Star Wars story scroll — shown on single tap */}
-      <FrogStoryScroll show={showStory} size={displaySize} />
+      {!compact && <FrogStoryScroll show={showStory} size={displaySize} />}
 
     </motion.div>
         </TooltipTrigger>

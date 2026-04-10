@@ -213,27 +213,27 @@ export const FrogChatModal = () => {
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-3 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <FrogMascot size={28} mood={frogMood} />
-            <div>
-              <p className="font-display font-black text-sm text-foreground flex items-center gap-1">
-                Verdinho <Sparkles size={12} className="text-primary" /> <span className="text-[10px] font-normal text-muted-foreground">IA</span>
+        <div className="flex items-center justify-between px-3 py-1.5 sm:px-4 sm:py-2 border-b border-border bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 flex-shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <FrogMascot size={24} mood={frogMood} compact />
+            <div className="min-w-0">
+              <p className="font-display font-black text-sm text-foreground flex items-center gap-1 truncate">
+                Verdinho <Sparkles size={12} className="text-primary flex-shrink-0" /> <span className="text-[10px] font-normal text-muted-foreground">IA</span>
               </p>
-              <p className="text-[10px] text-muted-foreground font-semibold">
-                {isStreaming ? "✍️ Digitando..." : "🟢 Online 24/7 • Sabe tudo!"}
+              <p className="text-[10px] text-muted-foreground font-semibold truncate">
+                {isStreaming ? "✍️ Digitando..." : "🟢 Online 24/7"}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 flex-shrink-0">
             <button onClick={clearChat} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground" title="Limpar conversa" aria-label="Limpar conversa">
               <Trash2 size={14} />
             </button>
             <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground" title="Minimizar chat" aria-label="Minimizar chat">
-              <Minimize2 size={16} />
+              <Minimize2 size={14} />
             </button>
-            <button onClick={() => setIsOpen(false)} className="p-2 rounded-lg hover:bg-destructive/20 transition-colors text-destructive font-bold" title="Fechar chat" aria-label="Fechar chat">
-              <X size={20} />
+            <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-destructive/20 transition-colors text-destructive font-bold" title="Fechar chat" aria-label="Fechar chat">
+              <X size={16} />
             </button>
           </div>
         </div>

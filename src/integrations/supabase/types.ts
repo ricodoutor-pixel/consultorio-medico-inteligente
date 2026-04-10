@@ -626,6 +626,7 @@ export type Database = {
           id: string
           is_online: boolean
           is_verified: boolean
+          pix_key: string | null
           rating: number | null
           rqe: string | null
           specialty: string
@@ -643,6 +644,7 @@ export type Database = {
           id?: string
           is_online?: boolean
           is_verified?: boolean
+          pix_key?: string | null
           rating?: number | null
           rqe?: string | null
           specialty?: string
@@ -660,6 +662,7 @@ export type Database = {
           id?: string
           is_online?: boolean
           is_verified?: boolean
+          pix_key?: string | null
           rating?: number | null
           rqe?: string | null
           specialty?: string
@@ -1361,6 +1364,65 @@ export type Database = {
           status?: string
         }
         Relationships: []
+      }
+      payout_history: {
+        Row: {
+          amount: number
+          created_at: string
+          doctor_id: string
+          error_message: string | null
+          id: string
+          mercadopago_payment_id: string | null
+          period_month: number
+          period_year: number
+          pix_key: string
+          processed_at: string | null
+          share_percentage: number
+          status: string
+          user_id: string
+          weighted_score: number
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          doctor_id: string
+          error_message?: string | null
+          id?: string
+          mercadopago_payment_id?: string | null
+          period_month: number
+          period_year: number
+          pix_key: string
+          processed_at?: string | null
+          share_percentage?: number
+          status?: string
+          user_id: string
+          weighted_score?: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          doctor_id?: string
+          error_message?: string | null
+          id?: string
+          mercadopago_payment_id?: string | null
+          period_month?: number
+          period_year?: number
+          pix_key?: string
+          processed_at?: string | null
+          share_percentage?: number
+          status?: string
+          user_id?: string
+          weighted_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_history_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       prescriptions: {
         Row: {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -12,65 +12,47 @@ interface Notification {
   created_at: string;
 }
 
+const POLL_INTERVAL_MS = 15_000; // 15 seconds
+
 export function useRealtimeNotifications(userId: string | undefined) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const fetchNotifications = useCallback(async () => {
+    if (!userId) return;
+    const { data } = await supabase
+      .from("notifications")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("is_read", false)
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (data) {
+      // Detect new notifications for toast
+      setNotifications((prev) => {
+        const prevIds = new Set(prev.map((n) => n.id));
+        const newOnes = (data as Notification[]).filter((n) => !prevIds.has(n.id));
+        for (const n of newOnes) {
+          toast({ title: n.title, description: n.message });
+        }
+        return data as Notification[];
+      });
+      setUnreadCount(data.length);
+    }
+  }, [userId]);
+
   useEffect(() => {
     if (!userId) return;
 
-    // Fetch existing unread notifications
-    const fetchNotifications = async () => {
-      const { data } = await supabase
-        .from("notifications")
-        .select("*")
-        .eq("user_id", userId)
-        .eq("is_read", false)
-        .order("created_at", { ascending: false })
-        .limit(20);
-
-      if (data) {
-        setNotifications(data as Notification[]);
-        setUnreadCount(data.length);
-      }
-    };
-
+    // Initial fetch
     fetchNotifications();
 
-    // Subscribe to realtime changes
-    const channel = supabase
-      .channel(`notifications-${userId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "notifications",
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          const newNotification = payload.new as Notification;
-          setNotifications((prev) => [newNotification, ...prev]);
-          setUnreadCount((prev) => prev + 1);
+    // Poll for new notifications
+    const interval = setInterval(fetchNotifications, POLL_INTERVAL_MS);
 
-          // Show toast for new notifications
-          const toastVariant = newNotification.type === "consultation_accepted"
-            ? "default"
-            : "default";
-
-          toast({
-            title: newNotification.title,
-            description: newNotification.message,
-            variant: toastVariant,
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userId]);
+    return () => clearInterval(interval);
+  }, [userId, fetchNotifications]);
 
   const markAsRead = async (notificationId: string) => {
     await supabase

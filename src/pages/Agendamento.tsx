@@ -58,8 +58,8 @@ const Agendamento = () => {
   }, []);
 
   const fetchDoctors = async () => {
-    const { data } = await supabase.from("doctors").select("*").eq("is_verified", true);
-    if (data) setDoctors(data as Doctor[]);
+    const { data } = await supabase.from("doctors_public").select("*");
+    if (data) setDoctors(data as unknown as Doctor[]);
   };
 
   const handleBook = async () => {

@@ -126,6 +126,78 @@ const conditions: Record<string, {
       "Habib & Artul (2018) — Clin Exp Rheumatology: Cannabis como substituto de medicamentos na fibromialgia",
     ],
   },
+  parkinson: {
+    title: "Cannabis Medicinal para Parkinson | Planta & Raiz",
+    h1: "Tratamento de Parkinson com Cannabis Medicinal",
+    description: "Cannabis medicinal alivia tremores, rigidez e melhora qualidade de vida em pacientes com Parkinson.",
+    cid: "G20",
+    content: [
+      "A doença de Parkinson afeta mais de 200 mil brasileiros. Cannabis medicinal pode aliviar sintomas motores e não-motores.",
+      "O CBD possui propriedades neuroprotetoras e anti-inflamatórias que atuam nos gânglios da base, região afetada no Parkinson.",
+      "Estudo brasileiro (Zuardi et al., 2009) demonstrou melhora significativa nos sintomas psicóticos e distúrbios do sono em pacientes com Parkinson.",
+      "O tratamento é personalizado como terapia adjuvante, associado ao tratamento convencional com levodopa.",
+    ],
+    strains: ["ACDC (CBD 24:1)", "Cannatonic (CBD 1:1)", "Harlequin (CBD 5:2)", "Charlotte's Web (CBD 20:1)"],
+    studies: [
+      "Zuardi et al. (2009) — J Psychopharmacol: CBD melhora psicose no Parkinson",
+      "Chagas et al. (2014) — J Clin Pharmacy & Therapeutics: CBD e distúrbios do sono no Parkinson",
+      "Lotan et al. (2014) — Clin Neuropharmacol: Cannabis alivia dor e tremor no Parkinson",
+    ],
+  },
+  autismo: {
+    title: "Cannabis Medicinal para Autismo (TEA) | Planta & Raiz",
+    h1: "Cannabis Medicinal no Tratamento do Autismo (TEA)",
+    description: "CBD melhora comportamento, sono e comunicação em pacientes com Transtorno do Espectro Autista.",
+    cid: "F84.0",
+    content: [
+      "O Transtorno do Espectro Autista (TEA) afeta 1 em cada 36 crianças. Cannabis medicinal tem mostrado resultados promissores.",
+      "O sistema endocanabinóide participa do neurodesenvolvimento e regulação da comunicação sináptica, áreas afetadas no TEA.",
+      "Estudo israelense (Aran et al., 2019) com 188 pacientes demonstrou melhora em 80% dos casos em comportamento, ansiedade e comunicação.",
+      "O tratamento deve ser supervisionado por neuropediatra ou psiquiatra infantil com experiência em cannabis medicinal.",
+    ],
+    strains: ["Charlotte's Web (CBD 30:1)", "ACDC (CBD 24:1)", "Cannatonic (CBD 1:1)", "Ringo's Gift (CBD 24:1)"],
+    studies: [
+      "Aran et al. (2019) — Scientific Reports: Cannabis rica em CBD melhora sintomas do autismo",
+      "Barchel et al. (2019) — J Autism Dev Disorders: CBD e qualidade de vida no TEA",
+      "Poleg et al. (2019) — Frontiers in Pharmacology: Canabinoides e autismo — revisão",
+    ],
+  },
+  "esclerose-multipla": {
+    title: "Cannabis Medicinal para Esclerose Múltipla | Planta & Raiz",
+    h1: "Tratamento de Esclerose Múltipla com Cannabis Medicinal",
+    description: "Cannabis medicinal reduz espasticidade e dor na esclerose múltipla. Sativex aprovado mundialmente.",
+    cid: "G35",
+    content: [
+      "A Esclerose Múltipla afeta mais de 40 mil brasileiros. O Sativex (nabiximols) foi um dos primeiros medicamentos canabinoides aprovados.",
+      "Os canabinoides modulam a resposta imune e reduzem a neuroinflamação característica da EM.",
+      "Meta-análise (Whiting et al., 2015) demonstrou eficácia significativa do nabiximols na redução da espasticidade em pacientes com EM.",
+      "O tratamento é prescrito como terapia adjuvante para espasticidade, dor neuropática e distúrbios urinários refratários.",
+    ],
+    strains: ["Cannatonic (CBD 1:1)", "Harlequin (CBD 5:2)", "Pennywise (CBD 1:1)", "ACDC (CBD 24:1)"],
+    studies: [
+      "Whiting et al. (2015) — JAMA: Nabiximols eficaz para espasticidade na EM",
+      "Novotna et al. (2011) — Eur J Neurology: Sativex melhora espasticidade em EM",
+      "Rudroff & Sosnoff (2018) — Frontiers in Neurology: Canabinoides e mobilidade na EM",
+    ],
+  },
+  tdah: {
+    title: "Cannabis Medicinal para TDAH | Planta & Raiz",
+    h1: "Cannabis Medicinal e TDAH — Transtorno de Déficit de Atenção",
+    description: "Pesquisas investigam o potencial do CBD no manejo de sintomas do TDAH. Consulte prescritores especializados.",
+    cid: "F90",
+    content: [
+      "O TDAH afeta cerca de 5% da população adulta brasileira. Pacientes buscam alternativas aos estimulantes tradicionais.",
+      "O sistema endocanabinóide modula a liberação de dopamina no córtex pré-frontal, região diretamente envolvida no TDAH.",
+      "Estudo piloto (Cooper et al., 2017) mostrou tendência de melhora na hiperatividade e impulsividade com Sativex, embora mais pesquisas sejam necessárias.",
+      "O tratamento é considerado experimental e deve ser prescrito apenas por psiquiatra especializado após avaliação completa.",
+    ],
+    strains: ["Harlequin (CBD 5:2)", "Cannatonic (CBD 1:1)", "Sour Tsunami (CBD 11:1)", "ACDC (CBD 24:1)"],
+    studies: [
+      "Cooper et al. (2017) — Eur Neuropsychopharmacol: Canabinoides e TDAH — estudo piloto",
+      "Strohbeck-Kuehner et al. (2008) — Cannabinoids: THC melhora concentração em paciente com TDAH",
+      "Loflin et al. (2017) — Subst Use Misuse: Cannabis e sintomas de TDAH — padrões de uso",
+    ],
+  },
 };
 
 const SEOCondicoes = () => {

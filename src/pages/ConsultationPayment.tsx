@@ -106,6 +106,15 @@ const ConsultationPayment = () => {
       });
       if (error) throw error;
       if (data?.status === "paid" || data?.status === "approved") {
+        setStatus("processing");
+        setProcessingStep(0);
+        // Animate processing steps
+        const steps = [1, 2, 3];
+        for (const step of steps) {
+          await new Promise(r => setTimeout(r, 800));
+          setProcessingStep(step);
+        }
+        await new Promise(r => setTimeout(r, 600));
         setStatus("confirmed");
         toast({ title: "✅ Pagamento confirmado!", description: "Sua consulta está agendada." });
       } else if (data?.status === "rejected") {

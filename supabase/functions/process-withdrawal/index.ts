@@ -53,6 +53,52 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Verificar limite diário
+    const todayStart = new Date().toISOString().split("T")[0] + "T00:00:00.000Z";
+    const { data: dailyWithdrawals } = await supabase
+      .from("withdrawal_requests")
+      .select("amount")
+      .eq("user_id", authData.user.id)
+      .gte("created_at", todayStart)
+      .in("status", ["completed", "pending"]);
+
+    const totalToday = dailyWithdrawals?.reduce((sum: number, r: any) => sum + Number(r.amount || 0), 0) || 0;
+
+    if (totalToday + amount > DAILY_LIMIT) {
+      // Alerta de segurança via ManyChat webhook
+      const manychatUrl = Deno.env.get("MANYCHAT_WEBHOOK_URL");
+      if (manychatUrl) {
+        try {
+          await fetch(manychatUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type: "SECURITY_ALERT",
+              message: `⚠️ Tentativa de saque excedida: User ${authData.user.id} tentou sacar R$ ${amount}, mas já atingiu R$ ${totalToday} hoje.`,
+              limit: DAILY_LIMIT,
+            }),
+          });
+        } catch (webhookErr) {
+          console.error("Erro ao enviar alerta ManyChat:", webhookErr);
+        }
+      }
+
+      // Audit log da tentativa
+      await supabase.from("audit_log").insert({
+        user_id: authData.user.id,
+        action: "withdrawal_limit_exceeded",
+        table_name: "withdrawal_requests",
+        record_id: authData.user.id,
+        new_data: { attempted: amount, total_today: totalToday, limit: DAILY_LIMIT },
+      });
+
+      return new Response(JSON.stringify({
+        error: `Limite diário de R$ ${DAILY_LIMIT.toFixed(2)} excedido. Você já sacou R$ ${totalToday.toFixed(2)} hoje. Tente novamente amanhã ou contate o suporte.`,
+      }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Calcular taxa automática
     const fee = Math.round(amount * WITHDRAWAL_FEE_RATE * 100) / 100;
     const netAmount = Math.round((amount - fee) * 100) / 100;

@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
 import { DoctorSubscriptionPlans } from "@/components/doctor/DoctorSubscriptionPlans";
 import { DoctorFinancialCards } from "@/components/doctor/DoctorFinancialCards";
+import { DoctorBICockpit } from "@/components/doctor/DoctorBICockpit";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -232,6 +233,13 @@ const DashboardMedico = () => {
               <div className="grid lg:grid-cols-2 gap-6 mb-8">
                 <DoctorPerformanceWidget doctorId={doctorData.id} simulatedTier={simulatedTier} />
                 <DoctorSubscriptionPlans doctorId={doctorData.id} currentTier={currentTier} onTierChange={setSimulatedTier} />
+              </div>
+            )}
+
+            {/* BI Cockpit - Domination Strategy */}
+            {doctorData && (
+              <div className="mb-8">
+                <DoctorBICockpit doctorId={doctorData.id} currentTier={currentTier} />
               </div>
             )}
 

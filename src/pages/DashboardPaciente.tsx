@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { WellnessSubscriptionCards } from "@/components/WellnessSubscriptionCards";
 import { professionals } from "@/data/professionals";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
@@ -340,6 +341,13 @@ const DashboardPaciente = () => {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Wellness Subscription Plans */}
+      <section className="pb-16">
+        <div className="container mx-auto px-4">
+          <WellnessSubscriptionCards />
         </div>
       </section>
 

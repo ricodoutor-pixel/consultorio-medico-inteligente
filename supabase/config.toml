@@ -50,3 +50,9 @@ verify_jwt = false
 
 [functions.system-monitor]
 verify_jwt = false
+
+[functions.anvisa-automation]
+verify_jwt = false
+
+[functions.retention-webhook]
+verify_jwt = false

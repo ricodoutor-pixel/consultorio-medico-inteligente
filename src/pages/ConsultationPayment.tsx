@@ -18,6 +18,7 @@ const ConsultationPayment = () => {
   const appointmentId = searchParams.get("appointment") || null;
   const pro = professionals.find((p) => p.id === proId) || professionals[0];
   const [status, setStatus] = useState<"pending" | "loading" | "processing" | "confirmed" | "rejected">("pending");
+  const [processingStep, setProcessingStep] = useState(0);
   const [countdown, setCountdown] = useState(900); // 15 min
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const { toast } = useToast();
@@ -194,7 +195,25 @@ const ConsultationPayment = () => {
                   <div className="text-center py-8">
                     <CheckCircle2 size={64} className="text-primary mx-auto mb-4" />
                     <h4 className="text-xl font-display font-black text-foreground mb-2">Pagamento Confirmado!</h4>
-                    <p className="text-muted-foreground mb-6">Sua consulta com {pro.name} está agendada.</p>
+                    <p className="text-muted-foreground mb-4">Sua consulta com {pro.name} está agendada.</p>
+                    
+                    {/* Anvisa Protocol */}
+                    <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 mb-6 text-left">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Shield size={16} className="text-primary" />
+                        <span className="text-sm font-black text-foreground">Protocolo Anvisa</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-1">Número do protocolo:</p>
+                      <p className="font-mono text-sm font-bold text-primary">ANV-{Date.now().toString(36).toUpperCase()}-{Math.random().toString(36).substring(2, 6).toUpperCase()}</p>
+                      <p className="text-[10px] text-muted-foreground mt-2">
+                        📋 Sua prescrição será preparada pelo médico durante a consulta. O protocolo ANVISA será vinculado automaticamente.
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border mb-4 text-left">
+                      <p className="text-xs text-muted-foreground">🪙 <span className="font-bold text-primary">+50 Planta-Coins</span> creditados como bônus de boas-vindas!</p>
+                    </div>
+
                     <Button className="bg-primary text-primary-foreground font-black rounded-2xl" asChild>
                       <Link to={`/telemedicina?pro=${pro.id}`}>
                         Iniciar Pré-Entrevista IA <ArrowRight size={18} className="ml-2" />

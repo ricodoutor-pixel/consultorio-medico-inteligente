@@ -51,6 +51,7 @@ export const appRouter = router({
   checkpointSync: checkpointSyncRouter,
   ebook: ebookRouter,
   ebookAnalytics: ebookAnalyticsRouter,
+  domination: dominationRouter,
   // marketplace: marketplaceRouter, // TODO: Fix marketplace router
 });
 

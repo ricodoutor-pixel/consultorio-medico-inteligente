@@ -1,47 +1,17 @@
 import { ManyChatClient } from './client';
+import { TAGS, FLOWS, CUSTOM_FIELDS } from './constants';
+import { B2BRecruitmentFlows } from './b2b-recruitment';
 import type { LeadQualification } from './types';
 
-// Tag IDs - configure in ManyChat dashboard
-const TAGS = {
-  LEAD_MEDICO: 1001,
-  LEAD_PACIENTE: 1002,
-  LEAD_CURIOSO: 1003,
-  FAST_TRACK: 1004,
-  EBOOK_DOWNLOADED: 1005,
-  CADASTRO_COMPLETO: 1006,
-  NPS_PROMOTER: 1007,
-  NPS_DETRACTOR: 1008,
-  VIP: 1009,
-  REATIVACAO: 1010,
-} as const;
-
-// Flow namespaces - configure in ManyChat dashboard
-const FLOWS = {
-  WELCOME_DOCTOR: 'content20250410_welcome_doctor',
-  WELCOME_PATIENT: 'content20250410_welcome_patient',
-  FUNNEL_RECOVERY: 'content20250410_funnel_recovery',
-  NPS_REQUEST: 'content20250410_nps_request',
-  SOCIAL_PROOF: 'content20250410_social_proof',
-  VIP_UPGRADE: 'content20250410_vip_upgrade',
-  REACTIVATION: 'content20250410_reactivation',
-  WEEKLY_REPORT: 'content20250410_weekly_report',
-  APPOINTMENT_CONFIRM: 'content20250410_appointment_confirm',
-  APPOINTMENT_REMINDER: 'content20250410_appointment_reminder',
-  PAYMENT_CONFIRMED: 'content20250410_payment_confirmed',
-  REFERRAL_BOOST: 'content20250410_referral_boost',
-  // Instagram Gamified Welcome Flows
-  IG_WELCOME_GAMIFIED: 'content20250413_ig_welcome_gamified',
-  IG_QUIZ_CANNABIS: 'content20250413_ig_quiz_cannabis',
-  IG_REWARD_COUPON: 'content20250413_ig_reward_coupon',
-  IG_STORY_REPLY_HOOK: 'content20250413_ig_story_reply_hook',
-  IG_DM_ONBOARDING: 'content20250413_ig_dm_onboarding',
-  IG_PROTOCOLO_ANVISA: 'content20250413_ig_protocolo_anvisa',
-} as const;
-
 export class ManyChatFlows {
-  constructor(private client: ManyChatClient) {}
+  public b2b: B2BRecruitmentFlows;
 
-  /** Qualify a lead as doctor/patient/curious */
+  constructor(private client: ManyChatClient) {
+    this.b2b = new B2BRecruitmentFlows(client);
+  }
+
+  // ── Lead Qualification ──
+
   async qualifyLead(subscriberId: string, info: { crm?: string; userType?: string }): Promise<LeadQualification> {
     let qualification: LeadQualification;
 
@@ -62,7 +32,8 @@ export class ManyChatFlows {
     return qualification;
   }
 
-  /** Recover abandoned funnel (ebook downloaded but no signup in 24h) */
+  // ── Funnel & Retention ──
+
   async triggerFunnelRecovery(subscriberId: string, doctorName: string): Promise<void> {
     await this.client.sendMessage(
       subscriberId,
@@ -71,19 +42,16 @@ export class ManyChatFlows {
     await this.client.sendContent(subscriberId, FLOWS.FUNNEL_RECOVERY);
   }
 
-  /** Request NPS after consultation */
   async requestNPS(subscriberId: string, consultationId: string): Promise<void> {
-    await this.client.setCustomField(subscriberId, 2001, consultationId);
+    await this.client.setCustomField(subscriberId, CUSTOM_FIELDS.CONSULTATION_ID, consultationId);
     await this.client.sendContent(subscriberId, FLOWS.NPS_REQUEST);
   }
 
-  /** Handle NPS promoter - request social proof */
   async requestSocialProof(subscriberId: string): Promise<void> {
     await this.client.addTag(subscriberId, TAGS.NPS_PROMOTER);
     await this.client.sendContent(subscriberId, FLOWS.SOCIAL_PROOF);
   }
 
-  /** Trigger VIP upgrade offer */
   async triggerVIPUpgrade(subscriberId: string, revenue: number, savings: number): Promise<void> {
     await this.client.sendMessage(
       subscriberId,
@@ -92,7 +60,6 @@ export class ManyChatFlows {
     await this.client.sendContent(subscriberId, FLOWS.VIP_UPGRADE);
   }
 
-  /** Reactivate inactive patient */
   async reactivatePatient(subscriberId: string, patientName: string): Promise<void> {
     await this.client.addTag(subscriberId, TAGS.REATIVACAO);
     await this.client.sendMessage(
@@ -102,7 +69,8 @@ export class ManyChatFlows {
     await this.client.sendContent(subscriberId, FLOWS.REACTIVATION);
   }
 
-  /** Appointment confirmation */
+  // ── Appointments & Payments ──
+
   async confirmAppointment(subscriberId: string, doctorName: string, dateTime: string): Promise<void> {
     await this.client.sendMessage(
       subscriberId,
@@ -111,12 +79,10 @@ export class ManyChatFlows {
     await this.client.sendContent(subscriberId, FLOWS.APPOINTMENT_CONFIRM);
   }
 
-  /** Appointment reminder */
-  async remindAppointment(subscriberId: string, minutesBefore: number): Promise<void> {
+  async remindAppointment(subscriberId: string, _minutesBefore: number): Promise<void> {
     await this.client.sendContent(subscriberId, FLOWS.APPOINTMENT_REMINDER);
   }
 
-  /** Payment confirmed notification */
   async notifyPaymentConfirmed(subscriberId: string, amount: number): Promise<void> {
     await this.client.sendMessage(
       subscriberId,
@@ -125,7 +91,6 @@ export class ManyChatFlows {
     await this.client.sendContent(subscriberId, FLOWS.PAYMENT_CONFIRMED);
   }
 
-  /** Referral boost notification */
   async notifyReferralBoost(subscriberId: string, referredName: string): Promise<void> {
     await this.client.sendMessage(
       subscriberId,
@@ -134,9 +99,8 @@ export class ManyChatFlows {
     await this.client.sendContent(subscriberId, FLOWS.REFERRAL_BOOST);
   }
 
-  // ── Instagram Gamified Welcome ──
+  // ── Instagram Gamified ──
 
-  /** Trigger gamified welcome for new Instagram follower/DM */
   async triggerInstagramWelcome(subscriberId: string, userName: string): Promise<void> {
     await this.client.sendMessage(
       subscriberId,
@@ -146,12 +110,10 @@ export class ManyChatFlows {
     await this.client.addTag(subscriberId, TAGS.LEAD_CURIOSO);
   }
 
-  /** Instagram quiz flow - cannabis knowledge */
   async triggerInstagramQuiz(subscriberId: string): Promise<void> {
     await this.client.sendContent(subscriberId, FLOWS.IG_QUIZ_CANNABIS);
   }
 
-  /** Reward coupon after quiz completion */
   async sendInstagramReward(subscriberId: string, score: number): Promise<void> {
     const coupon = score >= 3 ? 'CANNAEXPERT20' : 'BEMVINDO10';
     const discount = score >= 3 ? '20%' : '10%';
@@ -165,8 +127,7 @@ export class ManyChatFlows {
     }
   }
 
-  /** Story reply hook - auto-engage story repliers */
-  async handleStoryReply(subscriberId: string, storyKeyword: string): Promise<void> {
+  async handleStoryReply(subscriberId: string, _storyKeyword: string): Promise<void> {
     await this.client.sendMessage(
       subscriberId,
       `💚 Que bom que você se interessou! Vou te mostrar como a cannabis medicinal pode te ajudar. Responda "QUERO" para começar!`
@@ -175,13 +136,11 @@ export class ManyChatFlows {
     await this.client.addTag(subscriberId, TAGS.LEAD_PACIENTE);
   }
 
-  /** Full Instagram DM onboarding sequence */
   async startInstagramOnboarding(subscriberId: string, source: 'dm' | 'story' | 'comment' | 'ad'): Promise<void> {
-    await this.client.setCustomField(subscriberId, 2002, source);
+    await this.client.setCustomField(subscriberId, CUSTOM_FIELDS.IG_SOURCE, source);
     await this.client.sendContent(subscriberId, FLOWS.IG_DM_ONBOARDING);
   }
 
-  /** Keyword "PROTOCOLO" — explica legalidade ANVISA e geração automática do código ANV- */
   async handleProtocoloKeyword(subscriberId: string): Promise<void> {
     await this.client.sendMessage(
       subscriberId,
@@ -200,4 +159,4 @@ export class ManyChatFlows {
   }
 }
 
-export { TAGS, FLOWS };
+export { TAGS, FLOWS } from './constants';

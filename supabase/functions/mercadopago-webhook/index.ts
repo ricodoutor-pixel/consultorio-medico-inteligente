@@ -235,7 +235,17 @@ Deno.serve(async (req) => {
           });
         }
 
-        // 7. Notify admins
+        // 7. Credit Planta-Coins welcome bonus (50 coins)
+        await supabase.from("notifications").insert({
+          user_id: appt.patient_id,
+          title: "🪙 +50 Planta-Coins!",
+          message: "Bônus de boas-vindas creditado! Use seus coins para descontos e benefícios exclusivos.",
+          type: "planta_coin_bonus",
+          action_url: "/dashboard",
+          metadata: { coins: 50, reason: "welcome_bonus" },
+        });
+
+        // 8. Notify admins
         const { data: adminRoles } = await supabase
           .from("user_roles")
           .select("user_id")

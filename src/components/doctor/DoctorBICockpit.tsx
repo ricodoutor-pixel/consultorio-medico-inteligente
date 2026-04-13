@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { DoctorCashOutModal } from "./DoctorCashOutModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -37,15 +38,20 @@ interface DoctorBICockpitProps {
 export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps) {
   const [metrics, setMetrics] = useState<Partial<DoctorBIMetrics> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [cashOutOpen, setCashOutOpen] = useState(false);
+  const [pixKey, setPixKey] = useState<string | null>(null);
 
   const fetchMetrics = useCallback(async () => {
     try {
       // Fetch real data from Supabase
-      const [apptRes, npsRes, perfRes] = await Promise.all([
+      const [apptRes, npsRes, perfRes, doctorRes] = await Promise.all([
         supabase.from("appointments").select("amount, status, created_at").eq("doctor_id", doctorId),
         supabase.from("nps_responses").select("score").eq("professional_id", doctorId),
         supabase.from("doctor_performance_metrics").select("*").eq("doctor_id", doctorId).order("year", { ascending: false }).order("month", { ascending: false }).limit(6),
+        supabase.from("doctors").select("pix_key").eq("id", doctorId).single(),
       ]);
+
+      if (doctorRes.data?.pix_key) setPixKey(doctorRes.data.pix_key);
 
       const completedAppts = apptRes.data?.filter(a => a.status === "completed") || [];
       const thisMonthAppts = completedAppts.filter(a => {

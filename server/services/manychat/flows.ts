@@ -35,6 +35,7 @@ const FLOWS = {
   IG_REWARD_COUPON: 'content20250413_ig_reward_coupon',
   IG_STORY_REPLY_HOOK: 'content20250413_ig_story_reply_hook',
   IG_DM_ONBOARDING: 'content20250413_ig_dm_onboarding',
+  IG_PROTOCOLO_ANVISA: 'content20250413_ig_protocolo_anvisa',
 } as const;
 
 export class ManyChatFlows {
@@ -178,6 +179,24 @@ export class ManyChatFlows {
   async startInstagramOnboarding(subscriberId: string, source: 'dm' | 'story' | 'comment' | 'ad'): Promise<void> {
     await this.client.setCustomField(subscriberId, 2002, source);
     await this.client.sendContent(subscriberId, FLOWS.IG_DM_ONBOARDING);
+  }
+
+  /** Keyword "PROTOCOLO" — explica legalidade ANVISA e geração automática do código ANV- */
+  async handleProtocoloKeyword(subscriberId: string): Promise<void> {
+    await this.client.sendMessage(
+      subscriberId,
+      `🏛️ *Tudo 100% Legal e Regulamentado!*\n\n` +
+      `A cannabis medicinal é autorizada pela ANVISA (RDC 660/2022). ` +
+      `Na Planta & Raiz, o processo é simples:\n\n` +
+      `1️⃣ Você faz a teleconsulta com um médico prescritor\n` +
+      `2️⃣ O médico emite a receita digital com assinatura ICP-Brasil\n` +
+      `3️⃣ No ato do pagamento, nosso sistema gera automaticamente o protocolo *ANV-XXXXXX* da ANVISA\n` +
+      `4️⃣ Você recebe tudo no seu e-mail e WhatsApp\n\n` +
+      `💚 Zero burocracia. Zero risco. Tudo rastreável.\n\n` +
+      `👉 Quer agendar sua consulta agora? Responda "AGENDAR"!`
+    );
+    await this.client.sendContent(subscriberId, FLOWS.IG_PROTOCOLO_ANVISA);
+    await this.client.addTag(subscriberId, TAGS.LEAD_PACIENTE);
   }
 }
 

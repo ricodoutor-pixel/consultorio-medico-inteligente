@@ -29,6 +29,12 @@ const FLOWS = {
   APPOINTMENT_REMINDER: 'content20250410_appointment_reminder',
   PAYMENT_CONFIRMED: 'content20250410_payment_confirmed',
   REFERRAL_BOOST: 'content20250410_referral_boost',
+  // Instagram Gamified Welcome Flows
+  IG_WELCOME_GAMIFIED: 'content20250413_ig_welcome_gamified',
+  IG_QUIZ_CANNABIS: 'content20250413_ig_quiz_cannabis',
+  IG_REWARD_COUPON: 'content20250413_ig_reward_coupon',
+  IG_STORY_REPLY_HOOK: 'content20250413_ig_story_reply_hook',
+  IG_DM_ONBOARDING: 'content20250413_ig_dm_onboarding',
 } as const;
 
 export class ManyChatFlows {
@@ -125,6 +131,53 @@ export class ManyChatFlows {
       `🎉 ${referredName} se cadastrou com seu link! Seu bônus de 10% recebeu um boost temporário!`
     );
     await this.client.sendContent(subscriberId, FLOWS.REFERRAL_BOOST);
+  }
+
+  // ── Instagram Gamified Welcome ──
+
+  /** Trigger gamified welcome for new Instagram follower/DM */
+  async triggerInstagramWelcome(subscriberId: string, userName: string): Promise<void> {
+    await this.client.sendMessage(
+      subscriberId,
+      `🌿 Olá ${userName}! Bem-vindo(a) à Planta & Raiz! 🎮\n\nQuer descobrir qual tratamento natural combina com você? Responda "QUIZ" e ganhe um cupom exclusivo! 🎁`
+    );
+    await this.client.sendContent(subscriberId, FLOWS.IG_WELCOME_GAMIFIED);
+    await this.client.addTag(subscriberId, TAGS.LEAD_CURIOSO);
+  }
+
+  /** Instagram quiz flow - cannabis knowledge */
+  async triggerInstagramQuiz(subscriberId: string): Promise<void> {
+    await this.client.sendContent(subscriberId, FLOWS.IG_QUIZ_CANNABIS);
+  }
+
+  /** Reward coupon after quiz completion */
+  async sendInstagramReward(subscriberId: string, score: number): Promise<void> {
+    const coupon = score >= 3 ? 'CANNAEXPERT20' : 'BEMVINDO10';
+    const discount = score >= 3 ? '20%' : '10%';
+    await this.client.sendMessage(
+      subscriberId,
+      `🏆 Parabéns! Você acertou ${score}/5!\n\n🎁 Seu cupom exclusivo: ${coupon}\n💚 ${discount} OFF na primeira teleconsulta!\n\n👉 Agende agora: plantayraiz.com.br/agendamento`
+    );
+    await this.client.sendContent(subscriberId, FLOWS.IG_REWARD_COUPON);
+    if (score >= 3) {
+      await this.client.addTag(subscriberId, TAGS.VIP);
+    }
+  }
+
+  /** Story reply hook - auto-engage story repliers */
+  async handleStoryReply(subscriberId: string, storyKeyword: string): Promise<void> {
+    await this.client.sendMessage(
+      subscriberId,
+      `💚 Que bom que você se interessou! Vou te mostrar como a cannabis medicinal pode te ajudar. Responda "QUERO" para começar!`
+    );
+    await this.client.sendContent(subscriberId, FLOWS.IG_STORY_REPLY_HOOK);
+    await this.client.addTag(subscriberId, TAGS.LEAD_PACIENTE);
+  }
+
+  /** Full Instagram DM onboarding sequence */
+  async startInstagramOnboarding(subscriberId: string, source: 'dm' | 'story' | 'comment' | 'ad'): Promise<void> {
+    await this.client.setCustomField(subscriberId, 2002, source);
+    await this.client.sendContent(subscriberId, FLOWS.IG_DM_ONBOARDING);
   }
 }
 

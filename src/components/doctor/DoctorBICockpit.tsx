@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { DoctorCashOutModal } from "./DoctorCashOutModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
-import { TrendingUp, Award, Target, Coins, Rocket, Crown, ChevronRight, Trophy, Users, Zap } from "lucide-react";
+import { TrendingUp, Award, Target, Coins, Rocket, Crown, ChevronRight, Trophy, Users, Zap, Banknote } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   generateOpportunities,
@@ -37,15 +38,20 @@ interface DoctorBICockpitProps {
 export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps) {
   const [metrics, setMetrics] = useState<Partial<DoctorBIMetrics> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [cashOutOpen, setCashOutOpen] = useState(false);
+  const [pixKey, setPixKey] = useState<string | null>(null);
 
   const fetchMetrics = useCallback(async () => {
     try {
       // Fetch real data from Supabase
-      const [apptRes, npsRes, perfRes] = await Promise.all([
+      const [apptRes, npsRes, perfRes, doctorRes] = await Promise.all([
         supabase.from("appointments").select("amount, status, created_at").eq("doctor_id", doctorId),
         supabase.from("nps_responses").select("score").eq("professional_id", doctorId),
         supabase.from("doctor_performance_metrics").select("*").eq("doctor_id", doctorId).order("year", { ascending: false }).order("month", { ascending: false }).limit(6),
+        supabase.from("doctors").select("pix_key").eq("id", doctorId).single(),
       ]);
+
+      if (doctorRes.data?.pix_key) setPixKey(doctorRes.data.pix_key);
 
       const completedAppts = apptRes.data?.filter(a => a.status === "completed") || [];
       const thisMonthAppts = completedAppts.filter(a => {
@@ -171,9 +177,14 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
         <h2 className="text-2xl font-display font-black text-foreground flex items-center gap-2">
           <Rocket size={22} className="text-primary" /> Cockpit de Negócios
         </h2>
-        <Badge className="bg-primary/10 text-primary font-bold">
-          {tier.name} • Nível {tier.level}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Button onClick={() => setCashOutOpen(true)} size="sm" className="gap-2">
+            <Banknote size={16} /> Solicitar Saque
+          </Button>
+          <Badge className="bg-primary/10 text-primary font-bold">
+            {tier.name} • Nível {tier.level}
+          </Badge>
+        </div>
       </div>
 
       {/* Revenue Projection Chart */}
@@ -304,6 +315,16 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
           </div>
         </CardContent>
       </Card>
+      {/* Cash Out Modal */}
+      <DoctorCashOutModal
+        open={cashOutOpen}
+        onOpenChange={setCashOutOpen}
+        balanceReais={metrics.monthlyRevenue || 0}
+        plantaCoinBalance={metrics.plantaCoinBalance || 0}
+        pixKey={pixKey}
+        doctorId={doctorId}
+        onSuccess={fetchMetrics}
+      />
     </div>
   );
 }

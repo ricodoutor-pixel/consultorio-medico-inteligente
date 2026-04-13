@@ -10,6 +10,7 @@ const corsHeaders = {
 };
 
 const WITHDRAWAL_FEE_RATE = 0.05; // 5%
+const DAILY_LIMIT = 50.00; // R$ 50 limite diário
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });

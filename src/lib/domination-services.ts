@@ -198,3 +198,27 @@ export const WELLNESS_PLANS: WellnessPlan[] = [
     maxConsultations: 2, productDiscount: 0.20, priority: true,
   },
 ];
+
+// ===== Retention AI =====
+export function calculateAbandonmentRisk(params: {
+  daysSinceLastPurchase: number;
+  daysSinceLastConsultation: number;
+  npsScore: number;
+  subscriptionAgeMonths: number;
+  totalConsultations: number;
+}): number {
+  const { daysSinceLastPurchase, npsScore, subscriptionAgeMonths, totalConsultations } = params;
+  const inactivityScore = Math.min(daysSinceLastPurchase / 60, 1) * 0.4;
+  const npsRisk = ((10 - (npsScore || 5)) / 10) * 0.3;
+  const avgConsultPerMonth = totalConsultations / Math.max(subscriptionAgeMonths, 1);
+  const frequencyRisk = Math.max(0, (1 - Math.min(avgConsultPerMonth / 2, 1))) * 0.2;
+  const newSubRisk = (1 - Math.min(subscriptionAgeMonths / 6, 1)) * 0.1;
+  return Math.min(inactivityScore + npsRisk + frequencyRisk + newSubRisk, 1);
+}
+
+export function classifyRisk(score: number): 'low' | 'medium' | 'high' | 'critical' {
+  if (score >= 0.8) return 'critical';
+  if (score >= 0.6) return 'high';
+  if (score >= 0.4) return 'medium';
+  return 'low';
+}

@@ -79,6 +79,8 @@ export const Footer = () => {
             </Link>
             para quem mais precisa
           </p>
+          {/* Hidden admin automations link — triple-click the dot below */}
+          <Link to="/admin/automations" className="inline-block mt-2 text-[0px] leading-none opacity-0 hover:opacity-5" aria-hidden="true" tabIndex={-1}>·</Link>
         </div>
       </div>
     </footer>

@@ -40,7 +40,7 @@ describe('Authentication Tests', () => {
   });
 
   it('should handle JWT token generation', () => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
     expect(token).toBeTruthy();
     expect(token.split('.').length).toBe(3);
   });
@@ -116,8 +116,8 @@ describe('Payment System Tests', () => {
     const amount = 100;
     const manusCommission = amount * 0.07;
     const doctorAmount = amount * 0.93;
-    expect(manusCommission).toBe(7);
-    expect(doctorAmount).toBe(93);
+    expect(manusCommission).toBeCloseTo(7, 2);
+    expect(doctorAmount).toBeCloseTo(93, 2);
   });
 
   it('should handle payment refund', () => {

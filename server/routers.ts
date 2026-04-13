@@ -17,6 +17,7 @@ import { recommendationsRouter } from "./routers/recommendations";
 import { checkpointSyncRouter } from "./routers/checkpointSync";
 import { ebookRouter } from "./routers/ebook";
 import { ebookAnalyticsRouter } from "./routers/ebookAnalytics";
+import { dominationRouter } from "./routers/domination";
 // import { marketplaceRouter } from "./routers/marketplaceRouter"; // TODO: Fix marketplace router
 
 const COOKIE_NAME = "auth-token";

@@ -13,6 +13,7 @@ import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWi
 import { DoctorSubscriptionPlans } from "@/components/doctor/DoctorSubscriptionPlans";
 import { DoctorFinancialCards } from "@/components/doctor/DoctorFinancialCards";
 import { DoctorBICockpit } from "@/components/doctor/DoctorBICockpit";
+import { DominationMonitor } from "@/components/doctor/DominationMonitor";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -240,6 +241,13 @@ const DashboardMedico = () => {
             {doctorData && (
               <div className="mb-8">
                 <DoctorBICockpit doctorId={doctorData.id} currentTier={currentTier} />
+              </div>
+            )}
+
+            {/* Domination Monitor - BI Dashboard */}
+            {doctorData && (
+              <div className="mb-8">
+                <DominationMonitor />
               </div>
             )}
 

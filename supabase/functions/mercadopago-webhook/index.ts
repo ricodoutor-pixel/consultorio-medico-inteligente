@@ -109,12 +109,19 @@ Deno.serve(async (req) => {
       payer_email: payment.payer?.email,
     }));
 
-    // Calculate split - 7% platform fee for consultations, 5% for marketplace
+    // Calculate split using Digital Franchise tiers
     const totalAmount = payment.transaction_amount || 0;
     const metadata = payment.metadata || {};
     const isMarketplace = metadata.type === "marketplace";
-    const feeRate = isMarketplace ? 0.05 : 0.07;
-    const mpFee = Math.round((totalAmount * 0.0299 + 0.30) * 100) / 100; // MP fee estimate
+    const monthlyConsultations = metadata.monthly_consultations ?? 0;
+
+    // Franchise-tier split: 80% (0-50), 85% (51-200), 90% (201-500), 92% (501+)
+    let doctorShareRate = 0.80;
+    if (monthlyConsultations > 500) doctorShareRate = 0.92;
+    else if (monthlyConsultations > 200) doctorShareRate = 0.90;
+    else if (monthlyConsultations > 50) doctorShareRate = 0.85;
+
+    const feeRate = isMarketplace ? 0.05 : (1 - doctorShareRate);
     const platformFee = Math.round(totalAmount * feeRate * 100) / 100;
     const doctorPayout = Math.round((totalAmount - platformFee) * 100) / 100;
 
@@ -228,7 +235,17 @@ Deno.serve(async (req) => {
           });
         }
 
-        // 7. Notify admins
+        // 7. Credit Planta-Coins welcome bonus (50 coins)
+        await supabase.from("notifications").insert({
+          user_id: appt.patient_id,
+          title: "🪙 +50 Planta-Coins!",
+          message: "Bônus de boas-vindas creditado! Use seus coins para descontos e benefícios exclusivos.",
+          type: "planta_coin_bonus",
+          action_url: "/dashboard",
+          metadata: { coins: 50, reason: "welcome_bonus" },
+        });
+
+        // 8. Notify admins
         const { data: adminRoles } = await supabase
           .from("user_roles")
           .select("user_id")

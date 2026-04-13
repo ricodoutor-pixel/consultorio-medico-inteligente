@@ -37,6 +37,13 @@
     <meta name="author" content="Planta & Raiz" />
     <meta name="copyright" content="© 2026 Planta & Raiz. Todos os direitos reservados." />
     
+    <!-- Local SEO Geo Tags -->
+    <meta name="geo.region" content="BR-SP" />
+    <meta name="geo.placename" content="São Paulo" />
+    <meta name="geo.position" content="-23.5505;-46.6333" />
+    <meta name="ICBM" content="-23.5505, -46.6333" />
+    <meta name="keywords" content="cannabis medicinal SP, telemedicina cannabis São Paulo, médico cannabis medicinal, prescrição cannabis ANVISA, consulta cannabis online, CBD São Paulo, THC medicinal Brasil, tratamento cannabidiol SP" />
+    
     <!-- Canonical URL -->
     <link rel="canonical" href="https://plantayraiz.com.br/" />
 
@@ -95,22 +102,44 @@
         "postalCode": "01311-100",
         "addressCountry": "BR"
       },
-      "medicalSpecialty": "Cannabis Medicinal",
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -23.5505,
+        "longitude": -46.6333
+      },
+      "areaServed": [
+        {
+          "@type": "City",
+          "name": "São Paulo",
+          "sameAs": "https://www.wikidata.org/wiki/Q174"
+        },
+        {
+          "@type": "State",
+          "name": "São Paulo",
+          "sameAs": "https://www.wikidata.org/wiki/Q175"
+        },
+        {
+          "@type": "Country",
+          "name": "Brasil",
+          "sameAs": "https://www.wikidata.org/wiki/Q155"
+        }
+      ],
+      "medicalSpecialty": ["Cannabis Medicinal", "Neurologia", "Psiquiatria", "Dor Crônica"],
       "availableService": [
         {
           "@type": "MedicalProcedure",
           "name": "Teleconsulta Cannabis Medicinal",
-          "description": "Consulta online com médico especialista em cannabis medicinal"
+          "description": "Consulta online com médico especialista em cannabis medicinal em São Paulo e todo o Brasil"
         },
         {
           "@type": "MedicalProcedure",
           "name": "Prescrição Digital ANVISA",
-          "description": "Prescrição digital com validade legal conforme ANVISA"
+          "description": "Prescrição digital com validade legal conforme ANVISA para CBD e THC medicinal"
         },
         {
           "@type": "MedicalProcedure",
           "name": "Chat On-Demand",
-          "description": "Chat imediato com médico (resposta em 30-60 segundos )"
+          "description": "Chat imediato com médico (resposta em 30-60 segundos)"
         },
         {
           "@type": "MedicalProcedure",
@@ -118,10 +147,22 @@
           "description": "Videoconsulta profissional com gravação automática"
         }
       ],
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        "opens": "00:00",
+        "closes": "23:59"
+      },
       "image": "https://plantayraiz.com.br/og-image.png",
       "priceRange": "R$30 - R$500",
-      "ratingValue": "4.8",
-      "reviewCount": "2500"
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "2500",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "hasMap": "https://www.google.com/maps?q=-23.5505,-46.6333"
     }
     </script>
 

@@ -200,6 +200,29 @@ const ConsultationPayment = () => {
                     <Loader2 size={48} className="text-primary animate-spin mx-auto mb-4" />
                     <p className="text-muted-foreground">Gerando link de pagamento...</p>
                   </div>
+                ) : status === "processing" ? (
+                  <div className="text-center py-8">
+                    <Loader2 size={48} className="text-primary animate-spin mx-auto mb-4" />
+                    <h4 className="text-lg font-display font-black text-foreground mb-4">Processando Pagamento...</h4>
+                    <div className="space-y-3 max-w-xs mx-auto text-left">
+                      {[
+                        "Verificando pagamento PIX...",
+                        "Aplicando split automático (médico + plataforma)...",
+                        "Gerando protocolo Anvisa...",
+                      ].map((step, i) => (
+                        <div key={i} className={`flex items-center gap-2 text-sm transition-opacity ${processingStep >= i + 1 ? "opacity-100" : "opacity-30"}`}>
+                          {processingStep > i + 1 ? (
+                            <CheckCircle2 size={16} className="text-primary shrink-0" />
+                          ) : processingStep === i + 1 ? (
+                            <Loader2 size={16} className="text-primary animate-spin shrink-0" />
+                          ) : (
+                            <Clock size={16} className="text-muted-foreground shrink-0" />
+                          )}
+                          <span className="text-muted-foreground">{step}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ) : status === "confirmed" ? (
                   <div className="text-center py-8">
                     <CheckCircle2 size={64} className="text-primary mx-auto mb-4" />

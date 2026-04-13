@@ -492,3 +492,80 @@ describe('Doctor BI Service', () => {
     expect(proj[2]).toBeGreaterThan(proj[1]);
   });
 });
+
+// =======================================
+// STRESS TEST: Tier 4 Split (Elite 92/8)
+// =======================================
+describe('Tier 4 Split Stress Test — Full Transaction Simulation', () => {
+  const TIER4_THRESHOLD = 501;
+
+  it('should apply 92/8 split for Tier 4 doctor (501+ consultations)', () => {
+    const tier = getDoctorTier(TIER4_THRESHOLD);
+    expect(tier.level).toBe(4);
+    expect(tier.name).toBe('Elite');
+    expect(tier.doctorShare).toBe(0.92);
+    expect(tier.platformShare).toBe(0.08);
+  });
+
+  it('should correctly split R$30 consultation at Tier 4', () => {
+    const result = calculateFranchiseRevenue(30, 600);
+    expect(result.tier.level).toBe(4);
+    expect(result.doctorEarnings).toBe(27.60);
+    expect(result.platformFee).toBe(2.40);
+    expect(result.doctorEarnings + result.platformFee).toBe(30);
+  });
+
+  it('should correctly split R$150 consultation at Tier 4', () => {
+    const result = calculateFranchiseRevenue(150, 1000);
+    expect(result.tier.level).toBe(4);
+    expect(result.doctorEarnings).toBe(138.00);
+    expect(result.platformFee).toBe(12.00);
+    expect(result.doctorEarnings + result.platformFee).toBe(150);
+  });
+
+  it('should correctly split R$500 consultation at Tier 4', () => {
+    const result = calculateFranchiseRevenue(500, 999);
+    expect(result.tier.level).toBe(4);
+    expect(result.doctorEarnings).toBe(460.00);
+    expect(result.platformFee).toBe(40.00);
+    expect(result.doctorEarnings + result.platformFee).toBe(500);
+  });
+
+  it('should handle fractional amounts without rounding errors', () => {
+    const result = calculateFranchiseRevenue(33.33, 750);
+    expect(result.tier.level).toBe(4);
+    expect(result.doctorEarnings + result.platformFee).toBeCloseTo(33.33, 2);
+    expect(result.doctorEarnings).toBeCloseTo(30.66, 2);
+    expect(result.platformFee).toBeCloseTo(2.67, 2);
+  });
+
+  it('should ensure platform always receives exactly 8% at Tier 4', () => {
+    const amounts = [10, 25, 30, 49.99, 100, 150, 250, 500, 999.99, 1500];
+    for (const amount of amounts) {
+      const result = calculateFranchiseRevenue(amount, 600);
+      expect(result.tier.level).toBe(4);
+      const expectedPlatform = Math.round(amount * 0.08 * 100) / 100;
+      expect(result.platformFee).toBe(expectedPlatform);
+      expect(result.doctorEarnings + result.platformFee).toBeCloseTo(amount, 2);
+    }
+  });
+
+  it('should NOT apply Tier 4 at exactly 500 consultations (boundary)', () => {
+    const tier = getDoctorTier(500);
+    expect(tier.level).toBe(3); // Destaque, not Elite
+    expect(tier.doctorShare).toBe(0.90);
+  });
+
+  it('should apply Tier 4 at exactly 501 consultations (boundary)', () => {
+    const tier = getDoctorTier(501);
+    expect(tier.level).toBe(4);
+    expect(tier.doctorShare).toBe(0.92);
+  });
+
+  it('should handle massive volume (10,000 consultations) correctly', () => {
+    const result = calculateFranchiseRevenue(200, 10000);
+    expect(result.tier.level).toBe(4);
+    expect(result.platformFee).toBe(16.00);
+    expect(result.doctorEarnings).toBe(184.00);
+  });
+});

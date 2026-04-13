@@ -1,8 +1,19 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /admin
+Disallow: /admin-ceo
+Disallow: /admin-master
+Disallow: /admin-login
+Disallow: /dashboard-executivo
+Disallow: /prontuario
+Disallow: /ripd
+Disallow: /health
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /admin-ceo
+Disallow: /admin-master
 
 User-agent: Twitterbot
 Allow: /
@@ -12,3 +23,11 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin-ceo
+Disallow: /admin-master
+Disallow: /admin-login
+Disallow: /dashboard-executivo
+Disallow: /prontuario
+
+Sitemap: https://plantayraiz.com.br/sitemap.xml

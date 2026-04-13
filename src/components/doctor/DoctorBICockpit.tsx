@@ -177,9 +177,14 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
         <h2 className="text-2xl font-display font-black text-foreground flex items-center gap-2">
           <Rocket size={22} className="text-primary" /> Cockpit de Negócios
         </h2>
-        <Badge className="bg-primary/10 text-primary font-bold">
-          {tier.name} • Nível {tier.level}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Button onClick={() => setCashOutOpen(true)} size="sm" className="gap-2">
+            <Banknote size={16} /> Solicitar Saque
+          </Button>
+          <Badge className="bg-primary/10 text-primary font-bold">
+            {tier.name} • Nível {tier.level}
+          </Badge>
+        </div>
       </div>
 
       {/* Revenue Projection Chart */}
@@ -310,6 +315,16 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
           </div>
         </CardContent>
       </Card>
+      {/* Cash Out Modal */}
+      <DoctorCashOutModal
+        open={cashOutOpen}
+        onOpenChange={setCashOutOpen}
+        balanceReais={metrics.monthlyRevenue || 0}
+        plantaCoinBalance={metrics.plantaCoinBalance || 0}
+        pixKey={pixKey}
+        doctorId={doctorId}
+        onSuccess={fetchMetrics}
+      />
     </div>
   );
 }

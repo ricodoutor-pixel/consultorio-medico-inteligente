@@ -10,24 +10,16 @@ import {
   generateOpportunities,
   calculatePercentile,
   getRevenueProjection,
-  type DoctorBIMetrics,
-  type Opportunity,
-} from "../../../../server/services/doctorBIService";
-import {
   getDoctorTier,
   calculateFranchiseRevenue,
   COMMISSION_TIERS,
-} from "../../../../server/services/digitalFranchiseService";
-import {
   calculateNPSBonusCoins,
   MARKETPLACE_ITEMS,
-} from "../../../../server/services/plantaCoinService";
-import {
   calculateQualityScore,
   determineSealTier,
-  SEAL_BENEFITS,
+  type DoctorBIMetrics,
   type QualityCriteria,
-} from "../../../../server/services/qualitySealService";
+} from "@/lib/domination-services";
 import { supabase } from "@/integrations/supabase/client";
 
 const tooltipStyle = {

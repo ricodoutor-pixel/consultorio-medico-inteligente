@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Loader2, Heart, Sparkles, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { WELLNESS_PLANS, type WellnessPlan } from "../../../server/services/wellnessSubscriptionService";
+import { WELLNESS_PLANS, type WellnessPlan } from "@/lib/domination-services";
 
 const PLAN_ICONS: Record<string, typeof Heart> = {
   basic: Heart,

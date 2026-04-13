@@ -216,7 +216,17 @@ export function calculateAbandonmentRisk(params: {
   return Math.min(inactivityScore + npsRisk + frequencyRisk + newSubRisk, 1);
 }
 
+export function calculateCashOutValue(coins: number): number {
+  const feeRate = coins >= 500 ? 0.15 : 0.20;
+  return Math.round(coins * (1 - feeRate) * 100) / 100;
+}
+
 export function classifyRisk(score: number): 'low' | 'medium' | 'high' | 'critical' {
+  if (score >= 0.8) return 'critical';
+  if (score >= 0.6) return 'high';
+  if (score >= 0.4) return 'medium';
+  return 'low';
+}
   if (score >= 0.8) return 'critical';
   if (score >= 0.6) return 'high';
   if (score >= 0.4) return 'medium';

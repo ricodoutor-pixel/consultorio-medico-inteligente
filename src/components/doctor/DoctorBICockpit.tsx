@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
-import { TrendingUp, Award, Target, Coins, Rocket, Crown, ChevronRight, Trophy, Users, Zap } from "lucide-react";
+import { TrendingUp, Award, Target, Coins, Rocket, Crown, ChevronRight, Trophy, Users, Zap, Banknote } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   generateOpportunities,

@@ -17,6 +17,7 @@ const FUNCTIONS: FunctionStatus[] = [
   { name: "social-analytics", displayName: "Social Analytics", description: "Relatórios FB + IG + interno" },
   { name: "visitor-tracking", displayName: "Visitor Tracking", description: "UTM, exit intent, page views" },
   { name: "manychat-webhook", displayName: "ManyChat Hub", description: "100 automações cross-platform" },
+  { name: "send-meta-capi", displayName: "Meta CAPI", description: "Conversion API Server-Side + Smart Bidding" },
 ];
 
 export function EdgeFunctionStatusGrid() {
@@ -64,6 +65,22 @@ export function EdgeFunctionStatusGrid() {
     refetchInterval: 30000,
   });
 
+  const { data: capiTest } = useQuery({
+    queryKey: ["capi-status"],
+    queryFn: async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("send-meta-capi", {
+          body: { action: "health" },
+        });
+        if (error) return { status: "error", data: null };
+        return { status: data?.capi_configured ? "ok" : "warning", data };
+      } catch {
+        return { status: "error", data: null };
+      }
+    },
+    refetchInterval: 30000,
+  });
+
   const getStatus = (fnName: string) => {
     if (fnName === "manychat-webhook") {
       if (healthLoading) return "loading";
@@ -79,6 +96,9 @@ export function EdgeFunctionStatusGrid() {
     }
     if (fnName === "publish-to-instagram") {
       return fbTest?.status === "ok" ? "online" : "warning";
+    }
+    if (fnName === "send-meta-capi") {
+      return capiTest?.status === "ok" ? "online" : capiTest?.status === "warning" ? "warning" : "loading";
     }
     return "loading";
   };
@@ -124,7 +144,7 @@ export function EdgeFunctionStatusGrid() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
         {FUNCTIONS.map((fn) => {
           const status = getStatus(fn.name);
           return (

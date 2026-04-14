@@ -16,6 +16,7 @@ import MascotVerdinho from "@/components/MascotVerdinho";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { OpenGraphHead } from "@/components/OpenGraphHead";
 import { FacebookPixelProvider } from "@/components/FacebookPixelProvider";
+import { ReferralCaptureProvider } from "@/components/ReferralCaptureProvider";
 import { SearchEngineOptimization } from "@/components/SearchEngineOptimization";
 import { DynamicSEOHead } from "@/components/DynamicSEOHead";
 import { LocalCTABanner } from "@/components/LocalCTABanner";
@@ -115,6 +116,7 @@ const App = () => (
             <LocalCTABanner />
             <AccessibilitySkipLink />
             <FacebookPixelProvider />
+            <ReferralCaptureProvider />
             <FrogChatModal />
             <ShoppingCart />
             <Suspense fallback={<Loading />}>

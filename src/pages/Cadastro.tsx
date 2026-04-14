@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
+import { linkReferralOnSignup } from "@/hooks/useReferralTracking";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { validateCPF, validateCNPJ, formatCPF, formatCNPJ } from "@/lib/validators";
@@ -126,6 +127,8 @@ const Cadastro = () => {
             bio: formData.bio || null,
           });
         }
+        // 4. Link referral (3-level MLM tree)
+        await linkReferralOnSignup(authData.user.id);
       }
 
       trackPixelEvent("Lead", { content_name: "patient_signup", content_category: type }, {

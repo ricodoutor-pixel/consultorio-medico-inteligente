@@ -16,7 +16,7 @@ const FUNCTIONS: FunctionStatus[] = [
   { name: "publish-to-instagram", displayName: "Publish to Instagram", description: "Feed, Carrossel e Stories no IG" },
   { name: "social-analytics", displayName: "Social Analytics", description: "Relatórios FB + IG + interno" },
   { name: "visitor-tracking", displayName: "Visitor Tracking", description: "UTM, exit intent, page views" },
-  { name: "manychat-webhook", displayName: "ManyChat Hub", description: "77 automações cross-platform" },
+  { name: "manychat-webhook", displayName: "ManyChat Hub", description: "100 automações cross-platform" },
 ];
 
 export function EdgeFunctionStatusGrid() {

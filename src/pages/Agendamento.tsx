@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
+import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,14 @@ const Agendamento = () => {
     const scheduledAt = new Date(selectedDate);
     const [h, m] = selectedTime.split(":").map(Number);
     scheduledAt.setHours(h, m, 0, 0);
+
+    // Track Schedule event
+    trackPixelEvent("Schedule", {
+      content_name: "appointment_booking",
+      doctor_id: selectedDoctor.id,
+      consultation_type: consultType,
+      value: selectedDoctor.consultation_price,
+    }, { leadScore: 35, funnelStage: "decision", category: "conversion" });
 
     // 1. Create appointment with pending payment
     const { data: newAppt, error } = await supabase.from("appointments").insert({

@@ -217,22 +217,11 @@ const DashboardPaciente = () => {
           {activeTab === "overview" && (
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
-                <Card className="border-border">
-                  <CardContent className="p-6">
-                    <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                      <Heart size={16} className="text-primary" /> Índice de Bem-estar
-                    </h3>
-                    <ResponsiveContainer width="100%" height={200}>
-                      <LineChart data={wellnessData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 10% 16%)" />
-                        <XAxis dataKey="dia" stroke="hsl(240 10% 68%)" fontSize={11} />
-                        <YAxis stroke="hsl(240 10% 68%)" fontSize={11} domain={[50, 100]} />
-                        <Tooltip contentStyle={tooltipStyle} />
-                        <Line type="monotone" dataKey="score" stroke="hsl(152 80% 45%)" strokeWidth={2} dot={{ fill: "hsl(152 80% 45%)", r: 4 }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
+                {/* Check-in Card */}
+                <PatientCheckinCard userId={profile?.id || ""} onCheckinComplete={() => setCheckinRefresh(p => p + 1)} />
+
+                {/* Evolution Chart */}
+                {profile?.id && <EvolutionChart userId={profile.id} refreshKey={checkinRefresh} />}
 
                 {upcomingAppts.length > 0 && (
                   <Card className="border-green/20 bg-gradient-green">

@@ -74,6 +74,7 @@ const VideoCall = lazy(() => import("./pages/VideoCall"));
 const ConsultaRapida = lazy(() => import("./pages/ConsultaRapida"));
 const SEOCondicoes = lazy(() => import("./pages/SEOCondicoes"));
 const TratamentoDorCronica = lazy(() => import("./pages/TratamentoDorCronica"));
+const TratamentoAnsiedadeSaudeMental = lazy(() => import("./pages/TratamentoAnsiedadeSaudeMental"));
 const Club = lazy(() => import("./pages/Club"));
 const Deposits = lazy(() => import("./pages/Deposits"));
 const CartCheckout = lazy(() => import("./pages/CartCheckout"));
@@ -173,6 +174,7 @@ const App = () => (
                 <Route path="/videochamada" element={<VideoCall />} />
                 <Route path="/consulta-rapida" element={<ConsultaRapida />} />
                 <Route path="/tratamento-dor-cronica" element={<TratamentoDorCronica />} />
+                <Route path="/tratamento-ansiedade-saude-mental" element={<TratamentoAnsiedadeSaudeMental />} />
                 <Route path="/tratamentos" element={<SEOCondicoes />} />
                 <Route path="/tratamentos/:condicao" element={<SEOCondicoes />} />
                 <Route path="/club" element={<Club />} />

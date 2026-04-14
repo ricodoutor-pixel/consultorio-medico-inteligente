@@ -40,6 +40,9 @@ const CadastroProfissional = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [lgpdConsent, setLgpdConsent] = useState(false);
+
+  // Track funnel start
+  useEffect(() => { trackMedicalSignupStarted(); }, []);
   const [documentType, setDocumentType] = useState<DocumentType>("cpf");
   const [documentNumber, setDocumentNumber] = useState("");
   const [documentValidation, setDocumentValidation] = useState<{ valid: boolean; message: string } | null>(null);

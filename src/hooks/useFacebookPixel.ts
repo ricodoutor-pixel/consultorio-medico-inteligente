@@ -63,7 +63,7 @@ async function bridgeToSupabase(
         timestamp: Date.now(),
       },
       tags: ["meta_pixel", eventName.toLowerCase()],
-    });
+    }]);
   } catch (err) {
     console.warn("[FB Pixel CAPI Bridge]", err);
   }

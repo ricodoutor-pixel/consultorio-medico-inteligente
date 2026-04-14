@@ -15,6 +15,17 @@ export function TokenManagerModule() {
   const [igStatus, setIgStatus] = useState<"idle" | "ok" | "error">("idle");
   const [fbError, setFbError] = useState("");
   const [igError, setIgError] = useState("");
+  const [tokenAuditLog, setTokenAuditLog] = useState<Array<{ time: string; status: string; platform: string }>>(() => {
+    const saved = localStorage.getItem("token_audit_log");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const addAuditEntry = (platform: string, status: string) => {
+    const entry = { time: new Date().toISOString(), status, platform };
+    const updated = [entry, ...tokenAuditLog].slice(0, 10);
+    setTokenAuditLog(updated);
+    localStorage.setItem("token_audit_log", JSON.stringify(updated));
+  };
 
   const testFacebookConnection = async () => {
     setTestingFb(true);
@@ -27,13 +38,16 @@ export function TokenManagerModule() {
       if (error) {
         setFbStatus("error");
         setFbError(error.message);
+        addAuditEntry("Facebook", "error");
         toast.error("Facebook: Conexão falhou");
       } else if (data?.success) {
         setFbStatus("ok");
+        addAuditEntry("Facebook", "ok");
         toast.success("Facebook: Conexão OK!");
       } else {
         setFbStatus("error");
         setFbError(data?.error || "Unknown error");
+        addAuditEntry("Facebook", "error");
         toast.error("Facebook: " + (data?.error || "Erro desconhecido"));
       }
     } catch (e) {
@@ -55,13 +69,16 @@ export function TokenManagerModule() {
       if (error) {
         setIgStatus("error");
         setIgError(error.message);
+        addAuditEntry("Instagram", "error");
         toast.error("Instagram: Conexão falhou");
       } else if (data?.success) {
         setIgStatus("ok");
+        addAuditEntry("Instagram", "ok");
         toast.success("Instagram: Conexão OK!");
       } else {
         setIgStatus("error");
         setIgError(data?.error || "Unknown error");
+        addAuditEntry("Instagram", "error");
         toast.error("Instagram: " + (data?.error || "Erro desconhecido"));
       }
     } catch (e) {
@@ -197,6 +214,41 @@ export function TokenManagerModule() {
           >
             <ExternalLink className="w-3 h-3" /> Abrir Facebook Developer Console
           </a>
+        </CardContent>
+      </Card>
+
+      {/* Token Audit Log */}
+      <Card className="bg-slate-800/50 border-slate-700/50">
+        <CardHeader className="p-4 pb-2">
+          <CardTitle className="text-sm text-slate-300 flex items-center gap-2">
+            <Shield className="w-4 h-4" /> Log de Auditoria de Tokens
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 pt-0">
+          {tokenAuditLog.length === 0 ? (
+            <p className="text-xs text-slate-500 text-center py-4">Nenhum teste de conexão registrado ainda. Clique em "Test Connection" acima.</p>
+          ) : (
+            <div className="space-y-1.5">
+              {tokenAuditLog.map((entry, i) => (
+                <div key={i} className="flex items-center justify-between bg-slate-700/20 rounded px-3 py-1.5">
+                  <div className="flex items-center gap-2">
+                    {entry.status === "ok" ? (
+                      <CheckCircle className="w-3 h-3 text-emerald-400" />
+                    ) : (
+                      <XCircle className="w-3 h-3 text-red-400" />
+                    )}
+                    <span className="text-[11px] text-slate-300">{entry.platform}</span>
+                    <Badge className={`text-[9px] h-4 ${entry.status === "ok" ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-red-500/20 text-red-400 border-red-500/30"}`}>
+                      {entry.status === "ok" ? "Validado" : "Falhou"}
+                    </Badge>
+                  </div>
+                  <span className="text-[10px] text-slate-500">
+                    {new Date(entry.time).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

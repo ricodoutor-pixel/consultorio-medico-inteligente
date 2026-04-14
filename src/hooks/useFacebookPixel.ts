@@ -46,7 +46,7 @@ async function bridgeToSupabase(
   try {
     const { data: { user } } = await supabase.auth.getUser();
 
-    await supabase.from("social_interactions").insert([{
+    const { data } = await supabase.from("social_interactions").insert([{
       platform: "facebook_pixel" as string,
       interaction_type: eventName,
       post_url: window.location.pathname,
@@ -63,7 +63,12 @@ async function bridgeToSupabase(
         timestamp: Date.now(),
       })),
       tags: ["meta_pixel", eventName.toLowerCase()],
-    }]);
+    }]).select("id").single();
+
+    // Use the DB row ID as event_id for deduplication with CAPI
+    if (data?.id && typeof window.fbq === "function") {
+      window.fbq("track", eventName, properties, { eventID: data.id });
+    }
   } catch (err) {
     console.warn("[FB Pixel CAPI Bridge]", err);
   }

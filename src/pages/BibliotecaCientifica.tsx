@@ -152,6 +152,15 @@ const BibliotecaCientifica = () => {
               <span className="text-xs text-muted-foreground ml-1">downloads efetuados</span>
             </div>
           </div>
+
+          {/* Botão para Landing de Dor Crônica */}
+          <div className="mt-4 text-center">
+            <Link to="/tratamento-dor-cronica">
+              <Button variant="outline" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10 font-bold text-sm">
+                🩺 Conheça nosso Tratamento de Dor Crônica <ArrowRight size={14} className="ml-1" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

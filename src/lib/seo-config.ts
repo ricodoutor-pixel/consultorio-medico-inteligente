@@ -69,6 +69,13 @@ export const routeSEOMap: Record<string, PageSEO> = {
     keywords: "ebook cannabis medicinal, guia CBD grátis, curso cannabis medicinal, farmacologia canabinoides",
     canonical: `${BASE}/ebook`,
   },
+  "/tratamento-dor-cronica": {
+    title: "Tratamento de Dor Crônica com Cannabis Medicinal SP | Planta & Raiz",
+    description: "Tratamento especializado de dor crônica com cannabis medicinal em São Paulo. Fibromialgia, artrite, dores neuropáticas. Teleconsulta a partir de R$30 com prescrição ANVISA.",
+    keywords: "dor crônica cannabis medicinal, tratamento fibromialgia CBD, artrite cannabis SP, dor neuropática canabidiol, médico dor crônica São Paulo",
+    canonical: `${BASE}/tratamento-dor-cronica`,
+    h1: "Tratamento de Dor Crônica com Cannabis Medicinal em São Paulo",
+  },
   "/blog": {
     title: "Blog de Cannabis Medicinal | Notícias, Estudos e Dicas — Planta & Raiz",
     description: "Artigos científicos, notícias e dicas sobre cannabis medicinal, CBD, THC e legislação ANVISA. Conteúdo revisado por médicos especializados.",

@@ -3,13 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Wallet, ArrowUpRight, DollarSign, Clock, CheckCircle, ShieldCheck, AlertTriangle, Info } from "lucide-react";
+import { Wallet, ArrowUpRight, DollarSign, Clock, CheckCircle, ShieldCheck, AlertTriangle, Info, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
 const MIN_WITHDRAWAL = 100;
+const DAILY_LIMIT = 50;
 const GUARANTEE_DAYS = 7;
 
 // PIX key validation
@@ -85,11 +86,38 @@ export function AffiliateWalletCard() {
     },
   });
 
+  // Query today's withdrawals to calculate daily usage
+  const { data: todayWithdrawn } = useQuery({
+    queryKey: ["affiliate-daily-withdrawn"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return 0;
+      const todayStart = new Date().toISOString().split("T")[0] + "T00:00:00.000Z";
+      const { data } = await supabase
+        .from("affiliate_withdrawals")
+        .select("amount")
+        .eq("user_id", user.id)
+        .gte("created_at", todayStart)
+        .in("status", ["completed", "pending"]);
+      return (data || []).reduce((sum: number, r: any) => sum + Number(r.amount || 0), 0);
+    },
+  });
+
+  const dailyUsed = todayWithdrawn || 0;
+  const dailyRemaining = Math.max(0, DAILY_LIMIT - dailyUsed);
+  const isDailyLimitReached = dailyRemaining <= 0;
+
   const requestWithdrawal = useMutation({
     mutationFn: async () => {
       const amount = parseFloat(withdrawAmount);
       if (isNaN(amount) || amount < MIN_WITHDRAWAL) {
         throw new Error(`Valor mínimo para saque: R$ ${MIN_WITHDRAWAL},00`);
+      }
+      if (amount > DAILY_LIMIT) {
+        throw new Error(`Desculpe, por medidas de segurança o limite máximo de saque é de R$ ${DAILY_LIMIT},00 a cada 24 horas`);
+      }
+      if (dailyUsed + amount > DAILY_LIMIT) {
+        throw new Error(`Desculpe, por medidas de segurança o limite máximo de saque é de R$ ${DAILY_LIMIT},00 a cada 24 horas`);
       }
       if (!wallet || amount > (wallet.available_balance || 0)) {
         throw new Error("Saldo insuficiente");
@@ -99,17 +127,21 @@ export function AffiliateWalletCard() {
         throw new Error(validation.error || "Chave PIX inválida");
       }
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Não autenticado");
+      // Use the Edge Function for server-side validation
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Não autenticado");
 
-      const { error } = await supabase.from("affiliate_withdrawals").insert({
-        user_id: user.id,
-        amount,
-        pix_key: pixKey.trim(),
-        status: "pending",
+      const { data, error } = await supabase.functions.invoke("process-withdrawal", {
+        body: { amount, pixKey: pixKey.trim() },
       });
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(error.message || "Erro ao processar saque");
+      }
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+      return data;
     },
     onSuccess: () => {
       toast.success("Solicitação de saque enviada! Processamento em até 48h úteis.");
@@ -118,6 +150,7 @@ export function AffiliateWalletCard() {
       setPixValidation(null);
       queryClient.invalidateQueries({ queryKey: ["affiliate-wallet"] });
       queryClient.invalidateQueries({ queryKey: ["affiliate-withdrawals"] });
+      queryClient.invalidateQueries({ queryKey: ["affiliate-daily-withdrawn"] });
     },
     onError: (err: Error) => {
       toast.error(err.message);
@@ -235,6 +268,30 @@ export function AffiliateWalletCard() {
         </CardContent>
       </Card>
 
+      {/* Daily Limit Info */}
+      <Card className="border-amber-500/20 bg-amber-500/5">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <Shield className="h-5 w-5 text-amber-400 mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <h4 className="font-bold text-sm text-foreground mb-1">Limite diário de saque: R$ {DAILY_LIMIT},00</h4>
+              <p className="text-xs text-muted-foreground">
+                Por medidas de segurança, o valor máximo de saque por dia é de R$ {DAILY_LIMIT},00.
+              </p>
+              <div className="mt-2 flex items-center gap-4 text-xs">
+                <span className="text-muted-foreground">Sacado hoje: <span className="font-bold text-foreground">R$ {dailyUsed.toFixed(2)}</span></span>
+                <span className="text-muted-foreground">Restante: <span className={`font-bold ${isDailyLimitReached ? "text-destructive" : "text-emerald-400"}`}>R$ {dailyRemaining.toFixed(2)}</span></span>
+              </div>
+              {isDailyLimitReached && (
+                <p className="text-xs text-destructive mt-2 flex items-center gap-1 font-bold">
+                  <AlertTriangle className="h-3 w-3" /> Limite diário atingido. Tente novamente amanhã.
+                </p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Withdrawal Form */}
       <Card className="border-border/50">
         <CardHeader className="pb-3">
@@ -252,13 +309,20 @@ export function AffiliateWalletCard() {
                 placeholder={`Mínimo R$ ${MIN_WITHDRAWAL},00`}
                 type="number"
                 min={MIN_WITHDRAWAL}
+                max={dailyRemaining}
                 step="0.01"
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
+                disabled={isDailyLimitReached}
               />
               {withdrawAmount && parseFloat(withdrawAmount) > 0 && parseFloat(withdrawAmount) < MIN_WITHDRAWAL && (
                 <p className="text-xs text-destructive flex items-center gap-1">
                   <AlertTriangle className="h-3 w-3" /> Valor mínimo: R$ {MIN_WITHDRAWAL},00
+                </p>
+              )}
+              {withdrawAmount && parseFloat(withdrawAmount) > dailyRemaining && (
+                <p className="text-xs text-destructive flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" /> Excede o limite diário restante de R$ {dailyRemaining.toFixed(2)}
                 </p>
               )}
             </div>
@@ -269,6 +333,7 @@ export function AffiliateWalletCard() {
                 placeholder="CPF, e-mail, celular ou chave aleatória"
                 value={pixKey}
                 onChange={(e) => handlePixKeyChange(e.target.value)}
+                disabled={isDailyLimitReached}
               />
               {pixValidation && (
                 <p className={`text-xs flex items-center gap-1 ${pixValidation.valid ? "text-emerald-400" : "text-destructive"}`}>
@@ -284,13 +349,17 @@ export function AffiliateWalletCard() {
 
           <Button
             onClick={() => requestWithdrawal.mutate()}
-            disabled={requestWithdrawal.isPending || available < MIN_WITHDRAWAL || !pixValidation?.valid}
+            disabled={requestWithdrawal.isPending || available < MIN_WITHDRAWAL || !pixValidation?.valid || isDailyLimitReached || (parseFloat(withdrawAmount) || 0) > dailyRemaining}
             className="w-full font-bold"
           >
-            {requestWithdrawal.isPending ? "Processando..." : `Solicitar Saque — R$ ${withdrawAmount || "0,00"}`}
+            {isDailyLimitReached
+              ? "Limite diário atingido. Tente novamente amanhã"
+              : requestWithdrawal.isPending
+              ? "Processando..."
+              : `Solicitar Saque — R$ ${withdrawAmount || "0,00"}`}
           </Button>
 
-          {available < MIN_WITHDRAWAL && (
+          {available < MIN_WITHDRAWAL && !isDailyLimitReached && (
             <div className="flex items-center gap-2 justify-center text-xs text-muted-foreground">
               <Info className="h-3 w-3" />
               <span>Saldo mínimo de R$ {MIN_WITHDRAWAL},00 necessário para saque</span>

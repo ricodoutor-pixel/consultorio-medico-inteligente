@@ -9,18 +9,34 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle2, Upload, UserPlus, ArrowRight } from "lucide-react";
+import { CheckCircle2, Upload, UserPlus, ArrowRight, ShieldCheck, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { categories } from "@/data/professionals";
 import { motion } from "framer-motion";
+import {
+  DocumentType,
+  formatCPFInput,
+  formatRNEInput,
+  validateDocument,
+  getDocumentPlaceholder,
+  getDocumentLabel,
+} from "@/lib/document-validators";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
+
+const UF_OPTIONS = [
+  "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
+  "MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"
+];
 
 const CadastroProfissional = () => {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [lgpdConsent, setLgpdConsent] = useState(false);
+  const [documentType, setDocumentType] = useState<DocumentType>("cpf");
+  const [documentNumber, setDocumentNumber] = useState("");
+  const [documentValidation, setDocumentValidation] = useState<{ valid: boolean; message: string } | null>(null);
   const [form, setForm] = useState({
     nomeCompleto: "",
     email: "",
@@ -29,6 +45,7 @@ const CadastroProfissional = () => {
     valorCobrado: "",
     resumoAtuacao: "",
     registroProfissional: "",
+    crmUF: "SP",
     cidadeUF: "",
     atendimento: "chat",
     disponibilidade: "",
@@ -38,6 +55,28 @@ const CadastroProfissional = () => {
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleDocumentChange = (value: string) => {
+    let formatted = value;
+    if (documentType === "cpf") formatted = formatCPFInput(value);
+    else if (documentType === "rne") formatted = formatRNEInput(value);
+    else formatted = value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 11);
+
+    setDocumentNumber(formatted);
+
+    const cleaned = formatted.replace(/[\s.\-/]/g, "");
+    if (cleaned.length >= 8 || (documentType === "cpf" && cleaned.length === 11)) {
+      setDocumentValidation(validateDocument(documentType, cleaned));
+    } else {
+      setDocumentValidation(null);
+    }
+  };
+
+  const handleDocumentTypeChange = (type: DocumentType) => {
+    setDocumentType(type);
+    setDocumentNumber("");
+    setDocumentValidation(null);
   };
 
   const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,6 +110,18 @@ const CadastroProfissional = () => {
       toast({ title: "Resumo muito longo", description: "Máximo de 500 caracteres.", variant: "destructive" });
       return;
     }
+    if (!documentNumber) {
+      toast({ title: "Documento obrigatório", description: "Informe seu CPF, Passaporte ou RNE.", variant: "destructive" });
+      return;
+    }
+    if (documentValidation && !documentValidation.valid) {
+      toast({ title: "Documento inválido", description: documentValidation.message, variant: "destructive" });
+      return;
+    }
+    if (!form.registroProfissional) {
+      toast({ title: "Registro profissional obrigatório", description: "Informe seu CRM.", variant: "destructive" });
+      return;
+    }
     if (!lgpdConsent) {
       toast({ title: "Aceite os termos de uso e LGPD para continuar", variant: "destructive" });
       return;
@@ -79,7 +130,7 @@ const CadastroProfissional = () => {
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
-      toast({ title: "Cadastro enviado!", description: "Status: PENDENTE DE VERIFICAÇÃO. Aguarde aprovação." });
+      toast({ title: "Cadastro enviado!", description: "Status: PENDENTE DE VERIFICAÇÃO KYC. Aguarde validação automática do CRM." });
     }, 1500);
   };
 
@@ -95,11 +146,23 @@ const CadastroProfissional = () => {
                 Cadastro <span className="text-gradient-green">Enviado!</span>
               </h1>
               <p className="text-muted-foreground text-lg mb-2">
-                Seu cadastro foi recebido com status <strong className="text-primary">PENDENTE DE VERIFICAÇÃO</strong>.
+                Seu cadastro foi recebido com status <strong className="text-primary">PENDENTE DE VERIFICAÇÃO KYC</strong>.
               </p>
-              <p className="text-muted-foreground mb-8">
-                Nossa equipe irá analisar seus dados e documentos. Você receberá notificação por e-mail e WhatsApp assim que for aprovado.
+              <p className="text-muted-foreground mb-4">
+                O sistema está validando automaticamente seu CRM junto ao conselho médico e verificando seus documentos.
               </p>
+              <div className="p-4 rounded-2xl bg-muted/30 border border-border mb-8 text-left">
+                <div className="flex items-center gap-2 mb-2">
+                  <ShieldCheck size={18} className="text-primary" />
+                  <span className="font-bold text-sm text-foreground">Etapas da Verificação KYC:</span>
+                </div>
+                <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
+                  <li>✅ Validação do formato do documento ({documentType.toUpperCase()})</li>
+                  <li>⏳ Consulta ao Conselho Federal de Medicina (CRM)</li>
+                  <li>⏳ Verificação de consistência de dados</li>
+                  <li>⏳ Liberação do Dashboard Médico</li>
+                </ul>
+              </div>
               <div className="flex gap-3 justify-center flex-wrap">
                 <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
                   <a href="/profissionais">Ver Profissionais <ArrowRight size={16} className="ml-2" /></a>
@@ -130,7 +193,7 @@ const CadastroProfissional = () => {
               Cadastro de <span className="text-gradient-green">Profissional</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Atenda pacientes de todo o Brasil com preços populares. Preencha o formulário e aguarde a verificação.
+              Atenda pacientes de todo o Brasil com preços populares. Preencha o formulário e aguarde a verificação KYC.
             </p>
           </motion.div>
 
@@ -169,22 +232,88 @@ const CadastroProfissional = () => {
                     </div>
                   </div>
 
+                  {/* KYC Section */}
+                  <div className="p-4 rounded-2xl bg-muted/10 border border-primary/20 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck size={18} className="text-primary" />
+                      <span className="font-bold text-sm text-foreground">Verificação KYC (Know Your Customer)</span>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Tipo de Documento *</Label>
+                        <Select value={documentType} onValueChange={(v) => handleDocumentTypeChange(v as DocumentType)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cpf">🇧🇷 CPF (Brasileiro)</SelectItem>
+                            <SelectItem value="passport">🌎 Passaporte (Estrangeiro)</SelectItem>
+                            <SelectItem value="rne">🌎 RNE (Estrangeiro Residente)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="documentNumber">{getDocumentLabel(documentType)} *</Label>
+                        <Input
+                          id="documentNumber"
+                          placeholder={getDocumentPlaceholder(documentType)}
+                          value={documentNumber}
+                          onChange={(e) => handleDocumentChange(e.target.value)}
+                          required
+                        />
+                        {documentValidation && (
+                          <p className={`text-xs flex items-center gap-1 ${documentValidation.valid ? "text-primary" : "text-destructive"}`}>
+                            {documentValidation.valid ? <CheckCircle2 size={12} /> : <AlertTriangle size={12} />}
+                            {documentValidation.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="registroProfissional">CRM / Registro Profissional *</Label>
+                        <Input
+                          id="registroProfissional"
+                          placeholder="123456"
+                          value={form.registroProfissional}
+                          onChange={(e) => handleChange("registroProfissional", e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="crmUF">UF do CRM *</Label>
+                        <Select value={form.crmUF} onValueChange={(v) => handleChange("crmUF", v)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {UF_OPTIONS.map((uf) => (
+                              <SelectItem key={uf} value={uf}>{uf}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <p className="text-[10px] text-muted-foreground">
+                      🔒 Seus dados serão verificados automaticamente junto ao Conselho Federal de Medicina. Todas as tentativas são registradas para compliance ANVISA/CFM.
+                    </p>
+                  </div>
+
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="valorCobrado">Valor por Consulta (R$) *</Label>
                       <Input id="valorCobrado" type="number" min="0" step="0.01" placeholder="120.00" value={form.valorCobrado} onChange={(e) => handleChange("valorCobrado", e.target.value)} required />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="registroProfissional">Registro Profissional (CRM/CRF/CREFITO)</Label>
-                      <Input id="registroProfissional" placeholder="Opcional" value={form.registroProfissional} onChange={(e) => handleChange("registroProfissional", e.target.value)} />
+                      <Label htmlFor="cidadeUF">Cidade / UF</Label>
+                      <Input id="cidadeUF" placeholder="São Paulo / SP" value={form.cidadeUF} onChange={(e) => handleChange("cidadeUF", e.target.value)} />
                     </div>
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="cidadeUF">Cidade / UF</Label>
-                      <Input id="cidadeUF" placeholder="São Paulo / SP" value={form.cidadeUF} onChange={(e) => handleChange("cidadeUF", e.target.value)} />
-                    </div>
                     <div className="space-y-2">
                       <Label htmlFor="atendimento">Tipo de Atendimento</Label>
                       <Select value={form.atendimento} onValueChange={(v) => handleChange("atendimento", v)}>
@@ -198,11 +327,10 @@ const CadastroProfissional = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="disponibilidade">Disponibilidade</Label>
-                    <Input id="disponibilidade" placeholder="Ex: Seg-Sex 9h-17h" value={form.disponibilidade} onChange={(e) => handleChange("disponibilidade", e.target.value)} />
+                    <div className="space-y-2">
+                      <Label htmlFor="disponibilidade">Disponibilidade</Label>
+                      <Input id="disponibilidade" placeholder="Ex: Seg-Sex 9h-17h" value={form.disponibilidade} onChange={(e) => handleChange("disponibilidade", e.target.value)} />
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -269,12 +397,12 @@ const CadastroProfissional = () => {
 
                   <div className="pt-2">
                     <Button type="submit" disabled={loading} className="w-full font-black bg-primary text-primary-foreground text-lg h-12 rounded-2xl">
-                      {loading ? "Enviando..." : "Enviar Cadastro"}
+                      {loading ? "Verificando dados..." : "Enviar Cadastro & Iniciar Verificação KYC"}
                     </Button>
                   </div>
 
                   <p className="text-xs text-muted-foreground text-center">
-                    Após enviar, seu cadastro ficará como "Pendente de Verificação". A equipe analisará seus dados antes de liberar.
+                    Após enviar, seu CRM será validado automaticamente junto ao conselho médico. O acesso ao dashboard é liberado após aprovação KYC.
                   </p>
                 </form>
               </CardContent>

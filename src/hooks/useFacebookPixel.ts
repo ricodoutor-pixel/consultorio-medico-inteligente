@@ -46,8 +46,8 @@ async function bridgeToSupabase(
   try {
     const { data: { user } } = await supabase.auth.getUser();
 
-    await supabase.from("social_interactions").insert({
-      platform: "facebook_pixel",
+    await supabase.from("social_interactions").insert([{
+      platform: "facebook_pixel" as string,
       interaction_type: eventName,
       post_url: window.location.pathname,
       subscriber_id: user?.id || null,

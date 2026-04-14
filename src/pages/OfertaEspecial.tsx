@@ -135,7 +135,7 @@ const OfertaEspecial = () => {
             <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
               {i === 0 ? <AlertTriangle className="w-5 h-5 text-destructive shrink-0" /> :
                i === 1 ? <Heart className="w-5 h-5 text-primary shrink-0" /> :
-               <Zap className="w-5 h-5 text-yellow-500 shrink-0" />}
+               <Zap className="w-5 h-5 text-accent-foreground shrink-0" />}
               <p className="text-foreground font-medium text-sm">{msg}</p>
             </div>
           ))}

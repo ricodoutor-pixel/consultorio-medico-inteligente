@@ -376,15 +376,19 @@ const DashboardPaciente = () => {
                 <div className="grid gap-3">
                   {prescriptions.map(rx => {
                     const meds = Array.isArray(rx.medications) ? rx.medications : [];
+                    const nearExpiry = isNearExpiry(rx.valid_until);
                     return (
-                      <Card key={rx.id} className="border-border hover:border-primary/20 transition-colors">
+                      <Card key={rx.id} className={`border-border hover:border-primary/20 transition-colors ${nearExpiry ? "border-yellow-500/20" : ""}`}>
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between mb-2">
                             <div>
                               <p className="font-bold text-sm text-foreground">Prescrição #{rx.id.slice(0, 8)}</p>
                               <p className="text-xs text-muted-foreground">{new Date(rx.created_at).toLocaleDateString("pt-BR")}</p>
                             </div>
-                            <Badge className={`text-[10px] capitalize ${rx.status === "active" ? "bg-primary/10 text-primary border-green" : "bg-muted text-muted-foreground"}`}>{rx.status}</Badge>
+                            <div className="flex items-center gap-1.5">
+                              {nearExpiry && <Badge className="text-[10px] bg-yellow-500/10 text-yellow-400 border-yellow-500/20">Vencendo</Badge>}
+                              <Badge className={`text-[10px] capitalize ${rx.status === "active" ? "bg-primary/10 text-primary border-green" : "bg-muted text-muted-foreground"}`}>{rx.status}</Badge>
+                            </div>
                           </div>
                           {rx.diagnosis_cid && <p className="text-xs text-muted-foreground mb-1">CID: {rx.diagnosis_cid}</p>}
                           {meds.length > 0 && (
@@ -399,6 +403,11 @@ const DashboardPaciente = () => {
                           )}
                           {rx.instructions && <p className="text-xs text-muted-foreground mt-2 italic">{rx.instructions}</p>}
                           {rx.valid_until && <p className="text-[10px] text-muted-foreground mt-1">Válida até: {new Date(rx.valid_until).toLocaleDateString("pt-BR")}</p>}
+                          {nearExpiry && (
+                            <Button size="sm" variant="outline" className="mt-3 rounded-xl text-xs border-primary/30 text-primary hover:bg-primary/10" onClick={() => { setRenewTarget(rx); setRenewModalOpen(true); }}>
+                              <RefreshCw size={12} className="mr-1" /> Solicitar Renovação
+                            </Button>
+                          )}
                         </CardContent>
                       </Card>
                     );

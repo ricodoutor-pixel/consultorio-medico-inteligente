@@ -5,8 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, FileText, ClipboardList } from "lucide-react";
+import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, BellRing, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, FileText, ClipboardList, RefreshCw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,6 +36,10 @@ const DashboardPaciente = () => {
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
   const [triages, setTriages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [renewModalOpen, setRenewModalOpen] = useState(false);
+  const [renewTarget, setRenewTarget] = useState<any>(null);
+  const [renewLoading, setRenewLoading] = useState(false);
+  const [whatsappPreview, setWhatsappPreview] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   const recommendedPros = professionals.filter(p => p.category === "Médicos Prescritores").slice(0, 3);
@@ -72,6 +77,33 @@ const DashboardPaciente = () => {
     await supabase.auth.signOut();
     toast({ title: "Sessão encerrada" });
     navigate("/");
+  };
+
+  const handleRenewalRequest = async () => {
+    if (!renewTarget || !profile) return;
+    setRenewLoading(true);
+    const { error } = await supabase.from("prescription_requests" as any).insert({
+      patient_id: profile.id,
+      prescription_id: renewTarget.id,
+      doctor_id: renewTarget.doctor_id,
+      status: "pending",
+      notes: "Solicitação de renovação via Dashboard",
+    });
+    setRenewLoading(false);
+    if (error) {
+      toast({ title: "Erro ao solicitar renovação", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Renovação solicitada ✅", description: "Seu médico será notificado para avaliar a renovação." });
+      setWhatsappPreview(`Olá ${profile.full_name?.split(" ")[0] || "Paciente"}, sua solicitação de renovação de receita foi registrada na Planta y Raiz. Acompanhe pelo seu dashboard: https://plantayraiz.com.br/dashboard/paciente`);
+    }
+    setRenewModalOpen(false);
+    setRenewTarget(null);
+  };
+
+  const isNearExpiry = (validUntil: string | null) => {
+    if (!validUntil) return true;
+    const diff = new Date(validUntil).getTime() - Date.now();
+    return diff < 15 * 24 * 60 * 60 * 1000; // 15 days
   };
 
   const completedAppts = appointments.filter(a => a.status === "completed");
@@ -344,15 +376,19 @@ const DashboardPaciente = () => {
                 <div className="grid gap-3">
                   {prescriptions.map(rx => {
                     const meds = Array.isArray(rx.medications) ? rx.medications : [];
+                    const nearExpiry = isNearExpiry(rx.valid_until);
                     return (
-                      <Card key={rx.id} className="border-border hover:border-primary/20 transition-colors">
+                      <Card key={rx.id} className={`border-border hover:border-primary/20 transition-colors ${nearExpiry ? "border-yellow-500/20" : ""}`}>
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between mb-2">
                             <div>
                               <p className="font-bold text-sm text-foreground">Prescrição #{rx.id.slice(0, 8)}</p>
                               <p className="text-xs text-muted-foreground">{new Date(rx.created_at).toLocaleDateString("pt-BR")}</p>
                             </div>
-                            <Badge className={`text-[10px] capitalize ${rx.status === "active" ? "bg-primary/10 text-primary border-green" : "bg-muted text-muted-foreground"}`}>{rx.status}</Badge>
+                            <div className="flex items-center gap-1.5">
+                              {nearExpiry && <Badge className="text-[10px] bg-yellow-500/10 text-yellow-400 border-yellow-500/20">Vencendo</Badge>}
+                              <Badge className={`text-[10px] capitalize ${rx.status === "active" ? "bg-primary/10 text-primary border-green" : "bg-muted text-muted-foreground"}`}>{rx.status}</Badge>
+                            </div>
                           </div>
                           {rx.diagnosis_cid && <p className="text-xs text-muted-foreground mb-1">CID: {rx.diagnosis_cid}</p>}
                           {meds.length > 0 && (
@@ -367,6 +403,11 @@ const DashboardPaciente = () => {
                           )}
                           {rx.instructions && <p className="text-xs text-muted-foreground mt-2 italic">{rx.instructions}</p>}
                           {rx.valid_until && <p className="text-[10px] text-muted-foreground mt-1">Válida até: {new Date(rx.valid_until).toLocaleDateString("pt-BR")}</p>}
+                          {nearExpiry && (
+                            <Button size="sm" variant="outline" className="mt-3 rounded-xl text-xs border-primary/30 text-primary hover:bg-primary/10" onClick={() => { setRenewTarget(rx); setRenewModalOpen(true); }}>
+                              <RefreshCw size={12} className="mr-1" /> Solicitar Renovação
+                            </Button>
+                          )}
                         </CardContent>
                       </Card>
                     );
@@ -465,6 +506,56 @@ const DashboardPaciente = () => {
       </section>
 
       <Footer />
+
+      {/* Renewal Modal */}
+      <Dialog open={renewModalOpen} onOpenChange={setRenewModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><RefreshCw size={18} className="text-primary" /> Solicitar Renovação</DialogTitle>
+            <DialogDescription>
+              Deseja solicitar a renovação deste protocolo? Isso gerará uma nova triagem rápida para atualização do seu quadro clínico.
+            </DialogDescription>
+          </DialogHeader>
+          {renewTarget && (
+            <div className="bg-muted/20 rounded-xl p-3 border border-border text-xs">
+              <p className="font-bold text-foreground">Prescrição #{renewTarget.id?.slice(0, 8)}</p>
+              {renewTarget.diagnosis_cid && <p className="text-muted-foreground">CID: {renewTarget.diagnosis_cid}</p>}
+              {renewTarget.valid_until && <p className="text-muted-foreground">Válida até: {new Date(renewTarget.valid_until).toLocaleDateString("pt-BR")}</p>}
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            <Button variant="outline" className="rounded-xl" onClick={() => setRenewModalOpen(false)}>Cancelar</Button>
+            <Button className="rounded-xl bg-primary text-primary-foreground" onClick={handleRenewalRequest} disabled={renewLoading}>
+              {renewLoading ? "Enviando..." : "Confirmar Renovação"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* WhatsApp Notification Preview */}
+      <Dialog open={!!whatsappPreview} onOpenChange={() => setWhatsappPreview(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><MessageCircle size={18} className="text-primary" /> Simulação de Notificação WhatsApp</DialogTitle>
+            <DialogDescription>Veja como o paciente receberia este aviso via WhatsApp:</DialogDescription>
+          </DialogHeader>
+          <div className="bg-[hsl(142,40%,95%)] rounded-2xl p-4 border border-primary/20">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                <Leaf size={14} className="text-primary-foreground" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-foreground">Enf. Brisa - Planta y Raiz</p>
+                <p className="text-[10px] text-muted-foreground">Agora</p>
+              </div>
+            </div>
+            <p className="text-sm text-foreground leading-relaxed">{whatsappPreview}</p>
+          </div>
+          <DialogFooter>
+            <Button className="rounded-xl bg-primary text-primary-foreground w-full" onClick={() => setWhatsappPreview(null)}>Entendido</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

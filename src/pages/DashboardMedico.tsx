@@ -5,9 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield } from "lucide-react";
+import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, FileBarChart, Brain, Flame } from "lucide-react";
 import { motion } from "framer-motion";
 import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
 import { DoctorSubscriptionPlans } from "@/components/doctor/DoctorSubscriptionPlans";
@@ -32,6 +33,8 @@ const DashboardMedico = () => {
   const [currentTier, setCurrentTier] = useState("basic");
   const [simulatedTier, setSimulatedTier] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
+  const [selectedPatientTriage, setSelectedPatientTriage] = useState<any>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     fetchDoctorData();
@@ -75,6 +78,23 @@ const DashboardMedico = () => {
       await supabase.from("doctors").update({ is_online: val }).eq("id", doctorData.id);
       toast({ title: val ? "Você está Online ✅" : "Você está Offline" });
     }
+  };
+
+  const fetchTriageForPatient = async (patientId: string) => {
+    const { data } = await supabase
+      .from("brisa_triages")
+      .select("*")
+      .eq("patient_id", patientId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return data;
+  };
+
+  const openPatientTriage = async (appointment: any) => {
+    const triage = await fetchTriageForPatient(appointment.patient_id);
+    setSelectedPatientTriage({ appointment, triage });
+    setDrawerOpen(true);
   };
 
   const todayAppts = appointments.filter(a => {
@@ -256,28 +276,31 @@ const DashboardMedico = () => {
               <Card className="border-border">
                 <CardContent className="p-6">
                   <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                    <Clock size={18} /> Agenda de Hoje
+                    <Clock size={18} /> Próximas Consultas
                   </h3>
                   {todayAppts.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-8">Nenhuma consulta agendada para hoje.</p>
                   ) : (
                     <div className="space-y-3">
                       {todayAppts.map(a => (
-                        <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border">
+                        <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border cursor-pointer hover:border-primary/30 transition-colors" onClick={() => openPatientTriage(a)}>
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                               {a.type === "video" ? <Video size={16} className="text-primary" /> : a.type === "chat" ? <MessageSquare size={16} className="text-primary" /> : <Stethoscope size={16} className="text-primary" />}
                             </div>
                             <div>
                               <p className="font-bold text-sm text-foreground">{a.type === "video" ? "Vídeo" : a.type === "chat" ? "Chat" : "Telefone"}</p>
-                              <p className="text-xs text-muted-foreground">{a.notes?.slice(0, 40) || "Consulta agendada"}</p>
+                              <p className="text-xs text-muted-foreground">{a.notes?.slice(0, 40) || "Clique para ver triagem Brisa"}</p>
                             </div>
                           </div>
                           <div className="text-right">
                             <p className="font-display font-black text-sm text-foreground">{format(new Date(a.scheduled_at), "HH:mm")}</p>
-                            <Badge className={`text-[10px] ${a.status === "confirmed" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
-                              {a.status === "confirmed" ? "Confirmada" : a.status === "scheduled" ? "Agendada" : a.status}
-                            </Badge>
+                            <div className="flex items-center gap-1">
+                              <FileBarChart size={10} className="text-primary" />
+                              <Badge className={`text-[10px] ${a.status === "confirmed" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
+                                {a.status === "confirmed" ? "Confirmada" : a.status === "scheduled" ? "Agendada" : a.status}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -340,6 +363,88 @@ const DashboardMedico = () => {
         </div>
       </section>
       <Footer />
+
+      {/* Brisa Triage Drawer */}
+      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <FileBarChart size={18} className="text-primary" /> Relatório Pré-Consulta (Brisa IA)
+            </SheetTitle>
+            <SheetDescription>Resumo da triagem do paciente antes da consulta</SheetDescription>
+          </SheetHeader>
+
+          {selectedPatientTriage && (
+            <div className="mt-6 space-y-4">
+              {/* Appointment Info */}
+              <Card className="border-border">
+                <CardContent className="p-4">
+                  <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Calendar size={14} className="text-primary" /> Consulta</h4>
+                  <p className="text-xs text-muted-foreground">Horário: {format(new Date(selectedPatientTriage.appointment.scheduled_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
+                  <p className="text-xs text-muted-foreground">Tipo: {selectedPatientTriage.appointment.type}</p>
+                  <Badge className="mt-2 text-[10px] bg-primary/10 text-primary border-green capitalize">{selectedPatientTriage.appointment.status}</Badge>
+                </CardContent>
+              </Card>
+
+              {selectedPatientTriage.triage ? (
+                <>
+                  {/* Symptoms */}
+                  <Card className="border-border">
+                    <CardContent className="p-4">
+                      <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Brain size={14} className="text-secondary" /> Sintomas Principais</h4>
+                      <p className="text-sm text-foreground bg-muted/20 rounded-xl p-3 border border-border">{selectedPatientTriage.triage.symptoms}</p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Urgency */}
+                  <Card className="border-border">
+                    <CardContent className="p-4">
+                      <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Flame size={14} className="text-destructive" /> Nível de Urgência</h4>
+                      <Badge className={`text-xs capitalize ${selectedPatientTriage.triage.urgency === "alta" || selectedPatientTriage.triage.urgency === "urgente" ? "bg-destructive/10 text-destructive" : selectedPatientTriage.triage.urgency === "media" ? "bg-yellow-500/10 text-yellow-400" : "bg-primary/10 text-primary"}`}>
+                        {selectedPatientTriage.triage.urgency || "Não classificada"}
+                      </Badge>
+                      {selectedPatientTriage.triage.specialty && <p className="text-xs text-muted-foreground mt-2">Especialidade sugerida: {selectedPatientTriage.triage.specialty}</p>}
+                      {selectedPatientTriage.triage.category && <p className="text-xs text-muted-foreground">Categoria: {selectedPatientTriage.triage.category}</p>}
+                    </CardContent>
+                  </Card>
+
+                  {/* Suggested Conditions */}
+                  {selectedPatientTriage.triage.suggested_conditions?.length > 0 && (
+                    <Card className="border-border">
+                      <CardContent className="p-4">
+                        <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Activity size={14} className="text-primary" /> Condições Sugeridas pela IA</h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {selectedPatientTriage.triage.suggested_conditions.map((c: string, i: number) => (
+                            <Badge key={i} variant="outline" className="text-xs">{c}</Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Pre-record */}
+                  {selectedPatientTriage.triage.pre_record && (
+                    <Card className="border-border">
+                      <CardContent className="p-4">
+                        <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><FileText size={14} className="text-muted-foreground" /> Pré-Prontuário</h4>
+                        <p className="text-xs text-muted-foreground whitespace-pre-wrap">{selectedPatientTriage.triage.pre_record}</p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </>
+              ) : (
+                <Card className="border-border">
+                  <CardContent className="p-6 text-center">
+                    <Brain size={32} className="text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">Nenhuma triagem Brisa encontrada para este paciente.</p>
+                    <p className="text-xs text-muted-foreground mt-1">O paciente não realizou triagem antes da consulta.</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

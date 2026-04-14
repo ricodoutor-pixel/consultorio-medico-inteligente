@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf } from "lucide-react";
+import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, FileText, ClipboardList } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,10 +28,12 @@ const allBadges = [
 ];
 
 const DashboardPaciente = () => {
-  const [activeTab, setActiveTab] = useState<"overview" | "badges">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "badges" | "prescriptions" | "triages">("overview");
   const [profile, setProfile] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [prescriptions, setPrescriptions] = useState<any[]>([]);
+  const [triages, setTriages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -50,15 +52,19 @@ const DashboardPaciente = () => {
 
     const userId = session.user.id;
 
-    const [profileRes, apptsRes, notifRes] = await Promise.all([
+    const [profileRes, apptsRes, notifRes, prescRes, triageRes] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).single(),
       supabase.from("appointments").select("*").eq("patient_id", userId).order("scheduled_at", { ascending: false }).limit(20),
       supabase.from("notifications").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(10),
+      supabase.from("prescriptions").select("*").eq("patient_id", userId).order("created_at", { ascending: false }).limit(20),
+      supabase.from("brisa_triages").select("*").eq("patient_id", userId).order("created_at", { ascending: false }).limit(20),
     ]);
 
     if (profileRes.data) setProfile(profileRes.data);
     if (apptsRes.data) setAppointments(apptsRes.data);
     if (notifRes.data) setNotifications(notifRes.data);
+    if (prescRes.data) setPrescriptions(prescRes.data);
+    if (triageRes.data) setTriages(triageRes.data);
     setLoading(false);
   };
 
@@ -116,9 +122,11 @@ const DashboardPaciente = () => {
           </motion.div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-6">
+          <div className="flex gap-2 mb-6 flex-wrap">
             {([
               { key: "overview" as const, label: "Visão Geral", icon: Activity },
+              { key: "prescriptions" as const, label: "Receitas", icon: FileText },
+              { key: "triages" as const, label: "Triagens", icon: ClipboardList },
               { key: "badges" as const, label: "Badges", icon: Trophy },
             ]).map(t => (
               <button key={t.key} onClick={() => setActiveTab(t.key)} className={`px-4 py-2 rounded-full text-xs font-bold border transition-colors flex items-center gap-1.5 ${activeTab === t.key ? "border-primary bg-gradient-green text-primary" : "border-border bg-card/50 text-muted-foreground hover:text-foreground"}`}>
@@ -313,6 +321,111 @@ const DashboardPaciente = () => {
                   </CardContent>
                 </Card>
               </div>
+            </div>
+          )}
+
+          {activeTab === "prescriptions" && (
+            <div className="space-y-4">
+              <h2 className="font-display font-black text-foreground text-lg flex items-center gap-2">
+                <FileText size={18} className="text-primary" /> Minhas Receitas Médicas
+              </h2>
+              {prescriptions.length === 0 ? (
+                <Card className="border-border">
+                  <CardContent className="p-8 text-center">
+                    <FileText size={32} className="text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">Nenhuma receita encontrada.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Após sua primeira consulta, suas prescrições aparecerão aqui.</p>
+                    <Button size="sm" className="mt-4 rounded-xl bg-primary text-primary-foreground" asChild>
+                      <Link to="/telemedicina">Agendar Consulta</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid gap-3">
+                  {prescriptions.map(rx => {
+                    const meds = Array.isArray(rx.medications) ? rx.medications : [];
+                    return (
+                      <Card key={rx.id} className="border-border hover:border-primary/20 transition-colors">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <p className="font-bold text-sm text-foreground">Prescrição #{rx.id.slice(0, 8)}</p>
+                              <p className="text-xs text-muted-foreground">{new Date(rx.created_at).toLocaleDateString("pt-BR")}</p>
+                            </div>
+                            <Badge className={`text-[10px] capitalize ${rx.status === "active" ? "bg-primary/10 text-primary border-green" : "bg-muted text-muted-foreground"}`}>{rx.status}</Badge>
+                          </div>
+                          {rx.diagnosis_cid && <p className="text-xs text-muted-foreground mb-1">CID: {rx.diagnosis_cid}</p>}
+                          {meds.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              {meds.map((med: any, i: number) => (
+                                <div key={i} className="text-xs bg-muted/20 rounded-lg px-3 py-1.5 border border-border">
+                                  <span className="font-bold text-foreground">{med.name || med.medication || "Medicamento"}</span>
+                                  {med.dosage && <span className="text-muted-foreground ml-2">— {med.dosage}</span>}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {rx.instructions && <p className="text-xs text-muted-foreground mt-2 italic">{rx.instructions}</p>}
+                          {rx.valid_until && <p className="text-[10px] text-muted-foreground mt-1">Válida até: {new Date(rx.valid_until).toLocaleDateString("pt-BR")}</p>}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "triages" && (
+            <div className="space-y-4">
+              <h2 className="font-display font-black text-foreground text-lg flex items-center gap-2">
+                <ClipboardList size={18} className="text-secondary" /> Minhas Triagens (Brisa IA)
+              </h2>
+              {triages.length === 0 ? (
+                <Card className="border-border">
+                  <CardContent className="p-8 text-center">
+                    <ClipboardList size={32} className="text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">Nenhuma triagem realizada.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Use a Brisa IA para fazer sua triagem antes de agendar.</p>
+                    <Button size="sm" className="mt-4 rounded-xl bg-primary text-primary-foreground" asChild>
+                      <Link to="/telemedicina">Iniciar Triagem</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid gap-3">
+                  {triages.map(t => (
+                    <Card key={t.id} className="border-border hover:border-primary/20 transition-colors">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <p className="font-bold text-sm text-foreground">Triagem #{t.id.slice(0, 8)}</p>
+                            <p className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleDateString("pt-BR")}</p>
+                          </div>
+                          <div className="flex gap-1.5">
+                            {t.urgency && (
+                              <Badge className={`text-[10px] capitalize ${t.urgency === "alta" || t.urgency === "urgente" ? "bg-red-500/10 text-red-400 border-red-500/20" : t.urgency === "media" ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" : "bg-primary/10 text-primary border-green"}`}>
+                                {t.urgency}
+                              </Badge>
+                            )}
+                            <Badge className={`text-[10px] capitalize ${t.status === "completed" ? "bg-primary/10 text-primary border-green" : "bg-muted text-muted-foreground"}`}>{t.status}</Badge>
+                          </div>
+                        </div>
+                        <p className="text-xs text-foreground mb-1"><strong>Sintomas:</strong> {t.symptoms}</p>
+                        {t.specialty && <p className="text-xs text-muted-foreground">Especialidade: {t.specialty}</p>}
+                        {t.category && <p className="text-xs text-muted-foreground">Categoria: {t.category}</p>}
+                        {t.suggested_conditions && t.suggested_conditions.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {t.suggested_conditions.map((c: string, i: number) => (
+                              <span key={i} className="text-[10px] bg-muted/30 rounded-full px-2 py-0.5 border border-border text-muted-foreground">{c}</span>
+                            ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

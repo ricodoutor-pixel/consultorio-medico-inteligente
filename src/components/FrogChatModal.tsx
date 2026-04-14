@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import { X, Send, Sparkles, Trash2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FrogMascot } from "@/components/FrogMascot";
@@ -28,13 +29,14 @@ async function streamChat({
 }) {
   try {
     const leadName = localStorage.getItem("pr_lead_name") || "";
+    const currentPage = window.location.pathname;
     const resp = await fetch(CHAT_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages, leadName }),
+      body: JSON.stringify({ messages, leadName, referralPage: currentPage }),
     });
 
     if (!resp.ok) {

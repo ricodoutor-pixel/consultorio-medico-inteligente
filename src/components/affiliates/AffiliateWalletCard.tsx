@@ -86,11 +86,38 @@ export function AffiliateWalletCard() {
     },
   });
 
+  // Query today's withdrawals to calculate daily usage
+  const { data: todayWithdrawn } = useQuery({
+    queryKey: ["affiliate-daily-withdrawn"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return 0;
+      const todayStart = new Date().toISOString().split("T")[0] + "T00:00:00.000Z";
+      const { data } = await supabase
+        .from("affiliate_withdrawals")
+        .select("amount")
+        .eq("user_id", user.id)
+        .gte("created_at", todayStart)
+        .in("status", ["completed", "pending"]);
+      return (data || []).reduce((sum: number, r: any) => sum + Number(r.amount || 0), 0);
+    },
+  });
+
+  const dailyUsed = todayWithdrawn || 0;
+  const dailyRemaining = Math.max(0, DAILY_LIMIT - dailyUsed);
+  const isDailyLimitReached = dailyRemaining <= 0;
+
   const requestWithdrawal = useMutation({
     mutationFn: async () => {
       const amount = parseFloat(withdrawAmount);
       if (isNaN(amount) || amount < MIN_WITHDRAWAL) {
         throw new Error(`Valor mínimo para saque: R$ ${MIN_WITHDRAWAL},00`);
+      }
+      if (amount > DAILY_LIMIT) {
+        throw new Error(`Desculpe, por medidas de segurança o limite máximo de saque é de R$ ${DAILY_LIMIT},00 a cada 24 horas`);
+      }
+      if (dailyUsed + amount > DAILY_LIMIT) {
+        throw new Error(`Desculpe, por medidas de segurança o limite máximo de saque é de R$ ${DAILY_LIMIT},00 a cada 24 horas`);
       }
       if (!wallet || amount > (wallet.available_balance || 0)) {
         throw new Error("Saldo insuficiente");
@@ -100,17 +127,21 @@ export function AffiliateWalletCard() {
         throw new Error(validation.error || "Chave PIX inválida");
       }
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Não autenticado");
+      // Use the Edge Function for server-side validation
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Não autenticado");
 
-      const { error } = await supabase.from("affiliate_withdrawals").insert({
-        user_id: user.id,
-        amount,
-        pix_key: pixKey.trim(),
-        status: "pending",
+      const { data, error } = await supabase.functions.invoke("process-withdrawal", {
+        body: { amount, pixKey: pixKey.trim() },
       });
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(error.message || "Erro ao processar saque");
+      }
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+      return data;
     },
     onSuccess: () => {
       toast.success("Solicitação de saque enviada! Processamento em até 48h úteis.");
@@ -119,6 +150,7 @@ export function AffiliateWalletCard() {
       setPixValidation(null);
       queryClient.invalidateQueries({ queryKey: ["affiliate-wallet"] });
       queryClient.invalidateQueries({ queryKey: ["affiliate-withdrawals"] });
+      queryClient.invalidateQueries({ queryKey: ["affiliate-daily-withdrawn"] });
     },
     onError: (err: Error) => {
       toast.error(err.message);

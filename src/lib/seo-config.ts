@@ -76,6 +76,13 @@ export const routeSEOMap: Record<string, PageSEO> = {
     canonical: `${BASE}/tratamento-dor-cronica`,
     h1: "Tratamento de Dor Crônica com Cannabis Medicinal em São Paulo",
   },
+  "/tratamento-ansiedade-saude-mental": {
+    title: "Tratamento de Ansiedade e Insônia com Cannabis Medicinal SP | Planta & Raiz",
+    description: "Tratamento especializado de ansiedade, insônia e burnout com cannabis medicinal em São Paulo. CBD para saúde mental. Teleconsulta a partir de R$30 com prescrição ANVISA.",
+    keywords: "ansiedade cannabis medicinal, CBD insônia, tratamento burnout CBD, saúde mental cannabis SP, canabidiol ansiedade São Paulo, CBD para dormir",
+    canonical: `${BASE}/tratamento-ansiedade-saude-mental`,
+    h1: "Tratamento com Cannabis Medicinal para Ansiedade e Insônia em São Paulo",
+  },
   "/blog": {
     title: "Blog de Cannabis Medicinal | Notícias, Estudos e Dicas — Planta & Raiz",
     description: "Artigos científicos, notícias e dicas sobre cannabis medicinal, CBD, THC e legislação ANVISA. Conteúdo revisado por médicos especializados.",

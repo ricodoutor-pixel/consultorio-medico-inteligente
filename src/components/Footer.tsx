@@ -27,6 +27,7 @@ export const Footer = () => {
                 { to: "/profissionais", label: "Profissionais" },
                 { to: "/shopping", label: "Shopping" },
                 { to: "/biblioteca", label: "Biblioteca" },
+                { to: "/tratamento-ansiedade-saude-mental", label: "Ansiedade & Sono" },
                 { to: "/afiliados", label: "Afiliados" },
                 { to: "/planos", label: "Planos" },
                 { to: "/cadastro", label: "Cadastro" },

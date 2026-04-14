@@ -245,7 +245,33 @@ Deno.serve(async (req) => {
           metadata: { coins: 50, reason: "welcome_bonus" },
         });
 
-        // 8. Notify admins
+        // 8. Process Affiliate Commissions (3-Level MLM)
+        try {
+          const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+          const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+          const affiliateResp = await fetch(
+            `${supabaseUrl}/functions/v1/process-affiliate-commissions`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${serviceKey}`,
+              },
+              body: JSON.stringify({
+                buyer_id: appt.patient_id,
+                amount: doctorPayout, // Net amount after platform fee
+                transaction_id: appointmentId,
+                type: "consultation",
+              }),
+            }
+          );
+          const affiliateResult = await affiliateResp.json();
+          console.log(`[Webhook] Affiliate commissions:`, JSON.stringify(affiliateResult));
+        } catch (affErr) {
+          console.error("[Webhook] Affiliate commission error:", affErr);
+        }
+
+        // 9. Notify admins
         const { data: adminRoles } = await supabase
           .from("user_roles")
           .select("user_id")

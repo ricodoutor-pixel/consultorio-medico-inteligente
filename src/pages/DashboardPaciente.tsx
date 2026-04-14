@@ -235,6 +235,31 @@ const DashboardPaciente = () => {
           {activeTab === "overview" && (
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
+                {/* Awaiting Payment Alert */}
+                {awaitingPaymentAppts.length > 0 && (
+                  <Card className="border-yellow-500/30 bg-yellow-500/5">
+                    <CardContent className="p-4 space-y-3">
+                      <h3 className="font-display font-black text-sm text-foreground flex items-center gap-2">
+                        <Bell size={14} className="text-yellow-400" /> Pagamento Pendente
+                      </h3>
+                      {awaitingPaymentAppts.map(a => (
+                        <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-card border border-border">
+                          <div>
+                            <p className="text-sm font-bold text-foreground">
+                              Consulta {a.type === "video" ? "Vídeo" : a.type === "chat" ? "Chat" : "Telefone"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              R$ {Number(a.amount || 0).toFixed(2)} • {new Date(a.scheduled_at).toLocaleDateString("pt-BR")}
+                            </p>
+                          </div>
+                          <Button size="sm" className="rounded-xl text-xs" onClick={() => handleCompletePayment(a.id)}>
+                            💳 Pagar Agora
+                          </Button>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
                 {/* Check-in Card */}
                 <PatientCheckinCard userId={profile?.id || ""} onCheckinComplete={() => setCheckinRefresh(p => p + 1)} />
 

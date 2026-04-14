@@ -6,9 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, FileBarChart, Brain, Flame } from "lucide-react";
+import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, FileBarChart, Brain, Flame, RefreshCw, ClipboardCheck, Loader2 } from "lucide-react";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { motion } from "framer-motion";
 import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
@@ -37,6 +40,13 @@ const DashboardMedico = () => {
   const [selectedPatientTriage, setSelectedPatientTriage] = useState<any>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  // Renewal center state
+  const [renewalRequests, setRenewalRequests] = useState<any[]>([]);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [dosageNotes, setDosageNotes] = useState("");
+  const [processing, setProcessing] = useState(false);
+
   useEffect(() => {
     fetchDoctorData();
   }, []);
@@ -51,15 +61,16 @@ const DashboardMedico = () => {
       setDoctorData(doctor);
       setIsOnline(doctor.is_online);
 
-      const [apptRes, rxRes] = await Promise.all([
+      const [apptRes, rxRes, renewRes] = await Promise.all([
         supabase.from("appointments").select("*").eq("doctor_id", doctor.id).order("scheduled_at", { ascending: true }).limit(20),
         supabase.from("prescriptions").select("*").eq("doctor_id", doctor.id).order("created_at", { ascending: false }).limit(10),
+        supabase.from("prescription_requests").select("*").eq("doctor_id", doctor.id).eq("status", "pending").order("created_at", { ascending: false }),
       ]);
 
       if (apptRes.data) setAppointments(apptRes.data);
       if (rxRes.data) setPrescriptions(rxRes.data);
+      if (renewRes.data) setRenewalRequests(renewRes.data);
 
-      // Fetch subscription tier
       const { data: sub } = await supabase
         .from("medical_subscriptions")
         .select("plan_tier")
@@ -98,6 +109,80 @@ const DashboardMedico = () => {
     setDrawerOpen(true);
   };
 
+  const openReviewModal = async (request: any) => {
+    // Fetch linked prescription for context
+    let linkedRx = null;
+    if (request.prescription_id) {
+      const { data } = await supabase.from("prescriptions").select("*").eq("id", request.prescription_id).maybeSingle();
+      linkedRx = data;
+    }
+    // Fetch latest triage
+    const triage = await fetchTriageForPatient(request.patient_id);
+    setSelectedRequest({ ...request, linkedRx, triage });
+    setDosageNotes("");
+    setReviewModalOpen(true);
+  };
+
+  const handleApproveRenewal = async () => {
+    if (!selectedRequest || !doctorData) return;
+    setProcessing(true);
+    try {
+      // 1. Update request status
+      await supabase.from("prescription_requests").update({ status: "approved" } as any).eq("id", selectedRequest.id);
+
+      // 2. Create new prescription based on linked one
+      const baseMeds = selectedRequest.linkedRx?.medications || [];
+      const newRx: any = {
+        doctor_id: doctorData.id,
+        patient_id: selectedRequest.patient_id,
+        medications: baseMeds,
+        status: "draft",
+        instructions: dosageNotes || selectedRequest.linkedRx?.instructions || null,
+        diagnosis_cid: selectedRequest.linkedRx?.diagnosis_cid || null,
+      };
+      await supabase.from("prescriptions").insert(newRx);
+
+      // 3. Send notification to patient
+      await supabase.from("notifications").insert({
+        user_id: selectedRequest.patient_id,
+        title: "🎉 Receita Renovada!",
+        message: "Sua solicitação de renovação foi aprovada. Uma nova receita foi gerada pelo seu médico.",
+        type: "prescription",
+        action_url: "/dashboard/paciente",
+      });
+
+      toast({ title: "✅ Renovação aprovada", description: "Nova receita gerada e paciente notificado." });
+      setRenewalRequests(prev => prev.filter(r => r.id !== selectedRequest.id));
+      setReviewModalOpen(false);
+    } catch (err) {
+      toast({ title: "Erro ao aprovar", description: (err as Error).message, variant: "destructive" });
+    }
+    setProcessing(false);
+  };
+
+  const handleRequestConsultation = async () => {
+    if (!selectedRequest) return;
+    setProcessing(true);
+    try {
+      await supabase.from("prescription_requests").update({ status: "consultation_required" } as any).eq("id", selectedRequest.id);
+
+      await supabase.from("notifications").insert({
+        user_id: selectedRequest.patient_id,
+        title: "📋 Nova Consulta Necessária",
+        message: "Seu médico analisou sua solicitação e recomenda uma nova consulta antes de renovar a receita. Agende pelo Dashboard.",
+        type: "info",
+        action_url: "/agendamento",
+      });
+
+      toast({ title: "Consulta solicitada", description: "Paciente notificado para agendar nova consulta." });
+      setRenewalRequests(prev => prev.filter(r => r.id !== selectedRequest.id));
+      setReviewModalOpen(false);
+    } catch (err) {
+      toast({ title: "Erro", description: (err as Error).message, variant: "destructive" });
+    }
+    setProcessing(false);
+  };
+
   const todayAppts = appointments.filter(a => {
     const d = new Date(a.scheduled_at);
     const today = new Date();
@@ -107,7 +192,14 @@ const DashboardMedico = () => {
   const completedAppts = appointments.filter(a => a.status === "completed");
   const totalEarnings = completedAppts.reduce((sum, a) => sum + Number(a.amount || 0), 0);
 
-  // Mock chart data
+  // Monthly earnings estimate
+  const now = new Date();
+  const monthAppts = appointments.filter(a => {
+    const d = new Date(a.scheduled_at);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && a.status !== "cancelled";
+  });
+  const monthlyRevenue = monthAppts.reduce((sum, a) => sum + Number(a.amount || 0), 0);
+
   const earningsData = [
     { month: "Jan", valor: 2400 }, { month: "Fev", valor: 3200 }, { month: "Mar", valor: 4100 },
     { month: "Abr", valor: 3800 }, { month: "Mai", valor: totalEarnings || 5200 }, { month: "Jun", valor: 6100 },
@@ -171,23 +263,101 @@ const DashboardMedico = () => {
               </div>
             )}
 
-            {/* KPIs */}
+            {/* === NEW KPI CARDS === */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              {[
-                { icon: DollarSign, label: "Ganhos Total", value: `R$ ${totalEarnings.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, change: "+18%", color: "text-primary" },
-                { icon: Users, label: "Consultas Hoje", value: String(todayAppts.length), change: "", color: "text-primary" },
-                { icon: FileText, label: "Receitas Emitidas", value: String(prescriptions.length), change: "", color: "text-secondary" },
-                { icon: Star, label: "Avaliação", value: `${doctorData?.rating || 5.0}★`, change: "", color: "text-[hsl(var(--gold))]" },
-              ].map((kpi, i) => (
-                <Card key={i} className="border-border">
-                  <CardContent className="p-4">
-                    <kpi.icon size={20} className={kpi.color} />
-                    <p className="text-2xl font-display font-black text-foreground mt-2">{kpi.value}</p>
-                    <p className="text-xs text-muted-foreground font-bold">{kpi.label}</p>
-                  </CardContent>
-                </Card>
-              ))}
+              <Card className="border-border">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                      <RefreshCw size={18} className="text-yellow-400" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-display font-black text-foreground">{renewalRequests.length}</p>
+                      <p className="text-xs text-muted-foreground font-bold">Renovações Pendentes</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border-border">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <Users size={18} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-display font-black text-foreground">{todayAppts.length}</p>
+                      <p className="text-xs text-muted-foreground font-bold">Consultas Hoje</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border-border">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl bg-secondary/10 flex items-center justify-center">
+                      <DollarSign size={18} className="text-secondary" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-display font-black text-foreground">R$ {monthlyRevenue.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}</p>
+                      <p className="text-xs text-muted-foreground font-bold">Faturamento Mês</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border-border">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <Star size={18} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-display font-black text-foreground">{doctorData?.rating || 5.0}★</p>
+                      <p className="text-xs text-muted-foreground font-bold">Avaliação</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
+
+            {/* === RENEWAL CENTER === */}
+            {doctorData && renewalRequests.length > 0 && (
+              <Card className="border-yellow-500/30 bg-yellow-500/5 mb-8">
+                <CardContent className="p-6">
+                  <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
+                    <RefreshCw size={18} className="text-yellow-400" /> Solicitações de Renovação
+                    <Badge className="ml-2 bg-yellow-500/20 text-yellow-400 text-xs">{renewalRequests.length} pendente{renewalRequests.length > 1 ? "s" : ""}</Badge>
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-xs">Paciente</TableHead>
+                          <TableHead className="text-xs">Receita Ref.</TableHead>
+                          <TableHead className="text-xs">Data Solicitação</TableHead>
+                          <TableHead className="text-xs">Notas</TableHead>
+                          <TableHead className="text-xs text-right">Ação</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {renewalRequests.map(req => (
+                          <TableRow key={req.id}>
+                            <TableCell className="text-sm font-medium text-foreground">{req.patient_id?.slice(0, 8)}…</TableCell>
+                            <TableCell className="text-xs text-muted-foreground">{req.prescription_id?.slice(0, 8) || "—"}…</TableCell>
+                            <TableCell className="text-xs text-muted-foreground">{format(new Date(req.created_at), "dd/MM/yyyy HH:mm")}</TableCell>
+                            <TableCell className="text-xs text-muted-foreground max-w-[120px] truncate">{req.notes || "—"}</TableCell>
+                            <TableCell className="text-right">
+                              <Button size="sm" className="rounded-xl text-xs" onClick={() => openReviewModal(req)}>
+                                <ClipboardCheck size={14} className="mr-1" /> Revisar
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Quick Access — Cannabis & Clinical Tools */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
@@ -377,10 +547,8 @@ const DashboardMedico = () => {
 
           {selectedPatientTriage && (
             <div className="mt-6 space-y-4">
-              {/* Patient Evolution Chart */}
               <EvolutionChart userId={selectedPatientTriage.appointment.patient_id} compact />
 
-              {/* Appointment Info */}
               <Card className="border-border">
                 <CardContent className="p-4">
                   <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Calendar size={14} className="text-primary" /> Consulta</h4>
@@ -392,7 +560,6 @@ const DashboardMedico = () => {
 
               {selectedPatientTriage.triage ? (
                 <>
-                  {/* Symptoms */}
                   <Card className="border-border">
                     <CardContent className="p-4">
                       <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Brain size={14} className="text-secondary" /> Sintomas Principais</h4>
@@ -400,7 +567,6 @@ const DashboardMedico = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Urgency */}
                   <Card className="border-border">
                     <CardContent className="p-4">
                       <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Flame size={14} className="text-destructive" /> Nível de Urgência</h4>
@@ -412,7 +578,6 @@ const DashboardMedico = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Suggested Conditions */}
                   {selectedPatientTriage.triage.suggested_conditions?.length > 0 && (
                     <Card className="border-border">
                       <CardContent className="p-4">
@@ -426,7 +591,6 @@ const DashboardMedico = () => {
                     </Card>
                   )}
 
-                  {/* Pre-record */}
                   {selectedPatientTriage.triage.pre_record && (
                     <Card className="border-border">
                       <CardContent className="p-4">
@@ -449,6 +613,76 @@ const DashboardMedico = () => {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* === RENEWAL REVIEW MODAL === */}
+      <Dialog open={reviewModalOpen} onOpenChange={setReviewModalOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <RefreshCw size={18} className="text-yellow-400" /> Revisar Solicitação de Renovação
+            </DialogTitle>
+            <DialogDescription>Analise o histórico e decida se aprova ou solicita nova consulta.</DialogDescription>
+          </DialogHeader>
+
+          {selectedRequest && (
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+              {/* Patient Evolution */}
+              <EvolutionChart userId={selectedRequest.patient_id} compact />
+
+              {/* Triage Summary */}
+              {selectedRequest.triage && (
+                <Card className="border-border">
+                  <CardContent className="p-4">
+                    <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2">
+                      <Brain size={14} className="text-secondary" /> Última Triagem Brisa
+                    </h4>
+                    <p className="text-xs text-muted-foreground">{selectedRequest.triage.symptoms}</p>
+                    <Badge className="mt-2 text-[10px] capitalize bg-primary/10 text-primary">{selectedRequest.triage.urgency || "baixa"}</Badge>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Linked prescription info */}
+              {selectedRequest.linkedRx && (
+                <Card className="border-border">
+                  <CardContent className="p-4">
+                    <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2">
+                      <Pill size={14} className="text-primary" /> Receita Anterior
+                    </h4>
+                    <p className="text-xs text-muted-foreground">CID: {selectedRequest.linkedRx.diagnosis_cid || "Não informado"}</p>
+                    <p className="text-xs text-muted-foreground">Status: {selectedRequest.linkedRx.status}</p>
+                    {selectedRequest.linkedRx.instructions && (
+                      <p className="text-xs text-muted-foreground mt-1">Instruções: {selectedRequest.linkedRx.instructions}</p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Dosage adjustment */}
+              <div>
+                <label className="text-sm font-bold text-foreground mb-1 block">Ajustar dosagem / observações (opcional)</label>
+                <Textarea
+                  placeholder="Ex.: Aumentar CBD para 40mg/ml, reduzir THC..."
+                  value={dosageNotes}
+                  onChange={e => setDosageNotes(e.target.value)}
+                  className="min-h-[80px]"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" className="rounded-xl" onClick={handleRequestConsultation} disabled={processing}>
+              {processing ? <Loader2 size={14} className="animate-spin mr-1" /> : <Calendar size={14} className="mr-1" />}
+              Solicitar Nova Consulta
+            </Button>
+            <Button className="rounded-xl bg-primary" onClick={handleApproveRenewal} disabled={processing}>
+              {processing ? <Loader2 size={14} className="animate-spin mr-1" /> : <CheckCircle2 size={14} className="mr-1" />}
+              Aprovar e Gerar Receita
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

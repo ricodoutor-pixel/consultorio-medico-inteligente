@@ -112,7 +112,28 @@ const DashboardPaciente = () => {
 
   const completedAppts = appointments.filter(a => a.status === "completed");
   const upcomingAppts = appointments.filter(a => a.status === "scheduled" || a.status === "confirmed");
+  const awaitingPaymentAppts = appointments.filter(a => a.payment_status === "pending" || a.payment_status === "awaiting_payment");
   const totalSpent = appointments.reduce((sum, a) => sum + Number(a.amount || 0), 0);
+
+  const handleCompletePayment = async (appointmentId: string) => {
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke("create-payment", {
+        body: {
+          appointmentId,
+          patientEmail: session?.session?.user?.email || "",
+          description: "Consulta Planta y Raiz — Pagamento Pendente",
+        },
+      });
+      if (error || !data?.init_point) {
+        toast({ title: "Erro ao gerar pagamento", description: "Tente novamente em instantes.", variant: "destructive" });
+        return;
+      }
+      window.location.href = data.init_point;
+    } catch (err) {
+      toast({ title: "Erro", description: (err as Error).message, variant: "destructive" });
+    }
+  };
 
 
 

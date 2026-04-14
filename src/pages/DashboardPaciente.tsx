@@ -16,6 +16,7 @@ import { WellnessSubscriptionCards } from "@/components/WellnessSubscriptionCard
 import { PatientCheckinCard } from "@/components/PatientCheckinCard";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { ProgressReportGenerator } from "@/components/ProgressReportGenerator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { professionals } from "@/data/professionals";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
@@ -140,8 +141,31 @@ const DashboardPaciente = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <section className="pt-24 pb-8 md:pt-32">
+          <div className="container mx-auto px-4 space-y-6">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-14 h-14 rounded-2xl" />
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[1,2,3,4].map(i => (
+                <Card key={i} className="border-border">
+                  <CardContent className="p-4 space-y-2">
+                    <Skeleton className="h-4 w-4" />
+                    <Skeleton className="h-7 w-16" />
+                    <Skeleton className="h-3 w-20" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <Skeleton className="h-[220px] w-full rounded-xl" />
+          </div>
+        </section>
       </div>
     );
   }

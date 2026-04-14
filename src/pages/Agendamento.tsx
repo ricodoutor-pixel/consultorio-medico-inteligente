@@ -115,7 +115,7 @@ const Agendamento = () => {
       toast({ title: "Redirecionando para pagamento...", description: "Você será levado ao Mercado Pago." });
       window.location.href = paymentData.init_point;
     } catch (err) {
-      console.error("Payment error:", err);
+      // Payment error handled gracefully
       toast({ title: "Consulta agendada", description: "Pagamento pendente — conclua pelo Dashboard." });
       setStep(5);
     }

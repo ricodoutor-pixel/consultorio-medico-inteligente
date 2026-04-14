@@ -21,6 +21,12 @@ import {
   getDocumentPlaceholder,
   getDocumentLabel,
 } from "@/lib/document-validators";
+import {
+  trackMedicalSignupStarted,
+  trackKYCSubmissionAttempt,
+  trackKYCValidationFailed,
+  trackKYCValidationSuccess,
+} from "@/lib/analytics";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 

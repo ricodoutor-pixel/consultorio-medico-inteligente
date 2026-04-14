@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, FileBarChart, Brain, Flame } from "lucide-react";
+import { EvolutionChart } from "@/components/EvolutionChart";
 import { motion } from "framer-motion";
 import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
 import { DoctorSubscriptionPlans } from "@/components/doctor/DoctorSubscriptionPlans";
@@ -376,6 +377,9 @@ const DashboardMedico = () => {
 
           {selectedPatientTriage && (
             <div className="mt-6 space-y-4">
+              {/* Patient Evolution Chart */}
+              <EvolutionChart userId={selectedPatientTriage.appointment.patient_id} compact />
+
               {/* Appointment Info */}
               <Card className="border-border">
                 <CardContent className="p-4">

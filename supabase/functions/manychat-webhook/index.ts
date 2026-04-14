@@ -1070,7 +1070,10 @@ Deno.serve(async (req) => {
             suporte: 7,
             rh_medicos: 8,
             social_tracking: 5,
-            total: 65,
+            facebook_publishing: 3,
+            visitor_tracking: 5,
+            social_analytics: 4,
+            total: 77,
           },
           timestamp: new Date().toISOString(),
         });

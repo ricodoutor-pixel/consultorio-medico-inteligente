@@ -40,7 +40,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, leadName } = await req.json();
+    const { messages, leadName, referralPage } = await req.json();
 
     if (!Array.isArray(messages) || messages.length === 0 || messages.length > 50) {
       return new Response(JSON.stringify({ error: "Mensagens inválidas" }), {
@@ -112,10 +112,28 @@ serve(async (req) => {
       } catch { /* ignore logging errors */ }
     }
 
-    // Build system prompt with user name context
+    // Build system prompt with user name and page context
     let finalSystemPrompt = SYSTEM_PROMPT;
     if (leadName) {
       finalSystemPrompt += `\n\n### CONTEXTO DO USUÁRIO ATUAL:\nO nome do usuário é **${leadName}**. Use o nome dele(a) nas respostas para criar uma experiência personalizada e acolhedora.`;
+    }
+
+    // Page-aware context: adjust conversation based on which page the user is on
+    if (referralPage && typeof referralPage === "string") {
+      const pageContextMap: Record<string, string> = {
+        "/tratamento-dor-cronica": `O usuário está na página de **Tratamento de Dor Crônica com Cannabis Medicinal**. Ele provavelmente tem dúvidas sobre dor crônica (fibromialgia, artrite, dor neuropática). Foque suas respostas em como CBD/THC ajudam no alívio da dor, explique o Sistema Endocanabinoide de forma simples, e incentive a agendar consulta para dor crônica.`,
+        "/tratamento-ansiedade-saude-mental": `O usuário está na página de **Tratamento de Ansiedade e Saúde Mental**. Ele provavelmente busca ajuda para ansiedade, insônia, burnout ou depressão. Foque em como CBD ajuda na regulação do humor e do sono, tranquilize sobre segurança (não vicia, não causa efeito psicoativo), e incentive a teleconsulta de saúde mental.`,
+        "/telemedicina": `O usuário está na página de **Telemedicina**. Ele quer agendar ou entender o fluxo de consulta. Seja direto sobre como funciona: triagem → escolha do médico → pagamento → vídeo.`,
+        "/shopping": `O usuário está no **Shopping de Bem-Estar**. Ele busca produtos de CBD/cannabis. Ajude com dúvidas sobre produtos, dosagem e como comprar.`,
+        "/biblioteca": `O usuário está na **Biblioteca Científica**. Ele está interessado em estudos e evidências. Forneça informações mais técnicas e baseadas em evidências.`,
+        "/dispensario": `O usuário está no **Dispensário**. Ele busca medicamentos prescritos. Ajude com farmácias parceiras e processo de compra pós-receita.`,
+        "/dashboard/paciente": `O usuário está no **Dashboard do Paciente**. Ele pode ter dúvidas sobre suas consultas, receitas ou triagens. Ajude a navegar suas informações.`,
+      };
+
+      const pageContext = Object.entries(pageContextMap).find(([path]) => referralPage.startsWith(path));
+      if (pageContext) {
+        finalSystemPrompt += `\n\n### CONTEXTO DA PÁGINA:\n${pageContext[1]}`;
+      }
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

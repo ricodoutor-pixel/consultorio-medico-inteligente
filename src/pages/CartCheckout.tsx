@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { AlertCircle, CheckCircle, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { UpsellOffer } from '@/components/checkout/UpsellOffer';
 
 export default function CartCheckout() {
   const navigate = useNavigate();
@@ -12,6 +13,10 @@ export default function CartCheckout() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  const [showUpsell, setShowUpsell] = useState(true);
+  const [upsellApplied, setUpsellApplied] = useState<string | null>(null);
+  const [upsellExtra, setUpsellExtra] = useState(0);
 
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', address: '', city: '', state: '', zipCode: '',
@@ -56,7 +61,7 @@ export default function CartCheckout() {
   const subtotal = getSubtotal();
   const tax = getTax();
   const shipping = getShipping();
-  const total = getFinalTotal();
+  const total = getFinalTotal() + upsellExtra;
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
@@ -74,6 +79,26 @@ export default function CartCheckout() {
               {error && (
                 <div className="mb-6 p-4 bg-destructive/10 border border-destructive/30 rounded-lg flex items-center gap-3">
                   <AlertCircle className="text-destructive" /><p>{error}</p>
+                </div>
+              )}
+              {showUpsell && !success && (
+                <div className="mb-6">
+                  <UpsellOffer
+                    currentTotal={getFinalTotal()}
+                    onAccept={(newAmount, planName) => {
+                      setUpsellExtra(newAmount - getFinalTotal());
+                      setUpsellApplied(planName);
+                      setShowUpsell(false);
+                    }}
+                    onDecline={() => setShowUpsell(false)}
+                  />
+                </div>
+              )}
+              {upsellApplied && (
+                <div className="mb-4 p-3 bg-primary/10 border border-primary/30 rounded-xl flex items-center gap-2 text-sm">
+                  <CheckCircle size={16} className="text-primary" />
+                  <span className="font-semibold text-foreground">{upsellApplied}</span>
+                  <span className="text-muted-foreground">adicionado — + R$ {upsellExtra.toFixed(2)}</span>
                 </div>
               )}
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -124,6 +149,9 @@ export default function CartCheckout() {
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal:</span><span>R$ {subtotal.toFixed(2)}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Imposto:</span><span>R$ {tax.toFixed(2)}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Frete:</span><span>R$ {shipping.toFixed(2)}</span></div>
+                {upsellExtra > 0 && (
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Upgrade ({upsellApplied}):</span><span className="text-primary font-semibold">+ R$ {upsellExtra.toFixed(2)}</span></div>
+                )}
                 <div className="border-t border-border pt-3 flex justify-between font-bold"><span>Total:</span><span className="text-xl text-primary">R$ {total.toFixed(2)}</span></div>
               </div>
             </Card>

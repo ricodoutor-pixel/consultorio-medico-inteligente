@@ -506,6 +506,56 @@ const DashboardPaciente = () => {
       </section>
 
       <Footer />
+
+      {/* Renewal Modal */}
+      <Dialog open={renewModalOpen} onOpenChange={setRenewModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><RefreshCw size={18} className="text-primary" /> Solicitar Renovação</DialogTitle>
+            <DialogDescription>
+              Deseja solicitar a renovação deste protocolo? Isso gerará uma nova triagem rápida para atualização do seu quadro clínico.
+            </DialogDescription>
+          </DialogHeader>
+          {renewTarget && (
+            <div className="bg-muted/20 rounded-xl p-3 border border-border text-xs">
+              <p className="font-bold text-foreground">Prescrição #{renewTarget.id?.slice(0, 8)}</p>
+              {renewTarget.diagnosis_cid && <p className="text-muted-foreground">CID: {renewTarget.diagnosis_cid}</p>}
+              {renewTarget.valid_until && <p className="text-muted-foreground">Válida até: {new Date(renewTarget.valid_until).toLocaleDateString("pt-BR")}</p>}
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            <Button variant="outline" className="rounded-xl" onClick={() => setRenewModalOpen(false)}>Cancelar</Button>
+            <Button className="rounded-xl bg-primary text-primary-foreground" onClick={handleRenewalRequest} disabled={renewLoading}>
+              {renewLoading ? "Enviando..." : "Confirmar Renovação"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* WhatsApp Notification Preview */}
+      <Dialog open={!!whatsappPreview} onOpenChange={() => setWhatsappPreview(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><MessageCircle size={18} className="text-primary" /> Simulação de Notificação WhatsApp</DialogTitle>
+            <DialogDescription>Veja como o paciente receberia este aviso via WhatsApp:</DialogDescription>
+          </DialogHeader>
+          <div className="bg-[hsl(142,40%,95%)] rounded-2xl p-4 border border-primary/20">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                <Leaf size={14} className="text-primary-foreground" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-foreground">Enf. Brisa - Planta y Raiz</p>
+                <p className="text-[10px] text-muted-foreground">Agora</p>
+              </div>
+            </div>
+            <p className="text-sm text-foreground leading-relaxed">{whatsappPreview}</p>
+          </div>
+          <DialogFooter>
+            <Button className="rounded-xl bg-primary text-primary-foreground w-full" onClick={() => setWhatsappPreview(null)}>Entendido</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -759,6 +759,287 @@ Deno.serve(async (req) => {
       }
 
       // ═══════════════════════════════════════════
+      // SOCIAL MEDIA — Post Interaction Tracking (IG + FB)
+      // ═══════════════════════════════════════════
+
+      case "post_interaction": {
+        const { platform, interaction_type, post_id, post_url, post_caption,
+                subscriber: sub, message_content, keyword_matched, campaign_source,
+                ad_id, engagement_data } = payload;
+
+        if (!interaction_type) return jsonResponse({ error: "interaction_type obrigatório" }, 400);
+
+        let subscriberId: string | null = null;
+        let subscriberName = sub?.name || "";
+        let subscriberPhone = sub?.phone || "";
+        const subscriberUsername = sub?.username || "";
+
+        // If we have phone, find or create subscriber in ManyChat
+        if (subscriberPhone) {
+          const clean = subscriberPhone.replace(/\D/g, "");
+          const result = await findOrCreateSubscriber(clean, subscriberName || subscriberUsername || "Lead Social");
+          subscriberId = result.subscriberId;
+
+          if (subscriberId) {
+            const tagOps = [
+              tagSubscriber(subscriberId, `social_${platform || "instagram"}`),
+              tagSubscriber(subscriberId, `interacao_${interaction_type}`),
+              setCustomField(subscriberId, "social_username", subscriberUsername),
+              setCustomField(subscriberId, "social_platform", platform || "instagram"),
+              setCustomField(subscriberId, "ultima_interacao", new Date().toISOString()),
+            ];
+
+            if (keyword_matched) {
+              tagOps.push(tagSubscriber(subscriberId, `keyword_${keyword_matched}`));
+            }
+            if (campaign_source) {
+              tagOps.push(tagSubscriber(subscriberId, `campanha_${campaign_source}`));
+              tagOps.push(setCustomField(subscriberId, "campanha_origem", campaign_source));
+            }
+            if (ad_id) {
+              tagOps.push(setCustomField(subscriberId, "ad_id", ad_id));
+              tagOps.push(tagSubscriber(subscriberId, "lead_pago"));
+            }
+
+            await Promise.all(tagOps);
+          }
+        }
+
+        // Determine funnel stage based on interaction
+        const funnelMap: Record<string, string> = {
+          like: "awareness", save: "interest", comment: "interest",
+          share: "consideration", dm: "intent", story_reply: "interest",
+          mention: "awareness", reaction: "awareness",
+        };
+        const funnel = funnelMap[interaction_type] || "awareness";
+
+        // Determine lead score
+        const scoreMap: Record<string, number> = {
+          like: 5, reaction: 5, mention: 10, save: 15,
+          comment: 20, share: 25, story_reply: 30, dm: 40,
+        };
+        const leadScore = scoreMap[interaction_type] || 5;
+
+        // Save to DB
+        await supabase.from("social_interactions").insert({
+          platform: platform || "instagram",
+          interaction_type,
+          post_id: post_id || null,
+          post_url: post_url || null,
+          post_caption: post_caption || null,
+          subscriber_id: subscriberId,
+          subscriber_name: subscriberName,
+          subscriber_phone: subscriberPhone?.replace(/\D/g, "") || null,
+          subscriber_username: subscriberUsername,
+          message_content: message_content || null,
+          keyword_matched: keyword_matched || null,
+          lead_score: leadScore,
+          tags: [interaction_type, platform || "instagram", campaign_source].filter(Boolean),
+          engagement_data: engagement_data || {},
+          funnel_stage: funnel,
+          campaign_source: campaign_source || "organic",
+          ad_id: ad_id || null,
+          responded_at: subscriberId ? new Date().toISOString() : null,
+        });
+
+        console.log(`📱 Social: ${interaction_type} on ${platform || "IG"} by @${subscriberUsername || "anon"} [score:${leadScore}]`);
+        return jsonResponse({ success: true, interaction_type, lead_score: leadScore, funnel_stage: funnel, manychat_synced: !!subscriberId });
+      }
+
+      case "comment_capture": {
+        const { platform, post_id, post_url, comments } = payload;
+        if (!comments?.length) return jsonResponse({ error: "comments array obrigatório" }, 400);
+
+        let processed = 0;
+        for (const c of comments.slice(0, 100)) {
+          const username = c.username || "";
+          const text = c.text || "";
+          const phone = c.phone || "";
+
+          let subId: string | null = null;
+          if (phone) {
+            const result = await findOrCreateSubscriber(phone.replace(/\D/g, ""), c.name || username || "Lead");
+            subId = result.subscriberId;
+
+            if (subId) {
+              await Promise.all([
+                tagSubscriber(subId, `comentou_post`),
+                tagSubscriber(subId, `social_${platform || "instagram"}`),
+                setCustomField(subId, "social_username", username),
+                setCustomField(subId, "ultimo_comentario", text.slice(0, 200)),
+              ]);
+            }
+          }
+
+          // Detect keywords for auto-response
+          const lower = text.toLowerCase();
+          let keywordDetected: string | null = null;
+          let flowToTrigger: string | null = null;
+
+          if (lower.includes("protocolo") || lower.includes("anvisa")) {
+            keywordDetected = "PROTOCOLO";
+            flowToTrigger = "content20250413_ig_protocolo_anvisa";
+          } else if (lower.includes("quero saber mais") || lower.includes("como funciona")) {
+            keywordDetected = "QUERO_SABER_MAIS";
+            flowToTrigger = "content20250413_ig_dm_onboarding";
+          } else if (lower.includes("preço") || lower.includes("valor") || lower.includes("quanto custa")) {
+            keywordDetected = "PRECO";
+          } else if (lower.includes("médico") || lower.includes("consulta") || lower.includes("agendar")) {
+            keywordDetected = "AGENDAMENTO";
+          }
+
+          if (subId && flowToTrigger) {
+            await sendFlow(subId, flowToTrigger);
+          }
+
+          await supabase.from("social_interactions").insert({
+            platform: platform || "instagram",
+            interaction_type: "comment",
+            post_id: post_id || null,
+            post_url: post_url || null,
+            subscriber_id: subId,
+            subscriber_name: c.name || "",
+            subscriber_phone: phone?.replace(/\D/g, "") || null,
+            subscriber_username: username,
+            message_content: text,
+            keyword_matched: keywordDetected,
+            lead_score: keywordDetected ? 30 : 20,
+            funnel_stage: keywordDetected ? "intent" : "interest",
+            campaign_source: "organic",
+            flow_triggered: flowToTrigger,
+          });
+
+          processed++;
+        }
+
+        console.log(`💬 Captured ${processed} comments from ${platform || "IG"} post ${post_id}`);
+        return jsonResponse({ success: true, comments_processed: processed });
+      }
+
+      case "story_reply": {
+        const { platform, subscriber: sub, message_content, story_id } = payload;
+        if (!sub?.phone && !sub?.username) return jsonResponse({ error: "subscriber info obrigatório" }, 400);
+
+        let subId: string | null = null;
+        if (sub.phone) {
+          const result = await findOrCreateSubscriber(sub.phone.replace(/\D/g, ""), sub.name || sub.username || "Lead Story");
+          subId = result.subscriberId;
+
+          if (subId) {
+            await Promise.all([
+              tagSubscriber(subId, "story_engaged"),
+              tagSubscriber(subId, `social_${platform || "instagram"}`),
+              setCustomField(subId, "social_username", sub.username || ""),
+              setCustomField(subId, "story_reply_count", "1"),
+            ]);
+
+            // Auto-trigger story reply hook flow
+            await sendFlow(subId, "content20250413_ig_story_reply_hook");
+          }
+        }
+
+        await supabase.from("social_interactions").insert({
+          platform: platform || "instagram",
+          interaction_type: "story_reply",
+          post_id: story_id || null,
+          subscriber_id: subId,
+          subscriber_name: sub.name || "",
+          subscriber_phone: sub.phone?.replace(/\D/g, "") || null,
+          subscriber_username: sub.username || "",
+          message_content: message_content || "",
+          lead_score: 35,
+          funnel_stage: "interest",
+          flow_triggered: "content20250413_ig_story_reply_hook",
+        });
+
+        return jsonResponse({ success: true, story_reply_tracked: true, manychat_synced: !!subId });
+      }
+
+      case "post_engagement_sync": {
+        const { posts } = payload;
+        if (!posts?.length) return jsonResponse({ error: "posts array obrigatório" }, 400);
+
+        let synced = 0;
+        for (const p of posts.slice(0, 50)) {
+          await supabase.from("social_interactions").insert({
+            platform: p.platform || "instagram",
+            interaction_type: "engagement_snapshot",
+            post_id: p.post_id,
+            post_url: p.post_url || null,
+            post_caption: p.caption || null,
+            engagement_data: {
+              likes: p.likes || 0,
+              comments: p.comments || 0,
+              shares: p.shares || 0,
+              saves: p.saves || 0,
+              reach: p.reach || 0,
+              impressions: p.impressions || 0,
+              engagement_rate: p.engagement_rate || 0,
+            },
+            campaign_source: p.campaign_source || "organic",
+            ad_id: p.ad_id || null,
+            funnel_stage: "awareness",
+          });
+          synced++;
+        }
+
+        console.log(`📊 Synced engagement for ${synced} posts`);
+        return jsonResponse({ success: true, posts_synced: synced });
+      }
+
+      case "social_analytics": {
+        const { period, platform: plat } = payload;
+        const since = new Date();
+        if (period === "week") since.setDate(since.getDate() - 7);
+        else if (period === "month") since.setMonth(since.getMonth() - 1);
+        else since.setDate(since.getDate() - 1); // default: last 24h
+
+        let query = supabase
+          .from("social_interactions")
+          .select("*")
+          .gte("created_at", since.toISOString())
+          .order("created_at", { ascending: false })
+          .limit(500);
+
+        if (plat) query = query.eq("platform", plat);
+
+        const { data: interactions, error: qErr } = await query;
+        if (qErr) return jsonResponse({ error: "Erro ao buscar analytics" }, 500);
+
+        const items = interactions || [];
+        const totalInteractions = items.length;
+        const uniqueUsers = new Set(items.map((i: any) => i.subscriber_id).filter(Boolean)).size;
+        const totalScore = items.reduce((sum: number, i: any) => sum + (i.lead_score || 0), 0);
+        const conversions = items.filter((i: any) => i.converted_at).length;
+
+        const byType: Record<string, number> = {};
+        const byPlatform: Record<string, number> = {};
+        const byFunnel: Record<string, number> = {};
+
+        for (const i of items) {
+          const t = (i as any).interaction_type || "unknown";
+          const p = (i as any).platform || "unknown";
+          const f = (i as any).funnel_stage || "unknown";
+          byType[t] = (byType[t] || 0) + 1;
+          byPlatform[p] = (byPlatform[p] || 0) + 1;
+          byFunnel[f] = (byFunnel[f] || 0) + 1;
+        }
+
+        return jsonResponse({
+          success: true,
+          period: period || "24h",
+          summary: {
+            total_interactions: totalInteractions,
+            unique_users: uniqueUsers,
+            total_lead_score: totalScore,
+            conversions,
+            avg_score: totalInteractions ? Math.round(totalScore / totalInteractions) : 0,
+          },
+          breakdown: { by_type: byType, by_platform: byPlatform, by_funnel: byFunnel },
+        });
+      }
+
+      // ═══════════════════════════════════════════
       // STATUS — Health check
       // ═══════════════════════════════════════════
 
@@ -787,7 +1068,8 @@ Deno.serve(async (req) => {
             financeiro: 10,
             suporte: 7,
             rh_medicos: 8,
-            total: 60,
+            social_tracking: 5,
+            total: 65,
           },
           timestamp: new Date().toISOString(),
         });

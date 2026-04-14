@@ -250,6 +250,60 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_flows: {
+        Row: {
+          category: string
+          clicks: number | null
+          conversions: number | null
+          created_at: string
+          ctr: number | null
+          description: string | null
+          error_log: string | null
+          id: string
+          impressions: number | null
+          last_triggered_at: string | null
+          metadata: Json | null
+          name: string
+          platform: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          clicks?: number | null
+          conversions?: number | null
+          created_at?: string
+          ctr?: number | null
+          description?: string | null
+          error_log?: string | null
+          id?: string
+          impressions?: number | null
+          last_triggered_at?: string | null
+          metadata?: Json | null
+          name: string
+          platform?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          clicks?: number | null
+          conversions?: number | null
+          created_at?: string
+          ctr?: number | null
+          description?: string | null
+          error_log?: string | null
+          id?: string
+          impressions?: number | null
+          last_triggered_at?: string | null
+          metadata?: Json | null
+          name?: string
+          platform?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       brisa_triages: {
         Row: {
           category: string | null

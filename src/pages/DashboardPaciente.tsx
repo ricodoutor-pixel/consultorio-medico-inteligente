@@ -113,12 +113,8 @@ const DashboardPaciente = () => {
   const upcomingAppts = appointments.filter(a => a.status === "scheduled" || a.status === "confirmed");
   const totalSpent = appointments.reduce((sum, a) => sum + Number(a.amount || 0), 0);
 
-  const wellnessData = [
-    { dia: "Sem 1", score: 60 + completedAppts.length * 5 },
-    { dia: "Sem 2", score: 65 + completedAppts.length * 5 },
-    { dia: "Sem 3", score: 70 + completedAppts.length * 3 },
-    { dia: "Atual", score: 75 + completedAppts.length * 3 },
-  ];
+
+
 
   if (loading) {
     return (

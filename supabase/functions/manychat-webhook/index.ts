@@ -38,12 +38,56 @@ async function manychatGet(endpoint: string) {
   return res.json();
 }
 
+function formatPhone(phone: string): string {
+  return phone.startsWith("55") ? `+${phone}` : `+55${phone}`;
+}
+
 async function findSubscriber(phone: string) {
-  const formatted = phone.startsWith("55") ? `+${phone}` : `+55${phone}`;
   return manychatRequest("/subscriber/findBySystemField", {
     field_name: "phone",
-    field_value: formatted,
+    field_value: formatPhone(phone),
   });
+}
+
+/**
+ * Create a new subscriber in ManyChat via WhatsApp phone number.
+ * Requires "Importing subscribers via phone/WhatsApp" permission enabled in ManyChat.
+ */
+async function createSubscriber(phone: string, firstName: string, lastName = "") {
+  const formatted = formatPhone(phone);
+  const result = await manychatRequest("/subscriber/createSubscriber", {
+    phone: formatted,
+    whatsapp_phone: formatted,
+    first_name: firstName,
+    last_name: lastName,
+    has_opt_in_sms: true,
+    has_opt_in_email: false,
+    consent_phrase: "Lead capturado via Planta y Raiz",
+  });
+  return result;
+}
+
+/**
+ * Find or create a ManyChat subscriber — ensures every lead becomes a contact.
+ */
+async function findOrCreateSubscriber(phone: string, name: string) {
+  const mc = await findSubscriber(phone);
+  if (mc.status === "success" && mc.data?.id) {
+    return { subscriberId: mc.data.id, created: false };
+  }
+
+  // Split name into first/last
+  const parts = name.trim().split(/\s+/);
+  const firstName = parts[0] || "Lead";
+  const lastName = parts.slice(1).join(" ");
+
+  const created = await createSubscriber(phone, firstName, lastName);
+  if (created.status === "success" && created.data?.id) {
+    return { subscriberId: created.data.id, created: true };
+  }
+
+  console.warn(`[ManyChat] Could not create subscriber for ${phone}:`, created);
+  return { subscriberId: null, created: false };
 }
 
 async function tagSubscriber(subscriberId: string, tagName: string) {

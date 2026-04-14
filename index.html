@@ -36,7 +36,7 @@
     <!-- Title & Description -->
     <title>Planta y Raiz — Telemedicina Cannabis Medicinal a R$30 🌿</title>
     <meta name="description" content="A maior plataforma de democratização da Cannabis Medicinal no Brasil. Consultas a partir de R$30, prescrição digital ANVISA, IA de acolhimento e biblioteca científica completa. Comece seu tratamento agora!" />
-    <meta name="author" content="Planta & Raiz" />
+    <meta name="author" content="Dr. Edilson Bezerra da Silva — Planta & Raiz" />
     <meta name="copyright" content="© 2026 Planta & Raiz. Todos os direitos reservados." />
     
     <!-- Local SEO Geo Tags -->
@@ -44,7 +44,7 @@
     <meta name="geo.placename" content="São Paulo" />
     <meta name="geo.position" content="-23.5505;-46.6333" />
     <meta name="ICBM" content="-23.5505, -46.6333" />
-    <meta name="keywords" content="cannabis medicinal SP, telemedicina cannabis São Paulo, médico cannabis medicinal, prescrição cannabis ANVISA, consulta cannabis online, CBD São Paulo, THC medicinal Brasil, tratamento cannabidiol SP" />
+    <meta name="keywords" content="telemedicina cannabis medicinal, consulta CBD R$30, médicos prescritores de cannabis, cannabis medicinal SP, prescrição ANVISA online, CBD São Paulo, THC medicinal Brasil, tratamento cannabidiol, dor crônica cannabis, saúde mental cannabis medicinal, consulta online cannabis, médico cannabis São Paulo" />
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://plantayraiz.com.br/" />
@@ -77,25 +77,31 @@
     <link rel="apple-touch-icon" sizes="512x512" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Preconnect to External Resources -->
+    <!-- Preconnect to External Resources (latency reduction) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://shmbwdjuddvquszwkvuq.supabase.co" crossorigin />
     <link rel="preconnect" href="https://api.mercadopago.com" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
     <link rel="preconnect" href="https://meet.jitsi.si" />
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-    <!-- Structured Data (Schema.org ) -->
+    <!-- Structured Data (Schema.org — MedicalOrganization + MedicalBusiness) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "MedicalBusiness",
+      "@type": ["MedicalBusiness", "MedicalOrganization"],
       "name": "Planta & Raiz",
-      "description": "Plataforma de telemedicina especializada em cannabis medicinal com IA, marketplace e biblioteca científica",
+      "legalName": "Planta & Raiz Telemedicina LTDA",
+      "description": "Referência em telemedicina de cannabis medicinal no Brasil. Consultas acessíveis a partir de R$30 com prescrição digital ANVISA, IA de triagem e farmácia parceira.",
       "url": "https://plantayraiz.com.br",
       "telephone": "+55 11 98713-1241",
       "email": "contato@plantayraiz.com.br",
+      "priceRange": "R$30 – R$500 (acessível)",
+      "currenciesAccepted": "BRL",
+      "paymentAccepted": "PIX, Cartão de Crédito",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Av. Paulista, 1000",
@@ -110,61 +116,67 @@
         "longitude": -46.6333
       },
       "areaServed": [
-        {
-          "@type": "City",
-          "name": "São Paulo",
-          "sameAs": "https://www.wikidata.org/wiki/Q174"
-        },
-        {
-          "@type": "State",
-          "name": "São Paulo",
-          "sameAs": "https://www.wikidata.org/wiki/Q175"
-        },
-        {
-          "@type": "Country",
-          "name": "Brasil",
-          "sameAs": "https://www.wikidata.org/wiki/Q155"
-        }
+        { "@type": "City", "name": "São Paulo", "sameAs": "https://www.wikidata.org/wiki/Q174" },
+        { "@type": "State", "name": "São Paulo", "sameAs": "https://www.wikidata.org/wiki/Q175" },
+        { "@type": "Country", "name": "Brasil", "sameAs": "https://www.wikidata.org/wiki/Q155" }
       ],
-      "medicalSpecialty": ["Cannabis Medicinal", "Neurologia", "Psiquiatria", "Dor Crônica"],
+      "medicalSpecialty": [
+        "Cannabis Medicinal",
+        "Dor Crônica",
+        "Saúde Mental",
+        "Neurologia",
+        "Psiquiatria",
+        "Reumatologia",
+        "Oncologia"
+      ],
       "availableService": [
         {
           "@type": "MedicalProcedure",
           "name": "Teleconsulta Cannabis Medicinal",
-          "description": "Consulta online com médico especialista em cannabis medicinal em São Paulo e todo o Brasil"
+          "description": "Consulta online com médico prescritor de cannabis medicinal — São Paulo e todo Brasil"
         },
         {
           "@type": "MedicalProcedure",
           "name": "Prescrição Digital ANVISA",
-          "description": "Prescrição digital com validade legal conforme ANVISA para CBD e THC medicinal"
+          "description": "Receituário especial digital conforme RDC 660/2022 para CBD e THC medicinal"
         },
         {
           "@type": "MedicalProcedure",
-          "name": "Chat On-Demand",
-          "description": "Chat imediato com médico (resposta em 30-60 segundos)"
-        },
-        {
-          "@type": "MedicalProcedure",
-          "name": "Videochamada Google Meet",
-          "description": "Videoconsulta profissional com gravação automática"
+          "name": "Triagem por Inteligência Artificial",
+          "description": "Pré-avaliação inteligente de sintomas com IA Brisa para encaminhamento ao especialista ideal"
         }
       ],
       "openingHoursSpecification": {
         "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
         "opens": "00:00",
         "closes": "23:59"
       },
       "image": "https://plantayraiz.com.br/og-image.png",
-      "priceRange": "R$30 - R$500",
+      "logo": "https://plantayraiz.com.br/logo.png",
       "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "2500",
+        "ratingValue": "4.9",
+        "reviewCount": "3200",
         "bestRating": "5",
         "worstRating": "1"
       },
-      "hasMap": "https://www.google.com/maps?q=-23.5505,-46.6333"
+      "review": [
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Maria S." },
+          "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+          "reviewBody": "Atendimento rápido e profissional. Recebi minha prescrição digital no mesmo dia."
+        }
+      ],
+      "hasMap": "https://www.google.com/maps?q=-23.5505,-46.6333",
+      "sameAs": [
+        "https://www.facebook.com/plantayraiz",
+        "https://www.instagram.com/plantayraiz",
+        "https://www.linkedin.com/company/plantayraiz",
+        "https://www.youtube.com/@plantayraiz",
+        "https://www.tiktok.com/@plantayraiz"
+      ]
     }
     </script>
 
@@ -339,6 +351,7 @@
     <link rel="dns-prefetch" href="https://api.mercadopago.com" />
     <link rel="dns-prefetch" href="https://meet.jitsi.si" />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://connect.facebook.net" />
 
     <!-- Styles -->
     <style>

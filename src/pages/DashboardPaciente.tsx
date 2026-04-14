@@ -36,6 +36,10 @@ const DashboardPaciente = () => {
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
   const [triages, setTriages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [renewModalOpen, setRenewModalOpen] = useState(false);
+  const [renewTarget, setRenewTarget] = useState<any>(null);
+  const [renewLoading, setRenewLoading] = useState(false);
+  const [whatsappPreview, setWhatsappPreview] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   const recommendedPros = professionals.filter(p => p.category === "Médicos Prescritores").slice(0, 3);

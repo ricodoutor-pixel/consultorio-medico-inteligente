@@ -268,6 +268,30 @@ export function AffiliateWalletCard() {
         </CardContent>
       </Card>
 
+      {/* Daily Limit Info */}
+      <Card className="border-amber-500/20 bg-amber-500/5">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <Shield className="h-5 w-5 text-amber-400 mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <h4 className="font-bold text-sm text-foreground mb-1">Limite diário de saque: R$ {DAILY_LIMIT},00</h4>
+              <p className="text-xs text-muted-foreground">
+                Por medidas de segurança, o valor máximo de saque por dia é de R$ {DAILY_LIMIT},00.
+              </p>
+              <div className="mt-2 flex items-center gap-4 text-xs">
+                <span className="text-muted-foreground">Sacado hoje: <span className="font-bold text-foreground">R$ {dailyUsed.toFixed(2)}</span></span>
+                <span className="text-muted-foreground">Restante: <span className={`font-bold ${isDailyLimitReached ? "text-destructive" : "text-emerald-400"}`}>R$ {dailyRemaining.toFixed(2)}</span></span>
+              </div>
+              {isDailyLimitReached && (
+                <p className="text-xs text-destructive mt-2 flex items-center gap-1 font-bold">
+                  <AlertTriangle className="h-3 w-3" /> Limite diário atingido. Tente novamente amanhã.
+                </p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Withdrawal Form */}
       <Card className="border-border/50">
         <CardHeader className="pb-3">
@@ -285,13 +309,20 @@ export function AffiliateWalletCard() {
                 placeholder={`Mínimo R$ ${MIN_WITHDRAWAL},00`}
                 type="number"
                 min={MIN_WITHDRAWAL}
+                max={dailyRemaining}
                 step="0.01"
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
+                disabled={isDailyLimitReached}
               />
               {withdrawAmount && parseFloat(withdrawAmount) > 0 && parseFloat(withdrawAmount) < MIN_WITHDRAWAL && (
                 <p className="text-xs text-destructive flex items-center gap-1">
                   <AlertTriangle className="h-3 w-3" /> Valor mínimo: R$ {MIN_WITHDRAWAL},00
+                </p>
+              )}
+              {withdrawAmount && parseFloat(withdrawAmount) > dailyRemaining && (
+                <p className="text-xs text-destructive flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" /> Excede o limite diário restante de R$ {dailyRemaining.toFixed(2)}
                 </p>
               )}
             </div>
@@ -302,6 +333,7 @@ export function AffiliateWalletCard() {
                 placeholder="CPF, e-mail, celular ou chave aleatória"
                 value={pixKey}
                 onChange={(e) => handlePixKeyChange(e.target.value)}
+                disabled={isDailyLimitReached}
               />
               {pixValidation && (
                 <p className={`text-xs flex items-center gap-1 ${pixValidation.valid ? "text-emerald-400" : "text-destructive"}`}>
@@ -317,13 +349,17 @@ export function AffiliateWalletCard() {
 
           <Button
             onClick={() => requestWithdrawal.mutate()}
-            disabled={requestWithdrawal.isPending || available < MIN_WITHDRAWAL || !pixValidation?.valid}
+            disabled={requestWithdrawal.isPending || available < MIN_WITHDRAWAL || !pixValidation?.valid || isDailyLimitReached || (parseFloat(withdrawAmount) || 0) > dailyRemaining}
             className="w-full font-bold"
           >
-            {requestWithdrawal.isPending ? "Processando..." : `Solicitar Saque — R$ ${withdrawAmount || "0,00"}`}
+            {isDailyLimitReached
+              ? "Limite diário atingido. Tente novamente amanhã"
+              : requestWithdrawal.isPending
+              ? "Processando..."
+              : `Solicitar Saque — R$ ${withdrawAmount || "0,00"}`}
           </Button>
 
-          {available < MIN_WITHDRAWAL && (
+          {available < MIN_WITHDRAWAL && !isDailyLimitReached && (
             <div className="flex items-center gap-2 justify-center text-xs text-muted-foreground">
               <Info className="h-3 w-3" />
               <span>Saldo mínimo de R$ {MIN_WITHDRAWAL},00 necessário para saque</span>

@@ -74,7 +74,8 @@ const Agendamento = () => {
     const [h, m] = selectedTime.split(":").map(Number);
     scheduledAt.setHours(h, m, 0, 0);
 
-    const { error } = await supabase.from("appointments").insert({
+    // 1. Create appointment with pending payment
+    const { data: newAppt, error } = await supabase.from("appointments").insert({
       patient_id: userId,
       doctor_id: selectedDoctor.id,
       scheduled_at: scheduledAt.toISOString(),
@@ -83,15 +84,42 @@ const Agendamento = () => {
       amount: selectedDoctor.consultation_price,
       status: "scheduled",
       payment_status: "pending",
-    });
+    }).select("id").single();
 
-    setLoading(false);
-    if (error) {
-      toast({ title: "Erro ao agendar", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "✅ Consulta Agendada!", description: `${format(scheduledAt, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}` });
+    if (error || !newAppt) {
+      setLoading(false);
+      toast({ title: "Erro ao agendar", description: error?.message || "Tente novamente.", variant: "destructive" });
+      return;
+    }
+
+    // 2. Generate Mercado Pago checkout
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const { data: paymentData, error: paymentError } = await supabase.functions.invoke("create-payment", {
+        body: {
+          appointmentId: newAppt.id,
+          doctorName: `CRM ${selectedDoctor.crm}/${selectedDoctor.crm_state}`,
+          patientEmail: session?.session?.user?.email || "",
+          description: `Consulta ${consultTypes.find(c => c.id === consultType)?.label} — Planta y Raiz`,
+        },
+      });
+
+      if (paymentError || !paymentData?.init_point) {
+        toast({ title: "Consulta agendada", description: "Pagamento pendente — conclua pelo Dashboard.", variant: "default" });
+        setStep(5);
+        setLoading(false);
+        return;
+      }
+
+      // Redirect to Mercado Pago checkout
+      toast({ title: "Redirecionando para pagamento...", description: "Você será levado ao Mercado Pago." });
+      window.location.href = paymentData.init_point;
+    } catch (err) {
+      console.error("Payment error:", err);
+      toast({ title: "Consulta agendada", description: "Pagamento pendente — conclua pelo Dashboard." });
       setStep(5);
     }
+    setLoading(false);
   };
 
   return (

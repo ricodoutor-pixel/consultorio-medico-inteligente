@@ -38,6 +38,12 @@ export const FLOWS = {
   MEDICAL_EBOOK_DELIVERY: 'content20250413_medical_ebook_delivery',
   MEDICAL_ONBOARDING: 'content20250413_medical_onboarding',
   MEDICAL_EARNINGS_SIM: 'content20250413_medical_earnings_sim',
+  // Social Media Tracking (IG + FB)
+  SOCIAL_POST_COMMENT_AUTO: 'content20250414_social_comment_auto',
+  SOCIAL_DM_WELCOME: 'content20250414_social_dm_welcome',
+  SOCIAL_STORY_REPLY_HOOK: 'content20250414_social_story_hook',
+  SOCIAL_AD_LEAD_NURTURE: 'content20250414_social_ad_nurture',
+  SOCIAL_ENGAGEMENT_REWARD: 'content20250414_social_engagement_reward',
 } as const;
 
 // Custom field IDs
@@ -48,6 +54,13 @@ export const CUSTOM_FIELDS = {
   CBD_EXPERIENCE: 2004,
   WEEKLY_HOURS: 2005,
   RECRUITMENT_SOURCE: 2006,
+  SOCIAL_USERNAME: 2007,
+  SOCIAL_PLATFORM: 2008,
+  LAST_INTERACTION: 2009,
+  AD_ID: 2010,
+  CAMPAIGN_SOURCE: 2011,
+  STORY_REPLY_COUNT: 2012,
+  LAST_COMMENT: 2013,
 } as const;
 
 // Platform constants

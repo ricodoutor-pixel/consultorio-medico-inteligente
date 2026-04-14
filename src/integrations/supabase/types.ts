@@ -1859,6 +1859,102 @@ export type Database = {
         }
         Relationships: []
       }
+      social_interactions: {
+        Row: {
+          ad_id: string | null
+          campaign_source: string | null
+          conversion_event: string | null
+          converted_at: string | null
+          created_at: string
+          custom_fields: Json | null
+          device_type: string | null
+          engagement_data: Json | null
+          flow_triggered: string | null
+          funnel_stage: string | null
+          geo_location: string | null
+          id: string
+          interaction_type: string
+          keyword_matched: string | null
+          lead_score: number | null
+          message_content: string | null
+          platform: string
+          post_caption: string | null
+          post_id: string | null
+          post_url: string | null
+          responded_at: string | null
+          sentiment: string | null
+          subscriber_id: string | null
+          subscriber_name: string | null
+          subscriber_phone: string | null
+          subscriber_profile_url: string | null
+          subscriber_username: string | null
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          ad_id?: string | null
+          campaign_source?: string | null
+          conversion_event?: string | null
+          converted_at?: string | null
+          created_at?: string
+          custom_fields?: Json | null
+          device_type?: string | null
+          engagement_data?: Json | null
+          flow_triggered?: string | null
+          funnel_stage?: string | null
+          geo_location?: string | null
+          id?: string
+          interaction_type?: string
+          keyword_matched?: string | null
+          lead_score?: number | null
+          message_content?: string | null
+          platform?: string
+          post_caption?: string | null
+          post_id?: string | null
+          post_url?: string | null
+          responded_at?: string | null
+          sentiment?: string | null
+          subscriber_id?: string | null
+          subscriber_name?: string | null
+          subscriber_phone?: string | null
+          subscriber_profile_url?: string | null
+          subscriber_username?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          ad_id?: string | null
+          campaign_source?: string | null
+          conversion_event?: string | null
+          converted_at?: string | null
+          created_at?: string
+          custom_fields?: Json | null
+          device_type?: string | null
+          engagement_data?: Json | null
+          flow_triggered?: string | null
+          funnel_stage?: string | null
+          geo_location?: string | null
+          id?: string
+          interaction_type?: string
+          keyword_matched?: string | null
+          lead_score?: number | null
+          message_content?: string | null
+          platform?: string
+          post_caption?: string | null
+          post_id?: string | null
+          post_url?: string | null
+          responded_at?: string | null
+          sentiment?: string | null
+          subscriber_id?: string | null
+          subscriber_name?: string | null
+          subscriber_phone?: string | null
+          subscriber_profile_url?: string | null
+          subscriber_username?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       strain_images: {
         Row: {
           created_at: string

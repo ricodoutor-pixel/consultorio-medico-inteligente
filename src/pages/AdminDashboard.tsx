@@ -7,6 +7,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Users, DollarSign, Activity, Stethoscope, TrendingUp, AlertCircle, RefreshCw, ShoppingBag, Brain, Shield, Zap } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { LTVMetricsPanel } from "@/components/admin/LTVMetricsPanel";
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -285,6 +286,9 @@ const AdminDashboard = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* LTV & MRR Metrics */}
+          <LTVMetricsPanel />
 
           {/* System Alerts */}
           <div className="grid md:grid-cols-2 gap-4">

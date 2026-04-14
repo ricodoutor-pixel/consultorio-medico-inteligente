@@ -54,14 +54,14 @@ async function bridgeToSupabase(
       lead_score: (properties?.lead_score as number) ?? 0,
       funnel_stage: (properties?.funnel_stage as string) ?? "awareness",
       campaign_source: "meta_pixel",
-      engagement_data: {
+      engagement_data: JSON.parse(JSON.stringify({
         pixel_id: PIXEL_ID,
         event_properties: properties,
         page_url: window.location.href,
         referrer: document.referrer,
         user_agent: navigator.userAgent,
         timestamp: Date.now(),
-      },
+      })),
       tags: ["meta_pixel", eventName.toLowerCase()],
     }]);
   } catch (err) {

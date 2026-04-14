@@ -562,6 +562,12 @@ const DashboardPaciente = () => {
               ))}
             </div>
           )}
+
+          {activeTab === "upgrade" && (
+            <div className="max-w-3xl mx-auto">
+              <PlanUpgradeCard currentPlan="essencial" />
+            </div>
+          )}
         </div>
       </section>
 

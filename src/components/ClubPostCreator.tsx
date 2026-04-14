@@ -267,7 +267,7 @@ export default function ClubPostCreator({
                 className="flex-1 px-4 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                {isSubmitting ? "Enviando..." : "Publicar"}
+                {isSubmitting ? "Publicando..." : "Publicar no Club + Instagram 📸"}
               </button>
             </div>
           </div>

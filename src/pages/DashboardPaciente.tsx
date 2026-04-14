@@ -79,6 +79,33 @@ const DashboardPaciente = () => {
     navigate("/");
   };
 
+  const handleRenewalRequest = async () => {
+    if (!renewTarget || !profile) return;
+    setRenewLoading(true);
+    const { error } = await supabase.from("prescription_requests" as any).insert({
+      patient_id: profile.id,
+      prescription_id: renewTarget.id,
+      doctor_id: renewTarget.doctor_id,
+      status: "pending",
+      notes: "Solicitação de renovação via Dashboard",
+    });
+    setRenewLoading(false);
+    if (error) {
+      toast({ title: "Erro ao solicitar renovação", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Renovação solicitada ✅", description: "Seu médico será notificado para avaliar a renovação." });
+      setWhatsappPreview(`Olá ${profile.full_name?.split(" ")[0] || "Paciente"}, sua solicitação de renovação de receita foi registrada na Planta y Raiz. Acompanhe pelo seu dashboard: https://plantayraiz.com.br/dashboard/paciente`);
+    }
+    setRenewModalOpen(false);
+    setRenewTarget(null);
+  };
+
+  const isNearExpiry = (validUntil: string | null) => {
+    if (!validUntil) return true;
+    const diff = new Date(validUntil).getTime() - Date.now();
+    return diff < 15 * 24 * 60 * 60 * 1000; // 15 days
+  };
+
   const completedAppts = appointments.filter(a => a.status === "completed");
   const upcomingAppts = appointments.filter(a => a.status === "scheduled" || a.status === "confirmed");
   const totalSpent = appointments.reduce((sum, a) => sum + Number(a.amount || 0), 0);

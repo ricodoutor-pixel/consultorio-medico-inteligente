@@ -56,3 +56,12 @@ verify_jwt = false
 
 [functions.retention-webhook]
 verify_jwt = false
+
+[functions.publish-to-facebook]
+verify_jwt = false
+
+[functions.social-analytics]
+verify_jwt = false
+
+[functions.visitor-tracking]
+verify_jwt = false

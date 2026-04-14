@@ -8,6 +8,7 @@ import { Mail, MapPin, Phone, Clock, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -19,6 +20,11 @@ const Contato = () => {
     e.preventDefault();
     const message = `Olá! Meu nome é ${formData.name}.%0A%0AEmail: ${formData.email}%0ATelefone: ${formData.phone}%0A%0AMensagem: ${formData.message}`;
     window.open(`https://wa.me/5511991363154?text=${message}`, "_blank");
+    trackPixelEvent("Lead", { content_name: "contact_form", content_category: "contato" }, {
+      leadScore: 30,
+      funnelStage: "intent",
+      category: "conversion",
+    });
     toast({ title: "Redirecionando para WhatsApp", description: "Você será direcionado para conversar conosco!" });
   };
 

@@ -13,6 +13,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WellnessSubscriptionCards } from "@/components/WellnessSubscriptionCards";
+import { PatientCheckinCard } from "@/components/PatientCheckinCard";
+import { EvolutionChart } from "@/components/EvolutionChart";
 import { professionals } from "@/data/professionals";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
@@ -40,6 +42,7 @@ const DashboardPaciente = () => {
   const [renewTarget, setRenewTarget] = useState<any>(null);
   const [renewLoading, setRenewLoading] = useState(false);
   const [whatsappPreview, setWhatsappPreview] = useState<string | null>(null);
+  const [checkinRefresh, setCheckinRefresh] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
   const recommendedPros = professionals.filter(p => p.category === "Médicos Prescritores").slice(0, 3);
@@ -110,12 +113,8 @@ const DashboardPaciente = () => {
   const upcomingAppts = appointments.filter(a => a.status === "scheduled" || a.status === "confirmed");
   const totalSpent = appointments.reduce((sum, a) => sum + Number(a.amount || 0), 0);
 
-  const wellnessData = [
-    { dia: "Sem 1", score: 60 + completedAppts.length * 5 },
-    { dia: "Sem 2", score: 65 + completedAppts.length * 5 },
-    { dia: "Sem 3", score: 70 + completedAppts.length * 3 },
-    { dia: "Atual", score: 75 + completedAppts.length * 3 },
-  ];
+
+
 
   if (loading) {
     return (
@@ -214,22 +213,11 @@ const DashboardPaciente = () => {
           {activeTab === "overview" && (
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
-                <Card className="border-border">
-                  <CardContent className="p-6">
-                    <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                      <Heart size={16} className="text-primary" /> Índice de Bem-estar
-                    </h3>
-                    <ResponsiveContainer width="100%" height={200}>
-                      <LineChart data={wellnessData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 10% 16%)" />
-                        <XAxis dataKey="dia" stroke="hsl(240 10% 68%)" fontSize={11} />
-                        <YAxis stroke="hsl(240 10% 68%)" fontSize={11} domain={[50, 100]} />
-                        <Tooltip contentStyle={tooltipStyle} />
-                        <Line type="monotone" dataKey="score" stroke="hsl(152 80% 45%)" strokeWidth={2} dot={{ fill: "hsl(152 80% 45%)", r: 4 }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
+                {/* Check-in Card */}
+                <PatientCheckinCard userId={profile?.id || ""} onCheckinComplete={() => setCheckinRefresh(p => p + 1)} />
+
+                {/* Evolution Chart */}
+                {profile?.id && <EvolutionChart userId={profile.id} refreshKey={checkinRefresh} />}
 
                 {upcomingAppts.length > 0 && (
                   <Card className="border-green/20 bg-gradient-green">

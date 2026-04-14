@@ -364,6 +364,33 @@ export type Database = {
         }
         Relationships: []
       }
+      clinical_outcomes: {
+        Row: {
+          created_at: string
+          id: string
+          mood: string
+          notes: string | null
+          symptom_level: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mood?: string
+          notes?: string | null
+          symptom_level?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mood?: string
+          notes?: string | null
+          symptom_level?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       club_comment_likes: {
         Row: {
           comment_id: string

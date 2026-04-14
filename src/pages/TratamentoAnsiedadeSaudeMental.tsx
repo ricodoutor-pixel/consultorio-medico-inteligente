@@ -214,6 +214,13 @@ const TratamentoAnsiedadeSaudeMental = () => {
                 </a>
               </Button>
             </div>
+            <div className="mt-6">
+              <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-primary rounded-xl">
+                <Link to="/" className="flex items-center gap-2">
+                  <ArrowRight size={14} className="rotate-180" /> Ir para a Plataforma Planta y Raiz
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

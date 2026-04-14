@@ -36,7 +36,7 @@ export const organizationSchema: SchemaOrgConfig = {
     // Localização
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Plataforma Digital',
+      streetAddress: 'Av. Paulista, 1000 — Bela Vista',
       addressLocality: 'São Paulo',
       addressRegion: 'SP',
       postalCode: '01310-100',

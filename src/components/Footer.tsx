@@ -40,20 +40,23 @@ export const Footer = () => {
             </ul>
           </div>
 
-          <div>
+          <div itemScope itemType="https://schema.org/LocalBusiness">
             <h4 className="font-semibold text-foreground mb-4 text-sm">Contato</h4>
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Phone size={14} className="text-primary" />
-                <a href="https://wa.me/5511991363154" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">(11) 99136-3154</a>
+                <a href="tel:+5511987131241" className="hover:text-primary transition-colors" itemProp="telephone">(11) 98713-1241</a>
               </li>
               <li className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Mail size={14} className="text-primary" />
-                <a href="mailto:contato@plantayraiz.com.br" className="hover:text-primary transition-colors">contato@plantayraiz.com.br</a>
+                <a href="mailto:contato@plantayraiz.com.br" className="hover:text-primary transition-colors" itemProp="email">contato@plantayraiz.com.br</a>
               </li>
               <li className="flex items-start gap-2 text-muted-foreground text-sm">
                 <MapPin size={14} className="text-primary mt-0.5" />
-                <span>São Paulo, SP — Brasil</span>
+                <span itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+                  <span itemProp="streetAddress">Av. Paulista, 1000 — Bela Vista</span><br />
+                  <span itemProp="addressLocality">São Paulo</span>, <span itemProp="addressRegion">SP</span> — Brasil
+                </span>
               </li>
             </ul>
           </div>

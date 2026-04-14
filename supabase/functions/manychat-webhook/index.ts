@@ -330,6 +330,7 @@ Deno.serve(async (req) => {
           "48h": "🌟 Olá! Lembrando que temos médicos disponíveis agora para consulta online. Agendar é rápido e fácil!",
           "7d": "💚 Sentimos sua falta! Que tal aproveitar nosso desconto especial de 10% para sua primeira consulta? Use: PRIMEIRA10",
           "reativacao": "🔔 Faz tempo que não nos vemos! Temos novidades incríveis e médicos prontos para te atender. Volte quando quiser!",
+          "exit_intent": "👋 Ei, vimos que você estava navegando no site! Tem alguma dúvida? Posso ajudar com agendamento, preços ou informações sobre cannabis medicinal 🌿",
         };
 
         const msg = messages[followup_type || "24h"] || messages["24h"];

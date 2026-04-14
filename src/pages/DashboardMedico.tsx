@@ -80,6 +80,23 @@ const DashboardMedico = () => {
     }
   };
 
+  const fetchTriageForPatient = async (patientId: string) => {
+    const { data } = await supabase
+      .from("brisa_triages")
+      .select("*")
+      .eq("patient_id", patientId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return data;
+  };
+
+  const openPatientTriage = async (appointment: any) => {
+    const triage = await fetchTriageForPatient(appointment.patient_id);
+    setSelectedPatientTriage({ appointment, triage });
+    setDrawerOpen(true);
+  };
+
   const todayAppts = appointments.filter(a => {
     const d = new Date(a.scheduled_at);
     const today = new Date();

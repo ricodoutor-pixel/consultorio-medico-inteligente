@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
+import { AffiliateWalletCard } from "@/components/affiliates/AffiliateWalletCard";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -240,9 +241,12 @@ const Indicacoes = () => {
       <section className="py-4">
         <div className="container mx-auto px-4">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="w-full grid grid-cols-4 h-12 mb-6">
+            <TabsList className="w-full grid grid-cols-5 h-12 mb-6">
               <TabsTrigger value="painel" className="font-bold text-xs">
                 <BarChart3 size={14} className="mr-1" /> Painel
+              </TabsTrigger>
+              <TabsTrigger value="carteira" className="font-bold text-xs">
+                <Wallet size={14} className="mr-1" /> Carteira
               </TabsTrigger>
               <TabsTrigger value="rede" className="font-bold text-xs">
                 <Users size={14} className="mr-1" /> Minha Rede
@@ -254,6 +258,11 @@ const Indicacoes = () => {
                 <Medal size={14} className="mr-1" /> Ranking
               </TabsTrigger>
             </TabsList>
+
+            {/* CARTEIRA TAB */}
+            <TabsContent value="carteira">
+              <AffiliateWalletCard />
+            </TabsContent>
 
             {/* PAINEL TAB */}
             <TabsContent value="painel">

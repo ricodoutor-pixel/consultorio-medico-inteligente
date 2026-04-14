@@ -124,10 +124,15 @@ const CadastroProfissional = () => {
       return;
     }
     if (documentValidation && !documentValidation.valid) {
+      trackKYCValidationFailed(
+        documentType === "cpf" ? "CPF_INVALID" : documentType === "rne" ? "RNE_INVALID" : "PASSPORT_INVALID",
+        documentValidation.message
+      );
       toast({ title: "Documento inválido", description: documentValidation.message, variant: "destructive" });
       return;
     }
     if (!form.registroProfissional) {
+      trackKYCValidationFailed("CRM_MISSING", "CRM não informado");
       toast({ title: "Registro profissional obrigatório", description: "Informe seu CRM.", variant: "destructive" });
       return;
     }
@@ -135,10 +140,13 @@ const CadastroProfissional = () => {
       toast({ title: "Aceite os termos de uso e LGPD para continuar", variant: "destructive" });
       return;
     }
+
+    trackKYCSubmissionAttempt(documentType);
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
+      trackKYCValidationSuccess(documentType);
       toast({ title: "Cadastro enviado!", description: "Status: PENDENTE DE VERIFICAÇÃO KYC. Aguarde validação automática do CRM." });
     }, 1500);
   };

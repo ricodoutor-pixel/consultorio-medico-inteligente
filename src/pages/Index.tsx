@@ -6,7 +6,8 @@ import { Leaf, Users, Star, ArrowRight, TrendingUp, UserPlus, Download, Quote } 
 import { motion } from "framer-motion";
 import CannabisMarketChart from "@/components/CannabisMarketChart";
 import { Link } from "react-router-dom";
-import { HeroCarousel } from "@/components/HeroCarousel"; 
+import { HeroCarousel } from "@/components/HeroCarousel";
+import { LocalMapSection } from "@/components/LocalMapSection";
 import triagemPatient from "@/assets/triagem-patient.png";
 import consultaChat from "@/assets/consulta-chat.png";
 import triagemForm from "@/assets/triagem-form.png";
@@ -298,6 +299,8 @@ const Index = () => {
 
       {/* Mercado Cannabis Medicinal - Projeção Interativa */}
       <CannabisMarketChart />
+
+      <LocalMapSection />
 
       <Footer />
     </div>

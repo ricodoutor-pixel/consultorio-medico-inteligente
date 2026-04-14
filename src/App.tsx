@@ -17,6 +17,7 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { OpenGraphHead } from "@/components/OpenGraphHead";
 import { SearchEngineOptimization } from "@/components/SearchEngineOptimization";
 import { DynamicSEOHead } from "@/components/DynamicSEOHead";
+import { LocalCTABanner } from "@/components/LocalCTABanner";
 
 const Loading = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
@@ -107,6 +108,7 @@ const App = () => (
             <OpenGraphHead />
             <SearchEngineOptimization />
             <DynamicSEOHead />
+            <LocalCTABanner />
             <AccessibilitySkipLink />
             <FrogChatModal />
             <ShoppingCart />

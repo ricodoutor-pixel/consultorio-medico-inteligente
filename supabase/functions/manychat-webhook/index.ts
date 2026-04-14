@@ -176,13 +176,16 @@ Deno.serve(async (req) => {
           const merged = [...new Set([...(existing.tags || []), ...tags])];
           await supabase.from("leads_contatos").update({ tags: merged }).eq("id", existing.id);
 
-          // Sync tag in ManyChat
-          const mc = await findSubscriber(phone);
-          if (mc.status === "success" && mc.data?.id) {
-            await tagSubscriber(mc.data.id, `retorno_${origem}`);
+          // Find or create in ManyChat for returning leads
+          const { subscriberId } = await findOrCreateSubscriber(phone, nome);
+          if (subscriberId) {
+            await Promise.all([
+              tagSubscriber(subscriberId, `retorno_${origem}`),
+              setCustomField(subscriberId, "lead_nome", nome),
+            ]);
           }
 
-          return jsonResponse({ success: true, status: "existing_lead_updated", lead_id: existing.id });
+          return jsonResponse({ success: true, status: "existing_lead_updated", lead_id: existing.id, manychat_synced: !!subscriberId });
         }
 
         const { data: newLead, error: dbErr } = await supabase
@@ -196,21 +199,37 @@ Deno.serve(async (req) => {
           return jsonResponse({ error: "Erro ao salvar lead" }, 500);
         }
 
-        // ManyChat: tag + welcome flow
-        const mc = await findSubscriber(phone);
+        // ManyChat: find or CREATE subscriber + tag + welcome
+        const { subscriberId, created } = await findOrCreateSubscriber(phone, nome);
         let synced = false;
-        if (mc.status === "success" && mc.data?.id) {
-          await Promise.all([
-            tagSubscriber(mc.data.id, `lead_${origem}`),
-            tagSubscriber(mc.data.id, "novo_lead"),
-            setCustomField(mc.data.id, "lead_nome", nome),
-            setCustomField(mc.data.id, "lead_origem", origem),
-          ]);
+        if (subscriberId) {
+          const tagPromises = [
+            tagSubscriber(subscriberId, `lead_${origem}`),
+            tagSubscriber(subscriberId, "novo_lead"),
+            setCustomField(subscriberId, "lead_nome", nome),
+            setCustomField(subscriberId, "lead_origem", origem),
+          ];
+
+          // Add origin-specific tags for sequencing
+          if (origem === "ebook") {
+            tagPromises.push(tagSubscriber(subscriberId, "Origem_Ebook"));
+            tagPromises.push(tagSubscriber(subscriberId, "sequencia_ebook"));
+          } else {
+            tagPromises.push(tagSubscriber(subscriberId, "Origem_Chat"));
+            tagPromises.push(tagSubscriber(subscriberId, "sequencia_verdinho"));
+          }
+
+          // Apply custom tags from the LeadCaptureModal
+          for (const t of tags) {
+            tagPromises.push(tagSubscriber(subscriberId, t));
+          }
+
+          await Promise.all(tagPromises);
           synced = true;
         }
 
-        console.log(`📥 Lead: ${nome} (${phone}) from ${origem}${synced ? " [MC✓]" : ""}`);
-        return jsonResponse({ success: true, status: "new_lead", lead_id: newLead?.id, manychat_synced: synced });
+        console.log(`📥 Lead: ${nome} (${phone}) from ${origem} [MC:${synced ? (created ? "CREATED" : "FOUND") : "FAIL"}]`);
+        return jsonResponse({ success: true, status: "new_lead", lead_id: newLead?.id, manychat_synced: synced, manychat_created: created });
       }
 
       // ═══════════════════════════════════════════

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { validateCPF, validateCNPJ, formatCPF, formatCNPJ } from "@/lib/validators";
@@ -127,6 +128,9 @@ const Cadastro = () => {
         }
       }
 
+      trackPixelEvent("Lead", { content_name: "patient_signup", content_category: type }, {
+        leadScore: 30, funnelStage: "intent", category: "conversion",
+      });
       setSubmitted(true);
       toast({ title: "Cadastro realizado! ✅", description: "Verifique seu e-mail para confirmar a conta." });
     } catch (err) {

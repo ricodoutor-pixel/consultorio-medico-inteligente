@@ -637,9 +637,14 @@ export type Database = {
           created_at: string
           crm: string
           crm_state: string
+          document_number: string | null
+          document_type: string
           id: string
+          is_crm_valid: boolean
           is_online: boolean
           is_verified: boolean
+          kyc_status: string
+          last_crm_check: string | null
           pix_key: string | null
           rating: number | null
           rqe: string | null
@@ -655,9 +660,14 @@ export type Database = {
           created_at?: string
           crm: string
           crm_state?: string
+          document_number?: string | null
+          document_type?: string
           id?: string
+          is_crm_valid?: boolean
           is_online?: boolean
           is_verified?: boolean
+          kyc_status?: string
+          last_crm_check?: string | null
           pix_key?: string | null
           rating?: number | null
           rqe?: string | null
@@ -673,9 +683,14 @@ export type Database = {
           created_at?: string
           crm?: string
           crm_state?: string
+          document_number?: string | null
+          document_type?: string
           id?: string
+          is_crm_valid?: boolean
           is_online?: boolean
           is_verified?: boolean
+          kyc_status?: string
+          last_crm_check?: string | null
           pix_key?: string | null
           rating?: number | null
           rqe?: string | null

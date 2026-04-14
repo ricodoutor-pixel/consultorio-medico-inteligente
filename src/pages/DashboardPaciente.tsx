@@ -218,8 +218,14 @@ const DashboardPaciente = () => {
                 <PatientCheckinCard userId={profile?.id || ""} onCheckinComplete={() => setCheckinRefresh(p => p + 1)} />
 
                 {/* Evolution Chart */}
-                {profile?.id && <EvolutionChart userId={profile.id} refreshKey={checkinRefresh} />}
-
+                {profile?.id && (
+                  <div className="space-y-3">
+                    <EvolutionChart userId={profile.id} refreshKey={checkinRefresh} />
+                    <div className="flex justify-end">
+                      <ProgressReportGenerator userId={profile.id} patientName={profile.full_name || "Paciente"} />
+                    </div>
+                  </div>
+                )}
                 {upcomingAppts.length > 0 && (
                   <Card className="border-green/20 bg-gradient-green">
                     <CardContent className="p-5">

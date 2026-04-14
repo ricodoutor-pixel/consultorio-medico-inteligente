@@ -13,6 +13,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WellnessSubscriptionCards } from "@/components/WellnessSubscriptionCards";
+import { PatientCheckinCard } from "@/components/PatientCheckinCard";
+import { EvolutionChart } from "@/components/EvolutionChart";
 import { professionals } from "@/data/professionals";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
@@ -40,6 +42,7 @@ const DashboardPaciente = () => {
   const [renewTarget, setRenewTarget] = useState<any>(null);
   const [renewLoading, setRenewLoading] = useState(false);
   const [whatsappPreview, setWhatsappPreview] = useState<string | null>(null);
+  const [checkinRefresh, setCheckinRefresh] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
   const recommendedPros = professionals.filter(p => p.category === "Médicos Prescritores").slice(0, 3);

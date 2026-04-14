@@ -17,6 +17,23 @@ interface ProgressReportGeneratorProps {
   patientName: string;
 }
 
+// Sanitize text: remove unsupported chars, replace accents for jsPDF Helvetica
+const sanitize = (text: string): string => {
+  if (!text) return "";
+  return text
+    .replace(/[^\x20-\x7E\xA0-\xFF]/g, "") // keep latin-1 printable
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/\u2014/g, "-")
+    .replace(/\u2026/g, "...")
+    .trim();
+};
+
+const safeName = (name: string): string => {
+  const s = sanitize(name);
+  return s.length > 0 ? s : "Paciente";
+};
+
 export function ProgressReportGenerator({ userId, patientName }: ProgressReportGeneratorProps) {
   const [generating, setGenerating] = useState(false);
   const { toast } = useToast();
@@ -24,7 +41,6 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
   const generatePDF = async () => {
     setGenerating(true);
     try {
-      // Fetch clinical outcomes
       const { data: rawOutcomes } = await supabase
         .from("clinical_outcomes" as any)
         .select("symptom_level, mood, notes, created_at")
@@ -46,8 +62,9 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
       const contentW = W - margin * 2;
       let y = 20;
 
+      const name = safeName(patientName);
+
       // ========= HEADER =========
-      // Green bar
       doc.setFillColor(34, 139, 34);
       doc.rect(0, 0, W, 38, "F");
 
@@ -62,7 +79,7 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
 
       doc.setFontSize(9);
       const today = new Date().toLocaleDateString("pt-BR");
-      doc.text(`Emissao: ${today}`, W - margin - 50, 16);
+      doc.text(sanitize(`Emissao: ${today}`), W - margin - 50, 16);
       doc.text("CRM: 12345/SP", W - margin - 50, 22);
       doc.text("Dr. Edilson Bezerra da Silva", W - margin - 50, 28);
 
@@ -74,29 +91,28 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
       doc.setTextColor(30, 30, 30);
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.text(`Paciente: ${patientName}`, margin + 5, y + 7);
+      doc.text(sanitize(`Paciente: ${name}`), margin + 5, y + 7);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
+
       const firstDate = new Date(outcomes[0].created_at).toLocaleDateString("pt-BR");
       const lastDate = new Date(outcomes[outcomes.length - 1].created_at).toLocaleDateString("pt-BR");
-      doc.text(`Periodo: ${firstDate} a ${lastDate} | Total de registros: ${outcomes.length}`, margin + 5, y + 14);
+      doc.text(sanitize(`Periodo: ${firstDate} a ${lastDate} | Total de registros: ${outcomes.length}`), margin + 5, y + 14);
 
       y += 26;
 
-      // ========= SECTION 1: EVOLUTION CHART (drawn manually) =========
+      // ========= SECTION 1: EVOLUTION CHART =========
       doc.setFont("helvetica", "bold");
       doc.setFontSize(13);
       doc.setTextColor(34, 139, 34);
       doc.text("1. Curva de Resposta Terapeutica", margin, y);
       y += 8;
 
-      // Draw chart area
       const chartX = margin + 10;
       const chartW = contentW - 20;
       const chartH = 55;
       const chartY = y;
 
-      // Grid
       doc.setDrawColor(220, 220, 220);
       doc.setLineWidth(0.2);
       for (let i = 0; i <= 10; i += 2) {
@@ -107,7 +123,6 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
         doc.text(String(i), chartX - 6, ly + 1);
       }
 
-      // Plot line
       if (outcomes.length > 1) {
         const step = chartW / (outcomes.length - 1);
         doc.setDrawColor(34, 139, 34);
@@ -116,20 +131,21 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
         for (let i = 0; i < outcomes.length - 1; i++) {
           const x1 = chartX + i * step;
           const x2 = chartX + (i + 1) * step;
-          const y1 = chartY + chartH - (outcomes[i].symptom_level / 10) * chartH;
-          const y2 = chartY + chartH - (outcomes[i + 1].symptom_level / 10) * chartH;
+          const lv1 = Number(outcomes[i].symptom_level) || 0;
+          const lv2 = Number(outcomes[i + 1].symptom_level) || 0;
+          const y1 = chartY + chartH - (lv1 / 10) * chartH;
+          const y2 = chartY + chartH - (lv2 / 10) * chartH;
           doc.line(x1, y1, x2, y2);
         }
 
-        // Dots
         for (let i = 0; i < outcomes.length; i++) {
           const cx = chartX + i * step;
-          const cy = chartY + chartH - (outcomes[i].symptom_level / 10) * chartH;
+          const lv = Number(outcomes[i].symptom_level) || 0;
+          const cy = chartY + chartH - (lv / 10) * chartH;
           doc.setFillColor(34, 139, 34);
           doc.circle(cx, cy, 1.2, "F");
         }
 
-        // Goal line
         doc.setDrawColor(200, 170, 50);
         doc.setLineWidth(0.4);
         const goalY = chartY + chartH - (5 / 10) * chartH;
@@ -141,7 +157,6 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
         doc.text("Meta", chartX + chartW + 2, goalY + 1);
       }
 
-      // X-axis labels (first and last)
       doc.setFontSize(7);
       doc.setTextColor(130, 130, 130);
       doc.text(firstDate, chartX, chartY + chartH + 5);
@@ -156,10 +171,9 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
       doc.text("2. Resumo Clinico", margin, y);
       y += 8;
 
-      // Calculate stats
-      const firstLevel = outcomes[0].symptom_level;
-      const lastLevel = outcomes[outcomes.length - 1].symptom_level;
-      const avgLevel = outcomes.reduce((s, o) => s + o.symptom_level, 0) / outcomes.length;
+      const firstLevel = Number(outcomes[0].symptom_level) || 0;
+      const lastLevel = Number(outcomes[outcomes.length - 1].symptom_level) || 0;
+      const avgLevel = outcomes.reduce((s, o) => s + (Number(o.symptom_level) || 0), 0) / outcomes.length;
       const improvement = firstLevel > 0 ? Math.round(((firstLevel - lastLevel) / firstLevel) * 100) : 0;
 
       doc.setFont("helvetica", "normal");
@@ -167,11 +181,11 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
       doc.setTextColor(50, 50, 50);
 
       const summaryLines = [
-        `O paciente apresenta ${improvement > 0 ? `melhora de ${improvement}%` : improvement === 0 ? "estabilidade" : `aumento de ${Math.abs(improvement)}%`} nos sintomas desde o inicio do acompanhamento em ${firstDate}.`,
-        ``,
-        `Nivel medio de sintomas registrado: ${avgLevel.toFixed(1)}/10.`,
-        `Nivel inicial: ${firstLevel}/10 | Nivel atual: ${lastLevel}/10.`,
-        `Total de check-ins realizados: ${outcomes.length}.`,
+        sanitize(`O paciente apresenta ${improvement > 0 ? `melhora de ${improvement}%` : improvement === 0 ? "estabilidade" : `aumento de ${Math.abs(improvement)}%`} nos sintomas desde o inicio do acompanhamento em ${firstDate}.`),
+        "",
+        sanitize(`Nivel medio de sintomas registrado: ${avgLevel.toFixed(1)}/10.`),
+        sanitize(`Nivel inicial: ${firstLevel}/10 | Nivel atual: ${lastLevel}/10.`),
+        sanitize(`Total de check-ins realizados: ${outcomes.length}.`),
       ];
 
       summaryLines.forEach(line => {
@@ -181,7 +195,6 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
         y += split.length * 5;
       });
 
-      // Improvement badge
       y += 4;
       if (improvement > 0) {
         doc.setFillColor(230, 255, 230);
@@ -189,7 +202,7 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9);
         doc.setTextColor(34, 139, 34);
-        doc.text(`Tendencia: Melhora de ${improvement}%`, margin + 4, y + 7);
+        doc.text(sanitize(`Tendencia: Melhora de ${improvement}%`), margin + 4, y + 7);
       } else {
         doc.setFillColor(255, 245, 230);
         doc.roundedRect(margin, y, 80, 10, 2, 2, "F");
@@ -224,13 +237,14 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
           doc.setFont("helvetica", "bold");
           doc.setFontSize(8);
           doc.setTextColor(80, 80, 80);
-          doc.text(`${entryDate} | ${entry.mood} | Nivel: ${entry.symptom_level}/10`, margin + 3, y + 5);
+          doc.text(sanitize(`${entryDate} | ${entry.mood || "neutro"} | Nivel: ${Number(entry.symptom_level) || 0}/10`), margin + 3, y + 5);
 
           doc.setFont("helvetica", "normal");
           doc.setFontSize(8);
           doc.setTextColor(60, 60, 60);
-          const noteText = entry.notes!.length > 120 ? entry.notes!.slice(0, 117) + "..." : entry.notes!;
-          doc.text(noteText, margin + 3, y + 11);
+          const rawNote = entry.notes || "";
+          const noteText = sanitize(rawNote.length > 120 ? rawNote.slice(0, 117) + "..." : rawNote);
+          doc.text(noteText || "-", margin + 3, y + 11);
           y += 17;
 
           if (y > 265) {
@@ -240,13 +254,12 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
         });
       }
 
-      // ========= QR CODE (SIMULATED) =========
+      // ========= QR CODE =========
       y += 6;
       if (y > 240) { doc.addPage(); y = 20; }
 
       doc.setFillColor(240, 240, 240);
       doc.roundedRect(margin, y, 30, 30, 2, 2, "F");
-      // Simulated QR pattern
       doc.setFillColor(30, 30, 30);
       for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
@@ -277,12 +290,12 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
       const footerLines = doc.splitTextToSize(disclaimer, contentW);
       doc.text(footerLines, margin, footerY);
 
-      // Save
-      doc.save(`Relatorio_Progresso_${patientName.replace(/\s+/g, "_")}_${today.replace(/\//g, "-")}.pdf`);
+      // Safe filename
+      const safeFn = name.replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "_").slice(0, 50);
+      doc.save(`Relatorio_Progresso_${safeFn}_${today.replace(/\//g, "-")}.pdf`);
       toast({ title: "PDF gerado com sucesso! 📄", description: "O relatório foi baixado automaticamente." });
     } catch (err) {
-      console.error("Erro ao gerar PDF:", err);
-      toast({ title: "Erro ao gerar PDF", description: (err as Error).message, variant: "destructive" });
+      toast({ title: "Erro ao gerar relatório", description: "Tente novamente em instantes. Se o problema persistir, entre em contato com o suporte.", variant: "destructive" });
     }
     setGenerating(false);
   };

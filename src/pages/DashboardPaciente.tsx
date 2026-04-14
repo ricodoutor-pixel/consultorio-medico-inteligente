@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, BellRing, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, FileText, ClipboardList, RefreshCw, MessageCircle } from "lucide-react";
+import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, BellRing, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, FileText, ClipboardList, RefreshCw, MessageCircle, ArrowUpRight } from "lucide-react";
+import { PlanUpgradeCard } from "@/components/patient/PlanUpgradeCard";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,7 +34,7 @@ const allBadges = [
 ];
 
 const DashboardPaciente = () => {
-  const [activeTab, setActiveTab] = useState<"overview" | "badges" | "prescriptions" | "triages">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "badges" | "prescriptions" | "triages" | "upgrade">("overview");
   const [profile, setProfile] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -205,6 +206,7 @@ const DashboardPaciente = () => {
               { key: "prescriptions" as const, label: "Receitas", icon: FileText },
               { key: "triages" as const, label: "Triagens", icon: ClipboardList },
               { key: "badges" as const, label: "Badges", icon: Trophy },
+              { key: "upgrade" as const, label: "Upgrade", icon: ArrowUpRight },
             ]).map(t => (
               <button key={t.key} onClick={() => setActiveTab(t.key)} className={`px-4 py-2 rounded-full text-xs font-bold border transition-colors flex items-center gap-1.5 ${activeTab === t.key ? "border-primary bg-gradient-green text-primary" : "border-border bg-card/50 text-muted-foreground hover:text-foreground"}`}>
                 <t.icon size={12} /> {t.label}
@@ -558,6 +560,12 @@ const DashboardPaciente = () => {
                   </Card>
                 </motion.div>
               ))}
+            </div>
+          )}
+
+          {activeTab === "upgrade" && (
+            <div className="max-w-3xl mx-auto">
+              <PlanUpgradeCard currentPlan="essencial" />
             </div>
           )}
         </div>

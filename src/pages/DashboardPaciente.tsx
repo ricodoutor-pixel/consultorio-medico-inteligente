@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { WellnessSubscriptionCards } from "@/components/WellnessSubscriptionCards";
 import { PatientCheckinCard } from "@/components/PatientCheckinCard";
 import { EvolutionChart } from "@/components/EvolutionChart";
+import { ProgressReportGenerator } from "@/components/ProgressReportGenerator";
 import { professionals } from "@/data/professionals";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };

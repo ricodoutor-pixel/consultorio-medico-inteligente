@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
-import { Upload, X, Send, Image as ImageIcon } from "lucide-react";
+import { Upload, X, Send, Image as ImageIcon, Instagram } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ClubPostCreatorProps {
   userName?: string;
@@ -59,6 +60,30 @@ export default function ClubPostCreator({
   };
 
   // Submeter post
+  const publishToInstagram = async (post: ClubPost) => {
+    try {
+      // Only publish if there are images (IG requires images)
+      if (!post.images.length) return;
+
+      const { data, error } = await supabase.functions.invoke("publish-to-instagram", {
+        body: {
+          post_id: post.id || crypto.randomUUID(),
+          content: post.testimonial,
+          images: post.images,
+          author_name: post.author,
+        },
+      });
+
+      if (error) {
+        console.warn("[IG] Publish failed:", error);
+      } else {
+        console.log("[IG] Published:", data);
+      }
+    } catch (e) {
+      console.warn("[IG] Error:", e);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!testimonial.trim()) {
       alert("Por favor, escreva um depoimento");
@@ -77,11 +102,9 @@ export default function ClubPostCreator({
         comments: 0,
       };
 
-      // Chamar callback ou enviar para servidor
       if (onPostSubmit) {
         onPostSubmit(post);
       } else {
-        // Enviar para servidor
         const response = await fetch("/api/club/posts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -91,12 +114,14 @@ export default function ClubPostCreator({
         if (!response.ok) throw new Error("Falha ao criar post");
       }
 
-      // Reset
+      // Auto-publish to Instagram in background
+      publishToInstagram(post);
+
       setTestimonial("");
       setImages([]);
       setIsOpen(false);
 
-      alert("Post criado com sucesso! 🎉");
+      alert("Post criado com sucesso! 🎉 Publicando no Instagram...");
     } catch (error) {
       console.error("Erro ao criar post:", error);
       alert("Erro ao criar post. Tente novamente.");
@@ -242,7 +267,7 @@ export default function ClubPostCreator({
                 className="flex-1 px-4 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                {isSubmitting ? "Enviando..." : "Publicar"}
+                {isSubmitting ? "Publicando..." : "Publicar no Club + Instagram 📸"}
               </button>
             </div>
           </div>

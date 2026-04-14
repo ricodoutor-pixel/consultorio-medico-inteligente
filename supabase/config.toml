@@ -74,3 +74,6 @@ verify_jwt = false
 
 [functions.cart-recovery]
 verify_jwt = false
+
+[functions.recovery-engine]
+verify_jwt = false

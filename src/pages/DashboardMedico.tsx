@@ -33,6 +33,8 @@ const DashboardMedico = () => {
   const [currentTier, setCurrentTier] = useState("basic");
   const [simulatedTier, setSimulatedTier] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
+  const [selectedPatientTriage, setSelectedPatientTriage] = useState<any>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     fetchDoctorData();

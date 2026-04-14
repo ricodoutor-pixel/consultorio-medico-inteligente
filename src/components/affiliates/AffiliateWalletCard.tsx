@@ -2,16 +2,39 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Wallet, ArrowUpRight, DollarSign, Clock, CheckCircle } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Wallet, ArrowUpRight, DollarSign, Clock, CheckCircle, ShieldCheck, AlertTriangle, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 const MIN_WITHDRAWAL = 100;
+const GUARANTEE_DAYS = 7;
+
+// PIX key validation
+function validatePixKey(key: string): { valid: boolean; type: string; error?: string } {
+  const trimmed = key.trim();
+  if (!trimmed) return { valid: false, type: "", error: "Informe sua chave PIX" };
+
+  // CPF: 11 digits
+  if (/^\d{11}$/.test(trimmed)) return { valid: true, type: "CPF" };
+  // CNPJ: 14 digits
+  if (/^\d{14}$/.test(trimmed)) return { valid: true, type: "CNPJ" };
+  // Phone: +55...
+  if (/^\+?55\d{10,11}$/.test(trimmed.replace(/[\s()-]/g, ""))) return { valid: true, type: "Celular" };
+  // Email
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return { valid: true, type: "E-mail" };
+  // Random key (UUID format)
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed)) return { valid: true, type: "Aleatória" };
+
+  return { valid: false, type: "", error: "Chave PIX inválida. Use CPF, CNPJ, e-mail, celular ou chave aleatória." };
+}
 
 export function AffiliateWalletCard() {
   const [pixKey, setPixKey] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [pixValidation, setPixValidation] = useState<{ valid: boolean; type: string; error?: string } | null>(null);
   const queryClient = useQueryClient();
 
   const { data: wallet, isLoading } = useQuery({
@@ -28,6 +51,25 @@ export function AffiliateWalletCard() {
     },
   });
 
+  // Fetch pending commissions (within 7-day guarantee window)
+  const { data: pendingCommissions } = useQuery({
+    queryKey: ["affiliate-pending-commissions"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - GUARANTEE_DAYS);
+      const { data } = await supabase
+        .from("affiliate_commissions")
+        .select("*")
+        .eq("referrer_id", user.id)
+        .eq("status", "pending")
+        .gte("created_at", sevenDaysAgo.toISOString())
+        .order("created_at", { ascending: false });
+      return data || [];
+    },
+  });
+
   const { data: withdrawals } = useQuery({
     queryKey: ["affiliate-withdrawals"],
     queryFn: async () => {
@@ -38,7 +80,7 @@ export function AffiliateWalletCard() {
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(5);
+        .limit(10);
       return data || [];
     },
   });
@@ -52,8 +94,9 @@ export function AffiliateWalletCard() {
       if (!wallet || amount > (wallet.available_balance || 0)) {
         throw new Error("Saldo insuficiente");
       }
-      if (!pixKey.trim()) {
-        throw new Error("Informe sua chave PIX");
+      const validation = validatePixKey(pixKey);
+      if (!validation.valid) {
+        throw new Error(validation.error || "Chave PIX inválida");
       }
 
       const { data: { user } } = await supabase.auth.getUser();
@@ -62,16 +105,17 @@ export function AffiliateWalletCard() {
       const { error } = await supabase.from("affiliate_withdrawals").insert({
         user_id: user.id,
         amount,
-        pix_key: pixKey,
+        pix_key: pixKey.trim(),
         status: "pending",
       });
 
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Solicitação de saque enviada! Processamento em até 48h.");
+      toast.success("Solicitação de saque enviada! Processamento em até 48h úteis.");
       setWithdrawAmount("");
       setPixKey("");
+      setPixValidation(null);
       queryClient.invalidateQueries({ queryKey: ["affiliate-wallet"] });
       queryClient.invalidateQueries({ queryKey: ["affiliate-withdrawals"] });
     },
@@ -80,10 +124,28 @@ export function AffiliateWalletCard() {
     },
   });
 
+  const handlePixKeyChange = (value: string) => {
+    setPixKey(value);
+    if (value.trim().length > 3) {
+      setPixValidation(validatePixKey(value));
+    } else {
+      setPixValidation(null);
+    }
+  };
+
   const available = wallet?.available_balance || 0;
   const pending = wallet?.pending_balance || 0;
   const totalEarnings = wallet?.total_earnings || 0;
   const totalWithdrawn = wallet?.total_withdrawn || 0;
+
+  // Calculate guarantee release dates for pending commissions
+  const pendingWithDates = (pendingCommissions || []).map((c: any) => {
+    const createdAt = new Date(c.created_at);
+    const releaseDate = new Date(createdAt);
+    releaseDate.setDate(releaseDate.getDate() + GUARANTEE_DAYS);
+    const daysLeft = Math.max(0, Math.ceil((releaseDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+    return { ...c, releaseDate, daysLeft };
+  });
 
   return (
     <div className="space-y-4">
@@ -98,6 +160,7 @@ export function AffiliateWalletCard() {
             <p className="text-xl font-bold text-emerald-400">
               R$ {available.toFixed(2)}
             </p>
+            <p className="text-[10px] text-emerald-400/60 mt-1">Liberado para saque</p>
           </CardContent>
         </Card>
 
@@ -105,11 +168,12 @@ export function AffiliateWalletCard() {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <Clock className="h-4 w-4 text-amber-400" />
-              <span className="text-xs text-muted-foreground">Pendente</span>
+              <span className="text-xs text-muted-foreground">Em Garantia</span>
             </div>
             <p className="text-xl font-bold text-amber-400">
               R$ {pending.toFixed(2)}
             </p>
+            <p className="text-[10px] text-amber-400/60 mt-1">Liberação em até {GUARANTEE_DAYS} dias</p>
           </CardContent>
         </Card>
 
@@ -138,40 +202,99 @@ export function AffiliateWalletCard() {
         </Card>
       </div>
 
+      {/* Guarantee Period Info */}
+      <Card className="border-amber-500/20 bg-amber-500/5">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="h-5 w-5 text-amber-400 mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <h4 className="font-bold text-sm text-foreground mb-1">Prazo de Garantia — {GUARANTEE_DAYS} dias</h4>
+              <p className="text-xs text-muted-foreground mb-3">
+                Comissões ficam pendentes durante o período de garantia. Após {GUARANTEE_DAYS} dias sem estorno, o valor é liberado para saque.
+              </p>
+              {pendingWithDates.length > 0 ? (
+                <div className="space-y-2">
+                  {pendingWithDates.slice(0, 5).map((c: any) => (
+                    <div key={c.id} className="flex items-center justify-between text-xs p-2 rounded-lg bg-background/50 border border-border/30">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-3 w-3 text-amber-400" />
+                        <span className="text-muted-foreground">Nível {c.level}</span>
+                        <span className="font-bold text-foreground">R$ {Number(c.amount).toFixed(2)}</span>
+                      </div>
+                      <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-400">
+                        {c.daysLeft > 0 ? `${c.daysLeft}d restante${c.daysLeft > 1 ? "s" : ""}` : "Liberando..."}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground italic">Nenhuma comissão pendente no momento.</p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Withdrawal Form */}
       <Card className="border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <ArrowUpRight className="h-5 w-5" />
-            Solicitar Saque
+            Solicitar Saque via PIX
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Input
-              placeholder="Valor (mín. R$ 100,00)"
-              type="number"
-              min={MIN_WITHDRAWAL}
-              value={withdrawAmount}
-              onChange={(e) => setWithdrawAmount(e.target.value)}
-            />
-            <Input
-              placeholder="Chave PIX (CPF, e-mail ou celular)"
-              value={pixKey}
-              onChange={(e) => setPixKey(e.target.value)}
-            />
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="withdraw-amount" className="text-xs font-bold">Valor do saque</Label>
+              <Input
+                id="withdraw-amount"
+                placeholder={`Mínimo R$ ${MIN_WITHDRAWAL},00`}
+                type="number"
+                min={MIN_WITHDRAWAL}
+                step="0.01"
+                value={withdrawAmount}
+                onChange={(e) => setWithdrawAmount(e.target.value)}
+              />
+              {withdrawAmount && parseFloat(withdrawAmount) > 0 && parseFloat(withdrawAmount) < MIN_WITHDRAWAL && (
+                <p className="text-xs text-destructive flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" /> Valor mínimo: R$ {MIN_WITHDRAWAL},00
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pix-key" className="text-xs font-bold">Chave PIX</Label>
+              <Input
+                id="pix-key"
+                placeholder="CPF, e-mail, celular ou chave aleatória"
+                value={pixKey}
+                onChange={(e) => handlePixKeyChange(e.target.value)}
+              />
+              {pixValidation && (
+                <p className={`text-xs flex items-center gap-1 ${pixValidation.valid ? "text-emerald-400" : "text-destructive"}`}>
+                  {pixValidation.valid ? (
+                    <><CheckCircle className="h-3 w-3" /> Chave {pixValidation.type} válida</>
+                  ) : (
+                    <><AlertTriangle className="h-3 w-3" /> {pixValidation.error}</>
+                  )}
+                </p>
+              )}
+            </div>
           </div>
+
           <Button
             onClick={() => requestWithdrawal.mutate()}
-            disabled={requestWithdrawal.isPending || available < MIN_WITHDRAWAL}
-            className="w-full"
+            disabled={requestWithdrawal.isPending || available < MIN_WITHDRAWAL || !pixValidation?.valid}
+            className="w-full font-bold"
           >
-            {requestWithdrawal.isPending ? "Processando..." : `Solicitar Saque via PIX`}
+            {requestWithdrawal.isPending ? "Processando..." : `Solicitar Saque — R$ ${withdrawAmount || "0,00"}`}
           </Button>
+
           {available < MIN_WITHDRAWAL && (
-            <p className="text-xs text-muted-foreground text-center">
-              Saldo mínimo de R$ {MIN_WITHDRAWAL},00 necessário para saque
-            </p>
+            <div className="flex items-center gap-2 justify-center text-xs text-muted-foreground">
+              <Info className="h-3 w-3" />
+              <span>Saldo mínimo de R$ {MIN_WITHDRAWAL},00 necessário para saque</span>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -180,7 +303,7 @@ export function AffiliateWalletCard() {
       {withdrawals && withdrawals.length > 0 && (
         <Card className="border-border/50">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Últimos Saques</CardTitle>
+            <CardTitle className="text-sm">Histórico de Saques</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -189,13 +312,28 @@ export function AffiliateWalletCard() {
                   <div className="flex items-center gap-2">
                     <CheckCircle className={`h-4 w-4 ${
                       w.status === "completed" ? "text-emerald-400" :
-                      w.status === "pending" ? "text-amber-400" : "text-red-400"
+                      w.status === "pending" ? "text-amber-400" :
+                      w.status === "rejected" ? "text-destructive" : "text-muted-foreground"
                     }`} />
-                    <span>R$ {w.amount?.toFixed(2)}</span>
+                    <div>
+                      <span className="font-bold">R$ {Number(w.amount).toFixed(2)}</span>
+                      {w.pix_key && (
+                        <p className="text-[10px] text-muted-foreground">PIX: {w.pix_key.substring(0, 6)}***</p>
+                      )}
+                    </div>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(w.created_at).toLocaleDateString("pt-BR")}
-                  </span>
+                  <div className="text-right">
+                    <Badge variant="outline" className={`text-[10px] ${
+                      w.status === "completed" ? "border-emerald-500/30 text-emerald-400" :
+                      w.status === "pending" ? "border-amber-500/30 text-amber-400" :
+                      "border-destructive/30 text-destructive"
+                    }`}>
+                      {w.status === "completed" ? "Pago" : w.status === "pending" ? "Pendente" : "Rejeitado"}
+                    </Badge>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      {new Date(w.created_at).toLocaleDateString("pt-BR")}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>

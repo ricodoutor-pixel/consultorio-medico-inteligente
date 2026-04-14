@@ -38,13 +38,16 @@ export function TokenManagerModule() {
       if (error) {
         setFbStatus("error");
         setFbError(error.message);
+        addAuditEntry("Facebook", "error");
         toast.error("Facebook: Conexão falhou");
       } else if (data?.success) {
         setFbStatus("ok");
+        addAuditEntry("Facebook", "ok");
         toast.success("Facebook: Conexão OK!");
       } else {
         setFbStatus("error");
         setFbError(data?.error || "Unknown error");
+        addAuditEntry("Facebook", "error");
         toast.error("Facebook: " + (data?.error || "Erro desconhecido"));
       }
     } catch (e) {

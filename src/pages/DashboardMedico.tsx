@@ -363,6 +363,88 @@ const DashboardMedico = () => {
         </div>
       </section>
       <Footer />
+
+      {/* Brisa Triage Drawer */}
+      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <FileBarChart size={18} className="text-primary" /> Relatório Pré-Consulta (Brisa IA)
+            </SheetTitle>
+            <SheetDescription>Resumo da triagem do paciente antes da consulta</SheetDescription>
+          </SheetHeader>
+
+          {selectedPatientTriage && (
+            <div className="mt-6 space-y-4">
+              {/* Appointment Info */}
+              <Card className="border-border">
+                <CardContent className="p-4">
+                  <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Calendar size={14} className="text-primary" /> Consulta</h4>
+                  <p className="text-xs text-muted-foreground">Horário: {format(new Date(selectedPatientTriage.appointment.scheduled_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
+                  <p className="text-xs text-muted-foreground">Tipo: {selectedPatientTriage.appointment.type}</p>
+                  <Badge className="mt-2 text-[10px] bg-primary/10 text-primary border-green capitalize">{selectedPatientTriage.appointment.status}</Badge>
+                </CardContent>
+              </Card>
+
+              {selectedPatientTriage.triage ? (
+                <>
+                  {/* Symptoms */}
+                  <Card className="border-border">
+                    <CardContent className="p-4">
+                      <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Brain size={14} className="text-secondary" /> Sintomas Principais</h4>
+                      <p className="text-sm text-foreground bg-muted/20 rounded-xl p-3 border border-border">{selectedPatientTriage.triage.symptoms}</p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Urgency */}
+                  <Card className="border-border">
+                    <CardContent className="p-4">
+                      <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Flame size={14} className="text-destructive" /> Nível de Urgência</h4>
+                      <Badge className={`text-xs capitalize ${selectedPatientTriage.triage.urgency === "alta" || selectedPatientTriage.triage.urgency === "urgente" ? "bg-destructive/10 text-destructive" : selectedPatientTriage.triage.urgency === "media" ? "bg-yellow-500/10 text-yellow-400" : "bg-primary/10 text-primary"}`}>
+                        {selectedPatientTriage.triage.urgency || "Não classificada"}
+                      </Badge>
+                      {selectedPatientTriage.triage.specialty && <p className="text-xs text-muted-foreground mt-2">Especialidade sugerida: {selectedPatientTriage.triage.specialty}</p>}
+                      {selectedPatientTriage.triage.category && <p className="text-xs text-muted-foreground">Categoria: {selectedPatientTriage.triage.category}</p>}
+                    </CardContent>
+                  </Card>
+
+                  {/* Suggested Conditions */}
+                  {selectedPatientTriage.triage.suggested_conditions?.length > 0 && (
+                    <Card className="border-border">
+                      <CardContent className="p-4">
+                        <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Activity size={14} className="text-primary" /> Condições Sugeridas pela IA</h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {selectedPatientTriage.triage.suggested_conditions.map((c: string, i: number) => (
+                            <Badge key={i} variant="outline" className="text-xs">{c}</Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Pre-record */}
+                  {selectedPatientTriage.triage.pre_record && (
+                    <Card className="border-border">
+                      <CardContent className="p-4">
+                        <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><FileText size={14} className="text-muted-foreground" /> Pré-Prontuário</h4>
+                        <p className="text-xs text-muted-foreground whitespace-pre-wrap">{selectedPatientTriage.triage.pre_record}</p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </>
+              ) : (
+                <Card className="border-border">
+                  <CardContent className="p-6 text-center">
+                    <Brain size={32} className="text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">Nenhuma triagem Brisa encontrada para este paciente.</p>
+                    <p className="text-xs text-muted-foreground mt-1">O paciente não realizou triagem antes da consulta.</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

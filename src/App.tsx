@@ -98,6 +98,7 @@ const Badges = lazy(() => import("./pages/Badges"));
 const HealthCheck = lazy(() => import("./pages/HealthCheck"));
 const AutomationsDashboard = lazy(() => import("./pages/AutomationsDashboard"));
 const OmniChannelDashboard = lazy(() => import("./pages/OmniChannelDashboard"));
+const OfertaEspecial = lazy(() => import("./pages/OfertaEspecial"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -206,6 +207,7 @@ const App = () => (
                 <Route path="/health" element={<AdminRoute><HealthCheck /></AdminRoute>} />
                 <Route path="/admin/automations" element={<AdminRoute><AutomationsDashboard /></AdminRoute>} />
                 <Route path="/admin/omni-channel" element={<OmniChannelDashboard />} />
+                <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

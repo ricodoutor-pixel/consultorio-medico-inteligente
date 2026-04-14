@@ -1895,6 +1895,51 @@ export type Database = {
         }
         Relationships: []
       }
+      recovery_campaigns: {
+        Row: {
+          affiliate_notified: boolean | null
+          coupon_code: string | null
+          created_at: string
+          discount_amount: number | null
+          expires_at: string | null
+          id: string
+          message_sent_via: string | null
+          metadata: Json | null
+          status: string
+          trigger_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          affiliate_notified?: boolean | null
+          coupon_code?: string | null
+          created_at?: string
+          discount_amount?: number | null
+          expires_at?: string | null
+          id?: string
+          message_sent_via?: string | null
+          metadata?: Json | null
+          status?: string
+          trigger_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          affiliate_notified?: boolean | null
+          coupon_code?: string | null
+          created_at?: string
+          discount_amount?: number | null
+          expires_at?: string | null
+          id?: string
+          message_sent_via?: string | null
+          metadata?: Json | null
+          status?: string
+          trigger_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       referral_links: {
         Row: {
           code: string

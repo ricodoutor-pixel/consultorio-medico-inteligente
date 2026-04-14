@@ -69,13 +69,16 @@ export function TokenManagerModule() {
       if (error) {
         setIgStatus("error");
         setIgError(error.message);
+        addAuditEntry("Instagram", "error");
         toast.error("Instagram: Conexão falhou");
       } else if (data?.success) {
         setIgStatus("ok");
+        addAuditEntry("Instagram", "ok");
         toast.success("Instagram: Conexão OK!");
       } else {
         setIgStatus("error");
         setIgError(data?.error || "Unknown error");
+        addAuditEntry("Instagram", "error");
         toast.error("Instagram: " + (data?.error || "Erro desconhecido"));
       }
     } catch (e) {

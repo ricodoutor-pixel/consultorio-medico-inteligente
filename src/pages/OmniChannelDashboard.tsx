@@ -6,7 +6,10 @@ import { EdgeFunctionStatusGrid } from "@/components/admin/EdgeFunctionStatusGri
 import { SocialAnalyticsModule } from "@/components/admin/SocialAnalyticsModule";
 import { VisitorTrackingModule } from "@/components/admin/VisitorTrackingModule";
 import { TokenManagerModule } from "@/components/admin/TokenManagerModule";
-import { Activity, BarChart3, Globe, Key, Shield, LogOut } from "lucide-react";
+import { GrowthLoopsModule } from "@/components/admin/GrowthLoopsModule";
+import { AutomationManagerModule } from "@/components/admin/AutomationManagerModule";
+import { ClickHeatmapModule } from "@/components/admin/ClickHeatmapModule";
+import { Activity, BarChart3, Globe, Key, Shield, LogOut, Zap, Bot, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -18,7 +21,6 @@ const OmniChannelDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already an admin via Supabase auth
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -37,7 +39,6 @@ const OmniChannelDashboard = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Fallback password check for quick access
     if (password === "manus2026" || password === "plantaraiz") {
       setAuthenticated(true);
       toast.success("Acesso autorizado");
@@ -94,7 +95,7 @@ const OmniChannelDashboard = () => {
             </div>
             <div>
               <h1 className="text-sm font-semibold text-slate-100">Omni-Channel Control Center</h1>
-              <p className="text-[10px] text-slate-500">Planta & Raiz — 77 Automações Ativas</p>
+              <p className="text-[10px] text-slate-500">Planta & Raiz — 100 Automações Ativas</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -116,14 +117,21 @@ const OmniChannelDashboard = () => {
 
       {/* Content */}
       <div className="max-w-[1600px] mx-auto p-4 space-y-6">
-        {/* Edge Function Status */}
         <EdgeFunctionStatusGrid />
 
-        {/* Tabs for modules */}
-        <Tabs defaultValue="analytics" className="space-y-4">
-          <TabsList className="bg-slate-800/50 border border-slate-700/50 p-0.5">
+        <Tabs defaultValue="growth" className="space-y-4">
+          <TabsList className="bg-slate-800/50 border border-slate-700/50 p-0.5 flex-wrap h-auto">
+            <TabsTrigger value="growth" className="text-xs data-[state=active]:bg-blue-600/20 data-[state=active]:text-blue-400 gap-1.5">
+              <Zap className="w-3 h-3" /> Growth Loops
+            </TabsTrigger>
+            <TabsTrigger value="automations" className="text-xs data-[state=active]:bg-blue-600/20 data-[state=active]:text-blue-400 gap-1.5">
+              <Bot className="w-3 h-3" /> Automações (100)
+            </TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs data-[state=active]:bg-blue-600/20 data-[state=active]:text-blue-400 gap-1.5">
               <BarChart3 className="w-3 h-3" /> Analytics
+            </TabsTrigger>
+            <TabsTrigger value="heatmap" className="text-xs data-[state=active]:bg-blue-600/20 data-[state=active]:text-blue-400 gap-1.5">
+              <Flame className="w-3 h-3" /> Heatmap
             </TabsTrigger>
             <TabsTrigger value="visitors" className="text-xs data-[state=active]:bg-blue-600/20 data-[state=active]:text-blue-400 gap-1.5">
               <Globe className="w-3 h-3" /> Visitantes
@@ -133,8 +141,20 @@ const OmniChannelDashboard = () => {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="growth">
+            <GrowthLoopsModule />
+          </TabsContent>
+
+          <TabsContent value="automations">
+            <AutomationManagerModule />
+          </TabsContent>
+
           <TabsContent value="analytics">
             <SocialAnalyticsModule />
+          </TabsContent>
+
+          <TabsContent value="heatmap">
+            <ClickHeatmapModule />
           </TabsContent>
 
           <TabsContent value="visitors">

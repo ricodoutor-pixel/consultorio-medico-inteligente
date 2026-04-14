@@ -276,28 +276,31 @@ const DashboardMedico = () => {
               <Card className="border-border">
                 <CardContent className="p-6">
                   <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                    <Clock size={18} /> Agenda de Hoje
+                    <Clock size={18} /> Próximas Consultas
                   </h3>
                   {todayAppts.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-8">Nenhuma consulta agendada para hoje.</p>
                   ) : (
                     <div className="space-y-3">
                       {todayAppts.map(a => (
-                        <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border">
+                        <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border cursor-pointer hover:border-primary/30 transition-colors" onClick={() => openPatientTriage(a)}>
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                               {a.type === "video" ? <Video size={16} className="text-primary" /> : a.type === "chat" ? <MessageSquare size={16} className="text-primary" /> : <Stethoscope size={16} className="text-primary" />}
                             </div>
                             <div>
                               <p className="font-bold text-sm text-foreground">{a.type === "video" ? "Vídeo" : a.type === "chat" ? "Chat" : "Telefone"}</p>
-                              <p className="text-xs text-muted-foreground">{a.notes?.slice(0, 40) || "Consulta agendada"}</p>
+                              <p className="text-xs text-muted-foreground">{a.notes?.slice(0, 40) || "Clique para ver triagem Brisa"}</p>
                             </div>
                           </div>
                           <div className="text-right">
                             <p className="font-display font-black text-sm text-foreground">{format(new Date(a.scheduled_at), "HH:mm")}</p>
-                            <Badge className={`text-[10px] ${a.status === "confirmed" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
-                              {a.status === "confirmed" ? "Confirmada" : a.status === "scheduled" ? "Agendada" : a.status}
-                            </Badge>
+                            <div className="flex items-center gap-1">
+                              <FileBarChart size={10} className="text-primary" />
+                              <Badge className={`text-[10px] ${a.status === "confirmed" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
+                                {a.status === "confirmed" ? "Confirmada" : a.status === "scheduled" ? "Agendada" : a.status}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
                       ))}

@@ -61,6 +61,75 @@ export type Database = {
           },
         ]
       }
+      affiliate_wallets: {
+        Row: {
+          available_balance: number
+          created_at: string
+          id: string
+          pending_balance: number
+          total_earnings: number
+          total_withdrawn: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_balance?: number
+          created_at?: string
+          id?: string
+          pending_balance?: number
+          total_earnings?: number
+          total_withdrawn?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_balance?: number
+          created_at?: string
+          id?: string
+          pending_balance?: number
+          total_earnings?: number
+          total_withdrawn?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      affiliate_withdrawals: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          pix_key: string | null
+          processed_at: string | null
+          rejected_reason: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          pix_key?: string | null
+          processed_at?: string | null
+          rejected_reason?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          pix_key?: string | null
+          processed_at?: string | null
+          rejected_reason?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_events: {
         Row: {
           action: string | null
@@ -1796,6 +1865,7 @@ export type Database = {
           full_name: string
           id: string
           phone: string | null
+          referred_by: string | null
           updated_at: string
           user_type: string
         }
@@ -1807,6 +1877,7 @@ export type Database = {
           full_name?: string
           id: string
           phone?: string | null
+          referred_by?: string | null
           updated_at?: string
           user_type?: string
         }
@@ -1818,6 +1889,7 @@ export type Database = {
           full_name?: string
           id?: string
           phone?: string | null
+          referred_by?: string | null
           updated_at?: string
           user_type?: string
         }
@@ -2725,6 +2797,11 @@ export type Database = {
         }
         Returns: Json
       }
+      credit_affiliate_wallet: {
+        Args: { _amount: number; _user_id: string }
+        Returns: undefined
+      }
+      ensure_affiliate_wallet: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

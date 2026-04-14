@@ -15,6 +15,7 @@ import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
 import MascotVerdinho from "@/components/MascotVerdinho";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { OpenGraphHead } from "@/components/OpenGraphHead";
+import { FacebookPixelProvider } from "@/components/FacebookPixelProvider";
 import { SearchEngineOptimization } from "@/components/SearchEngineOptimization";
 import { DynamicSEOHead } from "@/components/DynamicSEOHead";
 import { LocalCTABanner } from "@/components/LocalCTABanner";
@@ -113,6 +114,7 @@ const App = () => (
             <DynamicSEOHead />
             <LocalCTABanner />
             <AccessibilitySkipLink />
+            <FacebookPixelProvider />
             <FrogChatModal />
             <ShoppingCart />
             <Suspense fallback={<Loading />}>

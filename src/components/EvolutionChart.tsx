@@ -36,7 +36,7 @@ export function EvolutionChart({ userId, compact = false, refreshKey = 0 }: Evol
       .limit(60);
 
     if (outcomes && outcomes.length > 0) {
-      const chartData = (outcomes as Outcome[]).map((o, i) => ({
+      const chartData = (outcomes as unknown as Outcome[]).map((o, i) => ({
         dia: new Date(o.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
         nivel: o.symptom_level,
         humor: o.mood,

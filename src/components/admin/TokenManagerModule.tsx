@@ -15,6 +15,17 @@ export function TokenManagerModule() {
   const [igStatus, setIgStatus] = useState<"idle" | "ok" | "error">("idle");
   const [fbError, setFbError] = useState("");
   const [igError, setIgError] = useState("");
+  const [tokenAuditLog, setTokenAuditLog] = useState<Array<{ time: string; status: string; platform: string }>>(() => {
+    const saved = localStorage.getItem("token_audit_log");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const addAuditEntry = (platform: string, status: string) => {
+    const entry = { time: new Date().toISOString(), status, platform };
+    const updated = [entry, ...tokenAuditLog].slice(0, 10);
+    setTokenAuditLog(updated);
+    localStorage.setItem("token_audit_log", JSON.stringify(updated));
+  };
 
   const testFacebookConnection = async () => {
     setTestingFb(true);

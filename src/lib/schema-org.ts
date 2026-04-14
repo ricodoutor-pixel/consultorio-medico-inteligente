@@ -94,7 +94,7 @@ export const localBusinessSchema: SchemaOrgConfig = {
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '4.9',
-      ratingCount: '1250',
+      ratingCount: '3200',
       bestRating: '5',
       worstRating: '1',
     },

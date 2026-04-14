@@ -15,11 +15,11 @@ const BASE = "https://plantayraiz.com.br";
 
 export const routeSEOMap: Record<string, PageSEO> = {
   "/": {
-    title: "Teleconsulta Cannabis Medicinal SP | Protocolo ANVISA — Planta & Raiz",
-    description: "Consulta online com médico especialista em cannabis medicinal em São Paulo a partir de R$30. Prescrição digital ANVISA, IA de triagem e farmácia parceira. Agende agora!",
-    keywords: "teleconsulta cannabis medicinal, médico cannabis São Paulo, prescrição ANVISA, CBD, THC medicinal, consulta online cannabis",
+    title: "Teleconsulta Cannabis Medicinal SP | Consulta CBD R$30 — Planta & Raiz",
+    description: "Médicos prescritores de cannabis medicinal em São Paulo. Consulta online a partir de R$30 com prescrição digital ANVISA, triagem por IA e farmácia parceira. Agende agora!",
+    keywords: "telemedicina cannabis medicinal, consulta CBD R$30, médicos prescritores de cannabis, prescrição ANVISA online, cannabis medicinal São Paulo, dor crônica cannabis, saúde mental cannabis",
     canonical: `${BASE}/`,
-    h1: "Teleconsulta de Cannabis Medicinal em São Paulo — Protocolo ANVISA Digital",
+    h1: "Teleconsulta de Cannabis Medicinal em São Paulo — Médicos Prescritores a R$30",
   },
   "/profissionais": {
     title: "Médicos Especialistas em Cannabis Medicinal | São Paulo — Planta & Raiz",

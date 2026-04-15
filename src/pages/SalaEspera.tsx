@@ -5,12 +5,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Clock, Video, MessageSquare, CheckCircle2, Wifi, Shield, Bell, ArrowRight, Loader2 } from "lucide-react";
+import { Users, Clock, Video, MessageSquare, CheckCircle2, Wifi, Shield, Bell, ArrowRight, Loader2, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useConsultationQueue } from "@/hooks/useConsultationQueue";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 

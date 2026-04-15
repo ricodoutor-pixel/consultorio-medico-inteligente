@@ -23,17 +23,17 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
 
           {/* Conteúdo Principal */}
           <div className="space-y-4">
-            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              A <span className="font-bold text-green-600">Planta & Raiz</span> está promovendo a{" "}
-              <span className="font-bold">equidade</span> e realmente democratizando o acesso ao
-              tratamento canabinoide oferecendo{" "}
-              <span className="font-bold text-green-600">consultas com especialistas por apenas R$30</span>.
-            </p>
+             <p className="text-xs md:text-lg text-gray-700 leading-relaxed">
+               A <span className="font-bold text-green-600">Planta & Raiz</span> está promovendo a{" "}
+               <span className="font-bold">equidade</span> e realmente democratizando o acesso ao
+               tratamento canabinoide oferecendo{" "}
+               <span className="font-bold text-green-600">consultas com especialistas por apenas R$30</span>.
+             </p>
 
-            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              Venha você também fazer parte de{" "}
-              <span className="font-bold">milhões de pessoas que mudaram a sua qualidade de vida!</span>
-            </p>
+             <p className="text-xs md:text-lg text-gray-700 leading-relaxed">
+               Venha você também fazer parte de{" "}
+               <span className="font-bold">milhões de pessoas que mudaram a sua qualidade de vida!</span>
+             </p>
 
             {/* CTAs Mobile Only - Iniciar Consulta + Abrir Shopping */}
             <div className="flex flex-col gap-3 mt-4 md:hidden">

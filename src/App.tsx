@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import { useCart } from "@/store/cart";
 import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
 import MascotVerdinho from "@/components/MascotVerdinho";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { OpenGraphHead } from "@/components/OpenGraphHead";
 import { FacebookPixelProvider } from "@/components/FacebookPixelProvider";
@@ -103,12 +105,14 @@ const OmniChannelDashboard = lazy(() => import("./pages/OmniChannelDashboard"));
 const OfertaEspecial = lazy(() => import("./pages/OfertaEspecial"));
 const AdminFinanceiro = lazy(() => import("./pages/AdminFinanceiro"));
 const QuizTriagem = lazy(() => import("./pages/QuizTriagem"));
+const CondicaoTratamento = lazy(() => import("./pages/CondicaoTratamento"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <ErrorBoundary>
+    <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <TooltipProvider>
@@ -216,6 +220,7 @@ const App = () => (
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
                 <Route path="/quiz" element={<QuizTriagem />} />
+                <Route path="/condicao/:condicao" element={<CondicaoTratamento />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
@@ -225,12 +230,14 @@ const App = () => (
             {/* Mascote Verdinho removido — presente apenas na Navbar */}
             {/* WhatsApp Brisa Button */}
             <WhatsAppButton />
+            <MobileBottomNav />
             <CookieConsentBanner />
           </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </LanguageProvider>
     </QueryClientProvider>
+    </HelmetProvider>
   </ErrorBoundary>
 );
 

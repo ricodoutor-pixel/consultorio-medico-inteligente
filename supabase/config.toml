@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.recovery-engine]
 verify_jwt = false
+
+[functions.manychat-sync]
+verify_jwt = false

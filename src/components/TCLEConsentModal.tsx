@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Shield, FileText, CheckCircle2 } from "lucide-react";
 
@@ -23,7 +22,6 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
   });
 
   const allChecked = Object.values(checks).every(Boolean);
-  const today = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
   const autoAcceptedRef = useRef(false);
 
   useEffect(() => {
@@ -35,80 +33,76 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onDecline(); }}>
-      <DialogContent className="w-[92vw] max-w-lg max-h-[80vh] p-0 gap-0 rounded-xl" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
-        <DialogHeader className="px-3 py-2 border-b border-border">
+      <DialogContent
+        className="w-[94vw] max-w-lg p-0 gap-0 rounded-xl overflow-hidden"
+        style={{ maxHeight: 'calc(100dvh - 2rem)' }}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
+        {/* Header compacto */}
+        <DialogHeader className="px-3 py-2 border-b border-border shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <FileText size={14} className="text-primary" />
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <FileText size={12} className="text-primary" />
             </div>
-            <div className="min-w-0">
-              <DialogTitle className="text-xs font-bold text-foreground leading-tight">
+            <div className="min-w-0 flex-1">
+              <DialogTitle className="text-[11px] sm:text-sm font-bold text-foreground leading-tight">
                 Termo de Consentimento (TCLE)
               </DialogTitle>
-              <p className="text-[9px] text-muted-foreground mt-0.5">
-                CFM Res. nº 2.314/2022 e nº 2.454/2026
+              <p className="text-[8px] sm:text-[9px] text-muted-foreground">
+                CFM Res. 2.314/2022 · 2.454/2026
               </p>
             </div>
-            <Badge variant="outline" className="ml-auto text-[8px] border-primary/30 text-primary px-1 py-0">
-              <Shield size={8} className="mr-0.5" /> Válido
+            <Badge variant="outline" className="text-[7px] sm:text-[8px] border-primary/30 text-primary px-1 py-0 shrink-0">
+              <Shield size={7} className="mr-0.5" /> Válido
             </Badge>
           </div>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[40vh] px-3 py-2">
-          <div className="space-y-2 text-[10px] text-muted-foreground leading-snug">
-            <p className="text-foreground font-semibold text-[11px]">
+        {/* Conteúdo scrollável */}
+        <div className="overflow-y-auto flex-1 px-3 py-2" style={{ maxHeight: 'calc(100dvh - 12rem)' }}>
+          <div className="space-y-1.5 text-[9px] sm:text-[10px] text-muted-foreground leading-snug">
+            <p className="text-foreground font-semibold text-[10px] sm:text-[11px]">
               Prezado(a) {patientName},
             </p>
             <p>
-              Este TCLE informa sobre condições, benefícios, limitações e riscos da teleconsulta
-              conforme <strong>Res. CFM nº 2.314/2022</strong>, <strong>nº 2.454/2026</strong> e <strong>LGPD</strong>.
+              Este TCLE informa sobre condições e riscos da teleconsulta
+              conforme <strong>Res. CFM 2.314/2022</strong>, <strong>2.454/2026</strong> e <strong>LGPD</strong>.
             </p>
 
-            <div className="bg-muted/30 border border-border rounded-lg p-2">
-              <h3 className="font-bold text-foreground text-[10px] mb-0.5">1. TELECONSULTA</h3>
-              <p>Atendimento por áudio/vídeo em tempo real pelo(a) Dr(a). <strong>{doctorName}</strong>.</p>
+            <div className="bg-muted/30 border border-border rounded-md p-1.5 sm:p-2">
+              <p><strong className="text-foreground">1. TELECONSULTA</strong> — Atendimento por áudio/vídeo pelo(a) Dr(a). <strong>{doctorName}</strong>.</p>
             </div>
-
-            <div className="bg-muted/30 border border-border rounded-lg p-2">
-              <h3 className="font-bold text-foreground text-[10px] mb-0.5">2. LIMITAÇÕES</h3>
-              <p>Não substitui urgência presencial. Exame físico impossível à distância. IA é apoio — decisão é do médico.</p>
+            <div className="bg-muted/30 border border-border rounded-md p-1.5 sm:p-2">
+              <p><strong className="text-foreground">2. LIMITAÇÕES</strong> — Não substitui urgência. Exame físico impossível. IA é apoio — decisão do médico.</p>
             </div>
-
-            <div className="bg-muted/30 border border-border rounded-lg p-2">
-              <h3 className="font-bold text-foreground text-[10px] mb-0.5">3. PRIVACIDADE (LGPD)</h3>
-              <p>Dados sensíveis com criptografia AES-256 + TLS 1.3. Vídeo não gravado sem autorização.</p>
+            <div className="bg-muted/30 border border-border rounded-md p-1.5 sm:p-2">
+              <p><strong className="text-foreground">3. PRIVACIDADE</strong> — Dados sensíveis criptografados (AES-256 + TLS 1.3). Vídeo não gravado.</p>
             </div>
-
-            <div className="bg-muted/30 border border-border rounded-lg p-2">
-              <h3 className="font-bold text-foreground text-[10px] mb-0.5">4. IA E DIREITOS</h3>
-              <p>Transcrição e sugestões por IA (CFM nº 2.454/2026). Você pode revogar consentimento a qualquer momento.</p>
+            <div className="bg-muted/30 border border-border rounded-md p-1.5 sm:p-2">
+              <p><strong className="text-foreground">4. IA E DIREITOS</strong> — Sugestões por IA (CFM 2.454/2026). Revogue consentimento a qualquer momento.</p>
             </div>
-
-            <p className="text-[8px] text-muted-foreground border-t border-border pt-1">
-              {today} — Planta & Raiz
-            </p>
           </div>
-        </ScrollArea>
+        </div>
 
-        <div className="px-3 py-2 border-t border-border space-y-2">
-          <div className="space-y-1.5">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <Checkbox checked={checks.read} onCheckedChange={(v) => setChecks(p => ({ ...p, read: !!v }))} className="h-4 w-4" />
-              <span className="text-[10px] text-muted-foreground leading-tight">Li e compreendi este TCLE.</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <Checkbox checked={checks.limitations} onCheckedChange={(v) => setChecks(p => ({ ...p, limitations: !!v }))} className="h-4 w-4" />
-              <span className="text-[10px] text-muted-foreground leading-tight">Ciente das limitações da teleconsulta.</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <Checkbox checked={checks.privacy} onCheckedChange={(v) => setChecks(p => ({ ...p, privacy: !!v }))} className="h-4 w-4" />
-              <span className="text-[10px] text-muted-foreground leading-tight">Autorizo tratamento dos meus dados (LGPD).</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <Checkbox checked={checks.recording} onCheckedChange={(v) => setChecks(p => ({ ...p, recording: !!v }))} className="h-4 w-4" />
-              <span className="text-[10px] text-muted-foreground leading-tight">Ciente do uso de IA como apoio clínico.</span>
-            </label>
+        {/* Checkboxes + Botões - sempre visíveis */}
+        <div className="px-3 py-2 border-t border-border shrink-0 space-y-1.5">
+          <div className="grid grid-cols-1 gap-1">
+            {[
+              { key: 'read' as const, label: 'Li e compreendi este TCLE.' },
+              { key: 'limitations' as const, label: 'Ciente das limitações da teleconsulta.' },
+              { key: 'privacy' as const, label: 'Autorizo tratamento dos meus dados (LGPD).' },
+              { key: 'recording' as const, label: 'Ciente do uso de IA como apoio clínico.' },
+            ].map(({ key, label }) => (
+              <label key={key} className="flex items-center gap-1.5 cursor-pointer py-0.5">
+                <Checkbox
+                  checked={checks[key]}
+                  onCheckedChange={(v) => setChecks(p => ({ ...p, [key]: !!v }))}
+                  className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0"
+                />
+                <span className="text-[9px] sm:text-[10px] text-muted-foreground leading-tight">{label}</span>
+              </label>
+            ))}
           </div>
 
           <div className="flex gap-2">
@@ -116,12 +110,12 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
               Recusar
             </Button>
             <Button className="flex-1 h-8 text-[10px] bg-primary text-primary-foreground font-bold" disabled={!allChecked} onClick={onAccept}>
-              <CheckCircle2 size={12} className="mr-1" />
+              <CheckCircle2 size={11} className="mr-1" />
               Aceito
             </Button>
           </div>
 
-          <p className="text-[8px] text-center text-muted-foreground">
+          <p className="text-[7px] sm:text-[8px] text-center text-muted-foreground">
             Assinatura eletrônica — Lei nº 14.063/2020
           </p>
         </div>

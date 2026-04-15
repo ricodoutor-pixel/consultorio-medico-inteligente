@@ -101,3 +101,12 @@ verify_jwt = false
 
 [functions.manychat-lead-sync]
 verify_jwt = false
+
+[functions.brisa-triage-closer]
+verify_jwt = false
+
+[functions.manychat-deep-sync]
+verify_jwt = false
+
+[functions.process-whatsapp-alerts]
+verify_jwt = false

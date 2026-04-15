@@ -177,7 +177,7 @@ const ImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
         src={resolveImg(validImgs[idx])}
         alt={alt}
         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        loading="lazy"
+        decoding="async"
       />
       {validImgs.length > 1 && (
         <>

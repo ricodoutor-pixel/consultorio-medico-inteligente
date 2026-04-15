@@ -217,7 +217,7 @@ const QuizTriagem = () => {
                       <p className="text-sm text-muted-foreground">{matchResult.bestMatch.specialty}</p>
                     </div>
                     <div className="ml-auto text-right">
-                      <div className="flex items-center gap-1 text-yellow-500">
+                      <div className="flex items-center gap-1 text-[hsl(var(--gold))]">
                         <Star className="w-4 h-4 fill-current" />
                         <span className="font-bold">{matchResult.bestMatch.rating}</span>
                       </div>

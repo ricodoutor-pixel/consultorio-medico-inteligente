@@ -761,6 +761,74 @@ export type Database = {
           },
         ]
       }
+      doctor_availability: {
+        Row: {
+          appointment_id: string | null
+          created_at: string
+          doctor_id: string
+          id: string
+          reserved_by: string | null
+          reserved_until: string | null
+          slot_date: string
+          status: string
+          time_slot: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string
+          doctor_id: string
+          id?: string
+          reserved_by?: string | null
+          reserved_until?: string | null
+          slot_date: string
+          status?: string
+          time_slot: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          reserved_by?: string | null
+          reserved_until?: string | null
+          slot_date?: string
+          status?: string
+          time_slot?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_availability_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_availability_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+          {
+            foreignKeyName: "doctor_availability_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_availability_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doctor_performance_metrics: {
         Row: {
           average_rating: number
@@ -1889,11 +1957,14 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          cannabis_experience: string | null
           cpf: string | null
           created_at: string
           date_of_birth: string | null
           full_name: string
+          health_goal: string | null
           id: string
+          onboarding_completed: boolean
           phone: string | null
           referred_by: string | null
           updated_at: string
@@ -1901,11 +1972,14 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          cannabis_experience?: string | null
           cpf?: string | null
           created_at?: string
           date_of_birth?: string | null
           full_name?: string
+          health_goal?: string | null
           id: string
+          onboarding_completed?: boolean
           phone?: string | null
           referred_by?: string | null
           updated_at?: string
@@ -1913,11 +1987,14 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          cannabis_experience?: string | null
           cpf?: string | null
           created_at?: string
           date_of_birth?: string | null
           full_name?: string
+          health_goal?: string | null
           id?: string
+          onboarding_completed?: boolean
           phone?: string | null
           referred_by?: string | null
           updated_at?: string

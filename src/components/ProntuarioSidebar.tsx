@@ -256,6 +256,15 @@ export const ProntuarioSidebar = ({ onClose, onSave, patientId }: ProntuarioSide
         <Button className="w-full bg-primary text-primary-foreground font-bold text-xs" onClick={handleSave}>
           <Save size={14} className="mr-1" /> Salvar Prontuário
         </Button>
+        <Button
+          variant="outline"
+          className="w-full text-xs border-primary/30 text-primary hover:bg-primary/10"
+          onClick={handleGenerateCart}
+          disabled={cartLoading || !data.medications.trim()}
+        >
+          {cartLoading ? <Loader2 size={14} className="mr-1 animate-spin" /> : <ShoppingCart size={14} className="mr-1" />}
+          Gerar Carrinho One-Click
+        </Button>
         <Button variant="outline" className="w-full text-xs" onClick={handleSign}>
           <Shield size={14} className="mr-1" /> Assinar Digitalmente (ICP-Brasil)
         </Button>

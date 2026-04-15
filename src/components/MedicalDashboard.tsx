@@ -216,6 +216,32 @@ export function MedicalDashboard() {
         description: `Prescrição de ${activePatient.name} finalizada e assinada digitalmente.`,
       });
 
+      // Save fast-track cart for patient checkout
+      const cartItems = prescriptionItems.map((item, i) => ({
+        id: item.id,
+        name: item.name,
+        dosage: item.dosage,
+        price: 28900 + i * 6000,
+        quantity: 1,
+      }));
+      localStorage.setItem(`fast-cart-${activePatient.id}`, JSON.stringify(cartItems));
+
+      // Trigger purchase link via Edge Function
+      try {
+        await supabase.functions.invoke("send-purchase-link", {
+          body: {
+            patientId: activePatient.id,
+            patientPhone: "11999999999",
+            patientName: activePatient.name,
+            doctorName: "Dr. Edilson Bezerra",
+            items: cartItems,
+          },
+        });
+        toast.info("Link de compra enviado ao paciente via WhatsApp");
+      } catch {
+        console.warn("[Upsell] Falha ao enviar link de compra");
+      }
+
       // Remove from waiting room
       setPatients((prev) => prev.filter((p) => p.id !== activePatient.id));
       const remaining = patients.filter((p) => p.id !== activePatient.id);

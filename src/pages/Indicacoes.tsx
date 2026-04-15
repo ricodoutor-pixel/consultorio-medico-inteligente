@@ -21,8 +21,7 @@ import { AffiliateWalletCard } from "@/components/affiliates/AffiliateWalletCard
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
-const referralCode = "PLANTA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-const referralLink = `https://plantaeraiz.com.br/cadastro?ref=${referralCode}`;
+// Will be loaded from DB for authenticated users
 
 // Commission structure - 3 levels, up to 50% total
 const commissionLevels = [
@@ -76,18 +75,72 @@ const Indicacoes = () => {
   const [copied, setCopied] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState("painel");
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Real data from DB
+  const [referralCode, setReferralCode] = useState("");
+  const [referralLink, setReferralLink] = useState("");
+  const [totalEarnings, setTotalEarnings] = useState(0);
+  const [totalReferrals, setTotalReferrals] = useState(0);
+  const [commissions, setCommissions] = useState<any[]>([]);
+  const [networkData, setNetworkData] = useState({ level1: 0, level2: 0, level3: 0 });
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
+      if (session?.user) {
+        setUserId(session.user.id);
+        loadAffiliateData(session.user.id);
+      }
     };
     checkAuth();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
+      if (session?.user) {
+        setUserId(session.user.id);
+        loadAffiliateData(session.user.id);
+      }
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  const loadAffiliateData = async (uid: string) => {
+    // Load referral link
+    const { data: refLink } = await supabase
+      .from("referral_links")
+      .select("code, total_referrals, total_earnings")
+      .eq("user_id", uid)
+      .maybeSingle();
+
+    if (refLink) {
+      setReferralCode(refLink.code);
+      setReferralLink(`https://plantaeraiz.com.br/cadastro?ref=${refLink.code}`);
+      setTotalReferrals(refLink.total_referrals || 0);
+      setTotalEarnings(refLink.total_earnings || 0);
+    } else {
+      // Generate a new referral code if none exists
+      const newCode = "PLANTA-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+      setReferralCode(newCode);
+      setReferralLink(`https://plantaeraiz.com.br/cadastro?ref=${newCode}`);
+    }
+
+    // Load commissions
+    const { data: comms } = await supabase
+      .from("affiliate_commissions")
+      .select("*")
+      .eq("referrer_id", uid)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (comms) {
+      setCommissions(comms);
+      const l1 = comms.filter(c => c.level === 1).length;
+      const l2 = comms.filter(c => c.level === 2).length;
+      const l3 = comms.filter(c => c.level === 3).length;
+      setNetworkData({ level1: l1, level2: l2, level3: l3 });
+    }
+  };
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -96,12 +149,13 @@ const Indicacoes = () => {
     setTimeout(() => setCopied(false), 3000);
   };
 
-  // Mock data
-  const totalEarnings = 140;
-  const totalReferrals = 6;
-  const currentTier = affiliateTiers[1]; // Prata
-  const nextTier = affiliateTiers[2];
-  const progressToNext = Math.round(((totalReferrals - currentTier.min) / (nextTier.min - currentTier.min)) * 100);
+  // Calculate tier from real data
+  const currentTier = affiliateTiers.reduce((prev, tier) => totalReferrals >= tier.min ? tier : prev, affiliateTiers[0]);
+  const nextTierIdx = affiliateTiers.indexOf(currentTier) + 1;
+  const nextTier = nextTierIdx < affiliateTiers.length ? affiliateTiers[nextTierIdx] : affiliateTiers[affiliateTiers.length - 1];
+  const progressToNext = nextTier.min > currentTier.min
+    ? Math.min(100, Math.round(((totalReferrals - currentTier.min) / (nextTier.min - currentTier.min)) * 100))
+    : 100;
 
   if (isAuthenticated === null) {
     return (

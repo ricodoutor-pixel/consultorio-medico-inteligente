@@ -4,6 +4,8 @@ import { X, Send, Sparkles, Trash2, Minimize2, Calendar, ShoppingBag } from "luc
 import { Button } from "@/components/ui/button";
 import { FrogMascot } from "@/components/FrogMascot";
 import { LeadCaptureModal } from "@/components/LeadCaptureModal";
+import { UrgencyAlert } from "@/components/chat/UrgencyAlert";
+import { analyzeSentiment, type SentimentLevel } from "@/lib/sentimentAnalysis";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
@@ -12,6 +14,7 @@ interface Message {
   text: string;
   sender: "user" | "ai";
   timestamp: Date;
+  urgencyLevel?: SentimentLevel;
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verdinho-chat`;
@@ -136,6 +139,7 @@ export const FrogChatModal = () => {
     return localStorage.getItem("pr_lead_name") || "";
   });
   const [pendingMessage, setPendingMessage] = useState("");
+  const [urgencyAlert, setUrgencyAlert] = useState<{ level: SentimentLevel; triggers: string[] } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -169,11 +173,18 @@ export const FrogChatModal = () => {
   const doSendMessage = useCallback((text: string) => {
     if (!text.trim() || isStreaming) return;
 
+    // 🧠 Brisa IA 2.0 — Sentiment Analysis
+    const sentiment = analyzeSentiment(text);
+    if (sentiment.level !== "normal") {
+      setUrgencyAlert({ level: sentiment.level, triggers: sentiment.triggers });
+    }
+
     const userMsg: Message = {
       id: Date.now().toString(),
       text,
       sender: "user",
       timestamp: new Date(),
+      urgencyLevel: sentiment.level,
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -360,6 +371,15 @@ export const FrogChatModal = () => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* 🧠 Brisa IA 2.0 — Urgency Alert */}
+          {urgencyAlert && !isStreaming && (
+            <UrgencyAlert
+              level={urgencyAlert.level}
+              triggers={urgencyAlert.triggers}
+              onDismiss={() => setUrgencyAlert(null)}
+            />
           )}
 
           {/* Express Checkout CTA — shown when Brisa detects intent */}

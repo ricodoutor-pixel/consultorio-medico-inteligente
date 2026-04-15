@@ -102,6 +102,7 @@ const RevenueDistribution = lazy(() => import("./pages/RevenueDistribution"));
 const ProfessionalDashboard = lazy(() => import("./pages/ProfessionalDashboard"));
 const AdminMaster = lazy(() => import("./pages/AdminMaster"));
 const AdminMasterControl = lazy(() => import("./pages/AdminMasterControl"));
+const AdminBI = lazy(() => import("./pages/AdminBI"));
 const Badges = lazy(() => import("./pages/Badges"));
 const HealthCheck = lazy(() => import("./pages/HealthCheck"));
 const AutomationsDashboard = lazy(() => import("./pages/AutomationsDashboard"));
@@ -225,6 +226,7 @@ const App = () => (
                 <Route path="/conquistas" element={<Badges />} />
                 <Route path="/admin-master" element={<AdminRoute><AdminMaster /></AdminRoute>} />
                 <Route path="/admin/master-control" element={<AdminRoute><AdminMasterControl /></AdminRoute>} />
+                <Route path="/admin/bi" element={<AdminRoute><AdminBI /></AdminRoute>} />
                 <Route path="/health" element={<AdminRoute><HealthCheck /></AdminRoute>} />
                 <Route path="/admin/automations" element={<AdminRoute><AutomationsDashboard /></AdminRoute>} />
                 <Route path="/admin/omni-channel" element={<OmniChannelDashboard />} />

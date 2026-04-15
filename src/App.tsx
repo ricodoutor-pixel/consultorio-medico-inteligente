@@ -218,6 +218,7 @@ const App = () => (
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
                 <Route path="/quiz" element={<QuizTriagem />} />
+                <Route path="/condicao/:condicao" element={<CondicaoTratamento />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
@@ -227,6 +228,7 @@ const App = () => (
             {/* Mascote Verdinho removido — presente apenas na Navbar */}
             {/* WhatsApp Brisa Button */}
             <WhatsAppButton />
+            <MobileBottomNav />
             <CookieConsentBanner />
           </Suspense>
         </BrowserRouter>

@@ -361,6 +361,33 @@ export const FrogChatModal = () => {
             </div>
           )}
 
+          {/* Express Checkout CTA — shown when Brisa detects intent */}
+          {messages.length > 1 && !isStreaming && (() => {
+            const lastAiMsg = [...messages].reverse().find(m => m.sender === "ai");
+            const intent = lastAiMsg ? detectIntent(lastAiMsg.text) : null;
+            if (!intent) return null;
+            return (
+              <div className="flex gap-2 pt-2">
+                {intent === "booking" && (
+                  <button
+                    onClick={() => { setIsOpen(false); navigate("/agendamento"); }}
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-full bg-primary text-primary-foreground font-bold animate-pulse hover:animate-none transition-all"
+                  >
+                    <Calendar size={14} /> Agendar Agora — R$ 55
+                  </button>
+                )}
+                {intent === "shopping" && (
+                  <button
+                    onClick={() => { setIsOpen(false); navigate("/shopping"); }}
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-full bg-primary text-primary-foreground font-bold animate-pulse hover:animate-none transition-all"
+                  >
+                    <ShoppingBag size={14} /> Ver Produtos
+                  </button>
+                )}
+              </div>
+            );
+          })()}
+
           {/* Quick actions - only show at start */}
           {messages.length === 1 && !isStreaming && (
             <div className="flex flex-wrap gap-2 pt-2">

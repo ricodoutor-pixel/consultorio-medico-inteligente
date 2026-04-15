@@ -106,6 +106,7 @@ const OfertaEspecial = lazy(() => import("./pages/OfertaEspecial"));
 const AdminFinanceiro = lazy(() => import("./pages/AdminFinanceiro"));
 const QuizTriagem = lazy(() => import("./pages/QuizTriagem"));
 const CondicaoTratamento = lazy(() => import("./pages/CondicaoTratamento"));
+const Consultorio = lazy(() => import("./pages/Consultorio"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -221,6 +222,7 @@ const App = () => (
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
                 <Route path="/quiz" element={<QuizTriagem />} />
                 <Route path="/condicao/:condicao" element={<CondicaoTratamento />} />
+                <Route path="/consultorio" element={<PrivateRoute><Consultorio /></PrivateRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

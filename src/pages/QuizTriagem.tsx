@@ -92,7 +92,7 @@ const QuizTriagem = () => {
     setLoading(true);
     try {
       const conditionStep = QUIZ_STEPS[0].options.find(o => o.value === answers.condition);
-      const specialty = conditionStep?.specialty || "Cannabis Medicinal";
+      const specialty = (conditionStep as any)?.specialty || "Cannabis Medicinal";
       const urgency = answers.urgency === "alta" ? "alta" : answers.urgency === "media" ? "media" : "baixa";
 
       const { data: { session } } = await supabase.auth.getSession();

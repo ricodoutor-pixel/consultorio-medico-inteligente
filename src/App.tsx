@@ -229,6 +229,8 @@ const App = () => (
                 <Route path="/quiz" element={<QuizTriagem />} />
                 <Route path="/condicao/:condicao" element={<CondicaoTratamento />} />
                 <Route path="/consultorio" element={<PrivateRoute><Consultorio /></PrivateRoute>} />
+                <Route path="/checkout/fast-track" element={<FastTrackCheckout />} />
+                <Route path="/afiliados/dashboard" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

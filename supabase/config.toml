@@ -116,3 +116,15 @@ verify_jwt = false
 
 [functions.queue-match]
 verify_jwt = false
+
+[functions.get-stripe-price]
+verify_jwt = false
+
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.payments-webhook]
+verify_jwt = false
+
+[functions.whatsapp-cart-notify]
+verify_jwt = false

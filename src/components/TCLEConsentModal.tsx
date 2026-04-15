@@ -35,183 +35,163 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onDecline(); }}>
-      <DialogContent className="max-w-2xl max-h-[90vh] p-0 gap-0" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
-        <DialogHeader className="p-6 pb-3 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <FileText size={20} className="text-primary" />
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[95vh] sm:max-h-[90vh] p-0 gap-0 rounded-2xl" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+        <DialogHeader className="p-3 sm:p-6 pb-2 sm:pb-3 border-b border-border">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <FileText size={16} className="text-primary sm:hidden" />
+              <FileText size={20} className="text-primary hidden sm:block" />
             </div>
-            <div>
-              <DialogTitle className="text-lg font-bold text-foreground">
-                Termo de Consentimento Livre e Esclarecido (TCLE)
+            <div className="min-w-0">
+              <DialogTitle className="text-sm sm:text-lg font-bold text-foreground leading-tight">
+                Termo de Consentimento (TCLE)
               </DialogTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Teleconsulta Médica — CFM Res. nº 2.314/2022 e nº 2.454/2026
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">
+                CFM Res. nº 2.314/2022 e nº 2.454/2026
               </p>
             </div>
           </div>
-          <Badge variant="outline" className="w-fit mt-2 text-[10px] border-primary/30 text-primary">
-            <Shield size={8} className="mr-1" /> Documento com validade jurídica
+          <Badge variant="outline" className="w-fit mt-1.5 text-[9px] sm:text-[10px] border-primary/30 text-primary">
+            <Shield size={8} className="mr-1" /> Validade jurídica
           </Badge>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[50vh] px-6 py-4">
-          <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-            <p className="text-foreground font-semibold">
+        <ScrollArea className="max-h-[45vh] sm:max-h-[50vh] px-3 sm:px-6 py-3 sm:py-4">
+          <div className="space-y-3 sm:space-y-4 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            <p className="text-foreground font-semibold text-xs sm:text-sm">
               Prezado(a) {patientName},
             </p>
 
-            <p>
-              Este Termo de Consentimento Livre e Esclarecido (TCLE) tem como objetivo informá-lo(a) sobre as condições, 
-              benefícios, limitações e riscos da teleconsulta médica que será realizada por meio desta plataforma, 
-              em conformidade com a <strong>Resolução CFM nº 2.314/2022</strong>, a <strong>Resolução CFM nº 2.454/2026</strong> (uso de IA na medicina), 
-              a <strong>Lei nº 13.709/2018 (LGPD)</strong> e demais normativas aplicáveis.
+            <p className="text-[11px] sm:text-sm">
+              Este TCLE informa sobre condições, benefícios, limitações e riscos da teleconsulta, 
+              conforme <strong>Res. CFM nº 2.314/2022</strong>, <strong>nº 2.454/2026</strong> e <strong>LGPD</strong>.
             </p>
 
-            <div className="bg-muted/30 border border-border rounded-xl p-4">
-              <h3 className="font-bold text-foreground mb-2">1. NATUREZA DA TELECONSULTA</h3>
-              <p>
-                A teleconsulta é uma modalidade de atendimento médico à distância, realizada por meio de tecnologias 
-                de comunicação em tempo real (áudio e vídeo), que permite a interação entre médico e paciente sem a 
-                necessidade de presença física simultânea no mesmo local. A teleconsulta será conduzida pelo(a) 
-                Dr(a). <strong>{doctorName}</strong>, devidamente registrado(a) no Conselho Regional de Medicina (CRM).
+            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">1. NATUREZA DA TELECONSULTA</h3>
+              <p className="text-[11px] sm:text-sm">
+                Atendimento médico à distância por áudio e vídeo em tempo real, conduzido pelo(a) 
+                Dr(a). <strong>{doctorName}</strong> (CRM ativo).
               </p>
             </div>
 
-            <div className="bg-muted/30 border border-border rounded-xl p-4">
-              <h3 className="font-bold text-foreground mb-2">2. OBJETIVOS</h3>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Avaliação clínica e anamnese do(a) paciente;</li>
-                <li>Orientação diagnóstica e terapêutica;</li>
-                <li>Emissão de receitas, atestados e solicitações de exames, quando aplicável;</li>
-                <li>Acompanhamento clínico de condições já diagnosticadas;</li>
-                <li>Encaminhamento para consulta presencial, quando necessário.</li>
+            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">2. OBJETIVOS</h3>
+              <ul className="list-disc list-inside space-y-0.5 text-[11px] sm:text-sm">
+                <li>Avaliação clínica e anamnese</li>
+                <li>Orientação diagnóstica e terapêutica</li>
+                <li>Emissão de receitas e atestados</li>
+                <li>Acompanhamento clínico</li>
               </ul>
             </div>
 
-            <div className="bg-muted/30 border border-border rounded-xl p-4">
-              <h3 className="font-bold text-foreground mb-2">3. LIMITAÇÕES DA TELECONSULTA</h3>
-              <div className="flex items-start gap-2 mb-2">
-                <AlertTriangle size={14} className="text-yellow-500 mt-0.5 shrink-0" />
-                <p className="text-xs">O(A) paciente declara estar ciente de que:</p>
+            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">3. LIMITAÇÕES</h3>
+              <div className="flex items-start gap-1.5 mb-1.5">
+                <AlertTriangle size={12} className="text-yellow-500 mt-0.5 shrink-0" />
+                <p className="text-[10px] sm:text-xs">O(A) paciente declara ciência:</p>
               </div>
-              <ul className="list-disc list-inside space-y-1">
-                <li>A teleconsulta <strong>não substitui</strong> o atendimento presencial em casos de urgência/emergência;</li>
-                <li>O exame físico não pode ser realizado à distância, o que pode limitar a precisão diagnóstica;</li>
-                <li>Problemas técnicos (conexão à internet, falhas de áudio/vídeo) podem prejudicar a qualidade do atendimento;</li>
-                <li>O médico poderá solicitar atendimento presencial se julgar necessário para a segurança do paciente;</li>
-                <li>Ferramentas de Inteligência Artificial podem ser utilizadas como <strong>apoio</strong> à decisão clínica, 
-                    mas a decisão final é sempre do médico responsável (CFM nº 2.454/2026).</li>
+              <ul className="list-disc list-inside space-y-0.5 text-[11px] sm:text-sm">
+                <li>Não substitui atendimento presencial de urgência</li>
+                <li>Exame físico não pode ser feito à distância</li>
+                <li>Problemas técnicos podem afetar a qualidade</li>
+                <li>IA é apenas apoio — decisão final é do médico (CFM nº 2.454/2026)</li>
               </ul>
             </div>
 
-            <div className="bg-muted/30 border border-border rounded-xl p-4">
-              <h3 className="font-bold text-foreground mb-2">4. PRIVACIDADE E PROTEÇÃO DE DADOS (LGPD)</h3>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Todos os dados de saúde são classificados como <strong>dados sensíveis</strong> (Art. 5º, II, LGPD);</li>
-                <li>As informações são criptografadas com protocolo <strong>AES-256</strong> (em repouso) e <strong>TLS 1.3</strong> (em trânsito);</li>
-                <li>O conteúdo do vídeo <strong>não é gravado nem armazenado</strong>, salvo autorização expressa do paciente;</li>
-                <li>O prontuário eletrônico é armazenado com acesso restrito e auditável;</li>
-                <li>O(A) paciente tem direito de solicitar acesso, correção ou exclusão de seus dados (Art. 18, LGPD);</li>
-                <li>Um Relatório de Impacto à Proteção de Dados (RIPD) está disponível em conformidade com o Art. 38 da LGPD.</li>
+            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">4. PRIVACIDADE (LGPD)</h3>
+              <ul className="list-disc list-inside space-y-0.5 text-[11px] sm:text-sm">
+                <li>Dados de saúde são <strong>dados sensíveis</strong></li>
+                <li>Criptografia <strong>AES-256</strong> + <strong>TLS 1.3</strong></li>
+                <li>Vídeo <strong>não gravado</strong> sem autorização</li>
+                <li>Prontuário com acesso restrito e auditável</li>
+                <li>Direito de acesso, correção e exclusão (Art. 18)</li>
               </ul>
             </div>
 
-            <div className="bg-muted/30 border border-border rounded-xl p-4">
-              <h3 className="font-bold text-foreground mb-2">5. ASSINATURA DIGITAL</h3>
-              <p>
-                Todos os documentos clínicos (receitas, atestados, laudos) emitidos durante ou após a teleconsulta 
-                são assinados digitalmente no padrão <strong>ICP-Brasil</strong> (Infraestrutura de Chaves Públicas Brasileira), 
-                possuindo validade jurídica equivalente à assinatura manuscrita, conforme a 
-                <strong> Medida Provisória nº 2.200-2/2001</strong> e a <strong>Lei nº 14.063/2020</strong>.
+            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">5. ASSINATURA DIGITAL</h3>
+              <p className="text-[11px] sm:text-sm">
+                Documentos assinados no padrão <strong>ICP-Brasil</strong> com validade jurídica (Lei nº 14.063/2020).
               </p>
             </div>
 
-            <div className="bg-muted/30 border border-border rounded-xl p-4">
-              <h3 className="font-bold text-foreground mb-2">6. USO DE INTELIGÊNCIA ARTIFICIAL (CFM nº 2.454/2026)</h3>
-              <p>
-                Esta plataforma pode utilizar recursos de IA para:
-              </p>
-              <ul className="list-disc list-inside space-y-1 mt-2">
-                <li>Transcrição automática de áudio (Speech-to-Text) para auxílio na redação do prontuário;</li>
-                <li>Sugestões de diagnóstico e tratamento baseadas em evidências científicas;</li>
-                <li>Triagem inicial para direcionamento ao especialista adequado.</li>
+            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">6. USO DE IA (CFM nº 2.454/2026)</h3>
+              <ul className="list-disc list-inside space-y-0.5 text-[11px] sm:text-sm">
+                <li>Transcrição automática de áudio</li>
+                <li>Sugestões baseadas em evidências</li>
+                <li>Triagem para especialista adequado</li>
               </ul>
-              <p className="mt-2 text-xs font-semibold text-foreground">
-                ⚠️ Conforme a Resolução CFM nº 2.454/2026, todas as decisões clínicas são de responsabilidade 
-                exclusiva do médico. A IA atua apenas como ferramenta de apoio e seus resultados estão sujeitos à 
-                revisão médica obrigatória.
+              <p className="mt-1.5 text-[10px] sm:text-xs font-semibold text-foreground">
+                ⚠️ Decisões clínicas são responsabilidade exclusiva do médico.
               </p>
             </div>
 
-            <div className="bg-muted/30 border border-border rounded-xl p-4">
-              <h3 className="font-bold text-foreground mb-2">7. DIREITOS DO PACIENTE</h3>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Revogar este consentimento a qualquer momento, sem prejuízo;</li>
-                <li>Solicitar atendimento presencial;</li>
-                <li>Acessar seu prontuário eletrônico completo;</li>
-                <li>Solicitar segunda opinião médica;</li>
-                <li>Registrar reclamações junto ao CRM ou à ANPD (Autoridade Nacional de Proteção de Dados).</li>
+            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">7. DIREITOS DO PACIENTE</h3>
+              <ul className="list-disc list-inside space-y-0.5 text-[11px] sm:text-sm">
+                <li>Revogar consentimento a qualquer momento</li>
+                <li>Solicitar atendimento presencial</li>
+                <li>Acessar prontuário completo</li>
+                <li>Segunda opinião médica</li>
               </ul>
             </div>
 
-            <div className="bg-muted/30 border border-border rounded-xl p-4">
-              <h3 className="font-bold text-foreground mb-2">8. REGISTRO DA CONSULTA</h3>
-              <p>
-                Conforme a Resolução CFM nº 2.314/2022, Art. 7º, a consulta será registrada no prontuário eletrônico 
-                contendo: data e hora, meio de comunicação utilizado, número do CRM do médico, diagnóstico (CID-10), 
-                conduta terapêutica e orientações fornecidas.
+            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
+              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">8. REGISTRO DA CONSULTA</h3>
+              <p className="text-[11px] sm:text-sm">
+                Registrada conforme Res. CFM nº 2.314/2022: data, hora, CRM, diagnóstico (CID-10) e conduta.
               </p>
             </div>
 
-            <p className="text-xs text-muted-foreground border-t border-border pt-3">
-              Data: {today} — Plataforma Planta & Raiz — CNPJ: XX.XXX.XXX/0001-XX<br />
-              Diretor Técnico Médico: Dr(a). [Nome] — CRM/UF: XXXXX
+            <p className="text-[9px] sm:text-xs text-muted-foreground border-t border-border pt-2">
+              {today} — Planta & Raiz — CNPJ: XX.XXX.XXX/0001-XX
             </p>
           </div>
         </ScrollArea>
 
-        <div className="p-6 pt-4 border-t border-border space-y-4">
-          <div className="space-y-3">
-            <label className="flex items-start gap-3 cursor-pointer group">
-              <Checkbox checked={checks.read} onCheckedChange={(v) => setChecks(p => ({ ...p, read: !!v }))} />
-              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                Li e compreendi integralmente este Termo de Consentimento Livre e Esclarecido.
+        <div className="p-3 sm:p-6 pt-3 sm:pt-4 border-t border-border space-y-2.5 sm:space-y-4">
+          <div className="space-y-2 sm:space-y-3">
+            <label className="flex items-start gap-2 sm:gap-3 cursor-pointer group">
+              <Checkbox checked={checks.read} onCheckedChange={(v) => setChecks(p => ({ ...p, read: !!v }))} className="mt-0.5" />
+              <span className="text-[11px] sm:text-xs text-muted-foreground group-hover:text-foreground transition-colors leading-tight">
+                Li e compreendi este TCLE.
               </span>
             </label>
-            <label className="flex items-start gap-3 cursor-pointer group">
-              <Checkbox checked={checks.limitations} onCheckedChange={(v) => setChecks(p => ({ ...p, limitations: !!v }))} />
-              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                Estou ciente das limitações da teleconsulta e de que o médico poderá solicitar atendimento presencial.
+            <label className="flex items-start gap-2 sm:gap-3 cursor-pointer group">
+              <Checkbox checked={checks.limitations} onCheckedChange={(v) => setChecks(p => ({ ...p, limitations: !!v }))} className="mt-0.5" />
+              <span className="text-[11px] sm:text-xs text-muted-foreground group-hover:text-foreground transition-colors leading-tight">
+                Ciente das limitações da teleconsulta.
               </span>
             </label>
-            <label className="flex items-start gap-3 cursor-pointer group">
-              <Checkbox checked={checks.privacy} onCheckedChange={(v) => setChecks(p => ({ ...p, privacy: !!v }))} />
-              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                Autorizo o tratamento dos meus dados de saúde conforme a LGPD e a Política de Privacidade da plataforma.
+            <label className="flex items-start gap-2 sm:gap-3 cursor-pointer group">
+              <Checkbox checked={checks.privacy} onCheckedChange={(v) => setChecks(p => ({ ...p, privacy: !!v }))} className="mt-0.5" />
+              <span className="text-[11px] sm:text-xs text-muted-foreground group-hover:text-foreground transition-colors leading-tight">
+                Autorizo o tratamento dos meus dados (LGPD).
               </span>
             </label>
-            <label className="flex items-start gap-3 cursor-pointer group">
-              <Checkbox checked={checks.recording} onCheckedChange={(v) => setChecks(p => ({ ...p, recording: !!v }))} />
-              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                Estou ciente de que o vídeo <strong>não será gravado</strong>, e que ferramentas de IA poderão ser utilizadas como apoio clínico.
+            <label className="flex items-start gap-2 sm:gap-3 cursor-pointer group">
+              <Checkbox checked={checks.recording} onCheckedChange={(v) => setChecks(p => ({ ...p, recording: !!v }))} className="mt-0.5" />
+              <span className="text-[11px] sm:text-xs text-muted-foreground group-hover:text-foreground transition-colors leading-tight">
+                Ciente do uso de IA como apoio clínico.
               </span>
             </label>
           </div>
 
-          <div className="flex gap-3">
-            <Button variant="outline" className="flex-1" onClick={onDecline}>
-              Recusar e Sair
+          <div className="flex gap-2 sm:gap-3">
+            <Button variant="outline" className="flex-1 h-9 sm:h-10 text-xs sm:text-sm" onClick={onDecline}>
+              Recusar
             </Button>
-            <Button className="flex-1 bg-primary text-primary-foreground font-bold" disabled={!allChecked} onClick={onAccept}>
-              <CheckCircle2 size={16} className="mr-2" />
-              Aceito o Termo
+            <Button className="flex-1 h-9 sm:h-10 text-xs sm:text-sm bg-primary text-primary-foreground font-bold" disabled={!allChecked} onClick={onAccept}>
+              <CheckCircle2 size={14} className="mr-1.5" />
+              Aceito
             </Button>
           </div>
 
-          <p className="text-[10px] text-center text-muted-foreground">
-            Ao aceitar, você assina eletronicamente este TCLE conforme Lei nº 14.063/2020. 
-            Uma cópia será enviada ao seu e-mail cadastrado.
+          <p className="text-[9px] sm:text-[10px] text-center text-muted-foreground">
+            Assinatura eletrônica conforme Lei nº 14.063/2020.
           </p>
         </div>
       </DialogContent>

@@ -168,7 +168,9 @@ const AdminDashboard = () => {
             ))}
           </div>
 
-          {/* Secondary KPIs */}
+          {/* App Downloads Counter */}
+          <AppDownloadsCounter />
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { label: "Consultas Totais", value: stats.totalAppointments, icon: Stethoscope },

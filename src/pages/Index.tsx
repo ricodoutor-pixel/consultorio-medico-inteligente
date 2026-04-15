@@ -192,7 +192,7 @@ const Index = () => {
             {steps.map((step, i) => (
               <motion.div key={i} className="relative p-4 md:p-6 rounded-2xl md:rounded-3xl bg-card/30 border border-border hover:border-primary/20 transition-all group" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
                 <div className="mb-3 md:mb-4 relative h-28 md:h-40 overflow-hidden rounded-xl md:rounded-2xl">
-                  <img src={step.img} alt={step.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  <img src={step.img} alt={step.title} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   <div className="absolute top-3 left-3 w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-primary-foreground text-lg font-black shadow-lg">
                     {step.n}
                   </div>
@@ -287,7 +287,9 @@ const Index = () => {
                 <div className="flex items-center gap-3">
                   <img 
                     src={t.image} 
-                    alt={t.name} 
+                    alt={t.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-12 h-12 rounded-full object-cover border-2 border-primary/30"
                   />
                   <div>

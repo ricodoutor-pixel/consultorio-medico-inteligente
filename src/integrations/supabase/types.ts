@@ -780,6 +780,42 @@ export type Database = {
         }
         Relationships: []
       }
+      data_deletion_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          reason: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       delivery_confirmations: {
         Row: {
           confirmed_at: string
@@ -2584,6 +2620,42 @@ export type Database = {
           sleep_quality?: number
           thc_pct?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_consents: {
+        Row: {
+          accepted: boolean
+          consent_type: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          revoked_at: string | null
+          user_agent: string | null
+          user_id: string
+          version: string
+        }
+        Insert: {
+          accepted?: boolean
+          consent_type: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          revoked_at?: string | null
+          user_agent?: string | null
+          user_id: string
+          version?: string
+        }
+        Update: {
+          accepted?: boolean
+          consent_type?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          revoked_at?: string | null
+          user_agent?: string | null
+          user_id?: string
+          version?: string
         }
         Relationships: []
       }

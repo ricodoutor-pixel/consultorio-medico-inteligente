@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { updateFrogIcon } from "@/lib/serviceWorkerRegistration";
 
 export type FrogMood = "happy" | "warning" | "critical";
 

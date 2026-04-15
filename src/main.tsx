@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { initAntiClone } from "./lib/anti-clone";
+import { registerServiceWorker } from "./lib/serviceWorkerRegistration";
 import App from "./App.tsx";
 import { CustomLoader } from "./components/CustomLoader";
 import "./index.css";
@@ -19,6 +20,9 @@ if (isPreviewHost || isInIframe) {
   navigator.serviceWorker?.getRegistrations().then((regs) => {
     regs.forEach((r) => r.unregister());
   });
+} else {
+  // Registrar Service Worker apenas em produção
+  registerServiceWorker();
 }
 
 createRoot(document.getElementById("root")!).render(

@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { LTVMetricsPanel } from "@/components/admin/LTVMetricsPanel";
 import { RegistrationStatsPanel } from "@/components/admin/RegistrationStatsPanel";
+import { AppDownloadsCounter } from "@/components/admin/AppDownloadsCounter";
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -167,7 +168,9 @@ const AdminDashboard = () => {
             ))}
           </div>
 
-          {/* Secondary KPIs */}
+          {/* App Downloads Counter */}
+          <AppDownloadsCounter />
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { label: "Consultas Totais", value: stats.totalAppointments, icon: Stethoscope },

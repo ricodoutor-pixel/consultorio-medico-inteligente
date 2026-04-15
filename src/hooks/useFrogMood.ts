@@ -114,6 +114,8 @@ export function useFrogMood() {
     };
     localStorage.setItem(MOOD_KEY, JSON.stringify(data));
     setMoodData(data);
+    // Notifica o Service Worker para atualizar o ícone do PWA
+    updateFrogIcon(computed);
   }, []);
 
   useEffect(() => {
@@ -142,6 +144,7 @@ export function useFrogMood() {
     };
     localStorage.setItem(MOOD_KEY, JSON.stringify(data));
     setMoodData(data);
+    updateFrogIcon(mood);
   }, []);
 
   return {

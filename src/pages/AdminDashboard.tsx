@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LTVMetricsPanel } from "@/components/admin/LTVMetricsPanel";
 import { RegistrationStatsPanel } from "@/components/admin/RegistrationStatsPanel";
 import { AppDownloadsCounter } from "@/components/admin/AppDownloadsCounter";
+import { LiveAppAnalytics } from "@/components/admin/LiveAppAnalytics";
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -170,6 +171,9 @@ const AdminDashboard = () => {
 
           {/* App Downloads Counter */}
           <AppDownloadsCounter />
+
+          {/* Live App Analytics (ManyChat Sync) */}
+          <LiveAppAnalytics />
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[

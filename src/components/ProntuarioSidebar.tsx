@@ -101,10 +101,33 @@ export const ProntuarioSidebar = ({ onClose, onSave, patientId }: ProntuarioSide
 
     // Generate a pseudo prescription ID from the current session
     const prescriptionId = crypto.randomUUID();
-    const doctorId = "current"; // Will be resolved server-side
+    const doctorId = "current";
     const pid = patientId || "unknown";
 
-    await createCartFromPrescription(prescriptionId, doctorId, pid, items);
+    const result = await createCartFromPrescription(prescriptionId, doctorId, pid, items);
+    
+    // Dispatch WhatsApp notification with cart link
+    if (result?.cart_token) {
+      const cartUrl = `${window.location.origin}/checkout/${result.cart_token}`;
+      const patientPhone = localStorage.getItem("pr_lead_phone") || "";
+      const patientName = localStorage.getItem("pr_lead_name") || "paciente";
+      
+      try {
+        await supabase.functions.invoke("whatsapp-cart-notify", {
+          body: {
+            action: "cart_ready",
+            patient_phone: patientPhone,
+            patient_name: patientName,
+            cart_url: cartUrl,
+            cart_token: result.cart_token,
+          },
+        });
+        toast({ title: "WhatsApp enviado!", description: "Link do carrinho enviado ao paciente." });
+      } catch {
+        // Non-blocking: cart was still created
+        console.warn("WhatsApp notify failed, cart still created");
+      }
+    }
   };
 
   return (

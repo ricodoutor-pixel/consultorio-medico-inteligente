@@ -113,6 +113,7 @@ const detectIntent = (text: string): "booking" | "shopping" | null => {
 };
 
 export const FrogChatModal = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {

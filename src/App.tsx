@@ -26,6 +26,7 @@ import { SearchEngineOptimization } from "@/components/SearchEngineOptimization"
 import { DynamicSEOHead } from "@/components/DynamicSEOHead";
 import { LocalCTABanner } from "@/components/LocalCTABanner";
 import { OnboardingModal } from "@/components/OnboardingModal";
+import { ConsentManager } from "@/components/ConsentManager";
 
 const Loading = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
@@ -100,6 +101,7 @@ const EbookAnalyticsDashboard = lazy(() => import("./pages/EbookAnalyticsDashboa
 const RevenueDistribution = lazy(() => import("./pages/RevenueDistribution"));
 const ProfessionalDashboard = lazy(() => import("./pages/ProfessionalDashboard"));
 const AdminMaster = lazy(() => import("./pages/AdminMaster"));
+const AdminMasterControl = lazy(() => import("./pages/AdminMasterControl"));
 const Badges = lazy(() => import("./pages/Badges"));
 const HealthCheck = lazy(() => import("./pages/HealthCheck"));
 const AutomationsDashboard = lazy(() => import("./pages/AutomationsDashboard"));
@@ -136,6 +138,7 @@ const App = () => (
             <FrogChatModal />
             <ShoppingCart />
             <OnboardingModal />
+            <ConsentManager />
             <Suspense fallback={<Loading />}>
               <main id="main-content" role="main">
               <Routes>
@@ -221,6 +224,7 @@ const App = () => (
                 <Route path="/badges" element={<Badges />} />
                 <Route path="/conquistas" element={<Badges />} />
                 <Route path="/admin-master" element={<AdminRoute><AdminMaster /></AdminRoute>} />
+                <Route path="/admin/master-control" element={<AdminRoute><AdminMasterControl /></AdminRoute>} />
                 <Route path="/health" element={<AdminRoute><HealthCheck /></AdminRoute>} />
                 <Route path="/admin/automations" element={<AdminRoute><AutomationsDashboard /></AdminRoute>} />
                 <Route path="/admin/omni-channel" element={<OmniChannelDashboard />} />

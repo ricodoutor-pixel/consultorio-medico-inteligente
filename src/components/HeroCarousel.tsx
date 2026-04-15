@@ -52,8 +52,12 @@ export function HeroCarousel() {
     return () => { emblaApi.off("select", onSelect); };
   }, [emblaApi, onSelect]);
 
+  const scrollTo = useCallback((index: number) => {
+    emblaApi?.scrollTo(index);
+  }, [emblaApi]);
+
   return (
-    <div className="relative w-[260px] sm:w-[300px] md:w-[340px] lg:w-[380px] mx-auto">
+    <div className="relative w-[240px] xs:w-[260px] sm:w-[300px] md:w-[340px] lg:w-[380px] mx-auto">
       {/* Phone frame */}
       <div className="relative rounded-[2.5rem] border-[6px] border-foreground/20 bg-background overflow-hidden shadow-2xl shadow-primary/20">
         {/* Notch */}
@@ -69,8 +73,9 @@ export function HeroCarousel() {
                   alt={slide.alt}
                   className="w-full h-full object-cover"
                   width={640}
-                  height={1024}
+                  height={1138}
                   loading={i === 0 ? undefined : "lazy"}
+                  decoding={i === 0 ? "sync" : "async"}
                 />
               </div>
             ))}
@@ -81,6 +86,26 @@ export function HeroCarousel() {
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-28 h-1 bg-foreground/30 rounded-full z-20" />
       </div>
 
+      {/* Pagination dots */}
+      <div className="flex items-center justify-center gap-1.5 mt-3">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => scrollTo(i)}
+            aria-label={`Ir para slide ${i + 1}`}
+            className={`rounded-full transition-all duration-300 ${
+              i === selectedIndex
+                ? "w-6 h-2 bg-primary"
+                : "w-2 h-2 bg-foreground/20 hover:bg-foreground/40"
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Slide counter */}
+      <p className="text-center text-xs text-muted-foreground mt-1">
+        {selectedIndex + 1} / {slides.length}
+      </p>
     </div>
   );
 }

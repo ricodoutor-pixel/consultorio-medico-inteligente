@@ -21,6 +21,7 @@ import { ReferralCaptureProvider } from "@/components/ReferralCaptureProvider";
 import { SearchEngineOptimization } from "@/components/SearchEngineOptimization";
 import { DynamicSEOHead } from "@/components/DynamicSEOHead";
 import { LocalCTABanner } from "@/components/LocalCTABanner";
+import { OnboardingModal } from "@/components/OnboardingModal";
 
 const Loading = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">

@@ -14,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WellnessSubscriptionCards } from "@/components/WellnessSubscriptionCards";
+import { PWAStreakBanner } from "@/components/PWAStreakBanner";
 import { PatientCheckinCard } from "@/components/PatientCheckinCard";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { ProgressReportGenerator } from "@/components/ProgressReportGenerator";
@@ -176,8 +177,11 @@ const DashboardPaciente = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      <div className="pt-20 md:pt-24">
+        <PWAStreakBanner />
+      </div>
 
-      <section className="pt-24 pb-8 md:pt-32">
+      <section className="pb-8">
         <div className="container mx-auto px-4">
           <motion.div className="flex items-center justify-between flex-wrap gap-4 mb-6" initial="hidden" animate="visible" variants={fadeUp}>
             <div className="flex items-center gap-3">

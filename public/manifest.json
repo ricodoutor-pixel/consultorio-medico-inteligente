@@ -1,11 +1,11 @@
 {
-  "name": "Planta y Raiz — Telemedicina Cannabis Medicinal",
+  "name": "Planta y Raiz — Cannabis Medicinal",
   "short_name": "Planta y Raiz",
   "description": "A maior plataforma de democratização da Cannabis Medicinal no Brasil. Consultas a partir de R$30.",
   "start_url": "/?source=pwa",
   "display": "standalone",
   "background_color": "#0A0E27",
-  "theme_color": "#0A0E27",
+  "theme_color": "#15803d",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [

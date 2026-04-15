@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
+import { PWAInstallSection } from "@/components/PWAInstallSection";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
@@ -327,6 +328,11 @@ const Precos = () => {
       </section>
 
       {/* CTA */}
+      {/* PWA Install CTA */}
+      <div id="instalar-app">
+        <PWAInstallSection />
+      </div>
+
       <section className="py-20 md:py-28 hero-glow">
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h2 className="text-3xl md:text-4xl font-display font-black text-foreground mb-6 tracking-tight">

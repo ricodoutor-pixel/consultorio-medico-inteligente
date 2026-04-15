@@ -123,6 +123,7 @@ const App = () => (
             <ReferralCaptureProvider />
             <FrogChatModal />
             <ShoppingCart />
+            <OnboardingModal />
             <Suspense fallback={<Loading />}>
               <main id="main-content" role="main">
               <Routes>

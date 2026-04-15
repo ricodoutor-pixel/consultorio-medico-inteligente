@@ -39,8 +39,13 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'vendor';
-            if (id.includes('framer-motion') || id.includes('recharts')) return 'ui';
+            if (id.includes('react-dom') || id.includes('react-router')) return 'react-core';
+            if (id.includes('react')) return 'react-base';
+            if (id.includes('recharts') || id.includes('d3')) return 'charts';
+            if (id.includes('framer-motion')) return 'animation';
+            if (id.includes('@radix-ui') || id.includes('cmdk')) return 'ui-primitives';
+            if (id.includes('@supabase')) return 'supabase';
+            if (id.includes('i18next')) return 'i18n';
             return 'vendor';
           }
         },

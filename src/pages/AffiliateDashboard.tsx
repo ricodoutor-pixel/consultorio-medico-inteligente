@@ -129,7 +129,7 @@ export default function AffiliateDashboard() {
               <p className="text-sm text-muted-foreground">Acompanhe seus resultados e comissões</p>
             </div>
             <div className="flex items-center gap-2">
-              <EarningsNotificationBell userId={referralCode ? undefined : undefined} />
+              <EarningsNotificationBell userId={userId} />
               <Badge variant="outline" className="border-primary/30 text-primary">
                 Nível Bronze
               </Badge>

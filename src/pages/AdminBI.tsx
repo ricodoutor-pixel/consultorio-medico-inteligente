@@ -152,10 +152,10 @@ const AdminBI = () => {
         ) : metrics && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { icon: DollarSign, label: "Faturamento Total", value: formatBRL(metrics.totalRevenue), color: "text-emerald-400" },
-              { icon: Users, label: "Pacientes", value: metrics.totalPatients.toString(), color: "text-blue-400" },
+              { icon: DollarSign, label: "MRR (Recorrente)", value: formatBRL((metrics as any).mrr || 0), color: "text-emerald-400" },
+              { icon: TrendingUp, label: "Vendas Hoje", value: formatBRL((metrics as any).dailySales || 0), color: "text-blue-400" },
               { icon: Activity, label: "Consultas", value: metrics.totalConsultations.toString(), color: "text-purple-400" },
-              { icon: Target, label: "Ticket Médio", value: formatBRL(metrics.avgTicket), color: "text-amber-400" },
+              { icon: Percent, label: "Conversão Triagem→Pago", value: `${metrics.triageConversion.toFixed(1)}%`, color: "text-amber-400" },
             ].map(({ icon: Icon, label, value, color }, i) => (
               <Card key={i} className="p-4 bg-card/80 border-border/50">
                 <div className="flex items-center gap-2 mb-2">

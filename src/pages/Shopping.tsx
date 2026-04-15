@@ -110,8 +110,38 @@ const CATEGORIES = [
   { key: "spray", label: "Sprays", icon: Package },
 ];
 
-const fadeUp = { hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } };
-const stagger = { visible: { transition: { staggerChildren: 0.05 } } };
+const fadeUp = { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.2 } } };
+const stagger = { visible: { transition: { staggerChildren: 0.02 } } };
+
+/* ─── PREFETCH CACHE ─── */
+let prefetchedProducts: VendorProduct[] | null = null;
+let prefetchPromise: Promise<VendorProduct[]> | null = null;
+
+const prefetchProducts = () => {
+  if (prefetchedProducts) return Promise.resolve(prefetchedProducts);
+  if (prefetchPromise) return prefetchPromise;
+  prefetchPromise = (async () => {
+    const { data } = await supabase.from("vendor_products").select("*, vendors(id, store_name, rating)").eq("is_active", true);
+    prefetchedProducts = (data as any) || [];
+    return prefetchedProducts;
+  })();
+  return prefetchPromise;
+};
+
+// Start prefetch immediately on module load
+prefetchProducts();
+
+/* ─── SKELETON GRID ─── */
+const ProductSkeleton = () => (
+  <div className="rounded-xl border border-border/30 bg-card/30 overflow-hidden">
+    <div className="aspect-square bg-muted/20 animate-pulse" />
+    <div className="p-2.5 space-y-2">
+      <div className="h-3 bg-muted/30 rounded animate-pulse w-3/4" />
+      <div className="h-3 bg-muted/30 rounded animate-pulse w-1/2" />
+      <div className="h-8 bg-muted/20 rounded-lg animate-pulse mt-2" />
+    </div>
+  </div>
+);
 
 const fmtPrice = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
 
@@ -147,7 +177,7 @@ const ImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
         src={resolveImg(validImgs[idx])}
         alt={alt}
         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        loading="lazy"
+        decoding="async"
       />
       {validImgs.length > 1 && (
         <>
@@ -339,11 +369,15 @@ const Shopping = () => {
   const { toggle: toggleFav, isFav } = useFavorites();
 
   useEffect(() => {
-    (async () => {
-      const { data } = await supabase.from("vendor_products").select("*, vendors(id, store_name, rating)").eq("is_active", true);
-      if (data) setProducts(data as any);
+    if (prefetchedProducts) {
+      setProducts(prefetchedProducts);
       setLoading(false);
-    })();
+      return;
+    }
+    prefetchProducts().then(data => {
+      setProducts(data);
+      setLoading(false);
+    });
   }, []);
 
   if (id) {
@@ -574,8 +608,8 @@ const Shopping = () => {
               </div>
 
               {loading ? (
-                <div className="flex items-center justify-center py-20">
-                  <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3">
+                  {Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)}
                 </div>
               ) : (
                 <motion.div

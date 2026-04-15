@@ -9,28 +9,27 @@ export function usePWAInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
-    // Detect iOS
     const ua = navigator.userAgent;
     const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const android = /Android/i.test(ua);
     setIsIOS(iOS);
+    setIsAndroid(android);
 
-    // Detect standalone mode
     const standalone = window.matchMedia("(display-mode: standalone)").matches
       || (navigator as any).standalone === true;
     setIsStandalone(standalone);
     setIsInstalled(standalone);
 
-    // Listen for beforeinstallprompt (Chrome/Android)
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
     window.addEventListener("beforeinstallprompt", handler);
 
-    // Listen for app installed
     const installedHandler = () => {
       setIsInstalled(true);
       setDeferredPrompt(null);
@@ -43,23 +42,32 @@ export function usePWAInstall() {
     };
   }, []);
 
-  const promptInstall = useCallback(async (): Promise<"accepted" | "dismissed" | "ios" | "unavailable"> => {
-    if (isIOS) return "ios";
-    if (!deferredPrompt) return "unavailable";
-
-    await deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      setIsInstalled(true);
-      setDeferredPrompt(null);
+  const promptInstall = useCallback(async (): Promise<"accepted" | "dismissed" | "ios" | "android-manual" | "desktop-manual"> => {
+    // Native prompt available (Chrome/Edge on Android or Desktop)
+    if (deferredPrompt) {
+      try {
+        await deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === "accepted") {
+          setIsInstalled(true);
+          setDeferredPrompt(null);
+        }
+        return outcome;
+      } catch {
+        // prompt() can throw if already called
+      }
     }
-    return outcome;
-  }, [deferredPrompt, isIOS]);
+
+    if (isIOS) return "ios";
+    if (isAndroid) return "android-manual";
+    return "desktop-manual";
+  }, [deferredPrompt, isIOS, isAndroid]);
 
   return {
-    canInstall: !isInstalled && (!!deferredPrompt || isIOS),
+    canInstall: !isInstalled,
     isInstalled,
     isIOS,
+    isAndroid,
     isStandalone,
     promptInstall,
   };

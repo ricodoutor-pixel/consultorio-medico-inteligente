@@ -25,6 +25,13 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
   const allChecked = Object.values(checks).every(Boolean);
   const today = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
 
+  // Auto-accept when all checkboxes are checked
+  const [autoAccepted, setAutoAccepted] = useState(false);
+  if (allChecked && !autoAccepted) {
+    setAutoAccepted(true);
+    setTimeout(() => onAccept(), 600);
+  }
+
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onDecline(); }}>
       <DialogContent className="max-w-2xl max-h-[90vh] p-0 gap-0" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>

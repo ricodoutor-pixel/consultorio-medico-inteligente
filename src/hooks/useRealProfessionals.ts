@@ -1,12 +1,17 @@
 /**
  * Hook: useRealProfessionals
  * Fetches real registered doctors from the database.
- * For each real doctor registered, one test placeholder is removed from the list.
- * Dr. Edilson Bezerra (med-0) is NEVER removed.
+ * Limits test professionals to 6 + Dr. Edilson (med-0) = 7 total.
+ * Rotates online status hourly among test doctors. Edilson is ALWAYS online.
+ * Real doctors replace test placeholders.
  */
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { professionals as testProfessionals, Professional, categories } from "@/data/professionals";
+
+// IDs of the 6 test doctors to keep (diverse specialties)
+const KEPT_TEST_IDS = ["med-1", "med-2", "med-3", "med-4", "med-5", "psi-1"];
+const MAX_TEST_SLOTS = 6;
 
 interface RealDoctor {
   id: string;
@@ -47,9 +52,29 @@ function mapCategoryFromSpecialty(specialty: string): string {
   return "Médicos Prescritores";
 }
 
+/**
+ * Returns the index (0-5) of the test doctor that should be "online" this hour.
+ * Rotates every hour based on UTC time.
+ */
+function getOnlineShiftIndex(): number {
+  const now = new Date();
+  const hour = now.getHours();
+  return hour % MAX_TEST_SLOTS;
+}
+
 export function useRealProfessionals(): { professionals: Professional[]; realCount: number; loading: boolean } {
   const [realDoctors, setRealDoctors] = useState<(RealDoctor & { profile?: RealProfile })[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentHour, setCurrentHour] = useState(() => new Date().getHours());
+
+  // Update shift every minute to catch hour changes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const h = new Date().getHours();
+      setCurrentHour(prev => prev !== h ? h : prev);
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchReal = async () => {
@@ -83,8 +108,10 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
   }, []);
 
   const merged = useMemo(() => {
-    if (realDoctors.length === 0) return testProfessionals;
+    const edilson = testProfessionals.find(p => p.id === "med-0")!;
+    const edilsonOnline = { ...edilson, online: true };
 
+    // Build real professionals list
     const realPros: Professional[] = realDoctors.map((d) => ({
       id: `real-${d.id}`,
       name: d.profile?.full_name || `Dr(a). ${d.crm}`,
@@ -111,30 +138,26 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       flags: ["🇧🇷"],
     }));
 
-    const testByCat: Record<string, Professional[]> = {};
-    const edilson = testProfessionals.find(p => p.id === "med-0")!;
+    // How many test slots remain after real doctors fill spots
+    const testSlotsRemaining = Math.max(0, MAX_TEST_SLOTS - realPros.length);
 
-    for (const p of testProfessionals) {
-      if (p.id === "med-0") continue;
-      if (!testByCat[p.category]) testByCat[p.category] = [];
-      testByCat[p.category].push(p);
-    }
+    // Get the 6 curated test doctors
+    const keptTests = KEPT_TEST_IDS
+      .map(id => testProfessionals.find(p => p.id === id))
+      .filter(Boolean) as Professional[];
 
-    const realByCat: Record<string, number> = {};
-    for (const rp of realPros) {
-      realByCat[rp.category] = (realByCat[rp.category] || 0) + 1;
-    }
+    // Only keep enough to fill remaining slots
+    const finalTests = keptTests.slice(0, testSlotsRemaining);
 
-    const remainingTest: Professional[] = [];
-    for (const cat of categories) {
-      const tests = testByCat[cat] || [];
-      const realInCat = realByCat[cat] || 0;
-      const keep = Math.max(0, tests.length - realInCat);
-      remainingTest.push(...tests.slice(0, keep));
-    }
+    // Apply hourly online rotation
+    const shiftIndex = getOnlineShiftIndex();
+    const rotatedTests = finalTests.map((p, i) => ({
+      ...p,
+      online: i === (shiftIndex % finalTests.length),
+    }));
 
-    return [edilson, ...realPros, ...remainingTest];
-  }, [realDoctors]);
+    return [edilsonOnline, ...realPros, ...rotatedTests];
+  }, [realDoctors, currentHour]);
 
   return { professionals: merged, realCount: realDoctors.length, loading };
 }

@@ -1,8 +1,28 @@
-import { Leaf, Mail, MapPin, Phone, Heart, Scale, Shield, Facebook, Instagram, Youtube } from "lucide-react";
+import { Leaf, Mail, MapPin, Phone, Heart, Scale, Shield, Facebook, Instagram, Youtube, Download } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { Link } from "react-router-dom";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Share2, Plus, CheckCircle2 } from "lucide-react";
 
 export const Footer = () => {
+  const { canInstall, isInstalled, isIOS, promptInstall } = usePWAInstall();
+  const isMobile = useIsMobile();
+  const [showIOSModal, setShowIOSModal] = useState(false);
+
+  const handleInstall = async () => {
+    const result = await promptInstall();
+    if (result === "ios") setShowIOSModal(true);
+  };
+
+  const ModalWrapper = isMobile ? Sheet : Dialog;
+  const ContentWrapper = isMobile ? SheetContent : DialogContent;
+  const HeaderWrapper = isMobile ? SheetHeader : DialogHeader;
+  const TitleWrapper = isMobile ? SheetTitle : DialogTitle;
+
   return (
     <footer className="border-t border-border bg-card/50" role="contentinfo" aria-label="Rodapé do site">
       <div className="container mx-auto px-4 sm:px-6 py-8 md:py-12">
@@ -118,6 +138,49 @@ export const Footer = () => {
               </div>
             </a>
           </div>
+
+          {/* Baixe nosso App */}
+          {!isInstalled && (
+            <div className="flex justify-center mb-4 md:mb-6">
+              <button
+                onClick={handleInstall}
+                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors group"
+              >
+                <Download size={12} className="group-hover:scale-110 transition-transform" />
+                <span>Baixe nosso App</span>
+              </button>
+            </div>
+          )}
+
+          {/* iOS Install Modal */}
+          <ModalWrapper open={showIOSModal} onOpenChange={setShowIOSModal}>
+            <ContentWrapper className={isMobile ? "px-4 pb-8" : "sm:max-w-md"}>
+              <HeaderWrapper>
+                <TitleWrapper className="flex items-center gap-2 text-foreground">
+                  <Download size={20} className="text-primary" />
+                  Instalar Planta y Raiz
+                </TitleWrapper>
+              </HeaderWrapper>
+              <div className="space-y-4 py-2">
+                <p className="text-sm text-muted-foreground">Siga os passos abaixo para instalar no seu iPhone/iPad:</p>
+                <div className="space-y-3">
+                  {[
+                    { step: 1, icon: Share2, text: "Toque no ícone de Compartilhar (quadrado com seta)" },
+                    { step: 2, icon: Plus, text: 'Selecione "Adicionar à Tela de Início"' },
+                    { step: 3, icon: CheckCircle2, text: 'Confirme tocando em "Adicionar"' },
+                  ].map(({ step, icon: Icon, text }) => (
+                    <div key={step} className="flex items-start gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-primary font-bold text-sm shrink-0">{step}</div>
+                      <div className="flex items-start gap-2">
+                        <Icon size={18} className="text-primary shrink-0 mt-0.5" />
+                        <span className="text-sm text-foreground">{text}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </ContentWrapper>
+          </ModalWrapper>
 
           {/* Social Media */}
           <div className="mb-4 md:mb-6">

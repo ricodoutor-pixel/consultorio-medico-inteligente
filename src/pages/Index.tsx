@@ -16,6 +16,7 @@ import testimonialRoberto from "@/assets/testimonial-roberto.jpg";
 import testimonialJuliana from "@/assets/testimonial-juliana.jpg";
 import testimonialAntonio from "@/assets/testimonial-antonio.jpg";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
+import { PWAInstallSection } from "@/components/PWAInstallSection";
 
 import { useEffect } from "react";
 
@@ -210,6 +211,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+      {/* PWA Install CTA */}
+      <PWAInstallSection />
+
       {/* Seleção de Patologias */}
       <section className="section-padding bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">

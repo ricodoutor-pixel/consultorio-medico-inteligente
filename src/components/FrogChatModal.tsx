@@ -173,11 +173,18 @@ export const FrogChatModal = () => {
   const doSendMessage = useCallback((text: string) => {
     if (!text.trim() || isStreaming) return;
 
+    // 🧠 Brisa IA 2.0 — Sentiment Analysis
+    const sentiment = analyzeSentiment(text);
+    if (sentiment.level !== "normal") {
+      setUrgencyAlert({ level: sentiment.level, triggers: sentiment.triggers });
+    }
+
     const userMsg: Message = {
       id: Date.now().toString(),
       text,
       sender: "user",
       timestamp: new Date(),
+      urgencyLevel: sentiment.level,
     };
 
     setMessages((prev) => [...prev, userMsg]);

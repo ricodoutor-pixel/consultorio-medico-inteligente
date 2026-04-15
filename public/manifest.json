@@ -10,32 +10,38 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/frog-happy.png?v=3",
+      "src": "/frog-happy.png?v=4",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/frog-happy.png?v=3",
+      "src": "/frog-happy.png?v=4",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/frog-warning.png?v=3",
+      "src": "/frog-warning.png?v=4",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/frog-critical.png?v=3",
+      "src": "/frog-critical.png?v=4",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/apple-touch-icon.png?v=3",
+      "src": "/apple-touch-icon.png?v=4",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+plantayraiz",
+      "url": "/%s"
     }
   ],
   "categories": ["health", "medical", "lifestyle"],

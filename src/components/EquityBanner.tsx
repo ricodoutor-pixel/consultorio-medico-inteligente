@@ -17,7 +17,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
       >
         <div className="max-w-6xl mx-auto">
           {/* Título */}
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-lg md:text-3xl font-bold text-gray-900 mb-3 md:mb-4">
             Referência No Tratamento Com Cannabis Medicinal No Brasil
           </h2>
 

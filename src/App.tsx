@@ -14,6 +14,7 @@ import { useCart } from "@/store/cart";
 import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
 import MascotVerdinho from "@/components/MascotVerdinho";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { OpenGraphHead } from "@/components/OpenGraphHead";
 import { FacebookPixelProvider } from "@/components/FacebookPixelProvider";
@@ -103,6 +104,7 @@ const OmniChannelDashboard = lazy(() => import("./pages/OmniChannelDashboard"));
 const OfertaEspecial = lazy(() => import("./pages/OfertaEspecial"));
 const AdminFinanceiro = lazy(() => import("./pages/AdminFinanceiro"));
 const QuizTriagem = lazy(() => import("./pages/QuizTriagem"));
+const CondicaoTratamento = lazy(() => import("./pages/CondicaoTratamento"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();

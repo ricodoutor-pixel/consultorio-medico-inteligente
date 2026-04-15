@@ -217,6 +217,47 @@ export type Database = {
         }
         Relationships: []
       }
+      alert_history: {
+        Row: {
+          alert_id: string | null
+          channel: string
+          delivered: boolean | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          recipient: string | null
+          sent_at: string
+        }
+        Insert: {
+          alert_id?: string | null
+          channel?: string
+          delivered?: boolean | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          recipient?: string | null
+          sent_at?: string
+        }
+        Update: {
+          alert_id?: string | null
+          channel?: string
+          delivered?: boolean | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          recipient?: string | null
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_history_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_downloads: {
         Row: {
           created_at: string
@@ -246,6 +287,66 @@ export type Database = {
           source?: string | null
         }
         Relationships: []
+      }
+      appointment_alerts: {
+        Row: {
+          alert_type: string
+          appointment_id: string | null
+          created_at: string
+          doctor_id: string | null
+          id: string
+          message: string
+          patient_id: string
+          priority: string
+          scheduled_for: string | null
+          sent_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          alert_type?: string
+          appointment_id?: string | null
+          created_at?: string
+          doctor_id?: string | null
+          id?: string
+          message: string
+          patient_id: string
+          priority?: string
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          alert_type?: string
+          appointment_id?: string | null
+          created_at?: string
+          doctor_id?: string | null
+          id?: string
+          message?: string
+          patient_id?: string
+          priority?: string
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_alerts_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_alerts_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+        ]
       }
       appointments: {
         Row: {
@@ -1340,6 +1441,63 @@ export type Database = {
           max_streak?: number
           professional_id?: string
           streak_broken_at?: string | null
+        }
+        Relationships: []
+      }
+      health_subscriptions: {
+        Row: {
+          amount: number
+          billing_cycle: string
+          cancelled_at: string | null
+          created_at: string
+          expires_at: string | null
+          external_subscription_id: string | null
+          features: Json | null
+          id: string
+          next_billing_at: string | null
+          payment_method: string | null
+          plan_name: string
+          plan_type: string
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          billing_cycle?: string
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          external_subscription_id?: string | null
+          features?: Json | null
+          id?: string
+          next_billing_at?: string | null
+          payment_method?: string | null
+          plan_name?: string
+          plan_type?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          billing_cycle?: string
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          external_subscription_id?: string | null
+          features?: Json | null
+          id?: string
+          next_billing_at?: string | null
+          payment_method?: string | null
+          plan_name?: string
+          plan_type?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -2620,6 +2778,54 @@ export type Database = {
           sleep_quality?: number
           thc_pct?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      triage_abandonment_tracking: {
+        Row: {
+          abandoned_at: string | null
+          converted: boolean | null
+          converted_at: string | null
+          coupon_code: string | null
+          coupon_sent: boolean | null
+          created_at: string
+          id: string
+          manychat_notified: boolean | null
+          patient_name: string | null
+          patient_phone: string | null
+          session_id: string
+          triage_started_at: string
+          user_id: string | null
+        }
+        Insert: {
+          abandoned_at?: string | null
+          converted?: boolean | null
+          converted_at?: string | null
+          coupon_code?: string | null
+          coupon_sent?: boolean | null
+          created_at?: string
+          id?: string
+          manychat_notified?: boolean | null
+          patient_name?: string | null
+          patient_phone?: string | null
+          session_id: string
+          triage_started_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          abandoned_at?: string | null
+          converted?: boolean | null
+          converted_at?: string | null
+          coupon_code?: string | null
+          coupon_sent?: boolean | null
+          created_at?: string
+          id?: string
+          manychat_notified?: boolean | null
+          patient_name?: string | null
+          patient_phone?: string | null
+          session_id?: string
+          triage_started_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

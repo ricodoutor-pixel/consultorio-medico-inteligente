@@ -256,6 +256,7 @@ export type Database = {
           duration_minutes: number
           id: string
           notes: string | null
+          organization_id: string | null
           patient_id: string
           payment_id: string | null
           payment_status: string
@@ -272,6 +273,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           notes?: string | null
+          organization_id?: string | null
           patient_id: string
           payment_id?: string | null
           payment_status?: string
@@ -288,6 +290,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           notes?: string | null
+          organization_id?: string | null
           patient_id?: string
           payment_id?: string | null
           payment_status?: string
@@ -941,6 +944,7 @@ export type Database = {
           is_verified: boolean
           kyc_status: string
           last_crm_check: string | null
+          organization_id: string | null
           pix_key: string | null
           rating: number | null
           rqe: string | null
@@ -964,6 +968,7 @@ export type Database = {
           is_verified?: boolean
           kyc_status?: string
           last_crm_check?: string | null
+          organization_id?: string | null
           pix_key?: string | null
           rating?: number | null
           rqe?: string | null
@@ -987,6 +992,7 @@ export type Database = {
           is_verified?: boolean
           kyc_status?: string
           last_crm_check?: string | null
+          organization_id?: string | null
           pix_key?: string | null
           rating?: number | null
           rqe?: string | null
@@ -1729,6 +1735,7 @@ export type Database = {
           created_at: string | null
           id: string
           items: Json
+          organization_id: string | null
           payment_id: string | null
           shipping_cep: string | null
           shipping_cost: number | null
@@ -1744,6 +1751,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           items?: Json
+          organization_id?: string | null
           payment_id?: string | null
           shipping_cep?: string | null
           shipping_cost?: number | null
@@ -1759,6 +1767,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           items?: Json
+          organization_id?: string | null
           payment_id?: string | null
           shipping_cep?: string | null
           shipping_cost?: number | null

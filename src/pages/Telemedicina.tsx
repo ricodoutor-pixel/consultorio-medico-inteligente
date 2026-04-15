@@ -51,7 +51,7 @@ const BrisaAvatar = () => {
         whileHover={{ scale: 1.05 }}
       >
         <div className="absolute -inset-4 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="w-32 h-32 rounded-full border-4 border-primary/30 overflow-hidden bg-muted shadow-2xl relative z-10">
+        <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full border-4 border-primary/30 overflow-hidden bg-muted shadow-2xl relative z-10">
           <img 
             src={brisaImg} 
             alt="Brisa - Enfermeira IA" 
@@ -89,7 +89,7 @@ const BrisaAvatar = () => {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed bottom-6 right-6 w-80 h-96 bg-card border border-border rounded-3xl shadow-2xl z-[100] flex flex-col overflow-hidden"
+            className="fixed bottom-4 right-4 w-[calc(100vw-2rem)] sm:w-80 h-80 sm:h-96 bg-card border border-border rounded-3xl shadow-2xl z-[100] flex flex-col overflow-hidden"
           >
             <div className="bg-primary p-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -244,13 +244,13 @@ const Telemedicina = () => {
             {/* Waiting for TCLE acceptance */}
             {step === -1 && !showTCLE && !tcleAccepted && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-                <Card className="border-border">
-                  <CardContent className="p-8 text-center">
-                    <Shield size={48} className="text-primary mx-auto mb-4" />
-                    <h2 className="text-xl font-display font-black text-foreground mb-4">Consentimento Necessário</h2>
-                    <p className="text-muted-foreground mb-6">Você precisa aceitar o Termo de Consentimento (TCLE) para prosseguir com a teleconsulta.</p>
-                    <Button 
-                      className="w-full h-14 bg-primary text-primary-foreground font-black rounded-2xl text-lg"
+                 <Card className="border-border">
+                   <CardContent className="p-5 sm:p-8 text-center">
+                     <Shield size={36} className="text-primary mx-auto mb-3 sm:mb-4 sm:w-12 sm:h-12" />
+                     <h2 className="text-lg sm:text-xl font-display font-black text-foreground mb-3 sm:mb-4">Consentimento Necessário</h2>
+                     <p className="text-sm text-muted-foreground mb-4 sm:mb-6">Você precisa aceitar o Termo de Consentimento (TCLE) para prosseguir com a teleconsulta.</p>
+                     <Button 
+                       className="w-full h-12 sm:h-14 bg-primary text-primary-foreground font-black rounded-2xl text-base sm:text-lg"
                       onClick={() => setShowTCLE(true)}
                     >
                       <FileText className="mr-2" /> Ler e Aceitar o TCLE
@@ -262,10 +262,10 @@ const Telemedicina = () => {
 
             {step === 0 && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-                <Card className="border-border">
-                  <CardContent className="p-8 space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-display font-black text-foreground">Identificação do Paciente</h2>
+                 <Card className="border-border">
+                   <CardContent className="p-4 sm:p-8 space-y-4 sm:space-y-6">
+                     <div className="flex items-center justify-between flex-wrap gap-2">
+                       <h2 className="text-lg sm:text-xl font-display font-black text-foreground">Identificação do Paciente</h2>
                       <Badge variant="outline" className="border-primary/30 text-primary text-[10px]">
                         <CheckCircle2 size={10} className="mr-1" /> TCLE Aceito
                       </Badge>
@@ -289,7 +289,7 @@ const Telemedicina = () => {
                         <Label className="text-xs font-bold uppercase">Nome Completo</Label>
                         <Input placeholder="Seu nome" value={patientData.nome} onChange={(e) => setPatientData({...patientData, nome: e.target.value})} className="h-12 rounded-xl" />
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div className="space-y-2">
                           <Label className="text-xs font-bold uppercase">CPF</Label>
                           <Input placeholder="000.000.000-00" value={patientData.cpf} onChange={(e) => setPatientData({...patientData, cpf: e.target.value})} className="h-12 rounded-xl" />
@@ -308,12 +308,12 @@ const Telemedicina = () => {
                         <Input placeholder="seu@email.com" value={patientData.email} onChange={(e) => setPatientData({...patientData, email: e.target.value})} className="h-12 rounded-xl" />
                       </div>
                     </div>
-                    <Button 
-                      className="w-full h-14 bg-primary text-primary-foreground font-black rounded-2xl text-lg"
-                      disabled={!isPatientDataValid()}
-                      onClick={() => setStep(1)}
-                    >
-                      Iniciar Triagem com Brisa <ArrowRight className="ml-2" />
+                     <Button 
+                       className="w-full h-12 sm:h-14 bg-primary text-primary-foreground font-black rounded-2xl text-sm sm:text-lg"
+                       disabled={!isPatientDataValid()}
+                       onClick={() => setStep(1)}
+                     >
+                       Iniciar Triagem com Brisa <ArrowRight className="ml-2" size={18} />
                     </Button>
                   </CardContent>
                 </Card>
@@ -322,9 +322,9 @@ const Telemedicina = () => {
 
             {step >= 1 && step <= 10 && currentQ && (
               <motion.div key={step} initial="hidden" animate="visible" variants={fadeUp}>
-                <Card className="border-border shadow-xl">
-                  <CardContent className="p-8">
-                    <h2 className="text-xl font-display font-black text-foreground mb-6">{currentQ.question}</h2>
+                 <Card className="border-border shadow-xl">
+                   <CardContent className="p-4 sm:p-8">
+                     <h2 className="text-base sm:text-xl font-display font-black text-foreground mb-4 sm:mb-6">{currentQ.question}</h2>
                     {/* Renderização dinâmica de campos de triagem */}
                     {currentQ.type === "textarea" && (
                       <Textarea 
@@ -335,12 +335,12 @@ const Telemedicina = () => {
                       />
                     )}
                     {/* ... (Demais tipos de input seguem a lógica anterior) */}
-                    <div className="flex gap-4 mt-8">
-                      <Button variant="ghost" onClick={() => setStep(step - 1)} className="h-12 rounded-xl font-bold">
-                        <ArrowLeft className="mr-2" /> Voltar
-                      </Button>
-                      <Button 
-                        className="flex-1 h-12 bg-primary text-primary-foreground font-black rounded-xl"
+                     <div className="flex gap-3 sm:gap-4 mt-6 sm:mt-8">
+                       <Button variant="ghost" onClick={() => setStep(step - 1)} className="h-10 sm:h-12 rounded-xl font-bold text-sm">
+                         <ArrowLeft className="mr-1 sm:mr-2" size={16} /> Voltar
+                       </Button>
+                       <Button 
+                         className="flex-1 h-10 sm:h-12 bg-primary text-primary-foreground font-black rounded-xl text-sm"
                         onClick={() => setStep(step + 1)}
                       >
                         Próximo <ArrowRight className="ml-2" />
@@ -354,23 +354,23 @@ const Telemedicina = () => {
             {/* Resultado Final e Seleção de Médicos */}
             {step > 10 && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-8">
-                <Card className="border-primary/30 bg-primary/5">
-                  <CardContent className="p-8 text-center">
-                    <CheckCircle2 size={48} className="text-primary mx-auto mb-4" />
-                    <h2 className="text-2xl font-display font-black text-foreground mb-2">Triagem Concluída!</h2>
-                    <p className="text-muted-foreground font-medium mb-6">A Brisa IA já preparou seu resumo clínico. Agora escolha seu médico para atendimento imediato.</p>
+                 <Card className="border-primary/30 bg-primary/5">
+                   <CardContent className="p-4 sm:p-8 text-center">
+                     <CheckCircle2 size={36} className="text-primary mx-auto mb-3 sm:mb-4" />
+                     <h2 className="text-xl sm:text-2xl font-display font-black text-foreground mb-2">Triagem Concluída!</h2>
+                     <p className="text-sm text-muted-foreground font-medium mb-4 sm:mb-6">A Brisa IA já preparou seu resumo clínico. Agora escolha seu médico para atendimento imediato.</p>
                     <div className="grid gap-4">
                       {medicos.map(med => (
                         <Card key={med.id} className="border-border hover:border-primary/50 transition-all">
-                          <CardContent className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <img src={med.imageUrl} className="w-12 h-12 rounded-xl object-cover" />
-                              <div className="text-left">
-                                <p className="font-black text-sm">{med.name}</p>
-                                <p className="text-xs text-muted-foreground">{med.category}</p>
-                              </div>
-                            </div>
-                            <Button size="sm" className="bg-primary text-white font-black rounded-lg">Agendar R$ 49,90</Button>
+                           <CardContent className="p-3 sm:p-4 flex items-center justify-between gap-2">
+                             <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                               <img src={med.imageUrl} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover shrink-0" />
+                               <div className="text-left min-w-0">
+                                 <p className="font-black text-xs sm:text-sm truncate">{med.name}</p>
+                                 <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{med.category}</p>
+                               </div>
+                             </div>
+                             <Button size="sm" className="bg-primary text-white font-black rounded-lg text-[10px] sm:text-xs shrink-0 px-2 sm:px-3">Agendar R$ 49,90</Button>
                           </CardContent>
                         </Card>
                       ))}

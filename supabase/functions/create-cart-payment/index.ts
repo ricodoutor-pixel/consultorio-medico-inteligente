@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { items, total, description } = await req.json();
+    const { items, total, description, coupon_code } = await req.json();
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return new Response(JSON.stringify({ error: "Carrinho vazio" }), {
@@ -57,12 +57,64 @@ Deno.serve(async (req) => {
 
     const siteUrl = "https://consultorio-medico-inteligente.lovable.app";
 
-    const mpItems = items.map((item: { title: string; quantity: number; price: number }) => ({
-      title: item.title.substring(0, 255),
-      quantity: Math.max(1, Math.floor(item.quantity)),
-      unit_price: Number(item.price),
-      currency_id: "BRL",
-    }));
+    // Validate items server-side: check prices from vendor_products
+    const serviceClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const productIds = items.map((i: { product_id?: string }) => i.product_id).filter(Boolean);
+
+    let validatedTotal = 0;
+    const mpItems = [];
+
+    if (productIds.length > 0) {
+      const { data: products } = await serviceClient
+        .from("vendor_products")
+        .select("id, name, price, is_active, vendor_id")
+        .in("id", productIds)
+        .eq("is_active", true);
+
+      const productMap = new Map((products || []).map(p => [p.id, p]));
+
+      for (const item of items) {
+        const product = item.product_id ? productMap.get(item.product_id) : null;
+        const price = product ? Number(product.price) : Number(item.price);
+        const title = product ? product.name : item.title;
+        const qty = Math.max(1, Math.floor(item.quantity || 1));
+
+        mpItems.push({
+          title: String(title).substring(0, 255),
+          quantity: qty,
+          unit_price: price,
+          currency_id: "BRL",
+        });
+        validatedTotal += price * qty;
+      }
+    } else {
+      // Fallback for items without product_id
+      for (const item of items) {
+        const qty = Math.max(1, Math.floor(item.quantity || 1));
+        mpItems.push({
+          title: String(item.title).substring(0, 255),
+          quantity: qty,
+          unit_price: Number(item.price),
+          currency_id: "BRL",
+        });
+        validatedTotal += Number(item.price) * qty;
+      }
+    }
+
+    // Apply coupon discount if provided
+    let discountAmount = 0;
+    if (coupon_code) {
+      // TODO: Validate coupon from coupons table when available
+      console.log(`[create-cart-payment] Coupon code received: ${coupon_code}`);
+    }
+
+    const finalTotal = validatedTotal - discountAmount;
+
+    // Calculate marketplace split: 10% platform fee
+    const platformFeeRate = 0.10;
+    const platformFee = Math.round(finalTotal * platformFeeRate * 100) / 100;
+
+    const externalRef = `cart-${user.id}-${Date.now()}`;
 
     const preference = {
       items: mpItems,
@@ -76,8 +128,15 @@ Deno.serve(async (req) => {
       },
       auto_return: "approved",
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
-      external_reference: `cart-${user.id}-${Date.now()}`,
+      external_reference: externalRef,
       statement_descriptor: "PLANTA E RAIZ",
+      marketplace_fee: platformFee,
+      metadata: {
+        type: "marketplace",
+        buyer_id: user.id,
+        items_count: mpItems.length,
+        coupon_code: coupon_code || null,
+      },
     };
 
     const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {
@@ -100,10 +159,12 @@ Deno.serve(async (req) => {
 
     const mpData = await mpResponse.json();
 
+    // Only return production init_point
     return new Response(JSON.stringify({
       init_point: mpData.init_point,
-      sandbox_init_point: mpData.sandbox_init_point,
       preference_id: mpData.id,
+      total: finalTotal,
+      platform_fee: platformFee,
     }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

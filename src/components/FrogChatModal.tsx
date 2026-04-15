@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useLocation } from "react-router-dom";
-import { X, Send, Sparkles, Trash2, Minimize2 } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { X, Send, Sparkles, Trash2, Minimize2, Calendar, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FrogMascot } from "@/components/FrogMascot";
 import { LeadCaptureModal } from "@/components/LeadCaptureModal";
@@ -97,13 +97,23 @@ const getFallback = (text: string): string => {
 };
 
 const QUICK_ACTIONS = [
-  { label: "🩺 Agendar consulta", msg: "Como faço para agendar uma consulta?" },
+  { label: "🩺 Agendar consulta", msg: "Como faço para agendar uma consulta?", cta: true },
   { label: "💊 Cannabis medicinal", msg: "O que é cannabis medicinal e quais condições trata?" },
   { label: "💰 Preços", msg: "Quais são os preços das consultas?" },
+  { label: "🛒 Shopping", msg: "Quais produtos vocês vendem?" },
   { label: "📱 Como funciona?", msg: "Como funciona a plataforma Planta & Raiz?" },
 ];
 
+// Detect purchase/booking intent from AI responses
+const detectIntent = (text: string): "booking" | "shopping" | null => {
+  const lower = text.toLowerCase();
+  if (lower.match(/agend|consult|médic|doutor|especialist|marc.*horári/)) return "booking";
+  if (lower.match(/compr|produto|carrinho|shopping|óleo|cápsula|tintur/)) return "shopping";
+  return null;
+};
+
 export const FrogChatModal = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -350,6 +360,33 @@ export const FrogChatModal = () => {
               </div>
             </div>
           )}
+
+          {/* Express Checkout CTA — shown when Brisa detects intent */}
+          {messages.length > 1 && !isStreaming && (() => {
+            const lastAiMsg = [...messages].reverse().find(m => m.sender === "ai");
+            const intent = lastAiMsg ? detectIntent(lastAiMsg.text) : null;
+            if (!intent) return null;
+            return (
+              <div className="flex gap-2 pt-2">
+                {intent === "booking" && (
+                  <button
+                    onClick={() => { setIsOpen(false); navigate("/agendamento"); }}
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-full bg-primary text-primary-foreground font-bold animate-pulse hover:animate-none transition-all"
+                  >
+                    <Calendar size={14} /> Agendar Agora — R$ 55
+                  </button>
+                )}
+                {intent === "shopping" && (
+                  <button
+                    onClick={() => { setIsOpen(false); navigate("/shopping"); }}
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-full bg-primary text-primary-foreground font-bold animate-pulse hover:animate-none transition-all"
+                  >
+                    <ShoppingBag size={14} /> Ver Produtos
+                  </button>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Quick actions - only show at start */}
           {messages.length === 1 && !isStreaming && (

@@ -76,6 +76,7 @@ Deno.serve(async (req) => {
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const siteUrl = "https://consultorio-medico-inteligente.lovable.app";
 
     const preference = {
       items: [
@@ -87,17 +88,22 @@ Deno.serve(async (req) => {
         },
       ],
       payer: {
-        email: patientEmail || "paciente@plantaeraiz.com",
+        email: patientEmail || authData.user.email || "paciente@plantaeraiz.com",
       },
       back_urls: {
-        success: `${supabaseUrl.replace('.supabase.co', '.lovable.app')}/dashboard?payment=success`,
-        failure: `${supabaseUrl.replace('.supabase.co', '.lovable.app')}/pagamento?status=failure`,
-        pending: `${supabaseUrl.replace('.supabase.co', '.lovable.app')}/pagamento?status=pending`,
+        success: `${siteUrl}/dashboard?payment=success`,
+        failure: `${siteUrl}/pagamento?status=failure`,
+        pending: `${siteUrl}/pagamento?status=pending`,
       },
       auto_return: "approved",
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
       external_reference: appointmentId || `planta-raiz-${Date.now()}`,
       statement_descriptor: "PLANTA E RAIZ",
+      metadata: {
+        type: "consultation",
+        patient_id: userId,
+        appointment_id: appointmentId || null,
+      },
       payment_methods: {
         excluded_payment_types: [],
         installments: 1,
@@ -134,9 +140,9 @@ Deno.serve(async (req) => {
         .eq("id", appointmentId);
     }
 
+    // Only return production init_point
     return new Response(JSON.stringify({
       init_point: mpData.init_point,
-      sandbox_init_point: mpData.sandbox_init_point,
       preference_id: mpData.id,
     }), {
       status: 200,

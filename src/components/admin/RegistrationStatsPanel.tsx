@@ -1,29 +1,41 @@
 /**
  * RegistrationStatsPanel
- * Shows new registrations (professionals, patients, pharmacies, distributors)
+ * Shows new registrations (professionals, patients, pharmacies, distributors, vendors/lojas)
  * by day, month, and year on the admin dashboard.
  */
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Stethoscope, Users, Store, Truck, CalendarDays, CalendarRange, Calendar } from "lucide-react";
+import { Stethoscope, Users, Store, Truck, CalendarDays, CalendarRange, Calendar, ShoppingBag, Package } from "lucide-react";
 
-interface RegistrationStats {
-  doctors: { today: number; month: number; year: number; total: number };
-  patients: { today: number; month: number; year: number; total: number };
-  // Pharmacies & distributors tracked via profiles with user_type
-  pharmacies: { today: number; month: number; year: number; total: number };
-  distributors: { today: number; month: number; year: number; total: number };
+interface PeriodStats {
+  today: number;
+  month: number;
+  year: number;
+  total: number;
 }
 
+interface RegistrationStats {
+  doctors: PeriodStats;
+  patients: PeriodStats;
+  pharmacies: PeriodStats;
+  distributors: PeriodStats;
+  vendors: PeriodStats;
+  products: PeriodStats;
+}
+
+const emptyPeriod: PeriodStats = { today: 0, month: 0, year: 0, total: 0 };
+
 const defaultStats: RegistrationStats = {
-  doctors: { today: 0, month: 0, year: 0, total: 0 },
-  patients: { today: 0, month: 0, year: 0, total: 0 },
-  pharmacies: { today: 0, month: 0, year: 0, total: 0 },
-  distributors: { today: 0, month: 0, year: 0, total: 0 },
+  doctors: { ...emptyPeriod },
+  patients: { ...emptyPeriod },
+  pharmacies: { ...emptyPeriod },
+  distributors: { ...emptyPeriod },
+  vendors: { ...emptyPeriod },
+  products: { ...emptyPeriod },
 };
 
-function countByPeriod(dates: string[]): { today: number; month: number; year: number; total: number } {
+function countByPeriod(dates: string[]): PeriodStats {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
   const monthStr = now.toISOString().slice(0, 7);
@@ -45,27 +57,29 @@ export const RegistrationStatsPanel = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Doctors
-        const { data: doctors } = await supabase
-          .from("doctors")
-          .select("created_at")
-          .eq("is_verified", true);
+        // Fetch all data sources in parallel
+        const [doctorsRes, profilesRes, vendorsRes, productsRes] = await Promise.all([
+          supabase.from("doctors").select("created_at").eq("is_verified", true),
+          supabase.from("profiles").select("created_at, user_type"),
+          supabase.from("vendors").select("created_at"),
+          supabase.from("vendor_products").select("created_at"),
+        ]);
 
-        // Profiles by user_type
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("created_at, user_type");
-
-        const doctorDates = (doctors || []).map(d => d.created_at);
-        const patientDates = (profiles || []).filter(p => p.user_type === "patient").map(p => p.created_at);
-        const pharmacyDates = (profiles || []).filter(p => p.user_type === "pharmacy").map(p => p.created_at);
-        const distributorDates = (profiles || []).filter(p => p.user_type === "distributor").map(p => p.created_at);
+        const doctorDates = (doctorsRes.data || []).map(d => d.created_at);
+        const profiles = profilesRes.data || [];
+        const patientDates = profiles.filter(p => p.user_type === "patient").map(p => p.created_at);
+        const pharmacyDates = profiles.filter(p => p.user_type === "pharmacy").map(p => p.created_at);
+        const distributorDates = profiles.filter(p => p.user_type === "distributor").map(p => p.created_at);
+        const vendorDates = (vendorsRes.data || []).map(v => v.created_at);
+        const productDates = (productsRes.data || []).map(p => p.created_at);
 
         setStats({
           doctors: countByPeriod(doctorDates),
           patients: countByPeriod(patientDates),
           pharmacies: countByPeriod(pharmacyDates),
           distributors: countByPeriod(distributorDates),
+          vendors: countByPeriod(vendorDates),
+          products: countByPeriod(productDates),
         });
       } catch (err) {
         console.error("[RegistrationStats] Error:", err);
@@ -79,7 +93,9 @@ export const RegistrationStatsPanel = () => {
   const categories = [
     { key: "doctors" as const, label: "Profissionais", icon: Stethoscope, color: "text-primary bg-primary/10" },
     { key: "patients" as const, label: "Pacientes", icon: Users, color: "text-green-500 bg-green-500/10" },
-    { key: "pharmacies" as const, label: "Farmácias", icon: Store, color: "text-amber-500 bg-amber-500/10" },
+    { key: "vendors" as const, label: "Lojas / Vendors", icon: Store, color: "text-violet-500 bg-violet-500/10" },
+    { key: "products" as const, label: "Produtos", icon: Package, color: "text-cyan-500 bg-cyan-500/10" },
+    { key: "pharmacies" as const, label: "Farmácias", icon: ShoppingBag, color: "text-amber-500 bg-amber-500/10" },
     { key: "distributors" as const, label: "Distribuidores", icon: Truck, color: "text-blue-500 bg-blue-500/10" },
   ];
 
@@ -107,7 +123,7 @@ export const RegistrationStatsPanel = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {categories.map(cat => {
             const Icon = cat.icon;
             const data = stats[cat.key];

@@ -86,3 +86,15 @@ verify_jwt = false
 
 [functions.whatsapp-recovery]
 verify_jwt = false
+
+[functions.ai-recommendations]
+verify_jwt = false
+
+[functions.auto-renewal]
+verify_jwt = false
+
+[functions.revenue-tracker]
+verify_jwt = false
+
+[functions.dynamic-pricing]
+verify_jwt = false

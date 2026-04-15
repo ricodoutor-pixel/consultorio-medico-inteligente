@@ -881,6 +881,60 @@ export type Database = {
         }
         Relationships: []
       }
+      consultation_queue: {
+        Row: {
+          amount: number | null
+          cancelled_at: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          jitsi_room: string | null
+          matched_at: string | null
+          matched_doctor_id: string | null
+          patient_id: string
+          payment_confirmed: boolean | null
+          payment_id: string | null
+          priority: number | null
+          specialty: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          jitsi_room?: string | null
+          matched_at?: string | null
+          matched_doctor_id?: string | null
+          patient_id: string
+          payment_confirmed?: boolean | null
+          payment_id?: string | null
+          priority?: number | null
+          specialty?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          jitsi_room?: string | null
+          matched_at?: string | null
+          matched_doctor_id?: string | null
+          patient_id?: string
+          payment_confirmed?: boolean | null
+          payment_id?: string | null
+          priority?: number | null
+          specialty?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       data_deletion_requests: {
         Row: {
           admin_notes: string | null
@@ -2079,6 +2133,62 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prescription_carts: {
+        Row: {
+          cart_token: string
+          completed_at: string | null
+          created_at: string
+          discount_percent: number | null
+          doctor_id: string
+          expires_at: string | null
+          id: string
+          items: Json
+          patient_id: string
+          payment_id: string | null
+          prescription_id: string | null
+          status: string
+          total_amount: number | null
+        }
+        Insert: {
+          cart_token?: string
+          completed_at?: string | null
+          created_at?: string
+          discount_percent?: number | null
+          doctor_id: string
+          expires_at?: string | null
+          id?: string
+          items?: Json
+          patient_id: string
+          payment_id?: string | null
+          prescription_id?: string | null
+          status?: string
+          total_amount?: number | null
+        }
+        Update: {
+          cart_token?: string
+          completed_at?: string | null
+          created_at?: string
+          discount_percent?: number | null
+          doctor_id?: string
+          expires_at?: string | null
+          id?: string
+          items?: Json
+          patient_id?: string
+          payment_id?: string | null
+          prescription_id?: string | null
+          status?: string
+          total_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescription_carts_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
             referencedColumns: ["id"]
           },
         ]

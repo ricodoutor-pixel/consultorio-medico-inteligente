@@ -608,8 +608,8 @@ const Shopping = () => {
               </div>
 
               {loading ? (
-                <div className="flex items-center justify-center py-20">
-                  <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3">
+                  {Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)}
                 </div>
               ) : (
                 <motion.div

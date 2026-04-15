@@ -179,6 +179,7 @@ const DashboardPaciente = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="pt-20 md:pt-24">
+        <FrogMoodBanner />
         <PWAStreakBanner />
       </div>
 

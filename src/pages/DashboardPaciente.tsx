@@ -180,6 +180,8 @@ const DashboardPaciente = () => {
       <div className="pt-20 md:pt-24">
         <PWAStreakBanner />
       </div>
+
+      <section className="pb-8">
         <div className="container mx-auto px-4">
           <motion.div className="flex items-center justify-between flex-wrap gap-4 mb-6" initial="hidden" animate="visible" variants={fadeUp}>
             <div className="flex items-center gap-3">

@@ -232,7 +232,7 @@ const CadastroProfissional = () => {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="telefone">Telefone / WhatsApp *</Label>
-                      <Input id="telefone" placeholder="(11) 98713-1241" value={form.telefone} onChange={(e) => handleChange("telefone", e.target.value)} required />
+                      <Input id="telefone" placeholder="(11) 99999-9999" value={form.telefone} onChange={(e) => handleChange("telefone", e.target.value)} required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="categoria">Categoria *</Label>

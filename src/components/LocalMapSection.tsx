@@ -50,11 +50,11 @@ export function LocalMapSection() {
               <div>
                 <p className="font-semibold text-foreground text-sm">Telefone / WhatsApp</p>
                 <a
-                  href="tel:+5511987131241"
+                  href="tel:+5511991363154"
                   className="text-muted-foreground hover:text-primary transition-colors text-sm"
                   itemProp="telephone"
                 >
-                  (11) 98713-1241
+                  (11) 99136-3154
                 </a>
               </div>
             </div>

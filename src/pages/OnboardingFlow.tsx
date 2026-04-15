@@ -661,7 +661,7 @@ export const OnboardingFlow: React.FC = () => {
 
         {/* Footer */}
         <div className="text-center mt-8 text-sm text-gray-600">
-          <p>Suporte 24/7: contato@plantayraiz.com.br | +55 11 98713-1241</p>
+          <p>Suporte 24/7: contato@plantayraiz.com.br | +55 11 99136-3154</p>
         </div>
       </div>
     </div>

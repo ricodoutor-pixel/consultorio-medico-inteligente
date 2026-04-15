@@ -33,7 +33,7 @@ export const APP_CONFIG = {
   COMPANY: {
     NAME: 'Planta & Raiz',
     EMAIL: 'contato@plantayraiz.com.br',
-    PHONE: '+55 11 98713-1241',
+    PHONE: '+55 11 99136-3154',
     WEBSITE: 'https://plantayraiz.com.br',
   },
 

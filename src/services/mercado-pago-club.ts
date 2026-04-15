@@ -88,7 +88,7 @@ export class MercadoPagoClubService {
           name: 'Cliente Planta y Raiz',
           phone: {
             area_code: '11',
-            number: '98713-1241',
+            number: '99136-3154',
           },
         },
         back_urls: {

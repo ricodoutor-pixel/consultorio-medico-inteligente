@@ -56,7 +56,7 @@ const TratamentoAnsiedadeSaudeMental = () => {
       name: "Planta & Raiz — Tratamento de Ansiedade e Saúde Mental",
       description: "Teleconsulta especializada em tratamento de ansiedade, insônia e saúde mental com cannabis medicinal em São Paulo.",
       url: "https://plantayraiz.com.br/tratamento-ansiedade-saude-mental",
-      telephone: "+55-11-98713-1241",
+      telephone: "+55-11-99136-3154",
       priceRange: "R$30 - R$200",
       address: { "@type": "PostalAddress", streetAddress: "Av. Paulista, 1000", addressLocality: "São Paulo", addressRegion: "SP", postalCode: "01310-100", addressCountry: "BR" },
       geo: { "@type": "GeoCoordinates", latitude: -23.5632, longitude: -46.6542 },

@@ -49,6 +49,7 @@ export interface ProntuarioData {
 
 export const ProntuarioSidebar = ({ onClose, onSave, patientId }: ProntuarioSidebarProps) => {
   const { toast } = useToast();
+  const { loading: cartLoading, createCartFromPrescription } = usePrescriptionCart();
   const [cidSearch, setCidSearch] = useState("");
   const [data, setData] = useState<ProntuarioData>({
     chiefComplaint: "",
@@ -83,6 +84,27 @@ export const ProntuarioSidebar = ({ onClose, onSave, patientId }: ProntuarioSide
       title: "Assinatura Digital ICP-Brasil 🔐", 
       description: "Integração com certificado e-CPF A3/Nuvem necessária para assinatura qualificada." 
     });
+  };
+
+  const handleGenerateCart = async () => {
+    if (!data.medications.trim()) {
+      toast({ title: "Prescrição vazia", description: "Preencha as medicações antes de gerar o carrinho.", variant: "destructive" });
+      return;
+    }
+
+    // Parse medications into cart items
+    const items = data.medications.split("\n").filter(Boolean).map(line => ({
+      product_name: line.trim(),
+      quantity: 1,
+      dosage: line.trim(),
+    }));
+
+    // Generate a pseudo prescription ID from the current session
+    const prescriptionId = crypto.randomUUID();
+    const doctorId = "current"; // Will be resolved server-side
+    const pid = patientId || "unknown";
+
+    await createCartFromPrescription(prescriptionId, doctorId, pid, items);
   };
 
   return (

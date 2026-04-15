@@ -8,6 +8,7 @@ import { UrgencyAlert } from "@/components/chat/UrgencyAlert";
 import { analyzeSentiment, type SentimentLevel } from "@/lib/sentimentAnalysis";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import { startTriageTracking } from "@/lib/triageTracker";
 
 interface Message {
   id: string;
@@ -140,6 +141,7 @@ export const FrogChatModal = () => {
   });
   const [pendingMessage, setPendingMessage] = useState("");
   const [urgencyAlert, setUrgencyAlert] = useState<{ level: SentimentLevel; triggers: string[] } | null>(null);
+  const triageStartedRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -172,6 +174,14 @@ export const FrogChatModal = () => {
 
   const doSendMessage = useCallback((text: string) => {
     if (!text.trim() || isStreaming) return;
+
+    // Start triage tracking on first user message
+    if (!triageStartedRef.current) {
+      triageStartedRef.current = true;
+      const phone = localStorage.getItem("pr_lead_phone") || undefined;
+      const name = localStorage.getItem("pr_lead_name") || undefined;
+      startTriageTracking(phone, name);
+    }
 
     // 🧠 Brisa IA 2.0 — Sentiment Analysis
     const sentiment = analyzeSentiment(text);

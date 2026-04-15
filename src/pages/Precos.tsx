@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
+import { HealthSubscriptionPlans } from "@/components/subscription/HealthSubscriptionPlans";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
@@ -324,6 +325,22 @@ const Precos = () => {
             </div>
             <p className="text-xs text-muted-foreground">Taxa de saque: 5% (isento para Plano Clínica Família)</p>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Health Subscription Plans (SaaS de Saúde) */}
+      <section className="py-20 md:py-28">
+        <div className="container mx-auto px-4">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-display font-black text-foreground mb-4 tracking-tight">
+              <Heart className="inline w-8 h-8 text-primary mr-2" />
+              Planos de Saúde Digital
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Assinaturas recorrentes com acesso ilimitado à Brisa IA, descontos exclusivos no Shopping e consultas inclusas.
+            </p>
+          </motion.div>
+          <HealthSubscriptionPlans />
         </div>
       </section>
 

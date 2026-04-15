@@ -100,6 +100,7 @@ const HealthCheck = lazy(() => import("./pages/HealthCheck"));
 const AutomationsDashboard = lazy(() => import("./pages/AutomationsDashboard"));
 const OmniChannelDashboard = lazy(() => import("./pages/OmniChannelDashboard"));
 const OfertaEspecial = lazy(() => import("./pages/OfertaEspecial"));
+const AdminFinanceiro = lazy(() => import("./pages/AdminFinanceiro"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();

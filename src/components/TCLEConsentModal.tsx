@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Shield, FileText, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Shield, FileText, CheckCircle2 } from "lucide-react";
 
 interface TCLEConsentModalProps {
   open: boolean;
@@ -35,163 +35,94 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onDecline(); }}>
-      <DialogContent className="w-[95vw] max-w-2xl max-h-[95vh] sm:max-h-[90vh] p-0 gap-0 rounded-2xl" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
-        <DialogHeader className="p-3 sm:p-6 pb-2 sm:pb-3 border-b border-border">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <FileText size={16} className="text-primary sm:hidden" />
-              <FileText size={20} className="text-primary hidden sm:block" />
+      <DialogContent className="w-[92vw] max-w-lg max-h-[80vh] p-0 gap-0 rounded-xl" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+        <DialogHeader className="px-3 py-2 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <FileText size={14} className="text-primary" />
             </div>
             <div className="min-w-0">
-              <DialogTitle className="text-sm sm:text-lg font-bold text-foreground leading-tight">
+              <DialogTitle className="text-xs font-bold text-foreground leading-tight">
                 Termo de Consentimento (TCLE)
               </DialogTitle>
-              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">
+              <p className="text-[9px] text-muted-foreground mt-0.5">
                 CFM Res. nº 2.314/2022 e nº 2.454/2026
               </p>
             </div>
+            <Badge variant="outline" className="ml-auto text-[8px] border-primary/30 text-primary px-1 py-0">
+              <Shield size={8} className="mr-0.5" /> Válido
+            </Badge>
           </div>
-          <Badge variant="outline" className="w-fit mt-1.5 text-[9px] sm:text-[10px] border-primary/30 text-primary">
-            <Shield size={8} className="mr-1" /> Validade jurídica
-          </Badge>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[45vh] sm:max-h-[50vh] px-3 sm:px-6 py-3 sm:py-4">
-          <div className="space-y-3 sm:space-y-4 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            <p className="text-foreground font-semibold text-xs sm:text-sm">
+        <ScrollArea className="max-h-[40vh] px-3 py-2">
+          <div className="space-y-2 text-[10px] text-muted-foreground leading-snug">
+            <p className="text-foreground font-semibold text-[11px]">
               Prezado(a) {patientName},
             </p>
-
-            <p className="text-[11px] sm:text-sm">
-              Este TCLE informa sobre condições, benefícios, limitações e riscos da teleconsulta, 
+            <p>
+              Este TCLE informa sobre condições, benefícios, limitações e riscos da teleconsulta
               conforme <strong>Res. CFM nº 2.314/2022</strong>, <strong>nº 2.454/2026</strong> e <strong>LGPD</strong>.
             </p>
 
-            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
-              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">1. NATUREZA DA TELECONSULTA</h3>
-              <p className="text-[11px] sm:text-sm">
-                Atendimento médico à distância por áudio e vídeo em tempo real, conduzido pelo(a) 
-                Dr(a). <strong>{doctorName}</strong> (CRM ativo).
-              </p>
+            <div className="bg-muted/30 border border-border rounded-lg p-2">
+              <h3 className="font-bold text-foreground text-[10px] mb-0.5">1. TELECONSULTA</h3>
+              <p>Atendimento por áudio/vídeo em tempo real pelo(a) Dr(a). <strong>{doctorName}</strong>.</p>
             </div>
 
-            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
-              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">2. OBJETIVOS</h3>
-              <ul className="list-disc list-inside space-y-0.5 text-[11px] sm:text-sm">
-                <li>Avaliação clínica e anamnese</li>
-                <li>Orientação diagnóstica e terapêutica</li>
-                <li>Emissão de receitas e atestados</li>
-                <li>Acompanhamento clínico</li>
-              </ul>
+            <div className="bg-muted/30 border border-border rounded-lg p-2">
+              <h3 className="font-bold text-foreground text-[10px] mb-0.5">2. LIMITAÇÕES</h3>
+              <p>Não substitui urgência presencial. Exame físico impossível à distância. IA é apoio — decisão é do médico.</p>
             </div>
 
-            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
-              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">3. LIMITAÇÕES</h3>
-              <div className="flex items-start gap-1.5 mb-1.5">
-                <AlertTriangle size={12} className="text-yellow-500 mt-0.5 shrink-0" />
-                <p className="text-[10px] sm:text-xs">O(A) paciente declara ciência:</p>
-              </div>
-              <ul className="list-disc list-inside space-y-0.5 text-[11px] sm:text-sm">
-                <li>Não substitui atendimento presencial de urgência</li>
-                <li>Exame físico não pode ser feito à distância</li>
-                <li>Problemas técnicos podem afetar a qualidade</li>
-                <li>IA é apenas apoio — decisão final é do médico (CFM nº 2.454/2026)</li>
-              </ul>
+            <div className="bg-muted/30 border border-border rounded-lg p-2">
+              <h3 className="font-bold text-foreground text-[10px] mb-0.5">3. PRIVACIDADE (LGPD)</h3>
+              <p>Dados sensíveis com criptografia AES-256 + TLS 1.3. Vídeo não gravado sem autorização.</p>
             </div>
 
-            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
-              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">4. PRIVACIDADE (LGPD)</h3>
-              <ul className="list-disc list-inside space-y-0.5 text-[11px] sm:text-sm">
-                <li>Dados de saúde são <strong>dados sensíveis</strong></li>
-                <li>Criptografia <strong>AES-256</strong> + <strong>TLS 1.3</strong></li>
-                <li>Vídeo <strong>não gravado</strong> sem autorização</li>
-                <li>Prontuário com acesso restrito e auditável</li>
-                <li>Direito de acesso, correção e exclusão (Art. 18)</li>
-              </ul>
+            <div className="bg-muted/30 border border-border rounded-lg p-2">
+              <h3 className="font-bold text-foreground text-[10px] mb-0.5">4. IA E DIREITOS</h3>
+              <p>Transcrição e sugestões por IA (CFM nº 2.454/2026). Você pode revogar consentimento a qualquer momento.</p>
             </div>
 
-            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
-              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">5. ASSINATURA DIGITAL</h3>
-              <p className="text-[11px] sm:text-sm">
-                Documentos assinados no padrão <strong>ICP-Brasil</strong> com validade jurídica (Lei nº 14.063/2020).
-              </p>
-            </div>
-
-            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
-              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">6. USO DE IA (CFM nº 2.454/2026)</h3>
-              <ul className="list-disc list-inside space-y-0.5 text-[11px] sm:text-sm">
-                <li>Transcrição automática de áudio</li>
-                <li>Sugestões baseadas em evidências</li>
-                <li>Triagem para especialista adequado</li>
-              </ul>
-              <p className="mt-1.5 text-[10px] sm:text-xs font-semibold text-foreground">
-                ⚠️ Decisões clínicas são responsabilidade exclusiva do médico.
-              </p>
-            </div>
-
-            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
-              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">7. DIREITOS DO PACIENTE</h3>
-              <ul className="list-disc list-inside space-y-0.5 text-[11px] sm:text-sm">
-                <li>Revogar consentimento a qualquer momento</li>
-                <li>Solicitar atendimento presencial</li>
-                <li>Acessar prontuário completo</li>
-                <li>Segunda opinião médica</li>
-              </ul>
-            </div>
-
-            <div className="bg-muted/30 border border-border rounded-lg sm:rounded-xl p-3 sm:p-4">
-              <h3 className="font-bold text-foreground mb-1.5 text-[11px] sm:text-sm">8. REGISTRO DA CONSULTA</h3>
-              <p className="text-[11px] sm:text-sm">
-                Registrada conforme Res. CFM nº 2.314/2022: data, hora, CRM, diagnóstico (CID-10) e conduta.
-              </p>
-            </div>
-
-            <p className="text-[9px] sm:text-xs text-muted-foreground border-t border-border pt-2">
-              {today} — Planta & Raiz — CNPJ: XX.XXX.XXX/0001-XX
+            <p className="text-[8px] text-muted-foreground border-t border-border pt-1">
+              {today} — Planta & Raiz
             </p>
           </div>
         </ScrollArea>
 
-        <div className="p-3 sm:p-6 pt-3 sm:pt-4 border-t border-border space-y-2.5 sm:space-y-4">
-          <div className="space-y-2 sm:space-y-3">
-            <label className="flex items-start gap-2 sm:gap-3 cursor-pointer group">
-              <Checkbox checked={checks.read} onCheckedChange={(v) => setChecks(p => ({ ...p, read: !!v }))} className="mt-0.5" />
-              <span className="text-[11px] sm:text-xs text-muted-foreground group-hover:text-foreground transition-colors leading-tight">
-                Li e compreendi este TCLE.
-              </span>
+        <div className="px-3 py-2 border-t border-border space-y-2">
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <Checkbox checked={checks.read} onCheckedChange={(v) => setChecks(p => ({ ...p, read: !!v }))} className="h-4 w-4" />
+              <span className="text-[10px] text-muted-foreground leading-tight">Li e compreendi este TCLE.</span>
             </label>
-            <label className="flex items-start gap-2 sm:gap-3 cursor-pointer group">
-              <Checkbox checked={checks.limitations} onCheckedChange={(v) => setChecks(p => ({ ...p, limitations: !!v }))} className="mt-0.5" />
-              <span className="text-[11px] sm:text-xs text-muted-foreground group-hover:text-foreground transition-colors leading-tight">
-                Ciente das limitações da teleconsulta.
-              </span>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <Checkbox checked={checks.limitations} onCheckedChange={(v) => setChecks(p => ({ ...p, limitations: !!v }))} className="h-4 w-4" />
+              <span className="text-[10px] text-muted-foreground leading-tight">Ciente das limitações da teleconsulta.</span>
             </label>
-            <label className="flex items-start gap-2 sm:gap-3 cursor-pointer group">
-              <Checkbox checked={checks.privacy} onCheckedChange={(v) => setChecks(p => ({ ...p, privacy: !!v }))} className="mt-0.5" />
-              <span className="text-[11px] sm:text-xs text-muted-foreground group-hover:text-foreground transition-colors leading-tight">
-                Autorizo o tratamento dos meus dados (LGPD).
-              </span>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <Checkbox checked={checks.privacy} onCheckedChange={(v) => setChecks(p => ({ ...p, privacy: !!v }))} className="h-4 w-4" />
+              <span className="text-[10px] text-muted-foreground leading-tight">Autorizo tratamento dos meus dados (LGPD).</span>
             </label>
-            <label className="flex items-start gap-2 sm:gap-3 cursor-pointer group">
-              <Checkbox checked={checks.recording} onCheckedChange={(v) => setChecks(p => ({ ...p, recording: !!v }))} className="mt-0.5" />
-              <span className="text-[11px] sm:text-xs text-muted-foreground group-hover:text-foreground transition-colors leading-tight">
-                Ciente do uso de IA como apoio clínico.
-              </span>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <Checkbox checked={checks.recording} onCheckedChange={(v) => setChecks(p => ({ ...p, recording: !!v }))} className="h-4 w-4" />
+              <span className="text-[10px] text-muted-foreground leading-tight">Ciente do uso de IA como apoio clínico.</span>
             </label>
           </div>
 
-          <div className="flex gap-2 sm:gap-3">
-            <Button variant="outline" className="flex-1 h-9 sm:h-10 text-xs sm:text-sm" onClick={onDecline}>
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1 h-8 text-[10px]" onClick={onDecline}>
               Recusar
             </Button>
-            <Button className="flex-1 h-9 sm:h-10 text-xs sm:text-sm bg-primary text-primary-foreground font-bold" disabled={!allChecked} onClick={onAccept}>
-              <CheckCircle2 size={14} className="mr-1.5" />
+            <Button className="flex-1 h-8 text-[10px] bg-primary text-primary-foreground font-bold" disabled={!allChecked} onClick={onAccept}>
+              <CheckCircle2 size={12} className="mr-1" />
               Aceito
             </Button>
           </div>
 
-          <p className="text-[9px] sm:text-[10px] text-center text-muted-foreground">
-            Assinatura eletrônica conforme Lei nº 14.063/2020.
+          <p className="text-[8px] text-center text-muted-foreground">
+            Assinatura eletrônica — Lei nº 14.063/2020
           </p>
         </div>
       </DialogContent>

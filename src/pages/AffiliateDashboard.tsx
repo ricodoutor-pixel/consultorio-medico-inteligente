@@ -29,6 +29,7 @@ const CHART_DATA = [
 
 export default function AffiliateDashboard() {
   const [referralCode, setReferralCode] = useState("");
+  const [userId, setUserId] = useState<string | undefined>();
   const [wallet, setWallet] = useState({ available: 0, pending: 0, total: 0, withdrawn: 0 });
   const [commissions, setCommissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,6 +43,7 @@ export default function AffiliateDashboard() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+      setUserId(user.id);
 
       // Load wallet
       const { data: walletData } = await supabase

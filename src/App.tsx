@@ -14,6 +14,7 @@ import { useCart } from "@/store/cart";
 import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
 import MascotVerdinho from "@/components/MascotVerdinho";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { OpenGraphHead } from "@/components/OpenGraphHead";
 import { FacebookPixelProvider } from "@/components/FacebookPixelProvider";
 import { ReferralCaptureProvider } from "@/components/ReferralCaptureProvider";
@@ -217,6 +218,7 @@ const App = () => (
             {/* Mascote Verdinho removido — presente apenas na Navbar */}
             {/* WhatsApp Brisa Button */}
             <WhatsAppButton />
+            <CookieConsentBanner />
           </Suspense>
         </BrowserRouter>
       </TooltipProvider>

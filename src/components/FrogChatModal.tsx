@@ -8,6 +8,7 @@ import { UrgencyAlert } from "@/components/chat/UrgencyAlert";
 import { analyzeSentiment, type SentimentLevel } from "@/lib/sentimentAnalysis";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import { startTriageTracking } from "@/lib/triageTracker";
 
 interface Message {
   id: string;

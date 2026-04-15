@@ -217,6 +217,36 @@ export type Database = {
         }
         Relationships: []
       }
+      app_downloads: {
+        Row: {
+          created_at: string
+          id: string
+          manychat_name: string | null
+          manychat_user_id: string | null
+          metadata: Json | null
+          platform: string | null
+          source: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          manychat_name?: string | null
+          manychat_user_id?: string | null
+          metadata?: Json | null
+          platform?: string | null
+          source?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          manychat_name?: string | null
+          manychat_user_id?: string | null
+          metadata?: Json | null
+          platform?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           amount: number

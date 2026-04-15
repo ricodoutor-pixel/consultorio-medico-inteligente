@@ -75,24 +75,24 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-green-200">
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-green-600">+50K</div>
-                <div className="text-xs md:text-sm text-gray-600">Pacientes Ativos</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-green-600">98%</div>
-                <div className="text-xs md:text-sm text-gray-600">Satisfação</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-green-600">24/7</div>
-                <div className="text-xs md:text-sm text-gray-600">Atendimento</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-green-600">R$30</div>
-                <div className="text-xs md:text-sm text-gray-600">Primeira Consulta</div>
-              </div>
-            </div>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-4 md:mt-6 pt-4 md:pt-6 border-t border-green-200">
+               <div className="text-center">
+                 <div className="text-xl md:text-3xl font-bold text-green-600">+50K</div>
+                 <div className="text-[10px] md:text-sm text-gray-600">Pacientes Ativos</div>
+               </div>
+               <div className="text-center">
+                 <div className="text-xl md:text-3xl font-bold text-green-600">98%</div>
+                 <div className="text-[10px] md:text-sm text-gray-600">Satisfação</div>
+               </div>
+               <div className="text-center">
+                 <div className="text-xl md:text-3xl font-bold text-green-600">24/7</div>
+                 <div className="text-[10px] md:text-sm text-gray-600">Atendimento</div>
+               </div>
+               <div className="text-center">
+                 <div className="text-xl md:text-3xl font-bold text-green-600">R$30</div>
+                 <div className="text-[10px] md:text-sm text-gray-600">Primeira Consulta</div>
+               </div>
+             </div>
           </div>
         </div>
       </div>

@@ -106,6 +106,7 @@ const OfertaEspecial = lazy(() => import("./pages/OfertaEspecial"));
 const AdminFinanceiro = lazy(() => import("./pages/AdminFinanceiro"));
 const QuizTriagem = lazy(() => import("./pages/QuizTriagem"));
 const CondicaoTratamento = lazy(() => import("./pages/CondicaoTratamento"));
+const Consultorio = lazy(() => import("./pages/Consultorio"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();

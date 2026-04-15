@@ -109,6 +109,8 @@ const AdminFinanceiro = lazy(() => import("./pages/AdminFinanceiro"));
 const QuizTriagem = lazy(() => import("./pages/QuizTriagem"));
 const CondicaoTratamento = lazy(() => import("./pages/CondicaoTratamento"));
 const Consultorio = lazy(() => import("./pages/Consultorio"));
+const FastTrackCheckout = lazy(() => import("./pages/FastTrackCheckout"));
+const AffiliateDashboard = lazy(() => import("./pages/AffiliateDashboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -227,6 +229,8 @@ const App = () => (
                 <Route path="/quiz" element={<QuizTriagem />} />
                 <Route path="/condicao/:condicao" element={<CondicaoTratamento />} />
                 <Route path="/consultorio" element={<PrivateRoute><Consultorio /></PrivateRoute>} />
+                <Route path="/checkout/fast-track" element={<FastTrackCheckout />} />
+                <Route path="/afiliados/dashboard" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

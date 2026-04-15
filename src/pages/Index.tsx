@@ -75,7 +75,7 @@ const Index = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="hero-glow pb-12 md:pb-16 min-h-[60dvh] lg:min-h-[80dvh] flex items-start overflow-hidden pt-20 md:pt-24">
+      <section className="hero-glow section-padding min-h-[60dvh] lg:min-h-[80dvh] flex items-start overflow-hidden pt-20 md:pt-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-14 items-start">
             
@@ -84,7 +84,7 @@ const Index = () => {
 
               <motion.h1 
                 variants={fadeUp} 
-                className="text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[0.95] mb-4 tracking-tight"
+                className="text-[clamp(2rem,6vw+0.5rem,4.5rem)] font-display font-black leading-[0.95] mb-4 tracking-tight"
               >
                 <span className="text-gradient-green">Mais que Acesso,</span>
                 <br />
@@ -141,7 +141,7 @@ const Index = () => {
                   </div>
                 </div>
                 {/* Texto institucional abaixo do carrossel - apenas mobile */}
-                <p className="mt-4 text-center leading-relaxed font-display font-bold text-[clamp(0.85rem,2vw,1.25rem)] max-w-full lg:hidden mx-auto px-2">
+                <p className="mt-4 text-center leading-relaxed font-display font-bold text-[clamp(0.75rem,1.8vw,1.1rem)] max-w-full lg:hidden mx-auto px-2">
                   <span className="text-primary">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
                   <span className="text-[hsl(25,95%,60%)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
                   <span className="text-[hsl(280,80%,65%)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}
@@ -157,7 +157,7 @@ const Index = () => {
 
 
       {/* Live Stats */}
-      <section className="py-12 md:py-16 border-b border-border bg-card/20 backdrop-blur-md">
+      <section className="section-padding border-b border-border bg-card/20 backdrop-blur-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {[
@@ -170,8 +170,8 @@ const Index = () => {
                 <Card className="border-border text-center hover:border-primary/30 transition-all hover:shadow-xl bg-background/40">
                   <CardContent className="p-5">
                     <stat.icon size={24} className="text-primary mx-auto mb-2" />
-                    <p className="text-2xl md:text-3xl font-display font-black text-foreground">{stat.value}</p>
-                    <span className="text-xs text-muted-foreground font-bold uppercase tracking-wider">{stat.label}</span>
+                    <p className="text-[clamp(1.25rem,3vw,2rem)] font-display font-black text-foreground">{stat.value}</p>
+                    <span className="text-[clamp(0.6rem,1.2vw,0.75rem)] text-muted-foreground font-bold uppercase tracking-wider">{stat.label}</span>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -181,23 +181,23 @@ const Index = () => {
       </section>
 
       {/* Como Funciona — 5 Passos */}
-      <section className="py-20 md:py-32 bg-background">
+      <section className="section-padding bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
-          <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-3xl md:text-5xl font-display font-black mb-6">Tratamento em <span className="text-gradient-purple">5 Passos</span></h2>
-            <p className="text-lg text-muted-foreground font-medium">Sua jornada completa, do diagnóstico à entrega do medicamento, com economia e segurança total.</p>
+          <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
+            <h2 className="font-display font-black mb-4 md:mb-6">Tratamento em <span className="text-gradient-purple">5 Passos</span></h2>
+            <p className="text-muted-foreground font-medium">Sua jornada completa, do diagnóstico à entrega do medicamento, com economia e segurança total.</p>
           </div>
-          <div className="grid md:grid-cols-5 gap-6 mb-10">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 mb-10">
             {steps.map((step, i) => (
-              <motion.div key={i} className="relative p-6 rounded-3xl bg-card/30 border border-border hover:border-primary/20 transition-all group" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-                <div className="mb-4 relative h-40 overflow-hidden rounded-2xl">
+              <motion.div key={i} className="relative p-4 md:p-6 rounded-2xl md:rounded-3xl bg-card/30 border border-border hover:border-primary/20 transition-all group" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+                <div className="mb-3 md:mb-4 relative h-28 md:h-40 overflow-hidden rounded-xl md:rounded-2xl">
                   <img src={step.img} alt={step.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   <div className="absolute top-3 left-3 w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-primary-foreground text-lg font-black shadow-lg">
                     {step.n}
                   </div>
                 </div>
-                <h3 className="text-lg font-bold mb-2">{step.title}</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm">{step.desc}</p>
+                <h3 className="text-sm md:text-base lg:text-lg font-bold mb-1 md:mb-2">{step.title}</h3>
+                <p className="text-muted-foreground leading-relaxed text-xs md:text-sm">{step.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -211,13 +211,13 @@ const Index = () => {
         </div>
       </section>
       {/* Seleção de Patologias */}
-      <section className="py-20 md:py-28 bg-background">
+      <section className="section-padding bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <div className="text-center max-w-3xl mx-auto mb-10">
-            <h2 className="text-3xl md:text-5xl font-display font-black mb-4">
+            <h2 className="font-display font-black mb-4">
               Selecione as suas <span className="text-gradient-green">patologias</span>
             </h2>
-            <p className="text-lg text-muted-foreground font-medium">
+            <p className="text-muted-foreground font-medium">
               Inicie seu tratamento com cannabis medicinal ainda hoje!
             </p>
             <p className="text-base text-muted-foreground mt-2">
@@ -249,7 +249,7 @@ const Index = () => {
                 key={item.name}
                 to={`/telemedicina`}
                 onClick={() => sessionStorage.setItem("triage_condition", item.name)}
-                className={`px-5 py-3 rounded-full ${item.bg} text-white font-bold text-sm shadow-lg ${item.shadow} hover:scale-105 transition-all duration-300 hover:animate-none`}
+                className={`px-3 py-2 md:px-5 md:py-3 rounded-full ${item.bg} text-white font-bold text-xs md:text-sm shadow-lg ${item.shadow} hover:scale-105 transition-all duration-300 hover:animate-none`}
                 style={{
                   animation: `twinkle ${6 + (index % 5) * 1.5}s ease-in-out ${(index * 0.8) % 7}s infinite`,
                 }}
@@ -262,11 +262,11 @@ const Index = () => {
       </section>
 
       {/* Depoimentos Reais */}
-      <section className="py-20 md:py-32 bg-card/10 border-y border-border">
+      <section className="section-padding bg-card/10 border-y border-border">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-5xl font-display font-black mb-6">Histórias <span className="text-gradient-green">Reais</span></h2>
-            <p className="text-lg text-muted-foreground font-medium">Vidas transformadas pela cannabis medicinal com acompanhamento profissional.</p>
+          <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
+            <h2 className="font-display font-black mb-4 md:mb-6">Histórias <span className="text-gradient-green">Reais</span></h2>
+            <p className="text-muted-foreground font-medium">Vidas transformadas pela cannabis medicinal com acompanhamento profissional.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {testimonialData.map((t, i) => (

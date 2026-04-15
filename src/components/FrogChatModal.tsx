@@ -373,6 +373,15 @@ export const FrogChatModal = () => {
             </div>
           )}
 
+          {/* 🧠 Brisa IA 2.0 — Urgency Alert */}
+          {urgencyAlert && !isStreaming && (
+            <UrgencyAlert
+              level={urgencyAlert.level}
+              triggers={urgencyAlert.triggers}
+              onDismiss={() => setUrgencyAlert(null)}
+            />
+          )}
+
           {/* Express Checkout CTA — shown when Brisa detects intent */}
           {messages.length > 1 && !isStreaming && (() => {
             const lastAiMsg = [...messages].reverse().find(m => m.sender === "ai");

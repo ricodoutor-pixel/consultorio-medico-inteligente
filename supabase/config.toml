@@ -98,3 +98,6 @@ verify_jwt = false
 
 [functions.dynamic-pricing]
 verify_jwt = false
+
+[functions.manychat-lead-sync]
+verify_jwt = false

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -24,13 +24,14 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
 
   const allChecked = Object.values(checks).every(Boolean);
   const today = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+  const autoAcceptedRef = useRef(false);
 
-  // Auto-accept when all checkboxes are checked
-  const [autoAccepted, setAutoAccepted] = useState(false);
-  if (allChecked && !autoAccepted) {
-    setAutoAccepted(true);
-    setTimeout(() => onAccept(), 600);
-  }
+  useEffect(() => {
+    if (allChecked && !autoAcceptedRef.current) {
+      autoAcceptedRef.current = true;
+      setTimeout(() => onAccept(), 600);
+    }
+  }, [allChecked, onAccept]);
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onDecline(); }}>

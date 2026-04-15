@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Save, Shield, X, Search, Pill, Stethoscope, ClipboardList, Globe } from "lucide-react";
+import { AITriagePreFill } from "@/components/doctor/AITriagePreFill";
 import { useToast } from "@/hooks/use-toast";
 import { CID10_TO_ICD11_MAP, ICD11_CODES } from "@/data/icd11";
 
@@ -29,6 +30,7 @@ const CID10_COMMON = [
 
 interface ProntuarioSidebarProps {
   appointmentId?: string | null;
+  patientId?: string | null;
   onClose: () => void;
   onSave?: (data: ProntuarioData) => void;
 }
@@ -44,7 +46,7 @@ export interface ProntuarioData {
   notes: string;
 }
 
-export const ProntuarioSidebar = ({ onClose, onSave }: ProntuarioSidebarProps) => {
+export const ProntuarioSidebar = ({ onClose, onSave, patientId }: ProntuarioSidebarProps) => {
   const { toast } = useToast();
   const [cidSearch, setCidSearch] = useState("");
   const [data, setData] = useState<ProntuarioData>({
@@ -93,6 +95,14 @@ export const ProntuarioSidebar = ({ onClose, onSave }: ProntuarioSidebarProps) =
 
       <ScrollArea className="flex-1 p-3">
         <div className="space-y-4">
+          {/* AI Pre-fill from triage */}
+          {patientId && (
+            <AITriagePreFill
+              patientId={patientId}
+              onApply={(prefill) => setData((p) => ({ ...p, ...prefill }))}
+            />
+          )}
+
           {/* Queixa Principal */}
           <div>
             <label className="text-xs font-bold text-muted-foreground flex items-center gap-1 mb-1">

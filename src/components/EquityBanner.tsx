@@ -13,7 +13,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
     <>
       {/* Banner de Equidade */}
       <div
-        className={`w-full bg-gradient-to-r from-green-50 to-emerald-50 border-t-4 border-green-500 py-8 px-4 md:px-8 ${className}`}
+        className={`w-full bg-gradient-to-r from-green-50 to-emerald-50 border-t-4 border-green-500 py-4 md:py-8 px-3 md:px-8 ${className}`}
       >
         <div className="max-w-6xl mx-auto">
           {/* Título */}

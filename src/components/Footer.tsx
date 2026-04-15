@@ -1,62 +1,10 @@
-import { Leaf, Mail, MapPin, Phone, Heart, Scale, Shield, Facebook, Instagram, Youtube, Download, Share2, Plus, CheckCircle2, MoreVertical, Chrome, Smartphone } from "lucide-react";
+import { Leaf, Mail, MapPin, Phone, Heart, Scale, Shield, Facebook, Instagram, Youtube, Download } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { Link } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useIsMobile } from "@/hooks/use-mobile";
-
-type ModalType = "ios" | "android" | "desktop" | null;
 
 export const Footer = () => {
-  const { canInstall, isInstalled, promptInstall } = usePWAInstall();
-  const isMobile = useIsMobile();
-  const [modalType, setModalType] = useState<ModalType>(null);
-
-  const handleInstall = async () => {
-    const result = await promptInstall();
-    if (result === "ios") setModalType("ios");
-    else if (result === "android-manual") setModalType("android");
-    else if (result === "desktop-manual") setModalType("desktop");
-  };
-
-  const StepItem = ({ step, icon: Icon, text }: { step: number; icon: any; text: string }) => (
-    <div className="flex items-start gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
-      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-primary font-bold text-sm shrink-0">{step}</div>
-      <div className="flex items-start gap-2">
-        <Icon size={18} className="text-primary shrink-0 mt-0.5" />
-        <span className="text-sm text-foreground">{text}</span>
-      </div>
-    </div>
-  );
-
-  const ModalContent = () => {
-    if (modalType === "ios") return (
-      <div className="space-y-3 py-2">
-        <p className="text-sm text-muted-foreground">Para instalar no iPhone/iPad:</p>
-        <StepItem step={1} icon={Share2} text="Toque no ícone de Compartilhar" />
-        <StepItem step={2} icon={Plus} text='Selecione "Adicionar à Tela de Início"' />
-        <StepItem step={3} icon={CheckCircle2} text='Confirme tocando em "Adicionar"' />
-      </div>
-    );
-    if (modalType === "android") return (
-      <div className="space-y-3 py-2">
-        <p className="text-sm text-muted-foreground">Para instalar no Android:</p>
-        <StepItem step={1} icon={MoreVertical} text="Toque nos 3 pontinhos (⋮) no Chrome" />
-        <StepItem step={2} icon={Plus} text='Selecione "Adicionar à tela inicial"' />
-        <StepItem step={3} icon={CheckCircle2} text='Confirme tocando em "Instalar"' />
-      </div>
-    );
-    return (
-      <div className="space-y-3 py-2">
-        <p className="text-sm text-muted-foreground">Para instalar no computador:</p>
-        <StepItem step={1} icon={Chrome} text="Abra no Chrome ou Edge" />
-        <StepItem step={2} icon={Download} text="Clique no ícone (⊕) na barra de endereço" />
-        <StepItem step={3} icon={CheckCircle2} text='Clique em "Instalar"' />
-      </div>
-    );
-  };
+  const { canInstall, promptInstall } = usePWAInstall();
 
   return (
     <footer className="border-t border-border bg-card/50" role="contentinfo" aria-label="Rodapé do site">
@@ -161,11 +109,11 @@ export const Footer = () => {
             </a>
           </div>
 
-          {/* Baixe nosso App */}
-          {!isInstalled && (
+          {/* Baixe nosso App - simple direct install */}
+          {canInstall && (
             <div className="flex justify-center mb-4 md:mb-6">
               <button
-                onClick={handleInstall}
+                onClick={() => promptInstall()}
                 className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors group"
               >
                 <Download size={12} className="group-hover:scale-110 transition-transform" />
@@ -217,33 +165,6 @@ export const Footer = () => {
           <Link to="/admin/automations" className="inline-block mt-2 text-[0px] leading-none opacity-0 hover:opacity-5" aria-hidden="true" tabIndex={-1}>·</Link>
         </div>
       </div>
-
-      {/* Install Instructions Modal */}
-      {isMobile ? (
-        <Sheet open={modalType !== null} onOpenChange={(open) => !open && setModalType(null)}>
-          <SheetContent className="px-4 pb-8">
-            <SheetHeader>
-              <SheetTitle className="flex items-center gap-2 text-foreground">
-                <Smartphone size={20} className="text-primary" />
-                Instalar Planta y Raiz
-              </SheetTitle>
-            </SheetHeader>
-            <ModalContent />
-          </SheetContent>
-        </Sheet>
-      ) : (
-        <Dialog open={modalType !== null} onOpenChange={(open) => !open && setModalType(null)}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-foreground">
-                <Smartphone size={20} className="text-primary" />
-                Instalar Planta y Raiz
-              </DialogTitle>
-            </DialogHeader>
-            <ModalContent />
-          </DialogContent>
-        </Dialog>
-      )}
     </footer>
   );
 };

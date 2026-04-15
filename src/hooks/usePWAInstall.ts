@@ -8,17 +8,9 @@ interface BeforeInstallPromptEvent extends Event {
 export function usePWAInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const [isAndroid, setIsAndroid] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
-    const ua = navigator.userAgent;
-    const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    const android = /Android/i.test(ua);
-    setIsIOS(iOS);
-    setIsAndroid(android);
-
     const standalone = window.matchMedia("(display-mode: standalone)").matches
       || (navigator as any).standalone === true;
     setIsStandalone(standalone);
@@ -42,8 +34,7 @@ export function usePWAInstall() {
     };
   }, []);
 
-  const promptInstall = useCallback(async (): Promise<"accepted" | "dismissed" | "ios" | "android-manual" | "desktop-manual"> => {
-    // Native prompt available (Chrome/Edge on Android or Desktop)
+  const promptInstall = useCallback(async () => {
     if (deferredPrompt) {
       try {
         await deferredPrompt.prompt();
@@ -57,17 +48,12 @@ export function usePWAInstall() {
         // prompt() can throw if already called
       }
     }
-
-    if (isIOS) return "ios";
-    if (isAndroid) return "android-manual";
-    return "desktop-manual";
-  }, [deferredPrompt, isIOS, isAndroid]);
+    return null;
+  }, [deferredPrompt]);
 
   return {
-    canInstall: !isInstalled,
+    canInstall: !!deferredPrompt && !isInstalled,
     isInstalled,
-    isIOS,
-    isAndroid,
     isStandalone,
     promptInstall,
   };

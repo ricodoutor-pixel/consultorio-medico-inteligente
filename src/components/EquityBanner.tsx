@@ -13,27 +13,27 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
     <>
       {/* Banner de Equidade */}
       <div
-        className={`w-full bg-gradient-to-r from-green-50 to-emerald-50 border-t-4 border-green-500 py-8 px-4 md:px-8 ${className}`}
+        className={`w-full bg-gradient-to-r from-green-50 to-emerald-50 border-t-4 border-green-500 py-4 md:py-8 px-3 md:px-8 ${className}`}
       >
         <div className="max-w-6xl mx-auto">
           {/* Título */}
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-lg md:text-3xl font-bold text-gray-900 mb-3 md:mb-4">
             Referência No Tratamento Com Cannabis Medicinal No Brasil
           </h2>
 
           {/* Conteúdo Principal */}
           <div className="space-y-4">
-            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              A <span className="font-bold text-green-600">Planta & Raiz</span> está promovendo a{" "}
-              <span className="font-bold">equidade</span> e realmente democratizando o acesso ao
-              tratamento canabinoide oferecendo{" "}
-              <span className="font-bold text-green-600">consultas com especialistas por apenas R$30</span>.
-            </p>
+             <p className="text-xs md:text-lg text-gray-700 leading-relaxed">
+               A <span className="font-bold text-green-600">Planta & Raiz</span> está promovendo a{" "}
+               <span className="font-bold">equidade</span> e realmente democratizando o acesso ao
+               tratamento canabinoide oferecendo{" "}
+               <span className="font-bold text-green-600">consultas com especialistas por apenas R$30</span>.
+             </p>
 
-            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              Venha você também fazer parte de{" "}
-              <span className="font-bold">milhões de pessoas que mudaram a sua qualidade de vida!</span>
-            </p>
+             <p className="text-xs md:text-lg text-gray-700 leading-relaxed">
+               Venha você também fazer parte de{" "}
+               <span className="font-bold">milhões de pessoas que mudaram a sua qualidade de vida!</span>
+             </p>
 
             {/* CTAs Mobile Only - Iniciar Consulta + Abrir Shopping */}
             <div className="flex flex-col gap-3 mt-4 md:hidden">
@@ -75,24 +75,24 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-green-200">
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-green-600">+50K</div>
-                <div className="text-xs md:text-sm text-gray-600">Pacientes Ativos</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-green-600">98%</div>
-                <div className="text-xs md:text-sm text-gray-600">Satisfação</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-green-600">24/7</div>
-                <div className="text-xs md:text-sm text-gray-600">Atendimento</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-green-600">R$30</div>
-                <div className="text-xs md:text-sm text-gray-600">Primeira Consulta</div>
-              </div>
-            </div>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-4 md:mt-6 pt-4 md:pt-6 border-t border-green-200">
+               <div className="text-center">
+                 <div className="text-xl md:text-3xl font-bold text-green-600">+50K</div>
+                 <div className="text-[10px] md:text-sm text-gray-600">Pacientes Ativos</div>
+               </div>
+               <div className="text-center">
+                 <div className="text-xl md:text-3xl font-bold text-green-600">98%</div>
+                 <div className="text-[10px] md:text-sm text-gray-600">Satisfação</div>
+               </div>
+               <div className="text-center">
+                 <div className="text-xl md:text-3xl font-bold text-green-600">24/7</div>
+                 <div className="text-[10px] md:text-sm text-gray-600">Atendimento</div>
+               </div>
+               <div className="text-center">
+                 <div className="text-xl md:text-3xl font-bold text-green-600">R$30</div>
+                 <div className="text-[10px] md:text-sm text-gray-600">Primeira Consulta</div>
+               </div>
+             </div>
           </div>
         </div>
       </div>

@@ -1,0 +1,116 @@
+/**
+ * prescription-to-cart — Generates a one-click checkout cart from a prescription
+ * 
+ * Called by doctors after prescribing. Creates a pre-filled cart with products
+ * and sends the patient a unique link to complete purchase in 1 click.
+ */
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+interface PrescribedItem {
+  product_name: string;
+  quantity: number;
+  dosage?: string;
+  unit_price?: number;
+}
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  try {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const body = await req.json();
+    const { prescription_id, doctor_id, patient_id, items, action } = body;
+
+    if (action === "get_cart") {
+      // Patient retrieving cart by token
+      const { cart_token } = body;
+      if (!cart_token) throw new Error("cart_token required");
+
+      const { data: cart, error } = await supabase
+        .from("prescription_carts")
+        .select("*")
+        .eq("cart_token", cart_token)
+        .eq("status", "pending")
+        .gt("expires_at", new Date().toISOString())
+        .single();
+
+      if (error || !cart) {
+        return new Response(JSON.stringify({ error: "Cart not found or expired" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      return new Response(JSON.stringify({ status: "ok", cart }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Create cart from prescription
+    if (!prescription_id || !doctor_id || !patient_id) {
+      throw new Error("prescription_id, doctor_id, patient_id required");
+    }
+
+    const prescribedItems: PrescribedItem[] = items || [];
+    const totalAmount = prescribedItems.reduce((sum: number, item: PrescribedItem) => 
+      sum + (item.unit_price || 0) * (item.quantity || 1), 0);
+
+    // Check if patient has active subscription for discount
+    const { data: subscription } = await supabase
+      .from("health_subscriptions")
+      .select("features, plan_type")
+      .eq("user_id", patient_id)
+      .eq("status", "active")
+      .single();
+
+    const discountPercent = subscription?.features?.marketplace_discount || 0;
+
+    const { data: cart, error } = await supabase
+      .from("prescription_carts")
+      .insert({
+        prescription_id,
+        patient_id,
+        doctor_id,
+        items: prescribedItems,
+        total_amount: totalAmount * (1 - discountPercent / 100),
+        discount_percent: discountPercent,
+      })
+      .select("id, cart_token")
+      .single();
+
+    if (error) throw error;
+
+    const cartUrl = `https://plantayraiz.com.br/carrinho/${cart.cart_token}`;
+
+    // Log to audit
+    await supabase.from("audit_log").insert({
+      user_id: doctor_id,
+      action: "prescription_cart_created",
+      table_name: "prescription_carts",
+      record_id: cart.id,
+      new_data: { prescription_id, items_count: prescribedItems.length, total: totalAmount },
+    });
+
+    return new Response(JSON.stringify({
+      status: "ok",
+      cart_id: cart.id,
+      cart_token: cart.cart_token,
+      cart_url: cartUrl,
+      total_amount: totalAmount,
+      discount_percent: discountPercent,
+    }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+  } catch (err) {
+    console.error("[PRESCRIPTION-CART]", err);
+    return new Response(JSON.stringify({ status: "error", message: String(err) }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

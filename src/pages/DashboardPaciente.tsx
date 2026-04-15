@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WellnessSubscriptionCards } from "@/components/WellnessSubscriptionCards";
 import { PWAStreakBanner } from "@/components/PWAStreakBanner";
+import { FrogMoodBanner } from "@/components/FrogMoodBanner";
 import { PatientCheckinCard } from "@/components/PatientCheckinCard";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { ProgressReportGenerator } from "@/components/ProgressReportGenerator";

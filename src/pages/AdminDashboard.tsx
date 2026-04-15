@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { LTVMetricsPanel } from "@/components/admin/LTVMetricsPanel";
 import { RegistrationStatsPanel } from "@/components/admin/RegistrationStatsPanel";
+import { AppDownloadsCounter } from "@/components/admin/AppDownloadsCounter";
 
 const AdminDashboard = () => {
   const { toast } = useToast();

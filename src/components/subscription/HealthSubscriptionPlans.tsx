@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, Crown, Leaf, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,12 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
+import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 const PLANS = [
   {
     id: "basic",
     name: "Essencial",
     price: 49.9,
+    priceId: "essencial_mensal",
     icon: Leaf,
     badge: null,
     features: [
@@ -25,6 +28,7 @@ const PLANS = [
     id: "premium",
     name: "Premium",
     price: 99.9,
+    priceId: "premium_mensal",
     icon: Crown,
     badge: "Mais Popular",
     features: [
@@ -39,6 +43,7 @@ const PLANS = [
     id: "vip",
     name: "VIP",
     price: 199.9,
+    priceId: "vip_mensal",
     icon: Sparkles,
     badge: "Exclusivo",
     features: [
@@ -53,40 +58,41 @@ const PLANS = [
 ];
 
 export function HealthSubscriptionPlans() {
-  const [loading, setLoading] = useState<string | null>(null);
+  const [activePlan, setActivePlan] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
 
-  const handleSubscribe = async (planId: string) => {
-    setLoading(planId);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({ title: "Faça login para assinar", variant: "destructive" });
-        return;
-      }
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+  }, []);
 
-      const plan = PLANS.find(p => p.id === planId)!;
-      const nextBilling = new Date();
-      nextBilling.setMonth(nextBilling.getMonth() + 1);
-
-      const { error } = await supabase.from("health_subscriptions").insert({
-        user_id: user.id,
-        plan_type: planId,
-        plan_name: plan.name,
-        amount: plan.price,
-        billing_cycle: "monthly",
-        next_billing_at: nextBilling.toISOString(),
-      });
-
-      if (error) throw error;
-
-      toast({ title: `Assinatura ${plan.name} ativada!`, description: "Bem-vindo ao clube de saúde." });
-    } catch (err) {
-      toast({ title: "Erro ao assinar", description: String(err), variant: "destructive" });
-    } finally {
-      setLoading(null);
+  const handleSubscribe = (planId: string) => {
+    if (!user) {
+      toast({ title: "Faça login para assinar", variant: "destructive" });
+      return;
     }
+    setActivePlan(planId);
   };
+
+  if (activePlan) {
+    const plan = PLANS.find(p => p.id === activePlan)!;
+    return (
+      <div className="max-w-lg mx-auto">
+        <Button variant="ghost" onClick={() => setActivePlan(null)} className="mb-4">
+          ← Voltar aos planos
+        </Button>
+        <h3 className="text-xl font-bold mb-4 text-center">Assinatura {plan.name}</h3>
+        <div className="rounded-xl overflow-hidden border border-border">
+          <StripeEmbeddedCheckout
+            priceId={plan.priceId}
+            customerEmail={user?.email}
+            userId={user?.id}
+            returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -125,10 +131,9 @@ export function HealthSubscriptionPlans() {
               </ul>
               <Button
                 className="w-full bg-primary hover:bg-primary/90 font-bold"
-                disabled={loading !== null}
                 onClick={() => handleSubscribe(plan.id)}
               >
-                {loading === plan.id ? "Processando..." : "Assinar Agora"}
+                Assinar Agora
               </Button>
             </CardContent>
           </Card>

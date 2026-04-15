@@ -102,6 +102,7 @@ const AutomationsDashboard = lazy(() => import("./pages/AutomationsDashboard"));
 const OmniChannelDashboard = lazy(() => import("./pages/OmniChannelDashboard"));
 const OfertaEspecial = lazy(() => import("./pages/OfertaEspecial"));
 const AdminFinanceiro = lazy(() => import("./pages/AdminFinanceiro"));
+const QuizTriagem = lazy(() => import("./pages/QuizTriagem"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -213,6 +214,8 @@ const App = () => (
                 <Route path="/admin/automations" element={<AdminRoute><AutomationsDashboard /></AdminRoute>} />
                 <Route path="/admin/omni-channel" element={<OmniChannelDashboard />} />
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
+                <Route path="/quiz-triagem" element={<QuizTriagem />} />
+                <Route path="/quiz" element={<QuizTriagem />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useLocation } from "react-router-dom";
-import { X, Send, Sparkles, Trash2, Minimize2 } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { X, Send, Sparkles, Trash2, Minimize2, Calendar, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FrogMascot } from "@/components/FrogMascot";
 import { LeadCaptureModal } from "@/components/LeadCaptureModal";
@@ -97,11 +97,20 @@ const getFallback = (text: string): string => {
 };
 
 const QUICK_ACTIONS = [
-  { label: "🩺 Agendar consulta", msg: "Como faço para agendar uma consulta?" },
+  { label: "🩺 Agendar consulta", msg: "Como faço para agendar uma consulta?", cta: true },
   { label: "💊 Cannabis medicinal", msg: "O que é cannabis medicinal e quais condições trata?" },
   { label: "💰 Preços", msg: "Quais são os preços das consultas?" },
+  { label: "🛒 Shopping", msg: "Quais produtos vocês vendem?" },
   { label: "📱 Como funciona?", msg: "Como funciona a plataforma Planta & Raiz?" },
 ];
+
+// Detect purchase/booking intent from AI responses
+const detectIntent = (text: string): "booking" | "shopping" | null => {
+  const lower = text.toLowerCase();
+  if (lower.match(/agend|consult|médic|doutor|especialist|marc.*horári/)) return "booking";
+  if (lower.match(/compr|produto|carrinho|shopping|óleo|cápsula|tintur/)) return "shopping";
+  return null;
+};
 
 export const FrogChatModal = () => {
   const [isOpen, setIsOpen] = useState(false);

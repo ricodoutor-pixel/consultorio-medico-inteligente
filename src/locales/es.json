@@ -1,0 +1,89 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "howItWorks": "Cómo Funciona",
+    "professionals": "Profesionales",
+    "shop": "Tienda",
+    "plans": "Planes",
+    "faq": "Preguntas Frecuentes",
+    "contact": "Contacto",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "profile": "Mi Perfil",
+    "dashboard": "Panel",
+    "waitingRoom": "Sala de Espera",
+    "library": "Biblioteca",
+    "community": "Comunidad",
+    "investors": "Inversores",
+    "blog": "Blog"
+  },
+  "hero": {
+    "title": "Planta y Raiz - Mega Clínica Digital",
+    "subtitle": "Democratizando el acceso a la salud y el bienestar a través de la tecnología y el cannabis medicinal.",
+    "startConsultation": "Iniciar Consulta",
+    "onlineNow": "En línea ahora"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "loading": "Cargando...",
+    "search": "Buscar",
+    "send": "Enviar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "consult": {
+    "title": "Teleconsulta",
+    "mute": "Silenciar",
+    "unmute": "Activar micrófono",
+    "endCall": "Terminar Llamada",
+    "chat": "Chat",
+    "aiAssistant": "Asistente IA",
+    "medicalRecord": "Historia Clínica",
+    "elapsed": "Tiempo de consulta",
+    "waitingRoom": "Sala de Espera Virtual",
+    "yourTurn": "¡Tu turno!",
+    "estimatedWait": "Tiempo estimado de espera",
+    "position": "Posición en la cola"
+  },
+  "med": {
+    "diagnosis": "Diagnóstico",
+    "prescription": "Receta",
+    "complaint": "Motivo de Consulta",
+    "history": "Historial",
+    "treatment": "Plan Terapéutico",
+    "sign": "Firmar Digitalmente",
+    "icd": "CIE-10 / CIE-11"
+  },
+  "bi": {
+    "title": "Inteligencia de Negocios",
+    "cac": "CAC",
+    "ltv": "LTV",
+    "conversionRate": "Tasa de Conversión",
+    "triageToConsultation": "Triaje → Consulta",
+    "revenue": "Ingresos",
+    "monthlyRevenue": "Ingresos Mensuales",
+    "activePatients": "Pacientes Activos",
+    "activeDoctors": "Médicos Activos",
+    "avgTicket": "Ticket Promedio",
+    "churnRate": "Tasa de Abandono",
+    "roi": "ROI"
+  },
+  "gamification": {
+    "level": "Nivel",
+    "bronze": "Bronce",
+    "silver": "Plata",
+    "gold": "Oro",
+    "platinum": "Platino",
+    "diamond": "Diamante",
+    "cashback": "Cashback",
+    "plantCoins": "Planta-Coins",
+    "nextLevel": "Próximo nivel",
+    "consultationsNeeded": "consultas restantes"
+  }
+}

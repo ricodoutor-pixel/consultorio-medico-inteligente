@@ -80,3 +80,9 @@ verify_jwt = false
 
 [functions.manychat-sync]
 verify_jwt = false
+
+[functions.generate-availability]
+verify_jwt = false
+
+[functions.whatsapp-recovery]
+verify_jwt = false

@@ -1,0 +1,89 @@
+{
+  "nav": {
+    "home": "Home",
+    "howItWorks": "How It Works",
+    "professionals": "Professionals",
+    "shop": "Shop",
+    "plans": "Plans",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "logout": "Log Out",
+    "profile": "My Profile",
+    "dashboard": "Dashboard",
+    "waitingRoom": "Waiting Room",
+    "library": "Library",
+    "community": "Community",
+    "investors": "Investors",
+    "blog": "Blog"
+  },
+  "hero": {
+    "title": "Planta y Raiz - Mega Digital Clinic",
+    "subtitle": "Democratizing access to health and well-being through technology and medical cannabis.",
+    "startConsultation": "Start Consultation",
+    "onlineNow": "Online now"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "search": "Search",
+    "send": "Send",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "consult": {
+    "title": "Teleconsultation",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "endCall": "End Call",
+    "chat": "Chat",
+    "aiAssistant": "AI Assistant",
+    "medicalRecord": "Medical Record",
+    "elapsed": "Consultation time",
+    "waitingRoom": "Virtual Waiting Room",
+    "yourTurn": "Your turn!",
+    "estimatedWait": "Estimated wait time",
+    "position": "Queue position"
+  },
+  "med": {
+    "diagnosis": "Diagnosis",
+    "prescription": "Prescription",
+    "complaint": "Chief Complaint",
+    "history": "History",
+    "treatment": "Treatment Plan",
+    "sign": "Sign Digitally",
+    "icd": "ICD-10 / ICD-11"
+  },
+  "bi": {
+    "title": "Business Intelligence",
+    "cac": "CAC",
+    "ltv": "LTV",
+    "conversionRate": "Conversion Rate",
+    "triageToConsultation": "Triage → Consultation",
+    "revenue": "Revenue",
+    "monthlyRevenue": "Monthly Revenue",
+    "activePatients": "Active Patients",
+    "activeDoctors": "Active Doctors",
+    "avgTicket": "Average Ticket",
+    "churnRate": "Churn Rate",
+    "roi": "ROI"
+  },
+  "gamification": {
+    "level": "Level",
+    "bronze": "Bronze",
+    "silver": "Silver",
+    "gold": "Gold",
+    "platinum": "Platinum",
+    "diamond": "Diamond",
+    "cashback": "Cashback",
+    "plantCoins": "Plant-Coins",
+    "nextLevel": "Next level",
+    "consultationsNeeded": "consultations remaining"
+  }
+}

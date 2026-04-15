@@ -104,9 +104,10 @@ const QUICK_ACTIONS = [
   { label: "📱 Como funciona?", msg: "Como funciona a plataforma Planta & Raiz?" },
 ];
 
-// Detect purchase/booking intent from AI responses
-const detectIntent = (text: string): "booking" | "shopping" | null => {
+// Detect purchase/booking/subscription intent from AI responses
+const detectIntent = (text: string): "booking" | "shopping" | "subscription" | null => {
   const lower = text.toLowerCase();
+  if (lower.match(/assinatur|plano recorrent|acompanhamento.*longo|mensal.*consult|recorrên|wellness|bem-estar.*plano/)) return "subscription";
   if (lower.match(/agend|consult|médic|doutor|especialist|marc.*horári/)) return "booking";
   if (lower.match(/compr|produto|carrinho|shopping|óleo|cápsula|tintur/)) return "shopping";
   return null;
@@ -367,7 +368,15 @@ export const FrogChatModal = () => {
             const intent = lastAiMsg ? detectIntent(lastAiMsg.text) : null;
             if (!intent) return null;
             return (
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2 pt-2 flex-wrap">
+                {intent === "subscription" && (
+                  <button
+                    onClick={() => { setIsOpen(false); navigate("/planos"); }}
+                    className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-full bg-gradient-to-r from-primary to-emerald-500 text-primary-foreground font-bold animate-pulse hover:animate-none transition-all"
+                  >
+                    <Sparkles size={14} /> Assinar Plano Recorrente
+                  </button>
+                )}
                 {intent === "booking" && (
                   <button
                     onClick={() => { setIsOpen(false); navigate("/agendamento"); }}

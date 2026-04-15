@@ -100,6 +100,7 @@ const HealthCheck = lazy(() => import("./pages/HealthCheck"));
 const AutomationsDashboard = lazy(() => import("./pages/AutomationsDashboard"));
 const OmniChannelDashboard = lazy(() => import("./pages/OmniChannelDashboard"));
 const OfertaEspecial = lazy(() => import("./pages/OfertaEspecial"));
+const AdminFinanceiro = lazy(() => import("./pages/AdminFinanceiro"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -153,6 +154,7 @@ const App = () => (
                 <Route path="/usuarios-online" element={<OnlineUsers />} />
                 <Route path="/admin-ceo" element={<AdminDashboard />} />
                 <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+                <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/biblioteca" element={<BibliotecaCientifica />} />
                 <Route path="/download" element={<DownloadApp />} />

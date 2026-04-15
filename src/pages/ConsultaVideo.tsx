@@ -20,6 +20,9 @@ import { BiometricShield } from "@/components/consultation/BiometricShield";
 import { AIScribeCoding } from "@/components/consultation/AIScribeCoding";
 import { SmartPrescriptionDTx } from "@/components/consultation/SmartPrescriptionDTx";
 import { BlockchainConsent } from "@/components/consultation/BlockchainConsent";
+import { MandatoryNPSModal } from "@/components/MandatoryNPSModal";
+import { PatientFlowGuide } from "@/components/patient/PatientFlowGuide";
+import type { FlowStep } from "@/components/patient/PatientFlowGuide";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
@@ -53,6 +56,11 @@ const ConsultaVideo = () => {
   const [isDoctor, setIsDoctor] = useState(false);
   const [tcleAccepted, setTcleAccepted] = useState(false);
   const [showTCLE, setShowTCLE] = useState(true);
+  const [showNPS, setShowNPS] = useState(false);
+  const [showFlowGuide, setShowFlowGuide] = useState(false);
+  const [flowStep, setFlowStep] = useState<FlowStep>("consultation_completed");
+  const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [doctorId, setDoctorId] = useState<string>("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -80,8 +88,12 @@ const ConsultaVideo = () => {
   const checkUserType = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
+    setCurrentUserId(session.user.id);
     const { data: doctor } = await supabase.from("doctors").select("id").eq("user_id", session.user.id).maybeSingle();
-    if (doctor) setIsDoctor(true);
+    if (doctor) {
+      setIsDoctor(true);
+      setDoctorId(doctor.id);
+    }
   };
 
   const sendMessage = () => {
@@ -145,7 +157,14 @@ const ConsultaVideo = () => {
       await supabase.from("appointments").update({ status: "completed" }).eq("id", appointmentId);
     }
     toast({ title: "Consulta encerrada ✅" });
-    window.history.back();
+    
+    if (!isDoctor) {
+      setShowNPS(true);
+    } else {
+      setShowFlowGuide(true);
+      setFlowStep("consultation_completed");
+      window.history.back();
+    }
   };
 
   const formatTime = (s: number) => {

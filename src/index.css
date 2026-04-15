@@ -93,17 +93,17 @@ section, article, aside, main, header, footer, div {
   object-fit: cover;
 }
 
-/* Responsive text scaling for very small screens */
-@media (max-width: 480px) {
-  h1 { font-size: clamp(1.75rem, 7vw, 2.5rem) !important; }
-  h2 { font-size: clamp(1.5rem, 6vw, 2rem) !important; }
-  h3 { font-size: clamp(1.125rem, 4.5vw, 1.5rem) !important; }
-}
+/* Responsive text scaling — harmonized across all breakpoints */
+h1 { font-size: clamp(1.75rem, 5vw + 0.5rem, 4.5rem); }
+h2 { font-size: clamp(1.5rem, 4vw + 0.5rem, 3rem); }
+h3 { font-size: clamp(1.125rem, 3vw + 0.25rem, 1.75rem); }
+h4 { font-size: clamp(0.95rem, 2vw + 0.25rem, 1.25rem); }
+p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
 
-/* Tablet adjustments */
-@media (min-width: 481px) and (max-width: 768px) {
-  h1 { font-size: clamp(2rem, 5vw, 3rem) !important; }
-  h2 { font-size: clamp(1.75rem, 4vw, 2.5rem) !important; }
+/* Standardized section spacing */
+.section-padding {
+  padding-top: clamp(3rem, 6vw, 8rem);
+  padding-bottom: clamp(3rem, 6vw, 8rem);
 }
 
 @layer base {

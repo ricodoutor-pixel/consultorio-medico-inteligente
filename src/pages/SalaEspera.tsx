@@ -157,6 +157,9 @@ const SalaEspera = () => {
               </CardContent>
             </Card>
 
+            {/* Uber-Style Quick Queue */}
+            <UberQueueSection userType={userType} />
+
             {appointments.length === 0 ? (
               <Card className="border-border">
                 <CardContent className="p-12 text-center">
@@ -262,5 +265,79 @@ const SalaEspera = () => {
     </div>
   );
 };
+
+/** Uber-Style Queue Component */
+function UberQueueSection({ userType }: { userType: "patient" | "doctor" }) {
+  const { queue, myEntry, loading, joinQueue, acceptPatient, waitingCount } = useConsultationQueue(userType);
+
+  return (
+    <Card className="border-border border-primary/20 mb-6">
+      <CardContent className="p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-display font-black text-foreground text-sm flex items-center gap-2">
+            <Zap size={14} className="text-primary" /> Fila Rápida (Uber-Style)
+          </h3>
+          <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">
+            {waitingCount} aguardando
+          </Badge>
+        </div>
+
+        {userType === "patient" && !myEntry && (
+          <Button
+            className="w-full bg-primary text-primary-foreground font-bold rounded-xl"
+            disabled={loading}
+            onClick={() => joinQueue()}
+          >
+            {loading ? <Loader2 size={14} className="mr-1 animate-spin" /> : <Zap size={14} className="mr-1" />}
+            Entrar na Fila Agora
+          </Button>
+        )}
+
+        {userType === "patient" && myEntry && (
+          <div className="text-center space-y-2">
+            <div className="w-3 h-3 rounded-full bg-primary animate-pulse mx-auto" />
+            <p className="text-sm font-bold text-foreground">
+              {myEntry.status === "matched" ? "🎉 Médico encontrado!" : "Aguardando médico..."}
+            </p>
+            {myEntry.jitsi_room && (
+              <Button className="bg-primary text-primary-foreground font-bold rounded-xl" asChild>
+                <Link to={`/consulta-video?room=${myEntry.jitsi_room}`}>
+                  <Video size={14} className="mr-1" /> Entrar na Sala
+                </Link>
+              </Button>
+            )}
+          </div>
+        )}
+
+        {userType === "doctor" && queue.filter(e => e.status === "waiting").length > 0 && (
+          <div className="space-y-2">
+            {queue.filter(e => e.status === "waiting").slice(0, 5).map((entry) => (
+              <div key={entry.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                <div>
+                  <p className="text-xs font-bold text-foreground">Paciente na fila</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {entry.specialty || "Geral"} • {format(new Date(entry.created_at), "HH:mm", { locale: ptBR })}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  className="bg-primary text-primary-foreground font-bold text-xs rounded-xl"
+                  disabled={loading}
+                  onClick={() => acceptPatient(entry.id)}
+                >
+                  <CheckCircle2 size={12} className="mr-1" /> Aceitar
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {userType === "doctor" && queue.filter(e => e.status === "waiting").length === 0 && (
+          <p className="text-xs text-muted-foreground text-center">Nenhum paciente na fila rápida no momento.</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default SalaEspera;

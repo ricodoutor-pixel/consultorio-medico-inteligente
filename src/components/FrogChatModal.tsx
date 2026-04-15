@@ -4,6 +4,8 @@ import { X, Send, Sparkles, Trash2, Minimize2, Calendar, ShoppingBag } from "luc
 import { Button } from "@/components/ui/button";
 import { FrogMascot } from "@/components/FrogMascot";
 import { LeadCaptureModal } from "@/components/LeadCaptureModal";
+import { UrgencyAlert } from "@/components/chat/UrgencyAlert";
+import { analyzeSentiment, type SentimentLevel } from "@/lib/sentimentAnalysis";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 
@@ -12,6 +14,7 @@ interface Message {
   text: string;
   sender: "user" | "ai";
   timestamp: Date;
+  urgencyLevel?: SentimentLevel;
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verdinho-chat`;
@@ -136,6 +139,7 @@ export const FrogChatModal = () => {
     return localStorage.getItem("pr_lead_name") || "";
   });
   const [pendingMessage, setPendingMessage] = useState("");
+  const [urgencyAlert, setUrgencyAlert] = useState<{ level: SentimentLevel; triggers: string[] } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

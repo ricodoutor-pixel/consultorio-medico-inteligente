@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 export function PWAInstallSection() {
   const { canInstall, isInstalled, promptInstall } = usePWAInstall();
 
-  if (isInstalled || !canInstall) return null;
+  if (isInstalled) return null;
 
   return (
     <section className="py-8 md:py-16">
@@ -42,7 +42,14 @@ export function PWAInstallSection() {
                 <Button
                   size="lg"
                   className="bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl h-12 px-6 shrink-0 w-full md:w-auto"
-                  onClick={() => promptInstall()}
+                  onClick={() => {
+                    if (canInstall) {
+                      promptInstall();
+                    } else {
+                      // Fallback: guide user to add to home screen
+                      window.open(window.location.origin, '_blank');
+                    }
+                  }}
                 >
                   <Download size={18} className="mr-2" />
                   Instalar App Planta y Raiz

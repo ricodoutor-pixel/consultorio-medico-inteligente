@@ -89,7 +89,7 @@ const BrisaAvatar = () => {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed bottom-6 right-6 w-80 h-96 bg-card border border-border rounded-3xl shadow-2xl z-[100] flex flex-col overflow-hidden"
+            className="fixed bottom-4 right-4 w-[calc(100vw-2rem)] sm:w-80 h-80 sm:h-96 bg-card border border-border rounded-3xl shadow-2xl z-[100] flex flex-col overflow-hidden"
           >
             <div className="bg-primary p-4 flex items-center justify-between">
               <div className="flex items-center gap-2">

@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
+import { EarningsNotificationBell } from "@/components/affiliates/EarningsNotificationBell";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar
@@ -125,9 +126,12 @@ export default function AffiliateDashboard() {
               <h1 className="text-2xl font-bold text-foreground">Portal do Afiliado</h1>
               <p className="text-sm text-muted-foreground">Acompanhe seus resultados e comissões</p>
             </div>
-            <Badge variant="outline" className="border-primary/30 text-primary">
-              Nível Bronze
-            </Badge>
+            <div className="flex items-center gap-2">
+              <EarningsNotificationBell userId={referralCode ? undefined : undefined} />
+              <Badge variant="outline" className="border-primary/30 text-primary">
+                Nível Bronze
+              </Badge>
+            </div>
           </div>
 
           {/* Link Generator */}

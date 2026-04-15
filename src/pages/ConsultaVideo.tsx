@@ -177,6 +177,31 @@ const ConsultaVideo = () => {
   return (
     <div className="min-h-screen bg-background">
       <TCLEConsentModal open={showTCLE && !tcleAccepted} onAccept={handleTCLEAccept} onDecline={handleTCLEDecline} />
+
+      {/* Mandatory NPS Modal (patient only, after consultation ends) */}
+      {showNPS && !isDoctor && (
+        <MandatoryNPSModal
+          open={showNPS}
+          consultationId={appointmentId || "unknown"}
+          patientId={currentUserId}
+          professionalId={doctorId}
+          flowType="consultation"
+          onComplete={() => {
+            setShowNPS(false);
+            setShowFlowGuide(true);
+            setFlowStep("consultation_completed");
+          }}
+        />
+      )}
+
+      {/* Patient Flow Guide */}
+      {showFlowGuide && !isDoctor && (
+        <PatientFlowGuide
+          currentStep={flowStep}
+          onClose={() => setShowFlowGuide(false)}
+          onTriggerNPS={() => setShowNPS(true)}
+        />
+      )}
       {!isFullscreen && <Navbar />}
 
       <div className={`${isFullscreen ? "" : "pt-16"} flex flex-col h-screen`}>

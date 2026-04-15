@@ -257,10 +257,10 @@ const Indicacoes = () => {
             <motion.div variants={fadeUp} className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
               {[
                 { label: "Rede Total", value: String(totalReferrals), icon: Users },
-                { label: "Nível 1", value: String(myNetwork.level1.length), icon: Layers },
-                { label: "Nível 2", value: String(myNetwork.level2.length), icon: Layers },
-                { label: "Nível 3", value: String(myNetwork.level3.length), icon: Layers },
-                { label: "Ganhos/mês", value: `R$ ${totalEarnings}`, icon: DollarSign },
+                { label: "Nível 1", value: String(networkData.level1), icon: Layers },
+                { label: "Nível 2", value: String(networkData.level2), icon: Layers },
+                { label: "Nível 3", value: String(networkData.level3), icon: Layers },
+                { label: "Ganhos Total", value: `R$ ${totalEarnings.toFixed(0)}`, icon: DollarSign },
               ].map((s, i) => (
                 <Card key={i} className="border-border">
                   <CardContent className="p-3 text-center">

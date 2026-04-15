@@ -14,6 +14,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { generatePrescriptionPDF, type PrescriptionData } from "@/lib/prescriptionPDF";
+import { APP_CONFIG } from "@/lib/app-config";
 
 // ─── Types ──────────────────────────────────────────────────
 interface WaitingPatient {
@@ -171,18 +173,61 @@ export function MedicalDashboard() {
   }, []);
 
   const handleFinalize = useCallback(async () => {
-    if (!activePatient) return;
-    toast.success("Receita gerada com sucesso!", {
-      description: `Prescrição de ${activePatient.name} finalizada e assinada digitalmente.`,
-    });
-    // Remove from waiting room
-    setPatients(prev => prev.filter(p => p.id !== activePatient.id));
-    const remaining = patients.filter(p => p.id !== activePatient.id);
-    setActivePatient(remaining[0] || null);
-    setNotes("");
-    setPrescriptionItems([]);
-    setIsVideoActive(false);
-  }, [activePatient, patients]);
+    if (!activePatient || prescriptionItems.length === 0) return;
+
+    try {
+      // Gerar PDF client-side
+      const prescriptionData: PrescriptionData = {
+        clinicName: APP_CONFIG.COMPANY.NAME,
+        clinicPhone: APP_CONFIG.COMPANY.PHONE,
+        doctorName: "Dr. Edilson Bezerra",
+        doctorCRM: "123456",
+        doctorCRMState: "SP",
+        doctorRQE: "78901",
+        patientName: activePatient.name,
+        patientCPF: activePatient.cpf,
+        patientAge: activePatient.age,
+        medications: prescriptionItems.map((item) => ({
+          name: item.name,
+          dosage: item.dosage,
+          instructions: item.instructions,
+        })),
+        notes: notes || undefined,
+        signatureHash: crypto.randomUUID().replace(/-/g, "").toUpperCase().slice(0, 32),
+        date: new Date(),
+      };
+
+      const doc = generatePrescriptionPDF(prescriptionData);
+      const pdfBlob = doc.output("blob");
+      const fileName = `receita_${activePatient.name.replace(/\s/g, "_")}_${Date.now()}.pdf`;
+
+      // Upload para o bucket prescriptions (se existir)
+      const { error: uploadError } = await supabase.storage
+        .from("prescriptions")
+        .upload(fileName, pdfBlob, { contentType: "application/pdf" });
+
+      if (uploadError) {
+        console.warn("[PDF] Upload falhou, salvando localmente:", uploadError.message);
+        // Fallback: download local
+        doc.save(fileName);
+      }
+
+      toast.success("Receita gerada com sucesso!", {
+        description: `Prescrição de ${activePatient.name} finalizada e assinada digitalmente.`,
+      });
+
+      // Remove from waiting room
+      setPatients((prev) => prev.filter((p) => p.id !== activePatient.id));
+      const remaining = patients.filter((p) => p.id !== activePatient.id);
+      setActivePatient(remaining[0] || null);
+      setNotes("");
+      setPrescriptionItems([]);
+      setIsVideoActive(false);
+    } catch (err) {
+      console.error("[PDF] Erro ao gerar receita:", err);
+      toast.error("Erro ao gerar receita. Tente novamente.");
+    }
+  }, [activePatient, patients, prescriptionItems, notes]);
 
   const addMockProduct = useCallback(() => {
     if (!activePatient) return;

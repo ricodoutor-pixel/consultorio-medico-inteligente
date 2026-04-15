@@ -11,6 +11,8 @@ import { ShoppingCart } from "./components/ShoppingCart";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { AdminRoute } from "@/components/AdminRoute";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { TenantProvider } from "@/contexts/TenantContext";
+import { OfflineAlert } from "@/components/OfflineAlert";
 import { useCart } from "@/store/cart";
 import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
 import MascotVerdinho from "@/components/MascotVerdinho";
@@ -115,10 +117,12 @@ const App = () => (
   <ErrorBoundary>
     <HelmetProvider>
     <QueryClientProvider client={queryClient}>
+      <TenantProvider>
       <LanguageProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <OfflineAlert />
           <BrowserRouter>
             <OpenGraphHead />
             <SearchEngineOptimization />
@@ -238,6 +242,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </LanguageProvider>
+    </TenantProvider>
     </QueryClientProvider>
     </HelmetProvider>
   </ErrorBoundary>

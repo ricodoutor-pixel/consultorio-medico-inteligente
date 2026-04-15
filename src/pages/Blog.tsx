@@ -1,45 +1,75 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Calendar, User, ArrowRight, Search, Zap } from "lucide-react";
+import { Calendar, User, ArrowRight, Zap, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
-const blogPosts = [
+const FALLBACK_POSTS = [
   {
-    id: 1,
+    id: "1",
     title: "Cannabis Medicinal no Brasil: Guia Completo 2026",
+    slug: "cannabis-medicinal-brasil-guia-2026",
     excerpt: "Tudo o que você precisa saber sobre a regulamentação da ANVISA, como conseguir sua receita e os benefícios comprovados do CBD.",
     author: "Dr. Edilson Bezerra",
-    date: "13 Mar 2026",
+    created_at: "2026-03-13",
     category: "Educação",
-    image: "https://images.unsplash.com/photo-1603903660314-2993d8302228?auto=format&fit=crop&q=80&w=800"
+    image_url: "https://images.unsplash.com/photo-1603903660314-2993d8302228?auto=format&fit=crop&q=80&w=800",
+    content: "",
   },
   {
-    id: 2,
+    id: "2",
     title: "Como a IA está revolucionando a Telemedicina de Cannabis",
+    slug: "ia-telemedicina-cannabis",
     excerpt: "Descubra como os novos protocolos de triagem inteligente garantem maior segurança e precisão no ajuste de doses para pacientes.",
     author: "Manus CEO",
-    date: "12 Mar 2026",
+    created_at: "2026-03-12",
     category: "Tecnologia",
-    image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=800"
+    image_url: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=800",
+    content: "",
   },
   {
-    id: 3,
+    id: "3",
     title: "CBD e Ansiedade: O que dizem os estudos mais recentes?",
+    slug: "cbd-ansiedade-estudos",
     excerpt: "Análise profunda sobre o impacto do canabidiol no controle do estresse e na melhoria da qualidade do sono baseada em evidências.",
     author: "Equipe Clínica P&R",
-    date: "10 Mar 2026",
+    created_at: "2026-03-10",
     category: "Ciência",
-    image: "https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&q=80&w=800"
-  }
+    image_url: "https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&q=80&w=800",
+    content: "",
+  },
 ];
 
+type BlogPost = typeof FALLBACK_POSTS[0];
+
 const Blog = () => {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const { data, error } = await supabase
+        .from("blog_posts")
+        .select("id, title, slug, excerpt, author, created_at, category, image_url, content")
+        .eq("is_published", true)
+        .order("created_at", { ascending: false })
+        .limit(12);
+
+      if (error || !data || data.length === 0) {
+        setPosts(FALLBACK_POSTS);
+      } else {
+        setPosts(data);
+      }
+      setLoading(false);
+    };
+    fetchPosts();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <SEO 
@@ -58,53 +88,60 @@ const Blog = () => {
           </motion.div>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {blogPosts.map((post, index) => (
-            <motion.div 
-              key={post.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="border-border hover:border-primary/30 transition-all group overflow-hidden h-full flex flex-col">
-                <div className="aspect-video overflow-hidden relative">
-                  <img 
-                    src={post.image} 
-                    alt={post.title} 
-                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <Badge className="absolute top-4 left-4 bg-background/80 backdrop-blur text-foreground border-border">
-                    {post.category}
-                  </Badge>
-                </div>
-                <CardHeader className="p-6 pb-2">
-                  <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-bold uppercase mb-3">
-                    <span className="flex items-center gap-1"><Calendar size={12} /> {post.date}</span>
-                    <span className="flex items-center gap-1"><User size={12} /> {post.author}</span>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            {posts.map((post, index) => (
+              <motion.div 
+                key={post.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="border-border hover:border-primary/30 transition-all group overflow-hidden h-full flex flex-col">
+                  <div className="aspect-video overflow-hidden relative">
+                    <img 
+                      src={post.image_url || "https://images.unsplash.com/photo-1603903660314-2993d8302228?auto=format&fit=crop&q=80&w=800"} 
+                      alt={post.title}
+                      loading="lazy"
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <Badge className="absolute top-4 left-4 bg-background/80 backdrop-blur text-foreground border-border">
+                      {post.category}
+                    </Badge>
                   </div>
-                  <CardTitle className="text-xl font-black group-hover:text-primary transition-colors leading-tight">
-                    {post.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 pt-0 flex-1 flex flex-col justify-between">
-                  <p className="text-sm text-muted-foreground mb-6 line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                  <Button variant="ghost" className="p-0 h-auto hover:bg-transparent text-primary font-black flex items-center gap-2 group/btn">
-                    Ler Artigo Completo <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+                  <CardHeader className="p-6 pb-2">
+                    <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-bold uppercase mb-3">
+                      <span className="flex items-center gap-1"><Calendar size={12} /> {new Date(post.created_at).toLocaleDateString("pt-BR")}</span>
+                      <span className="flex items-center gap-1"><User size={12} /> {post.author}</span>
+                    </div>
+                    <CardTitle className="text-xl font-black group-hover:text-primary transition-colors leading-tight">
+                      {post.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 pt-0 flex-1 flex flex-col justify-between">
+                    <p className="text-sm text-muted-foreground mb-6 line-clamp-3">
+                      {post.excerpt}
+                    </p>
+                    <Button variant="ghost" className="p-0 h-auto hover:bg-transparent text-primary font-black flex items-center gap-2 group/btn">
+                      Ler Artigo Completo <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         <Card className="border-primary/20 bg-primary/5 p-8 md:p-12 rounded-3xl text-center">
           <div className="max-w-2xl mx-auto">
             <Zap size={40} className="text-primary mx-auto mb-6 animate-pulse" />
-            <h2 className="text-2xl md:text-3xl font-black mb-4">Newsletter Manus CEO</h2>
+            <h2 className="text-2xl md:text-3xl font-black mb-4">Newsletter Planta y Raiz</h2>
             <p className="text-muted-foreground mb-8">
-              Receba semanalmente os últimos avanços da medicina canabinoide e as novidades da Planta y Raiz direto no seu e-mail.
+              Receba semanalmente os últimos avanços da medicina canabinoide direto no seu e-mail.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <input 

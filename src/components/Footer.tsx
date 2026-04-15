@@ -2,6 +2,7 @@ import { Leaf, Mail, MapPin, Phone, Heart, Scale, Shield, Facebook, Instagram, Y
 import { NavLink } from "@/components/NavLink";
 import { Link } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { PWAInstallSection } from "@/components/PWAInstallSection";
 
 export const Footer = () => {
   const { canInstall, promptInstall } = usePWAInstall();
@@ -109,18 +110,25 @@ export const Footer = () => {
             </a>
           </div>
 
+          {/* PWA Install Section - visible on all pages */}
+          <PWAInstallSection />
+
           {/* Baixe nosso App - simple direct install */}
-          {canInstall && (
-            <div className="flex justify-center mb-4 md:mb-6">
-              <button
-                onClick={() => promptInstall()}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors group"
-              >
-                <Download size={12} className="group-hover:scale-110 transition-transform" />
-                <span>Baixe nosso App</span>
-              </button>
-            </div>
-          )}
+          <div className="flex justify-center mb-4 md:mb-6">
+            <button
+              onClick={() => {
+                if (canInstall) {
+                  promptInstall();
+                } else {
+                  window.open(window.location.origin, '_blank');
+                }
+              }}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors group"
+            >
+              <Download size={12} className="group-hover:scale-110 transition-transform" />
+              <span>Baixe nosso App</span>
+            </button>
+          </div>
 
           {/* Social Media */}
           <div className="mb-4 md:mb-6">

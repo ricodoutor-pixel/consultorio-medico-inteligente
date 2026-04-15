@@ -5,10 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Save, Shield, X, Search, Pill, Stethoscope, ClipboardList, Globe } from "lucide-react";
+import { FileText, Save, Shield, X, Search, Pill, Stethoscope, ClipboardList, Globe, ShoppingCart, Loader2 } from "lucide-react";
 import { AITriagePreFill } from "@/components/doctor/AITriagePreFill";
 import { useToast } from "@/hooks/use-toast";
 import { CID10_TO_ICD11_MAP, ICD11_CODES } from "@/data/icd11";
+import { usePrescriptionCart } from "@/hooks/usePrescriptionCart";
 
 const CID10_COMMON = [
   { code: "F41.1", name: "Ansiedade generalizada" },
@@ -48,6 +49,7 @@ export interface ProntuarioData {
 
 export const ProntuarioSidebar = ({ onClose, onSave, patientId }: ProntuarioSidebarProps) => {
   const { toast } = useToast();
+  const { loading: cartLoading, createCartFromPrescription } = usePrescriptionCart();
   const [cidSearch, setCidSearch] = useState("");
   const [data, setData] = useState<ProntuarioData>({
     chiefComplaint: "",
@@ -82,6 +84,27 @@ export const ProntuarioSidebar = ({ onClose, onSave, patientId }: ProntuarioSide
       title: "Assinatura Digital ICP-Brasil 🔐", 
       description: "Integração com certificado e-CPF A3/Nuvem necessária para assinatura qualificada." 
     });
+  };
+
+  const handleGenerateCart = async () => {
+    if (!data.medications.trim()) {
+      toast({ title: "Prescrição vazia", description: "Preencha as medicações antes de gerar o carrinho.", variant: "destructive" });
+      return;
+    }
+
+    // Parse medications into cart items
+    const items = data.medications.split("\n").filter(Boolean).map(line => ({
+      product_name: line.trim(),
+      quantity: 1,
+      dosage: line.trim(),
+    }));
+
+    // Generate a pseudo prescription ID from the current session
+    const prescriptionId = crypto.randomUUID();
+    const doctorId = "current"; // Will be resolved server-side
+    const pid = patientId || "unknown";
+
+    await createCartFromPrescription(prescriptionId, doctorId, pid, items);
   };
 
   return (
@@ -232,6 +255,15 @@ export const ProntuarioSidebar = ({ onClose, onSave, patientId }: ProntuarioSide
       <div className="p-3 border-t border-border space-y-2">
         <Button className="w-full bg-primary text-primary-foreground font-bold text-xs" onClick={handleSave}>
           <Save size={14} className="mr-1" /> Salvar Prontuário
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full text-xs border-primary/30 text-primary hover:bg-primary/10"
+          onClick={handleGenerateCart}
+          disabled={cartLoading || !data.medications.trim()}
+        >
+          {cartLoading ? <Loader2 size={14} className="mr-1 animate-spin" /> : <ShoppingCart size={14} className="mr-1" />}
+          Gerar Carrinho One-Click
         </Button>
         <Button variant="outline" className="w-full text-xs" onClick={handleSign}>
           <Shield size={14} className="mr-1" /> Assinar Digitalmente (ICP-Brasil)

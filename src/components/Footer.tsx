@@ -1,4 +1,4 @@
-import { Leaf, Mail, MapPin, Phone, Heart, Scale, Shield, Facebook, Instagram, Youtube, Download } from "lucide-react";
+import { Leaf, Mail, MapPin, Phone, Heart, Scale, Shield, Facebook, Instagram, Youtube, Download, Share2, Plus, CheckCircle2, MoreVertical, Chrome, Smartphone } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { Link } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
@@ -6,22 +6,57 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Share2, Plus, CheckCircle2 } from "lucide-react";
+
+type ModalType = "ios" | "android" | "desktop" | null;
 
 export const Footer = () => {
-  const { canInstall, isInstalled, isIOS, promptInstall } = usePWAInstall();
+  const { canInstall, isInstalled, promptInstall } = usePWAInstall();
   const isMobile = useIsMobile();
-  const [showIOSModal, setShowIOSModal] = useState(false);
+  const [modalType, setModalType] = useState<ModalType>(null);
 
   const handleInstall = async () => {
     const result = await promptInstall();
-    if (result === "ios") setShowIOSModal(true);
+    if (result === "ios") setModalType("ios");
+    else if (result === "android-manual") setModalType("android");
+    else if (result === "desktop-manual") setModalType("desktop");
   };
 
-  const ModalWrapper = isMobile ? Sheet : Dialog;
-  const ContentWrapper = isMobile ? SheetContent : DialogContent;
-  const HeaderWrapper = isMobile ? SheetHeader : DialogHeader;
-  const TitleWrapper = isMobile ? SheetTitle : DialogTitle;
+  const StepItem = ({ step, icon: Icon, text }: { step: number; icon: any; text: string }) => (
+    <div className="flex items-start gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-primary font-bold text-sm shrink-0">{step}</div>
+      <div className="flex items-start gap-2">
+        <Icon size={18} className="text-primary shrink-0 mt-0.5" />
+        <span className="text-sm text-foreground">{text}</span>
+      </div>
+    </div>
+  );
+
+  const ModalContent = () => {
+    if (modalType === "ios") return (
+      <div className="space-y-3 py-2">
+        <p className="text-sm text-muted-foreground">Para instalar no iPhone/iPad:</p>
+        <StepItem step={1} icon={Share2} text="Toque no ícone de Compartilhar" />
+        <StepItem step={2} icon={Plus} text='Selecione "Adicionar à Tela de Início"' />
+        <StepItem step={3} icon={CheckCircle2} text='Confirme tocando em "Adicionar"' />
+      </div>
+    );
+    if (modalType === "android") return (
+      <div className="space-y-3 py-2">
+        <p className="text-sm text-muted-foreground">Para instalar no Android:</p>
+        <StepItem step={1} icon={MoreVertical} text="Toque nos 3 pontinhos (⋮) no Chrome" />
+        <StepItem step={2} icon={Plus} text='Selecione "Adicionar à tela inicial"' />
+        <StepItem step={3} icon={CheckCircle2} text='Confirme tocando em "Instalar"' />
+      </div>
+    );
+    return (
+      <div className="space-y-3 py-2">
+        <p className="text-sm text-muted-foreground">Para instalar no computador:</p>
+        <StepItem step={1} icon={Chrome} text="Abra no Chrome ou Edge" />
+        <StepItem step={2} icon={Download} text="Clique no ícone (⊕) na barra de endereço" />
+        <StepItem step={3} icon={CheckCircle2} text='Clique em "Instalar"' />
+      </div>
+    );
+  };
 
   return (
     <footer className="border-t border-border bg-card/50" role="contentinfo" aria-label="Rodapé do site">
@@ -107,27 +142,14 @@ export const Footer = () => {
 
           {/* LGPD + ANVISA Badges */}
           <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 md:mb-6">
-            <a
-              href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 bg-card border border-border rounded-xl px-3 py-2 hover:border-primary/40 hover:shadow-md transition-all duration-300 group"
-              title="Lei Geral de Proteção de Dados"
-            >
+            <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 bg-card border border-border rounded-xl px-3 py-2 hover:border-primary/40 hover:shadow-md transition-all duration-300 group" title="Lei Geral de Proteção de Dados">
               <Shield size={16} className="text-primary group-hover:scale-110 transition-transform" />
               <div className="text-left">
                 <span className="block text-[10px] md:text-xs font-bold text-foreground leading-tight">LGPD</span>
                 <span className="block text-[8px] md:text-[10px] text-muted-foreground leading-tight">Compliant</span>
               </div>
             </a>
-
-            <a
-              href="https://www.gov.br/anvisa/pt-br"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 bg-card border border-border rounded-xl px-3 py-2 hover:border-primary/40 hover:shadow-md transition-all duration-300 group"
-              title="Agência Nacional de Vigilância Sanitária"
-            >
+            <a href="https://www.gov.br/anvisa/pt-br" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 bg-card border border-border rounded-xl px-3 py-2 hover:border-primary/40 hover:shadow-md transition-all duration-300 group" title="Agência Nacional de Vigilância Sanitária">
               <svg viewBox="0 0 32 32" className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" fill="none">
                 <path d="M16 2L4 8v8c0 7.73 5.12 14.96 12 17 6.88-2.04 12-9.27 12-17V8L16 2z" stroke="currentColor" strokeWidth="2" fill="currentColor" fillOpacity="0.1"/>
                 <path d="M12 16h8M16 12v8M10 10l12 12M22 10L10 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.6"/>
@@ -152,78 +174,20 @@ export const Footer = () => {
             </div>
           )}
 
-          {/* iOS Install Modal */}
-          <ModalWrapper open={showIOSModal} onOpenChange={setShowIOSModal}>
-            <ContentWrapper className={isMobile ? "px-4 pb-8" : "sm:max-w-md"}>
-              <HeaderWrapper>
-                <TitleWrapper className="flex items-center gap-2 text-foreground">
-                  <Download size={20} className="text-primary" />
-                  Instalar Planta y Raiz
-                </TitleWrapper>
-              </HeaderWrapper>
-              <div className="space-y-4 py-2">
-                <p className="text-sm text-muted-foreground">Siga os passos abaixo para instalar no seu iPhone/iPad:</p>
-                <div className="space-y-3">
-                  {[
-                    { step: 1, icon: Share2, text: "Toque no ícone de Compartilhar (quadrado com seta)" },
-                    { step: 2, icon: Plus, text: 'Selecione "Adicionar à Tela de Início"' },
-                    { step: 3, icon: CheckCircle2, text: 'Confirme tocando em "Adicionar"' },
-                  ].map(({ step, icon: Icon, text }) => (
-                    <div key={step} className="flex items-start gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-primary font-bold text-sm shrink-0">{step}</div>
-                      <div className="flex items-start gap-2">
-                        <Icon size={18} className="text-primary shrink-0 mt-0.5" />
-                        <span className="text-sm text-foreground">{text}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </ContentWrapper>
-          </ModalWrapper>
-
           {/* Social Media */}
           <div className="mb-4 md:mb-6">
             <h4 className="text-xs md:text-sm font-semibold text-foreground mb-2 md:mb-3">Nossas Redes e Recursos</h4>
             <div className="flex items-center justify-center gap-3">
-              <a
-                href="https://www.facebook.com/plantayraiz"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 md:w-11 md:h-11 rounded-full bg-[#1877F2] flex items-center justify-center text-white hover:scale-110 hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300"
-                aria-label="Facebook"
-              >
-                <Facebook size={16} className="md:hidden" />
-                <Facebook size={20} className="hidden md:block" />
+              <a href="https://www.facebook.com/plantayraiz" target="_blank" rel="noopener noreferrer" className="w-9 h-9 md:w-11 md:h-11 rounded-full bg-[#1877F2] flex items-center justify-center text-white hover:scale-110 hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300" aria-label="Facebook">
+                <Facebook size={16} className="md:hidden" /><Facebook size={20} className="hidden md:block" />
               </a>
-              <a
-                href="https://www.instagram.com/plantayraiz"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 md:w-11 md:h-11 rounded-full bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#bc1888] flex items-center justify-center text-white hover:scale-110 hover:shadow-lg hover:shadow-pink-500/30 transition-all duration-300"
-                aria-label="Instagram"
-              >
-                <Instagram size={16} className="md:hidden" />
-                <Instagram size={20} className="hidden md:block" />
+              <a href="https://www.instagram.com/plantayraiz" target="_blank" rel="noopener noreferrer" className="w-9 h-9 md:w-11 md:h-11 rounded-full bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#bc1888] flex items-center justify-center text-white hover:scale-110 hover:shadow-lg hover:shadow-pink-500/30 transition-all duration-300" aria-label="Instagram">
+                <Instagram size={16} className="md:hidden" /><Instagram size={20} className="hidden md:block" />
               </a>
-              <a
-                href="https://www.youtube.com/@plantayraiz"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 md:w-11 md:h-11 rounded-full bg-[#FF0000] flex items-center justify-center text-white hover:scale-110 hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300"
-                aria-label="YouTube"
-              >
-                <Youtube size={16} className="md:hidden" />
-                <Youtube size={20} className="hidden md:block" />
+              <a href="https://www.youtube.com/@plantayraiz" target="_blank" rel="noopener noreferrer" className="w-9 h-9 md:w-11 md:h-11 rounded-full bg-[#FF0000] flex items-center justify-center text-white hover:scale-110 hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300" aria-label="YouTube">
+                <Youtube size={16} className="md:hidden" /><Youtube size={20} className="hidden md:block" />
               </a>
-              <a
-                href="https://www.google.com/search?q=Planta+y+Raiz+telemedicina+cannabis"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 md:w-11 md:h-11 rounded-full bg-card border border-border flex items-center justify-center hover:scale-110 hover:shadow-lg hover:border-primary/40 transition-all duration-300"
-                aria-label="Pesquisar no Google"
-                title="Acessar Recursos Externos"
-              >
+              <a href="https://www.google.com/search?q=Planta+y+Raiz+telemedicina+cannabis" target="_blank" rel="noopener noreferrer" className="w-9 h-9 md:w-11 md:h-11 rounded-full bg-card border border-border flex items-center justify-center hover:scale-110 hover:shadow-lg hover:border-primary/40 transition-all duration-300" aria-label="Pesquisar no Google" title="Acessar Recursos Externos">
                 <svg viewBox="0 0 24 24" className="w-4 h-4 md:w-5 md:h-5">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -253,6 +217,33 @@ export const Footer = () => {
           <Link to="/admin/automations" className="inline-block mt-2 text-[0px] leading-none opacity-0 hover:opacity-5" aria-hidden="true" tabIndex={-1}>·</Link>
         </div>
       </div>
+
+      {/* Install Instructions Modal */}
+      {isMobile ? (
+        <Sheet open={modalType !== null} onOpenChange={(open) => !open && setModalType(null)}>
+          <SheetContent className="px-4 pb-8">
+            <SheetHeader>
+              <SheetTitle className="flex items-center gap-2 text-foreground">
+                <Smartphone size={20} className="text-primary" />
+                Instalar Planta y Raiz
+              </SheetTitle>
+            </SheetHeader>
+            <ModalContent />
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <Dialog open={modalType !== null} onOpenChange={(open) => !open && setModalType(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-foreground">
+                <Smartphone size={20} className="text-primary" />
+                Instalar Planta y Raiz
+              </DialogTitle>
+            </DialogHeader>
+            <ModalContent />
+          </DialogContent>
+        </Dialog>
+      )}
     </footer>
   );
 };

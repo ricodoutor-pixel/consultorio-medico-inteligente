@@ -14,6 +14,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { generatePrescriptionPDF, type PrescriptionData } from "@/lib/prescriptionPDF";
+import { APP_CONFIG } from "@/lib/app-config";
 
 // ─── Types ──────────────────────────────────────────────────
 interface WaitingPatient {

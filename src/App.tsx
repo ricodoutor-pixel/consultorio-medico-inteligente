@@ -242,6 +242,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </LanguageProvider>
+    </TenantProvider>
     </QueryClientProvider>
     </HelmetProvider>
   </ErrorBoundary>

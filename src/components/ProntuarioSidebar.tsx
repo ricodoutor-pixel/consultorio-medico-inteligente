@@ -10,6 +10,7 @@ import { AITriagePreFill } from "@/components/doctor/AITriagePreFill";
 import { useToast } from "@/hooks/use-toast";
 import { CID10_TO_ICD11_MAP, ICD11_CODES } from "@/data/icd11";
 import { usePrescriptionCart } from "@/hooks/usePrescriptionCart";
+import { supabase } from "@/integrations/supabase/client";
 
 const CID10_COMMON = [
   { code: "F41.1", name: "Ansiedade generalizada" },

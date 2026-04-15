@@ -9,6 +9,7 @@ import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { motion } from "framer-motion";
 import { professionals as allProfessionals, categories, Professional } from "@/data/professionals";
+import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -245,7 +246,9 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
 const Profissionais = () => {
   const { id } = useParams();
   const [activeCategory, setActiveCategory] = useState(categories[0]);
-  const professionals = useRotatingOnline(allProfessionals);
+  // Use real professionals from DB, replacing test placeholders
+  const { professionals: mergedPros, realCount } = useRealProfessionals();
+  const professionals = useRotatingOnline(mergedPros);
 
   if (id) {
     return (

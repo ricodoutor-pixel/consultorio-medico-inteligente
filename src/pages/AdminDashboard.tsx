@@ -8,6 +8,7 @@ import { Users, DollarSign, Activity, Stethoscope, TrendingUp, AlertCircle, Refr
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { LTVMetricsPanel } from "@/components/admin/LTVMetricsPanel";
+import { RegistrationStatsPanel } from "@/components/admin/RegistrationStatsPanel";
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -289,6 +290,9 @@ const AdminDashboard = () => {
 
           {/* LTV & MRR Metrics */}
           <LTVMetricsPanel />
+
+          {/* Registration Stats */}
+          <RegistrationStatsPanel />
 
           {/* System Alerts */}
           <div className="grid md:grid-cols-2 gap-4">

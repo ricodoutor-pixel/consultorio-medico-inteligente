@@ -22,61 +22,53 @@ const moodStyles: Record<FrogMood, { bg: string; border: string; text: string }>
 };
 
 export function FrogMoodBanner() {
-  const { mood, message, icon } = useFrogMood();
-  const [dismissed, setDismissed] = useState(false);
-  const style = moodStyles[mood];
-
-  if (dismissed) return null;
+  const { mood, message } = useFrogMood();
 
   return (
-    <AnimatePresence>
+    <div className="flex flex-col items-center gap-1 py-2">
+      {/* Cabeça do Verdinho sem fundo/moldura */}
       <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        className={`${style.bg} ${style.border} border rounded-xl p-3 mx-4 mb-4 flex items-center gap-3`}
+        animate={{ scale: [1, 1.06, 1] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
       >
-        {/* Animated breathing frog head */}
-        <motion.div
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-          className="shrink-0"
-        >
-          <svg viewBox="0 0 60 60" className="w-12 h-12 drop-shadow-lg" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="30" cy="30" r="26" fill={mood === "critical" ? "#ef4444" : mood === "warning" ? "#eab308" : "#10b981"} />
-            <circle cx="22" cy="24" r="4" fill="#ffffff" />
-            <circle cx="38" cy="24" r="4" fill="#ffffff" />
-            <circle cx="22" cy="24" r="2" fill="#000000" className="animate-pulse" />
-            <circle cx="38" cy="24" r="2" fill="#000000" className="animate-pulse" />
-            {mood === "happy" && (
-              <path d="M 22 36 Q 30 42 38 36" stroke="#ffffff" strokeWidth="2.5" fill="none" />
-            )}
-            {mood === "warning" && (
-              <line x1="22" y1="37" x2="38" y2="37" stroke="#ffffff" strokeWidth="2.5" />
-            )}
-            {mood === "critical" && (
-              <path d="M 22 40 Q 30 34 38 40" stroke="#ffffff" strokeWidth="2.5" fill="none" />
-            )}
-          </svg>
-        </motion.div>
-
-        {/* Speech bubble */}
-        <div className="flex-1 min-w-0 relative">
-          <div className="absolute -left-2 top-3 w-0 h-0 border-t-[6px] border-t-transparent border-r-[8px] border-r-muted/50 border-b-[6px] border-b-transparent" />
-          <div className="bg-muted/30 rounded-lg px-3 py-2">
-            <p className={`text-xs font-bold ${style.text}`}>
-              Verdinho diz:
-            </p>
-            <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
-              {message}
-            </p>
-          </div>
-        </div>
-
-        <button onClick={() => setDismissed(true)} className="text-muted-foreground hover:text-foreground shrink-0">
-          <X size={14} />
-        </button>
+        <svg viewBox="0 0 64 64" className="w-14 h-14 drop-shadow-lg" xmlns="http://www.w3.org/2000/svg">
+          {/* Cabeça */}
+          <ellipse cx="32" cy="34" rx="26" ry="22" fill={mood === "critical" ? "#ef4444" : mood === "warning" ? "#eab308" : "#22c55e"} />
+          {/* Olhos - protuberâncias */}
+          <circle cx="20" cy="18" r="10" fill={mood === "critical" ? "#ef4444" : mood === "warning" ? "#eab308" : "#22c55e"} />
+          <circle cx="44" cy="18" r="10" fill={mood === "critical" ? "#ef4444" : mood === "warning" ? "#eab308" : "#22c55e"} />
+          {/* Olhos brancos */}
+          <circle cx="20" cy="17" r="6" fill="#ffffff" />
+          <circle cx="44" cy="17" r="6" fill="#ffffff" />
+          {/* Pupilas */}
+          <circle cx="21" cy="17" r="3" fill="#1a1a2e" />
+          <circle cx="45" cy="17" r="3" fill="#1a1a2e" />
+          {/* Brilho nos olhos */}
+          <circle cx="19" cy="15" r="1.2" fill="#ffffff" opacity="0.9" />
+          <circle cx="43" cy="15" r="1.2" fill="#ffffff" opacity="0.9" />
+          {/* Narinas */}
+          <circle cx="28" cy="30" r="1.5" fill="#15803d" opacity="0.6" />
+          <circle cx="36" cy="30" r="1.5" fill="#15803d" opacity="0.6" />
+          {/* Boca */}
+          {mood === "happy" && (
+            <path d="M 20 38 Q 32 46 44 38" stroke="#15803d" strokeWidth="2" fill="none" />
+          )}
+          {mood === "warning" && (
+            <line x1="22" y1="39" x2="42" y2="39" stroke="#92400e" strokeWidth="2" />
+          )}
+          {mood === "critical" && (
+            <path d="M 22 42 Q 32 36 42 42" stroke="#7f1d1d" strokeWidth="2" fill="none" />
+          )}
+        </svg>
       </motion.div>
-    </AnimatePresence>
+
+      {/* Texto padrão */}
+      <p className="text-sm font-bold text-foreground leading-tight text-center">
+        Planta y Raiz
+      </p>
+      <p className="text-[11px] text-muted-foreground font-medium -mt-0.5">
+        Mega Clínica Digital
+      </p>
+    </div>
   );
 }

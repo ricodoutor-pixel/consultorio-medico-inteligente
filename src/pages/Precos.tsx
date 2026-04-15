@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
+import { HealthSubscriptionPlans } from "@/components/subscription/HealthSubscriptionPlans";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };

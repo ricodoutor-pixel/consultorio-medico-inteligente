@@ -1194,6 +1194,36 @@ export type Database = {
         }
         Relationships: []
       }
+      error_logs: {
+        Row: {
+          created_at: string | null
+          error_type: string | null
+          id: string
+          message: string | null
+          metadata: Json | null
+          source: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_type?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          source?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_type?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          source?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       escrow_transactions: {
         Row: {
           amount: number
@@ -2373,8 +2403,10 @@ export type Database = {
           full_name: string
           health_goal: string | null
           id: string
+          is_subscriber: boolean | null
           onboarding_completed: boolean
           phone: string | null
+          planta_coins: number | null
           referred_by: string | null
           updated_at: string
           user_type: string
@@ -2388,8 +2420,10 @@ export type Database = {
           full_name?: string
           health_goal?: string | null
           id: string
+          is_subscriber?: boolean | null
           onboarding_completed?: boolean
           phone?: string | null
+          planta_coins?: number | null
           referred_by?: string | null
           updated_at?: string
           user_type?: string
@@ -2403,8 +2437,10 @@ export type Database = {
           full_name?: string
           health_goal?: string | null
           id?: string
+          is_subscriber?: boolean | null
           onboarding_completed?: boolean
           phone?: string | null
+          planta_coins?: number | null
           referred_by?: string | null
           updated_at?: string
           user_type?: string
@@ -2732,6 +2768,54 @@ export type Database = {
           terpenes?: string[] | null
           thc_cbd_ratio?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean | null
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          environment: string
+          id: string
+          price_id: string
+          product_id: string
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          id?: string
+          price_id: string
+          product_id: string
+          status?: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          id?: string
+          price_id?: string
+          product_id?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_subscription_id?: string
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -3474,6 +3558,10 @@ export type Database = {
         Returns: undefined
       }
       ensure_affiliate_wallet: { Args: { _user_id: string }; Returns: string }
+      has_active_subscription: {
+        Args: { check_env?: string; user_uuid: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

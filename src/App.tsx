@@ -114,6 +114,8 @@ const CondicaoTratamento = lazy(() => import("./pages/CondicaoTratamento"));
 const Consultorio = lazy(() => import("./pages/Consultorio"));
 const FastTrackCheckout = lazy(() => import("./pages/FastTrackCheckout"));
 const AffiliateDashboard = lazy(() => import("./pages/AffiliateDashboard"));
+const PrescriptionCheckout = lazy(() => import("./pages/PrescriptionCheckout"));
+const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -236,6 +238,8 @@ const App = () => (
                 <Route path="/condicao/:condicao" element={<CondicaoTratamento />} />
                 <Route path="/consultorio" element={<PrivateRoute><Consultorio /></PrivateRoute>} />
                 <Route path="/checkout/fast-track" element={<FastTrackCheckout />} />
+                <Route path="/checkout/:token" element={<PrescriptionCheckout />} />
+                <Route path="/checkout/return" element={<CheckoutReturn />} />
                 <Route path="/afiliados/dashboard" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

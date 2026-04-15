@@ -1,0 +1,178 @@
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { type StripeEnv, verifyWebhook } from "../_shared/stripe.ts";
+
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+);
+
+serve(async (req) => {
+  if (req.method !== "POST") {
+    return new Response("Method not allowed", { status: 405 });
+  }
+
+  const url = new URL(req.url);
+  const env = (url.searchParams.get('env') || 'sandbox') as StripeEnv;
+
+  try {
+    const event = await verifyWebhook(req, env);
+    console.log("Webhook event:", event.type, "env:", env);
+
+    switch (event.type) {
+      case "checkout.session.completed":
+        await handleCheckoutCompleted(event.data.object, env);
+        break;
+      case "customer.subscription.created":
+        await handleSubscriptionCreated(event.data.object, env);
+        break;
+      case "customer.subscription.updated":
+        await handleSubscriptionUpdated(event.data.object, env);
+        break;
+      case "customer.subscription.deleted":
+        await handleSubscriptionDeleted(event.data.object, env);
+        break;
+      case "invoice.payment_failed":
+        await handlePaymentFailed(event.data.object, env);
+        break;
+      default:
+        console.log("Unhandled event:", event.type);
+    }
+
+    return new Response(JSON.stringify({ received: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    console.error("Webhook error:", e);
+
+    // Log error for dunning
+    await supabase.from("error_logs").insert({
+      source: "payments-webhook",
+      error_type: "webhook_verification",
+      message: String(e),
+      metadata: { env },
+    });
+
+    return new Response("Webhook error", { status: 400 });
+  }
+});
+
+async function handleCheckoutCompleted(session: any, env: StripeEnv) {
+  const userId = session.metadata?.userId;
+  const cartToken = session.metadata?.cartToken;
+
+  console.log("Checkout completed:", session.id, "mode:", session.mode, "userId:", userId);
+
+  // One-time payment: credit Planta-Coins
+  if (session.mode === "payment" && userId) {
+    const amount = (session.amount_total || 0) / 100;
+    const coins = Math.floor(amount); // 1 BRL = 1 Planta-Coin
+
+    await supabase.rpc("increment_planta_coins", { _user_id: userId, _coins: coins }).catch(() => {
+      // Fallback: direct update
+      supabase.from("profiles").update({ planta_coins: coins }).eq("id", userId);
+    });
+
+    // If cart token, mark cart as completed
+    if (cartToken) {
+      await supabase.from("prescription_carts")
+        .update({ status: "completed", completed_at: new Date().toISOString(), payment_id: session.id })
+        .eq("cart_token", cartToken);
+    }
+  }
+
+  // Audit
+  await supabase.from("audit_log").insert({
+    user_id: userId || "anonymous",
+    action: "payment_completed",
+    table_name: "subscriptions",
+    record_id: session.id,
+    new_data: { amount: session.amount_total, mode: session.mode, env, cartToken },
+  });
+}
+
+async function handleSubscriptionCreated(subscription: any, env: StripeEnv) {
+  const userId = subscription.metadata?.userId;
+  if (!userId) {
+    console.error("No userId in subscription metadata");
+    return;
+  }
+
+  const item = subscription.items?.data?.[0];
+  const priceId = item?.price?.metadata?.lovable_external_id || item?.price?.id;
+  const productId = item?.price?.product;
+  const periodStart = subscription.current_period_start;
+  const periodEnd = subscription.current_period_end;
+
+  await supabase.from("subscriptions").upsert(
+    {
+      user_id: userId,
+      stripe_subscription_id: subscription.id,
+      stripe_customer_id: subscription.customer,
+      product_id: productId,
+      price_id: priceId,
+      status: subscription.status,
+      current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
+      current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      environment: env,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "stripe_subscription_id" }
+  );
+
+  // Mark user as subscriber
+  await supabase.from("profiles").update({ is_subscriber: true }).eq("id", userId);
+
+  // Audit
+  await supabase.from("audit_log").insert({
+    user_id: userId,
+    action: "subscription_created",
+    table_name: "subscriptions",
+    record_id: subscription.id,
+    new_data: { priceId, productId, status: subscription.status, env },
+  });
+}
+
+async function handleSubscriptionUpdated(subscription: any, env: StripeEnv) {
+  const item = subscription.items?.data?.[0];
+  const priceId = item?.price?.metadata?.lovable_external_id || item?.price?.id;
+  const productId = item?.price?.product;
+  const periodStart = subscription.current_period_start;
+  const periodEnd = subscription.current_period_end;
+
+  await supabase.from("subscriptions").update({
+    status: subscription.status,
+    product_id: productId,
+    price_id: priceId,
+    current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
+    current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+    cancel_at_period_end: subscription.cancel_at_period_end || false,
+    updated_at: new Date().toISOString(),
+  }).eq("stripe_subscription_id", subscription.id).eq("environment", env);
+}
+
+async function handleSubscriptionDeleted(subscription: any, env: StripeEnv) {
+  await supabase.from("subscriptions").update({
+    status: "canceled",
+    updated_at: new Date().toISOString(),
+  }).eq("stripe_subscription_id", subscription.id).eq("environment", env);
+
+  // Update profile
+  const userId = subscription.metadata?.userId;
+  if (userId) {
+    await supabase.from("profiles").update({ is_subscriber: false }).eq("id", userId);
+  }
+}
+
+async function handlePaymentFailed(invoice: any, env: StripeEnv) {
+  console.error("Payment failed:", invoice.id);
+
+  await supabase.from("error_logs").insert({
+    source: "stripe",
+    error_type: "payment_failed",
+    message: `Invoice ${invoice.id} payment failed`,
+    user_id: invoice.metadata?.userId || null,
+    metadata: { invoice_id: invoice.id, subscription: invoice.subscription, env },
+  });
+}

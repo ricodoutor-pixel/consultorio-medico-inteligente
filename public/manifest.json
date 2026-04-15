@@ -1,5 +1,5 @@
 {
-  "name": "Planta y Raiz — Cannabis Medicinal",
+  "name": "Planta y Raiz Mega Clínica Digital 24x7",
   "short_name": "Planta y Raiz",
   "description": "A maior plataforma de democratização da Cannabis Medicinal no Brasil. Consultas a partir de R$30.",
   "start_url": "/?source=pwa",
@@ -10,10 +10,20 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "/frog-happy.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/frog-warning.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/frog-critical.png",
+      "sizes": "512x512",
+      "type": "image/png"
     },
     {
       "src": "/apple-touch-icon.png",

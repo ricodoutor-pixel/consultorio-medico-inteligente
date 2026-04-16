@@ -9,7 +9,8 @@ import { TokenManagerModule } from "@/components/admin/TokenManagerModule";
 import { GrowthLoopsModule } from "@/components/admin/GrowthLoopsModule";
 import { AutomationManagerModule } from "@/components/admin/AutomationManagerModule";
 import { ClickHeatmapModule } from "@/components/admin/ClickHeatmapModule";
-import { Activity, BarChart3, Globe, Key, Shield, LogOut, Zap, Bot, Flame } from "lucide-react";
+import { BrisaReportsModule } from "@/components/admin/BrisaReportsModule";
+import { Activity, BarChart3, Globe, Key, Shield, LogOut, Zap, Bot, Flame, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -139,6 +140,9 @@ const OmniChannelDashboard = () => {
             <TabsTrigger value="tokens" className="text-xs data-[state=active]:bg-blue-600/20 data-[state=active]:text-blue-400 gap-1.5">
               <Key className="w-3 h-3" /> Tokens & IDs
             </TabsTrigger>
+            <TabsTrigger value="brisa" className="text-xs data-[state=active]:bg-emerald-600/20 data-[state=active]:text-emerald-400 gap-1.5">
+              <Brain className="w-3 h-3" /> Relatórios da Brisa
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="growth">
@@ -163,6 +167,10 @@ const OmniChannelDashboard = () => {
 
           <TabsContent value="tokens">
             <TokenManagerModule />
+          </TabsContent>
+
+          <TabsContent value="brisa">
+            <BrisaReportsModule />
           </TabsContent>
         </Tabs>
       </div>

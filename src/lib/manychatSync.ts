@@ -33,7 +33,7 @@ export async function syncLeadEvent(
       return null;
     }
 
-    console.log(`[ManyChat Sync] ✅ ${eventType} synced:`, data);
+    // Sync successful
     return data;
   } catch (err) {
     console.warn("[ManyChat Sync] Error:", err);

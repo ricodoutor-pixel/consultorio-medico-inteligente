@@ -77,7 +77,7 @@ export default function ClubPostCreator({
       if (error) {
         console.warn("[IG] Publish failed:", error);
       } else {
-        console.log("[IG] Published:", data);
+        // Published successfully
       }
     } catch (e) {
       console.warn("[IG] Error:", e);

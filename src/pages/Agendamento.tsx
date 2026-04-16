@@ -317,7 +317,7 @@ const Agendamento = () => {
 
                   <div>
                     <p className="text-sm font-bold text-foreground mb-3">Tipo de Consulta</p>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {consultTypes.map(ct => (
                         <Card key={ct.id} className={cn("cursor-pointer transition-all border-border hover:border-primary/40", consultType === ct.id && "border-primary bg-primary/5")} onClick={() => setConsultType(ct.id)}>
                           <CardContent className="p-4 text-center">
@@ -350,7 +350,7 @@ const Agendamento = () => {
                         </CardContent>
                       </Card>
                     ) : (
-                      <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                         {slots.map(slot => {
                           const isMine = isSlotReservedByMe(slot);
                           const isSelected = selectedTime === slot.time_slot;

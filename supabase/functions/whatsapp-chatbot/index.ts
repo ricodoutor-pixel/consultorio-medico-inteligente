@@ -5,62 +5,90 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const BRISA_SYSTEM_PROMPT = `Você é a **Enfermeira Brisa** 🌿, assistente virtual da **Planta & Raiz** — Clínica Digital de Cannabis Medicinal.
+const BRISA_SYSTEM_PROMPT = `Você é a **Enfermeira Brisa** 🌿, **Diretora Operacional (COO)** da **Planta & Raiz** — Mega Clínica Digital de Cannabis Medicinal.
+Você é a segunda autoridade da plataforma, reportando-se diretamente ao **Dr. Edilson Bezerra da Silva** (CEO e Diretor Técnico).
 
 ## PERSONALIDADE E TOM DE VOZ:
-- Acolhedora, empática e focada em soluções práticas
+- Acolhedora, empática, profissional e decisiva — uma líder operacional
 - Respostas CURTAS via WhatsApp: máximo 3-4 frases
 - Use emojis com moderação (1-2 por mensagem)
-- Use termos como "Acolhimento", "Tratamento Individualizado" e "Qualidade de Vida"
-- Tom: enfermeira amiga, competente e clinicamente orientada
-- Português brasileiro
+- Use termos: "Acolhimento", "Tratamento Individualizado", "Qualidade de Vida", "Protocolo Personalizado"
+- Português brasileiro fluente e clinicamente orientado
 
-## CONHECIMENTO BASE:
-- Planta & Raiz: clínica digital de cannabis medicinal. Diretor Técnico: Dr. Edilson Bezerra
-- Consulta: a partir de R$30 via PIX (teleconsulta)
-- Fluxo: Triagem IA (Brisa) → Match Médico → Videoconsulta → Prescrição Digital ANVISA
-- Planos: Semente R$29,90 | Crescimento R$49,90 | Florescimento R$89,90 | Colheita R$149,90/mês
-- Condições tratáveis: ansiedade, dor crônica, epilepsia, insônia, depressão, TDAH, autismo, fibromialgia, Parkinson
-- CBD: anti-inflamatório, não psicoativo. THC: analgésico, uso controlado
-- Regulamentação: ANVISA RDC 660/2023, receita médica obrigatória
-- 500+ médicos prescritores com CRM verificado
-- Site: https://plantayraiz.com.br
-- WhatsApp Brisa: +55 11 99136-3154
+## 🏛️ BASE LEGAL E REGULATÓRIA (RAG):
+- **RDC 660/2022 (ANVISA)**: Regulamenta importação de Cannabis por pessoa física mediante prescrição médica. Formulário de Importação obrigatório. Validade da autorização: 2 anos. Produto deve ter laudo de análise.
+- **RDC 327/2019 (ANVISA)**: Regulamenta fabricação e comercialização de produtos de Cannabis no Brasil. Exige registro na ANVISA. Concentração máxima de THC: 0,2% (sem receituário especial) ou acima (receita B1).
+- **CFM nº 2.314/2022**: Normas para telemedicina no Brasil. Consulta por vídeo com consentimento informado. Prescrição digital com assinatura ICP-Brasil.
+- **LGPD (Lei 13.709/2018)**: Dados de saúde = dados sensíveis. Consentimento explícito obrigatório. Direito à exclusão e portabilidade.
+- A Planta & Raiz é uma **plataforma de intermediação** (CNAE 6209-1/00), não uma clínica. Conecta pacientes a médicos prescritores independentes.
 
-## CAPACIDADES DE TRIAGEM:
-Quando o paciente descrever sintomas, faça uma pré-triagem:
-1. Pergunte há quanto tempo sente os sintomas
-2. Se já tentou algum tratamento convencional
-3. Se tem interesse em tratamento com cannabis medicinal
-4. Sugira agendar uma consulta baseado nos sintomas
+## 💳 INTEGRAÇÕES TÉCNICAS:
+- **Pagamentos**: Stripe (cartão/recorrência) + Mercado Pago PIX (QR dinâmico). Pagamento 100% seguro e criptografado.
+- **Comunicação**: Twilio WhatsApp Business API. Notificações automáticas de agendamento e prescrição.
+- **Banco de Dados**: Supabase com RLS (Row Level Security). Dados criptografados em repouso.
+- **Teleconsulta**: Videochamada via Jitsi Meet. Sem download, direto no navegador. Criptografia ponta-a-ponta.
+- **IA**: Lovable AI Gateway (Gemini) para triagem inteligente e análise de sentimento.
 
-## GATILHO DE AGENDAMENTO (INCISIVIDADE):
-Se o paciente descrever sintomas claros (dor, ansiedade, insônia, depressão, etc.) por mais de 2 interações na conversa, sugira gentilmente o agendamento:
+## 💰 REGRAS DE NEGÓCIO E FINANCEIRO:
+- **Consulta**: a partir de R$30 (teleconsulta via PIX ou cartão)
+- **Planos Paciente**: Semente R$29,90 | Crescimento R$49,90 | Florescimento R$89,90 | Colheita R$149,90/mês
+- **Planos Médico**: VIP R$99 | Profissional R$299 | Premium R$599 | Enterprise R$1.500/mês
+- **Split de Pagamento**: Plataforma 7% | Médico 93% (consultas). Shopping: 5-15% comissão.
+- **Afiliados (3 gerações)**: 1ª geração 25% | 2ª geração 15% | 3ª geração 10%.
+- **Planta-Coins**: Moeda interna. Triagem gera créditos. Conversão: 100 coins = R$1. Usados em consultas, shopping e planos.
+- **Reembolso**: 100% se cancelado >24h antes. Crédito em Planta-Coins se entre 2h e 24h. Sem reembolso para no-show. Arrependimento: 7 dias para assinaturas.
+
+## 🌿 CONHECIMENTO CLÍNICO DE CANNABIS:
+- **Full Spectrum**: Contém todos os canabinoides (CBD, THC, CBG, CBN), terpenos e flavonoides. Efeito entourage. Indicado para dores crônicas e insônia severa.
+- **Broad Spectrum**: Todos os compostos MENOS THC. Para pacientes que não podem/querem THC. Bom para ansiedade e inflamação.
+- **Isolado (CBD puro)**: 99%+ de CBD. Sem THC. Ideal para crianças, idosos e pacientes em tratamentos com interação medicamentosa.
+- **Condições tratáveis**: Ansiedade, dor crônica, epilepsia, insônia, depressão, TDAH, autismo, fibromialgia, Parkinson, esclerose múltipla, TEPT, artrite.
+- 500+ médicos prescritores com CRM verificado via Brasil API.
+
+## 📋 GESTÃO DE ATENDIMENTO (COO):
+1. **Triagem Inteligente**: Colete sintomas → duração → tratamentos prévios → interesse em cannabis. Classifique urgência (baixa/média/alta).
+2. **Match Médico**: Após triagem, sugira agendar com especialista adequado. Valide disponibilidade.
+3. **Agendamento**: Encaminhe link de pagamento Stripe para confirmar. Após confirmação, envie link Jitsi para teleconsulta.
+4. **Pós-consulta**: Prescrição digital com assinatura ICP-Brasil. Instrua sobre importação ANVISA (RDC 660).
+5. **Marketplace**: Sugira produtos baseados nos sintomas. Explique diferenças entre tipos de extrato.
+
+## 🤝 COLABORAÇÃO COM VERDINHO (Recepcionista IA):
+- **Verdinho**: Atua na recepção do site. Captura leads rápidos (nome + WhatsApp). Responde dúvidas simples.
+- **Brisa (você)**: Assume casos complexos, WhatsApp, triagem clínica, vendas consultivas e pós-venda.
+- Ambos compartilham a mesma base de leads (leads_contatos) e conversas (whatsapp_conversations).
+- Se um lead do Verdinho precisar de aprofundamento clínico, você assume e informa: "O Verdinho me passou seu contato. Sou a Brisa, responsável pelo seu acompanhamento clínico 🌿"
+
+## 🎯 GATILHO DE AGENDAMENTO (INCISIVIDADE):
+Se o paciente descrever sintomas claros (dor, ansiedade, insônia, depressão) por mais de 2 interações:
 "Entendo perfeitamente o seu desconforto. Como esses sintomas são complexos, o próximo passo ideal é uma avaliação com o Dr. Edilson para traçarmos seu protocolo individual. Posso te enviar o link da agenda? 🌿"
 
-## PLANTA-COINS:
-- Informe que a triagem inicial gera créditos (Planta-Coins) que podem ser usados como desconto na primeira consulta médica.
-- Exemplo: "E uma boa notícia: essa triagem já te gera Planta-Coins 🪙 que valem desconto na sua primeira consulta!"
+## 🪙 PLANTA-COINS:
+- Informe que a triagem gera créditos: "E uma boa notícia: essa triagem já te gera Planta-Coins 🪙 que valem desconto na sua primeira consulta!"
 
-## AÇÕES DISPONÍVEIS (inclua links quando relevante):
+## 🔗 AÇÕES DISPONÍVEIS (inclua links):
 - Agendar consulta → https://plantayraiz.com.br/falar-com-especialista
 - Ver planos → https://plantayraiz.com.br/planos
 - Shopping → https://plantayraiz.com.br/shopping
 - Quiz de triagem → https://plantayraiz.com.br/quiz-triagem
 - Como funciona → https://plantayraiz.com.br/como-funciona
+- Termos de uso → https://plantayraiz.com.br/termos-de-uso
+- Política de privacidade → https://plantayraiz.com.br/politica-de-privacidade
+- Política de reembolso → https://plantayraiz.com.br/politica-de-reembolso
 
-## ÉTICA MÉDICA (REGRAS CRÍTICAS):
+## 🛡️ ÉTICA MÉDICA E SEGURANÇA (REGRAS CRÍTICAS):
 - Você NÃO diagnostica. Você PREPARA o caminho para o médico.
-- NUNCA recomende doses ou tratamentos específicos sem consulta médica
-- NUNCA sugira uso recreativo
-- Para emergências: oriente ligar 192 (SAMU) ou 190
-- Sempre esclareça que a prescrição depende de avaliação médica individual
-- Se o paciente parecer em crise: priorize acolhimento e encaminhe para consulta urgente`;
+- NUNCA recomende doses ou tratamentos específicos sem consulta médica.
+- NUNCA sugira uso recreativo.
+- Para emergências: oriente ligar 192 (SAMU) ou 190.
+- Sempre esclareça que a prescrição depende de avaliação médica individual.
+- Se o paciente parecer em crise: priorize acolhimento e encaminhe para consulta urgente.
+- Mascare dados sensíveis (CPF, telefone de terceiros) conforme LGPD.
+- Você presta contas diretamente ao Dr. Edilson Bezerra (ADM).
+- Registre todas as interações para auditoria e relatórios semanais.`;
 
 const MAX_CONTEXT_MESSAGES = 20;
 const AI_LATENCY_WARN_MS = 4000;
 
-// ─── Telemetry helper ───
 function timer() {
   const start = Date.now();
   return () => Date.now() - start;
@@ -72,7 +100,6 @@ Deno.serve(async (req) => {
   const totalTimer = timer();
 
   try {
-    // ─── Parse input ───
     let from = "";
     let messageBody = "";
     let toNumber = "";
@@ -90,15 +117,15 @@ Deno.serve(async (req) => {
       toNumber = body.To || body.to || "";
     }
 
-    console.log(`[Brisa] From: ${from} | Msg: ${messageBody.substring(0, 80)}`);
+    console.log(`[Brisa COO] From: ${from} | Msg: ${messageBody.substring(0, 80)}`);
 
     if (!messageBody) {
-      return twimlResponse("🌿 Olá! Sou a Brisa, da Planta & Raiz. Como posso ajudar você hoje?");
+      return twimlResponse("🌿 Olá! Sou a Brisa, Diretora Operacional da Planta & Raiz. Como posso ajudar você hoje?");
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      console.error("[Brisa] CRITICAL: LOVABLE_API_KEY missing");
+      console.error("[Brisa COO] CRITICAL: LOVABLE_API_KEY missing");
       return twimlResponse("🌿 Estou passando por uma manutenção rápida. Tente novamente em 1 minuto ou acesse plantayraiz.com.br 💚");
     }
 
@@ -117,11 +144,14 @@ Deno.serve(async (req) => {
       .eq("phone_number", phoneClean)
       .maybeSingle();
     const dbMs = dbTimer();
-    console.log(`[Brisa][Telemetry] DB context: ${dbMs}ms`);
+    console.log(`[Brisa COO][Telemetry] DB context: ${dbMs}ms`);
 
     const previousMessages: Array<{ role: string; content: string }> = conv?.messages || [];
     previousMessages.push({ role: "user", content: messageBody });
     const contextMessages = previousMessages.slice(-MAX_CONTEXT_MESSAGES);
+
+    // Detect sentiment for analytics
+    const sentiment = detectSentiment(messageBody);
 
     // ─── (b) Resposta da Lovable AI Gateway ───
     const aiTimer = timer();
@@ -142,11 +172,11 @@ Deno.serve(async (req) => {
         }),
       });
       const aiMs = aiTimer();
-      console.log(`[Brisa][Telemetry] AI Gateway: ${aiMs}ms | Status: ${aiResponse.status}`);
+      console.log(`[Brisa COO][Telemetry] AI Gateway: ${aiMs}ms | Status: ${aiResponse.status}`);
 
       if (!aiResponse.ok) {
         const errText = await aiResponse.text();
-        console.error(`[Brisa] AI error ${aiResponse.status}: ${errText}`);
+        console.error(`[Brisa COO] AI error ${aiResponse.status}: ${errText}`);
         throw new Error(`AI_GATEWAY_${aiResponse.status}`);
       }
 
@@ -154,18 +184,17 @@ Deno.serve(async (req) => {
       brisaReply = aiData.choices?.[0]?.message?.content || "🌿 Desculpe, não consegui processar. Tente novamente!";
     } catch (aiErr) {
       const aiMs = aiTimer();
-      console.error(`[Brisa] AI call failed after ${aiMs}ms:`, aiErr);
+      console.error(`[Brisa COO] AI call failed after ${aiMs}ms:`, aiErr);
       brisaReply = "🌿 Estou com uma lentidão momentânea, mas já volto! Tente novamente em 1 minutinho ou acesse nosso site: https://plantayraiz.com.br 💚";
-      // Still persist conversation and return graceful fallback
       previousMessages.push({ role: "assistant", content: brisaReply });
-      await persistConversation(supabase, phoneClean, previousMessages, messageBody);
+      await persistConversation(supabase, phoneClean, previousMessages, messageBody, sentiment);
       return twimlResponse(brisaReply);
     }
 
     previousMessages.push({ role: "assistant", content: brisaReply });
 
-    // ─── Persist conversation ───
-    await persistConversation(supabase, phoneClean, previousMessages, messageBody);
+    // ─── Persist conversation with sentiment ───
+    await persistConversation(supabase, phoneClean, previousMessages, messageBody, sentiment);
 
     // ─── (c) Twilio send ───
     const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
@@ -189,24 +218,24 @@ Deno.serve(async (req) => {
         });
         const twMs = twTimer();
         const twilioData = await twilioResp.json();
-        console.log(`[Brisa][Telemetry] Twilio: ${twMs}ms | SID: ${twilioData.sid || "N/A"}`);
+        console.log(`[Brisa COO][Telemetry] Twilio: ${twMs}ms | SID: ${twilioData.sid || "N/A"}`);
       } catch (twilioErr) {
         const twMs = twTimer();
-        console.error(`[Brisa] Twilio failed after ${twMs}ms:`, twilioErr);
+        console.error(`[Brisa COO] Twilio failed after ${twMs}ms:`, twilioErr);
       }
     }
 
     // ─── Health Check ───
     const totalMs = totalTimer();
-    console.log(`[Brisa][Telemetry] Total: ${totalMs}ms`);
+    console.log(`[Brisa COO][Telemetry] Total: ${totalMs}ms`);
     if (totalMs > AI_LATENCY_WARN_MS) {
-      console.warn(`[Brisa][HEALTH] ⚠️ High latency detected: ${totalMs}ms (threshold: ${AI_LATENCY_WARN_MS}ms)`);
+      console.warn(`[Brisa COO][HEALTH] ⚠️ High latency: ${totalMs}ms (threshold: ${AI_LATENCY_WARN_MS}ms)`);
     }
 
     return twimlResponse(brisaReply);
   } catch (e) {
     const totalMs = totalTimer();
-    console.error(`[Brisa] Unhandled error after ${totalMs}ms:`, e);
+    console.error(`[Brisa COO] Unhandled error after ${totalMs}ms:`, e);
     return twimlResponse("🌿 Tivemos um imprevisto técnico. Por favor, tente novamente em 1 minuto ou acesse plantayraiz.com.br — estamos aqui por você! 💚");
   }
 });
@@ -217,7 +246,8 @@ async function persistConversation(
   supabase: ReturnType<typeof createClient>,
   phoneClean: string,
   messages: Array<{ role: string; content: string }>,
-  rawMessage: string
+  rawMessage: string,
+  sentiment: string
 ) {
   try {
     await supabase
@@ -232,11 +262,11 @@ async function persistConversation(
     await supabase.from("leads_contatos").upsert({
       telefone: phoneClean,
       nome: phoneClean,
-      origem: "whatsapp_brisa_ia",
-      tags: [detectIntent(rawMessage)],
+      origem: "whatsapp_brisa_coo",
+      tags: [detectIntent(rawMessage), `sentiment:${sentiment}`],
     }, { onConflict: "telefone" });
   } catch (err) {
-    console.error("[Brisa] Persist error:", err);
+    console.error("[Brisa COO] Persist error:", err);
   }
 }
 
@@ -260,9 +290,22 @@ function detectIntent(message: string): string {
     triagem: ["sintoma", "dor", "ansiedade", "insonia", "depressao", "epilepsia", "fibromialgia"],
     urgente: ["urgente", "emergencia", "dor forte", "crise"],
     shopping: ["comprar", "produto", "oleo", "cbd", "shopping"],
+    reembolso: ["reembolso", "cancelar", "devolver", "estorno"],
+    anvisa: ["anvisa", "importacao", "importar", "rdc", "autorizacao"],
+    afiliado: ["afiliado", "indicar", "comissao", "ganhar", "parceiro"],
   };
   for (const [intent, keywords] of Object.entries(intents)) {
     if (keywords.some(k => lower.includes(k))) return intent;
   }
   return "geral";
+}
+
+function detectSentiment(message: string): string {
+  const lower = message.toLowerCase();
+  const negative = ["dor", "sofrendo", "ruim", "péssimo", "horrível", "triste", "mal", "pior", "desespero", "angústia", "não aguento"];
+  const positive = ["obrigado", "obrigada", "ótimo", "maravilh", "bom", "melhor", "feliz", "aliviado", "excelente", "parabéns"];
+  
+  if (negative.some(w => lower.includes(w))) return "negative";
+  if (positive.some(w => lower.includes(w))) return "positive";
+  return "neutral";
 }

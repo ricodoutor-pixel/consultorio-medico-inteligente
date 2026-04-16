@@ -224,9 +224,9 @@ const SalaEspera = () => {
                                 </div>
                               )}
                               {isInProgress && (
-                                <Button className="bg-primary text-primary-foreground font-bold rounded-xl" asChild>
+                                <Button className="w-full sm:w-auto bg-primary text-primary-foreground font-bold rounded-xl h-12 text-base animate-pulse shadow-lg shadow-primary/30" asChild>
                                   <Link to={`/consulta-video?appointment=${appt.id}`}>
-                                    <Video size={14} className="mr-1" /> Entrar na Sala
+                                    <Video size={16} className="mr-2" /> Entrar na Sala
                                   </Link>
                                 </Button>
                               )}
@@ -300,11 +300,11 @@ function UberQueueSection({ userType }: { userType: "patient" | "doctor" }) {
               {myEntry.status === "matched" ? "🎉 Médico encontrado!" : "Aguardando médico..."}
             </p>
             {myEntry.jitsi_room && (
-              <Button className="bg-primary text-primary-foreground font-bold rounded-xl" asChild>
+               <Button className="w-full bg-primary text-primary-foreground font-bold rounded-xl h-12 text-base animate-pulse shadow-lg shadow-primary/30" asChild>
                 <Link to={`/consulta-video?room=${myEntry.jitsi_room}`}>
-                  <Video size={14} className="mr-1" /> Entrar na Sala
+                  <Video size={16} className="mr-2" /> Entrar na Sala
                 </Link>
-              </Button>
+               </Button>
             )}
           </div>
         )}

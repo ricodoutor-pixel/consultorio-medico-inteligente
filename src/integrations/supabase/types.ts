@@ -1127,7 +1127,6 @@ export type Database = {
           created_at: string
           crm: string
           crm_state: string
-          document_number: string | null
           document_type: string
           id: string
           is_crm_valid: boolean
@@ -1136,7 +1135,6 @@ export type Database = {
           kyc_status: string
           last_crm_check: string | null
           organization_id: string | null
-          pix_key: string | null
           rating: number | null
           rqe: string | null
           specialty: string
@@ -1151,7 +1149,6 @@ export type Database = {
           created_at?: string
           crm: string
           crm_state?: string
-          document_number?: string | null
           document_type?: string
           id?: string
           is_crm_valid?: boolean
@@ -1160,7 +1157,6 @@ export type Database = {
           kyc_status?: string
           last_crm_check?: string | null
           organization_id?: string | null
-          pix_key?: string | null
           rating?: number | null
           rqe?: string | null
           specialty?: string
@@ -1175,7 +1171,6 @@ export type Database = {
           created_at?: string
           crm?: string
           crm_state?: string
-          document_number?: string | null
           document_type?: string
           id?: string
           is_crm_valid?: boolean
@@ -1184,7 +1179,6 @@ export type Database = {
           kyc_status?: string
           last_crm_check?: string | null
           organization_id?: string | null
-          pix_key?: string | null
           rating?: number | null
           rqe?: string | null
           specialty?: string
@@ -1193,6 +1187,57 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      doctors_financial: {
+        Row: {
+          bank_account: string | null
+          bank_agency: string | null
+          bank_name: string | null
+          created_at: string
+          doctor_id: string
+          document_number: string | null
+          id: string
+          pix_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          bank_account?: string | null
+          bank_agency?: string | null
+          bank_name?: string | null
+          created_at?: string
+          doctor_id: string
+          document_number?: string | null
+          id?: string
+          pix_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bank_account?: string | null
+          bank_agency?: string | null
+          bank_name?: string | null
+          created_at?: string
+          doctor_id?: string
+          document_number?: string | null
+          id?: string
+          pix_key?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctors_financial_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: true
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctors_financial_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: true
+            referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       error_logs: {
         Row: {

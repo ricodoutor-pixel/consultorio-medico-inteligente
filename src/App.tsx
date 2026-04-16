@@ -50,6 +50,9 @@ const BibliotecaCientifica = lazy(() => import("./pages/BibliotecaCientifica"));
 const CadastroProfissional = lazy(() => import("./pages/CadastroProfissional"));
 const FalarComEspecialista = lazy(() => import("./pages/FalarComEspecialista"));
 const Legal = lazy(() => import("./pages/Legal"));
+const TermosDeUso = lazy(() => import("./pages/TermosDeUso"));
+const PoliticaDePrivacidade = lazy(() => import("./pages/PoliticaDePrivacidade"));
+const PoliticaDeReembolso = lazy(() => import("./pages/PoliticaDeReembolso"));
 const Indicacoes = lazy(() => import("./pages/Indicacoes"));
 const Telemedicina = lazy(() => import("./pages/Telemedicina"));
 const Cadastro = lazy(() => import("./pages/Cadastro"));
@@ -166,8 +169,9 @@ const App = () => (
                 <Route path="/afiliados" element={<Indicacoes />} />
                 <Route path="/indicacoes" element={<Indicacoes />} />
                 <Route path="/legal" element={<Legal />} />
-                <Route path="/termos" element={<Legal />} />
-                <Route path="/privacidade" element={<Legal />} />
+                <Route path="/termos" element={<TermosDeUso />} />
+                <Route path="/privacidade" element={<PoliticaDePrivacidade />} />
+                <Route path="/reembolso" element={<PoliticaDeReembolso />} />
                 <Route path="/pagamento" element={<ConsultationPayment />} />
                 <Route path="/dashboard-especialista" element={<SpecialistDashboard />} />
                 <Route path="/influenciadores" element={<InfluencerDashboard />} />

@@ -14,7 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WellnessSubscriptionCards } from "@/components/WellnessSubscriptionCards";
-import { PWAStreakBanner } from "@/components/PWAStreakBanner";
+
 import { FrogMoodBanner } from "@/components/FrogMoodBanner";
 import { PatientCheckinCard } from "@/components/PatientCheckinCard";
 import { EvolutionChart } from "@/components/EvolutionChart";
@@ -180,7 +180,6 @@ const DashboardPaciente = () => {
       <Navbar />
       <div className="pt-20 md:pt-24">
         <FrogMoodBanner />
-        <PWAStreakBanner />
       </div>
 
       <section className="pb-8">

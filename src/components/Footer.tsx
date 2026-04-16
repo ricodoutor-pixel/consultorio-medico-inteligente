@@ -1,7 +1,10 @@
-import { Leaf, Instagram, MessageCircle, Lock, ShieldCheck, ExternalLink } from "lucide-react";
+import { Leaf, Instagram, MessageCircle, Lock, ShieldCheck, Download } from "lucide-react";
 import { Link } from "react-router-dom";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 export const Footer = () => {
+  const { canInstall, isInstalled, promptInstall } = usePWAInstall();
+
   return (
     <footer className="border-t border-border/40 bg-background" role="contentinfo" aria-label="Rodapé do site">
       <div className="container mx-auto px-4 sm:px-6 py-10 md:py-14">
@@ -74,6 +77,16 @@ export const Footer = () => {
         <div className="border-t border-border/30 mt-8 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-muted-foreground/50">
           <p>© {new Date().getFullYear()} Planta y Raiz. Todos os direitos reservados.</p>
           <div className="flex items-center gap-3">
+            {canInstall && !isInstalled && (
+              <button
+                onClick={() => promptInstall()}
+                className="flex items-center gap-1 hover:text-primary transition-colors"
+              >
+                <Download size={10} />
+                Instalar App
+              </button>
+            )}
+            {canInstall && !isInstalled && <span>·</span>}
             <Link to="/legal" className="hover:text-primary transition-colors">Conformidade</Link>
             <span>·</span>
             <Link to="/afiliados" className="hover:text-primary transition-colors">Afiliados</Link>

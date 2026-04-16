@@ -54,9 +54,9 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
         // Load doctor's pix key
         if (doctorId) {
           const { data: doc } = await supabase
-            .from("doctors")
+            .from("doctors_financial")
             .select("pix_key")
-            .eq("id", doctorId)
+            .eq("doctor_id", doctorId)
             .single();
           if (doc?.pix_key) {
             setPixKey(doc.pix_key);
@@ -94,9 +94,8 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
     setSavingPix(true);
     try {
       const { error } = await supabase
-        .from("doctors")
-        .update({ pix_key: pixKey.trim() })
-        .eq("id", doctorId);
+        .from("doctors_financial")
+        .upsert({ doctor_id: doctorId, pix_key: pixKey.trim() }, { onConflict: "doctor_id" });
       if (error) throw error;
       setSavedPixKey(pixKey.trim());
       toast.success("✅ Chave Pix salva com sucesso!");

@@ -71,7 +71,7 @@ export class MercadoPagoClubService {
    */
   async createPaymentPreference(order: Order): Promise<string> {
     try {
-      console.log(`💳 Manus CEO: Criando preferência de pagamento para pedido ${order.id}`);
+      // Creating payment preference
 
       const items = order.items.map((item) => ({
         id: item.productId,
@@ -113,7 +113,7 @@ export class MercadoPagoClubService {
         },
       });
 
-      console.log(`✅ Manus CEO: Preferência criada com sucesso - ${response.data.id}`);
+      // Preference created successfully
       return response.data.init_point; // URL do checkout
     } catch (error) {
       console.error('❌ Erro ao criar preferência:', error);
@@ -127,11 +127,11 @@ export class MercadoPagoClubService {
    */
   async processPayment(paymentData: MercadoPagoPayment, orderId: string): Promise<Order> {
     try {
-      console.log(`💰 Manus CEO: Processando pagamento ${paymentData.id} para pedido ${orderId}`);
+      // Processing payment
 
       // Validar status do pagamento
       if (paymentData.status === 'approved') {
-        console.log(`✅ Manus CEO: Pagamento aprovado! Valor: R$ ${paymentData.transaction_amount}`);
+        // Payment approved
 
         // Atualizar status do pedido
         const order = await this.updateOrderStatus(orderId, 'approved', paymentData.id.toString());
@@ -147,14 +147,14 @@ export class MercadoPagoClubService {
 
         return order;
       } else if (paymentData.status === 'pending') {
-        console.log(`⏳ Manus CEO: Pagamento pendente - aguardando confirmação`);
+        // Payment pending
         await this.updateOrderStatus(orderId, 'processing', paymentData.id.toString());
         await this.notifyCustomer(
           { id: orderId } as Order,
           'pending'
         );
       } else if (paymentData.status === 'rejected') {
-        console.log(`❌ Manus CEO: Pagamento rejeitado - motivo: ${paymentData.status_detail}`);
+        // Payment rejected
         await this.updateOrderStatus(orderId, 'rejected', paymentData.id.toString());
         await this.notifyCustomer({ id: orderId } as Order, 'rejected');
       }
@@ -189,7 +189,7 @@ export class MercadoPagoClubService {
    */
   async processRefund(paymentId: string, amount?: number): Promise<void> {
     try {
-      console.log(`🔄 Manus CEO: Processando reembolso para pagamento ${paymentId}`);
+      // Processing refund
 
       const refundData = amount ? { amount } : {};
 
@@ -204,7 +204,7 @@ export class MercadoPagoClubService {
         }
       );
 
-      console.log(`✅ Manus CEO: Reembolso processado com sucesso - ${response.data.id}`);
+      // Refund processed
     } catch (error) {
       console.error('❌ Erro ao processar reembolso:', error);
       throw error;
@@ -220,7 +220,7 @@ export class MercadoPagoClubService {
     paymentId: string
   ): Promise<Order> {
     // Aqui você faria a atualização no banco de dados
-    console.log(`📝 Manus CEO: Atualizando pedido ${orderId} para status ${status}`);
+    // Updating order status
 
     return {
       id: orderId,
@@ -245,7 +245,7 @@ export class MercadoPagoClubService {
         rejected: `❌ Seu pagamento foi rejeitado. Pedido #${order.id} cancelado.`,
       };
 
-      console.log(`📱 Manus CEO: Enviando notificação WhatsApp - ${messages[status]}`);
+      // Sending notification
 
       // Aqui você faria a integração com Twilio
       // await twilioService.sendWhatsApp(customerPhone, messages[status]);
@@ -274,7 +274,7 @@ export class MercadoPagoClubService {
         action: 'payment_processed',
       };
 
-      console.log(`📋 Manus CEO: Registrando na auditoria:`, auditLog);
+      // Audit log recorded
 
       // Aqui você faria o registro no banco de dados
     } catch (error) {
@@ -287,7 +287,7 @@ export class MercadoPagoClubService {
    */
   private async scheduleShipment(order: Order): Promise<void> {
     try {
-      console.log(`📦 Manus CEO: Agendando envio automático para pedido ${order.id}`);
+      // Scheduling shipment
 
       // Usar IA para determinar melhor transportadora
       const shipmentRecommendation = await invokeLLM({
@@ -304,7 +304,7 @@ export class MercadoPagoClubService {
         ],
       });
 
-      console.log(`🚚 Manus CEO: Recomendação de transportadora:`, shipmentRecommendation);
+      // Shipment recommendation received
 
       // Aqui você faria a integração com a transportadora
     } catch (error) {
@@ -317,7 +317,7 @@ export class MercadoPagoClubService {
    */
   async generateFinancialReport(startDate: Date, endDate: Date): Promise<void> {
     try {
-      console.log(`📊 Manus CEO: Gerando relatório financeiro de ${startDate} a ${endDate}`);
+      // Generating financial report
 
       // Consultar pagamentos aprovados
       const response = await axios.get(`${this.apiUrl}/payments/search`, {
@@ -356,7 +356,7 @@ export class MercadoPagoClubService {
         generatedBy: 'Manus CEO',
       };
 
-      console.log(`✅ Manus CEO: Relatório gerado:`, report);
+      // Report generated
 
       // Aqui você faria o envio do relatório por email
     } catch (error) {
@@ -369,7 +369,7 @@ export class MercadoPagoClubService {
    */
   async handleWebhook(data: any): Promise<void> {
     try {
-      console.log(`🔔 Manus CEO: Recebendo webhook do Mercado Pago:`, data);
+      // Webhook received
 
       if (data.type === 'payment') {
         const payment = await this.getPaymentStatus(data.data.id);

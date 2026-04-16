@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,7 +20,9 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [forgotMode, setForgotMode] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const redirectTo = searchParams.get("redirect");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,23 +53,26 @@ const Login = () => {
         const name = profile?.full_name || "usuário";
         toast({ title: `Bem-vindo, ${name}! 🌿` });
 
-        // Redirect based on user type
-        const userType = profile?.user_type || "patient";
-        if (userType === "doctor") {
-          navigate("/dashboard-medico");
+        // Redirect: prioritize ?redirect= param, then role-based default
+        if (redirectTo) {
+          navigate(decodeURIComponent(redirectTo));
         } else {
-          // Check if admin
-          const { data: roleData } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", data.user.id)
-            .eq("role", "admin")
-            .maybeSingle();
-
-          if (roleData) {
-            navigate("/admin");
+          const userType = profile?.user_type || "patient";
+          if (userType === "doctor") {
+            navigate("/dashboard-medico");
           } else {
-            navigate("/dashboard");
+            const { data: roleData } = await supabase
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", data.user.id)
+              .eq("role", "admin")
+              .maybeSingle();
+
+            if (roleData) {
+              navigate("/admin");
+            } else {
+              navigate("/dashboard");
+            }
           }
         }
       }

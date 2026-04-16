@@ -3371,32 +3371,41 @@ export type Database = {
       }
       whatsapp_conversations: {
         Row: {
+          clinical_summary: string | null
+          clinical_summary_at: string | null
           created_at: string
           id: string
           last_intent: string | null
           messages: Json
           patient_id: string | null
           phone_number: string
+          sentiment: string | null
           triage_id: string | null
           updated_at: string
         }
         Insert: {
+          clinical_summary?: string | null
+          clinical_summary_at?: string | null
           created_at?: string
           id?: string
           last_intent?: string | null
           messages?: Json
           patient_id?: string | null
           phone_number: string
+          sentiment?: string | null
           triage_id?: string | null
           updated_at?: string
         }
         Update: {
+          clinical_summary?: string | null
+          clinical_summary_at?: string | null
           created_at?: string
           id?: string
           last_intent?: string | null
           messages?: Json
           patient_id?: string | null
           phone_number?: string
+          sentiment?: string | null
           triage_id?: string | null
           updated_at?: string
         }

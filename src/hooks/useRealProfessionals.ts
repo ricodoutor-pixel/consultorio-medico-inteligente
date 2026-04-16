@@ -25,7 +25,7 @@ interface RealDoctor {
   total_consultations: number | null;
   is_online: boolean;
   is_verified: boolean;
-  pix_key: string | null;
+  document_type: string;
   rqe: string | null;
   available_hours: any;
   created_at: string;

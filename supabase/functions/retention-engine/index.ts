@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
 
         const { data: metrics } = await supabase
           .from("doctor_performance_metrics")
-          .select("*, doctors:doctor_id(user_id, pix_key, consultation_price)")
+          .select("*, doctors:doctor_id(user_id, consultation_price)")
           .eq("month", month)
           .eq("year", year)
           .gte("consultations_count", 15); // threshold

@@ -60,6 +60,9 @@ import tecEnfAdrianaImg from "@/assets/tec-enf-adriana.jpg";
 import cuidHelenaImg from "@/assets/cuid-helena.jpg";
 import cuidJorgeImg from "@/assets/cuid-jorge.jpg";
 import cuidSandraImg from "@/assets/cuid-sandra.jpg";
+import draMarianaIntImg from "@/assets/dra-mariana-integrativa.jpg";
+import drRobertoIntImg from "@/assets/dr-roberto-integrativa.jpg";
+import draBeatrizIntImg from "@/assets/dra-beatriz-integrativa.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -96,6 +99,7 @@ export const categories = [
   "Enfermagem",
   "Téc. Enfermagem",
   "Cuidadores de Idosos",
+  "Medicina Integrativa",
 ];
 
 export const professionals: Professional[] = [
@@ -1809,6 +1813,91 @@ export const professionals: Professional[] = [
       { name: "Família Almeida", rating: 5, text: "20 anos de experiência insubstituíveis." },
       { name: "Dra. Regina", rating: 5, text: "A melhor cuidadora que já trabalhei." },
       { name: "Seu Carlos", rating: 5, text: "Sandra é um anjo na minha vida." },
+    ],
+  },
+
+  // ═══════ Medicina Integrativa (3) ═══════
+  {
+    id: "int-1",
+    name: "Dra. Mariana Castello",
+    category: "Medicina Integrativa",
+    bio: "Médica integrativa com formação em Ayurveda e Fitoterapia pela ABMA. Especialista em protocolos combinados de cannabis medicinal com acupuntura e meditação guiada. 15 anos de experiência em abordagem holística para dor crônica, fibromialgia e transtornos de ansiedade.",
+    experience: "15 anos",
+    tags: ["Ayurveda", "Fitoterapia", "Cannabis + Acupuntura", "Dor Crônica"],
+    price: "R$ 120,00",
+    priceValue: 120,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 420,
+    avatar: "MC",
+    imageUrl: draMarianaIntImg,
+    flags: ["🇧🇷", "🇮🇳"],
+    services: [
+      { name: "Consulta Integrativa", price: "R$ 120,00", desc: "Avaliação holística + protocolo canábico + fitoterapia" },
+      { name: "Retorno + Ajuste", price: "R$ 80", desc: "Acompanhamento e reequilíbrio terapêutico" },
+      { name: "Protocolo Ayurvédico", price: "R$ 150", desc: "Avaliação constitucional + plano personalizado" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Cláudia M.", rating: 5, text: "A abordagem integrativa mudou completamente meu tratamento." },
+      { name: "Fernando L.", rating: 5, text: "Combinação de acupuntura com CBD foi transformadora." },
+      { name: "Regina S.", rating: 5, text: "Finalmente uma médica que olha o paciente como um todo." },
+    ],
+  },
+  {
+    id: "int-2",
+    name: "Dr. Roberto Figueiredo",
+    category: "Medicina Integrativa",
+    bio: "Médico ortomolecular e nutrólogo com pós-graduação em Medicina Integrativa pela UNIFESP. Pioneiro na integração de canabinoides com suplementação ortomolecular e nutrição funcional. Foco em longevidade, modulação do sistema endocanabinoide e saúde metabólica.",
+    experience: "22 anos",
+    tags: ["Ortomolecular", "Nutrologia", "Longevidade", "Endocanabinoide"],
+    price: "R$ 95,00",
+    priceValue: 95,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.8,
+    consults: 580,
+    avatar: "RF",
+    imageUrl: drRobertoIntImg,
+    flags: ["🇧🇷"],
+    services: [
+      { name: "Consulta Ortomolecular", price: "R$ 95,00", desc: "Avaliação metabólica + protocolo canábico-nutricional" },
+      { name: "Protocolo Longevidade", price: "R$ 180", desc: "Plano completo anti-aging + CBD" },
+      { name: "Retorno", price: "R$ 70", desc: "Ajuste de suplementação e dosagem" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
+    reviews: [
+      { name: "Antônio G.", rating: 5, text: "Minha energia e disposição voltaram com o protocolo dele." },
+      { name: "Lúcia F.", rating: 5, text: "22 anos de experiência fazem toda a diferença." },
+    ],
+  },
+  {
+    id: "int-3",
+    name: "Dra. Beatriz Herbal",
+    category: "Medicina Integrativa",
+    bio: "Naturopata e fitoterapeuta com especialização em Plantas Medicinais e Cannabis pela Universidade de Barcelona. Abordagem centrada na conexão mente-corpo-planta. Especialista em aromaterapia com terpenos canábicos e protocolos de microdosagem para bem-estar emocional.",
+    experience: "8 anos",
+    tags: ["Naturopatia", "Aromaterapia", "Terpenos", "Microdosagem"],
+    price: "R$ 75,00",
+    priceValue: 75,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 310,
+    avatar: "BH",
+    imageUrl: draBeatrizIntImg,
+    flags: ["🇧🇷", "🇪🇸"],
+    services: [
+      { name: "Consulta Naturopática", price: "R$ 75,00", desc: "Avaliação holística + plano fitoterápico" },
+      { name: "Aromaterapia Canábica", price: "R$ 90", desc: "Protocolo personalizado de terpenos" },
+      { name: "Microdosagem Guiada", price: "R$ 60", desc: "Acompanhamento de protocolo de microdose" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "13:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Patrícia V.", rating: 5, text: "A aromaterapia com terpenos foi incrível para minha ansiedade." },
+      { name: "Marcos R.", rating: 5, text: "Abordagem natural e muito eficaz." },
+      { name: "Daniela C.", rating: 5, text: "Me sinto outra pessoa após o protocolo da Dra. Beatriz." },
     ],
   },
 ];

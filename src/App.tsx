@@ -166,8 +166,9 @@ const App = () => (
                 <Route path="/afiliados" element={<Indicacoes />} />
                 <Route path="/indicacoes" element={<Indicacoes />} />
                 <Route path="/legal" element={<Legal />} />
-                <Route path="/termos" element={<Legal />} />
-                <Route path="/privacidade" element={<Legal />} />
+                <Route path="/termos" element={<TermosDeUso />} />
+                <Route path="/privacidade" element={<PoliticaDePrivacidade />} />
+                <Route path="/reembolso" element={<PoliticaDeReembolso />} />
                 <Route path="/pagamento" element={<ConsultationPayment />} />
                 <Route path="/dashboard-especialista" element={<SpecialistDashboard />} />
                 <Route path="/influenciadores" element={<InfluencerDashboard />} />

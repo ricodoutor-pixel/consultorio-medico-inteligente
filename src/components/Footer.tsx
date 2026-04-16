@@ -37,8 +37,8 @@ export const Footer = () => {
               <li><Link to="/reembolso" className="text-muted-foreground hover:text-primary transition-colors">Política de Reembolso</Link></li>
             </ul>
             <div className="pt-2 text-[10px] text-muted-foreground/70 leading-relaxed space-y-0.5">
-              <p>CNPJ: __.___.___/____-__</p>
-              <p>Razão Social: [A preencher]</p>
+              <p>CNPJ: [Pendente de registro]</p>
+              <p>Razão Social: Planta y Raiz Saúde Digital Ltda.</p>
             </div>
           </div>
 
@@ -46,8 +46,8 @@ export const Footer = () => {
           <div className="space-y-3">
             <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Compliance Médico</h4>
             <div className="text-[10px] text-muted-foreground/70 leading-relaxed space-y-1">
-              <p className="text-xs text-muted-foreground">Diretor Técnico: [A preencher]</p>
-              <p>CRM: ______ | RQE: ______</p>
+              <p className="text-xs text-muted-foreground">Diretor Técnico: Dr. Edilson Bezerra</p>
+              <p>CRM: 10963 — Bolívia</p>
             </div>
             <p className="text-[10px] text-muted-foreground/60 leading-relaxed pt-1 max-w-[260px]">
               O conteúdo deste site é informativo. A prescrição de terapias canabinoides depende de avaliação médica individual.

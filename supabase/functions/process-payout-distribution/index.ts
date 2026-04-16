@@ -72,9 +72,17 @@ Deno.serve(async (req: Request) => {
     // 3. Get performance metrics with doctor data
     const { data: metrics } = await supabase
       .from("doctor_performance_metrics")
-      .select("*, doctors!inner(id, user_id, pix_key, is_verified)")
+      .select("*, doctors!inner(id, user_id, is_verified)")
       .eq("month", targetMonth)
       .eq("year", targetYear);
+
+    // Fetch financial data separately (isolated table)
+    const doctorIds = (metrics || []).map(m => m.doctor_id);
+    const { data: financialData } = await supabase
+      .from("doctors_financial")
+      .select("doctor_id, pix_key")
+      .in("doctor_id", doctorIds);
+    const pixMap = new Map((financialData || []).map(f => [f.doctor_id, f.pix_key]));
 
     if (!metrics || metrics.length === 0) {
       return new Response(JSON.stringify({
@@ -92,7 +100,7 @@ Deno.serve(async (req: Request) => {
       return {
         doctor_id: m.doctor_id,
         user_id: m.doctors.user_id,
-        pix_key: m.doctors.pix_key,
+        pix_key: pixMap.get(m.doctor_id) || null,
         is_verified: m.doctors.is_verified,
         consultations: m.consultations_count,
         hoursOnline: Number(m.hours_online),

@@ -48,7 +48,7 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
         supabase.from("appointments").select("amount, status, created_at").eq("doctor_id", doctorId),
         supabase.from("nps_responses").select("score").eq("professional_id", doctorId),
         supabase.from("doctor_performance_metrics").select("*").eq("doctor_id", doctorId).order("year", { ascending: false }).order("month", { ascending: false }).limit(6),
-        supabase.from("doctors").select("pix_key").eq("id", doctorId).single(),
+        supabase.from("doctors_financial").select("pix_key").eq("doctor_id", doctorId).single(),
       ]);
 
       if (doctorRes.data?.pix_key) setPixKey(doctorRes.data.pix_key);

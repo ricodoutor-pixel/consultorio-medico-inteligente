@@ -7,11 +7,12 @@ const corsHeaders = {
 
 const BRISA_SYSTEM_PROMPT = `Você é a **Enfermeira Brisa** 🌿, assistente virtual da **Planta & Raiz** — Clínica Digital de Cannabis Medicinal.
 
-## PERSONALIDADE:
-- Acolhedora, profissional e empática
+## PERSONALIDADE E TOM DE VOZ:
+- Acolhedora, empática e focada em soluções práticas
 - Respostas CURTAS via WhatsApp: máximo 3-4 frases
 - Use emojis com moderação (1-2 por mensagem)
-- Tom: enfermeira amiga e competente
+- Use termos como "Acolhimento", "Tratamento Individualizado" e "Qualidade de Vida"
+- Tom: enfermeira amiga, competente e clinicamente orientada
 - Português brasileiro
 
 ## CONHECIMENTO BASE:
@@ -33,6 +34,14 @@ Quando o paciente descrever sintomas, faça uma pré-triagem:
 3. Se tem interesse em tratamento com cannabis medicinal
 4. Sugira agendar uma consulta baseado nos sintomas
 
+## GATILHO DE AGENDAMENTO (INCISIVIDADE):
+Se o paciente descrever sintomas claros (dor, ansiedade, insônia, depressão, etc.) por mais de 2 interações na conversa, sugira gentilmente o agendamento:
+"Entendo perfeitamente o seu desconforto. Como esses sintomas são complexos, o próximo passo ideal é uma avaliação com o Dr. Edilson para traçarmos seu protocolo individual. Posso te enviar o link da agenda? 🌿"
+
+## PLANTA-COINS:
+- Informe que a triagem inicial gera créditos (Planta-Coins) que podem ser usados como desconto na primeira consulta médica.
+- Exemplo: "E uma boa notícia: essa triagem já te gera Planta-Coins 🪙 que valem desconto na sua primeira consulta!"
+
 ## AÇÕES DISPONÍVEIS (inclua links quando relevante):
 - Agendar consulta → https://plantayraiz.com.br/falar-com-especialista
 - Ver planos → https://plantayraiz.com.br/planos
@@ -40,21 +49,30 @@ Quando o paciente descrever sintomas, faça uma pré-triagem:
 - Quiz de triagem → https://plantayraiz.com.br/quiz-triagem
 - Como funciona → https://plantayraiz.com.br/como-funciona
 
-## REGRAS CRÍTICAS:
+## ÉTICA MÉDICA (REGRAS CRÍTICAS):
+- Você NÃO diagnostica. Você PREPARA o caminho para o médico.
 - NUNCA recomende doses ou tratamentos específicos sem consulta médica
 - NUNCA sugira uso recreativo
 - Para emergências: oriente ligar 192 (SAMU) ou 190
 - Sempre esclareça que a prescrição depende de avaliação médica individual
 - Se o paciente parecer em crise: priorize acolhimento e encaminhe para consulta urgente`;
 
-// Max conversation context to send to AI (last N messages)
 const MAX_CONTEXT_MESSAGES = 20;
+const AI_LATENCY_WARN_MS = 4000;
+
+// ─── Telemetry helper ───
+function timer() {
+  const start = Date.now();
+  return () => Date.now() - start;
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const totalTimer = timer();
+
   try {
-    // Parse Twilio webhook (application/x-www-form-urlencoded) or JSON
+    // ─── Parse input ───
     let from = "";
     let messageBody = "";
     let toNumber = "";
@@ -72,13 +90,16 @@ Deno.serve(async (req) => {
       toNumber = body.To || body.to || "";
     }
 
-    console.log(`[Brisa WhatsApp] From: ${from} | Message: ${messageBody}`);
+    console.log(`[Brisa] From: ${from} | Msg: ${messageBody.substring(0, 80)}`);
 
     if (!messageBody) {
-      return new Response(
-        `<?xml version="1.0" encoding="UTF-8"?><Response><Message>🌿 Olá! Sou a Brisa, da Planta &amp; Raiz. Como posso ajudar?</Message></Response>`,
-        { headers: { ...corsHeaders, "Content-Type": "text/xml" } }
-      );
+      return twimlResponse("🌿 Olá! Sou a Brisa, da Planta & Raiz. Como posso ajudar você hoje?");
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error("[Brisa] CRITICAL: LOVABLE_API_KEY missing");
+      return twimlResponse("🌿 Estou passando por uma manutenção rápida. Tente novamente em 1 minuto ou acesse plantayraiz.com.br 💚");
     }
 
     const supabase = createClient(
@@ -86,80 +107,72 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Clean phone number for storage
     const phoneClean = from.replace("whatsapp:", "").replace(/\D/g, "");
 
-    // ─── Load or create conversation ───
+    // ─── (a) Busca de contexto no Supabase ───
+    const dbTimer = timer();
     const { data: conv } = await supabase
       .from("whatsapp_conversations")
       .select("*")
       .eq("phone_number", phoneClean)
       .maybeSingle();
+    const dbMs = dbTimer();
+    console.log(`[Brisa][Telemetry] DB context: ${dbMs}ms`);
 
     const previousMessages: Array<{ role: string; content: string }> = conv?.messages || [];
-
-    // Add user message to history
     previousMessages.push({ role: "user", content: messageBody });
-
-    // Trim to last N messages for context window
     const contextMessages = previousMessages.slice(-MAX_CONTEXT_MESSAGES);
 
-    // ─── Call Lovable AI Gateway (Brisa IA) ───
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    // ─── (b) Resposta da Lovable AI Gateway ───
+    const aiTimer = timer();
+    let brisaReply: string;
+    try {
+      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: BRISA_SYSTEM_PROMPT },
+            ...contextMessages,
+          ],
+        }),
+      });
+      const aiMs = aiTimer();
+      console.log(`[Brisa][Telemetry] AI Gateway: ${aiMs}ms | Status: ${aiResponse.status}`);
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: BRISA_SYSTEM_PROMPT },
-          ...contextMessages,
-        ],
-      }),
-    });
+      if (!aiResponse.ok) {
+        const errText = await aiResponse.text();
+        console.error(`[Brisa] AI error ${aiResponse.status}: ${errText}`);
+        throw new Error(`AI_GATEWAY_${aiResponse.status}`);
+      }
 
-    if (!aiResponse.ok) {
-      const errText = await aiResponse.text();
-      console.error(`[Brisa WhatsApp] AI error ${aiResponse.status}: ${errText}`);
-      // Fallback response
-      const fallback = "🌿 No momento estou com dificuldade técnica. Por favor, tente novamente em alguns minutos ou acesse https://plantayraiz.com.br";
-      return twimlResponse(fallback);
+      const aiData = await aiResponse.json();
+      brisaReply = aiData.choices?.[0]?.message?.content || "🌿 Desculpe, não consegui processar. Tente novamente!";
+    } catch (aiErr) {
+      const aiMs = aiTimer();
+      console.error(`[Brisa] AI call failed after ${aiMs}ms:`, aiErr);
+      brisaReply = "🌿 Estou com uma lentidão momentânea, mas já volto! Tente novamente em 1 minutinho ou acesse nosso site: https://plantayraiz.com.br 💚";
+      // Still persist conversation and return graceful fallback
+      previousMessages.push({ role: "assistant", content: brisaReply });
+      await persistConversation(supabase, phoneClean, previousMessages, messageBody);
+      return twimlResponse(brisaReply);
     }
 
-    const aiData = await aiResponse.json();
-    const brisaReply = aiData.choices?.[0]?.message?.content || "🌿 Desculpe, não consegui processar. Tente novamente!";
-
-    // Add assistant response to history
     previousMessages.push({ role: "assistant", content: brisaReply });
 
     // ─── Persist conversation ───
-    await supabase
-      .from("whatsapp_conversations")
-      .upsert({
-        phone_number: phoneClean,
-        messages: previousMessages.slice(-50), // keep last 50 messages
-        last_intent: detectIntent(messageBody),
-        updated_at: new Date().toISOString(),
-      }, { onConflict: "phone_number" });
+    await persistConversation(supabase, phoneClean, previousMessages, messageBody);
 
-    // ─── Save/update lead ───
-    await supabase.from("leads_contatos").upsert({
-      telefone: phoneClean,
-      nome: phoneClean,
-      origem: "whatsapp_brisa_ia",
-      tags: [detectIntent(messageBody)],
-    }, { onConflict: "telefone" });
-
-    // ─── Send reply via Twilio Connector Gateway ───
+    // ─── (c) Twilio send ───
     const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
     const TWILIO_FROM = toNumber || "whatsapp:+5511991363154";
 
-    if (LOVABLE_API_KEY && TWILIO_API_KEY && from) {
+    if (TWILIO_API_KEY && from) {
+      const twTimer = timer();
       try {
         const twilioResp = await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
           method: "POST",
@@ -174,30 +187,68 @@ Deno.serve(async (req) => {
             Body: brisaReply,
           }),
         });
+        const twMs = twTimer();
         const twilioData = await twilioResp.json();
-        console.log(`[Brisa WhatsApp] Twilio SID: ${twilioData.sid || JSON.stringify(twilioData)}`);
+        console.log(`[Brisa][Telemetry] Twilio: ${twMs}ms | SID: ${twilioData.sid || "N/A"}`);
       } catch (twilioErr) {
-        console.error("[Brisa WhatsApp] Twilio send error:", twilioErr);
+        const twMs = twTimer();
+        console.error(`[Brisa] Twilio failed after ${twMs}ms:`, twilioErr);
       }
     }
 
-    // Return TwiML for Twilio webhook fallback
+    // ─── Health Check ───
+    const totalMs = totalTimer();
+    console.log(`[Brisa][Telemetry] Total: ${totalMs}ms`);
+    if (totalMs > AI_LATENCY_WARN_MS) {
+      console.warn(`[Brisa][HEALTH] ⚠️ High latency detected: ${totalMs}ms (threshold: ${AI_LATENCY_WARN_MS}ms)`);
+    }
+
     return twimlResponse(brisaReply);
   } catch (e) {
-    console.error("[Brisa WhatsApp] Error:", e);
-    return twimlResponse("🌿 Ocorreu um erro. Tente novamente ou acesse plantayraiz.com.br");
+    const totalMs = totalTimer();
+    console.error(`[Brisa] Unhandled error after ${totalMs}ms:`, e);
+    return twimlResponse("🌿 Tivemos um imprevisto técnico. Por favor, tente novamente em 1 minuto ou acesse plantayraiz.com.br — estamos aqui por você! 💚");
   }
 });
+
+// ─── Helpers ───
+
+async function persistConversation(
+  supabase: ReturnType<typeof createClient>,
+  phoneClean: string,
+  messages: Array<{ role: string; content: string }>,
+  rawMessage: string
+) {
+  try {
+    await supabase
+      .from("whatsapp_conversations")
+      .upsert({
+        phone_number: phoneClean,
+        messages: messages.slice(-50),
+        last_intent: detectIntent(rawMessage),
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "phone_number" });
+
+    await supabase.from("leads_contatos").upsert({
+      telefone: phoneClean,
+      nome: phoneClean,
+      origem: "whatsapp_brisa_ia",
+      tags: [detectIntent(rawMessage)],
+    }, { onConflict: "telefone" });
+  } catch (err) {
+    console.error("[Brisa] Persist error:", err);
+  }
+}
 
 function twimlResponse(message: string): Response {
   const escaped = message
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
-  const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response><Message>${escaped}</Message></Response>`;
-  return new Response(twiml, {
-    headers: { ...corsHeaders, "Content-Type": "text/xml" },
-  });
+  return new Response(
+    `<?xml version="1.0" encoding="UTF-8"?><Response><Message>${escaped}</Message></Response>`,
+    { headers: { ...corsHeaders, "Content-Type": "text/xml" } }
+  );
 }
 
 function detectIntent(message: string): string {

@@ -1,42 +1,31 @@
 ---
 name: WhatsApp Brisa IA COO Flow
-description: Brisa Singularity - COO + Social Media Manager + Lead Recovery + Clinical Handoff + Prescription Dispatch + Affiliate Tracking
+description: Brisa Singularity - COO + Social Media + Retention Engine + Crisis Alert + Clinical Handoff + Prescription Dispatch + Affiliate Tracking
 type: feature
 ---
 
-## Brisa COO — Singularidade IA 360°
+## Brisa COO — Singularidade IA 360° + Retenção
 
-**Papel**: Enfermeira, COO e Gestora de Tráfego. Segunda autoridade, reportando ao Dr. Edilson Bezerra.
+### Edge Functions (6 total)
+- `whatsapp-chatbot`: IA conversacional, deep linking, UTM, opt-out, clinical handoff, affiliate tagging
+- `brisa-reports`: Relatórios semanais operacionais
+- `brisa-social-manager`: Postagens automáticas, recuperação de carrinho, métricas marketing
+- `brisa-whatsapp-status`: Status diário WhatsApp com links do site
+- `brisa-prescription-dispatch`: Envio automático de prescrição pós-assinatura
+- `brisa-retention`: Régua de relacionamento, win-back, restock, crise, métricas retenção
 
-### Edge Functions
-- `whatsapp-chatbot`: IA conversacional via Twilio. Deep linking, UTM detection, clinical handoff, affiliate tagging, sentiment analysis.
-- `brisa-reports`: Relatórios semanais (leads, conversão, receita, sentimento).
-- `brisa-social-manager`: Postagens automáticas (Facebook/Instagram), recuperação de carrinho abandonado, métricas de marketing.
-- `brisa-whatsapp-status`: Postagem diária no WhatsApp Status com links do site.
-- `brisa-prescription-dispatch`: Envio automático de prescrição via WhatsApp pós-assinatura digital.
+### Retention Engine (brisa-retention)
+- **follow_up**: D+7 acolhimento, D+30 restock, D+60 renovação
+- **win_back**: 90+ dias inativos → cupom Planta-Coins
+- **restock_alert**: 5 dias antes do óleo acabar (30ml = 30 dias)
+- **crisis_check**: Se sentimento negativo >50% na semana → alerta WhatsApp ao ADM
+- **retention_metrics**: Taxa retenção, follow-ups enviados, churn rate, alerta crise
 
-### Social Media Automation (brisa-social-manager)
-- **action: generate_and_post** — 7 temas rotativos (RDC, CBD, depoimentos, quiz, marketplace, telemedicina, Planta-Coins)
-- **action: recovery_check** — Busca leads com 15min de inatividade em shopping/triagem/preços, envia lembrete acolhedor
-- **action: marketing_metrics** — Retorna posts publicados, leads orgânicos, recuperações, comissões de afiliados
-
-### Deep Linking + UTM
-- Mapa completo: shopping, planos, agenda, afiliado, ajuda, anvisa, quiz
-- UTM: utm_source=brisa_ia, utm_medium=social/facebook/whatsapp
-- Regra de retenção: nunca encerrar sem confirmação do paciente
-- Saudação personalizada por origem (Instagram, Facebook, etc.)
-
-### Clinical Handoff
-- Ao detectar intenção "agendar" com 4+ mensagens, gera resumo clínico via AI
-- Armazena em whatsapp_conversations.clinical_summary
-- Campos DB: clinical_summary (text), clinical_summary_at (timestamptz), sentiment (text)
+### Opt-out
+- Palavras-chave: "parar", "cancelar lembrete", "não me mande", etc.
+- Tag `no_followup` respeitada em todos os follow-ups e win-back
 
 ### Admin Dashboard (BrisaReportsModule)
-- 8 StatCards: leads, conversas, conversão, receita, posts, leads orgânicos, recuperações, comissões
-- Sentimento do paciente (positivo/neutro/negativo)
-- Intenções detectadas
-- Vendas assistidas pela Brisa (afiliados)
-
-### Telemetry
-- Threshold: 2s
-- DB + AI Gateway + Twilio medidos
+- 12 StatCards: operacional (4) + marketing (4) + retenção (4)
+- Alerta de Crise visual (⚠️ ATIVO / ✅ Normal)
+- Sentimento, intenções, vendas assistidas por afiliado

@@ -190,6 +190,22 @@ Deno.serve(async (req) => {
     const sentiment = detectSentiment(messageBody);
     const intent = detectIntent(messageBody);
 
+    // ─── Opt-out detection: respect no_followup requests ───
+    const optOutKeywords = ["parar", "não quero", "cancelar lembrete", "não me mande", "opt out", "sair", "desinscrever"];
+    const isOptOut = optOutKeywords.some(k => messageBody.toLowerCase().includes(k));
+    if (isOptOut) {
+      const existingTags: string[] = affiliateResult.data?.tags || [];
+      if (!existingTags.includes("no_followup")) {
+        await supabase.from("leads_contatos").upsert({
+          telefone: phoneClean,
+          nome: phoneClean,
+          origem: "whatsapp_brisa_coo",
+          tags: [...existingTags, "no_followup"],
+        }, { onConflict: "telefone" });
+      }
+      return twimlResponse("🌿 Entendido! Seus lembretes foram desativados. Se precisar de algo, é só me chamar aqui. Estou sempre disponível! 💚");
+    }
+
     // ─── Affiliate tagging: detect ref= in message ───
     const refMatch = messageBody.match(/ref[=:\s]+([A-Z0-9-]+)/i);
     let affiliateTags: string[] = affiliateResult.data?.tags || [];

@@ -1,44 +1,42 @@
 ---
 name: WhatsApp Brisa IA COO Flow
-description: Brisa COO with deep linking, clinical handoff, prescription dispatch, affiliate tagging, daily WhatsApp Status, and sentiment analysis
+description: Brisa Singularity - COO + Social Media Manager + Lead Recovery + Clinical Handoff + Prescription Dispatch + Affiliate Tracking
 type: feature
 ---
 
-## Brisa COO — Diretora Operacional IA (360°)
+## Brisa COO — Singularidade IA 360°
 
-**Papel**: Segunda autoridade da plataforma, reportando ao Dr. Edilson Bezerra.
+**Papel**: Enfermeira, COO e Gestora de Tráfego. Segunda autoridade, reportando ao Dr. Edilson Bezerra.
 
 ### Edge Functions
-- `whatsapp-chatbot`: IA conversacional via Twilio WhatsApp. Modelo: Gemini 2.5 Flash. Deep linking, clinical handoff, affiliate tagging.
-- `brisa-reports`: Gera relatórios semanais (leads, conversão, receita, sentimento, affiliate conversions).
-- `brisa-whatsapp-status`: Postagem diária automática no WhatsApp Status com links para o site.
-- `brisa-prescription-dispatch`: Webhook para envio automático de prescrição via WhatsApp após assinatura digital.
+- `whatsapp-chatbot`: IA conversacional via Twilio. Deep linking, UTM detection, clinical handoff, affiliate tagging, sentiment analysis.
+- `brisa-reports`: Relatórios semanais (leads, conversão, receita, sentimento).
+- `brisa-social-manager`: Postagens automáticas (Facebook/Instagram), recuperação de carrinho abandonado, métricas de marketing.
+- `brisa-whatsapp-status`: Postagem diária no WhatsApp Status com links do site.
+- `brisa-prescription-dispatch`: Envio automático de prescrição via WhatsApp pós-assinatura digital.
 
-### Deep Linking (Navegação Inteligente)
-- shopping → /shopping | preco → /planos | agendar → /falar-com-especialista
-- afiliado → /dashboard/parceiro | reembolso → /ajuda | anvisa → /como-funciona
+### Social Media Automation (brisa-social-manager)
+- **action: generate_and_post** — 7 temas rotativos (RDC, CBD, depoimentos, quiz, marketplace, telemedicina, Planta-Coins)
+- **action: recovery_check** — Busca leads com 15min de inatividade em shopping/triagem/preços, envia lembrete acolhedor
+- **action: marketing_metrics** — Retorna posts publicados, leads orgânicos, recuperações, comissões de afiliados
+
+### Deep Linking + UTM
+- Mapa completo: shopping, planos, agenda, afiliado, ajuda, anvisa, quiz
+- UTM: utm_source=brisa_ia, utm_medium=social/facebook/whatsapp
 - Regra de retenção: nunca encerrar sem confirmação do paciente
+- Saudação personalizada por origem (Instagram, Facebook, etc.)
 
-### Clinical Handoff (Prontuário Inteligente)
+### Clinical Handoff
 - Ao detectar intenção "agendar" com 4+ mensagens, gera resumo clínico via AI
-- Armazena em `whatsapp_conversations.clinical_summary`
-- Formato: Sintomas, Duração, Intensidade, Tratamentos anteriores, Urgência
+- Armazena em whatsapp_conversations.clinical_summary
+- Campos DB: clinical_summary (text), clinical_summary_at (timestamptz), sentiment (text)
 
-### Prescription Dispatch
-- Webhook recebe: patient_phone, prescription_url, doctor_name
-- Envia via Twilio com link do PDF + guia ANVISA
-
-### Affiliate Tagging
-- Detecta `ref=CODE` nas mensagens e tagga lead com `affiliate:CODE` + `brisa_assisted`
-- Visível no BrisaReportsModule (Vendas Assistidas pela Brisa)
-
-### RAG Context Injetado
-- Leis: RDC 660/2022, RDC 327/2019, CFM 2.314/2022, LGPD
-- Integrações: Stripe, Twilio, Supabase, Jitsi
-- Negócio: Afiliados 3 gerações, Planta-Coins, política de reembolso, split 7%/93%
-- Clínico: Full/Broad Spectrum, Isolado, condições tratáveis
+### Admin Dashboard (BrisaReportsModule)
+- 8 StatCards: leads, conversas, conversão, receita, posts, leads orgânicos, recuperações, comissões
+- Sentimento do paciente (positivo/neutro/negativo)
+- Intenções detectadas
+- Vendas assistidas pela Brisa (afiliados)
 
 ### Telemetry
-- Threshold reduzido para 2s (era 4s)
-- DB, AI Gateway, Twilio latência medidos
-- Health Check warn se total > 2s
+- Threshold: 2s
+- DB + AI Gateway + Twilio medidos

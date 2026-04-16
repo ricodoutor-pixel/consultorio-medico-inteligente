@@ -62,15 +62,23 @@ Deno.serve(async (req) => {
     const totalAmount = prescribedItems.reduce((sum: number, item: PrescribedItem) => 
       sum + (item.unit_price || 0) * (item.quantity || 1), 0);
 
-    // Check if patient has active subscription for discount
+    // Check if patient has active Stripe subscription for discount
     const { data: subscription } = await supabase
-      .from("health_subscriptions")
-      .select("features, plan_type")
+      .from("subscriptions")
+      .select("price_id, status")
       .eq("user_id", patient_id)
-      .eq("status", "active")
-      .single();
+      .in("status", ["active", "trialing"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    const discountPercent = subscription?.features?.marketplace_discount || 0;
+    // Map price_id to discount percentage
+    const discountMap: Record<string, number> = {
+      essencial_mensal: 5,
+      premium_mensal: 15,
+      vip_mensal: 25,
+    };
+    const discountPercent = subscription ? (discountMap[subscription.price_id] || 5) : 0;
 
     const { data: cart, error } = await supabase
       .from("prescription_carts")

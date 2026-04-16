@@ -3,12 +3,14 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
 
 interface StripeEmbeddedCheckoutProps {
-  priceId: string;
+  priceId?: string;
   quantity?: number;
   customerEmail?: string;
   userId?: string;
   returnUrl?: string;
   cartToken?: string;
+  /** Amount in centavos for dynamic pricing (e.g. prescription carts). Overrides priceId. */
+  dynamicAmount?: number;
 }
 
 export function StripeEmbeddedCheckout({
@@ -18,10 +20,20 @@ export function StripeEmbeddedCheckout({
   userId,
   returnUrl,
   cartToken,
+  dynamicAmount,
 }: StripeEmbeddedCheckoutProps) {
   const fetchClientSecret = async (): Promise<string> => {
     const { data, error } = await supabase.functions.invoke("create-checkout", {
-      body: { priceId, quantity, customerEmail, userId, returnUrl, environment: getStripeEnvironment(), cartToken },
+      body: {
+        priceId,
+        quantity,
+        customerEmail,
+        userId,
+        returnUrl,
+        environment: getStripeEnvironment(),
+        cartToken,
+        dynamicAmount,
+      },
     });
     if (error || !data?.clientSecret) {
       throw new Error(error?.message || "Failed to create checkout session");

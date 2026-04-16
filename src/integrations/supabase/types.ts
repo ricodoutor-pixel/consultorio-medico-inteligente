@@ -3569,6 +3569,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_planta_coins: {
+        Args: { _coins: number; _user_id: string }
+        Returns: undefined
+      }
       increment_site_counter: {
         Args: { _counter_id: string }
         Returns: undefined

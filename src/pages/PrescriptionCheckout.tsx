@@ -184,8 +184,7 @@ export default function PrescriptionCheckout() {
         ) : (
           <div className="rounded-xl overflow-hidden border border-border">
             <StripeEmbeddedCheckout
-              priceId="prescricao_checkout"
-              quantity={Math.max(1, Math.round((cart.total_amount || 1) * 100))}
+              dynamicAmount={Math.max(100, Math.round((cart.total_amount || 1) * 100))}
               customerEmail={user?.email}
               userId={user?.id}
               cartToken={token}

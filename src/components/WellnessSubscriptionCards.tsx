@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +6,7 @@ import { CheckCircle2, Loader2, Heart, Sparkles, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { WELLNESS_PLANS, type WellnessPlan } from "@/lib/domination-services";
+import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
 
 const PLAN_ICONS: Record<string, typeof Heart> = {
   basic: Heart,
@@ -19,51 +20,54 @@ const PLAN_COLORS: Record<string, string> = {
   premium: "text-amber-400",
 };
 
+// Map wellness plan IDs to Stripe price lookup_keys
+const STRIPE_PRICE_MAP: Record<string, string> = {
+  basic: "essencial_mensal",
+  pro: "premium_mensal",
+  premium: "vip_mensal",
+};
+
 export function WellnessSubscriptionCards() {
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [activePlan, setActivePlan] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
 
-  const handleSubscribe = async (plan: WellnessPlan) => {
-    setLoadingPlan(plan.id);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Faça login para assinar.", {
-          action: { label: "Login", onClick: () => window.location.href = "/login" },
-        });
-        return;
-      }
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+  }, []);
 
-      const { data, error } = await supabase.functions.invoke("create-subscription", {
-        body: {
-          planId: `wellness-${plan.id}`,
-          planName: plan.name,
-          amount: plan.price,
-          email: session.user.email,
-          userId: session.user.id,
-        },
+  const handleSubscribe = (plan: WellnessPlan) => {
+    if (!user) {
+      toast.error("Faça login para assinar.", {
+        action: { label: "Login", onClick: () => window.location.href = "/login" },
       });
-
-      if (error) {
-        console.error("Subscription error:", error);
-        toast.error("Erro ao processar assinatura. Tente novamente.");
-        return;
-      }
-
-      if (data?.init_point) {
-        toast.success("Redirecionando para o Mercado Pago...");
-        window.location.href = data.init_point;
-      } else if (data?.error) {
-        toast.error(data.error);
-      } else {
-        toast.error("Erro ao gerar link de pagamento");
-      }
-    } catch (err) {
-      console.error("Subscription error:", err);
-      toast.error("Erro ao processar. Tente novamente.");
-    } finally {
-      setLoadingPlan(null);
+      return;
     }
+    setActivePlan(plan.id);
   };
+
+  if (activePlan) {
+    const plan = WELLNESS_PLANS.find(p => p.id === activePlan);
+    const stripePriceId = STRIPE_PRICE_MAP[activePlan];
+
+    if (!plan || !stripePriceId) return null;
+
+    return (
+      <div className="max-w-lg mx-auto space-y-4">
+        <Button variant="ghost" onClick={() => setActivePlan(null)}>
+          ← Voltar aos planos
+        </Button>
+        <h3 className="text-xl font-bold text-center">Assinatura {plan.name}</h3>
+        <div className="rounded-xl overflow-hidden border border-border">
+          <StripeEmbeddedCheckout
+            priceId={stripePriceId}
+            customerEmail={user?.email}
+            userId={user?.id}
+            returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -127,13 +131,8 @@ export function WellnessSubscriptionCards() {
                   className={`w-full rounded-xl font-bold ${isHighlighted ? "bg-primary hover:bg-primary/90" : ""}`}
                   variant={isHighlighted ? "default" : "outline"}
                   onClick={() => handleSubscribe(plan)}
-                  disabled={loadingPlan === plan.id}
                 >
-                  {loadingPlan === plan.id ? (
-                    <><Loader2 size={14} className="animate-spin mr-2" /> Processando...</>
-                  ) : (
-                    "Assinar Agora"
-                  )}
+                  Assinar Agora
                 </Button>
               </CardContent>
             </Card>

@@ -14,37 +14,57 @@ serve(async (req) => {
   }
 
   try {
-    const { priceId, quantity, customerEmail, userId, returnUrl, environment, cartToken } = await req.json();
-    
-    if (!priceId || typeof priceId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
-      return new Response(JSON.stringify({ error: "Invalid priceId" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const body = await req.json();
+    const { priceId, quantity, customerEmail, userId, returnUrl, environment, cartToken, dynamicAmount } = body;
 
     const env = (environment || 'sandbox') as StripeEnv;
     const stripe = createStripeClient(env);
 
-    const prices = await stripe.prices.list({ lookup_keys: [priceId] });
-    if (!prices.data.length) {
-      return new Response(JSON.stringify({ error: "Price not found" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    let lineItems: any[];
+    let mode: string;
+
+    if (dynamicAmount && typeof dynamicAmount === "number" && dynamicAmount >= 100) {
+      // Dynamic pricing for prescription carts (amount in centavos)
+      lineItems = [{
+        price_data: {
+          currency: "brl",
+          product_data: { name: "Carrinho de Prescrição Médica" },
+          unit_amount: dynamicAmount,
+        },
+        quantity: 1,
+      }];
+      mode = "payment";
+    } else {
+      // Standard: resolve human-readable price via lookup_keys
+      if (!priceId || typeof priceId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
+        return new Response(JSON.stringify({ error: "Invalid priceId" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const prices = await stripe.prices.list({ lookup_keys: [priceId] });
+      if (!prices.data.length) {
+        return new Response(JSON.stringify({ error: "Price not found" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const stripePrice = prices.data[0];
+      const isRecurring = stripePrice.type === "recurring";
+      mode = isRecurring ? "subscription" : "payment";
+      lineItems = [{ price: stripePrice.id, quantity: quantity || 1 }];
     }
-    const stripePrice = prices.data[0];
-    const isRecurring = stripePrice.type === "recurring";
 
     const session = await stripe.checkout.sessions.create({
-      line_items: [{ price: stripePrice.id, quantity: quantity || 1 }],
-      mode: isRecurring ? "subscription" : "payment",
+      line_items: lineItems,
+      mode,
       ui_mode: "embedded",
       return_url: returnUrl || `${req.headers.get("origin")}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
       ...(customerEmail && { customer_email: customerEmail }),
       ...(userId && {
         metadata: { userId, ...(cartToken && { cartToken }) },
-        ...(isRecurring && { subscription_data: { metadata: { userId } } }),
+        ...(mode === "subscription" && { subscription_data: { metadata: { userId } } }),
       }),
     });
 
@@ -54,7 +74,7 @@ serve(async (req) => {
       action: "checkout_session_created",
       table_name: "subscriptions",
       record_id: session.id,
-      new_data: { priceId, environment: env, cartToken: cartToken || null },
+      new_data: { priceId: priceId || "dynamic", environment: env, cartToken: cartToken || null, dynamicAmount },
     });
 
     return new Response(JSON.stringify({ clientSecret: session.client_secret }), {

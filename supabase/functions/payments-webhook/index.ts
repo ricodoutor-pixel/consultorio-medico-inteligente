@@ -1,6 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { type StripeEnv, verifyWebhook } from "../_shared/stripe.ts";
+import { type StripeEnv, verifyWebhook, createStripeClient } from "../_shared/stripe.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -46,7 +46,6 @@ serve(async (req) => {
   } catch (e) {
     console.error("Webhook error:", e);
 
-    // Log error for dunning
     await supabase.from("error_logs").insert({
       source: "payments-webhook",
       error_type: "webhook_verification",
@@ -64,15 +63,24 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
 
   console.log("Checkout completed:", session.id, "mode:", session.mode, "userId:", userId);
 
-  // One-time payment: credit Planta-Coins
+  // One-time payment: credit Planta-Coins atomically
   if (session.mode === "payment" && userId) {
     const amount = (session.amount_total || 0) / 100;
-    const coins = Math.floor(amount); // 1 BRL = 1 Planta-Coin
+    const coins = Math.floor(amount);
 
-    await supabase.rpc("increment_planta_coins", { _user_id: userId, _coins: coins }).catch(() => {
-      // Fallback: direct update
-      supabase.from("profiles").update({ planta_coins: coins }).eq("id", userId);
-    });
+    // Use the DB function that atomically increments (no overwrite)
+    const { error: rpcError } = await supabase.rpc("increment_planta_coins", { _user_id: userId, _coins: coins });
+    if (rpcError) {
+      console.error("Failed to credit coins via RPC:", rpcError);
+      // Log for manual recovery
+      await supabase.from("error_logs").insert({
+        source: "payments-webhook",
+        error_type: "coins_credit_failed",
+        message: rpcError.message,
+        user_id: userId,
+        metadata: { session_id: session.id, coins, env },
+      });
+    }
 
     // If cart token, mark cart as completed
     if (cartToken) {
@@ -153,26 +161,67 @@ async function handleSubscriptionUpdated(subscription: any, env: StripeEnv) {
 }
 
 async function handleSubscriptionDeleted(subscription: any, env: StripeEnv) {
+  // Update subscription status
   await supabase.from("subscriptions").update({
     status: "canceled",
     updated_at: new Date().toISOString(),
   }).eq("stripe_subscription_id", subscription.id).eq("environment", env);
 
-  // Update profile
-  const userId = subscription.metadata?.userId;
+  // Look up userId from our subscriptions table (metadata may be missing on deleted events)
+  const { data: sub } = await supabase
+    .from("subscriptions")
+    .select("user_id")
+    .eq("stripe_subscription_id", subscription.id)
+    .single();
+
+  const userId = sub?.user_id || subscription.metadata?.userId;
   if (userId) {
-    await supabase.from("profiles").update({ is_subscriber: false }).eq("id", userId);
+    // Check if user has ANY other active subscription before marking as non-subscriber
+    const { data: otherSubs } = await supabase
+      .from("subscriptions")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("environment", env)
+      .in("status", ["active", "trialing"])
+      .neq("stripe_subscription_id", subscription.id)
+      .limit(1);
+
+    if (!otherSubs?.length) {
+      await supabase.from("profiles").update({ is_subscriber: false }).eq("id", userId);
+    }
   }
 }
 
 async function handlePaymentFailed(invoice: any, env: StripeEnv) {
   console.error("Payment failed:", invoice.id);
 
+  // Look up userId from subscription in our DB (invoice.metadata is often empty)
+  let userId = invoice.metadata?.userId || null;
+  if (!userId && invoice.subscription) {
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("user_id")
+      .eq("stripe_subscription_id", invoice.subscription)
+      .single();
+    userId = sub?.user_id || null;
+  }
+
   await supabase.from("error_logs").insert({
     source: "stripe",
     error_type: "payment_failed",
-    message: `Invoice ${invoice.id} payment failed`,
-    user_id: invoice.metadata?.userId || null,
-    metadata: { invoice_id: invoice.id, subscription: invoice.subscription, env },
+    message: `Invoice ${invoice.id} payment failed. Amount: ${(invoice.amount_due || 0) / 100} ${invoice.currency}`,
+    user_id: userId,
+    metadata: { invoice_id: invoice.id, subscription: invoice.subscription, env, amount: invoice.amount_due },
   });
+
+  // Notify user if we found them
+  if (userId) {
+    await supabase.from("notifications").insert({
+      user_id: userId,
+      type: "payment_failed",
+      title: "⚠️ Falha no pagamento",
+      message: "Seu pagamento não foi processado. Atualize seu método de pagamento para manter sua assinatura ativa.",
+      action_url: "/planos",
+    });
+  }
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Brain, Users, TrendingUp, DollarSign, Heart, RefreshCw, MessageSquare, Calendar, Link2, Zap } from "lucide-react";
+import { Brain, Users, TrendingUp, DollarSign, Heart, RefreshCw, MessageSquare, Calendar, Link2, Zap, Globe, Share2, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -15,6 +15,12 @@ interface BrisaReport {
   generated_by: string;
 }
 
+interface MarketingMetrics {
+  social_media: { posts_published: number; platforms: string[]; social_leads: number };
+  organic_traffic: { total_leads: number; brisa_assisted: number; recovery_campaigns: number };
+  affiliates: { total_commissions_paid: number; total_commissions_pending: number; commission_count: number };
+}
+
 interface AffiliateConversion {
   affiliate_code: string;
   leads_count: number;
@@ -23,21 +29,26 @@ interface AffiliateConversion {
 
 export const BrisaReportsModule = () => {
   const [report, setReport] = useState<BrisaReport | null>(null);
+  const [marketing, setMarketing] = useState<MarketingMetrics | null>(null);
   const [affiliateConversions, setAffiliateConversions] = useState<AffiliateConversion[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchReport = async () => {
     setLoading(true);
     try {
-      const [reportRes, leadsRes] = await Promise.all([
+      const [reportRes, marketingRes, leadsRes] = await Promise.all([
         supabase.functions.invoke("brisa-reports"),
+        supabase.functions.invoke("brisa-social-manager", { body: { action: "marketing_metrics" } }),
         supabase.from("leads_contatos").select("tags").not("tags", "is", null),
       ]);
 
       if (reportRes.error) throw reportRes.error;
       setReport(reportRes.data);
 
-      // Parse affiliate conversions from lead tags
+      if (!marketingRes.error && marketingRes.data) {
+        setMarketing(marketingRes.data);
+      }
+
       if (leadsRes.data) {
         const affiliateMap = new Map<string, { leads: number; assisted: number }>();
         for (const lead of leadsRes.data) {
@@ -93,7 +104,7 @@ export const BrisaReportsModule = () => {
           </div>
           <div>
             <h3 className="text-sm font-semibold text-slate-100">Relatórios da Brisa COO</h3>
-            <p className="text-[10px] text-slate-500">Inteligência operacional semanal</p>
+            <p className="text-[10px] text-slate-500">Inteligência operacional + marketing semanal</p>
           </div>
         </div>
         <Button variant="outline" size="sm" onClick={fetchReport} disabled={loading} className="text-xs border-slate-700 text-slate-300">
@@ -104,12 +115,23 @@ export const BrisaReportsModule = () => {
 
       {report ? (
         <>
+          {/* Core Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard icon={Users} label="Leads Captados" value={report.leads.total} sub="Semana atual" color="bg-blue-600/80" />
             <StatCard icon={MessageSquare} label="Conversas WhatsApp" value={report.conversations.total} sub={`${report.conversations.scheduling_intents} com intenção de agendar`} color="bg-emerald-600/80" />
             <StatCard icon={TrendingUp} label="Taxa de Conversão" value={report.conversion.rate} sub={`${report.conversion.appointments} agendamentos`} color="bg-purple-600/80" />
             <StatCard icon={DollarSign} label="Receita Processada" value={`R$ ${report.payments.total_revenue.toLocaleString("pt-BR")}`} sub={`${report.payments.total_transactions} transações`} color="bg-amber-600/80" />
           </div>
+
+          {/* Marketing Metrics */}
+          {marketing && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StatCard icon={Share2} label="Posts Publicados" value={marketing.social_media.posts_published} sub={marketing.social_media.platforms.join(", ")} color="bg-pink-600/80" />
+              <StatCard icon={Globe} label="Leads Orgânicos" value={marketing.organic_traffic.total_leads} sub={`${marketing.organic_traffic.brisa_assisted} assistidos pela Brisa`} color="bg-cyan-600/80" />
+              <StatCard icon={Zap} label="Recuperações" value={marketing.organic_traffic.recovery_campaigns} sub="Campanhas de recuperação" color="bg-orange-600/80" />
+              <StatCard icon={BarChart3} label="Comissões Pagas" value={`R$ ${(marketing.affiliates.total_commissions_paid / 100).toFixed(2)}`} sub={`R$ ${(marketing.affiliates.total_commissions_pending / 100).toFixed(2)} pendente`} color="bg-indigo-600/80" />
+            </div>
+          )}
 
           {/* Sentiment */}
           <div className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-4">

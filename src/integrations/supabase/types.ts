@@ -3369,6 +3369,39 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          last_intent: string | null
+          messages: Json
+          patient_id: string | null
+          phone_number: string
+          triage_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_intent?: string | null
+          messages?: Json
+          patient_id?: string | null
+          phone_number: string
+          triage_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_intent?: string | null
+          messages?: Json
+          patient_id?: string | null
+          phone_number?: string
+          triage_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       withdrawal_requests: {
         Row: {
           amount: number

@@ -106,7 +106,7 @@ export const HeroCarousel = memo(function HeroCarousel() {
                   height={1138}
                   loading={i === 0 ? "eager" : "lazy"}
                   decoding={i === 0 ? "sync" : "async"}
-                  {...(i === 0 ? { fetchPriority: "high" as any } : {})}
+                  {...(i === 0 ? { fetchpriority: "high" } : {})}
                 />
               </div>
             ))}

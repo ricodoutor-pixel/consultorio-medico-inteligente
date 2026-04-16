@@ -5,6 +5,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// ─── Deep Links Map ───
+const DEEP_LINKS: Record<string, { url: string; label: string }> = {
+  shopping: { url: "https://plantayraiz.com.br/shopping", label: "Shopping de Óleos" },
+  preco: { url: "https://plantayraiz.com.br/planos", label: "Planos e Preços" },
+  agendar: { url: "https://plantayraiz.com.br/falar-com-especialista", label: "Agendar Consulta" },
+  triagem: { url: "https://plantayraiz.com.br/quiz-triagem", label: "Quiz de Triagem" },
+  afiliado: { url: "https://plantayraiz.com.br/dashboard/parceiro", label: "Área do Parceiro" },
+  reembolso: { url: "https://plantayraiz.com.br/ajuda", label: "Suporte / Reembolso" },
+  anvisa: { url: "https://plantayraiz.com.br/como-funciona", label: "Importação ANVISA" },
+  receita: { url: "https://plantayraiz.com.br/como-funciona", label: "Prescrições" },
+  urgente: { url: "https://plantayraiz.com.br/falar-com-especialista", label: "Consulta Urgente" },
+  geral: { url: "https://plantayraiz.com.br", label: "Planta & Raiz" },
+};
+
 const BRISA_SYSTEM_PROMPT = `Você é a **Enfermeira Brisa** 🌿, **Diretora Operacional (COO)** da **Planta & Raiz** — Mega Clínica Digital de Cannabis Medicinal.
 Você é a segunda autoridade da plataforma, reportando-se diretamente ao **Dr. Edilson Bezerra da Silva** (CEO e Diretor Técnico).
 
@@ -65,15 +79,20 @@ Se o paciente descrever sintomas claros (dor, ansiedade, insônia, depressão) p
 ## 🪙 PLANTA-COINS:
 - Informe que a triagem gera créditos: "E uma boa notícia: essa triagem já te gera Planta-Coins 🪙 que valem desconto na sua primeira consulta!"
 
-## 🔗 AÇÕES DISPONÍVEIS (inclua links):
+## 🔗 NAVEGAÇÃO INTELIGENTE (DEEP LINKING OBRIGATÓRIO):
+Ao responder dúvidas, SEMPRE inclua o link direto do site para conclusão da ação:
+- Dúvidas sobre óleos/produtos → https://plantayraiz.com.br/shopping
+- Dúvidas sobre preço/planos → https://plantayraiz.com.br/planos
 - Agendar consulta → https://plantayraiz.com.br/falar-com-especialista
-- Ver planos → https://plantayraiz.com.br/planos
-- Shopping → https://plantayraiz.com.br/shopping
-- Quiz de triagem → https://plantayraiz.com.br/quiz-triagem
-- Como funciona → https://plantayraiz.com.br/como-funciona
+- Suporte técnico/Pagamento/Reembolso → https://plantayraiz.com.br/ajuda
+- Área do Afiliado/Parceiro → https://plantayraiz.com.br/dashboard/parceiro
+- Triagem/Quiz → https://plantayraiz.com.br/quiz-triagem
+- Importação ANVISA → https://plantayraiz.com.br/como-funciona
 - Termos de uso → https://plantayraiz.com.br/termos-de-uso
 - Política de privacidade → https://plantayraiz.com.br/politica-de-privacidade
 - Política de reembolso → https://plantayraiz.com.br/politica-de-reembolso
+
+**REGRA DE RETENÇÃO**: Nunca encerre a conversa após enviar o link. Pergunte: "Conseguiu acessar?" ou "Posso ajudar com mais alguma coisa?". Só encerre quando o paciente confirmar que realizou a ação.
 
 ## 🛡️ ÉTICA MÉDICA E SEGURANÇA (REGRAS CRÍTICAS):
 - Você NÃO diagnostica. Você PREPARA o caminho para o médico.
@@ -87,7 +106,7 @@ Se o paciente descrever sintomas claros (dor, ansiedade, insônia, depressão) p
 - Registre todas as interações para auditoria e relatórios semanais.`;
 
 const MAX_CONTEXT_MESSAGES = 20;
-const AI_LATENCY_WARN_MS = 4000;
+const AI_LATENCY_WARN_MS = 2000;
 
 function timer() {
   const start = Date.now();
@@ -138,11 +157,20 @@ Deno.serve(async (req) => {
 
     // ─── (a) Busca de contexto no Supabase ───
     const dbTimer = timer();
-    const { data: conv } = await supabase
-      .from("whatsapp_conversations")
-      .select("*")
-      .eq("phone_number", phoneClean)
-      .maybeSingle();
+    const [convResult, affiliateResult] = await Promise.all([
+      supabase
+        .from("whatsapp_conversations")
+        .select("*")
+        .eq("phone_number", phoneClean)
+        .maybeSingle(),
+      // Check if lead came via affiliate link
+      supabase
+        .from("leads_contatos")
+        .select("tags")
+        .eq("telefone", phoneClean)
+        .maybeSingle(),
+    ]);
+    const conv = convResult.data;
     const dbMs = dbTimer();
     console.log(`[Brisa COO][Telemetry] DB context: ${dbMs}ms`);
 
@@ -150,8 +178,18 @@ Deno.serve(async (req) => {
     previousMessages.push({ role: "user", content: messageBody });
     const contextMessages = previousMessages.slice(-MAX_CONTEXT_MESSAGES);
 
-    // Detect sentiment for analytics
     const sentiment = detectSentiment(messageBody);
+    const intent = detectIntent(messageBody);
+
+    // ─── Affiliate tagging: detect ref= in message ───
+    const refMatch = messageBody.match(/ref[=:\s]+([A-Z0-9-]+)/i);
+    let affiliateTags: string[] = affiliateResult.data?.tags || [];
+    if (refMatch) {
+      const affiliateCode = refMatch[1];
+      if (!affiliateTags.includes(`affiliate:${affiliateCode}`)) {
+        affiliateTags = [...affiliateTags, `affiliate:${affiliateCode}`, "brisa_assisted"];
+      }
+    }
 
     // ─── (b) Resposta da Lovable AI Gateway ───
     const aiTimer = timer();
@@ -185,16 +223,23 @@ Deno.serve(async (req) => {
     } catch (aiErr) {
       const aiMs = aiTimer();
       console.error(`[Brisa COO] AI call failed after ${aiMs}ms:`, aiErr);
-      brisaReply = "🌿 Estou com uma lentidão momentânea, mas já volto! Tente novamente em 1 minutinho ou acesse nosso site: https://plantayraiz.com.br 💚";
+      // Fallback with deep link based on detected intent
+      const link = DEEP_LINKS[intent] || DEEP_LINKS.geral;
+      brisaReply = `🌿 Estou com uma lentidão momentânea! Enquanto isso, acesse ${link.label}: ${link.url} 💚\nVolto em 1 minutinho!`;
       previousMessages.push({ role: "assistant", content: brisaReply });
-      await persistConversation(supabase, phoneClean, previousMessages, messageBody, sentiment);
+      await persistConversation(supabase, phoneClean, previousMessages, messageBody, sentiment, intent, affiliateTags);
       return twimlResponse(brisaReply);
     }
 
     previousMessages.push({ role: "assistant", content: brisaReply });
 
-    // ─── Persist conversation with sentiment ───
-    await persistConversation(supabase, phoneClean, previousMessages, messageBody, sentiment);
+    // ─── Persist conversation + affiliate tags ───
+    await persistConversation(supabase, phoneClean, previousMessages, messageBody, sentiment, intent, affiliateTags);
+
+    // ─── Clinical Handoff: Generate triage summary on scheduling intent ───
+    if (intent === "agendar" && previousMessages.length >= 4) {
+      await generateClinicalSummary(supabase, phoneClean, previousMessages);
+    }
 
     // ─── (c) Twilio send ───
     const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
@@ -240,6 +285,62 @@ Deno.serve(async (req) => {
   }
 });
 
+// ─── Clinical Handoff: Consolidate WhatsApp history into triage summary ───
+async function generateClinicalSummary(
+  supabase: ReturnType<typeof createClient>,
+  phone: string,
+  messages: Array<{ role: string; content: string }>
+) {
+  try {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) return;
+
+    const summaryPrompt = `Analise o histórico de conversa abaixo entre a enfermeira Brisa e um paciente via WhatsApp.
+Gere um RESUMO CLÍNICO DE TRIAGEM conciso para o médico, contendo:
+- **Sintomas Relatados**: lista dos sintomas mencionados
+- **Duração**: há quanto tempo o paciente apresenta os sintomas
+- **Intensidade**: leve/moderada/severa (baseado nas palavras do paciente)
+- **Tratamentos Anteriores**: medicamentos ou terapias mencionadas
+- **Interesse em Cannabis**: o que o paciente sabe/espera do tratamento
+- **Nível de Urgência**: baixa/média/alta
+- **Observações da Brisa**: qualquer insight relevante da conversa
+
+Histórico:
+${messages.map(m => `[${m.role}]: ${m.content}`).join("\n")}
+
+Responda APENAS com o resumo clínico formatado. Sem saudações.`;
+
+    const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [{ role: "user", content: summaryPrompt }],
+      }),
+    });
+
+    if (aiResp.ok) {
+      const data = await aiResp.json();
+      const summary = data.choices?.[0]?.message?.content || "";
+      
+      if (summary) {
+        // Store clinical summary linked to phone
+        await supabase.from("whatsapp_conversations").update({
+          clinical_summary: summary,
+          clinical_summary_at: new Date().toISOString(),
+        }).eq("phone_number", phone);
+
+        console.log(`[Brisa COO] Clinical summary generated for ${phone.substring(0, 6)}***`);
+      }
+    }
+  } catch (err) {
+    console.error("[Brisa COO] Clinical summary error:", err);
+  }
+}
+
 // ─── Helpers ───
 
 async function persistConversation(
@@ -247,7 +348,9 @@ async function persistConversation(
   phoneClean: string,
   messages: Array<{ role: string; content: string }>,
   rawMessage: string,
-  sentiment: string
+  sentiment: string,
+  intent: string,
+  affiliateTags: string[]
 ) {
   try {
     await supabase
@@ -255,15 +358,21 @@ async function persistConversation(
       .upsert({
         phone_number: phoneClean,
         messages: messages.slice(-50),
-        last_intent: detectIntent(rawMessage),
+        last_intent: intent,
+        sentiment,
         updated_at: new Date().toISOString(),
       }, { onConflict: "phone_number" });
+
+    const tags = [intent, `sentiment:${sentiment}`];
+    if (affiliateTags.length > 0) {
+      tags.push(...affiliateTags.filter(t => t.startsWith("affiliate:") || t === "brisa_assisted"));
+    }
 
     await supabase.from("leads_contatos").upsert({
       telefone: phoneClean,
       nome: phoneClean,
       origem: "whatsapp_brisa_coo",
-      tags: [detectIntent(rawMessage), `sentiment:${sentiment}`],
+      tags,
     }, { onConflict: "telefone" });
   } catch (err) {
     console.error("[Brisa COO] Persist error:", err);

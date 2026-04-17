@@ -159,6 +159,13 @@ export const FrogChatModal = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingText]);
 
+  // Persist conversation history to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem("pr_chat_history", JSON.stringify(messages.slice(-30)));
+    } catch { /* quota exceeded, ignore */ }
+  }, [messages]);
+
   useEffect(() => {
     const handler = () => setIsOpen(true);
     window.addEventListener("open-frog-chat", handler);

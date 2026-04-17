@@ -67,6 +67,14 @@ import draLuanaIntImg from "@/assets/dra-luana-integrativa.jpg";
 import drAndreIntImg from "@/assets/dr-andre-integrativa.jpg";
 import draCamilaIntImg from "@/assets/dra-camila-integrativa.jpg";
 import drThiagoIntImg from "@/assets/dr-thiago-integrativa.jpg";
+// Test doctors (auto fade-out via useRealProfessionals hook when real doctors register)
+import testBeatrizImg from "@/assets/test-dr-beatriz-souza.jpg";
+import testMarkImg from "@/assets/test-dr-mark-evans.jpg";
+import testElenaImg from "@/assets/test-dra-elena-rodriguez.jpg";
+import testDavidImg from "@/assets/test-dr-david-okafor.jpg";
+import testJiwooImg from "@/assets/test-dra-jiwoo-park.jpg";
+import testFelipeImg from "@/assets/test-dr-felipe-cardoso.jpg";
+import testLaylaImg from "@/assets/test-dra-layla-hassan.jpg";
 export type Professional = {
   id: string;
   name: string;

@@ -120,14 +120,25 @@ const detectIntent = (text: string): "booking" | "shopping" | "subscription" | n
 export const FrogChatModal = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: "Olá! 🐸👑 Sou o **Verdinho**, assistente IA da **Planta & Raiz**!\n\nPosso te ajudar com:\n- 🩺 Consultas e agendamentos\n- 💊 Cannabis medicinal\n- 🛒 Shopping e produtos\n- 📋 Cadastro e plataforma\n- 🧠 Saúde e bem-estar\n\nPergunte qualquer coisa!",
-      sender: "ai",
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    try {
+      const saved = localStorage.getItem("pr_chat_history");
+      if (saved) {
+        const parsed = JSON.parse(saved) as Message[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((m) => ({ ...m, timestamp: new Date(m.timestamp) }));
+        }
+      }
+    } catch { /* ignore */ }
+    return [
+      {
+        id: "1",
+        text: "Olá! 🐸👑 Sou o **Verdinho**, assistente IA da **Planta & Raiz**!\n\nPosso te ajudar com:\n- 🩺 Consultas e agendamentos\n- 💊 Cannabis medicinal\n- 🛒 Shopping e produtos\n- 📋 Cadastro e plataforma\n- 🧠 Saúde e bem-estar\n\nPergunte qualquer coisa!",
+        sender: "ai" as const,
+        timestamp: new Date(),
+      },
+    ];
+  });
   const [inputValue, setInputValue] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");
@@ -147,6 +158,13 @@ export const FrogChatModal = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingText]);
+
+  // Persist conversation history to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem("pr_chat_history", JSON.stringify(messages.slice(-30)));
+    } catch { /* quota exceeded, ignore */ }
+  }, [messages]);
 
   useEffect(() => {
     const handler = () => setIsOpen(true);
@@ -272,14 +290,16 @@ export const FrogChatModal = () => {
   }, [inputValue, sendMessage]);
 
   const clearChat = () => {
-    setMessages([
+    const initial = [
       {
         id: Date.now().toString(),
         text: "Chat limpo! 🐸 Como posso ajudar? 💚",
-        sender: "ai",
+        sender: "ai" as const,
         timestamp: new Date(),
       },
-    ]);
+    ];
+    setMessages(initial);
+    try { localStorage.removeItem("pr_chat_history"); } catch { /* ignore */ }
   };
 
   if (!isOpen) return null;
@@ -409,7 +429,11 @@ export const FrogChatModal = () => {
                 )}
                 {intent === "booking" && (
                   <button
-                    onClick={() => { setIsOpen(false); navigate("/agendamento"); }}
+                    onClick={() => {
+                      setIsOpen(false);
+                      const name = encodeURIComponent(localStorage.getItem("pr_lead_name") || "");
+                      navigate(name ? `/agendamento?nome=${name}` : "/agendamento");
+                    }}
                     className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-full bg-primary text-primary-foreground font-bold animate-pulse hover:animate-none transition-all"
                   >
                     <Calendar size={14} /> Agendar Agora — R$ 55

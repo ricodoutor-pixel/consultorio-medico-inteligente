@@ -60,17 +60,23 @@ export const OnboardingModal = () => {
   }, [allowedRoute, location.pathname]);
 
   const checkOnboarding = async () => {
+    // 1) Authenticated users: respect DB flag
     const { data: session } = await supabase.auth.getSession();
-    if (!session?.session?.user?.id) return;
+    if (session?.session?.user?.id) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", session.session.user.id)
+        .single();
+      if (profile && !profile.onboarding_completed) setOpen(true);
+      return;
+    }
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("onboarding_completed")
-      .eq("id", session.session.user.id)
-      .single();
-
-    if (profile && !profile.onboarding_completed) {
-      setOpen(true);
+    // 2) Anonymous visitors: open quiz once per browser (lead-capture)
+    const completedAnon = localStorage.getItem("pr_onboarding_anon_completed");
+    if (!completedAnon) {
+      // Small delay to avoid flashing on first paint
+      setTimeout(() => setOpen(true), 600);
     }
   };
 
@@ -83,6 +89,13 @@ export const OnboardingModal = () => {
         health_goal: goal,
         cannabis_experience: experience,
       }).eq("id", session.session.user.id);
+    } else {
+      // Persist anonymous answers for lead routing & remarketing
+      try {
+        localStorage.setItem("pr_onboarding_anon_completed", "true");
+        localStorage.setItem("pr_health_goal", goal);
+        localStorage.setItem("pr_cannabis_experience", experience);
+      } catch { /* ignore */ }
     }
     setSaving(false);
     setOpen(false);

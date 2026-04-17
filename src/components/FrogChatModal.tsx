@@ -120,14 +120,25 @@ const detectIntent = (text: string): "booking" | "shopping" | "subscription" | n
 export const FrogChatModal = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: "Olá! 🐸👑 Sou o **Verdinho**, assistente IA da **Planta & Raiz**!\n\nPosso te ajudar com:\n- 🩺 Consultas e agendamentos\n- 💊 Cannabis medicinal\n- 🛒 Shopping e produtos\n- 📋 Cadastro e plataforma\n- 🧠 Saúde e bem-estar\n\nPergunte qualquer coisa!",
-      sender: "ai",
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    try {
+      const saved = localStorage.getItem("pr_chat_history");
+      if (saved) {
+        const parsed = JSON.parse(saved) as Message[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((m) => ({ ...m, timestamp: new Date(m.timestamp) }));
+        }
+      }
+    } catch { /* ignore */ }
+    return [
+      {
+        id: "1",
+        text: "Olá! 🐸👑 Sou o **Verdinho**, assistente IA da **Planta & Raiz**!\n\nPosso te ajudar com:\n- 🩺 Consultas e agendamentos\n- 💊 Cannabis medicinal\n- 🛒 Shopping e produtos\n- 📋 Cadastro e plataforma\n- 🧠 Saúde e bem-estar\n\nPergunte qualquer coisa!",
+        sender: "ai" as const,
+        timestamp: new Date(),
+      },
+    ];
+  });
   const [inputValue, setInputValue] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");

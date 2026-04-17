@@ -1820,7 +1820,7 @@ export const professionals: Professional[] = [
     ],
   },
 
-  // ═══════ Medicina Integrativa (3) ═══════
+  // ═══════ Medicina Integrativa (7) ═══════
   {
     id: "int-1",
     name: "Dra. Mariana Castello",

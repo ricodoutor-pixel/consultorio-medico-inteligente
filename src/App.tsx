@@ -119,6 +119,7 @@ const FastTrackCheckout = lazy(() => import("./pages/FastTrackCheckout"));
 const AffiliateDashboard = lazy(() => import("./pages/AffiliateDashboard"));
 const PrescriptionCheckout = lazy(() => import("./pages/PrescriptionCheckout"));
 const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
+const ChatDrEdilson = lazy(() => import("./pages/ChatDrEdilson"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -209,6 +210,8 @@ const App = () => (
                 <Route path="/tratamento-dor-cronica" element={<TratamentoDorCronica />} />
                 <Route path="/tratamento-ansiedade-saude-mental" element={<TratamentoAnsiedadeSaudeMental />} />
                 <Route path="/tratamentos" element={<SEOCondicoes />} />
+                <Route path="/chat-dr-edilson" element={<ChatDrEdilson />} />
+                <Route path="/consultoria-breve" element={<ChatDrEdilson />} />
                 <Route path="/tratamentos/:condicao" element={<SEOCondicoes />} />
                 <Route path="/club" element={<Club />} />
                 <Route path="/deposits" element={<Deposits />} />

@@ -211,9 +211,9 @@ export const Navbar = () => {
         </div>
       </nav>
 
-      {/* MOBILE MENU OVERLAY */}
+      {/* MOBILE MENU OVERLAY - Embutido e Padronizado */}
       <div 
-        className={`fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl xl:hidden flex flex-col pt-20 pb-8 overflow-y-auto transition-all duration-300 ease-in-out ${
+        className={`fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl xl:hidden flex flex-col pt-[env(safe-area-inset-top,20px)] pb-[env(safe-area-inset-bottom,20px)] overflow-y-auto transition-all duration-300 ease-in-out ${
           isOpen ? "opacity-100 pointer-events-auto translate-x-0" : "opacity-0 pointer-events-none translate-x-full"
         }`}
       >
@@ -233,16 +233,16 @@ export const Navbar = () => {
             <FrogMascot size={73} mood="happy" onClick={() => { setIsOpen(false); openChat(); }} enableJumpToNav={false} />
           </div>
 
-          <div className="space-y-1 flex-1">
+          <div className="grid grid-cols-1 gap-1 flex-1">
             {links.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
-                className="flex items-center justify-between py-4 px-4 text-foreground font-black text-lg rounded-xl hover:bg-muted/50"
+                className="flex items-center justify-between py-3 px-4 text-foreground font-black text-base md:text-lg rounded-xl hover:bg-primary/10 transition-colors border border-transparent hover:border-primary/20"
                 onClick={() => setIsOpen(false)}
               >
-                <span>{link.label}</span>
-                <ChevronRight size={20} className="text-primary" />
+                <span className="tracking-tight uppercase">{link.label}</span>
+                <ChevronRight size={18} className="text-primary/50" />
               </NavLink>
             ))}
           </div>

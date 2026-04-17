@@ -75,8 +75,8 @@ const Index = () => {
     <div className="min-h-screen bg-background w-full overflow-x-hidden">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="hero-glow section-padding min-h-[60dvh] lg:min-h-[80dvh] flex items-start overflow-hidden pt-20 md:pt-24">
+      {/* Hero Section - Otimizado para Mobile/Desktop */}
+      <section className="hero-glow section-padding min-h-[70dvh] lg:min-h-[85dvh] flex items-start overflow-hidden pt-24 md:pt-32 pb-12 md:pb-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-14 items-start">
             
@@ -134,15 +134,15 @@ const Index = () => {
                 </motion.span>
               </Link>
 
-              <div className="relative group w-full flex flex-col items-center">
-                <div className="relative">
+              <div className="relative group w-full flex flex-col items-center mt-8 lg:mt-0">
+                <div className="relative scale-90 sm:scale-100 transition-transform duration-500">
                   <div className="absolute -inset-10 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-[80px] opacity-40 group-hover:opacity-70 transition duration-1000"></div>
                   <div className="relative z-10">
                     <HeroCarousel />
                   </div>
                 </div>
                 {/* Texto institucional abaixo do carrossel - apenas mobile */}
-                <p className="mt-4 text-center leading-relaxed font-display font-bold text-[clamp(0.75rem,1.8vw,1.1rem)] max-w-full lg:hidden mx-auto px-2">
+                <p className="mt-8 text-center leading-relaxed font-display font-bold text-[clamp(0.85rem,2vw,1.1rem)] max-w-full lg:hidden mx-auto px-4 bg-card/30 p-6 rounded-3xl border border-border/50 backdrop-blur-sm">
                   <span className="text-primary">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
                   <span className="text-[hsl(25,95%,60%)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
                   <span className="text-[hsl(280,80%,65%)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}

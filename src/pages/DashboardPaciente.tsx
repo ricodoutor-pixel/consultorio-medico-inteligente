@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, BellRing, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, FileText, ClipboardList, RefreshCw, MessageCircle, ArrowUpRight } from "lucide-react";
 import { PlanUpgradeCard } from "@/components/patient/PlanUpgradeCard";
+import { ProfileAvatarCard } from "@/components/patient/ProfileAvatarCard";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -185,15 +186,14 @@ const DashboardPaciente = () => {
       <section className="pb-8">
         <div className="container mx-auto px-4">
           <motion.div className="flex items-center justify-between flex-wrap gap-4 mb-6" initial="hidden" animate="visible" variants={fadeUp}>
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-green border border-green flex items-center justify-center">
-                <User size={28} className="text-primary" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-4xl font-display font-black text-foreground">Olá, {userName.split(" ")[0]}! 👋</h1>
-                <p className="text-sm text-muted-foreground">{completedAppts.length} consulta(s) realizadas</p>
-              </div>
-            </div>
+            <ProfileAvatarCard
+              userId={profile?.id}
+              fullName={userName}
+              phone={profile?.phone}
+              avatarUrl={profile?.avatar_url}
+              completedCount={completedAppts.length}
+              onUpdated={(url) => setProfile((p: any) => ({ ...p, avatar_url: url }))}
+            />
             <div className="flex gap-2">
               <Button variant="outline" size="sm" className="rounded-xl text-xs" onClick={handleLogout}>
                 <LogOut size={14} className="mr-1" /> Sair

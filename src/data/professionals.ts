@@ -63,6 +63,10 @@ import cuidSandraImg from "@/assets/cuid-sandra.jpg";
 import draMarianaIntImg from "@/assets/dra-mariana-integrativa.jpg";
 import drRobertoIntImg from "@/assets/dr-roberto-integrativa.jpg";
 import draBeatrizIntImg from "@/assets/dra-beatriz-integrativa.jpg";
+import draLuanaIntImg from "@/assets/dra-luana-integrativa.jpg";
+import drAndreIntImg from "@/assets/dr-andre-integrativa.jpg";
+import draCamilaIntImg from "@/assets/dra-camila-integrativa.jpg";
+import drThiagoIntImg from "@/assets/dr-thiago-integrativa.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -1816,7 +1820,7 @@ export const professionals: Professional[] = [
     ],
   },
 
-  // ═══════ Medicina Integrativa (3) ═══════
+  // ═══════ Medicina Integrativa (7) ═══════
   {
     id: "int-1",
     name: "Dra. Mariana Castello",
@@ -1898,6 +1902,115 @@ export const professionals: Professional[] = [
       { name: "Patrícia V.", rating: 5, text: "A aromaterapia com terpenos foi incrível para minha ansiedade." },
       { name: "Marcos R.", rating: 5, text: "Abordagem natural e muito eficaz." },
       { name: "Daniela C.", rating: 5, text: "Me sinto outra pessoa após o protocolo da Dra. Beatriz." },
+    ],
+  },
+  {
+    id: "int-4",
+    name: "Dra. Luana Verdejo",
+    category: "Medicina Integrativa",
+    bio: "Médica integrativa formada pela UNIFESP com especialização em Medicina Tradicional Chinesa e Fitocanabinologia. Atua há 10 anos com protocolos combinados de cannabis medicinal, acupuntura e meditação para dor crônica, ansiedade e burnout. Membro da SBMI.",
+    experience: "10 anos",
+    tags: ["MTC", "Fitocanabinologia", "Burnout", "Dor Crônica"],
+    price: "R$ 110,00",
+    priceValue: 110,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 380,
+    avatar: "LV",
+    imageUrl: draLuanaIntImg,
+    flags: ["🇧🇷"],
+    services: [
+      { name: "Consulta Integrativa", price: "R$ 110,00", desc: "Avaliação holística + plano canábico personalizado" },
+      { name: "Sessão MTC + CBD", price: "R$ 130", desc: "Acupuntura combinada com protocolo canábico" },
+      { name: "Retorno", price: "R$ 70", desc: "Acompanhamento e ajuste terapêutico" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Renata P.", rating: 5, text: "A Dra. Luana entende o paciente como um todo." },
+      { name: "Eduardo M.", rating: 5, text: "Combinação perfeita de MTC com cannabis." },
+    ],
+  },
+  {
+    id: "int-5",
+    name: "Dr. André Holanda",
+    category: "Medicina Integrativa",
+    bio: "Clínico geral com pós-graduação em Medicina Integrativa pelo Hospital Albert Einstein. Especialista em modulação do sistema endocanabinoide, fitoterapia e práticas mente-corpo. 12 anos atendendo pacientes com fibromialgia, enxaqueca e distúrbios do sono.",
+    experience: "12 anos",
+    tags: ["Endocanabinoide", "Fitoterapia", "Fibromialgia", "Sono"],
+    price: "R$ 100,00",
+    priceValue: 100,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.8,
+    consults: 510,
+    avatar: "AH",
+    imageUrl: drAndreIntImg,
+    flags: ["🇧🇷"],
+    services: [
+      { name: "Consulta Integrativa", price: "R$ 100,00", desc: "Avaliação completa + protocolo canábico-fitoterápico" },
+      { name: "Protocolo Sono", price: "R$ 130", desc: "Plano focado em insônia e qualidade do sono" },
+      { name: "Retorno", price: "R$ 65", desc: "Ajuste de dosagem e acompanhamento" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
+    reviews: [
+      { name: "Sandra L.", rating: 5, text: "Recuperei meu sono depois de anos de insônia." },
+      { name: "Paulo R.", rating: 5, text: "Excelente abordagem integrativa." },
+    ],
+  },
+  {
+    id: "int-6",
+    name: "Dra. Camila Ervas",
+    category: "Medicina Integrativa",
+    bio: "Médica homeopata e integrativa com formação pela AMHB. Combina homeopatia, fitoterapia e canabinoides para tratamento de transtornos emocionais, alergias e doenças autoimunes. Atendimento humanizado com escuta ampliada.",
+    experience: "9 anos",
+    tags: ["Homeopatia", "Autoimunes", "Alergias", "Escuta Ampliada"],
+    price: "R$ 90,00",
+    priceValue: 90,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 4.9,
+    consults: 290,
+    avatar: "CE",
+    imageUrl: draCamilaIntImg,
+    flags: ["🇧🇷"],
+    services: [
+      { name: "Consulta Homeopática", price: "R$ 90,00", desc: "Anamnese ampliada + protocolo homeopático e canábico" },
+      { name: "Protocolo Autoimune", price: "R$ 140", desc: "Plano integrativo para doenças autoimunes" },
+      { name: "Retorno", price: "R$ 60", desc: "Acompanhamento e reequilíbrio" },
+    ],
+    slots: ["08:00", "09:00", "10:00", "13:00", "14:00", "15:00"],
+    reviews: [
+      { name: "Vanessa T.", rating: 5, text: "Tratamento gentil e muito eficaz." },
+      { name: "Jorge A.", rating: 5, text: "A escuta da Dra. Camila já é terapêutica." },
+    ],
+  },
+  {
+    id: "int-7",
+    name: "Dr. Thiago Raízes",
+    category: "Medicina Integrativa",
+    bio: "Geriatra integrativo com 25 anos de prática. Pioneiro no uso de cannabis medicinal em pacientes idosos com Parkinson, Alzheimer e dor crônica. Formação em Medicina Antroposófica e Mindfulness aplicado à saúde do idoso.",
+    experience: "25 anos",
+    tags: ["Geriatria", "Parkinson", "Alzheimer", "Antroposófica"],
+    price: "R$ 130,00",
+    priceValue: 130,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511987131241",
+    rating: 5.0,
+    consults: 720,
+    avatar: "TR",
+    imageUrl: drThiagoIntImg,
+    flags: ["🇧🇷"],
+    services: [
+      { name: "Consulta Geriátrica Integrativa", price: "R$ 130,00", desc: "Avaliação completa do idoso + protocolo canábico" },
+      { name: "Protocolo Neurodegenerativo", price: "R$ 180", desc: "Plano para Parkinson/Alzheimer" },
+      { name: "Retorno", price: "R$ 80", desc: "Acompanhamento e ajuste" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Família Souza", rating: 5, text: "Devolveu qualidade de vida ao meu pai com Parkinson." },
+      { name: "Marta C.", rating: 5, text: "25 anos de experiência se notam em cada consulta." },
+      { name: "Hélio B.", rating: 5, text: "Médico raro, atencioso e competente." },
     ],
   },
 ];

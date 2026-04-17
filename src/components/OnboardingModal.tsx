@@ -80,23 +80,56 @@ export const OnboardingModal = () => {
     }
   };
 
+  const sendToBrisa = async (userId: string | null) => {
+    // Compor pré-prontuário com a Enfermeira Brisa para enviar ao médico prescritor
+    try {
+      const goalLabel = healthGoals.find(g => g.id === goal)?.label || goal;
+      const expLabel = experiences.find(e => e.id === experience)?.label || experience;
+      const leadName = (typeof window !== "undefined" && localStorage.getItem("pr_lead_name")) || "Visitante";
+      const leadPhone = (typeof window !== "undefined" && localStorage.getItem("pr_lead_phone")) || "";
+
+      const symptoms = `Objetivo de saúde: ${goalLabel}. Experiência prévia: ${expLabel}.`;
+      const preRecord = `🌿 PRÉ-PRONTUÁRIO (Quiz Brisa)\n\nPaciente: ${leadName}${leadPhone ? ` (${leadPhone})` : ""}\nObjetivo: ${goalLabel}\nExperiência com cannabis: ${expLabel}\nEspecialista sugerido: ${rec.specialist}\nPlano sugerido: ${rec.plan}\n\nEnviado automaticamente pela Enfermeira Brisa antes da consulta.`;
+
+      if (userId) {
+        await supabase.from("brisa_triages").insert({
+          patient_id: userId,
+          session_id: crypto.randomUUID(),
+          symptoms,
+          specialty: rec.specialist,
+          category: goal,
+          urgency: "normal",
+          pre_record: preRecord,
+          patient_info: { name: leadName, phone: leadPhone, goal, experience },
+          status: "completed",
+        });
+      }
+    } catch (err) {
+      console.error("[OnboardingModal] Falha ao enviar pré-prontuário para Brisa:", err);
+    }
+  };
+
   const completeOnboarding = async () => {
     setSaving(true);
     const { data: session } = await supabase.auth.getSession();
-    if (session?.session?.user?.id) {
+    const userId = session?.session?.user?.id ?? null;
+
+    if (userId) {
       await supabase.from("profiles").update({
         onboarding_completed: true,
         health_goal: goal,
         cannabis_experience: experience,
-      }).eq("id", session.session.user.id);
+      }).eq("id", userId);
     } else {
-      // Persist anonymous answers for lead routing & remarketing
       try {
         localStorage.setItem("pr_onboarding_anon_completed", "true");
         localStorage.setItem("pr_health_goal", goal);
         localStorage.setItem("pr_cannabis_experience", experience);
       } catch { /* ignore */ }
     }
+
+    await sendToBrisa(userId);
+
     setSaving(false);
     setOpen(false);
   };

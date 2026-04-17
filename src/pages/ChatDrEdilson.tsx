@@ -304,7 +304,7 @@ const ChatDrEdilson = () => {
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2">
             <button
               onClick={generateReferralPDF}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition"
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-xl font-bold hover:bg-primary/90 transition"
             >
               <Download className="w-4 h-4" />
               Download PDF de Encaminhamento

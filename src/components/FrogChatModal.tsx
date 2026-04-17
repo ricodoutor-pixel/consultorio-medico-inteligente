@@ -290,14 +290,16 @@ export const FrogChatModal = () => {
   }, [inputValue, sendMessage]);
 
   const clearChat = () => {
-    setMessages([
+    const initial = [
       {
         id: Date.now().toString(),
         text: "Chat limpo! 🐸 Como posso ajudar? 💚",
-        sender: "ai",
+        sender: "ai" as const,
         timestamp: new Date(),
       },
-    ]);
+    ];
+    setMessages(initial);
+    try { localStorage.removeItem("pr_chat_history"); } catch { /* ignore */ }
   };
 
   if (!isOpen) return null;

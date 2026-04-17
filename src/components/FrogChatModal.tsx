@@ -429,7 +429,11 @@ export const FrogChatModal = () => {
                 )}
                 {intent === "booking" && (
                   <button
-                    onClick={() => { setIsOpen(false); navigate("/agendamento"); }}
+                    onClick={() => {
+                      setIsOpen(false);
+                      const name = encodeURIComponent(localStorage.getItem("pr_lead_name") || "");
+                      navigate(name ? `/agendamento?nome=${name}` : "/agendamento");
+                    }}
                     className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-full bg-primary text-primary-foreground font-bold animate-pulse hover:animate-none transition-all"
                   >
                     <Calendar size={14} /> Agendar Agora — R$ 55

@@ -215,15 +215,15 @@ const ChatDrEdilson = () => {
                 CRM 10963 — Bolívia · Responsável Técnico
               </p>
             </div>
-            <span className="text-[10px] px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-500 font-semibold">
+            <span className="text-[10px] px-2 py-1 rounded-full bg-primary/10 text-primary font-semibold">
               ● ONLINE
             </span>
           </div>
 
           {/* Disclaimer banner */}
-          <div className="mb-3 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 flex gap-2">
-            <ShieldAlert className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-            <p className="text-[11px] leading-relaxed text-amber-200/90">{DISCLAIMER}</p>
+          <div className="mb-3 rounded-xl border border-primary/30 bg-primary/5 p-3 flex gap-2">
+            <ShieldAlert className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+            <p className="text-[11px] leading-relaxed text-foreground/80">{DISCLAIMER}</p>
           </div>
 
           {/* Patient name */}

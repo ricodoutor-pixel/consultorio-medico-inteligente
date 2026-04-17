@@ -26,10 +26,12 @@ interface Job {
   completed_at: string | null;
 }
 
-async function processNpsJob(supabase: ReturnType<typeof createClient>, job: Job) {
+// deno-lint-ignore no-explicit-any
+type DB = SupabaseClient<any, "public", any>;
+
+async function processNpsJob(supabase: DB, job: Job) {
   const { consultation_id, patient_id } = job.payload as { consultation_id: string; patient_id: string };
   
-  // Enviar notificação de NPS ao paciente
   await supabase.from("notifications").insert({
     user_id: patient_id,
     title: "📊 Como foi sua consulta?",
@@ -41,7 +43,7 @@ async function processNpsJob(supabase: ReturnType<typeof createClient>, job: Job
   return { sent: true, consultation_id };
 }
 
-async function processRevenueJob(supabase: ReturnType<typeof createClient>, job: Job) {
+async function processRevenueJob(supabase: DB, job: Job) {
   const { escrow_id } = job.payload as { escrow_id: string };
   
   const { data: escrow } = await supabase
@@ -50,13 +52,13 @@ async function processRevenueJob(supabase: ReturnType<typeof createClient>, job:
     .eq("id", escrow_id)
     .single();
 
-  if (!escrow || escrow.status !== "held") {
+  if (!escrow || (escrow as any).status !== "held") {
     return { skipped: true, reason: "Not in held status" };
   }
 
-  // Calcular split
-  const platformFee = Math.round(escrow.amount * 0.07 * 100) / 100;
-  const doctorPayout = Math.round((escrow.amount - platformFee) * 100) / 100;
+  const amount = (escrow as any).amount as number;
+  const platformFee = Math.round(amount * 0.07 * 100) / 100;
+  const doctorPayout = Math.round((amount - platformFee) * 100) / 100;
 
   await supabase
     .from("escrow_transactions")
@@ -71,7 +73,7 @@ async function processRevenueJob(supabase: ReturnType<typeof createClient>, job:
   return { processed: true, platformFee, doctorPayout };
 }
 
-async function processNotificationJob(supabase: ReturnType<typeof createClient>, job: Job) {
+async function processNotificationJob(supabase: DB, job: Job) {
   const { user_id, title, message, type, action_url } = job.payload as {
     user_id: string; title: string; message: string; type: string; action_url?: string;
   };
@@ -83,7 +85,7 @@ async function processNotificationJob(supabase: ReturnType<typeof createClient>,
   return { sent: true };
 }
 
-async function processPrescriptionJob(supabase: ReturnType<typeof createClient>, job: Job) {
+async function processPrescriptionJob(supabase: DB, job: Job) {
   const { prescription_id } = job.payload as { prescription_id: string };
 
   const { data: rx } = await supabase
@@ -94,9 +96,8 @@ async function processPrescriptionJob(supabase: ReturnType<typeof createClient>,
 
   if (!rx) return { skipped: true, reason: "Prescription not found" };
 
-  // Notify patient
   await supabase.from("notifications").insert({
-    user_id: rx.patient_id,
+    user_id: (rx as any).patient_id,
     title: "💊 Nova Prescrição Disponível",
     message: `Sua prescrição foi emitida. Confira os detalhes.`,
     type: "prescription",
@@ -106,7 +107,7 @@ async function processPrescriptionJob(supabase: ReturnType<typeof createClient>,
   return { notified: true, prescription_id };
 }
 
-const PROCESSORS: Record<string, (s: ReturnType<typeof createClient>, j: Job) => Promise<unknown>> = {
+const PROCESSORS: Record<string, (s: DB, j: Job) => Promise<unknown>> = {
   nps_dispatch: processNpsJob,
   revenue_calculator: processRevenueJob,
   notification_sender: processNotificationJob,

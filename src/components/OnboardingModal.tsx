@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,10 +46,18 @@ export const OnboardingModal = () => {
   const [goal, setGoal] = useState("");
   const [experience, setExperience] = useState("");
   const [saving, setSaving] = useState(false);
+  const location = useLocation();
+
+  // Onboarding "Qual seu objetivo de saúde?" só aparece em /profissionais
+  const allowedRoute = location.pathname.startsWith("/profissionais");
 
   useEffect(() => {
+    if (!allowedRoute) {
+      setOpen(false);
+      return;
+    }
     checkOnboarding();
-  }, []);
+  }, [allowedRoute, location.pathname]);
 
   const checkOnboarding = async () => {
     const { data: session } = await supabase.auth.getSession();

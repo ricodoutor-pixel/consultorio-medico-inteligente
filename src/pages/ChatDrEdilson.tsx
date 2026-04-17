@@ -33,6 +33,22 @@ const DISCLAIMER =
 
 const WHATSAPP_DR_EDILSON = "5511987131241";
 
+// 📲 Monta mensagem de handoff para WhatsApp com contexto da consultoria
+function buildWhatsAppHandoff(
+  patientName: string,
+  messages: ChatMessage[]
+): string {
+  const header = `Olá Dr. Edilson, ${
+    patientName || "o paciente"
+  } concluiu a consultoria paga (R$ 30 / $ 10) e está pronto para orientação.`;
+  const transcript = messages
+    .filter((m) => m.role !== "system")
+    .slice(-10) // últimas 10 mensagens (limite de URL)
+    .map((m) => `${m.role === "doctor" ? "Dr." : "Paciente"}: ${m.content}`)
+    .join("\n");
+  return `${header}\n\n— Resumo da anamnese —\n${transcript}`;
+}
+
 const ChatDrEdilson = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {

@@ -9,6 +9,17 @@ import { Helmet } from "react-helmet-async";
 import { Send, Download, ShieldAlert, Stethoscope, MessageCircle } from "lucide-react";
 import jsPDF from "jspdf";
 import drEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
+import { supabase } from "@/integrations/supabase/client";
+
+// 📋 Dados oficiais do Responsável Técnico
+const DR_EDILSON = {
+  fullName: "Dr. Edilson Bezerra da Silva",
+  crm: "CRM 10963 — Bolívia",
+  cpf: "009.536.834-51",
+  phone: "+55 11 98713-1241",
+  email: "contato@plantayraiz.com.br",
+  address: "Planta y Raiz Ltda. — São Paulo/SP, Brasil",
+};
 
 interface ChatMessage {
   id: string;
@@ -21,6 +32,22 @@ const DISCLAIMER =
   "Esta é uma consultoria de orientação técnica e integrativa. Para emissão de receitas e prescrições médicas válidas no seu país, você será encaminhado ao nosso corpo de médicos prescritores após esta breve sessão.";
 
 const WHATSAPP_DR_EDILSON = "5511987131241";
+
+// 📲 Monta mensagem de handoff para WhatsApp com contexto da consultoria
+function buildWhatsAppHandoff(
+  patientName: string,
+  messages: ChatMessage[]
+): string {
+  const header = `Olá Dr. Edilson, ${
+    patientName || "o paciente"
+  } concluiu a consultoria paga (R$ 30 / $ 10) e está pronto para orientação.`;
+  const transcript = messages
+    .filter((m) => m.role !== "system")
+    .slice(-10) // últimas 10 mensagens (limite de URL)
+    .map((m) => `${m.role === "doctor" ? "Dr." : "Paciente"}: ${m.content}`)
+    .join("\n");
+  return `${header}\n\n— Resumo da anamnese —\n${transcript}`;
+}
 
 const ChatDrEdilson = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -47,41 +74,55 @@ const ChatDrEdilson = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, isTyping]);
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
+  const sendMessage = async () => {
+    if (!input.trim() || isTyping) return;
     const userMsg: ChatMessage = {
       id: `p-${Date.now()}`,
       role: "patient",
       content: input.trim(),
       timestamp: new Date(),
     };
-    setMessages((m) => [...m, userMsg]);
+    const next = [...messages, userMsg];
+    setMessages(next);
     setInput("");
     setIsTyping(true);
 
-    // Resposta simulada do Dr. Edilson (anamnese estruturada)
-    setTimeout(() => {
-      const replies = [
-        "Entendido. Há quanto tempo você convive com esse sintoma e qual a intensidade (0 a 10)?",
-        "Compreendo. Você já fez uso prévio de Cannabis medicinal (CBD/THC) ou outros tratamentos?",
-        "Importante. Possui comorbidades, alergias ou faz uso contínuo de medicamentos?",
-        "Ótimo. Com base no seu relato, recomendo encaminhamento a um médico prescritor habilitado. Vou gerar seu Protocolo de Encaminhamento em PDF.",
-      ];
-      const idx = Math.min(
-        replies.length - 1,
-        messages.filter((m) => m.role === "patient").length
-      );
+    try {
+      const history = next
+        .filter((m) => m.role !== "system")
+        .map((m) => ({
+          role: m.role === "doctor" ? "assistant" : "user",
+          content: m.content,
+        }));
+
+      const { data, error } = await supabase.functions.invoke("dr-edilson-chat", {
+        body: { messages: history, patientName: patientName || undefined },
+      });
+
+      if (error) throw error;
+      const reply =
+        data?.reply ??
+        "Desculpe, tive um problema técnico. Pode repetir sua última mensagem?";
+
+      setMessages((m) => [
+        ...m,
+        { id: `d-${Date.now()}`, role: "doctor", content: reply, timestamp: new Date() },
+      ]);
+    } catch (e) {
+      console.error("dr-edilson-chat error:", e);
       setMessages((m) => [
         ...m,
         {
           id: `d-${Date.now()}`,
           role: "doctor",
-          content: replies[idx],
+          content:
+            "Tive uma instabilidade momentânea. Vamos seguir: pode me contar há quanto tempo convive com esse sintoma e qual a intensidade (0 a 10)?",
           timestamp: new Date(),
         },
       ]);
+    } finally {
       setIsTyping(false);
-    }, 1200);
+    }
   };
 
   const generateReferralPDF = () => {
@@ -114,9 +155,13 @@ const ChatDrEdilson = () => {
     y += 6;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text("Dr. Edilson Bezerra da Silva", margin, y);
+    doc.text(DR_EDILSON.fullName, margin, y);
     y += 5;
-    doc.text("CRM 10963 — Bolívia | Cannabis Medicinal & Medicina Integrativa", margin, y);
+    doc.text(`${DR_EDILSON.crm} | CPF: ${DR_EDILSON.cpf}`, margin, y);
+    y += 5;
+    doc.text("Cannabis Medicinal & Medicina Integrativa", margin, y);
+    y += 5;
+    doc.text(`Tel: ${DR_EDILSON.phone}  |  E-mail: ${DR_EDILSON.email}`, margin, y);
     y += 10;
 
     doc.setFont("helvetica", "bold");
@@ -163,22 +208,38 @@ const ChatDrEdilson = () => {
       y += 4;
     });
 
-    y = Math.max(y + 12, 250);
+    y = Math.max(y + 12, 245);
     doc.setDrawColor(120, 120, 120);
     doc.line(margin, y, margin + 80, y);
     y += 5;
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
-    doc.text("Dr. Edilson Bezerra da Silva", margin, y);
+    doc.text(DR_EDILSON.fullName, margin, y);
     y += 4;
     doc.setFont("helvetica", "normal");
-    doc.text("CRM 10963 — Bolívia | Responsável Técnico Planta y Raiz", margin, y);
+    doc.text(`${DR_EDILSON.crm} · CPF ${DR_EDILSON.cpf}`, margin, y);
+    y += 4;
+    doc.text("Responsável Técnico — Planta y Raiz Ltda.", margin, y);
+    y += 4;
+    doc.setFontSize(7);
+    doc.setTextColor(120, 120, 120);
+    doc.text(
+      "Assinatura eletrônica padrão — validada digitalmente pela plataforma Planta y Raiz.",
+      margin,
+      y
+    );
 
     const footerY = doc.internal.pageSize.getHeight() - 10;
     doc.setFontSize(7);
     doc.setTextColor(140, 140, 140);
     doc.text(
-      "Documento gerado eletronicamente — plantayraiz.com.br | Encaminhamento sem valor de prescrição",
+      `${DR_EDILSON.address} · plantayraiz.com.br · ${DR_EDILSON.email} · ${DR_EDILSON.phone}`,
+      pageWidth / 2,
+      footerY - 4,
+      { align: "center" }
+    );
+    doc.text(
+      "Documento gerado eletronicamente — Encaminhamento sem valor de prescrição",
       pageWidth / 2,
       footerY,
       { align: "center" }
@@ -311,14 +372,14 @@ const ChatDrEdilson = () => {
             </button>
             <a
               href={`https://wa.me/${WHATSAPP_DR_EDILSON}?text=${encodeURIComponent(
-                "Olá Dr. Edilson, acabei de realizar minha consultoria breve na plataforma e gostaria de orientações sobre o próximo passo."
+                buildWhatsAppHandoff(patientName, messages)
               )}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 px-4 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-muted transition"
             >
               <MessageCircle className="w-4 h-4" />
-              Falar no WhatsApp
+              Falar no WhatsApp (com contexto)
             </a>
           </div>
         </div>

@@ -177,7 +177,7 @@ const App = () => (
                 <Route path="/dashboard-especialista" element={<SpecialistDashboard />} />
                 <Route path="/influenciadores" element={<InfluencerDashboard />} />
                 <Route path="/usuarios-online" element={<OnlineUsers />} />
-                <Route path="/admin-ceo" element={<AdminDashboard />} />
+                <Route path="/admin-ceo" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
                 <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
                 <Route path="/admin-login" element={<AdminLogin />} />
@@ -238,7 +238,7 @@ const App = () => (
                 <Route path="/admin/bi" element={<AdminRoute><AdminBI /></AdminRoute>} />
                 <Route path="/health" element={<AdminRoute><HealthCheck /></AdminRoute>} />
                 <Route path="/admin/automations" element={<AdminRoute><AutomationsDashboard /></AdminRoute>} />
-                <Route path="/admin/omni-channel" element={<OmniChannelDashboard />} />
+                <Route path="/admin/omni-channel" element={<AdminRoute><OmniChannelDashboard /></AdminRoute>} />
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
                 <Route path="/quiz" element={<QuizTriagem />} />

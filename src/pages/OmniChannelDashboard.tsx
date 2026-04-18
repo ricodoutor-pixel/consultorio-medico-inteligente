@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EdgeFunctionStatusGrid } from "@/components/admin/EdgeFunctionStatusGrid";
 import { SocialAnalyticsModule } from "@/components/admin/SocialAnalyticsModule";
@@ -10,80 +8,17 @@ import { GrowthLoopsModule } from "@/components/admin/GrowthLoopsModule";
 import { AutomationManagerModule } from "@/components/admin/AutomationManagerModule";
 import { ClickHeatmapModule } from "@/components/admin/ClickHeatmapModule";
 import { BrisaReportsModule } from "@/components/admin/BrisaReportsModule";
-import { Activity, BarChart3, Globe, Key, Shield, LogOut, Zap, Bot, Flame, Brain } from "lucide-react";
+import { Activity, BarChart3, Globe, Key, LogOut, Zap, Bot, Flame, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const OmniChannelDashboard = () => {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [password, setPassword] = useState("");
-  const [checking, setChecking] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const { data } = await supabase.rpc("has_role", {
-          _user_id: session.user.id,
-          _role: "admin",
-        });
-        if (data) {
-          setAuthenticated(true);
-        }
-      }
-      setChecking(false);
-    };
-    checkAuth();
-  }, []);
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === "manus2026" || password === "plantaraiz") {
-      setAuthenticated(true);
-      toast.success("Acesso autorizado");
-    } else {
-      toast.error("Senha incorreta");
-    }
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/admin-login");
   };
-
-  if (checking) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="w-6 h-6 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
-      </div>
-    );
-  }
-
-  if (!authenticated) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-        <div className="w-full max-w-sm">
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-xl bg-blue-600/20 flex items-center justify-center mx-auto mb-3">
-              <Shield className="w-6 h-6 text-blue-400" />
-            </div>
-            <h1 className="text-lg font-semibold text-slate-200">Omni-Channel Control</h1>
-            <p className="text-xs text-slate-500 mt-1">Dashboard de Automação — Acesso Restrito</p>
-          </div>
-          <form onSubmit={handleLogin} className="space-y-3">
-            <Input
-              type="password"
-              placeholder="Senha de acesso"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-slate-800/50 border-slate-700 text-slate-200 placeholder:text-slate-600 h-10"
-              autoFocus
-            />
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 h-10 text-sm">
-              Acessar Dashboard
-            </Button>
-          </form>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200">
@@ -107,7 +42,7 @@ const OmniChannelDashboard = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => { setAuthenticated(false); navigate("/"); }}
+              onClick={handleLogout}
               className="text-slate-500 hover:text-slate-300 h-7 text-xs"
             >
               <LogOut className="w-3 h-3" />
@@ -145,33 +80,13 @@ const OmniChannelDashboard = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="growth">
-            <GrowthLoopsModule />
-          </TabsContent>
-
-          <TabsContent value="automations">
-            <AutomationManagerModule />
-          </TabsContent>
-
-          <TabsContent value="analytics">
-            <SocialAnalyticsModule />
-          </TabsContent>
-
-          <TabsContent value="heatmap">
-            <ClickHeatmapModule />
-          </TabsContent>
-
-          <TabsContent value="visitors">
-            <VisitorTrackingModule />
-          </TabsContent>
-
-          <TabsContent value="tokens">
-            <TokenManagerModule />
-          </TabsContent>
-
-          <TabsContent value="brisa">
-            <BrisaReportsModule />
-          </TabsContent>
+          <TabsContent value="growth"><GrowthLoopsModule /></TabsContent>
+          <TabsContent value="automations"><AutomationManagerModule /></TabsContent>
+          <TabsContent value="analytics"><SocialAnalyticsModule /></TabsContent>
+          <TabsContent value="heatmap"><ClickHeatmapModule /></TabsContent>
+          <TabsContent value="visitors"><VisitorTrackingModule /></TabsContent>
+          <TabsContent value="tokens"><TokenManagerModule /></TabsContent>
+          <TabsContent value="brisa"><BrisaReportsModule /></TabsContent>
         </Tabs>
       </div>
     </div>

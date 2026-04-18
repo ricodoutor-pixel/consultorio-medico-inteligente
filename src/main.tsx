@@ -48,14 +48,45 @@ const isPreviewHost =
   window.location.hostname.includes("id-preview--") ||
   window.location.hostname.includes("lovableproject.com");
 
-if (isPreviewHost || isInIframe) {
-  navigator.serviceWorker?.getRegistrations().then((regs) => {
-    regs.forEach((r) => r.unregister());
-  });
-} else {
-  // Registrar Service Worker apenas em produção
-  registerServiceWorker();
+// 🚨 MOBILE FIX: Limpa SWs/caches antigos SEMPRE antes de registrar o novo.
+// Mobile (iOS Safari + Android Chrome) costuma manter SWs zumbis que servem
+// HTML stale apontando para bundles JS que não existem mais → tela escura.
+async function cleanStaleServiceWorkers() {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    // Em preview/iframe: remove tudo e sai
+    if (isPreviewHost || isInIframe) {
+      await Promise.all(regs.map((r) => r.unregister()));
+      return;
+    }
+    // Em produção: remove caches antigos que não batem com a versão atual
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter((k) => !k.includes('plantayraiz-v2.0'))
+          .map((k) => caches.delete(k))
+      );
+    }
+  } catch (e) {
+    console.warn('[PWA] cleanup failed:', e);
+  }
 }
+
+cleanStaleServiceWorkers().then(() => {
+  if (!isPreviewHost && !isInIframe) {
+    registerServiceWorker();
+  }
+});
+
+// 🛡️ Failsafe global: erros não tratados no boot não devem deixar tela preta
+window.addEventListener('error', (e) => {
+  console.error('[Global Error]', e.message);
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('[Unhandled Promise]', e.reason);
+});
 
 createRoot(document.getElementById("root")!).render(
   <>

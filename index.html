@@ -4,24 +4,28 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id=GTM-MKSBS7P';f.parentNode.insertBefore(j,f );
-    })(window,document,'script','dataLayer','GTM-MKSBS7P');</script>
-    <!-- End Google Tag Manager -->
-
-    <!-- Google Analytics 4 (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QY3HFCG64L"></script>
+    <!-- Analytics deferred — load AFTER first paint to unblock Facebook/Instagram in-app browser -->
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag( ){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-QY3HFCG64L', {
-        'page_path': window.location.pathname,
-        'page_title': document.title
-      });
+      function gtag(){dataLayer.push(arguments);}
+      function loadAnalytics(){
+        // Google Tag Manager (deferred)
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+        j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id=GTM-MKSBS7P';
+        f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-MKSBS7P');
+        // GA4 (deferred)
+        var ga=document.createElement('script');ga.async=true;
+        ga.src='https://www.googletagmanager.com/gtag/js?id=G-QY3HFCG64L';
+        document.head.appendChild(ga);
+        gtag('js', new Date());
+        gtag('config', 'G-QY3HFCG64L', {page_path: window.location.pathname});
+      }
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadAnalytics, {timeout: 3000});
+      } else {
+        window.addEventListener('load', function(){ setTimeout(loadAnalytics, 1500); });
+      }
     </script>
 
     <!-- Meta Tags -->
@@ -85,8 +89,9 @@
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
     <link rel="preconnect" href="https://meet.jitsi.si" />
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Google Fonts (non-blocking — async load via media swap trick) -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" /></noscript>
 
     <!-- Structured Data (Schema.org — MedicalOrganization + MedicalBusiness) -->
     <script type="application/ld+json">
@@ -220,7 +225,7 @@
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "Customer Service",
-        "telephone": "+55 11 98713-1241",
+        "telephone": "+5511991363154",
         "email": "contato@plantayraiz.com.br"
       },
       "sameAs": [
@@ -240,7 +245,7 @@
       "description": "Médico especialista em cannabis medicinal e telemedicina. Responsável técnico da Planta & Raiz.",
       "url": "https://plantayraiz.com.br/profissionais",
       "image": "https://plantayraiz.com.br/og-image.png",
-      "telephone": "+55 11 98713-1241",
+      "telephone": "+5511991363154",
       "email": "contato@plantayraiz.com.br",
       "medicalSpecialty": [
         {

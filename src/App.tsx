@@ -213,7 +213,7 @@ const App = () => (
                 <Route path="/chat-dr-edilson" element={<ChatDrEdilson />} />
                 <Route path="/consultoria-breve" element={<ChatDrEdilson />} />
                 <Route path="/tratamentos/:condicao" element={<SEOCondicoes />} />
-                <Route path="/club" element={<Club />} />
+                <Route path="/club" element={<ErrorBoundary><Club /></ErrorBoundary>} />
                 <Route path="/deposits" element={<Deposits />} />
                 <Route path="/cart-checkout" element={<CartCheckout />} />
                 <Route path="/payment/success" element={<PaymentSuccess />} />

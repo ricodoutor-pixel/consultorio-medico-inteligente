@@ -193,19 +193,36 @@ const Club = () => {
   }, [user]);
 
   const loadPosts = async () => {
-    const { data } = await supabase.from("club_posts").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(20);
-    if (data && data.length > 0) setPosts(data);
-    else setPosts(staticPosts);
+    try {
+      const { data, error } = await supabase.from("club_posts").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(20);
+      if (error) throw error;
+      if (data && data.length > 0) setPosts(data);
+      else setPosts(staticPosts);
+    } catch (err) {
+      console.warn("[Club] loadPosts fallback:", err);
+      setPosts(staticPosts);
+    }
   };
 
   const loadNotifications = async () => {
-    const { data } = await supabase.from("club_notifications").select("*").eq("user_id", user?.id).eq("is_read", false).order("created_at", { ascending: false });
-    if (data) setNotifications(data);
+    if (!user?.id) return;
+    try {
+      const { data, error } = await supabase.from("club_notifications").select("*").eq("user_id", user.id).eq("is_read", false).order("created_at", { ascending: false });
+      if (error) throw error;
+      if (data) setNotifications(data);
+    } catch (err) {
+      console.warn("[Club] loadNotifications skipped:", err);
+    }
   };
 
   const loadComments = async (postId: string) => {
-    const { data } = await supabase.from("club_post_comments").select("*").eq("post_id", postId).eq("status", "active").order("created_at", { ascending: true });
-    if (data) setComments((prev) => ({ ...prev, [postId]: data }));
+    try {
+      const { data, error } = await supabase.from("club_post_comments").select("*").eq("post_id", postId).eq("status", "active").order("created_at", { ascending: true });
+      if (error) throw error;
+      if (data) setComments((prev) => ({ ...prev, [postId]: data }));
+    } catch (err) {
+      console.warn("[Club] loadComments skipped:", err);
+    }
   };
 
   const handleCreatePost = async () => {

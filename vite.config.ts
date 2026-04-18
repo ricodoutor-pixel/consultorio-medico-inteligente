@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 // import obfuscator from "vite-plugin-obfuscator";
@@ -6,10 +6,20 @@ import path from "path";
 // Nota: componentTagger removido - não é necessário em produção e causa falha no Hostinger
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  const supabaseUrl = env.VITE_SUPABASE_URL || env.SUPABASE_URL || "https://shmbwdjuddvquszwkvuq.supabase.co";
+  const supabasePublishableKey = env.VITE_SUPABASE_PUBLISHABLE_KEY || env.SUPABASE_PUBLISHABLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobWJ3ZGp1ZGR2cXVzendrdnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE4MDksImV4cCI6MjA4Nzg2NzgwOX0.wGL0NQi2gKWyiC4L1ca1xxzSvEbvq2Uc8jvM7XOH9xQ";
+
+  return {
+  base: "/",
   server: {
     host: "::",
     port: 8080,
+  },
+  define: {
+    "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
+    "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabasePublishableKey),
   },
   plugins: [
     react(),
@@ -20,6 +30,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    target: ["es2020", "chrome88", "edge88", "firefox78", "safari14"],
     minify: "terser",
     cssMinify: false,
     chunkSizeWarningLimit: 1000,
@@ -52,4 +63,5 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
-}));
+};
+});

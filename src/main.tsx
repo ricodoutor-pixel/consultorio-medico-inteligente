@@ -48,14 +48,34 @@ const isPreviewHost =
   window.location.hostname.includes("id-preview--") ||
   window.location.hostname.includes("lovableproject.com");
 
-if (isPreviewHost || isInIframe) {
-  navigator.serviceWorker?.getRegistrations().then((regs) => {
-    regs.forEach((r) => r.unregister());
-  });
-} else {
-  // Registrar Service Worker apenas em produção
-  registerServiceWorker();
-}
+// 🛡️ Mobile safety: ALWAYS purge stale service workers + caches on every load.
+// This prevents the #1 cause of "tela escura" on mobile: an old SW serving a
+// broken cached build. After purge, only re-register in real production.
+(async () => {
+  try {
+    if ("serviceWorker" in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      // Force unregister stale workers (cache busting)
+      await Promise.all(regs.map((r) => r.unregister()));
+    }
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      // Drop old plantayraiz caches (kept names like plantayraiz-v2.0)
+      await Promise.all(
+        keys
+          .filter((k) => k.startsWith("plantayraiz-"))
+          .map((k) => caches.delete(k))
+      );
+    }
+  } catch (e) {
+    console.warn("[sw-cleanup] failed:", e);
+  }
+
+  if (!isPreviewHost && !isInIframe) {
+    // Re-register only on real production domain (not iframe/preview)
+    registerServiceWorker();
+  }
+})();
 
 createRoot(document.getElementById("root")!).render(
   <>

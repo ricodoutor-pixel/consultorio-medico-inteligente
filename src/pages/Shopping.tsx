@@ -259,7 +259,7 @@ const ProductDetail = ({ id }: { id: string }) => {
               <img src={resolveImg(images[mainImg])} alt={product.name} className="w-full h-full object-contain bg-muted/5 p-4 sm:p-6" />
             </div>
           </Card>
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="hidden sm:flex gap-2 overflow-x-auto pb-1">
             {images.map((img, i) => (
               <button
                 key={i}

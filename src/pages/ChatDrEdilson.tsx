@@ -4,9 +4,10 @@
  * Inclui disclaimer legal automático e geração de PDF de Encaminhamento.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Send, Download, ShieldAlert, Stethoscope, MessageCircle } from "lucide-react";
+import { useSearchParams, Link } from "react-router-dom";
+import { Send, Download, ShieldAlert, Stethoscope, MessageCircle, Lock } from "lucide-react";
 import jsPDF from "jspdf";
 import drEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,17 +34,18 @@ const DISCLAIMER =
 
 const WHATSAPP_DR_EDILSON = "5511987131241";
 
-// 📲 Monta mensagem de handoff para WhatsApp com contexto da consultoria
+// 📲 Monta mensagem de handoff para WhatsApp com contexto + ID de pagamento confirmado
 function buildWhatsAppHandoff(
   patientName: string,
-  messages: ChatMessage[]
+  messages: ChatMessage[],
+  paymentId: string
 ): string {
   const header = `Olá Dr. Edilson, ${
     patientName || "o paciente"
-  } concluiu a consultoria paga (R$ 30 / $ 10) e está pronto para orientação.`;
+  } concluiu a consultoria paga e está pronto para orientação. [ID_PAGAMENTO_CONFIRMADO_${paymentId}]`;
   const transcript = messages
     .filter((m) => m.role !== "system")
-    .slice(-10) // últimas 10 mensagens (limite de URL)
+    .slice(-10)
     .map((m) => `${m.role === "doctor" ? "Dr." : "Paciente"}: ${m.content}`)
     .join("\n");
   return `${header}\n\n— Resumo da anamnese —\n${transcript}`;
@@ -68,7 +70,48 @@ const ChatDrEdilson = () => {
   const [input, setInput] = useState("");
   const [patientName, setPatientName] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [paymentVerified, setPaymentVerified] = useState(false);
+  const [verifying, setVerifying] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [searchParams] = useSearchParams();
+
+  // 🔒 Gate de pagamento: exige ?payment_id=xxx&status=approved (vindo do redirect Mercado Pago)
+  const paymentId = useMemo(() => {
+    return (
+      searchParams.get("payment_id") ||
+      searchParams.get("collection_id") ||
+      ""
+    );
+  }, [searchParams]);
+  const paymentStatus = searchParams.get("status") || searchParams.get("collection_status") || "";
+
+  useEffect(() => {
+    // Permite acesso se: (a) payment_id presente + status approved, OU (b) usuário autenticado com assinatura ativa
+    const verify = async () => {
+      try {
+        if (paymentId && (paymentStatus === "approved" || paymentStatus === "success")) {
+          setPaymentVerified(true);
+        } else {
+          // Fallback: checar assinatura ativa do usuário logado
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { data: sub } = await supabase
+              .from("health_subscriptions")
+              .select("status")
+              .eq("user_id", user.id)
+              .eq("status", "active")
+              .maybeSingle();
+            if (sub) setPaymentVerified(true);
+          }
+        }
+      } catch (err) {
+        console.warn("[ChatDrEdilson] payment verify error:", err);
+      } finally {
+        setVerifying(false);
+      }
+    };
+    verify();
+  }, [paymentId, paymentStatus]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -370,18 +413,34 @@ const ChatDrEdilson = () => {
               <Download className="w-4 h-4" />
               Download PDF de Encaminhamento
             </button>
-            <a
-              href={`https://wa.me/${WHATSAPP_DR_EDILSON}?text=${encodeURIComponent(
-                buildWhatsAppHandoff(patientName, messages)
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-muted transition"
-            >
-              <MessageCircle className="w-4 h-4" />
-              Falar no WhatsApp (com contexto)
-            </a>
+            {paymentVerified ? (
+              <a
+                href={`https://wa.me/${WHATSAPP_DR_EDILSON}?text=${encodeURIComponent(
+                  buildWhatsAppHandoff(patientName, messages, paymentId || "ASSINANTE_ATIVO")
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-muted transition"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Falar no WhatsApp (com contexto)
+              </a>
+            ) : (
+              <Link
+                to="/agendamento"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-muted border border-border text-muted-foreground rounded-xl font-bold hover:bg-muted/80 transition"
+                title="Disponível após confirmação de pagamento"
+              >
+                <Lock className="w-4 h-4" />
+                Liberar WhatsApp (pagar consultoria)
+              </Link>
+            )}
           </div>
+          {!paymentVerified && !verifying && (
+            <p className="mt-2 text-[11px] text-muted-foreground text-center">
+              🔒 O contato direto com o Dr. Edilson é liberado apenas após confirmação do pagamento da consultoria.
+            </p>
+          )}
         </div>
       </div>
     </>

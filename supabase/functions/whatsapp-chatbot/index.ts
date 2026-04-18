@@ -151,6 +151,20 @@ Deno.serve(async (req) => {
       return twimlResponse("🌿 Olá! Sou a Brisa, Diretora Operacional da Planta & Raiz. Como posso ajudar você hoje?");
     }
 
+    // 🚨 FILTRO DE EMERGÊNCIA (BIOÉTICA) — interrompe funil ANTES de chamar IA
+    const EMERGENCY_RX = /\b(infarto|infartando|ataque cardíaco|avc|derrame|suic[ií]dio|me matar|quero morrer|n[ãa]o consigo respirar|falta de ar grave|convuls[ãa]o|overdose|envenenamento|sangrando muito|engasgad)/i;
+    if (EMERGENCY_RX.test(messageBody)) {
+      console.warn(`[Brisa COO] 🚨 EMERGÊNCIA detectada de ${from}: "${messageBody.substring(0, 100)}"`);
+      return twimlResponse(
+        "🚨 *ATENÇÃO — SITUAÇÃO DE EMERGÊNCIA*\n\n" +
+        "Este é um serviço de orientação. Em caso de emergência médica, ligue AGORA:\n\n" +
+        "📞 *SAMU: 192*\n" +
+        "🚒 *Bombeiros: 193*\n\n" +
+        "Ou procure o hospital mais próximo imediatamente.\n\n" +
+        "Sua vida é prioridade. 💚"
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       console.error("[Brisa COO] CRITICAL: LOVABLE_API_KEY missing");

@@ -413,18 +413,34 @@ const ChatDrEdilson = () => {
               <Download className="w-4 h-4" />
               Download PDF de Encaminhamento
             </button>
-            <a
-              href={`https://wa.me/${WHATSAPP_DR_EDILSON}?text=${encodeURIComponent(
-                buildWhatsAppHandoff(patientName, messages)
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-muted transition"
-            >
-              <MessageCircle className="w-4 h-4" />
-              Falar no WhatsApp (com contexto)
-            </a>
+            {paymentVerified ? (
+              <a
+                href={`https://wa.me/${WHATSAPP_DR_EDILSON}?text=${encodeURIComponent(
+                  buildWhatsAppHandoff(patientName, messages, paymentId || "ASSINANTE_ATIVO")
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-muted transition"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Falar no WhatsApp (com contexto)
+              </a>
+            ) : (
+              <Link
+                to="/agendamento"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-muted border border-border text-muted-foreground rounded-xl font-bold hover:bg-muted/80 transition"
+                title="Disponível após confirmação de pagamento"
+              >
+                <Lock className="w-4 h-4" />
+                Liberar WhatsApp (pagar consultoria)
+              </Link>
+            )}
           </div>
+          {!paymentVerified && !verifying && (
+            <p className="mt-2 text-[11px] text-muted-foreground text-center">
+              🔒 O contato direto com o Dr. Edilson é liberado apenas após confirmação do pagamento da consultoria.
+            </p>
+          )}
         </div>
       </div>
     </>

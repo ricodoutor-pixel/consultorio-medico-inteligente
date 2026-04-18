@@ -2,17 +2,21 @@ import { useEffect, useState } from "react";
 
 /**
  * Splash / Loader screen — shows the Planta y Raiz brand while the app hydrates.
- * Fades out automatically after the app is ready.
+ * Removes itself as soon as React mounts (fast fade-out) to avoid the
+ * "tela escura" perception on the homepage.
  */
 export function CustomLoader() {
   const [visible, setVisible] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setFadeOut(true), 800);
-    const remove = setTimeout(() => setVisible(false), 1200);
+    // Hide as soon as the first paint happens (next animation frame).
+    const raf = requestAnimationFrame(() => {
+      setFadeOut(true);
+    });
+    const remove = setTimeout(() => setVisible(false), 350);
     return () => {
-      clearTimeout(timer);
+      cancelAnimationFrame(raf);
       clearTimeout(remove);
     };
   }, []);
@@ -21,19 +25,18 @@ export function CustomLoader() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background transition-opacity duration-400 ${
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background transition-opacity duration-300 ${
         fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
       aria-label="Carregando Planta y Raiz"
+      aria-hidden={fadeOut}
     >
-      {/* Logo / Brand */}
       <div className="flex flex-col items-center gap-4">
         <span className="text-4xl font-display font-black tracking-tight text-foreground">
           🌿 <span className="text-primary">Planta</span>{" "}
           <span className="text-muted-foreground">y Raiz</span>
         </span>
 
-        {/* Spinner */}
         <div className="relative h-10 w-10">
           <div className="absolute inset-0 rounded-full border-4 border-muted" />
           <div className="absolute inset-0 rounded-full border-4 border-t-primary animate-spin" />

@@ -15,9 +15,15 @@ export function CustomLoader() {
       setFadeOut(true);
     });
     const remove = setTimeout(() => setVisible(false), 350);
+    // 🛡️ Safety net: never block UI longer than 5s, even if React fails to hydrate.
+    const safety = setTimeout(() => {
+      setFadeOut(true);
+      setVisible(false);
+    }, 5000);
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(remove);
+      clearTimeout(safety);
     };
   }, []);
 

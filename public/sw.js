@@ -1,15 +1,12 @@
 /**
- * 🐸 Planta y Raiz — Service Worker v2.0
- * Cache inteligente + atualização dinâmica de ícones
- * Protocolo: Cache-First com Network Fallback
+ * 🐸 Planta y Raiz — Service Worker v3.1
+ * Mobile hotfix: evita servir HTML antigo em Android/iOS.
  */
 
-const CACHE_VERSION = 'plantayraiz-v2.0';
-const DYNAMIC_CACHE = 'plantayraiz-dynamic-v2.0';
+const STATIC_CACHE = 'plantayraiz-static-v3.1';
+const RUNTIME_CACHE = 'plantayraiz-runtime-v3.1';
 
-// Assets essenciais para cache imediato
 const PRECACHE_ASSETS = [
-  '/',
   '/manifest.json',
   '/favicon.svg',
   '/favicon.png',
@@ -20,110 +17,103 @@ const PRECACHE_ASSETS = [
   '/og-image.png'
 ];
 
-// Instalação: pré-cacheia assets essenciais
 self.addEventListener('install', (event) => {
-  console.log('[SW] Instalando Service Worker v2.0...');
+  console.log('[SW] Instalando Service Worker v3.1...');
   event.waitUntil(
-    caches.open(CACHE_VERSION)
+    caches.open(STATIC_CACHE)
       .then((cache) => cache.addAll(PRECACHE_ASSETS))
-      .then(() => self.skipWaiting()) // Ativa imediatamente
+      .then(() => self.skipWaiting())
   );
 });
 
-// Ativação: limpa caches antigos
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Ativando Service Worker v2.0...');
+  console.log('[SW] Ativando Service Worker v3.1...');
   event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
+    caches.keys()
+      .then((cacheNames) => Promise.all(
         cacheNames
-          .filter((name) => name !== CACHE_VERSION && name !== DYNAMIC_CACHE)
-          .map((name) => {
-            console.log('[SW] Removendo cache antigo:', name);
-            return caches.delete(name);
-          })
-      )
-    ).then(() => self.clients.claim()) // Controla todas as abas abertas
+          .filter((name) => ![STATIC_CACHE, RUNTIME_CACHE].includes(name))
+          .map((name) => caches.delete(name))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
-// Estratégia de Fetch: Network-First para API, Cache-First para assets
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  const url = new URL(request.url);
 
-  // Ignorar requests não-GET
   if (request.method !== 'GET') return;
+  if (request.cache === 'only-if-cached' && request.mode !== 'same-origin') return;
 
-  // Ignorar requests externos (analytics, etc.)
-  if (!url.origin.includes(self.location.origin) && 
-      !url.pathname.includes('supabase')) return;
+  const url = new URL(request.url);
+  const isSameOrigin = url.origin === self.location.origin;
+  const accept = request.headers.get('accept') || '';
 
-  // manifest.json: SEMPRE buscar da rede (cache busting de ícones)
-  if (url.pathname === '/manifest.json') {
-    event.respondWith(networkFirst(request));
+  if (!isSameOrigin) {
+    if (url.pathname.includes('/rest/') || url.pathname.includes('/auth/') || url.pathname.includes('/functions/')) {
+      event.respondWith(fetch(request));
+    }
     return;
   }
 
-  // Ícones do sapo: Network-First para atualização dinâmica
-  if (url.pathname.match(/\/frog-(happy|warning|critical)\.png/)) {
-    event.respondWith(networkFirst(request));
+  if (request.mode === 'navigate' || request.destination === 'document' || accept.includes('text/html')) {
+    event.respondWith(networkFirst(request, false));
     return;
   }
 
-  // API/Supabase: Network-only
-  if (url.pathname.includes('/rest/') || 
-      url.pathname.includes('/auth/') ||
-      url.pathname.includes('/functions/')) {
-    event.respondWith(fetch(request));
+  if (url.pathname === '/manifest.json' || /\/frog-(happy|warning|critical)\.png$/.test(url.pathname)) {
+    event.respondWith(networkFirst(request, true, STATIC_CACHE));
     return;
   }
 
-  // Demais assets: Cache-First com fallback para rede
-  event.respondWith(cacheFirst(request));
+  if (['script', 'style', 'worker'].includes(request.destination)) {
+    event.respondWith(networkFirst(request, true, RUNTIME_CACHE));
+    return;
+  }
+
+  if (['image', 'font'].includes(request.destination)) {
+    event.respondWith(cacheFirst(request, RUNTIME_CACHE));
+    return;
+  }
+
+  event.respondWith(networkFirst(request, true, RUNTIME_CACHE));
 });
 
-// Cache-First: responde do cache, faz fetch em segundo plano
-async function cacheFirst(request) {
+async function cacheFirst(request, cacheName) {
   const cached = await caches.match(request);
   if (cached) return cached;
 
   try {
     const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(DYNAMIC_CACHE);
+    if (response && response.ok) {
+      const cache = await caches.open(cacheName);
       cache.put(request, response.clone());
     }
     return response;
-  } catch (err) {
-    // Offline fallback
+  } catch (error) {
     return new Response('Offline', { status: 503 });
   }
 }
 
-// Network-First: busca na rede, cacheia, fallback para cache
-async function networkFirst(request) {
+async function networkFirst(request, shouldCache = true, cacheName = RUNTIME_CACHE) {
   try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(CACHE_VERSION);
+    const response = await fetch(request, { cache: 'no-store' });
+    if (shouldCache && response && response.ok) {
+      const cache = await caches.open(cacheName);
       cache.put(request, response.clone());
     }
     return response;
-  } catch (err) {
+  } catch (error) {
     const cached = await caches.match(request);
     return cached || new Response('Offline', { status: 503 });
   }
 }
 
-// Listener para mensagens do app (atualização dinâmica de ícone)
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'UPDATE_ICON') {
     console.log('[SW] Recebido pedido de atualização de ícone:', event.data.mood);
-    // Invalida cache do manifest para forçar re-fetch
-    caches.open(CACHE_VERSION).then((cache) => {
+    caches.open(STATIC_CACHE).then((cache) => {
       cache.delete('/manifest.json');
-      // Notifica todos os clients que o ícone mudou
       self.clients.matchAll().then((clients) => {
         clients.forEach((client) => {
           client.postMessage({
@@ -137,19 +127,5 @@ self.addEventListener('message', (event) => {
 
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
-  }
-});
-
-// Background Sync: verificar atualizações periódicas
-self.addEventListener('periodicsync', (event) => {
-  if (event.tag === 'check-updates') {
-    event.waitUntil(
-      caches.open(CACHE_VERSION).then((cache) => {
-        // Força re-cache do manifest
-        return cache.delete('/manifest.json').then(() =>
-          cache.add('/manifest.json')
-        );
-      })
-    );
   }
 });

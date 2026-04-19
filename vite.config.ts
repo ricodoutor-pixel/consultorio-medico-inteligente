@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import legacy from "@vitejs/plugin-legacy";
 import path from "path";
 // import obfuscator from "vite-plugin-obfuscator";
 
@@ -23,6 +24,11 @@ export default defineConfig(({ mode }) => {
   },
   plugins: [
     react(),
+    legacy({
+      targets: ["chrome >= 87", "edge >= 88", "firefox >= 78", "safari >= 14", "ios >= 14"],
+      renderLegacyChunks: true,
+      modernPolyfills: true,
+    }),
   ],
   resolve: {
     alias: {
@@ -30,7 +36,7 @@ export default defineConfig(({ mode }) => {
     },
   },
   build: {
-    target: ["es2020", "chrome88", "edge88", "firefox78", "safari14"],
+    target: ["es2015", "edge88", "firefox78", "chrome87", "safari14"],
     minify: "terser",
     cssMinify: false,
     chunkSizeWarningLimit: 1000,
@@ -50,12 +56,11 @@ export default defineConfig(({ mode }) => {
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            if (id.includes('react-dom') || id.includes('react-router')) return 'react-core';
-            if (id.includes('react')) return 'react-base';
+            if (id.includes('react') || id.includes('scheduler') || id.includes('react-router')) return 'react-vendor';
             if (id.includes('recharts') || id.includes('d3')) return 'charts';
-            if (id.includes('framer-motion')) return 'animation';
+            if (id.includes('framer-motion')) return 'motion';
             if (id.includes('@radix-ui') || id.includes('cmdk')) return 'ui-primitives';
-            if (id.includes('@supabase')) return 'supabase';
+            if (id.includes('@supabase') || id.includes('@lovable.dev/cloud-auth-js')) return 'backend';
             if (id.includes('i18next')) return 'i18n';
             return 'vendor';
           }

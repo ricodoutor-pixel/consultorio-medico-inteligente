@@ -115,7 +115,7 @@ const Carteira = () => {
               </div>
 
               <Button className="mb-8 font-bold bg-gradient-to-r from-primary/20 to-primary/10 border border-gold text-primary" asChild>
-                <a href="https://wa.me/5511991363154?text=Olá%20Enf.%20Brisa!%20Quero%20solicitar%20saque%20Pix" target="_blank" rel="noopener noreferrer">
+                <a href="https://wa.me/5511987131241?text=Olá!%20Quero%20solicitar%20saque%20Pix" target="_blank" rel="noopener noreferrer">
                   Solicitar Saque Pix <ArrowRight size={16} className="ml-2" />
                 </a>
               </Button>

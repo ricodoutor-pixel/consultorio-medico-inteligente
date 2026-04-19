@@ -99,9 +99,9 @@ const TratamentoAnsiedadeSaudeMental = () => {
                   <Link to="/agendamento">Agendar Teleconsulta de Saúde Mental - R$30 <ArrowRight size={16} className="ml-1" /></Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
-                  <Link to="/triagem-brisa?origem=ansiedade">
+                  <a href="https://wa.me/5511987131241?text=Olá, gostaria de saber mais sobre tratamento para ansiedade com cannabis medicinal" target="_blank" rel="noopener noreferrer">
                     <MessageCircle size={16} className="mr-1" /> Pergunte à Brisa IA
-                  </Link>
+                  </a>
                 </Button>
               </div>
             </motion.div>
@@ -151,9 +151,9 @@ const TratamentoAnsiedadeSaudeMental = () => {
                 <Link to="/agendamento">Agendar Teleconsulta - R$30 <ArrowRight size={16} className="ml-1" /></Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
-                <Link to="/triagem-brisa?origem=ansiedade-triagem">
+                <a href="https://wa.me/5511987131241?text=Gostaria de fazer uma pré-triagem para ansiedade" target="_blank" rel="noopener noreferrer">
                   <MessageCircle size={16} className="mr-1" /> Triagem com Brisa IA
-                </Link>
+                </a>
               </Button>
             </div>
           </div>
@@ -209,9 +209,9 @@ const TratamentoAnsiedadeSaudeMental = () => {
                 <Link to="/agendamento">Agendar Teleconsulta - R$30 <ArrowRight size={16} className="ml-1" /></Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
-                <Link to="/triagem-brisa?origem=ansiedade-final">
+                <a href="https://wa.me/5511987131241?text=Dúvida sobre tratamento para ansiedade e insônia com CBD" target="_blank" rel="noopener noreferrer">
                   <MessageCircle size={16} className="mr-1" /> Dúvida? Pergunte à Brisa
-                </Link>
+                </a>
               </Button>
             </div>
             <div className="mt-6">

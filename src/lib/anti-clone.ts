@@ -24,20 +24,7 @@ const BRAND_FINGERPRINT = 'PR_v2_' + btoa('PlantaERaiz2026').slice(0, 12);
 // ── 1. Domain Lock ──────────────────────────────────────────────
 export function enforceDomainLock(): boolean {
   try {
-    const hostname = (window.location.hostname || "").toLowerCase();
-
-    // 🛡️ Mobile safety: never block on local/private/empty hostnames.
-    // Some mobile in-app browsers (Instagram/Facebook/TikTok) and tunnels
-    // expose IPs or empty hostnames — blocking them would brick the site.
-    if (
-      !hostname ||
-      hostname === "" ||
-      /^\d+\.\d+\.\d+\.\d+$/.test(hostname) ||
-      hostname.endsWith(".local")
-    ) {
-      return true;
-    }
-
+    const hostname = window.location.hostname;
     const isAuthorized = AUTHORIZED_DOMAINS.some(
       (d) => hostname === d || hostname.endsWith('.' + d)
     );

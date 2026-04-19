@@ -60,76 +60,30 @@ export const OnboardingModal = () => {
   }, [allowedRoute, location.pathname]);
 
   const checkOnboarding = async () => {
-    // 1) Authenticated users: respect DB flag
     const { data: session } = await supabase.auth.getSession();
-    if (session?.session?.user?.id) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("onboarding_completed")
-        .eq("id", session.session.user.id)
-        .single();
-      if (profile && !profile.onboarding_completed) setOpen(true);
-      return;
-    }
+    if (!session?.session?.user?.id) return;
 
-    // 2) Anonymous visitors: open quiz once per browser (lead-capture)
-    const completedAnon = localStorage.getItem("pr_onboarding_anon_completed");
-    if (!completedAnon) {
-      // Small delay to avoid flashing on first paint
-      setTimeout(() => setOpen(true), 600);
-    }
-  };
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", session.session.user.id)
+      .single();
 
-  const sendToBrisa = async (userId: string | null) => {
-    // Compor pré-prontuário com a Enfermeira Brisa para enviar ao médico prescritor
-    try {
-      const goalLabel = healthGoals.find(g => g.id === goal)?.label || goal;
-      const expLabel = experiences.find(e => e.id === experience)?.label || experience;
-      const leadName = (typeof window !== "undefined" && localStorage.getItem("pr_lead_name")) || "Visitante";
-      const leadPhone = (typeof window !== "undefined" && localStorage.getItem("pr_lead_phone")) || "";
-
-      const symptoms = `Objetivo de saúde: ${goalLabel}. Experiência prévia: ${expLabel}.`;
-      const preRecord = `🌿 PRÉ-PRONTUÁRIO (Quiz Brisa)\n\nPaciente: ${leadName}${leadPhone ? ` (${leadPhone})` : ""}\nObjetivo: ${goalLabel}\nExperiência com cannabis: ${expLabel}\nEspecialista sugerido: ${rec.specialist}\nPlano sugerido: ${rec.plan}\n\nEnviado automaticamente pela Enfermeira Brisa antes da consulta.`;
-
-      if (userId) {
-        await supabase.from("brisa_triages").insert({
-          patient_id: userId,
-          session_id: crypto.randomUUID(),
-          symptoms,
-          specialty: rec.specialist,
-          category: goal,
-          urgency: "normal",
-          pre_record: preRecord,
-          patient_info: { name: leadName, phone: leadPhone, goal, experience },
-          status: "completed",
-        });
-      }
-    } catch (err) {
-      console.error("[OnboardingModal] Falha ao enviar pré-prontuário para Brisa:", err);
+    if (profile && !profile.onboarding_completed) {
+      setOpen(true);
     }
   };
 
   const completeOnboarding = async () => {
     setSaving(true);
     const { data: session } = await supabase.auth.getSession();
-    const userId = session?.session?.user?.id ?? null;
-
-    if (userId) {
+    if (session?.session?.user?.id) {
       await supabase.from("profiles").update({
         onboarding_completed: true,
         health_goal: goal,
         cannabis_experience: experience,
-      }).eq("id", userId);
-    } else {
-      try {
-        localStorage.setItem("pr_onboarding_anon_completed", "true");
-        localStorage.setItem("pr_health_goal", goal);
-        localStorage.setItem("pr_cannabis_experience", experience);
-      } catch { /* ignore */ }
+      }).eq("id", session.session.user.id);
     }
-
-    await sendToBrisa(userId);
-
     setSaving(false);
     setOpen(false);
   };

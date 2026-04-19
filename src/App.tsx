@@ -119,7 +119,6 @@ const FastTrackCheckout = lazy(() => import("./pages/FastTrackCheckout"));
 const AffiliateDashboard = lazy(() => import("./pages/AffiliateDashboard"));
 const PrescriptionCheckout = lazy(() => import("./pages/PrescriptionCheckout"));
 const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
-const ChatDrEdilson = lazy(() => import("./pages/ChatDrEdilson"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -177,7 +176,7 @@ const App = () => (
                 <Route path="/dashboard-especialista" element={<SpecialistDashboard />} />
                 <Route path="/influenciadores" element={<InfluencerDashboard />} />
                 <Route path="/usuarios-online" element={<OnlineUsers />} />
-                <Route path="/admin-ceo" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                <Route path="/admin-ceo" element={<AdminDashboard />} />
                 <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
                 <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
                 <Route path="/admin-login" element={<AdminLogin />} />
@@ -210,10 +209,8 @@ const App = () => (
                 <Route path="/tratamento-dor-cronica" element={<TratamentoDorCronica />} />
                 <Route path="/tratamento-ansiedade-saude-mental" element={<TratamentoAnsiedadeSaudeMental />} />
                 <Route path="/tratamentos" element={<SEOCondicoes />} />
-                <Route path="/chat-dr-edilson" element={<ChatDrEdilson />} />
-                <Route path="/consultoria-breve" element={<ChatDrEdilson />} />
                 <Route path="/tratamentos/:condicao" element={<SEOCondicoes />} />
-                <Route path="/club" element={<ErrorBoundary><Club /></ErrorBoundary>} />
+                <Route path="/club" element={<Club />} />
                 <Route path="/deposits" element={<Deposits />} />
                 <Route path="/cart-checkout" element={<CartCheckout />} />
                 <Route path="/payment/success" element={<PaymentSuccess />} />
@@ -238,7 +235,7 @@ const App = () => (
                 <Route path="/admin/bi" element={<AdminRoute><AdminBI /></AdminRoute>} />
                 <Route path="/health" element={<AdminRoute><HealthCheck /></AdminRoute>} />
                 <Route path="/admin/automations" element={<AdminRoute><AutomationsDashboard /></AdminRoute>} />
-                <Route path="/admin/omni-channel" element={<AdminRoute><OmniChannelDashboard /></AdminRoute>} />
+                <Route path="/admin/omni-channel" element={<OmniChannelDashboard />} />
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
                 <Route path="/quiz" element={<QuizTriagem />} />

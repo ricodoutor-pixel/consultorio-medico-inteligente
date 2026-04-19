@@ -183,18 +183,25 @@ const ImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
         <>
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIdx((idx - 1 + validImgs.length) % validImgs.length); }}
-            className="hidden sm:flex absolute left-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/90 backdrop-blur-sm items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:bg-background"
-            aria-label="Imagem anterior"
+            className="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:bg-background"
           >
             <ChevronLeft size={14} />
           </button>
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIdx((idx + 1) % validImgs.length); }}
-            className="hidden sm:flex absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/90 backdrop-blur-sm items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:bg-background"
-            aria-label="Próxima imagem"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:bg-background"
           >
             <ChevronRight size={14} />
           </button>
+          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-0.5">
+            {validImgs.map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIdx(i); }}
+                className={`rounded-full transition-all ${i === idx ? "w-2.5 h-1 bg-primary" : "w-1 h-1 bg-background/60"}`}
+              />
+            ))}
+          </div>
         </>
       )}
     </div>
@@ -261,7 +268,7 @@ const ProductDetail = ({ id }: { id: string }) => {
               <img src={resolveImg(images[mainImg])} alt={product.name} className="w-full h-full object-contain bg-muted/5 p-4 sm:p-6" />
             </div>
           </Card>
-          <div className="hidden sm:flex gap-2 overflow-x-auto pb-1">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {images.map((img, i) => (
               <button
                 key={i}

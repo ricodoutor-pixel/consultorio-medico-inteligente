@@ -22,11 +22,6 @@ const EMERGENCY_KEYWORDS = [
   "sangramento", "sangrando muito",
   "paralisia", "não consigo mexer",
   "falta de ar grave", "não consigo respirar",
-  // Bioética 2026 — adições críticas
-  "infarto", "infartando", "ataque cardíaco", "dor no peito forte",
-  "avc", "derrame", "boca torta",
-  "engasgado", "engasgando",
-  "envenenamento", "envenenado",
 ];
 
 const URGENT_KEYWORDS = [

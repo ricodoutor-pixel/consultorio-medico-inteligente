@@ -193,15 +193,6 @@ const ImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
           >
             <ChevronRight size={14} />
           </button>
-          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-0.5">
-            {validImgs.map((_, i) => (
-              <button
-                key={i}
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIdx(i); }}
-                className={`rounded-full transition-all ${i === idx ? "w-2.5 h-1 bg-primary" : "w-1 h-1 bg-background/60"}`}
-              />
-            ))}
-          </div>
         </>
       )}
     </div>

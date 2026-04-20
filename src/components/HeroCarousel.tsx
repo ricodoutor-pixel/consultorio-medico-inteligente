@@ -117,24 +117,8 @@ export const HeroCarousel = memo(function HeroCarousel() {
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-28 h-1 bg-foreground/30 rounded-full z-20" />
       </div>
 
-      {/* Pagination dots */}
-      <div className="flex items-center justify-center gap-1.5 mt-3">
-        {Array.from({ length: totalSlides }).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => scrollTo(i)}
-            aria-label={`Ir para slide ${i + 1}`}
-            className={`rounded-full transition-all duration-300 ${
-              i === selectedIndex
-                ? "w-6 h-2 bg-primary"
-                : "w-2 h-2 bg-foreground/20 hover:bg-foreground/40"
-            }`}
-          />
-        ))}
-      </div>
-
       {/* Slide counter */}
-      <p className="text-center text-xs text-muted-foreground mt-1">
+      <p className="text-center text-xs text-muted-foreground mt-3">
         {selectedIndex + 1} / {totalSlides}
       </p>
     </div>

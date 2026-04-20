@@ -1,4 +1,4 @@
-import { Leaf, Instagram, MessageCircle, Lock, ShieldCheck, Download } from "lucide-react";
+import { Leaf, Instagram, MessageCircle, Lock, ShieldCheck, Download, Youtube } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 
@@ -27,6 +27,9 @@ export const Footer = () => {
               </a>
               <a href="https://wa.me/5511991363154" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-200" aria-label="WhatsApp">
                 <MessageCircle size={14} />
+              </a>
+              <a href="https://www.youtube.com/channel/UC_Azx7mmS0_edjCxv4MXQ1Q" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-200" aria-label="Canal no YouTube — Planta y Raiz">
+                <Youtube size={14} />
               </a>
             </div>
           </div>

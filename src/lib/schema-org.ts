@@ -48,7 +48,7 @@ export const organizationSchema: SchemaOrgConfig = {
       'https://www.facebook.com/plantayraiz',
       'https://www.instagram.com/plantayraiz',
       'https://www.linkedin.com/company/plantayraiz',
-      'https://www.youtube.com/@plantayraiz',
+      'https://www.youtube.com/channel/UC_Azx7mmS0_edjCxv4MXQ1Q',
       'https://www.tiktok.com/@plantayraiz',
     ],
     

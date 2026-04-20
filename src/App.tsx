@@ -11,7 +11,9 @@ import { ShoppingCart } from "./components/ShoppingCart";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { AdminRoute } from "@/components/AdminRoute";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { TenantProvider } from "@/contexts/TenantContext";
+import { ManyChatWidget } from "@/components/ManyChatWidget";
 import { OfflineAlert } from "@/components/OfflineAlert";
 import { useCart } from "@/store/cart";
 import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
@@ -129,6 +131,7 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TenantProvider>
       <LanguageProvider>
+      <CurrencyProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -254,11 +257,13 @@ const App = () => (
             {/* Mascote Verdinho removido — presente apenas na Navbar */}
             {/* WhatsApp Brisa Button */}
             <WhatsAppButton />
+            <ManyChatWidget />
             <MobileBottomNav />
             <CookieConsentBanner />
           </Suspense>
         </BrowserRouter>
       </TooltipProvider>
+    </CurrencyProvider>
     </LanguageProvider>
     </TenantProvider>
     </QueryClientProvider>

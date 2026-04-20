@@ -230,8 +230,9 @@ Deno.serve(async (req) => {
         });
     }
   } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
     console.error("❌ [Growth Engine] Erro:", e);
-    return new Response(JSON.stringify({ error: "Erro interno", details: e.message }), {
+    return new Response(JSON.stringify({ error: "Erro interno", details: msg }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

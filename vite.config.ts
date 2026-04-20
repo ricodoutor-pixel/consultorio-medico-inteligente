@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import legacy from "@vitejs/plugin-legacy";
 import path from "path";
-// import obfuscator from "vite-plugin-obfuscator";
 
 // Nota: componentTagger removido - não é necessário em produção e causa falha no Hostinger
 
@@ -13,6 +13,10 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
+    legacy({
+      targets: ["defaults", "not IE 11", "Android >= 7"],
+      renderLegacyChunks: true,
+    }),
   ],
   resolve: {
     alias: {

@@ -46,7 +46,7 @@ export const Footer = () => {
               <li><Link to="/reembolso" className="text-muted-foreground hover:text-primary transition-colors">Política de Reembolso</Link></li>
             </ul>
             <div className="pt-2 text-[10px] text-muted-foreground/70 leading-relaxed space-y-0.5">
-              <p>CNPJ: [Pendente de registro]<br/>WhatsApp: (11) 99136-3154</p>
+              
               <p>Razão Social: Planta y Raiz Saúde Digital Ltda.</p>
             </div>
           </div>

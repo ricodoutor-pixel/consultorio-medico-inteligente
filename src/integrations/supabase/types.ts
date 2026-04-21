@@ -3503,12 +3503,12 @@ export type Database = {
           bio: string | null
           consultation_price: number | null
           created_at: string | null
-          crm: string | null
-          crm_state: string | null
           id: string | null
           is_online: boolean | null
           is_verified: boolean | null
+          organization_id: string | null
           rating: number | null
+          rqe: string | null
           specialty: string | null
           total_consultations: number | null
           updated_at: string | null
@@ -3519,12 +3519,12 @@ export type Database = {
           bio?: string | null
           consultation_price?: number | null
           created_at?: string | null
-          crm?: string | null
-          crm_state?: string | null
           id?: string | null
           is_online?: boolean | null
           is_verified?: boolean | null
+          organization_id?: string | null
           rating?: number | null
+          rqe?: string | null
           specialty?: string | null
           total_consultations?: number | null
           updated_at?: string | null
@@ -3535,12 +3535,12 @@ export type Database = {
           bio?: string | null
           consultation_price?: number | null
           created_at?: string | null
-          crm?: string | null
-          crm_state?: string | null
           id?: string | null
           is_online?: boolean | null
           is_verified?: boolean | null
+          organization_id?: string | null
           rating?: number | null
+          rqe?: string | null
           specialty?: string | null
           total_consultations?: number | null
           updated_at?: string | null

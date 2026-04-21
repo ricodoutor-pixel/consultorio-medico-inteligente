@@ -80,9 +80,8 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     const fetchReal = async () => {
       try {
         const { data: doctors } = await supabase
-          .from("doctors")
-          .select("*")
-          .eq("is_verified", true);
+          .from("doctors_public" as any)
+          .select("*") as { data: RealDoctor[] | null };
 
         if (doctors && doctors.length > 0) {
           const userIds = doctors.map(d => d.user_id);

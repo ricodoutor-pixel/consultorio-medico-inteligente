@@ -81,7 +81,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       try {
         const { data: doctors } = await supabase
           .from("doctors_public" as any)
-          .select("*");
+          .select("*") as { data: RealDoctor[] | null };
 
         if (doctors && doctors.length > 0) {
           const userIds = doctors.map(d => d.user_id);

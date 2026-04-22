@@ -1,13 +1,16 @@
 import { ManyChatClient } from './client';
 import { TAGS, FLOWS, CUSTOM_FIELDS } from './constants';
 import { B2BRecruitmentFlows } from './b2b-recruitment';
+import { EnfBrisaProFlows } from './enf-brisa-pro';
 import type { LeadQualification } from './types';
 
 export class ManyChatFlows {
   public b2b: B2BRecruitmentFlows;
+  public brisa: EnfBrisaProFlows;
 
   constructor(private client: ManyChatClient) {
     this.b2b = new B2BRecruitmentFlows(client);
+    this.brisa = new EnfBrisaProFlows(client);
   }
 
   // ── Lead Qualification ──

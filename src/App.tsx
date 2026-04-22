@@ -121,6 +121,7 @@ const FastTrackCheckout = lazy(() => import("./pages/FastTrackCheckout"));
 const AffiliateDashboard = lazy(() => import("./pages/AffiliateDashboard"));
 const PrescriptionCheckout = lazy(() => import("./pages/PrescriptionCheckout"));
 const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
+const GestãoPacientes = lazy(() => import("./pages/GestãoPacientes"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -248,6 +249,7 @@ const App = () => (
                 <Route path="/checkout/:token" element={<PrescriptionCheckout />} />
                 <Route path="/checkout/return" element={<CheckoutReturn />} />
                 <Route path="/afiliados/dashboard" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
+                <Route path="/gestao-pacientes" element={<PrivateRoute><GestãoPacientes /></PrivateRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

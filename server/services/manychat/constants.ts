@@ -44,6 +44,14 @@ export const FLOWS = {
   SOCIAL_STORY_REPLY_HOOK: 'content20250414_social_story_hook',
   SOCIAL_AD_LEAD_NURTURE: 'content20250414_social_ad_nurture',
   SOCIAL_ENGAGEMENT_REWARD: 'content20250414_social_engagement_reward',
+  // ENF Brisa Pro V1 — Trilingual Conversion Flow
+  ENF_BRISA_WELCOME: 'content20250422_enf_brisa_welcome',
+  ENF_BRISA_LANG_PT: 'content20250422_enf_brisa_lang_pt',
+  ENF_BRISA_LANG_EN: 'content20250422_enf_brisa_lang_en',
+  ENF_BRISA_LANG_ES: 'content20250422_enf_brisa_lang_es',
+  ENF_BRISA_MEDICO_CTA: 'content20250422_enf_brisa_medico_cta',
+  ENF_BRISA_PACIENTE_CTA: 'content20250422_enf_brisa_paciente_cta',
+  ENF_BRISA_AGENDAMENTO: 'content20250422_enf_brisa_agendamento',
 } as const;
 
 // Custom field IDs
@@ -68,3 +76,8 @@ export const EBOOK_PDF_URL = 'https://plantayraiz.com.br/biblioteca/ebook-medici
 export const SIGNUP_BASE_URL = 'https://plantayraiz.com.br/cadastro-profissional';
 export const CONSULTATION_PRICE = 150; // avg price per consultation
 export const DOCTOR_SPLIT = 0.92; // 92% for doctors
+
+// ENF Brisa Pro links
+export const LINKEDIN_DR_EDILSON = 'https://www.linkedin.com/in/dr-edilson-bezerra-bp-757391285/';
+export const WHATSAPP_SUPPORT = 'https://wa.me/5511991363154?text=Ol%C3%A1%2C+vim+pelo+bot+da+Enf.+Brisa';
+export const MANYCHAT_BRISA_FLOW = 'https://app.manychat.com/flowPlayerPage?share_hash=4773110_52afc617acd735b548c9a794700447116667f7d5';

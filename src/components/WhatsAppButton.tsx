@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Stethoscope, User, Store, BookOpen } from "lucide-react";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
-import { useNavigate } from "react-router-dom";
+
+const SITE_BASE = "https://consultorio-medico-inteligente.lovable.app";
 
 const VISITOR_OPTIONS = [
   {
@@ -10,8 +11,8 @@ const VISITOR_OPTIONS = [
     label: "Sou Paciente",
     icon: User,
     description: "Agendar consulta ou tirar dúvidas",
-    route: "/quiz-triagem",
-    whatsappMsg: "Olá Enf. Brisa! Sou paciente e gostaria de agendar uma consulta.",
+    path: "/quiz-triagem",
+    greeting: `Olá Enf. Brisa! 🌿 Sou paciente e gostaria de agendar uma consulta.\n\nPode me orientar sobre como funciona?`,
     color: "hsl(152 100% 74%)",
   },
   {
@@ -19,8 +20,8 @@ const VISITOR_OPTIONS = [
     label: "Sou Médico",
     icon: Stethoscope,
     description: "Quero prescrever na plataforma",
-    route: "/profissionais",
-    whatsappMsg: "Olá Enf. Brisa! Sou médico e gostaria de saber como prescrever pela plataforma.",
+    path: "/profissionais",
+    greeting: `Olá Enf. Brisa! 🌿 Sou médico e gostaria de saber como prescrever pela plataforma Planta y Raiz.`,
     color: "hsl(217 91% 60%)",
   },
   {
@@ -28,8 +29,8 @@ const VISITOR_OPTIONS = [
     label: "Sou Lojista",
     icon: Store,
     description: "Vender no nosso marketplace",
-    route: "/shopping",
-    whatsappMsg: "Olá Enf. Brisa! Sou lojista e gostaria de vender no marketplace.",
+    path: "/shopping",
+    greeting: `Olá Enf. Brisa! 🌿 Sou lojista e gostaria de vender no marketplace da Planta y Raiz.`,
     color: "hsl(45 93% 58%)",
   },
   {
@@ -37,8 +38,8 @@ const VISITOR_OPTIONS = [
     label: "Baixar E-book",
     icon: BookOpen,
     description: "Material educativo gratuito",
-    route: "/como-funciona",
-    whatsappMsg: "Olá Enf. Brisa! Gostaria de receber o e-book gratuito sobre cannabis medicinal.",
+    path: "/como-funciona",
+    greeting: `Olá Enf. Brisa! 🌿 Gostaria de receber o e-book gratuito sobre cannabis medicinal.`,
     color: "hsl(280 67% 60%)",
   },
 ] as const;
@@ -46,7 +47,6 @@ const VISITOR_OPTIONS = [
 export const WhatsAppButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const handler = (e: MouseEvent | TouchEvent) => {
@@ -73,13 +73,10 @@ export const WhatsAppButton = () => {
       category: "conversion",
     });
 
-    // Navigate to the corresponding page on the site
-    navigate(option.route);
-    setIsOpen(false);
-  };
-
-  const handleWhatsApp = (option: (typeof VISITOR_OPTIONS)[number]) => {
-    const url = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(option.whatsappMsg)}`;
+    // Build WhatsApp message with greeting + link to the relevant page
+    const pageLink = `${SITE_BASE}${option.path}`;
+    const fullMessage = `${option.greeting}\n\n📎 ${pageLink}`;
+    const url = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
     window.open(url, "_blank", "noopener,noreferrer");
     setIsOpen(false);
   };
@@ -94,7 +91,7 @@ export const WhatsAppButton = () => {
           <div className="px-4 py-3 border-b border-border"
             style={{ background: "linear-gradient(135deg, hsl(152 100% 74% / 0.15), hsl(152 100% 74% / 0.05))" }}>
             <p className="text-sm font-bold text-foreground">🌿 Olá! Eu sou a Enf. Brisa</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Como posso te ajudar? Escolha seu perfil:</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Escolha seu perfil e fale comigo no WhatsApp:</p>
           </div>
 
           {/* Options */}
@@ -102,31 +99,30 @@ export const WhatsAppButton = () => {
             {VISITOR_OPTIONS.map((option) => {
               const Icon = option.icon;
               return (
-                <div key={option.id} className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleOptionClick(option)}
-                    className="flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 hover:bg-accent/50 active:scale-[0.98]"
-                  >
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                      style={{ background: `color-mix(in srgb, ${option.color} 15%, transparent)`, border: `1px solid color-mix(in srgb, ${option.color} 25%, transparent)` }}>
-                      <Icon size={18} style={{ color: option.color }} />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-foreground truncate">{option.label}</p>
-                      <p className="text-xs text-muted-foreground truncate">{option.description}</p>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleWhatsApp(option)}
-                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-all hover:bg-accent/50"
-                    aria-label={`WhatsApp - ${option.label}`}
-                    title="Falar pelo WhatsApp"
-                  >
-                    <MessageCircle size={16} className="text-secondary" />
-                  </button>
-                </div>
+                <button
+                  key={option.id}
+                  onClick={() => handleOptionClick(option)}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 hover:bg-accent/50 active:scale-[0.98] w-full"
+                >
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: `color-mix(in srgb, ${option.color} 15%, transparent)`, border: `1px solid color-mix(in srgb, ${option.color} 25%, transparent)` }}>
+                    <Icon size={18} style={{ color: option.color }} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-foreground truncate">{option.label}</p>
+                    <p className="text-xs text-muted-foreground truncate">{option.description}</p>
+                  </div>
+                  <MessageCircle size={16} className="text-secondary shrink-0" />
+                </button>
               );
             })}
+          </div>
+
+          {/* Footer */}
+          <div className="px-4 py-2 border-t border-border">
+            <p className="text-[10px] text-muted-foreground text-center">
+              Atendimento 24h • Respostas em minutos
+            </p>
           </div>
         </div>
       )}

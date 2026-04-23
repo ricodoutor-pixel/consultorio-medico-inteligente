@@ -13,7 +13,7 @@ import { AdminRoute } from "@/components/AdminRoute";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { TenantProvider } from "@/contexts/TenantContext";
-import { ManyChatWidget } from "@/components/ManyChatWidget";
+
 import { OfflineAlert } from "@/components/OfflineAlert";
 import { useCart } from "@/store/cart";
 import { AccessibilitySkipLink } from "@/components/AccessibilitySkipLink";
@@ -259,7 +259,7 @@ const App = () => (
             {/* Mascote Verdinho removido — presente apenas na Navbar */}
             {/* WhatsApp Brisa Button */}
             <WhatsAppButton />
-            <ManyChatWidget />
+            {/* ManyChatWidget removido — Brisa agora é nativa no WhatsAppButton */}
             <MobileBottomNav />
             <CookieConsentBanner />
           </Suspense>

@@ -108,7 +108,7 @@ export const WhatsAppButton = () => {
                     className="flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 hover:bg-accent/50 active:scale-[0.98]"
                   >
                     <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                      style={{ background: `${option.color} / 0.15)`.replace(")", ""), border: `1px solid ${option.color}40` }}>
+                      style={{ background: `color-mix(in srgb, ${option.color} 15%, transparent)`, border: `1px solid color-mix(in srgb, ${option.color} 25%, transparent)` }}>
                       <Icon size={18} style={{ color: option.color }} />
                     </div>
                     <div className="min-w-0">

@@ -1,8 +1,8 @@
 import { MessageCircle } from "lucide-react";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
+import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
 
-const MANYCHAT_FLOW_URL =
-  "https://app.manychat.com/flowPlayerPage?share_hash=4773110_52afc617acd735b548c9a794700447116667f7d5";
+const WHATSAPP_DIRECT_URL = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent("Olá Enf. Brisa! Gostaria de informações sobre consultas.")}`;
 
 export const WhatsAppButton = () => {
   const handleClick = () => {
@@ -11,7 +11,7 @@ export const WhatsAppButton = () => {
       funnelStage: "intent",
       category: "conversion",
     });
-    window.open(MANYCHAT_FLOW_URL, "_blank", "noopener,noreferrer");
+    window.open(WHATSAPP_DIRECT_URL, "_blank", "noopener,noreferrer");
   };
 
   return (

@@ -203,6 +203,14 @@ export const LeadCaptureModal = ({
                     className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#39FF14]/50 transition-colors"
                   />
                   <input
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    maxLength={120}
+                    className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#39FF14]/50 transition-colors"
+                  />
+                  <input
                     type="tel"
                     placeholder="(11) 99999-9999"
                     value={telefone}

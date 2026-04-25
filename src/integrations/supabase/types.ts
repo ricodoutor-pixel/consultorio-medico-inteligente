@@ -555,6 +555,57 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_identity: {
+        Row: {
+          brand_name: string
+          created_at: string
+          effective_from: string
+          favicon_url: string
+          icon_url: string
+          id: string
+          is_active: boolean
+          legal_name: string
+          logo_url: string
+          notes: string | null
+          primary_color: string
+          secondary_color: string
+          splash_url: string
+          updated_at: string
+        }
+        Insert: {
+          brand_name: string
+          created_at?: string
+          effective_from?: string
+          favicon_url: string
+          icon_url: string
+          id?: string
+          is_active?: boolean
+          legal_name: string
+          logo_url: string
+          notes?: string | null
+          primary_color?: string
+          secondary_color?: string
+          splash_url: string
+          updated_at?: string
+        }
+        Update: {
+          brand_name?: string
+          created_at?: string
+          effective_from?: string
+          favicon_url?: string
+          icon_url?: string
+          id?: string
+          is_active?: boolean
+          legal_name?: string
+          logo_url?: string
+          notes?: string | null
+          primary_color?: string
+          secondary_color?: string
+          splash_url?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       brisa_triages: {
         Row: {
           category: string | null

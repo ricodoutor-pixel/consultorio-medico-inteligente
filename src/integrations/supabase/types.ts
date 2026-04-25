@@ -1674,24 +1674,33 @@ export type Database = {
       }
       leads_contatos: {
         Row: {
+          categoria: string | null
           created_at: string
+          email: string | null
           id: string
+          idioma: string | null
           nome: string
           origem: string
           tags: string[] | null
           telefone: string
         }
         Insert: {
+          categoria?: string | null
           created_at?: string
+          email?: string | null
           id?: string
+          idioma?: string | null
           nome: string
           origem?: string
           tags?: string[] | null
           telefone: string
         }
         Update: {
+          categoria?: string | null
           created_at?: string
+          email?: string | null
           id?: string
+          idioma?: string | null
           nome?: string
           origem?: string
           tags?: string[] | null

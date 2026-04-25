@@ -110,7 +110,43 @@ const Admin = () => {
             ))}
           </div>
 
-          {/* Dashboard Content (Placeholder for original charts) */}
+          {/* Acesso rápido — Gestão White-label */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card className="border-primary/30 bg-gradient-to-br from-primary/10 to-transparent hover:border-primary/60 transition-all cursor-pointer" onClick={() => navigate("/admin/clinicas")}>
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
+                  <Globe size={22} className="text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-display font-black text-foreground">Clínicas Online</p>
+                  <p className="text-[11px] text-muted-foreground">Gerencie médicos, domínios e identidade visual white-label</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-border bg-card/50 hover:border-primary/40 transition-all cursor-pointer" onClick={() => navigate("/admin/financeiro")}>
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center shrink-0">
+                  <DollarSign size={22} className="text-secondary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-display font-black text-foreground">Financeiro</p>
+                  <p className="text-[11px] text-muted-foreground">Splits, repasses e auditoria de pagamentos</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border-border bg-card/50 hover:border-primary/40 transition-all cursor-pointer" onClick={() => navigate("/admin/automations")}>
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
+                  <Zap size={22} className="text-accent-foreground" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-display font-black text-foreground">Automações</p>
+                  <p className="text-[11px] text-muted-foreground">Brisa IA, ManyChat, Twilio</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           <div className="grid lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-2 border-border bg-card/30">
               <CardContent className="p-6">

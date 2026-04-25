@@ -251,7 +251,11 @@ const AdminMaster = () => {
       .on("postgres_changes", { event: "*", schema: "public", table: "vendor_transactions" }, () => loadDashboardData())
       .on("postgres_changes", { event: "*", schema: "public", table: "vendor_products" }, () => loadDashboardData())
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    });
+    return () => {
+      cancelled = true;
+      if (ch) supabase.removeChannel(ch);
+    };
   }, [loadDashboardData]);
 
   const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = "/"; };

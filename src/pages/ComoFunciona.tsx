@@ -142,6 +142,41 @@ const ComoFunciona = () => {
             ))}
           </motion.div>
 
+          {/* E-book Download Section */}
+          <motion.div
+            className="max-w-3xl mx-auto mt-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+          >
+            <Card className="border-secondary/40 bg-gradient-to-br from-secondary/10 via-card to-primary/10">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green mb-4">
+                  <BookOpen size={32} className="text-secondary" />
+                </div>
+                <h3 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-3">
+                  📚 E-book Gratuito: Cannabis Medicinal
+                </h3>
+                <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+                  Guia completo escrito pela equipe Planta & Raiz: indicações terapêuticas, dosagens, ANVISA e como começar seu tratamento.
+                </p>
+                <Button
+                  size="lg"
+                  onClick={handleDownloadEbook}
+                  disabled={downloading}
+                  className="text-lg font-bold bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground"
+                >
+                  {downloading ? (
+                    <><Loader2 size={20} className="mr-2 animate-spin" /> Preparando...</>
+                  ) : (
+                    <><Download size={20} className="mr-2" /> Baixar E-book Gratuito (PDF)</>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+
           {/* CTAs */}
           <motion.div className="flex flex-col sm:flex-row gap-4 justify-center mt-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <Button size="lg" className="text-lg font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground" asChild>

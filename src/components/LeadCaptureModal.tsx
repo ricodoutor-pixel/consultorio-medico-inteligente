@@ -7,10 +7,12 @@ import { motion, AnimatePresence } from "framer-motion";
 interface LeadCaptureModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (data: { nome: string; telefone: string }) => void;
+  onSuccess: (data: { nome: string; telefone: string; email?: string; categoria?: string }) => void;
   origem: "chat" | "ebook";
   message?: string;
   tags?: string[];
+  /** Categoria do visitante: paciente | medico | lojista | ebook */
+  categoria?: "paciente" | "medico" | "lojista" | "ebook";
 }
 
 const formatPhone = (value: string): string => {

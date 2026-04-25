@@ -61,18 +61,29 @@ const DownloadApp = () => {
                 Consultas, receitas, shopping e biblioteca científica — tudo offline-first com biometria, push notifications e a melhor experiência mobile do mercado.
               </motion.p>
 
-              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Button size="lg" className="h-14 px-8 bg-foreground text-background font-black rounded-2xl hover:bg-foreground/90 gap-3">
-                  <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-                    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.51-3.23 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.32-1.55 4.08-3.74 4.25z"/>
-                  </svg>
-                  App Store
+              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 mb-4">
+                <Button asChild size="lg" className="h-14 px-8 bg-foreground text-background font-black rounded-2xl hover:bg-foreground/90 gap-3">
+                  <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="Baixar na App Store">
+                    <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor" aria-hidden="true">
+                      <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.51-3.23 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.32-1.55 4.08-3.74 4.25z"/>
+                    </svg>
+                    App Store
+                  </a>
                 </Button>
-                <Button size="lg" className="h-14 px-8 bg-foreground text-background font-black rounded-2xl hover:bg-foreground/90 gap-3">
-                  <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-                    <path d="M3.18 23.79L14.35 12.62 3.18.45C2.35 1.19 1.82 2.35 1.82 3.79v16.42c0 1.44.53 2.6 1.36 3.34v.24zm15.1-14.4l-3.15 3.23 3.15 3.23 3.53-2.03c.59-.34.94-.9.94-1.2 0-.3-.35-.86-.94-1.2l-3.53-2.03zm-4.38 4.46L4.43 23.31l12.2-7.01-2.73-2.45zM4.43.69l9.47 9.46 2.73-2.45-12.2-7.01z"/>
-                  </svg>
-                  Google Play
+                <Button asChild size="lg" className="h-14 px-8 bg-foreground text-background font-black rounded-2xl hover:bg-foreground/90 gap-3">
+                  <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" aria-label="Baixar no Google Play">
+                    <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor" aria-hidden="true">
+                      <path d="M3.18 23.79L14.35 12.62 3.18.45C2.35 1.19 1.82 2.35 1.82 3.79v16.42c0 1.44.53 2.6 1.36 3.34v.24zm15.1-14.4l-3.15 3.23 3.15 3.23 3.53-2.03c.59-.34.94-.9.94-1.2 0-.3-.35-.86-.94-1.2l-3.53-2.03zm-4.38 4.46L4.43 23.31l12.2-7.01-2.73-2.45zM4.43.69l9.47 9.46 2.73-2.45-12.2-7.01z"/>
+                    </svg>
+                    Google Play
+                  </a>
+                </Button>
+              </motion.div>
+
+              <motion.div variants={fadeUp} className="mb-8">
+                <Button onClick={handleInstallPWA} size="lg" variant="outline" className="h-12 px-6 border-primary/40 text-primary font-bold rounded-xl gap-2">
+                  <Download size={18} />
+                  {isInstalled ? "App instalado ✓" : canInstall ? "Instalar agora (PWA)" : "Instalar como App (PWA)"}
                 </Button>
               </motion.div>
 

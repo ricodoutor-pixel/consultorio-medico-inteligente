@@ -74,8 +74,9 @@ export function useConsultationQueue(userType: "patient" | "doctor") {
         }
       )
       .subscribe();
+    });
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { if (channel) supabase.removeChannel(channel); };
   }, [userType, toast, myEntry?.id]);
 
   const joinQueue = useCallback(async (specialty?: string) => {

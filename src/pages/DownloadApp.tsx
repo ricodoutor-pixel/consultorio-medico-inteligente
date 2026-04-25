@@ -6,11 +6,38 @@ import { Badge } from "@/components/ui/badge";
 import { Download, Smartphone, Shield, Wifi, Users, Star, Zap, Heart, Globe, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { useToast } from "@/hooks/use-toast";
+
+// URLs oficiais das lojas (atualizar quando publicado nas stores)
+const APP_STORE_URL = "https://apps.apple.com/br/app/planta-y-raiz/id0000000000";
+const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.plantayraiz.app";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 const DownloadApp = () => {
+  const { canInstall, isInstalled, promptInstall } = usePWAInstall();
+  const { toast } = useToast();
+
+  const handleInstallPWA = async () => {
+    if (isInstalled) {
+      toast({ title: "App já instalado ✅", description: "Abra a partir da sua tela inicial." });
+      return;
+    }
+    if (canInstall) {
+      const outcome = await promptInstall();
+      if (outcome === "accepted") {
+        toast({ title: "Instalado! 🌿", description: "Agora abra o app a partir da tela inicial." });
+      }
+      return;
+    }
+    toast({
+      title: "Instale como App (PWA)",
+      description: "No iOS, toque em Compartilhar → Adicionar à Tela de Início. No Android, abra o menu do navegador → Instalar app.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />

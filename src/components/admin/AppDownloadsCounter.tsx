@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, Smartphone, TrendingUp, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { publicChannel } from "@/lib/realtime-channels";
 import { motion } from "framer-motion";
 
 interface DownloadStats {
@@ -45,7 +46,7 @@ export function AppDownloadsCounter() {
 
     // Realtime subscription
     const channel = supabase
-      .channel('app-downloads-live')
+      .channel(publicChannel('app-downloads-live'))
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'app_downloads' }, () => {
         fetchStats();
       })

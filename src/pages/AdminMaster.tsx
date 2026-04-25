@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { userChannel } from "@/lib/realtime-channels";
 import {
   DollarSign, Users, Activity, Shield, Wifi, WifiOff,
   Clock, TrendingUp, AlertTriangle, Bot, Terminal, Search,
@@ -214,7 +215,13 @@ const AdminMaster = () => {
   }, [loadDashboardData]);
 
   useEffect(() => {
-    const ch = supabase.channel("admin-master-rt")
+    let ch: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+    supabase.auth.getUser().then(({ data }) => {
+      if (cancelled) return;
+      const uid = data.user?.id;
+      if (!uid) return;
+      ch = supabase.channel(userChannel(uid, "admin-master-rt"))
       .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, (payload) => {
         loadDashboardData();
         if (payload.eventType === "UPDATE" && payload.new?.is_verified && !payload.old?.is_verified) {

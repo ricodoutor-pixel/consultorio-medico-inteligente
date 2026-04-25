@@ -192,24 +192,36 @@ const Login = () => {
                   <>
                     <div className="relative my-5">
                       <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
-                      <div className="relative flex justify-center text-[10px] uppercase tracking-wider"><span className="bg-card px-2 text-muted-foreground">ou continue com</span></div>
+                      <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
+                        <span className="bg-card px-2 text-muted-foreground font-bold">Ou entre rapidamente com</span>
+                      </div>
                     </div>
 
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full font-bold h-11 rounded-xl border-border"
+                      className="w-full font-bold h-12 rounded-xl border-2 border-primary/30 hover:border-primary/60 hover:bg-primary/5 transition-all"
                       disabled={loading}
                       onClick={async () => {
                         setLoading(true);
+                        // Build a safe redirect target (avoids 404 by always landing on a known route)
+                        const target = redirectTo
+                          ? decodeURIComponent(redirectTo)
+                          : "/dashboard";
+                        const redirectUrl = `${window.location.origin}${target.startsWith("/") ? target : `/${target}`}`;
                         const { error } = await supabase.auth.signInWithOAuth({
                           provider: "google",
                           options: {
-                            redirectTo: `${window.location.origin}${redirectTo ? `?redirect=${redirectTo}` : ""}`,
+                            redirectTo: redirectUrl,
+                            queryParams: { prompt: "select_account" },
                           },
                         });
                         if (error) {
-                          toast({ title: "Erro com Google", description: "Não foi possível entrar com Google.", variant: "destructive" });
+                          toast({
+                            title: "Erro com Google",
+                            description: error.message || "Não foi possível entrar com Google.",
+                            variant: "destructive",
+                          });
                           setLoading(false);
                         }
                       }}

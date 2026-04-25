@@ -1,15 +1,67 @@
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, Zap, Stethoscope, ShoppingBag, Shield, FileText, CheckCircle2, ArrowRight, MessageSquare, UserPlus } from "lucide-react";
+import { Users, Zap, Stethoscope, ShoppingBag, Shield, FileText, CheckCircle2, ArrowRight, MessageSquare, UserPlus, Download, Loader2, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+const EBOOK_BUCKET = "ebooks";
+const EBOOK_FILE = "planta-y-raiz-cannabis-medicinal.pdf";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 const ComoFunciona = () => {
+  const { toast } = useToast();
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadEbook = async () => {
+    setDownloading(true);
+    try {
+      // Verify the file exists in storage
+      const { data: list, error: listError } = await supabase.storage
+        .from(EBOOK_BUCKET)
+        .list("", { search: EBOOK_FILE, limit: 1 });
+
+      if (listError || !list || list.length === 0) {
+        toast({
+          title: "E-book em preparação 📚",
+          description: "Nosso e-book ainda está sendo finalizado. Deixe seu WhatsApp na Enf. Brisa para receber em primeira mão!",
+        });
+        setDownloading(false);
+        return;
+      }
+
+      // Get public URL and trigger download
+      const { data: urlData } = supabase.storage
+        .from(EBOOK_BUCKET)
+        .getPublicUrl(EBOOK_FILE);
+
+      const link = document.createElement("a");
+      link.href = urlData.publicUrl;
+      link.download = "planta-y-raiz-cannabis-medicinal.pdf";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({ title: "Download iniciado! 🌿", description: "Aproveite a leitura do e-book gratuito." });
+    } catch (e) {
+      toast({
+        title: "Erro no download",
+        description: "Tente novamente em instantes ou fale com a Enf. Brisa.",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const steps = [
     {
       icon: Users,

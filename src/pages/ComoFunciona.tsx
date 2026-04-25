@@ -1,15 +1,67 @@
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, Zap, Stethoscope, ShoppingBag, Shield, FileText, CheckCircle2, ArrowRight, MessageSquare, UserPlus } from "lucide-react";
+import { Users, Zap, Stethoscope, ShoppingBag, Shield, FileText, CheckCircle2, ArrowRight, MessageSquare, UserPlus, Download, Loader2, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+const EBOOK_BUCKET = "ebooks";
+const EBOOK_FILE = "planta-y-raiz-cannabis-medicinal.pdf";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 const ComoFunciona = () => {
+  const { toast } = useToast();
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadEbook = async () => {
+    setDownloading(true);
+    try {
+      // Verify the file exists in storage
+      const { data: list, error: listError } = await supabase.storage
+        .from(EBOOK_BUCKET)
+        .list("", { search: EBOOK_FILE, limit: 1 });
+
+      if (listError || !list || list.length === 0) {
+        toast({
+          title: "E-book em preparação 📚",
+          description: "Nosso e-book ainda está sendo finalizado. Deixe seu WhatsApp na Enf. Brisa para receber em primeira mão!",
+        });
+        setDownloading(false);
+        return;
+      }
+
+      // Get public URL and trigger download
+      const { data: urlData } = supabase.storage
+        .from(EBOOK_BUCKET)
+        .getPublicUrl(EBOOK_FILE);
+
+      const link = document.createElement("a");
+      link.href = urlData.publicUrl;
+      link.download = "planta-y-raiz-cannabis-medicinal.pdf";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({ title: "Download iniciado! 🌿", description: "Aproveite a leitura do e-book gratuito." });
+    } catch (e) {
+      toast({
+        title: "Erro no download",
+        description: "Tente novamente em instantes ou fale com a Enf. Brisa.",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const steps = [
     {
       icon: Users,
@@ -88,6 +140,41 @@ const ComoFunciona = () => {
                 </Card>
               </motion.div>
             ))}
+          </motion.div>
+
+          {/* E-book Download Section */}
+          <motion.div
+            className="max-w-3xl mx-auto mt-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+          >
+            <Card className="border-secondary/40 bg-gradient-to-br from-secondary/10 via-card to-primary/10">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green mb-4">
+                  <BookOpen size={32} className="text-secondary" />
+                </div>
+                <h3 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-3">
+                  📚 E-book Gratuito: Cannabis Medicinal
+                </h3>
+                <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+                  Guia completo escrito pela equipe Planta & Raiz: indicações terapêuticas, dosagens, ANVISA e como começar seu tratamento.
+                </p>
+                <Button
+                  size="lg"
+                  onClick={handleDownloadEbook}
+                  disabled={downloading}
+                  className="text-lg font-bold bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground"
+                >
+                  {downloading ? (
+                    <><Loader2 size={20} className="mr-2 animate-spin" /> Preparando...</>
+                  ) : (
+                    <><Download size={20} className="mr-2" /> Baixar E-book Gratuito (PDF)</>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
           </motion.div>
 
           {/* CTAs */}

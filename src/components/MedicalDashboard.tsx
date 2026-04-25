@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { doctorChannel } from "@/lib/realtime-channels";
 import { toast } from "sonner";
 import { generatePrescriptionPDF, type PrescriptionData } from "@/lib/prescriptionPDF";
 import { APP_CONFIG } from "@/lib/app-config";
@@ -127,22 +128,28 @@ export function MedicalDashboard() {
       setLoading(false);
     }, 800);
 
-    // Real-time channel for appointment changes
-    const channel = supabase
-      .channel("waiting-room")
-      .on("postgres_changes", {
-        event: "*",
-        schema: "public",
-        table: "appointments",
-        filter: "status=eq.scheduled",
-      }, () => {
-        // In production, re-fetch waiting room patients
-      })
-      .subscribe();
+    // Real-time channel for appointment changes — RLS on realtime.messages
+    // requires a doctor-scoped channel name.
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    supabase.auth.getUser().then(({ data }) => {
+      const uid = data.user?.id;
+      if (!uid) return;
+      channel = supabase
+        .channel(doctorChannel(uid, "waiting-room"))
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "appointments",
+          filter: "status=eq.scheduled",
+        }, () => {
+          // In production, re-fetch waiting room patients
+        })
+        .subscribe();
+    });
 
     return () => {
       clearTimeout(timer);
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, []);
 

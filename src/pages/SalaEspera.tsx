@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { doctorChannel, userChannel } from "@/lib/realtime-channels";
 import { Users, Clock, Video, MessageSquare, CheckCircle2, Wifi, Shield, Bell, ArrowRight, Loader2, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
@@ -41,17 +42,21 @@ const SalaEspera = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Realtime subscription
+  // Realtime subscription — channel name follows realtime.messages RLS convention
   useEffect(() => {
+    if (!currentUserId) return;
+    const name = userType === "doctor"
+      ? doctorChannel(currentUserId, "waiting-room")
+      : userChannel(currentUserId, "waiting-room");
     const channel = supabase
-      .channel("waiting-room")
+      .channel(name)
       .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, () => {
         fetchQueue();
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [currentUserId, doctorId]);
+  }, [currentUserId, doctorId, userType]);
 
   const fetchQueue = async () => {
     const { data: { session } } = await supabase.auth.getSession();

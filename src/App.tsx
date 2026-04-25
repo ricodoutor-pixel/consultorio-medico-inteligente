@@ -47,6 +47,7 @@ const Contato = lazy(() => import("./pages/Contato"));
 const Pay = lazy(() => import("./pages/Pay"));
 const Carteira = lazy(() => import("./pages/Carteira"));
 const Admin = lazy(() => import("./pages/Admin"));
+const AdminClinicas = lazy(() => import("./pages/AdminClinicas"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const BibliotecaCientifica = lazy(() => import("./pages/BibliotecaCientifica"));
 const CadastroProfissional = lazy(() => import("./pages/CadastroProfissional"));
@@ -182,6 +183,7 @@ const App = () => (
                 <Route path="/usuarios-online" element={<OnlineUsers />} />
                 <Route path="/admin-ceo" element={<AdminDashboard />} />
                 <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+                <Route path="/admin/clinicas" element={<AdminRoute><AdminClinicas /></AdminRoute>} />
                 <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/biblioteca" element={<BibliotecaCientifica />} />

@@ -720,6 +720,63 @@ export type Database = {
         }
         Relationships: []
       }
+      clinic_profiles: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          doctor_name: string
+          domain: string | null
+          email: string | null
+          id: string
+          logo_url: string | null
+          owner_user_id: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          slug: string
+          specialty: string
+          tagline: string | null
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          doctor_name: string
+          domain?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          owner_user_id?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          slug: string
+          specialty: string
+          tagline?: string | null
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          doctor_name?: string
+          domain?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          owner_user_id?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          slug?: string
+          specialty?: string
+          tagline?: string | null
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       clinical_outcomes: {
         Row: {
           created_at: string

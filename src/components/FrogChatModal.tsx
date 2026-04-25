@@ -117,13 +117,28 @@ const detectIntent = (text: string): "booking" | "shopping" | "subscription" | n
   return null;
 };
 
+// 🌍 i18n: detecta idioma do navegador e retorna mensagem de boas-vindas
+const detectLang = (): "pt" | "en" | "es" => {
+  if (typeof navigator === "undefined") return "pt";
+  const lang = (navigator.language || "pt").toLowerCase();
+  if (lang.startsWith("en")) return "en";
+  if (lang.startsWith("es")) return "es";
+  return "pt";
+};
+
+const WELCOME_BY_LANG: Record<"pt" | "en" | "es", string> = {
+  pt: "Olá! 🐸👑 Sou o **Verdinho**, assistente IA da **Planta & Raiz**!\n\nPosso te ajudar com:\n- 🩺 Consultas e agendamentos\n- 💊 Cannabis medicinal\n- 🛒 Shopping e produtos\n- 📋 Cadastro e plataforma\n- 🧠 Saúde e bem-estar\n\nPergunte qualquer coisa!",
+  en: "Hi! 🐸👑 I'm **Verdinho**, the **Planta & Raiz** AI assistant!\n\nI can help you with:\n- 🩺 Appointments\n- 💊 Medical cannabis\n- 🛒 Shop and products\n- 📋 Sign-up and platform\n- 🧠 Health & wellness\n\nAsk me anything!",
+  es: "¡Hola! 🐸👑 Soy **Verdinho**, asistente IA de **Planta & Raiz**!\n\nPuedo ayudarte con:\n- 🩺 Consultas y citas\n- 💊 Cannabis medicinal\n- 🛒 Tienda y productos\n- 📋 Registro y plataforma\n- 🧠 Salud y bienestar\n\n¡Pregúntame lo que quieras!",
+};
+
 export const FrogChatModal = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Olá! 🐸👑 Sou o **Verdinho**, assistente IA da **Planta & Raiz**!\n\nPosso te ajudar com:\n- 🩺 Consultas e agendamentos\n- 💊 Cannabis medicinal\n- 🛒 Shopping e produtos\n- 📋 Cadastro e plataforma\n- 🧠 Saúde e bem-estar\n\nPergunte qualquer coisa!",
+      text: WELCOME_BY_LANG[detectLang()],
       sender: "ai",
       timestamp: new Date(),
     },

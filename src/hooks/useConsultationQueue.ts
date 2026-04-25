@@ -4,6 +4,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { doctorChannel, userChannel } from "@/lib/realtime-channels";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 interface QueueEntry {
@@ -38,13 +39,21 @@ export function useConsultationQueue(userType: "patient" | "doctor") {
 
     fetchQueue();
 
-    // Subscribe to realtime changes
-    const channel = supabase
-      .channel("consultation-queue-live")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "consultation_queue" },
-        (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
+    // Subscribe to realtime changes — RLS on realtime.messages requires
+    // channel names scoped to the auth user (doctor:<uid>:... or user:<uid>:...).
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    supabase.auth.getUser().then(({ data }) => {
+      const uid = data.user?.id;
+      if (!uid) return;
+      const name = userType === "doctor"
+        ? doctorChannel(uid, "consultation-queue-live")
+        : userChannel(uid, "consultation-queue-live");
+      channel = supabase
+        .channel(name)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "consultation_queue" },
+          (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const newRecord = payload.new as QueueEntry;
           const oldRecord = payload.old as QueueEntry;
 

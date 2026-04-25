@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { userChannel } from "@/lib/realtime-channels";
 
 export interface SubscriptionInfo {
   isActive: boolean;
@@ -88,17 +89,24 @@ export function useSubscription(): SubscriptionInfo {
 
     fetch();
 
-    // Listen for realtime changes
-    const channel = supabase
-      .channel("subscription-changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "subscriptions" }, () => {
-        fetch();
-      })
-      .subscribe();
+    // Listen for realtime changes — channel name MUST follow the
+    // realtime.messages RLS naming convention (user:<auth.uid>:...).
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    supabase.auth.getUser().then(({ data }) => {
+      const uid = data.user?.id;
+      if (cancelled || !uid) return;
+      channel = supabase
+        .channel(userChannel(uid, "subscription-changes"))
+        .on("postgres_changes", {
+          event: "*", schema: "public", table: "subscriptions",
+          filter: `user_id=eq.${uid}`,
+        }, () => { fetch(); })
+        .subscribe();
+    });
 
     return () => {
       cancelled = true;
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, []);
 

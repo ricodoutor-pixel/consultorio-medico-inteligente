@@ -9,6 +9,7 @@ import { CheckCircle2, Copy, Clock, ArrowRight, Shield, QrCode, Loader2, AlertCi
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { userChannel } from "@/lib/realtime-channels";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -136,24 +137,29 @@ const ConsultationPayment = () => {
     return () => clearInterval(interval);
   }, [checkPaymentStatus, status, appointmentId]);
 
-  // Realtime listener
+  // Realtime listener — channel name follows realtime.messages RLS convention
   useEffect(() => {
     if (!appointmentId) return;
-    const channel = supabase
-      .channel(`payment-${appointmentId}`)
-      .on("postgres_changes", {
-        event: "UPDATE",
-        schema: "public",
-        table: "appointments",
-        filter: `id=eq.${appointmentId}`,
-      }, (payload: any) => {
-        if (payload.new?.payment_status === "paid") {
-          setStatus("confirmed");
-          toast({ title: "✅ Pagamento confirmado!", description: "Redirecionando..." });
-        }
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    supabase.auth.getUser().then(({ data }) => {
+      const uid = data.user?.id;
+      if (!uid) return;
+      channel = supabase
+        .channel(userChannel(uid, `payment-${appointmentId}`))
+        .on("postgres_changes", {
+          event: "UPDATE",
+          schema: "public",
+          table: "appointments",
+          filter: `id=eq.${appointmentId}`,
+        }, (payload: any) => {
+          if (payload.new?.payment_status === "paid") {
+            setStatus("confirmed");
+            toast({ title: "✅ Pagamento confirmado!", description: "Redirecionando..." });
+          }
+        })
+        .subscribe();
+    });
+    return () => { if (channel) supabase.removeChannel(channel); };
   }, [appointmentId, toast]);
 
   const handleCopyLink = () => {

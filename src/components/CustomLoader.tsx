@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
+import drVerdinho from "@/assets/dr-verdinho.png";
 
 /**
- * Splash / Loader screen — shows the Planta y Raiz brand while the app hydrates.
- * Fades out automatically after the app is ready.
+ * Splash / Loader screen — Dr. Verdinho, mascote oficial da Planta y Raiz Ltda.
+ * Exibido ao iniciar o app em todos os dispositivos. Faz fade-out após hidratação.
  */
 export function CustomLoader() {
   const [visible, setVisible] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setFadeOut(true), 800);
-    const remove = setTimeout(() => setVisible(false), 1200);
+    const timer = setTimeout(() => setFadeOut(true), 1400);
+    const remove = setTimeout(() => setVisible(false), 1800);
     return () => {
       clearTimeout(timer);
       clearTimeout(remove);
@@ -21,26 +22,44 @@ export function CustomLoader() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background transition-opacity duration-400 ${
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500 ${
         fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
+      style={{ backgroundColor: "#1B4332" }}
       aria-label="Carregando Planta y Raiz"
     >
-      {/* Logo / Brand */}
-      <div className="flex flex-col items-center gap-4">
-        <span className="text-4xl font-display font-black tracking-tight text-foreground">
-          🌿 <span className="text-primary">Planta</span>{" "}
-          <span className="text-muted-foreground">y Raiz</span>
-        </span>
+      <div className="flex flex-col items-center gap-6 px-6 text-center">
+        {/* Dr. Verdinho — Identidade Oficial */}
+        <img
+          src={drVerdinho}
+          alt="Dr. Verdinho — Mascote Oficial Planta y Raiz Ltda"
+          className="w-40 h-40 sm:w-48 sm:h-48 object-contain drop-shadow-2xl animate-[float_2.5s_ease-in-out_infinite]"
+          style={{ filter: "drop-shadow(0 10px 30px rgba(0,0,0,0.4))" }}
+          fetchPriority="high"
+        />
 
-        {/* Spinner */}
-        <div className="relative h-10 w-10">
-          <div className="absolute inset-0 rounded-full border-4 border-muted" />
-          <div className="absolute inset-0 rounded-full border-4 border-t-primary animate-spin" />
+        <div className="flex flex-col items-center gap-2">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
+            Planta <span className="text-emerald-300">y</span> Raiz
+          </h1>
+          <p className="text-xs sm:text-sm text-emerald-100/80 tracking-wide">
+            Telemedicina Cannabis Medicinal
+          </p>
         </div>
 
-        <p className="text-xs text-muted-foreground mt-2">Carregando sua experiência…</p>
+        {/* Spinner */}
+        <div className="relative h-8 w-8 mt-2">
+          <div className="absolute inset-0 rounded-full border-2 border-white/20" />
+          <div className="absolute inset-0 rounded-full border-2 border-t-emerald-300 animate-spin" />
+        </div>
       </div>
+
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-12px); }
+        }
+      `}</style>
     </div>
   );
 }

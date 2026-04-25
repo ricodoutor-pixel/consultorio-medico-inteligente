@@ -10,6 +10,7 @@ import { Leaf, Mail, Lock, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -204,22 +205,30 @@ const Login = () => {
                       disabled={loading}
                       onClick={async () => {
                         setLoading(true);
-                        // Build a safe redirect target (avoids 404 by always landing on a known route)
-                        const target = redirectTo
-                          ? decodeURIComponent(redirectTo)
-                          : "/dashboard";
-                        const redirectUrl = `${window.location.origin}${target.startsWith("/") ? target : `/${target}`}`;
-                        const { error } = await supabase.auth.signInWithOAuth({
-                          provider: "google",
-                          options: {
-                            redirectTo: redirectUrl,
-                            queryParams: { prompt: "select_account" },
-                          },
-                        });
-                        if (error) {
+                        try {
+                          const result = await lovable.auth.signInWithOAuth("google", {
+                            redirect_uri: window.location.origin,
+                            extraParams: { prompt: "select_account" },
+                          });
+                          if (result.error) {
+                            toast({
+                              title: "Erro com Google",
+                              description: result.error.message || "Não foi possível entrar com Google.",
+                              variant: "destructive",
+                            });
+                            setLoading(false);
+                            return;
+                          }
+                          if (result.redirected) {
+                            // Browser is redirecting to Google — keep loading state
+                            return;
+                          }
+                          // Session established — go to dashboard
+                          window.location.href = redirectTo ? decodeURIComponent(redirectTo) : "/dashboard";
+                        } catch (e: any) {
                           toast({
                             title: "Erro com Google",
-                            description: error.message || "Não foi possível entrar com Google.",
+                            description: e?.message || "Falha inesperada no login.",
                             variant: "destructive",
                           });
                           setLoading(false);

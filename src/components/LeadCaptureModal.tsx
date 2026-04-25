@@ -36,8 +36,10 @@ export const LeadCaptureModal = ({
   origem,
   message,
   tags = [],
+  categoria,
 }: LeadCaptureModalProps) => {
   const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -66,6 +68,10 @@ export const LeadCaptureModal = ({
       setError("Informe seu nome");
       return;
     }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Informe um e-mail válido");
+      return;
+    }
     if (!isValidPhone(telefone)) {
       setError("Informe um telefone válido com DDD");
       return;
@@ -81,41 +87,59 @@ export const LeadCaptureModal = ({
       if (existingName) {
         setRecognized(existingName);
         localStorage.setItem("pr_lead_name", existingName);
+        localStorage.setItem("pr_lead_phone", phoneDigits);
+        if (email) localStorage.setItem("pr_lead_email", email.trim());
+        if (categoria) localStorage.setItem("pr_lead_categoria", categoria);
         setTimeout(() => {
-          onSuccess({ nome: existingName, telefone: phoneDigits });
+          onSuccess({ nome: existingName, telefone: phoneDigits, email: email.trim() || undefined, categoria });
         }, 1500);
         return;
       }
 
+      const idioma = (typeof navigator !== "undefined" ? navigator.language.slice(0, 2) : "pt").toLowerCase();
       const allTags = origem === "ebook" ? ["Origem_Ebook", ...tags] : ["Origem_Chat", ...tags];
+      if (categoria) allTags.push(`Categoria_${categoria}`);
 
-      // Send to edge function which saves to DB
-      const resp = await fetch(WEBHOOK_URL, {
+      // Save directly to Supabase (no dependency on edge function)
+      const { error: dbError } = await supabase
+        .from("leads_contatos" as any)
+        .insert({
+          nome: nome.trim(),
+          telefone: phoneDigits,
+          email: email.trim() || null,
+          categoria: categoria || null,
+          idioma,
+          origem,
+          tags: allTags,
+        } as any);
+
+      if (dbError) throw new Error(dbError.message);
+
+      // Best-effort fire-and-forget sync to webhook (does not block UX)
+      fetch(WEBHOOK_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
-          subscriber: { name: nome.trim(), phone: phoneDigits },
-          data: { origem, tags: allTags },
+          subscriber: { name: nome.trim(), phone: phoneDigits, email: email.trim() || undefined },
+          data: { origem, tags: allTags, categoria, idioma },
         }),
-      });
-
-      if (!resp.ok) {
-        const errData = await resp.json().catch(() => ({}));
-        throw new Error(errData.error || "Erro ao salvar");
-      }
+      }).catch(() => {});
 
       localStorage.setItem("pr_lead_name", nome.trim());
-      onSuccess({ nome: nome.trim(), telefone: phoneDigits });
+      localStorage.setItem("pr_lead_phone", phoneDigits);
+      if (email) localStorage.setItem("pr_lead_email", email.trim());
+      if (categoria) localStorage.setItem("pr_lead_categoria", categoria);
+      onSuccess({ nome: nome.trim(), telefone: phoneDigits, email: email.trim() || undefined, categoria });
     } catch (e) {
       console.error("Lead capture error:", e);
       setError("Erro ao enviar. Tente novamente.");
     } finally {
       setIsSubmitting(false);
     }
-  }, [nome, telefone, origem, tags, onSuccess, checkExistingLead]);
+  }, [nome, email, telefone, origem, tags, categoria, onSuccess, checkExistingLead]);
 
   if (!isOpen) return null;
 

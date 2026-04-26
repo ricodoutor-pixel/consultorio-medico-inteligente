@@ -77,10 +77,19 @@ export const WhatsAppButton = () => {
     const pageLink = `${SITE_BASE}${option.path}`;
     const fullMessage = `${option.greeting}\n\n📎 ${pageLink}`;
     
-    // ManyChat Flow "Enf Brisa Bot Lovable" (Official Automation)
-    const manyChatFlowUrl = `https://app.manychat.com/flowPlayerPage?share_hash=4773110_52afc617acd735b548c9a794700447116667f7d5&mc_locale=pt_BR&user_type=${option.id}`;
+    // Detect if user is on mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
-    window.open(manyChatFlowUrl, "_blank", "noopener,noreferrer");
+    if (isMobile) {
+      // On mobile: Direct WhatsApp link for seamless experience
+      const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
+      window.location.href = whatsappUrl;
+    } else {
+      // On desktop: ManyChat Flow "Enf Brisa Bot Lovable" (Official Automation)
+      const manyChatFlowUrl = `https://app.manychat.com/flowPlayerPage?share_hash=4773110_52afc617acd735b548c9a794700447116667f7d5&mc_locale=pt_BR&user_type=${option.id}`;
+      window.open(manyChatFlowUrl, "_blank", "noopener,noreferrer");
+    }
+    
     setIsOpen(false);
   };
 

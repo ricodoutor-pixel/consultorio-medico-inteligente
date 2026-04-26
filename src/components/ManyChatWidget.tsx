@@ -19,7 +19,7 @@ export const ManyChatWidget = () => {
       s.id = "manychat-widget-script";
       s.async = true;
       s.defer = true;
-      s.src = `https://widget.manychat.com/108740678123445.js?locale=${locale}`;
+      s.src = `https://widget.manychat.com/11227069.js?locale=${locale}`;
       document.body.appendChild(s);
     };
 

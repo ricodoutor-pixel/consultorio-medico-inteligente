@@ -207,7 +207,8 @@ Deno.serve(async (req: Request) => {
           }
         } catch (err) {
           payoutRecord.status = "failed";
-          payoutRecord.error_message = `Erro de rede: ${err.message}`;
+          const errMsg = err instanceof Error ? err.message : String(err);
+          payoutRecord.error_message = `Erro de rede: ${errMsg}`;
           results.push({ ...payoutRecord, success: false });
         }
       } else {
@@ -249,7 +250,8 @@ Deno.serve(async (req: Request) => {
 
   } catch (error) {
     console.error("Payout error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const message = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: message }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

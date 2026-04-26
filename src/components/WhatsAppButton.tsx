@@ -12,7 +12,7 @@ const VISITOR_OPTIONS = [
     icon: User,
     description: "Agendar consulta ou tirar dúvidas",
     path: "/quiz-triagem",
-    greeting: `Olá Enf. Brisa! 🌿 Sou paciente e gostaria de agendar uma consulta.\n\nPode me orientar sobre como funciona?`,
+    greeting: `Olá, Enf. Brisa! 🌿 Tudo bem? Sou paciente e adoraria agendar uma consulta com vocês. Pode me dar uma ajudinha e me orientar sobre como funciona? 😊`,
     color: "hsl(152 100% 74%)",
   },
   {
@@ -21,7 +21,7 @@ const VISITOR_OPTIONS = [
     icon: Stethoscope,
     description: "Quero prescrever na plataforma",
     path: "/profissionais",
-    greeting: `Olá Enf. Brisa! 🌿 Sou médico e gostaria de saber como prescrever pela plataforma Planta y Raiz.`,
+    greeting: `Olá, Enf. Brisa! 🌿 Que prazer falar com você. Sou médico e estou muito interessado em saber como posso começar a prescrever pela plataforma Planta y Raiz. Pode me passar as informações? 🩺✨`,
     color: "hsl(217 91% 60%)",
   },
   {
@@ -30,7 +30,7 @@ const VISITOR_OPTIONS = [
     icon: Store,
     description: "Vender no nosso marketplace",
     path: "/shopping",
-    greeting: `Olá Enf. Brisa! 🌿 Sou lojista e gostaria de vender no marketplace da Planta y Raiz.`,
+    greeting: `Olá, Enf. Brisa! 🌿 Como vai? Sou lojista e tenho muito interesse em levar meus produtos para o marketplace da Planta y Raiz. Como podemos fazer essa parceria acontecer? 🤝🚀`,
     color: "hsl(45 93% 58%)",
   },
   {
@@ -39,7 +39,7 @@ const VISITOR_OPTIONS = [
     icon: BookOpen,
     description: "Material educativo gratuito",
     path: "/como-funciona",
-    greeting: `Olá Enf. Brisa! 🌿 Gostaria de receber o e-book gratuito sobre cannabis medicinal.`,
+    greeting: `Olá, Enf. Brisa! 🌿 Tudo ótimo? Fiquei sabendo do e-book gratuito sobre cannabis medicinal e adoraria receber o meu para aprender mais! Pode me enviar o link? 📚💚`,
     color: "hsl(280 67% 60%)",
   },
 ] as const;

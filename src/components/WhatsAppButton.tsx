@@ -82,10 +82,12 @@ export const WhatsAppButton = () => {
     
     if (isMobile) {
       // On mobile: Direct WhatsApp link for seamless experience
+      // This avoids exposing the ManyChat flow player page on small screens
       const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
       window.location.href = whatsappUrl;
     } else {
       // On desktop: ManyChat Flow "Enf Brisa Bot Lovable" (Official Automation)
+      // Using flowPlayerEmbed for a cleaner integration if possible, or keeping flowPlayerPage
       const manyChatFlowUrl = `https://app.manychat.com/flowPlayerPage?share_hash=4773110_52afc617acd735b548c9a794700447116667f7d5&mc_locale=pt_BR&user_type=${option.id}`;
       window.open(manyChatFlowUrl, "_blank", "noopener,noreferrer");
     }

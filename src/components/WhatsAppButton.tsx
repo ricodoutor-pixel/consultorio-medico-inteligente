@@ -77,11 +77,10 @@ export const WhatsAppButton = () => {
     const pageLink = `${SITE_BASE}${option.path}`;
     const fullMessage = `${option.greeting}\n\n📎 ${pageLink}`;
     
-    // Use ManyChat Flow URL for automation
-    const manyChatFlowUrl = `https://app.manychat.com/flowPlayerPage?share_hash=4773110_52afc617acd735b548c9a794700447116667f7d5&mc_locale=pt_BR&user_type=${option.id}`;
+    // Direct WhatsApp link (Official destination for Enfª Brisa)
+    const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
     
-    // Open ManyChat Flow which will then redirect to WhatsApp after interaction
-    window.open(manyChatFlowUrl, "_blank", "noopener,noreferrer");
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     setIsOpen(false);
   };
 

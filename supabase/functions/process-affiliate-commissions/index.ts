@@ -121,16 +121,19 @@ Deno.serve(async (req) => {
       }
 
       // Update referral_links total_earnings
-      await supabase.rpc("increment_referral_earnings", {
-        _user_id: referrerId,
-        _amount: commissionAmount,
-      }).catch(() => {
+      try {
+        const { error: rpcErr } = await supabase.rpc("increment_referral_earnings", {
+          _user_id: referrerId,
+          _amount: commissionAmount,
+        });
+        if (rpcErr) throw rpcErr;
+      } catch (_e) {
         // RPC may not exist yet, fallback to direct update
-        supabase
+        await supabase
           .from("referral_links")
-          .update({ total_earnings: commissionAmount }) // Will be overwritten below
+          .update({ total_earnings: commissionAmount })
           .eq("user_id", referrerId);
-      });
+      }
 
       // Notify affiliate
       await supabase.from("notifications").insert({

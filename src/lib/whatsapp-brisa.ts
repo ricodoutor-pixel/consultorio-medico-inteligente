@@ -5,7 +5,7 @@
  * Número: 5511991363154
  */
 
-export const BRISA_WHATSAPP = "5511987131241";
+export const BRISA_WHATSAPP = "5511991363154";
 
 /**
  * Gerar URL de WhatsApp com template dinâmico

@@ -77,10 +77,10 @@ export const WhatsAppButton = () => {
     const pageLink = `${SITE_BASE}${option.path}`;
     const fullMessage = `${option.greeting}\n\n📎 ${pageLink}`;
     
-    // Direct WhatsApp link (Official destination for Enfª Brisa)
-    const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
+    // ManyChat Flow "Enf Brisa Bot Lovable" (Official Automation)
+    const manyChatFlowUrl = `https://app.manychat.com/flowPlayerPage?share_hash=4773110_52afc617acd735b548c9a794700447116667f7d5&mc_locale=pt_BR&user_type=${option.id}`;
     
-    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    window.open(manyChatFlowUrl, "_blank", "noopener,noreferrer");
     setIsOpen(false);
   };
 

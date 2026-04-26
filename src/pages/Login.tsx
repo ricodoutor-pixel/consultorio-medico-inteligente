@@ -10,6 +10,7 @@ import { Leaf, Mail, Lock, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -202,16 +203,16 @@ const Login = () => {
                       disabled={loading}
                       onClick={async () => {
                         setLoading(true);
-                        const { error } = await supabase.auth.signInWithOAuth({
-                          provider: "google",
-                          options: {
-                            redirectTo: window.location.origin,
-                          },
+                        const result = await lovable.auth.signInWithOAuth("google", {
+                          redirect_uri: window.location.origin,
                         });
-                        if (error) {
+                        if (result.error) {
                           toast({ title: "Erro com Google", description: "Não foi possível entrar com Google.", variant: "destructive" });
                           setLoading(false);
+                          return;
                         }
+                        if (result.redirected) return;
+                        navigate(redirectTo || "/");
                       }}
                     >
                       <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">

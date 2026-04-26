@@ -102,7 +102,12 @@ Deno.test("revenue-distribution / RevenuePoolRow update tem shape correto", () =
   assertEquals(update.total_pool, 100);
 });
 
-Deno.test("revenue-distribution / handler carrega sem erros de tipo", async () => {
-  const mod = await import("./index.ts");
-  assert(mod !== null);
+Deno.test({
+  name: "revenue-distribution / handler carrega sem erros de tipo",
+  sanitizeOps: false,
+  sanitizeResources: false,
+  fn: async () => {
+    const mod = await import("./index.ts");
+    assert(mod !== null);
+  },
 });

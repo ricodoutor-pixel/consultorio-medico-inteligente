@@ -77,10 +77,13 @@ Deno.test("nps-submit / fórmula NPS: %promoters - %detractors", () => {
   assertEquals(nps, 25); // (2-1)/4 * 100 = 25
 });
 
-Deno.test("nps-submit / handler real responde 405 fora de POST", async () => {
-  // Importação dinâmica do handler — registra Deno.serve no escopo, mas só testamos
-  // o módulo em isolamento via fetch quando rodamos `deno test --allow-net`.
-  // Aqui validamos que o módulo carrega sem erros de tipo.
-  const mod = await import("./index.ts");
-  assert(mod !== null);
+Deno.test({
+  name: "nps-submit / handler real carrega sem erros de tipo",
+  // O handler chama Deno.serve no top-level → isolamos os leaks
+  sanitizeOps: false,
+  sanitizeResources: false,
+  fn: async () => {
+    const mod = await import("./index.ts");
+    assert(mod !== null);
+  },
 });

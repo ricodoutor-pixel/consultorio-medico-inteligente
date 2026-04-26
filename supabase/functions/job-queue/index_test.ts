@@ -80,15 +80,17 @@ Deno.test("job-queue / processPrescriptionJob → notification para paciente", (
   assertEquals(payload.type, "prescription");
 });
 
-Deno.test("job-queue / SupabaseClient<any> aceita .from('notifications').insert sem virar never", async () => {
-  // Regression test do bug TS2769 (table=never). Usa um cliente real tipado
-  // como any → se alguém regredir a importação para `ReturnType<typeof createClient>`
-  // sem genéricos, este teste para de compilar.
-  const { createClient, SupabaseClient } = await import("https://esm.sh/@supabase/supabase-js@2");
-  type DB = InstanceType<typeof SupabaseClient<any, "public", any>>;
-
-  // Não chamamos o servidor — só validamos que o tipo aceita o shape
-  const fakeClient = createClient("http://x", "k") as unknown as DB;
-  const builder = fakeClient.from("notifications");
-  assert(typeof builder.insert === "function");
+Deno.test({
+  name: "job-queue / SupabaseClient<any> aceita .from('notifications').insert sem virar never",
+  // Importar supabase-js cria um realtime channel global — isolamos os leaks
+  sanitizeOps: false,
+  sanitizeResources: false,
+  fn: async () => {
+    // Regression do bug TS2769 (table=never). Validação puramente de tipos.
+    const mod = await import("https://esm.sh/@supabase/supabase-js@2");
+    type DB = InstanceType<typeof mod.SupabaseClient<any, "public", any>>;
+    const fakeClient = mod.createClient("http://x", "k") as unknown as DB;
+    const builder = fakeClient.from("notifications");
+    assert(typeof builder.insert === "function");
+  },
 });

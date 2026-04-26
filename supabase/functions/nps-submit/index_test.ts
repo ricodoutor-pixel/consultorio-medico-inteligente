@@ -1,4 +1,5 @@
-import "https://deno.land/std@0.224.0/dotenv/load.ts?allowEmptyValues=true";
+import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
+await load({ export: true, allowEmptyValues: true, examplePath: null });
 import { assertEquals, assert } from "https://deno.land/std@0.224.0/assert/mod.ts";
 import type { NpsResponseInsert } from "../_test/mock-supabase.ts";
 

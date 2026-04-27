@@ -1,13 +1,58 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Download, Smartphone, Flame } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Download, Smartphone, Flame, Share, Plus, Check } from "lucide-react";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 export function PWAInstallSection() {
-  const { canInstall, isInstalled, promptInstall } = usePWAInstall();
+  const { canInstall, isInstalled, isIOS, promptInstall } = usePWAInstall();
+  const [iosDialogOpen, setIosDialogOpen] = useState(false);
 
-  if (isInstalled) return null;
+  const handleClick = async () => {
+    // Já instalado → abrir o PWA / origin
+    if (isInstalled) {
+      window.location.href = "/?source=pwa";
+      return;
+    }
+
+    // Android / Desktop com prompt nativo disponível
+    if (canInstall) {
+      const outcome = await promptInstall();
+      if (outcome === "accepted") {
+        toast.success("App instalado com sucesso! 🐸");
+      }
+      return;
+    }
+
+    // iOS — sem beforeinstallprompt, mostrar instruções
+    if (isIOS) {
+      setIosDialogOpen(true);
+      return;
+    }
+
+    // Fallback: navegador sem suporte → instrução genérica
+    toast.info(
+      "Use o menu do seu navegador e escolha 'Instalar app' ou 'Adicionar à tela inicial'.",
+      { duration: 6000 }
+    );
+  };
+
+  const buttonLabel = isInstalled
+    ? "Abrir App"
+    : isIOS
+      ? "Adicionar à Tela Inicial"
+      : "Instalar App Planta y Raiz";
+
+  const ButtonIcon = isInstalled ? Check : Download;
 
   return (
     <section className="py-8 md:py-16">
@@ -26,33 +71,37 @@ export function PWAInstallSection() {
 
             <CardContent className="p-5 md:p-10">
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
-                <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-primary/10 border border-primary/20 shrink-0">
-                  <Smartphone size={32} className="text-primary" />
+                <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-primary/10 border border-primary/20 shrink-0 overflow-hidden">
+                  <img
+                    src="/dr-verdinho-192.png?v=6"
+                    alt="Dr. Verdinho — mascote oficial Planta y Raiz"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
                 </div>
 
                 <div className="flex-1 text-center md:text-left">
                   <h3 className="text-lg md:text-2xl font-display font-black text-foreground mb-2">
-                    Sua Saúde no Bolso: <span className="text-gradient-green">Baixe o App Oficial</span>
+                    Sua Saúde no Bolso:{" "}
+                    <span className="text-gradient-green">
+                      {isInstalled ? "Abra o App Oficial" : "Baixe o App Oficial"}
+                    </span>
                   </h3>
                   <p className="text-xs md:text-sm text-muted-foreground max-w-lg">
-                    Não quebre sua sequência de cuidados! Receba lembretes diários e acompanhe seu tratamento direto na tela inicial do seu celular.
+                    {isInstalled
+                      ? "Você já tem o app instalado. Toque em Abrir App para retomar seu tratamento na hora."
+                      : "Não quebre sua sequência de cuidados! Receba lembretes diários e acompanhe seu tratamento direto na tela inicial do seu celular."}
                   </p>
                 </div>
 
                 <Button
                   size="lg"
                   className="bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl h-12 px-6 shrink-0 w-full md:w-auto"
-                  onClick={() => {
-                    if (canInstall) {
-                      promptInstall();
-                    } else {
-                      // Fallback: guide user to add to home screen
-                      window.open(window.location.origin, '_blank');
-                    }
-                  }}
+                  onClick={handleClick}
+                  aria-label={buttonLabel}
                 >
-                  <Download size={18} className="mr-2" />
-                  Instalar App Planta y Raiz
+                  <ButtonIcon size={18} className="mr-2" />
+                  {buttonLabel}
                 </Button>
               </div>
 
@@ -73,6 +122,44 @@ export function PWAInstallSection() {
           </Card>
         </motion.div>
       </div>
+
+      {/* Diálogo de instruções iOS (Safari não suporta beforeinstallprompt) */}
+      <Dialog open={iosDialogOpen} onOpenChange={setIosDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Smartphone size={20} className="text-primary" />
+              Instalar no iPhone / iPad
+            </DialogTitle>
+            <DialogDescription>
+              No Safari, siga estes 2 passos para adicionar o Dr. Verdinho à sua tela inicial:
+            </DialogDescription>
+          </DialogHeader>
+          <ol className="space-y-3 mt-2">
+            <li className="flex items-start gap-3 text-sm">
+              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/20 text-primary font-bold shrink-0">
+                1
+              </span>
+              <span className="flex-1">
+                Toque no ícone <Share size={14} className="inline mx-1" />
+                <strong>Compartilhar</strong> na barra inferior do Safari.
+              </span>
+            </li>
+            <li className="flex items-start gap-3 text-sm">
+              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/20 text-primary font-bold shrink-0">
+                2
+              </span>
+              <span className="flex-1">
+                Escolha <Plus size={14} className="inline mx-1" />
+                <strong>"Adicionar à Tela de Início"</strong> e confirme.
+              </span>
+            </li>
+          </ol>
+          <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/10 text-xs text-muted-foreground">
+            Pronto! O ícone do Dr. Verdinho ficará na sua tela inicial e o app abrirá em tela cheia, sem barra de endereço.
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

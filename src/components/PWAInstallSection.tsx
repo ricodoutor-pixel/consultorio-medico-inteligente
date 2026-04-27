@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -13,22 +13,40 @@ import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
+const IOS_HINT_KEY = "pyr_ios_install_hint_shown";
+
 export function PWAInstallSection() {
   const { canInstall, isInstalled, isIOS, promptInstall } = usePWAInstall();
   const [iosDialogOpen, setIosDialogOpen] = useState(false);
 
+  // Auto-mostra a instrução iOS uma vez por sessão (Safari não tem prompt nativo)
+  useEffect(() => {
+    if (isIOS && !isInstalled && typeof sessionStorage !== "undefined") {
+      const alreadyShown = sessionStorage.getItem(IOS_HINT_KEY);
+      if (!alreadyShown) {
+        const t = setTimeout(() => {
+          setIosDialogOpen(true);
+          sessionStorage.setItem(IOS_HINT_KEY, "1");
+        }, 2500);
+        return () => clearTimeout(t);
+      }
+    }
+  }, [isIOS, isInstalled]);
+
   const handleClick = async () => {
-    // Já instalado → abrir o PWA / origin
+    // Já instalado → reabrir o app
     if (isInstalled) {
       window.location.href = "/?source=pwa";
       return;
     }
 
-    // Android / Desktop com prompt nativo disponível
+    // Android / Desktop com prompt nativo disponível → dispara IMEDIATAMENTE
     if (canInstall) {
       const outcome = await promptInstall();
       if (outcome === "accepted") {
-        toast.success("App instalado com sucesso! 🐸");
+        toast.success("App Planta y Raiz instalado! 🐸");
+      } else if (outcome === "dismissed") {
+        toast.info("Você pode instalar a qualquer momento pelo menu do navegador.");
       }
       return;
     }
@@ -41,7 +59,7 @@ export function PWAInstallSection() {
 
     // Fallback: navegador sem suporte → instrução genérica
     toast.info(
-      "Use o menu do seu navegador e escolha 'Instalar app' ou 'Adicionar à tela inicial'.",
+      "Use o menu do seu navegador (⋮) e escolha 'Instalar app' ou 'Adicionar à tela inicial'.",
       { duration: 6000 }
     );
   };

@@ -3614,6 +3614,54 @@ export type Database = {
       }
     }
     Views: {
+      clinic_profiles_public: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          description: string | null
+          doctor_name: string | null
+          domain: string | null
+          id: string | null
+          logo_url: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          slug: string | null
+          specialty: string | null
+          tagline: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          doctor_name?: string | null
+          domain?: string | null
+          id?: string | null
+          logo_url?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          slug?: string | null
+          specialty?: string | null
+          tagline?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          doctor_name?: string | null
+          domain?: string | null
+          id?: string | null
+          logo_url?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          slug?: string | null
+          specialty?: string | null
+          tagline?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       doctors_public: {
         Row: {
           available_hours: Json | null

@@ -7,16 +7,14 @@
 const CACHE_VERSION = 'plantayraiz-v2.0';
 const DYNAMIC_CACHE = 'plantayraiz-dynamic-v2.0';
 
-// Assets essenciais para cache imediato
+// Assets essenciais para cache imediato (apenas arquivos garantidamente existentes)
 const PRECACHE_ASSETS = [
   '/',
   '/manifest.json',
-  '/favicon.svg',
   '/favicon.png',
   '/apple-touch-icon.png',
-  '/frog-happy.png',
-  '/frog-warning.png',
-  '/frog-critical.png',
+  '/dr-verdinho-192.png',
+  '/dr-verdinho-512.png',
   '/og-image.png'
 ];
 

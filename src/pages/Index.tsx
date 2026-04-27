@@ -16,6 +16,7 @@ import testimonialRoberto from "@/assets/testimonial-roberto.jpg";
 import testimonialJuliana from "@/assets/testimonial-juliana.jpg";
 import testimonialAntonio from "@/assets/testimonial-antonio.jpg";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
+import { PWAInstallSection } from "@/components/PWAInstallSection";
 
 
 import { useEffect } from "react";
@@ -301,6 +302,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Instalação do App PWA - Dr. Verdinho na tela inicial */}
+      <PWAInstallSection />
 
       {/* Mercado Cannabis Medicinal - Projeção Interativa */}
       <CannabisMarketChart />

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Stethoscope, User, Store, BookOpen } from "lucide-react";
+import { MessageCircle, X, Stethoscope, User, Store, BookOpen, HelpCircle } from "lucide-react";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 // ManyChat keyword triggers — devem estar configurados como
 // "Keyword Rule" no painel do ManyChat (Automation → Keywords)
 // para disparar o fluxo correto de cada perfil automaticamente.
+const SITE_BASE = "https://plantayraiz.com.br";
+
 const VISITOR_OPTIONS = [
   {
     id: "paciente",
@@ -14,7 +16,8 @@ const VISITOR_OPTIONS = [
     label: "Sou Paciente",
     icon: User,
     description: "Agendar consulta ou tirar dúvidas",
-    greeting: `#PACIENTE\n\nOlá, Enf. Brisa! 🌿 Tudo bem? Sou paciente e adoraria agendar uma consulta com vocês. Pode me orientar sobre como funciona? 😊`,
+    greeting: `#PACIENTE\n\nOlá, Enfª Brisa! 🌿 Sou paciente e quero conhecer os planos de atendimento da Planta y Raiz. Pode me orientar? 😊`,
+    landing: `${SITE_BASE}/planos`,
     color: "hsl(152 100% 74%)",
   },
   {
@@ -23,32 +26,60 @@ const VISITOR_OPTIONS = [
     label: "Sou Médico",
     icon: Stethoscope,
     description: "Quero prescrever na plataforma",
-    greeting: `#MEDICO\n\nOlá, Enf. Brisa! 🌿 Que prazer falar com você. Sou médico e estou interessado em começar a prescrever pela plataforma Planta y Raiz. Pode me passar as informações? 🩺✨`,
+    greeting: `#MEDICO\n\nOlá, Enfª Brisa! 🌿 Sou médico e quero começar a prescrever pela Planta y Raiz. Pode me passar as informações? 🩺✨`,
+    landing: `${SITE_BASE}/profissionais`,
     color: "hsl(217 91% 60%)",
   },
   {
     id: "lojista",
     keyword: "#LOJISTA",
-    label: "Sou Lojista",
+    label: "Sou Lojista / Parceiro",
     icon: Store,
     description: "Vender no nosso marketplace",
-    greeting: `#LOJISTA\n\nOlá, Enf. Brisa! 🌿 Como vai? Sou lojista e tenho interesse em levar meus produtos para o marketplace da Planta y Raiz. Como fazemos essa parceria? 🤝🚀`,
+    greeting: `#LOJISTA\n\nOlá, Enfª Brisa! 🌿 Sou lojista/parceiro e tenho interesse em levar meus produtos para o marketplace da Planta y Raiz. Como fazemos a parceria? 🤝🚀`,
+    landing: `${SITE_BASE}/parceiros`,
     color: "hsl(45 93% 58%)",
   },
   {
     id: "ebook",
     keyword: "#EBOOK",
-    label: "Baixar E-book",
+    label: "Biblioteca / E-book",
     icon: BookOpen,
     description: "Material educativo gratuito",
-    greeting: `#EBOOK\n\nOlá, Enf. Brisa! 🌿 Fiquei sabendo do e-book gratuito sobre cannabis medicinal e adoraria receber o meu! Pode me enviar o link? 📚💚`,
+    greeting: `#EBOOK\n\nOlá, Enfª Brisa! 🌿 Quero acessar a biblioteca e receber o e-book gratuito sobre cannabis medicinal. Pode me enviar? 📚💚`,
+    landing: `${SITE_BASE}/biblioteca`,
     color: "hsl(280 67% 60%)",
+  },
+  {
+    id: "suporte",
+    keyword: "#SUPORTE",
+    label: "Suporte Geral",
+    icon: HelpCircle,
+    description: "Falar direto com o atendimento",
+    greeting: `#SUPORTE\n\nOlá, Enfª Brisa! 🌿 Preciso de suporte com a plataforma Planta y Raiz. Pode me ajudar? 🙏`,
+    landing: null,
+    color: "hsl(0 84% 65%)",
   },
 ] as const;
 
 export const WhatsAppButton = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showHint, setShowHint] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Badge "Oi! Posso ajudar?" — aparece após 4s, some quando o menu abre
+  useEffect(() => {
+    if (sessionStorage.getItem("pyr_brisa_hint_shown")) return;
+    const t = setTimeout(() => setShowHint(true), 4000);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShowHint(false);
+      sessionStorage.setItem("pyr_brisa_hint_shown", "1");
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const handler = (e: MouseEvent | TouchEvent) => {
@@ -89,26 +120,29 @@ export const WhatsAppButton = () => {
         });
       }
     } catch (e) {
-      // Falha silenciosa — não bloqueia o redirecionamento
       console.warn("[Brisa] lead persist skipped:", e);
     }
 
     // Mensagem com keyword na primeira linha — ManyChat usa isso como gatilho
-    // de fluxo (Automation → Keywords). Funciona mesmo via wa.me porque o
-    // bot do número conectado lê a primeira mensagem do usuário.
     const fullMessage = option.greeting;
-
+    const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+    // Abre WhatsApp (bot ManyChat assume pela keyword)
     if (isMobile) {
-      // Mobile: abre WhatsApp diretamente — bot ManyChat assume pela keyword
-      const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
       window.location.href = whatsappUrl;
     } else {
-      // Desktop: também abre wa.me (WhatsApp Web). O ManyChat dispara o fluxo
-      // pela keyword, sem expor o flow player ao visitante.
-      const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
       window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    }
+
+    // Em paralelo, redireciona a aba atual para a landing da categoria (quando houver)
+    if (option.landing && !isMobile) {
+      setTimeout(() => {
+        window.location.href = option.landing!;
+      }, 600);
+    } else if (option.landing && isMobile) {
+      // No mobile, salva a landing para abrir quando o usuário voltar ao site
+      sessionStorage.setItem("pyr_brisa_next_landing", option.landing);
     }
 
     setIsOpen(false);
@@ -123,12 +157,12 @@ export const WhatsAppButton = () => {
           {/* Header */}
           <div className="px-4 py-3 border-b border-border"
             style={{ background: "linear-gradient(135deg, hsl(152 100% 74% / 0.15), hsl(152 100% 74% / 0.05))" }}>
-            <p className="text-sm font-bold text-foreground">🌿 Olá! Eu sou a Enf. Brisa</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Escolha seu perfil e fale comigo no WhatsApp:</p>
+            <p className="text-sm font-bold text-foreground">🌿 Olá! Sou a Enfª Brisa</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Para te ajudar melhor, escolha uma das opções abaixo:</p>
           </div>
 
           {/* Options */}
-          <div className="p-2 flex flex-col gap-1">
+          <div className="p-2 flex flex-col gap-1 max-h-[60vh] overflow-y-auto">
             {VISITOR_OPTIONS.map((option) => {
               const Icon = option.icon;
               return (
@@ -160,6 +194,30 @@ export const WhatsAppButton = () => {
         </div>
       )}
 
+      {/* Badge "Oi! Posso ajudar?" */}
+      {showHint && !isOpen && (
+        <div
+          className="absolute right-16 bottom-2 md:bottom-3 whitespace-nowrap px-3 py-1.5 rounded-full shadow-lg border border-border animate-in fade-in slide-in-from-right-2 duration-300 cursor-pointer"
+          style={{
+            background: "hsl(var(--card))",
+          }}
+          onClick={() => setIsOpen(true)}
+        >
+          <span className="text-xs font-medium text-foreground">Oi! Posso ajudar? 🌿</span>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowHint(false);
+              sessionStorage.setItem("pyr_brisa_hint_shown", "1");
+            }}
+            className="ml-2 text-muted-foreground hover:text-foreground"
+            aria-label="Fechar"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* FAB */}
       <button
         onClick={() => setIsOpen((o) => !o)}
@@ -168,7 +226,7 @@ export const WhatsAppButton = () => {
           background: "linear-gradient(135deg, hsl(152 100% 74% / 0.2), hsl(152 100% 74% / 0.1))",
           border: "1px solid hsl(152 100% 74% / 0.3)",
         }}
-        aria-label="Fale conosco — Enf. Brisa"
+        aria-label="Fale conosco — Enfª Brisa"
       >
         {isOpen ? (
           <X size={28} className="text-secondary" />

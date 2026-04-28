@@ -2,44 +2,46 @@ import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Stethoscope, User, Store, BookOpen } from "lucide-react";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
+import { supabase } from "@/integrations/supabase/client";
 
-const SITE_BASE = "https://consultorio-medico-inteligente.lovable.app";
-
+// ManyChat keyword triggers — devem estar configurados como
+// "Keyword Rule" no painel do ManyChat (Automation → Keywords)
+// para disparar o fluxo correto de cada perfil automaticamente.
 const VISITOR_OPTIONS = [
   {
     id: "paciente",
+    keyword: "#PACIENTE",
     label: "Sou Paciente",
     icon: User,
     description: "Agendar consulta ou tirar dúvidas",
-    path: "/quiz-triagem",
-    greeting: `Olá, Enf. Brisa! 🌿 Tudo bem? Sou paciente e adoraria agendar uma consulta com vocês. Pode me dar uma ajudinha e me orientar sobre como funciona? 😊`,
+    greeting: `#PACIENTE\n\nOlá, Enf. Brisa! 🌿 Tudo bem? Sou paciente e adoraria agendar uma consulta com vocês. Pode me orientar sobre como funciona? 😊`,
     color: "hsl(152 100% 74%)",
   },
   {
     id: "medico",
+    keyword: "#MEDICO",
     label: "Sou Médico",
     icon: Stethoscope,
     description: "Quero prescrever na plataforma",
-    path: "/profissionais",
-    greeting: `Olá, Enf. Brisa! 🌿 Que prazer falar com você. Sou médico e estou muito interessado em saber como posso começar a prescrever pela plataforma Planta y Raiz. Pode me passar as informações? 🩺✨`,
+    greeting: `#MEDICO\n\nOlá, Enf. Brisa! 🌿 Que prazer falar com você. Sou médico e estou interessado em começar a prescrever pela plataforma Planta y Raiz. Pode me passar as informações? 🩺✨`,
     color: "hsl(217 91% 60%)",
   },
   {
     id: "lojista",
+    keyword: "#LOJISTA",
     label: "Sou Lojista",
     icon: Store,
     description: "Vender no nosso marketplace",
-    path: "/shopping",
-    greeting: `Olá, Enf. Brisa! 🌿 Como vai? Sou lojista e tenho muito interesse em levar meus produtos para o marketplace da Planta y Raiz. Como podemos fazer essa parceria acontecer? 🤝🚀`,
+    greeting: `#LOJISTA\n\nOlá, Enf. Brisa! 🌿 Como vai? Sou lojista e tenho interesse em levar meus produtos para o marketplace da Planta y Raiz. Como fazemos essa parceria? 🤝🚀`,
     color: "hsl(45 93% 58%)",
   },
   {
     id: "ebook",
+    keyword: "#EBOOK",
     label: "Baixar E-book",
     icon: BookOpen,
     description: "Material educativo gratuito",
-    path: "/como-funciona",
-    greeting: `Olá, Enf. Brisa! 🌿 Tudo ótimo? Fiquei sabendo do e-book gratuito sobre cannabis medicinal e adoraria receber o meu para aprender mais! Pode me enviar o link? 📚💚`,
+    greeting: `#EBOOK\n\nOlá, Enf. Brisa! 🌿 Fiquei sabendo do e-book gratuito sobre cannabis medicinal e adoraria receber o meu! Pode me enviar o link? 📚💚`,
     color: "hsl(280 67% 60%)",
   },
 ] as const;
@@ -64,7 +66,7 @@ export const WhatsAppButton = () => {
     };
   }, [isOpen]);
 
-  const handleOptionClick = (option: (typeof VISITOR_OPTIONS)[number]) => {
+  const handleOptionClick = async (option: (typeof VISITOR_OPTIONS)[number]) => {
     trackPixelEvent("Contact", {
       content_name: `brisa_${option.id}`,
     }, {
@@ -73,25 +75,42 @@ export const WhatsAppButton = () => {
       category: "conversion",
     });
 
-    // Build WhatsApp message with greeting + link to the relevant page
-    const pageLink = `${SITE_BASE}${option.path}`;
-    const fullMessage = `${option.greeting}\n\n📎 ${pageLink}`;
-    
-    // Detect if user is on mobile device
+    // Persiste lead com a categoria escolhida (LGPD-friendly: só salva se houver dados)
+    try {
+      const nome = localStorage.getItem("pr_lead_name") || "Visitante";
+      const telefone = localStorage.getItem("pr_lead_phone") || "";
+      if (telefone) {
+        await supabase.from("leads_contatos").insert({
+          nome,
+          telefone,
+          origem: "brisa_whatsapp_fab",
+          categoria: option.id,
+          tags: [option.keyword.replace("#", "").toLowerCase()],
+        });
+      }
+    } catch (e) {
+      // Falha silenciosa — não bloqueia o redirecionamento
+      console.warn("[Brisa] lead persist skipped:", e);
+    }
+
+    // Mensagem com keyword na primeira linha — ManyChat usa isso como gatilho
+    // de fluxo (Automation → Keywords). Funciona mesmo via wa.me porque o
+    // bot do número conectado lê a primeira mensagem do usuário.
+    const fullMessage = option.greeting;
+
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
+
     if (isMobile) {
-      // On mobile: Direct WhatsApp link for seamless experience
-      // This avoids exposing the ManyChat flow player page on small screens
+      // Mobile: abre WhatsApp diretamente — bot ManyChat assume pela keyword
       const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
       window.location.href = whatsappUrl;
     } else {
-      // On desktop: ManyChat Flow "Enf Brisa Bot Lovable" (Official Automation)
-      // Using flowPlayerEmbed for a cleaner integration if possible, or keeping flowPlayerPage
-      const manyChatFlowUrl = `https://app.manychat.com/flowPlayerPage?share_hash=4773110_52afc617acd735b548c9a794700447116667f7d5&mc_locale=pt_BR&user_type=${option.id}`;
-      window.open(manyChatFlowUrl, "_blank", "noopener,noreferrer");
+      // Desktop: também abre wa.me (WhatsApp Web). O ManyChat dispara o fluxo
+      // pela keyword, sem expor o flow player ao visitante.
+      const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     }
-    
+
     setIsOpen(false);
   };
 

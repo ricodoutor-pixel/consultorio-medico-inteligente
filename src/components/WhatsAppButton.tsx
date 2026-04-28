@@ -4,9 +4,7 @@ import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
 import { supabase } from "@/integrations/supabase/client";
 
-// ManyChat keyword triggers — devem estar configurados como
-// "Keyword Rule" no painel do ManyChat (Automation → Keywords)
-// para disparar o fluxo correto de cada perfil automaticamente.
+// ManyChat keyword triggers — Ative em Automation → Keywords no painel ManyChat
 const SITE_BASE = "https://plantayraiz.com.br";
 
 const VISITOR_OPTIONS = [
@@ -16,7 +14,7 @@ const VISITOR_OPTIONS = [
     label: "Sou Paciente",
     icon: User,
     description: "Agendar consulta ou tirar dúvidas",
-    greeting: `#PACIENTE\n\nOlá, Enfª Brisa! 🌿 Sou paciente e quero conhecer os planos de atendimento da Planta y Raiz. Pode me orientar? 😊`,
+    greeting: "#PACIENTE\n\nOlá, Enfª Brisa! 🌿 Sou paciente e gostaria de iniciar meu atendimento na Planta y Raiz. Pode me ajudar?",
     landing: `${SITE_BASE}/planos`,
     color: "hsl(152 100% 74%)",
   },
@@ -26,7 +24,7 @@ const VISITOR_OPTIONS = [
     label: "Sou Médico",
     icon: Stethoscope,
     description: "Quero prescrever na plataforma",
-    greeting: `#MEDICO\n\nOlá, Enfª Brisa! 🌿 Sou médico e quero começar a prescrever pela Planta y Raiz. Pode me passar as informações? 🩺✨`,
+    greeting: "#MEDICO\n\nOlá, Enfª Brisa! 🌿 Sou médico e quero conhecer as vantagens de prescrever pela Planta y Raiz. Como funciona?",
     landing: `${SITE_BASE}/profissionais`,
     color: "hsl(217 91% 60%)",
   },
@@ -36,8 +34,8 @@ const VISITOR_OPTIONS = [
     label: "Sou Lojista / Parceiro",
     icon: Store,
     description: "Vender no nosso marketplace",
-    greeting: `#LOJISTA\n\nOlá, Enfª Brisa! 🌿 Sou lojista/parceiro e tenho interesse em levar meus produtos para o marketplace da Planta y Raiz. Como fazemos a parceria? 🤝🚀`,
-    landing: `${SITE_BASE}/parceiros`,
+    greeting: "#LOJISTA\n\nOlá, Enfª Brisa! 🌿 Sou lojista e quero levar meus produtos para o ecossistema Planta y Raiz. Como me cadastro?",
+    landing: `${SITE_BASE}/afiliados`,
     color: "hsl(45 93% 58%)",
   },
   {
@@ -46,7 +44,7 @@ const VISITOR_OPTIONS = [
     label: "Biblioteca / E-book",
     icon: BookOpen,
     description: "Material educativo gratuito",
-    greeting: `#EBOOK\n\nOlá, Enfª Brisa! 🌿 Quero acessar a biblioteca e receber o e-book gratuito sobre cannabis medicinal. Pode me enviar? 📚💚`,
+    greeting: "#EBOOK\n\nOlá, Enfª Brisa! 🌿 Gostaria de receber o e-book gratuito e acessar a biblioteca científica. Pode me enviar?",
     landing: `${SITE_BASE}/biblioteca`,
     color: "hsl(280 67% 60%)",
   },
@@ -56,7 +54,7 @@ const VISITOR_OPTIONS = [
     label: "Suporte Geral",
     icon: HelpCircle,
     description: "Falar direto com o atendimento",
-    greeting: `#SUPORTE\n\nOlá, Enfª Brisa! 🌿 Preciso de suporte com a plataforma Planta y Raiz. Pode me ajudar? 🙏`,
+    greeting: "#SUPORTE\n\nOlá, Enfª Brisa! 🌿 Preciso de ajuda com a plataforma. Pode me dar um suporte?",
     landing: null,
     color: "hsl(0 84% 65%)",
   },
@@ -67,10 +65,10 @@ export const WhatsAppButton = () => {
   const [showHint, setShowHint] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Badge "Oi! Posso ajudar?" — aparece após 4s, some quando o menu abre
   useEffect(() => {
     if (sessionStorage.getItem("pyr_brisa_hint_shown")) return;
-    const t = setTimeout(() => setShowHint(true), 4000);
+    // Badge "Oi! Posso ajudar?" após 3s como solicitado pelo usuário
+    const t = setTimeout(() => setShowHint(true), 3000);
     return () => clearTimeout(t);
   }, []);
 
@@ -98,15 +96,8 @@ export const WhatsAppButton = () => {
   }, [isOpen]);
 
   const handleOptionClick = async (option: (typeof VISITOR_OPTIONS)[number]) => {
-    trackPixelEvent("Contact", {
-      content_name: `brisa_${option.id}`,
-    }, {
-      leadScore: 30,
-      funnelStage: "intent",
-      category: "conversion",
-    });
+    trackPixelEvent("Contact", { content_name: `brisa_${option.id}` });
 
-    // Persiste lead com a categoria escolhida (LGPD-friendly: só salva se houver dados)
     try {
       const nome = localStorage.getItem("pr_lead_name") || "Visitante";
       const telefone = localStorage.getItem("pr_lead_phone") || "";
@@ -123,26 +114,20 @@ export const WhatsAppButton = () => {
       console.warn("[Brisa] lead persist skipped:", e);
     }
 
-    // Mensagem com keyword na primeira linha — ManyChat usa isso como gatilho
     const fullMessage = option.greeting;
     const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    // Abre WhatsApp (bot ManyChat assume pela keyword)
     if (isMobile) {
       window.location.href = whatsappUrl;
     } else {
       window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     }
 
-    // Em paralelo, redireciona a aba atual para a landing da categoria (quando houver)
     if (option.landing && !isMobile) {
       setTimeout(() => {
         window.location.href = option.landing!;
-      }, 600);
-    } else if (option.landing && isMobile) {
-      // No mobile, salva a landing para abrir quando o usuário voltar ao site
-      sessionStorage.setItem("pyr_brisa_next_landing", option.landing);
+      }, 800);
     }
 
     setIsOpen(false);
@@ -150,18 +135,15 @@ export const WhatsAppButton = () => {
 
   return (
     <div ref={menuRef} className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40">
-      {/* Menu popup */}
       {isOpen && (
         <div className="absolute bottom-16 right-0 w-72 sm:w-80 rounded-2xl shadow-2xl border border-border overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300"
           style={{ background: "hsl(var(--card))" }}>
-          {/* Header */}
           <div className="px-4 py-3 border-b border-border"
             style={{ background: "linear-gradient(135deg, hsl(152 100% 74% / 0.15), hsl(152 100% 74% / 0.05))" }}>
             <p className="text-sm font-bold text-foreground">🌿 Olá! Sou a Enfª Brisa</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Para te ajudar melhor, escolha uma das opções abaixo:</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Em que posso ajudá-lo hoje?</p>
           </div>
 
-          {/* Options */}
           <div className="p-2 flex flex-col gap-1 max-h-[60vh] overflow-y-auto">
             {VISITOR_OPTIONS.map((option) => {
               const Icon = option.icon;
@@ -185,40 +167,24 @@ export const WhatsAppButton = () => {
             })}
           </div>
 
-          {/* Footer */}
           <div className="px-4 py-2 border-t border-border">
             <p className="text-[10px] text-muted-foreground text-center">
-              Atendimento 24h • Respostas em minutos
+              Atendimento Humanizado & Inteligente 24h
             </p>
           </div>
         </div>
       )}
 
-      {/* Badge "Oi! Posso ajudar?" */}
       {showHint && !isOpen && (
         <div
           className="absolute right-16 bottom-2 md:bottom-3 whitespace-nowrap px-3 py-1.5 rounded-full shadow-lg border border-border animate-in fade-in slide-in-from-right-2 duration-300 cursor-pointer"
-          style={{
-            background: "hsl(var(--card))",
-          }}
+          style={{ background: "hsl(var(--card))" }}
           onClick={() => setIsOpen(true)}
         >
           <span className="text-xs font-medium text-foreground">Oi! Posso ajudar? 🌿</span>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowHint(false);
-              sessionStorage.setItem("pyr_brisa_hint_shown", "1");
-            }}
-            className="ml-2 text-muted-foreground hover:text-foreground"
-            aria-label="Fechar"
-          >
-            ×
-          </button>
         </div>
       )}
 
-      {/* FAB */}
       <button
         onClick={() => setIsOpen((o) => !o)}
         className="p-3 md:p-4 rounded-2xl shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center glow-green"

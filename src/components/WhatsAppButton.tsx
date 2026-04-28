@@ -66,7 +66,7 @@ export const WhatsAppButton = () => {
     };
   }, [isOpen]);
 
-  const handleOptionClick = (option: (typeof VISITOR_OPTIONS)[number]) => {
+  const handleOptionClick = async (option: (typeof VISITOR_OPTIONS)[number]) => {
     trackPixelEvent("Contact", {
       content_name: `brisa_${option.id}`,
     }, {
@@ -75,25 +75,42 @@ export const WhatsAppButton = () => {
       category: "conversion",
     });
 
-    // Build WhatsApp message with greeting + link to the relevant page
-    const pageLink = `${SITE_BASE}${option.path}`;
-    const fullMessage = `${option.greeting}\n\n📎 ${pageLink}`;
-    
-    // Detect if user is on mobile device
+    // Persiste lead com a categoria escolhida (LGPD-friendly: só salva se houver dados)
+    try {
+      const nome = localStorage.getItem("pr_lead_name") || "Visitante";
+      const telefone = localStorage.getItem("pr_lead_phone") || "";
+      if (telefone) {
+        await supabase.from("leads_contatos").insert({
+          nome,
+          telefone,
+          origem: "brisa_whatsapp_fab",
+          categoria: option.id,
+          tags: [option.keyword.replace("#", "").toLowerCase()],
+        });
+      }
+    } catch (e) {
+      // Falha silenciosa — não bloqueia o redirecionamento
+      console.warn("[Brisa] lead persist skipped:", e);
+    }
+
+    // Mensagem com keyword na primeira linha — ManyChat usa isso como gatilho
+    // de fluxo (Automation → Keywords). Funciona mesmo via wa.me porque o
+    // bot do número conectado lê a primeira mensagem do usuário.
+    const fullMessage = option.greeting;
+
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
+
     if (isMobile) {
-      // On mobile: Direct WhatsApp link for seamless experience
-      // This avoids exposing the ManyChat flow player page on small screens
+      // Mobile: abre WhatsApp diretamente — bot ManyChat assume pela keyword
       const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
       window.location.href = whatsappUrl;
     } else {
-      // On desktop: ManyChat Flow "Enf Brisa Bot Lovable" (Official Automation)
-      // Using flowPlayerEmbed for a cleaner integration if possible, or keeping flowPlayerPage
-      const manyChatFlowUrl = `https://app.manychat.com/flowPlayerPage?share_hash=4773110_52afc617acd735b548c9a794700447116667f7d5&mc_locale=pt_BR&user_type=${option.id}`;
-      window.open(manyChatFlowUrl, "_blank", "noopener,noreferrer");
+      // Desktop: também abre wa.me (WhatsApp Web). O ManyChat dispara o fluxo
+      // pela keyword, sem expor o flow player ao visitante.
+      const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     }
-    
+
     setIsOpen(false);
   };
 

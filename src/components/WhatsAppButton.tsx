@@ -2,44 +2,46 @@ import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Stethoscope, User, Store, BookOpen } from "lucide-react";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
+import { supabase } from "@/integrations/supabase/client";
 
-const SITE_BASE = "https://consultorio-medico-inteligente.lovable.app";
-
+// ManyChat keyword triggers — devem estar configurados como
+// "Keyword Rule" no painel do ManyChat (Automation → Keywords)
+// para disparar o fluxo correto de cada perfil automaticamente.
 const VISITOR_OPTIONS = [
   {
     id: "paciente",
+    keyword: "#PACIENTE",
     label: "Sou Paciente",
     icon: User,
     description: "Agendar consulta ou tirar dúvidas",
-    path: "/quiz-triagem",
-    greeting: `Olá, Enf. Brisa! 🌿 Tudo bem? Sou paciente e adoraria agendar uma consulta com vocês. Pode me dar uma ajudinha e me orientar sobre como funciona? 😊`,
+    greeting: `#PACIENTE\n\nOlá, Enf. Brisa! 🌿 Tudo bem? Sou paciente e adoraria agendar uma consulta com vocês. Pode me orientar sobre como funciona? 😊`,
     color: "hsl(152 100% 74%)",
   },
   {
     id: "medico",
+    keyword: "#MEDICO",
     label: "Sou Médico",
     icon: Stethoscope,
     description: "Quero prescrever na plataforma",
-    path: "/profissionais",
-    greeting: `Olá, Enf. Brisa! 🌿 Que prazer falar com você. Sou médico e estou muito interessado em saber como posso começar a prescrever pela plataforma Planta y Raiz. Pode me passar as informações? 🩺✨`,
+    greeting: `#MEDICO\n\nOlá, Enf. Brisa! 🌿 Que prazer falar com você. Sou médico e estou interessado em começar a prescrever pela plataforma Planta y Raiz. Pode me passar as informações? 🩺✨`,
     color: "hsl(217 91% 60%)",
   },
   {
     id: "lojista",
+    keyword: "#LOJISTA",
     label: "Sou Lojista",
     icon: Store,
     description: "Vender no nosso marketplace",
-    path: "/shopping",
-    greeting: `Olá, Enf. Brisa! 🌿 Como vai? Sou lojista e tenho muito interesse em levar meus produtos para o marketplace da Planta y Raiz. Como podemos fazer essa parceria acontecer? 🤝🚀`,
+    greeting: `#LOJISTA\n\nOlá, Enf. Brisa! 🌿 Como vai? Sou lojista e tenho interesse em levar meus produtos para o marketplace da Planta y Raiz. Como fazemos essa parceria? 🤝🚀`,
     color: "hsl(45 93% 58%)",
   },
   {
     id: "ebook",
+    keyword: "#EBOOK",
     label: "Baixar E-book",
     icon: BookOpen,
     description: "Material educativo gratuito",
-    path: "/como-funciona",
-    greeting: `Olá, Enf. Brisa! 🌿 Tudo ótimo? Fiquei sabendo do e-book gratuito sobre cannabis medicinal e adoraria receber o meu para aprender mais! Pode me enviar o link? 📚💚`,
+    greeting: `#EBOOK\n\nOlá, Enf. Brisa! 🌿 Fiquei sabendo do e-book gratuito sobre cannabis medicinal e adoraria receber o meu! Pode me enviar o link? 📚💚`,
     color: "hsl(280 67% 60%)",
   },
 ] as const;

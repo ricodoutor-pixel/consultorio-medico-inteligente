@@ -20,7 +20,7 @@ export const organizationSchema: SchemaOrgConfig = {
     alternateName: 'Planta y Raiz',
     description: 'Referência no tratamento com cannabis medicinal no Brasil. Telemedicina com especialistas.',
     url: 'https://plantayraiz.com.br',
-    logo: 'https://plantayraiz.com.br/logo.png',
+    logo: 'https://plantayraiz.com.br/dr-verdinho-512.png',
     image: 'https://plantayraiz.com.br/og-home.jpg',
     
     // Contato
@@ -150,7 +150,7 @@ export const articleSchema: SchemaOrgConfig = {
       name: 'Planta & Raiz',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://plantayraiz.com.br/logo.png',
+        url: 'https://plantayraiz.com.br/dr-verdinho-512.png',
       },
     },
     

@@ -1,45 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Core pages -->
-  <url><loc>https://plantayraiz.com.br/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>https://plantayraiz.com.br/profissionais</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>https://plantayraiz.com.br/como-funciona</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/telemedicina</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://plantayraiz.com.br/shopping</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>https://plantayraiz.com.br/faq</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://plantayraiz.com.br/contato</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://plantayraiz.com.br/planos</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/agendamento</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>https://plantayraiz.com.br/cadastro</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://plantayraiz.com.br/login</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://plantayraiz.com.br/</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://plantayraiz.com.br/profissionais</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://plantayraiz.com.br/como-funciona</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/telemedicina</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://plantayraiz.com.br/shopping</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://plantayraiz.com.br/faq</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://plantayraiz.com.br/contato</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://plantayraiz.com.br/planos</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/agendamento</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://plantayraiz.com.br/cadastro</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://plantayraiz.com.br/login</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
 
   <!-- Content & SEO pages -->
-  <url><loc>https://plantayraiz.com.br/blog</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/biblioteca</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://plantayraiz.com.br/comunidade</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://plantayraiz.com.br/ebook</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/cursos</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://plantayraiz.com.br/forum</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
-  <url><loc>https://plantayraiz.com.br/webinars</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://plantayraiz.com.br/blog</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/biblioteca</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://plantayraiz.com.br/comunidade</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://plantayraiz.com.br/ebook</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/cursos</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://plantayraiz.com.br/forum</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://plantayraiz.com.br/webinars</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
 
   <!-- Treatment / long-tail SEO pages -->
-  <url><loc>https://plantayraiz.com.br/tratamentos</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamentos/ansiedade</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamentos/dor-cronica</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamentos/epilepsia</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamentos/fibromialgia</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamentos/insonia</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamentos/parkinson</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamentos/autismo</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamentos/esclerose-multipla</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamentos/tdah</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamentos/depressao</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamentos</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamento-dor-cronica</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamento-ansiedade-saude-mental</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamentos/ansiedade</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamentos/dor-cronica</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamentos/epilepsia</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamentos/fibromialgia</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamentos/insonia</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamentos/parkinson</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamentos/autismo</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamentos/esclerose-multipla</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamentos/tdah</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/tratamentos/depressao</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- Compliance & legal -->
-  <url><loc>https://plantayraiz.com.br/indicacoes</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://plantayraiz.com.br/legal</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://plantayraiz.com.br/download</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://plantayraiz.com.br/club</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/impacto</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://plantayraiz.com.br/voluntarios</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://plantayraiz.com.br/indicacoes</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://plantayraiz.com.br/legal</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://plantayraiz.com.br/download</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://plantayraiz.com.br/club</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/impacto</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://plantayraiz.com.br/voluntarios</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
 </urlset>

@@ -203,3 +203,5 @@ export const WhatsAppButton = () => {
     </div>
   );
 };
+
+export default WhatsAppButton;

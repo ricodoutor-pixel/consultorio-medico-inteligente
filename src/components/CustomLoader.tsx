@@ -35,7 +35,7 @@ export function CustomLoader() {
           alt="Dr. Verdinho — Mascote Oficial Planta y Raiz Ltda"
           className="w-40 h-40 sm:w-48 sm:h-48 object-contain drop-shadow-2xl animate-[float_2.5s_ease-in-out_infinite]"
           style={{ filter: "drop-shadow(0 10px 30px rgba(0,0,0,0.4))" }}
-          fetchPriority="high"
+          {...({ fetchpriority: "high" } as any)}
         />
 
         <div className="flex flex-col items-center gap-2">

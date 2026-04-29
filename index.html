@@ -1,43 +1,68 @@
 <!doctype html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <script src="https://widget.manychat.com/565404550005523.js" defer></script>
-    
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      
+      // Estado padrão: Negado (cumpre a lei rigorosamente)
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'wait_for_update': 500
+      });
+
+      // Função global para o seu componente CookieBanner ativar os rastreios
+      window.updateConsent = function(consent) {
+        gtag('consent', 'update', {
+          'analytics_storage': consent.analytics_storage,
+          'ad_storage': consent.ad_storage,
+          'ad_user_data': consent.ad_user_data,
+          'ad_personalization': consent.ad_personalization
+        });
+        console.log('Consentimento atualizado para GTM');
+      };
+    </script>
+
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id=GTM-MKSBS7P';f.parentNode.insertBefore(j,f);
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-MKSBS7P');</script>
 
-    <title>Planta y Raiz — Telemedicina Cannabis Medicinal São Paulo 🌿</title>
-    <meta name="description" content="Especialista em Cannabis Medicinal em São Paulo. Consultas a partir de R$30 com o Dr. Edilson Bezerra. Prescrição digital ANVISA e acolhimento via IA Brisa. Atendimento 24h na Av. Paulista e todo Brasil.">
+    <script src="https://widget.manychat.com/565404550005523.js" defer></script>
+
+    <title>Planta y Raiz | Cannabis Medicinal em São Paulo | Dr. Edilson Bezerra</title>
+    <meta name="description" content="Consultoria de Cannabis Medicinal com Dr. Edilson Bezerra (CRM 10963) a partir de R$30. 100% online e regulamentado pela ANVISA. Atendimento SP e Brasil.">
     <meta name="author" content="Dr. Edilson Bezerra da Silva — CRM 10963" />
-    <meta name="robots" content="index, follow" />
     
     <meta name="geo.region" content="BR-SP" />
-    <meta name="geo.placename" content="São Paulo, Jardim Castro Alves, Grajaú, Av. Paulista" />
+    <meta name="geo.placename" content="São Paulo, Av Paulista, Grajaú" />
     <meta name="geo.position" content="-23.5632;-46.6542" />
-    <meta name="ICBM" content="-23.5632, -46.6542" />
-    
-    <link rel="canonical" href="https://plantayraiz.com.br/" />
-    <link rel="icon" type="image/png" href="/favicon.png?v=8" />
-    <link rel="apple-touch-icon" href="/dr-verdinho-512.png" />
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#0A0E27" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Planta y Raiz — Cannabis Medicinal Online | R$30" />
+    <meta property="og:description" content="Consulta com Dr. Edilson Bezerra (CRM 10963). Prescrição digital ANVISA." />
+    <meta property="og:image" content="https://plantayraiz.com.br/og-image.png" />
+    <meta property="og:url" content="https://plantayraiz.com.br" />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "MedicalBusiness",
-      "name": "Planta & Raiz Telemedicina",
-      "alternateName": "Planta y Raiz",
-      "image": "https://plantayraiz.com.br/og-image.png",
-      "@id": "https://plantayraiz.com.br",
+      "name": "Planta y Raiz",
+      "alternateName": "Planta y Raiz Telemedicina",
       "url": "https://plantayraiz.com.br",
-      "telephone": "+5511987131241",
+      "logo": "https://plantayraiz.com.br/favicon.png",
+      "image": "https://plantayraiz.com.br/og-image.png",
+      "description": "Clínica de Telemedicina especializada em Cannabis Medicinal.",
+      "telephone": "+55-11-98713-1241",
       "priceRange": "R$30",
       "address": {
         "@type": "PostalAddress",
@@ -47,52 +72,30 @@
         "postalCode": "01310-100",
         "addressCountry": "BR"
       },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": -23.5632,
-        "longitude": -46.6542
-      },
-      "openingHoursSpecification": {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-        "opens": "00:00",
-        "closes": "23:59"
-      },
-      "sameAs": [
-        "https://www.instagram.com/plantayraiz",
-        "https://www.linkedin.com/company/plantayraiz"
-      ],
-      "medicalSpecialty": "Cannabis Medicinal",
-      "availableService": {
-        "@type": "MedicalProcedure",
-        "name": "Teleconsulta Cannabis Medicinal",
-        "description": "Consulta com médico prescritor de CBD e THC para dor crônica, ansiedade e insônia."
+      "founder": {
+        "@type": "Person",
+        "name": "Dr. Edilson Bezerra da Silva",
+        "jobTitle": "Médico",
+        "identifier": "CRM 10963"
       }
     }
     </script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
-
-    <style>
-      :root { --color-primary: #0A0E27; --color-accent: #00FF00; }
-      html { scroll-behavior: smooth; background: var(--color-primary); }
-      body { margin: 0; font-family: 'Inter', sans-serif; color: white; overflow-x: hidden; }
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar { width: 8px; }
-      ::-webkit-scrollbar-track { background: #0A0E27; }
-      ::-webkit-scrollbar-thumb { background: #15803d; border-radius: 10px; }
-      #root { min-height: 100vh; }
-    </style>
   </head>
-
   <body>
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MKSBS7P" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MKSBS7P"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <div id="root"></div>
+
     <script type="module" src="/src/main.tsx"></script>
 
-    <a href="#root" class="sr-only">Pular para o conteúdo</a>
+    <script>
+      // Garante que mudanças de página no React sejam enviadas ao Google Analytics
+      window.trackEvent = function(eventName, params) {
+        if (window.gtag) {
+          gtag('event', eventName, params);
+        }
+      };
+    </script>
   </body>
 </html>

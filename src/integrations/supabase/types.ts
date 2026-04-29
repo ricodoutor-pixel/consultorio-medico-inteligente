@@ -3673,10 +3673,8 @@ export type Database = {
           is_verified: boolean | null
           organization_id: string | null
           rating: number | null
-          rqe: string | null
           specialty: string | null
           total_consultations: number | null
-          updated_at: string | null
           user_id: string | null
         }
         Insert: {
@@ -3689,10 +3687,8 @@ export type Database = {
           is_verified?: boolean | null
           organization_id?: string | null
           rating?: number | null
-          rqe?: string | null
           specialty?: string | null
           total_consultations?: number | null
-          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
@@ -3705,10 +3701,8 @@ export type Database = {
           is_verified?: boolean | null
           organization_id?: string | null
           rating?: number | null
-          rqe?: string | null
           specialty?: string | null
           total_consultations?: number | null
-          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []

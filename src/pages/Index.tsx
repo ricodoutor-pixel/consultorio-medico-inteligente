@@ -17,7 +17,7 @@ import testimonialJuliana from "@/assets/testimonial-juliana.jpg";
 import testimonialAntonio from "@/assets/testimonial-antonio.jpg";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
-
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 import { useEffect } from "react";
 
@@ -70,6 +70,7 @@ const testimonialData = [
 const Index = () => {
   useEffect(() => {
     document.title = "Planta y Raiz - Telemedicina Cannabis Medicinal | Consultas a partir de R$30";
+    // ManyChat widget (ID 11227069) é injetado centralizadamente via <ManyChatWidget /> após consentimento LGPD.
   }, []);
 
   return (
@@ -312,6 +313,9 @@ const Index = () => {
       <LocalMapSection />
 
       <Footer />
+
+      {/* Botão flutuante da Enfermeira Brisa (WhatsApp) */}
+      <WhatsAppButton />
     </div>
   );
 };

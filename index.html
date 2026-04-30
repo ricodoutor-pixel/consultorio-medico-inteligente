@@ -1,9 +1,17 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0A0E27" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <style>
+      /* Fundo escuro instantâneo — evita flash branco antes do React montar */
+      html, body { background-color: #0A0E27 !important; margin: 0; padding: 0; }
+      #root { min-height: 100dvh; background-color: #0A0E27; }
+    </style>
+
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -90,12 +98,19 @@
     <script type="module" src="/src/main.tsx"></script>
 
     <script>
-      // Garante que mudanças de página no React sejam enviadas ao Google Analytics
+      // Bridge global de eventos para o GTM/GA4
       window.trackEvent = function(eventName, params) {
-        if (window.gtag) {
-          gtag('event', eventName, params);
-        }
+        if (window.gtag) gtag('event', eventName, params);
+        if (window.dataLayer) window.dataLayer.push({ event: eventName, ...(params || {}) });
       };
+
+      // Captura cliques em qualquer link wa.me / WhatsApp Brisa sem alterar comportamento
+      document.addEventListener('click', function(e) {
+        var t = e.target;
+        if (!t || !t.closest) return;
+        var a = t.closest('a[href*="wa.me"], a[href*="api.whatsapp.com"], [data-brisa-cta]');
+        if (a) window.trackEvent('click_brisa_whatsapp', { href: a.getAttribute('href') || '' });
+      }, { passive: true });
     </script>
   </body>
 </html>

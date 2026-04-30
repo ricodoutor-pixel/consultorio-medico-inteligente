@@ -37,19 +37,8 @@ const stagger = { visible: { transition: { staggerChildren: 0.12 } } };
 const Index = () => {
   useEffect(() => {
     document.title = "Planta y Raiz - Telemedicina Cannabis Medicinal | Consultas a partir de R$30";
-
-    // --- INTEGRAÇÃO MANYCHAT (ENFERMEIRA BRISA) ---
-    // Injeta o script do ManyChat automaticamente ao carregar a Home
-    const script = document.createElement("script");
-    script.src = "https://widget.manychat.com/565404550005523.js"; // Seu ID configurado
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      // Limpa o script ao sair da página para não sobrecarregar
-      const existingScript = document.querySelector('script[src*="manychat"]');
-      if (existingScript) existingScript.remove();
-    };
+    // ManyChat widget é injetado de forma centralizada via <ManyChatWidget /> (ID 11227069),
+    // após consentimento LGPD. Não duplicar scripts aqui.
   }, []);
 
   return (

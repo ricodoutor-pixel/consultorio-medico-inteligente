@@ -98,12 +98,19 @@
     <script type="module" src="/src/main.tsx"></script>
 
     <script>
-      // Garante que mudanças de página no React sejam enviadas ao Google Analytics
+      // Bridge global de eventos para o GTM/GA4
       window.trackEvent = function(eventName, params) {
-        if (window.gtag) {
-          gtag('event', eventName, params);
-        }
+        if (window.gtag) gtag('event', eventName, params);
+        if (window.dataLayer) window.dataLayer.push({ event: eventName, ...(params || {}) });
       };
+
+      // Captura cliques em qualquer link wa.me / WhatsApp Brisa sem alterar comportamento
+      document.addEventListener('click', function(e) {
+        var t = e.target;
+        if (!t || !t.closest) return;
+        var a = t.closest('a[href*="wa.me"], a[href*="api.whatsapp.com"], [data-brisa-cta]');
+        if (a) window.trackEvent('click_brisa_whatsapp', { href: a.getAttribute('href') || '' });
+      }, { passive: true });
     </script>
   </body>
 </html>

@@ -5,7 +5,6 @@ import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
 import { supabase } from "@/integrations/supabase/client";
 
 // ManyChat keyword triggers — Ative em Automation → Keywords no painel ManyChat
-const SITE_BASE = "https://plantayraiz.com.br";
 
 const VISITOR_OPTIONS = [
   {

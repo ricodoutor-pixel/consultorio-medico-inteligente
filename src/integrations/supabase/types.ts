@@ -262,8 +262,8 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          manychat_name: string | null
-          manychat_user_id: string | null
+// ManyChat removed
+// ManyChat removed
           metadata: Json | null
           platform: string | null
           source: string | null
@@ -271,8 +271,8 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          manychat_name?: string | null
-          manychat_user_id?: string | null
+// ManyChat removed
+// ManyChat removed
           metadata?: Json | null
           platform?: string | null
           source?: string | null
@@ -280,8 +280,8 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          manychat_name?: string | null
-          manychat_user_id?: string | null
+// ManyChat removed
+// ManyChat removed
           metadata?: Json | null
           platform?: string | null
           source?: string | null
@@ -3146,7 +3146,7 @@ export type Database = {
           coupon_sent: boolean | null
           created_at: string
           id: string
-          manychat_notified: boolean | null
+// ManyChat removed
           patient_name: string | null
           patient_phone: string | null
           session_id: string
@@ -3161,7 +3161,7 @@ export type Database = {
           coupon_sent?: boolean | null
           created_at?: string
           id?: string
-          manychat_notified?: boolean | null
+// ManyChat removed
           patient_name?: string | null
           patient_phone?: string | null
           session_id: string
@@ -3176,7 +3176,7 @@ export type Database = {
           coupon_sent?: boolean | null
           created_at?: string
           id?: string
-          manychat_notified?: boolean | null
+// ManyChat removed
           patient_name?: string | null
           patient_phone?: string | null
           session_id?: string

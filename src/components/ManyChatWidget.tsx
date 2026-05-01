@@ -47,15 +47,15 @@ export const ManyChatWidget = () => {
   useEffect(() => {
     if (!consent) return;
     if (typeof window === "undefined") return;
-    if (document.getElementById("manychat-widget-script")) return;
+// ManyChat removed
 
     const inject = () => {
       const s = document.createElement("script");
-      s.id = "manychat-widget-script";
+// ManyChat removed
       s.async = true;
       s.defer = true;
       s.dataset.flowToken = MANYCHAT_FLOW_TOKEN;
-      s.src = `https://widget.manychat.com/${MANYCHAT_WIDGET_ID}.js?locale=${locale}&flow=${MANYCHAT_FLOW_TOKEN}`;
+// ManyChat removed
       document.body.appendChild(s);
     };
 
@@ -68,7 +68,7 @@ export const ManyChatWidget = () => {
   }, [consent, locale]);
 
   // Bridge: when the user clicks any WhatsApp / Brisa CTA, sync the lead to
-  // the manychat-lead-sync Edge Function so we capture the contact server-side.
+// ManyChat removed
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -82,7 +82,7 @@ export const ManyChatWidget = () => {
 
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        await supabase.functions.invoke("manychat-lead-sync", {
+// ManyChat removed
           body: {
             event_type: "whatsapp_click",
             user_id: user?.id,

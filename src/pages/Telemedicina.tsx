@@ -1,3 +1,4 @@
+import { useDynamicPrice } from '@/hooks/useDynamicPrice';
 import { useState, useEffect } from "react";
 import brisaImg from "@/assets/brisa-enfermeira.png";
 import { Navbar } from "@/components/Navbar";
@@ -121,6 +122,7 @@ const BrisaAvatar = () => {
 };
 
 const Telemedicina = () => {
+  const { value: dynamicPrice, symbol: dynamicSymbol, isInternational } = useDynamicPrice();
   const navigate = useNavigate();
   const [showTCLE, setShowTCLE] = useState(true);
   const [step, setStep] = useState(-1);
@@ -358,7 +360,7 @@ const Telemedicina = () => {
                    <CardContent className="p-4 sm:p-8 text-center">
                      <CheckCircle2 size={36} className="text-primary mx-auto mb-3 sm:mb-4" />
                      <h2 className="text-xl sm:text-2xl font-display font-black text-foreground mb-2">Triagem Concluída!</h2>
-                     <p className="text-sm text-muted-foreground font-medium mb-4 sm:mb-6">A Brisa IA já preparou seu resumo clínico. Agora escolha seu médico para atendimento imediato.</p>
+                     <p className="text-sm text-muted-foreground font-medium mb-4 sm:mb-6">A Brisa IA já preparou seu resumo clínico. Selecione um especialista para uma **Orientação Técnica (20 min)** personalizada com supervisão do Dr. Edilson Bezerra (CRM 10963).</p>
                     <div className="grid gap-4">
                       {medicos.map(med => (
                         <Card key={med.id} className="border-border hover:border-primary/50 transition-all">
@@ -380,7 +382,7 @@ const Telemedicina = () => {
                                   navigate(`/pagamento?pro=${med.id}`);
                                 }}
                               >
-                                Agendar R$ 30
+                                {`Agendar ${dynamicSymbol} ${dynamicPrice}`}
                               </Button>
                           </CardContent>
                         </Card>

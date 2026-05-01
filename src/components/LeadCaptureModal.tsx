@@ -27,7 +27,7 @@ const isValidPhone = (value: string): boolean => {
   return digits.length === 10 || digits.length === 11;
 };
 
-const WEBHOOK_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manychat-webhook`;
+// ManyChat removed
 
 export const LeadCaptureModal = ({
   isOpen,

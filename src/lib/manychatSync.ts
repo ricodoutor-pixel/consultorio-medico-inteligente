@@ -20,7 +20,7 @@ export async function syncLeadEvent(
   metadata?: Record<string, string>
 ) {
   try {
-    const { data, error } = await supabase.functions.invoke("manychat-lead-sync", {
+// ManyChat removed
       body: {
         event_type: eventType,
         user_id: userId,

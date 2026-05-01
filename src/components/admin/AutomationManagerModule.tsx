@@ -18,7 +18,7 @@ const CATEGORY_MAP: Record<string, { label: string; icon: any; color: string }> 
 };
 
 const PLATFORM_ICONS: Record<string, string> = {
-  manychat: "💬",
+// ManyChat removed
   instagram: "📷",
   facebook: "f",
   website: "🌐",

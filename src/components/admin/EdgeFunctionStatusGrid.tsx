@@ -16,15 +16,15 @@ const FUNCTIONS: FunctionStatus[] = [
   { name: "publish-to-instagram", displayName: "Publish to Instagram", description: "Feed, Carrossel e Stories no IG" },
   { name: "social-analytics", displayName: "Social Analytics", description: "Relatórios FB + IG + interno" },
   { name: "visitor-tracking", displayName: "Visitor Tracking", description: "UTM, exit intent, page views" },
-  { name: "manychat-webhook", displayName: "ManyChat Hub", description: "100 automações cross-platform" },
+// ManyChat removed
   { name: "send-meta-capi", displayName: "Meta CAPI", description: "Conversion API Server-Side + Smart Bidding" },
 ];
 
 export function EdgeFunctionStatusGrid() {
   const { data: healthData, isLoading: healthLoading, refetch: refetchHealth } = useQuery({
-    queryKey: ["manychat-health"],
+// ManyChat removed
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke("manychat-webhook", {
+// ManyChat removed
         body: { action: "health" },
       });
       if (error) throw error;
@@ -82,9 +82,9 @@ export function EdgeFunctionStatusGrid() {
   });
 
   const getStatus = (fnName: string) => {
-    if (fnName === "manychat-webhook") {
+// ManyChat removed
       if (healthLoading) return "loading";
-      return healthData?.manychat === "connected" ? "online" : "error";
+// ManyChat removed
     }
     if (fnName === "social-analytics" || fnName === "publish-to-facebook") {
       if (fbLoading) return "loading";

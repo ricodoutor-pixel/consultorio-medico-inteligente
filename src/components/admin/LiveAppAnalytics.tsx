@@ -11,8 +11,8 @@ interface DownloadStats {
   thisWeek: number;
   recentDownloads: Array<{
     id: string;
-    manychat_name: string | null;
-    manychat_user_id: string | null;
+// ManyChat removed
+// ManyChat removed
     platform: string | null;
     source: string | null;
     created_at: string;
@@ -35,7 +35,7 @@ export function LiveAppAnalytics() {
         supabase.from("app_downloads").select("id", { count: "exact", head: true }),
         supabase.from("app_downloads").select("id", { count: "exact", head: true }).gte("created_at", todayStart),
         supabase.from("app_downloads").select("id", { count: "exact", head: true }).gte("created_at", weekStart),
-        supabase.from("app_downloads").select("id, manychat_name, manychat_user_id, platform, source, created_at")
+// ManyChat removed
           .order("created_at", { ascending: false }).limit(10),
       ]);
 
@@ -120,10 +120,10 @@ export function LiveAppAnalytics() {
                 >
                   <Smartphone size={12} className="text-primary shrink-0" />
                   <span className="font-medium text-foreground truncate">
-                    {d.manychat_name || "Anônimo"}
+// ManyChat removed
                   </span>
-                  {d.manychat_user_id && (
-                    <span className="text-primary/60 truncate">ID: {d.manychat_user_id.slice(0, 8)}…</span>
+// ManyChat removed
+// ManyChat removed
                   )}
                   <span className="ml-auto shrink-0">
                     {d.platform || "—"} · {d.source || "direto"}

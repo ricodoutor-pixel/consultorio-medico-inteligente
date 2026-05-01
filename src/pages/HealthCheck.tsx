@@ -24,7 +24,7 @@ interface HealthData {
   status: "healthy" | "degraded" | "down";
   checks: {
     database: ServiceCheck;
-    manychat: ServiceCheck;
+// ManyChat removed
     mercadopago: ServiceCheck;
     edge_functions: ServiceCheck;
     automations: AutomationStats;
@@ -35,7 +35,7 @@ interface HealthData {
 
 const SERVICE_CONFIG = [
   { key: "database", label: "Database", icon: Database, critical: true },
-  { key: "manychat", label: "ManyChat", icon: MessageSquare, critical: false },
+// ManyChat removed
   { key: "mercadopago", label: "Mercado Pago", icon: CreditCard, critical: true },
   { key: "edge_functions", label: "Edge Functions", icon: Wifi, critical: true },
 ] as const;

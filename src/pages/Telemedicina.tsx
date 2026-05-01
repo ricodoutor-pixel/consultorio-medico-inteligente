@@ -370,7 +370,18 @@ const Telemedicina = () => {
                                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{med.category}</p>
                                </div>
                              </div>
-                             <Button size="sm" className="bg-primary text-white font-black rounded-lg text-[10px] sm:text-xs shrink-0 px-2 sm:px-3">Agendar R$ 49,90</Button>
+                              <Button
+                                size="sm"
+                                className="bg-primary text-white font-black rounded-lg text-[10px] sm:text-xs shrink-0 px-2 sm:px-3"
+                                onClick={() => {
+                                  if (typeof window !== "undefined" && (window as any).fbq) {
+                                    (window as any).fbq("track", "InitiateCheckout", { value: 30, currency: "BRL", content_name: med.name });
+                                  }
+                                  navigate(`/pagamento?pro=${med.id}`);
+                                }}
+                              >
+                                Agendar R$ 30
+                              </Button>
                           </CardContent>
                         </Card>
                       ))}

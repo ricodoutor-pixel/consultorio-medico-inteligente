@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Check, Smartphone } from "lucide-react";
+import { Download, Check, Smartphone, Share2 } from "lucide-react";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function PWAInstallButton({ variant = "default" }: { variant?: "default" | "compact" }) {
-  const { canInstall, isInstalled, promptInstall } = usePWAInstall();
+  const { canInstall, isInstalled, isIOS, promptInstall } = usePWAInstall();
   const [installing, setInstalling] = useState(false);
+  const [showIOSHelp, setShowIOSHelp] = useState(false);
 
   if (isInstalled) {
     return (
@@ -16,12 +17,15 @@ export function PWAInstallButton({ variant = "default" }: { variant?: "default" 
     );
   }
 
-  if (!canInstall) return null;
-
   const handleInstall = async () => {
-    setInstalling(true);
-    await promptInstall();
-    setInstalling(false);
+    if (canInstall) {
+      setInstalling(true);
+      await promptInstall();
+      setInstalling(false);
+      return;
+    }
+    // Fallback: show manual install instructions (iOS Safari, etc.)
+    setShowIOSHelp(true);
   };
 
   if (variant === "compact") {
@@ -52,6 +56,37 @@ export function PWAInstallButton({ variant = "default" }: { variant?: "default" 
         <Download size={16} />
         {installing ? "Instalando..." : "Instalar App Gratuito"}
       </Button>
+
+      <AnimatePresence>
+        {showIOSHelp && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-3 p-3 rounded-xl bg-muted/50 border border-border text-xs text-foreground space-y-2"
+          >
+            {isIOS ? (
+              <>
+                <p className="font-bold flex items-center gap-1.5">
+                  <Share2 size={14} className="text-primary" /> Como instalar no iPhone/iPad:
+                </p>
+                <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+                  <li>Toque no botão <b>Compartilhar</b> (ícone de seta) na barra do Safari.</li>
+                  <li>Role e selecione <b>“Adicionar à Tela de Início”</b>.</li>
+                  <li>Toque em <b>Adicionar</b> no canto superior direito.</li>
+                </ol>
+              </>
+            ) : (
+              <>
+                <p className="font-bold">Instalação manual:</p>
+                <p className="text-muted-foreground">
+                  Abra o menu do navegador (⋮) e toque em <b>“Instalar app”</b> ou <b>“Adicionar à tela inicial”</b>.
+                </p>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

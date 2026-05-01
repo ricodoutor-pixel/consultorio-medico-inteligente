@@ -114,8 +114,13 @@ export const WhatsAppButton = () => {
       console.warn("[Brisa] lead persist skipped:", e);
     }
 
-    const fullMessage = option.greeting;
-    const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(fullMessage)}`;
+    // Personaliza a saudação com nome do usuário se disponível (CRM/lead context)
+    const leadName = (typeof window !== "undefined" && localStorage.getItem("pr_lead_name")) || "";
+    const personalizedGreeting = leadName
+      ? option.greeting.replace("Olá, Enfª Brisa!", `Olá, Enfª Brisa! Sou ${leadName} e`)
+      : option.greeting;
+
+    const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(personalizedGreeting)}`;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     if (isMobile) {
@@ -124,17 +129,16 @@ export const WhatsAppButton = () => {
       window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     }
 
-    if (option.landing && !isMobile) {
-      setTimeout(() => {
-        window.location.href = option.landing!;
-      }, 800);
-    }
+    // NOTA: redirecionamento para landing pages internas removido — alguns destinos
+    // (ex: /profissionais, /afiliados) podem ter guards de auth que enviavam o
+    // usuário para /admin-login. Mantemos apenas a abertura do WhatsApp.
 
     setIsOpen(false);
   };
 
   return (
-    <div ref={menuRef} className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40">
+    <div ref={menuRef} className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50">
+
       {isOpen && (
         <div className="absolute bottom-16 right-0 w-72 sm:w-80 rounded-2xl shadow-2xl border border-border overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300"
           style={{ background: "hsl(var(--card))" }}>

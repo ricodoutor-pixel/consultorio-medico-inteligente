@@ -90,7 +90,7 @@ const Login = () => {
     }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `https://plantayraiz.com.br/reset-password`,
+      redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
     if (error) {
@@ -205,7 +205,7 @@ const Login = () => {
                         const { error } = await supabase.auth.signInWithOAuth({
                           provider: "google",
                           options: {
-                            redirectTo: `https://plantayraiz.com.br/dashboard`,
+                            redirectTo: `${window.location.origin}/dashboard`,
                           },
                         });
                         if (error) {

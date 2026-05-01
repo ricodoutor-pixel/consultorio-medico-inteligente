@@ -644,12 +644,17 @@ const BibliotecaCientifica = () => {
           setShowLeadGate(false);
           setLeadSuccess(true);
           incrementCounter();
-          // Redirect to ebook after short delay
+          // Facebook Pixel: e-book lead conversion
+          if (typeof window !== "undefined" && (window as any).fbq) {
+            (window as any).fbq("track", "Lead", { content_name: "Ebook Medicina Canabinoide", value: 0, currency: "BRL" });
+          }
+          // Immediate redirect to the e-book content page
           setTimeout(() => {
             window.location.href = "/ebook-medicina-canabinoide";
-          }, 2000);
+          }, 800);
         }}
         origem="ebook"
+        message="Preencha para acessar o E-book completo (PDF interativo). Você receberá o link no WhatsApp e será redirecionado agora."
         tags={["Origem_Ebook"]}
       />
 

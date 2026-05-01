@@ -145,7 +145,9 @@ export const WhatsAppButton = () => {
           <div className="px-4 py-3 border-b border-border"
             style={{ background: "linear-gradient(135deg, hsl(152 100% 74% / 0.15), hsl(152 100% 74% / 0.05))" }}>
             <p className="text-sm font-bold text-foreground">🌿 Olá! Sou a Enfª Brisa</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Em que posso ajudá-lo hoje?</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Como posso ajudar na sua jornada com a cannabis medicinal hoje?
+            </p>
           </div>
 
           <div className="p-2 flex flex-col gap-1 max-h-[60vh] overflow-y-auto">

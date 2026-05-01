@@ -3,122 +3,78 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
 
   try {
-    const { symptoms, patientInfo, mode } = await req.json();
+    const { symptoms, patientInfo, mode = "triage" } = await req.json();
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "AIzaSyCYeChGB-5lcqXgA4qfg18u0-H8gQurK_E";
 
-    if (!symptoms) {
-      return new Response(JSON.stringify({ error: "Sintomas são obrigatórios" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const systemPrompt = `Atue como a Enfª Brisa, assistente virtual sênior do Dr. Edilson Bezerra (CRM 10963), diretor clínico da Planta y Raiz.
+Sua missão é realizar uma triagem clínica acolhedora, técnica e eficiente para pacientes interessados em Cannabis Medicinal.
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+DIRETRIZES:
+1. Seja empática e profissional. Use terminologia médica correta, mas acessível.
+2. Identifique a queixa principal e organize os sintomas.
+3. SEMPRE gere um PRÉ-PRONTUÁRIO estruturado para o Dr. Edilson.
+4. Não forneça diagnósticos definitivos, mas sugira hipóteses baseadas na literatura de medicina canabinoide.
+5. Mencione que o Dr. Edilson Bezerra (CRM 10963) revisará os dados.
 
-    // Brisa AI Nurse - Triage & Pre-Medical Record Generation
-    const systemPrompt = mode === "match_doctor" 
-      ? `Você é Brisa, enfermeira IA da Planta & Raiz. Analise os sintomas e retorne um JSON com:
-{
-  "specialty": "especialidade médica recomendada",
-  "urgency": "baixa|media|alta|urgente",
-  "keywords": ["palavras-chave da condição"],
-  "suggested_conditions": ["possíveis condições"],
-  "pre_record": "resumo clínico para o médico"
-}
-APENAS o JSON, sem markdown.`
-      : `Você é Brisa, enfermeira virtual IA da Planta & Raiz, especializada em cannabis medicinal.
-Sua função é realizar triagem inicial de pacientes, sendo acolhedora e profissional.
-
-Ao receber sintomas do paciente, gere um PRÉ-PRONTUÁRIO estruturado:
-
+ESTRUTURA DO PRÉ-PRONTUÁRIO:
 ## Pré-Prontuário Eletrônico (Brisa IA)
-
 ### Dados da Triagem
-- Data/Hora: [timestamp]
-- Método: Triagem Digital Automatizada
+- Data/Hora: ${new Date().toLocaleString('pt-BR')}
+- Método: Triagem Digital Automatizada (Gemini 1.5 Flash)
+- Supervisor Clínico: Dr. Edilson Bezerra (CRM 10963)
 
 ### Queixa Principal
-[resumo dos sintomas relatados]
+[Resumo conciso dos sintomas]
 
 ### Avaliação Inicial (IA)
 - Categoria: [Neurológico/Psiquiátrico/Dor/Oncológico/Outro]
 - Urgência: [Baixa/Média/Alta/Urgente]
 - Especialidade recomendada: [especialidade]
 
-### Histórico Coletado
-${patientInfo ? `- Nome: ${patientInfo.nome || 'Não informado'}
-- Idade: ${patientInfo.idade || 'Não informada'}
-- Medicamentos: ${patientInfo.medicamentos || 'Nenhum relatado'}
-- Alergias: ${patientInfo.alergias || 'Nenhuma relatada'}` : '- Dados pessoais não fornecidos'}
-
 ### Hipóteses Diagnósticas (Pré-análise)
-[2-3 hipóteses baseadas nos sintomas]
+[Hipóteses baseadas nos sintomas relatados]
 
 ### Conduta Sugerida
-- Tipo de consulta: [Presencial/Telemedicina]
-- Exames complementares sugeridos: [se aplicável]
-- Perfil canabinóide indicado: [CBD predominante / THC:CBD equilibrado / etc]
+- Perfil canabinóide indicado: [Ex: CBD predominante / Full Spectrum / THC:CBD 1:1]
+- Sugestão de agendamento: Telemedicina Imediata
 
-### Observações para o Médico
-[notas relevantes para o prescritor]
+⚠️ TRIAGEM AUTOMATIZADA — Não constitui diagnóstico médico (CFM 2.314/2022).`;
 
-⚠️ TRIAGEM AUTOMATIZADA — Não constitui diagnóstico médico (CFM 2.314/2022).
-Gerado por: Brisa IA — Enfermeira Virtual Planta & Raiz`;
-
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: `Sintomas do paciente: ${symptoms}` },
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: `System: ${systemPrompt}\n\nUser Symptoms: ${symptoms}\nPatient Info: ${JSON.stringify(patientInfo)}` }]
+          }
         ],
+        generationConfig: {
+          temperature: 0.2,
+          topP: 0.8,
+          topK: 40,
+        }
       }),
     });
 
     if (!aiResponse.ok) {
-      if (aiResponse.status === 429) {
-        return new Response(JSON.stringify({ error: "Muitas requisições. Tente novamente." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw new Error(`AI error: ${aiResponse.status}`);
+      throw new Error(`Gemini API error: ${aiResponse.status}`);
     }
 
     const aiData = await aiResponse.json();
-    const content = aiData.choices?.[0]?.message?.content || "";
-
-    if (mode === "match_doctor") {
-      // Parse JSON response for doctor matching
-      try {
-        const cleaned = content.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
-        const matchData = JSON.parse(cleaned);
-        return new Response(JSON.stringify({ success: true, match: matchData }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      } catch {
-        // Fallback keyword matching
-        const fallback = findSpecialtyByKeywords(symptoms);
-        return new Response(JSON.stringify({ success: true, match: fallback }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-    }
+    const content = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     return new Response(JSON.stringify({ success: true, preRecord: content }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -130,48 +86,3 @@ Gerado por: Brisa IA — Enfermeira Virtual Planta & Raiz`;
     });
   }
 });
-
-function findSpecialtyByKeywords(symptoms: string): any {
-  const lower = symptoms.toLowerCase();
-  const map: Record<string, { specialty: string; urgency: string; keywords: string[] }> = {
-    "ansiedade|pânico|insônia|depressão|estresse": {
-      specialty: "Psiquiatria",
-      urgency: "media",
-      keywords: ["saúde mental", "ansiedade"],
-    },
-    "dor crônica|fibromialgia|artrite|lombalgia": {
-      specialty: "Neurologia / Dor",
-      urgency: "media",
-      keywords: ["dor crônica", "manejo da dor"],
-    },
-    "epilepsia|convulsão|tremor|parkinson": {
-      specialty: "Neurologia",
-      urgency: "alta",
-      keywords: ["neurológico", "epilepsia"],
-    },
-    "câncer|oncologia|quimioterapia|tumor": {
-      specialty: "Oncologia",
-      urgency: "alta",
-      keywords: ["oncologia", "suporte"],
-    },
-    "autismo|tdah|déficit de atenção": {
-      specialty: "Neuropediatria",
-      urgency: "media",
-      keywords: ["neurodesenvolvimento"],
-    },
-  };
-
-  for (const [pattern, data] of Object.entries(map)) {
-    if (new RegExp(pattern).test(lower)) {
-      return { ...data, suggested_conditions: [pattern.split("|")[0]], pre_record: `Triagem automática: ${data.specialty}` };
-    }
-  }
-
-  return {
-    specialty: "Clínica Geral - Cannabis Medicinal",
-    urgency: "baixa",
-    keywords: ["cannabis medicinal", "avaliação geral"],
-    suggested_conditions: ["Avaliação inicial"],
-    pre_record: "Paciente para avaliação geral de cannabis medicinal",
-  };
-}

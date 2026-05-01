@@ -19,9 +19,9 @@ const testimonials = [
 ];
 
 const faqs = [
-  { q: "Como funciona a consulta para dor crônica?", a: "Você realiza uma teleconsulta com um médico especialista em medicina canabinoide. Ele analisa seu histórico, exames e sintomas para criar um protocolo personalizado de tratamento com CBD e/ou THC." },
+  { q: "Como funciona a orientação técnica para dor crônica?", a: "Você realiza uma teleorientação técnica com um médico especialista em medicina canabinoide. Ele analisa seu histórico, exames e sintomas para criar um protocolo personalizado de tratamento com CBD e/ou THC." },
   { q: "O tratamento com cannabis medicinal é legalizado pela ANVISA?", a: "Sim. A ANVISA regulamenta o uso de produtos à base de cannabis para fins medicinais no Brasil desde 2015 (RDC 17/2015, atualizada pela RDC 660/2022). A prescrição é feita por médico habilitado com receita tipo B." },
-  { q: "Quanto custa a consulta?", a: "A teleconsulta na Planta & Raiz começa a partir de R$30, com pagamento via Pix. Não há custos ocultos." },
+  { q: "Quanto custa a orientação técnica?", a: "A teleorientação técnica na Planta & Raiz começa a partir de R$30, com pagamento via Pix. Não há custos ocultos." },
   { q: "Quais condições de dor crônica podem ser tratadas?", a: "Fibromialgia, artrite reumatoide, dores neuropáticas, enxaqueca crônica, dor oncológica, dor pós-operatória e outras condições resistentes a tratamentos convencionais." },
   { q: "Preciso de receita médica?", a: "Sim. O médico da Planta & Raiz emite uma prescrição digital com assinatura eletrônica, válida em todo o Brasil, seguindo os protocolos da ANVISA." },
   { q: "Em quanto tempo sentirei os efeitos?", a: "Os efeitos variam conforme a condição. Muitos pacientes relatam melhora significativa entre 2 a 6 semanas de tratamento contínuo." },
@@ -54,7 +54,7 @@ const TratamentoDorCronica = () => {
       "@context": "https://schema.org",
       "@type": "MedicalBusiness",
       name: "Planta & Raiz — Tratamento de Dor Crônica",
-      description: "Teleconsulta especializada em tratamento de dor crônica com cannabis medicinal em São Paulo.",
+      description: "Teleorientação técnica especializada em tratamento de dor crônica com cannabis medicinal em São Paulo.",
       url: "https://plantayraiz.com.br/tratamento-dor-cronica",
       telephone: "+55-11-99136-3154",
       priceRange: "R$30 - R$200",
@@ -92,11 +92,11 @@ const TratamentoDorCronica = () => {
                 Tratamento de <span className="text-primary">Dor Crônica</span> com Cannabis Medicinal em São Paulo
               </h1>
               <p className="text-muted-foreground text-base md:text-lg mb-6 max-w-xl">
-                Médicos especialistas em medicina canabinoide. Teleconsulta a partir de <strong className="text-primary">R$30</strong> com prescrição digital ANVISA.
+                Médicos especialistas em medicina canabinoide. Teleorientação técnica a partir de <strong className="text-primary">R$30</strong> com prescrição digital ANVISA.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl">
-                  <Link to="/agendamento">Agendar Teleconsulta por R$30 <ArrowRight size={16} className="ml-1" /></Link>
+                  <Link to="/agendamento">Agendar Teleorientação técnica por R$30 <ArrowRight size={16} className="ml-1" /></Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
                   <a href="https://wa.me/5511987131241?text=Olá, tenho dúvida sobre tratamento de dor crônica" target="_blank" rel="noopener noreferrer">
@@ -143,9 +143,9 @@ const TratamentoDorCronica = () => {
         <div className="container mx-auto px-4 text-center">
           <div className="rounded-2xl bg-primary/5 border border-primary/20 p-6 md:p-8 max-w-2xl mx-auto">
             <p className="text-lg font-bold text-foreground mb-2">Atendimento prioritário para pacientes de São Paulo</p>
-            <p className="text-muted-foreground text-sm mb-4">Av. Paulista, 1000 — Teleconsulta 24/7 com médicos especializados</p>
+            <p className="text-muted-foreground text-sm mb-4">Av. Paulista, 1000 — Teleorientação técnica 24/7 com médicos especializados</p>
             <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl">
-              <Link to="/agendamento">Agendar Teleconsulta por R$30 <ArrowRight size={16} className="ml-1" /></Link>
+              <Link to="/agendamento">Agendar Teleorientação técnica por R$30 <ArrowRight size={16} className="ml-1" /></Link>
             </Button>
           </div>
         </div>
@@ -197,7 +197,7 @@ const TratamentoDorCronica = () => {
             <p className="text-muted-foreground text-sm mb-6">Converse com um de nossos especialistas e descubra o protocolo ideal para o seu caso.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl">
-                <Link to="/agendamento">Agendar Teleconsulta por R$30 <ArrowRight size={16} className="ml-1" /></Link>
+                <Link to="/agendamento">Agendar Teleorientação técnica por R$30 <ArrowRight size={16} className="ml-1" /></Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
                 <a href="https://wa.me/5511987131241?text=Dúvida sobre meu caso de dor crônica" target="_blank" rel="noopener noreferrer">

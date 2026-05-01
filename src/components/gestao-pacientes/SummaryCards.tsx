@@ -2,7 +2,7 @@ import { Users, CalendarCheck, FileText, UserPlus } from "lucide-react";
 
 const cards = [
   { label: "Total de Pacientes", value: "1.247", icon: Users, color: "bg-[#1B4332]" },
-  { label: "Consultas Hoje", value: "18", icon: CalendarCheck, color: "bg-[#2D6A4F]" },
+  { label: "Orientação Técnicas Hoje", value: "18", icon: CalendarCheck, color: "bg-[#2D6A4F]" },
   { label: "Prescrições Ativas", value: "342", icon: FileText, color: "bg-[#40916C]" },
   { label: "Novos Cadastros", value: "23", icon: UserPlus, color: "bg-[#52B788]" },
 ];

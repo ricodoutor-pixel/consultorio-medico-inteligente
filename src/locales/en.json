@@ -21,7 +21,7 @@
   "hero": {
     "title": "Planta y Raiz - Mega Digital Clinic",
     "subtitle": "Democratizing access to health and well-being through technology and medical cannabis.",
-    "startConsultation": "Start Consultation",
+    "startOrientação Técnication": "Start Orientação Técnication",
     "onlineNow": "Online now"
   },
   "common": {
@@ -38,14 +38,14 @@
     "no": "No"
   },
   "consult": {
-    "title": "Teleconsultation",
+    "title": "Teleorientação técnication",
     "mute": "Mute",
     "unmute": "Unmute",
     "endCall": "End Call",
     "chat": "Chat",
     "aiAssistant": "AI Assistant",
     "medicalRecord": "Medical Record",
-    "elapsed": "Consultation time",
+    "elapsed": "Orientação Técnication time",
     "waitingRoom": "Virtual Waiting Room",
     "yourTurn": "Your turn!",
     "estimatedWait": "Estimated wait time",
@@ -65,7 +65,7 @@
     "cac": "CAC",
     "ltv": "LTV",
     "conversionRate": "Conversion Rate",
-    "triageToConsultation": "Triage → Consultation",
+    "triageToOrientação Técnication": "Triage → Orientação Técnication",
     "revenue": "Revenue",
     "monthlyRevenue": "Monthly Revenue",
     "activePatients": "Active Patients",
@@ -84,6 +84,6 @@
     "cashback": "Cashback",
     "plantCoins": "Plant-Coins",
     "nextLevel": "Next level",
-    "consultationsNeeded": "consultations remaining"
+    "orientação técnicationsNeeded": "orientação técnications remaining"
   }
 }

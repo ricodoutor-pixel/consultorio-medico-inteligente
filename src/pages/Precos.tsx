@@ -71,9 +71,9 @@ const Precos = () => {
       period: "/mês",
       tag: "MAIS POPULAR",
       icon: Stethoscope,
-      description: "Receba 100% do valor da consulta + selo de verificação premium.",
+      description: "Receba 100% do valor da orientação técnica + selo de verificação premium.",
       features: [
-        "100% do valor da consulta (taxa zero)",
+        "100% do valor da orientação técnica (taxa zero)",
         "Selo de Médico Verificado",
         "Telemedicina ilimitada",
         "Prontuário digital ilimitado",
@@ -118,7 +118,7 @@ const Precos = () => {
         "Todos os benefícios anteriores",
         "Até 5 perfis familiares",
         "Isenção total de taxa de saque",
-        "Taxa ZERO em consultas e shopping",
+        "Taxa ZERO em orientação técnicas e shopping",
         "Compartilhamento de prontuários",
         "Relatórios de saúde mensais",
         "Acesso prioritário a novos recursos",
@@ -337,7 +337,7 @@ const Precos = () => {
               Planos de Saúde Digital
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Assinaturas recorrentes com acesso ilimitado à Brisa IA, descontos exclusivos no Shopping e consultas inclusas.
+              Assinaturas recorrentes com acesso ilimitado à Brisa IA, descontos exclusivos no Shopping e orientação técnicas inclusas.
             </p>
           </motion.div>
           <HealthSubscriptionPlans />

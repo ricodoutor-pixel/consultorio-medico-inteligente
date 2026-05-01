@@ -173,9 +173,9 @@ export const Navbar = () => {
                     <LanguageSwitcher />
                   </div>
                   
-                  {/* Botão Iniciar Consulta ao lado do Idioma */}
+                  {/* Botão Iniciar Orientação Técnica ao lado do Idioma */}
                   <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-xl text-xs h-9 px-4 hover:scale-105 transition-all shadow-lg shadow-secondary/20" asChild>
-                    <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
+                    <NavLink to="/telemedicina">Iniciar Orientação Técnica</NavLink>
                   </Button>
 
                   {user ? (

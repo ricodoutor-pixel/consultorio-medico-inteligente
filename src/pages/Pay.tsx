@@ -38,7 +38,7 @@ const Pay = () => {
   let paymentLabel = "";
   if (payType === "intake" || payType === "appointment") {
     paymentAmount = amountParam ? parseFloat(amountParam) : (pro?.priceValue || 0);
-    paymentLabel = pro ? `Consulta com ${pro.name}` : "Consulta";
+    paymentLabel = pro ? `Orientação Técnica com ${pro.name}` : "Orientação Técnica";
   } else if (payType === "subscription") {
     paymentAmount = plan?.price || 0;
     paymentLabel = plan ? `Assinatura ${plan.name}` : "Assinatura";
@@ -124,7 +124,7 @@ const Pay = () => {
                 <h2 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
                   {payType === "order" ? <><ShoppingCart size={18} /> Resumo do Pedido</> :
                    payType === "subscription" ? <><Star size={18} /> Assinatura</> :
-                   <><Stethoscope size={18} /> Consulta</>}
+                   <><Stethoscope size={18} /> Orientação Técnica</>}
                 </h2>
 
                 {payType === "order" && items.length === 0 ? (
@@ -232,7 +232,7 @@ const Pay = () => {
                     )}
                     {(payType === "intake" || payType === "appointment") && (
                       <Button className="w-full font-black rounded-2xl mt-2" variant="outline" asChild>
-                        <a href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, acabei de pagar a consulta com ${pro?.name || 'o especialista'}.`)}`} target="_blank" rel="noopener noreferrer">
+                        <a href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, acabei de pagar a orientação técnica com ${pro?.name || 'o especialista'}.`)}`} target="_blank" rel="noopener noreferrer">
                           Confirmar com Enfermeira Brisa 💬
                         </a>
                       </Button>

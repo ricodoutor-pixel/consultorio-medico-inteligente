@@ -66,7 +66,7 @@ const PoliticaDePrivacidade = () => {
           <section className="space-y-3">
             <h2 className="text-lg font-display font-black text-foreground">🌿 4. Isolamento de Dados Financeiros de Profissionais</h2>
             <p>As informações financeiras dos profissionais de saúde — como <strong className="text-foreground">chaves PIX, dados bancários e documentos fiscais</strong> — são armazenadas em <strong className="text-foreground">tabela segregada</strong> (<em>doctors_financial</em>) com acesso restrito exclusivamente ao próprio profissional e à administração da plataforma.</p>
-            <p>Esses dados <strong className="text-foreground">não transitam nem são expostos</strong> em consultas públicas, JOINs de front-end ou qualquer endpoint acessível por outros usuários.</p>
+            <p>Esses dados <strong className="text-foreground">não transitam nem são expostos</strong> em orientação técnicas públicas, JOINs de front-end ou qualquer endpoint acessível por outros usuários.</p>
           </section>
 
           {/* 5. Prescrições e Armazenamento */}

@@ -48,7 +48,7 @@ export function PatientTable({ search, statusFilter }: Props) {
             <TableRow className="bg-[#F8FAFC]">
               <TableHead className="text-[#64748B] font-medium">Nome</TableHead>
               <TableHead className="text-[#64748B] font-medium">CPF</TableHead>
-              <TableHead className="text-[#64748B] font-medium">Última Consulta</TableHead>
+              <TableHead className="text-[#64748B] font-medium">Última Orientação Técnica</TableHead>
               <TableHead className="text-[#64748B] font-medium">Status</TableHead>
             </TableRow>
           </TableHeader>

@@ -214,7 +214,7 @@ const Telemedicina = () => {
               <span className="text-sm font-bold text-primary">TELEMEDICINA AVANÇADA</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground leading-tight mb-4">
-              Consulta <span className="text-gradient-green">Inteligente</span>
+              Orientação Técnica <span className="text-gradient-green">Inteligente</span>
             </h1>
             <p className="text-muted-foreground max-w-2xl font-medium">
               Triagem conduzida pela Brisa IA + análise clínica + receita digital ANVISA — supervisionado por IA de última geração 24×7.
@@ -250,7 +250,7 @@ const Telemedicina = () => {
                    <CardContent className="p-5 sm:p-8 text-center">
                      <Shield size={36} className="text-primary mx-auto mb-3 sm:mb-4 sm:w-12 sm:h-12" />
                      <h2 className="text-lg sm:text-xl font-display font-black text-foreground mb-3 sm:mb-4">Consentimento Necessário</h2>
-                     <p className="text-sm text-muted-foreground mb-4 sm:mb-6">Você precisa aceitar o Termo de Consentimento (TCLE) para prosseguir com a teleconsulta.</p>
+                     <p className="text-sm text-muted-foreground mb-4 sm:mb-6">Você precisa aceitar o Termo de Consentimento (TCLE) para prosseguir com a teleorientação técnica.</p>
                      <Button 
                        className="w-full h-12 sm:h-14 bg-primary text-primary-foreground font-black rounded-2xl text-base sm:text-lg"
                       onClick={() => setShowTCLE(true)}

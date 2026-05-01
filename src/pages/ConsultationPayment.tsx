@@ -13,7 +13,7 @@ import { userChannel } from "@/lib/realtime-channels";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
-const ConsultationPayment = () => {
+const Orientação TécnicationPayment = () => {
   const [searchParams] = useSearchParams();
   const proId = searchParams.get("pro") || "med-1";
   const appointmentId = searchParams.get("appointment") || null;
@@ -62,7 +62,7 @@ const ConsultationPayment = () => {
           doctorName: pro.name,
           amount: total,
           patientEmail: session?.user?.email || "",
-          description: `Consulta com ${pro.name} - Planta & Raiz`,
+          description: `Orientação Técnica com ${pro.name} - Planta & Raiz`,
         },
       });
 
@@ -117,7 +117,7 @@ const ConsultationPayment = () => {
         }
         await new Promise(r => setTimeout(r, 600));
         setStatus("confirmed");
-        toast({ title: "✅ Pagamento confirmado!", description: "Sua consulta está agendada." });
+        toast({ title: "✅ Pagamento confirmado!", description: "Sua orientação técnica está agendada." });
       } else if (data?.status === "rejected") {
         setStatus("rejected");
         toast({ title: "❌ Pagamento recusado", description: "Tente novamente.", variant: "destructive" });
@@ -189,7 +189,7 @@ const ConsultationPayment = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-display font-black text-gradient-green">{pro.price}</p>
-                  <p className="text-xs text-muted-foreground">consulta</p>
+                  <p className="text-xs text-muted-foreground">orientação técnica</p>
                 </div>
               </CardContent>
             </Card>
@@ -233,7 +233,7 @@ const ConsultationPayment = () => {
                   <div className="text-center py-8">
                     <CheckCircle2 size={64} className="text-primary mx-auto mb-4" />
                     <h4 className="text-xl font-display font-black text-foreground mb-2">Pagamento Confirmado!</h4>
-                    <p className="text-muted-foreground mb-4">Sua consulta com {pro.name} está agendada.</p>
+                    <p className="text-muted-foreground mb-4">Sua orientação técnica com {pro.name} está agendada.</p>
                     
                     {/* Anvisa Protocol */}
                     <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 mb-6 text-left">
@@ -244,7 +244,7 @@ const ConsultationPayment = () => {
                       <p className="text-xs text-muted-foreground mb-1">Número do protocolo:</p>
                       <p className="font-mono text-sm font-bold text-primary">ANV-{Date.now().toString(36).toUpperCase()}-{Math.random().toString(36).substring(2, 6).toUpperCase()}</p>
                       <p className="text-[10px] text-muted-foreground mt-2">
-                        📋 Sua prescrição será preparada pelo médico durante a consulta. O protocolo ANVISA será vinculado automaticamente.
+                        📋 Sua prescrição será preparada pelo médico durante a orientação técnica. O protocolo ANVISA será vinculado automaticamente.
                       </p>
                     </div>
 
@@ -309,7 +309,7 @@ const ConsultationPayment = () => {
                     {/* Price Breakdown */}
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Consulta</span>
+                        <span className="text-muted-foreground">Orientação Técnica</span>
                         <span className="text-foreground font-bold">{pro.price}</span>
                       </div>
                       <div className="flex justify-between text-sm">
@@ -358,4 +358,4 @@ const ConsultationPayment = () => {
   );
 };
 
-export default ConsultationPayment;
+export default Orientação TécnicationPayment;

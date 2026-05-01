@@ -195,7 +195,7 @@ const ProfessionalDashboard = () => {
     { id: "home", icon: Home, label: "Home" },
     { id: "agenda", icon: Calendar, label: "Agenda" },
     { id: "patients", icon: Users, label: "Meus Pacientes" },
-    { id: "teleconsulta", icon: Video, label: "Teleconsulta" },
+    { id: "teleorientação técnica", icon: Video, label: "Teleorientação técnica" },
     { id: "gamification", icon: Trophy, label: "Conquistas e Metas" },
     { id: "library", icon: BookOpen, label: "Biblioteca" },
     { id: "financial", icon: DollarSign, label: "Financeiro" },
@@ -233,7 +233,7 @@ const ProfessionalDashboard = () => {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { icon: Users, label: "Consultas Hoje", value: appointments.length, color: "text-blue-400" },
+          { icon: Users, label: "Orientação Técnicas Hoje", value: appointments.length, color: "text-blue-400" },
           { icon: Clock, label: "Horas Online", value: formatTimer(onlineTimer), color: "text-emerald-400" },
           { icon: Star, label: "Avaliação", value: doctorData?.rating?.toFixed(1) || "5.0", color: "text-amber-400" },
           { icon: Bell, label: "Notificações", value: notifications.length, color: "text-red-400" },
@@ -260,12 +260,12 @@ const ProfessionalDashboard = () => {
             <Badge variant="outline" className="text-[10px]">{format(new Date(), "dd/MM/yyyy")}</Badge>
           </div>
           {appointments.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">Nenhuma consulta agendada para hoje.</p>
+            <p className="text-sm text-muted-foreground text-center py-6">Nenhuma orientação técnica agendada para hoje.</p>
           ) : (
             <div className="space-y-2">
               {appointments.slice(0, 5).map((appt) => (
                 <div key={appt.id} className="flex items-center gap-3 p-3 rounded-xl bg-muted/20 border border-border hover:border-primary/30 transition-all cursor-pointer"
-                  onClick={() => { setSelectedPatient(appt); setActiveSection("teleconsulta"); }}>
+                  onClick={() => { setSelectedPatient(appt); setActiveSection("teleorientação técnica"); }}>
                   <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
                     <Stethoscope size={16} className="text-primary" />
                   </div>
@@ -296,7 +296,7 @@ const ProfessionalDashboard = () => {
             </div>
             <div className="flex-1">
               <h4 className="font-bold text-foreground text-sm">IA Brisa — Assistente Clínica</h4>
-              <p className="text-[11px] text-muted-foreground">Solicite resumos de histórico do paciente antes da consulta</p>
+              <p className="text-[11px] text-muted-foreground">Solicite resumos de histórico do paciente antes da orientação técnica</p>
             </div>
             <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 text-xs">
               <Zap size={12} className="mr-1" /> Ativar
@@ -338,7 +338,7 @@ const ProfessionalDashboard = () => {
               </div>
               <p className="text-xs text-muted-foreground mb-2">Paciente: #{appt.patient_id?.slice(0, 8)} · {appt.type} · {appt.duration_minutes}min</p>
               <div className="flex gap-2">
-                <Button size="sm" className="text-[11px] h-7 gap-1" onClick={() => { setSelectedPatient(appt); setActiveSection("teleconsulta"); }}>
+                <Button size="sm" className="text-[11px] h-7 gap-1" onClick={() => { setSelectedPatient(appt); setActiveSection("teleorientação técnica"); }}>
                   <Video size={12} /> Iniciar
                 </Button>
                 <Button size="sm" variant="outline" className="text-[11px] h-7 gap-1">
@@ -350,7 +350,7 @@ const ProfessionalDashboard = () => {
           {appointments.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               <Calendar size={32} className="mx-auto mb-3 opacity-30" />
-              <p className="text-sm">Nenhuma consulta para hoje</p>
+              <p className="text-sm">Nenhuma orientação técnica para hoje</p>
             </div>
           )}
         </TabsContent>
@@ -381,11 +381,11 @@ const ProfessionalDashboard = () => {
     </div>
   );
 
-  const renderTeleconsulta = () => (
+  const renderTeleorientação técnica = () => (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-black text-foreground flex items-center gap-2">
-          <Video size={18} className="text-primary" /> Sala de Teleconsulta
+          <Video size={18} className="text-primary" /> Sala de Teleorientação técnica
         </h2>
         {showVideo && (
           <Button size="sm" variant="destructive" className="text-xs gap-1" onClick={() => setShowVideo(false)}>
@@ -400,8 +400,8 @@ const ProfessionalDashboard = () => {
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Video size={32} className="text-primary" />
             </div>
-            <h3 className="font-bold text-foreground mb-2">Iniciar Teleconsulta</h3>
-            <p className="text-sm text-muted-foreground mb-4">Selecione uma consulta na agenda ou inicie uma sala livre.</p>
+            <h3 className="font-bold text-foreground mb-2">Iniciar Teleorientação técnica</h3>
+            <p className="text-sm text-muted-foreground mb-4">Selecione uma orientação técnica na agenda ou inicie uma sala livre.</p>
             <Button className="gap-2" onClick={() => setShowVideo(true)}>
               <Video size={16} /> Abrir Sala Jitsi
             </Button>
@@ -415,7 +415,7 @@ const ProfessionalDashboard = () => {
               <div className="aspect-video bg-black/90 flex items-center justify-center relative">
                 <div className="text-center text-white/60">
                   <Video size={48} className="mx-auto mb-3 opacity-40" />
-                  <p className="text-sm">Sala Jitsi — Consulta em andamento</p>
+                  <p className="text-sm">Sala Jitsi — Orientação Técnica em andamento</p>
                   <p className="text-xs mt-1 text-white/40">
                     {selectedPatient ? `Paciente #${selectedPatient.patient_id?.slice(0, 8)}` : "Sala Livre"}
                   </p>
@@ -443,7 +443,7 @@ const ProfessionalDashboard = () => {
               <CardContent className="p-3">
                 <ScrollArea className="h-32 mb-2">
                   {chatMessages.length === 0 ? (
-                    <p className="text-xs text-muted-foreground text-center py-4">Chat da consulta</p>
+                    <p className="text-xs text-muted-foreground text-center py-4">Chat da orientação técnica</p>
                   ) : (
                     <div className="space-y-2">
                       {chatMessages.map(msg => (
@@ -562,7 +562,7 @@ const ProfessionalDashboard = () => {
             </div>
             <div className="flex-1">
               <p className="text-sm font-bold text-foreground">{name}</p>
-              <p className="text-[10px] text-muted-foreground">Última consulta: {format(new Date(Date.now() - i * 86400000 * 3), "dd/MM/yyyy")}</p>
+              <p className="text-[10px] text-muted-foreground">Última orientação técnica: {format(new Date(Date.now() - i * 86400000 * 3), "dd/MM/yyyy")}</p>
             </div>
             <Button size="sm" variant="ghost" className="h-7 text-[10px]">
               <FileText size={12} className="mr-1" /> Prontuário
@@ -660,7 +660,7 @@ const ProfessionalDashboard = () => {
       case "home": return renderHome();
       case "agenda": return renderAgenda();
       case "patients": return renderPatients();
-      case "teleconsulta": return renderTeleconsulta();
+      case "teleorientação técnica": return renderTeleorientação técnica();
       case "gamification": return renderGamification();
       case "library": return renderLibrary();
       case "financial": return renderFinancial();

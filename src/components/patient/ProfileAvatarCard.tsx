@@ -119,7 +119,7 @@ export const ProfileAvatarCard = ({
           Olá, {firstName}! 👋
         </h1>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground mt-0.5">
-          <span>{completedCount} consulta(s) realizadas</span>
+          <span>{completedCount} orientação técnica(s) realizadas</span>
           {phone && (
             <span className="inline-flex items-center gap-1">
               <Phone size={11} className="text-primary" /> {phone}

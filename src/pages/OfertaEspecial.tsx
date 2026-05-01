@@ -114,7 +114,7 @@ const OfertaEspecial = () => {
             </h3>
             <div className="space-y-3">
               {[
-                "Teleconsulta com Dr. Edilson (Especialista em Cannabis Medicinal)",
+                "Teleorientação técnica com Dr. Edilson (Especialista em Cannabis Medicinal)",
                 "Prescrição digital válida em todo Brasil",
                 "Acompanhamento contínuo pelo app",
                 "Acesso ao Club Planta & Raiz",
@@ -146,10 +146,10 @@ const OfertaEspecial = () => {
           <Button
             size="lg"
             className="w-full text-lg py-6"
-            onClick={() => navigate(`/consulta-rapida?cupom=${cupom}`)}
+            onClick={() => navigate(`/orientação técnica-rapida?cupom=${cupom}`)}
             disabled={isExpired}
           >
-            🩺 Agendar Minha Consulta com Desconto
+            🩺 Agendar Minha Orientação Técnica com Desconto
           </Button>
           <Button
             variant="outline"

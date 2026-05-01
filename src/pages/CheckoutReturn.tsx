@@ -29,7 +29,7 @@ export default function CheckoutReturn() {
                   <Card className="border-primary/20">
                     <CardContent className="p-4 text-center space-y-2">
                       <Calendar className="mx-auto text-primary" size={32} />
-                      <p className="text-sm font-medium text-foreground">Agende sua Consulta</p>
+                      <p className="text-sm font-medium text-foreground">Agende sua Orientação Técnica</p>
                       <p className="text-xs text-muted-foreground">Escolha o melhor horário com seu especialista.</p>
                       <Button size="sm" variant="outline" asChild className="w-full">
                         <Link to="/falar-com-especialista">Agendar</Link>

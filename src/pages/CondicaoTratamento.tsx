@@ -20,7 +20,7 @@ const CONDITIONS: Record<string, {
   "dor-cronica": {
     title: "Tratamento Cannabis para Dor Crônica | Planta & Raiz",
     h1: "Tratamento com Cannabis Medicinal para Dor Crônica",
-    metaDesc: "Alivie a dor crônica com cannabis medicinal. Consulta online com médicos especializados. Prescrição digital em até 24h. Planta & Raiz.",
+    metaDesc: "Alivie a dor crônica com cannabis medicinal. Orientação Técnica online com médicos especializados. Prescrição digital em até 24h. Planta & Raiz.",
     heroText: "Mais de 37% dos pacientes com dor crônica relatam melhora significativa com cannabis medicinal. Consulte um especialista hoje.",
     symptoms: ["Fibromialgia", "Dor neuropática", "Artrite", "Enxaqueca crônica", "Dor lombar"],
     benefits: ["Redução de até 30% no uso de opioides", "Melhora na qualidade do sono", "Anti-inflamatório natural", "Menor risco de dependência"],

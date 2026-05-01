@@ -14,7 +14,7 @@ interface ClubSubscriptionModalProps {
 const BENEFITS = [
   "15% de desconto em todos os pedidos",
   "Renovação automática de receita",
-  "Consultas ilimitadas com especialistas",
+  "Orientação Técnicas ilimitadas com especialistas",
   "Acesso ao conteúdo premium exclusivo",
   "Prioridade na fila de atendimento",
 ];

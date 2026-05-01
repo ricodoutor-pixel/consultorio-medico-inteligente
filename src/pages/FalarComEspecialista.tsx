@@ -103,11 +103,11 @@ const FalarComEspecialista = () => {
                   <div className="flex items-center gap-2 mb-3">
                     <Star size={14} className="text-primary fill-primary" />
                     <span className="text-sm font-black">{pro.rating}</span>
-                    <span className="text-xs text-muted-foreground">• {pro.consults} consultas</span>
+                    <span className="text-xs text-muted-foreground">• {pro.consults} orientação técnicas</span>
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-4">{pro.bio}</p>
                   <div className="border-t border-border pt-3">
-                    <p className="text-xs text-muted-foreground mb-1">Valor da consulta</p>
+                    <p className="text-xs text-muted-foreground mb-1">Valor da orientação técnica</p>
                     <p className="text-2xl font-display font-black text-gradient-green">{pro.price}</p>
                   </div>
 

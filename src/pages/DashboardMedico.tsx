@@ -160,21 +160,21 @@ const DashboardMedico = () => {
     setProcessing(false);
   };
 
-  const handleRequestConsultation = async () => {
+  const handleRequestOrientação Técnication = async () => {
     if (!selectedRequest) return;
     setProcessing(true);
     try {
-      await supabase.from("prescription_requests").update({ status: "consultation_required" } as any).eq("id", selectedRequest.id);
+      await supabase.from("prescription_requests").update({ status: "orientação técnication_required" } as any).eq("id", selectedRequest.id);
 
       await supabase.from("notifications").insert({
         user_id: selectedRequest.patient_id,
-        title: "📋 Nova Consulta Necessária",
-        message: "Seu médico analisou sua solicitação e recomenda uma nova consulta antes de renovar a receita. Agende pelo Dashboard.",
+        title: "📋 Nova Orientação Técnica Necessária",
+        message: "Seu médico analisou sua solicitação e recomenda uma nova orientação técnica antes de renovar a receita. Agende pelo Dashboard.",
         type: "info",
         action_url: "/agendamento",
       });
 
-      toast({ title: "Consulta solicitada", description: "Paciente notificado para agendar nova consulta." });
+      toast({ title: "Orientação Técnica solicitada", description: "Paciente notificado para agendar nova orientação técnica." });
       setRenewalRequests(prev => prev.filter(r => r.id !== selectedRequest.id));
       setReviewModalOpen(false);
     } catch (err) {
@@ -286,7 +286,7 @@ const DashboardMedico = () => {
                     </div>
                     <div>
                       <p className="text-2xl font-display font-black text-foreground">{todayAppts.length}</p>
-                      <p className="text-xs text-muted-foreground font-bold">Consultas Hoje</p>
+                      <p className="text-xs text-muted-foreground font-bold">Orientação Técnicas Hoje</p>
                     </div>
                   </div>
                 </CardContent>
@@ -405,7 +405,7 @@ const DashboardMedico = () => {
               <Card className="border-border">
                 <CardContent className="p-6">
                   <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                    <Calendar size={18} /> Consultas por Dia
+                    <Calendar size={18} /> Orientação Técnicas por Dia
                   </h3>
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={consultsByDay}>
@@ -447,10 +447,10 @@ const DashboardMedico = () => {
               <Card className="border-border">
                 <CardContent className="p-6">
                   <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                    <Clock size={18} /> Próximas Consultas
+                    <Clock size={18} /> Próximas Orientação Técnicas
                   </h3>
                   {todayAppts.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-8">Nenhuma consulta agendada para hoje.</p>
+                    <p className="text-sm text-muted-foreground text-center py-8">Nenhuma orientação técnica agendada para hoje.</p>
                   ) : (
                     <div className="space-y-3">
                       {todayAppts.map(a => (
@@ -540,9 +540,9 @@ const DashboardMedico = () => {
         <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
-              <FileBarChart size={18} className="text-primary" /> Relatório Pré-Consulta (Brisa IA)
+              <FileBarChart size={18} className="text-primary" /> Relatório Pré-Orientação Técnica (Brisa IA)
             </SheetTitle>
-            <SheetDescription>Resumo da triagem do paciente antes da consulta</SheetDescription>
+            <SheetDescription>Resumo da triagem do paciente antes da orientação técnica</SheetDescription>
           </SheetHeader>
 
           {selectedPatientTriage && (
@@ -551,7 +551,7 @@ const DashboardMedico = () => {
 
               <Card className="border-border">
                 <CardContent className="p-4">
-                  <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Calendar size={14} className="text-primary" /> Consulta</h4>
+                  <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Calendar size={14} className="text-primary" /> Orientação Técnica</h4>
                   <p className="text-xs text-muted-foreground">Horário: {format(new Date(selectedPatientTriage.appointment.scheduled_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
                   <p className="text-xs text-muted-foreground">Tipo: {selectedPatientTriage.appointment.type}</p>
                   <Badge className="mt-2 text-[10px] bg-primary/10 text-primary border-green capitalize">{selectedPatientTriage.appointment.status}</Badge>
@@ -605,7 +605,7 @@ const DashboardMedico = () => {
                   <CardContent className="p-6 text-center">
                     <Brain size={32} className="text-muted-foreground mx-auto mb-3" />
                     <p className="text-sm text-muted-foreground">Nenhuma triagem Brisa encontrada para este paciente.</p>
-                    <p className="text-xs text-muted-foreground mt-1">O paciente não realizou triagem antes da consulta.</p>
+                    <p className="text-xs text-muted-foreground mt-1">O paciente não realizou triagem antes da orientação técnica.</p>
                   </CardContent>
                 </Card>
               )}
@@ -621,7 +621,7 @@ const DashboardMedico = () => {
             <DialogTitle className="flex items-center gap-2">
               <RefreshCw size={18} className="text-yellow-400" /> Revisar Solicitação de Renovação
             </DialogTitle>
-            <DialogDescription>Analise o histórico e decida se aprova ou solicita nova consulta.</DialogDescription>
+            <DialogDescription>Analise o histórico e decida se aprova ou solicita nova orientação técnica.</DialogDescription>
           </DialogHeader>
 
           {selectedRequest && (
@@ -672,9 +672,9 @@ const DashboardMedico = () => {
           )}
 
           <DialogFooter className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" className="rounded-xl" onClick={handleRequestConsultation} disabled={processing}>
+            <Button variant="outline" className="rounded-xl" onClick={handleRequestOrientação Técnication} disabled={processing}>
               {processing ? <Loader2 size={14} className="animate-spin mr-1" /> : <Calendar size={14} className="mr-1" />}
-              Solicitar Nova Consulta
+              Solicitar Nova Orientação Técnica
             </Button>
             <Button className="rounded-xl bg-primary" onClick={handleApproveRenewal} disabled={processing}>
               {processing ? <Loader2 size={14} className="animate-spin mr-1" /> : <CheckCircle2 size={14} className="mr-1" />}

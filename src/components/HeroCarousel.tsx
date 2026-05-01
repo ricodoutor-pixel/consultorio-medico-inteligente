@@ -22,17 +22,17 @@ const carouselImports = [
 ];
 
 const slideAlts = [
-  "Teleconsulta médica via smartphone",
+  "Teleorientação técnica médica via smartphone",
   "Produtos CBD de qualidade farmacêutica",
   "Paciente feliz com tratamento digital",
   "Marketplace cannabis medicinal",
   "Prescrição digital cannabis",
   "Comunidade de saúde e bem-estar",
-  "Consulta médica cannabis medicinal online",
+  "Orientação Técnica médica cannabis medicinal online",
   "Dr. Verdinho - Mascote Planta y Raiz",
   "Brisa - Enfermeira Chefe IA Planta y Raiz",
   "Médico especialista Planta y Raiz",
-  "Teleconsulta médica com especialista",
+  "Teleorientação técnica médica com especialista",
   "App mobile de telemedicina cannabis",
   "Pagamento PIX via Mercado Pago",
   "Produtos cannabis medicinal com prescrição",

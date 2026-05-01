@@ -59,7 +59,7 @@ export const SEO = ({
         },
         {
           "@type": "MedicalWebPage",
-          "name": "Teleconsulta de Cannabis"
+          "name": "Teleorientação técnica de Cannabis"
         }
       ],
       "address": {

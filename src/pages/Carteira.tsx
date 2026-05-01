@@ -11,7 +11,7 @@ const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, tra
 const mockOrders = [
   { id: "PED-001", type: "shopping", title: "Óleo CBD Isolado 10ml", date: "15/02/2026", amount: "R$ 69,90", status: "approved" },
   { id: "PED-002", type: "shopping", title: "Gomas de Melatonina + Cânhamo", date: "12/02/2026", amount: "R$ 39,90", status: "approved" },
-  { id: "CON-001", type: "appointment", title: "Consulta - Dr. Felipe Andrade", date: "10/02/2026", amount: "R$ 120,00", status: "approved" },
+  { id: "CON-001", type: "appointment", title: "Orientação Técnica - Dr. Felipe Andrade", date: "10/02/2026", amount: "R$ 120,00", status: "approved" },
   { id: "PED-003", type: "shopping", title: "Creme Tópico Hemp 120g", date: "05/02/2026", amount: "R$ 29,90", status: "pending" },
   { id: "CON-002", type: "appointment", title: "Retorno - Dra. Camila Rocha", date: "01/02/2026", amount: "R$ 75,00", status: "approved" },
 ];
@@ -64,7 +64,7 @@ const Carteira = () => {
 
           {view === "patient" ? (
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-lg font-display font-bold text-foreground mb-4">Histórico de Compras e Consultas</h2>
+              <h2 className="text-lg font-display font-bold text-foreground mb-4">Histórico de Compras e Orientação Técnicas</h2>
               <div className="space-y-3">
                 {mockOrders.map((order) => (
                   <Card key={order.id} className="border-border">

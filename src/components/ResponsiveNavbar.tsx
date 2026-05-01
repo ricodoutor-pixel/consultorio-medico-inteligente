@@ -65,8 +65,8 @@ export const ResponsiveNavbar = () => {
           <a href="/" className="text-gray-700 hover:text-green-600 font-medium transition">
             Início
           </a>
-          <a href="/consultas" className="text-gray-700 hover:text-green-600 font-medium transition">
-            Consultas
+          <a href="/orientação técnicas" className="text-gray-700 hover:text-green-600 font-medium transition">
+            Orientação Técnicas
           </a>
           <a href="/medicos" className="text-gray-700 hover:text-green-600 font-medium transition">
             Médicos
@@ -86,9 +86,9 @@ export const ResponsiveNavbar = () => {
           <LanguageSwitcher />
           <Button
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition"
-            onClick={() => navigate('/consulta')}
+            onClick={() => navigate('/orientação técnica')}
           >
-            🩺 Iniciar Consulta
+            🩺 Iniciar Orientação Técnica
           </Button>
           <Button variant="ghost" size="sm">
             <LogIn className="w-5 h-5" />
@@ -110,9 +110,9 @@ export const ResponsiveNavbar = () => {
           {/* CTA Fixo em Mobile */}
           <Button
             className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-semibold transition"
-            onClick={() => navigate('/consulta')}
+            onClick={() => navigate('/orientação técnica')}
           >
-            🩺 Consulta
+            🩺 Orientação Técnica
           </Button>
 
           {/* Menu Toggle */}
@@ -140,8 +140,8 @@ export const ResponsiveNavbar = () => {
             <a href="/" className="block text-gray-700 hover:text-green-600 font-medium py-2">
               Início
             </a>
-            <a href="/consultas" className="block text-gray-700 hover:text-green-600 font-medium py-2">
-              Consultas
+            <a href="/orientação técnicas" className="block text-gray-700 hover:text-green-600 font-medium py-2">
+              Orientação Técnicas
             </a>
             <a href="/medicos" className="block text-gray-700 hover:text-green-600 font-medium py-2">
               Médicos

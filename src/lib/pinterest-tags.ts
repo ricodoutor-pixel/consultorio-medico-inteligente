@@ -15,7 +15,7 @@ export interface PinterestConfig {
 export const pinterestConfigs: Record<string, PinterestConfig> = {
   home: {
     title: 'Planta & Raiz — Telemedicina Cannabis Medicinal',
-    description: 'Referência no tratamento com cannabis medicinal no Brasil. Consultas com especialistas por apenas R$30.',
+    description: 'Referência no tratamento com cannabis medicinal no Brasil. Orientação Técnicas com especialistas por apenas R$30.',
     image: 'https://plantayraiz.com.br/og-home.jpg',
     url: 'https://plantayraiz.com.br',
     mediaType: 'article',

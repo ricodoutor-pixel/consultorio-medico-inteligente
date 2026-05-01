@@ -13,18 +13,18 @@ export const BRISA_WHATSAPP = "5511991363154";
 export function generateBrisaWhatsAppURL(
   userName: string,
   doctorName?: string,
-  consultationType?: string
+  orientação técnicationType?: string
 ): string {
   let message = `Olá enfermeira Brisa meu nome é ${userName}`;
 
   if (doctorName) {
-    message += `, gostaria de agendar uma consulta online com o Dr. ${doctorName}`;
+    message += `, gostaria de agendar uma orientação técnica online com o Dr. ${doctorName}`;
   } else {
-    message += `, gostaria de agendar uma consulta online`;
+    message += `, gostaria de agendar uma orientação técnica online`;
   }
 
-  if (consultationType) {
-    message += ` para ${consultationType}`;
+  if (orientação técnicationType) {
+    message += ` para ${orientação técnicationType}`;
   }
 
   message += ".";
@@ -34,10 +34,10 @@ export function generateBrisaWhatsAppURL(
 }
 
 /**
- * Tipos de consulta
+ * Tipos de orientação técnica
  */
 export const CONSULTATION_TYPES = {
-  initial: "Consulta Inicial",
+  initial: "Orientação Técnica Inicial",
   followup: "Acompanhamento",
   emergency: "Emergência",
   prescription: "Prescrição",
@@ -50,9 +50,9 @@ export const CONSULTATION_TYPES = {
 export function openBrisaWhatsApp(
   userName: string,
   doctorName?: string,
-  consultationType?: string
+  orientação técnicationType?: string
 ): void {
-  const url = generateBrisaWhatsAppURL(userName, doctorName, consultationType);
+  const url = generateBrisaWhatsAppURL(userName, doctorName, orientação técnicationType);
   window.open(url, "_blank");
 }
 
@@ -62,10 +62,10 @@ export function openBrisaWhatsApp(
 export async function copyBrisaWhatsAppLink(
   userName: string,
   doctorName?: string,
-  consultationType?: string
+  orientação técnicationType?: string
 ): Promise<boolean> {
   try {
-    const url = generateBrisaWhatsAppURL(userName, doctorName, consultationType);
+    const url = generateBrisaWhatsAppURL(userName, doctorName, orientação técnicationType);
     await navigator.clipboard.writeText(url);
     return true;
   } catch (error) {

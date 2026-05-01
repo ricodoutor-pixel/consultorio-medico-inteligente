@@ -44,8 +44,8 @@ export async function syncLeadEvent(
 /**
  * Dispara quando paciente abandona pagamento
  */
-export const syncPaymentAbandoned = (userId: string, consultationValue?: string) =>
-  syncLeadEvent("payment_abandoned", userId, { valor_consulta: consultationValue || "" });
+export const syncPaymentAbandoned = (userId: string, orientação técnicationValue?: string) =>
+  syncLeadEvent("payment_abandoned", userId, { valor_orientação técnica: orientação técnicationValue || "" });
 
 /**
  * Dispara quando triagem é finalizada
@@ -54,13 +54,13 @@ export const syncTriageCompleted = (userId: string, specialty?: string) =>
   syncLeadEvent("triage_completed", userId, { especialidade: specialty || "" });
 
 /**
- * Dispara quando consulta é agendada
+ * Dispara quando orientação técnica é agendada
  */
 export const syncAppointmentBooked = (userId: string, doctorName?: string) =>
   syncLeadEvent("appointment_booked", userId, { medico: doctorName || "" });
 
 /**
- * Dispara quando consulta é finalizada
+ * Dispara quando orientação técnica é finalizada
  */
 export const syncAppointmentCompleted = (userId: string) =>
   syncLeadEvent("appointment_completed", userId);

@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 export type FlowStep = 
   | "payment_completed"
-  | "consultation_completed"
+  | "orientação técnication_completed"
   | "prescription_ready"
   | "product_delivered";
 
@@ -29,8 +29,8 @@ const FLOW_MAP: Record<FlowStep, NextAction[]> = {
       id: "go-waiting",
       icon: <Calendar size={20} />,
       title: "Entrar na Sala de Espera",
-      description: "Sua consulta está confirmada. Aguarde o médico.",
-      route: "/consulta",
+      description: "Sua orientação técnica está confirmada. Aguarde o médico.",
+      route: "/orientação técnica",
       highlight: true,
     },
     {
@@ -41,7 +41,7 @@ const FLOW_MAP: Record<FlowStep, NextAction[]> = {
       route: "/consultorio",
     },
   ],
-  consultation_completed: [
+  orientação técnication_completed: [
     {
       id: "view-prescription",
       icon: <FileText size={20} />,
@@ -60,7 +60,7 @@ const FLOW_MAP: Record<FlowStep, NextAction[]> = {
     {
       id: "rate-doctor",
       icon: <Star size={20} />,
-      title: "Avaliar Consulta",
+      title: "Avaliar Orientação Técnica",
       description: "Sua opinião nos ajuda a melhorar.",
       route: "#nps",
     },
@@ -95,7 +95,7 @@ const FLOW_MAP: Record<FlowStep, NextAction[]> = {
       id: "schedule-followup",
       icon: <Calendar size={20} />,
       title: "Agendar Retorno",
-      description: "Marque sua consulta de acompanhamento.",
+      description: "Marque sua orientação técnica de acompanhamento.",
       route: "/agendar",
     },
     {

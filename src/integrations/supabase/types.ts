@@ -989,7 +989,7 @@ export type Database = {
         }
         Relationships: []
       }
-      consultation_queue: {
+      orientação técnication_queue: {
         Row: {
           amount: number | null
           cancelled_at: string | null
@@ -1182,7 +1182,7 @@ export type Database = {
       doctor_performance_metrics: {
         Row: {
           average_rating: number
-          consultations_count: number
+          orientação técnications_count: number
           created_at: string
           doctor_id: string
           estimated_share: number
@@ -1197,7 +1197,7 @@ export type Database = {
         }
         Insert: {
           average_rating?: number
-          consultations_count?: number
+          orientação técnications_count?: number
           created_at?: string
           doctor_id: string
           estimated_share?: number
@@ -1212,7 +1212,7 @@ export type Database = {
         }
         Update: {
           average_rating?: number
-          consultations_count?: number
+          orientação técnications_count?: number
           created_at?: string
           doctor_id?: string
           estimated_share?: number
@@ -1231,7 +1231,7 @@ export type Database = {
         Row: {
           available_hours: Json | null
           bio: string | null
-          consultation_price: number
+          orientação técnication_price: number
           created_at: string
           crm: string
           crm_state: string
@@ -1246,14 +1246,14 @@ export type Database = {
           rating: number | null
           rqe: string | null
           specialty: string
-          total_consultations: number | null
+          total_orientação técnications: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           available_hours?: Json | null
           bio?: string | null
-          consultation_price?: number
+          orientação técnication_price?: number
           created_at?: string
           crm: string
           crm_state?: string
@@ -1268,14 +1268,14 @@ export type Database = {
           rating?: number | null
           rqe?: string | null
           specialty?: string
-          total_consultations?: number | null
+          total_orientação técnications?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           available_hours?: Json | null
           bio?: string | null
-          consultation_price?: number
+          orientação técnication_price?: number
           created_at?: string
           crm?: string
           crm_state?: string
@@ -1290,7 +1290,7 @@ export type Database = {
           rating?: number | null
           rqe?: string | null
           specialty?: string
-          total_consultations?: number | null
+          total_orientação técnications?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -2134,7 +2134,7 @@ export type Database = {
       nps_responses: {
         Row: {
           category: string
-          consultation_id: string
+          orientação técnication_id: string
           created_at: string
           feedback: string | null
           id: string
@@ -2146,7 +2146,7 @@ export type Database = {
         }
         Insert: {
           category: string
-          consultation_id: string
+          orientação técnication_id: string
           created_at?: string
           feedback?: string | null
           id?: string
@@ -2158,7 +2158,7 @@ export type Database = {
         }
         Update: {
           category?: string
-          consultation_id?: string
+          orientação técnication_id?: string
           created_at?: string
           feedback?: string | null
           id?: string
@@ -3666,7 +3666,7 @@ export type Database = {
         Row: {
           available_hours: Json | null
           bio: string | null
-          consultation_price: number | null
+          orientação técnication_price: number | null
           created_at: string | null
           id: string | null
           is_online: boolean | null
@@ -3674,13 +3674,13 @@ export type Database = {
           organization_id: string | null
           rating: number | null
           specialty: string | null
-          total_consultations: number | null
+          total_orientação técnications: number | null
           user_id: string | null
         }
         Insert: {
           available_hours?: Json | null
           bio?: string | null
-          consultation_price?: number | null
+          orientação técnication_price?: number | null
           created_at?: string | null
           id?: string | null
           is_online?: boolean | null
@@ -3688,13 +3688,13 @@ export type Database = {
           organization_id?: string | null
           rating?: number | null
           specialty?: string | null
-          total_consultations?: number | null
+          total_orientação técnications?: number | null
           user_id?: string | null
         }
         Update: {
           available_hours?: Json | null
           bio?: string | null
-          consultation_price?: number | null
+          orientação técnication_price?: number | null
           created_at?: string | null
           id?: string | null
           is_online?: boolean | null
@@ -3702,7 +3702,7 @@ export type Database = {
           organization_id?: string | null
           rating?: number | null
           specialty?: string | null
-          total_consultations?: number | null
+          total_orientação técnications?: number | null
           user_id?: string | null
         }
         Relationships: []
@@ -3792,7 +3792,7 @@ export type Database = {
     Functions: {
       calculate_doctor_performance: {
         Args: {
-          _consultations: number
+          _orientação técnications: number
           _hours_online: number
           _plan_tier: string
           _rating: number

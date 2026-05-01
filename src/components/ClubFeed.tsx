@@ -66,7 +66,7 @@ export const SAMPLE_POSTS: FeedPost[] = [
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop",
     testimonial:
-      "Finalmente encontrei uma solução para minha insônia. R$30 a consulta é acessível e o resultado é real. Muito grato!",
+      "Finalmente encontrei uma solução para minha insônia. R$30 a orientação técnica é acessível e o resultado é real. Muito grato!",
     likes: 378,
     comments: 28,
     timestamp: "há 1 semana",

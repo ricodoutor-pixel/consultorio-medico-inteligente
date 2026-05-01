@@ -6,28 +6,28 @@
 export interface CommissionTier {
   level: number;
   name: string;
-  minConsultations: number;
-  maxConsultations: number;
+  minOrientação Técnications: number;
+  maxOrientação Técnications: number;
   doctorShare: number;
   platformShare: number;
   bonus: string;
 }
 
 export const COMMISSION_TIERS: CommissionTier[] = [
-  { level: 1, name: 'Iniciante', minConsultations: 0, maxConsultations: 50, doctorShare: 0.80, platformShare: 0.20, bonus: '' },
-  { level: 2, name: 'Ativo', minConsultations: 51, maxConsultations: 200, doctorShare: 0.85, platformShare: 0.15, bonus: 'Badge Ativo' },
-  { level: 3, name: 'Destaque', minConsultations: 201, maxConsultations: 500, doctorShare: 0.90, platformShare: 0.10, bonus: 'Destaque na busca' },
-  { level: 4, name: 'Elite', minConsultations: 501, maxConsultations: Infinity, doctorShare: 0.92, platformShare: 0.08, bonus: 'Bônus 5% extra' },
+  { level: 1, name: 'Iniciante', minOrientação Técnications: 0, maxOrientação Técnications: 50, doctorShare: 0.80, platformShare: 0.20, bonus: '' },
+  { level: 2, name: 'Ativo', minOrientação Técnications: 51, maxOrientação Técnications: 200, doctorShare: 0.85, platformShare: 0.15, bonus: 'Badge Ativo' },
+  { level: 3, name: 'Destaque', minOrientação Técnications: 201, maxOrientação Técnications: 500, doctorShare: 0.90, platformShare: 0.10, bonus: 'Destaque na busca' },
+  { level: 4, name: 'Elite', minOrientação Técnications: 501, maxOrientação Técnications: Infinity, doctorShare: 0.92, platformShare: 0.08, bonus: 'Bônus 5% extra' },
 ];
 
-export function getDoctorTier(monthlyConsultations: number): CommissionTier {
+export function getDoctorTier(monthlyOrientação Técnications: number): CommissionTier {
   return COMMISSION_TIERS.find(
-    t => monthlyConsultations >= t.minConsultations && monthlyConsultations <= t.maxConsultations
+    t => monthlyOrientação Técnications >= t.minOrientação Técnications && monthlyOrientação Técnications <= t.maxOrientação Técnications
   ) || COMMISSION_TIERS[0];
 }
 
-export function calculateFranchiseRevenue(amount: number, monthlyConsultations: number) {
-  const tier = getDoctorTier(monthlyConsultations);
+export function calculateFranchiseRevenue(amount: number, monthlyOrientação Técnications: number) {
+  const tier = getDoctorTier(monthlyOrientação Técnications);
   return {
     tier,
     doctorEarnings: Math.round(amount * tier.doctorShare * 100) / 100,
@@ -71,7 +71,7 @@ export interface QualityCriteria {
   avgResponseTimeMinutes: number;
   certificationsValid: boolean;
   complaintsCount: number;
-  totalConsultations: number;
+  totalOrientação Técnications: number;
   memberSinceMonths: number;
 }
 
@@ -85,7 +85,7 @@ export function calculateQualityScore(criteria: QualityCriteria): number {
   const responseTimeWeight = (1 - Math.min(criteria.avgResponseTimeMinutes / 30, 1)) * 0.20;
   const certWeight = (criteria.certificationsValid ? 1 : 0) * 0.15;
   const complaintsWeight = (1 - Math.min(criteria.complaintsCount / 5, 1)) * 0.10;
-  const experienceWeight = Math.min(criteria.totalConsultations / 200, 1) * 0.05;
+  const experienceWeight = Math.min(criteria.totalOrientação Técnications / 200, 1) * 0.05;
   return Math.round((npsWeight + responseRateWeight + responseTimeWeight + certWeight + complaintsWeight + experienceWeight) * 100) / 10;
 }
 
@@ -109,8 +109,8 @@ export interface Opportunity {
 export interface DoctorBIMetrics {
   monthlyRevenue: number;
   revenueGrowth: number;
-  avgConsultationValue: number;
-  consultationsThisMonth: number;
+  avgOrientação TécnicationValue: number;
+  orientação técnicationsThisMonth: number;
   bonusAccumulated: number;
   plantaCoinBalance: number;
   newPatients: number;
@@ -124,7 +124,7 @@ export interface DoctorBIMetrics {
   percentile: number;
   opportunities: Opportunity[];
   revenueHistory: { month: string; value: number }[];
-  consultationHistory: { month: string; count: number }[];
+  orientação técnicationHistory: { month: string; count: number }[];
 }
 
 export function generateOpportunities(metrics: Partial<DoctorBIMetrics>): Opportunity[] {
@@ -137,15 +137,15 @@ export function generateOpportunities(metrics: Partial<DoctorBIMetrics>): Opport
       action: 'Ativar retenção',
     });
   }
-  if ((metrics.consultationsThisMonth ?? 0) < 50) {
+  if ((metrics.orientação técnicationsThisMonth ?? 0) < 50) {
     opportunities.push({
-      icon: '📈', title: 'Aumente suas consultas',
+      icon: '📈', title: 'Aumente suas orientação técnicas',
       description: 'Compartilhe sua página personalizada',
-      potentialRevenue: (50 - (metrics.consultationsThisMonth ?? 0)) * (metrics.avgConsultationValue ?? 150),
+      potentialRevenue: (50 - (metrics.orientação técnicationsThisMonth ?? 0)) * (metrics.avgOrientação TécnicationValue ?? 150),
       action: 'Compartilhar',
     });
   }
-  if ((metrics.npsScore ?? 0) >= 8.5 && (metrics.consultationsThisMonth ?? 0) >= 100) {
+  if ((metrics.npsScore ?? 0) >= 8.5 && (metrics.orientação técnicationsThisMonth ?? 0) >= 100) {
     opportunities.push({ icon: '🏆', title: 'Elegível para Selo de Qualidade', description: 'Você atende os critérios', action: 'Solicitar selo' });
   }
   if ((metrics.plantaCoinBalance ?? 0) >= 500) {
@@ -176,7 +176,7 @@ export interface WellnessPlan {
   price: number;
   period: 'monthly' | 'yearly';
   features: string[];
-  maxConsultations: number;
+  maxOrientação Técnications: number;
   productDiscount: number;
   priority: boolean;
 }
@@ -185,32 +185,32 @@ export const WELLNESS_PLANS: WellnessPlan[] = [
   {
     id: 'basic', name: 'Bem-Estar Básico', price: 99, period: 'monthly',
     features: ['Suporte 24h com IA Brisa', 'Renovação automática de receitas', '10% desconto em produtos', 'Acesso à biblioteca científica'],
-    maxConsultations: 0, productDiscount: 0.10, priority: false,
+    maxOrientação Técnications: 0, productDiscount: 0.10, priority: false,
   },
   {
     id: 'pro', name: 'Bem-Estar Pro', price: 149, period: 'monthly',
-    features: ['Tudo do Básico', '1 consulta com médico/mês', '15% desconto em produtos', 'Acesso a cursos gratuitos', 'Smart-Refill automático'],
-    maxConsultations: 1, productDiscount: 0.15, priority: false,
+    features: ['Tudo do Básico', '1 orientação técnica com médico/mês', '15% desconto em produtos', 'Acesso a cursos gratuitos', 'Smart-Refill automático'],
+    maxOrientação Técnications: 1, productDiscount: 0.15, priority: false,
   },
   {
     id: 'premium', name: 'Bem-Estar Premium', price: 199, period: 'monthly',
-    features: ['Tudo do Pro', '2 consultas com médico/mês', '20% desconto em produtos', 'Prioridade no atendimento', 'Consultoria nutricional', 'Rastreamento Anvisa automático'],
-    maxConsultations: 2, productDiscount: 0.20, priority: true,
+    features: ['Tudo do Pro', '2 orientação técnicas com médico/mês', '20% desconto em produtos', 'Prioridade no atendimento', 'Consultoria nutricional', 'Rastreamento Anvisa automático'],
+    maxOrientação Técnications: 2, productDiscount: 0.20, priority: true,
   },
 ];
 
 // ===== Retention AI =====
 export function calculateAbandonmentRisk(params: {
   daysSinceLastPurchase: number;
-  daysSinceLastConsultation: number;
+  daysSinceLastOrientação Técnication: number;
   npsScore: number;
   subscriptionAgeMonths: number;
-  totalConsultations: number;
+  totalOrientação Técnications: number;
 }): number {
-  const { daysSinceLastPurchase, npsScore, subscriptionAgeMonths, totalConsultations } = params;
+  const { daysSinceLastPurchase, npsScore, subscriptionAgeMonths, totalOrientação Técnications } = params;
   const inactivityScore = Math.min(daysSinceLastPurchase / 60, 1) * 0.4;
   const npsRisk = ((10 - (npsScore || 5)) / 10) * 0.3;
-  const avgConsultPerMonth = totalConsultations / Math.max(subscriptionAgeMonths, 1);
+  const avgConsultPerMonth = totalOrientação Técnications / Math.max(subscriptionAgeMonths, 1);
   const frequencyRisk = Math.max(0, (1 - Math.min(avgConsultPerMonth / 2, 1))) * 0.2;
   const newSubRisk = (1 - Math.min(subscriptionAgeMonths / 6, 1)) * 0.1;
   return Math.min(inactivityScore + npsRisk + frequencyRisk + newSubRisk, 1);

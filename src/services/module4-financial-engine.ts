@@ -28,7 +28,7 @@ interface PaymentCalculation {
   doctorAmount: number;
   transactionId: string;
   timestamp: Date;
-  type: 'consultation' | 'marketplace';
+  type: 'orientação técnication' | 'marketplace';
 }
 
 // 🟠 INTERFACE: Subscriber Plan
@@ -41,11 +41,11 @@ interface SubscriberPlan {
 }
 
 /**
- * 🟠 FUNÇÃO: Calcular Split de Pagamento (Consultas)
+ * 🟠 FUNÇÃO: Calcular Split de Pagamento (Orientação Técnicas)
  * Reter 7% (Plataforma) / 93% (Médico)
  */
-export async function calculateConsultationSplit(
-  consultationId: string,
+export async function calculateOrientação TécnicationSplit(
+  orientação técnicationId: string,
   grossAmount: number,
   doctorId: string
 ): Promise<PaymentCalculation> {
@@ -57,12 +57,12 @@ export async function calculateConsultationSplit(
     const { data, error } = await supabase
       .from('payment_calculations')
       .insert({
-        consultation_id: consultationId,
+        orientação técnication_id: orientação técnicationId,
         doctor_id: doctorId,
         gross_amount: grossAmount,
         platform_fee: platformFee,
         doctor_amount: doctorAmount,
-        type: 'consultation',
+        type: 'orientação técnication',
         created_at: new Date().toISOString(),
       })
       .select()
@@ -76,10 +76,10 @@ export async function calculateConsultationSplit(
       doctorAmount,
       transactionId: data.id,
       timestamp: new Date(data.created_at),
-      type: 'consultation',
+      type: 'orientação técnication',
     };
   } catch (error) {
-    console.error('Erro ao calcular split de consulta:', error);
+    console.error('Erro ao calcular split de orientação técnica:', error);
     throw error;
   }
 }
@@ -137,7 +137,7 @@ export async function calculateMarketplaceSplit(
 
 /**
  * 🟠 FUNÇÃO: Validação de CRM em Tempo Real
- * Verificar CRM do médico antes de permitir teleconsulta
+ * Verificar CRM do médico antes de permitir teleorientação técnica
  */
 export async function validateDoctorCRM(
   doctorId: string,
@@ -263,7 +263,7 @@ async function getSubscriberPlan(
  */
 export async function checkSubscriberFeeExemption(
   userId: string,
-  transactionType: 'consultation' | 'marketplace'
+  transactionType: 'orientação técnication' | 'marketplace'
 ): Promise<{
   isExempt: boolean;
   feeRate: number;
@@ -276,7 +276,7 @@ export async function checkSubscriberFeeExemption(
       return {
         isExempt: false,
         feeRate:
-          transactionType === 'consultation'
+          transactionType === 'orientação técnication'
             ? SPLIT_RATES.CONSULTATION.platform
             : SPLIT_RATES.MARKETPLACE.platform,
         planType: 'free',
@@ -297,7 +297,7 @@ export async function checkSubscriberFeeExemption(
     return {
       isExempt: false,
       feeRate:
-        transactionType === 'consultation'
+        transactionType === 'orientação técnication'
           ? SPLIT_RATES.CONSULTATION.platform
           : SPLIT_RATES.MARKETPLACE.platform,
       planType: 'free',
@@ -310,12 +310,12 @@ export async function checkSubscriberFeeExemption(
  */
 export async function processPaymentWithSplit(
   paymentData: {
-    type: 'consultation' | 'marketplace';
+    type: 'orientação técnication' | 'marketplace';
     grossAmount: number;
     doctorId?: string;
     supplierId?: string;
     buyerId?: string;
-    consultationId?: string;
+    orientação técnicationId?: string;
     orderId?: string;
   }
 ): Promise<{
@@ -326,9 +326,9 @@ export async function processPaymentWithSplit(
   try {
     let calculation: PaymentCalculation;
 
-    if (paymentData.type === 'consultation') {
-      calculation = await calculateConsultationSplit(
-        paymentData.consultationId!,
+    if (paymentData.type === 'orientação técnication') {
+      calculation = await calculateOrientação TécnicationSplit(
+        paymentData.orientação técnicationId!,
         paymentData.grossAmount,
         paymentData.doctorId!
       );
@@ -382,8 +382,8 @@ async function createMercadoPagoPreferenceWithSplit(
         items: [
           {
             title:
-              calculation.type === 'consultation'
-                ? 'Teleconsulta Cannabis Medicinal'
+              calculation.type === 'orientação técnication'
+                ? 'Teleorientação técnica Cannabis Medicinal'
                 : 'Produto Marketplace',
             quantity: 1,
             currency_id: 'BRL',
@@ -417,7 +417,7 @@ async function createMercadoPagoPreferenceWithSplit(
 }
 
 export default {
-  calculateConsultationSplit,
+  calculateOrientação TécnicationSplit,
   calculateMarketplaceSplit,
   validateDoctorCRM,
   checkSubscriberFeeExemption,

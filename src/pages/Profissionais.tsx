@@ -47,15 +47,15 @@ function useRotatingOnline(base: Professional[]): Professional[] {
 
 const SERVICE_TIERS = [
   { name: "Mentoria", price: "R$ 30", value: 30, icon: Zap, desc: "Orientação rápida de 15 min", highlight: false },
-  { name: "Consulta Chat", price: "R$ 50", value: 50, icon: MessageSquare, desc: "Consulta por chat completa", highlight: false },
-  { name: "Consulta Vídeo", price: "R$ 80", value: 80, icon: Video, desc: "Teleconsulta por vídeo 30 min", highlight: false },
-  { name: "Consulta + Receita", price: "R$ 100", value: 100, icon: FileText, desc: "Consulta com prescrição canábica", highlight: true },
-  { name: "Combo ANVISA Chat", price: "R$ 120", value: 120, icon: ShieldCheck, desc: "Consulta + laudo + receita ANVISA", highlight: false },
+  { name: "Orientação Técnica Chat", price: "R$ 50", value: 50, icon: MessageSquare, desc: "Orientação Técnica por chat completa", highlight: false },
+  { name: "Orientação Técnica Vídeo", price: "R$ 80", value: 80, icon: Video, desc: "Teleorientação técnica por vídeo 30 min", highlight: false },
+  { name: "Orientação Técnica + Receita", price: "R$ 100", value: 100, icon: FileText, desc: "Orientação Técnica com prescrição canábica", highlight: true },
+  { name: "Combo ANVISA Chat", price: "R$ 120", value: 120, icon: ShieldCheck, desc: "Orientação Técnica + laudo + receita ANVISA", highlight: false },
   { name: "Combo Full Vídeo", price: "R$ 150", value: 150, icon: Star, desc: "Vídeo + receita + laudo completo", highlight: false },
 ];
 
 const WhatsAppContactButton = ({ name, className = "" }: { name: string; className?: string }) => {
-  const message = encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${name}`);
+  const message = encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma orientação técnica online com ${name}`);
   return (
     <a
       href={`https://wa.me/${BRISA_WHATSAPP}?text=${message}`}
@@ -177,7 +177,7 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
               <div className="flex items-center gap-2 mb-4">
                 <Star size={14} className="text-primary fill-primary" />
                 <span className="text-sm font-black">{pro.rating}</span>
-                <span className="text-xs text-muted-foreground">• {pro.consults} consultas</span>
+                <span className="text-xs text-muted-foreground">• {pro.consults} orientação técnicas</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">{pro.bio}</p>
               <div className="flex flex-wrap gap-2 mb-4">
@@ -349,7 +349,7 @@ const Profissionais = () => {
                             <div className="flex items-center gap-1 mt-1">
                               <Star size={12} className="text-primary fill-primary" />
                               <span className="text-xs font-black text-foreground">{p.rating}</span>
-                              <span className="text-[10px] text-muted-foreground">• {p.consults} consultas</span>
+                              <span className="text-[10px] text-muted-foreground">• {p.consults} orientação técnicas</span>
                             </div>
                           </div>
                         </div>
@@ -372,16 +372,16 @@ const Profissionais = () => {
                           </span>
                         </div>
 
-                        {/* Botão Agendar Consulta via WhatsApp */}
+                        {/* Botão Agendar Orientação Técnica via WhatsApp */}
                         <a
-                          href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${p.name}`)}`}
+                          href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma orientação técnica online com ${p.name}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
                           className="mt-3 block"
                         >
                           <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-black rounded-xl gap-2 text-sm h-10">
-                            <Phone size={14} /> Agendar Consulta
+                            <Phone size={14} /> Agendar Orientação Técnica
                           </Button>
                         </a>
                       </div>

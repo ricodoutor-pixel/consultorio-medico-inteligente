@@ -160,7 +160,7 @@ const GlobalCompliance = () => {
                   <h3 className="font-bold mb-2">HL7 FHIR R4</h3>
                   <ul className="space-y-1 text-muted-foreground text-xs">
                     <li>✅ Patient Resource (dados demográficos padronizados)</li>
-                    <li>✅ Encounter Resource (registros de teleconsulta)</li>
+                    <li>✅ Encounter Resource (registros de teleorientação técnica)</li>
                     <li>✅ Observation Resource (achados clínicos)</li>
                     <li>✅ MedicationRequest (prescrições digitais)</li>
                     <li>✅ Condition Resource (diagnósticos CID-10 → ICD-11)</li>

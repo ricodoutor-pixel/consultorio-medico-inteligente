@@ -120,7 +120,7 @@ const Dispensario = () => {
           </p>
           <div className="space-y-3">
             <Button onClick={() => window.location.href = "/falar-com-especialista"} className="w-full bg-primary text-primary-foreground">
-              <Pill size={16} className="mr-2" /> Consultar um Prescritor
+              <Pill size={16} className="mr-2" /> Orientação Técnicar um Prescritor
             </Button>
             <Button variant="outline" onClick={() => window.location.href = "/dashboard"} className="w-full">
               Voltar ao Dashboard

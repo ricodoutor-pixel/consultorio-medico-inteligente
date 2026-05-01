@@ -284,7 +284,7 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-center">
                     <div>
-                      <p className="text-[10px] text-muted-foreground">Receita Consultas</p>
+                      <p className="text-[10px] text-muted-foreground">Receita Orientação Técnicas</p>
                       <p className="text-lg font-black text-foreground">R$ {revenueData.summary.totalRevenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
                     </div>
                     <div>
@@ -318,8 +318,8 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
                     <div className="grid grid-cols-3 gap-2">
                       <div className="bg-muted/20 rounded-lg p-2.5 text-center">
                         <Users className="h-3.5 w-3.5 mx-auto mb-1 text-blue-400" />
-                        <p className="text-lg font-black text-foreground">{revenueData.myDistribution.consultations}</p>
-                        <p className="text-[9px] text-muted-foreground">Consultas</p>
+                        <p className="text-lg font-black text-foreground">{revenueData.myDistribution.orientação técnications}</p>
+                        <p className="text-[9px] text-muted-foreground">Orientação Técnicas</p>
                       </div>
                       <div className="bg-muted/20 rounded-lg p-2.5 text-center">
                         <Clock className="h-3.5 w-3.5 mx-auto mb-1 text-emerald-400" />
@@ -457,8 +457,8 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
               <p className="text-xs font-bold text-foreground">📋 Como funciona a distribuição?</p>
               <div className="space-y-1.5">
                 {[
-                  "10% do lucro total das consultas do mês é reservado",
-                  "O valor é dividido por peso: consultas (50%), horas online (30%), avaliação (20%)",
+                  "10% do lucro total das orientação técnicas do mês é reservado",
+                  "O valor é dividido por peso: orientação técnicas (50%), horas online (30%), avaliação (20%)",
                   "Multiplicadores por plano: Basic 1x, Professional 1.2x, Premium 1.5x, Enterprise 2x",
                   "Pagamento automático via Pix no último dia útil do mês",
                   "Mínimo de R$ 1,00 para receber a transferência",

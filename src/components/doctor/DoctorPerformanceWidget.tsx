@@ -7,7 +7,7 @@ import { TrendingUp, Users, Clock, Star, Award, Zap, ShieldCheck } from "lucide-
 import { motion } from "framer-motion";
 
 interface PerformanceData {
-  consultations: number;
+  orientação técnications: number;
   hoursOnline: number;
   rating: number;
   planTier: string;
@@ -39,7 +39,7 @@ interface Props {
 
 export const DoctorPerformanceWidget = ({ doctorId, simulatedTier }: Props) => {
   const [perf, setPerf] = useState<PerformanceData>({
-    consultations: 0, hoursOnline: 0, rating: 5.0,
+    orientação técnications: 0, hoursOnline: 0, rating: 5.0,
     planTier: "basic", baseScore: 0, multiplier: 1, weightedScore: 0, estimatedShare: 0, feeRate: 0,
   });
 
@@ -90,7 +90,7 @@ export const DoctorPerformanceWidget = ({ doctorId, simulatedTier }: Props) => {
       .lte("scheduled_at", endOfMonth);
 
     const completed = appts?.filter(a => a.status === "completed") || [];
-    const consultations = completed.length;
+    const orientação técnications = completed.length;
     const hoursOnline = completed.reduce((s, a) => s + (a.duration_minutes || 30), 0) / 60;
 
     const { data: doc } = await supabase
@@ -102,7 +102,7 @@ export const DoctorPerformanceWidget = ({ doctorId, simulatedTier }: Props) => {
     const rating = Number(doc?.rating || 5.0);
 
     const { data: scoreResult } = await supabase.rpc("calculate_doctor_performance", {
-      _consultations: consultations,
+      _orientação técnications: orientação técnications,
       _hours_online: hoursOnline,
       _rating: rating,
       _plan_tier: tier,
@@ -112,7 +112,7 @@ export const DoctorPerformanceWidget = ({ doctorId, simulatedTier }: Props) => {
     const tierInfo = TIER_CONFIG[tier] || TIER_CONFIG.basic;
 
     setPerf({
-      consultations,
+      orientação técnications,
       hoursOnline: Math.round(hoursOnline * 10) / 10,
       rating,
       planTier: tier,
@@ -163,8 +163,8 @@ export const DoctorPerformanceWidget = ({ doctorId, simulatedTier }: Props) => {
         <div className="grid grid-cols-3 gap-3 mb-5">
           <motion.div whileHover={{ scale: 1.03 }} className="bg-muted/30 rounded-xl p-3 border border-border text-center">
             <Users size={16} className="text-primary mx-auto mb-1" />
-            <p className="text-xl font-display font-black text-foreground">{perf.consultations}</p>
-            <p className="text-[10px] text-muted-foreground font-bold">Consultas/Mês</p>
+            <p className="text-xl font-display font-black text-foreground">{perf.orientação técnications}</p>
+            <p className="text-[10px] text-muted-foreground font-bold">Orientação Técnicas/Mês</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.03 }} className="bg-muted/30 rounded-xl p-3 border border-border text-center">
             <Clock size={16} className="text-primary mx-auto mb-1" />

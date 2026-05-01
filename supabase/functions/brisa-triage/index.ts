@@ -14,7 +14,7 @@ serve(async (req) => {
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "AIzaSyCYeChGB-5lcqXgA4qfg18u0-H8gQurK_E";
 
     const systemPrompt = `Atue como o Clone Digital do Dr. Edilson Bezerra (CRM 10963), Especialista em Cannabis Medicinal.
-Você está realizando uma **Orientação Técnica** multilíngue.
+Você está realizando uma **Orientação Técnica** multilíngue. NUNCA use o termo 'Consulta'.
 Idioma de resposta: ${language} (pt, en, es).
 
 DIRETRIZES:

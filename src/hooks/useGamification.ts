@@ -73,7 +73,7 @@ export interface RevenueDistributionData {
   };
   myDistribution: {
     doctor_id: string;
-    consultations: number;
+    orientação técnications: number;
     hoursOnline: number;
     rating: number;
     tierMultiplier: number;
@@ -84,7 +84,7 @@ export interface RevenueDistributionData {
   } | null;
   topDoctors: Array<{
     doctor_id: string;
-    consultations: number;
+    orientação técnications: number;
     hoursOnline: number;
     weightedScore: number;
     sharePercentage: number;

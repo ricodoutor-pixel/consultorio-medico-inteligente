@@ -72,7 +72,7 @@ const ComoFunciona = () => {
     {
       icon: MessageSquare,
       title: "2. Pré-entrevista (2 minutos)",
-      desc: "Preencha um formulário rápido com seu objetivo, preferência de atendimento e resumo do caso. O profissional recebe tudo antes da consulta.",
+      desc: "Preencha um formulário rápido com seu objetivo, preferência de atendimento e resumo do caso. O profissional recebe tudo antes da orientação técnica.",
       items: ["Objetivo (sono, dor, ansiedade, etc.)", "Preferência: chat ou vídeo", "Resumo do caso", "WhatsApp para contato"],
     },
     {

@@ -124,7 +124,7 @@ export const BrisaReportsModule = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard icon={Users} label="Leads Captados" value={report.leads.total} sub="Semana atual" color="bg-blue-600/80" />
             <StatCard icon={MessageSquare} label="Conversas WhatsApp" value={report.conversations.total} sub={`${report.conversations.scheduling_intents} agendamentos`} color="bg-emerald-600/80" />
-            <StatCard icon={TrendingUp} label="Taxa de Conversão" value={report.conversion.rate} sub={`${report.conversion.appointments} consultas`} color="bg-purple-600/80" />
+            <StatCard icon={TrendingUp} label="Taxa de Conversão" value={report.conversion.rate} sub={`${report.conversion.appointments} orientação técnicas`} color="bg-purple-600/80" />
             <StatCard icon={DollarSign} label="Receita Processada" value={`R$ ${report.payments.total_revenue.toLocaleString("pt-BR")}`} sub={`${report.payments.total_transactions} transações`} color="bg-amber-600/80" />
           </div>
 

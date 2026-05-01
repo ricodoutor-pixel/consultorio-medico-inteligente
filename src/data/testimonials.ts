@@ -3,7 +3,7 @@ export const testimonials = [
     name: "Dona Maria",
     age: "62 anos",
     topic: "Artrite • Dor Crônica",
-    quote: "Depois de 8 anos sofrendo com artrite reumatoide, o óleo de CBD mudou minha vida. Reduzi 70% dos analgésicos e voltei a fazer crochê. A consulta pela plataforma foi acessível e o médico explicou tudo com paciência.",
+    quote: "Depois de 8 anos sofrendo com artrite reumatoide, o óleo de CBD mudou minha vida. Reduzi 70% dos analgésicos e voltei a fazer crochê. A orientação técnica pela plataforma foi acessível e o médico explicou tudo com paciência.",
     imageUrl: "https://images.unsplash.com/photo-1566616213894-2d4e1baee5d8?w=200&h=200&fit=crop&crop=face",
   },
   {
@@ -31,7 +31,7 @@ export const testimonials = [
     name: "Carla",
     age: "28 anos",
     topic: "Fibromialgia • Fadiga",
-    quote: "Vivi 5 anos com dores que ninguém entendia. Depois da consulta online com o especialista em dor, iniciei o protocolo com CBD + THC microdose. Em 2 meses voltei a trabalhar e fazer exercícios. Gratidão eterna!",
+    quote: "Vivi 5 anos com dores que ninguém entendia. Depois da orientação técnica online com o especialista em dor, iniciei o protocolo com CBD + THC microdose. Em 2 meses voltei a trabalhar e fazer exercícios. Gratidão eterna!",
     imageUrl: "https://images.unsplash.com/photo-1589571894960-20bbe2828d0a?w=200&h=200&fit=crop&crop=face",
   },
 ];

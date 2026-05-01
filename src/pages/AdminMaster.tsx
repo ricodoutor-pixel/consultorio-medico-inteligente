@@ -81,7 +81,7 @@ const generateRevenueData = () => {
   const days = [];
   for (let i = 30; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
-    days.push({ date: d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }), receita: Math.floor(3000 + Math.random() * 12000), consultas: Math.floor(800 + Math.random() * 5000), marketplace: Math.floor(400 + Math.random() * 3000) });
+    days.push({ date: d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }), receita: Math.floor(3000 + Math.random() * 12000), orientação técnicas: Math.floor(800 + Math.random() * 5000), marketplace: Math.floor(400 + Math.random() * 3000) });
   }
   return days;
 };
@@ -115,7 +115,7 @@ const generateSecurityLogs = () => [
 ];
 
 const salesByPlan = [
-  { name: "Consultas", value: 45, color: "#39FF14" },
+  { name: "Orientação Técnicas", value: 45, color: "#39FF14" },
   { name: "Club VIP", value: 25, color: "#00D4FF" },
   { name: "Marketplace", value: 20, color: "#FF6B35" },
   { name: "Assinaturas", value: 10, color: "#A855F7" },
@@ -183,7 +183,7 @@ const AdminMaster = () => {
       { count: subsCount }, { data: vTxs }, { data: allEscrows }, { data: appts }, { data: vProducts },
     ] = await Promise.all([
       supabase.from("profiles").select("*", { count: "exact", head: true }),
-      supabase.from("doctors").select("id, user_id, specialty, is_online, is_verified, rating, total_consultations, crm, crm_state").order("is_online", { ascending: false }),
+      supabase.from("doctors").select("id, user_id, specialty, is_online, is_verified, rating, total_orientação técnications, crm, crm_state").order("is_online", { ascending: false }),
       supabase.from("escrow_transactions").select("amount, status, type, created_at").eq("status", "released"),
       supabase.from("payment_webhooks").select("*").order("created_at", { ascending: false }).limit(10),
       supabase.from("product_alert_subscriptions").select("*", { count: "exact", head: true }).eq("is_active", true),
@@ -267,7 +267,7 @@ const AdminMaster = () => {
   const alertZone = useMemo<AlertZone>(() => {
     const openSACCount = Math.floor(Math.random() * 20); // simulated
     const paymentFailing = recentPayments.some(p => p.status === "rejected" || p.status === "refunded");
-    const longQueueDoctor = doctorsList.some(d => d.is_online && (d.total_consultations || 0) > 50);
+    const longQueueDoctor = doctorsList.some(d => d.is_online && (d.total_orientação técnications || 0) > 50);
     if (paymentFailing || longQueueDoctor) return "red";
     const lowStock = vendorProducts.filter(p => p.stock <= 5 && p.is_active).length > 0;
     if (openSACCount > 10 || lowStock) return "yellow";
@@ -620,7 +620,7 @@ const AdminMaster = () => {
                   <YAxis tick={{ fill: "#ffffff30", fontSize: 9 }} axisLine={false} tickLine={false} tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
                   <RechartsTooltip contentStyle={{ background: "#0A0E27", border: "1px solid #39FF1440", borderRadius: 8, fontSize: 11 }} />
                   <Area type="monotone" dataKey="receita" stroke="#39FF14" strokeWidth={2} fill="url(#gGrad)" />
-                  <Area type="monotone" dataKey="consultas" stroke="#00D4FF" strokeWidth={1} fill="none" />
+                  <Area type="monotone" dataKey="orientação técnicas" stroke="#00D4FF" strokeWidth={1} fill="none" />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
@@ -902,7 +902,7 @@ const AdminMaster = () => {
                     ? <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "#39FF1420", color: "#39FF14" }}>✅ Verificado</span>
                     : <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "#FF444420", color: "#FF4444" }}>❌ Pendente</span>}
                   </span>
-                  <span className="text-[10px] text-white">{doc.total_consultations || 0}</span>
+                  <span className="text-[10px] text-white">{doc.total_orientação técnications || 0}</span>
                   <span>{crmExpiring
                     ? <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "#FFB80020", color: "#FFB800" }}>⚠️ Vencendo</motion.span>
                     : <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "#39FF1420", color: "#39FF14" }}>Válido</span>}

@@ -9,11 +9,11 @@ import { useAuditLog } from "@/hooks/useAuditLog";
 
 interface MandatoryNPSModalProps {
   open: boolean;
-  consultationId: string;
+  orientação técnicationId: string;
   patientId: string;
   professionalId: string;
   professionalName?: string;
-  flowType: "consultation" | "delivery";
+  flowType: "orientação técnication" | "delivery";
   onComplete: () => void;
 }
 
@@ -33,7 +33,7 @@ const SCORE_LABELS: Record<number, string> = {
 
 export const MandatoryNPSModal = ({
   open,
-  consultationId,
+  orientação técnicationId,
   patientId,
   professionalId,
   professionalName,
@@ -64,7 +64,7 @@ export const MandatoryNPSModal = ({
       const sentiment = score >= 7 ? "positive" : score >= 4 ? "neutral" : "negative";
 
       const { error } = await supabase.from("nps_responses").insert({
-        consultation_id: consultationId,
+        orientação técnication_id: orientação técnicationId,
         patient_id: patientId,
         professional_id: professionalId,
         score,
@@ -75,7 +75,7 @@ export const MandatoryNPSModal = ({
 
       if (error) throw error;
 
-      await log("nps_submitted", "nps_responses", consultationId, null, {
+      await log("nps_submitted", "nps_responses", orientação técnicationId, null, {
         score,
         category,
         flow_type: flowType,
@@ -112,8 +112,8 @@ export const MandatoryNPSModal = ({
       <DialogContent className="sm:max-w-md bg-card border-border" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="text-center text-foreground">
-            {flowType === "consultation"
-              ? "Como foi sua consulta?"
+            {flowType === "orientação técnication"
+              ? "Como foi sua orientação técnica?"
               : "Como foi sua experiência?"}
           </DialogTitle>
         </DialogHeader>

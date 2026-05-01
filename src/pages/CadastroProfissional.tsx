@@ -175,7 +175,7 @@ const CadastroProfissional = () => {
                 </div>
                 <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
                   <li>✅ Validação do formato do documento ({documentType.toUpperCase()})</li>
-                  <li>⏳ Consulta ao Conselho Federal de Medicina (CRM)</li>
+                  <li>⏳ Orientação Técnica ao Conselho Federal de Medicina (CRM)</li>
                   <li>⏳ Verificação de consistência de dados</li>
                   <li>⏳ Liberação do Dashboard Médico</li>
                 </ul>
@@ -321,7 +321,7 @@ const CadastroProfissional = () => {
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="valorCobrado">Valor por Consulta (R$) *</Label>
+                      <Label htmlFor="valorCobrado">Valor por Orientação Técnica (R$) *</Label>
                       <Input id="valorCobrado" type="number" min="0" step="0.01" placeholder="120.00" value={form.valorCobrado} onChange={(e) => handleChange("valorCobrado", e.target.value)} required />
                     </div>
                     <div className="space-y-2">
@@ -366,7 +366,7 @@ const CadastroProfissional = () => {
                       </SelectContent>
                     </Select>
                     {form.plano === "basic" && (
-                      <p className="text-[11px] text-primary font-bold mt-1">🎉 Parabéns! Você terá TAXA ZERO em todas as suas consultas.</p>
+                      <p className="text-[11px] text-primary font-bold mt-1">🎉 Parabéns! Você terá TAXA ZERO em todas as suas orientação técnicas.</p>
                     )}
                     {form.plano !== "basic" && (
                       <p className="text-[10px] text-muted-foreground">O plano VIP garante 100% dos honorários sem taxa de intermediação.</p>

@@ -21,7 +21,7 @@
   "hero": {
     "title": "Planta y Raiz - Mega Clínica Digital",
     "subtitle": "Democratizando el acceso a la salud y el bienestar a través de la tecnología y el cannabis medicinal.",
-    "startConsultation": "Iniciar Consulta",
+    "startOrientação Técnication": "Iniciar Orientação Técnica",
     "onlineNow": "En línea ahora"
   },
   "common": {
@@ -38,14 +38,14 @@
     "no": "No"
   },
   "consult": {
-    "title": "Teleconsulta",
+    "title": "Teleorientação técnica",
     "mute": "Silenciar",
     "unmute": "Activar micrófono",
     "endCall": "Terminar Llamada",
     "chat": "Chat",
     "aiAssistant": "Asistente IA",
     "medicalRecord": "Historia Clínica",
-    "elapsed": "Tiempo de consulta",
+    "elapsed": "Tiempo de orientação técnica",
     "waitingRoom": "Sala de Espera Virtual",
     "yourTurn": "¡Tu turno!",
     "estimatedWait": "Tiempo estimado de espera",
@@ -54,7 +54,7 @@
   "med": {
     "diagnosis": "Diagnóstico",
     "prescription": "Receta",
-    "complaint": "Motivo de Consulta",
+    "complaint": "Motivo de Orientação Técnica",
     "history": "Historial",
     "treatment": "Plan Terapéutico",
     "sign": "Firmar Digitalmente",
@@ -65,7 +65,7 @@
     "cac": "CAC",
     "ltv": "LTV",
     "conversionRate": "Tasa de Conversión",
-    "triageToConsultation": "Triaje → Consulta",
+    "triageToOrientação Técnication": "Triaje → Orientação Técnica",
     "revenue": "Ingresos",
     "monthlyRevenue": "Ingresos Mensuales",
     "activePatients": "Pacientes Activos",
@@ -84,6 +84,6 @@
     "cashback": "Cashback",
     "plantCoins": "Planta-Coins",
     "nextLevel": "Próximo nivel",
-    "consultationsNeeded": "consultas restantes"
+    "orientação técnicationsNeeded": "orientação técnicas restantes"
   }
 }

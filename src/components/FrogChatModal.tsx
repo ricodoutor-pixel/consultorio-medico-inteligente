@@ -86,24 +86,24 @@ async function streamChat({
 }
 
 const fallbackResponses: Record<string, string> = {
-  default: "Olá! 🐸 Estou com dificuldade para me conectar agora. Mas posso te ajudar! Acesse /telemedicina para consultas, /shopping para produtos, ou /profissionais para especialistas. 💚",
+  default: "Olá! 🐸 Estou com dificuldade para me conectar agora. Mas posso te ajudar! Acesse /telemedicina para orientação técnicas, /shopping para produtos, ou /profissionais para especialistas. 💚",
   oi: "Eae! 🐸👑 Sou o Verdinho! Estou com problemas técnicos, mas a plataforma funciona normalmente. Como posso ajudar? 💚",
-  consulta: "Para agendar: acesse /telemedicina, faça a triagem IA, escolha seu especialista e pague via PIX! Tudo em 5 minutos. ✅",
-  preco: "Consultas a partir de R$ 55 via PIX (Mercado Pago). Confira nossos planos em /planos! 💳",
+  orientação técnica: "Para agendar: acesse /telemedicina, faça a triagem IA, escolha seu especialista e pague via PIX! Tudo em 5 minutos. ✅",
+  preco: "Orientação Técnicas a partir de R$ 55 via PIX (Mercado Pago). Confira nossos planos em /planos! 💳",
 };
 
 const getFallback = (text: string): string => {
   const lower = text.toLowerCase();
   if (lower.match(/oi|olá|hey|eae/)) return fallbackResponses.oi;
-  if (lower.match(/consult|agend|marc/)) return fallbackResponses.consulta;
+  if (lower.match(/consult|agend|marc/)) return fallbackResponses.orientação técnica;
   if (lower.match(/preç|valor|custo|pag/)) return fallbackResponses.preco;
   return fallbackResponses.default;
 };
 
 const QUICK_ACTIONS = [
-  { label: "🩺 Agendar consulta", msg: "Como faço para agendar uma consulta?", cta: true },
+  { label: "🩺 Agendar orientação técnica", msg: "Como faço para agendar uma orientação técnica?", cta: true },
   { label: "💊 Cannabis medicinal", msg: "O que é cannabis medicinal e quais condições trata?" },
-  { label: "💰 Preços", msg: "Quais são os preços das consultas?" },
+  { label: "💰 Preços", msg: "Quais são os preços das orientação técnicas?" },
   { label: "🛒 Shopping", msg: "Quais produtos vocês vendem?" },
   { label: "📱 Como funciona?", msg: "Como funciona a plataforma Planta & Raiz?" },
 ];
@@ -127,9 +127,9 @@ const detectLang = (): "pt" | "en" | "es" => {
 };
 
 const WELCOME_BY_LANG: Record<"pt" | "en" | "es", string> = {
-  pt: "Olá! 🐸👑 Sou o **Verdinho**, assistente IA da **Planta & Raiz**!\n\nPosso te ajudar com:\n- 🩺 Consultas e agendamentos\n- 💊 Cannabis medicinal\n- 🛒 Shopping e produtos\n- 📋 Cadastro e plataforma\n- 🧠 Saúde e bem-estar\n\nPergunte qualquer coisa!",
+  pt: "Olá! 🐸👑 Sou o **Verdinho**, assistente IA da **Planta & Raiz**!\n\nPosso te ajudar com:\n- 🩺 Orientação Técnicas e agendamentos\n- 💊 Cannabis medicinal\n- 🛒 Shopping e produtos\n- 📋 Cadastro e plataforma\n- 🧠 Saúde e bem-estar\n\nPergunte qualquer coisa!",
   en: "Hi! 🐸👑 I'm **Verdinho**, the **Planta & Raiz** AI assistant!\n\nI can help you with:\n- 🩺 Appointments\n- 💊 Medical cannabis\n- 🛒 Shop and products\n- 📋 Sign-up and platform\n- 🧠 Health & wellness\n\nAsk me anything!",
-  es: "¡Hola! 🐸👑 Soy **Verdinho**, asistente IA de **Planta & Raiz**!\n\nPuedo ayudarte con:\n- 🩺 Consultas y citas\n- 💊 Cannabis medicinal\n- 🛒 Tienda y productos\n- 📋 Registro y plataforma\n- 🧠 Salud y bienestar\n\n¡Pregúntame lo que quieras!",
+  es: "¡Hola! 🐸👑 Soy **Verdinho**, asistente IA de **Planta & Raiz**!\n\nPuedo ayudarte con:\n- 🩺 Orientação Técnicas y citas\n- 💊 Cannabis medicinal\n- 🛒 Tienda y productos\n- 📋 Registro y plataforma\n- 🧠 Salud y bienestar\n\n¡Pregúntame lo que quieras!",
 };
 
 export const FrogChatModal = () => {

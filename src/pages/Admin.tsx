@@ -165,7 +165,7 @@ const Admin = () => {
                     <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-background/50 border border-border">
                       <div className="w-2 h-2 rounded-full bg-primary" />
                       <div className="flex-1">
-                        <p className="text-xs font-bold text-foreground">Nova consulta agendada</p>
+                        <p className="text-xs font-bold text-foreground">Nova orientação técnica agendada</p>
                         <p className="text-[10px] text-muted-foreground">Há {i*2} minutos</p>
                       </div>
                     </div>

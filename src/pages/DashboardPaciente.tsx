@@ -31,7 +31,7 @@ const allBadges = [
   { name: "Iniciante", icon: "🌱", earned: true, desc: "Criou conta na plataforma" },
   { name: "Ativo", icon: "⚡", earned: false, desc: "7 dias consecutivos de login", progress: 30 },
   { name: "Estudioso", icon: "📚", earned: false, desc: "Leu 5 artigos da biblioteca", progress: 10 },
-  { name: "Especialista", icon: "🏆", earned: false, desc: "Complete 10 orientação técnicas", progress: 0 },
+  { name: "Especialista", icon: "🏆", earned: false, desc: "Complete 10 consultas", progress: 0 },
   { name: "Embaixador", icon: "🌟", earned: false, desc: "Indique 5 amigos", progress: 0 },
   { name: "VIP", icon: "👑", earned: false, desc: "Acumule 1000 pontos", progress: 0 },
 ];
@@ -332,7 +332,7 @@ const DashboardPaciente = () => {
                     {appointments.length === 0 ? (
                       <div className="text-center py-8">
                         <Stethoscope size={32} className="text-muted-foreground mx-auto mb-3" />
-                        <p className="text-sm text-muted-foreground">Nenhuma orientação técnica ainda.</p>
+                        <p className="text-sm text-muted-foreground">Nenhuma consulta ainda.</p>
                         <Button size="sm" className="mt-3 rounded-xl bg-primary text-primary-foreground" asChild>
                           <Link to="/telemedicina">Agendar Primeira Consulta</Link>
                         </Button>
@@ -438,7 +438,7 @@ const DashboardPaciente = () => {
                   <CardContent className="p-8 text-center">
                     <FileText size={32} className="text-muted-foreground mx-auto mb-3" />
                     <p className="text-sm text-muted-foreground">Nenhuma receita encontrada.</p>
-                    <p className="text-xs text-muted-foreground mt-1">Após sua primeira orientação técnica, suas prescrições aparecerão aqui.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Após sua primeira consulta, suas prescrições aparecerão aqui.</p>
                     <Button size="sm" className="mt-4 rounded-xl bg-primary text-primary-foreground" asChild>
                       <Link to="/telemedicina">Agendar Consulta</Link>
                     </Button>

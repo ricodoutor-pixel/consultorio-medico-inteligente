@@ -28,7 +28,7 @@ interface PaymentCalculation {
   doctorAmount: number;
   transactionId: string;
   timestamp: Date;
-  type: 'orientação técnication' | 'marketplace';
+  type: 'consultation' | 'marketplace';
 }
 
 // 🟠 INTERFACE: Subscriber Plan
@@ -45,7 +45,7 @@ interface SubscriberPlan {
  * Reter 7% (Plataforma) / 93% (Médico)
  */
 export async function calculateConsultationSplit(
-  orientação técnicationId: string,
+  consultationId: string,
   grossAmount: number,
   doctorId: string
 ): Promise<PaymentCalculation> {
@@ -57,12 +57,12 @@ export async function calculateConsultationSplit(
     const { data, error } = await supabase
       .from('payment_calculations')
       .insert({
-        orientação técnication_id: orientação técnicationId,
+        consultation_id: consultationId,
         doctor_id: doctorId,
         gross_amount: grossAmount,
         platform_fee: platformFee,
         doctor_amount: doctorAmount,
-        type: 'orientação técnication',
+        type: 'consultation',
         created_at: new Date().toISOString(),
       })
       .select()
@@ -76,10 +76,10 @@ export async function calculateConsultationSplit(
       doctorAmount,
       transactionId: data.id,
       timestamp: new Date(data.created_at),
-      type: 'orientação técnication',
+      type: 'consultation',
     };
   } catch (error) {
-    console.error('Erro ao calcular split de orientação técnica:', error);
+    console.error('Erro ao calcular split de consulta:', error);
     throw error;
   }
 }
@@ -137,7 +137,7 @@ export async function calculateMarketplaceSplit(
 
 /**
  * 🟠 FUNÇÃO: Validação de CRM em Tempo Real
- * Verificar CRM do médico antes de permitir teleorientação técnica
+ * Verificar CRM do médico antes de permitir teleconsulta
  */
 export async function validateDoctorCRM(
   doctorId: string,
@@ -263,7 +263,7 @@ async function getSubscriberPlan(
  */
 export async function checkSubscriberFeeExemption(
   userId: string,
-  transactionType: 'orientação técnication' | 'marketplace'
+  transactionType: 'consultation' | 'marketplace'
 ): Promise<{
   isExempt: boolean;
   feeRate: number;
@@ -276,7 +276,7 @@ export async function checkSubscriberFeeExemption(
       return {
         isExempt: false,
         feeRate:
-          transactionType === 'orientação técnication'
+          transactionType === 'consultation'
             ? SPLIT_RATES.CONSULTATION.platform
             : SPLIT_RATES.MARKETPLACE.platform,
         planType: 'free',
@@ -297,7 +297,7 @@ export async function checkSubscriberFeeExemption(
     return {
       isExempt: false,
       feeRate:
-        transactionType === 'orientação técnication'
+        transactionType === 'consultation'
           ? SPLIT_RATES.CONSULTATION.platform
           : SPLIT_RATES.MARKETPLACE.platform,
       planType: 'free',
@@ -310,12 +310,12 @@ export async function checkSubscriberFeeExemption(
  */
 export async function processPaymentWithSplit(
   paymentData: {
-    type: 'orientação técnication' | 'marketplace';
+    type: 'consultation' | 'marketplace';
     grossAmount: number;
     doctorId?: string;
     supplierId?: string;
     buyerId?: string;
-    orientação técnicationId?: string;
+    consultationId?: string;
     orderId?: string;
   }
 ): Promise<{
@@ -326,9 +326,9 @@ export async function processPaymentWithSplit(
   try {
     let calculation: PaymentCalculation;
 
-    if (paymentData.type === 'orientação técnication') {
+    if (paymentData.type === 'consultation') {
       calculation = await calculateConsultationSplit(
-        paymentData.orientação técnicationId!,
+        paymentData.consultationId!,
         paymentData.grossAmount,
         paymentData.doctorId!
       );
@@ -382,8 +382,8 @@ async function createMercadoPagoPreferenceWithSplit(
         items: [
           {
             title:
-              calculation.type === 'orientação técnication'
-                ? 'Teleorientação técnica Cannabis Medicinal'
+              calculation.type === 'consultation'
+                ? 'Teleconsulta Cannabis Medicinal'
                 : 'Produto Marketplace',
             quantity: 1,
             currency_id: 'BRL',

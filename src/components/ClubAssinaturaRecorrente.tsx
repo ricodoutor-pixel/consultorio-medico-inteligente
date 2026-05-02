@@ -107,7 +107,7 @@ export const ClubAssinaturaRecorrente = () => {
             Assine e economize com saúde
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Planos recorrentes com orientação técnicas incluídas, descontos exclusivos e acompanhamento contínuo.
+            Planos recorrentes com consultas incluídas, descontos exclusivos e acompanhamento contínuo.
           </p>
         </motion.div>
       </div>

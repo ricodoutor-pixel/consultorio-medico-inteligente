@@ -30,7 +30,7 @@ export function useNPS() {
 
   const submitResponse = useCallback(
     async (data: {
-      orientação técnicationId: string;
+      consultationId: string;
       patientId: string;
       professionalId: string;
       score: number;

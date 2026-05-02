@@ -109,7 +109,7 @@ const AdminDashboard = () => {
         monthly.push({
           name: d.toLocaleString("pt-BR", { month: "short" }),
           receita: monthAppts.reduce((s, a) => s + Number(a.amount || 0), 0),
-          orientação técnicas: monthAppts.length,
+          consultas: monthAppts.length,
         });
       }
       setMonthlyData(monthly);
@@ -210,7 +210,7 @@ const AdminDashboard = () => {
                       contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
                     />
                     <Line type="monotone" dataKey="receita" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 5 }} />
-                    <Line type="monotone" dataKey="orientação técnicas" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="consultas" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -250,7 +250,7 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               {recentAppointments.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">Nenhuma orientação técnica registrada ainda.</p>
+                <p className="text-sm text-muted-foreground text-center py-8">Nenhuma consulta registrada ainda.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">

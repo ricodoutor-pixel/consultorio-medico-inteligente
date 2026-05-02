@@ -188,7 +188,7 @@ export const professionals: Professional[] = [
     slots: ["08:00", "09:00", "10:00", "13:00", "14:00"],
     reviews: [
       { name: "Ana S.", rating: 5, text: "Mudou minha qualidade de vida completamente." },
-      { name: "Pedro M.", rating: 4, text: "Ótima orientação técnica, muito acolhedora." },
+      { name: "Pedro M.", rating: 4, text: "Ótima consulta, muito acolhedora." },
     ],
   },
   {

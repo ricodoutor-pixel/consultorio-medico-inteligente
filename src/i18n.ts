@@ -10,7 +10,7 @@ export const translations = {
   pt: {
     hero_title: "Planta y Raiz - Mega Clínica Digital",
     hero_subtitle: "Democratizando o acesso à saúde e bem-estar através da tecnologia e cannabis medicinal.",
-    start_orientação técnication: "Iniciar Consulta",
+    start_consultation: "Iniciar Consulta",
     professionals: "Profissionais",
     shopping: "Shopping",
     online_status: "Online agora",
@@ -20,7 +20,7 @@ export const translations = {
   es: {
     hero_title: "Planta y Raiz - Mega Clínica Digital",
     hero_subtitle: "Democratizando el acceso a la salud y el bienestar a través de la tecnología y el cannabis medicinal.",
-    start_orientação técnication: "Iniciar Consulta",
+    start_consultation: "Iniciar Consulta",
     professionals: "Profesionales",
     shopping: "Tienda",
     online_status: "En línea ahora",
@@ -30,7 +30,7 @@ export const translations = {
   en: {
     hero_title: "Planta y Raiz - Mega Digital Clinic",
     hero_subtitle: "Democratizing access to health and well-being through technology and medical cannabis.",
-    start_orientação técnication: "Start Consultation",
+    start_consultation: "Start Consultation",
     professionals: "Professionals",
     shopping: "Shopping",
     online_status: "Online now",

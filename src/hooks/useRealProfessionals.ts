@@ -20,9 +20,9 @@ interface RealDoctor {
   crm_state: string;
   specialty: string;
   bio: string | null;
-  orientação técnication_price: number;
+  consultation_price: number;
   rating: number | null;
-  total_orientação técnications: number | null;
+  total_consultations: number | null;
   is_online: boolean;
   is_verified: boolean;
   document_type: string;
@@ -118,19 +118,19 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       bio: d.bio || `Profissional verificado na Planta & Raiz. Especialidade: ${d.specialty}. CRM ${d.crm}/${d.crm_state}.`,
       experience: "Verificado",
       tags: [d.specialty, `CRM ${d.crm_state}`],
-      price: `R$ ${d.orientação técnication_price.toFixed(2).replace(".", ",")}`,
-      priceValue: d.orientação técnication_price,
+      price: `R$ ${d.consultation_price.toFixed(2).replace(".", ",")}`,
+      priceValue: d.consultation_price,
       whatsapp: "5511991363154",
       rating: d.rating || 5.0,
-      consults: d.total_orientação técnications || 0,
+      consults: d.total_consultations || 0,
       avatar: (d.profile?.full_name || "PR").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase(),
       imageUrl: d.profile?.avatar_url || "",
       paymentLink: "https://mpago.la/12KAwmH",
       online: d.is_online,
       crm: `${d.crm} - ${d.crm_state}`,
       services: [
-        { name: "Consulta Inicial", price: `R$ ${d.orientação técnication_price.toFixed(2).replace(".", ",")}`, desc: "Avaliação completa + plano terapêutico" },
-        { name: "Retorno", price: `R$ ${(d.orientação técnication_price * 0.6).toFixed(2).replace(".", ",")}`, desc: "Acompanhamento e ajuste" },
+        { name: "Consulta Inicial", price: `R$ ${d.consultation_price.toFixed(2).replace(".", ",")}`, desc: "Avaliação completa + plano terapêutico" },
+        { name: "Retorno", price: `R$ ${(d.consultation_price * 0.6).toFixed(2).replace(".", ",")}`, desc: "Acompanhamento e ajuste" },
       ],
       slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
       reviews: [],

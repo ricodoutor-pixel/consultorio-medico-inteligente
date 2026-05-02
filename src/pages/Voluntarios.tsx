@@ -38,7 +38,7 @@ export default function Voluntarios() {
               Médicos <span className="text-primary">Voluntários</span>
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-              Conectamos médicos voluntários com pacientes que não podem pagar por orientação técnicas. Saúde de qualidade é um direito de todos.
+              Conectamos médicos voluntários com pacientes que não podem pagar por consultas. Saúde de qualidade é um direito de todos.
             </p>
           </div>
 

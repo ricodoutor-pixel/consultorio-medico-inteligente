@@ -134,7 +134,7 @@ Dados protegidos pela LGPD (Lei 13.709/2018)
                         <CardContent className="p-8 text-center">
                           <FileText size={32} className="text-muted-foreground mx-auto mb-3" />
                           <p className="text-sm text-muted-foreground">Nenhum prontuário encontrado.</p>
-                          <p className="text-xs text-muted-foreground mt-1">Seus prontuários aparecerão aqui após orientação técnicas.</p>
+                          <p className="text-xs text-muted-foreground mt-1">Seus prontuários aparecerão aqui após consultas.</p>
                         </CardContent>
                       </Card>
                     ) : (

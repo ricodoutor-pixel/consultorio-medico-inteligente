@@ -15,7 +15,7 @@ export const MobileBottomNav = () => {
   const navigate = useNavigate();
 
   // Hide on video call / admin pages
-  const hiddenPaths = ["/orientação técnica-video", "/videochamada", "/admin"];
+  const hiddenPaths = ["/consulta-video", "/videochamada", "/admin"];
   if (hiddenPaths.some((p) => location.pathname.startsWith(p))) return null;
 
   return (

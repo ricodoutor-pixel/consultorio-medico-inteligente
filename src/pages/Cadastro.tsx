@@ -22,7 +22,7 @@ const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, tra
 type UserType = "paciente" | "medico" | "profissional" | "farmacia" | "produtor" | null;
 
 const userTypes = [
-  { id: "paciente" as UserType, label: "Paciente / Usuário", icon: Users, desc: "Busco orientação técnica ou tratamento", color: "green", dbType: "patient" },
+  { id: "paciente" as UserType, label: "Paciente / Usuário", icon: Users, desc: "Busco consulta ou tratamento", color: "green", dbType: "patient" },
   { id: "medico" as UserType, label: "Médico Prescritor", icon: Stethoscope, desc: "CRM ativo, prescrevo cannabis", color: "green", dbType: "doctor" },
   { id: "profissional" as UserType, label: "Profissional de Saúde", icon: UserPlus, desc: "Psicólogo, farmacêutico, TO, etc.", color: "purple", dbType: "professional" },
   { id: "farmacia" as UserType, label: "Farmácia / Loja", icon: Building2, desc: "CNPJ + autorização ANVISA", color: "purple", dbType: "pharmacy" },
@@ -200,7 +200,7 @@ const Cadastro = () => {
               Faça parte da <span className="text-gradient-green">Planta & Raiz</span>
             </h1>
             <p className="text-muted-foreground max-w-2xl font-medium">
-              Crie sua conta para acessar orientação técnicas, prontuários e toda a plataforma.{" "}
+              Crie sua conta para acessar consultas, prontuários e toda a plataforma.{" "}
               <Link to="/login" className="text-primary font-bold hover:underline">Já tem conta? Faça login</Link>
             </p>
           </motion.div>

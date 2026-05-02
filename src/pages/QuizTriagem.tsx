@@ -50,7 +50,7 @@ const QUIZ_STEPS = [
     id: "urgency",
     question: "Qual a urgência do seu atendimento?",
     options: [
-      { label: "Quero orientação técnica agora", value: "alta" },
+      { label: "Quero consulta agora", value: "alta" },
       { label: "Dentro de 24h", value: "media" },
       { label: "Esta semana", value: "baixa" },
       { label: "Apenas explorando", value: "informativa" },

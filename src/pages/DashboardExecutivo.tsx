@@ -15,9 +15,9 @@ const tooltipStyle = { background: "hsl(240 15% 7%)", border: "1px solid hsl(240
 const COLORS = ["hsl(152 80% 45%)", "hsl(270 60% 60%)", "hsl(45 76% 52%)", "hsl(350 80% 55%)"];
 
 const revenueData = [
-  { month: "Jan", receita: 45000, orientação técnicas: 320 }, { month: "Fev", receita: 62000, orientação técnicas: 440 },
-  { month: "Mar", receita: 78000, orientação técnicas: 580 }, { month: "Abr", receita: 95000, orientação técnicas: 710 },
-  { month: "Mai", receita: 115000, orientação técnicas: 850 }, { month: "Jun", receita: 142000, orientação técnicas: 1020 },
+  { month: "Jan", receita: 45000, consultas: 320 }, { month: "Fev", receita: 62000, consultas: 440 },
+  { month: "Mar", receita: 78000, consultas: 580 }, { month: "Abr", receita: 95000, consultas: 710 },
+  { month: "Mai", receita: 115000, consultas: 850 }, { month: "Jun", receita: 142000, consultas: 1020 },
 ];
 
 const channelData = [

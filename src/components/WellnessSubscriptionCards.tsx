@@ -76,7 +76,7 @@ export function WellnessSubscriptionCards() {
           Planos <span className="text-gradient-green">Bem-Estar</span>
         </h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Cuidado contínuo com orientação técnicas, descontos e suporte 24h
+          Cuidado contínuo com consultas, descontos e suporte 24h
         </p>
       </div>
 
@@ -110,7 +110,7 @@ export function WellnessSubscriptionCards() {
 
                 {plan.maxConsultations > 0 && (
                   <Badge className="bg-primary/10 text-primary text-[10px] mb-3">
-                    {plan.maxConsultations} orientação técnica{plan.maxConsultations > 1 ? "s" : ""}/mês inclusa{plan.maxConsultations > 1 ? "s" : ""}
+                    {plan.maxConsultations} consulta{plan.maxConsultations > 1 ? "s" : ""}/mês inclusa{plan.maxConsultations > 1 ? "s" : ""}
                   </Badge>
                 )}
 

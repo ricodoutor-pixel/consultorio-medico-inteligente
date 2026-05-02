@@ -56,9 +56,9 @@ const RevenueDistribution = () => {
   ];
 
   const fraudRules = [
-    { flag: "Horas online altas, poucas orientação técnicas", points: 20, color: "text-amber-400" },
+    { flag: "Horas online altas, poucas consultas", points: 20, color: "text-amber-400" },
     { flag: "Avaliação alta, poucas interações", points: 15, color: "text-amber-400" },
-    { flag: "Aumento anormal de orientação técnicas (>300%)", points: 25, color: "text-red-400" },
+    { flag: "Aumento anormal de consultas (>300%)", points: 25, color: "text-red-400" },
     { flag: "Múltiplas avaliações do mesmo usuário", points: 30, color: "text-red-400" },
   ];
 

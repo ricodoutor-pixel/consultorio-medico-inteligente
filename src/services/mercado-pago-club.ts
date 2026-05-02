@@ -179,7 +179,7 @@ export class MercadoPagoClubService {
 
       return response.data;
     } catch (error) {
-      console.error('❌ Erro ao orientação técnicar pagamento:', error);
+      console.error('❌ Erro ao consultar pagamento:', error);
       throw error;
     }
   }

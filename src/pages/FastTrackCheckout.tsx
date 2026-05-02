@@ -82,7 +82,7 @@ export default function FastTrackCheckout() {
           {/* Header */}
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-3">
-              <Percent className="h-4 w-4" /> Desconto exclusivo pós-orientação técnica
+              <Percent className="h-4 w-4" /> Desconto exclusivo pós-consulta
             </div>
             <h1 className="text-2xl font-bold text-foreground">Checkout Rápido</h1>
             <p className="text-sm text-muted-foreground mt-1">Itens do seu protocolo com 10% de desconto</p>

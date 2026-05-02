@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { LocalMapSection } from "@/components/LocalMapSection";
 import triagemPatient from "@/assets/triagem-patient.png";
-import orientação técnicaChat from "@/assets/orientação técnica-chat.png";
+import consultaChat from "@/assets/consulta-chat.png";
 import triagemForm from "@/assets/triagem-form.png";
 import testimonialMaria from "@/assets/testimonial-maria.jpg";
 import testimonialRoberto from "@/assets/testimonial-roberto.jpg";
@@ -30,7 +30,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.12 } } };
 const steps = [
   { n: "1", title: "Escolha o especialista", desc: "Navegue por categorias, veja avaliações, preços populares e perfis verificados.", img: triagemPatient },
   { n: "2", title: "Pré-entrevista rápida", desc: "Preencha um formulário de 2 minutos com seu objetivo e resumo do caso.", img: triagemForm },
-  { n: "3", title: "Pague via Pix", desc: "Pagamento instantâneo com QR code Mercado Pago. Confirmação automática.", img: orientação técnicaChat },
+  { n: "3", title: "Pague via Pix", desc: "Pagamento instantâneo com QR code Mercado Pago. Confirmação automática.", img: consultaChat },
   { n: "4", title: "Receba atendimento", desc: "O profissional recebe seu resumo e inicia o atendimento (chat ou vídeo).", img: triagemPatient },
   { n: "5", title: "Compre seu tratamento", desc: "Acesse nossas lojas parceiras e compre seus medicamentos com receita digital e frete grátis.", img: triagemPatient },
 ];
@@ -110,7 +110,7 @@ const Index = () => {
                   <span className="text-primary drop-shadow-[0_0_8px_hsl(142,70%,45%/0.4)]">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
                   <span className="text-[hsl(25,95%,60%)] drop-shadow-[0_0_8px_hsl(25,95%,60%/0.3)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
                   <span className="text-[hsl(280,80%,65%)] drop-shadow-[0_0_8px_hsl(280,80%,65%/0.3)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}
-                  <span className="text-[hsl(190,90%,50%)] drop-shadow-[0_0_8px_hsl(190,90%,50%/0.3)]">Canabinoide oferecendo orientação técnicas com especialistas</span>{' '}
+                  <span className="text-[hsl(190,90%,50%)] drop-shadow-[0_0_8px_hsl(190,90%,50%/0.3)]">Canabinoide oferecendo consultas com especialistas</span>{' '}
                   <span className="text-[hsl(45,90%,55%)] drop-shadow-[0_0_8px_hsl(45,90%,55%/0.3)]">por apenas R$30.</span>{' '}
                   <span className="text-[hsl(340,85%,60%)] drop-shadow-[0_0_10px_hsl(340,85%,60%/0.4)]">Venha Você Também Fazer Parte!</span>
                 </p>
@@ -148,7 +148,7 @@ const Index = () => {
                   <span className="text-primary">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
                   <span className="text-[hsl(25,95%,60%)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
                   <span className="text-[hsl(280,80%,65%)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}
-                  <span className="text-[hsl(190,90%,50%)]">Canabinoide oferecendo orientação técnicas com especialistas</span>{' '}
+                  <span className="text-[hsl(190,90%,50%)]">Canabinoide oferecendo consultas com especialistas</span>{' '}
                   <span className="text-[hsl(45,90%,55%)]">por apenas R$30.</span>{' '}
                   <span className="text-[hsl(340,85%,60%)]">Venha Você Também Fazer Parte!</span>
                 </p>

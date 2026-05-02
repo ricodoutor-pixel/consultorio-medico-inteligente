@@ -22,7 +22,7 @@ const carouselImports = [
 ];
 
 const slideAlts = [
-  "Teleorientação técnica médica via smartphone",
+  "Teleconsulta médica via smartphone",
   "Produtos CBD de qualidade farmacêutica",
   "Paciente feliz com tratamento digital",
   "Marketplace cannabis medicinal",
@@ -32,7 +32,7 @@ const slideAlts = [
   "Dr. Verdinho - Mascote Planta y Raiz",
   "Brisa - Enfermeira Chefe IA Planta y Raiz",
   "Médico especialista Planta y Raiz",
-  "Teleorientação técnica médica com especialista",
+  "Teleconsulta médica com especialista",
   "App mobile de telemedicina cannabis",
   "Pagamento PIX via Mercado Pago",
   "Produtos cannabis medicinal com prescrição",

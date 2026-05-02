@@ -141,7 +141,7 @@ const DownloadApp = () => {
               { icon: Users, title: "Comunidade", desc: "Conecte-se com pacientes e especialistas", accent: "purple" },
               { icon: Download, title: "Receitas Digitais", desc: "Baixe prescrições ANVISA-compliant", accent: "green" },
               { icon: Globe, title: "Multi-idioma", desc: "Disponível em PT, EN, ES e mais", accent: "purple" },
-              { icon: Heart, title: "Push Notifications", desc: "Lembretes de orientação técnica e promoções", accent: "green" },
+              { icon: Heart, title: "Push Notifications", desc: "Lembretes de consulta e promoções", accent: "green" },
               { icon: Smartphone, title: "PWA Instalável", desc: "Instale direto do navegador sem loja", accent: "purple" },
             ].map((f, i) => (
               <motion.div key={i} variants={fadeUp}>
@@ -168,7 +168,7 @@ const DownloadApp = () => {
               Comece agora — é <span className="text-gradient-green">grátis</span>
             </h2>
             <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-              Baixe o app ou acesse pelo navegador. Cadastro rápido e sua primeira orientação técnica com desconto.
+              Baixe o app ou acesse pelo navegador. Cadastro rápido e sua primeira consulta com desconto.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="h-14 px-8 bg-primary text-primary-foreground font-black rounded-2xl" asChild>

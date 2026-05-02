@@ -93,7 +93,7 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
         monthlyRevenue: franchise.doctorEarnings,
         revenueGrowth: 15,
         avgConsultationValue: thisMonthAppts.length > 0 ? monthlyRevenue / thisMonthAppts.length : 200,
-        orientação técnicationsThisMonth: thisMonthAppts.length,
+        consultationsThisMonth: thisMonthAppts.length,
         bonusAccumulated: franchise.platformFee,
         plantaCoinBalance,
         newPatients: Math.floor(totalConsultations * 0.3),
@@ -106,7 +106,7 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
         totalDoctors,
         percentile: calculatePercentile(rank, totalDoctors),
         revenueHistory: revenueHistory.length >= 3 ? revenueHistory : projectionHistory,
-        orientação técnicationHistory: [],
+        consultationHistory: [],
         opportunities: [],
       };
 
@@ -122,7 +122,7 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
         monthlyRevenue: 5000,
         revenueGrowth: 15,
         avgConsultationValue: 200,
-        orientação técnicationsThisMonth: 25,
+        consultationsThisMonth: 25,
         bonusAccumulated: 500,
         plantaCoinBalance: 75,
         newPatients: 8,
@@ -135,8 +135,8 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
         totalDoctors: 150,
         percentile: 92,
         revenueHistory: proj.map((v, i) => ({ month: months[i], value: v })),
-        orientação técnicationHistory: [],
-        opportunities: generateOpportunities({ retentionRate: 85, orientação técnicationsThisMonth: 25, totalPatients: 50, avgConsultationValue: 200, npsScore: 8.2, plantaCoinBalance: 75 }),
+        consultationHistory: [],
+        opportunities: generateOpportunities({ retentionRate: 85, consultationsThisMonth: 25, totalPatients: 50, avgConsultationValue: 200, npsScore: 8.2, plantaCoinBalance: 75 }),
       });
     } finally {
       setLoading(false);
@@ -157,7 +157,7 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
     );
   }
 
-  const tier = getDoctorTier(metrics.orientação técnicationsThisMonth || 0);
+  const tier = getDoctorTier(metrics.consultationsThisMonth || 0);
   const qualityCriteria: QualityCriteria = {
     npsAverage: metrics.npsScore || 7,
     responseRate: (metrics.responseRate || 90) / 100,
@@ -243,8 +243,8 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
             {COMMISSION_TIERS.map((t) => {
               const isCurrent = t.level === tier.level;
               const isPast = t.level < tier.level;
-              const orientação técnications = metrics.orientação técnicationsThisMonth || 0;
-              const progress = isPast ? 100 : isCurrent ? Math.min((orientação técnications / (t.maxConsultations === Infinity ? 600 : t.maxConsultations)) * 100, 100) : 0;
+              const consultations = metrics.consultationsThisMonth || 0;
+              const progress = isPast ? 100 : isCurrent ? Math.min((consultations / (t.maxConsultations === Infinity ? 600 : t.maxConsultations)) * 100, 100) : 0;
               return (
                 <div key={t.level} className={`flex items-center gap-3 p-2 rounded-lg ${isCurrent ? "bg-primary/5 border border-primary/20" : ""}`}>
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${isPast || isCurrent ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>

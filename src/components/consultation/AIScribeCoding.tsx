@@ -118,7 +118,7 @@ export const AIScribeCoding = ({ onApplyToEHR }: { onApplyToEHR?: (output: Scrib
           <Textarea
             value={transcript}
             onChange={e => setTranscript(e.target.value)}
-            placeholder="A transcrição da orientação técnica aparecerá aqui automaticamente..."
+            placeholder="A transcrição da consulta aparecerá aqui automaticamente..."
             className="bg-muted border-border text-xs min-h-[120px] pr-12"
           />
           <Button

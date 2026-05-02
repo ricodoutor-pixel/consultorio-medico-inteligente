@@ -15,11 +15,11 @@ import { TCLEConsentModal } from "@/components/TCLEConsentModal";
 import { ProntuarioSidebar } from "@/components/ProntuarioSidebar";
 import { useAuditLog } from "@/hooks/useAuditLog";
 import { CbdThcAISuggestionPanel } from "@/components/CbdThcAISuggestionPanel";
-import { VitalSignsOverlay } from "@/components/orientação técnication/VitalSignsOverlay";
-import { BiometricShield } from "@/components/orientação técnication/BiometricShield";
-import { AIScribeCoding } from "@/components/orientação técnication/AIScribeCoding";
-import { SmartPrescriptionDTx } from "@/components/orientação técnication/SmartPrescriptionDTx";
-import { BlockchainConsent } from "@/components/orientação técnication/BlockchainConsent";
+import { VitalSignsOverlay } from "@/components/consultation/VitalSignsOverlay";
+import { BiometricShield } from "@/components/consultation/BiometricShield";
+import { AIScribeCoding } from "@/components/consultation/AIScribeCoding";
+import { SmartPrescriptionDTx } from "@/components/consultation/SmartPrescriptionDTx";
+import { BlockchainConsent } from "@/components/consultation/BlockchainConsent";
 import { MandatoryNPSModal } from "@/components/MandatoryNPSModal";
 import { PatientFlowGuide } from "@/components/patient/PatientFlowGuide";
 import type { FlowStep } from "@/components/patient/PatientFlowGuide";
@@ -58,7 +58,7 @@ const ConsultaVideo = () => {
   const [showTCLE, setShowTCLE] = useState(true);
   const [showNPS, setShowNPS] = useState(false);
   const [showFlowGuide, setShowFlowGuide] = useState(false);
-  const [flowStep, setFlowStep] = useState<FlowStep>("orientação técnication_completed");
+  const [flowStep, setFlowStep] = useState<FlowStep>("consultation_completed");
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [doctorId, setDoctorId] = useState<string>("");
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -73,11 +73,11 @@ const ConsultaVideo = () => {
     setTcleAccepted(true);
     setShowTCLE(false);
     log("tcle_accepted", "appointments", appointmentId || "unknown", null, { timestamp: new Date().toISOString() });
-    toast({ title: "TCLE aceito ✅", description: "Você pode iniciar a teleorientação técnica." });
+    toast({ title: "TCLE aceito ✅", description: "Você pode iniciar a teleconsulta." });
   };
 
   const handleTCLEDecline = () => {
-    toast({ title: "TCLE recusado", description: "Não é possível iniciar a orientação técnica sem aceitar o TCLE.", variant: "destructive" });
+    toast({ title: "TCLE recusado", description: "Não é possível iniciar a consulta sem aceitar o TCLE.", variant: "destructive" });
     navigate(-1);
   };
 
@@ -162,7 +162,7 @@ const ConsultaVideo = () => {
       setShowNPS(true);
     } else {
       setShowFlowGuide(true);
-      setFlowStep("orientação técnication_completed");
+      setFlowStep("consultation_completed");
       window.history.back();
     }
   };
@@ -178,18 +178,18 @@ const ConsultaVideo = () => {
     <div className="min-h-screen bg-background">
       <TCLEConsentModal open={showTCLE && !tcleAccepted} onAccept={handleTCLEAccept} onDecline={handleTCLEDecline} />
 
-      {/* Mandatory NPS Modal (patient only, after orientação técnication ends) */}
+      {/* Mandatory NPS Modal (patient only, after consultation ends) */}
       {showNPS && !isDoctor && (
         <MandatoryNPSModal
           open={showNPS}
-          orientação técnicationId={appointmentId || "unknown"}
+          consultationId={appointmentId || "unknown"}
           patientId={currentUserId}
           professionalId={doctorId}
-          flowType="orientação técnication"
+          flowType="consultation"
           onComplete={() => {
             setShowNPS(false);
             setShowFlowGuide(true);
-            setFlowStep("orientação técnication_completed");
+            setFlowStep("consultation_completed");
           }}
         />
       )}

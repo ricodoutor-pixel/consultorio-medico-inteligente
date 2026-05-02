@@ -15,22 +15,22 @@ const BASE = "https://plantayraiz.com.br";
 
 export const routeSEOMap: Record<string, PageSEO> = {
   "/": {
-    title: "Teleorientação técnica Cannabis Medicinal SP | Consulta CBD R$30 — Planta & Raiz",
+    title: "Teleconsulta Cannabis Medicinal SP | Consulta CBD R$30 — Planta & Raiz",
     description: "Médicos prescritores de cannabis medicinal em São Paulo. Consulta online a partir de R$30 com prescrição digital ANVISA, triagem por IA e farmácia parceira. Agende agora!",
-    keywords: "telemedicina cannabis medicinal, orientação técnica CBD R$30, médicos prescritores de cannabis, prescrição ANVISA online, cannabis medicinal São Paulo, dor crônica cannabis, saúde mental cannabis",
+    keywords: "telemedicina cannabis medicinal, consulta CBD R$30, médicos prescritores de cannabis, prescrição ANVISA online, cannabis medicinal São Paulo, dor crônica cannabis, saúde mental cannabis",
     canonical: `${BASE}/`,
-    h1: "Teleorientação técnica de Cannabis Medicinal em São Paulo — Médicos Prescritores a R$30",
+    h1: "Teleconsulta de Cannabis Medicinal em São Paulo — Médicos Prescritores a R$30",
   },
   "/profissionais": {
     title: "Médicos Especialistas em Cannabis Medicinal | São Paulo — Planta & Raiz",
-    description: "Encontre médicos prescritores de cannabis medicinal verificados em São Paulo. CRM validado, avaliações reais e orientação técnica a partir de R$30 via Pix.",
+    description: "Encontre médicos prescritores de cannabis medicinal verificados em São Paulo. CRM validado, avaliações reais e consulta a partir de R$30 via Pix.",
     keywords: "médico cannabis medicinal SP, prescritor CBD, especialista THC São Paulo, CRM cannabis",
     canonical: `${BASE}/profissionais`,
   },
   "/como-funciona": {
-    title: "Como Funciona a Teleorientação técnica de Cannabis Medicinal | Planta & Raiz",
-    description: "Passo a passo completo: da triagem por IA à prescrição digital ANVISA. Teleorientação técnica em 5 etapas, pagamento via Pix e atendimento 24/7.",
-    keywords: "como funciona cannabis medicinal, teleorientação técnica passo a passo, prescrição digital ANVISA",
+    title: "Como Funciona a Teleconsulta de Cannabis Medicinal | Planta & Raiz",
+    description: "Passo a passo completo: da triagem por IA à prescrição digital ANVISA. Teleconsulta em 5 etapas, pagamento via Pix e atendimento 24/7.",
+    keywords: "como funciona cannabis medicinal, teleconsulta passo a passo, prescrição digital ANVISA",
     canonical: `${BASE}/como-funciona`,
   },
   "/shopping": {
@@ -47,8 +47,8 @@ export const routeSEOMap: Record<string, PageSEO> = {
   },
   "/telemedicina": {
     title: "Telemedicina Cannabis Medicinal 24/7 | Consulta Online SP — Planta & Raiz",
-    description: "Atendimento médico online 24/7 especializado em cannabis medicinal. Videoorientação técnica ou chat com prescritores em São Paulo. Protocolo ANVISA automático.",
-    keywords: "telemedicina cannabis, orientação técnica online cannabis medicinal, videochamada médico CBD",
+    description: "Atendimento médico online 24/7 especializado em cannabis medicinal. Videoconsulta ou chat com prescritores em São Paulo. Protocolo ANVISA automático.",
+    keywords: "telemedicina cannabis, consulta online cannabis medicinal, videochamada médico CBD",
     canonical: `${BASE}/telemedicina`,
   },
   "/biblioteca": {
@@ -71,14 +71,14 @@ export const routeSEOMap: Record<string, PageSEO> = {
   },
   "/tratamento-dor-cronica": {
     title: "Tratamento de Dor Crônica com Cannabis Medicinal SP | Planta & Raiz",
-    description: "Tratamento especializado de dor crônica com cannabis medicinal em São Paulo. Fibromialgia, artrite, dores neuropáticas. Teleorientação técnica a partir de R$30 com prescrição ANVISA.",
+    description: "Tratamento especializado de dor crônica com cannabis medicinal em São Paulo. Fibromialgia, artrite, dores neuropáticas. Teleconsulta a partir de R$30 com prescrição ANVISA.",
     keywords: "dor crônica cannabis medicinal, tratamento fibromialgia CBD, artrite cannabis SP, dor neuropática canabidiol, médico dor crônica São Paulo",
     canonical: `${BASE}/tratamento-dor-cronica`,
     h1: "Tratamento de Dor Crônica com Cannabis Medicinal em São Paulo",
   },
   "/tratamento-ansiedade-saude-mental": {
     title: "Tratamento de Ansiedade e Insônia com Cannabis Medicinal SP | Planta & Raiz",
-    description: "Tratamento especializado de ansiedade, insônia e burnout com cannabis medicinal em São Paulo. CBD para saúde mental. Teleorientação técnica a partir de R$30 com prescrição ANVISA.",
+    description: "Tratamento especializado de ansiedade, insônia e burnout com cannabis medicinal em São Paulo. CBD para saúde mental. Teleconsulta a partir de R$30 com prescrição ANVISA.",
     keywords: "ansiedade cannabis medicinal, CBD insônia, tratamento burnout CBD, saúde mental cannabis SP, canabidiol ansiedade São Paulo, CBD para dormir",
     canonical: `${BASE}/tratamento-ansiedade-saude-mental`,
     h1: "Tratamento com Cannabis Medicinal para Ansiedade e Insônia em São Paulo",
@@ -96,14 +96,14 @@ export const routeSEOMap: Record<string, PageSEO> = {
     canonical: `${BASE}/contato`,
   },
   "/planos": {
-    title: "Planos e Preços | Teleorientação técnica Cannabis a partir de R$30 — Planta & Raiz",
-    description: "Conheça os planos de teleorientação técnica da Planta & Raiz. Consultas a partir de R$30, assinatura Club com benefícios e descontos exclusivos.",
-    keywords: "preço orientação técnica cannabis medicinal, planos telemedicina, assinatura cannabis",
+    title: "Planos e Preços | Teleconsulta Cannabis a partir de R$30 — Planta & Raiz",
+    description: "Conheça os planos de teleconsulta da Planta & Raiz. Consultas a partir de R$30, assinatura Club com benefícios e descontos exclusivos.",
+    keywords: "preço consulta cannabis medicinal, planos telemedicina, assinatura cannabis",
     canonical: `${BASE}/planos`,
   },
   "/club": {
     title: "Club Planta & Raiz | Assinatura com Benefícios Exclusivos",
-    description: "Assine o Club Planta & Raiz: orientação técnicas ilimitadas, descontos em produtos, conteúdo premium e comunidade exclusiva de cannabis medicinal.",
+    description: "Assine o Club Planta & Raiz: consultas ilimitadas, descontos em produtos, conteúdo premium e comunidade exclusiva de cannabis medicinal.",
     keywords: "club cannabis medicinal, assinatura CBD, benefícios exclusivos planta raiz",
     canonical: `${BASE}/club`,
   },
@@ -121,8 +121,8 @@ export const routeSEOMap: Record<string, PageSEO> = {
   },
   "/agendamento": {
     title: "Agendar Consulta Cannabis Medicinal | São Paulo — Planta & Raiz",
-    description: "Agende sua teleorientação técnica com médico especialista em cannabis medicinal. Horários flexíveis, pagamento via Pix e atendimento em São Paulo e todo Brasil.",
-    keywords: "agendar orientação técnica cannabis, marcar teleorientação técnica CBD, agendamento médico cannabis SP",
+    description: "Agende sua teleconsulta com médico especialista em cannabis medicinal. Horários flexíveis, pagamento via Pix e atendimento em São Paulo e todo Brasil.",
+    keywords: "agendar consulta cannabis, marcar teleconsulta CBD, agendamento médico cannabis SP",
     canonical: `${BASE}/agendamento`,
   },
   "/comunidade": {
@@ -152,9 +152,9 @@ export function getPageSEO(pathname: string): PageSEO {
 
   // Default fallback
   return {
-    title: "Planta & Raiz — Teleorientação técnica Cannabis Medicinal SP | Protocolo ANVISA",
+    title: "Planta & Raiz — Teleconsulta Cannabis Medicinal SP | Protocolo ANVISA",
     description: "A maior plataforma de telemedicina em cannabis medicinal do Brasil. Consultas a partir de R$30, prescrição digital ANVISA e IA de acolhimento 24/7.",
-    keywords: "cannabis medicinal, telemedicina, CBD, THC, ANVISA, orientação técnica online",
+    keywords: "cannabis medicinal, telemedicina, CBD, THC, ANVISA, consulta online",
     canonical: `${BASE}${pathname}`,
   };
 }

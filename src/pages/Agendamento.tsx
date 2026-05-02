@@ -30,10 +30,10 @@ type Doctor = {
   rqe: string | null;
   specialty: string;
   bio: string | null;
-  orientação técnication_price: number;
+  consultation_price: number;
   is_online: boolean;
   rating: number | null;
-  total_orientação técnications: number | null;
+  total_consultations: number | null;
   profiles?: { full_name: string; avatar_url: string | null } | null;
 };
 
@@ -158,8 +158,8 @@ const Agendamento = () => {
     trackPixelEvent("Schedule", {
       content_name: "appointment_booking",
       doctor_id: selectedDoctor.id,
-      orientação técnication_type: consultType,
-      value: selectedDoctor.orientação técnication_price,
+      consultation_type: consultType,
+      value: selectedDoctor.consultation_price,
     }, { leadScore: 35, funnelStage: "decision", category: "conversion" });
 
     const { data: newAppt, error } = await supabase.from("appointments").insert({
@@ -168,7 +168,7 @@ const Agendamento = () => {
       scheduled_at: scheduledAt.toISOString(),
       type: consultType,
       notes,
-      amount: selectedDoctor.orientação técnication_price,
+      amount: selectedDoctor.consultation_price,
       status: "scheduled",
       payment_status: "pending",
     }).select("id").single();
@@ -271,12 +271,12 @@ const Agendamento = () => {
                               <div className="flex items-center gap-2 mt-1">
                                 <Star size={12} className="text-[hsl(var(--gold))]" />
                                 <span className="text-xs text-foreground font-bold">{doc.rating || "5.0"}</span>
-                                <span className="text-xs text-muted-foreground">• {doc.total_orientação técnications || 0} orientação técnicas</span>
+                                <span className="text-xs text-muted-foreground">• {doc.total_consultations || 0} consultas</span>
                               </div>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-lg font-display font-black text-primary">R$ {Number(doc.orientação técnication_price).toFixed(2)}</p>
+                            <p className="text-lg font-display font-black text-primary">R$ {Number(doc.consultation_price).toFixed(2)}</p>
                             {doc.is_online && <Badge className="bg-primary/10 text-primary border-primary text-[10px]">Online</Badge>}
                           </div>
                         </CardContent>
@@ -389,7 +389,7 @@ const Agendamento = () => {
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Descreva brevemente seus sintomas ou motivo da orientação técnica..."
+                      placeholder="Descreva brevemente seus sintomas ou motivo da consulta..."
                       className="w-full h-24 rounded-xl bg-card border border-border p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:border-primary focus:outline-none"
                     />
                   </div>
@@ -427,7 +427,7 @@ const Agendamento = () => {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-bold uppercase">Valor</p>
-                          <p className="text-2xl font-display font-black text-primary">R$ {Number(selectedDoctor?.orientação técnication_price || 0).toFixed(2)}</p>
+                          <p className="text-2xl font-display font-black text-primary">R$ {Number(selectedDoctor?.consultation_price || 0).toFixed(2)}</p>
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-bold uppercase">Pagamento</p>
@@ -468,7 +468,7 @@ const Agendamento = () => {
                       <CheckCircle2 size={48} className="text-primary mx-auto mb-4" />
                       <h2 className="text-2xl font-display font-black text-foreground mb-2">Consulta Agendada!</h2>
                       <p className="text-muted-foreground mb-6">
-                        Sua orientação técnica foi agendada para{" "}
+                        Sua consulta foi agendada para{" "}
                         <strong className="text-foreground">
                           {selectedDate && format(selectedDate, "dd/MM/yyyy")} às {selectedTime}
                         </strong>

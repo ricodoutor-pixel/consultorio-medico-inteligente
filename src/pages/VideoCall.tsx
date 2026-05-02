@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 const VideoCall = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
-  const [orientação técnicationId, setConsultationId] = useState("CONS-123456");
+  const [consultationId, setConsultationId] = useState("CONS-123456");
   const [messages, setMessages] = useState([
     { id: 1, text: "Olá, Dr. Edilson. Estou com dor nas costas.", translated: "Hola, Dr. Edilson. Tengo dolor de espalda.", sender: "patient", lang: "es" },
     { id: 2, text: "Olá! Vamos iniciar o protocolo de CBD Full Spectrum.", translated: "¡Hola! Iniciemos el protocolo de CBD de Espectro Completo.", sender: "doctor", lang: "pt" }
@@ -44,7 +44,7 @@ const VideoCall = () => {
                 <h1 className="text-xl font-display font-black text-foreground">Consulta Online</h1>
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
                   <Badge variant="outline" className="text-[10px] font-bold text-green-500 border-green-500/20 bg-green-500/5">Conexão Segura</Badge>
-                  ID: {orientação técnicationId}
+                  ID: {consultationId}
                 </p>
               </div>
             </div>

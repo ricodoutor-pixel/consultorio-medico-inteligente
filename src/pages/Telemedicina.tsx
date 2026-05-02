@@ -250,7 +250,7 @@ const Telemedicina = () => {
                    <CardContent className="p-5 sm:p-8 text-center">
                      <Shield size={36} className="text-primary mx-auto mb-3 sm:mb-4 sm:w-12 sm:h-12" />
                      <h2 className="text-lg sm:text-xl font-display font-black text-foreground mb-3 sm:mb-4">Consentimento Necessário</h2>
-                     <p className="text-sm text-muted-foreground mb-4 sm:mb-6">Você precisa aceitar o Termo de Consentimento (TCLE) para prosseguir com a teleorientação técnica.</p>
+                     <p className="text-sm text-muted-foreground mb-4 sm:mb-6">Você precisa aceitar o Termo de Consentimento (TCLE) para prosseguir com a teleconsulta.</p>
                      <Button 
                        className="w-full h-12 sm:h-14 bg-primary text-primary-foreground font-black rounded-2xl text-base sm:text-lg"
                       onClick={() => setShowTCLE(true)}

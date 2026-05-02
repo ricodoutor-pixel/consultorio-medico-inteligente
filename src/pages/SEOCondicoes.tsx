@@ -39,7 +39,7 @@ const conditions: Record<string, {
   "dor-cronica": {
     title: "Cannabis Medicinal para Dor Crônica | Planta & Raiz",
     h1: "Tratamento de Dor Crônica com Cannabis Medicinal",
-    description: "Cannabis medicinal no manejo da dor crônica. Evidências científicas e orientação técnica com prescritores especializados.",
+    description: "Cannabis medicinal no manejo da dor crônica. Evidências científicas e consulta com prescritores especializados.",
     cid: "G89.4",
     content: [
       "A dor crônica afeta 37% da população brasileira (IASP). Cannabis medicinal é uma alternativa segura aos opioides para manejo da dor.",
@@ -313,12 +313,12 @@ const SEOCondicoes = () => {
                 <Shield size={32} className="text-primary mx-auto mb-3" />
                 <h2 className="text-xl font-display font-black text-foreground mb-2">Consulte um Especialista</h2>
                 <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
-                  Agende uma orientação técnica com um médico prescritor especializado em cannabis medicinal.
+                  Agende uma consulta com um médico prescritor especializado em cannabis medicinal.
                   Triagem gratuita com IA + matching automático.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-12 px-6" asChild>
-                    <Link to="/orientação técnica-rapida">
+                    <Link to="/consulta-rapida">
                       <Stethoscope size={16} className="mr-2" /> Consulta Rápida (IA)
                     </Link>
                   </Button>

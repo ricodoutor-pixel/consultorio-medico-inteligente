@@ -427,7 +427,7 @@ export function MedicalDashboard() {
                     onClick={() => setIsVideoActive(!isVideoActive)}
                   >
                     {isVideoActive ? <VideoOff className="h-4 w-4" /> : <Video className="h-4 w-4" />}
-                    {isVideoActive ? "Encerrar Vídeo" : "Iniciar Teleorientação técnica"}
+                    {isVideoActive ? "Encerrar Vídeo" : "Iniciar Teleconsulta"}
                   </Button>
                   <Button size="sm" variant="outline" className="gap-2">
                     <Phone className="h-4 w-4" /> Ligar
@@ -456,7 +456,7 @@ export function MedicalDashboard() {
                         <div className="h-20 w-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4 ring-4 ring-primary/20">
                           <Video className="h-10 w-10 text-primary" />
                         </div>
-                        <p className="text-muted-foreground font-medium">Teleorientação técnica em Andamento</p>
+                        <p className="text-muted-foreground font-medium">Teleconsulta em Andamento</p>
                         <p className="text-xs text-muted-foreground/60 mt-1">
                           Integração Daily.co / Jitsi Meet
                         </p>

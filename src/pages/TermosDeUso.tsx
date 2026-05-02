@@ -34,7 +34,7 @@ const TermosDeUso = () => {
           <section className="space-y-3">
             <h2 className="text-lg font-display font-black text-foreground">🌿 1. Natureza da Plataforma</h2>
             <p>A <strong className="text-foreground">Planta y Raiz</strong> é uma plataforma digital de telemedicina e marketplace de saúde canabinoide que conecta pacientes a profissionais de saúde devidamente habilitados e a estabelecimentos autorizados pela ANVISA para comercialização de produtos à base de cannabis medicinal.</p>
-            <p>A plataforma <strong className="text-foreground">não pratica medicina, não prescreve medicamentos e não se responsabiliza por condutas clínicas individuais</strong> dos profissionais cadastrados. Todas as orientação técnicas são realizadas por profissionais independentes com registro ativo nos respectivos conselhos profissionais.</p>
+            <p>A plataforma <strong className="text-foreground">não pratica medicina, não prescreve medicamentos e não se responsabiliza por condutas clínicas individuais</strong> dos profissionais cadastrados. Todas as consultas são realizadas por profissionais independentes com registro ativo nos respectivos conselhos profissionais.</p>
           </section>
 
           {/* 2. Responsabilidade Médica */}
@@ -69,13 +69,13 @@ const TermosDeUso = () => {
           {/* 5. Telemedicina */}
           <section className="space-y-3">
             <h2 className="text-lg font-display font-black text-foreground">⚖️ 5. Consultas Online e Telemedicina</h2>
-            <p>Ao agendar uma orientação técnica, o usuário <strong className="text-foreground">consente expressamente</strong> com a realização de atendimento médico por meio de teleorientação técnica (videoconferência), em conformidade com a <strong className="text-foreground">Resolução CFM nº 2.314/2022</strong>.</p>
+            <p>Ao agendar uma consulta, o usuário <strong className="text-foreground">consente expressamente</strong> com a realização de atendimento médico por meio de teleconsulta (videoconferência), em conformidade com a <strong className="text-foreground">Resolução CFM nº 2.314/2022</strong>.</p>
             <p>O paciente declara estar ciente de que:</p>
             <ul className="list-disc pl-6 space-y-1">
-              <li>A teleorientação técnica possui limitações inerentes ao formato remoto;</li>
+              <li>A teleconsulta possui limitações inerentes ao formato remoto;</li>
               <li>O profissional poderá solicitar atendimento presencial quando julgar necessário;</li>
               <li>É responsabilidade do paciente garantir conexão de internet estável e ambiente adequado;</li>
-              <li>A gravação da orientação técnica é proibida salvo autorização expressa de ambas as partes;</li>
+              <li>A gravação da consulta é proibida salvo autorização expressa de ambas as partes;</li>
               <li>Os dados da sessão são criptografados ponta a ponta e registrados em log de auditoria imutável.</li>
             </ul>
           </section>

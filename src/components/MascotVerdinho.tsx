@@ -65,7 +65,7 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
         ...prev,
         {
           role: "assistant",
-          text: `Obrigado pela pergunta sobre "${userMsg}". A Planta y Raiz oferece orientação técnicas especializadas a partir de R$30. Para informações clínicas detalhadas, recomendo agendar com nossos especialistas. ⚠️ Este é um assistente informativo — não substitui orientação médica profissional.`,
+          text: `Obrigado pela pergunta sobre "${userMsg}". A Planta y Raiz oferece consultas especializadas a partir de R$30. Para informações clínicas detalhadas, recomendo agendar com nossos especialistas. ⚠️ Este é um assistente informativo — não substitui orientação médica profissional.`,
         },
       ]);
     }, 800);
@@ -208,7 +208,7 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
             {/* Disclaimer */}
             <div className="px-4 py-1">
               <p className="text-[10px] text-muted-foreground text-center">
-                ⚠️ Informativo apenas. Não substitui orientação técnica médica. CFM 2314 + LGPD
+                ⚠️ Informativo apenas. Não substitui consulta médica. CFM 2314 + LGPD
               </p>
             </div>
 

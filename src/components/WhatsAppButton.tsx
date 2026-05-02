@@ -12,7 +12,7 @@ const VISITOR_OPTIONS = [
     keyword: "#PACIENTE",
     label: "Paciente",
     icon: User,
-    description: "Agendar orientação técnica ou tirar dúvidas",
+    description: "Agendar consulta ou tirar dúvidas",
     greeting: "#PACIENTE\n\nOlá, Enfª Brisa! 🌿 Sou paciente e gostaria de iniciar meu atendimento na Planta y Raiz. Pode me ajudar?",
     landing: null,
     color: "hsl(152 100% 74%)",

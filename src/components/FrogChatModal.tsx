@@ -86,24 +86,24 @@ async function streamChat({
 }
 
 const fallbackResponses: Record<string, string> = {
-  default: "Olá! 🐸 Estou com dificuldade para me conectar agora. Mas posso te ajudar! Acesse /telemedicina para orientação técnicas, /shopping para produtos, ou /profissionais para especialistas. 💚",
+  default: "Olá! 🐸 Estou com dificuldade para me conectar agora. Mas posso te ajudar! Acesse /telemedicina para consultas, /shopping para produtos, ou /profissionais para especialistas. 💚",
   oi: "Eae! 🐸👑 Sou o Verdinho! Estou com problemas técnicos, mas a plataforma funciona normalmente. Como posso ajudar? 💚",
-  orientação técnica: "Para agendar: acesse /telemedicina, faça a triagem IA, escolha seu especialista e pague via PIX! Tudo em 5 minutos. ✅",
+  consulta: "Para agendar: acesse /telemedicina, faça a triagem IA, escolha seu especialista e pague via PIX! Tudo em 5 minutos. ✅",
   preco: "Consultas a partir de R$ 55 via PIX (Mercado Pago). Confira nossos planos em /planos! 💳",
 };
 
 const getFallback = (text: string): string => {
   const lower = text.toLowerCase();
   if (lower.match(/oi|olá|hey|eae/)) return fallbackResponses.oi;
-  if (lower.match(/consult|agend|marc/)) return fallbackResponses.orientação técnica;
+  if (lower.match(/consult|agend|marc/)) return fallbackResponses.consulta;
   if (lower.match(/preç|valor|custo|pag/)) return fallbackResponses.preco;
   return fallbackResponses.default;
 };
 
 const QUICK_ACTIONS = [
-  { label: "🩺 Agendar orientação técnica", msg: "Como faço para agendar uma orientação técnica?", cta: true },
+  { label: "🩺 Agendar consulta", msg: "Como faço para agendar uma consulta?", cta: true },
   { label: "💊 Cannabis medicinal", msg: "O que é cannabis medicinal e quais condições trata?" },
-  { label: "💰 Preços", msg: "Quais são os preços das orientação técnicas?" },
+  { label: "💰 Preços", msg: "Quais são os preços das consultas?" },
   { label: "🛒 Shopping", msg: "Quais produtos vocês vendem?" },
   { label: "📱 Como funciona?", msg: "Como funciona a plataforma Planta & Raiz?" },
 ];

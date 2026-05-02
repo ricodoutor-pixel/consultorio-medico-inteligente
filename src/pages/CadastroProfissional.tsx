@@ -366,7 +366,7 @@ const CadastroProfissional = () => {
                       </SelectContent>
                     </Select>
                     {form.plano === "basic" && (
-                      <p className="text-[11px] text-primary font-bold mt-1">🎉 Parabéns! Você terá TAXA ZERO em todas as suas orientação técnicas.</p>
+                      <p className="text-[11px] text-primary font-bold mt-1">🎉 Parabéns! Você terá TAXA ZERO em todas as suas consultas.</p>
                     )}
                     {form.plano !== "basic" && (
                       <p className="text-[10px] text-muted-foreground">O plano VIP garante 100% dos honorários sem taxa de intermediação.</p>

@@ -106,8 +106,8 @@ router.get('/order/:orderId', async (req: Request, res: Response) => {
       order,
     });
   } catch (error) {
-    console.error('❌ Erro ao orientação técnicar pedido:', error);
-    res.status(500).json({ error: 'Erro ao orientação técnicar pedido' });
+    console.error('❌ Erro ao consultar pedido:', error);
+    res.status(500).json({ error: 'Erro ao consultar pedido' });
   }
 });
 

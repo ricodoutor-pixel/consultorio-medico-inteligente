@@ -117,7 +117,7 @@ const ConsultationPayment = () => {
         }
         await new Promise(r => setTimeout(r, 600));
         setStatus("confirmed");
-        toast({ title: "✅ Pagamento confirmado!", description: "Sua orientação técnica está agendada." });
+        toast({ title: "✅ Pagamento confirmado!", description: "Sua consulta está agendada." });
       } else if (data?.status === "rejected") {
         setStatus("rejected");
         toast({ title: "❌ Pagamento recusado", description: "Tente novamente.", variant: "destructive" });
@@ -189,7 +189,7 @@ const ConsultationPayment = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-display font-black text-gradient-green">{pro.price}</p>
-                  <p className="text-xs text-muted-foreground">orientação técnica</p>
+                  <p className="text-xs text-muted-foreground">consulta</p>
                 </div>
               </CardContent>
             </Card>
@@ -233,7 +233,7 @@ const ConsultationPayment = () => {
                   <div className="text-center py-8">
                     <CheckCircle2 size={64} className="text-primary mx-auto mb-4" />
                     <h4 className="text-xl font-display font-black text-foreground mb-2">Pagamento Confirmado!</h4>
-                    <p className="text-muted-foreground mb-4">Sua orientação técnica com {pro.name} está agendada.</p>
+                    <p className="text-muted-foreground mb-4">Sua consulta com {pro.name} está agendada.</p>
                     
                     {/* Anvisa Protocol */}
                     <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 mb-6 text-left">
@@ -244,7 +244,7 @@ const ConsultationPayment = () => {
                       <p className="text-xs text-muted-foreground mb-1">Número do protocolo:</p>
                       <p className="font-mono text-sm font-bold text-primary">ANV-{Date.now().toString(36).toUpperCase()}-{Math.random().toString(36).substring(2, 6).toUpperCase()}</p>
                       <p className="text-[10px] text-muted-foreground mt-2">
-                        📋 Sua prescrição será preparada pelo médico durante a orientação técnica. O protocolo ANVISA será vinculado automaticamente.
+                        📋 Sua prescrição será preparada pelo médico durante a consulta. O protocolo ANVISA será vinculado automaticamente.
                       </p>
                     </div>
 

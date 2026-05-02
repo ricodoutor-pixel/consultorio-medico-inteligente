@@ -81,7 +81,7 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
             Prezado(a) {patientName},
           </p>
           <p>
-            Este TCLE informa sobre condições e riscos da teleorientação técnica conforme <strong>Res. CFM 2.314/2022</strong>, <strong>2.454/2026</strong> e <strong>LGPD</strong>.
+            Este TCLE informa sobre condições e riscos da teleconsulta conforme <strong>Res. CFM 2.314/2022</strong>, <strong>2.454/2026</strong> e <strong>LGPD</strong>.
           </p>
 
           <div className="rounded-lg border border-border bg-muted/30 p-3 sm:p-3.5">
@@ -103,7 +103,7 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
         <div className="grid grid-cols-1 gap-2.5">
           {[
             { key: 'read' as const, label: 'Li e compreendi este TCLE.' },
-            { key: 'limitations' as const, label: 'Estou ciente das limitações da teleorientação técnica.' },
+            { key: 'limitations' as const, label: 'Estou ciente das limitações da teleconsulta.' },
             { key: 'privacy' as const, label: 'Autorizo o tratamento dos meus dados conforme a LGPD.' },
             { key: 'recording' as const, label: 'Estou ciente do uso de IA como apoio clínico.' },
           ].map(({ key, label }) => (

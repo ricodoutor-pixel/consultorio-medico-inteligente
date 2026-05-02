@@ -13,18 +13,18 @@ export const BRISA_WHATSAPP = "5511991363154";
 export function generateBrisaWhatsAppURL(
   userName: string,
   doctorName?: string,
-  orientação técnicationType?: string
+  consultationType?: string
 ): string {
   let message = `Olá enfermeira Brisa meu nome é ${userName}`;
 
   if (doctorName) {
-    message += `, gostaria de agendar uma orientação técnica online com o Dr. ${doctorName}`;
+    message += `, gostaria de agendar uma consulta online com o Dr. ${doctorName}`;
   } else {
-    message += `, gostaria de agendar uma orientação técnica online`;
+    message += `, gostaria de agendar uma consulta online`;
   }
 
-  if (orientação técnicationType) {
-    message += ` para ${orientação técnicationType}`;
+  if (consultationType) {
+    message += ` para ${consultationType}`;
   }
 
   message += ".";
@@ -34,7 +34,7 @@ export function generateBrisaWhatsAppURL(
 }
 
 /**
- * Tipos de orientação técnica
+ * Tipos de consulta
  */
 export const CONSULTATION_TYPES = {
   initial: "Consulta Inicial",
@@ -50,9 +50,9 @@ export const CONSULTATION_TYPES = {
 export function openBrisaWhatsApp(
   userName: string,
   doctorName?: string,
-  orientação técnicationType?: string
+  consultationType?: string
 ): void {
-  const url = generateBrisaWhatsAppURL(userName, doctorName, orientação técnicationType);
+  const url = generateBrisaWhatsAppURL(userName, doctorName, consultationType);
   window.open(url, "_blank");
 }
 
@@ -62,10 +62,10 @@ export function openBrisaWhatsApp(
 export async function copyBrisaWhatsAppLink(
   userName: string,
   doctorName?: string,
-  orientação técnicationType?: string
+  consultationType?: string
 ): Promise<boolean> {
   try {
-    const url = generateBrisaWhatsAppURL(userName, doctorName, orientação técnicationType);
+    const url = generateBrisaWhatsAppURL(userName, doctorName, consultationType);
     await navigator.clipboard.writeText(url);
     return true;
   } catch (error) {

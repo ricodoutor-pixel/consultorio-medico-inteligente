@@ -232,7 +232,7 @@ const Pay = () => {
                     )}
                     {(payType === "intake" || payType === "appointment") && (
                       <Button className="w-full font-black rounded-2xl mt-2" variant="outline" asChild>
-                        <a href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, acabei de pagar a orientação técnica com ${pro?.name || 'o especialista'}.`)}`} target="_blank" rel="noopener noreferrer">
+                        <a href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, acabei de pagar a consulta com ${pro?.name || 'o especialista'}.`)}`} target="_blank" rel="noopener noreferrer">
                           Confirmar com Enfermeira Brisa 💬
                         </a>
                       </Button>

@@ -21,10 +21,10 @@ const TIERS: TierInfo[] = [
   { name: "Diamante", icon: Diamond, cashbackRate: 12, minConsultations: 30, color: "text-cyan-300" },
 ];
 
-function getTier(orientação técnications: number): { current: TierInfo; next: TierInfo | null; progress: number } {
+function getTier(consultations: number): { current: TierInfo; next: TierInfo | null; progress: number } {
   let currentIdx = 0;
   for (let i = TIERS.length - 1; i >= 0; i--) {
-    if (orientação técnications >= TIERS[i].minConsultations) {
+    if (consultations >= TIERS[i].minConsultations) {
       currentIdx = i;
       break;
     }
@@ -32,13 +32,13 @@ function getTier(orientação técnications: number): { current: TierInfo; next:
   const current = TIERS[currentIdx];
   const next = currentIdx < TIERS.length - 1 ? TIERS[currentIdx + 1] : null;
   const progress = next
-    ? ((orientação técnications - current.minConsultations) / (next.minConsultations - current.minConsultations)) * 100
+    ? ((consultations - current.minConsultations) / (next.minConsultations - current.minConsultations)) * 100
     : 100;
   return { current, next, progress: Math.min(progress, 100) };
 }
 
 export function PatientTierCard() {
-  const [orientação técnications, setConsultations] = useState(0);
+  const [consultations, setConsultations] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export function PatientTierCard() {
 
   if (loading) return null;
 
-  const { current, next, progress } = getTier(orientação técnications);
+  const { current, next, progress } = getTier(consultations);
   const Icon = current.icon;
 
   return (
@@ -78,7 +78,7 @@ export function PatientTierCard() {
         <>
           <Progress value={progress} className="h-2 mb-2" />
           <p className="text-[11px] text-muted-foreground">
-            {next.minConsultations - orientação técnications} orientação técnicas para {next.name} ({next.cashbackRate}% cashback)
+            {next.minConsultations - consultations} consultas para {next.name} ({next.cashbackRate}% cashback)
           </p>
         </>
       )}

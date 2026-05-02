@@ -65,7 +65,7 @@ export const ResponsiveNavbar = () => {
           <a href="/" className="text-gray-700 hover:text-green-600 font-medium transition">
             Início
           </a>
-          <a href="/orientação técnicas" className="text-gray-700 hover:text-green-600 font-medium transition">
+          <a href="/consultas" className="text-gray-700 hover:text-green-600 font-medium transition">
             Consultas
           </a>
           <a href="/medicos" className="text-gray-700 hover:text-green-600 font-medium transition">
@@ -86,7 +86,7 @@ export const ResponsiveNavbar = () => {
           <LanguageSwitcher />
           <Button
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition"
-            onClick={() => navigate('/orientação técnica')}
+            onClick={() => navigate('/consulta')}
           >
             🩺 Iniciar Consulta
           </Button>
@@ -110,7 +110,7 @@ export const ResponsiveNavbar = () => {
           {/* CTA Fixo em Mobile */}
           <Button
             className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-semibold transition"
-            onClick={() => navigate('/orientação técnica')}
+            onClick={() => navigate('/consulta')}
           >
             🩺 Consulta
           </Button>
@@ -140,7 +140,7 @@ export const ResponsiveNavbar = () => {
             <a href="/" className="block text-gray-700 hover:text-green-600 font-medium py-2">
               Início
             </a>
-            <a href="/orientação técnicas" className="block text-gray-700 hover:text-green-600 font-medium py-2">
+            <a href="/consultas" className="block text-gray-700 hover:text-green-600 font-medium py-2">
               Consultas
             </a>
             <a href="/medicos" className="block text-gray-700 hover:text-green-600 font-medium py-2">

@@ -110,7 +110,7 @@ export interface DoctorBIMetrics {
   monthlyRevenue: number;
   revenueGrowth: number;
   avgConsultationValue: number;
-  orientação técnicationsThisMonth: number;
+  consultationsThisMonth: number;
   bonusAccumulated: number;
   plantaCoinBalance: number;
   newPatients: number;
@@ -124,7 +124,7 @@ export interface DoctorBIMetrics {
   percentile: number;
   opportunities: Opportunity[];
   revenueHistory: { month: string; value: number }[];
-  orientação técnicationHistory: { month: string; count: number }[];
+  consultationHistory: { month: string; count: number }[];
 }
 
 export function generateOpportunities(metrics: Partial<DoctorBIMetrics>): Opportunity[] {
@@ -137,15 +137,15 @@ export function generateOpportunities(metrics: Partial<DoctorBIMetrics>): Opport
       action: 'Ativar retenção',
     });
   }
-  if ((metrics.orientação técnicationsThisMonth ?? 0) < 50) {
+  if ((metrics.consultationsThisMonth ?? 0) < 50) {
     opportunities.push({
-      icon: '📈', title: 'Aumente suas orientação técnicas',
+      icon: '📈', title: 'Aumente suas consultas',
       description: 'Compartilhe sua página personalizada',
-      potentialRevenue: (50 - (metrics.orientação técnicationsThisMonth ?? 0)) * (metrics.avgConsultationValue ?? 150),
+      potentialRevenue: (50 - (metrics.consultationsThisMonth ?? 0)) * (metrics.avgConsultationValue ?? 150),
       action: 'Compartilhar',
     });
   }
-  if ((metrics.npsScore ?? 0) >= 8.5 && (metrics.orientação técnicationsThisMonth ?? 0) >= 100) {
+  if ((metrics.npsScore ?? 0) >= 8.5 && (metrics.consultationsThisMonth ?? 0) >= 100) {
     opportunities.push({ icon: '🏆', title: 'Elegível para Selo de Qualidade', description: 'Você atende os critérios', action: 'Solicitar selo' });
   }
   if ((metrics.plantaCoinBalance ?? 0) >= 500) {
@@ -189,12 +189,12 @@ export const WELLNESS_PLANS: WellnessPlan[] = [
   },
   {
     id: 'pro', name: 'Bem-Estar Pro', price: 149, period: 'monthly',
-    features: ['Tudo do Básico', '1 orientação técnica com médico/mês', '15% desconto em produtos', 'Acesso a cursos gratuitos', 'Smart-Refill automático'],
+    features: ['Tudo do Básico', '1 consulta com médico/mês', '15% desconto em produtos', 'Acesso a cursos gratuitos', 'Smart-Refill automático'],
     maxConsultations: 1, productDiscount: 0.15, priority: false,
   },
   {
     id: 'premium', name: 'Bem-Estar Premium', price: 199, period: 'monthly',
-    features: ['Tudo do Pro', '2 orientação técnicas com médico/mês', '20% desconto em produtos', 'Prioridade no atendimento', 'Consultoria nutricional', 'Rastreamento Anvisa automático'],
+    features: ['Tudo do Pro', '2 consultas com médico/mês', '20% desconto em produtos', 'Prioridade no atendimento', 'Consultoria nutricional', 'Rastreamento Anvisa automático'],
     maxConsultations: 2, productDiscount: 0.20, priority: true,
   },
 ];

@@ -14,13 +14,13 @@ const UPSELL_OFFERS = [
   {
     id: "vip-upgrade",
     name: "Plano VIP",
-    description: "Acesso prioritário + orientação técnicas ilimitadas + selo de verificação",
+    description: "Acesso prioritário + consultas ilimitadas + selo de verificação",
     additionalPrice: 79.90,
     icon: Crown,
     color: "text-amber-400",
     benefits: [
       "Atendimento prioritário na fila",
-      "Taxa zero em orientação técnicas",
+      "Taxa zero em consultas",
       "Selo VIP no perfil",
       "Suporte WhatsApp 24h",
     ],

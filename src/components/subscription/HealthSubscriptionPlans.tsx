@@ -34,7 +34,7 @@ const PLANS = [
     features: [
       "Tudo do Essencial",
       "15% desconto no Marketplace",
-      "1 orientação técnica trimestral inclusa",
+      "1 consulta trimestral inclusa",
       "Acesso ao Club Planta y Raiz",
       "Receita com renovação automática",
     ],
@@ -49,7 +49,7 @@ const PLANS = [
     features: [
       "Tudo do Premium",
       "25% desconto no Marketplace",
-      "1 orientação técnica mensal inclusa",
+      "1 consulta mensal inclusa",
       "Médico dedicado",
       "Fila prioritária 24/7",
       "Acesso antecipado a novos produtos",

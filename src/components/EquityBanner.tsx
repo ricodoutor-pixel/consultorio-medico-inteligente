@@ -27,7 +27,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
                A <span className="font-bold text-green-600">Planta & Raiz</span> está promovendo a{" "}
                <span className="font-bold">equidade</span> e realmente democratizando o acesso ao
                tratamento canabinoide oferecendo{" "}
-               <span className="font-bold text-green-600">orientação técnicas com especialistas por apenas R$30</span>.
+               <span className="font-bold text-green-600">consultas com especialistas por apenas R$30</span>.
              </p>
 
              <p className="text-xs md:text-lg text-gray-700 leading-relaxed">
@@ -65,7 +65,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
 
               {/* CTA Principal */}
               <a
-                href="https://wa.me/5511991363154?text=Olá%20enfermeira%20Brisa%20gostaria%20de%20agendar%20uma%20orientação técnica"
+                href="https://wa.me/5511991363154?text=Olá%20enfermeira%20Brisa%20gostaria%20de%20agendar%20uma%20consulta"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 md:flex-none px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition text-center"

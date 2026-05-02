@@ -14,7 +14,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 describe("🔍 SIMULAÇÃO DE NAVEGAÇÃO E UX", () => {
   describe("Teste de Entrada - Home Page", () => {
     it("deve exibir texto de Equidade (Consultas R$30)", () => {
-      const equityText = "orientação técnicas com especialistas por apenas R$30";
+      const equityText = "consultas com especialistas por apenas R$30";
       expect(equityText).toContain("R$30");
       expect(equityText).toContain("especialistas");
     });
@@ -91,7 +91,7 @@ describe("🧪 SIMULAÇÃO DE INTEGRAÇÕES (END-TO-END)", () => {
     it("deve gerar URL WhatsApp correta", () => {
       const userName = "João Silva";
       const doctorName = "Dr. Carlos";
-      const expectedMessage = `Olá enfermeira Brisa meu nome é ${userName}, gostaria de agendar uma orientação técnica online com o Dr. ${doctorName}.`;
+      const expectedMessage = `Olá enfermeira Brisa meu nome é ${userName}, gostaria de agendar uma consulta online com o Dr. ${doctorName}.`;
       
       expect(expectedMessage).toContain(userName);
       expect(expectedMessage).toContain(doctorName);
@@ -116,7 +116,7 @@ describe("🧪 SIMULAÇÃO DE INTEGRAÇÕES (END-TO-END)", () => {
     it("deve injetar nome do médico dinamicamente", () => {
       const doctors = ["Dr. Carlos", "Dra. Mariana", "Dr. Pedro"];
       doctors.forEach((doctor) => {
-        const message = `gostaria de agendar uma orientação técnica online com o ${doctor}`;
+        const message = `gostaria de agendar uma consulta online com o ${doctor}`;
         expect(message).toContain(doctor);
       });
     });
@@ -191,7 +191,7 @@ describe("🧪 SIMULAÇÃO DE INTEGRAÇÕES (END-TO-END)", () => {
       expect(question).toContain("interações");
     });
 
-    it("deve incluir recomendação de orientação técnica médica", () => {
+    it("deve incluir recomendação de consulta médica", () => {
       const response = "Consulte um médico especializado para orientações específicas";
       expect(response).toContain("médico");
       expect(response).toContain("especializado");
@@ -223,7 +223,7 @@ describe("🛡️ AUDITORIA DE REPOSITÓRIO E PERFORMANCE", () => {
 
     it("deve chamar APIs corretas", () => {
       const apis = [
-        "trpc.orientação técnications.create",
+        "trpc.consultations.create",
         "trpc.payments.process",
         "trpc.club.createPost",
       ];
@@ -233,7 +233,7 @@ describe("🛡️ AUDITORIA DE REPOSITÓRIO E PERFORMANCE", () => {
     });
 
     it("deve ter RLS Policies implementadas", () => {
-      const rlsPolicies = 6; // users, orientação técnications, payments, club_notifications, webhooks, ebook
+      const rlsPolicies = 6; // users, consultations, payments, club_notifications, webhooks, ebook
       expect(rlsPolicies).toBeGreaterThan(0);
     });
   });

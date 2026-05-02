@@ -19,7 +19,7 @@ const goals = [
   { label: "Meta 2026: 20.000 pacientes atendidos", progress: 62 },
   { label: "Meta 2026: 300 médicos cadastrados", progress: 61 },
   { label: "Meta 2026: Cobertura em todos os 26 estados", progress: 69 },
-  { label: "Meta 2026: 2.000 orientação técnicas voluntárias", progress: 61 },
+  { label: "Meta 2026: 2.000 consultas voluntárias", progress: 61 },
 ];
 
 const impactStories = [

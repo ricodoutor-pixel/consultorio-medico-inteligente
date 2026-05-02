@@ -23,7 +23,7 @@ const FUNCTIONS: FunctionStatus[] = [
 export function EdgeFunctionStatusGrid() {
   // ManyChat health-check removido. Mantemos a forma do hook para preservar a API
   // local (`healthData`, `healthLoading`, `refetchHealth`) sem fazer chamadas.
-  const healthData: { status?: string } | undefined = undefined;
+  const healthData: { status?: string; automations?: Record<string, number> } | undefined = undefined;
   const healthLoading = false;
   const refetchHealth = async () => {};
 
@@ -146,7 +146,7 @@ export function EdgeFunctionStatusGrid() {
               <CardHeader className="p-3 pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full shrink-0 ${status === "online" ? "bg-emerald-400 animate-pulse" : status === "error" ? "bg-red-400" : status === "blocked" ? "bg-amber-400" : "bg-slate-500"}`} />
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${status === "online" ? "bg-emerald-400 animate-pulse" : status === "blocked" ? "bg-amber-400" : "bg-slate-500"}`} />
                     <CardTitle className="text-xs font-medium text-slate-200 leading-tight">{fn.displayName}</CardTitle>
                   </div>
                 </div>

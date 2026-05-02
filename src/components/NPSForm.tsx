@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Star, Send, MessageCircle } from "lucide-react";
 
 interface NPSFormProps {
-  orientação técnicationId: string;
+  consultationId: string;
   patientId: string;
   professionalId: string;
   professionalName?: string;
@@ -30,7 +30,7 @@ const scoreColors: Record<number, string> = {
 };
 
 export const NPSForm: React.FC<NPSFormProps> = ({
-  orientação técnicationId,
+  consultationId,
   patientId,
   professionalId,
   professionalName,
@@ -54,7 +54,7 @@ export const NPSForm: React.FC<NPSFormProps> = ({
     }
     try {
       await submitResponse({
-        orientação técnicationId,
+        consultationId,
         patientId,
         professionalId,
         score,
@@ -76,7 +76,7 @@ export const NPSForm: React.FC<NPSFormProps> = ({
         </div>
         {professionalName && (
           <p className="text-sm text-muted-foreground">
-            Orientação Técnica com <span className="font-medium text-foreground">{professionalName}</span>
+            Consulta com <span className="font-medium text-foreground">{professionalName}</span>
           </p>
         )}
       </CardHeader>

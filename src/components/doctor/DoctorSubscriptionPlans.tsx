@@ -22,7 +22,7 @@ const PLANS = [
       "✨ Taxa de intermediação 0%",
       "Retenha 100% dos honorários",
       "Perfil verificado na plataforma",
-      "Até 20 orientação técnicas/mês",
+      "Até 20 consultas/mês",
       "Suporte prioritário por email",
       "Participação base nos lucros",
     ],
@@ -39,7 +39,7 @@ const PLANS = [
     tagline: null,
     features: [
       "Tudo do VIP",
-      "Orientação Técnicas ilimitadas",
+      "Consultas ilimitadas",
       "Destaque no ranking",
       "1.2× multiplicador de lucros",
       "Relatórios avançados",
@@ -197,7 +197,7 @@ export const DoctorSubscriptionPlans = ({ doctorId, currentTier, onTierChange }:
                         <span className="text-xs text-muted-foreground font-normal">/mês</span>
                       </span>
                     ) : (
-                      <span className="text-lg font-display font-black text-purple-400">Sob orientação técnica</span>
+                      <span className="text-lg font-display font-black text-purple-400">Sob consulta</span>
                     )}
                   </div>
 

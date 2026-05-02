@@ -81,7 +81,7 @@ export default function AdminFinanceiro() {
   const pendingPayments = (webhooks || []).filter((w) => w.status === "pending").length;
   const totalCommissions = (commissions || []).reduce((s, c) => s + Number(c.amount || 0), 0);
   const paidCommissions = (commissions || []).filter((c) => c.status === "paid").reduce((s, c) => s + Number(c.amount || 0), 0);
-  const orientação técnications = (escrows || []).filter((e) => e.type === "orientação técnication").length;
+  const consultations = (escrows || []).filter((e) => e.type === "consultation").length;
   const orders = (escrows || []).filter((e) => e.type === "marketplace").length;
 
   const isLoading = loadingEscrows || loadingWebhooks;
@@ -119,7 +119,7 @@ export default function AdminFinanceiro() {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <KPICard icon={DollarSign} label="Receita Bruta" value={formatBRL(totalRevenue)} color="emerald" trend={orientação técnications + orders > 0 ? `${orientação técnications + orders} transações` : undefined} />
+          <KPICard icon={DollarSign} label="Receita Bruta" value={formatBRL(totalRevenue)} color="emerald" trend={consultations + orders > 0 ? `${consultations + orders} transações` : undefined} />
           <KPICard icon={TrendingUp} label="Taxa Plataforma" value={formatBRL(platformFees)} color="blue" trend={totalRevenue > 0 ? `${((platformFees / totalRevenue) * 100).toFixed(1)}%` : undefined} />
           <KPICard icon={Users} label="Comissões Afiliados" value={formatBRL(totalCommissions)} color="amber" trend={`${paidCommissions > 0 ? formatBRL(paidCommissions) + " pago" : "0 pago"}`} />
           <KPICard icon={Wallet} label="Split Médicos" value={formatBRL(doctorPayouts)} color="purple" trend={vendorPayouts > 0 ? `Lojistas: ${formatBRL(vendorPayouts)}` : undefined} />
@@ -127,7 +127,7 @@ export default function AdminFinanceiro() {
 
         {/* Secondary metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <MetricCard label="Orientação Técnicas" value={orientação técnications} icon={<BarChart3 size={16} className="text-primary" />} />
+          <MetricCard label="Consultas" value={consultations} icon={<BarChart3 size={16} className="text-primary" />} />
           <MetricCard label="Pedidos Marketplace" value={orders} icon={<ArrowUpRight size={16} className="text-primary" />} />
           <MetricCard label="Pagamentos Aprovados" value={approvedPayments} icon={<TrendingUp size={16} className="text-emerald-400" />} />
           <MetricCard label="Pagamentos Pendentes" value={pendingPayments} icon={<AlertTriangle size={16} className="text-amber-400" />} />

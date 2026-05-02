@@ -289,7 +289,7 @@ O MÉDICO aceita a gestão autônoma dos seguintes agentes:
 
 ## PLANO: MÉDICO VIP (R$ 99/mês)
 
-- Receita 100% das orientação técnicas
+- Receita 100% das consultas
 - Sem taxa de saque
 - Selo de verificação
 - Suporte VIP 24/7

@@ -1,7 +1,7 @@
 /**
  * Biofeedback Module — rPPG Vital Signs Overlay
  * Extracts simulated heart rate from video stream via rPPG API placeholder
- * Displays real-time vitals on doctor's view during teleorientação técnication
+ * Displays real-time vitals on doctor's view during teleconsultation
  */
 import { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";

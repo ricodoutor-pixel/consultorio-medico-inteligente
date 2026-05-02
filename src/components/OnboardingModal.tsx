@@ -22,19 +22,19 @@ const experiences = [
 ];
 
 const recommendations: Record<string, { plan: string; specialist: string; cta: string }> = {
-  "dor-nunca": { plan: "Essencial", specialist: "Neurologista Cannabinoide", cta: "Agendar 1ª Orientação Técnica" },
+  "dor-nunca": { plan: "Essencial", specialist: "Neurologista Cannabinoide", cta: "Agendar 1ª Consulta" },
   "dor-iniciante": { plan: "Premium", specialist: "Especialista em Dor Crônica", cta: "Agendar Avaliação" },
   "dor-uso": { plan: "Premium", specialist: "Clínico Cannabinoide", cta: "Ajustar Tratamento" },
   "dor-automedico": { plan: "Essencial", specialist: "Clínico Cannabinoide", cta: "Regularizar Receita" },
-  "ansiedade-nunca": { plan: "Essencial", specialist: "Psiquiatra Cannabinoide", cta: "Agendar 1ª Orientação Técnica" },
+  "ansiedade-nunca": { plan: "Essencial", specialist: "Psiquiatra Cannabinoide", cta: "Agendar 1ª Consulta" },
   "ansiedade-iniciante": { plan: "Premium", specialist: "Psiquiatra Cannabinoide", cta: "Agendar Avaliação" },
   "ansiedade-uso": { plan: "VIP", specialist: "Psiquiatra Cannabinoide", cta: "Checkup Mensal" },
   "ansiedade-automedico": { plan: "Essencial", specialist: "Psiquiatra Cannabinoide", cta: "Regularizar Receita" },
-  "qualidade-nunca": { plan: "Essencial", specialist: "Clínico Geral", cta: "Orientação Técnica Inicial" },
+  "qualidade-nunca": { plan: "Essencial", specialist: "Clínico Geral", cta: "Consulta Inicial" },
   "qualidade-iniciante": { plan: "Premium", specialist: "Nutrólogo Cannabinoide", cta: "Agendar Avaliação" },
   "qualidade-uso": { plan: "VIP", specialist: "Nutrólogo Cannabinoide", cta: "Otimizar Protocolo" },
   "qualidade-automedico": { plan: "Essencial", specialist: "Clínico Geral", cta: "Regularizar Receita" },
-  "outro-nunca": { plan: "Premium", specialist: "Neurologista Cannabinoide", cta: "Agendar Orientação Técnica" },
+  "outro-nunca": { plan: "Premium", specialist: "Neurologista Cannabinoide", cta: "Agendar Consulta" },
   "outro-iniciante": { plan: "Premium", specialist: "Especialista Cannabinoide", cta: "Agendar Avaliação" },
   "outro-uso": { plan: "VIP", specialist: "Especialista Cannabinoide", cta: "Revisão de Protocolo" },
   "outro-automedico": { plan: "Essencial", specialist: "Clínico Cannabinoide", cta: "Regularizar Receita" },
@@ -88,7 +88,7 @@ export const OnboardingModal = () => {
     setOpen(false);
   };
 
-  const rec = recommendations[`${goal}-${experience}`] || { plan: "Essencial", specialist: "Clínico Cannabinoide", cta: "Agendar Orientação Técnica" };
+  const rec = recommendations[`${goal}-${experience}`] || { plan: "Essencial", specialist: "Clínico Cannabinoide", cta: "Agendar Consulta" };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

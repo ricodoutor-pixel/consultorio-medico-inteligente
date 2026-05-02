@@ -50,7 +50,7 @@ const QUIZ_STEPS = [
     id: "urgency",
     question: "Qual a urgência do seu atendimento?",
     options: [
-      { label: "Quero orientação técnica agora", value: "alta" },
+      { label: "Quero consulta agora", value: "alta" },
       { label: "Dentro de 24h", value: "media" },
       { label: "Esta semana", value: "baixa" },
       { label: "Apenas explorando", value: "informativa" },
@@ -239,7 +239,7 @@ const QuizTriagem = () => {
                 onClick={() => navigate("/agendamento")}
                 className="w-full gap-2 bg-gradient-to-r from-primary to-secondary text-primary-foreground h-12"
               >
-                <Zap className="w-5 h-5" /> Agendar Orientação Técnica Agora
+                <Zap className="w-5 h-5" /> Agendar Consulta Agora
               </Button>
               <Button variant="outline" onClick={() => { setMatchResult(null); setCurrentStep(0); setAnswers({}); }}>
                 Refazer Quiz

@@ -70,8 +70,8 @@ export function trackPageView(page: string) {
   trackEvent("PageView", { page });
 }
 
-export function trackOrientação TécnicationBooked(doctorId: string, amount: number) {
-  trackEvent("Orientação Técnication_Booked", { doctor_id: doctorId, amount });
+export function trackConsultationBooked(doctorId: string, amount: number) {
+  trackEvent("Consultation_Booked", { doctor_id: doctorId, amount });
 }
 
 export function trackCheckoutStarted(value: number) {

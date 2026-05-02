@@ -134,7 +134,7 @@ Dados protegidos pela LGPD (Lei 13.709/2018)
                         <CardContent className="p-8 text-center">
                           <FileText size={32} className="text-muted-foreground mx-auto mb-3" />
                           <p className="text-sm text-muted-foreground">Nenhum prontuário encontrado.</p>
-                          <p className="text-xs text-muted-foreground mt-1">Seus prontuários aparecerão aqui após orientação técnicas.</p>
+                          <p className="text-xs text-muted-foreground mt-1">Seus prontuários aparecerão aqui após consultas.</p>
                         </CardContent>
                       </Card>
                     ) : (
@@ -148,7 +148,7 @@ Dados protegidos pela LGPD (Lei 13.709/2018)
                                   <span className="text-xs text-muted-foreground">{format(new Date(record.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</span>
                                   {record.diagnosis_cid && <Badge className="bg-secondary/10 text-secondary text-[10px]">CID: {record.diagnosis_cid}</Badge>}
                                 </div>
-                                <p className="font-bold text-foreground text-sm">{record.chief_complaint || "Orientação Técnica registrada"}</p>
+                                <p className="font-bold text-foreground text-sm">{record.chief_complaint || "Consulta registrada"}</p>
                                 {record.diagnosis && <p className="text-xs text-muted-foreground mt-1">Diagnóstico: {record.diagnosis}</p>}
                                 {record.treatment_plan && <p className="text-xs text-muted-foreground mt-1">Tratamento: {record.treatment_plan}</p>}
                               </div>

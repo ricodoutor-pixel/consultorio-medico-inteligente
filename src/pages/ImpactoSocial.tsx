@@ -9,7 +9,7 @@ import { Heart, Users, MapPin, Stethoscope, BookOpen, DollarSign, TrendingUp, Gl
 const metrics = [
   { icon: Users, label: "Pacientes Atendidos", value: "12.450", growth: "+23%", color: "text-primary" },
   { icon: Stethoscope, label: "Médicos na Plataforma", value: "185", growth: "+15%", color: "text-blue-400" },
-  { icon: Heart, label: "Orientação Técnicas Voluntárias", value: "1.230", growth: "+40%", color: "text-pink-400" },
+  { icon: Heart, label: "Consultas Voluntárias", value: "1.230", growth: "+40%", color: "text-pink-400" },
   { icon: MapPin, label: "Cidades Alcançadas", value: "340", growth: "+18%", color: "text-yellow-400" },
   { icon: BookOpen, label: "Artigos Publicados", value: "520", growth: "+12%", color: "text-purple-400" },
   { icon: DollarSign, label: "Economia ao Paciente", value: "R$ 2.8M", growth: "+30%", color: "text-green-400" },
@@ -19,7 +19,7 @@ const goals = [
   { label: "Meta 2026: 20.000 pacientes atendidos", progress: 62 },
   { label: "Meta 2026: 300 médicos cadastrados", progress: 61 },
   { label: "Meta 2026: Cobertura em todos os 26 estados", progress: 69 },
-  { label: "Meta 2026: 2.000 orientação técnicas voluntárias", progress: 61 },
+  { label: "Meta 2026: 2.000 consultas voluntárias", progress: 61 },
 ];
 
 const impactStories = [

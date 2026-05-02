@@ -28,7 +28,7 @@ const storyLines = [
   "Nossas funcionalidades:",
   "",
   "🩺 Telemedicina Avançada",
-  "Orientação Técnicas online com os",
+  "Consultas online com os",
   "melhores médicos prescritores",
   "de cannabis medicinal.",
   "",

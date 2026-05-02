@@ -12,7 +12,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { useOrientação TécnicationQueue } from "@/hooks/useOrientação TécnicationQueue";
+import { useConsultationQueue } from "@/hooks/useConsultationQueue";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
@@ -100,9 +100,9 @@ const SalaEspera = () => {
     return `~${minutes} min`;
   };
 
-  const handleStartOrientação Técnication = async (appointmentId: string) => {
+  const handleStartConsultation = async (appointmentId: string) => {
     await supabase.from("appointments").update({ status: "in_progress" }).eq("id", appointmentId);
-    toast({ title: "Orientação Técnica iniciada! 🩺" });
+    toast({ title: "Consulta iniciada! 🩺" });
   };
 
   if (loading) {
@@ -169,13 +169,13 @@ const SalaEspera = () => {
               <Card className="border-border">
                 <CardContent className="p-12 text-center">
                   <Clock size={48} className="text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-display font-black text-foreground mb-2">Nenhuma orientação técnica na fila</h3>
+                  <h3 className="text-lg font-display font-black text-foreground mb-2">Nenhuma consulta na fila</h3>
                   <p className="text-sm text-muted-foreground mb-6">
-                    {userType === "doctor" ? "Quando pacientes agendarem, aparecerão aqui em tempo real." : "Agende uma orientação técnica para entrar na sala de espera."}
+                    {userType === "doctor" ? "Quando pacientes agendarem, aparecerão aqui em tempo real." : "Agende uma consulta para entrar na sala de espera."}
                   </p>
                   {userType === "patient" && (
                     <Button className="bg-primary text-primary-foreground font-bold rounded-xl" asChild>
-                      <Link to="/agendamento">Agendar Orientação Técnica <ArrowRight size={16} className="ml-2" /></Link>
+                      <Link to="/agendamento">Agendar Consulta <ArrowRight size={16} className="ml-2" /></Link>
                     </Button>
                   )}
                 </CardContent>
@@ -203,7 +203,7 @@ const SalaEspera = () => {
                               <div>
                                 <div className="flex items-center gap-2">
                                   <p className="font-bold text-sm text-foreground">
-                                    {appt.type === "video" ? "Teleorientação técnica Vídeo" : appt.type === "chat" ? "Orientação Técnica Chat" : "Orientação Técnica"}
+                                    {appt.type === "video" ? "Teleconsulta Vídeo" : appt.type === "chat" ? "Consulta Chat" : "Consulta"}
                                   </p>
                                   {isInProgress && (
                                     <Badge className="bg-primary/10 text-primary text-[10px]">EM ANDAMENTO</Badge>
@@ -230,13 +230,13 @@ const SalaEspera = () => {
                               )}
                               {isInProgress && (
                                 <Button className="w-full sm:w-auto bg-primary text-primary-foreground font-bold rounded-xl h-12 text-base animate-pulse shadow-lg shadow-primary/30" asChild>
-                                  <Link to={`/orientação técnica-video?appointment=${appt.id}`}>
+                                  <Link to={`/consulta-video?appointment=${appt.id}`}>
                                     <Video size={16} className="mr-2" /> Entrar na Sala
                                   </Link>
                                 </Button>
                               )}
                               {userType === "doctor" && !isInProgress && isNext && (
-                                <Button className="bg-primary text-primary-foreground font-bold rounded-xl" onClick={() => handleStartOrientação Técnication(appt.id)}>
+                                <Button className="bg-primary text-primary-foreground font-bold rounded-xl" onClick={() => handleStartConsultation(appt.id)}>
                                   <CheckCircle2 size={14} className="mr-1" /> Chamar Paciente
                                 </Button>
                               )}
@@ -256,7 +256,7 @@ const SalaEspera = () => {
                 <h3 className="font-display font-black text-foreground text-sm mb-3">📋 Instruções da Sala de Espera</h3>
                 <ul className="space-y-2 text-xs text-muted-foreground">
                   <li className="flex items-start gap-2"><CheckCircle2 size={12} className="text-primary mt-0.5 shrink-0" /> Mantenha a página aberta — você será notificado quando for sua vez.</li>
-                  <li className="flex items-start gap-2"><CheckCircle2 size={12} className="text-primary mt-0.5 shrink-0" /> Verifique sua câmera e microfone antes da orientação técnica.</li>
+                  <li className="flex items-start gap-2"><CheckCircle2 size={12} className="text-primary mt-0.5 shrink-0" /> Verifique sua câmera e microfone antes da consulta.</li>
                   <li className="flex items-start gap-2"><CheckCircle2 size={12} className="text-primary mt-0.5 shrink-0" /> Tenha seu documento de identidade em mãos (Art. 5º, CFM 2.314/2022).</li>
                   <li className="flex items-start gap-2"><CheckCircle2 size={12} className="text-primary mt-0.5 shrink-0" /> A conexão é criptografada ponta-a-ponta (AES-256).</li>
                   <li className="flex items-start gap-2"><Shield size={12} className="text-secondary mt-0.5 shrink-0" /> Nenhuma gravação é realizada sem seu consentimento expresso (Art. 7º, CFM 2.314/2022).</li>
@@ -273,7 +273,7 @@ const SalaEspera = () => {
 
 /** Uber-Style Queue Component */
 function UberQueueSection({ userType }: { userType: "patient" | "doctor" }) {
-  const { queue, myEntry, loading, joinQueue, acceptPatient, waitingCount } = useOrientação TécnicationQueue(userType);
+  const { queue, myEntry, loading, joinQueue, acceptPatient, waitingCount } = useConsultationQueue(userType);
 
   return (
     <Card className="border-border border-primary/20 mb-6">
@@ -306,7 +306,7 @@ function UberQueueSection({ userType }: { userType: "patient" | "doctor" }) {
             </p>
             {myEntry.jitsi_room && (
                <Button className="w-full bg-primary text-primary-foreground font-bold rounded-xl h-12 text-base animate-pulse shadow-lg shadow-primary/30" asChild>
-                <Link to={`/orientação técnica-video?room=${myEntry.jitsi_room}`}>
+                <Link to={`/consulta-video?room=${myEntry.jitsi_room}`}>
                   <Video size={16} className="mr-2" /> Entrar na Sala
                 </Link>
                </Button>

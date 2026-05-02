@@ -58,7 +58,7 @@ const DownloadApp = () => {
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-muted-foreground text-lg mb-8 font-medium max-w-lg">
-                Orientação Técnicas, receitas, shopping e biblioteca científica — tudo offline-first com biometria, push notifications e a melhor experiência mobile do mercado.
+                Consultas, receitas, shopping e biblioteca científica — tudo offline-first com biometria, push notifications e a melhor experiência mobile do mercado.
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -135,13 +135,13 @@ const DownloadApp = () => {
 
           <motion.div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {[
-              { icon: Zap, title: "Orientação Técnicas 24/7", desc: "Chat e vídeo com especialistas a qualquer hora", accent: "green" },
+              { icon: Zap, title: "Consultas 24/7", desc: "Chat e vídeo com especialistas a qualquer hora", accent: "green" },
               { icon: Shield, title: "100% Seguro", desc: "Biometria, 2FA e criptografia end-to-end", accent: "purple" },
               { icon: Wifi, title: "Offline-First", desc: "Funciona mesmo sem internet, sincroniza depois", accent: "green" },
               { icon: Users, title: "Comunidade", desc: "Conecte-se com pacientes e especialistas", accent: "purple" },
               { icon: Download, title: "Receitas Digitais", desc: "Baixe prescrições ANVISA-compliant", accent: "green" },
               { icon: Globe, title: "Multi-idioma", desc: "Disponível em PT, EN, ES e mais", accent: "purple" },
-              { icon: Heart, title: "Push Notifications", desc: "Lembretes de orientação técnica e promoções", accent: "green" },
+              { icon: Heart, title: "Push Notifications", desc: "Lembretes de consulta e promoções", accent: "green" },
               { icon: Smartphone, title: "PWA Instalável", desc: "Instale direto do navegador sem loja", accent: "purple" },
             ].map((f, i) => (
               <motion.div key={i} variants={fadeUp}>
@@ -168,14 +168,14 @@ const DownloadApp = () => {
               Comece agora — é <span className="text-gradient-green">grátis</span>
             </h2>
             <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-              Baixe o app ou acesse pelo navegador. Cadastro rápido e sua primeira orientação técnica com desconto.
+              Baixe o app ou acesse pelo navegador. Cadastro rápido e sua primeira consulta com desconto.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="h-14 px-8 bg-primary text-primary-foreground font-black rounded-2xl" asChild>
                 <Link to="/cadastro">Cadastre-se Grátis <ArrowRight size={18} className="ml-2" /></Link>
               </Button>
               <Button size="lg" variant="outline" className="h-14 px-8 border-primary/30 text-primary font-black rounded-2xl" asChild>
-                <Link to="/telemedicina">Iniciar Orientação Técnica IA</Link>
+                <Link to="/telemedicina">Iniciar Consulta IA</Link>
               </Button>
             </div>
           </motion.div>

@@ -17,9 +17,9 @@ import { cn } from "@/lib/utils";
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
 const consultTypes = [
-  { id: "video", label: "Vídeo", icon: Video, desc: "Orientação Técnica por vídeo HD" },
-  { id: "chat", label: "Chat", icon: MessageSquare, desc: "Orientação Técnica por mensagem" },
-  { id: "phone", label: "Telefone", icon: Phone, desc: "Orientação Técnica por telefone" },
+  { id: "video", label: "Vídeo", icon: Video, desc: "Consulta por vídeo HD" },
+  { id: "chat", label: "Chat", icon: MessageSquare, desc: "Consulta por mensagem" },
+  { id: "phone", label: "Telefone", icon: Phone, desc: "Consulta por telefone" },
 ];
 
 type Doctor = {
@@ -30,10 +30,10 @@ type Doctor = {
   rqe: string | null;
   specialty: string;
   bio: string | null;
-  orientação técnication_price: number;
+  consultation_price: number;
   is_online: boolean;
   rating: number | null;
-  total_orientação técnications: number | null;
+  total_consultations: number | null;
   profiles?: { full_name: string; avatar_url: string | null } | null;
 };
 
@@ -158,8 +158,8 @@ const Agendamento = () => {
     trackPixelEvent("Schedule", {
       content_name: "appointment_booking",
       doctor_id: selectedDoctor.id,
-      orientação técnication_type: consultType,
-      value: selectedDoctor.orientação técnication_price,
+      consultation_type: consultType,
+      value: selectedDoctor.consultation_price,
     }, { leadScore: 35, funnelStage: "decision", category: "conversion" });
 
     const { data: newAppt, error } = await supabase.from("appointments").insert({
@@ -168,7 +168,7 @@ const Agendamento = () => {
       scheduled_at: scheduledAt.toISOString(),
       type: consultType,
       notes,
-      amount: selectedDoctor.orientação técnication_price,
+      amount: selectedDoctor.consultation_price,
       status: "scheduled",
       payment_status: "pending",
     }).select("id").single();
@@ -194,12 +194,12 @@ const Agendamento = () => {
           appointmentId: newAppt.id,
           doctorName: `CRM ${selectedDoctor.crm}/${selectedDoctor.crm_state}`,
           patientEmail: session?.session?.user?.email || "",
-          description: `Orientação Técnica ${consultTypes.find(c => c.id === consultType)?.label} — Planta y Raiz`,
+          description: `Consulta ${consultTypes.find(c => c.id === consultType)?.label} — Planta y Raiz`,
         },
       });
 
       if (paymentError || !paymentData?.init_point) {
-        toast({ title: "Orientação Técnica agendada", description: "Pagamento pendente — conclua pelo Dashboard." });
+        toast({ title: "Consulta agendada", description: "Pagamento pendente — conclua pelo Dashboard." });
         setStep(5);
         setLoading(false);
         return;
@@ -208,7 +208,7 @@ const Agendamento = () => {
       toast({ title: "Redirecionando para pagamento...", description: "Você será levado ao Mercado Pago." });
       window.location.href = paymentData.init_point;
     } catch {
-      toast({ title: "Orientação Técnica agendada", description: "Pagamento pendente — conclua pelo Dashboard." });
+      toast({ title: "Consulta agendada", description: "Pagamento pendente — conclua pelo Dashboard." });
       setStep(5);
     }
     setLoading(false);
@@ -224,7 +224,7 @@ const Agendamento = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <h1 className="text-3xl md:text-4xl font-display font-black text-foreground mb-2">
-              Agendar <span className="text-gradient-green">Orientação Técnica</span>
+              Agendar <span className="text-gradient-green">Consulta</span>
             </h1>
             <p className="text-muted-foreground mb-8">Sistema de agendamento inteligente — CFM 2.314/2022 | Suporte: (11) 99136-3154</p>
 
@@ -271,12 +271,12 @@ const Agendamento = () => {
                               <div className="flex items-center gap-2 mt-1">
                                 <Star size={12} className="text-[hsl(var(--gold))]" />
                                 <span className="text-xs text-foreground font-bold">{doc.rating || "5.0"}</span>
-                                <span className="text-xs text-muted-foreground">• {doc.total_orientação técnications || 0} orientação técnicas</span>
+                                <span className="text-xs text-muted-foreground">• {doc.total_consultations || 0} consultas</span>
                               </div>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-lg font-display font-black text-primary">R$ {Number(doc.orientação técnication_price).toFixed(2)}</p>
+                            <p className="text-lg font-display font-black text-primary">R$ {Number(doc.consultation_price).toFixed(2)}</p>
                             {doc.is_online && <Badge className="bg-primary/10 text-primary border-primary text-[10px]">Online</Badge>}
                           </div>
                         </CardContent>
@@ -308,7 +308,7 @@ const Agendamento = () => {
                 </motion.div>
               )}
 
-              {/* Step 3: Time Slots from DB + Orientação Técnication Type */}
+              {/* Step 3: Time Slots from DB + Consultation Type */}
               {step === 3 && (
                 <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                   <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
@@ -316,7 +316,7 @@ const Agendamento = () => {
                   </h2>
 
                   <div>
-                    <p className="text-sm font-bold text-foreground mb-3">Tipo de Orientação Técnica</p>
+                    <p className="text-sm font-bold text-foreground mb-3">Tipo de Consulta</p>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {consultTypes.map(ct => (
                         <Card key={ct.id} className={cn("cursor-pointer transition-all border-border hover:border-primary/40", consultType === ct.id && "border-primary bg-primary/5")} onClick={() => setConsultType(ct.id)}>
@@ -389,7 +389,7 @@ const Agendamento = () => {
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Descreva brevemente seus sintomas ou motivo da orientação técnica..."
+                      placeholder="Descreva brevemente seus sintomas ou motivo da consulta..."
                       className="w-full h-24 rounded-xl bg-card border border-border p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:border-primary focus:outline-none"
                     />
                   </div>
@@ -407,7 +407,7 @@ const Agendamento = () => {
               {step === 4 && (
                 <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                   <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
-                    <CheckCircle2 size={18} className="text-primary" /> Confirme sua Orientação Técnica
+                    <CheckCircle2 size={18} className="text-primary" /> Confirme sua Consulta
                   </h2>
 
                   <Card className="border-primary/30 bg-primary/5">
@@ -427,7 +427,7 @@ const Agendamento = () => {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-bold uppercase">Valor</p>
-                          <p className="text-2xl font-display font-black text-primary">R$ {Number(selectedDoctor?.orientação técnication_price || 0).toFixed(2)}</p>
+                          <p className="text-2xl font-display font-black text-primary">R$ {Number(selectedDoctor?.consultation_price || 0).toFixed(2)}</p>
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-bold uppercase">Pagamento</p>
@@ -466,9 +466,9 @@ const Agendamento = () => {
                   <Card className="border-primary/30 bg-primary/5">
                     <CardContent className="p-8 text-center">
                       <CheckCircle2 size={48} className="text-primary mx-auto mb-4" />
-                      <h2 className="text-2xl font-display font-black text-foreground mb-2">Orientação Técnica Agendada!</h2>
+                      <h2 className="text-2xl font-display font-black text-foreground mb-2">Consulta Agendada!</h2>
                       <p className="text-muted-foreground mb-6">
-                        Sua orientação técnica foi agendada para{" "}
+                        Sua consulta foi agendada para{" "}
                         <strong className="text-foreground">
                           {selectedDate && format(selectedDate, "dd/MM/yyyy")} às {selectedTime}
                         </strong>

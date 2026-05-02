@@ -125,7 +125,7 @@ export const professionals: Professional[] = [
     hospital: "Beneficência Portuguesa (SP) / Hospital Menino Jesus",
     hospitalUrl: "https://www.beneficencia.org.br",
     services: [
-      { name: "Orientação Técnica Inicial", price: "R$ 30,00", desc: "Avaliação completa + plano terapêutico canábico" },
+      { name: "Consulta Inicial", price: "R$ 30,00", desc: "Avaliação completa + plano terapêutico canábico" },
       { name: "Retorno", price: "R$ 35,00", desc: "Acompanhamento e ajuste de dosagem" },
       { name: "Laudo ANVISA", price: "R$ 50,00", desc: "Documentação para importação ou uso compassivo" },
     ],
@@ -153,7 +153,7 @@ export const professionals: Professional[] = [
     imageUrl: drLucasImg,
     flags: ["🇧🇷", "🇵🇹"],
     services: [
-      { name: "Orientação Técnica Inicial", price: "R$ 130,00", desc: "Avaliação completa + plano terapêutico" },
+      { name: "Consulta Inicial", price: "R$ 130,00", desc: "Avaliação completa + plano terapêutico" },
       { name: "Retorno", price: "R$ 80", desc: "Acompanhamento e ajuste de dosagem" },
       { name: "Laudo/Relatório", price: "R$ 60", desc: "Documentação para ANVISA ou importação" },
     ],
@@ -181,14 +181,14 @@ export const professionals: Professional[] = [
     imageUrl: draSofiaImg,
     flags: ["🇵🇹", "🇧🇷"],
     services: [
-      { name: "Orientação Técnica Inicial", price: "R$ 90,00", desc: "Avaliação psiquiátrica + orientação" },
+      { name: "Consulta Inicial", price: "R$ 90,00", desc: "Avaliação psiquiátrica + orientação" },
       { name: "Retorno", price: "R$ 75", desc: "Acompanhamento mensal" },
       { name: "Receita Especial", price: "R$ 50", desc: "Prescrição controlada quando aplicável" },
     ],
     slots: ["08:00", "09:00", "10:00", "13:00", "14:00"],
     reviews: [
       { name: "Ana S.", rating: 5, text: "Mudou minha qualidade de vida completamente." },
-      { name: "Pedro M.", rating: 4, text: "Ótima orientação técnica, muito acolhedora." },
+      { name: "Pedro M.", rating: 4, text: "Ótima consulta, muito acolhedora." },
     ],
   },
   {
@@ -208,7 +208,7 @@ export const professionals: Professional[] = [
     imageUrl: drCarlosImg,
     flags: ["🇲🇽", "🇧🇷"],
     services: [
-      { name: "Orientação Técnica Inicial", price: "R$ 30", desc: "Avaliação geral + plano" },
+      { name: "Consulta Inicial", price: "R$ 30", desc: "Avaliação geral + plano" },
       { name: "Retorno", price: "R$ 70", desc: "Acompanhamento" },
       { name: "Parecer Técnico", price: "R$ 90", desc: "Para importação ou habeas corpus" },
     ],
@@ -234,7 +234,7 @@ export const professionals: Professional[] = [
     avatar: "JF",
     imageUrl: draJulianaImg,
     services: [
-      { name: "Orientação Técnica Reumatológica", price: "R$ 110,00", desc: "Avaliação completa + protocolo CBD/THC" },
+      { name: "Consulta Reumatológica", price: "R$ 110,00", desc: "Avaliação completa + protocolo CBD/THC" },
       { name: "Retorno", price: "R$ 75", desc: "Ajuste de dosagem e acompanhamento" },
       { name: "Laudo para Importação", price: "R$ 65", desc: "Documentação ANVISA" },
     ],
@@ -262,7 +262,7 @@ export const professionals: Professional[] = [
     imageUrl: draValentinaImg,
     flags: ["🇨🇴", "🇧🇷"],
     services: [
-      { name: "Orientação Técnica Oncológica", price: "R$ 85,00", desc: "Avaliação + plano paliativo canábico" },
+      { name: "Consulta Oncológica", price: "R$ 85,00", desc: "Avaliação + plano paliativo canábico" },
       { name: "Acompanhamento", price: "R$ 60", desc: "Follow-up quinzenal" },
       { name: "Relatório Médico", price: "R$ 55", desc: "Para importação ou uso compassivo" },
     ],
@@ -345,7 +345,7 @@ export const professionals: Professional[] = [
     imageUrl: drMarcosImg,
     flags: ["🇧🇷", "🇵🇹"],
     services: [
-      { name: "Orientação Técnica Geriátrica", price: "R$ 95,00", desc: "Avaliação completa + protocolo canábico" },
+      { name: "Consulta Geriátrica", price: "R$ 95,00", desc: "Avaliação completa + protocolo canábico" },
       { name: "Retorno", price: "R$ 65", desc: "Acompanhamento mensal" },
       { name: "Laudo ANVISA", price: "R$ 55", desc: "Documentação para importação" },
     ],
@@ -372,7 +372,7 @@ export const professionals: Professional[] = [
     imageUrl: draIsabellaImg,
     flags: ["🇧🇷", "🇻🇪"],
     services: [
-      { name: "Orientação Técnica Dermatológica", price: "R$ 120,00", desc: "Avaliação + protocolo tópico canábico" },
+      { name: "Consulta Dermatológica", price: "R$ 120,00", desc: "Avaliação + protocolo tópico canábico" },
       { name: "Retorno", price: "R$ 80", desc: "Acompanhamento e ajuste" },
       { name: "Receita Especial", price: "R$ 60", desc: "Prescrição de fitocanabinoides tópicos" },
     ],
@@ -399,7 +399,7 @@ export const professionals: Professional[] = [
     imageUrl: drAntonioImg,
     flags: ["🇵🇹", "🇧🇷"],
     services: [
-      { name: "Orientação Técnica Neurológica", price: "R$ 150,00", desc: "Avaliação completa + plano terapêutico" },
+      { name: "Consulta Neurológica", price: "R$ 150,00", desc: "Avaliação completa + plano terapêutico" },
       { name: "Segunda Opinião", price: "R$ 120", desc: "Revisão de caso e protocolo" },
       { name: "Laudo Internacional", price: "R$ 90", desc: "Documentação para importação UE/BR" },
     ],
@@ -512,7 +512,7 @@ export const professionals: Professional[] = [
     imageUrl: draSarahImg,
     flags: ["🇺🇸", "🇧🇷"],
     services: [
-      { name: "Orientação Técnica Internacional", price: "R$ 140,00", desc: "Avaliação completa em inglês/português" },
+      { name: "Consulta Internacional", price: "R$ 140,00", desc: "Avaliação completa em inglês/português" },
       { name: "Retorno", price: "R$ 90", desc: "Acompanhamento mensal" },
       { name: "Second Opinion", price: "R$ 120", desc: "Revisão de caso internacional" },
     ],
@@ -539,7 +539,7 @@ export const professionals: Professional[] = [
     imageUrl: drJamesImg,
     flags: ["🇬🇧", "🇺🇸"],
     services: [
-      { name: "Orientação Técnica Especializada", price: "R$ 160,00", desc: "Avaliação neurológica avançada" },
+      { name: "Consulta Especializada", price: "R$ 160,00", desc: "Avaliação neurológica avançada" },
       { name: "Telemedicina Internacional", price: "R$ 130", desc: "Atendimento remoto em inglês" },
       { name: "Laudo Internacional", price: "R$ 100", desc: "Documentação para importação UK/BR" },
     ],
@@ -566,7 +566,7 @@ export const professionals: Professional[] = [
     imageUrl: drAlejandroImg,
     flags: ["🇪🇸", "🇧🇷"],
     services: [
-      { name: "Orientação Técnica Psiquiátrica", price: "R$ 115,00", desc: "Avaliação completa + protocolo canábico" },
+      { name: "Consulta Psiquiátrica", price: "R$ 115,00", desc: "Avaliação completa + protocolo canábico" },
       { name: "Retorno", price: "R$ 80", desc: "Acompanhamento quinzenal" },
       { name: "Laudo Médico", price: "R$ 70", desc: "Documentação para importação ES/BR" },
     ],
@@ -593,7 +593,7 @@ export const professionals: Professional[] = [
     imageUrl: draEmilyImg,
     flags: ["🇺🇸", "🇬🇧"],
     services: [
-      { name: "Orientação Técnica Reumatológica", price: "R$ 135,00", desc: "Avaliação + protocolo CBD/THC" },
+      { name: "Consulta Reumatológica", price: "R$ 135,00", desc: "Avaliação + protocolo CBD/THC" },
       { name: "Follow-up", price: "R$ 85", desc: "Acompanhamento mensal" },
       { name: "Laudo Internacional", price: "R$ 80", desc: "Documentação para importação US/BR" },
     ],
@@ -845,7 +845,7 @@ export const professionals: Professional[] = [
     flags: ["🇧🇷"],
     crm: "CRF-34567",
     services: [
-      { name: "Orientação Técnica Farmacêutica", price: "R$ 70,00", desc: "Análise de interações e ajuste" },
+      { name: "Consulta Farmacêutica", price: "R$ 70,00", desc: "Análise de interações e ajuste" },
       { name: "Revisão de Medicamentos", price: "R$ 55", desc: "Revisão completa de politerapia" },
       { name: "Orientação ANVISA", price: "R$ 85", desc: "Suporte para importação" },
     ],
@@ -1449,7 +1449,7 @@ export const professionals: Professional[] = [
     imageUrl: enfPatriciaImg,
     flags: ["🇧🇷"],
     services: [
-      { name: "Orientação Técnica de Enfermagem", price: "R$ 75,00", desc: "Avaliação + plano de cuidados" },
+      { name: "Consulta de Enfermagem", price: "R$ 75,00", desc: "Avaliação + plano de cuidados" },
       { name: "Acompanhamento Domiciliar", price: "R$ 60", desc: "Visita domiciliar completa" },
       { name: "Orientação Canábica", price: "R$ 50", desc: "Orientação sobre uso de cannabis" },
     ],
@@ -1503,7 +1503,7 @@ export const professionals: Professional[] = [
     imageUrl: enfClaudiaImg,
     flags: ["🇧🇷"],
     services: [
-      { name: "Orientação Técnica Pré-Natal", price: "R$ 70,00", desc: "Acompanhamento da gestação" },
+      { name: "Consulta Pré-Natal", price: "R$ 70,00", desc: "Acompanhamento da gestação" },
       { name: "Pós-Parto", price: "R$ 65", desc: "Suporte puerperal + amamentação" },
       { name: "Orientação CBD Gestacional", price: "R$ 55", desc: "Orientação sobre uso seguro" },
     ],
@@ -1530,7 +1530,7 @@ export const professionals: Professional[] = [
     imageUrl: enfMarcosImg,
     flags: ["🇧🇷"],
     services: [
-      { name: "Orientação Técnica de Enfermagem", price: "R$ 65,00", desc: "Avaliação e orientação" },
+      { name: "Consulta de Enfermagem", price: "R$ 65,00", desc: "Avaliação e orientação" },
       { name: "Educação em Saúde", price: "R$ 50", desc: "Palestra ou oficina comunitária" },
       { name: "Visita Domiciliar", price: "R$ 55", desc: "Acompanhamento na residência" },
     ],
@@ -1834,7 +1834,7 @@ export const professionals: Professional[] = [
     imageUrl: draMarianaIntImg,
     flags: ["🇧🇷", "🇮🇳"],
     services: [
-      { name: "Orientação Técnica Integrativa", price: "R$ 120,00", desc: "Avaliação holística + protocolo canábico + fitoterapia" },
+      { name: "Consulta Integrativa", price: "R$ 120,00", desc: "Avaliação holística + protocolo canábico + fitoterapia" },
       { name: "Retorno + Ajuste", price: "R$ 80", desc: "Acompanhamento e reequilíbrio terapêutico" },
       { name: "Protocolo Ayurvédico", price: "R$ 150", desc: "Avaliação constitucional + plano personalizado" },
     ],
@@ -1862,7 +1862,7 @@ export const professionals: Professional[] = [
     imageUrl: drRobertoIntImg,
     flags: ["🇧🇷"],
     services: [
-      { name: "Orientação Técnica Ortomolecular", price: "R$ 95,00", desc: "Avaliação metabólica + protocolo canábico-nutricional" },
+      { name: "Consulta Ortomolecular", price: "R$ 95,00", desc: "Avaliação metabólica + protocolo canábico-nutricional" },
       { name: "Protocolo Longevidade", price: "R$ 180", desc: "Plano completo anti-aging + CBD" },
       { name: "Retorno", price: "R$ 70", desc: "Ajuste de suplementação e dosagem" },
     ],
@@ -1889,7 +1889,7 @@ export const professionals: Professional[] = [
     imageUrl: draBeatrizIntImg,
     flags: ["🇧🇷", "🇪🇸"],
     services: [
-      { name: "Orientação Técnica Naturopática", price: "R$ 75,00", desc: "Avaliação holística + plano fitoterápico" },
+      { name: "Consulta Naturopática", price: "R$ 75,00", desc: "Avaliação holística + plano fitoterápico" },
       { name: "Aromaterapia Canábica", price: "R$ 90", desc: "Protocolo personalizado de terpenos" },
       { name: "Microdosagem Guiada", price: "R$ 60", desc: "Acompanhamento de protocolo de microdose" },
     ],

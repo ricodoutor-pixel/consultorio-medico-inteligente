@@ -41,7 +41,7 @@ interface PrescriptionItem {
 // ─── Mock data (will be replaced by real queries) ───────────
 const MOCK_WAITING: WaitingPatient[] = [
   { id: "1", appointmentId: "a1", name: "Maria Silva", cpf: "***.***.789-01", age: 45, waitMinutes: 3, tags: ["Dor Crônica", "Retorno"], urgency: "medium", symptoms: "Lombalgia persistente, insônia leve" },
-  { id: "2", appointmentId: "a2", name: "João Santos", cpf: "***.***.456-78", age: 32, waitMinutes: 18, tags: ["Ansiedade", "1ª Orientação Técnica"], urgency: "low", symptoms: "Ansiedade generalizada, pânico noturno" },
+  { id: "2", appointmentId: "a2", name: "João Santos", cpf: "***.***.456-78", age: 32, waitMinutes: 18, tags: ["Ansiedade", "1ª Consulta"], urgency: "low", symptoms: "Ansiedade generalizada, pânico noturno" },
   { id: "3", appointmentId: "a3", name: "Ana Costa", cpf: "***.***.123-45", age: 58, waitMinutes: 1, tags: ["Epilepsia", "Urgente"], urgency: "high", symptoms: "Crises refratárias, 3x/semana" },
   { id: "4", appointmentId: "a4", name: "Carlos Oliveira", cpf: "***.***.321-00", age: 67, waitMinutes: 22, tags: ["Parkinson", "Retorno"], urgency: "medium", symptoms: "Tremores, rigidez muscular progressiva" },
   { id: "5", appointmentId: "a5", name: "Fernanda Lima", cpf: "***.***.654-32", age: 29, waitMinutes: 5, tags: ["Insônia", "Fibromialgia"], urgency: "low", symptoms: "Dificuldade para dormir, dor difusa" },
@@ -60,7 +60,7 @@ function getProtocolForTags(tags: string[]) {
   for (const tag of tags) {
     if (AI_PROTOCOLS[tag]) return { tag, ...AI_PROTOCOLS[tag] };
   }
-  return { tag: "Geral", product: "CBD Full Spectrum 10%", dosage: "1 gota/kg/dia", notes: "Orientação Técnicar protocolo clínico" };
+  return { tag: "Geral", product: "CBD Full Spectrum 10%", dosage: "1 gota/kg/dia", notes: "Consultar protocolo clínico" };
 }
 
 // ─── Sub-components ─────────────────────────────────────────
@@ -427,7 +427,7 @@ export function MedicalDashboard() {
                     onClick={() => setIsVideoActive(!isVideoActive)}
                   >
                     {isVideoActive ? <VideoOff className="h-4 w-4" /> : <Video className="h-4 w-4" />}
-                    {isVideoActive ? "Encerrar Vídeo" : "Iniciar Teleorientação técnica"}
+                    {isVideoActive ? "Encerrar Vídeo" : "Iniciar Teleconsulta"}
                   </Button>
                   <Button size="sm" variant="outline" className="gap-2">
                     <Phone className="h-4 w-4" /> Ligar
@@ -456,7 +456,7 @@ export function MedicalDashboard() {
                         <div className="h-20 w-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4 ring-4 ring-primary/20">
                           <Video className="h-10 w-10 text-primary" />
                         </div>
-                        <p className="text-muted-foreground font-medium">Teleorientação técnica em Andamento</p>
+                        <p className="text-muted-foreground font-medium">Teleconsulta em Andamento</p>
                         <p className="text-xs text-muted-foreground/60 mt-1">
                           Integração Daily.co / Jitsi Meet
                         </p>
@@ -527,7 +527,7 @@ export function MedicalDashboard() {
                     <div className="mt-1 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                     <div>
                       <span className="text-muted-foreground">15/04/2026 — </span>
-                      <span className="text-foreground/80">Orientação Técnica inicial. Paciente relata sintomas há 6 meses.</span>
+                      <span className="text-foreground/80">Consulta inicial. Paciente relata sintomas há 6 meses.</span>
                     </div>
                   </div>
                   <div className="flex items-start gap-2 text-xs">

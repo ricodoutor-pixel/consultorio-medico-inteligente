@@ -14,7 +14,7 @@ interface UpsellProduct {
   tag?: string;
 }
 
-interface UpsellPostOrientação TécnicaProps {
+interface UpsellPostConsultaProps {
   isOpen: boolean;
   onClose: () => void;
   patientName?: string;
@@ -42,13 +42,13 @@ const UPSELL_PRODUCTS: UpsellProduct[] = [
   {
     id: "club-assinatura",
     name: "Club Planta & Raiz — Mensal",
-    description: "Orientação Técnicas ilimitadas + 20% desconto no shopping + conteúdo premium.",
+    description: "Consultas ilimitadas + 20% desconto no shopping + conteúdo premium.",
     price: 99,
     tag: "Economia",
   },
 ];
 
-export const UpsellPostOrientação Técnica = ({ isOpen, onClose, patientName, condition, onAddToCart }: UpsellPostOrientação TécnicaProps) => {
+export const UpsellPostConsulta = ({ isOpen, onClose, patientName, condition, onAddToCart }: UpsellPostConsultaProps) => {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -78,7 +78,7 @@ export const UpsellPostOrientação Técnica = ({ isOpen, onClose, patientName, 
             <div className="flex items-center gap-3 mb-2">
               <Gift className="w-8 h-8 text-primary" />
               <div>
-                <h2 className="text-xl font-bold text-foreground">Oferta Especial Pós-Orientação Técnica</h2>
+                <h2 className="text-xl font-bold text-foreground">Oferta Especial Pós-Consulta</h2>
                 <p className="text-sm text-muted-foreground">
                   {patientName ? `${patientName}, c` : "C"}omplete seu tratamento com desconto exclusivo
                 </p>

@@ -61,7 +61,7 @@ const Telemedicina = lazy(() => import("./pages/Telemedicina"));
 const Cadastro = lazy(() => import("./pages/Cadastro"));
 const Login = lazy(() => import("./pages/Login"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const Orientação TécnicationPayment = lazy(() => import("./pages/Orientação TécnicationPayment"));
+const ConsultationPayment = lazy(() => import("./pages/ConsultationPayment"));
 const SpecialistDashboard = lazy(() => import("./pages/SpecialistDashboard"));
 const InfluencerDashboard = lazy(() => import("./pages/InfluencerDashboard"));
 const OnlineUsers = lazy(() => import("./pages/OnlineUsers"));
@@ -75,7 +75,7 @@ const DashboardMedico = lazy(() => import("./pages/DashboardMedico"));
 const DashboardExecutivo = lazy(() => import("./pages/DashboardExecutivo"));
 const Notificacoes = lazy(() => import("./pages/Notificacoes"));
 const SalaEspera = lazy(() => import("./pages/SalaEspera"));
-const Orientação TécnicaVideo = lazy(() => import("./pages/Orientação TécnicaVideo"));
+const ConsultaVideo = lazy(() => import("./pages/ConsultaVideo"));
 const RIPD = lazy(() => import("./pages/RIPD"));
 const LGPDDireitos = lazy(() => import("./pages/LGPDDireitos"));
 const GlobalCompliance = lazy(() => import("./pages/GlobalCompliance"));
@@ -86,7 +86,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const ShoppingDashboard = lazy(() => import("./pages/ShoppingDashboard"));
 const InvestorDashboard = lazy(() => import("./pages/InvestorDashboard"));
 const VideoCall = lazy(() => import("./pages/VideoCall"));
-const Orientação TécnicaRapida = lazy(() => import("./pages/Orientação TécnicaRapida"));
+const ConsultaRapida = lazy(() => import("./pages/ConsultaRapida"));
 const SEOCondicoes = lazy(() => import("./pages/SEOCondicoes"));
 const TratamentoDorCronica = lazy(() => import("./pages/TratamentoDorCronica"));
 const TratamentoAnsiedadeSaudeMental = lazy(() => import("./pages/TratamentoAnsiedadeSaudeMental"));
@@ -179,7 +179,7 @@ const App = () => (
                 <Route path="/termos" element={<TermosDeUso />} />
                 <Route path="/privacidade" element={<PoliticaDePrivacidade />} />
                 <Route path="/reembolso" element={<PoliticaDeReembolso />} />
-                <Route path="/pagamento" element={<Orientação TécnicationPayment />} />
+                <Route path="/pagamento" element={<ConsultationPayment />} />
                 <Route path="/dashboard-especialista" element={<SpecialistDashboard />} />
                 <Route path="/influenciadores" element={<InfluencerDashboard />} />
                 <Route path="/usuarios-online" element={<OnlineUsers />} />
@@ -198,7 +198,7 @@ const App = () => (
                 <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />
                 <Route path="/notificacoes" element={<Notificacoes />} />
                 <Route path="/sala-espera" element={<SalaEspera />} />
-                <Route path="/orientação técnica-video" element={<Orientação TécnicaVideo />} />
+                <Route path="/consulta-video" element={<ConsultaVideo />} />
                 <Route path="/ripd" element={<RIPD />} />
                 <Route path="/lgpd" element={<LGPDDireitos />} />
                 <Route path="/meus-dados" element={<LGPDDireitos />} />
@@ -213,7 +213,7 @@ const App = () => (
                 <Route path="/dashboard-loja" element={<ShoppingDashboard />} />
                 <Route path="/investidores" element={<InvestorDashboard />} />
                 <Route path="/videochamada" element={<VideoCall />} />
-                <Route path="/orientação técnica-rapida" element={<Orientação TécnicaRapida />} />
+                <Route path="/consulta-rapida" element={<ConsultaRapida />} />
                 <Route path="/tratamento-dor-cronica" element={<TratamentoDorCronica />} />
                 <Route path="/tratamento-ansiedade-saude-mental" element={<TratamentoAnsiedadeSaudeMental />} />
                 <Route path="/tratamentos" element={<SEOCondicoes />} />

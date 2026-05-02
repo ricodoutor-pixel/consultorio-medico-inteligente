@@ -58,7 +58,7 @@ export const RodizioMedicos = () => {
             Conectando com o Próximo Especialista Disponível
           </h1>
           <p className="text-muted-foreground mb-12">
-            Nosso sistema de rodízio garante que você seja atendido pelo médico com maior disponibilidade imediata para sua **Orientação Técnica**.
+            Nosso sistema de rodízio garante que você seja atendido pelo médico com maior disponibilidade imediata para sua **Consulta**.
           </p>
 
           <AnimatePresence mode="wait">

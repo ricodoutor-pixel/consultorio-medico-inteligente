@@ -23,7 +23,7 @@ const AdminDashboard = () => {
     onlineDoctors: 0,
     pendingBTC: 0,
     platformFees: 0,
-    completedOrientação Técnications: 0,
+    completedConsultations: 0,
   });
   const [recentAppointments, setRecentAppointments] = useState<any[]>([]);
   const [doctorStatus, setDoctorStatus] = useState<{ name: string; value: number; color: string }[]>([]);
@@ -64,12 +64,12 @@ const AdminDashboard = () => {
         .filter(a => a.payment_status === "paid")
         .reduce((sum, a) => sum + Number(a.amount || 0), 0);
 
-      const completedOrientação Técnications = (appointments || []).filter(a => a.status === "completed").length;
+      const completedConsultations = (appointments || []).filter(a => a.status === "completed").length;
       const platformFees = totalRevenue * 0.07; // 7% platform fee
 
       const onlineDocs = (doctors || []).filter(d => d.is_online).length;
       const verifiedDocs = (doctors || []).filter(d => d.is_verified).length;
-      const inOrientação Técnication = (appointments || []).filter(a => a.status === "in_progress").length;
+      const inConsultation = (appointments || []).filter(a => a.status === "in_progress").length;
 
       setStats({
         totalRevenue,
@@ -79,13 +79,13 @@ const AdminDashboard = () => {
         onlineDoctors: onlineDocs,
         pendingBTC: (btcPending || []).length,
         platformFees,
-        completedOrientação Técnications,
+        completedConsultations,
       });
 
       setDoctorStatus([
         { name: "Online", value: onlineDocs, color: "#22c55e" },
-        { name: "Offline", value: Math.max(0, verifiedDocs - onlineDocs - inOrientação Técnication), color: "#ef4444" },
-        { name: "Em Orientação Técnica", value: inOrientação Técnication, color: "#f59e0b" },
+        { name: "Offline", value: Math.max(0, verifiedDocs - onlineDocs - inConsultation), color: "#ef4444" },
+        { name: "Em Consulta", value: inConsultation, color: "#f59e0b" },
       ]);
 
       // Recent appointments
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
         monthly.push({
           name: d.toLocaleString("pt-BR", { month: "short" }),
           receita: monthAppts.reduce((s, a) => s + Number(a.amount || 0), 0),
-          orientação técnicas: monthAppts.length,
+          consultas: monthAppts.length,
         });
       }
       setMonthlyData(monthly);
@@ -177,8 +177,8 @@ const AdminDashboard = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: "Orientação Técnicas Totais", value: stats.totalAppointments, icon: Stethoscope },
-              { label: "Concluídas", value: stats.completedOrientação Técnications, icon: Shield },
+              { label: "Consultas Totais", value: stats.totalAppointments, icon: Stethoscope },
+              { label: "Concluídas", value: stats.completedConsultations, icon: Shield },
               { label: "BTC Pendentes", value: stats.pendingBTC, icon: Zap },
               { label: "IA Triagens", value: "Ativo", icon: Brain },
             ].map((s) => (
@@ -198,7 +198,7 @@ const AdminDashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-2 border-border bg-card/50 backdrop-blur">
               <CardHeader>
-                <CardTitle className="text-xs font-black uppercase tracking-widest text-muted-foreground">Faturamento & Orientação Técnicas (6 meses)</CardTitle>
+                <CardTitle className="text-xs font-black uppercase tracking-widest text-muted-foreground">Faturamento & Consultas (6 meses)</CardTitle>
               </CardHeader>
               <CardContent className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -210,7 +210,7 @@ const AdminDashboard = () => {
                       contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
                     />
                     <Line type="monotone" dataKey="receita" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 5 }} />
-                    <Line type="monotone" dataKey="orientação técnicas" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="consultas" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -246,11 +246,11 @@ const AdminDashboard = () => {
           {/* Recent Appointments */}
           <Card className="border-border bg-card/50 backdrop-blur">
             <CardHeader>
-              <CardTitle className="text-xs font-black uppercase tracking-widest text-muted-foreground">Orientação Técnicas Recentes</CardTitle>
+              <CardTitle className="text-xs font-black uppercase tracking-widest text-muted-foreground">Consultas Recentes</CardTitle>
             </CardHeader>
             <CardContent>
               {recentAppointments.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">Nenhuma orientação técnica registrada ainda.</p>
+                <p className="text-sm text-muted-foreground text-center py-8">Nenhuma consulta registrada ainda.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">

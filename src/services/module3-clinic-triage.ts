@@ -48,7 +48,7 @@ interface DoctorOnDuty {
 const TRIAGE_QUESTIONS = [
   {
     id: 1,
-    question: 'Qual é o seu principal sintoma ou motivo da orientação técnica?',
+    question: 'Qual é o seu principal sintoma ou motivo da consulta?',
     type: 'text',
   },
   {
@@ -199,7 +199,7 @@ export async function processTriageOmega(
  * 🟡 FUNÇÃO: Transbordo Automático (5 minutos inatividade)
  */
 export async function handleAutomaticTransfer(
-  orientação técnicationId: string,
+  consultationId: string,
   patientId: string,
   currentDoctorId: string,
   specialty: string,
@@ -207,13 +207,13 @@ export async function handleAutomaticTransfer(
 ): Promise<void> {
   try {
     // 1. Verificar inatividade (5 minutos)
-    const { data: orientação técnication } = await supabase
-      .from('orientação técnications')
+    const { data: consultation } = await supabase
+      .from('consultations')
       .select('last_activity_at')
-      .eq('id', orientação técnicationId)
+      .eq('id', consultationId)
       .single();
 
-    const lastActivity = new Date(orientação técnication.last_activity_at);
+    const lastActivity = new Date(consultation.last_activity_at);
     const inactivityMinutes =
       (Date.now() - lastActivity.getTime()) / (1000 * 60);
 
@@ -235,18 +235,18 @@ export async function handleAutomaticTransfer(
     }
 
     // 3. Transferir sala Jitsi
-    const jitsiRoomId = `orientação técnication-${orientação técnicationId}`;
+    const jitsiRoomId = `consultation-${consultationId}`;
     await transferJitsiRoom(jitsiRoomId, currentDoctorId, nextDoctor.id);
 
     // 4. Atualizar banco de dados
     await supabase
-      .from('orientação técnications')
+      .from('consultations')
       .update({
         doctor_id: nextDoctor.id,
         transferred_at: new Date().toISOString(),
-        transfer_count: orientação técnication.transfer_count + 1,
+        transfer_count: consultation.transfer_count + 1,
       })
-      .eq('id', orientação técnicationId);
+      .eq('id', consultationId);
 
     // 5. Notificar paciente via WhatsApp
     await sendWhatsAppMessage({

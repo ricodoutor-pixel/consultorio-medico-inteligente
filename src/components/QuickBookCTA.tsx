@@ -21,7 +21,7 @@ export function QuickBookCTA({ variant = "inline", className = "" }: QuickBookCT
             <Zap className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="font-bold text-sm">Orientação Técnica Express</p>
+            <p className="font-bold text-sm">Consulta Express</p>
             <p className="text-xs text-muted-foreground">Agende em 2 cliques • A partir de R$30</p>
           </div>
         </div>
@@ -48,7 +48,7 @@ export function QuickBookCTA({ variant = "inline", className = "" }: QuickBookCT
             className="bg-primary hover:bg-primary/90 rounded-full gap-2 font-bold shadow-2xl shadow-primary/40 px-6"
           >
             <Calendar className="w-5 h-5" />
-            Orientação Técnicar R$30
+            Consultar R$30
           </Button>
         </Link>
       </motion.div>
@@ -59,7 +59,7 @@ export function QuickBookCTA({ variant = "inline", className = "" }: QuickBookCT
     <Link to="/falar-com-especialista" className={className}>
       <Button className="bg-primary hover:bg-primary/90 gap-2 font-bold w-full">
         <Calendar className="w-4 h-4" />
-        Agendar Orientação Técnica
+        Agendar Consulta
       </Button>
     </Link>
   );

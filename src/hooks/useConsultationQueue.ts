@@ -1,5 +1,5 @@
 /**
- * useOrientação TécnicationQueue — Realtime hook for Uber-style doctor matching
+ * useConsultationQueue — Realtime hook for Uber-style doctor matching
  */
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,7 +19,7 @@ interface QueueEntry {
   matched_at: string | null;
 }
 
-export function useOrientação TécnicationQueue(userType: "patient" | "doctor") {
+export function useConsultationQueue(userType: "patient" | "doctor") {
   const [queue, setQueue] = useState<QueueEntry[]>([]);
   const [myEntry, setMyEntry] = useState<QueueEntry | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,7 +29,7 @@ export function useOrientação TécnicationQueue(userType: "patient" | "doctor"
   useEffect(() => {
     const fetchQueue = async () => {
       const { data } = await supabase
-        .from("orientação técnication_queue")
+        .from("consultation_queue")
         .select("*")
         .in("status", ["waiting", "matched"])
         .order("created_at", { ascending: true });
@@ -46,13 +46,13 @@ export function useOrientação TécnicationQueue(userType: "patient" | "doctor"
       const uid = data.user?.id;
       if (!uid) return;
       const name = userType === "doctor"
-        ? doctorChannel(uid, "orientação técnication-queue-live")
-        : userChannel(uid, "orientação técnication-queue-live");
+        ? doctorChannel(uid, "consultation-queue-live")
+        : userChannel(uid, "consultation-queue-live");
       channel = supabase
         .channel(name)
         .on(
           "postgres_changes",
-          { event: "*", schema: "public", table: "orientação técnication_queue" },
+          { event: "*", schema: "public", table: "consultation_queue" },
           (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const newRecord = payload.new as QueueEntry;
           const oldRecord = payload.old as QueueEntry;
@@ -60,12 +60,12 @@ export function useOrientação TécnicationQueue(userType: "patient" | "doctor"
           if (payload.eventType === "INSERT") {
             setQueue(prev => [...prev, newRecord]);
             if (userType === "doctor") {
-              toast({ title: "🔔 Novo paciente na fila!", description: "Aceite a orientação técnica agora." });
+              toast({ title: "🔔 Novo paciente na fila!", description: "Aceite a consulta agora." });
             }
           } else if (payload.eventType === "UPDATE") {
             setQueue(prev => prev.map(e => e.id === newRecord.id ? newRecord : e));
             if (newRecord.status === "matched" && userType === "patient" && myEntry?.id === newRecord.id) {
-              toast({ title: "🎉 Médico encontrado!", description: "Sua orientação técnica vai começar." });
+              toast({ title: "🎉 Médico encontrado!", description: "Sua consulta vai começar." });
               setMyEntry(newRecord);
             }
           } else if (payload.eventType === "DELETE") {
@@ -120,7 +120,7 @@ export function useOrientação TécnicationQueue(userType: "patient" | "doctor"
       });
 
       if (error) throw error;
-      toast({ title: "Orientação Técnica aceita!", description: "Entrando na sala..." });
+      toast({ title: "Consulta aceita!", description: "Entrando na sala..." });
       return data;
     } catch (err) {
       toast({ title: "Erro", description: String(err), variant: "destructive" });

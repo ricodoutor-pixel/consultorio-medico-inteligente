@@ -15,9 +15,9 @@ const tooltipStyle = { background: "hsl(240 15% 7%)", border: "1px solid hsl(240
 const COLORS = ["hsl(152 80% 45%)", "hsl(270 60% 60%)", "hsl(45 76% 52%)", "hsl(350 80% 55%)"];
 
 const revenueData = [
-  { month: "Jan", receita: 45000, orientação técnicas: 320 }, { month: "Fev", receita: 62000, orientação técnicas: 440 },
-  { month: "Mar", receita: 78000, orientação técnicas: 580 }, { month: "Abr", receita: 95000, orientação técnicas: 710 },
-  { month: "Mai", receita: 115000, orientação técnicas: 850 }, { month: "Jun", receita: 142000, orientação técnicas: 1020 },
+  { month: "Jan", receita: 45000, consultas: 320 }, { month: "Fev", receita: 62000, consultas: 440 },
+  { month: "Mar", receita: 78000, consultas: 580 }, { month: "Abr", receita: 95000, consultas: 710 },
+  { month: "Mai", receita: 115000, consultas: 850 }, { month: "Jun", receita: 142000, consultas: 1020 },
 ];
 
 const channelData = [
@@ -27,7 +27,7 @@ const channelData = [
 
 const conversionData = [
   { step: "Visita", value: 10000 }, { step: "Cadastro", value: 3500 },
-  { step: "Triagem", value: 2100 }, { step: "Orientação Técnica", value: 1200 },
+  { step: "Triagem", value: 2100 }, { step: "Consulta", value: 1200 },
   { step: "Recorrente", value: 480 },
 ];
 
@@ -58,7 +58,7 @@ const DashboardExecutivo = () => {
   const kpis = [
     { icon: Users, label: "Pacientes", value: counts.patients.toLocaleString(), change: "+24%", color: "text-primary" },
     { icon: Stethoscope, label: "Médicos", value: String(counts.doctors), change: "+12%", color: "text-secondary" },
-    { icon: FileText, label: "Orientação Técnicas", value: counts.appointments.toLocaleString(), change: "+38%", color: "text-[hsl(var(--gold))]" },
+    { icon: FileText, label: "Consultas", value: counts.appointments.toLocaleString(), change: "+38%", color: "text-[hsl(var(--gold))]" },
     { icon: DollarSign, label: "Receita (mês)", value: "R$ 142K", change: "+23%", color: "text-primary" },
   ];
 

@@ -167,7 +167,7 @@ export class MercadoPagoClubService {
   }
 
   /**
-   * Orientação Técnicar status de pagamento
+   * Consultar status de pagamento
    */
   async getPaymentStatus(paymentId: string): Promise<MercadoPagoPayment> {
     try {
@@ -179,7 +179,7 @@ export class MercadoPagoClubService {
 
       return response.data;
     } catch (error) {
-      console.error('❌ Erro ao orientação técnicar pagamento:', error);
+      console.error('❌ Erro ao consultar pagamento:', error);
       throw error;
     }
   }
@@ -319,7 +319,7 @@ export class MercadoPagoClubService {
     try {
       // Generating financial report
 
-      // Orientação Técnicar pagamentos aprovados
+      // Consultar pagamentos aprovados
       const response = await axios.get(`${this.apiUrl}/payments/search`, {
         params: {
           range: 'date_created',

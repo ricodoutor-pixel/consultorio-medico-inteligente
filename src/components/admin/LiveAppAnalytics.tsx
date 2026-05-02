@@ -35,7 +35,7 @@ export function LiveAppAnalytics() {
         supabase.from("app_downloads").select("id", { count: "exact", head: true }),
         supabase.from("app_downloads").select("id", { count: "exact", head: true }).gte("created_at", todayStart),
         supabase.from("app_downloads").select("id", { count: "exact", head: true }).gte("created_at", weekStart),
-// ManyChat removed
+        supabase.from("app_downloads").select("id, platform, source, created_at")
           .order("created_at", { ascending: false }).limit(10),
       ]);
 
@@ -120,11 +120,9 @@ export function LiveAppAnalytics() {
                 >
                   <Smartphone size={12} className="text-primary shrink-0" />
                   <span className="font-medium text-foreground truncate">
-// ManyChat removed
+                    {/* ManyChat user-name removed */}
+                    Download
                   </span>
-// ManyChat removed
-// ManyChat removed
-                  )}
                   <span className="ml-auto shrink-0">
                     {d.platform || "—"} · {d.source || "direto"}
                   </span>

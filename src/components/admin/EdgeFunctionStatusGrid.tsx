@@ -16,22 +16,16 @@ const FUNCTIONS: FunctionStatus[] = [
   { name: "publish-to-instagram", displayName: "Publish to Instagram", description: "Feed, Carrossel e Stories no IG" },
   { name: "social-analytics", displayName: "Social Analytics", description: "Relatórios FB + IG + interno" },
   { name: "visitor-tracking", displayName: "Visitor Tracking", description: "UTM, exit intent, page views" },
-// ManyChat removed
+  // ManyChat removed
   { name: "send-meta-capi", displayName: "Meta CAPI", description: "Conversion API Server-Side + Smart Bidding" },
 ];
 
 export function EdgeFunctionStatusGrid() {
-  const { data: healthData, isLoading: healthLoading, refetch: refetchHealth } = useQuery({
-// ManyChat removed
-    queryFn: async () => {
-// ManyChat removed
-        body: { action: "health" },
-      });
-      if (error) throw error;
-      return data;
-    },
-    refetchInterval: 30000,
-  });
+  // ManyChat health-check removido. Mantemos a forma do hook para preservar a API
+  // local (`healthData`, `healthLoading`, `refetchHealth`) sem fazer chamadas.
+  const healthData: { status?: string; automations?: Record<string, number> } | undefined = undefined;
+  const healthLoading = false;
+  const refetchHealth = async () => {};
 
   const { data: fbTest, isLoading: fbLoading } = useQuery({
     queryKey: ["fb-status"],
@@ -82,9 +76,9 @@ export function EdgeFunctionStatusGrid() {
   });
 
   const getStatus = (fnName: string) => {
-// ManyChat removed
-      if (healthLoading) return "loading";
-// ManyChat removed
+    // ManyChat status block removed
+    if (healthLoading) {
+      // no-op: kept for parity with previous loading state
     }
     if (fnName === "social-analytics" || fnName === "publish-to-facebook") {
       if (fbLoading) return "loading";
@@ -152,7 +146,7 @@ export function EdgeFunctionStatusGrid() {
               <CardHeader className="p-3 pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full shrink-0 ${status === "online" ? "bg-emerald-400 animate-pulse" : status === "error" ? "bg-red-400" : status === "blocked" ? "bg-amber-400" : "bg-slate-500"}`} />
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${status === "online" ? "bg-emerald-400 animate-pulse" : status === "blocked" ? "bg-amber-400" : "bg-slate-500"}`} />
                     <CardTitle className="text-xs font-medium text-slate-200 leading-tight">{fn.displayName}</CardTitle>
                   </div>
                 </div>

@@ -115,18 +115,7 @@ export const LeadCaptureModal = ({
 
       if (dbError) throw new Error(dbError.message);
 
-      // Best-effort fire-and-forget sync to webhook (does not block UX)
-      fetch(WEBHOOK_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
-          subscriber: { name: nome.trim(), phone: phoneDigits, email: email.trim() || undefined },
-          data: { origem, tags: allTags, categoria, idioma },
-        }),
-      }).catch(() => {});
+      // ManyChat webhook removed — lead is persisted via Supabase only.
 
       localStorage.setItem("pr_lead_name", nome.trim());
       localStorage.setItem("pr_lead_phone", phoneDigits);

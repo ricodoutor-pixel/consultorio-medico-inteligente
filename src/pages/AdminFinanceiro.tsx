@@ -127,7 +127,7 @@ export default function AdminFinanceiro() {
 
         {/* Secondary metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <MetricCard label="Orientação Técnicas" value={orientação técnications} icon={<BarChart3 size={16} className="text-primary" />} />
+          <MetricCard label="Consultas" value={orientação técnications} icon={<BarChart3 size={16} className="text-primary" />} />
           <MetricCard label="Pedidos Marketplace" value={orders} icon={<ArrowUpRight size={16} className="text-primary" />} />
           <MetricCard label="Pagamentos Aprovados" value={approvedPayments} icon={<TrendingUp size={16} className="text-emerald-400" />} />
           <MetricCard label="Pagamentos Pendentes" value={pendingPayments} icon={<AlertTriangle size={16} className="text-amber-400" />} />

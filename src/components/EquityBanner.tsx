@@ -35,13 +35,13 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
                <span className="font-bold">milhões de pessoas que mudaram a sua qualidade de vida!</span>
              </p>
 
-            {/* CTAs Mobile Only - Iniciar Orientação Técnica + Abrir Shopping */}
+            {/* CTAs Mobile Only - Iniciar Consulta + Abrir Shopping */}
             <div className="flex flex-col gap-3 mt-4 md:hidden">
               <Link
                 to="/profissionais"
                 className="flex items-center justify-center gap-2 px-6 py-4 bg-primary text-primary-foreground font-black rounded-2xl shadow-lg shadow-primary/20 text-base transition-all hover:scale-105 active:scale-95"
               >
-                🎯 Iniciar Orientação Técnica <ArrowRight size={20} />
+                🎯 Iniciar Consulta <ArrowRight size={20} />
               </Link>
               <Link
                 to="/shopping"
@@ -70,7 +70,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
                 rel="noopener noreferrer"
                 className="flex-1 md:flex-none px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition text-center"
               >
-                Agendar Orientação Técnica Agora
+                Agendar Consulta Agora
               </a>
             </div>
 
@@ -90,7 +90,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
                </div>
                <div className="text-center">
                  <div className="text-xl md:text-3xl font-bold text-green-600">R$30</div>
-                 <div className="text-[10px] md:text-sm text-gray-600">Primeira Orientação Técnica</div>
+                 <div className="text-[10px] md:text-sm text-gray-600">Primeira Consulta</div>
                </div>
              </div>
           </div>

@@ -203,7 +203,7 @@ const Badges: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-muted-foreground">
               <div className="flex items-start gap-2">
                 <Users className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
-                <div><strong className="text-foreground">Orientação Técnicas</strong>: Realize orientação técnicas com pacientes para desbloquear badges de atendimento.</div>
+                <div><strong className="text-foreground">Consultas</strong>: Realize orientação técnicas com pacientes para desbloquear badges de atendimento.</div>
               </div>
               <div className="flex items-start gap-2">
                 <Star className="h-4 w-4 text-yellow-500 shrink-0 mt-0.5" />

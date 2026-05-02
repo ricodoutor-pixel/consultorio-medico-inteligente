@@ -69,7 +69,7 @@ const testimonialData = [
 
 const Index = () => {
   useEffect(() => {
-    document.title = "Planta y Raiz - Telemedicina Cannabis Medicinal | Orientação Técnicas a partir de R$30";
+    document.title = "Planta y Raiz - Telemedicina Cannabis Medicinal | Consultas a partir de R$30";
     // ManyChat widget (ID 11227069) é injetado centralizadamente via <ManyChatWidget /> após consentimento LGPD.
   }, []);
 
@@ -207,7 +207,7 @@ const Index = () => {
           <div className="flex justify-center">
             <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
               <Link to="/profissionais">
-                🎯 Iniciar Orientação Técnica <ArrowRight size={18} className="ml-2" />
+                🎯 Iniciar Consulta <ArrowRight size={18} className="ml-2" />
               </Link>
             </Button>
           </div>

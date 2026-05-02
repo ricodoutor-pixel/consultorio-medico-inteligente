@@ -50,7 +50,7 @@ const RevenueDistribution = () => {
   };
 
   const distributionData = [
-    { name: "Orientação Técnicas (50%)", value: 50 },
+    { name: "Consultas (50%)", value: 50 },
     { name: "Horas Online (30%)", value: 30 },
     { name: "Avaliação (20%)", value: 20 },
   ];
@@ -105,7 +105,7 @@ const RevenueDistribution = () => {
                         <TrendingUp size={18} className="text-primary" /> Fórmula de Cálculo
                       </h3>
                       <div className="bg-muted/20 rounded-xl p-4 border border-border mb-4 font-mono text-sm text-muted-foreground">
-                        <p className="text-amber-400 font-bold mb-2">Peso = (Orientação Técnicas × 0.5) + (HorasOnline × 0.3) + (Avaliação × 0.2)</p>
+                        <p className="text-amber-400 font-bold mb-2">Peso = (Consultas × 0.5) + (HorasOnline × 0.3) + (Avaliação × 0.2)</p>
                         <p className="text-primary">PesoFinal = Peso × Multiplicador do Plano</p>
                       </div>
                       <ResponsiveContainer width="100%" height={180}>

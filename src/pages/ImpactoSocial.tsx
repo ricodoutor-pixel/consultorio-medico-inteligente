@@ -9,7 +9,7 @@ import { Heart, Users, MapPin, Stethoscope, BookOpen, DollarSign, TrendingUp, Gl
 const metrics = [
   { icon: Users, label: "Pacientes Atendidos", value: "12.450", growth: "+23%", color: "text-primary" },
   { icon: Stethoscope, label: "Médicos na Plataforma", value: "185", growth: "+15%", color: "text-blue-400" },
-  { icon: Heart, label: "Orientação Técnicas Voluntárias", value: "1.230", growth: "+40%", color: "text-pink-400" },
+  { icon: Heart, label: "Consultas Voluntárias", value: "1.230", growth: "+40%", color: "text-pink-400" },
   { icon: MapPin, label: "Cidades Alcançadas", value: "340", growth: "+18%", color: "text-yellow-400" },
   { icon: BookOpen, label: "Artigos Publicados", value: "520", growth: "+12%", color: "text-purple-400" },
   { icon: DollarSign, label: "Economia ao Paciente", value: "R$ 2.8M", growth: "+30%", color: "text-green-400" },

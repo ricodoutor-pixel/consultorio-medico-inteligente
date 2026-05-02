@@ -387,7 +387,7 @@ const BibliotecaCientifica = () => {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <Link to="/profissionais">
-                          Orientação Técnicar Especialista <ArrowRight size={10} className="ml-1" />
+                          Consultar Especialista <ArrowRight size={10} className="ml-1" />
                         </Link>
                       </Button>
                     </CardContent>
@@ -625,7 +625,7 @@ const BibliotecaCientifica = () => {
               {/* CTA */}
               <Button className="w-full bg-primary text-primary-foreground font-black rounded-xl" asChild>
                 <Link to="/profissionais">
-                  Orientação Técnicar Especialista <ArrowRight size={16} className="ml-2" />
+                  Consultar Especialista <ArrowRight size={16} className="ml-2" />
                 </Link>
               </Button>
 

@@ -20,7 +20,7 @@ interface BIMetrics {
   totalRevenue: number;
   totalPatients: number;
   totalDoctors: number;
-  totalOrientação Técnications: number;
+  totalConsultations: number;
   avgTicket: number;
   triageConversion: number;
   cac: number;
@@ -60,10 +60,10 @@ const AdminBI = () => {
     const appointments = appointmentsRes.data || [];
     const totalRevenue = appointments.reduce((s, a) => s + Number(a.amount || 0), 0);
     const paidAppointments = appointments.filter(a => a.payment_status === "paid" || a.payment_status === "approved");
-    const totalOrientação Técnications = appointments.length;
+    const totalConsultations = appointments.length;
     const totalPatients = patientsRes.count || 0;
     const totalDoctors = doctorsRes.count || 0;
-    const avgTicket = totalOrientação Técnications > 0 ? totalRevenue / totalOrientação Técnications : 0;
+    const avgTicket = totalConsultations > 0 ? totalRevenue / totalConsultations : 0;
 
     const totalTriages = triagesRes.count || 0;
     const completedTriages = (triagesRes.data || []).filter(t => t.status === "completed").length;
@@ -91,7 +91,7 @@ const AdminBI = () => {
 
     setMetrics({
       totalRevenue: totalRevenue + monthlyEscrow,
-      totalPatients, totalDoctors, totalOrientação Técnications,
+      totalPatients, totalDoctors, totalConsultations,
       avgTicket, triageConversion, cac, ltv,
       churnRate: Math.min(churnRate, 15),
       mrr, dailySales,
@@ -115,7 +115,7 @@ const AdminBI = () => {
     setConversionData([
       { name: "Visitantes", value: totalPatients * 8 },
       { name: "Triagem", value: totalTriages },
-      { name: "Orientação Técnica Paga", value: paidAppointments.length },
+      { name: "Consulta Paga", value: paidAppointments.length },
       { name: "Assinantes", value: activeSubs.length },
     ]);
 
@@ -154,7 +154,7 @@ const AdminBI = () => {
             {[
               { icon: DollarSign, label: "MRR (Recorrente)", value: formatBRL((metrics as any).mrr || 0), color: "text-emerald-400" },
               { icon: TrendingUp, label: "Vendas Hoje", value: formatBRL((metrics as any).dailySales || 0), color: "text-blue-400" },
-              { icon: Activity, label: "Orientação Técnicas", value: metrics.totalOrientação Técnications.toString(), color: "text-purple-400" },
+              { icon: Activity, label: "Consultas", value: metrics.totalConsultations.toString(), color: "text-purple-400" },
               { icon: Percent, label: "Conversão Triagem→Pago", value: `${metrics.triageConversion.toFixed(1)}%`, color: "text-amber-400" },
             ].map(({ icon: Icon, label, value, color }, i) => (
               <Card key={i} className="p-4 bg-card/80 border-border/50">

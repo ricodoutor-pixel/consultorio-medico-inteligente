@@ -13,7 +13,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 
 describe("🔍 SIMULAÇÃO DE NAVEGAÇÃO E UX", () => {
   describe("Teste de Entrada - Home Page", () => {
-    it("deve exibir texto de Equidade (Orientação Técnicas R$30)", () => {
+    it("deve exibir texto de Equidade (Consultas R$30)", () => {
       const equityText = "orientação técnicas com especialistas por apenas R$30";
       expect(equityText).toContain("R$30");
       expect(equityText).toContain("especialistas");

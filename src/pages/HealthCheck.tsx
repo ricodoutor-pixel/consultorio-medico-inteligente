@@ -122,7 +122,7 @@ export default function HealthCheck() {
               <CardContent className="p-4 flex items-center gap-3">
                 <Calendar className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Orientação Técnicas Hoje</p>
+                  <p className="text-xs text-muted-foreground">Consultas Hoje</p>
                   <p className="text-lg font-bold">{health.checks.automations.today_appointments}</p>
                 </div>
               </CardContent>

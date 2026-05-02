@@ -127,7 +127,7 @@ const DashboardPaciente = () => {
         body: {
           appointmentId,
           patientEmail: session?.session?.user?.email || "",
-          description: "Orientação Técnica Planta y Raiz — Pagamento Pendente",
+          description: "Consulta Planta y Raiz — Pagamento Pendente",
         },
       });
       if (error || !data?.init_point) {
@@ -199,7 +199,7 @@ const DashboardPaciente = () => {
                 <LogOut size={14} className="mr-1" /> Sair
               </Button>
               <Button size="sm" className="rounded-xl text-xs bg-primary text-primary-foreground" asChild>
-                <Link to="/telemedicina"><Stethoscope size={14} className="mr-1" /> Nova Orientação Técnica</Link>
+                <Link to="/telemedicina"><Stethoscope size={14} className="mr-1" /> Nova Consulta</Link>
               </Button>
             </div>
           </motion.div>
@@ -222,7 +222,7 @@ const DashboardPaciente = () => {
           {/* Stats */}
           <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8" initial="hidden" animate="visible" variants={stagger}>
             {[
-              { label: "Orientação Técnicas", value: String(appointments.length), icon: Stethoscope, color: "primary" },
+              { label: "Consultas", value: String(appointments.length), icon: Stethoscope, color: "primary" },
               { label: "Confirmadas", value: String(upcomingAppts.length), icon: Calendar, color: "gold" },
               { label: "Concluídas", value: String(completedAppts.length), icon: CheckCircle2, color: "secondary" },
               { label: "Total Gasto", value: `R$ ${totalSpent.toFixed(0)}`, icon: Star, color: "primary" },
@@ -277,7 +277,7 @@ const DashboardPaciente = () => {
                         <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-card border border-border">
                           <div>
                             <p className="text-sm font-bold text-foreground">
-                              Orientação Técnica {a.type === "video" ? "Vídeo" : a.type === "chat" ? "Chat" : "Telefone"}
+                              Consulta {a.type === "video" ? "Vídeo" : a.type === "chat" ? "Chat" : "Telefone"}
                             </p>
                             <p className="text-xs text-muted-foreground">
                               R$ {Number(a.amount || 0).toFixed(2)} • {new Date(a.scheduled_at).toLocaleDateString("pt-BR")}
@@ -307,12 +307,12 @@ const DashboardPaciente = () => {
                   <Card className="border-green/20 bg-gradient-green">
                     <CardContent className="p-5">
                       <h3 className="font-display font-black text-foreground text-sm mb-3 flex items-center gap-2">
-                        <Calendar size={14} className="text-primary" /> Próximas Orientação Técnicas
+                        <Calendar size={14} className="text-primary" /> Próximas Consultas
                       </h3>
                       {upcomingAppts.map(a => (
                         <div key={a.id} className="flex items-center justify-between p-3 rounded-xl bg-card border border-border mb-2">
                           <div>
-                            <p className="font-bold text-sm text-foreground">Orientação Técnica {a.type}</p>
+                            <p className="font-bold text-sm text-foreground">Consulta {a.type}</p>
                             <p className="text-xs text-muted-foreground">
                               {new Date(a.scheduled_at).toLocaleDateString("pt-BR")} às {new Date(a.scheduled_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                             </p>
@@ -327,14 +327,14 @@ const DashboardPaciente = () => {
                 <Card className="border-border">
                   <CardContent className="p-5">
                     <h3 className="font-display font-black text-foreground text-sm mb-4 flex items-center gap-2">
-                      <Clock size={14} className="text-muted-foreground" /> Histórico de Orientação Técnicas
+                      <Clock size={14} className="text-muted-foreground" /> Histórico de Consultas
                     </h3>
                     {appointments.length === 0 ? (
                       <div className="text-center py-8">
                         <Stethoscope size={32} className="text-muted-foreground mx-auto mb-3" />
                         <p className="text-sm text-muted-foreground">Nenhuma orientação técnica ainda.</p>
                         <Button size="sm" className="mt-3 rounded-xl bg-primary text-primary-foreground" asChild>
-                          <Link to="/telemedicina">Agendar Primeira Orientação Técnica</Link>
+                          <Link to="/telemedicina">Agendar Primeira Consulta</Link>
                         </Button>
                       </div>
                     ) : (
@@ -344,7 +344,7 @@ const DashboardPaciente = () => {
                             <div className="flex items-center gap-3">
                               <CheckCircle2 size={16} className={a.status === "completed" ? "text-primary" : "text-muted-foreground"} />
                               <div>
-                                <p className="text-sm font-bold text-foreground">Orientação Técnica {a.type}</p>
+                                <p className="text-sm font-bold text-foreground">Consulta {a.type}</p>
                                 <p className="text-xs text-muted-foreground">{new Date(a.scheduled_at).toLocaleDateString("pt-BR")}</p>
                               </div>
                             </div>
@@ -440,7 +440,7 @@ const DashboardPaciente = () => {
                     <p className="text-sm text-muted-foreground">Nenhuma receita encontrada.</p>
                     <p className="text-xs text-muted-foreground mt-1">Após sua primeira orientação técnica, suas prescrições aparecerão aqui.</p>
                     <Button size="sm" className="mt-4 rounded-xl bg-primary text-primary-foreground" asChild>
-                      <Link to="/telemedicina">Agendar Orientação Técnica</Link>
+                      <Link to="/telemedicina">Agendar Consulta</Link>
                     </Button>
                   </CardContent>
                 </Card>

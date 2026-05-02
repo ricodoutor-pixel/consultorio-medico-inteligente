@@ -27,7 +27,7 @@ const translations: Record<Locale, Record<string, string>> = {
     // Hero
     "hero.title": "Planta y Raiz - Mega Clínica Digital",
     "hero.subtitle": "Democratizando o acesso à saúde e bem-estar através da tecnologia e cannabis medicinal.",
-    "hero.start_orientação técnication": "Iniciar Orientação Técnica",
+    "hero.start_orientação técnication": "Iniciar Consulta",
     "hero.online_now": "Online agora",
     "hero.responsible_tech": "Supervisionado por IA de última geração 24×7",
     // Common
@@ -42,7 +42,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "common.next": "Próximo",
     "common.yes": "Sim",
     "common.no": "Não",
-    // Orientação Técnication
+    // Consultation
     "consult.title": "Teleorientação técnica",
     "consult.mute": "Mutar",
     "consult.unmute": "Desmutar",
@@ -104,7 +104,7 @@ const translations: Record<Locale, Record<string, string>> = {
     // Hero
     "hero.title": "Planta y Raiz - Mega Digital Clinic",
     "hero.subtitle": "Democratizing access to health and well-being through technology and medical cannabis.",
-    "hero.start_orientação técnication": "Start Orientação Técnication",
+    "hero.start_orientação técnication": "Start Consultation",
     "hero.online_now": "Online now",
     "hero.responsible_tech": "Technical and Legal Director",
     "common.save": "Save",
@@ -125,7 +125,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "consult.chat": "Chat",
     "consult.aiAssistant": "AI Assistant",
     "consult.medicalRecord": "Medical Record",
-    "consult.elapsed": "Orientação Técnication time",
+    "consult.elapsed": "Consultation time",
     "consult.waitingRoom": "Virtual Waiting Room",
     "consult.yourTurn": "Your turn!",
     "consult.estimatedWait": "Estimated wait time",
@@ -175,7 +175,7 @@ const translations: Record<Locale, Record<string, string>> = {
     // Hero
     "hero.title": "Planta y Raiz - Mega Clínica Digital",
     "hero.subtitle": "Democratizando el acceso a la salud y el bienestar a través de la tecnología y el cannabis medicinal.",
-    "hero.start_orientação técnication": "Iniciar Orientação Técnica",
+    "hero.start_orientação técnication": "Iniciar Consulta",
     "hero.online_now": "En línea ahora",
     "hero.responsible_tech": "Responsable Técnico y Jurídico",
     "common.save": "Guardar",
@@ -203,7 +203,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "consult.position": "Posición en la cola",
     "med.diagnosis": "Diagnóstico",
     "med.prescription": "Receta",
-    "med.complaint": "Motivo de Orientação Técnica",
+    "med.complaint": "Motivo de Consulta",
     "med.history": "Historial",
     "med.treatment": "Plan Terapéutico",
     "med.sign": "Firmar Digitalmente",

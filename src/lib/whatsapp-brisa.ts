@@ -37,7 +37,7 @@ export function generateBrisaWhatsAppURL(
  * Tipos de orientação técnica
  */
 export const CONSULTATION_TYPES = {
-  initial: "Orientação Técnica Inicial",
+  initial: "Consulta Inicial",
   followup: "Acompanhamento",
   emergency: "Emergência",
   prescription: "Prescrição",

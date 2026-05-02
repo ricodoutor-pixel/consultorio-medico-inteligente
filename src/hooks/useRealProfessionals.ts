@@ -129,7 +129,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       online: d.is_online,
       crm: `${d.crm} - ${d.crm_state}`,
       services: [
-        { name: "Orientação Técnica Inicial", price: `R$ ${d.orientação técnication_price.toFixed(2).replace(".", ",")}`, desc: "Avaliação completa + plano terapêutico" },
+        { name: "Consulta Inicial", price: `R$ ${d.orientação técnication_price.toFixed(2).replace(".", ",")}`, desc: "Avaliação completa + plano terapêutico" },
         { name: "Retorno", price: `R$ ${(d.orientação técnication_price * 0.6).toFixed(2).replace(".", ",")}`, desc: "Acompanhamento e ajuste" },
       ],
       slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],

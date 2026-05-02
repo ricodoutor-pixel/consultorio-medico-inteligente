@@ -27,7 +27,7 @@ const DEFAULT_MESSAGES: Record<FrogMood, { message: string; reason: string; icon
   },
   critical: {
     message: "⚠️ Atenção! Seu tratamento precisa de ação imediata.",
-    reason: "Orientação Técnica cancelada ou medicamento acabando",
+    reason: "Consulta cancelada ou medicamento acabando",
     icon: "/frog-critical.png",
   },
 };

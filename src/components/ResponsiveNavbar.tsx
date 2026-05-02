@@ -66,7 +66,7 @@ export const ResponsiveNavbar = () => {
             Início
           </a>
           <a href="/orientação técnicas" className="text-gray-700 hover:text-green-600 font-medium transition">
-            Orientação Técnicas
+            Consultas
           </a>
           <a href="/medicos" className="text-gray-700 hover:text-green-600 font-medium transition">
             Médicos
@@ -88,7 +88,7 @@ export const ResponsiveNavbar = () => {
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition"
             onClick={() => navigate('/orientação técnica')}
           >
-            🩺 Iniciar Orientação Técnica
+            🩺 Iniciar Consulta
           </Button>
           <Button variant="ghost" size="sm">
             <LogIn className="w-5 h-5" />
@@ -112,7 +112,7 @@ export const ResponsiveNavbar = () => {
             className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-semibold transition"
             onClick={() => navigate('/orientação técnica')}
           >
-            🩺 Orientação Técnica
+            🩺 Consulta
           </Button>
 
           {/* Menu Toggle */}
@@ -141,7 +141,7 @@ export const ResponsiveNavbar = () => {
               Início
             </a>
             <a href="/orientação técnicas" className="block text-gray-700 hover:text-green-600 font-medium py-2">
-              Orientação Técnicas
+              Consultas
             </a>
             <a href="/medicos" className="block text-gray-700 hover:text-green-600 font-medium py-2">
               Médicos

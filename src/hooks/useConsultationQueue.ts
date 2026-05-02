@@ -1,5 +1,5 @@
 /**
- * useOrientação TécnicationQueue — Realtime hook for Uber-style doctor matching
+ * useConsultationQueue — Realtime hook for Uber-style doctor matching
  */
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,7 +19,7 @@ interface QueueEntry {
   matched_at: string | null;
 }
 
-export function useOrientação TécnicationQueue(userType: "patient" | "doctor") {
+export function useConsultationQueue(userType: "patient" | "doctor") {
   const [queue, setQueue] = useState<QueueEntry[]>([]);
   const [myEntry, setMyEntry] = useState<QueueEntry | null>(null);
   const [loading, setLoading] = useState(false);
@@ -120,7 +120,7 @@ export function useOrientação TécnicationQueue(userType: "patient" | "doctor"
       });
 
       if (error) throw error;
-      toast({ title: "Orientação Técnica aceita!", description: "Entrando na sala..." });
+      toast({ title: "Consulta aceita!", description: "Entrando na sala..." });
       return data;
     } catch (err) {
       toast({ title: "Erro", description: String(err), variant: "destructive" });

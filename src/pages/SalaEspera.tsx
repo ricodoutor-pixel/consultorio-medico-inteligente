@@ -12,7 +12,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { useOrientação TécnicationQueue } from "@/hooks/useOrientação TécnicationQueue";
+import { useConsultationQueue } from "@/hooks/useConsultationQueue";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
@@ -100,9 +100,9 @@ const SalaEspera = () => {
     return `~${minutes} min`;
   };
 
-  const handleStartOrientação Técnication = async (appointmentId: string) => {
+  const handleStartConsultation = async (appointmentId: string) => {
     await supabase.from("appointments").update({ status: "in_progress" }).eq("id", appointmentId);
-    toast({ title: "Orientação Técnica iniciada! 🩺" });
+    toast({ title: "Consulta iniciada! 🩺" });
   };
 
   if (loading) {
@@ -175,7 +175,7 @@ const SalaEspera = () => {
                   </p>
                   {userType === "patient" && (
                     <Button className="bg-primary text-primary-foreground font-bold rounded-xl" asChild>
-                      <Link to="/agendamento">Agendar Orientação Técnica <ArrowRight size={16} className="ml-2" /></Link>
+                      <Link to="/agendamento">Agendar Consulta <ArrowRight size={16} className="ml-2" /></Link>
                     </Button>
                   )}
                 </CardContent>
@@ -203,7 +203,7 @@ const SalaEspera = () => {
                               <div>
                                 <div className="flex items-center gap-2">
                                   <p className="font-bold text-sm text-foreground">
-                                    {appt.type === "video" ? "Teleorientação técnica Vídeo" : appt.type === "chat" ? "Orientação Técnica Chat" : "Orientação Técnica"}
+                                    {appt.type === "video" ? "Teleorientação técnica Vídeo" : appt.type === "chat" ? "Consulta Chat" : "Consulta"}
                                   </p>
                                   {isInProgress && (
                                     <Badge className="bg-primary/10 text-primary text-[10px]">EM ANDAMENTO</Badge>
@@ -236,7 +236,7 @@ const SalaEspera = () => {
                                 </Button>
                               )}
                               {userType === "doctor" && !isInProgress && isNext && (
-                                <Button className="bg-primary text-primary-foreground font-bold rounded-xl" onClick={() => handleStartOrientação Técnication(appt.id)}>
+                                <Button className="bg-primary text-primary-foreground font-bold rounded-xl" onClick={() => handleStartConsultation(appt.id)}>
                                   <CheckCircle2 size={14} className="mr-1" /> Chamar Paciente
                                 </Button>
                               )}
@@ -273,7 +273,7 @@ const SalaEspera = () => {
 
 /** Uber-Style Queue Component */
 function UberQueueSection({ userType }: { userType: "patient" | "doctor" }) {
-  const { queue, myEntry, loading, joinQueue, acceptPatient, waitingCount } = useOrientação TécnicationQueue(userType);
+  const { queue, myEntry, loading, joinQueue, acceptPatient, waitingCount } = useConsultationQueue(userType);
 
   return (
     <Card className="border-border border-primary/20 mb-6">

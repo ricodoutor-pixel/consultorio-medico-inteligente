@@ -334,7 +334,7 @@ const AdminMasterControl = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {[
           { label: "Faturamento Bruto", value: `R$ ${kpis.revenue.toLocaleString("pt-BR")}`, icon: DollarSign, color: "text-emerald-400" },
-          { label: "Orientação Técnicas Hoje", value: kpis.orientação técnicationsToday.toString(), icon: Activity, color: "text-blue-400" },
+          { label: "Consultas Hoje", value: kpis.orientação técnicationsToday.toString(), icon: Activity, color: "text-blue-400" },
           { label: "MRR Club", value: `R$ ${kpis.clubMRR.toLocaleString("pt-BR")}`, icon: TrendingUp, color: "text-purple-400" },
           { label: "Comissões Pendentes", value: `R$ ${kpis.pendingCommissions.toLocaleString("pt-BR")}`, icon: Users, color: "text-amber-400" },
         ].map((kpi, i) => (
@@ -351,14 +351,14 @@ const AdminMasterControl = () => {
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-4 mb-6">
         <Card className="bg-white/5 border-white/10 p-4">
-          <h3 className="text-sm font-medium text-gray-400 mb-3">Orientação Técnicas vs Médicos Online</h3>
+          <h3 className="text-sm font-medium text-gray-400 mb-3">Consultas vs Médicos Online</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
               <XAxis dataKey="day" stroke="#64748b" fontSize={11} />
               <YAxis stroke="#64748b" fontSize={11} />
               <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b", borderRadius: 8 }} />
-              <Bar dataKey="orientação técnicas" fill="#10b981" radius={[4, 4, 0, 0]} name="Orientação Técnicas" />
+              <Bar dataKey="orientação técnicas" fill="#10b981" radius={[4, 4, 0, 0]} name="Consultas" />
               <Bar dataKey="medicos" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Médicos" />
             </BarChart>
           </ResponsiveContainer>

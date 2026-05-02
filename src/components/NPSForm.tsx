@@ -76,7 +76,7 @@ export const NPSForm: React.FC<NPSFormProps> = ({
         </div>
         {professionalName && (
           <p className="text-sm text-muted-foreground">
-            Orientação Técnica com <span className="font-medium text-foreground">{professionalName}</span>
+            Consulta com <span className="font-medium text-foreground">{professionalName}</span>
           </p>
         )}
       </CardHeader>

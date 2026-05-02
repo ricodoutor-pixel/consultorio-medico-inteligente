@@ -58,7 +58,7 @@ const DownloadApp = () => {
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-muted-foreground text-lg mb-8 font-medium max-w-lg">
-                Orientação Técnicas, receitas, shopping e biblioteca científica — tudo offline-first com biometria, push notifications e a melhor experiência mobile do mercado.
+                Consultas, receitas, shopping e biblioteca científica — tudo offline-first com biometria, push notifications e a melhor experiência mobile do mercado.
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -135,7 +135,7 @@ const DownloadApp = () => {
 
           <motion.div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {[
-              { icon: Zap, title: "Orientação Técnicas 24/7", desc: "Chat e vídeo com especialistas a qualquer hora", accent: "green" },
+              { icon: Zap, title: "Consultas 24/7", desc: "Chat e vídeo com especialistas a qualquer hora", accent: "green" },
               { icon: Shield, title: "100% Seguro", desc: "Biometria, 2FA e criptografia end-to-end", accent: "purple" },
               { icon: Wifi, title: "Offline-First", desc: "Funciona mesmo sem internet, sincroniza depois", accent: "green" },
               { icon: Users, title: "Comunidade", desc: "Conecte-se com pacientes e especialistas", accent: "purple" },
@@ -175,7 +175,7 @@ const DownloadApp = () => {
                 <Link to="/cadastro">Cadastre-se Grátis <ArrowRight size={18} className="ml-2" /></Link>
               </Button>
               <Button size="lg" variant="outline" className="h-14 px-8 border-primary/30 text-primary font-black rounded-2xl" asChild>
-                <Link to="/telemedicina">Iniciar Orientação Técnica IA</Link>
+                <Link to="/telemedicina">Iniciar Consulta IA</Link>
               </Button>
             </div>
           </motion.div>

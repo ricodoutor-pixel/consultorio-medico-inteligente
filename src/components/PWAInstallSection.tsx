@@ -126,7 +126,7 @@ export function PWAInstallSection() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 pt-6 border-t border-border/50">
                 {[
                   { icon: "🔔", text: "Lembretes de dose" },
-                  { icon: "🩺", text: "Orientação Técnicas rápidas" },
+                  { icon: "🩺", text: "Consultas rápidas" },
                   { icon: "📱", text: "Acesso offline" },
                   { icon: "🔥", text: "Ofensiva diária" },
                 ].map(({ icon, text }) => (

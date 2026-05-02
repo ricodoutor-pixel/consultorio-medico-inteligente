@@ -15,8 +15,8 @@ const BASE = "https://plantayraiz.com.br";
 
 export const routeSEOMap: Record<string, PageSEO> = {
   "/": {
-    title: "Teleorientação técnica Cannabis Medicinal SP | Orientação Técnica CBD R$30 — Planta & Raiz",
-    description: "Médicos prescritores de cannabis medicinal em São Paulo. Orientação Técnica online a partir de R$30 com prescrição digital ANVISA, triagem por IA e farmácia parceira. Agende agora!",
+    title: "Teleorientação técnica Cannabis Medicinal SP | Consulta CBD R$30 — Planta & Raiz",
+    description: "Médicos prescritores de cannabis medicinal em São Paulo. Consulta online a partir de R$30 com prescrição digital ANVISA, triagem por IA e farmácia parceira. Agende agora!",
     keywords: "telemedicina cannabis medicinal, orientação técnica CBD R$30, médicos prescritores de cannabis, prescrição ANVISA online, cannabis medicinal São Paulo, dor crônica cannabis, saúde mental cannabis",
     canonical: `${BASE}/`,
     h1: "Teleorientação técnica de Cannabis Medicinal em São Paulo — Médicos Prescritores a R$30",
@@ -46,7 +46,7 @@ export const routeSEOMap: Record<string, PageSEO> = {
     canonical: `${BASE}/faq`,
   },
   "/telemedicina": {
-    title: "Telemedicina Cannabis Medicinal 24/7 | Orientação Técnica Online SP — Planta & Raiz",
+    title: "Telemedicina Cannabis Medicinal 24/7 | Consulta Online SP — Planta & Raiz",
     description: "Atendimento médico online 24/7 especializado em cannabis medicinal. Videoorientação técnica ou chat com prescritores em São Paulo. Protocolo ANVISA automático.",
     keywords: "telemedicina cannabis, orientação técnica online cannabis medicinal, videochamada médico CBD",
     canonical: `${BASE}/telemedicina`,
@@ -97,7 +97,7 @@ export const routeSEOMap: Record<string, PageSEO> = {
   },
   "/planos": {
     title: "Planos e Preços | Teleorientação técnica Cannabis a partir de R$30 — Planta & Raiz",
-    description: "Conheça os planos de teleorientação técnica da Planta & Raiz. Orientação Técnicas a partir de R$30, assinatura Club com benefícios e descontos exclusivos.",
+    description: "Conheça os planos de teleorientação técnica da Planta & Raiz. Consultas a partir de R$30, assinatura Club com benefícios e descontos exclusivos.",
     keywords: "preço orientação técnica cannabis medicinal, planos telemedicina, assinatura cannabis",
     canonical: `${BASE}/planos`,
   },
@@ -115,12 +115,12 @@ export const routeSEOMap: Record<string, PageSEO> = {
   },
   "/login": {
     title: "Login | Acesse sua Conta — Planta & Raiz",
-    description: "Acesse sua conta na Planta & Raiz. Orientação Técnicas, prescrições e acompanhamento do seu tratamento com cannabis medicinal.",
+    description: "Acesse sua conta na Planta & Raiz. Consultas, prescrições e acompanhamento do seu tratamento com cannabis medicinal.",
     keywords: "login planta raiz, acessar conta cannabis medicinal",
     canonical: `${BASE}/login`,
   },
   "/agendamento": {
-    title: "Agendar Orientação Técnica Cannabis Medicinal | São Paulo — Planta & Raiz",
+    title: "Agendar Consulta Cannabis Medicinal | São Paulo — Planta & Raiz",
     description: "Agende sua teleorientação técnica com médico especialista em cannabis medicinal. Horários flexíveis, pagamento via Pix e atendimento em São Paulo e todo Brasil.",
     keywords: "agendar orientação técnica cannabis, marcar teleorientação técnica CBD, agendamento médico cannabis SP",
     canonical: `${BASE}/agendamento`,
@@ -153,7 +153,7 @@ export function getPageSEO(pathname: string): PageSEO {
   // Default fallback
   return {
     title: "Planta & Raiz — Teleorientação técnica Cannabis Medicinal SP | Protocolo ANVISA",
-    description: "A maior plataforma de telemedicina em cannabis medicinal do Brasil. Orientação Técnicas a partir de R$30, prescrição digital ANVISA e IA de acolhimento 24/7.",
+    description: "A maior plataforma de telemedicina em cannabis medicinal do Brasil. Consultas a partir de R$30, prescrição digital ANVISA e IA de acolhimento 24/7.",
     keywords: "cannabis medicinal, telemedicina, CBD, THC, ANVISA, orientação técnica online",
     canonical: `${BASE}${pathname}`,
   };

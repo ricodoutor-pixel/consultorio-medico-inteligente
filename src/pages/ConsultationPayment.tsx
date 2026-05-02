@@ -13,7 +13,7 @@ import { userChannel } from "@/lib/realtime-channels";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
-const Orientação TécnicationPayment = () => {
+const ConsultationPayment = () => {
   const [searchParams] = useSearchParams();
   const proId = searchParams.get("pro") || "med-1";
   const appointmentId = searchParams.get("appointment") || null;
@@ -62,7 +62,7 @@ const Orientação TécnicationPayment = () => {
           doctorName: pro.name,
           amount: total,
           patientEmail: session?.user?.email || "",
-          description: `Orientação Técnica com ${pro.name} - Planta & Raiz`,
+          description: `Consulta com ${pro.name} - Planta & Raiz`,
         },
       });
 
@@ -309,7 +309,7 @@ const Orientação TécnicationPayment = () => {
                     {/* Price Breakdown */}
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Orientação Técnica</span>
+                        <span className="text-muted-foreground">Consulta</span>
                         <span className="text-foreground font-bold">{pro.price}</span>
                       </div>
                       <div className="flex justify-between text-sm">
@@ -358,4 +358,4 @@ const Orientação TécnicationPayment = () => {
   );
 };
 
-export default Orientação TécnicationPayment;
+export default ConsultationPayment;

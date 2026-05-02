@@ -60,7 +60,7 @@ const FLOW_MAP: Record<FlowStep, NextAction[]> = {
     {
       id: "rate-doctor",
       icon: <Star size={20} />,
-      title: "Avaliar Orientação Técnica",
+      title: "Avaliar Consulta",
       description: "Sua opinião nos ajuda a melhorar.",
       route: "#nps",
     },

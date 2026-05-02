@@ -284,7 +284,7 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-center">
                     <div>
-                      <p className="text-[10px] text-muted-foreground">Receita Orientação Técnicas</p>
+                      <p className="text-[10px] text-muted-foreground">Receita Consultas</p>
                       <p className="text-lg font-black text-foreground">R$ {revenueData.summary.totalRevenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
                     </div>
                     <div>
@@ -319,7 +319,7 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
                       <div className="bg-muted/20 rounded-lg p-2.5 text-center">
                         <Users className="h-3.5 w-3.5 mx-auto mb-1 text-blue-400" />
                         <p className="text-lg font-black text-foreground">{revenueData.myDistribution.orientação técnications}</p>
-                        <p className="text-[9px] text-muted-foreground">Orientação Técnicas</p>
+                        <p className="text-[9px] text-muted-foreground">Consultas</p>
                       </div>
                       <div className="bg-muted/20 rounded-lg p-2.5 text-center">
                         <Clock className="h-3.5 w-3.5 mx-auto mb-1 text-emerald-400" />

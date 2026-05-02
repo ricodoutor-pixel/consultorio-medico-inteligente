@@ -41,10 +41,10 @@ interface SubscriberPlan {
 }
 
 /**
- * 🟠 FUNÇÃO: Calcular Split de Pagamento (Orientação Técnicas)
+ * 🟠 FUNÇÃO: Calcular Split de Pagamento (Consultas)
  * Reter 7% (Plataforma) / 93% (Médico)
  */
-export async function calculateOrientação TécnicationSplit(
+export async function calculateConsultationSplit(
   orientação técnicationId: string,
   grossAmount: number,
   doctorId: string
@@ -327,7 +327,7 @@ export async function processPaymentWithSplit(
     let calculation: PaymentCalculation;
 
     if (paymentData.type === 'orientação técnication') {
-      calculation = await calculateOrientação TécnicationSplit(
+      calculation = await calculateConsultationSplit(
         paymentData.orientação técnicationId!,
         paymentData.grossAmount,
         paymentData.doctorId!
@@ -417,7 +417,7 @@ async function createMercadoPagoPreferenceWithSplit(
 }
 
 export default {
-  calculateOrientação TécnicationSplit,
+  calculateConsultationSplit,
   calculateMarketplaceSplit,
   validateDoctorCRM,
   checkSubscriberFeeExemption,

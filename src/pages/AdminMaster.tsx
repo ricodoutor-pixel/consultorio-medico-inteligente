@@ -115,7 +115,7 @@ const generateSecurityLogs = () => [
 ];
 
 const salesByPlan = [
-  { name: "Orientação Técnicas", value: 45, color: "#39FF14" },
+  { name: "Consultas", value: 45, color: "#39FF14" },
   { name: "Club VIP", value: 25, color: "#00D4FF" },
   { name: "Marketplace", value: 20, color: "#FF6B35" },
   { name: "Assinaturas", value: 10, color: "#A855F7" },

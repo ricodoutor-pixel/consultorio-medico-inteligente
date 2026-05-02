@@ -6,28 +6,28 @@
 export interface CommissionTier {
   level: number;
   name: string;
-  minOrientação Técnications: number;
-  maxOrientação Técnications: number;
+  minConsultations: number;
+  maxConsultations: number;
   doctorShare: number;
   platformShare: number;
   bonus: string;
 }
 
 export const COMMISSION_TIERS: CommissionTier[] = [
-  { level: 1, name: 'Iniciante', minOrientação Técnications: 0, maxOrientação Técnications: 50, doctorShare: 0.80, platformShare: 0.20, bonus: '' },
-  { level: 2, name: 'Ativo', minOrientação Técnications: 51, maxOrientação Técnications: 200, doctorShare: 0.85, platformShare: 0.15, bonus: 'Badge Ativo' },
-  { level: 3, name: 'Destaque', minOrientação Técnications: 201, maxOrientação Técnications: 500, doctorShare: 0.90, platformShare: 0.10, bonus: 'Destaque na busca' },
-  { level: 4, name: 'Elite', minOrientação Técnications: 501, maxOrientação Técnications: Infinity, doctorShare: 0.92, platformShare: 0.08, bonus: 'Bônus 5% extra' },
+  { level: 1, name: 'Iniciante', minConsultations: 0, maxConsultations: 50, doctorShare: 0.80, platformShare: 0.20, bonus: '' },
+  { level: 2, name: 'Ativo', minConsultations: 51, maxConsultations: 200, doctorShare: 0.85, platformShare: 0.15, bonus: 'Badge Ativo' },
+  { level: 3, name: 'Destaque', minConsultations: 201, maxConsultations: 500, doctorShare: 0.90, platformShare: 0.10, bonus: 'Destaque na busca' },
+  { level: 4, name: 'Elite', minConsultations: 501, maxConsultations: Infinity, doctorShare: 0.92, platformShare: 0.08, bonus: 'Bônus 5% extra' },
 ];
 
-export function getDoctorTier(monthlyOrientação Técnications: number): CommissionTier {
+export function getDoctorTier(monthlyConsultations: number): CommissionTier {
   return COMMISSION_TIERS.find(
-    t => monthlyOrientação Técnications >= t.minOrientação Técnications && monthlyOrientação Técnications <= t.maxOrientação Técnications
+    t => monthlyConsultations >= t.minConsultations && monthlyConsultations <= t.maxConsultations
   ) || COMMISSION_TIERS[0];
 }
 
-export function calculateFranchiseRevenue(amount: number, monthlyOrientação Técnications: number) {
-  const tier = getDoctorTier(monthlyOrientação Técnications);
+export function calculateFranchiseRevenue(amount: number, monthlyConsultations: number) {
+  const tier = getDoctorTier(monthlyConsultations);
   return {
     tier,
     doctorEarnings: Math.round(amount * tier.doctorShare * 100) / 100,
@@ -71,7 +71,7 @@ export interface QualityCriteria {
   avgResponseTimeMinutes: number;
   certificationsValid: boolean;
   complaintsCount: number;
-  totalOrientação Técnications: number;
+  totalConsultations: number;
   memberSinceMonths: number;
 }
 
@@ -85,7 +85,7 @@ export function calculateQualityScore(criteria: QualityCriteria): number {
   const responseTimeWeight = (1 - Math.min(criteria.avgResponseTimeMinutes / 30, 1)) * 0.20;
   const certWeight = (criteria.certificationsValid ? 1 : 0) * 0.15;
   const complaintsWeight = (1 - Math.min(criteria.complaintsCount / 5, 1)) * 0.10;
-  const experienceWeight = Math.min(criteria.totalOrientação Técnications / 200, 1) * 0.05;
+  const experienceWeight = Math.min(criteria.totalConsultations / 200, 1) * 0.05;
   return Math.round((npsWeight + responseRateWeight + responseTimeWeight + certWeight + complaintsWeight + experienceWeight) * 100) / 10;
 }
 
@@ -109,7 +109,7 @@ export interface Opportunity {
 export interface DoctorBIMetrics {
   monthlyRevenue: number;
   revenueGrowth: number;
-  avgOrientação TécnicationValue: number;
+  avgConsultationValue: number;
   orientação técnicationsThisMonth: number;
   bonusAccumulated: number;
   plantaCoinBalance: number;
@@ -141,7 +141,7 @@ export function generateOpportunities(metrics: Partial<DoctorBIMetrics>): Opport
     opportunities.push({
       icon: '📈', title: 'Aumente suas orientação técnicas',
       description: 'Compartilhe sua página personalizada',
-      potentialRevenue: (50 - (metrics.orientação técnicationsThisMonth ?? 0)) * (metrics.avgOrientação TécnicationValue ?? 150),
+      potentialRevenue: (50 - (metrics.orientação técnicationsThisMonth ?? 0)) * (metrics.avgConsultationValue ?? 150),
       action: 'Compartilhar',
     });
   }
@@ -176,7 +176,7 @@ export interface WellnessPlan {
   price: number;
   period: 'monthly' | 'yearly';
   features: string[];
-  maxOrientação Técnications: number;
+  maxConsultations: number;
   productDiscount: number;
   priority: boolean;
 }
@@ -185,32 +185,32 @@ export const WELLNESS_PLANS: WellnessPlan[] = [
   {
     id: 'basic', name: 'Bem-Estar Básico', price: 99, period: 'monthly',
     features: ['Suporte 24h com IA Brisa', 'Renovação automática de receitas', '10% desconto em produtos', 'Acesso à biblioteca científica'],
-    maxOrientação Técnications: 0, productDiscount: 0.10, priority: false,
+    maxConsultations: 0, productDiscount: 0.10, priority: false,
   },
   {
     id: 'pro', name: 'Bem-Estar Pro', price: 149, period: 'monthly',
     features: ['Tudo do Básico', '1 orientação técnica com médico/mês', '15% desconto em produtos', 'Acesso a cursos gratuitos', 'Smart-Refill automático'],
-    maxOrientação Técnications: 1, productDiscount: 0.15, priority: false,
+    maxConsultations: 1, productDiscount: 0.15, priority: false,
   },
   {
     id: 'premium', name: 'Bem-Estar Premium', price: 199, period: 'monthly',
     features: ['Tudo do Pro', '2 orientação técnicas com médico/mês', '20% desconto em produtos', 'Prioridade no atendimento', 'Consultoria nutricional', 'Rastreamento Anvisa automático'],
-    maxOrientação Técnications: 2, productDiscount: 0.20, priority: true,
+    maxConsultations: 2, productDiscount: 0.20, priority: true,
   },
 ];
 
 // ===== Retention AI =====
 export function calculateAbandonmentRisk(params: {
   daysSinceLastPurchase: number;
-  daysSinceLastOrientação Técnication: number;
+  daysSinceLastConsultation: number;
   npsScore: number;
   subscriptionAgeMonths: number;
-  totalOrientação Técnications: number;
+  totalConsultations: number;
 }): number {
-  const { daysSinceLastPurchase, npsScore, subscriptionAgeMonths, totalOrientação Técnications } = params;
+  const { daysSinceLastPurchase, npsScore, subscriptionAgeMonths, totalConsultations } = params;
   const inactivityScore = Math.min(daysSinceLastPurchase / 60, 1) * 0.4;
   const npsRisk = ((10 - (npsScore || 5)) / 10) * 0.3;
-  const avgConsultPerMonth = totalOrientação Técnications / Math.max(subscriptionAgeMonths, 1);
+  const avgConsultPerMonth = totalConsultations / Math.max(subscriptionAgeMonths, 1);
   const frequencyRisk = Math.max(0, (1 - Math.min(avgConsultPerMonth / 2, 1))) * 0.2;
   const newSubRisk = (1 - Math.min(subscriptionAgeMonths / 6, 1)) * 0.1;
   return Math.min(inactivityScore + npsRisk + frequencyRisk + newSubRisk, 1);

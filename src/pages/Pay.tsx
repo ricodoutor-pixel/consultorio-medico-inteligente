@@ -38,7 +38,7 @@ const Pay = () => {
   let paymentLabel = "";
   if (payType === "intake" || payType === "appointment") {
     paymentAmount = amountParam ? parseFloat(amountParam) : (pro?.priceValue || 0);
-    paymentLabel = pro ? `Orientação Técnica com ${pro.name}` : "Orientação Técnica";
+    paymentLabel = pro ? `Consulta com ${pro.name}` : "Consulta";
   } else if (payType === "subscription") {
     paymentAmount = plan?.price || 0;
     paymentLabel = plan ? `Assinatura ${plan.name}` : "Assinatura";
@@ -124,7 +124,7 @@ const Pay = () => {
                 <h2 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
                   {payType === "order" ? <><ShoppingCart size={18} /> Resumo do Pedido</> :
                    payType === "subscription" ? <><Star size={18} /> Assinatura</> :
-                   <><Stethoscope size={18} /> Orientação Técnica</>}
+                   <><Stethoscope size={18} /> Consulta</>}
                 </h2>
 
                 {payType === "order" && items.length === 0 ? (

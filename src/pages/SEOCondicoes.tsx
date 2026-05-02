@@ -319,7 +319,7 @@ const SEOCondicoes = () => {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-12 px-6" asChild>
                     <Link to="/orientação técnica-rapida">
-                      <Stethoscope size={16} className="mr-2" /> Orientação Técnica Rápida (IA)
+                      <Stethoscope size={16} className="mr-2" /> Consulta Rápida (IA)
                     </Link>
                   </Button>
                   <Button variant="outline" className="font-black rounded-2xl h-12 px-6 border-primary/30 text-primary" asChild>

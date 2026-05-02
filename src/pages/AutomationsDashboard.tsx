@@ -54,11 +54,11 @@ const AUTOMATIONS_CATALOG: Omit<Automation, "status" | "lastRun" | "responseTime
   { id: "vnd-08", name: "Lead Scoring Automático", category: "Vendas" },
   // Operações (15)
   { id: "ops-01", name: "Agendamento Automático", category: "Operações" },
-  { id: "ops-02", name: "Confirmação de Orientação Técnica", category: "Operações" },
+  { id: "ops-02", name: "Confirmação de Consulta", category: "Operações" },
   { id: "ops-03", name: "Lembrete 24h Antes", category: "Operações" },
   { id: "ops-04", name: "Lembrete 1h Antes", category: "Operações" },
   { id: "ops-05", name: "Geração Link de Acesso", category: "Operações" },
-  { id: "ops-06", name: "Gravação de Orientação Técnica", category: "Operações" },
+  { id: "ops-06", name: "Gravação de Consulta", category: "Operações" },
   { id: "ops-07", name: "Geração de Prescrição", category: "Operações" },
   { id: "ops-08", name: "Envio de Prescrição", category: "Operações" },
   { id: "ops-09", name: "Cancelamento Automático", category: "Operações" },
@@ -164,12 +164,12 @@ async function fetchKPIs() {
     supabase.from("escrow_transactions").select("amount, platform_fee"),
   ]);
   const totalUsers = profilesRes.count ?? 0;
-  const totalOrientação Técnications = appointmentsRes.count ?? 0;
+  const totalConsultations = appointmentsRes.count ?? 0;
   const npsScores = npsRes.data ?? [];
   const avgNPS = npsScores.length ? npsScores.reduce((s, r) => s + r.score, 0) / npsScores.length : 0;
   const escrow = escrowRes.data ?? [];
   const totalRevenue = escrow.reduce((s, e) => s + Number(e.amount), 0);
-  return { totalUsers, totalOrientação Técnications, avgNPS, totalRevenue, conversionRate: totalOrientação Técnications > 0 ? (totalOrientação Técnications / Math.max(totalUsers, 1)) * 100 : 0 };
+  return { totalUsers, totalConsultations, avgNPS, totalRevenue, conversionRate: totalConsultations > 0 ? (totalConsultations / Math.max(totalUsers, 1)) * 100 : 0 };
 }
 
 // ── Page ──────────────────────────────────────────
@@ -178,7 +178,7 @@ const AutomationsDashboard = () => {
   const [automations, setAutomations] = useState<Automation[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [trafficData, setTrafficData] = useState(generateTrafficData());
-  const [kpis, setKpis] = useState({ totalUsers: 0, totalOrientação Técnications: 0, avgNPS: 0, totalRevenue: 0, conversionRate: 0 });
+  const [kpis, setKpis] = useState({ totalUsers: 0, totalConsultations: 0, avgNPS: 0, totalRevenue: 0, conversionRate: 0 });
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [uptime] = useState(99.9);
   const [latency, setLatency] = useState(145);
@@ -255,7 +255,7 @@ const AutomationsDashboard = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {[
             { label: "Usuários", value: kpis.totalUsers.toLocaleString(), icon: <Users className="h-5 w-5" />, accent: "text-blue-400" },
-            { label: "Orientação Técnicas", value: kpis.totalOrientação Técnications.toLocaleString(), icon: <Activity className="h-5 w-5" />, accent: "text-green-400" },
+            { label: "Consultas", value: kpis.totalConsultations.toLocaleString(), icon: <Activity className="h-5 w-5" />, accent: "text-green-400" },
             { label: "Receita", value: `R$ ${(kpis.totalRevenue / 1000).toFixed(1)}k`, icon: <DollarSign className="h-5 w-5" />, accent: "text-yellow-400" },
             { label: "NPS Médio", value: kpis.avgNPS.toFixed(1), icon: <Star className="h-5 w-5" />, accent: "text-purple-400" },
             { label: "Conversão", value: `${kpis.conversionRate.toFixed(1)}%`, icon: <TrendingUp className="h-5 w-5" />, accent: "text-cyan-400" },

@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const DoctorFinancialCards = ({ doctorId, currentTier }: Props) => {
-  const [earnings, setEarnings] = useState({ total: 0, monthOrientação Técnications: 0, platformFee: 0, distributionBonus: 0 });
+  const [earnings, setEarnings] = useState({ total: 0, monthConsultations: 0, platformFee: 0, distributionBonus: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export const DoctorFinancialCards = ({ doctorId, currentTier }: Props) => {
 
     setEarnings({
       total: released.reduce((s, e) => s + Number(e.doctor_payout || 0), 0),
-      monthOrientação Técnications: monthReleased.reduce((s, e) => s + Number(e.doctor_payout || 0), 0),
+      monthConsultations: monthReleased.reduce((s, e) => s + Number(e.doctor_payout || 0), 0),
       platformFee: released.reduce((s, e) => s + Number(e.platform_fee || 0), 0),
       distributionBonus: Number(metricsRes.data?.estimated_share || 0),
     });
@@ -46,7 +46,7 @@ export const DoctorFinancialCards = ({ doctorId, currentTier }: Props) => {
 
   const cards = [
     { icon: DollarSign, label: "Ganhos Acumulados", value: `R$ ${earnings.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, sub: "Total líquido recebido", color: "text-primary", glow: "shadow-primary/10", tooltip: "Soma de todos os honorários líquidos já recebidos via orientação técnicas e serviços na plataforma." },
-    { icon: TrendingUp, label: "Ganhos do Mês", value: `R$ ${earnings.monthOrientação Técnications.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, sub: "Orientação Técnicas no mês atual", color: "text-primary", glow: "shadow-primary/10", tooltip: "Total de honorários recebidos no mês corrente por orientação técnicas finalizadas." },
+    { icon: TrendingUp, label: "Ganhos do Mês", value: `R$ ${earnings.monthConsultations.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, sub: "Consultas no mês atual", color: "text-primary", glow: "shadow-primary/10", tooltip: "Total de honorários recebidos no mês corrente por orientação técnicas finalizadas." },
     { icon: Gift, label: "Bônus de Distribuição", value: `R$ ${earnings.distributionBonus.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, sub: "10% do lucro da plataforma", color: "text-amber-400", glow: "shadow-amber-400/10", tooltip: "Sua participação nos 10% de lucro global da plataforma, calculada pelo seu Score Ponderado e multiplicador do plano." },
     { icon: Percent, label: "Taxa de Intermediação", value: feeRate === 0 ? "ZERO ✨" : `${feeRate}%`, sub: feeRate === 0 ? "100% dos honorários são seus" : `${100 - feeRate}% dos honorários retidos`, color: feeRate === 0 ? "text-primary" : "text-muted-foreground", glow: feeRate === 0 ? "shadow-primary/10" : "", tooltip: feeRate === 0 ? "Com seu plano atual, você retém 100% dos honorários sem nenhuma taxa de intermediação." : `A plataforma retém ${feeRate}% como taxa de intermediação. Faça upgrade para Taxa Zero no plano VIP.` },
   ];

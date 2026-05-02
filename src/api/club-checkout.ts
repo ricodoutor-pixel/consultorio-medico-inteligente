@@ -77,13 +77,13 @@ router.post('/checkout', async (req: Request, res: Response) => {
 
 /**
  * GET /api/club/order/:orderId
- * Orientação Técnicar status do pedido
+ * Consultar status do pedido
  */
 router.get('/order/:orderId', async (req: Request, res: Response) => {
   try {
     const { orderId } = req.params;
 
-    console.log(`📋 Manus CEO: Orientação Técnicando pedido ${orderId}`);
+    console.log(`📋 Manus CEO: Consultando pedido ${orderId}`);
 
     // Buscar pedido no banco de dados
     // const order = await db.orders.findOne({ id: orderId });

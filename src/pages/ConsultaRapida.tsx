@@ -24,7 +24,7 @@ type MatchResult = {
   message?: string;
 };
 
-const Orientação TécnicaRapida = () => {
+const ConsultaRapida = () => {
   const { toast } = useToast();
   const [step, setStep] = useState<"symptoms" | "matching" | "result">("symptoms");
   const [symptoms, setSymptoms] = useState(() => {
@@ -181,7 +181,7 @@ const Orientação TécnicaRapida = () => {
                   {[
                     { icon: Brain, title: "Brisa analisa", desc: "IA faz triagem e gera pré-prontuário" },
                     { icon: Activity, title: "Matching Uber", desc: "Algoritmo encontra o médico ideal" },
-                    { icon: Stethoscope, title: "Orientação Técnica em 5min", desc: "Atendimento imediato ou agendado" },
+                    { icon: Stethoscope, title: "Consulta em 5min", desc: "Atendimento imediato ou agendado" },
                   ].map((s, i) => (
                     <div key={i} className="flex items-start gap-3 p-4 rounded-2xl bg-card/50 border border-border">
                       <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -284,7 +284,7 @@ const Orientação TécnicaRapida = () => {
                           </div>
                           <Button className="w-full mt-4 font-black bg-primary text-primary-foreground h-12 rounded-2xl" asChild>
                             <Link to="/pagamento">
-                              Confirmar Orientação Técnica <ArrowRight size={16} className="ml-2" />
+                              Confirmar Consulta <ArrowRight size={16} className="ml-2" />
                             </Link>
                           </Button>
                           <div className="flex items-center gap-2 justify-center mt-3 text-xs text-muted-foreground">
@@ -333,4 +333,4 @@ const Orientação TécnicaRapida = () => {
   );
 };
 
-export default Orientação TécnicaRapida;
+export default ConsultaRapida;

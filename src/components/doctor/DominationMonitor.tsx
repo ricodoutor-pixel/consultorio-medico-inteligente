@@ -56,10 +56,10 @@ export const DominationMonitor = () => {
     const risks = mockPatients.map(p => {
       const score = calculateAbandonmentRisk({
         daysSinceLastPurchase: p.days,
-        daysSinceLastOrientação Técnication: p.days,
+        daysSinceLastConsultation: p.days,
         npsScore: p.nps,
         subscriptionAgeMonths: p.subAge,
-        totalOrientação Técnications: p.consults,
+        totalConsultations: p.consults,
       });
       return classifyRisk(score);
     });

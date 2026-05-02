@@ -35,7 +35,7 @@ type ChatMessage = {
   fileName?: string;
 };
 
-const Orientação TécnicaVideo = () => {
+const ConsultaVideo = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { log } = useAuditLog();
@@ -140,7 +140,7 @@ const Orientação TécnicaVideo = () => {
     try {
       const { data, error } = await supabase.functions.invoke("triage-summary", {
         body: {
-          answers: { transcript: aiTranscript || "Orientação Técnica de acompanhamento para tratamento com cannabis medicinal." },
+          answers: { transcript: aiTranscript || "Consulta de acompanhamento para tratamento com cannabis medicinal." },
           patientData: { nome: "Paciente" },
         },
       });
@@ -152,11 +152,11 @@ const Orientação TécnicaVideo = () => {
     setAiLoading(false);
   };
 
-  const endOrientação Técnication = async () => {
+  const endConsultation = async () => {
     if (appointmentId) {
       await supabase.from("appointments").update({ status: "completed" }).eq("id", appointmentId);
     }
-    toast({ title: "Orientação Técnica encerrada ✅" });
+    toast({ title: "Consulta encerrada ✅" });
     
     if (!isDoctor) {
       setShowNPS(true);
@@ -308,7 +308,7 @@ const Orientação TécnicaVideo = () => {
                 variant="destructive"
                 size="lg"
                 className="rounded-full w-12 h-12"
-                onClick={endOrientação Técnication}
+                onClick={endConsultation}
               >
                 <Phone size={20} className="rotate-[135deg]" />
               </Button>
@@ -478,4 +478,4 @@ const CID10QuickSearch = () => {
   );
 };
 
-export default Orientação TécnicaVideo;
+export default ConsultaVideo;

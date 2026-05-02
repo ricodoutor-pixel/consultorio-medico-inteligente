@@ -88,7 +88,7 @@ export const localBusinessSchema: SchemaOrgConfig = {
     '@type': 'MedicalBusiness',
     name: 'Planta & Raiz — Telemedicina Cannabis Medicinal',
     image: 'https://plantayraiz.com.br/og-home.jpg',
-    description: 'Orientação Técnicas online com especialistas em cannabis medicinal. Apenas R$30 por orientação técnica.',
+    description: 'Consultas online com especialistas em cannabis medicinal. Apenas R$30 por orientação técnica.',
     
     // Avaliações
     aggregateRating: {

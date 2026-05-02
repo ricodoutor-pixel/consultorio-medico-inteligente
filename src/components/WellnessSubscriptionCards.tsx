@@ -108,9 +108,9 @@ export function WellnessSubscriptionCards() {
                   <span className="text-sm text-muted-foreground">/mês</span>
                 </div>
 
-                {plan.maxOrientação Técnications > 0 && (
+                {plan.maxConsultations > 0 && (
                   <Badge className="bg-primary/10 text-primary text-[10px] mb-3">
-                    {plan.maxOrientação Técnications} orientação técnica{plan.maxOrientação Técnications > 1 ? "s" : ""}/mês inclusa{plan.maxOrientação Técnications > 1 ? "s" : ""}
+                    {plan.maxConsultations} orientação técnica{plan.maxConsultations > 1 ? "s" : ""}/mês inclusa{plan.maxConsultations > 1 ? "s" : ""}
                   </Badge>
                 )}
 

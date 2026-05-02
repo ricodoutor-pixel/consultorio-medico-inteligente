@@ -164,7 +164,7 @@ export const DoctorPerformanceWidget = ({ doctorId, simulatedTier }: Props) => {
           <motion.div whileHover={{ scale: 1.03 }} className="bg-muted/30 rounded-xl p-3 border border-border text-center">
             <Users size={16} className="text-primary mx-auto mb-1" />
             <p className="text-xl font-display font-black text-foreground">{perf.consultations}</p>
-            <p className="text-[10px] text-muted-foreground font-bold">Consultas/Mês</p>
+            <p className="text-[10px] text-muted-foreground font-bold">Orientações Técnicas/Mês</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.03 }} className="bg-muted/30 rounded-xl p-3 border border-border text-center">
             <Clock size={16} className="text-primary mx-auto mb-1" />

@@ -89,7 +89,7 @@ const fallbackResponses: Record<string, string> = {
   default: "Olá! 🐸 Estou com dificuldade para me conectar agora. Mas posso te ajudar! Acesse /telemedicina para consultas, /shopping para produtos, ou /profissionais para especialistas. 💚",
   oi: "Eae! 🐸👑 Sou o Verdinho! Estou com problemas técnicos, mas a plataforma funciona normalmente. Como posso ajudar? 💚",
   consulta: "Para agendar: acesse /telemedicina, faça a triagem IA, escolha seu especialista e pague via PIX! Tudo em 5 minutos. ✅",
-  preco: "Consultas a partir de R$ 55 via PIX (Mercado Pago). Confira nossos planos em /planos! 💳",
+  preco: "Orientações Técnicas a partir de R$ 55 via PIX (Mercado Pago). Confira nossos planos em /planos! 💳",
 };
 
 const getFallback = (text: string): string => {
@@ -127,9 +127,9 @@ const detectLang = (): "pt" | "en" | "es" => {
 };
 
 const WELCOME_BY_LANG: Record<"pt" | "en" | "es", string> = {
-  pt: "Olá! 🐸👑 Sou o **Verdinho**, assistente IA da **Planta & Raiz**!\n\nPosso te ajudar com:\n- 🩺 Consultas e agendamentos\n- 💊 Cannabis medicinal\n- 🛒 Shopping e produtos\n- 📋 Cadastro e plataforma\n- 🧠 Saúde e bem-estar\n\nPergunte qualquer coisa!",
+  pt: "Olá! 🐸👑 Sou o **Verdinho**, assistente IA da **Planta & Raiz**!\n\nPosso te ajudar com:\n- 🩺 Orientações Técnicas e agendamentos\n- 💊 Cannabis medicinal\n- 🛒 Shopping e produtos\n- 📋 Cadastro e plataforma\n- 🧠 Saúde e bem-estar\n\nPergunte qualquer coisa!",
   en: "Hi! 🐸👑 I'm **Verdinho**, the **Planta & Raiz** AI assistant!\n\nI can help you with:\n- 🩺 Appointments\n- 💊 Medical cannabis\n- 🛒 Shop and products\n- 📋 Sign-up and platform\n- 🧠 Health & wellness\n\nAsk me anything!",
-  es: "¡Hola! 🐸👑 Soy **Verdinho**, asistente IA de **Planta & Raiz**!\n\nPuedo ayudarte con:\n- 🩺 Consultas y citas\n- 💊 Cannabis medicinal\n- 🛒 Tienda y productos\n- 📋 Registro y plataforma\n- 🧠 Salud y bienestar\n\n¡Pregúntame lo que quieras!",
+  es: "¡Hola! 🐸👑 Soy **Verdinho**, asistente IA de **Planta & Raiz**!\n\nPuedo ayudarte con:\n- 🩺 Orientações Técnicas y citas\n- 💊 Cannabis medicinal\n- 🛒 Tienda y productos\n- 📋 Registro y plataforma\n- 🧠 Salud y bienestar\n\n¡Pregúntame lo que quieras!",
 };
 
 export const FrogChatModal = () => {

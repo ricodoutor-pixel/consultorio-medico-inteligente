@@ -233,7 +233,7 @@ const ProfessionalDashboard = () => {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { icon: Users, label: "Consultas Hoje", value: appointments.length, color: "text-blue-400" },
+          { icon: Users, label: "Orientações Técnicas Hoje", value: appointments.length, color: "text-blue-400" },
           { icon: Clock, label: "Horas Online", value: formatTimer(onlineTimer), color: "text-emerald-400" },
           { icon: Star, label: "Avaliação", value: doctorData?.rating?.toFixed(1) || "5.0", color: "text-amber-400" },
           { icon: Bell, label: "Notificações", value: notifications.length, color: "text-red-400" },
@@ -415,7 +415,7 @@ const ProfessionalDashboard = () => {
               <div className="aspect-video bg-black/90 flex items-center justify-center relative">
                 <div className="text-center text-white/60">
                   <Video size={48} className="mx-auto mb-3 opacity-40" />
-                  <p className="text-sm">Sala Jitsi — Consulta em andamento</p>
+                  <p className="text-sm">Sala Jitsi — Orientação Técnica em andamento</p>
                   <p className="text-xs mt-1 text-white/40">
                     {selectedPatient ? `Paciente #${selectedPatient.patient_id?.slice(0, 8)}` : "Sala Livre"}
                   </p>

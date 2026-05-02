@@ -11,7 +11,7 @@ serve(async (req) => {
 
   try {
     const { symptoms, patientInfo, language = "pt" } = await req.json();
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "AIzaSyCYeChGB-5lcqXgA4qfg18u0-H8gQurK_E";
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
     const systemPrompt = `Atue como o Clone Digital do Dr. Edilson Bezerra (CRM 10963), Especialista em Cannabis Medicinal.
 Você está realizando uma **Orientação Técnica** multilíngue. NUNCA use o termo 'Consulta'.
@@ -29,7 +29,7 @@ ESTRUTURA:
 - Indicação de Perfil Canabinoide
 - Próximos Passos (Aprovação da Enfª Brisa)`;
 
-    const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`, {
+    const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -41,7 +41,7 @@ ESTRUTURA:
     const content = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     return new Response(JSON.stringify({ success: true, orientation: content }), {
-      headers: { ...corsHeaders, "Content-Type": "text/plain" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders });

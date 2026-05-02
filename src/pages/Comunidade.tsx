@@ -100,7 +100,7 @@ const initialTopics: Topic[] = [
   {
     id: 5, title: "Importação pela ANVISA — passo a passo atualizado", author: "Dra. Camila Rocha", authorType: "doctor", category: "geral", replyCount: 42, upvotes: 156, downvotes: 0, date: "12h atrás",
     preview: "Guia completo atualizado para 2026 sobre importação de cannabis medicinal...",
-    content: "Guia completo atualizado para 2026:\n\n1. Consulta com médico prescritor habilitado\n2. Receita tipo B ou C (conforme produto)\n3. Cadastro no Portal ANVISA (anvisa.gov.br)\n4. Upload da receita + laudo médico + documentos pessoais\n5. Aguardar aprovação (prazo médio: 10 dias úteis)\n6. Autorização válida por 1 ano\n7. Importar via empresa autorizada\n\nDica: mantenham sempre a receita atualizada e renovem a autorização antes do vencimento. A Planta & Raiz pode ajudar em todo o processo!",
+    content: "Guia completo atualizado para 2026:\n\n1. Orientação Técnica com médico prescritor habilitado\n2. Receita tipo B ou C (conforme produto)\n3. Cadastro no Portal ANVISA (anvisa.gov.br)\n4. Upload da receita + laudo médico + documentos pessoais\n5. Aguardar aprovação (prazo médio: 10 dias úteis)\n6. Autorização válida por 1 ano\n7. Importar via empresa autorizada\n\nDica: mantenham sempre a receita atualizada e renovem a autorização antes do vencimento. A Planta & Raiz pode ajudar em todo o processo!",
     replies: makeReplies([
       { author: "Roberto S.", authorType: "patient", content: "Dra. Camila, minha autorização foi aprovada em 7 dias! O processo está mais rápido em 2026.", date: "10h atrás" },
       { author: "João P.", authorType: "patient", content: "Obrigado pelo guia! Estava perdido no processo. Já agendei consulta pela plataforma.", date: "8h atrás" },

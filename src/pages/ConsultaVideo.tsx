@@ -140,7 +140,7 @@ const ConsultaVideo = () => {
     try {
       const { data, error } = await supabase.functions.invoke("triage-summary", {
         body: {
-          answers: { transcript: aiTranscript || "Consulta de acompanhamento para tratamento com cannabis medicinal." },
+          answers: { transcript: aiTranscript || "Orientação Técnica de acompanhamento para tratamento com cannabis medicinal." },
           patientData: { nome: "Paciente" },
         },
       });
@@ -156,7 +156,7 @@ const ConsultaVideo = () => {
     if (appointmentId) {
       await supabase.from("appointments").update({ status: "completed" }).eq("id", appointmentId);
     }
-    toast({ title: "Consulta encerrada ✅" });
+    toast({ title: "Orientação Técnica encerrada ✅" });
     
     if (!isDoctor) {
       setShowNPS(true);

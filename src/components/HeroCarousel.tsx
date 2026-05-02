@@ -28,7 +28,7 @@ const slideAlts = [
   "Marketplace cannabis medicinal",
   "Prescrição digital cannabis",
   "Comunidade de saúde e bem-estar",
-  "Consulta médica cannabis medicinal online",
+  "Orientação Técnica médica cannabis medicinal online",
   "Dr. Verdinho - Mascote Planta y Raiz",
   "Brisa - Enfermeira Chefe IA Planta y Raiz",
   "Médico especialista Planta y Raiz",

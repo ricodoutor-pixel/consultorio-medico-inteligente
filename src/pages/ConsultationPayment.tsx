@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { userChannel } from "@/lib/realtime-channels";
+import { usePaymentGateway } from "@/hooks/usePaymentGateway";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -23,6 +24,7 @@ const ConsultationPayment = () => {
   const [countdown, setCountdown] = useState(900); // 15 min
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const { toast } = useToast();
+  const { price: dynamicPrice, gateway, createPayment: createGatewayPayment, loading: loadingGateway } = usePaymentGateway();
 
   const [isExempt, setIsExempt] = useState(false);
 
@@ -44,36 +46,31 @@ const ConsultationPayment = () => {
   }, []);
 
   const feeRate = isExempt ? 0 : 0.07;
-  const commission = pro.priceValue * feeRate;
-  const total = pro.priceValue;
+  const total = dynamicPrice || pro.priceValue;
 
-  // Create Mercado Pago payment preference on mount
+  // Create payment preference on mount or when dynamic price is ready
   useEffect(() => {
-    createPayment();
-  }, []);
+    if (!loadingGateway) {
+      createPayment();
+    }
+  }, [loadingGateway]);
 
   const createPayment = async () => {
     setStatus("loading");
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const { data, error } = await supabase.functions.invoke("create-payment", {
-        body: {
-          appointmentId,
-          doctorName: pro.name,
-          amount: total,
-          patientEmail: session?.user?.email || "",
-          description: `Consulta com ${pro.name} - Planta & Raiz`,
-        },
+      const data = await createGatewayPayment({
+        appointmentId,
+        doctorName: pro.name,
+        patientEmail: session?.user?.email || "",
+        description: `Orientação Técnica com ${pro.name} - Planta & Raiz`,
       });
 
-      if (error) throw error;
-
-      if (data?.init_point) {
-        setCheckoutUrl(data.init_point);
+      if (data?.init_point || data?.url) {
+        setCheckoutUrl(data.init_point || data.url);
         setStatus("pending");
-      } else if (data?.error) {
-        // Fallback to static link if MP API fails
-        console.warn("Fallback to static link:", data.error);
+      } else {
+        // Fallback to static link
         setCheckoutUrl(pro.paymentLink);
         setStatus("pending");
       }
@@ -117,7 +114,11 @@ const ConsultationPayment = () => {
         }
         await new Promise(r => setTimeout(r, 600));
         setStatus("confirmed");
-        toast({ title: "✅ Pagamento confirmado!", description: "Sua consulta está agendada." });
+        toast({ title: "✅ Pagamento confirmado!", description: "Redirecionando para validação..." });
+        // Redirect to WhatsApp Proof Modal as requested
+        setTimeout(() => {
+          window.location.href = "/whatsapp-proof";
+        }, 1500);
       } else if (data?.status === "rejected") {
         setStatus("rejected");
         toast({ title: "❌ Pagamento recusado", description: "Tente novamente.", variant: "destructive" });
@@ -309,7 +310,7 @@ const ConsultationPayment = () => {
                     {/* Price Breakdown */}
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Consulta</span>
+                        <span className="text-muted-foreground">Orientação Técnica</span>
                         <span className="text-foreground font-bold">{pro.price}</span>
                       </div>
                       <div className="flex justify-between text-sm">

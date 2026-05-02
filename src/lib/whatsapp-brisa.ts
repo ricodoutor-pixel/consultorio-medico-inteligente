@@ -37,7 +37,7 @@ export function generateBrisaWhatsAppURL(
  * Tipos de consulta
  */
 export const CONSULTATION_TYPES = {
-  initial: "Consulta Inicial",
+  initial: "Orientação Técnica Inicial",
   followup: "Acompanhamento",
   emergency: "Emergência",
   prescription: "Prescrição",

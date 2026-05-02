@@ -85,7 +85,7 @@ const AdminDashboard = () => {
       setDoctorStatus([
         { name: "Online", value: onlineDocs, color: "#22c55e" },
         { name: "Offline", value: Math.max(0, verifiedDocs - onlineDocs - inConsultation), color: "#ef4444" },
-        { name: "Em Consulta", value: inConsultation, color: "#f59e0b" },
+        { name: "Em Orientação Técnica", value: inConsultation, color: "#f59e0b" },
       ]);
 
       // Recent appointments
@@ -177,7 +177,7 @@ const AdminDashboard = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: "Consultas Totais", value: stats.totalAppointments, icon: Stethoscope },
+              { label: "Orientações Técnicas Totais", value: stats.totalAppointments, icon: Stethoscope },
               { label: "Concluídas", value: stats.completedConsultations, icon: Shield },
               { label: "BTC Pendentes", value: stats.pendingBTC, icon: Zap },
               { label: "IA Triagens", value: "Ativo", icon: Brain },
@@ -198,7 +198,7 @@ const AdminDashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-2 border-border bg-card/50 backdrop-blur">
               <CardHeader>
-                <CardTitle className="text-xs font-black uppercase tracking-widest text-muted-foreground">Faturamento & Consultas (6 meses)</CardTitle>
+                <CardTitle className="text-xs font-black uppercase tracking-widest text-muted-foreground">Faturamento & Orientações Técnicas (6 meses)</CardTitle>
               </CardHeader>
               <CardContent className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -246,7 +246,7 @@ const AdminDashboard = () => {
           {/* Recent Appointments */}
           <Card className="border-border bg-card/50 backdrop-blur">
             <CardHeader>
-              <CardTitle className="text-xs font-black uppercase tracking-widest text-muted-foreground">Consultas Recentes</CardTitle>
+              <CardTitle className="text-xs font-black uppercase tracking-widest text-muted-foreground">Orientações Técnicas Recentes</CardTitle>
             </CardHeader>
             <CardContent>
               {recentAppointments.length === 0 ? (

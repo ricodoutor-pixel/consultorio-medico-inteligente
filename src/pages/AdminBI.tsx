@@ -115,7 +115,7 @@ const AdminBI = () => {
     setConversionData([
       { name: "Visitantes", value: totalPatients * 8 },
       { name: "Triagem", value: totalTriages },
-      { name: "Consulta Paga", value: paidAppointments.length },
+      { name: "Orientação Técnica Paga", value: paidAppointments.length },
       { name: "Assinantes", value: activeSubs.length },
     ]);
 
@@ -154,7 +154,7 @@ const AdminBI = () => {
             {[
               { icon: DollarSign, label: "MRR (Recorrente)", value: formatBRL((metrics as any).mrr || 0), color: "text-emerald-400" },
               { icon: TrendingUp, label: "Vendas Hoje", value: formatBRL((metrics as any).dailySales || 0), color: "text-blue-400" },
-              { icon: Activity, label: "Consultas", value: metrics.totalConsultations.toString(), color: "text-purple-400" },
+              { icon: Activity, label: "Orientações Técnicas", value: metrics.totalConsultations.toString(), color: "text-purple-400" },
               { icon: Percent, label: "Conversão Triagem→Pago", value: `${metrics.triageConversion.toFixed(1)}%`, color: "text-amber-400" },
             ].map(({ icon: Icon, label, value, color }, i) => (
               <Card key={i} className="p-4 bg-card/80 border-border/50">

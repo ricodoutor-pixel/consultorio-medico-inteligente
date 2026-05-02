@@ -27,7 +27,7 @@ const translations: Record<Locale, Record<string, string>> = {
     // Hero
     "hero.title": "Planta y Raiz - Mega Clínica Digital",
     "hero.subtitle": "Democratizando o acesso à saúde e bem-estar através da tecnologia e cannabis medicinal.",
-    "hero.start_consultation": "Iniciar Consulta",
+    "hero.start_consultation": "Iniciar Orientação Técnica",
     "hero.online_now": "Online agora",
     "hero.responsible_tech": "Supervisionado por IA de última geração 24×7",
     // Common
@@ -175,7 +175,7 @@ const translations: Record<Locale, Record<string, string>> = {
     // Hero
     "hero.title": "Planta y Raiz - Mega Clínica Digital",
     "hero.subtitle": "Democratizando el acceso a la salud y el bienestar a través de la tecnología y el cannabis medicinal.",
-    "hero.start_consultation": "Iniciar Consulta",
+    "hero.start_consultation": "Iniciar Orientação Técnica",
     "hero.online_now": "En línea ahora",
     "hero.responsible_tech": "Responsable Técnico y Jurídico",
     "common.save": "Guardar",
@@ -203,7 +203,7 @@ const translations: Record<Locale, Record<string, string>> = {
     "consult.position": "Posición en la cola",
     "med.diagnosis": "Diagnóstico",
     "med.prescription": "Receta",
-    "med.complaint": "Motivo de Consulta",
+    "med.complaint": "Motivo de Orientação Técnica",
     "med.history": "Historial",
     "med.treatment": "Plan Terapéutico",
     "med.sign": "Firmar Digitalmente",

@@ -47,10 +47,10 @@ function useRotatingOnline(base: Professional[]): Professional[] {
 
 const SERVICE_TIERS = [
   { name: "Mentoria", price: "R$ 30", value: 30, icon: Zap, desc: "Orientação rápida de 15 min", highlight: false },
-  { name: "Consulta Chat", price: "R$ 50", value: 50, icon: MessageSquare, desc: "Consulta por chat completa", highlight: false },
-  { name: "Consulta Vídeo", price: "R$ 80", value: 80, icon: Video, desc: "Teleconsulta por vídeo 30 min", highlight: false },
-  { name: "Consulta + Receita", price: "R$ 100", value: 100, icon: FileText, desc: "Consulta com prescrição canábica", highlight: true },
-  { name: "Combo ANVISA Chat", price: "R$ 120", value: 120, icon: ShieldCheck, desc: "Consulta + laudo + receita ANVISA", highlight: false },
+  { name: "Orientação Técnica Chat", price: "R$ 50", value: 50, icon: MessageSquare, desc: "Orientação Técnica por chat completa", highlight: false },
+  { name: "Orientação Técnica Vídeo", price: "R$ 80", value: 80, icon: Video, desc: "Teleconsulta por vídeo 30 min", highlight: false },
+  { name: "Orientação Técnica + Receita", price: "R$ 100", value: 100, icon: FileText, desc: "Orientação Técnica com prescrição canábica", highlight: true },
+  { name: "Combo ANVISA Chat", price: "R$ 120", value: 120, icon: ShieldCheck, desc: "Orientação Técnica + laudo + receita ANVISA", highlight: false },
   { name: "Combo Full Vídeo", price: "R$ 150", value: 150, icon: Star, desc: "Vídeo + receita + laudo completo", highlight: false },
 ];
 
@@ -372,7 +372,7 @@ const Profissionais = () => {
                           </span>
                         </div>
 
-                        {/* Botão Agendar Consulta via WhatsApp */}
+                        {/* Botão Agendar Orientação Técnica via WhatsApp */}
                         <a
                           href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${p.name}`)}`}
                           target="_blank"
@@ -381,7 +381,7 @@ const Profissionais = () => {
                           className="mt-3 block"
                         >
                           <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-black rounded-xl gap-2 text-sm h-10">
-                            <Phone size={14} /> Agendar Consulta
+                            <Phone size={14} /> Agendar Orientação Técnica
                           </Button>
                         </a>
                       </div>

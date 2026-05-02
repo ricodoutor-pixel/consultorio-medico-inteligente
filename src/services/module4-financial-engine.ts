@@ -41,7 +41,7 @@ interface SubscriberPlan {
 }
 
 /**
- * 🟠 FUNÇÃO: Calcular Split de Pagamento (Consultas)
+ * 🟠 FUNÇÃO: Calcular Split de Pagamento (Orientações Técnicas)
  * Reter 7% (Plataforma) / 93% (Médico)
  */
 export async function calculateConsultationSplit(

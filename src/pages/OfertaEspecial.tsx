@@ -149,7 +149,7 @@ const OfertaEspecial = () => {
             onClick={() => navigate(`/consulta-rapida?cupom=${cupom}`)}
             disabled={isExpired}
           >
-            🩺 Agendar Minha Consulta com Desconto
+            🩺 Agendar Minha Orientação Técnica com Desconto
           </Button>
           <Button
             variant="outline"

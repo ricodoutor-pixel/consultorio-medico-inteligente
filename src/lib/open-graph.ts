@@ -17,7 +17,7 @@ export interface OpenGraphConfig {
 export const openGraphConfigs: Record<string, OpenGraphConfig> = {
   home: {
     title: 'Planta & Raiz — Telemedicina Cannabis Medicinal',
-    description: 'Referência no tratamento com cannabis medicinal no Brasil. Consultas com especialistas por apenas R$30. Democratizando acesso à medicina personalizada.',
+    description: 'Referência no tratamento com cannabis medicinal no Brasil. Orientações Técnicas com especialistas por apenas R$30. Democratizando acesso à medicina personalizada.',
     image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-home.jpg',
     url: 'https://plantayraiz.com.br',
     type: 'website',
@@ -56,7 +56,7 @@ export const openGraphConfigs: Record<string, OpenGraphConfig> = {
     imageType: 'image/jpeg',
   },
   agendamento: {
-    title: 'Agende sua Consulta — Telemedicina Cannabis Medicinal',
+    title: 'Agende sua Orientação Técnica — Telemedicina Cannabis Medicinal',
     description: 'Consulte com especialistas em cannabis medicinal por apenas R$30. Atendimento online, rápido e seguro. Agende agora!',
     image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-agendamento.jpg',
     url: 'https://plantayraiz.com.br/agendamento',

@@ -102,7 +102,7 @@ const SalaEspera = () => {
 
   const handleStartConsultation = async (appointmentId: string) => {
     await supabase.from("appointments").update({ status: "in_progress" }).eq("id", appointmentId);
-    toast({ title: "Consulta iniciada! 🩺" });
+    toast({ title: "Orientação Técnica iniciada! 🩺" });
   };
 
   if (loading) {
@@ -175,7 +175,7 @@ const SalaEspera = () => {
                   </p>
                   {userType === "patient" && (
                     <Button className="bg-primary text-primary-foreground font-bold rounded-xl" asChild>
-                      <Link to="/agendamento">Agendar Consulta <ArrowRight size={16} className="ml-2" /></Link>
+                      <Link to="/agendamento">Agendar Orientação Técnica <ArrowRight size={16} className="ml-2" /></Link>
                     </Button>
                   )}
                 </CardContent>
@@ -203,7 +203,7 @@ const SalaEspera = () => {
                               <div>
                                 <div className="flex items-center gap-2">
                                   <p className="font-bold text-sm text-foreground">
-                                    {appt.type === "video" ? "Teleconsulta Vídeo" : appt.type === "chat" ? "Consulta Chat" : "Consulta"}
+                                    {appt.type === "video" ? "Teleconsulta Vídeo" : appt.type === "chat" ? "Orientação Técnica Chat" : "Orientação Técnica"}
                                   </p>
                                   {isInProgress && (
                                     <Badge className="bg-primary/10 text-primary text-[10px]">EM ANDAMENTO</Badge>

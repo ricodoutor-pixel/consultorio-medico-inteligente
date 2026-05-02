@@ -13,7 +13,7 @@ interface WhatsAppConfig {
   apiVersion: string;
 }
 
-const WHATSAPP_API_BASE = 'https://graph.instagram.com';
+const WHATSAPP_API_BASE = 'https://graph.facebook.com';
 
 /**
  * Enviar mensagem via WhatsApp

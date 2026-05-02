@@ -21,7 +21,7 @@ const consultsByDay = [
 ];
 
 const upcomingConsults = [
-  { patient: "Maria Silva", time: "09:00", type: "Primeira Consulta", status: "confirmed" },
+  { patient: "Maria Silva", time: "09:00", type: "Primeira Orientação Técnica", status: "confirmed" },
   { patient: "João Santos", time: "10:30", type: "Retorno", status: "confirmed" },
   { patient: "Ana Oliveira", time: "14:00", type: "Avaliação", status: "pending" },
   { patient: "Carlos Lima", time: "15:30", type: "Receita", status: "confirmed" },
@@ -62,7 +62,7 @@ const SpecialistDashboard = () => {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {[
                 { icon: DollarSign, label: "Ganhos (mês)", value: "R$ 6.100", change: "+18%", color: "green" },
-                { icon: Users, label: "Consultas (mês)", value: "38", change: "+12%", color: "green" },
+                { icon: Users, label: "Orientações Técnicas (mês)", value: "38", change: "+12%", color: "green" },
                 { icon: FileText, label: "Receitas Emitidas", value: "24", change: "+8%", color: "purple" },
                 { icon: Star, label: "Avaliação Média", value: "4.9★", change: "+0.1", color: "gold" },
               ].map((kpi, i) => (
@@ -102,7 +102,7 @@ const SpecialistDashboard = () => {
               <Card className="border-border">
                 <CardContent className="p-6">
                   <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                    <Calendar size={18} /> Consultas por Dia
+                    <Calendar size={18} /> Orientações Técnicas por Dia
                   </h3>
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={consultsByDay}>
@@ -122,7 +122,7 @@ const SpecialistDashboard = () => {
               <Card className="border-border">
                 <CardContent className="p-6">
                   <h3 className="font-display font-black text-foreground mb-4 flex items-center gap-2">
-                    <Clock size={18} /> Próximas Consultas
+                    <Clock size={18} /> Próximas Orientações Técnicas
                   </h3>
                   <div className="space-y-3">
                     {upcomingConsults.map((c, i) => (

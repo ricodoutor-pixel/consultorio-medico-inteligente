@@ -84,7 +84,7 @@ const PoliticaDePrivacidade = () => {
           {/* 6. Pagamentos */}
           <section className="space-y-3">
             <h2 className="text-lg font-display font-black text-foreground">🌿 6. Processamento de Pagamentos</h2>
-            <p>Todos os pagamentos são processados exclusivamente pelo <strong className="text-foreground">Stripe</strong>, gateway certificado PCI-DSS Level 1. A Planta y Raiz:</p>
+            <p>Os pagamentos são processados através de gateways certificados como <strong className="text-foreground">Mercado Pago</strong> (Brasil) e <strong className="text-foreground">Stripe</strong> (Internacional), ambos certificados PCI-DSS Level 1. A Planta y Raiz:</p>
             <ul className="list-disc pl-6 space-y-1">
               <li><strong className="text-foreground">Não armazena</strong> números de cartão de crédito, CVV ou dados bancários de pacientes;</li>
               <li><strong className="text-foreground">Não processa</strong> transações financeiras diretamente;</li>
@@ -97,9 +97,9 @@ const PoliticaDePrivacidade = () => {
             <h2 className="text-lg font-display font-black text-foreground">⚖️ 7. Compartilhamento de Dados</h2>
             <p>Seus dados pessoais poderão ser compartilhados exclusivamente com:</p>
             <ul className="list-disc pl-6 space-y-1">
-              <li>Profissionais de saúde cadastrados na plataforma, para fins de atendimento clínico;</li>
+              <li>Profissionais de saúde cadastrados na plataforma, para fins de orientação técnica;</li>
               <li>Farmácias e importadoras autorizadas pela ANVISA, para dispensação de prescrições;</li>
-              <li>Stripe (processamento de pagamentos);</li>
+              <li>Mercado Pago e Stripe (processamento de pagamentos);</li>
               <li>Autoridades competentes, quando exigido por lei ou ordem judicial.</li>
             </ul>
             <p><strong className="text-foreground">🌿 Não vendemos, alugamos ou compartilhamos seus dados com terceiros para fins de marketing.</strong></p>

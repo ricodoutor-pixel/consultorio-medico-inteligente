@@ -120,7 +120,7 @@ export function useConsultationQueue(userType: "patient" | "doctor") {
       });
 
       if (error) throw error;
-      toast({ title: "Consulta aceita!", description: "Entrando na sala..." });
+      toast({ title: "Orientação Técnica aceita!", description: "Entrando na sala..." });
       return data;
     } catch (err) {
       toast({ title: "Erro", description: String(err), variant: "destructive" });

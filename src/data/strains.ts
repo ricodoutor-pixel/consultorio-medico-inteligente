@@ -88,11 +88,10 @@ const aiImg = (name: string, type: string) => {
   
   const seed = Math.abs([...name].reduce((h, c) => ((h << 5) - h) + c.charCodeAt(0), 0));
   const t = type.toLowerCase();
-  if (t.includes("medicinal") || t.includes("especializada")) return medicinalImages[seed % medicinalImages.length];
-  if (t.includes("indica")) return indicaImages[seed % indicaImages.length];
-  if (t.includes("sativa")) return sativaImages[seed % sativaImages.length];
-  if (t.includes("cbd")) return cbdImages[seed % cbdImages.length];
-  return hybridImages[seed % hybridImages.length];
+  
+  // Use pollinations.ai for dynamic image generation
+  const prompt = encodeURIComponent(`high quality cannabis flower strain ${name} ${type} macro photography realistic medicinal`);
+  return `https://image.pollinations.ai/prompt/${prompt}?seed=${seed}&width=1024&height=1024&nologo=true`;
 };
 
 export const getPlantImage = (id: number) => {

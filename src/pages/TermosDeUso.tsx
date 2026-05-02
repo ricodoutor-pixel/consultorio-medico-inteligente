@@ -68,7 +68,7 @@ const TermosDeUso = () => {
 
           {/* 5. Telemedicina */}
           <section className="space-y-3">
-            <h2 className="text-lg font-display font-black text-foreground">⚖️ 5. Consultas Online e Telemedicina</h2>
+            <h2 className="text-lg font-display font-black text-foreground">⚖️ 5. Orientações Técnicas Online e Telemedicina</h2>
             <p>Ao agendar uma consulta, o usuário <strong className="text-foreground">consente expressamente</strong> com a realização de atendimento médico por meio de teleconsulta (videoconferência), em conformidade com a <strong className="text-foreground">Resolução CFM nº 2.314/2022</strong>.</p>
             <p>O paciente declara estar ciente de que:</p>
             <ul className="list-disc pl-6 space-y-1">

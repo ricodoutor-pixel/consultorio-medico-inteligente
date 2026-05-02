@@ -31,7 +31,7 @@ const PoliticaDeReembolso = () => {
         <div className="container mx-auto px-4 max-w-3xl space-y-8 text-sm text-muted-foreground leading-relaxed">
 
           <section className="space-y-3">
-            <h2 className="text-lg font-display font-black text-foreground">1. Consultas — Cancelamento com Antecedência</h2>
+            <h2 className="text-lg font-display font-black text-foreground">1. Orientações Técnicas — Cancelamento com Antecedência</h2>
             <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 space-y-2">
               <div className="flex items-start gap-3">
                 <span className="text-primary font-black text-lg">100%</span>
@@ -41,7 +41,7 @@ const PoliticaDeReembolso = () => {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-display font-black text-foreground">2. Consultas — Cancelamento Tardio (2h a 24h)</h2>
+            <h2 className="text-lg font-display font-black text-foreground">2. Orientações Técnicas — Cancelamento Tardio (2h a 24h)</h2>
             <div className="bg-secondary/5 border border-secondary/10 rounded-xl p-4 space-y-2">
               <p>Para cancelamentos realizados entre <strong className="text-foreground">2 horas e 24 horas</strong> antes do horário agendado, o valor pago será convertido em <strong className="text-foreground">crédito na forma de Planta-Coins</strong>.</p>
               <p>Os Planta-Coins poderão ser utilizados para:</p>
@@ -55,7 +55,7 @@ const PoliticaDeReembolso = () => {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-display font-black text-foreground">3. Consultas — No-Show (Ausência sem Aviso)</h2>
+            <h2 className="text-lg font-display font-black text-foreground">3. Orientações Técnicas — No-Show (Ausência sem Aviso)</h2>
             <div className="bg-destructive/5 border border-destructive/10 rounded-xl p-4">
               <p><strong className="text-foreground">Não há reembolso</strong> para pacientes que não compareçam à consulta sem aviso prévio (no-show). O profissional de saúde reservou seu horário exclusivamente para o atendimento.</p>
               <p className="mt-2">Em caso de problemas técnicos comprovados (queda de servidor, falha na plataforma), o paciente poderá solicitar reagendamento sem custo adicional.</p>

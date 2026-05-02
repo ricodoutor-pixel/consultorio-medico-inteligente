@@ -27,7 +27,7 @@ const channelData = [
 
 const conversionData = [
   { step: "Visita", value: 10000 }, { step: "Cadastro", value: 3500 },
-  { step: "Triagem", value: 2100 }, { step: "Consulta", value: 1200 },
+  { step: "Triagem", value: 2100 }, { step: "Orientação Técnica", value: 1200 },
   { step: "Recorrente", value: 480 },
 ];
 
@@ -58,7 +58,7 @@ const DashboardExecutivo = () => {
   const kpis = [
     { icon: Users, label: "Pacientes", value: counts.patients.toLocaleString(), change: "+24%", color: "text-primary" },
     { icon: Stethoscope, label: "Médicos", value: String(counts.doctors), change: "+12%", color: "text-secondary" },
-    { icon: FileText, label: "Consultas", value: counts.appointments.toLocaleString(), change: "+38%", color: "text-[hsl(var(--gold))]" },
+    { icon: FileText, label: "Orientações Técnicas", value: counts.appointments.toLocaleString(), change: "+38%", color: "text-[hsl(var(--gold))]" },
     { icon: DollarSign, label: "Receita (mês)", value: "R$ 142K", change: "+23%", color: "text-primary" },
   ];
 

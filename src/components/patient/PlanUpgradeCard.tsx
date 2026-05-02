@@ -29,7 +29,7 @@ const plans = [
     id: "familia",
     name: "Família",
     price: 250,
-    features: ["Tudo do Acesso", "Até 5 dependentes", "Consultas ilimitadas", "Prescrição digital"],
+    features: ["Tudo do Acesso", "Até 5 dependentes", "Orientações Técnicas ilimitadas", "Prescrição digital"],
     color: "hsl(45,76%,52%)",
     popular: false,
   },

@@ -39,7 +39,7 @@ const PLANS = [
     tagline: null,
     features: [
       "Tudo do VIP",
-      "Consultas ilimitadas",
+      "Orientações Técnicas ilimitadas",
       "Destaque no ranking",
       "1.2× multiplicador de lucros",
       "Relatórios avançados",

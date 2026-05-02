@@ -65,6 +65,16 @@ export const CookieConsentBanner = () => {
       localStorage.setItem(COOKIE_KEY, JSON.stringify(consent));
       setVisible(false);
 
+      // Integrar com GTM Consent Mode v2 via função global definida no index.html
+      if (typeof (window as any).updateConsent === "function") {
+        (window as any).updateConsent({
+          analytics_storage: "granted",
+          ad_storage: "granted",
+          ad_user_data: "granted",
+          ad_personalization: "granted",
+        });
+      }
+
       // Dispatch custom event so analytics/pixel scripts know consent was granted
       window.dispatchEvent(new CustomEvent("plr:cookie-consent", { detail: consent }));
 

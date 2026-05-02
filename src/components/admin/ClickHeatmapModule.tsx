@@ -53,7 +53,7 @@ export function ClickHeatmapModule() {
 
   // Generate heatmap visualization
   const buttonZones = [
-    { name: "Agendar Consulta", x: 50, y: 30, w: 140, h: 36 },
+    { name: "Agendar Orientação Técnica", x: 50, y: 30, w: 140, h: 36 },
     { name: "WhatsApp Float", x: 320, y: 180, w: 45, h: 45 },
     { name: "Falar com Médico", x: 50, y: 90, w: 130, h: 36 },
     { name: "Ver Planos", x: 200, y: 30, w: 100, h: 36 },
@@ -67,7 +67,7 @@ export function ClickHeatmapModule() {
   });
 
   const actionToZone: Record<string, string> = {
-    schedule_click: "Agendar Consulta",
+    schedule_click: "Agendar Orientação Técnica",
     whatsapp_click: "WhatsApp Float",
     cta_click: "Falar com Médico",
     form_submit: "Ver Planos",

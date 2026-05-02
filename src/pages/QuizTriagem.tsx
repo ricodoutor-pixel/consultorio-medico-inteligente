@@ -239,7 +239,7 @@ const QuizTriagem = () => {
                 onClick={() => navigate("/agendamento")}
                 className="w-full gap-2 bg-gradient-to-r from-primary to-secondary text-primary-foreground h-12"
               >
-                <Zap className="w-5 h-5" /> Agendar Consulta Agora
+                <Zap className="w-5 h-5" /> Agendar Orientação Técnica Agora
               </Button>
               <Button variant="outline" onClick={() => { setMatchResult(null); setCurrentStep(0); setAnswers({}); }}>
                 Refazer Quiz

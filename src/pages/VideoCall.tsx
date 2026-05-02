@@ -41,7 +41,7 @@ const VideoCall = () => {
                 <Video size={20} />
               </div>
               <div>
-                <h1 className="text-xl font-display font-black text-foreground">Consulta Online</h1>
+                <h1 className="text-xl font-display font-black text-foreground">Orientação Técnica Online</h1>
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
                   <Badge variant="outline" className="text-[10px] font-bold text-green-500 border-green-500/20 bg-green-500/5">Conexão Segura</Badge>
                   ID: {consultationId}
@@ -98,7 +98,7 @@ const VideoCall = () => {
               <Card className="border-border bg-card/50 flex-grow">
                 <CardHeader>
                   <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                    <MessageSquare size={14} className="text-primary" /> Chat da Consulta
+                    <MessageSquare size={14} className="text-primary" /> Chat da Orientação Técnica
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 flex flex-col h-full">

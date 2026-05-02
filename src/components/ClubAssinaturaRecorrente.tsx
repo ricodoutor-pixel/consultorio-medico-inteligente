@@ -19,7 +19,7 @@ const CLUB_PLANS = [
     color: "from-primary to-primary/80",
     popular: false,
     features: [
-      "1 Consulta/mês com desconto",
+      "1 Orientação Técnica/mês com desconto",
       "Acesso ao Club exclusivo",
       "Conteúdo educacional premium",
       "Alertas de receita vencendo",
@@ -35,7 +35,7 @@ const CLUB_PLANS = [
     color: "from-secondary to-secondary/80",
     popular: true,
     features: [
-      "3 Consultas/mês incluídas",
+      "3 Orientações Técnicas/mês incluídas",
       "20% desconto no Shopping",
       "Acompanhamento contínuo IA",
       "Prontuário digital completo",
@@ -53,7 +53,7 @@ const CLUB_PLANS = [
     popular: false,
     features: [
       "Até 5 membros da família",
-      "Consultas ilimitadas",
+      "Orientações Técnicas ilimitadas",
       "30% desconto no Shopping",
       "Concierge médico 24/7",
       "Prioridade no matching",

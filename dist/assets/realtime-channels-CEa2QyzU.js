@@ -1,0 +1,1 @@
+import"./client-CgRK0a3r.js";function n(n){return`public:${n}`}function r(n,r){return`user:${n}:${r}`}function t(n,r){return`doctor:${n}:${r}`}export{n,r,t};

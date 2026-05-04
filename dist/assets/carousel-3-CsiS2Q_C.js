@@ -1,0 +1,1 @@
+var a="/assets/carousel-3-BmuqAWf4.jpg";export{a as default};

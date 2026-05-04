@@ -1,0 +1,1 @@
+var a="/assets/carousel-13-tBScDnfd.jpg";export{a as default};

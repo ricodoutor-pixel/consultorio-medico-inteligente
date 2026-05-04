@@ -63,9 +63,9 @@ const DashboardExecutivo = () => {
   ];
 
   const performanceKPIs = [
-    { label: "CAC", value: "R$ 42", target: "< R$ 50", ok: true },
-    { label: "LTV", value: "R$ 1.840", target: "> R$ 1.500", ok: true },
-    { label: "Churn", value: "3.2%", target: "< 5%", ok: true },
+    { label: "Orientação R$ 30", value: "842", target: "Brasil", ok: true },
+    { label: "Orientação US$ 10", value: "128", target: "Intl", ok: true },
+    { label: "Brisa-CEO", value: "Ativa", target: "Orquestradora", ok: true },
     { label: "NPS", value: "72", target: "> 70", ok: true },
     { label: "Conversão", value: "12%", target: "> 15%", ok: false },
     { label: "Uptime", value: "99.99%", target: "99.99%", ok: true },
@@ -181,10 +181,10 @@ const DashboardExecutivo = () => {
                   <div className="space-y-3">
                     {[
                       { msg: "Taxa de conversão abaixo da meta (12% vs 15%)", type: "warning" },
-                      { msg: "3 médicos aguardando verificação de CRM", type: "info" },
-                      { msg: "Webhook Mercado Pago operacional ✅", type: "success" },
-                      { msg: "Backup automático realizado às 03:00", type: "success" },
-                      { msg: "Conformidade CFM/ANVISA: 100%", type: "success" },
+                      { msg: "Brisa-CEO: 450 protocolos ANVISA gerados hoje", type: "success" },
+                      { msg: "Evolution API: Custo zero de mensagens ativo ✅", type: "success" },
+                      { msg: "RAG Científico: 40k artigos indexados via pgvector", type: "success" },
+                      { msg: "Conformidade CRM 10963: 100% Blindado", type: "success" },
                     ].map((alert, i) => (
                       <div key={i} className={`p-3 rounded-xl border text-xs font-bold ${alert.type === "warning" ? "border-[hsl(var(--gold))]/30 bg-[hsl(var(--gold))]/5 text-[hsl(var(--gold))]" : alert.type === "success" ? "border-primary/30 bg-primary/5 text-primary" : "border-secondary/30 bg-secondary/5 text-secondary"}`}>
                         {alert.msg}

@@ -1,0 +1,1 @@
+import{t as a}from"./client-CgRK0a3r.js";var t=()=>({log:async(t,r,o,e,i)=>{try{const{data:{session:s}}=await a.auth.getSession();if(!s)return;await a.from("audit_log").insert({user_id:s.user.id,action:t,table_name:r,record_id:o,old_data:e??null,new_data:i??null})}catch(s){console.error("Audit log error:",s)}}});export{t};

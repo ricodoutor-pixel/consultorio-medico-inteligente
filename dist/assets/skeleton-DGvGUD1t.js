@@ -1,0 +1,1 @@
+import{i as a}from"./animation-BJhzlK-I.js";import{r as s}from"./button-DHpTLg5x.js";var t=a();function m({className:a,...m}){return(0,t.jsx)("div",{className:s("animate-pulse rounded-md bg-muted",a),...m})}export{m as t};

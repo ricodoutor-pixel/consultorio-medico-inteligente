@@ -18,6 +18,7 @@ import testimonialAntonio from "@/assets/testimonial-antonio.jpg";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import drEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 
 import { useEffect } from "react";
 
@@ -230,8 +231,14 @@ const Index = () => {
               <Card className="relative border-primary/30 bg-card/60 backdrop-blur-md rounded-3xl overflow-hidden">
                 <CardContent className="p-8 space-y-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-[hsl(142,70%,35%)] flex items-center justify-center text-3xl shadow-lg">
-                      👨‍⚕️
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/40 shrink-0">
+                      <img
+                        src={drEdilsonPhoto}
+                        alt="Dr. Edilson Bezerra — CRM 10963"
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
                     </div>
                     <div>
                       <p className="font-display font-black text-xl">Dr. Edilson Bezerra</p>

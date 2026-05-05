@@ -270,7 +270,7 @@ const Index = () => {
                       <p className="text-[10px] text-muted-foreground font-bold uppercase">Brasil</p>
                     </div>
                     <div className="text-center p-3 rounded-xl bg-background/60 border border-border">
-                      <p className="text-xl font-black text-primary">20min</p>
+                      <p className="text-xl font-black text-primary">30min</p>
                       <p className="text-[10px] text-muted-foreground font-bold uppercase">Duração</p>
                     </div>
                     <div className="text-center p-3 rounded-xl bg-background/60 border border-border">

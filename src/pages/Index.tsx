@@ -177,7 +177,7 @@ const Index = () => {
           </h2>
           <p className="text-sm md:text-base text-muted-foreground mb-6">
             Triagem → Orientação Técnica → Médico Prescritor → Consulta → Shopping com frete grátis.
-            Tudo dentro da plataforma, auditado pela Enf.Brisa.
+            Tudo dentro da Mesma plataforma, auditado 24x7 pela Enf.Brisa.
           </p>
           <Button
             size="lg"

@@ -3,7 +3,7 @@ import { X, Stethoscope, User, Store, BookOpen, HelpCircle, MessageCircle } from
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
 import { supabase } from "@/integrations/supabase/client";
-import brisaAvatar from "@/assets/brisa-enfermeira.png";
+import brisaAvatar from "@/assets/brisa-enfermeira.webp";
 
 // ManyChat keyword triggers — Ative em Automation → Keywords no painel ManyChat
 

@@ -198,16 +198,17 @@ const Index = () => {
                 ⚕️ Especialista Verificado · CRM 10963
               </span>
             <h2 className="font-display font-black text-3xl md:text-5xl leading-tight">
-                Orientação e Avaliacao Técnica Com Dr. Edilson Bezerra
+                Orientação e Avaliação Técnica com{" "}
+                <span className="text-gradient-green">Dr. Edilson Bezerra</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                Médico Pesquizador referência em <strong className="text-foreground">Cannabis Medicinal no Brasil</strong>. Atendimento online de ate 20 minutos com pré-prontuário, indicação do perfil canabinoide e orientacao tecnica sobre todo processo da modulacao Precisa e e assertiva do sistema endocannabinoide humano conte com suporte completo da Enfª Brisa via WhatsApp.
+                Médico pesquisador e referência em <strong className="text-foreground">Cannabis Medicinal no Brasil</strong>. Atendimento online de até 20 minutos com pré-prontuário, indicação do perfil canabinoide e orientação técnica sobre todo o processo de modulação precisa e assertiva do sistema endocanabinoide humano. Conte com o suporte completo da Enfª Brisa via WhatsApp.
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Pagamento via Pix com confirmação automática</li>
                 <li className="flex items-start gap-2">
-                  <Leaf size={16} className="text-primary mt-0.5 shrink-0" /> 
-                  Avaliação Completa e Indicação<br />digital com assinatura ICP-Brasil
+                  <Leaf size={16} className="text-primary mt-0.5 shrink-0" />
+                  Avaliação completa e indicação digital com assinatura ICP-Brasil
                 </li>
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Importação RDC 660/2022 facilitada</li>
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Selo gov.br no PDF oficial</li>

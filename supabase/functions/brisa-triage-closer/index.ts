@@ -4,7 +4,7 @@
  * Called via pg_cron every 5 minutes to check for abandoned triages (>15min without booking)
  * Sends webhook to ManyChat to deliver "First Health" coupon via WhatsApp
  */
-import { createClient } from "npm:@supabase/supabase-js@2.42.0@2.49.4";
+import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

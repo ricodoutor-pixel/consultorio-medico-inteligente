@@ -1,5 +1,5 @@
-import { createClient } from "npm:@supabase/supabase-js@2.42.0@2";
-import { corsHeaders } from "npm:@supabase/supabase-js@2.42.0@2.95.0/cors";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;

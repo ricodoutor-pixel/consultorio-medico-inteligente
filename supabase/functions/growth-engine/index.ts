@@ -2,7 +2,7 @@
  * 📈 GROWTH & VIRALITY ENGINE
  * Indicação premiada, prova social automática, conteúdo evergreen
  */
-import { createClient } from "npm:@supabase/supabase-js@2.42.0@2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

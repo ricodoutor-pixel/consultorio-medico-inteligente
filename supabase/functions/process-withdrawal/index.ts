@@ -2,7 +2,7 @@
  * 🏦 MANUS CEO - Process Withdrawal (Taxa 5% automática)
  * Todo saque sofre retenção de 5% para manutenção do ecossistema
  */
-import { createClient } from "npm:@supabase/supabase-js@2.42.0@2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

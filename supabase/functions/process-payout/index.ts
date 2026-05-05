@@ -3,7 +3,7 @@
  * Disparado quando paciente confirma recebimento do tratamento.
  * Fluxo: Libera Pix Médico → Libera Pix Lojista → Distribui Afiliados → Retém Taxas
  */
-import { createClient } from "npm:@supabase/supabase-js@2.42.0@2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

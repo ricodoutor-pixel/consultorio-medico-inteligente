@@ -2,7 +2,7 @@
  * 🏦 Process PIX Payout - Liquidação de comissões via Mercado Pago
  * Valida saldo, limites diários, processa pagamento e concilia webhook
  */
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2.42.0@2";
 import { z } from "https://esm.sh/zod@3.22.4";
 
 const corsHeaders = {

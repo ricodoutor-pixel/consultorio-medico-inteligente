@@ -2,7 +2,7 @@
  * 💸 RETENTION & FINANCIAL ENGINE
  * VIP upgrade, reativação de pacientes, relatórios WhatsApp, auditoria ANVISA
  */
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2.42.0@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

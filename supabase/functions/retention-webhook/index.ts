@@ -1,4 +1,4 @@
-import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
+import { corsHeaders } from "npm:@supabase/supabase-js@2.42.0@2.95.0/cors";
 
 function calculateAbandonmentRisk(params: {
   daysSinceLastPurchase: number;

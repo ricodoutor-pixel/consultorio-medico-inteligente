@@ -220,13 +220,13 @@ const Index = () => {
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="text-sm font-black h-14 px-6 rounded-2xl border-primary/30 hover:bg-primary/5" asChild>
-                  <a href="https://wa.me/5511987131241?text=Ol%C3%A1%2C%20quero%20agendar%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20o%20Dr.%20Edilson" target="_blank" rel="noopener noreferrer">
-                    💬 WhatsApp Direto
+                  <a href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20triagem%20para%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20o%20Dr.%20Edilson%20Bezerra%20On" target="_blank" rel="noopener noreferrer">
+                    💬 Falar com Enfª Brisa
                   </a>
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground italic">
-                * Pacientes internacionais: US$10 · WhatsApp +55 11 98713-1241
+                * Triagem obrigatória com Enfª Brisa antes do atendimento · Pacientes internacionais: US$10
               </p>
             </div>
             <div className="relative">

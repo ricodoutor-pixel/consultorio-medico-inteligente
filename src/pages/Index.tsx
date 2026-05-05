@@ -244,7 +244,7 @@ const Index = () => {
                       />
                     </div>
                     <div>
-                      <p className="font-display font-black text-xl">Dr. Edilson Bezerra</p>
+                      <p className="font-display font-black text-xl">Dr. Edilson Bezerra On</p>
                       <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Cannabis Medicinal · CRM 10963</p>
                     </div>
                   </div>

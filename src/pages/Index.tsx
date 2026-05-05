@@ -183,6 +183,87 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Dr. Edilson Bezerra — Orientação Técnica Destacada */}
+      <section className="section-padding bg-gradient-to-br from-primary/10 via-background to-[hsl(280,80%,65%)]/10 border-y border-primary/20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="grid lg:grid-cols-2 gap-8 items-center max-w-6xl mx-auto"
+          >
+            <div className="space-y-5">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/15 border border-primary/30 text-xs font-black uppercase tracking-wider text-primary">
+                ⚕️ Especialista Verificado · CRM 10963
+              </span>
+              <h2 className="font-display font-black text-3xl md:text-5xl leading-tight">
+                Orientação Técnica com{" "}
+                <span className="text-gradient-green">Dr. Edilson Bezerra</span>
+              </h2>
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                Médico referência em <strong className="text-foreground">Cannabis Medicinal no Brasil</strong>. Atendimento online de 20 minutos com pré-prontuário, indicação de perfil canabinoide e suporte completo da Enfª Brisa via WhatsApp.
+              </p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Pagamento via Pix com confirmação automática</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Receita digital com assinatura ICP-Brasil</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Importação RDC 660/2022 facilitada</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Selo gov.br no PDF oficial</li>
+              </ul>
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <Button size="lg" className="text-sm font-black h-14 px-6 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all" asChild>
+                  <Link to="/consultation-payment">
+                    🎯 Agendar por R$30 <ArrowRight size={18} className="ml-2" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" className="text-sm font-black h-14 px-6 rounded-2xl border-primary/30 hover:bg-primary/5" asChild>
+                  <a href="https://wa.me/5511987131241?text=Ol%C3%A1%2C%20quero%20agendar%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20o%20Dr.%20Edilson" target="_blank" rel="noopener noreferrer">
+                    💬 WhatsApp Direto
+                  </a>
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground italic">
+                * Pacientes internacionais: US$10 · WhatsApp +55 11 98713-1241
+              </p>
+            </div>
+            <div className="relative">
+              <div className="absolute -inset-6 bg-gradient-to-br from-primary/20 to-[hsl(280,80%,65%)]/20 rounded-3xl blur-3xl opacity-60" />
+              <Card className="relative border-primary/30 bg-card/60 backdrop-blur-md rounded-3xl overflow-hidden">
+                <CardContent className="p-8 space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-[hsl(142,70%,35%)] flex items-center justify-center text-3xl shadow-lg">
+                      👨‍⚕️
+                    </div>
+                    <div>
+                      <p className="font-display font-black text-xl">Dr. Edilson Bezerra</p>
+                      <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Cannabis Medicinal · CRM 10963</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 pt-2">
+                    <div className="text-center p-3 rounded-xl bg-background/60 border border-border">
+                      <p className="text-xl font-black text-primary">R$30</p>
+                      <p className="text-[10px] text-muted-foreground font-bold uppercase">Brasil</p>
+                    </div>
+                    <div className="text-center p-3 rounded-xl bg-background/60 border border-border">
+                      <p className="text-xl font-black text-primary">20min</p>
+                      <p className="text-[10px] text-muted-foreground font-bold uppercase">Duração</p>
+                    </div>
+                    <div className="text-center p-3 rounded-xl bg-background/60 border border-border">
+                      <p className="text-xl font-black text-primary">4.9★</p>
+                      <p className="text-[10px] text-muted-foreground font-bold uppercase">Avaliação</p>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-border">
+                    <p className="text-xs text-muted-foreground italic leading-relaxed">
+                      "Atendo com base científica, escutando cada paciente. Cannabis salva vidas — e a equidade no acesso é a minha missão."
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Como Funciona — 5 Passos */}
       <section className="section-padding bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">

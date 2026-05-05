@@ -199,7 +199,7 @@ const Index = () => {
               </span>
             <h2 className="font-display font-black text-3xl md:text-5xl leading-tight">
                 Orientação e Avaliação Técnica com{" "}
-                <span className="text-gradient-green">Dr. Edilson Bezerra</span>
+                <span className="text-gradient-green">Dr. Edilson Bezerra On</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
                 Médico pesquisador e referência em <strong className="text-foreground">Cannabis Medicinal no Brasil</strong>. Atendimento online de até 20 minutos com pré-prontuário, indicação do perfil canabinoide e orientação técnica sobre todo o processo de modulação precisa e assertiva do sistema endocanabinoide humano. Conte com o suporte completo da Enfª Brisa via WhatsApp.

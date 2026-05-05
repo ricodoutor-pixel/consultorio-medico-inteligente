@@ -179,6 +179,7 @@ export type Database = {
         Row: {
           active: boolean
           avatar_url: string | null
+          channel: string
           created_at: string
           display_name: string
           id: string
@@ -188,11 +189,12 @@ export type Database = {
           triggers_intents: string[] | null
           updated_at: string
           voice_tone: string | null
-          whatsapp_number: string
+          whatsapp_number: string | null
         }
         Insert: {
           active?: boolean
           avatar_url?: string | null
+          channel?: string
           created_at?: string
           display_name: string
           id?: string
@@ -202,11 +204,12 @@ export type Database = {
           triggers_intents?: string[] | null
           updated_at?: string
           voice_tone?: string | null
-          whatsapp_number?: string
+          whatsapp_number?: string | null
         }
         Update: {
           active?: boolean
           avatar_url?: string | null
+          channel?: string
           created_at?: string
           display_name?: string
           id?: string
@@ -216,7 +219,7 @@ export type Database = {
           triggers_intents?: string[] | null
           updated_at?: string
           voice_tone?: string | null
-          whatsapp_number?: string
+          whatsapp_number?: string | null
         }
         Relationships: []
       }

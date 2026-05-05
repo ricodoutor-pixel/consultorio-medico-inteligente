@@ -137,7 +137,7 @@ export const WhatsAppButton = () => {
   };
 
   return (
-    <div ref={menuRef} className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50">
+    <div ref={menuRef} className="fixed right-4 md:right-6 z-50" style={{ bottom: "calc(5rem + env(safe-area-inset-bottom, 0px))" }}>
 
       {isOpen && (
         <div className="absolute bottom-16 right-0 w-72 sm:w-80 rounded-2xl shadow-2xl border border-border overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300"

@@ -170,14 +170,14 @@ const Index = () => {
           className="text-center px-4 max-w-2xl mx-auto"
         >
           <p className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-3">
-            🌿 Atendimento Autônomo Inteligente · Gemini IA
+            🌿 ATENDIMENTO AUTÔNOMO HUMANIZADO
           </p>
           <h2 className="font-display font-black text-2xl md:text-4xl leading-tight mb-4">
-            Comece sua jornada com a <span className="text-gradient-green">Enfª Brisa</span>
+            Comece sua jornada Aqui com a <span className="text-gradient-green">Enfª Brisa</span>
           </h2>
           <p className="text-sm md:text-base text-muted-foreground mb-6">
             Triagem → Orientação Técnica → Médico Prescritor → Consulta → Shopping com frete grátis.
-            Tudo dentro da plataforma, auditado pela Brisa Gemini.
+            Tudo dentro da plataforma, auditado pela Enf.Brisa.
           </p>
           <Button
             size="lg"

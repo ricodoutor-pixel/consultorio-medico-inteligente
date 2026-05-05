@@ -19,6 +19,7 @@ import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import drEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
+import brisaEnfermeira from "@/assets/brisa-enfermeira.png";
 
 import { useEffect } from "react";
 
@@ -169,6 +170,18 @@ const Index = () => {
           transition={{ duration: 0.6 }}
           className="text-center px-4 max-w-2xl mx-auto"
         >
+          <div className="flex justify-center mb-5">
+            <div className="relative">
+              <div className="absolute -inset-3 bg-gradient-to-br from-primary/40 to-[hsl(280,80%,65%)]/40 rounded-full blur-2xl opacity-70 animate-pulse" />
+              <img
+                src={brisaEnfermeira}
+                alt="Enfª Brisa — Triagem autônoma humanizada"
+                loading="lazy"
+                decoding="async"
+                className="relative w-32 h-32 md:w-40 md:h-40 rounded-full object-cover ring-4 ring-primary/40 shadow-2xl shadow-primary/30"
+              />
+            </div>
+          </div>
           <p className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-3">
             🌿 ATENDIMENTO AUTÔNOMO HUMANIZADO
           </p>

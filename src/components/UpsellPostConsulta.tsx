@@ -14,7 +14,7 @@ interface UpsellProduct {
   tag?: string;
 }
 
-interface UpsellPostOrientação TécnicaProps {
+interface UpsellPostConsultaProps {
   isOpen: boolean;
   onClose: () => void;
   patientName?: string;
@@ -48,7 +48,7 @@ const UPSELL_PRODUCTS: UpsellProduct[] = [
   },
 ];
 
-export const UpsellPostOrientação Técnica = ({ isOpen, onClose, patientName, condition, onAddToCart }: UpsellPostOrientação TécnicaProps) => {
+export const UpsellPostConsulta = ({ isOpen, onClose, patientName, condition, onAddToCart }: UpsellPostConsultaProps) => {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
 
   if (!isOpen) return null;

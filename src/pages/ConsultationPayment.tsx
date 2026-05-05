@@ -46,7 +46,9 @@ const ConsultationPayment = () => {
   }, []);
 
   const feeRate = isExempt ? 0 : 0.07;
-  const total = dynamicPrice || pro.priceValue;
+  const basePrice = dynamicPrice || pro.priceValue;
+  const commission = basePrice * feeRate;
+  const total = basePrice + commission;
 
   // Create payment preference on mount or when dynamic price is ready
   useEffect(() => {

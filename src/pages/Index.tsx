@@ -160,8 +160,37 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Como Funciona — 5 Passos (logo após texto institucional do Hero) */}
+      <section className="section-padding bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
+          <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
+            <h2 className="font-display font-black mb-4 md:mb-6">Tratamento em <span className="text-gradient-purple">5 Passos</span></h2>
+            <p className="text-muted-foreground font-medium">Sua jornada completa, do diagnóstico à entrega do medicamento, com economia e segurança total.</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 mb-10">
+            {steps.map((step, i) => (
+              <motion.div key={i} className="relative p-4 md:p-6 rounded-2xl md:rounded-3xl bg-card/30 border border-border hover:border-primary/20 transition-all group" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+                <div className="mb-3 md:mb-4 relative h-28 md:h-40 overflow-hidden rounded-xl md:rounded-2xl">
+                  <img src={step.img} alt={step.title} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  <div className="absolute top-3 left-3 w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-primary-foreground text-lg font-black shadow-lg">
+                    {step.n}
+                  </div>
+                </div>
+                <h3 className="text-sm md:text-base lg:text-lg font-bold mb-1 md:mb-2">{step.title}</h3>
+                <p className="text-muted-foreground leading-relaxed text-xs md:text-sm">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+          <div className="flex justify-center">
+            <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
+              <Link to="/profissionais">
+                🎯 Iniciar Orientação Técnica <ArrowRight size={18} className="ml-2" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
 
-      {/* CTA Central — Iniciar Triagem com Enfª Brisa (fluxo autônomo Gemini) */}
       <section className="py-10 md:py-14 flex justify-center bg-gradient-to-b from-background via-primary/5 to-background">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -341,36 +370,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Como Funciona — 5 Passos */}
-      <section className="section-padding bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
-          <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
-            <h2 className="font-display font-black mb-4 md:mb-6">Tratamento em <span className="text-gradient-purple">5 Passos</span></h2>
-            <p className="text-muted-foreground font-medium">Sua jornada completa, do diagnóstico à entrega do medicamento, com economia e segurança total.</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 mb-10">
-            {steps.map((step, i) => (
-              <motion.div key={i} className="relative p-4 md:p-6 rounded-2xl md:rounded-3xl bg-card/30 border border-border hover:border-primary/20 transition-all group" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-                <div className="mb-3 md:mb-4 relative h-28 md:h-40 overflow-hidden rounded-xl md:rounded-2xl">
-                  <img src={step.img} alt={step.title} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  <div className="absolute top-3 left-3 w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-primary-foreground text-lg font-black shadow-lg">
-                    {step.n}
-                  </div>
-                </div>
-                <h3 className="text-sm md:text-base lg:text-lg font-bold mb-1 md:mb-2">{step.title}</h3>
-                <p className="text-muted-foreground leading-relaxed text-xs md:text-sm">{step.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-          <div className="flex justify-center">
-            <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
-              <Link to="/profissionais">
-                🎯 Iniciar Orientação Técnica <ArrowRight size={18} className="ml-2" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* 5 Passos movido para logo após o Hero */}
       {/* Patologias section follows */}
 
       {/* Seleção de Patologias */}

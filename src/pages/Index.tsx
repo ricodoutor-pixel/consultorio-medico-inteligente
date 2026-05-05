@@ -197,16 +197,18 @@ const Index = () => {
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/15 border border-primary/30 text-xs font-black uppercase tracking-wider text-primary">
                 ⚕️ Especialista Verificado · CRM 10963
               </span>
-              <h2 className="font-display font-black text-3xl md:text-5xl leading-tight">
-                Orientação Técnica com{" "}
-                <span className="text-gradient-green">Dr. Edilson Bezerra</span>
+            <h2 className="font-display font-black text-3xl md:text-5xl leading-tight">
+                Orientação e Avaliacao Técnica Com Dr. Edilson Bezerra
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                Médico referência em <strong className="text-foreground">Cannabis Medicinal no Brasil</strong>. Atendimento online de 20 minutos com pré-prontuário, indicação de perfil canabinoide e suporte completo da Enfª Brisa via WhatsApp.
+                Médico Pesquizador referência em <strong className="text-foreground">Cannabis Medicinal no Brasil</strong>. Atendimento online de ate 20 minutos com pré-prontuário, indicação do perfil canabinoide e orientacao tecnica sobre todo processo da modulacao Precisa e e assertiva do sistema endocannabinoide humano conte com suporte completo da Enfª Brisa via WhatsApp.
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Pagamento via Pix com confirmação automática</li>
-                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Receita digital com assinatura ICP-Brasil</li>
+                <li className="flex items-start gap-2">
+                  <Leaf size={16} className="text-primary mt-0.5 shrink-0" /> 
+                  Avaliação Completa e Indicação<br />digital com assinatura ICP-Brasil
+                </li>
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Importação RDC 660/2022 facilitada</li>
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Selo gov.br no PDF oficial</li>
               </ul>

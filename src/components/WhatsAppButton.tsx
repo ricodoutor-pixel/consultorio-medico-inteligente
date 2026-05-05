@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Stethoscope, User, Store, BookOpen, HelpCircle } from "lucide-react";
+import { X, Stethoscope, User, Store, BookOpen, HelpCircle, MessageCircle } from "lucide-react";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
 import { supabase } from "@/integrations/supabase/client";
+import brisaAvatar from "@/assets/brisa-enfermeira.png";
 
 // ManyChat keyword triggers — Ative em Automation → Keywords no painel ManyChat
 

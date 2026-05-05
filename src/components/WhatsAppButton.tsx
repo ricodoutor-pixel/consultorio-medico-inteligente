@@ -193,17 +193,30 @@ export const WhatsAppButton = () => {
 
       <button
         onClick={() => setIsOpen((o) => !o)}
-        className="p-3 md:p-4 rounded-2xl shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center glow-green"
+        className="relative p-1.5 rounded-full shadow-2xl hover:scale-110 transition-transform duration-300 flex items-center justify-center glow-green overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, hsl(152 100% 74% / 0.2), hsl(152 100% 74% / 0.1))",
-          border: "1px solid hsl(152 100% 74% / 0.3)",
+          background: "linear-gradient(135deg, hsl(152 100% 74% / 0.25), hsl(152 100% 74% / 0.10))",
+          border: "2px solid hsl(152 100% 74% / 0.5)",
+          width: 64,
+          height: 64,
         }}
         aria-label="Fale conosco — Enfª Brisa"
       >
         {isOpen ? (
           <X size={28} className="text-secondary" />
         ) : (
-          <MessageCircle size={28} className="text-secondary" />
+          <img
+            src={brisaAvatar}
+            alt="Enfermeira Brisa"
+            className="w-full h-full rounded-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        )}
+        {!isOpen && (
+          <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#25D366] flex items-center justify-center border-2 border-background shadow-md">
+            <MessageCircle size={12} className="text-white" fill="white" />
+          </span>
         )}
       </button>
     </div>

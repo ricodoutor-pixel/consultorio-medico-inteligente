@@ -209,7 +209,7 @@ export const WhatsAppButton = () => {
             src={brisaAvatar}
             alt="Enfermeira Brisa"
             className="w-full h-full rounded-full object-cover"
-            style={{ objectPosition: "center 20%" }}
+            style={{ objectPosition: "center 15%", transform: "scale(1.35)" }}
             loading="eager"
             decoding="async"
           />

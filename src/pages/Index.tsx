@@ -213,40 +213,33 @@ const Index = () => {
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Importação RDC 660/2022 facilitada</li>
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Selo gov.br no PDF oficial</li>
               </ul>
-              {/* Fluxo Oficial: Verdinho (Recepção) → Brisa (Triagem) → Dr. Edilson On (Orientação Técnica) */}
+              {/* Fluxo exclusivo deste card: Enfª Brisa (Triagem) → Pix Seguro Mercado Pago → Orientação Técnica Dr. Edilson Bezerra On */}
               <div className="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-background/40 border border-primary/20">
                 <div className="text-center">
-                  <div className="text-2xl mb-1">🐸</div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">1. Verdinho</p>
-                  <p className="text-[10px] text-muted-foreground">Recepção</p>
-                </div>
-                <div className="text-center">
                   <div className="text-2xl mb-1">👩‍⚕️</div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">2. Brisa</p>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">1. Enfª Brisa</p>
                   <p className="text-[10px] text-muted-foreground">Triagem IA</p>
                 </div>
                 <div className="text-center">
+                  <div className="text-2xl mb-1">🔒</div>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">2. Pix Seguro</p>
+                  <p className="text-[10px] text-muted-foreground">Mercado Pago</p>
+                </div>
+                <div className="text-center">
                   <div className="text-2xl mb-1">⚕️</div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">3. Dr. Edilson</p>
-                  <p className="text-[10px] text-muted-foreground">Orientação</p>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">3. Dr. Edilson On</p>
+                  <p className="text-[10px] text-muted-foreground">Orientação Técnica</p>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <Button
-                  size="lg"
-                  className="text-sm font-black h-14 px-6 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all"
-                  onClick={() => window.dispatchEvent(new CustomEvent("open-frog-chat"))}
-                >
-                  🐸 Iniciar com Verdinho <ArrowRight size={18} className="ml-2" />
-                </Button>
-                <Button size="lg" variant="outline" className="text-sm font-black h-14 px-6 rounded-2xl border-primary/30 hover:bg-primary/5" asChild>
-                  <a href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20o%20Verdinho%20me%20encaminhou%20para%20a%20triagem%20da%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20o%20Dr.%20Edilson%20Bezerra%20On" target="_blank" rel="noopener noreferrer">
-                    💬 Triagem Enfª Brisa
+                <Button size="lg" className="text-sm font-black h-14 px-6 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all" asChild>
+                  <a href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20a%20triagem%20para%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20o%20Dr.%20Edilson%20Bezerra%20On" target="_blank" rel="noopener noreferrer">
+                    💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={18} className="ml-2" />
                   </a>
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground italic">
-                * Fluxo obrigatório: <strong>Verdinho recepciona → Brisa faz a triagem → Dr. Edilson Bezerra On atende</strong>. Nenhum paciente fala direto com o profissional. Pacientes internacionais: US$10.
+                * Fluxo exclusivo deste card: <strong>Enfª Brisa (triagem) → Pix Seguro Mercado Pago → Orientação Técnica com Dr. Edilson Bezerra On</strong>. Nenhum paciente fala direto com o profissional antes do pagamento e auditoria. Pacientes internacionais: US$10.
               </p>
             </div>
             <div className="relative">

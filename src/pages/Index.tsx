@@ -160,6 +160,44 @@ const Index = () => {
       </section>
 
 
+      {/* CTA Central — Iniciar Triagem com Enfª Brisa (fluxo autônomo Gemini) */}
+      <section className="py-10 md:py-14 flex justify-center bg-gradient-to-b from-background via-primary/5 to-background">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center px-4 max-w-2xl mx-auto"
+        >
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-3">
+            🌿 Atendimento Autônomo Inteligente · Gemini IA
+          </p>
+          <h2 className="font-display font-black text-2xl md:text-4xl leading-tight mb-4">
+            Comece sua jornada com a <span className="text-gradient-green">Enfª Brisa</span>
+          </h2>
+          <p className="text-sm md:text-base text-muted-foreground mb-6">
+            Triagem → Orientação Técnica → Médico Prescritor → Consulta → Shopping com frete grátis.
+            Tudo dentro da plataforma, auditado pela Brisa Gemini.
+          </p>
+          <Button
+            size="lg"
+            className="text-base font-black h-16 px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-2xl shadow-primary/40 hover:scale-105 transition-all animate-pulse"
+            asChild
+          >
+            <a
+              href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20minha%20triagem%20e%20consulta%20na%20Planta%20y%20Raiz."
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={20} className="ml-2" />
+            </a>
+          </Button>
+          <p className="text-[11px] text-muted-foreground italic mt-4">
+            Todos os botões "Iniciar Consulta" desta plataforma direcionam para a Enfª Brisa, que conduz o fluxo completo de forma autônoma e auditada.
+          </p>
+        </motion.div>
+      </section>
+
       {/* Live Stats */}
       <section className="section-padding border-b border-border bg-card/20 backdrop-blur-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">

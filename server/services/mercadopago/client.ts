@@ -89,7 +89,7 @@ export class MercadoPagoClient {
 }
 
 export const createMercadoPagoClient = (): MercadoPagoClient => {
-  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN;
+  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!token) throw new Error('MERCADO_PAGO_ACCESS_TOKEN not configured');
   return new MercadoPagoClient(token);
 };

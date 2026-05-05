@@ -44,7 +44,7 @@ serve(async (req) => {
 
       // 3. Mercado Pago check
       const mpStart = Date.now();
-      const MP_TOKEN = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") || Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
+      const MP_TOKEN = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") || Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
       if (MP_TOKEN) {
         try {
           const mpRes = await fetch("https://api.mercadopago.com/v1/payment_methods", {

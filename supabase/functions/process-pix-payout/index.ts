@@ -122,7 +122,7 @@ async function processPixOut(supabase: any, withdrawal: any, pixKey: string, adm
     .update({ status: "processing" })
     .eq("id", withdrawal.id);
 
-  const mpToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") || Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
+  const mpToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") || Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
   if (!mpToken) {
     // Fallback: mark as approved for manual processing
     await supabase
@@ -260,7 +260,7 @@ Deno.serve(async (req) => {
       if (parsed.data.action !== "payment.updated") return json({ ok: true });
 
       const supabase = await getAdminSupabase();
-      const mpToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") || Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
+      const mpToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") || Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
       if (!mpToken) return json({ error: "Token MP não configurado" }, 500);
 
       const mpRes = await fetch(`https://api.mercadopago.com/v1/payments/${parsed.data.data.id}`, {

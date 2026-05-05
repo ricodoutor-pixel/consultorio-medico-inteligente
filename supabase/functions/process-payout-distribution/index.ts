@@ -24,7 +24,7 @@ Deno.serve(async (req: Request) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN") || Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
+    const MERCADO_PAGO_ACCESS_TOKEN = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") || Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
 
     const { month, year, dryRun = true } = await req.json();
     const targetMonth = month || new Date().getMonth() + 1;
@@ -168,12 +168,12 @@ Deno.serve(async (req: Request) => {
       }
 
       // Attempt Mercado Pago Pix transfer
-      if (MERCADOPAGO_ACCESS_TOKEN) {
+      if (MERCADO_PAGO_ACCESS_TOKEN) {
         try {
           const mpResponse = await fetch("https://api.mercadopago.com/v1/payments", {
             method: "POST",
             headers: {
-              "Authorization": `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`,
+              "Authorization": `Bearer ${MERCADO_PAGO_ACCESS_TOKEN}`,
               "Content-Type": "application/json",
               "X-Idempotency-Key": `payout-${payout.doctor_id}-${targetMonth}-${targetYear}`,
             },

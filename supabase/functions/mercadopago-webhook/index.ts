@@ -74,9 +74,9 @@ Deno.serve(async (req) => {
     }
 
     // Fetch payment details from Mercado Pago API
-    const mpAccessToken = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
+    const mpAccessToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
     if (!mpAccessToken) {
-      console.error("MERCADOPAGO_ACCESS_TOKEN not configured");
+      console.error("MERCADO_PAGO_ACCESS_TOKEN not configured");
       return new Response(JSON.stringify({ status: "received", warning: "MP token not configured" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

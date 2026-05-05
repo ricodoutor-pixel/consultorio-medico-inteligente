@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { appointmentId, type = "consultation" } = body;
 
-    const MP_ACCESS_TOKEN = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
+    const MP_ACCESS_TOKEN = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
     if (!MP_ACCESS_TOKEN) {
       return new Response(JSON.stringify({ error: "Mercado Pago não configurado" }), {
         status: 500,

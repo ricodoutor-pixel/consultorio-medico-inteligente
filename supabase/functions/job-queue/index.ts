@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from "npm:@supabase/supabase-js@2.42.0@2";
+import { createClient, SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 // Cliente sem amarração de schema — evita que tabelas virem `never` no type-check
 // quando não existe um Database type gerado para edge functions.

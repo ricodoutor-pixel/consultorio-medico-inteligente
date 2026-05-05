@@ -4,7 +4,7 @@
  * Called by doctors after prescribing. Creates a pre-filled cart with products
  * and sends the patient a unique link to complete purchase in 1 click.
  */
-import { createClient } from "npm:@supabase/supabase-js@2.42.0@2.49.4";
+import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

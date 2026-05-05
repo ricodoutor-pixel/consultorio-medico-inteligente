@@ -2,7 +2,7 @@
  * whatsapp-cart-notify — Dispara WhatsApp para paciente com link do carrinho
  * Também dispara notificação de sala Jitsi para consultas
  */
-import { createClient } from "npm:@supabase/supabase-js@2.42.0@2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

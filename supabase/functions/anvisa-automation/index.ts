@@ -1,5 +1,5 @@
-import { createClient } from "npm:@supabase/supabase-js@2.42.0@2.49.1";
-import { corsHeaders } from "npm:@supabase/supabase-js@2.42.0@2.95.0/cors";
+import { createClient } from "npm:@supabase/supabase-js@2.49.1";
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 interface AnvisaMedicine {
   name: string;

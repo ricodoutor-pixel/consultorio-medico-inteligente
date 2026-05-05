@@ -19,7 +19,7 @@ import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import drEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
-import brisaEnfermeira from "@/assets/brisa-enfermeira.png";
+import brisaEnfermeira from "@/assets/brisa-enfermeira-original.jpeg";
 
 import { useEffect } from "react";
 

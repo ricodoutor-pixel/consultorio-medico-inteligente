@@ -202,17 +202,20 @@ const Index = () => {
                 <span className="text-gradient-green">Dr. Edilson Bezerra On</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                Médico pesquisador e referência em <strong className="text-foreground">Cannabis Medicinal no Brasil</strong>. Atendimento online de até 20 minutos com pré-prontuário, indicação do perfil canabinoide e orientação técnica sobre todo o processo de modulação precisa e assertiva do sistema endocanabinoide humano. Conte com o suporte completo da Enfª Brisa via WhatsApp.
+                Médico pesquisador, palestrante e referência em <strong className="text-foreground">Cannabis Medicinal e Medicina Integrativa Ancestral no Brasil</strong>. Atendimento privado online de até 30 minutos com anamnese e <strong className="text-foreground">orientação técnica pré-prontuário</strong>, relatório e indicação do perfil personalizado sobre todo o processo de modulação das moléculas sinalizadoras de forma precisa e assertiva no sistema endocanabinoide humano. Conte com o suporte completo da Enfª Brisa via WhatsApp para dúvidas.
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Pagamento via Pix com confirmação automática</li>
-                <li className="flex items-start gap-2">
-                  <Leaf size={16} className="text-primary mt-0.5 shrink-0" />
-                  Avaliação completa e indicação digital com assinatura ICP-Brasil
-                </li>
-                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Importação RDC 660/2022 facilitada</li>
-                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Selo gov.br no PDF oficial</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Triagem individual personalizada com Enfª Brisa</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Pagamento seguro via Pix com confirmação automática</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Avaliação técnica humanitária completa</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Encaminhamento técnico preciso por especialidade</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Relatório digital em PDF com assinatura ICP-Brasil e selo gov.br</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Mentoria e consultoria particular especializada</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Importação RDC 660/2022 facilitada com desconto e frete grátis</li>
               </ul>
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] leading-relaxed text-amber-100/90">
+                ⚖️ <strong>Aviso Legal:</strong> O Dr. Edilson Bezerra <strong>não emite receitas, não realiza consultas, não prescreve medicamentos e não fornece diagnósticos</strong> através desta plataforma. O serviço consiste exclusivamente em <strong>orientação técnica educativa</strong> sobre o sistema endocanabinoide, com entrega de <strong>relatório técnico em PDF assinado digitalmente (ICP-Brasil / gov.br)</strong>. Para prescrições, o paciente é encaminhado a profissional habilitado.
+              </div>
               {/* Fluxo exclusivo deste card: Enfª Brisa (Triagem) → Pix Seguro Mercado Pago → Orientação Técnica Dr. Edilson Bezerra On */}
               <div className="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-background/40 border border-primary/20">
                 <div className="text-center">

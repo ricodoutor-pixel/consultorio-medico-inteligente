@@ -18,6 +18,7 @@ import testimonialAntonio from "@/assets/testimonial-antonio.jpg";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import drEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 
 import { useEffect } from "react";
 

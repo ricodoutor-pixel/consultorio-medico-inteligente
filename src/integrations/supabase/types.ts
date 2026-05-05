@@ -217,6 +217,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_token_usage: {
+        Row: {
+          cost: number
+          created_at: string
+          function_name: string
+          id: string
+          metadata: Json | null
+          model: string | null
+          tokens_used: number
+          user_id: string | null
+        }
+        Insert: {
+          cost?: number
+          created_at?: string
+          function_name: string
+          id?: string
+          metadata?: Json | null
+          model?: string | null
+          tokens_used?: number
+          user_id?: string | null
+        }
+        Update: {
+          cost?: number
+          created_at?: string
+          function_name?: string
+          id?: string
+          metadata?: Json | null
+          model?: string | null
+          tokens_used?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       alert_history: {
         Row: {
           alert_id: string | null
@@ -989,6 +1022,92 @@ export type Database = {
         }
         Relationships: []
       }
+      consultation_offers: {
+        Row: {
+          accepted_at: string | null
+          amount: number
+          appointment_id: string | null
+          consultation_type: string
+          created_at: string
+          distance_km: number | null
+          doctor_id: string
+          expires_at: string
+          id: string
+          patient_id: string
+          patient_lat: number | null
+          patient_lng: number | null
+          payload: Json | null
+          status: string
+          triage_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          amount?: number
+          appointment_id?: string | null
+          consultation_type?: string
+          created_at?: string
+          distance_km?: number | null
+          doctor_id: string
+          expires_at?: string
+          id?: string
+          patient_id: string
+          patient_lat?: number | null
+          patient_lng?: number | null
+          payload?: Json | null
+          status?: string
+          triage_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          amount?: number
+          appointment_id?: string | null
+          consultation_type?: string
+          created_at?: string
+          distance_km?: number | null
+          doctor_id?: string
+          expires_at?: string
+          id?: string
+          patient_id?: string
+          patient_lat?: number | null
+          patient_lng?: number | null
+          payload?: Json | null
+          status?: string
+          triage_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_offers_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_offers_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+          {
+            foreignKeyName: "consultation_offers_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_offers_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consultation_queue: {
         Row: {
           amount: number | null
@@ -1039,6 +1158,39 @@ export type Database = {
           priority?: number | null
           specialty?: string | null
           status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cost_metrics: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          infrastructure_cost: number
+          marketing_spend: number
+          operational_cost: number
+          total_cost: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          infrastructure_cost?: number
+          marketing_spend?: number
+          operational_cost?: number
+          total_cost?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          infrastructure_cost?: number
+          marketing_spend?: number
+          operational_cost?: number
+          total_cost?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -1242,7 +1394,11 @@ export type Database = {
           is_verified: boolean
           kyc_status: string
           last_crm_check: string | null
+          last_seen_online: string | null
+          latitude: number | null
+          longitude: number | null
           organization_id: string | null
+          plan_tier: string
           rating: number | null
           rqe: string | null
           specialty: string
@@ -1264,7 +1420,11 @@ export type Database = {
           is_verified?: boolean
           kyc_status?: string
           last_crm_check?: string | null
+          last_seen_online?: string | null
+          latitude?: number | null
+          longitude?: number | null
           organization_id?: string | null
+          plan_tier?: string
           rating?: number | null
           rqe?: string | null
           specialty?: string
@@ -1286,7 +1446,11 @@ export type Database = {
           is_verified?: boolean
           kyc_status?: string
           last_crm_check?: string | null
+          last_seen_online?: string | null
+          latitude?: number | null
+          longitude?: number | null
           organization_id?: string | null
+          plan_tier?: string
           rating?: number | null
           rqe?: string | null
           specialty?: string
@@ -1346,6 +1510,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      dr_edilson_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          model: string | null
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_reason: string | null
+          moderation_status: string
+          role: string
+          sources: Json
+          user_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          model?: string | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_reason?: string | null
+          moderation_status?: string
+          role: string
+          sources?: Json
+          user_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          model?: string | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_reason?: string | null
+          moderation_status?: string
+          role?: string
+          sources?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      dr_edilson_user_status: {
+        Row: {
+          is_paused: boolean
+          pause_reason: string | null
+          paused_at: string | null
+          paused_by: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          is_paused?: boolean
+          pause_reason?: string | null
+          paused_at?: string | null
+          paused_by?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          is_paused?: boolean
+          pause_reason?: string | null
+          paused_at?: string | null
+          paused_by?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       error_logs: {
         Row: {
@@ -1448,6 +1684,54 @@ export type Database = {
             referencedColumns: ["appointment_id"]
           },
         ]
+      }
+      financial_metrics: {
+        Row: {
+          affiliate_commissions: number
+          average_consultation_time: string | null
+          created_at: string
+          date: string
+          doctor_bonuses: number
+          id: string
+          philanthropy_revenue: number
+          platform_revenue: number
+          total_conversions: number
+          total_leads: number
+          total_revenue: number
+          updated_at: string
+          vendor_revenue: number
+        }
+        Insert: {
+          affiliate_commissions?: number
+          average_consultation_time?: string | null
+          created_at?: string
+          date: string
+          doctor_bonuses?: number
+          id?: string
+          philanthropy_revenue?: number
+          platform_revenue?: number
+          total_conversions?: number
+          total_leads?: number
+          total_revenue?: number
+          updated_at?: string
+          vendor_revenue?: number
+        }
+        Update: {
+          affiliate_commissions?: number
+          average_consultation_time?: string | null
+          created_at?: string
+          date?: string
+          doctor_bonuses?: number
+          id?: string
+          philanthropy_revenue?: number
+          platform_revenue?: number
+          total_conversions?: number
+          total_leads?: number
+          total_revenue?: number
+          updated_at?: string
+          vendor_revenue?: number
+        }
+        Relationships: []
       }
       gamification_achievements: {
         Row: {
@@ -1813,6 +2097,42 @@ export type Database = {
           origem?: string
           tags?: string[] | null
           telefone?: string
+        }
+        Relationships: []
+      }
+      master_reports: {
+        Row: {
+          content_summary: Json
+          created_at: string
+          generated_by: string | null
+          id: string
+          pdf_url: string | null
+          period_end: string | null
+          period_start: string | null
+          report_date: string
+          storage_path: string | null
+        }
+        Insert: {
+          content_summary?: Json
+          created_at?: string
+          generated_by?: string | null
+          id?: string
+          pdf_url?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          report_date?: string
+          storage_path?: string | null
+        }
+        Update: {
+          content_summary?: Json
+          created_at?: string
+          generated_by?: string | null
+          id?: string
+          pdf_url?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          report_date?: string
+          storage_path?: string | null
         }
         Relationships: []
       }
@@ -2221,6 +2541,277 @@ export type Database = {
         }
         Relationships: []
       }
+      orientacao_tecnica_orders: {
+        Row: {
+          ai_analysis: string | null
+          amount: number
+          amount_brl: number | null
+          btc_address: string | null
+          btc_amount: number | null
+          btc_tx_hash: string | null
+          created_at: string
+          currency: string
+          dispatched_at: string | null
+          doctor_payout: number
+          document_id: string | null
+          external_reference: string
+          id: string
+          mp_payment_id: string | null
+          mp_preference_id: string | null
+          patient_email: string | null
+          patient_name: string
+          patient_whatsapp: string
+          payment_method: string
+          pdf_storage_path: string | null
+          pdf_url: string | null
+          platform_fee: number
+          proof_url: string | null
+          qr_code: string | null
+          qr_code_base64: string | null
+          signature_hash: string | null
+          status: string
+          stripe_session_id: string | null
+          ticket_url: string | null
+          topic: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          ai_analysis?: string | null
+          amount?: number
+          amount_brl?: number | null
+          btc_address?: string | null
+          btc_amount?: number | null
+          btc_tx_hash?: string | null
+          created_at?: string
+          currency?: string
+          dispatched_at?: string | null
+          doctor_payout?: number
+          document_id?: string | null
+          external_reference: string
+          id?: string
+          mp_payment_id?: string | null
+          mp_preference_id?: string | null
+          patient_email?: string | null
+          patient_name: string
+          patient_whatsapp: string
+          payment_method?: string
+          pdf_storage_path?: string | null
+          pdf_url?: string | null
+          platform_fee?: number
+          proof_url?: string | null
+          qr_code?: string | null
+          qr_code_base64?: string | null
+          signature_hash?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          ticket_url?: string | null
+          topic?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          ai_analysis?: string | null
+          amount?: number
+          amount_brl?: number | null
+          btc_address?: string | null
+          btc_amount?: number | null
+          btc_tx_hash?: string | null
+          created_at?: string
+          currency?: string
+          dispatched_at?: string | null
+          doctor_payout?: number
+          document_id?: string | null
+          external_reference?: string
+          id?: string
+          mp_payment_id?: string | null
+          mp_preference_id?: string | null
+          patient_email?: string | null
+          patient_name?: string
+          patient_whatsapp?: string
+          payment_method?: string
+          pdf_storage_path?: string | null
+          pdf_url?: string | null
+          platform_fee?: number
+          proof_url?: string | null
+          qr_code?: string | null
+          qr_code_base64?: string | null
+          signature_hash?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          ticket_url?: string | null
+          topic?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ot_access_tokens: {
+        Row: {
+          attempts: number
+          contact: string
+          contact_type: string
+          created_at: string
+          expires_at: string
+          id: string
+          otp_hash: string
+          session_expires_at: string | null
+          session_token: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          attempts?: number
+          contact: string
+          contact_type: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          otp_hash: string
+          session_expires_at?: string | null
+          session_token?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          attempts?: number
+          contact?: string
+          contact_type?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          otp_hash?: string
+          session_expires_at?: string | null
+          session_token?: string | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
+      ot_dispatch_events: {
+        Row: {
+          created_at: string
+          external_reference: string
+          id: string
+          message: string | null
+          meta: Json | null
+          order_id: string
+          stage: string
+        }
+        Insert: {
+          created_at?: string
+          external_reference: string
+          id?: string
+          message?: string | null
+          meta?: Json | null
+          order_id: string
+          stage: string
+        }
+        Update: {
+          created_at?: string
+          external_reference?: string
+          id?: string
+          message?: string | null
+          meta?: Json | null
+          order_id?: string
+          stage?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ot_dispatch_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orientacao_tecnica_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pagamentos_audit: {
+        Row: {
+          amount: number
+          amount_brl: number | null
+          created_at: string
+          currency: string
+          external_reference: string | null
+          fx_rate: number | null
+          id: string
+          metadata: Json | null
+          order_id: string | null
+          payment_method: string
+          provider_id: string | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          amount_brl?: number | null
+          created_at?: string
+          currency: string
+          external_reference?: string | null
+          fx_rate?: number | null
+          id?: string
+          metadata?: Json | null
+          order_id?: string | null
+          payment_method: string
+          provider_id?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          amount_brl?: number | null
+          created_at?: string
+          currency?: string
+          external_reference?: string | null
+          fx_rate?: number | null
+          id?: string
+          metadata?: Json | null
+          order_id?: string | null
+          payment_method?: string
+          provider_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagamentos_audit_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orientacao_tecnica_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patient_clinical_context: {
+        Row: {
+          created_at: string
+          id: string
+          patient_id: string
+          scientific_reference: Json | null
+          source: string
+          suggestions: string | null
+          summary: string
+          symptoms: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          patient_id: string
+          scientific_reference?: Json | null
+          source?: string
+          suggestions?: string | null
+          summary: string
+          symptoms?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          patient_id?: string
+          scientific_reference?: Json | null
+          source?: string
+          suggestions?: string | null
+          summary?: string
+          symptoms?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_webhooks: {
         Row: {
           action: string | null
@@ -2328,6 +2919,166 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payouts: {
+        Row: {
+          appointment_id: string | null
+          country_code: string | null
+          created_at: string
+          currency: string
+          doctor_amount: number
+          doctor_id: string | null
+          id: string
+          patient_id: string | null
+          philanthropy_amount: number
+          platform_amount: number
+          provider_id: string
+          provider_payment_id: string | null
+          status: string
+          total_amount: number
+          updated_at: string
+          vendor_amount: number
+          vendor_id: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          country_code?: string | null
+          created_at?: string
+          currency?: string
+          doctor_amount?: number
+          doctor_id?: string | null
+          id?: string
+          patient_id?: string | null
+          philanthropy_amount?: number
+          platform_amount?: number
+          provider_id?: string
+          provider_payment_id?: string | null
+          status?: string
+          total_amount: number
+          updated_at?: string
+          vendor_amount?: number
+          vendor_id?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          country_code?: string | null
+          created_at?: string
+          currency?: string
+          doctor_amount?: number
+          doctor_id?: string | null
+          id?: string
+          patient_id?: string | null
+          philanthropy_amount?: number
+          platform_amount?: number
+          provider_id?: string
+          provider_payment_id?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          vendor_amount?: number
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payouts_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payouts_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+          {
+            foreignKeyName: "payouts_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payouts_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payouts_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payouts_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_moderation_queue: {
+        Row: {
+          admin_decision_at: string | null
+          admin_decision_by: string | null
+          admin_notes: string | null
+          author_name: string
+          brisa_categories: Json | null
+          brisa_reason: string | null
+          brisa_verdict: string
+          content: string
+          created_at: string
+          id: string
+          images: Json
+          published_facebook: boolean | null
+          published_instagram: boolean | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_decision_at?: string | null
+          admin_decision_by?: string | null
+          admin_notes?: string | null
+          author_name: string
+          brisa_categories?: Json | null
+          brisa_reason?: string | null
+          brisa_verdict?: string
+          content: string
+          created_at?: string
+          id?: string
+          images?: Json
+          published_facebook?: boolean | null
+          published_instagram?: boolean | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_decision_at?: string | null
+          admin_decision_by?: string | null
+          admin_notes?: string | null
+          author_name?: string
+          brisa_categories?: Json | null
+          brisa_reason?: string | null
+          brisa_verdict?: string
+          content?: string
+          created_at?: string
+          id?: string
+          images?: Json
+          published_facebook?: boolean | null
+          published_instagram?: boolean | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       prescription_carts: {
         Row: {
@@ -2557,6 +3308,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          anvisa_protocol: string | null
           avatar_url: string | null
           cannabis_experience: string | null
           cpf: string | null
@@ -2574,6 +3326,7 @@ export type Database = {
           user_type: string
         }
         Insert: {
+          anvisa_protocol?: string | null
           avatar_url?: string | null
           cannabis_experience?: string | null
           cpf?: string | null
@@ -2591,6 +3344,7 @@ export type Database = {
           user_type?: string
         }
         Update: {
+          anvisa_protocol?: string | null
           avatar_url?: string | null
           cannabis_experience?: string | null
           cpf?: string | null
@@ -2750,6 +3504,84 @@ export type Database = {
           total_pool?: number
           updated_at?: string
           year?: number
+        }
+        Relationships: []
+      }
+      scientific_articles: {
+        Row: {
+          abstract: string
+          authors: string | null
+          created_at: string
+          doi: string | null
+          id: string
+          keywords: string[] | null
+          source: string | null
+          title: string
+          url: string | null
+          year: number | null
+        }
+        Insert: {
+          abstract: string
+          authors?: string | null
+          created_at?: string
+          doi?: string | null
+          id?: string
+          keywords?: string[] | null
+          source?: string | null
+          title: string
+          url?: string | null
+          year?: number | null
+        }
+        Update: {
+          abstract?: string
+          authors?: string | null
+          created_at?: string
+          doi?: string | null
+          id?: string
+          keywords?: string[] | null
+          source?: string | null
+          title?: string
+          url?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      security_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          delivered_at: string | null
+          delivered_to_whatsapp: boolean
+          delivery_attempts: number
+          id: string
+          message: string
+          payload: Json | null
+          related_user_id: string | null
+          severity: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          delivered_at?: string | null
+          delivered_to_whatsapp?: boolean
+          delivery_attempts?: number
+          id?: string
+          message: string
+          payload?: Json | null
+          related_user_id?: string | null
+          severity?: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          delivered_at?: string | null
+          delivered_to_whatsapp?: boolean
+          delivery_attempts?: number
+          id?: string
+          message?: string
+          payload?: Json | null
+          related_user_id?: string | null
+          severity?: string
         }
         Relationships: []
       }
@@ -3221,6 +4053,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_content_bans: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          reason: string
+          severity: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          reason: string
+          severity?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          reason?: string
+          severity?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_experiences: {
         Row: {
           category: string
@@ -3531,6 +4396,36 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_events: {
+        Row: {
+          event_id: string
+          event_type: string | null
+          external_reference: string | null
+          gateway: string
+          id: string
+          payload: Json | null
+          processed_at: string
+        }
+        Insert: {
+          event_id: string
+          event_type?: string | null
+          external_reference?: string | null
+          gateway: string
+          id?: string
+          payload?: Json | null
+          processed_at?: string
+        }
+        Update: {
+          event_id?: string
+          event_type?: string | null
+          external_reference?: string | null
+          gateway?: string
+          id?: string
+          payload?: Json | null
+          processed_at?: string
+        }
+        Relationships: []
+      }
       whatsapp_conversations: {
         Row: {
           clinical_summary: string | null
@@ -3570,6 +4465,42 @@ export type Database = {
           sentiment?: string | null
           triage_id?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      whatsapp_routing_log: {
+        Row: {
+          created_at: string
+          detected_intent: string | null
+          from_number: string
+          id: string
+          message_preview: string | null
+          metadata: Json | null
+          patient_id: string | null
+          routed_agent: string
+          to_number: string
+        }
+        Insert: {
+          created_at?: string
+          detected_intent?: string | null
+          from_number: string
+          id?: string
+          message_preview?: string | null
+          metadata?: Json | null
+          patient_id?: string | null
+          routed_agent: string
+          to_number: string
+        }
+        Update: {
+          created_at?: string
+          detected_intent?: string | null
+          from_number?: string
+          id?: string
+          message_preview?: string | null
+          metadata?: Json | null
+          patient_id?: string | null
+          routed_agent?: string
+          to_number?: string
         }
         Relationships: []
       }
@@ -3790,6 +4721,7 @@ export type Database = {
       }
     }
     Functions: {
+      anonymize_old_ot_orders: { Args: never; Returns: undefined }
       calculate_doctor_performance: {
         Args: {
           _consultations: number
@@ -3822,6 +4754,20 @@ export type Database = {
       increment_site_counter: {
         Args: { _counter_id: string }
         Returns: undefined
+      }
+      search_scientific_articles: {
+        Args: { limit_count?: number; query_text: string }
+        Returns: {
+          abstract: string
+          authors: string
+          doi: string
+          id: string
+          keywords: string[]
+          rank: number
+          title: string
+          url: string
+          year: number
+        }[]
       }
     }
     Enums: {

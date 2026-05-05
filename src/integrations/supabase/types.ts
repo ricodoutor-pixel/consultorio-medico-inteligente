@@ -175,6 +175,51 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_personas: {
+        Row: {
+          active: boolean
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+          persona_key: string
+          requires_payment: boolean
+          system_prompt: string
+          triggers_intents: string[] | null
+          updated_at: string
+          voice_tone: string | null
+          whatsapp_number: string
+        }
+        Insert: {
+          active?: boolean
+          avatar_url?: string | null
+          created_at?: string
+          display_name: string
+          id?: string
+          persona_key: string
+          requires_payment?: boolean
+          system_prompt: string
+          triggers_intents?: string[] | null
+          updated_at?: string
+          voice_tone?: string | null
+          whatsapp_number?: string
+        }
+        Update: {
+          active?: boolean
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          persona_key?: string
+          requires_payment?: boolean
+          system_prompt?: string
+          triggers_intents?: string[] | null
+          updated_at?: string
+          voice_tone?: string | null
+          whatsapp_number?: string
+        }
+        Relationships: []
+      }
       ai_registry: {
         Row: {
           capabilities: string[] | null
@@ -585,6 +630,33 @@ export type Database = {
           title?: string
           updated_at?: string | null
           views_count?: number | null
+        }
+        Relationships: []
+      }
+      brand_assets: {
+        Row: {
+          active: boolean
+          asset_key: string
+          asset_url: string
+          created_at: string
+          description: string | null
+          id: string
+        }
+        Insert: {
+          active?: boolean
+          asset_key: string
+          asset_url: string
+          created_at?: string
+          description?: string | null
+          id?: string
+        }
+        Update: {
+          active?: boolean
+          asset_key?: string
+          asset_url?: string
+          created_at?: string
+          description?: string | null
+          id?: string
         }
         Relationships: []
       }
@@ -2021,6 +2093,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      intent_routing_rules: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          intent_key: string
+          keywords: string[]
+          priority: number
+          requires_payment: boolean
+          target_persona_key: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          intent_key: string
+          keywords?: string[]
+          priority?: number
+          requires_payment?: boolean
+          target_persona_key: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          intent_key?: string
+          keywords?: string[]
+          priority?: number
+          requires_payment?: boolean
+          target_persona_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intent_routing_rules_target_persona_key_fkey"
+            columns: ["target_persona_key"]
+            isOneToOne: false
+            referencedRelation: "ai_personas"
+            referencedColumns: ["persona_key"]
+          },
+        ]
       }
       job_queue: {
         Row: {

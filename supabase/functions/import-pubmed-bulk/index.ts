@@ -48,7 +48,7 @@ serve(async (req) => {
         return {
           title: art.title || `PubMed ${uid}`,
           authors: (art.authors || []).map((a: any) => a.name).join(", ") || null,
-          abstract: art.fulljournalname || null,
+          abstract: art.fulljournalname || art.title || "PubMed indexed article",
           doi: art.elocationid || null,
           url: `https://pubmed.ncbi.nlm.nih.gov/${uid}/`,
           year: yearNum,

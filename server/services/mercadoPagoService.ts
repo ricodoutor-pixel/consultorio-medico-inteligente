@@ -4,7 +4,7 @@ import crypto from 'crypto';
 const MP_API_BASE = 'https://api.mercadopago.com';
 
 function getAccessToken() {
-  return process.env.MERCADO_PAGO_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN || '';
+  return process.env.MERCADO_PAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN || '';
 }
 
 function getPublicKey() {

@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const MP_ACCESS_TOKEN = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN");
+    const MP_ACCESS_TOKEN = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
     if (!MP_ACCESS_TOKEN) {
       return new Response(JSON.stringify({ error: "Token Mercado Pago não configurado" }), {
         status: 500,

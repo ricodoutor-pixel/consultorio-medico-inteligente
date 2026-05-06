@@ -39,6 +39,21 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Ownership check: authenticated user must own the doctor profile
+    const serviceClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const { data: doctorOwn } = await serviceClient
+      .from("doctors")
+      .select("id")
+      .eq("id", doctorId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (!doctorOwn) {
+      return new Response(JSON.stringify({ error: "Não autorizado" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const MP_ACCESS_TOKEN = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
     if (!MP_ACCESS_TOKEN) {
       return new Response(JSON.stringify({ error: "Token Mercado Pago não configurado" }), {

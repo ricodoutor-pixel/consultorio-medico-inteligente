@@ -66,6 +66,7 @@ const SpecialistDashboard = lazy(() => import("./pages/SpecialistDashboard"));
 const InfluencerDashboard = lazy(() => import("./pages/InfluencerDashboard"));
 const OnlineUsers = lazy(() => import("./pages/OnlineUsers"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminCreditAudit = lazy(() => import("./components/AdminCreditAudit").then(m => ({ default: m.AdminCreditAudit })));
 const DownloadApp = lazy(() => import("./pages/DownloadApp"));
 const Comunidade = lazy(() => import("./pages/Comunidade"));
 const DashboardPaciente = lazy(() => import("./pages/DashboardPaciente"));
@@ -249,6 +250,7 @@ const App = () => (
                 <Route path="/health" element={<AdminRoute><HealthCheck /></AdminRoute>} />
                 <Route path="/admin/automations" element={<AdminRoute><AutomationsDashboard /></AdminRoute>} />
                 <Route path="/admin/omni-channel" element={<OmniChannelDashboard />} />
+                <Route path="/admin/auditoria-de-crédito" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
                 <Route path="/quiz" element={<QuizTriagem />} />

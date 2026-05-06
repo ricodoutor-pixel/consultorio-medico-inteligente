@@ -1,122 +1,120 @@
 /**
- * WhatsApp Brisa Integration
- * 
- * Fluxo centralizado para todas as interações com WhatsApp da Enfermeira Brisa
- * Número: 5511991363154
+ * WhatsApp Brisa Integration — Centralized funnel for Enfª Brisa
+ * Number: +55 11 99136-3154
  */
+import { trackEvent } from "@/lib/analytics";
 
 export const BRISA_WHATSAPP = "5511991363154";
 
-/**
- * Gerar URL de WhatsApp com template dinâmico
- */
-export function generateBrisaWhatsAppURL(
-  userName: string,
-  doctorName?: string,
-  consultationType?: string
-): string {
-  let message = `Olá enfermeira Brisa meu nome é ${userName}`;
-
-  if (doctorName) {
-    message += `, gostaria de agendar uma consulta online com o Dr. ${doctorName}`;
-  } else {
-    message += `, gostaria de agendar uma consulta online`;
-  }
-
-  if (consultationType) {
-    message += ` para ${consultationType}`;
-  }
-
-  message += ".";
-
-  const encodedMessage = encodeURIComponent(message);
-  return `https://wa.me/${BRISA_WHATSAPP}?text=${encodedMessage}`;
-}
-
-/**
- * Tipos de consulta
- */
 export const CONSULTATION_TYPES = {
   initial: "Orientação Técnica Inicial",
   followup: "Acompanhamento",
   emergency: "Emergência",
   prescription: "Prescrição",
   adjustment: "Ajuste de Dosagem",
+  ansiedade: "tratamento de ansiedade",
+  dor_cronica: "tratamento de dor crônica",
+  telemedicina: "consulta de telemedicina",
+  dashboard: "nova orientação",
+  hero: "iniciar triagem",
 };
 
-/**
- * Abrir WhatsApp em nova aba
- */
-export function openBrisaWhatsApp(
-  userName: string,
-  doctorName?: string,
-  consultationType?: string
-): void {
-  const url = generateBrisaWhatsAppURL(userName, doctorName, consultationType);
-  window.open(url, "_blank");
+interface BrisaOptions {
+  userName?: string;
+  doctorName?: string;
+  consultationType?: string;
+  /** Section/source identifier for tracking (e.g. "hero", "dashboard", "ansiedade") */
+  section?: string;
 }
 
-/**
- * Copiar link do WhatsApp para clipboard
- */
-export async function copyBrisaWhatsAppLink(
-  userName: string,
-  doctorName?: string,
-  consultationType?: string
-): Promise<boolean> {
+function getUTMParams(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  const params = new URLSearchParams(window.location.search);
+  const utm: Record<string, string> = {};
+  ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach((k) => {
+    const v = params.get(k);
+    if (v) utm[k] = v;
+  });
+  return utm;
+}
+
+export function generateBrisaWhatsAppURL(opts: BrisaOptions | string = {}, _legacyDoctor?: string, _legacyType?: string): string {
+  // Backwards-compat: old signature (userName, doctorName, consultationType)
+  const o: BrisaOptions = typeof opts === "string"
+    ? { userName: opts, doctorName: _legacyDoctor, consultationType: _legacyType }
+    : opts;
+
+  const name = o.userName?.trim() || "paciente";
+  let message = `Olá Enfª Brisa, meu nome é ${name}`;
+
+  if (o.section) {
+    message += `, vim pela seção ${o.section}`;
+  }
+  if (o.consultationType) {
+    message += ` para ${o.consultationType}`;
+  }
+  if (o.doctorName) {
+    message += ` com o Dr. ${o.doctorName}`;
+  }
+  message += ".";
+
+  return `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(message)}`;
+}
+
+export function openBrisaWhatsApp(opts: BrisaOptions | string = {}, _legacyDoctor?: string, _legacyType?: string): void {
+  const o: BrisaOptions = typeof opts === "string"
+    ? { userName: opts, doctorName: _legacyDoctor, consultationType: _legacyType }
+    : opts;
+
+  const url = generateBrisaWhatsAppURL(o);
+  trackBrisaClick(o.section || "unknown", o);
+  if (typeof window !== "undefined") window.open(url, "_blank", "noopener,noreferrer");
+}
+
+export function trackBrisaClick(source: string, extra: BrisaOptions = {}): void {
+  const utm = getUTMParams();
+  trackEvent("iniciar_triagem_brisa", {
+    source,
+    consultation_type: extra.consultationType ?? null,
+    doctor_name: extra.doctorName ?? null,
+    has_user_name: extra.userName ? true : false,
+    ...utm,
+  });
+  // Meta Pixel standard event
   try {
-    const url = generateBrisaWhatsAppURL(userName, doctorName, consultationType);
-    await navigator.clipboard.writeText(url);
+    (window as any).fbq?.("track", "Contact", { source, ...utm });
+  } catch {
+    /* noop */
+  }
+}
+
+// Legacy alias kept for compatibility
+export const trackWhatsAppClick = trackBrisaClick;
+
+export async function copyBrisaWhatsAppLink(opts: BrisaOptions = {}): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(generateBrisaWhatsAppURL(opts));
     return true;
-  } catch (error) {
-    console.error("Failed to copy WhatsApp link:", error);
+  } catch {
     return false;
   }
 }
 
-/**
- * Rastrear clique em WhatsApp (Analytics)
- */
-export function trackWhatsAppClick(
-  source: string,
-  userName?: string,
-  doctorName?: string
-): void {
-  if (typeof window !== "undefined" && (window as any).gtag) {
-    (window as any).gtag("event", "whatsapp_click", {
-      source,
-      user_name: userName,
-      doctor_name: doctorName,
-      timestamp: new Date().toISOString(),
-    });
-  }
-}
-
-/**
- * Componente React Hook para WhatsApp
- */
 export function useBrisaWhatsApp() {
   return {
     BRISA_WHATSAPP,
     generateBrisaWhatsAppURL,
     openBrisaWhatsApp,
     copyBrisaWhatsAppLink,
-    trackWhatsAppClick,
+    trackBrisaClick,
     CONSULTATION_TYPES,
   };
 }
 
-/**
- * Validar número de WhatsApp
- */
 export function isValidWhatsAppNumber(number: string): boolean {
-  const regex = /^\d{10,15}$/;
-  return regex.test(number.replace(/\D/g, ""));
+  return /^\d{10,15}$/.test(number.replace(/\D/g, ""));
 }
 
-/**
- * Formatar número de WhatsApp
- */
 export function formatWhatsAppNumber(number: string): string {
   const cleaned = number.replace(/\D/g, "");
   if (cleaned.length === 11) {
@@ -130,6 +128,7 @@ export default {
   generateBrisaWhatsAppURL,
   openBrisaWhatsApp,
   copyBrisaWhatsAppLink,
+  trackBrisaClick,
   trackWhatsAppClick,
   CONSULTATION_TYPES,
   useBrisaWhatsApp,

@@ -9,6 +9,25 @@ import "./index.css";
 // Inicializa proteções anti-clonagem ANTES do React
 initAntiClone();
 
+// 🔄 Recupera de chunks falhados (Hostinger 429 ou deploy invalidando hashes)
+const RELOAD_KEY = "__pr_chunk_reload__";
+const reloadOnce = () => {
+  if (!sessionStorage.getItem(RELOAD_KEY)) {
+    sessionStorage.setItem(RELOAD_KEY, "1");
+    console.warn("⚠️ Chunk falhou ao carregar. Recarregando…");
+    window.location.reload();
+  }
+};
+window.addEventListener("vite:preloadError", (e) => { e.preventDefault(); reloadOnce(); });
+window.addEventListener("error", (e) => {
+  const m = e.message || "";
+  if (m.includes("Failed to fetch dynamically imported module") ||
+      m.includes("Importing a module script failed")) reloadOnce();
+});
+window.addEventListener("load", () => {
+  setTimeout(() => sessionStorage.removeItem(RELOAD_KEY), 5000);
+});
+
 // PWA: Guard against service workers in preview/iframe contexts
 const isInIframe = (() => {
   try { return window.self !== window.top; } catch { return true; }

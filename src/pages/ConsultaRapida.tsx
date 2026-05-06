@@ -283,9 +283,9 @@ const ConsultaRapida = () => {
                             </div>
                           </div>
                           <Button className="w-full mt-4 font-black bg-primary text-primary-foreground h-12 rounded-2xl" asChild>
-                            <Link to="/pagamento">
+                            <a href={`https://wa.me/5511991363154?text=${encodeURIComponent(`Olá Brisa, finalizei a triagem (${matchResult.bestMatch.specialty}) e quero confirmar a Orientação Técnica.`)}`} target="_blank" rel="noopener noreferrer">
                               Confirmar Orientação Técnica <ArrowRight size={16} className="ml-2" />
-                            </Link>
+                            </a>
                           </Button>
                           <div className="flex items-center gap-2 justify-center mt-3 text-xs text-muted-foreground">
                             <Clock size={12} /> Tempo limite: 5 minutos
@@ -303,11 +303,15 @@ const ConsultaRapida = () => {
                               : "Escolha um profissional manualmente"
                             }
                           </p>
-                          <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl" asChild>
-                            <Link to={matchResult.matchType === "guest" ? "/cadastro" : "/profissionais"}>
-                              {matchResult.matchType === "guest" ? "Criar Conta Grátis" : "Ver Profissionais"} <ArrowRight size={16} className="ml-2" />
-                            </Link>
-                          </Button>
+                          {matchResult.matchType === "guest" ? (
+                            <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl" asChild>
+                              <Link to="/cadastro">Criar Conta Grátis <ArrowRight size={16} className="ml-2" /></Link>
+                            </Button>
+                          ) : (
+                            <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl" asChild>
+                              <a href="https://wa.me/5511991363154?text=Olá Brisa, quero falar com um especialista." target="_blank" rel="noopener noreferrer">Falar com Brisa (WhatsApp) <ArrowRight size={16} className="ml-2" /></a>
+                            </Button>
+                          )}
                         </CardContent>
                       </Card>
                     )}

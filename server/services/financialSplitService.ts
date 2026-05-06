@@ -98,25 +98,51 @@ export class FinancialSplitService {
   static async releaseDoctorCreditOnRating(params: {
     consultationId: string;
     professionalId: string;
+    patientId: string;
     rating: number; // 1..5
-    auditorPhone?: string; // Dr. Edilson final 1241
-  }): Promise<{ status: 'released' | 'under_review'; reason: string }> {
-    const { consultationId, professionalId, rating, auditorPhone = '5511987131241' } = params;
-    const ledger = this.ledger.get(professionalId) || [];
-    const entry = ledger.find((e: any) => e.transactionId === consultationId || e.description?.includes(consultationId));
+    amount: number;
+    comment?: string;
+  }): Promise<{ status: 'released' | 'under_review'; reason: string; ratingId?: string }> {
+    const { consultationId, professionalId, patientId, rating, amount, comment } = params;
 
-    if (rating >= 5) {
-      if (entry) entry.available = true;
-      this.ledger.set(professionalId, ledger);
-      return { status: 'released', reason: 'Avaliação 5★ validada pela Enfª Brisa' };
+    // Delega ao trigger handle_consultation_rating: inserir em consultation_ratings
+    // dispara automaticamente o registro em consultation_credit_audit + nps_alerts
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.SUPABASE_URL || '',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || ''
+    );
+
+    const { data, error } = await supabase
+      .from('consultation_ratings')
+      .insert({
+        consultation_id: consultationId,
+        professional_id: professionalId,
+        patient_id: patientId,
+        stars: rating,
+        amount,
+        comment: comment ?? null,
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error('[BrisaAudit] Falha ao inserir rating:', error);
+      throw error;
     }
 
-    if (entry) entry.available = false;
-    this.ledger.set(professionalId, ledger);
-    console.warn(`[BrisaAudit] Consulta ${consultationId} sob análise (rating ${rating}★) — notificar Dr. Edilson em ${auditorPhone}`);
+    if (rating >= 5) {
+      return {
+        status: 'released',
+        reason: 'Avaliação 5★ — crédito liberado automaticamente pela Enfª Brisa',
+        ratingId: data?.id,
+      };
+    }
+    console.warn(`[BrisaAudit] Consulta ${consultationId} sob análise (${rating}★) — Dr. Edilson notificado (1241)`);
     return {
       status: 'under_review',
-      reason: `Avaliação ${rating}★ inferior a 5★ — encaminhado para auditoria manual`,
+      reason: `Avaliação ${rating}★ inferior a 5★ — encaminhado para auditoria do Dr. Edilson (1241)`,
+      ratingId: data?.id,
     };
   }
 

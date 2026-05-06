@@ -125,6 +125,7 @@ const PrescriptionCheckout = lazy(() => import("./pages/PrescriptionCheckout"));
 const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
 const GestãoPacientes = lazy(() => import("./pages/GestãoPacientes"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const QaRatingTest = lazy(() => import("./pages/QaRatingTest"));
 const RodizioMedicos = lazy(() => import("./pages/RodizioMedicos"));
 
 const queryClient = new QueryClient();

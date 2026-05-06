@@ -6,91 +6,113 @@ const corsHeaders = {
 };
 
 /**
- * Brisa Prescription Dispatch
- * Webhook: triggered when a doctor signs a digital prescription.
- * Sends the prescription PDF link to the patient via WhatsApp.
+ * Brisa Prescription Dispatch (Evolution API only — Twilio deprecated)
+ *
+ * Triggered after a prescription is digitally signed (gov.br ou ClickSign).
+ * Envia o link do PDF assinado + guia ANVISA RDC 660/2023 via WhatsApp
+ * usando a Evolution API (Enfª Brisa +55 11 99136-3154).
+ *
+ * Auditoria: grava `whatsapp_delivered` em public.ai_events.
  */
+const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL");
+const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY");
+const INSTANCE_NAME = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+
   try {
     const body = await req.json();
-    const { patient_phone, patient_name, doctor_name, prescription_url, appointment_id } = body;
+    const {
+      patient_phone,
+      patient_name,
+      doctor_name,
+      prescription_url,
+      appointment_id,
+      prescription_id,
+    } = body;
 
     if (!patient_phone || !prescription_url) {
-      return new Response(JSON.stringify({ error: "patient_phone and prescription_url required" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ error: "patient_phone and prescription_url required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
-
-    if (!LOVABLE_API_KEY || !TWILIO_API_KEY) {
-      return new Response(JSON.stringify({ error: "Missing API keys" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "Evolution API not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const patientFirst = (patient_name || "paciente").split(" ")[0];
     const doctorDisplay = doctor_name || "Dr. Edilson";
+    const phoneClean = patient_phone.replace(/\D/g, "");
 
     const message = `Olá ${patientFirst}! Aqui é a Brisa 🌿
 
 Sua consulta com o ${doctorDisplay} foi finalizada com sucesso! ✅
 
-📋 Segue sua prescrição digital:
+📋 Segue sua prescrição digital assinada:
 ${prescription_url}
 
-📦 Guia de importação ANVISA:
+📦 Guia de importação ANVISA (RDC 660/2023):
 https://plantayraiz.com.br/como-funciona
 
 Qualquer dúvida sobre o tratamento, estou aqui! 💚`;
 
-    const phoneClean = patient_phone.replace(/\D/g, "");
-
-    // Send via Twilio
-    const twilioResp = await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
+    const evoUrl = `${EVOLUTION_API_URL}/message/sendText/${INSTANCE_NAME}`;
+    const evoResp = await fetch(evoUrl, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "X-Connection-Api-Key": TWILIO_API_KEY,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        To: `whatsapp:+${phoneClean}`,
-        From: "whatsapp:+5511991363154",
-        Body: message,
+      headers: { "Content-Type": "application/json", apikey: EVOLUTION_API_KEY },
+      body: JSON.stringify({
+        number: phoneClean,
+        options: { delay: 1200, presence: "composing", linkPreview: true },
+        textMessage: { text: message },
       }),
     });
 
-    const twilioData = await twilioResp.json();
-    console.log(`[Brisa Rx] Prescription sent to ${phoneClean.substring(0, 6)}*** | SID: ${twilioData.sid || "N/A"}`);
+    const evoData = await evoResp.json().catch(() => ({}));
+    const ok = evoResp.ok;
 
-    // Log the dispatch
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    console.log(
+      `[Brisa Rx] Evolution dispatch to ${phoneClean.substring(0, 6)}*** | status=${evoResp.status}`
     );
 
     await supabase.from("ai_events").insert({
       ai_name: "brisa_coo",
-      event_type: "prescription_dispatch",
-      status: twilioResp.ok ? "completed" : "failed",
-      input_data: { appointment_id, patient_phone: `${phoneClean.substring(0, 4)}****` },
-      output_data: { twilio_sid: twilioData.sid, twilio_status: twilioData.status },
+      event_type: "whatsapp_delivered",
+      status: ok ? "completed" : "failed",
+      input_data: {
+        appointment_id,
+        prescription_id,
+        patient_phone: `${phoneClean.substring(0, 4)}****`,
+      },
+      output_data: { provider: "evolution", evolution_response: evoData },
     });
 
-    return new Response(JSON.stringify({
-      success: twilioResp.ok,
-      sid: twilioData.sid,
-    }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ success: ok, provider: "evolution", result: evoData }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (e) {
-    console.error("[Brisa Rx] Error:", e);
-    return new Response(JSON.stringify({ error: "Dispatch failed" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    const msg = e instanceof Error ? e.message : "Dispatch failed";
+    console.error("[Brisa Rx] Error:", msg);
+    await supabase.from("ai_events").insert({
+      ai_name: "brisa_coo",
+      event_type: "whatsapp_delivered",
+      status: "failed",
+      output_data: { error: msg },
+    }).then(() => {}, () => {});
+    return new Response(JSON.stringify({ error: msg }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

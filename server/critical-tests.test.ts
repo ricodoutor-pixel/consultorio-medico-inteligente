@@ -407,7 +407,7 @@ describe('Integration Tests', () => {
   });
 
   it('should send SMS notifications', () => {
-    const smsProvider = 'twilio';
+    const smsProvider = 'evolution';
     expect(smsProvider).toBeTruthy();
   });
 

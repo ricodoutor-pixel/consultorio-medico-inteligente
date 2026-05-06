@@ -531,7 +531,7 @@ const AdminMaster = () => {
               { name: "Verdinho", status: "Ativo", color: "#39FF14", icon: Bot, ping: true },
               { name: "Mercado Pago", status: "Conectado", color: "#39FF14", icon: CreditCard, ping: true },
               { name: "Supabase RT", status: "Online", color: "#39FF14", icon: Database, ping: true },
-              { name: "Twilio/SMS", status: "Ativo", color: "#39FF14", icon: MessageSquare, ping: true },
+              { name: "Evolution API", status: "Ativo", color: "#39FF14", icon: MessageSquare, ping: true },
               { name: "ManyChat", status: "Webhook OK", color: "#00D4FF", icon: Megaphone, ping: true },
             ].map(sys => (
               <div key={sys.name} className="flex items-center gap-2 p-2 rounded-lg" style={{ background: "#ffffff05" }}>

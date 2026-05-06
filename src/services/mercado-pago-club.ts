@@ -136,7 +136,7 @@ export class MercadoPagoClubService {
         // Atualizar status do pedido
         const order = await this.updateOrderStatus(orderId, 'approved', paymentData.id.toString());
 
-        // Notificar cliente via Twilio
+        // Notificar cliente via Evolution API
         await this.notifyCustomer(order, 'approved');
 
         // Registrar na auditoria
@@ -235,7 +235,7 @@ export class MercadoPagoClubService {
   }
 
   /**
-   * Notificar cliente via Twilio
+   * Notificar cliente via Evolution API
    */
   private async notifyCustomer(order: Order, status: string): Promise<void> {
     try {
@@ -247,8 +247,8 @@ export class MercadoPagoClubService {
 
       // Sending notification
 
-      // Aqui você faria a integração com Twilio
-      // await twilioService.sendWhatsApp(customerPhone, messages[status]);
+      // Aqui você faria a integração com Evolution API
+      // // await evolutionService.sendWhatsApp(customerPhone, messages[status]);
     } catch (error) {
       console.error('❌ Erro ao notificar cliente:', error);
     }

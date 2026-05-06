@@ -190,7 +190,7 @@ const GlobalCompliance = () => {
           </p>
           <p>
             Para operação nos EUA (HIPAA), a Planta & Raiz mantém BAA assinado com todos os provedores de infraestrutura
-            (AWS, Twilio, Supabase). Documentação disponível sob NDA para parceiros institucionais.
+            (AWS, Evolution API, Supabase). Documentação disponível sob NDA para parceiros institucionais.
           </p>
         </div>
       </div>

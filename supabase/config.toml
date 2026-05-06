@@ -128,3 +128,6 @@ verify_jwt = false
 
 [functions.whatsapp-cart-notify]
 verify_jwt = false
+[functions.create-stripe-payment]
+verify_jwt = false
+

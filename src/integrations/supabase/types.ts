@@ -4938,37 +4938,25 @@ export type Database = {
       }
       vendors_public: {
         Row: {
-          created_at: string | null
           id: string | null
-          is_active: boolean | null
           rating: number | null
-          store_banner_url: string | null
           store_description: string | null
           store_logo_url: string | null
           store_name: string | null
-          total_products: number | null
         }
         Insert: {
-          created_at?: string | null
           id?: string | null
-          is_active?: boolean | null
           rating?: number | null
-          store_banner_url?: string | null
           store_description?: string | null
           store_logo_url?: string | null
           store_name?: string | null
-          total_products?: number | null
         }
         Update: {
-          created_at?: string | null
           id?: string | null
-          is_active?: boolean | null
           rating?: number | null
-          store_banner_url?: string | null
           store_description?: string | null
           store_logo_url?: string | null
           store_name?: string | null
-          total_products?: number | null
         }
         Relationships: []
       }

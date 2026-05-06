@@ -67,5 +67,52 @@ export const financialSplitService = {
       return true;
     }
     return false;
-  }
+  },
+
+  /**
+   * Libera os 93% ao médico apenas se a avaliação for 5★.
+   * Caso contrário, marca o crédito como `under_review` (auditoria do Dr. Edilson).
+   *
+   * @param ratingId  ID da linha em consultation_ratings (gerada após o paciente avaliar)
+   */
+  async releaseDoctorCreditOnRating(ratingId: string): Promise<{
+    status: "released" | "under_review" | "error";
+    message?: string;
+  }> {
+    try {
+      const { data: rating, error: rErr } = await (supabase as any)
+        .from("consultation_ratings")
+        .select("id, stars, professional_id, amount, consultation_id, patient_id")
+        .eq("id", ratingId)
+        .maybeSingle();
+      if (rErr || !rating) throw new Error(rErr?.message || "Avaliação não encontrada");
+
+      const isFiveStar = Number(rating.stars) >= 5;
+      const payoutStatus = isFiveStar ? "released" : "under_review";
+      const reason = isFiveStar
+        ? "Avaliação 5★ — repasse de 93% liberado para saque pelo médico."
+        : `Avaliação ${rating.stars}★ < 5★ — repasse retido para auditoria do Dr. Edilson.`;
+
+      // Atualiza o registro de auditoria criado pelo trigger handle_consultation_rating
+      const { error: uErr } = await (supabase as any)
+        .from("consultation_credit_audit")
+        .update({ payout_status: payoutStatus, status: payoutStatus, reason })
+        .eq("rating_id", ratingId);
+      if (uErr) throw uErr;
+
+      // Se 5★, credita carteira do médico
+      if (isFiveStar && rating.amount) {
+        const split = this.calculateSplit(Number(rating.amount));
+        await (supabase as any).rpc("credit_affiliate_wallet", {
+          _user_id: rating.professional_id,
+          _amount: split.doctorAmount,
+        }).catch((e: any) => console.warn("[credit_affiliate_wallet]", e?.message));
+      }
+
+      return { status: payoutStatus as "released" | "under_review", message: reason };
+    } catch (err: any) {
+      console.error("[releaseDoctorCreditOnRating]", err);
+      return { status: "error", message: err?.message || String(err) };
+    }
+  },
 };

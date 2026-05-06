@@ -5,7 +5,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-
 const SITE_BASE = "https://plantayraiz.com.br";
 
 const BRISA_WELCOME: Record<string, { message: string; link: string }> = {
@@ -51,7 +50,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Parse webhook body (Evolution sends JSON; tolerate URL-encoded too)
+    // Parse webhook body (Evolution sends JSON; tolerate URL-encoded fallback)
     const raw = await req.text();
     let from = "", incomingText = "", messageSid = "";
     try {
@@ -69,16 +68,13 @@ Deno.serve(async (req) => {
 
     console.log(`[Brisa WhatsApp] Message from ${from}: ${incomingText.substring(0, 80)}`);
 
-    // Detect visitor intent
     const intent = detectIntent(incomingText);
-
     let replyText: string;
 
     if (intent !== "default" && BRISA_WELCOME[intent]) {
       const welcome = BRISA_WELCOME[intent];
       replyText = `${welcome.message}\n\n👉 ${welcome.link}\n\nSe tiver dúvidas sobre a plataforma, estou aqui para ajudar! 💚`;
     } else {
-      // Use AI for general questions
       const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -90,10 +86,10 @@ Deno.serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `Você é a Enfermeira Brisa, assistente virtual da Planta & Raiz — plataforma de telemedicina especializada em Cannabis Medicinal. 
+              content: `Você é a Enfermeira Brisa, assistente virtual da Planta & Raiz — plataforma de telemedicina especializada em Cannabis Medicinal.
 Regras:
 - Seja acolhedora, empática e profissional
-- Máximo 300 caracteres na resposta  
+- Máximo 300 caracteres na resposta
 - Use 1-2 emojis relevantes
 - Sempre direcione para o site: ${SITE_BASE}
 - Nunca dê diagnósticos ou prescrições
@@ -116,7 +112,7 @@ Regras:
     }
 
     // Send reply via Evolution API (Enfª Brisa)
-    const phoneClean = (from.replace(/\D/g, "") || "").replace(/^@.*$/, "");
+    const phoneClean = (from || "").replace(/\D/g, "");
     const evoResponse = await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: EVO_KEY },
@@ -124,12 +120,10 @@ Regras:
     });
 
     const evoData = await evoResponse.json().catch(() => ({}));
-
     if (!evoResponse.ok) {
       console.error("[Brisa WhatsApp] Evolution send failed:", JSON.stringify(evoData));
     }
 
-    // Log interaction
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -138,21 +132,20 @@ Regras:
     await supabase.from("ai_events").insert({
       ai_name: "brisa_coo",
       event_type: "whatsapp_reply",
-      status: twilioResponse.ok ? "completed" : "failed",
+      status: evoResponse.ok ? "completed" : "failed",
       input_data: { from, message: incomingText, intent, message_sid: messageSid },
-      output_data: { reply: replyText, twilio_sid: twilioData?.sid },
+      output_data: { reply: replyText, evolution_id: evoData?.key?.id || evoData?.messageId },
     });
 
-    // Respond to Twilio webhook with TwiML (empty to avoid double-send)
-    return new Response(
-      `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`,
-      { headers: { ...corsHeaders, "Content-Type": "text/xml" }, status: 200 }
-    );
+    return new Response(JSON.stringify({ ok: evoResponse.ok }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
+    });
   } catch (e) {
     console.error("[Brisa WhatsApp] Error:", e);
-    return new Response(
-      `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`,
-      { headers: { "Content-Type": "text/xml" }, status: 200 }
-    );
+    return new Response(JSON.stringify({ ok: false, error: String(e) }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
+    });
   }
 });

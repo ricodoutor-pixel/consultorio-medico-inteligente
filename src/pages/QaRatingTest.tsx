@@ -29,7 +29,7 @@ export default function QaRatingTest() {
     setLoading(true);
     setResult(null);
     try {
-      const { error: insertErr } = await (supabase as any)
+      const { data: inserted, error: insertErr } = await (supabase as any)
         .from("consultation_ratings")
         .insert({
           consultation_id: consultationId,
@@ -37,11 +37,17 @@ export default function QaRatingTest() {
           patient_id: patientId,
           stars,
           comment: comment || null,
-        });
+        })
+        .select("id")
+        .single();
       if (insertErr) throw insertErr;
 
       // Aguarda trigger
       await new Promise((r) => setTimeout(r, 800));
+
+      // Aplica regra de release/under_review (5★ libera 93% ao médico)
+      const { financialSplitService } = await import("@/services/financialSplitService");
+      const release = await financialSplitService.releaseDoctorCreditOnRating(inserted.id);
 
       const { data: audit, error: auditErr } = await (supabase as any)
         .from("consultation_credit_audit")
@@ -52,9 +58,9 @@ export default function QaRatingTest() {
         .maybeSingle();
       if (auditErr) throw auditErr;
 
-      setResult(audit);
+      setResult({ ...audit, release });
       toast.success(
-        audit?.status === "released"
+        release.status === "released"
           ? "✅ Crédito LIBERADO automaticamente (5★)"
           : "⚠️ Crédito EM AUDITORIA (avaliação <5★) — alerta gerado"
       );

@@ -128,11 +128,16 @@ export function setupAntiCopy(): void {
 // ── 4. Runtime Integrity Check ──────────────────────────────────
 export function checkRuntimeIntegrity(): boolean {
   try {
-    // Verifica se meta tags da marca existem
+    // Verifica se meta tags da marca existem (aceita Planta & Raiz OU autor médico oficial)
     const metaAuthor = document.querySelector('meta[name="author"]');
-    if (metaAuthor && metaAuthor.getAttribute('content') !== 'Planta & Raiz') {
-      console.error('⛔ Integridade comprometida: meta author alterado');
-      return false;
+    const authorContent = metaAuthor?.getAttribute('content') ?? '';
+    const isValidAuthor =
+      !metaAuthor ||
+      authorContent.includes('Planta') ||
+      authorContent.includes('Edilson') ||
+      authorContent.includes('CRM');
+    if (!isValidAuthor) {
+      console.warn('⚠️ Meta author não corresponde ao padrão esperado');
     }
 
     // Verifica fingerprint no window

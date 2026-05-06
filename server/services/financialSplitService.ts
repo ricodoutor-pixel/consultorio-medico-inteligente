@@ -91,7 +91,37 @@ export class FinancialSplitService {
   }
 
   /**
-   * Obtém saldo acumulado do profissional
+   * Brisa CEO Audit — libera ou retém o crédito do médico após avaliação do paciente.
+   * Regra: somente avaliação 5★ libera o saldo "Disponível para Saque".
+   * Avaliações <5 entram em status "under_review" para auditoria do Dr. Edilson.
+   */
+  static async releaseDoctorCreditOnRating(params: {
+    consultationId: string;
+    professionalId: string;
+    rating: number; // 1..5
+    auditorPhone?: string; // Dr. Edilson final 1241
+  }): Promise<{ status: 'released' | 'under_review'; reason: string }> {
+    const { consultationId, professionalId, rating, auditorPhone = '5511987131241' } = params;
+    const ledger = this.ledger.get(professionalId) || [];
+    const entry = ledger.find((e: any) => e.transactionId === consultationId || e.description?.includes(consultationId));
+
+    if (rating >= 5) {
+      if (entry) entry.available = true;
+      this.ledger.set(professionalId, ledger);
+      return { status: 'released', reason: 'Avaliação 5★ validada pela Enfª Brisa' };
+    }
+
+    if (entry) entry.available = false;
+    this.ledger.set(professionalId, ledger);
+    console.warn(`[BrisaAudit] Consulta ${consultationId} sob análise (rating ${rating}★) — notificar Dr. Edilson em ${auditorPhone}`);
+    return {
+      status: 'under_review',
+      reason: `Avaliação ${rating}★ inferior a 5★ — encaminhado para auditoria manual`,
+    };
+  }
+
+  /**
+   * Obtém saldo acumulado do profissional (apenas valores liberados pela auditoria)
    */
   static async getProfessionalBalance(professionalId: string): Promise<number> {
     const ledger = this.ledger.get(professionalId) || [];

@@ -334,7 +334,7 @@ const DashboardPaciente = () => {
                         <Stethoscope size={32} className="text-muted-foreground mx-auto mb-3" />
                         <p className="text-sm text-muted-foreground">Nenhuma consulta ainda.</p>
                         <Button size="sm" className="mt-3 rounded-xl bg-primary text-primary-foreground" asChild>
-                          <Link to="/telemedicina">Agendar Primeira Orientação Técnica</Link>
+                          <a href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Brisa, quero agendar minha primeira Orientação Técnica.")}`} target="_blank" rel="noopener noreferrer">Agendar Primeira Orientação Técnica</a>
                         </Button>
                       </div>
                     ) : (

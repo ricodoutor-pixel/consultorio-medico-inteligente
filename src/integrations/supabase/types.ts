@@ -1105,6 +1105,7 @@ export type Database = {
           created_at: string
           id: string
           patient_id: string
+          payout_status: string
           professional_id: string
           rating_id: string | null
           reason: string | null
@@ -1120,6 +1121,7 @@ export type Database = {
           created_at?: string
           id?: string
           patient_id: string
+          payout_status?: string
           professional_id: string
           rating_id?: string | null
           reason?: string | null
@@ -1135,6 +1137,7 @@ export type Database = {
           created_at?: string
           id?: string
           patient_id?: string
+          payout_status?: string
           professional_id?: string
           rating_id?: string | null
           reason?: string | null
@@ -1323,6 +1326,42 @@ export type Database = {
           patient_id?: string
           professional_id?: string
           stars?: number
+        }
+        Relationships: []
+      }
+      conversion_leads: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json | null
+          processed_at: string | null
+          reference_id: string | null
+          source: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          reference_id?: string | null
+          source: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          reference_id?: string | null
+          source?: string
+          status?: string
+          user_id?: string | null
         }
         Relationships: []
       }

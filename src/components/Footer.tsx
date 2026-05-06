@@ -82,33 +82,36 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-border/30 mt-8 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-muted-foreground/50">
-          <p>© {new Date().getFullYear()} Planta y Raiz. Todos os direitos reservados.</p>
-          <div className="flex items-center gap-3">
-            {canInstall && !isInstalled && (
-              <button
-                onClick={() => promptInstall()}
-                className="flex items-center gap-1 hover:text-primary transition-colors"
-              >
-                <Download size={10} />
-                Instalar App
-              </button>
-            )}
-            {canInstall && !isInstalled && <span>·</span>}
-            <Link to="/legal" className="hover:text-primary transition-colors">Conformidade</Link>
-            <span>·</span>
-            <Link to="/afiliados" className="hover:text-primary transition-colors">Afiliados</Link>
-            <span>·</span>
+        {/* Bottom bar — heart admin à esquerda, evita sobreposição com FAB Brisa e MobileBottomNav */}
+        <div className="border-t border-border/30 mt-8 pt-5 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:pb-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-muted-foreground/50">
+          <div className="flex items-center gap-3 order-2 sm:order-1">
             {/* Porta oculta de administração — clicar no coração leva ao /admin (proteção de role aplicada na rota) */}
             <Link
               to="/admin"
-              className="opacity-30 hover:opacity-100 hover:text-primary transition-all"
+              className="opacity-30 hover:opacity-100 hover:text-primary transition-all shrink-0"
               aria-label="Acesso administrativo"
               title="Feito com ❤️"
             >
-              <Heart size={11} className="inline-block" fill="currentColor" />
+              <Heart size={12} className="inline-block" fill="currentColor" />
             </Link>
+            <span className="opacity-70">© {new Date().getFullYear()} Planta y Raiz. Todos os direitos reservados.</span>
+          </div>
+          <div className="flex items-center gap-3 order-1 sm:order-2 flex-wrap justify-center">
+            {canInstall && !isInstalled && (
+              <>
+                <button
+                  onClick={() => promptInstall()}
+                  className="flex items-center gap-1 hover:text-primary transition-colors"
+                >
+                  <Download size={10} />
+                  Instalar App
+                </button>
+                <span>·</span>
+              </>
+            )}
+            <Link to="/legal" className="hover:text-primary transition-colors">Conformidade</Link>
+            <span>·</span>
+            <Link to="/afiliados" className="hover:text-primary transition-colors">Afiliados</Link>
           </div>
         </div>
       </div>

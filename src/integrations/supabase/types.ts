@@ -1097,6 +1097,62 @@ export type Database = {
         }
         Relationships: []
       }
+      consultation_credit_audit: {
+        Row: {
+          amount: number | null
+          audit_phone: string | null
+          consultation_id: string
+          created_at: string
+          id: string
+          patient_id: string
+          professional_id: string
+          rating_id: string | null
+          reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          stars: number
+          status: string
+        }
+        Insert: {
+          amount?: number | null
+          audit_phone?: string | null
+          consultation_id: string
+          created_at?: string
+          id?: string
+          patient_id: string
+          professional_id: string
+          rating_id?: string | null
+          reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          stars: number
+          status: string
+        }
+        Update: {
+          amount?: number | null
+          audit_phone?: string | null
+          consultation_id?: string
+          created_at?: string
+          id?: string
+          patient_id?: string
+          professional_id?: string
+          rating_id?: string | null
+          reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          stars?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_credit_audit_rating_id_fkey"
+            columns: ["rating_id"]
+            isOneToOne: false
+            referencedRelation: "consultation_ratings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consultation_offers: {
         Row: {
           accepted_at: string | null
@@ -1234,6 +1290,39 @@ export type Database = {
           specialty?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      consultation_ratings: {
+        Row: {
+          amount: number | null
+          comment: string | null
+          consultation_id: string
+          created_at: string
+          id: string
+          patient_id: string
+          professional_id: string
+          stars: number
+        }
+        Insert: {
+          amount?: number | null
+          comment?: string | null
+          consultation_id: string
+          created_at?: string
+          id?: string
+          patient_id: string
+          professional_id: string
+          stars: number
+        }
+        Update: {
+          amount?: number | null
+          comment?: string | null
+          consultation_id?: string
+          created_at?: string
+          id?: string
+          patient_id?: string
+          professional_id?: string
+          stars?: number
         }
         Relationships: []
       }

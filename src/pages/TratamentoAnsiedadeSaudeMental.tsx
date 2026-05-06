@@ -148,7 +148,7 @@ const TratamentoAnsiedadeSaudeMental = () => {
             <p className="text-muted-foreground text-sm mb-4">Faça uma pré-triagem gratuita com a IA Brisa e descubra como a medicina canabinoide pode ajudar.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl">
-                <Link to="/agendamento">Agendar Teleconsulta - R$30 <ArrowRight size={16} className="ml-1" /></Link>
+                <a href="https://wa.me/5511991363154?text=Olá Brisa, quero agendar minha Teleconsulta (R$30)." target="_blank" rel="noopener noreferrer">Agendar Teleconsulta - R$30 <ArrowRight size={16} className="ml-1" /></a>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
                 <a href="https://wa.me/5511987131241?text=Gostaria de fazer uma pré-triagem para ansiedade" target="_blank" rel="noopener noreferrer">

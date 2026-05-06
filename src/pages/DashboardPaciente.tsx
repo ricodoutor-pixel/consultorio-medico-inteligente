@@ -199,7 +199,7 @@ const DashboardPaciente = () => {
                 <LogOut size={14} className="mr-1" /> Sair
               </Button>
               <Button size="sm" className="rounded-xl text-xs bg-primary text-primary-foreground" asChild>
-                <Link to="/telemedicina"><Stethoscope size={14} className="mr-1" /> Nova Orientação Técnica</Link>
+                <a href={`https://wa.me/5511991363154?text=${encodeURIComponent(`Olá Enfermeira Brisa, ${profile?.full_name || "sou paciente"}, gostaria de iniciar uma nova Orientação Técnica.`)}`} target="_blank" rel="noopener noreferrer"><Stethoscope size={14} className="mr-1" /> Nova Orientação Técnica</a>
               </Button>
             </div>
           </motion.div>

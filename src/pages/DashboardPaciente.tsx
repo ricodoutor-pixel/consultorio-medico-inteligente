@@ -440,7 +440,7 @@ const DashboardPaciente = () => {
                     <p className="text-sm text-muted-foreground">Nenhuma receita encontrada.</p>
                     <p className="text-xs text-muted-foreground mt-1">Após sua primeira consulta, suas prescrições aparecerão aqui.</p>
                     <Button size="sm" className="mt-4 rounded-xl bg-primary text-primary-foreground" asChild>
-                      <Link to="/telemedicina">Agendar Orientação Técnica</Link>
+                      <a href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Brisa, quero agendar uma Orientação Técnica.")}`} target="_blank" rel="noopener noreferrer">Agendar Orientação Técnica</a>
                     </Button>
                   </CardContent>
                 </Card>

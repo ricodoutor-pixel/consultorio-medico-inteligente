@@ -283,9 +283,9 @@ const ConsultaRapida = () => {
                             </div>
                           </div>
                           <Button className="w-full mt-4 font-black bg-primary text-primary-foreground h-12 rounded-2xl" asChild>
-                            <Link to="/pagamento">
+                            <a href={`https://wa.me/5511991363154?text=${encodeURIComponent(`Olá Brisa, finalizei a triagem (${matchResult.bestMatch.specialty}) e quero confirmar a Orientação Técnica.`)}`} target="_blank" rel="noopener noreferrer">
                               Confirmar Orientação Técnica <ArrowRight size={16} className="ml-2" />
-                            </Link>
+                            </a>
                           </Button>
                           <div className="flex items-center gap-2 justify-center mt-3 text-xs text-muted-foreground">
                             <Clock size={12} /> Tempo limite: 5 minutos

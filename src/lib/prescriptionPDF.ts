@@ -152,14 +152,21 @@ export function generatePrescriptionPDF(data: PrescriptionData): jsPDF {
   doc.line(margin, y, margin + 80, y);
   y += 5;
   doc.setFontSize(9);
-  doc.setFont("helvetica", "normal");
-  doc.text(`Dr(a). ${data.doctorName}`, margin, y);
+  doc.setFont("helvetica", "bold");
+  doc.text(`Dr. ${data.doctorName}`, margin, y);
   y += 4;
-  doc.text(
-    `CRM ${data.doctorCRM}/${data.doctorCRMState}`,
-    margin,
-    y
-  );
+  doc.setFont("helvetica", "normal");
+  doc.text(`Medicina Integrativa · CRM ${data.doctorCRM}/${data.doctorCRMState} · CPF 009.536.834-51`, margin, y);
+
+  // ─── Selo Gov.br ───────────────────────────────────────
+  y += 8;
+  doc.setFillColor(30, 64, 175);
+  doc.roundedRect(margin, y, 60, 10, 2, 2, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "bold");
+  doc.text("✓ ASSINATURA DIGITAL gov.br", margin + 30, y + 6.5, { align: "center" });
+  doc.setTextColor(40, 40, 40);
 
   // ─── Hash de Autenticidade ─────────────────────────────
   if (data.signatureHash) {

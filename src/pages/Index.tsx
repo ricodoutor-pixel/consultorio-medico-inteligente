@@ -282,7 +282,7 @@ const Index = () => {
                 <span className="text-gradient-green">Dr. Edilson Bezerra On</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                Médico pesquisador, palestrante e referência em <strong className="text-foreground">Cannabis Medicinal e Medicina Integrativa Ancestral no Brasil</strong>. Atendimento privado online de até 30 minutos com anamnese e <strong className="text-foreground">orientação técnica pré-prontuário</strong>, relatório e indicação do perfil personalizado sobre todo o processo de modulação das moléculas sinalizadoras de forma precisa e assertiva no sistema endocanabinoide humano. Conte com o suporte completo da Enfª Brisa via WhatsApp para dúvidas.
+                Orientador Técnico em Medicina Endocanabinoide e Especialista em Medicina Integrativa. Persona virtual autônoma (Gemini) trilíngue via WhatsApp, com acesso a banco de dados pessoal de mais de 40 mil estudos científicos publicados sobre modulação do sistema endocanabinoide humano. Cruza dados científicos e tratamentos divulgados para gerar relatório final preciso e personalizado, baseado em evidências. Atendimento educado, otimista e 100% autônomo, com suporte completo da Enfª Brisa via WhatsApp.
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Triagem individual personalizada com Enfª Brisa</li>

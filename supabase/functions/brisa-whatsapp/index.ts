@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
+
 const SITE_BASE = "https://plantayraiz.com.br";
 
 const BRISA_WELCOME: Record<string, { message: string; link: string }> = {
@@ -41,21 +41,31 @@ Deno.serve(async (req) => {
 
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
-    const TWILIO_FROM = Deno.env.get("TWILIO_WHATSAPP_FROM") || "+5511991363154";
+    const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+    const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
 
-    if (!LOVABLE_API_KEY || !TWILIO_API_KEY) {
+    if (!LOVABLE_API_KEY || !EVO_URL || !EVO_KEY) {
       return new Response(JSON.stringify({ error: "Missing credentials" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Parse Twilio webhook body (URL-encoded)
-    const body = await req.text();
-    const params = new URLSearchParams(body);
-    const from = params.get("From") || "";
-    const incomingText = params.get("Body") || "";
-    const messageSid = params.get("MessageSid") || "";
+    // Parse webhook body (Evolution sends JSON; tolerate URL-encoded too)
+    const raw = await req.text();
+    let from = "", incomingText = "", messageSid = "";
+    try {
+      const j = JSON.parse(raw);
+      const data = j?.data || j;
+      from = data?.key?.remoteJid || data?.from || "";
+      incomingText = data?.message?.conversation || data?.message?.extendedTextMessage?.text || data?.body || "";
+      messageSid = data?.key?.id || data?.messageId || "";
+    } catch {
+      const params = new URLSearchParams(raw);
+      from = params.get("From") || "";
+      incomingText = params.get("Body") || "";
+      messageSid = params.get("MessageSid") || "";
+    }
 
     console.log(`[Brisa WhatsApp] Message from ${from}: ${incomingText.substring(0, 80)}`);
 
@@ -105,25 +115,18 @@ Regras:
       }
     }
 
-    // Send reply via Twilio Gateway
-    const twilioResponse = await fetch(`${GATEWAY_URL}/Messages.json`, {
+    // Send reply via Evolution API (Enfª Brisa)
+    const phoneClean = (from.replace(/\D/g, "") || "").replace(/^@.*$/, "");
+    const evoResponse = await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "X-Connection-Api-Key": TWILIO_API_KEY,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        To: from,
-        From: `whatsapp:${TWILIO_FROM}`,
-        Body: replyText,
-      }),
+      headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+      body: JSON.stringify({ number: phoneClean, text: replyText, delay: 1200 }),
     });
 
-    const twilioData = await twilioResponse.json();
-    
-    if (!twilioResponse.ok) {
-      console.error("[Brisa WhatsApp] Twilio send failed:", JSON.stringify(twilioData));
+    const evoData = await evoResponse.json().catch(() => ({}));
+
+    if (!evoResponse.ok) {
+      console.error("[Brisa WhatsApp] Evolution send failed:", JSON.stringify(evoData));
     }
 
     // Log interaction

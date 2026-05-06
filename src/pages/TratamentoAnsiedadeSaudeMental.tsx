@@ -96,7 +96,7 @@ const TratamentoAnsiedadeSaudeMental = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl">
-                  <Link to="/agendamento">Agendar Teleconsulta de Saúde Mental - R$30 <ArrowRight size={16} className="ml-1" /></Link>
+                  <a href="https://wa.me/5511991363154?text=Olá Brisa, quero agendar uma Orientação Técnica de Saúde Mental (R$30)." target="_blank" rel="noopener noreferrer">Agendar Teleconsulta de Saúde Mental - R$30 <ArrowRight size={16} className="ml-1" /></a>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
                   <a href="https://wa.me/5511987131241?text=Olá, gostaria de saber mais sobre tratamento para ansiedade com cannabis medicinal" target="_blank" rel="noopener noreferrer">

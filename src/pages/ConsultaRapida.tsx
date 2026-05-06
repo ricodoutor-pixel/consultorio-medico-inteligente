@@ -303,11 +303,15 @@ const ConsultaRapida = () => {
                               : "Escolha um profissional manualmente"
                             }
                           </p>
-                          <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl" asChild>
-                            <Link to={matchResult.matchType === "guest" ? "/cadastro" : "/profissionais"}>
-                              {matchResult.matchType === "guest" ? "Criar Conta Grátis" : "Ver Profissionais"} <ArrowRight size={16} className="ml-2" />
-                            </Link>
-                          </Button>
+                          {matchResult.matchType === "guest" ? (
+                            <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl" asChild>
+                              <Link to="/cadastro">Criar Conta Grátis <ArrowRight size={16} className="ml-2" /></Link>
+                            </Button>
+                          ) : (
+                            <Button className="w-full font-black bg-primary text-primary-foreground rounded-2xl" asChild>
+                              <a href="https://wa.me/5511991363154?text=Olá Brisa, quero falar com um especialista." target="_blank" rel="noopener noreferrer">Falar com Brisa (WhatsApp) <ArrowRight size={16} className="ml-2" /></a>
+                            </Button>
+                          )}
                         </CardContent>
                       </Card>
                     )}

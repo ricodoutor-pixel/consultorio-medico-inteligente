@@ -44,11 +44,12 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const action = body.action || "follow_up";
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
+    const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+    const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
 
-    if (!LOVABLE_API_KEY) {
-      return jsonResp({ error: "LOVABLE_API_KEY missing" }, 500);
+    if (!EVO_URL || !EVO_KEY) {
+      return jsonResp({ error: "EVOLUTION_API_URL/EVOLUTION_API_KEY missing" }, 500);
     }
 
     const supabase = createClient(

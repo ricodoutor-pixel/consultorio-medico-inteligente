@@ -34,7 +34,7 @@ export const financialSplitService = {
     const split = this.calculateSplit(grossAmount);
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('financial_metrics')
         .insert({
           order_id: orderId,

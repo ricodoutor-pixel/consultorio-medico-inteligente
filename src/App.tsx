@@ -66,7 +66,6 @@ const SpecialistDashboard = lazy(() => import("./pages/SpecialistDashboard"));
 const InfluencerDashboard = lazy(() => import("./pages/InfluencerDashboard"));
 const OnlineUsers = lazy(() => import("./pages/OnlineUsers"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-const AdminCreditAudit = lazy(() => import("./components/AdminCreditAudit").then(m => ({ default: m.AdminCreditAudit })));
 const DownloadApp = lazy(() => import("./pages/DownloadApp"));
 const Comunidade = lazy(() => import("./pages/Comunidade"));
 const DashboardPaciente = lazy(() => import("./pages/DashboardPaciente"));
@@ -126,6 +125,7 @@ const PrescriptionCheckout = lazy(() => import("./pages/PrescriptionCheckout"));
 const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
 const GestãoPacientes = lazy(() => import("./pages/GestãoPacientes"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const QaRatingTest = lazy(() => import("./pages/QaRatingTest"));
 const RodizioMedicos = lazy(() => import("./pages/RodizioMedicos"));
 
 const queryClient = new QueryClient();
@@ -193,6 +193,7 @@ const App = () => (
                 <Route path="/admin/clinicas" element={<AdminRoute><AdminClinicas /></AdminRoute>} />
                 <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
                 <Route path="/admin/credit-audit" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />
+                <Route path="/qa/rating-test" element={<QaRatingTest />} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/biblioteca" element={<BibliotecaCientifica />} />
                 <Route path="/download" element={<DownloadApp />} />

@@ -234,26 +234,22 @@ const ConsultaVideo = () => {
             {/* Biometric Shield */}
             <BiometricShield enabled={tcleAccepted} isDoctor={isDoctor} />
 
-            {/* Main video (remote) */}
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-32 h-32 md:w-48 md:h-48 rounded-full bg-muted/20 flex items-center justify-center mx-auto mb-4 border-2 border-primary/20">
-                  <Video size={48} className="text-primary/40" />
-                </div>
-                <p className="text-sm text-white/60">Conectando com Jitsi Meet...</p>
-                <p className="text-xs text-white/30 mt-1">WebRTC • HD • Baixa latência</p>
-              </div>
-            </div>
-
-            {/* Self video (picture-in-picture) */}
-            <div className="absolute bottom-20 right-4 w-32 h-24 md:w-48 md:h-36 rounded-xl bg-muted/30 border border-border overflow-hidden">
-              {isVideoOff ? (
-                <div className="w-full h-full flex items-center justify-center">
-                  <VideoOff size={20} className="text-muted-foreground" />
-                </div>
+            {/* Main video — Jitsi Meet (WebRTC HD) */}
+            <div className="flex-1 flex items-stretch justify-stretch">
+              {tcleAccepted ? (
+                <JitsiRoom
+                  roomName={searchParams.get("room") || appointmentId || `consulta-${currentUserId || "guest"}`}
+                  isDoctor={isDoctor}
+                  onClose={() => navigate("/")}
+                />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10">
-                  <span className="text-xs text-white/40">Sua câmera</span>
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-32 h-32 md:w-48 md:h-48 rounded-full bg-muted/20 flex items-center justify-center mx-auto mb-4 border-2 border-primary/20">
+                      <Video size={48} className="text-primary/40" />
+                    </div>
+                    <p className="text-sm text-white/60">Aceite o TCLE para iniciar a teleconsulta com Jitsi Meet</p>
+                  </div>
                 </div>
               )}
             </div>

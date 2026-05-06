@@ -69,7 +69,7 @@ Deno.serve(async (req: Request) => {
           event_data: { badge_name: badge.name, badge_rarity: badge.rarity },
         });
 
-        // Send notification via ManyChat/Twilio
+        // Send notification via Evolution API
         try {
           await supabase.functions.invoke("notify-achievement", {
             body: {

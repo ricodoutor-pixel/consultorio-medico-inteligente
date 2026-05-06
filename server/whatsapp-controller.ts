@@ -9,7 +9,7 @@ import { Request, Response } from 'express';
 export const whatsappWebhook = async (req: Request, res: Response) => {
   const { body } = req;
 
-  // Verificação de Webhook (padrão Meta/Twilio)
+  // Verificação de Webhook (padrão Meta/Evolution)
   if (req.method === 'GET' && req.query['hub.verify_token'] === process.env.WHATSAPP_VERIFY_TOKEN) {
     return res.send(req.query['hub.challenge']);
   }
@@ -48,5 +48,5 @@ const processWhatsAppMessage = async (from: string, text: string) => {
 
 export const sendWhatsAppNotification = async (to: string, template: string, vars: any) => {
   console.log(`📤 [Manus CEO] Enviando notificação para ${to} [Template: ${template}]`);
-  // Integração com API de envio (Twilio/Evolution/WPPConnect)
+  // Integração com API de envio (Evolution API/WPPConnect)
 };

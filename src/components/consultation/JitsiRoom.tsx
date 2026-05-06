@@ -19,7 +19,8 @@ interface JitsiRoomProps {
   onReady?: () => void;
 }
 
-const JITSI_DOMAIN = APP_CONFIG?.VIDEO?.DOMAIN || "meet.jit.si";
+// Use the official public Jitsi domain (corrige typo "meet.jitsi.si")
+const JITSI_DOMAIN = (APP_CONFIG?.JITSI?.DOMAIN || "meet.jit.si").replace("meet.jitsi.si", "meet.jit.si");
 const SCRIPT_URL = `https://${JITSI_DOMAIN}/external_api.js`;
 
 let scriptPromise: Promise<void> | null = null;

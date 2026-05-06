@@ -141,7 +141,7 @@ const Admin = () => {
                 </div>
                 <div className="flex-1">
                   <p className="font-display font-black text-foreground">Automações</p>
-                  <p className="text-[11px] text-muted-foreground">Brisa IA, ManyChat, Twilio</p>
+                  <p className="text-[11px] text-muted-foreground">Brisa IA, ManyChat, Evolution API</p>
                 </div>
               </CardContent>
             </Card>

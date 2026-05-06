@@ -42,11 +42,9 @@ Deno.serve(async (req) => {
 
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
-
-    if (!LOVABLE_API_KEY || !TWILIO_API_KEY) {
-      console.error("[Brisa Status] Missing API keys");
-      return new Response(JSON.stringify({ error: "Missing API keys" }), {
+    if (!LOVABLE_API_KEY) {
+      console.error("[Brisa Status] Missing LOVABLE_API_KEY");
+      return new Response(JSON.stringify({ error: "Missing API key" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

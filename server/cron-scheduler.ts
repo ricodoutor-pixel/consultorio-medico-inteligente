@@ -19,7 +19,7 @@ cron.schedule('0 1 0 1 * *', async () => {
     const markdown = await createInvestorPDF(data);
     
     // Lógica para enviar por E-mail e WhatsApp para investidores
-    // (Integrar com SendGrid/Twilio aqui)
+    // (Integrar com Evolution API aqui)
     
     console.log(`✅ [Manus CEO] Relatório de ${data.month} enviado com sucesso!`);
   } catch (error) {

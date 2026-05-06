@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 /**
- * Brisa Prescription Dispatch (Evolution API only — Twilio deprecated)
+ * Brisa Prescription Dispatch (Evolution API only — Twilio removido)
  *
  * Triggered after a prescription is digitally signed (gov.br ou ClickSign).
  * Envia o link do PDF assinado + guia ANVISA RDC 660/2023 via WhatsApp

@@ -153,12 +153,6 @@ class HealthCheckService {
       return true;
     });
 
-    // Verificar Twilio
-    services.twilio = await this.checkService('Twilio', async () => {
-      // TODO: Implementar verificação real do Twilio
-      return true;
-    });
-
     // Verificar Mercado Pago
     services.mercadopago = await this.checkService('Mercado Pago', async () => {
       // TODO: Implementar verificação real do Mercado Pago

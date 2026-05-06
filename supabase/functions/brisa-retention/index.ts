@@ -44,11 +44,12 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const action = body.action || "follow_up";
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
+    const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+    const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
 
-    if (!LOVABLE_API_KEY) {
-      return jsonResp({ error: "LOVABLE_API_KEY missing" }, 500);
+    if (!EVO_URL || !EVO_KEY) {
+      return jsonResp({ error: "EVOLUTION_API_URL/EVOLUTION_API_KEY missing" }, 500);
     }
 
     const supabase = createClient(
@@ -58,7 +59,7 @@ Deno.serve(async (req) => {
 
     // ─── FOLLOW-UP: D+7, D+30, D+60 ───
     if (action === "follow_up") {
-      if (!TWILIO_API_KEY) return jsonResp({ error: "TWILIO_API_KEY missing" }, 500);
+      
 
       const results: any[] = [];
 
@@ -110,9 +111,9 @@ Deno.serve(async (req) => {
           const firstName = patientName.split(" ")[0];
           const msg = rule.message(firstName);
 
-          // Send via Twilio
+          // Send via Evolution API (Enfª Brisa)
           try {
-            await sendWhatsApp(LOVABLE_API_KEY, TWILIO_API_KEY, phone, msg);
+            await sendWhatsApp(phone, msg);
             await supabase.from("ai_events").insert({
               ai_name: "brisa_coo",
               event_type: `followup_${rule.id}`,
@@ -133,7 +134,7 @@ Deno.serve(async (req) => {
 
     // ─── WIN-BACK: 90+ days inactive ───
     if (action === "win_back") {
-      if (!TWILIO_API_KEY) return jsonResp({ error: "TWILIO_API_KEY missing" }, 500);
+      
 
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - WINBACK_DAYS);
@@ -172,7 +173,7 @@ Deno.serve(async (req) => {
         const msg = `Olá ${firstName}! Aqui é a Brisa 🌿 Sentimos sua falta na Planta & Raiz! Como está sua qualidade de vida?\n\nTenho um presente especial: 50 Planta-Coins 🪙 de bônus para sua consulta de retorno! Vamos retomar seu tratamento?\n\n👉 https://plantayraiz.com.br/falar-com-especialista?utm_source=brisa_ia&utm_medium=whatsapp&utm_campaign=winback_d90`;
 
         try {
-          await sendWhatsApp(LOVABLE_API_KEY, TWILIO_API_KEY, conv.phone_number, msg);
+          await sendWhatsApp(conv.phone_number, msg);
           await supabase.from("ai_events").insert({
             ai_name: "brisa_coo",
             event_type: "winback",
@@ -191,7 +192,7 @@ Deno.serve(async (req) => {
 
     // ─── RESTOCK ALERT: 5 days before oil runs out ───
     if (action === "restock_alert") {
-      if (!TWILIO_API_KEY) return jsonResp({ error: "TWILIO_API_KEY missing" }, 500);
+      
 
       const restockTarget = new Date();
       restockTarget.setDate(restockTarget.getDate() - (OIL_DURATION_DAYS - RESTOCK_DAYS_BEFORE));
@@ -230,7 +231,7 @@ Deno.serve(async (req) => {
         const msg = `Oi ${firstName}! 🌿 Calculamos que seu produto deve estar acabando em cerca de 5 dias. Para não interromper seu tratamento, preparei o link de reposição:\n\n🛒 https://plantayraiz.com.br/shopping?utm_source=brisa_ia&utm_medium=whatsapp&utm_campaign=restock_smart\n\nContinuidade é chave para os melhores resultados! 💚`;
 
         try {
-          await sendWhatsApp(LOVABLE_API_KEY, TWILIO_API_KEY, phone, msg);
+          await sendWhatsApp(phone, msg);
           results.push({ phone: phone.substring(0, 6) + "***", sent: true });
         } catch {
           results.push({ phone: phone.substring(0, 6) + "***", sent: false });
@@ -260,13 +261,13 @@ Deno.serve(async (req) => {
       const negativeRate = total > 0 ? (negative / total) * 100 : 0;
       const isCrisis = negativeRate > 50;
 
-      if (isCrisis && TWILIO_API_KEY) {
+      if (isCrisis) {
         // Send crisis alert to admin (Dr. Edilson)
         const adminPhone = "5511991363154"; // Admin phone
         const crisisMsg = `🚨 ALERTA DE CRISE — Brisa COO\n\nSentimento negativo acima de 50% esta semana:\n• Positivo: ${positive}\n• Neutro: ${neutral}\n• Negativo: ${negative}\n• Taxa negativa: ${negativeRate.toFixed(1)}%\n\nRecomendo revisão dos pontos de atrito.\nRelatório completo: https://plantayraiz.com.br/admin`;
 
         try {
-          await sendWhatsApp(LOVABLE_API_KEY, TWILIO_API_KEY, adminPhone, crisisMsg);
+          await sendWhatsApp(adminPhone, crisisMsg);
         } catch (e) {
           console.error("[Brisa Retention] Crisis alert send failed:", e);
         }
@@ -374,23 +375,24 @@ Deno.serve(async (req) => {
 
 // ─── Helpers ───
 
-async function sendWhatsApp(lovableKey: string, twilioKey: string, phone: string, message: string) {
-  const resp = await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
+async function sendWhatsApp(phone: string, message: string) {
+  const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+  const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+  const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
+  if (!EVO_URL || !EVO_KEY) throw new Error("Evolution API not configured");
+
+  const resp = await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": twilioKey,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      To: `whatsapp:+${phone.replace(/\D/g, "")}`,
-      From: "whatsapp:+5511991363154",
-      Body: message,
+    headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+    body: JSON.stringify({
+      number: phone.replace(/\D/g, ""),
+      text: message,
+      delay: 1200,
     }),
   });
   if (!resp.ok) {
     const err = await resp.text();
-    throw new Error(`Twilio ${resp.status}: ${err}`);
+    throw new Error(`Evolution ${resp.status}: ${err}`);
   }
   return resp.json();
 }

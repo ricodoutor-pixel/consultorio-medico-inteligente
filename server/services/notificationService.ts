@@ -98,7 +98,7 @@ class NotificationService {
    * Send SMS notification
    */
   private async sendSMSNotification(payload: NotificationPayload): Promise<void> {
-    // TODO: Implement SMS service (Twilio, AWS SNS, etc)
+    // TODO: Implement SMS service (Evolution API)
     console.log(`[SMS] ${payload.title}: ${payload.message}`);
   }
 

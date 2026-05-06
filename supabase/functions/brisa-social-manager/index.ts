@@ -148,16 +148,17 @@ Deno.serve(async (req) => {
 
     // ─── Action: Abandoned cart/quiz recovery ───
     if (action === "recovery_check") {
-      const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
-      if (!TWILIO_API_KEY) {
-        return new Response(JSON.stringify({ error: "TWILIO_API_KEY missing" }), {
+      const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+      const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+      const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
+      if (!EVO_URL || !EVO_KEY) {
+        return new Response(JSON.stringify({ error: "EVOLUTION_API credentials missing" }), {
           status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
       const fifteenMinAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
 
-      // Find leads with recent activity but no appointment
       const { data: recentLeads } = await supabase
         .from("whatsapp_conversations")
         .select("phone_number, last_intent, updated_at, messages")
@@ -167,14 +168,13 @@ Deno.serve(async (req) => {
       const recoveryResults: any[] = [];
 
       for (const lead of recentLeads || []) {
-        // Check if they already have a recent appointment
         const { count } = await supabase
           .from("appointments")
           .select("*", { count: "exact", head: true })
           .eq("patient_id", lead.phone_number)
           .gte("created_at", fifteenMinAgo);
 
-        if ((count || 0) > 0) continue; // Already converted
+        if ((count || 0) > 0) continue;
 
         const intentMessages: Record<string, string> = {
           shopping: "🌿 Olá! Vi que você estava explorando nosso Shopping de produtos. Posso te ajudar a encontrar o óleo ideal para você? Acesse: https://plantayraiz.com.br/shopping 💚",
@@ -186,17 +186,13 @@ Deno.serve(async (req) => {
         if (!msg) continue;
 
         try {
-          await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
+          await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
             method: "POST",
-            headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
-              "X-Connection-Api-Key": TWILIO_API_KEY,
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-              To: `whatsapp:+${lead.phone_number}`,
-              From: "whatsapp:+5511991363154",
-              Body: msg,
+            headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+            body: JSON.stringify({
+              number: (lead.phone_number || "").replace(/\D/g, ""),
+              text: msg,
+              delay: 1200,
             }),
           });
           recoveryResults.push({ phone: lead.phone_number.substring(0, 6) + "***", intent: lead.last_intent, sent: true });

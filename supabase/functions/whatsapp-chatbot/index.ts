@@ -38,7 +38,7 @@ Você é a segunda autoridade da plataforma, reportando-se diretamente ao **Dr. 
 
 ## 💳 INTEGRAÇÕES TÉCNICAS:
 - **Pagamentos**: Stripe (cartão/recorrência) + Mercado Pago PIX (QR dinâmico). Pagamento 100% seguro e criptografado.
-- **Comunicação**: Twilio WhatsApp Business API. Notificações automáticas de agendamento e prescrição.
+- **Comunicação**: Evolution API WhatsApp. Notificações automáticas de agendamento e prescrição.
 - **Banco de Dados**: Supabase com RLS (Row Level Security). Dados criptografados em repouso.
 - **Teleconsulta**: Videochamada via Jitsi Meet. Sem download, direto no navegador. Criptografia ponta-a-ponta.
 - **IA**: Lovable AI Gateway (Gemini) para triagem inteligente e análise de sentimento.
@@ -266,32 +266,26 @@ Deno.serve(async (req) => {
       await generateClinicalSummary(supabase, phoneClean, previousMessages);
     }
 
-    // ─── (c) Twilio send ───
-    const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
-    const TWILIO_FROM = toNumber || "whatsapp:+5511991363154";
+    // ─── (c) Evolution API send (Enfª Brisa) ───
+    const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+    const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
 
-    if (TWILIO_API_KEY && from) {
-      const twTimer = timer();
+    if (EVO_URL && EVO_KEY && from) {
+      const evoTimer = timer();
       try {
-        const twilioResp = await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
+        const phoneNumber = (from || "").replace(/\D/g, "");
+        const evoResp = await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "X-Connection-Api-Key": TWILIO_API_KEY,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({
-            To: from.startsWith("whatsapp:") ? from : `whatsapp:${from}`,
-            From: TWILIO_FROM.startsWith("whatsapp:") ? TWILIO_FROM : `whatsapp:${TWILIO_FROM}`,
-            Body: brisaReply,
-          }),
+          headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+          body: JSON.stringify({ number: phoneNumber, text: brisaReply, delay: 1200 }),
         });
-        const twMs = twTimer();
-        const twilioData = await twilioResp.json();
-        console.log(`[Brisa COO][Telemetry] Twilio: ${twMs}ms | SID: ${twilioData.sid || "N/A"}`);
-      } catch (twilioErr) {
-        const twMs = twTimer();
-        console.error(`[Brisa COO] Twilio failed after ${twMs}ms:`, twilioErr);
+        const evoMs = evoTimer();
+        const evoData = await evoResp.json().catch(() => ({}));
+        console.log(`[Brisa COO][Telemetry] Evolution: ${evoMs}ms | ID: ${evoData?.key?.id || evoData?.messageId || "N/A"}`);
+      } catch (evoErr) {
+        const evoMs = evoTimer();
+        console.error(`[Brisa COO] Evolution failed after ${evoMs}ms:`, evoErr);
       }
     }
 

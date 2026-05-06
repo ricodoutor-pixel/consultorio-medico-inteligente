@@ -14,8 +14,9 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const manychatKey = Deno.env.get("MANYCHAT_API_KEY");
-    const twilioSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const twilioToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+    const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+    const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
     const supabase = createClient(supabaseUrl, serviceKey);
 
     const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
@@ -59,25 +60,20 @@ Deno.serve(async (req) => {
       const paymentLink = `${supabaseUrl.replace('.supabase.co', '.lovable.app')}/pagamento/${appt.id}`;
       const message = `Olá ${patient.full_name?.split(" ")[0] || ""}! 🌿 Notamos que sua consulta com ${doctorName} não foi finalizada. Seu horário ainda está reservado por alguns minutos. Conclua aqui: ${paymentLink}`;
 
-      // Try Twilio WhatsApp first
-      if (twilioSid && twilioToken) {
+      // Send via Evolution API (Enfª Brisa)
+      if (EVO_URL && EVO_KEY) {
         try {
-          const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`;
-          const body = new URLSearchParams({
-            From: "whatsapp:+5511991363154",
-            To: `whatsapp:+55${patient.phone.replace(/\D/g, "")}`,
-            Body: message,
-          });
-          await fetch(twilioUrl, {
+          await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
             method: "POST",
-            headers: {
-              Authorization: `Basic ${btoa(`${twilioSid}:${twilioToken}`)}`,
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: body.toString(),
+            headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+            body: JSON.stringify({
+              number: `55${patient.phone.replace(/\D/g, "")}`,
+              text: message,
+              delay: 1200,
+            }),
           });
         } catch (e) {
-          console.error("Twilio error:", e);
+          console.error("Evolution error:", e);
         }
       }
 
@@ -114,7 +110,7 @@ Deno.serve(async (req) => {
         user_id: appt.patient_id,
         trigger_type: "abandoned_appointment",
         status: "sent",
-        message_sent_via: twilioSid ? "whatsapp" : "in_app",
+        message_sent_via: EVO_URL && EVO_KEY ? "whatsapp" : "in_app",
         metadata: { appointment_id: appt.id, doctor_name: doctorName },
       });
 

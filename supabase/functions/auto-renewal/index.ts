@@ -94,15 +94,14 @@ serve(async (req) => {
       });
       notified++;
 
-      // 5. Trigger WhatsApp notification for urgent cases
+      // 5. Trigger WhatsApp notification for urgent cases (Evolution API — Enfª Brisa)
       if (isUrgent) {
         try {
-          const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
-          const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-          const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
+          const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+          const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+          const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
 
-          if (LOVABLE_API_KEY && TWILIO_API_KEY) {
-            // Get patient phone
+          if (EVO_URL && EVO_KEY) {
             const { data: profile } = await supabase
               .from("profiles")
               .select("phone, full_name")
@@ -110,17 +109,12 @@ serve(async (req) => {
               .single();
 
             if (profile?.phone) {
-              await fetch(`${GATEWAY_URL}/Messages.json`, {
+              await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
                 method: "POST",
-                headers: {
-                  Authorization: `Bearer ${LOVABLE_API_KEY}`,
-                  "X-Connection-Api-Key": TWILIO_API_KEY,
-                  "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                  To: `whatsapp:${profile.phone}`,
-                  From: "whatsapp:+551199136154",
-                  Body: `🌿 Olá ${profile.full_name}! Sua receita de cannabis medicinal vence em ${daysLeft} dias.\n\n⚡ Renove agora pelo app e garanta a continuidade do seu tratamento:\nhttps://plantayraiz.com.br/dashboard\n\n🏥 Planta & Raiz - Sua saúde em primeiro lugar`,
+                headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+                body: JSON.stringify({
+                  number: profile.phone.replace(/\D/g, ""),
+                  text: `🌿 Olá ${profile.full_name}! Sua receita de cannabis medicinal vence em ${daysLeft} dias.\n\n⚡ Renove agora pelo app e garanta a continuidade do seu tratamento:\nhttps://plantayraiz.com.br/dashboard\n\n🏥 Planta & Raiz - Sua saúde em primeiro lugar`,
                 }),
               });
             }

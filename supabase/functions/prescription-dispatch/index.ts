@@ -8,7 +8,7 @@ const corsHeaders = {
 /**
  * Prescription Automation — Triggered after doctor creates a prescription
  * 1. Generates prescription notification
- * 2. Sends WhatsApp via Twilio
+ * 2. Sends WhatsApp via Evolution API (Enfª Brisa)
  * 3. Notifies patient with download link
  * 4. Tracks dispensation status
  */
@@ -112,17 +112,16 @@ Deno.serve(async (req) => {
         },
       });
 
-      // 3. Send WhatsApp via Twilio (if patient has phone)
+      // 3. Send WhatsApp via Evolution API (if patient has phone)
       let whatsappSent = false;
       if (patientPhone) {
-        const twilioSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-        const twilioAuth = Deno.env.get("TWILIO_AUTH_TOKEN");
+        const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+        const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+        const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
 
-        if (twilioSid && twilioAuth) {
+        if (EVO_URL && EVO_KEY) {
           const formattedPhone = patientPhone.replace(/\D/g, "");
-          const whatsappTo = formattedPhone.startsWith("55")
-            ? `whatsapp:+${formattedPhone}`
-            : `whatsapp:+55${formattedPhone}`;
+          const number = formattedPhone.startsWith("55") ? formattedPhone : `55${formattedPhone}`;
 
           const medications = Array.isArray(prescription.medications)
             ? prescription.medications
@@ -150,31 +149,21 @@ Deno.serve(async (req) => {
           ].filter(Boolean).join("\n");
 
           try {
-            const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`;
-            const twilioBody = new URLSearchParams({
-              To: whatsappTo,
-              From: "whatsapp:+5511991363154",
-              Body: message,
-            });
-
-            const twilioRes = await fetch(twilioUrl, {
+            const evoRes = await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
               method: "POST",
-              headers: {
-                Authorization: `Basic ${btoa(`${twilioSid}:${twilioAuth}`)}`,
-                "Content-Type": "application/x-www-form-urlencoded",
-              },
-              body: twilioBody.toString(),
+              headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+              body: JSON.stringify({ number, text: message, delay: 1200 }),
             });
 
-            if (twilioRes.ok) {
+            if (evoRes.ok) {
               whatsappSent = true;
-              console.log(`📱 WhatsApp sent to ${whatsappTo} for prescription ${prescriptionId}`);
+              console.log(`📱 WhatsApp sent to ${number} for prescription ${prescriptionId}`);
             } else {
-              const errBody = await twilioRes.text();
-              console.error("Twilio error:", twilioRes.status, errBody);
+              const errBody = await evoRes.text();
+              console.error("Evolution error:", evoRes.status, errBody);
             }
-          } catch (twilioErr) {
-            console.error("Twilio send error:", twilioErr);
+          } catch (evoErr) {
+            console.error("Evolution send error:", evoErr);
           }
         }
       }

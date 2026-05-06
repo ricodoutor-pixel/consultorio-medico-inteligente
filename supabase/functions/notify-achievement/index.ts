@@ -111,34 +111,29 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // 4. Twilio WhatsApp (if configured)
-    const twilioSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const twilioAuth = Deno.env.get("TWILIO_AUTH_TOKEN");
-    if (twilioSid && twilioAuth && phone) {
+    // 4. Evolution API WhatsApp (Enfª Brisa)
+    const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+    const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
+    if (EVO_URL && EVO_KEY && phone) {
       try {
-        const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`;
-        const formBody = new URLSearchParams({
-          From: "whatsapp:+14155238886",
-          To: `whatsapp:+55${phone.replace(/\D/g, "")}`,
-          Body: `${title}\n\n${message}`,
-        });
-
-        await fetch(twilioUrl, {
+        await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
           method: "POST",
-          headers: {
-            "Authorization": `Basic ${btoa(`${twilioSid}:${twilioAuth}`)}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: formBody.toString(),
+          headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+          body: JSON.stringify({
+            number: `55${phone.replace(/\D/g, "")}`,
+            text: `${title}\n\n${message}`,
+            delay: 1200,
+          }),
         });
-        console.log(`Twilio WhatsApp sent to ${phone}`);
-      } catch (twErr) {
-        console.error("Twilio notification failed:", twErr);
+        console.log(`Evolution WhatsApp sent to ${phone}`);
+      } catch (evoErr) {
+        console.error("Evolution notification failed:", evoErr);
       }
     }
 
     return new Response(
-      JSON.stringify({ success: true, title, message, channels: { internal: true, manychat: !!manychatApiKey, twilio: !!twilioSid } }),
+      JSON.stringify({ success: true, title, message, channels: { internal: true, manychat: !!manychatApiKey, evolution: !!(EVO_URL && EVO_KEY) } }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

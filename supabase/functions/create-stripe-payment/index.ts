@@ -1,3 +1,4 @@
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 
 const corsHeaders = {
@@ -5,20 +6,44 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Server-side canonical pricing for orientação técnica internacional (USD).
+// Client-supplied amounts are NOT trusted.
+const OT_INTERNATIONAL_USD = 10;
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    // Require authenticated user
+    const authHeader = req.headers.get("Authorization") || "";
+    if (!authHeader.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Não autorizado" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user } } = await userClient.auth.getUser();
+    if (!user) {
+      return new Response(JSON.stringify({ error: "Não autorizado" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const body = await req.json();
     const {
       appointmentId,
       doctorName = "Dr. Edilson Bezerra",
-      patientEmail,
       description = "Orientação Técnica Internacional - Planta y Raiz",
-      amount = 10, // USD
-      currency = "USD",
       environment,
     } = body || {};
+
+    // Server-controlled amount + currency
+    const amount = OT_INTERNATIONAL_USD;
+    const currency = "USD";
 
     const env: StripeEnv = (environment === "live" ? "live" : "sandbox");
     const stripe = createStripeClient(env);
@@ -28,18 +53,19 @@ Deno.serve(async (req) => {
       mode: "payment",
       ui_mode: "embedded_page",
       return_url: `${origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
-      ...(patientEmail ? { customer_email: patientEmail } : {}),
+      customer_email: user.email ?? undefined,
       line_items: [{
         price_data: {
           currency: currency.toLowerCase(),
           product_data: { name: `Orientação Técnica - ${doctorName}`, description },
-          unit_amount: Math.round(Number(amount) * 100),
+          unit_amount: Math.round(amount * 100),
         },
         quantity: 1,
       }],
       metadata: {
         appointmentId: appointmentId ?? "",
         doctorName,
+        userId: user.id,
         type: "orientacao_tecnica_internacional",
       },
     });
@@ -55,7 +81,7 @@ Deno.serve(async (req) => {
   } catch (err) {
     console.error("[create-stripe-payment]", err);
     return new Response(
-      JSON.stringify({ error: (err as Error).message }),
+      JSON.stringify({ error: "Erro interno. Tente novamente." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }

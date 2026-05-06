@@ -11,8 +11,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
   try {
     const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const query = body.query || "medical cannabis OR cannabidiol OR CBD OR THC OR cannabinoid";
@@ -71,7 +75,8 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    console.error("[import-pubmed-bulk]", err);
+    return new Response(JSON.stringify({ error: "Erro interno. Tente novamente." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

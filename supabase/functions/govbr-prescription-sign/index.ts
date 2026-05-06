@@ -30,21 +30,44 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { prescriptionId, documentPath, contentBase64, doctorCRM, doctorName, patientName } =
+    const { prescriptionId, documentPath, contentBase64, doctorName, patientName } =
       await req.json();
 
-    if (!documentPath || !contentBase64 || !doctorCRM) {
+    if (!documentPath || !contentBase64 || !prescriptionId) {
       return new Response(JSON.stringify({ success: false, error: "Campos obrigatórios ausentes" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    if (String(doctorCRM).replace(/\D/g, "") !== "10963") {
+    // Server-side ownership check: the authenticated user MUST be a doctor
+    // with CRM 10963 (Dr. Edilson) and own the target prescription.
+    const { data: doctor } = await admin
+      .from("doctors")
+      .select("id, crm")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!doctor || String(doctor.crm).replace(/\D/g, "") !== "10963") {
       return new Response(JSON.stringify({
         success: false,
         error: "Endpoint gov.br restrito ao Dr. Edilson Bezerra (CRM 10963). Use ClickSign para os demais médicos.",
       }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+
+    const { data: rx } = await admin
+      .from("prescriptions")
+      .select("id, doctor_id")
+      .eq("id", prescriptionId)
+      .maybeSingle();
+
+    if (!rx || rx.doctor_id !== doctor.id) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Prescrição não pertence ao médico autenticado.",
+      }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    const doctorCRM = doctor.crm;
 
     // Hash de autenticidade (SHA-256 do PDF)
     const pdfBytes = Uint8Array.from(atob(contentBase64), (c) => c.charCodeAt(0));
@@ -67,16 +90,13 @@ Deno.serve(async (req) => {
     const signedPdfUrl = signed?.signedUrl;
     const documentKey = `govbr:${hash.substring(0, 16)}`;
 
-    // Atualiza prescription se id fornecido
-    if (prescriptionId) {
-      await admin.from("prescriptions").update({
-        digital_signature: documentKey,
-        signature_hash: hash,
-        signature_provider: "gov.br",
-        signed_pdf_url: signedPdfUrl,
-        status: "signed",
-      }).eq("id", prescriptionId);
-    }
+    await admin.from("prescriptions").update({
+      digital_signature: documentKey,
+      signature_hash: hash,
+      signature_provider: "gov.br",
+      signed_pdf_url: signedPdfUrl,
+      status: "signed",
+    }).eq("id", prescriptionId).eq("doctor_id", doctor.id);
 
     // Audit trail
     await admin.from("ai_events").insert({
@@ -99,7 +119,7 @@ Deno.serve(async (req) => {
     console.error("[govbr-prescription-sign] Error:", e);
     return new Response(JSON.stringify({
       success: false,
-      error: e instanceof Error ? e.message : "Erro interno",
+      error: "Erro interno. Tente novamente.",
     }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

@@ -49,10 +49,15 @@ function setInMemory(key: string, data: unknown, ttlSeconds: number): void {
   }
 }
 
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
 
   try {
     const supabase = createClient(
@@ -172,8 +177,8 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Cache error:", error);
-    return new Response(JSON.stringify({ error: String(error) }), {
+    console.error("[system-cache] error:", error);
+    return new Response(JSON.stringify({ error: "Erro interno. Tente novamente." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

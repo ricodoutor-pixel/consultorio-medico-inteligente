@@ -170,8 +170,13 @@ async function trackToManyChat(
 }
 
 // ─── Main handler ───
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
 
   const igAccountId = Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID");
   const fbToken = Deno.env.get("FACEBOOK_GRAPH_API_TOKEN");
@@ -267,7 +272,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error("[IG Publish Error]", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: "Erro interno. Tente novamente." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

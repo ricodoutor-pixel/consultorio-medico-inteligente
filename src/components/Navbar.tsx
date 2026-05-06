@@ -197,7 +197,7 @@ export const Navbar = () => {
             {/* Mobile Actions */}
             <div className="xl:hidden flex items-center gap-2">
                <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-lg text-[10px] h-8 px-2 animate-pulse" asChild>
-                <NavLink to="/telemedicina">INICIAR CONSULTA</NavLink>
+                <NavLink to="/telemedicina">INICIAR ORIENTAÇÃO</NavLink>
               </Button>
               <button
                 className="p-2 text-foreground flex-shrink-0 relative z-[60]"

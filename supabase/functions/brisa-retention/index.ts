@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
           const firstName = patientName.split(" ")[0];
           const msg = rule.message(firstName);
 
-          // Send via Twilio
+          // Send via Evolution API (Enfª Brisa)
           try {
             await sendWhatsApp(phone, msg);
             await supabase.from("ai_events").insert({
@@ -375,23 +375,24 @@ Deno.serve(async (req) => {
 
 // ─── Helpers ───
 
-async function sendWhatsApp(lovableKey: string, twilioKey: string, phone: string, message: string) {
-  const resp = await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
+async function sendWhatsApp(phone: string, message: string) {
+  const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+  const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+  const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
+  if (!EVO_URL || !EVO_KEY) throw new Error("Evolution API not configured");
+
+  const resp = await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": twilioKey,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      To: `whatsapp:+${phone.replace(/\D/g, "")}`,
-      From: "whatsapp:+5511991363154",
-      Body: message,
+    headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+    body: JSON.stringify({
+      number: phone.replace(/\D/g, ""),
+      text: message,
+      delay: 1200,
     }),
   });
   if (!resp.ok) {
     const err = await resp.text();
-    throw new Error(`Twilio ${resp.status}: ${err}`);
+    throw new Error(`Evolution ${resp.status}: ${err}`);
   }
   return resp.json();
 }

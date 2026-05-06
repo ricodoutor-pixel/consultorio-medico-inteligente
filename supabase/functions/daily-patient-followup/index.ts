@@ -34,8 +34,12 @@ async function sendBrisaWhatsApp(phone: string, message: string) {
   }
 }
 
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
   try {
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
     const now = new Date();
@@ -123,7 +127,7 @@ Deno.serve(async (req) => {
     );
   } catch (err) {
     console.error("[daily-patient-followup]", err);
-    return new Response(JSON.stringify({ ok: false, error: String(err) }), {
+    return new Response(JSON.stringify({ ok: false, error: "Erro interno. Tente novamente." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

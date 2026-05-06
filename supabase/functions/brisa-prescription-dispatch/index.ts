@@ -18,8 +18,13 @@ const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL");
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY");
 const INSTANCE_NAME = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
 
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -110,7 +115,7 @@ Qualquer dúvida sobre o tratamento, estou aqui! 💚`;
       status: "failed",
       output_data: { error: msg },
     }).then(() => {}, () => {});
-    return new Response(JSON.stringify({ error: msg }), {
+    return new Response(JSON.stringify({ error: "Erro interno. Tente novamente." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

@@ -32,8 +32,12 @@ async function sendBrisa(phone: string, msg: string) {
   } catch { return false; }
 }
 
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
   try {
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
     const cutoff = new Date(Date.now() - 2 * 3600_000).toISOString();
@@ -93,7 +97,7 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("[pharmacy-cart-recovery]", err);
-    return new Response(JSON.stringify({ ok: false, error: String(err) }), {
+    return new Response(JSON.stringify({ ok: false, error: "Erro interno. Tente novamente." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

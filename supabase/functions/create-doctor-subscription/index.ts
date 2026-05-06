@@ -118,8 +118,7 @@ Deno.serve(async (req) => {
 
     const mpData = await mpResponse.json();
 
-    // Insert subscription record
-    const serviceClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    // Insert subscription record (serviceClient already created above)
     await serviceClient.from("medical_subscriptions").upsert({
       doctor_id: doctorId,
       plan_tier: planId,

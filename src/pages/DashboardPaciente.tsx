@@ -501,7 +501,7 @@ const DashboardPaciente = () => {
                     <p className="text-sm text-muted-foreground">Nenhuma triagem realizada.</p>
                     <p className="text-xs text-muted-foreground mt-1">Use a Brisa IA para fazer sua triagem antes de agendar.</p>
                     <Button size="sm" className="mt-4 rounded-xl bg-primary text-primary-foreground" asChild>
-                      <Link to="/telemedicina">Iniciar Triagem</Link>
+                      <a href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Brisa, quero iniciar minha triagem.")}`} target="_blank" rel="noopener noreferrer">Iniciar Triagem</a>
                     </Button>
                   </CardContent>
                 </Card>

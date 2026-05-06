@@ -23,6 +23,7 @@ import { BlockchainConsent } from "@/components/consultation/BlockchainConsent";
 import { MandatoryNPSModal } from "@/components/MandatoryNPSModal";
 import { PatientFlowGuide } from "@/components/patient/PatientFlowGuide";
 import type { FlowStep } from "@/components/patient/PatientFlowGuide";
+import { JitsiRoom } from "@/components/consultation/JitsiRoom";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 

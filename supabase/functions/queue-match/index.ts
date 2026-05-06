@@ -2,7 +2,7 @@
  * queue-match — Uber-style doctor matching for consultation queue
  * 
  * Monitors the consultation_queue table and matches waiting patients
- * with the first available online doctor. Notifies via Twilio.
+ * with the first available online doctor. Notifies via Evolution API (Enfª Brisa).
  */
 import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 
@@ -13,25 +13,18 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID") || "";
-const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN") || "";
+const EVO_URL = Deno.env.get("EVOLUTION_API_URL") || "";
+const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
+const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
 
-async function notifyDoctor(phone: string, patientName: string, queueId: string): Promise<boolean> {
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !phone) return false;
+async function notifyDoctor(phone: string, patientName: string, _queueId: string): Promise<boolean> {
+  if (!EVO_URL || !EVO_KEY || !phone) return false;
   try {
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
     const message = `🩺 Nova consulta na fila!\n\nPaciente: ${patientName}\nAceite agora no painel médico.\n\nPlanta y Raiz - Telemedicina`;
-    const resp = await fetch(url, {
+    const resp = await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
       method: "POST",
-      headers: {
-        "Authorization": "Basic " + btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`),
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        From: "whatsapp:+5511991363154",
-        To: `whatsapp:${phone}`,
-        Body: message,
-      }),
+      headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+      body: JSON.stringify({ number: phone.replace(/\D/g, ""), text: message, delay: 1200 }),
     });
     return resp.ok;
   } catch { return false; }

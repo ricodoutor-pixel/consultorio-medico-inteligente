@@ -34,29 +34,22 @@ Deno.serve(async (req) => {
 
     const checkoutUrl = `https://plantayraiz.com.br/checkout/fast-track?pid=${patientId}`
 
-    // Send via Twilio WhatsApp
-    const twilioSid = Deno.env.get('TWILIO_ACCOUNT_SID')
-    const twilioAuth = Deno.env.get('TWILIO_AUTH_TOKEN')
-    const fromNumber = 'whatsapp:+5511991363154'
-    const toNumber = `whatsapp:+55${patientPhone.replace(/\D/g, '')}`
+    // Send via Evolution API (Enfª Brisa)
+    const EVO_URL = Deno.env.get('EVOLUTION_API_URL')
+    const EVO_KEY = Deno.env.get('EVOLUTION_API_KEY')
+    const EVO_INSTANCE = Deno.env.get('EVOLUTION_INSTANCE') || 'Enf_Brisa'
 
     const message = `🌿 *Planta & Raiz*\n\nOlá ${patientName}! O ${doctorName} finalizou seu protocolo!\n\n🛒 Clique aqui para comprar seu tratamento com *desconto exclusivo de 10%*:\n${checkoutUrl}\n\n⏰ Oferta válida por 30 minutos.`
 
-    if (twilioSid && twilioAuth) {
-      const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`
-      const body = new URLSearchParams({
-        From: fromNumber,
-        To: toNumber,
-        Body: message,
-      })
-
-      await fetch(twilioUrl, {
+    if (EVO_URL && EVO_KEY) {
+      await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
         method: 'POST',
-        headers: {
-          'Authorization': 'Basic ' + btoa(`${twilioSid}:${twilioAuth}`),
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: body.toString(),
+        headers: { 'Content-Type': 'application/json', apikey: EVO_KEY },
+        body: JSON.stringify({
+          number: `55${patientPhone.replace(/\D/g, '')}`,
+          text: message,
+          delay: 1200,
+        }),
       })
     }
 

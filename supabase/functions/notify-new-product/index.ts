@@ -4,7 +4,7 @@ const corsHeaders = {
 };
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -47,12 +47,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
-    const fromNumber = Deno.env.get("TWILIO_WHATSAPP_FROM") || "+14155238886";
+    const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+    const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
 
-    if (!LOVABLE_API_KEY || !TWILIO_API_KEY) {
-      console.warn("Missing Twilio keys, logging notifications instead");
+    if (!EVO_URL || !EVO_KEY) {
+      console.warn("Missing Evolution API keys, logging notifications instead");
       // Fallback: save as in-app notifications
       for (const sub of subscribers) {
         await supabase.from("notifications").insert({
@@ -75,17 +75,13 @@ Deno.serve(async (req) => {
 
     for (const sub of subscribers) {
       try {
-        const response = await fetch(`${GATEWAY_URL}/Messages.json`, {
+        const response = await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "X-Connection-Api-Key": TWILIO_API_KEY,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({
-            To: `whatsapp:${sub.phone}`,
-            From: `whatsapp:${fromNumber}`,
-            Body: message,
+          headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+          body: JSON.stringify({
+            number: (sub.phone || "").replace(/\D/g, ""),
+            text: message,
+            delay: 1200,
           }),
         });
 

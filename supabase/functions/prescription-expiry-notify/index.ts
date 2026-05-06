@@ -90,11 +90,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Send WhatsApp notifications for urgent cases via Twilio
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
+    // Send WhatsApp notifications for urgent cases via Evolution API (Enfª Brisa)
+    const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
+    const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
+    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
 
-    if (LOVABLE_API_KEY && TWILIO_API_KEY) {
+    if (EVO_URL && EVO_KEY) {
       for (const rx of (expiring3 || [])) {
         const { data: profile } = await supabase
           .from("profiles")
@@ -104,17 +105,13 @@ Deno.serve(async (req) => {
 
         if (profile?.phone) {
           try {
-            await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
+            await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
               method: "POST",
-              headers: {
-                "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-                "X-Connection-Api-Key": TWILIO_API_KEY,
-                "Content-Type": "application/x-www-form-urlencoded",
-              },
-              body: new URLSearchParams({
-                To: `whatsapp:${profile.phone}`,
-                From: "whatsapp:+5511991363154",
-                Body: `🌿 Olá ${profile.full_name || ''}!\n\nSua receita de cannabis medicinal vence em breve.\n\n📋 Renove agora para não ficar sem medicação:\n👉 https://consultorio-medico-inteligente.lovable.app/dashboard\n\n— Equipe Planta & Raiz`,
+              headers: { "Content-Type": "application/json", apikey: EVO_KEY },
+              body: JSON.stringify({
+                number: profile.phone.replace(/\D/g, ""),
+                text: `🌿 Olá ${profile.full_name || ''}!\n\nSua receita de cannabis medicinal vence em breve.\n\n📋 Renove agora para não ficar sem medicação:\n👉 https://consultorio-medico-inteligente.lovable.app/dashboard\n\n— Equipe Planta & Raiz`,
+                delay: 1200,
               }),
             });
           } catch (e) {

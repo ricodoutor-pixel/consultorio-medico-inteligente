@@ -3437,6 +3437,9 @@ export type Database = {
           pharmacy_id: string | null
           pharmacy_name: string | null
           signature_date: string | null
+          signature_hash: string | null
+          signature_provider: string | null
+          signed_pdf_url: string | null
           status: string
           updated_at: string
           valid_until: string | null
@@ -3456,6 +3459,9 @@ export type Database = {
           pharmacy_id?: string | null
           pharmacy_name?: string | null
           signature_date?: string | null
+          signature_hash?: string | null
+          signature_provider?: string | null
+          signed_pdf_url?: string | null
           status?: string
           updated_at?: string
           valid_until?: string | null
@@ -3475,6 +3481,9 @@ export type Database = {
           pharmacy_id?: string | null
           pharmacy_name?: string | null
           signature_date?: string | null
+          signature_hash?: string | null
+          signature_provider?: string | null
+          signed_pdf_url?: string | null
           status?: string
           updated_at?: string
           valid_until?: string | null

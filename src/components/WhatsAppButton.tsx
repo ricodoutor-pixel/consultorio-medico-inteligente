@@ -3,7 +3,7 @@ import { X, Stethoscope, User, Store, BookOpen, HelpCircle, MessageCircle } from
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
 import { supabase } from "@/integrations/supabase/client";
-import brisaAvatar from "@/assets/brisa-enfermeira.webp";
+import brisaAvatar from "@/assets/brisa-whatsapp-icon.jpg";
 
 // ManyChat keyword triggers — Ative em Automation → Keywords no painel ManyChat
 
@@ -209,7 +209,7 @@ export const WhatsAppButton = () => {
             src={brisaAvatar}
             alt="Enfermeira Brisa"
             className="w-full h-full rounded-full object-cover"
-            style={{ objectPosition: "center 15%", transform: "scale(1.35)" }}
+            style={{ objectPosition: "center center", transform: "scale(1.05)" }}
             loading="eager"
             decoding="async"
           />

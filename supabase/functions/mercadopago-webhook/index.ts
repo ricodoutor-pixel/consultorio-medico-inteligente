@@ -81,9 +81,12 @@ Deno.serve(async (req) => {
           });
         }
         console.log("Webhook signature verified successfully");
+      } else {
+        return new Response(JSON.stringify({ error: "Malformed signature" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
-    } else {
-      console.warn("Webhook signature check skipped — secret or header missing");
     }
 
     // Fetch payment details from Mercado Pago API

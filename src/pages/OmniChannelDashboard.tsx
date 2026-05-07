@@ -40,12 +40,8 @@ const OmniChannelDashboard = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "manus2026" || password === "plantaraiz") {
-      setAuthenticated(true);
-      toast.success("Acesso autorizado");
-    } else {
-      toast.error("Senha incorreta");
-    }
+    toast.error("Acesso restrito. Faça login com uma conta de administrador.");
+    navigate("/login");
   };
 
   if (checking) {

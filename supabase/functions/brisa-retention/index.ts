@@ -369,7 +369,7 @@ Deno.serve(async (req) => {
     return jsonResp({ error: "Unknown action. Use: follow_up, win_back, restock_alert, crisis_check, retention_metrics" }, 400);
   } catch (e) {
     console.error("[Brisa Retention] Error:", e);
-    return jsonResp({ error: String(e) }, 500);
+    return jsonResp({ error: "Internal error" }, 500);
   }
 });
 

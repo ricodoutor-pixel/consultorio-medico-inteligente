@@ -1,4 +1,5 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 function calculateAbandonmentRisk(params: {
   daysSinceLastPurchase: number;
@@ -32,6 +33,9 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
+
   try {
     const body = await req.json();
     const { patientId, daysSinceLastPurchase = 30, daysSinceLastConsultation = 30, npsScore = 5, subscriptionAgeMonths = 3, totalConsultations = 5 } = body;
@@ -59,6 +63,7 @@ Deno.serve(async (req) => {
       action: riskLevel === "critical" ? "phone_call" : riskLevel === "high" ? "discount_coupon" : riskLevel === "medium" ? "email_reminder" : "none",
     }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
-    return new Response(JSON.stringify({ error: "Erro interno", message: String(e) }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    console.error("[retention-webhook] error:", e);
+    return new Response(JSON.stringify({ error: "Internal error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

@@ -195,6 +195,6 @@ Deno.serve(async (req) => {
     }
   } catch (error) {
     console.error("[Social Analytics Error]", error);
-    return jsonResponse({ error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    return jsonResponse({ error: "Internal error" }, 500);
   }
 });

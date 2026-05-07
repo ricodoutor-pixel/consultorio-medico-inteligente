@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireProfessionalAccess } from "../_shared/professional-auth.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {

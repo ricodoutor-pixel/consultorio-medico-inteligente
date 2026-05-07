@@ -38,6 +38,17 @@ function detectIntent(text: string): string {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  // Webhook signature verification (Evolution API shared secret)
+  const expectedSecret = Deno.env.get("EVOLUTION_WEBHOOK_SECRET");
+  if (expectedSecret) {
+    const provided = req.headers.get("x-evolution-secret") || req.headers.get("apikey") || "";
+    if (provided !== expectedSecret) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  }
+
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const EVO_URL = Deno.env.get("EVOLUTION_API_URL");

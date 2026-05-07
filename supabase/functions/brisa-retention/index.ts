@@ -41,6 +41,9 @@ const OIL_DURATION_DAYS = 30; // 30ml lasts ~30 days
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
+
   try {
     const body = await req.json().catch(() => ({}));
     const action = body.action || "follow_up";

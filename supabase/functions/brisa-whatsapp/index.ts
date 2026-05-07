@@ -40,13 +40,11 @@ Deno.serve(async (req) => {
 
   // Webhook signature verification (Evolution API shared secret)
   const expectedSecret = Deno.env.get("EVOLUTION_WEBHOOK_SECRET");
-  if (expectedSecret) {
-    const provided = req.headers.get("x-evolution-secret") || req.headers.get("apikey") || "";
-    if (provided !== expectedSecret) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+  const provided = req.headers.get("x-evolution-secret") || req.headers.get("apikey") || "";
+  if (!expectedSecret || provided !== expectedSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   try {

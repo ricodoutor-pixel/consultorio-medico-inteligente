@@ -3,6 +3,7 @@
  * Recuperação de abandono, qualificação de leads e agendamento 24/7
  */
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

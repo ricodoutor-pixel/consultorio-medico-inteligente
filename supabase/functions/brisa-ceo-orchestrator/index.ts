@@ -60,6 +60,31 @@ const tools = [
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Authenticate caller (user JWT or service-role)
+  const authHeader = req.headers.get("Authorization") || "";
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const isServiceRole = !!serviceRoleKey && authHeader === `Bearer ${serviceRoleKey}`;
+  if (!isServiceRole) {
+    if (!authHeader.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const userClient = createClient(
+      SUPABASE_URL,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(
+      authHeader.replace("Bearer ", "")
+    );
+    if (claimsErr || !claims?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  }
+
   try {
     const { userInput, context = {}, phone } = await req.json();
 

@@ -145,27 +145,48 @@ export function generatePrescriptionPDF(data: PrescriptionData): jsPDF {
     y += noteLines.length * 4 + 6;
   }
 
-  // ─── Assinatura ────────────────────────────────────────
-  y = Math.max(y + 10, 220);
+  // ─── Linha de Assinatura ───────────────────────────────
+  y = Math.max(y + 10, 215);
   doc.setDrawColor(100, 100, 100);
   doc.setLineWidth(0.3);
   doc.line(margin, y, margin + 80, y);
   y += 5;
   doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
-  doc.text(`Dr. ${data.doctorName}`, margin, y);
+  doc.text(`Dr(a). ${data.doctorName}`, margin, y);
   y += 4;
   doc.setFont("helvetica", "normal");
-  doc.text(`Medicina Integrativa · CRM ${data.doctorCRM}/${data.doctorCRMState} · CPF 009.536.834-51`, margin, y);
+  doc.text(`Medicina Integrativa`, margin, y);
 
-  // ─── Selo Gov.br ───────────────────────────────────────
+  // ─── Carimbo Digital do CRM (destaque visual) ─────────
+  const stampX = pageWidth - margin - 70;
+  const stampY = y - 10;
+  doc.setDrawColor(16, 185, 129);
+  doc.setLineWidth(1.2);
+  doc.roundedRect(stampX, stampY, 70, 26, 3, 3, "S");
+  doc.setTextColor(16, 185, 129);
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "bold");
+  doc.text("CARIMBO MÉDICO", stampX + 35, stampY + 5, { align: "center" });
+  doc.setFontSize(9);
+  doc.text(`Dr(a). ${data.doctorName}`, stampX + 35, stampY + 11, { align: "center" });
+  doc.setFontSize(10);
+  doc.text(`CRM ${data.doctorCRM}/${data.doctorCRMState}`, stampX + 35, stampY + 17, { align: "center" });
+  if (data.doctorRQE) {
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.text(`RQE ${data.doctorRQE}`, stampX + 35, stampY + 22, { align: "center" });
+  }
+  doc.setTextColor(40, 40, 40);
+
+  // ─── Selo de Assinatura Digital ────────────────────────
   y += 8;
   doc.setFillColor(30, 64, 175);
-  doc.roundedRect(margin, y, 60, 10, 2, 2, "F");
+  doc.roundedRect(margin, y, 70, 10, 2, 2, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(8);
   doc.setFont("helvetica", "bold");
-  doc.text("✓ ASSINATURA DIGITAL gov.br", margin + 30, y + 6.5, { align: "center" });
+  doc.text("✓ ASSINATURA DIGITAL gov.br / ITI", margin + 35, y + 6.5, { align: "center" });
   doc.setTextColor(40, 40, 40);
 
   // ─── Hash de Autenticidade ─────────────────────────────

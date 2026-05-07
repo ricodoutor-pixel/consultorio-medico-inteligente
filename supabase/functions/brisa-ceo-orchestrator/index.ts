@@ -43,18 +43,9 @@ const tools = [
       required: ["condition"]
     }
   },
-  {
-    name: "dispatch_whatsapp_message",
-    description: "Envia uma mensagem via Evolution API para o paciente.",
-    parameters: {
-      type: "object",
-      properties: {
-        phone: { type: "string" },
-        message: { type: "string" }
-      },
-      required: ["phone", "message"]
-    }
-  }
+  // Note: dispatch_whatsapp_message is intentionally NOT exposed to the user-facing
+  // orchestrator to prevent prompt-injection-driven WhatsApp spam. Internal/admin flows
+  // should call evolution-api-proxy directly with the service role key.
 ];
 
 serve(async (req) => {
@@ -86,7 +77,16 @@ serve(async (req) => {
   }
 
   try {
-    const { userInput, context = {}, phone } = await req.json();
+    const { userInput: rawInput, context: rawContext = {}, phone } = await req.json();
+
+    // Sanitize: cap length, strip control chars, JSON-stringify context safely.
+    const sanitize = (s: unknown, max = 2000) =>
+      String(s ?? "")
+        .replace(/[\u0000-\u001F\u007F]/g, " ")
+        .slice(0, max);
+    const userInput = sanitize(rawInput, 2000);
+    let contextStr = "{}";
+    try { contextStr = sanitize(JSON.stringify(rawContext ?? {}), 4000); } catch { contextStr = "{}"; }
 
     const systemPrompt = `Você é a Enfª Brisa, a Orquestradora CEO da Planta y Raiz.
 Sua missão é gerenciar o atendimento de ponta a ponta com autonomia total.
@@ -98,7 +98,7 @@ Seja acolhedora, técnica e eficiente.`;
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: `System: ${systemPrompt}\n\nContexto: ${JSON.stringify(context)}\n\nUsuário: ${userInput}` }] }],
+        contents: [{ role: "user", parts: [{ text: `System: ${systemPrompt}\n\nContexto: ${contextStr}\n\nUsuário: ${userInput}` }] }],
         tools: [{ function_declarations: tools }]
       }),
     });
@@ -125,11 +125,6 @@ Seja acolhedora, técnica e eficiente.`;
         case "get_scientific_evidence":
           const { data: evidence } = await supabase.functions.invoke("scientific-rag", { body: args });
           toolResult = evidence;
-          break;
-        case "dispatch_whatsapp_message":
-          // Integração com Evolution API via n8n ou direto
-          const { data: waResult } = await supabase.functions.invoke("evolution-api-proxy", { body: args });
-          toolResult = waResult;
           break;
       }
 

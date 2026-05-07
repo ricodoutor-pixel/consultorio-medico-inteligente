@@ -22,6 +22,9 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    const authErr = await requireProfessionalAccess(req, professionalId, corsHeaders);
+    if (authErr) return authErr;
+
     // Parallel fetches
     const [metaRes, npsRes, bonusRes, achieveRes, streakRes, leaderRes] = await Promise.all([
       supabase.from("gamification_metas").select("*").eq("professional_id", professionalId).eq("status", "active").limit(1).maybeSingle(),

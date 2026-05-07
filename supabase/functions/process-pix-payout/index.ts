@@ -253,9 +253,39 @@ Deno.serve(async (req) => {
   // Webhook handler (POST /webhook)
   if (url.pathname.endsWith("/webhook") && req.method === "POST") {
     try {
-      const body = await req.json();
+      // HMAC-SHA256 signature verification (Mercado Pago x-signature)
+      const mpWebhookSecret = Deno.env.get("MERCADOPAGO_WEBHOOK_SECRET");
+      const xSignature = req.headers.get("x-signature");
+      const xRequestId = req.headers.get("x-request-id");
+      if (!mpWebhookSecret) {
+        console.error("[pix-payout/webhook] MERCADOPAGO_WEBHOOK_SECRET missing");
+        return json({ error: "Webhook secret not configured" }, 500);
+      }
+      if (!xSignature) return json({ error: "Missing signature" }, 401);
+
+      const rawBody = await req.text();
+      let body: unknown;
+      try { body = JSON.parse(rawBody); } catch { return json({ error: "Invalid JSON" }, 400); }
       const parsed = WebhookSchema.safeParse(body);
       if (!parsed.success) return json({ error: "Payload inválido" }, 400);
+
+      const dataId = parsed.data.data.id;
+      const parts = xSignature.split(",");
+      const ts = parts.find((p) => p.trim().startsWith("ts="))?.split("=")[1];
+      const v1 = parts.find((p) => p.trim().startsWith("v1="))?.split("=")[1];
+      if (!ts || !v1) return json({ error: "Invalid signature format" }, 401);
+      const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+      const key = await crypto.subtle.importKey(
+        "raw", new TextEncoder().encode(mpWebhookSecret),
+        { name: "HMAC", hash: "SHA-256" }, false, ["sign"],
+      );
+      const sigBuf = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(manifest));
+      const expected = Array.from(new Uint8Array(sigBuf))
+        .map((b) => b.toString(16).padStart(2, "0")).join("");
+      if (expected !== v1) {
+        console.error("[pix-payout/webhook] Invalid signature");
+        return json({ error: "Invalid signature" }, 401);
+      }
 
       if (parsed.data.action !== "payment.updated") return json({ ok: true });
 

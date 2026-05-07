@@ -282,6 +282,6 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: `Unknown request_action: ${requestAction}` }, 400);
   } catch (error) {
     console.error("[Visitor Tracking Error]", error);
-    return jsonResponse({ error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    return jsonResponse({ error: "Internal error" }, 500);
   }
 });

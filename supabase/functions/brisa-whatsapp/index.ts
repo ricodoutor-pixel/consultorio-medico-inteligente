@@ -143,7 +143,7 @@ Regras:
     });
   } catch (e) {
     console.error("[Brisa WhatsApp] Error:", e);
-    return new Response(JSON.stringify({ ok: false, error: String(e) }), {
+    return new Response(JSON.stringify({ ok: false, error: "Internal error" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

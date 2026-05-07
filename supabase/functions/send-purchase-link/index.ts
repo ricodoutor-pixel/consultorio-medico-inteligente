@@ -113,10 +113,8 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Log notification in database
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    // Log notification in database (reuse the service-role client created above)
+    const supabase = createClient(supabaseUrl, serviceKey)
 
     await supabase.from('notifications').insert({
       user_id: patientId,

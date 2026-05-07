@@ -116,10 +116,10 @@ const ConsultationPayment = () => {
         }
         await new Promise(r => setTimeout(r, 600));
         setStatus("confirmed");
-        toast({ title: "✅ Pagamento confirmado!", description: "Redirecionando para validação..." });
-        // Redirect to WhatsApp Proof Modal as requested
+        toast({ title: "✅ Pagamento confirmado!", description: "Conectando com médico online..." });
+        // Redireciona para a sala de espera onde o match com médico online acontece
         setTimeout(() => {
-          window.location.href = "/whatsapp-proof";
+          window.location.href = "/sala-espera";
         }, 1500);
       } else if (data?.status === "rejected") {
         setStatus("rejected");

@@ -92,6 +92,7 @@ Deno.serve(async (req) => {
       message: `Solicitação submetida com sucesso. Protocolo: ${protocol}`,
     }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
-    return new Response(JSON.stringify({ error: "Erro interno", message: String(e) }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    console.error("[anvisa-automation] error:", e);
+    return new Response(JSON.stringify({ error: "Erro interno. Tente novamente." }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

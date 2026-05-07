@@ -33,6 +33,9 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
+
   try {
     const body = await req.json();
     const { patientId, daysSinceLastPurchase = 30, daysSinceLastConsultation = 30, npsScore = 5, subscriptionAgeMonths = 3, totalConsultations = 5 } = body;

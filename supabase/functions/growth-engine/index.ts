@@ -95,6 +95,9 @@ const EVERGREEN_CONTENT = [
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
+
   try {
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const { action } = await req.json().catch(() => ({ action: "health" }));

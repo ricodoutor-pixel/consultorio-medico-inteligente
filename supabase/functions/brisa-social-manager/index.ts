@@ -129,7 +129,8 @@ Deno.serve(async (req) => {
           };
           console.log(`[Brisa Social] Instagram content generated for manual/scheduled posting`);
         } catch (e) {
-          results.instagram = { success: false, error: String(e) };
+          console.error("[Brisa Social] instagram error:", e);
+          results.instagram = { success: false, error: "instagram_api_error" };
         }
       }
 

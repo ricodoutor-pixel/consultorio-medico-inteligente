@@ -22,3 +22,10 @@ node_modules
 *.njsproj
 *.sln
 *.sw?
+
+# Local env files (keep .env.example committed as template)
+.env
+.env.local
+.env.development
+.env.production
+.env.staging

@@ -417,7 +417,7 @@ const Index = () => {
               asChild
             >
               <a
-                href="https://www.google.com/search?q=Planta+y+Raiz+Telemedicina+Cannabis+Medicinal+avalia%C3%A7%C3%B5es"
+                href="https://www.google.com/search?sca_esv=b297bba60c9ca3dc&hl=pt-BR&sxsrf=ANbL-n6Z2aCE3ZjDH4pHrO9dp9YGu-2Isg:1778132928455&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOX0TncgJDneqpWemRGvKjzMcejuZczqD7sw4j1K2gfBOmO8mPD7Hql21K2gCtfJ5fPIHTN41mSZHq7nPlncrMwlx4nDLm7uMj-GbSdxRr3IXPi_rYg%3D%3D&q=Planta+y+Raiz+Ltda+Coment%C3%A1rios&sa=X&ved=2ahUKEwi6nMGsvaaUAxX7mZUCHddCNR4Q0bkNegQIIhAF"
                 target="_blank"
                 rel="noopener noreferrer"
               >

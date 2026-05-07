@@ -63,6 +63,7 @@ Deno.serve(async (req) => {
       action: riskLevel === "critical" ? "phone_call" : riskLevel === "high" ? "discount_coupon" : riskLevel === "medium" ? "email_reminder" : "none",
     }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
-    return new Response(JSON.stringify({ error: "Erro interno", message: String(e) }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    console.error("[retention-webhook] error:", e);
+    return new Response(JSON.stringify({ error: "Internal error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

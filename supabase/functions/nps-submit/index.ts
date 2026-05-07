@@ -63,6 +63,39 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    // ── AUTHZ: caller must own the patient_id ──
+    if (data.patientId !== callerId) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── Verify consultation belongs to this patient + professional ──
+    const { data: consultation } = await supabase
+      .from("consultations")
+      .select("id, patient_id, professional_id")
+      .eq("id", data.consultationId)
+      .maybeSingle();
+    if (!consultation
+      || consultation.patient_id !== data.patientId
+      || consultation.professional_id !== data.professionalId) {
+      return new Response(JSON.stringify({ error: "Consultation not found for this patient/professional" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── Dedupe: one response per consultation ──
+    const { data: existing } = await supabase
+      .from("nps_responses")
+      .select("id")
+      .eq("consultation_id", data.consultationId)
+      .maybeSingle();
+    if (existing) {
+      return new Response(JSON.stringify({ error: "NPS already submitted for this consultation" }), {
+        status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Categorize
     let category: "detractor" | "passive" | "promoter";
     if (data.score <= 6) category = "detractor";

@@ -97,12 +97,12 @@ const EVENT_FLOW_MAP: Record<string, string> = {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders }
+    return new Response("ok", { headers: corsHeaders });
+  }
 
   const authErr = requireServiceAuth(req, corsHeaders);
   if (authErr) return authErr;
-);
-  }
+
 
   try {
     const MANYCHAT_API_KEY = Deno.env.get("MANYCHAT_API_KEY");

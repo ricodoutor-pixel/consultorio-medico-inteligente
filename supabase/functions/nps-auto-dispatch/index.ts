@@ -33,12 +33,12 @@ async function setField(id: string, f: string, v: string) { return mcPost("/subs
  */
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders }
+    return new Response("ok", { headers: corsHeaders });
+  }
 
   const authErr = requireServiceAuth(req, corsHeaders);
   if (authErr) return authErr;
-);
-  }
+
 
   try {
     const supabase = createClient(

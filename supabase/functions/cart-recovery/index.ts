@@ -8,12 +8,12 @@ const corsHeaders = {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders }
+    return new Response("ok", { headers: corsHeaders });
+  }
 
   const authErr = requireServiceAuth(req, corsHeaders);
   if (authErr) return authErr;
-);
-  }
+
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;

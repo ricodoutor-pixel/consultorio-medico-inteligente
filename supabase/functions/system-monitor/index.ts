@@ -30,12 +30,12 @@ interface Alert {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders }
+    return new Response(null, { headers: corsHeaders });
+  }
 
   const authErr = requireServiceAuth(req, corsHeaders);
   if (authErr) return authErr;
-);
-  }
+
 
   try {
     const supabase = createClient(

@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2.49.4";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,7 +8,11 @@ const corsHeaders = {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders }
+
+  const authErr = requireServiceAuth(req, corsHeaders);
+  if (authErr) return authErr;
+);
   }
 
   try {

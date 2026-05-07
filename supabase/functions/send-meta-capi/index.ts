@@ -10,6 +10,7 @@
  *  3. Via cron for retry/catch-up
  */
 import { createClient } from "npm:@supabase/supabase-js@2.49.4";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -117,7 +118,11 @@ async function sendToCAPI(events: SocialInteraction[]): Promise<{ sent: number; 
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders }
+
+  const authErr = requireServiceAuth(req, corsHeaders);
+  if (authErr) return authErr;
+);
   }
 
   try {

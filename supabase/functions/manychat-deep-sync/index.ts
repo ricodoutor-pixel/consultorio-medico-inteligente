@@ -5,6 +5,7 @@
  * Updates ManyChat custom fields for automated WhatsApp flows
  */
 import { createClient } from "npm:@supabase/supabase-js@2.49.4";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -65,6 +66,10 @@ async function syncToManyChat(actions: SyncAction[]): Promise<number> {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const authErr = requireServiceAuth(req, corsHeaders);
+  if (authErr) return authErr;
+
 
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);

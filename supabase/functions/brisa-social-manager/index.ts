@@ -35,6 +35,9 @@ const SITE_LINKS: Record<string, string> = {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
+
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const FACEBOOK_GRAPH_API_TOKEN = Deno.env.get("FACEBOOK_GRAPH_API_TOKEN");

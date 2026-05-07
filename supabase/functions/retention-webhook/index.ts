@@ -1,4 +1,5 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 function calculateAbandonmentRisk(params: {
   daysSinceLastPurchase: number;

@@ -123,6 +123,9 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
+
   try {
     const supabase: DB = createClient(
       Deno.env.get("SUPABASE_URL")!,

@@ -43,6 +43,9 @@ async function setCustomField(subscriberId: string, fieldName: string, value: st
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  const authError = requireServiceAuth(req, corsHeaders);
+  if (authError) return authError;
+
   try {
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,

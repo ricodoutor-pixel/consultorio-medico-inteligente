@@ -273,49 +273,6 @@ const Index = () => {
                 </Button>
               </div>
 
-              {/* Card do Dr. Edilson reposicionado logo abaixo do botão */}
-              <div className="relative pt-2">
-                <div className="absolute -inset-6 bg-gradient-to-br from-primary/20 to-[hsl(280,80%,65%)]/20 rounded-3xl blur-3xl opacity-60" />
-                <Card className="relative border-primary/30 bg-card/60 backdrop-blur-md rounded-3xl overflow-hidden">
-                  <CardContent className="p-8 space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/40 shrink-0">
-                        <img
-                          src={drEdilsonPhoto}
-                          alt="Dr. Edilson Bezerra — CRM 10963"
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
-                      <div>
-                        <p className="font-display font-black text-xl">Dr. Edilson Bezerra On</p>
-                        <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Cannabis Medicinal · CRM 10963</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3 pt-2">
-                      <div className="text-center p-3 rounded-xl bg-background/60 border border-border">
-                        <p className="text-xl font-black text-primary">R$30</p>
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase">Brasil</p>
-                      </div>
-                      <div className="text-center p-3 rounded-xl bg-background/60 border border-border">
-                        <p className="text-xl font-black text-primary">30min</p>
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase">Duração</p>
-                      </div>
-                      <div className="text-center p-3 rounded-xl bg-background/60 border border-border">
-                        <p className="text-xl font-black text-primary">4.9★</p>
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase">Avaliação</p>
-                      </div>
-                    </div>
-                    <div className="pt-2 border-t border-border">
-                      <p className="text-xs text-muted-foreground italic leading-relaxed">
-                        "Atendo com base científica, escutando cada paciente. Cannabis salva vidas — e a equidade no acesso é a minha missão."
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
               <p className="text-xs text-muted-foreground italic">
                 * Fluxo exclusivo deste card: <strong>Enfª Brisa (triagem) → Pix Seguro Mercado Pago → Orientação Técnica com Dr. Edilson Bezerra On</strong>. Nenhum paciente fala direto com o profissional antes do pagamento e auditoria. Pacientes internacionais: US$10.
               </p>

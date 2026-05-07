@@ -126,11 +126,6 @@ Seja acolhedora, técnica e eficiente.`;
           const { data: evidence } = await supabase.functions.invoke("scientific-rag", { body: args });
           toolResult = evidence;
           break;
-        case "dispatch_whatsapp_message":
-          // Integração com Evolution API via n8n ou direto
-          const { data: waResult } = await supabase.functions.invoke("evolution-api-proxy", { body: args });
-          toolResult = waResult;
-          break;
       }
 
       // Retornar resposta com o resultado da ferramenta para a IA processar o texto final

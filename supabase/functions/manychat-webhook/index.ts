@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -139,6 +140,15 @@ function jsonResponse(data: unknown, status = 200) {
  */
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Auth: accept service-role bearer OR shared webhook secret header
+  const manychatSecret = Deno.env.get("MANYCHAT_WEBHOOK_SECRET");
+  const providedSecret = req.headers.get("x-manychat-secret");
+  const secretOk = !!manychatSecret && providedSecret === manychatSecret;
+  if (!secretOk) {
+    const unauth = requireServiceAuth(req, corsHeaders);
+    if (unauth) return unauth;
+  }
 
   try {
     const supabase = createClient(

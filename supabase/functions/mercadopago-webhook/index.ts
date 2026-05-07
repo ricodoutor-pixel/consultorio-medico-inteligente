@@ -35,7 +35,20 @@ Deno.serve(async (req) => {
     const xSignature = req.headers.get("x-signature");
     const xRequestId = req.headers.get("x-request-id");
 
-    if (mpWebhookSecret && xSignature) {
+    if (!mpWebhookSecret) {
+      console.error("MERCADOPAGO_WEBHOOK_SECRET not configured — refusing webhook");
+      return new Response(JSON.stringify({ error: "Webhook secret not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!xSignature) {
+      return new Response(JSON.stringify({ error: "Missing signature" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    {
       const parts = xSignature.split(",");
       const tsPart = parts.find((p: string) => p.trim().startsWith("ts="));
       const v1Part = parts.find((p: string) => p.trim().startsWith("v1="));
@@ -68,9 +81,12 @@ Deno.serve(async (req) => {
           });
         }
         console.log("Webhook signature verified successfully");
+      } else {
+        return new Response(JSON.stringify({ error: "Malformed signature" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
-    } else {
-      console.warn("Webhook signature check skipped — secret or header missing");
     }
 
     // Fetch payment details from Mercado Pago API

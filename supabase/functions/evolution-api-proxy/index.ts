@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +13,25 @@ const INSTANCE_NAME = "Enf_Brisa"; // Instância fixa para custo zero via QR Cod
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Auth: accept service-role bearer OR a signed-in user JWT
+  const authHeader = req.headers.get("Authorization") || "";
+  const serviceUnauth = requireServiceAuth(req, corsHeaders);
+  if (serviceUnauth) {
+    if (!authHeader.startsWith("Bearer ")) return serviceUnauth;
+    try {
+      const userClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } },
+      );
+      const token = authHeader.replace("Bearer ", "");
+      const { data, error } = await userClient.auth.getClaims(token);
+      if (error || !data?.claims) return serviceUnauth;
+    } catch {
+      return serviceUnauth;
+    }
+  }
 
   try {
     const { phone, message, mediaUrl, type = "text" } = await req.json();

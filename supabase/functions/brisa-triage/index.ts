@@ -44,6 +44,9 @@ ESTRUTURA:
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders });
+    console.error("[brisa-triage] error:", e);
+    return new Response(JSON.stringify({ error: "Erro interno. Tente novamente." }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

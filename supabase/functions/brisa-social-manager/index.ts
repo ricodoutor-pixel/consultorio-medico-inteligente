@@ -288,7 +288,7 @@ Deno.serve(async (req) => {
     });
   } catch (e) {
     console.error("[Brisa Social] Error:", e);
-    return new Response(JSON.stringify({ error: String(e) }), {
+    return new Response(JSON.stringify({ error: "Erro interno. Tente novamente." }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

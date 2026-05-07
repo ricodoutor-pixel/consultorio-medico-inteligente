@@ -3,6 +3,7 @@
  * VIP upgrade, reativação de pacientes, relatórios WhatsApp, auditoria ANVISA
  */
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -37,6 +38,10 @@ async function tagSubscriber(subscriberId: string, tagName: string) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const authErr = requireServiceAuth(req, corsHeaders);
+  if (authErr) return authErr;
+
 
   try {
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);

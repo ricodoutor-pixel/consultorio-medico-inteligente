@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -163,6 +164,10 @@ async function crossPostToInstagram(
 // ─── Main handler ───
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const authErr = requireServiceAuth(req, corsHeaders);
+  if (authErr) return authErr;
+
 
   const pageId = Deno.env.get("FACEBOOK_PAGE_ID");
   const fbToken = Deno.env.get("FACEBOOK_GRAPH_API_TOKEN");

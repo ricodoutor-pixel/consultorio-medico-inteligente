@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireProfessionalAccess } from "../_shared/professional-auth.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -20,6 +21,9 @@ Deno.serve(async (req: Request) => {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const authErr = await requireProfessionalAccess(req, professionalId, corsHeaders);
+    if (authErr) return authErr;
 
     // Parallel fetches
     const [metaRes, npsRes, bonusRes, achieveRes, streakRes, leaderRes] = await Promise.all([

@@ -149,8 +149,36 @@ Deno.serve(async (req) => {
       return jsonResponse({ success: true, score, funnel_stage: funnel });
     }
 
-    // ── ANALYTICS SUMMARY ──
+    // Helper: validate caller is service-role OR an authenticated user (returns claims)
+    async function getAuthContext(): Promise<{ ok: boolean; isService: boolean; userId?: string; userPhone?: string }> {
+      const authHeader = req.headers.get("Authorization") || "";
+      if (authHeader === `Bearer ${serviceKey}`) return { ok: true, isService: true };
+      if (!authHeader.startsWith("Bearer ")) return { ok: false, isService: false };
+      try {
+        const anon = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+          global: { headers: { Authorization: authHeader } },
+        });
+        const token = authHeader.replace("Bearer ", "");
+        const { data, error } = await anon.auth.getClaims(token);
+        if (error || !data?.claims?.sub) return { ok: false, isService: false };
+        const { data: profile } = await supabase
+          .from("profiles").select("phone").eq("id", data.claims.sub).maybeSingle();
+        return { ok: true, isService: false, userId: data.claims.sub, userPhone: (profile as any)?.phone };
+      } catch {
+        return { ok: false, isService: false };
+      }
+    }
+
+    // ── ANALYTICS SUMMARY ── (admin/service-role only)
     if (requestAction === "analytics") {
+      const ctx = await getAuthContext();
+      if (!ctx.ok) return jsonResponse({ error: "Unauthorized" }, 401);
+      if (!ctx.isService) {
+        const { data: isAdmin } = await supabase.rpc("has_role", {
+          _user_id: ctx.userId, _role: "admin",
+        });
+        if (!isAdmin) return jsonResponse({ error: "Forbidden" }, 403);
+      }
       const { period = "day" } = payload;
       const since = new Date();
       if (period === "week") since.setDate(since.getDate() - 7);

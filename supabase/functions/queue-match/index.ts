@@ -1,10 +1,13 @@
 /**
  * queue-match — Uber-style doctor matching for consultation queue
- * 
- * Monitors the consultation_queue table and matches waiting patients
- * with the first available online doctor. Notifies via Evolution API (Enfª Brisa).
+ *
+ * Auth model:
+ *  - action="join"   → requires patient JWT; patient_id forced to auth.uid()
+ *  - action="accept" → requires doctor JWT; caller must own a verified doctor row
+ *  - default match    → service-role only (cron)
  */
 import { createClient } from "npm:@supabase/supabase-js@2.49.4";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,11 +16,35 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const EVO_URL = Deno.env.get("EVOLUTION_API_URL") || "";
 const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
 const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
 
-async function notifyDoctor(phone: string, patientName: string, _queueId: string): Promise<boolean> {
+function jsonRes(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+async function getUserFromAuth(req: Request): Promise<string | null> {
+  const authHeader = req.headers.get("Authorization") || "";
+  if (!authHeader.startsWith("Bearer ")) return null;
+  // Service-role bypass not applicable for join/accept (they must be a real user)
+  try {
+    const c = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data, error } = await c.auth.getClaims(authHeader.replace("Bearer ", ""));
+    if (error || !data?.claims?.sub) return null;
+    return data.claims.sub as string;
+  } catch {
+    return null;
+  }
+}
+
+async function notifyDoctor(phone: string, patientName: string): Promise<boolean> {
   if (!EVO_URL || !EVO_KEY || !phone) return false;
   try {
     const message = `🩺 Nova consulta na fila!\n\nPaciente: ${patientName}\nAceite agora no painel médico.\n\nPlanta y Raiz - Telemedicina`;
@@ -38,17 +65,18 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const action = body.action || "match";
 
+    // ── action: join ──────────────────────────────────────────
     if (action === "join") {
-      // Patient joins queue
-      const { patient_id, specialty, amount, payment_id } = body;
-      if (!patient_id) throw new Error("patient_id required");
+      const uid = await getUserFromAuth(req);
+      if (!uid) return jsonRes({ error: "Unauthorized" }, 401);
 
+      const { specialty, amount, payment_id } = body;
       const jitsiRoom = `plr-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
       const { data: entry, error } = await supabase
         .from("consultation_queue")
         .insert({
-          patient_id,
+          patient_id: uid, // forced to authenticated user
           specialty: specialty || "Cannabis Medicinal",
           amount: amount || 30,
           payment_id: payment_id || null,
@@ -59,21 +87,32 @@ Deno.serve(async (req) => {
         .single();
 
       if (error) throw error;
-
-      return new Response(JSON.stringify({ status: "ok", queue_id: entry.id, jitsi_room: entry.jitsi_room }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return jsonRes({ status: "ok", queue_id: entry.id, jitsi_room: entry.jitsi_room });
     }
 
+    // ── action: accept ────────────────────────────────────────
     if (action === "accept") {
-      // Doctor accepts a queue entry
-      const { queue_id, doctor_id } = body;
-      if (!queue_id || !doctor_id) throw new Error("queue_id and doctor_id required");
+      const uid = await getUserFromAuth(req);
+      if (!uid) return jsonRes({ error: "Unauthorized" }, 401);
+
+      const { queue_id } = body;
+      if (!queue_id) return jsonRes({ error: "queue_id required" }, 400);
+
+      // Caller must be a verified doctor; doctor_id is derived from auth, never trusted from body
+      const { data: doctor } = await supabase
+        .from("doctors")
+        .select("id, is_verified")
+        .eq("user_id", uid)
+        .maybeSingle();
+
+      if (!doctor || !doctor.is_verified) {
+        return jsonRes({ error: "Forbidden: caller is not a verified doctor" }, 403);
+      }
 
       const { data: entry, error } = await supabase
         .from("consultation_queue")
         .update({
-          matched_doctor_id: doctor_id,
+          matched_doctor_id: doctor.id,
           status: "matched",
           matched_at: new Date().toISOString(),
         })
@@ -84,7 +123,6 @@ Deno.serve(async (req) => {
 
       if (error) throw error;
 
-      // Create notification for patient
       if (entry) {
         await supabase.from("notifications").insert({
           user_id: entry.patient_id,
@@ -95,12 +133,13 @@ Deno.serve(async (req) => {
         });
       }
 
-      return new Response(JSON.stringify({ status: "ok", entry }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return jsonRes({ status: "ok", entry });
     }
 
-    // Default: match waiting patients with online doctors
+    // ── default action: match (service-role only) ─────────────
+    const guard = requireServiceAuth(req, corsHeaders);
+    if (guard) return guard;
+
     const { data: waiting } = await supabase
       .from("consultation_queue")
       .select("id, patient_id, specialty, priority")
@@ -110,13 +149,8 @@ Deno.serve(async (req) => {
       .order("created_at", { ascending: true })
       .limit(10);
 
-    if (!waiting?.length) {
-      return new Response(JSON.stringify({ status: "ok", matched: 0, waiting: 0 }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    if (!waiting?.length) return jsonRes({ status: "ok", matched: 0, waiting: 0 });
 
-    // Find online doctors
     const { data: onlineDoctors } = await supabase
       .from("doctors")
       .select("id, user_id, specialty")
@@ -124,54 +158,25 @@ Deno.serve(async (req) => {
       .eq("is_verified", true);
 
     if (!onlineDoctors?.length) {
-      // Notify all doctors that patients are waiting
       const { data: allDoctors } = await supabase
-        .from("doctors")
-        .select("user_id")
-        .eq("is_verified", true)
-        .limit(5);
-
+        .from("doctors").select("user_id").eq("is_verified", true).limit(5);
       for (const doc of allDoctors || []) {
         const { data: profile } = await supabase
-          .from("profiles")
-          .select("phone")
-          .eq("id", doc.user_id)
-          .single();
-
-        if (profile?.phone) {
-          await notifyDoctor(profile.phone, `${waiting.length} paciente(s)`, "");
-        }
+          .from("profiles").select("phone").eq("id", doc.user_id).single();
+        if (profile?.phone) await notifyDoctor(profile.phone, `${waiting.length} paciente(s)`);
       }
-
-      return new Response(JSON.stringify({ status: "ok", matched: 0, waiting: waiting.length, doctors_notified: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return jsonRes({ status: "ok", matched: 0, waiting: waiting.length, doctors_notified: true });
     }
 
-    // Match patients to doctors
     let matched = 0;
     for (const patient of waiting) {
       const doctor = onlineDoctors.find(d => d.specialty === patient.specialty) || onlineDoctors[0];
       if (!doctor) continue;
-
-      // Notify doctor
       const { data: profile } = await supabase
-        .from("profiles")
-        .select("phone, full_name")
-        .eq("id", doctor.user_id)
-        .single();
-
+        .from("profiles").select("phone, full_name").eq("id", doctor.user_id).single();
       const { data: patientProfile } = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("id", patient.patient_id)
-        .single();
-
-      if (profile?.phone) {
-        await notifyDoctor(profile.phone, patientProfile?.full_name || "Paciente", patient.id);
-      }
-
-      // Send in-app notification
+        .from("profiles").select("full_name").eq("id", patient.patient_id).single();
+      if (profile?.phone) await notifyDoctor(profile.phone, patientProfile?.full_name || "Paciente");
       await supabase.from("notifications").insert({
         user_id: doctor.user_id,
         title: "Paciente na fila!",
@@ -179,17 +184,12 @@ Deno.serve(async (req) => {
         type: "queue_match",
         action_url: `/painel-medico?queue=${patient.id}`,
       });
-
       matched++;
     }
 
-    return new Response(JSON.stringify({ status: "ok", matched, waiting: waiting.length }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonRes({ status: "ok", matched, waiting: waiting.length });
   } catch (err) {
     console.error("[QUEUE-MATCH]", err);
-    return new Response(JSON.stringify({ status: "error", message: String(err) }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonRes({ status: "error", message: "Internal error" }, 500);
   }
 });

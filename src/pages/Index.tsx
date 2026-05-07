@@ -183,9 +183,13 @@ const Index = () => {
           </div>
           <div className="flex justify-center">
             <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
-              <Link to="/profissionais">
+              <a
+                href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Enfª Brisa, eu preciso de uma orientação técnica com Dr Edilson Bezerra On Agora!")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 🎯 Iniciar Orientação Técnica <ArrowRight size={18} className="ml-2" />
-              </Link>
+              </a>
             </Button>
           </div>
 

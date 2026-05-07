@@ -30,12 +30,43 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    // Authenticate caller — patient_id and subscriber status derived server-side
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const userClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: claimsData, error: claimsErr } = await userClient.auth.getClaims(
+      authHeader.replace("Bearer ", "")
+    );
+    if (claimsErr || !claimsData?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const patient_id = claimsData.claims.sub as string;
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { doctor_id, specialty, urgency, patient_id, is_subscriber } = await req.json();
+    const { doctor_id, specialty, urgency } = await req.json();
+
+    // Derive subscriber status server-side (never trust client)
+    const { data: subRow } = await supabase
+      .from("subscriptions")
+      .select("status")
+      .eq("user_id", patient_id)
+      .in("status", ["active", "trialing"])
+      .maybeSingle();
+    const is_subscriber = !!subRow;
 
     // 1. Get doctor base price
     const { data: doctor } = await supabase

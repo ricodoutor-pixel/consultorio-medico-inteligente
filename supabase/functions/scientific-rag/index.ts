@@ -76,6 +76,9 @@ serve(async (req) => {
     });
 
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders });
+    console.error("[scientific-rag] error:", e);
+    return new Response(JSON.stringify({ error: "Internal error" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

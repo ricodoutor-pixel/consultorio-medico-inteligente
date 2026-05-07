@@ -81,16 +81,47 @@ Deno.serve(async (req) => {
         return jsonResponse({ error: "action and page are required" }, 400);
       }
 
+      // Verify caller before trusting phone/user_id (prevents WhatsApp spam to arbitrary numbers).
+      const authHeader = req.headers.get("Authorization") || "";
+      let callerIsService = authHeader === `Bearer ${serviceKey}`;
+      let callerUserId: string | undefined;
+      let callerPhone: string | undefined;
+      if (!callerIsService && authHeader.startsWith("Bearer ")) {
+        try {
+          const anon = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+            global: { headers: { Authorization: authHeader } },
+          });
+          const token = authHeader.replace("Bearer ", "");
+          const { data, error } = await anon.auth.getClaims(token);
+          if (!error && data?.claims?.sub) {
+            callerUserId = data.claims.sub as string;
+            const { data: profile } = await supabase
+              .from("profiles").select("phone").eq("id", callerUserId).maybeSingle();
+            callerPhone = (profile as any)?.phone
+              ? String((profile as any).phone).replace(/\D/g, "")
+              : undefined;
+          }
+        } catch { /* anonymous */ }
+      }
+
+      const suppliedPhone = event.phone ? String(event.phone).replace(/\D/g, "") : "";
+      let trustedPhone: string | null = null;
+      if (callerIsService) trustedPhone = suppliedPhone || null;
+      else if (callerPhone && suppliedPhone && suppliedPhone === callerPhone) trustedPhone = suppliedPhone;
+
+      const trustedUserId: string | null = callerIsService
+        ? (event.user_id || null)
+        : (callerUserId || null);
+
       const score = eventScores[event.action] || 1;
       const funnel = funnelMap[event.action] || "awareness";
 
-      // Save to social_interactions for unified analytics
       await supabase.from("social_interactions").insert({
         platform: "website",
         interaction_type: event.action,
         post_url: event.page,
-        subscriber_id: event.user_id || null,
-        subscriber_phone: event.phone?.replace(/\D/g, "") || null,
+        subscriber_id: trustedUserId,
+        subscriber_phone: trustedPhone,
         lead_score: score,
         funnel_stage: funnel,
         campaign_source: event.utm_source || event.referrer || "direct",
@@ -109,8 +140,8 @@ Deno.serve(async (req) => {
         tags: [event.action, "website", event.utm_source].filter(Boolean) as string[],
       });
 
-      // If phone is known, sync high-intent events to ManyChat
-      if (event.phone && score >= 15) {
+      // ManyChat side-effects ONLY when phone is verifiably owned by caller (or service-role).
+      if (trustedPhone && score >= 15) {
         try {
           await fetch(`${supabaseUrl}/functions/v1/manychat-webhook`, {
             method: "POST",
@@ -120,7 +151,7 @@ Deno.serve(async (req) => {
               platform: "website",
               interaction_type: event.action,
               post_url: event.page,
-              subscriber: { phone: event.phone },
+              subscriber: { phone: trustedPhone },
               campaign_source: event.utm_source || "website",
             }),
           });
@@ -129,15 +160,14 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Exit intent: trigger recovery if phone is known
-      if (event.action === "exit_intent" && event.phone) {
+      if (event.action === "exit_intent" && trustedPhone) {
         try {
           await fetch(`${supabaseUrl}/functions/v1/manychat-webhook`, {
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
             body: JSON.stringify({
               action: "followup",
-              phone: event.phone,
+              phone: trustedPhone,
               followup_type: "exit_intent",
             }),
           });

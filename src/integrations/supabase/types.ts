@@ -2264,6 +2264,13 @@ export type Database = {
             referencedRelation: "ai_personas"
             referencedColumns: ["persona_key"]
           },
+          {
+            foreignKeyName: "intent_routing_rules_target_persona_key_fkey"
+            columns: ["target_persona_key"]
+            isOneToOne: false
+            referencedRelation: "ai_personas_public"
+            referencedColumns: ["persona_key"]
+          },
         ]
       }
       job_queue: {
@@ -4837,6 +4844,42 @@ export type Database = {
       }
     }
     Views: {
+      ai_personas_public: {
+        Row: {
+          active: boolean | null
+          avatar_url: string | null
+          channel: string | null
+          display_name: string | null
+          id: string | null
+          persona_key: string | null
+          requires_payment: boolean | null
+          triggers_intents: string[] | null
+          voice_tone: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          avatar_url?: string | null
+          channel?: string | null
+          display_name?: string | null
+          id?: string | null
+          persona_key?: string | null
+          requires_payment?: boolean | null
+          triggers_intents?: string[] | null
+          voice_tone?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          avatar_url?: string | null
+          channel?: string | null
+          display_name?: string | null
+          id?: string | null
+          persona_key?: string | null
+          requires_payment?: boolean | null
+          triggers_intents?: string[] | null
+          voice_tone?: string | null
+        }
+        Relationships: []
+      }
       clinic_profiles_public: {
         Row: {
           active: boolean | null

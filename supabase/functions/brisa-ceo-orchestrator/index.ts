@@ -43,18 +43,9 @@ const tools = [
       required: ["condition"]
     }
   },
-  {
-    name: "dispatch_whatsapp_message",
-    description: "Envia uma mensagem via Evolution API para o paciente.",
-    parameters: {
-      type: "object",
-      properties: {
-        phone: { type: "string" },
-        message: { type: "string" }
-      },
-      required: ["phone", "message"]
-    }
-  }
+  // Note: dispatch_whatsapp_message is intentionally NOT exposed to the user-facing
+  // orchestrator to prevent prompt-injection-driven WhatsApp spam. Internal/admin flows
+  // should call evolution-api-proxy directly with the service role key.
 ];
 
 serve(async (req) => {

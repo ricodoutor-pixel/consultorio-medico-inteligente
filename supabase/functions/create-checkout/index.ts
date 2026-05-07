@@ -14,28 +14,72 @@ serve(async (req) => {
   }
 
   try {
+    // Require auth
+    const authHeader = req.headers.get("Authorization") || "";
+    if (!authHeader.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const userClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(token);
+    const callerId = claims?.claims?.sub as string | undefined;
+    if (claimsErr || !callerId) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const body = await req.json();
-    const { priceId, quantity, customerEmail, userId, returnUrl, environment, cartToken, dynamicAmount } = body;
+    const { priceId, quantity, customerEmail, returnUrl, environment, cartToken } = body;
+    const userId = callerId; // never trust client-provided userId
 
     const env = (environment || 'sandbox') as StripeEnv;
     const stripe = createStripeClient(env);
 
     let lineItems: any[];
     let mode: string;
+    let resolvedAmount: number | null = null;
 
-    if (dynamicAmount && typeof dynamicAmount === "number" && dynamicAmount >= 100) {
-      // Dynamic pricing for prescription carts (amount in centavos)
+    if (cartToken && typeof cartToken === "string") {
+      // Dynamic pricing — resolve from prescription_carts server-side
+      const { data: cart, error: cartErr } = await supabase
+        .from("prescription_carts")
+        .select("id, patient_id, total_amount, status")
+        .eq("cart_token", cartToken)
+        .maybeSingle();
+      if (cartErr || !cart) {
+        return new Response(JSON.stringify({ error: "Cart not found" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (cart.patient_id !== userId) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (cart.status !== "pending") {
+        return new Response(JSON.stringify({ error: "Cart is not pending" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      resolvedAmount = Math.max(100, Math.round(Number(cart.total_amount || 0) * 100));
       lineItems = [{
         price_data: {
           currency: "brl",
           product_data: { name: "Carrinho de Prescrição Médica" },
-          unit_amount: dynamicAmount,
+          unit_amount: resolvedAmount,
         },
         quantity: 1,
       }];
       mode = "payment";
     } else {
-      // Standard: resolve human-readable price via lookup_keys
+      // Standard: resolve via Stripe lookup_keys
       if (!priceId || typeof priceId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
         return new Response(JSON.stringify({ error: "Invalid priceId" }), {
           status: 400,
@@ -62,28 +106,24 @@ serve(async (req) => {
       ui_mode: "embedded",
       return_url: returnUrl || `${req.headers.get("origin")}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
       ...(customerEmail && { customer_email: customerEmail }),
-      ...(userId && {
-        metadata: { userId, ...(cartToken && { cartToken }) },
-        ...(mode === "subscription" && { subscription_data: { metadata: { userId } } }),
-      }),
+      metadata: { userId, ...(cartToken && { cartToken }) },
+      ...(mode === "subscription" && { subscription_data: { metadata: { userId } } }),
     });
 
-    // Log to audit
     await supabase.from("audit_log").insert({
-      user_id: userId || "anonymous",
+      user_id: userId,
       action: "checkout_session_created",
       table_name: "subscriptions",
       record_id: session.id,
-      new_data: { priceId: priceId || "dynamic", environment: env, cartToken: cartToken || null, dynamicAmount },
+      new_data: { priceId: priceId || "dynamic", environment: env, cartToken: cartToken || null, amount: resolvedAmount },
     });
 
     return new Response(JSON.stringify({ clientSecret: session.client_secret }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
     console.error("[CREATE-CHECKOUT]", error);
-    return new Response(JSON.stringify({ error: msg }), {
+    return new Response(JSON.stringify({ error: "Checkout creation failed" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

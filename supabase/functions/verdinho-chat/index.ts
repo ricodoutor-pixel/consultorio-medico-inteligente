@@ -114,8 +114,12 @@ serve(async (req) => {
 
     // Build system prompt with user name and page context
     let finalSystemPrompt = SYSTEM_PROMPT;
-    if (leadName) {
-      finalSystemPrompt += `\n\n### CONTEXTO DO USUÁRIO ATUAL:\nO nome do usuário é **${leadName}**. Use o nome dele(a) nas respostas para criar uma experiência personalizada e acolhedora.`;
+    // Sanitize leadName to prevent prompt injection: keep only safe chars, cap length
+    const safeLeadName = typeof leadName === "string"
+      ? leadName.replace(/[^\p{L}\p{N}\s.'-]/gu, "").trim().slice(0, 60)
+      : "";
+    if (safeLeadName) {
+      finalSystemPrompt += `\n\n### CONTEXTO DO USUÁRIO ATUAL:\nO nome do usuário é **${safeLeadName}**. Use o nome dele(a) nas respostas para criar uma experiência personalizada e acolhedora.`;
     }
 
     // Page-aware context: adjust conversation based on which page the user is on

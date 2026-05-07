@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 // Cliente sem amarração de schema — evita que tabelas virem `never` no type-check
 // quando não existe um Database type gerado para edge functions.
@@ -121,6 +122,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
 
   try {
     const supabase: DB = createClient(

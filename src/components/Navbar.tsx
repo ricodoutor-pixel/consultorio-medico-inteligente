@@ -173,9 +173,9 @@ export const Navbar = () => {
                     <LanguageSwitcher />
                   </div>
                   
-                  {/* Botão Iniciar Orientação Técnica ao lado do Idioma */}
-                  <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-xl text-xs h-9 px-4 hover:scale-105 transition-all shadow-lg shadow-secondary/20" asChild>
-                    <NavLink to="/telemedicina">Iniciar Orientação Técnica</NavLink>
+                  {/* Botão pulsátil — Triagem → Pagamento → Médico Online */}
+                  <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-xl text-xs h-9 px-4 hover:scale-105 transition-all shadow-lg shadow-secondary/40 animate-pulse" asChild>
+                    <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
                   </Button>
 
                   {user ? (
@@ -196,8 +196,8 @@ export const Navbar = () => {
 
             {/* Mobile Actions */}
             <div className="xl:hidden flex items-center gap-2">
-               <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-lg text-[10px] h-8 px-2 animate-pulse" asChild>
-                <NavLink to="/telemedicina">INICIAR ORIENTAÇÃO</NavLink>
+               <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-lg text-[10px] h-8 px-2 animate-pulse shadow-lg shadow-secondary/40" asChild>
+                <NavLink to="/telemedicina">INICIAR CONSULTA</NavLink>
               </Button>
               <button
                 className="p-2 text-foreground flex-shrink-0 relative z-[60]"

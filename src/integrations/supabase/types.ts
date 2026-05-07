@@ -3760,6 +3760,45 @@ export type Database = {
         }
         Relationships: []
       }
+      rls_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown
+          reason: string | null
+          row_pk: string | null
+          table_name: string
+          user_id: string | null
+          user_role: string | null
+          was_allowed: boolean
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          reason?: string | null
+          row_pk?: string | null
+          table_name: string
+          user_id?: string | null
+          user_role?: string | null
+          was_allowed: boolean
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          reason?: string | null
+          row_pk?: string | null
+          table_name?: string
+          user_id?: string | null
+          user_role?: string | null
+          was_allowed?: boolean
+        }
+        Relationships: []
+      }
       scientific_articles: {
         Row: {
           abstract: string

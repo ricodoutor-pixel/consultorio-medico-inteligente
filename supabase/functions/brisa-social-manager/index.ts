@@ -112,7 +112,8 @@ Deno.serve(async (req) => {
           results.facebook = { success: fbResp.ok, id: fbData.id, error: fbData.error };
           console.log(`[Brisa Social] Facebook post: ${fbResp.ok ? "✅" : "❌"}`);
         } catch (e) {
-          results.facebook = { success: false, error: String(e) };
+          console.error("[Brisa Social] facebook error:", e);
+          results.facebook = { success: false, error: "facebook_api_error" };
         }
       }
 
@@ -128,7 +129,8 @@ Deno.serve(async (req) => {
           };
           console.log(`[Brisa Social] Instagram content generated for manual/scheduled posting`);
         } catch (e) {
-          results.instagram = { success: false, error: String(e) };
+          console.error("[Brisa Social] instagram error:", e);
+          results.instagram = { success: false, error: "instagram_api_error" };
         }
       }
 

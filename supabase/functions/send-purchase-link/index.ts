@@ -23,6 +23,49 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // ── AUTH: service-role (cron/internal) OR verified-doctor JWT ──
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!
+    const authHeader = req.headers.get('Authorization') || ''
+    const isService = !!authHeader && authHeader === `Bearer ${serviceKey}`
+
+    let callerDoctorUserId: string | null = null
+    if (!isService) {
+      if (!authHeader.startsWith('Bearer ')) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+      try {
+        const userClient = createClient(supabaseUrl, anonKey, {
+          global: { headers: { Authorization: authHeader } },
+        })
+        const { data: claims, error: cErr } = await userClient.auth.getClaims(authHeader.replace('Bearer ', ''))
+        if (cErr || !claims?.claims?.sub) {
+          return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+        const adminClient = createClient(supabaseUrl, serviceKey)
+        const { data: doctor } = await adminClient
+          .from('doctors')
+          .select('user_id, is_verified')
+          .eq('user_id', claims.claims.sub as string)
+          .maybeSingle()
+        if (!doctor || !doctor.is_verified) {
+          return new Response(JSON.stringify({ error: 'Forbidden: caller is not a verified doctor' }), {
+            status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+        callerDoctorUserId = doctor.user_id as string
+      } catch {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+    }
+
     const parsed = BodySchema.safeParse(await req.json())
     if (!parsed.success) {
       return new Response(JSON.stringify({ error: parsed.error.flatten().fieldErrors }), {
@@ -31,6 +74,23 @@ Deno.serve(async (req) => {
     }
 
     const { patientId, patientPhone, patientName, doctorName, items } = parsed.data
+
+    // If a doctor is calling (not service-role), verify they have an appointment with this patient
+    if (callerDoctorUserId) {
+      const adminClient = createClient(supabaseUrl, serviceKey)
+      const { data: appt } = await adminClient
+        .from('consultations')
+        .select('id')
+        .eq('patient_id', patientId)
+        .eq('professional_id', callerDoctorUserId)
+        .limit(1)
+        .maybeSingle()
+      if (!appt) {
+        return new Response(JSON.stringify({ error: 'Forbidden: no consultation with this patient' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+    }
 
     const checkoutUrl = `https://plantayraiz.com.br/checkout/fast-track?pid=${patientId}`
 
@@ -53,10 +113,8 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Log notification in database
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    // Log notification in database (reuse the service-role client created above)
+    const supabase = createClient(supabaseUrl, serviceKey)
 
     await supabase.from('notifications').insert({
       user_id: patientId,

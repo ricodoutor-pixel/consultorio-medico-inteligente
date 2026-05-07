@@ -4840,7 +4840,6 @@ export type Database = {
       clinic_profiles_public: {
         Row: {
           active: boolean | null
-          created_at: string | null
           description: string | null
           doctor_name: string | null
           domain: string | null
@@ -4851,11 +4850,9 @@ export type Database = {
           slug: string | null
           specialty: string | null
           tagline: string | null
-          updated_at: string | null
         }
         Insert: {
           active?: boolean | null
-          created_at?: string | null
           description?: string | null
           doctor_name?: string | null
           domain?: string | null
@@ -4866,11 +4863,9 @@ export type Database = {
           slug?: string | null
           specialty?: string | null
           tagline?: string | null
-          updated_at?: string | null
         }
         Update: {
           active?: boolean | null
-          created_at?: string | null
           description?: string | null
           doctor_name?: string | null
           domain?: string | null
@@ -4881,7 +4876,6 @@ export type Database = {
           slug?: string | null
           specialty?: string | null
           tagline?: string | null
-          updated_at?: string | null
         }
         Relationships: []
       }

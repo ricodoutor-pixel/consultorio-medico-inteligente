@@ -13,9 +13,15 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // ClickSign API token — fallback to embedded sandbox key if secret not set.
-    const CLICKSIGN_API_TOKEN =
-      Deno.env.get("CLICKSIGN_API_TOKEN") || "d37a2a07-c3a6-46ae-a2db-b780db02d127";
+    // ClickSign API token — required, NEVER fall back to a hardcoded value.
+    const CLICKSIGN_API_TOKEN = Deno.env.get("CLICKSIGN_API_TOKEN");
+    if (!CLICKSIGN_API_TOKEN) {
+      console.error("[clicksign-prescription] CLICKSIGN_API_TOKEN not configured");
+      return new Response(
+        JSON.stringify({ success: false, error: "ClickSign integration not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Validate auth
     const authHeader = req.headers.get("Authorization");

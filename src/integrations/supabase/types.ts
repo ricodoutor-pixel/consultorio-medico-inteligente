@@ -339,6 +339,36 @@ export type Database = {
           },
         ]
       }
+      anvisa_dou_alerts: {
+        Row: {
+          created_at: string
+          id: string
+          notified: boolean
+          summary: string | null
+          term: string
+          title: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notified?: boolean
+          summary?: string | null
+          term: string
+          title: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notified?: boolean
+          summary?: string | null
+          term?: string
+          title?: string
+          url?: string
+        }
+        Relationships: []
+      }
       app_downloads: {
         Row: {
           created_at: string

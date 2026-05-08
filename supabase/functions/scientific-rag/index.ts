@@ -1,3 +1,6 @@
+// Scientific RAG — refatorado para Lovable AI Gateway (Gemini).
+// Não usa mais OpenAI embeddings. Faz busca full-text via RPC search_scientific_articles
+// e opcionalmente sintetiza um resumo clínico com Lovable AI (Gemini Flash).
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -6,16 +9,17 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  // Require auth: signed-in user OR service-role bearer
+  // Auth: signed-in user OR service-role bearer
   const authHeader = req.headers.get("Authorization") || "";
   const isService = authHeader === `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`;
   if (!isService) {
@@ -25,17 +29,11 @@ serve(async (req) => {
       });
     }
     try {
-      const anon = createClient(
-        SUPABASE_URL,
-        Deno.env.get("SUPABASE_ANON_KEY")!,
-        { global: { headers: { Authorization: authHeader } } },
-      );
+      const anon = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        global: { headers: { Authorization: authHeader } },
+      });
       const { data, error } = await anon.auth.getClaims(authHeader.replace("Bearer ", ""));
-      if (error || !data?.claims) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      if (error || !data?.claims) throw new Error("invalid");
     } catch {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -44,37 +42,55 @@ serve(async (req) => {
   }
 
   try {
-    const { condition } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const condition = String(body.condition ?? body.query ?? "").slice(0, 200).trim();
+    const summarize = Boolean(body.summarize ?? false);
+    const limit = Math.min(Number(body.limit ?? 3), 8);
 
-    // 1. Gerar embedding para a condição (usando OpenAI nano ou similar disponível no ambiente)
-    const embeddingResponse = await fetch("https://api.openai.com/v1/embeddings", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        input: condition,
-        model: "text-embedding-3-small",
-      }),
+    if (!condition || condition.length < 3) {
+      return new Response(JSON.stringify({ error: "condition (min 3 chars) required" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // 1) Busca full-text gratuita via RPC (sem embeddings, sem OpenAI)
+    const { data: articles, error } = await supabase.rpc("search_scientific_articles", {
+      query_text: condition, limit_count: limit,
     });
-
-    const embeddingData = await embeddingResponse.json();
-    const embedding = embeddingData.data[0].embedding;
-
-    // 2. Buscar artigos similares no Supabase usando pgvector
-    const { data: articles, error } = await supabase.rpc("match_scientific_articles", {
-      query_embedding: embedding,
-      match_threshold: 0.5,
-      match_count: 3,
-    });
-
     if (error) throw error;
 
-    return new Response(JSON.stringify({ success: true, articles }), {
+    const cleaned = (articles ?? []).map((a: any) => ({
+      title: a.title, authors: a.authors, year: a.year,
+      url: a.url, doi: a.doi, abstract: (a.abstract || "").slice(0, 500),
+    }));
+
+    // 2) (Opcional) sintetizar resumo clínico via Lovable AI Gateway
+    let summary: string | null = null;
+    if (summarize && LOVABLE_API_KEY && cleaned.length > 0) {
+      try {
+        const ctx = cleaned.map((a, i) =>
+          `[${i + 1}] ${a.title} (${a.year || "s/d"}) — ${a.abstract}`).join("\n\n");
+        const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: "Você é um assistente clínico. Resuma evidências em 3 frases curtas, em PT-BR, citando [n]." },
+              { role: "user", content: `Condição: ${condition}\n\nEvidências:\n${ctx}` },
+            ],
+          }),
+        });
+        if (r.ok) {
+          const j = await r.json();
+          summary = j.choices?.[0]?.message?.content || null;
+        }
+      } catch (_) { /* opcional */ }
+    }
+
+    return new Response(JSON.stringify({ success: true, condition, articles: cleaned, summary }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-
   } catch (e) {
     console.error("[scientific-rag] error:", e);
     return new Response(JSON.stringify({ error: "Internal error" }), {

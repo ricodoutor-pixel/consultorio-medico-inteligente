@@ -125,46 +125,10 @@ function timer() {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  // Webhook signature verification
-  // Twilio: validate X-Twilio-Signature with TWILIO_AUTH_TOKEN (HMAC-SHA1)
-  // Evolution API: shared secret header
+  // Webhook signature verification — Evolution API only (Twilio removido)
   const evoSecret = Deno.env.get("EVOLUTION_WEBHOOK_SECRET");
-  const twilioToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-  const twilioSig = req.headers.get("X-Twilio-Signature");
   const evoProvided = req.headers.get("x-evolution-secret") || req.headers.get("apikey") || "";
-
-  if (twilioSig && twilioToken) {
-    // Twilio request — validate signature
-    try {
-      const url = req.url;
-      const cloned = req.clone();
-      const params = new URLSearchParams(await cloned.text());
-      const sortedKeys = [...params.keys()].sort();
-      const data = url + sortedKeys.map((k) => k + params.get(k)).join("");
-      const key = await crypto.subtle.importKey(
-        "raw", new TextEncoder().encode(twilioToken),
-        { name: "HMAC", hash: "SHA-1" }, false, ["sign"],
-      );
-      const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(data));
-      const computed = btoa(String.fromCharCode(...new Uint8Array(sig)));
-      if (computed !== twilioSig) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-    } catch {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-  } else if (evoSecret) {
-    if (evoProvided !== evoSecret) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-  } else {
-    // No webhook auth secret configured — refuse all requests instead of accepting silently.
+  if (!evoSecret || evoProvided !== evoSecret) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

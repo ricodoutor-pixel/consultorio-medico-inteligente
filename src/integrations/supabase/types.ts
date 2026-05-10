@@ -5092,6 +5092,18 @@ export type Database = {
         Returns: undefined
       }
       ensure_affiliate_wallet: { Args: { _user_id: string }; Returns: string }
+      get_cron_health: {
+        Args: { _window_hours?: number }
+        Returns: {
+          active: boolean
+          hours_since_last_run: number
+          is_overdue: boolean
+          jobname: string
+          last_run_at: string
+          last_status: string
+          schedule: string
+        }[]
+      }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean

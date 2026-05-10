@@ -253,6 +253,8 @@ const App = () => (
                 <Route path="/admin/automations" element={<AdminRoute><AutomationsDashboard /></AdminRoute>} />
                 <Route path="/admin/omni-channel" element={<OmniChannelDashboard />} />
                 <Route path="/admin/auditoria-de-crédito" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />
+                <Route path="/admin/audit-log" element={<AdminRoute><AuditLog /></AdminRoute>} />
+                <Route path="/admin/auditoria" element={<AdminRoute><AuditLog /></AdminRoute>} />
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
                 <Route path="/quiz" element={<QuizTriagem />} />

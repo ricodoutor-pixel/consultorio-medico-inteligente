@@ -41,6 +41,7 @@ const JOB_TO_FUNCTION: Record<string, string> = {
   "queue-match-cron": "queue-match",
   "job-queue-cron": "job-queue",
   "infra-self-healing-hourly": "infra-self-healing",
+  "hostinger-sync-daily": "hostinger-sync",
 };
 
 async function discord(content: string, level: "info" | "warn" | "critical" = "info") {

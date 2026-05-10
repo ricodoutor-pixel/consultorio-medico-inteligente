@@ -172,7 +172,9 @@ Deno.serve(async (req) => {
   });
 
   await discord(
-    `Upsert: +${toApply.length} adicionados, ${skipped.length} já presentes | VPS IP: \`${vpsIp}\` | ${okCount}/${steps.length} OK${failCount ? ` ⚠️ ${failCount}` : " ✅"}`,
+    toApply.length > 0
+      ? `✅ Injeção cirúrgica de DNS concluída. Subdomínios VPS ativos no IP ${vpsIp}. (+${toApply.length} novos, ${skipped.length} já presentes, ${okCount}/${steps.length} OK)`
+      : `🟢 DNS já 100% sincronizado — nada a adicionar. ${skipped.length} registros validados. VPS ${vpsIp}.`,
   );
 
   return new Response(

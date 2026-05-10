@@ -1428,6 +1428,54 @@ export type Database = {
         }
         Relationships: []
       }
+      cron_circuit_breaker: {
+        Row: {
+          consecutive_failures: number
+          consecutive_successes: number
+          cooldown_minutes: number
+          created_at: string
+          id: string
+          job_name: string
+          last_failure_at: string | null
+          last_success_at: string | null
+          notes: string | null
+          opened_at: string | null
+          state: string
+          threshold: number
+          updated_at: string
+        }
+        Insert: {
+          consecutive_failures?: number
+          consecutive_successes?: number
+          cooldown_minutes?: number
+          created_at?: string
+          id?: string
+          job_name: string
+          last_failure_at?: string | null
+          last_success_at?: string | null
+          notes?: string | null
+          opened_at?: string | null
+          state?: string
+          threshold?: number
+          updated_at?: string
+        }
+        Update: {
+          consecutive_failures?: number
+          consecutive_successes?: number
+          cooldown_minutes?: number
+          created_at?: string
+          id?: string
+          job_name?: string
+          last_failure_at?: string | null
+          last_success_at?: string | null
+          notes?: string | null
+          opened_at?: string | null
+          state?: string
+          threshold?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       data_deletion_requests: {
         Row: {
           admin_notes: string | null

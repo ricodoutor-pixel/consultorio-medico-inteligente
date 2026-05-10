@@ -5135,6 +5135,7 @@ export type Database = {
         }
         Returns: Json
       }
+      cleanup_http_logs: { Args: never; Returns: Json }
       credit_affiliate_wallet: {
         Args: { _amount: number; _user_id: string }
         Returns: undefined

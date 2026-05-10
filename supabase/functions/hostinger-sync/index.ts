@@ -1,6 +1,6 @@
-// 🌐 Hostinger Omni-Integration v2.0 — DNS Overwrite + VPS Audit
-// Aplica zona DNS completa (Lovable + Resend + VPS subdomains + Meta/Google + VAPID)
-// Auto-fetch VPS IP. Placeholders para códigos de verificação (editar depois).
+// 🌐 Hostinger Omni-Integration v3.0 — UPSERT seguro
+// Adiciona APENAS o que falta (subdomínios VPS + VAPID + Google/Meta placeholders)
+// NUNCA sobrescreve Lovable Email, CDN Hostinger, DKIMs, SPF, DMARC, MX existentes.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -10,12 +10,9 @@ const corsHeaders = {
 
 const HOST_API = "https://developers.hostinger.com/api";
 const DOMAIN = "plantayraiz.com.br";
-const LOVABLE_IP = "185.158.133.1";
 
-// Placeholders — substituir no painel Hostinger ou via update_secret depois
-const LOVABLE_VERIFY = Deno.env.get("LOVABLE_VERIFY_CODE") ?? "PLACEHOLDER_LOVABLE_VERIFY";
-const GOOGLE_VERIFY = Deno.env.get("GOOGLE_SITE_VERIFICATION") ?? "PLACEHOLDER_GOOGLE_CODE";
-const META_VERIFY = Deno.env.get("FACEBOOK_DOMAIN_VERIFICATION") ?? "PLACEHOLDER_META_CODE";
+const GOOGLE_VERIFY = Deno.env.get("GOOGLE_SITE_VERIFICATION") ?? "PENDING_GOOGLE_CODE";
+const META_VERIFY = Deno.env.get("FACEBOOK_DOMAIN_VERIFICATION") ?? "PENDING_META_CODE";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -44,49 +41,40 @@ async function discord(content: string) {
     await fetch(DISCORD, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: `🌐 **[Hostinger Sync v2]** ${content}` }),
+      body: JSON.stringify({ content: `🌐 **[Hostinger Sync v3 UPSERT]** ${content}` }),
     });
   } catch (_) {}
 }
 
-function buildZoneRecords(vpsIp: string) {
+// Registros que vamos garantir (SEM mexer em nada existente)
+function desiredRecords(vpsIp: string) {
   return [
-    // 🌐 Hospedagem Lovable (root + www)
-    { type: "A", name: "@", ttl: 3600, records: [{ content: LOVABLE_IP }] },
-    { type: "A", name: "www", ttl: 3600, records: [{ content: LOVABLE_IP }] },
-    { type: "TXT", name: "_lovable", ttl: 300, records: [{ content: `lovable_verify=${LOVABLE_VERIFY}` }] },
-    { type: "CNAME", name: "cdn", ttl: 3600, records: [{ content: "cdn.hostinger.com." }] },
-
-    // 📧 E-mail Hostinger + Resend
-    { type: "MX", name: "@", ttl: 3600, records: [
-      { content: "mx1.hostinger.com.", priority: 10 },
-      { content: "mx2.hostinger.com.", priority: 20 },
-    ]},
-    { type: "TXT", name: "@", ttl: 3600, records: [
-      { content: "v=spf1 include:_spf.mail.hostinger.com include:amazonses.com ~all" },
-    ]},
-    { type: "TXT", name: "_dmarc", ttl: 3600, records: [
-      { content: "v=DMARC1; p=quarantine; rua=mailto:dmarc@plantayraiz.com.br" },
-    ]},
-    { type: "CNAME", name: "resend._domainkey", ttl: 3600, records: [{ content: "dkim.resend.com." }] },
-
-    // ⚙️ Subdomínios soberanos (VPS)
+    // VPS subdomains
     { type: "A", name: "n8n", ttl: 3600, records: [{ content: vpsIp }] },
     { type: "A", name: "assinaturas", ttl: 3600, records: [{ content: vpsIp }] },
     { type: "A", name: "analytics", ttl: 3600, records: [{ content: vpsIp }] },
     { type: "A", name: "api", ttl: 3600, records: [{ content: vpsIp }] },
-
-    // 💬 Verificações Meta + Google
-    { type: "TXT", name: "@", ttl: 3600, records: [
-      { content: `google-site-verification=${GOOGLE_VERIFY}` },
-      { content: `facebook-domain-verification=${META_VERIFY}` },
-    ]},
-
-    // 🛡️ VAPID Push
-    { type: "TXT", name: "_vapid_subject", ttl: 3600, records: [
-      { content: "mailto:contato@plantayraiz.com.br" },
-    ]},
+    // Push VAPID
+    { type: "TXT", name: "_vapid_subject", ttl: 3600, records: [{ content: "mailto:contato@plantayraiz.com.br" }] },
+    // Google Search Console
+    { type: "TXT", name: "@", ttl: 3600, records: [{ content: `google-site-verification=${GOOGLE_VERIFY}` }] },
+    // Meta Business / CAPI
+    { type: "TXT", name: "@", ttl: 3600, records: [{ content: `facebook-domain-verification=${META_VERIFY}` }] },
   ];
+}
+
+// Verifica se um registro alvo já existe na zona atual (idempotência)
+function alreadyExists(zone: any[], target: { type: string; name: string; records: any[] }) {
+  const targetContent = target.records[0]?.content?.toString() ?? "";
+  return zone.some((r) =>
+    r.type === target.type &&
+    r.name === target.name &&
+    Array.isArray(r.records) &&
+    r.records.some((x: any) => {
+      const c = String(x.content ?? "").replace(/^"|"$/g, "");
+      return c === targetContent || c.includes(targetContent.split("=")[0] ?? "@@@");
+    }),
+  );
 }
 
 Deno.serve(async (req) => {
@@ -104,68 +92,79 @@ Deno.serve(async (req) => {
     steps.push({ name, ok: result.ok, status: result.status, body: result.body });
   };
 
-  // 1. Sanity-check token
-  const domains = await hAPI("/domains/v1/portfolio");
-  recordStep("list_domains", domains);
+  // 1. Sanity-check
+  recordStep("list_domains", await hAPI("/domains/v1/portfolio"));
 
-  // 2. VPS list — pega IP público da primeira VM ativa
+  // 2. VPS — auto-fetch IP
   const vpsList = await hAPI("/vps/v1/virtual-machines");
   recordStep("list_vps", vpsList);
   const vms: any[] = Array.isArray(vpsList.body) ? vpsList.body : [];
   const primaryVm = vms[0];
-  const vpsIp =
-    primaryVm?.ipv4?.[0]?.address ||
-    primaryVm?.public_ip ||
-    primaryVm?.ip ||
-    LOVABLE_IP; // fallback
-  recordStep("vps_ip_resolved", { ok: !!vpsIp, status: 200, body: { vpsIp, vmId: primaryVm?.id } });
+  const vpsIp = primaryVm?.ipv4?.[0]?.address || primaryVm?.public_ip || primaryVm?.ip;
+  recordStep("vps_ip_resolved", { ok: !!vpsIp, status: vpsIp ? 200 : 500, body: { vpsIp, vmId: primaryVm?.id } });
+  if (!vpsIp) {
+    return new Response(JSON.stringify({ error: "no VPS IP", steps }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
-  // 3. Snapshot da zona atual (audit pre-overwrite)
+  // 3. Snapshot zona atual
   const before = await hAPI(`/dns/v1/zones/${DOMAIN}`);
-  recordStep("dns_snapshot_before", before);
+  recordStep("dns_snapshot_before", { ok: before.ok, status: before.status, body: { count: Array.isArray(before.body) ? before.body.length : 0 } });
+  const zone: any[] = Array.isArray(before.body) ? before.body : [];
 
-  // 4. Overwrite total da zona
-  const records = buildZoneRecords(vpsIp);
-  const put = await hAPI(`/dns/v1/zones/${DOMAIN}`, {
-    method: "PUT",
-    body: JSON.stringify({ overwrite: true, zone: records }),
-  });
-  recordStep("dns_overwrite", put);
+  // 4. UPSERT — aplica só o que falta
+  const desired = desiredRecords(vpsIp);
+  const toApply: any[] = [];
+  const skipped: any[] = [];
+  for (const d of desired) {
+    if (alreadyExists(zone, d)) {
+      skipped.push({ type: d.type, name: d.name, reason: "already_present" });
+    } else {
+      toApply.push(d);
+    }
+  }
+  recordStep("plan", { ok: true, status: 200, body: { will_add: toApply.length, skipped: skipped.length, skipped_details: skipped } });
 
-  // 5. Snapshot pós-aplicação
+  // PUT com overwrite:false → merge (a Hostinger anexa em vez de substituir)
+  if (toApply.length > 0) {
+    const merge = await hAPI(`/dns/v1/zones/${DOMAIN}`, {
+      method: "PUT",
+      body: JSON.stringify({ overwrite: false, zone: toApply }),
+    });
+    recordStep("dns_upsert", merge);
+  } else {
+    recordStep("dns_upsert", { ok: true, status: 204, body: { note: "nada a fazer, zona já completa" } });
+  }
+
+  // 5. Snapshot pós-upsert
   const after = await hAPI(`/dns/v1/zones/${DOMAIN}`);
-  recordStep("dns_snapshot_after", after);
+  recordStep("dns_snapshot_after", { ok: after.ok, status: after.status, body: { count: Array.isArray(after.body) ? after.body.length : 0 } });
 
-  // 6. VPS metrics + snapshot semanal (continua igual)
+  // 6. VPS metrics + snapshot semanal
   const dateTo = new Date().toISOString();
   const dateFrom = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   for (const vm of vms) {
-    const metrics = await hAPI(
-      `/vps/v1/virtual-machines/${vm.id}/metrics?date_from=${encodeURIComponent(dateFrom)}&date_to=${encodeURIComponent(dateTo)}`,
-    );
-    recordStep(`vps_${vm.id}_metrics`, metrics);
-    const snap = await hAPI(`/vps/v1/virtual-machines/${vm.id}/snapshot`, { method: "POST" });
-    recordStep(`vps_${vm.id}_snapshot`, snap);
+    const m = await hAPI(`/vps/v1/virtual-machines/${vm.id}/metrics?date_from=${encodeURIComponent(dateFrom)}&date_to=${encodeURIComponent(dateTo)}`);
+    recordStep(`vps_${vm.id}_metrics`, { ok: m.ok, status: m.status, body: { has_data: !!m.body } });
+    const s = await hAPI(`/vps/v1/virtual-machines/${vm.id}/snapshot`, { method: "POST" });
+    recordStep(`vps_${vm.id}_snapshot`, s);
   }
 
-  // 7. Audit
+  // 7. Audit log
   const okCount = steps.filter((s) => s.ok).length;
   const failCount = steps.length - okCount;
-
   await supabase.from("audit_log").insert({
-    action: "hostinger_sync_v2_executed",
+    action: "hostinger_sync_v3_upsert",
     table_name: "hostinger.api",
     record_id: "00000000-0000-0000-0000-000000000000",
     new_data: {
-      domain: DOMAIN,
-      vps_ip: vpsIp,
-      total_steps: steps.length,
-      ok: okCount,
-      failed: failCount,
-      placeholders: {
-        lovable_verify: LOVABLE_VERIFY.startsWith("PLACEHOLDER"),
-        google_verify: GOOGLE_VERIFY.startsWith("PLACEHOLDER"),
-        meta_verify: META_VERIFY.startsWith("PLACEHOLDER"),
+      domain: DOMAIN, vps_ip: vpsIp,
+      total_steps: steps.length, ok: okCount, failed: failCount,
+      added: toApply.length, skipped: skipped.length,
+      pending_codes: {
+        google: GOOGLE_VERIFY.startsWith("PENDING"),
+        meta: META_VERIFY.startsWith("PENDING"),
       },
       executed_at: new Date().toISOString(),
       steps: steps.map((s) => ({ name: s.name, ok: s.ok, status: s.status })),
@@ -173,11 +172,11 @@ Deno.serve(async (req) => {
   });
 
   await discord(
-    `Sync v2 concluído — ${okCount}/${steps.length} OK${failCount ? ` ⚠️ ${failCount} falhas` : " ✅"} | VPS IP: \`${vpsIp}\``,
+    `Upsert: +${toApply.length} adicionados, ${skipped.length} já presentes | VPS IP: \`${vpsIp}\` | ${okCount}/${steps.length} OK${failCount ? ` ⚠️ ${failCount}` : " ✅"}`,
   );
 
   return new Response(
-    JSON.stringify({ ok: failCount === 0, vpsIp, total: steps.length, success: okCount, failed: failCount, steps }),
+    JSON.stringify({ ok: failCount === 0, vpsIp, added: toApply.length, skipped: skipped.length, steps }),
     { headers: { ...corsHeaders, "Content-Type": "application/json" } },
   );
 });

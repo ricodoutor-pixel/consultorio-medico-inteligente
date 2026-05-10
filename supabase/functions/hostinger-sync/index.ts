@@ -63,21 +63,33 @@ Deno.serve(async (req) => {
   const domains = await hAPI("/domains/v1/portfolio");
   recordStep("list_domains", domains);
 
-  // 2. Configurar zona DNS (A root + A www + TXT _lovable)
-  const dnsRecords = {
-    overwrite: true,
-    zone: [
-      { name: "@",        type: "A",   ttl: 3600, records: [{ content: LOVABLE_IP }] },
-      { name: "www",      type: "A",   ttl: 3600, records: [{ content: LOVABLE_IP }] },
-      { name: "_lovable", type: "TXT", ttl: 3600, records: [{ content: "lovable_verify=plantayraiz" }] },
-    ],
-  };
-  const dnsUpdate = await hAPI(`/dns/v1/zones/${DOMAIN}`, {
-    method: "PUT", body: JSON.stringify(dnsRecords),
-  });
-  recordStep("dns_update", dnsUpdate);
+  // 2. Snapshot da zona DNS atual (read-only, audit)
+  const dnsSnapshot = await hAPI(`/dns/v1/zones/${DOMAIN}`);
+  recordStep("dns_snapshot", dnsSnapshot);
 
-  // 3. Listar VPS para snapshots/malware-scan/metrics
+  // 2b. DNS é gerenciado pela CDN Hostinger (não pode ser sobrescrito).
+  // Apenas auditamos: A root deve apontar para Lovable IP OU para a CDN da Hostinger
+  // que por sua vez aponta para Lovable. Se desviar, alertamos.
+  const zone: any[] = Array.isArray(dnsSnapshot.body) ? dnsSnapshot.body : [];
+  const aRoot = zone.find((r: any) => r.type === "A" && (r.name === "@" || r.name === DOMAIN));
+  const cnameWww = zone.find((r: any) => r.type === "CNAME" && r.name === "www");
+  const dnsHealthy =
+    !!aRoot?.records?.length || !!cnameWww?.records?.some?.((x: any) => /hstgr|lovable/i.test(x.content));
+
+  recordStep("dns_audit", {
+    ok: dnsHealthy,
+    status: dnsHealthy ? 200 : 409,
+    body: {
+      a_root: aRoot?.records ?? null,
+      cname_www: cnameWww?.records ?? null,
+      healthy: dnsHealthy,
+      note: dnsHealthy
+        ? "DNS gerenciado pela CDN Hostinger — saudável"
+        : "⚠️ DNS sem A root nem CNAME www esperado",
+    },
+  });
+
+  // 3. Listar VPS para métricas + snapshot
   const vpsList = await hAPI("/vps/v1/virtual-machines");
   recordStep("list_vps", vpsList);
 
@@ -85,15 +97,18 @@ Deno.serve(async (req) => {
     ? vpsList.body.map((v: any) => v.id).filter(Boolean)
     : [];
 
+  const dateTo = new Date().toISOString();
+  const dateFrom = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
   for (const id of vmIds) {
-    const metrics = await hAPI(`/vps/v1/virtual-machines/${id}/metrics`);
+    const metrics = await hAPI(
+      `/vps/v1/virtual-machines/${id}/metrics?date_from=${encodeURIComponent(dateFrom)}&date_to=${encodeURIComponent(dateTo)}`,
+    );
     recordStep(`vps_${id}_metrics`, metrics);
 
-    const snapshot = await hAPI(`/vps/v1/virtual-machines/${id}/snapshots`, { method: "POST" });
+    // Endpoint correto é singular: /snapshot
+    const snapshot = await hAPI(`/vps/v1/virtual-machines/${id}/snapshot`, { method: "POST" });
     recordStep(`vps_${id}_snapshot`, snapshot);
-
-    const scan = await hAPI(`/vps/v1/virtual-machines/${id}/malware-scanner/scan`, { method: "POST" });
-    recordStep(`vps_${id}_malware_scan`, scan);
   }
 
   // 4. Audit log

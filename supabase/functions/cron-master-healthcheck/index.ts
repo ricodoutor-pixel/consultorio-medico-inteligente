@@ -40,6 +40,7 @@ const JOB_TO_FUNCTION: Record<string, string> = {
   "pharmacy-cart-recovery-cron": "pharmacy-cart-recovery",
   "queue-match-cron": "queue-match",
   "job-queue-cron": "job-queue",
+  "infra-self-healing-hourly": "infra-self-healing",
 };
 
 async function discord(content: string, level: "info" | "warn" | "critical" = "info") {

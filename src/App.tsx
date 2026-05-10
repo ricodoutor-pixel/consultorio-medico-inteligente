@@ -127,6 +127,7 @@ const GestãoPacientes = lazy(() => import("./pages/GestãoPacientes"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const QaRatingTest = lazy(() => import("./pages/QaRatingTest"));
 const RodizioMedicos = lazy(() => import("./pages/RodizioMedicos"));
+const AuditLog = lazy(() => import("./pages/admin/AuditLog"));
 
 const queryClient = new QueryClient();
 

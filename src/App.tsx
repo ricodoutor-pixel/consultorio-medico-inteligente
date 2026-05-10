@@ -128,6 +128,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const QaRatingTest = lazy(() => import("./pages/QaRatingTest"));
 const RodizioMedicos = lazy(() => import("./pages/RodizioMedicos"));
 const AuditLog = lazy(() => import("./pages/admin/AuditLog"));
+const CronHealth = lazy(() => import("./pages/admin/CronHealth"));
 
 const queryClient = new QueryClient();
 
@@ -255,6 +256,7 @@ const App = () => (
                 <Route path="/admin/auditoria-de-crédito" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />
                 <Route path="/admin/audit-log" element={<AdminRoute><AuditLog /></AdminRoute>} />
                 <Route path="/admin/auditoria" element={<AdminRoute><AuditLog /></AdminRoute>} />
+                <Route path="/admin/cron-health" element={<AdminRoute><CronHealth /></AdminRoute>} />
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
                 <Route path="/quiz" element={<QuizTriagem />} />

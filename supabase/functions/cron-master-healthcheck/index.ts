@@ -119,11 +119,53 @@ Deno.serve(async (req) => {
     }
   }
 
-  // 🔧 Tentativa de auto-heal
+  // 🔧 Tentativa de auto-heal com Circuit Breaker
   const healed: any[] = [];
   const stillBroken: any[] = [];
+  const breakerSkipped: any[] = [];
+  const breakerOpened: any[] = [];
 
   for (const j of unhealthy) {
+    // Carrega ou cria estado do breaker
+    let { data: cb } = await supabase
+      .from("cron_circuit_breaker")
+      .select("*")
+      .eq("job_name", j.jobname)
+      .maybeSingle();
+
+    if (!cb) {
+      const { data: created } = await supabase
+        .from("cron_circuit_breaker")
+        .insert({ job_name: j.jobname })
+        .select()
+        .single();
+      cb = created;
+    }
+
+    const threshold = cb?.threshold ?? 5;
+    const cooldownMin = cb?.cooldown_minutes ?? 30;
+    const openedAt = cb?.opened_at ? new Date(cb.opened_at).getTime() : 0;
+    const cooldownExpired = openedAt > 0 && Date.now() - openedAt > cooldownMin * 60_000;
+
+    // Breaker OPEN → pula tentativa salvo cooldown expirado (half_open probe)
+    if (cb?.state === "open" && !cooldownExpired) {
+      breakerSkipped.push({ ...j, breaker: cb });
+      await supabase.from("audit_log").insert({
+        action: "cron_breaker_open_skip",
+        table_name: "cron_circuit_breaker",
+        record_id: cb.id,
+        new_data: { jobname: j.jobname, consecutive_failures: cb.consecutive_failures },
+      });
+      continue;
+    }
+
+    if (cb?.state === "open" && cooldownExpired) {
+      await supabase
+        .from("cron_circuit_breaker")
+        .update({ state: "half_open" })
+        .eq("id", cb.id);
+    }
+
     const result = await attemptHeal(j.jobname);
 
     await supabase.from("audit_log").insert({
@@ -136,13 +178,43 @@ Deno.serve(async (req) => {
         last_status: j.last_status,
         hours_since_last_run: j.hours_since_last_run,
         heal_result: result,
+        breaker_state_before: cb?.state,
       },
     });
 
     if (result.healed) {
       healed.push({ ...j, heal: result });
+      await supabase
+        .from("cron_circuit_breaker")
+        .update({
+          state: "closed",
+          consecutive_failures: 0,
+          consecutive_successes: (cb?.consecutive_successes ?? 0) + 1,
+          last_success_at: new Date().toISOString(),
+          opened_at: null,
+          notes: null,
+        })
+        .eq("id", cb!.id);
     } else {
       stillBroken.push({ ...j, heal: result });
+      const newFails = (cb?.consecutive_failures ?? 0) + 1;
+      const shouldOpen = newFails >= threshold;
+      await supabase
+        .from("cron_circuit_breaker")
+        .update({
+          state: shouldOpen ? "open" : (cb?.state === "half_open" ? "open" : "closed"),
+          consecutive_failures: newFails,
+          consecutive_successes: 0,
+          last_failure_at: new Date().toISOString(),
+          opened_at: shouldOpen || cb?.state === "half_open"
+            ? new Date().toISOString()
+            : cb?.opened_at,
+          notes: result.error?.slice(0, 500) ?? null,
+        })
+        .eq("id", cb!.id);
+
+      if (shouldOpen) breakerOpened.push({ ...j, breaker_failures: newFails });
+
       await supabase.from("audit_log").insert({
         action: j._kind === "failed" ? "cron_job_failed" : "cron_job_overdue",
         table_name: "cron.job",
@@ -154,6 +226,8 @@ Deno.serve(async (req) => {
           last_status: j.last_status,
           hours_since_last_run: j.hours_since_last_run,
           heal_attempt: result,
+          consecutive_failures: newFails,
+          breaker_opened: shouldOpen,
         },
       });
     }
@@ -161,12 +235,12 @@ Deno.serve(async (req) => {
 
   const total = (jobs ?? []).length;
   let level: "info" | "warn" | "critical" = "info";
-  if (stillBroken.length > 0) level = "critical";
-  else if (healed.length > 0) level = "warn";
+  if (stillBroken.length > 0 || breakerOpened.length > 0) level = "critical";
+  else if (healed.length > 0 || breakerSkipped.length > 0) level = "warn";
 
   let summary =
-    `Health-check + Auto-Healing concluído\n` +
-    `• Total: **${total}** | ✅ Saudáveis: **${healthy.length}** | 🔧 Curados: **${healed.length}** | 🔴 Persistem: **${stillBroken.length}**`;
+    `Health-check + Auto-Healing + Circuit Breaker\n` +
+    `• Total: **${total}** | ✅ **${healthy.length}** | 🔧 **${healed.length}** | 🔴 **${stillBroken.length}** | ⛔ Breaker open: **${breakerSkipped.length}** | 🚨 Novos breakers: **${breakerOpened.length}**`;
 
   if (healed.length > 0) {
     summary +=
@@ -186,8 +260,18 @@ Deno.serve(async (req) => {
         .join("\n");
   }
 
-  // Só envia Discord se houver algo a reportar
-  if (healed.length > 0 || stillBroken.length > 0) {
+  if (breakerOpened.length > 0) {
+    summary +=
+      `\n\n**🚨 Circuit Breakers ABERTOS (cron pausado):**\n` +
+      breakerOpened.map((j) => `• \`${j.jobname}\` (${j.breaker_failures} falhas)`).join("\n");
+  }
+  if (breakerSkipped.length > 0) {
+    summary +=
+      `\n\n**⛔ Pulados (breaker open):**\n` +
+      breakerSkipped.map((j) => `• \`${j.jobname}\``).join("\n");
+  }
+
+  if (healed.length > 0 || stillBroken.length > 0 || breakerOpened.length > 0) {
     await discord(summary, level);
   }
 
@@ -198,7 +282,9 @@ Deno.serve(async (req) => {
       healthy: healthy.length,
       healed: healed.length,
       still_broken: stillBroken.length,
-      details: { healed, stillBroken, healthy },
+      breaker_skipped: breakerSkipped.length,
+      breaker_opened: breakerOpened.length,
+      details: { healed, stillBroken, healthy, breakerSkipped, breakerOpened },
     }),
     { headers: { ...corsHeaders, "Content-Type": "application/json" } },
   );

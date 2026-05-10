@@ -67,27 +67,27 @@ Deno.serve(async (req) => {
   const dnsSnapshot = await hAPI(`/dns/v1/zones/${DOMAIN}`);
   recordStep("dns_snapshot", dnsSnapshot);
 
-  // 2b. Só atualiza se A root ainda não aponta para Lovable IP (CDN bloqueia override desnecessário)
+  // 2b. DNS é gerenciado pela CDN Hostinger (não pode ser sobrescrito).
+  // Apenas auditamos: A root deve apontar para Lovable IP OU para a CDN da Hostinger
+  // que por sua vez aponta para Lovable. Se desviar, alertamos.
   const zone: any[] = Array.isArray(dnsSnapshot.body) ? dnsSnapshot.body : [];
   const aRoot = zone.find((r: any) => r.type === "A" && (r.name === "@" || r.name === DOMAIN));
-  const dnsAlreadyOk = !!aRoot?.records?.some?.((x: any) => x.content === LOVABLE_IP);
+  const cnameWww = zone.find((r: any) => r.type === "CNAME" && r.name === "www");
+  const dnsHealthy =
+    !!aRoot?.records?.length || !!cnameWww?.records?.some?.((x: any) => /hstgr|lovable/i.test(x.content));
 
-  if (!dnsAlreadyOk) {
-    const dnsUpdate = await hAPI(`/dns/v1/zones/${DOMAIN}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        overwrite: true,
-        zone: [
-          { name: "@",        type: "A",   ttl: 3600, records: [{ content: LOVABLE_IP }] },
-          { name: "www",      type: "A",   ttl: 3600, records: [{ content: LOVABLE_IP }] },
-          { name: "_lovable", type: "TXT", ttl: 3600, records: [{ content: "lovable_verify=plantayraiz" }] },
-        ],
-      }),
-    });
-    recordStep("dns_update", dnsUpdate);
-  } else {
-    recordStep("dns_update", { ok: true, status: 200, body: { skipped: "DNS já aponta para Lovable IP" } });
-  }
+  recordStep("dns_audit", {
+    ok: dnsHealthy,
+    status: dnsHealthy ? 200 : 409,
+    body: {
+      a_root: aRoot?.records ?? null,
+      cname_www: cnameWww?.records ?? null,
+      healthy: dnsHealthy,
+      note: dnsHealthy
+        ? "DNS gerenciado pela CDN Hostinger — saudável"
+        : "⚠️ DNS sem A root nem CNAME www esperado",
+    },
+  });
 
   // 3. Listar VPS para métricas + snapshot
   const vpsList = await hAPI("/vps/v1/virtual-machines");

@@ -1,6 +1,11 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # Real /api/health → Supabase Edge Function (proxy 302)
+  RewriteRule ^api/health/?$ https://shmbwdjuddvquszwkvuq.supabase.co/functions/v1/health [P,L]
+
+  # SPA fallback
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d

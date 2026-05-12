@@ -131,3 +131,9 @@ verify_jwt = false
 [functions.create-stripe-payment]
 verify_jwt = false
 
+
+[functions.health]
+verify_jwt = false
+
+[functions.sre-alert]
+verify_jwt = false

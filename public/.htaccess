@@ -2,8 +2,8 @@
   RewriteEngine On
   RewriteBase /
 
-  # Real /api/health → Supabase Edge Function (proxy 302)
-  RewriteRule ^api/health/?$ https://shmbwdjuddvquszwkvuq.supabase.co/functions/v1/health [P,L]
+  # Real /api/health → Supabase Edge Function (302 redirect; Hostinger não tem mod_proxy)
+  RewriteRule ^api/health/?$ https://shmbwdjuddvquszwkvuq.supabase.co/functions/v1/health [R=302,L]
 
   # SPA fallback
   RewriteRule ^index\.html$ - [L]

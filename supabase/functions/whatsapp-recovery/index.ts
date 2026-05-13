@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
     const manychatKey = Deno.env.get("MANYCHAT_API_KEY");
     const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
     const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
-    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
+    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
     const supabase = createClient(supabaseUrl, serviceKey);
 
     const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();

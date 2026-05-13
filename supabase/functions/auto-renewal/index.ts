@@ -104,7 +104,7 @@ serve(async (req) => {
         try {
           const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
           const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
-          const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
+          const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
 
           if (EVO_URL && EVO_KEY) {
             const { data: profile } = await supabase

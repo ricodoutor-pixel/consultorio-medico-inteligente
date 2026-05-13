@@ -3,6 +3,7 @@
 // 2. Tenta re-executar crons falhados/atrasados (auto-heal)
 // 3. Só alerta no Discord se persistir após o retry
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -90,6 +91,10 @@ async function attemptHeal(
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const _unauth = requireServiceAuth(req, corsHeaders);
+  if (_unauth) return _unauth;
+
 
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 

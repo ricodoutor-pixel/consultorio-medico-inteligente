@@ -1,9 +1,14 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders }
+
+  const _unauth = requireServiceAuth(req, corsHeaders);
+  if (_unauth) return _unauth;
+);
   }
 
   try {

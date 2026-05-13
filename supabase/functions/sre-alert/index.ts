@@ -1,3 +1,4 @@
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 // SRE Alert dispatcher → Discord webhook
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,6 +21,10 @@ const COLOR = {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const _unauth = requireServiceAuth(req, corsHeaders);
+  if (_unauth) return _unauth;
+
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405, headers: corsHeaders });
 
   const url = Deno.env.get("DISCORD_SRE_WEBHOOK_URL");

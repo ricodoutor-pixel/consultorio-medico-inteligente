@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
     const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
-    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Enf_Brisa";
+    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
 
     if (!LOVABLE_API_KEY || !EVO_URL || !EVO_KEY) {
       return new Response(JSON.stringify({ error: "Missing credentials" }), {

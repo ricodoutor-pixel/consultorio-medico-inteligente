@@ -8,7 +8,7 @@ const corsHeaders = {
 
 const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL"); // Ex: https://sua-instancia.com
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY");
-const INSTANCE_NAME = "Enf_Brisa"; // Instância fixa para custo zero via QR Code
+const INSTANCE_NAME = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });

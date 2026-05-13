@@ -45,6 +45,23 @@ async function startServer() {
   // GitHub CI/CD Webhook
   app.post("/api/deploy/webhook", deployWebhook);
 
+  // Health checks
+  app.get("/health", (_req, res) => {
+    res.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      service: "planta-y-raiz-web",
+    });
+  });
+
+  app.get("/api/health", (_req, res) => {
+    res.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      service: "planta-y-raiz-web",
+    });
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",

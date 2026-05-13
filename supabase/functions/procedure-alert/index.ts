@@ -33,6 +33,23 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    // RBAC: only verified doctors or admins may push procedure alerts to patients
+    const { data: doctorRow } = await supabase
+      .from("doctors")
+      .select("id")
+      .eq("user_id", authData.user.id)
+      .eq("is_verified", true)
+      .maybeSingle();
+    const { data: isAdmin } = await supabase.rpc("has_role", {
+      _user_id: authData.user.id,
+      _role: "admin",
+    });
+    if (!doctorRow && !isAdmin) {
+      return new Response(JSON.stringify({ error: "Acesso negado" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { patientId, procedureType, urgency, recommendedSpecialty, estimatedDate, notes } = await req.json();
 
     if (!patientId || !procedureType) {

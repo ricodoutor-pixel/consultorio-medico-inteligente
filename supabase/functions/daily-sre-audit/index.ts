@@ -1,3 +1,4 @@
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 // Daily SRE audit — pings critical endpoints and dispatches Discord alert via sre-alert
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,6 +29,10 @@ async function probe(url: string) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const _unauth = requireServiceAuth(req, corsHeaders);
+  if (_unauth) return _unauth;
+
 
   const results = await Promise.all(
     ENDPOINTS.map(async (e) => ({ ...e, ...(await probe(e.url)) }))

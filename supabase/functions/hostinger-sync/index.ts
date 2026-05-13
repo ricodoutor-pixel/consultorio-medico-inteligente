@@ -2,6 +2,7 @@
 // Adiciona APENAS o que falta (subdomínios VPS + VAPID + Google/Meta placeholders)
 // NUNCA sobrescreve Lovable Email, CDN Hostinger, DKIMs, SPF, DMARC, MX existentes.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -79,6 +80,10 @@ function alreadyExists(zone: any[], target: { type: string; name: string; record
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const _unauth = requireServiceAuth(req, corsHeaders);
+  if (_unauth) return _unauth;
+
 
   if (!TOKEN) {
     return new Response(JSON.stringify({ error: "HOSTINGER_API_TOKEN not configured" }), {

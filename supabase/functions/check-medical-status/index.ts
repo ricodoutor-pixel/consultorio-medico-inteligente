@@ -70,7 +70,14 @@ serve(async (req) => {
     for (const d of doctors ?? []) {
       const info = await fetchCRM(d.crm, d.crm_state);
       const situacao = (info?.situacao ?? "").toLowerCase();
-      const isInactive = !info || /inativo|cancelad|suspens|falecid/i.test(situacao);
+      // Only suspend when API responded AND status matches inactive pattern.
+      // If info is null (API timeout/outage), skip to avoid mass-suspending all doctors.
+      if (!info) {
+        console.warn("[check-medical-status] Brasil API returned null for", d.crm, d.crm_state, "- skipping");
+        results.push({ id: d.id, crm: d.crm, uf: d.crm_state, action: "skipped_api_unavailable" });
+        continue;
+      }
+      const isInactive = /inativo|cancelad|suspens|falecid/i.test(situacao);
 
       if (isInactive) {
         suspendedCount++;

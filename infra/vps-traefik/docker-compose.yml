@@ -119,6 +119,8 @@ services:
     image: clickhouse/clickhouse-server:24.3-alpine
     container_name: plausible_events_db
     restart: unless-stopped
+    environment:
+      - CLICKHOUSE_SKIP_USER_SETUP=1
     volumes:
       - plausible_event_data:/var/lib/clickhouse
     ulimits:

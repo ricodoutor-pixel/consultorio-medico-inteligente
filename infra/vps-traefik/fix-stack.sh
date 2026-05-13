@@ -24,6 +24,14 @@ if [ ! -d "${TARGET}" ]; then
   exit 1
 fi
 cd "${TARGET}"
+
+if ! git diff --quiet -- docker-compose.yml; then
+  COMPOSE_BACKUP="${TARGET}/docker-compose.yml.bak.$(date +%s)"
+  cp docker-compose.yml "${COMPOSE_BACKUP}"
+  echo "🧹 docker-compose.yml local alterado; backup salvo em ${COMPOSE_BACKUP}"
+  git restore docker-compose.yml
+fi
+
 git pull --ff-only || true
 
 if [ ! -f "${ENV_FILE}" ]; then

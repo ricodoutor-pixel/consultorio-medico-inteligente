@@ -39,9 +39,12 @@ export const RodizioMedicos = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSelect = () => {
-    if (currentDoctor) {
-      navigate(`/pagamento?pro=${currentDoctor.id}`);
+  const handleSelect = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      window.location.href = `https://wa.me/5511991363154?text=${encodeURIComponent("Iniciar orientação agora")}`;
+    } else {
+      navigate(`/login?redirect=${encodeURIComponent("/brisa-orientacao")}`);
     }
   };
 

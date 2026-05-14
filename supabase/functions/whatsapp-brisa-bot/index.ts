@@ -157,6 +157,46 @@ async function sendWhatsAppAudio(number: string, base64Audio: string) {
   });
 }
 
+// 🎙️ ElevenLabs TTS — voz feminina sensual PT-BR (Laura) p/ Brisa, masculina firme (George) p/ Dr. Edilson
+const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY") || "";
+const VOICE_BRISA = "FGY2WhTYpPnrIDTdsKH5";   // Laura — feminina jovem, calorosa
+const VOICE_EDILSON = "JBFqnCBsd6RMkjVDRZzb"; // George — masculina firme, profissional
+
+async function synthesizeVoice(text: string, voiceId: string): Promise<string | null> {
+  if (!ELEVENLABS_API_KEY || !text) return null;
+  try {
+    // Limita a 600 chars p/ não estourar quota free
+    const cleanText = text.replace(/[*_`#]/g, "").slice(0, 600);
+    const r = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
+      {
+        method: "POST",
+        headers: { "xi-api-key": ELEVENLABS_API_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: cleanText,
+          model_id: "eleven_multilingual_v2",
+          voice_settings: { stability: 0.45, similarity_boost: 0.8, style: 0.55, use_speaker_boost: true, speed: 1.0 },
+        }),
+      },
+    );
+    if (!r.ok) {
+      console.error("[brisa-bot] ElevenLabs TTS failed:", r.status, await r.text().catch(() => ""));
+      return null;
+    }
+    const buf = new Uint8Array(await r.arrayBuffer());
+    // base64 sem stack overflow
+    let binary = "";
+    const chunk = 0x8000;
+    for (let i = 0; i < buf.length; i += chunk) {
+      binary += String.fromCharCode(...buf.subarray(i, i + chunk));
+    }
+    return btoa(binary);
+  } catch (e) {
+    console.error("[brisa-bot] synthesizeVoice error:", e);
+    return null;
+  }
+}
+
 async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>) {
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",

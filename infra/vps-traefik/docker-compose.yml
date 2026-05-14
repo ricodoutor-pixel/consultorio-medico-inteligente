@@ -193,7 +193,9 @@ services:
     networks: [proxy]
 
   evolution:
-    image: atendai/evolution-api:latest
+    # Pinado em v2.3.1 (Baileys atualizado). NÃO usar :latest — resolve para v2.2.3 antiga
+    # com Baileys quebrado, gerando loop infinito de reconexão sem QR.
+    image: atendai/evolution-api:v2.3.1
     container_name: evolution
     restart: unless-stopped
     depends_on: [evolution_postgres, evolution_redis]
@@ -205,11 +207,33 @@ services:
       - DATABASE_ENABLED=true
       - DATABASE_SAVE_DATA_INSTANCE=true
       - DATABASE_SAVE_DATA_NEW_MESSAGE=true
+      - DATABASE_SAVE_MESSAGE_UPDATE=true
+      - DATABASE_SAVE_DATA_CONTACTS=true
+      - DATABASE_SAVE_DATA_CHATS=true
       - CACHE_REDIS_ENABLED=true
       - CACHE_REDIS_URI=redis://evolution_redis:6379
       - CACHE_REDIS_PREFIX_KEY=evolution
+      - CACHE_LOCAL_ENABLED=false
       - LANGUAGE=pt-BR
+      # 🔑 Identidade do "celular" virtual — SEM ESSAS 3 VARIÁVEIS o WhatsApp
+      # rejeita o fingerprint (vira "Chrome,<kernel-linux>") e o Baileys
+      # entra em loop infinito sem emitir QR/pareamento.
       - CONFIG_SESSION_PHONE_CLIENT=Planta y Raiz
+      - CONFIG_SESSION_PHONE_NAME=Chrome
+      - CONFIG_SESSION_PHONE_VERSION=2.3000.1015901307
+      # 📲 QR Code
+      - QRCODE_LIMIT=30
+      - QRCODE_COLOR=#1B4332
+      # 🧹 Higiene
+      - DEL_INSTANCE=false
+      - DEL_TEMP_INSTANCES=true
+      - LOG_LEVEL=ERROR,WARN,INFO
+      - LOG_COLOR=true
+      - LOG_BAILEYS=error
+      # 🔐 Webhook global (opcional — preencha no .env se for usar)
+      - WEBHOOK_GLOBAL_URL=${EVOLUTION_WEBHOOK_URL:-}
+      - WEBHOOK_GLOBAL_ENABLED=${EVOLUTION_WEBHOOK_ENABLED:-false}
+      - WEBHOOK_GLOBAL_WEBHOOK_BY_EVENTS=false
     volumes:
       - evolution_instances:/evolution/instances
     networks: [proxy]

@@ -15,6 +15,29 @@ export class ErrorBoundary extends React.Component<Props, State> {
     return { hasError: true, error };
   }
 
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    // Envia ao AI Error Gateway (autocura) — fire-and-forget, sem auth
+    try {
+      fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-error-gateway`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "frontend",
+          source_ref: window.location.pathname,
+          error_type: error.name,
+          error_message: error.message,
+          stack: error.stack,
+          context: {
+            componentStack: info?.componentStack?.slice(0, 2000),
+            userAgent: navigator.userAgent,
+            url: window.location.href,
+          },
+        }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch { /* noop */ }
+  }
+
   render() {
     if (this.state.hasError) {
       return (

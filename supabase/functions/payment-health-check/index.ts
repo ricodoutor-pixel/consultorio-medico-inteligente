@@ -17,7 +17,7 @@ interface ProbeResult {
 async function probeMercadoPago(token: string): Promise<ProbeResult> {
   const t0 = performance.now()
   try {
-    const res = await fetch('https://api.mercadopago.com/users/me', {
+    const res = await fetch('https://api.mercadopago.com/sites/MLB/payment_methods', {
       headers: { Authorization: `Bearer ${token}` },
       signal: AbortSignal.timeout(8000),
     })

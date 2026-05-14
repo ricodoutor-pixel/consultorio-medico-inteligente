@@ -150,3 +150,6 @@ verify_jwt = false
 [functions.db-backup-offsite]
 verify_jwt = false
 
+
+[functions.payment-health-check]
+verify_jwt = false

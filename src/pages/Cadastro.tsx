@@ -137,6 +137,13 @@ const Cadastro = () => {
       trackPixelEvent("Lead", { content_name: "patient_signup", content_category: type }, {
         leadScore: 30, funnelStage: "intent", category: "conversion",
       });
+
+      // If session created immediately and we have a redirect target, go there
+      if (authData.session && redirectTo) {
+        window.location.href = decodeURIComponent(redirectTo);
+        return;
+      }
+
       setSubmitted(true);
       toast({ title: "Cadastro realizado! ✅", description: "Verifique seu e-mail para confirmar a conta." });
     } catch (err) {

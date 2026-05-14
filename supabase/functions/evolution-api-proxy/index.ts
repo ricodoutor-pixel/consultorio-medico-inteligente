@@ -27,16 +27,12 @@ serve(async (req) => {
     const cleanPhone = phone.replace(/\D/g, "");
     const url = `${EVOLUTION_API_URL}/message/sendText/${INSTANCE_NAME}`;
 
+    // Evolution API v2.x payload format (flat structure)
     const payload = {
       number: cleanPhone,
-      options: {
-        delay: 1200,
-        presence: "composing",
-        linkPreview: true
-      },
-      textMessage: {
-        text: message
-      }
+      text: message,
+      delay: 1200,
+      linkPreview: true,
     };
 
     const response = await fetch(url, {

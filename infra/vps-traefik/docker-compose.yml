@@ -191,9 +191,9 @@ services:
     networks: [proxy]
 
   evolution:
-    # Pinado em v2.3.1 (Baileys atualizado). NÃO usar :latest — resolve para v2.2.3 antiga
-    # com Baileys quebrado, gerando loop infinito de reconexão sem QR.
-    image: atendai/evolution-api:v2.3.1
+    # ⚠️ O projeto migrou de atendai/evolution-api (parado em v2.2.3) para
+    # evoapicloud/evolution-api (fork oficial mantido). Usar v2.3.7 com Baileys novo.
+    image: evoapicloud/evolution-api:v2.3.7
     container_name: evolution
     restart: unless-stopped
     depends_on: [evolution_postgres, evolution_redis]

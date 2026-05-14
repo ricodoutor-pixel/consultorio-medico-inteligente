@@ -5,6 +5,7 @@
  * Sends webhook to ManyChat to deliver "First Health" coupon via WhatsApp
  */
 import { createClient } from "npm:@supabase/supabase-js@2.49.4";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -92,38 +93,54 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const action = body.action || "check";
 
-    if (action === "track_start") {
-      // Frontend calls this when triage starts
-      const { session_id, user_id, patient_phone, patient_name } = body;
-      
-      const { error } = await supabase.from("triage_abandonment_tracking").insert({
-        session_id: session_id || crypto.randomUUID(),
-        user_id: user_id || null,
-        patient_phone: patient_phone || null,
-        patient_name: patient_name || null,
-      });
+    if (action === "track_start" || action === "track_conversion") {
+      const authHeader = req.headers.get("Authorization") || "";
+      if (!authHeader.startsWith("Bearer ")) {
+        return new Response(JSON.stringify({ status: "error", message: "Unauthorized" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const userClient = createClient(
+        SUPABASE_URL,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } },
+      );
+      const { data: u, error: ue } = await userClient.auth.getUser();
+      if (ue || !u?.user) {
+        return new Response(JSON.stringify({ status: "error", message: "Unauthorized" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const authedUserId = u.user.id;
 
-      if (error) throw error;
+      if (action === "track_start") {
+        const { session_id, patient_phone, patient_name } = body;
+        const { error } = await supabase.from("triage_abandonment_tracking").insert({
+          session_id: session_id || crypto.randomUUID(),
+          user_id: authedUserId,
+          patient_phone: patient_phone || null,
+          patient_name: patient_name || null,
+        });
+        if (error) throw error;
+        return new Response(JSON.stringify({ status: "ok", tracked: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
-      return new Response(JSON.stringify({ status: "ok", tracked: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (action === "track_conversion") {
-      // Frontend calls this when user books after triage
       const { session_id } = body;
-      
       await supabase.from("triage_abandonment_tracking")
         .update({ converted: true, converted_at: new Date().toISOString() })
-        .eq("session_id", session_id);
-
+        .eq("session_id", session_id)
+        .eq("user_id", authedUserId);
       return new Response(JSON.stringify({ status: "ok", converted: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Default: check for abandonments (called by cron)
+    // Default cron action — service-role only
+    const guard = requireServiceAuth(req, corsHeaders);
+    if (guard) return guard;
+
     const thresholdTime = new Date(Date.now() - ABANDONMENT_THRESHOLD_MINUTES * 60 * 1000).toISOString();
 
     const { data: abandoned, error } = await supabase

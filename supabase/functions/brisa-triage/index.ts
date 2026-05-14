@@ -41,12 +41,16 @@ serve(async (req) => {
   }
 
   try {
-    const { symptoms, patientInfo, language = "pt" } = await req.json();
+    const { symptoms: rawSymptoms, patientInfo, language = "pt" } = await req.json();
+    const symptoms = String(rawSymptoms ?? "")
+      .replace(/[\u0000-\u001F\u007F]/g, " ")
+      .slice(0, 2000);
+    const safeLang = ["pt", "en", "es"].includes(String(language)) ? language : "pt";
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
     const systemPrompt = `Atue como o Clone Digital do Dr. Edilson Bezerra (CRM 10963), Especialista em Cannabis Medicinal.
 Você está realizando uma **Orientação Técnica** multilíngue. NUNCA use o termo 'Consulta'.
-Idioma de resposta: ${language} (pt, en, es).
+Idioma de resposta: ${safeLang} (pt, en, es).
 
 DIRETRIZES:
 1. Se apresente como o Dr. Edilson Bezerra.
@@ -64,7 +68,8 @@ ESTRUTURA:
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: `System: ${systemPrompt}\n\nSintomas: ${symptoms}` }] }]
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: "user", parts: [{ text: `Sintomas: ${symptoms}` }] }],
       }),
     });
 

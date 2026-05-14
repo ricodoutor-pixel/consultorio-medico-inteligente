@@ -98,7 +98,8 @@ Seja acolhedora, técnica e eficiente.`;
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: `System: ${systemPrompt}\n\nContexto: ${contextStr}\n\nUsuário: ${userInput}` }] }],
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: "user", parts: [{ text: `Contexto: ${contextStr}\n\nUsuário: ${userInput}` }] }],
         tools: [{ function_declarations: tools }]
       }),
     });
@@ -114,10 +115,19 @@ Seja acolhedora, técnica e eficiente.`;
       // Lógica de execução das ferramentas
       let toolResult;
       switch (name) {
-        case "create_payment":
-          const { data: payData } = await supabase.functions.invoke("create-payment", { body: args });
+        case "create_payment": {
+          // Server-side guard against prompt-injection-driven tool calls:
+          // bound amount and force currency before invoking the payment function.
+          const amt = Number((args as any)?.amount);
+          if (!Number.isFinite(amt) || amt < 1 || amt > 5000) {
+            toolResult = { error: "Valor de pagamento fora do intervalo permitido (1–5000)" };
+            break;
+          }
+          const safeArgs = { ...(args as any), amount: amt, currency: "BRL" };
+          const { data: payData } = await supabase.functions.invoke("create-payment", { body: safeArgs });
           toolResult = payData;
           break;
+        }
         case "check_doctor_availability":
           const { data: doctors } = await supabase.from("professionals").select("name, category").eq("is_online", true);
           toolResult = doctors;

@@ -1,6 +1,19 @@
 import { createClient } from "npm:@supabase/supabase-js@2.49.1";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
+async function requireAuthenticatedUser(req: Request) {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) return null;
+  const client = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: authHeader } } }
+  );
+  const { data, error } = await client.auth.getUser();
+  if (error || !data?.user) return null;
+  return data.user;
+}
+
 interface AnvisaMedicine {
   name: string;
   activePrinciple: string;
@@ -74,6 +87,11 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    const user = await requireAuthenticatedUser(req);
+    if (!user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const body: AnvisaRequest = await req.json();
     const validation = validateForm(body);
     if (!validation.valid) {
@@ -92,7 +110,8 @@ Deno.serve(async (req) => {
       message: `Solicitação submetida com sucesso. Protocolo: ${protocol}`,
     }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
-    console.error("[anvisa-automation] error:", e);
+    // Avoid logging request body (contains PII like CPF)
+    console.error("[anvisa-automation] error:", e instanceof Error ? e.message : "unknown");
     return new Response(JSON.stringify({ error: "Erro interno. Tente novamente." }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

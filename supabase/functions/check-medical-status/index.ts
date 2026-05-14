@@ -10,9 +10,13 @@ const corsHeaders = {
 };
 
 const DISCORD_WEBHOOK_URL = Deno.env.get("DISCORD_WEBHOOK_URL")
-  ?? "https://discord.com/api/webhooks/1503041371391655946/N4Aw1XrxKAijq-hGOuxY9vouDJmYqCkhRJvLwsXNQRUJhIWdkUhcPd_5JVKUzrdela3G";
+  ?? Deno.env.get("DISCORD_SRE_WEBHOOK_URL");
 
 async function discord(content: string) {
+  if (!DISCORD_WEBHOOK_URL) {
+    console.warn("[discord] webhook URL not configured, skipping alert");
+    return;
+  }
   try {
     await fetch(DISCORD_WEBHOOK_URL, {
       method: "POST",

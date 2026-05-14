@@ -50,45 +50,52 @@ function validateRNE(rne: string): boolean {
   return /^[A-Z]\d{6}[A-Z0-9]$/i.test(rne.replace(/[\s-]/g, ""));
 }
 
-// Query Brasil API for CRM validation
+// Real CRM lookup via Brasil API (CFM proxy)
 async function checkCRM(crm: string, uf: string): Promise<CRMResult> {
+  const crmNumber = crm.replace(/\D/g, "");
+  const ufUpper = uf.toUpperCase();
+
+  if (crmNumber.length < 4 || crmNumber.length > 7) {
+    return { valid: false, error: "Formato de CRM inválido" };
+  }
+
+  const validUFs = [
+    "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
+    "MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC",
+    "SP","SE","TO"
+  ];
+  if (!validUFs.includes(ufUpper)) {
+    return { valid: false, error: "UF inválida" };
+  }
+
   try {
-    // Try BrasilAPI first
     const resp = await fetch(
-      `https://brasilapi.com.br/api/cvm/v1/${crm}`,
-      { signal: AbortSignal.timeout(5000) }
+      `https://brasilapi.com.br/api/cfm/v1/${crmNumber}/${ufUpper}`,
+      { signal: AbortSignal.timeout(7000) }
     );
 
-    // BrasilAPI doesn't have CRM endpoint yet, so we use CFM portal simulation
-    // In production, integrate with CFM official API or web scraping service
-    console.log(`[KYC] Checking CRM ${crm}-${uf} via external API`);
-
-    // Fallback: validate CRM format (XXXXXX/UF)
-    const crmNumber = crm.replace(/\D/g, "");
-    if (crmNumber.length < 4 || crmNumber.length > 7) {
-      return { valid: false, error: "Formato de CRM inválido" };
+    if (!resp.ok) {
+      // Couldn't reach CFM — do NOT auto-approve. Mark as pending manual review.
+      console.warn(`[KYC] Brasil API CFM returned ${resp.status} for ${crmNumber}/${ufUpper}`);
+      return { valid: false, status: "pending_manual_review", error: "Não foi possível confirmar o CRM no CFM agora — encaminhado para revisão manual" };
     }
 
-    const validUFs = [
-      "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS",
-      "MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC",
-      "SP","SE","TO"
-    ];
-    if (!validUFs.includes(uf.toUpperCase())) {
-      return { valid: false, error: "UF inválida" };
-    }
+    const j: any = await resp.json().catch(() => null);
+    const status = String(j?.situacao || j?.status || "").toLowerCase();
+    const name = j?.nome || j?.name || "";
+    const specialty = j?.especialidade || j?.specialty || "";
+    const isActive = status.includes("ativo");
 
-    // For now, return format-valid result
-    // TODO: Replace with real CFM API when available
     return {
-      valid: true,
-      status: "Ativo",
-      name: "",
-      specialty: "Cannabis Medicinal",
+      valid: isActive,
+      status: isActive ? "Ativo" : (j?.situacao || "Inativo"),
+      name,
+      specialty,
+      error: isActive ? undefined : "CRM não está ativo no CFM",
     };
   } catch (error) {
-    console.error("[KYC] CRM check error:", error);
-    return { valid: false, error: "Falha na conexão com o conselho médico" };
+    console.error("[KYC] CRM check error:", error instanceof Error ? error.message : "unknown");
+    return { valid: false, status: "pending_manual_review", error: "Falha na conexão com o conselho médico — revisão manual necessária" };
   }
 }
 
@@ -182,8 +189,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 4. Determine KYC status
-    const kycStatus = results.crm_valid && results.document_valid ? "verified" : "rejected";
+    // 4. Determine KYC status — only "verified" when CRM was actually confirmed by CFM/Brasil API.
+    const kycStatus = results.crm_valid && results.document_valid
+      ? "verified"
+      : (crmResult.status === "pending_manual_review" ? "pending_manual_review" : "rejected");
 
     // 5. Update doctor record
     await supabase

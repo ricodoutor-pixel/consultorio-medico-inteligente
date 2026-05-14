@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const MANYCHAT_API = "https://api.manychat.com/fb";
 
@@ -52,6 +53,9 @@ function jsonRes(data: unknown, status = 200) {
  */
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const guard = requireServiceAuth(req, corsHeaders);
+  if (guard) return guard;
 
   try {
     const supabase = createClient(

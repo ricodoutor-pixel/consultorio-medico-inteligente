@@ -101,9 +101,12 @@ async function sendToCAPI(events: SocialInteraction[]): Promise<{ sent: number; 
     };
   }));
 
-  const resp = await fetch(`${CAPI_URL}?access_token=${FB_ACCESS_TOKEN}`, {
+  const resp = await fetch(CAPI_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${FB_ACCESS_TOKEN}`,
+    },
     body: JSON.stringify({ data: capiEvents }),
   });
 

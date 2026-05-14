@@ -266,7 +266,7 @@ const Index = () => {
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Avaliação técnica humanitária completa</li>
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Encaminhamento técnico preciso por especialidade e Patologia</li>
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Relatório digital em PDF com assinatura ICP-Brasil e selo gov.br</li>
-                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Mentoria Orientacoes e consultoria particular especializada</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Mentoria, Orientações e consultoria particular especializada</li>
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Importação RDC 660/2022 facilitada com desconto e frete grátis</li>
               </ul>
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] leading-relaxed text-amber-100/90">

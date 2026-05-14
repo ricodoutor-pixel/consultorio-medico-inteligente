@@ -22,10 +22,14 @@ async function probeMercadoPago(token: string): Promise<ProbeResult> {
       signal: AbortSignal.timeout(8000),
     })
     const latency = Math.round(performance.now() - t0)
-    if (!res.ok) {
-      return { provider: 'mercado_pago', status: res.status >= 500 ? 'down' : 'degraded', latency_ms: latency, last_error: `HTTP ${res.status}` }
+    // 5xx = real outage; 4xx = API alive (auth/payload issue, not infra failure)
+    if (res.status >= 500) {
+      return { provider: 'mercado_pago', status: 'down', latency_ms: latency, last_error: `HTTP ${res.status}` }
     }
-    return { provider: 'mercado_pago', status: latency > 3000 ? 'degraded' : 'operational', latency_ms: latency, last_error: null }
+    if (latency > 3000) {
+      return { provider: 'mercado_pago', status: 'degraded', latency_ms: latency, last_error: 'high_latency' }
+    }
+    return { provider: 'mercado_pago', status: 'operational', latency_ms: latency, last_error: res.ok ? null : `HTTP ${res.status} (auth)` }
   } catch (e) {
     return { provider: 'mercado_pago', status: 'down', latency_ms: Math.round(performance.now() - t0), last_error: String(e) }
   }

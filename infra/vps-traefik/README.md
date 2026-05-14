@@ -77,20 +77,21 @@ docker compose logs -f n8n                    # logs específicos
 docker compose restart evolution              # reinicia 1 serviço
 ```
 
-### Recuperar QR do WhatsApp quando travar
+### Recuperar QR / código de pareamento quando travar
 
-Se o QR não aparecer ou o estado do Baileys ficar corrompido, rode na VPS:
+Se o QR não aparecer, o código de pareamento sumir ou a instância ficar “zumbi”, rode na VPS:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ricodoutor-pixel/consultorio-medico-inteligente/main/infra/vps-traefik/reset-evolution-qr.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ricodoutor-pixel/consultorio-medico-inteligente/main/infra/vps-traefik/reset-evolution-qr.sh | bash -s -- Brisa_CEO 607361D42FA0-4B10-A0F3-A070CA3B5F41
 ```
 
 O script:
-1. Atualiza o repo local
-2. Para apenas o container `evolution`
+1. Lê a `EVOLUTION_API_KEY` do `.env` local da VPS
+2. Reinicia o serviço `evolution` e espera a API responder
 3. Remove e recria o volume `evolution_instances`
-4. Sobe a imagem estável com correção de QR
-5. Mostra os logs filtrados de boot (`qr`, `ready`, `error`, `baileys`)
+4. Apaga a instância antiga via API, se existir
+5. Recria a instância com `qrcode: true`
+6. Deixa pronto para buscar QR ou pareamento no Manager / API
 
 Snapshots semanais da VPS já são criados automaticamente pelo `hostinger-sync` (cron 03:00 UTC).
 

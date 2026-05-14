@@ -35,7 +35,7 @@ serve(async (req) => {
   let httpStatus = 0;
   let latency = 0;
   try {
-    const r = await fetch("https://api.mercadopago.com/v1/payment_methods?site_id=MLB", {
+    const r = await fetch("https://api.mercadopago.com/users/me", {
       headers: { Authorization: `Bearer ${MP_TOKEN}` },
       signal: AbortSignal.timeout(LATENCY_THRESHOLD_MS + 2000),
     });

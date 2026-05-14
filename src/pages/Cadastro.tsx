@@ -220,13 +220,15 @@ const Cadastro = () => {
                   variant="outline"
                   className="w-full font-bold h-12 rounded-xl border-border"
                   onClick={async () => {
-                    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+                    const result = await lovable.auth.signInWithOAuth("google", {
+                      redirect_uri: redirectTo ? `${window.location.origin}${decodeURIComponent(redirectTo)}` : window.location.origin,
+                    });
                     if (result.error) {
                       toast({ title: "Erro com Google", description: "Não foi possível continuar com Google.", variant: "destructive" });
                       return;
                     }
                     if (result.redirected) return;
-                    navigate("/dashboard");
+                    navigate(redirectTo ? decodeURIComponent(redirectTo) : "/dashboard");
                   }}
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">

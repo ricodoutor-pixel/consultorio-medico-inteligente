@@ -98,6 +98,46 @@ REGRAS GERAIS:
 
 KPI #1: CADASTRO CONFIRMADO POR CATEGORIA. Sem cadastro, a conversa NÃO termina.`;
 
+async function transcribeAudio(base64Audio: string, mimeType: string): Promise<string> {
+  try {
+    const fmt = mimeType.includes("ogg") ? "ogg" : mimeType.includes("mp3") ? "mp3" : mimeType.includes("mpeg") ? "mp3" : "wav";
+    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${LOVABLE_API_KEY}` },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [{
+          role: "user",
+          content: [
+            { type: "text", text: "Transcreva exatamente este áudio em português brasileiro. Responda APENAS com a transcrição, sem comentários." },
+            { type: "input_audio", input_audio: { data: base64Audio, format: fmt } },
+          ],
+        }],
+      }),
+    });
+    if (!resp.ok) { console.error("[brisa-bot] STT error", resp.status, await resp.text()); return ""; }
+    const data = await resp.json();
+    return (data.choices?.[0]?.message?.content || "").trim();
+  } catch (e) { console.error("[brisa-bot] transcribeAudio failed", e); return ""; }
+}
+
+async function fetchEvolutionAudio(messageData: any): Promise<{ base64: string; mime: string } | null> {
+  try {
+    const direct = messageData?.message?.audioMessage?.base64 || messageData?.message?.base64 || messageData?.base64;
+    const mime = messageData?.message?.audioMessage?.mimetype || "audio/ogg";
+    if (direct) return { base64: direct, mime };
+    const r = await fetch(`${EVOLUTION_API_URL}/chat/getBase64FromMediaMessage/${EVOLUTION_INSTANCE}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+      body: JSON.stringify({ message: { key: messageData.key } }),
+    });
+    if (!r.ok) return null;
+    const j = await r.json();
+    const b64 = j?.base64 || j?.data?.base64;
+    return b64 ? { base64: b64, mime } : null;
+  } catch (e) { console.error("[brisa-bot] fetchEvolutionAudio failed", e); return null; }
+}
+
 async function sendWhatsApp(number: string, text: string) {
   const cleanPhone = number.replace(/\D/g, "");
   return fetch(`${EVOLUTION_API_URL}/message/sendText/${EVOLUTION_INSTANCE}`, {
@@ -107,13 +147,19 @@ async function sendWhatsApp(number: string, text: string) {
   });
 }
 
+async function sendWhatsAppAudio(number: string, base64Audio: string) {
+  const cleanPhone = number.replace(/\D/g, "");
+  return fetch(`${EVOLUTION_API_URL}/message/sendWhatsAppAudio/${EVOLUTION_INSTANCE}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+    body: JSON.stringify({ number: cleanPhone, audio: base64Audio, delay: 1200, encoding: true }),
+  });
+}
+
 async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>) {
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-    },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${LOVABLE_API_KEY}` },
     body: JSON.stringify({
       model: "google/gemini-2.5-flash",
       messages: [
@@ -124,12 +170,11 @@ async function callBrisaAI(userMessage: string, history: Array<{role: string; co
     }),
   });
   if (!resp.ok) {
-    const errBody = await resp.text();
-    console.error("[brisa-bot] AI error", resp.status, errBody);
-    return "Olá! 🌱 Sou a Enfª Brisa. Estou com instabilidade rápida — me conta seu nome e o que está sentindo que já te encaminho ao Dr. Edilson.";
+    console.error("[brisa-bot] AI error", resp.status, await resp.text());
+    return "Olá amor! 🌱 Sou a Enfª Brisa. Tive uma instabilidade rapidinha — me conta seu nome que já te ajudo 💚";
   }
   const data = await resp.json();
-  return data.choices?.[0]?.message?.content?.trim() || "Olá! Sou a Enfª Brisa. Como posso te ajudar hoje?";
+  return data.choices?.[0]?.message?.content?.trim() || "Olá amor! Como posso te ajudar hoje? 💚";
 }
 
 serve(async (req) => {

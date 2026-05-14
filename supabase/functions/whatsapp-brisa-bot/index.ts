@@ -144,7 +144,7 @@ async function sendWhatsApp(number: string, text: string) {
   return fetch(`${EVOLUTION_API_URL}/message/sendText/${EVOLUTION_INSTANCE}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
-    body: JSON.stringify({ number: cleanPhone, text, delay: 1500, linkPreview: true }),
+    body: JSON.stringify({ number: cleanPhone, text, delay: 1500, linkPreview: false }),
   });
 }
 

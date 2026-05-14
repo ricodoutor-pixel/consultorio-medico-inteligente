@@ -117,12 +117,12 @@ serve(async (req) => {
     }
 
     // Persist inbound message + load short history
-    await supabase.from("whatsapp_conversations").insert({
+    await supabase.from("whatsapp_brisa_log").insert({
       phone, direction: "inbound", message: messageText, raw: data,
     }).then(() => {}).catch(() => {});
 
     const { data: rows } = await supabase
-      .from("whatsapp_conversations")
+      .from("whatsapp_brisa_log")
       .select("direction, message")
       .eq("phone", phone)
       .order("created_at", { ascending: false })
@@ -136,7 +136,7 @@ serve(async (req) => {
     const reply = await callBrisaAI(messageText, history);
     await sendWhatsApp(phone, reply);
 
-    await supabase.from("whatsapp_conversations").insert({
+    await supabase.from("whatsapp_brisa_log").insert({
       phone, direction: "outbound", message: reply, raw: { ai: true },
     }).then(() => {}).catch(() => {});
 

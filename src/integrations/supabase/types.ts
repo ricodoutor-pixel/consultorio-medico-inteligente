@@ -4803,6 +4803,33 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_brisa_log: {
+        Row: {
+          created_at: string
+          direction: string
+          id: string
+          message: string
+          phone: string
+          raw: Json | null
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          id?: string
+          message: string
+          phone: string
+          raw?: Json | null
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          id?: string
+          message?: string
+          phone?: string
+          raw?: Json | null
+        }
+        Relationships: []
+      }
       whatsapp_conversations: {
         Row: {
           clinical_summary: string | null

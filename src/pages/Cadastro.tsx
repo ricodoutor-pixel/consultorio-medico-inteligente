@@ -37,6 +37,8 @@ const Cadastro = () => {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
 
   const handleChange = (key: string, value: string) => setFormData({ ...formData, [key]: value });
 

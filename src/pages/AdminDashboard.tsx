@@ -11,6 +11,7 @@ import { LTVMetricsPanel } from "@/components/admin/LTVMetricsPanel";
 import { RegistrationStatsPanel } from "@/components/admin/RegistrationStatsPanel";
 import { AppDownloadsCounter } from "@/components/admin/AppDownloadsCounter";
 import { LiveAppAnalytics } from "@/components/admin/LiveAppAnalytics";
+import { ManusCEOKPIPanel } from "@/components/admin/ManusCEOKPIPanel";
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -141,6 +142,9 @@ const AdminDashboard = () => {
               <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Atualizar
             </Button>
           </div>
+
+          {/* Manus CEO Operational Matrix (5 KPIs) */}
+          <ManusCEOKPIPanel />
 
           {/* KPI Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">

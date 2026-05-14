@@ -21,6 +21,8 @@ serve(async (req) => {
       status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   try {
     const body = await req.json();

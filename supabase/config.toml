@@ -147,3 +147,6 @@ verify_jwt = false
 [functions.ai-error-gateway]
 verify_jwt = false
 
+[functions.db-backup-offsite]
+verify_jwt = false
+

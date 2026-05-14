@@ -137,3 +137,6 @@ verify_jwt = false
 
 [functions.sre-alert]
 verify_jwt = false
+
+[functions.whatsapp-brisa-bot]
+verify_jwt = false

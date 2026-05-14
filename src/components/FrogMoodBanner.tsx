@@ -5,6 +5,7 @@ const moodImages: Record<FrogMood, string> = {
   happy: "/frog-happy.png",
   warning: "/frog-warning.png",
   critical: "/frog-critical.png",
+  in_call: "/frog-happy.png", // mesmo asset, recolorido via filtro CSS
 };
 
 export function FrogMoodBanner() {
@@ -19,8 +20,13 @@ export function FrogMoodBanner() {
         width={72}
         height={72}
         className="w-[72px] h-[72px] drop-shadow-lg object-contain"
+        style={
+          mood === "in_call"
+            ? { filter: "hue-rotate(180deg) saturate(1.15) drop-shadow(0 0 8px rgba(56,189,248,0.55))" }
+            : undefined
+        }
         animate={{ scale: [1, 1.06, 1] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: mood === "in_call" ? 1.4 : 2.5, repeat: Infinity, ease: "easeInOut" }}
         draggable={false}
       />
 
@@ -40,7 +46,9 @@ export function FrogMoodBanner() {
           className={`mt-1 px-3 py-1.5 rounded-lg text-xs font-medium text-center max-w-[260px] ${
             mood === "warning"
               ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
-              : "bg-red-500/10 text-red-400 border border-red-500/20"
+              : mood === "critical"
+              ? "bg-red-500/10 text-red-400 border border-red-500/20"
+              : "bg-sky-500/10 text-sky-400 border border-sky-500/20"
           }`}
         >
           {message}

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { updateFrogIcon } from "@/lib/serviceWorkerRegistration";
 
-export type FrogMood = "happy" | "warning" | "critical";
+export type FrogMood = "happy" | "warning" | "critical" | "in_call";
 
 interface FrogMoodData {
   mood: FrogMood;
@@ -30,6 +30,11 @@ const DEFAULT_MESSAGES: Record<FrogMood, { message: string; reason: string; icon
     reason: "Orientação Técnica cancelada ou medicamento acabando",
     icon: "/frog-critical.png",
   },
+  in_call: {
+    message: "🩺 Seu médico está em atendimento — você está sendo cuidado!",
+    reason: "Médico em sala de teleconsulta",
+    icon: "/frog-happy.png",
+  },
 };
 
 function getMoodFromStorage(): FrogMoodData {
@@ -51,6 +56,16 @@ async function computeMoodFromSupabase(): Promise<FrogMood> {
 
     const userId = session.user.id;
     const now = new Date();
+
+    // PRIORIDADE MÁXIMA: médico em atendimento ativo (Verde→Azul)
+    const { data: activeCall } = await supabase
+      .from("appointments")
+      .select("id")
+      .eq("patient_id", userId)
+      .eq("status", "in_progress")
+      .limit(1)
+      .maybeSingle();
+    if (activeCall) return "in_call";
 
     // Check profile completeness
     const { data: profile } = await supabase

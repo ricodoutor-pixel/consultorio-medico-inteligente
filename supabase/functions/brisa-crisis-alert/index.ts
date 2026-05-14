@@ -37,6 +37,8 @@ async function sendWhatsApp(message: string) {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();

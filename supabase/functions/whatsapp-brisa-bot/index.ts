@@ -331,9 +331,24 @@ serve(async (req) => {
       });
     }
 
-    // Persist inbound message + load short history
+    // Classify sentiment (Gemini) → habilita brisa-crisis-alert
+    const { sentiment_score, is_negative } = await classifySentiment(messageText);
+
+    // Persist inbound message com sentiment + load short history
     await supabase.from("whatsapp_brisa_log").insert({
       phone, direction: "inbound", message: messageText, raw: data,
+      sentiment_score, is_negative,
+    }).then(() => {}).catch(() => {});
+
+    // Espelha em audit_log para auditoria centralizada (Manus CEO)
+    await supabase.from("audit_log").insert({
+      action: "brisa_message_scored",
+      table_name: "whatsapp_brisa_log",
+      new_data: {
+        phone, message: messageText.slice(0, 500),
+        sentiment_score, is_negative,
+        scored_at: new Date().toISOString(),
+      },
     }).then(() => {}).catch(() => {});
 
     const { data: rows } = await supabase

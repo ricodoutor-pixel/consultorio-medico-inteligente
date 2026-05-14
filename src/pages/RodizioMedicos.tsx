@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { professionals, Professional } from "@/data/professionals";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Loader2, UserCheck, Clock, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";

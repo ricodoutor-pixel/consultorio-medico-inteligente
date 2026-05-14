@@ -41,11 +41,14 @@ serve(async (req) => {
     });
     httpStatus = r.status;
     latency = Date.now() - start;
-    ok = r.ok && latency < LATENCY_THRESHOLD_MS;
+    // MP API alive = qualquer resposta HTTP (mesmo 401/403) abaixo do limite de latência.
+    // Falha real = timeout, erro de rede ou 5xx.
+    ok = httpStatus < 500 && latency < LATENCY_THRESHOLD_MS;
     await r.text();
   } catch (e) {
     latency = Date.now() - start;
     ok = false;
+    httpStatus = 0;
   }
 
   // Read current state

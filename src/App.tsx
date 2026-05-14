@@ -128,6 +128,7 @@ const GestãoPacientes = lazy(() => import("./pages/GestãoPacientes"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const QaRatingTest = lazy(() => import("./pages/QaRatingTest"));
 const RodizioMedicos = lazy(() => import("./pages/RodizioMedicos"));
+const BrisaOrientacaoRedirect = lazy(() => import("./pages/BrisaOrientacaoRedirect"));
 const AuditLog = lazy(() => import("./pages/admin/AuditLog"));
 const CronHealth = lazy(() => import("./pages/admin/CronHealth"));
 
@@ -178,6 +179,7 @@ const App = () => (
                 <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />
                 <Route path="/telemedicina" element={<Telemedicina />} />
                 <Route path="/rodizio" element={<RodizioMedicos />} />
+                <Route path="/brisa-orientacao" element={<BrisaOrientacaoRedirect />} />
                 <Route path="/afiliados" element={<Indicacoes />} />
                 <Route path="/indicacoes" element={<Indicacoes />} />
                 <Route path="/legal" element={<Legal />} />

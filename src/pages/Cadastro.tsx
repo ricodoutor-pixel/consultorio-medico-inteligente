@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { linkReferralOnSignup } from "@/hooks/useReferralTracking";
 import { Navbar } from "@/components/Navbar";
@@ -37,6 +37,8 @@ const Cadastro = () => {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
 
   const handleChange = (key: string, value: string) => setFormData({ ...formData, [key]: value });
 
@@ -135,6 +137,13 @@ const Cadastro = () => {
       trackPixelEvent("Lead", { content_name: "patient_signup", content_category: type }, {
         leadScore: 30, funnelStage: "intent", category: "conversion",
       });
+
+      // If session created immediately and we have a redirect target, go there
+      if (authData.session && redirectTo) {
+        window.location.href = decodeURIComponent(redirectTo);
+        return;
+      }
+
       setSubmitted(true);
       toast({ title: "Cadastro realizado! ✅", description: "Verifique seu e-mail para confirmar a conta." });
     } catch (err) {
@@ -218,13 +227,15 @@ const Cadastro = () => {
                   variant="outline"
                   className="w-full font-bold h-12 rounded-xl border-border"
                   onClick={async () => {
-                    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+                    const result = await lovable.auth.signInWithOAuth("google", {
+                      redirect_uri: redirectTo ? `${window.location.origin}${decodeURIComponent(redirectTo)}` : window.location.origin,
+                    });
                     if (result.error) {
                       toast({ title: "Erro com Google", description: "Não foi possível continuar com Google.", variant: "destructive" });
                       return;
                     }
                     if (result.redirected) return;
-                    navigate("/dashboard");
+                    navigate(redirectTo ? decodeURIComponent(redirectTo) : "/dashboard");
                   }}
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">

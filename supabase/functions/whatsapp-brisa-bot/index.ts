@@ -273,7 +273,7 @@ serve(async (req) => {
     url.searchParams.get("token") ||
     req.headers.get("x-webhook-secret") ||
     req.headers.get("apikey");
-  if (EVOLUTION_WEBHOOK_SECRET && providedSecret !== EVOLUTION_WEBHOOK_SECRET && providedSecret !== EVOLUTION_API_KEY) {
+  if (!EVOLUTION_WEBHOOK_SECRET || (providedSecret !== EVOLUTION_WEBHOOK_SECRET && providedSecret !== EVOLUTION_API_KEY)) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

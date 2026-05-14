@@ -85,13 +85,43 @@ Se o QR não aparecer, o código de pareamento sumir ou a instância ficar “zu
 curl -fsSL https://raw.githubusercontent.com/ricodoutor-pixel/consultorio-medico-inteligente/main/infra/vps-traefik/reset-evolution-qr.sh | bash -s -- Brisa_CEO 607361D42FA0-4B10-A0F3-A070CA3B5F41
 ```
 
+Se quiser forçar **código de pareamento por número**, passe o telefone com DDI como 3º argumento:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ricodoutor-pixel/consultorio-medico-inteligente/main/infra/vps-traefik/reset-evolution-qr.sh | bash -s -- Brisa_CEO 607361D42FA0-4B10-A0F3-A070CA3B5F41 5511999999999
+```
+
 O script:
 1. Lê a `EVOLUTION_API_KEY` do `.env` local da VPS
 2. Reinicia o serviço `evolution` e espera a API responder
 3. Remove e recria o volume `evolution_instances`
 4. Apaga a instância antiga via API, se existir
 5. Recria a instância com `qrcode: true`
-6. Deixa pronto para buscar QR ou pareamento no Manager / API
+6. Consulta `GET /instance/connectionState/{instance}`
+7. Consulta `GET /instance/connect/{instance}` para devolver QR / pareamento
+
+### Endpoints corretos de conexão
+
+Na versão atual da Evolution API exposta em `api.plantayraiz.com.br`, a rota correta é:
+
+```bash
+curl -X GET "https://api.plantayraiz.com.br/instance/connect/Brisa_CEO" \
+  -H "apikey: SEU_EVOLUTION_API_KEY"
+```
+
+Para pedir **código de pareamento por número**:
+
+```bash
+curl -X GET "https://api.plantayraiz.com.br/instance/connect/Brisa_CEO?number=5511999999999" \
+  -H "apikey: SEU_EVOLUTION_API_KEY"
+```
+
+Para checar status da sessão:
+
+```bash
+curl -X GET "https://api.plantayraiz.com.br/instance/connectionState/Brisa_CEO" \
+  -H "apikey: SEU_EVOLUTION_API_KEY"
+```
 
 Snapshots semanais da VPS já são criados automaticamente pelo `hostinger-sync` (cron 03:00 UTC).
 

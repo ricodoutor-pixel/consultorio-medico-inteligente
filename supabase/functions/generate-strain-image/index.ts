@@ -34,6 +34,18 @@ serve(async (req) => {
       });
     }
 
+    // Require admin role — this function uses service_role to write to a public bucket
+    const { data: isAdmin, error: roleErr } = await userClient.rpc("has_role", {
+      _user_id: user.id,
+      _role: "admin",
+    });
+    if (roleErr || !isAdmin) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { strain_id, strain_name, strain_type } = await req.json();
 
     if (!strain_id || !strain_name) {

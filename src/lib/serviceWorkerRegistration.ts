@@ -52,7 +52,7 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
 /**
  * Notifica o SW para atualizar o ícone dinâmico do sapo
  */
-export function updateFrogIcon(mood: 'happy' | 'warning' | 'critical'): void {
+export function updateFrogIcon(mood: 'happy' | 'warning' | 'critical' | 'in_call'): void {
   if (!navigator.serviceWorker?.controller) return;
 
   navigator.serviceWorker.controller.postMessage({

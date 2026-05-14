@@ -3285,6 +3285,75 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_contingency_config: {
+        Row: {
+          beneficiary_doc: string | null
+          beneficiary_name: string
+          created_at: string
+          id: string
+          is_active: boolean
+          pix_key: string
+          pix_key_type: string
+          updated_at: string
+          whatsapp_proof_number: string
+        }
+        Insert: {
+          beneficiary_doc?: string | null
+          beneficiary_name: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          pix_key: string
+          pix_key_type: string
+          updated_at?: string
+          whatsapp_proof_number?: string
+        }
+        Update: {
+          beneficiary_doc?: string | null
+          beneficiary_name?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          pix_key?: string
+          pix_key_type?: string
+          updated_at?: string
+          whatsapp_proof_number?: string
+        }
+        Relationships: []
+      }
+      payment_provider_health: {
+        Row: {
+          checked_at: string
+          created_at: string
+          error_rate: number | null
+          id: string
+          last_error: string | null
+          latency_ms: number | null
+          provider: string
+          status: string
+        }
+        Insert: {
+          checked_at?: string
+          created_at?: string
+          error_rate?: number | null
+          id?: string
+          last_error?: string | null
+          latency_ms?: number | null
+          provider: string
+          status: string
+        }
+        Update: {
+          checked_at?: string
+          created_at?: string
+          error_rate?: number | null
+          id?: string
+          last_error?: string | null
+          latency_ms?: number | null
+          provider?: string
+          status?: string
+        }
+        Relationships: []
+      }
       payment_webhooks: {
         Row: {
           action: string | null
@@ -5381,6 +5450,15 @@ export type Database = {
         Returns: undefined
       }
       ensure_affiliate_wallet: { Args: { _user_id: string }; Returns: string }
+      get_active_contingency_pix: {
+        Args: never
+        Returns: {
+          beneficiary_name: string
+          pix_key: string
+          pix_key_type: string
+          whatsapp_proof_number: string
+        }[]
+      }
       get_cron_health: {
         Args: { _window_hours?: number }
         Returns: {
@@ -5392,6 +5470,16 @@ export type Database = {
           last_run_at: string
           last_status: string
           schedule: string
+        }[]
+      }
+      get_payment_status_summary: {
+        Args: never
+        Returns: {
+          checked_at: string
+          error_rate: number
+          latency_ms: number
+          provider: string
+          status: string
         }[]
       }
       has_active_subscription: {

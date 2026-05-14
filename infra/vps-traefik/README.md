@@ -95,10 +95,10 @@ O script:
 1. Lê a `EVOLUTION_API_KEY` do `.env` local da VPS
 2. Reinicia o serviço `evolution` e espera a API responder
 3. Remove e recria o volume `evolution_instances`
-4. Apaga a instância antiga via API, se existir
-5. Recria a instância com `qrcode: true`
+4. Apaga a instância antiga via API, se existir, e espera a exclusão propagar
+5. Recria a instância com `qrcode: true`, com retentativas se o nome ainda estiver preso
 6. Consulta `GET /instance/connectionState/{instance}`
-7. Consulta `GET /instance/connect/{instance}` para devolver QR / pareamento
+7. Consulta `GET /instance/connect/{instance}` em loop até devolver QR / pareamento
 
 ### Endpoints corretos de conexão
 
@@ -115,6 +115,8 @@ Para pedir **código de pareamento por número**:
 curl -X GET "https://api.plantayraiz.com.br/instance/connect/Brisa_CEO?number=5511999999999" \
   -H "apikey: SEU_EVOLUTION_API_KEY"
 ```
+
+> Não use `/instance/connect/pairing/...`: nessa stack a rota válida é `/instance/connect/{instance}` com `?number=` opcional. Se o `DELETE` retornar sucesso mas o `POST /instance/create` ainda acusar `This name ... is already in use`, aguarde alguns segundos e tente de novo — a remoção é assíncrona.
 
 Para checar status da sessão:
 

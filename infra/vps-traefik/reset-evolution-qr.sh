@@ -10,6 +10,21 @@ INSTANCE_TOKEN="${2:-}"
 PHONE_NUMBER="${3:-}"
 API_BASE="https://api.plantayraiz.com.br"
 
+request_with_status() {
+  local method="$1"
+  local url="$2"
+  shift 2
+  curl -sS -w "\nHTTP_STATUS:%{http_code}" -X "${method}" "${url}" "$@"
+}
+
+response_status() {
+  printf '%s\n' "$1" | sed -n 's/^HTTP_STATUS://p' | tail -n 1
+}
+
+response_body() {
+  printf '%s\n' "$1" | sed '/^HTTP_STATUS:/d'
+}
+
 echo "🛠️ [1/8] Verificando stack local..."
 if [ ! -d "${TARGET}" ]; then
   echo "❌ Stack não encontrada em ${TARGET}. Rode o bootstrap primeiro."
@@ -78,8 +93,30 @@ if [ "${ready}" -ne 1 ]; then
 fi
 
 echo "🗑️ [7/8] Removendo instância antiga (${INSTANCE_NAME}) se existir..."
-curl -fsS -X DELETE "${API_BASE}/instance/delete/${INSTANCE_NAME}" \
-  -H "apikey: ${EVOLUTION_API_KEY}" >/dev/null 2>&1 || true
+delete_response=$(request_with_status DELETE "${API_BASE}/instance/delete/${INSTANCE_NAME}" \
+  -H "apikey: ${EVOLUTION_API_KEY}" || true)
+delete_status=$(response_status "${delete_response}")
+
+if [ -n "${delete_status}" ]; then
+  echo "$(response_body "${delete_response}")"
+fi
+
+echo "⏳ Aguardando a exclusão realmente sair do cadastro interno..."
+deleted=0
+for i in $(seq 1 20); do
+  state_response=$(request_with_status GET "${API_BASE}/instance/connectionState/${INSTANCE_NAME}" \
+    -H "apikey: ${EVOLUTION_API_KEY}" || true)
+  state_status=$(response_status "${state_response}")
+  if [ "${state_status}" = "404" ]; then
+    deleted=1
+    break
+  fi
+  sleep 2
+done
+
+if [ "${deleted}" -ne 1 ]; then
+  echo "⚠️ A exclusão ainda não propagou totalmente. Vou tentar recriar mesmo assim com retentativas."
+fi
 
 echo "🆕 [8/8] Criando instância limpa (${INSTANCE_NAME})..."
 token_fragment=""
@@ -91,13 +128,37 @@ payload=$(printf '{"instanceName":"%s","integration":"WHATSAPP-BAILEYS","qrcode"
   "${INSTANCE_NAME}" \
   "${token_fragment}")
 
-create_response=$(curl -sS -w "\nHTTP_STATUS:%{http_code}" -X POST "${API_BASE}/instance/create" \
-  -H "Content-Type: application/json" \
-  -H "apikey: ${EVOLUTION_API_KEY}" \
-  -d "${payload}")
+create_response=""
+created=0
+for i in $(seq 1 15); do
+  create_response=$(request_with_status POST "${API_BASE}/instance/create" \
+    -H "Content-Type: application/json" \
+    -H "apikey: ${EVOLUTION_API_KEY}" \
+    -d "${payload}")
+
+  create_status=$(response_status "${create_response}")
+  create_body=$(response_body "${create_response}")
+
+  if [ "${create_status}" = "200" ] || [ "${create_status}" = "201" ]; then
+    created=1
+    break
+  fi
+
+  if printf '%s' "${create_body}" | grep -q 'already in use'; then
+    sleep 2
+    continue
+  fi
+
+  break
+done
 
 echo "✅ Resposta da criação:"
 printf '%s\n' "${create_response}" | sed 's/"apikey":"[^"]*"/"apikey":"***"/g'
+
+if [ "${created}" -ne 1 ]; then
+  echo "❌ Não foi possível recriar a instância." 
+  exit 1
+fi
 
 connect_url="${API_BASE}/instance/connect/${INSTANCE_NAME}"
 if [ -n "${PHONE_NUMBER}" ]; then
@@ -111,8 +172,27 @@ curl -sS "${API_BASE}/instance/connectionState/${INSTANCE_NAME}" \
 
 echo ""
 echo "📲 QR code / pareamento:"
-curl -sS "${connect_url}" \
-  -H "apikey: ${EVOLUTION_API_KEY}" || true
+connect_response=""
+paired=0
+for i in $(seq 1 20); do
+  connect_response=$(request_with_status GET "${connect_url}" \
+    -H "apikey: ${EVOLUTION_API_KEY}" || true)
+  connect_status=$(response_status "${connect_response}")
+  connect_body=$(response_body "${connect_response}")
+
+  if [ "${connect_status}" = "200" ] && printf '%s' "${connect_body}" | grep -Eq '"pairingCode"|"code"|"count"[[:space:]]*:[[:space:]]*[1-9]'; then
+    paired=1
+    break
+  fi
+
+  sleep 3
+done
+
+printf '%s\n' "${connect_response}" | sed '/^HTTP_STATUS:/d'
+
+if [ "${paired}" -ne 1 ]; then
+  echo "⚠️ A API respondeu, mas ainda não gerou QR/código. Rode: docker compose logs --tail=200 evolution"
+fi
 
 echo ""
 echo "📜 Logs úteis (Ctrl+C para sair):"

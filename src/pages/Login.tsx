@@ -226,7 +226,7 @@ const Login = () => {
                     <div className="mt-6 text-center">
                       <p className="text-xs text-muted-foreground">
                         Não tem conta?{" "}
-                        <Link to="/cadastro" className="text-primary font-bold hover:underline">
+                        <Link to={redirectTo ? `/cadastro?redirect=${redirectTo}` : "/cadastro"} className="text-primary font-bold hover:underline">
                           Cadastre-se
                         </Link>
                       </p>

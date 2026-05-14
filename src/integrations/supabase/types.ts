@@ -744,6 +744,45 @@ export type Database = {
         }
         Relationships: []
       }
+      brisa_triage_severity: {
+        Row: {
+          created_at: string
+          id: string
+          is_urgent: boolean
+          lead_id: string | null
+          notes: string | null
+          notified_doctor_at: string | null
+          red_flags: string[] | null
+          severity_score: number
+          symptoms: Json
+          whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_urgent?: boolean
+          lead_id?: string | null
+          notes?: string | null
+          notified_doctor_at?: string | null
+          red_flags?: string[] | null
+          severity_score?: number
+          symptoms?: Json
+          whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_urgent?: boolean
+          lead_id?: string | null
+          notes?: string | null
+          notified_doctor_at?: string | null
+          red_flags?: string[] | null
+          severity_score?: number
+          symptoms?: Json
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       brisa_triages: {
         Row: {
           category: string | null
@@ -5444,6 +5483,7 @@ export type Database = {
         }
         Returns: Json
       }
+      calculate_fuzzy_severity: { Args: { symptoms: Json }; Returns: Json }
       cleanup_http_logs: { Args: never; Returns: Json }
       credit_affiliate_wallet: {
         Args: { _amount: number; _user_id: string }
@@ -5480,6 +5520,17 @@ export type Database = {
           latency_ms: number
           provider: string
           status: string
+        }[]
+      }
+      get_pending_urgent_triages: {
+        Args: never
+        Returns: {
+          created_at: string
+          id: string
+          red_flags: string[]
+          severity_score: number
+          symptoms: Json
+          whatsapp: string
         }[]
       }
       has_active_subscription: {

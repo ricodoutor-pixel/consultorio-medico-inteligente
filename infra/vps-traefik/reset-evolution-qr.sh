@@ -79,9 +79,14 @@ curl -fsS -X DELETE "${API_BASE}/instance/delete/${INSTANCE_NAME}" \
   -H "apikey: ${EVOLUTION_API_KEY}" >/dev/null 2>&1 || true
 
 echo "🆕 [8/8] Criando instância limpa (${INSTANCE_NAME})..."
+token_fragment=""
+if [ -n "${INSTANCE_TOKEN}" ]; then
+  token_fragment=$(printf ',"token":"%s"' "${INSTANCE_TOKEN}")
+fi
+
 payload=$(printf '{"instanceName":"%s","qrcode":true%s}' \
   "${INSTANCE_NAME}" \
-  "$( [ -n "${INSTANCE_TOKEN}" ] && printf ',"token":"%s"' "${INSTANCE_TOKEN}" )")
+  "${token_fragment}")
 
 create_response=$(curl -fsS -X POST "${API_BASE}/instance/create" \
   -H "Content-Type: application/json" \

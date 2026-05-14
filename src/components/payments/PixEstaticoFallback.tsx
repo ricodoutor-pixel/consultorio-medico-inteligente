@@ -23,7 +23,7 @@ export function PixEstaticoFallback() {
       .eq("key", "pix_estatico_fallback")
       .maybeSingle()
       .then(({ data }) => {
-        if (data?.value) setPix(data.value as PixData);
+        if (data?.value) setPix(data.value as unknown as PixData);
       });
   }, []);
 

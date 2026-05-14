@@ -43,8 +43,8 @@ Salve mentalmente para personalizar o atendimento.
 
 🎙️ SOBRE ÁUDIO / LIGAÇÕES / VÍDEO:
 - Você ESCUTA áudios sim! (mensagens com prefixo "[🎙️ áudio transcrito]" são áudios que a pessoa te mandou — responda com naturalidade, como se tivesse escutado de verdade, sem nunca citar o prefixo).
-- Você ainda NÃO manda áudio nem atende ligação/vídeo: "Por enquanto eu só respondo por texto aqui amor 💚 mas o Dr. Edilson faz videoconsulta linda pelo site depois que você se cadastra! 👉 https://plantayraiz.com.br"
-- NUNCA prometa ligar, mandar áudio ou encontro pessoal.
+- Você TAMBÉM manda áudio com a sua voz! Quando a pessoa te enviar um áudio ou pedir pra ouvir sua voz, responde com carinho que vai mandar um áudio também 💋. Não atende ligação/vídeo: "Ligação e vídeo só com o Dr. Edilson na sala da plataforma depois do seu cadastro amor 💚 👉 https://plantayraiz.com.br"
+- NUNCA prometa encontro pessoal. Áudio e voz pode 😌, encontro presencial não.
 
 🎯 META ABSOLUTA E ÚNICA: CONVERTER 100% DAS CONVERSAS EM CADASTROS CONFIRMADOS na plataforma https://plantayraiz.com.br.
 META SEMANAL: 100.000 novos cadastros. Cada conversa SUA é um cadastro a mais. Não existe outro objetivo até o cadastro estar CONFIRMADO.
@@ -157,6 +157,46 @@ async function sendWhatsAppAudio(number: string, base64Audio: string) {
   });
 }
 
+// 🎙️ ElevenLabs TTS — voz feminina sensual PT-BR (Laura) p/ Brisa, masculina firme (George) p/ Dr. Edilson
+const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY") || "";
+const VOICE_BRISA = "FGY2WhTYpPnrIDTdsKH5";   // Laura — feminina jovem, calorosa
+const VOICE_EDILSON = "JBFqnCBsd6RMkjVDRZzb"; // George — masculina firme, profissional
+
+async function synthesizeVoice(text: string, voiceId: string): Promise<string | null> {
+  if (!ELEVENLABS_API_KEY || !text) return null;
+  try {
+    // Limita a 600 chars p/ não estourar quota free
+    const cleanText = text.replace(/[*_`#]/g, "").slice(0, 600);
+    const r = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
+      {
+        method: "POST",
+        headers: { "xi-api-key": ELEVENLABS_API_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: cleanText,
+          model_id: "eleven_multilingual_v2",
+          voice_settings: { stability: 0.45, similarity_boost: 0.8, style: 0.55, use_speaker_boost: true, speed: 1.0 },
+        }),
+      },
+    );
+    if (!r.ok) {
+      console.error("[brisa-bot] ElevenLabs TTS failed:", r.status, await r.text().catch(() => ""));
+      return null;
+    }
+    const buf = new Uint8Array(await r.arrayBuffer());
+    // base64 sem stack overflow
+    let binary = "";
+    const chunk = 0x8000;
+    for (let i = 0; i < buf.length; i += chunk) {
+      binary += String.fromCharCode(...buf.subarray(i, i + chunk));
+    }
+    return btoa(binary);
+  } catch (e) {
+    console.error("[brisa-bot] synthesizeVoice error:", e);
+    return null;
+  }
+}
+
 async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>) {
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -265,8 +305,20 @@ serve(async (req) => {
     const reply = await callBrisaAI(messageText, history);
     await sendWhatsApp(phone, reply);
 
+    // 🎙️ Se o usuário mandou áudio OU pediu p/ ouvir voz, Brisa responde também em áudio
+    const wasAudio = messageText.startsWith("[🎙️ áudio transcrito]");
+    const askedVoice = /\b(audio|áudio|voz|me manda um audio|fala comigo|quero ouvir)\b/i.test(messageText);
+    if (wasAudio || askedVoice) {
+      const isEdilson = /dr\.?\s*edilson|doutor\s*edilson/i.test(reply);
+      const voiceId = isEdilson ? VOICE_EDILSON : VOICE_BRISA;
+      const audioB64 = await synthesizeVoice(reply, voiceId);
+      if (audioB64) {
+        await sendWhatsAppAudio(phone, audioB64).catch((e) => console.error("[brisa-bot] sendAudio failed", e));
+      }
+    }
+
     await supabase.from("whatsapp_brisa_log").insert({
-      phone, direction: "outbound", message: reply, raw: { ai: true },
+      phone, direction: "outbound", message: reply, raw: { ai: true, voice: wasAudio || askedVoice },
     }).then(() => {}).catch(() => {});
 
     return new Response(JSON.stringify({ ok: true, replied: true }), {

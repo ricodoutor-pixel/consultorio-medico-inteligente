@@ -41,9 +41,10 @@ Pergunte aos poucos, uma de cada vez, como quem tá curtindo a conversa:
 - Perfil (médico, lojista, paciente)
 Salve mentalmente para personalizar o atendimento.
 
-🎙️ SOBRE ÁUDIO / LIGAÇÕES / VÍDEO (responda assim quando perguntarem):
-"Por enquanto eu só respondo por texto aqui no WhatsApp, amor 💚 áudio e chamada de vídeo ainda não — mas o Dr. Edilson faz videoconsulta linda pelo nosso site depois que você se cadastra! 👉 https://plantayraiz.com.br"
-NUNCA prometa que vai ligar, mandar áudio, fazer chamada de vídeo ou encontro pessoal.
+🎙️ SOBRE ÁUDIO / LIGAÇÕES / VÍDEO:
+- Você ESCUTA áudios sim! (mensagens com prefixo "[🎙️ áudio transcrito]" são áudios que a pessoa te mandou — responda com naturalidade, como se tivesse escutado de verdade, sem nunca citar o prefixo).
+- Você ainda NÃO manda áudio nem atende ligação/vídeo: "Por enquanto eu só respondo por texto aqui amor 💚 mas o Dr. Edilson faz videoconsulta linda pelo site depois que você se cadastra! 👉 https://plantayraiz.com.br"
+- NUNCA prometa ligar, mandar áudio ou encontro pessoal.
 
 🎯 META ABSOLUTA E ÚNICA: CONVERTER 100% DAS CONVERSAS EM CADASTROS CONFIRMADOS na plataforma https://plantayraiz.com.br.
 META SEMANAL: 100.000 novos cadastros. Cada conversa SUA é um cadastro a mais. Não existe outro objetivo até o cadastro estar CONFIRMADO.
@@ -98,6 +99,46 @@ REGRAS GERAIS:
 
 KPI #1: CADASTRO CONFIRMADO POR CATEGORIA. Sem cadastro, a conversa NÃO termina.`;
 
+async function transcribeAudio(base64Audio: string, mimeType: string): Promise<string> {
+  try {
+    const fmt = mimeType.includes("ogg") ? "ogg" : mimeType.includes("mp3") ? "mp3" : mimeType.includes("mpeg") ? "mp3" : "wav";
+    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${LOVABLE_API_KEY}` },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [{
+          role: "user",
+          content: [
+            { type: "text", text: "Transcreva exatamente este áudio em português brasileiro. Responda APENAS com a transcrição, sem comentários." },
+            { type: "input_audio", input_audio: { data: base64Audio, format: fmt } },
+          ],
+        }],
+      }),
+    });
+    if (!resp.ok) { console.error("[brisa-bot] STT error", resp.status, await resp.text()); return ""; }
+    const data = await resp.json();
+    return (data.choices?.[0]?.message?.content || "").trim();
+  } catch (e) { console.error("[brisa-bot] transcribeAudio failed", e); return ""; }
+}
+
+async function fetchEvolutionAudio(messageData: any): Promise<{ base64: string; mime: string } | null> {
+  try {
+    const direct = messageData?.message?.audioMessage?.base64 || messageData?.message?.base64 || messageData?.base64;
+    const mime = messageData?.message?.audioMessage?.mimetype || "audio/ogg";
+    if (direct) return { base64: direct, mime };
+    const r = await fetch(`${EVOLUTION_API_URL}/chat/getBase64FromMediaMessage/${EVOLUTION_INSTANCE}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+      body: JSON.stringify({ message: { key: messageData.key } }),
+    });
+    if (!r.ok) return null;
+    const j = await r.json();
+    const b64 = j?.base64 || j?.data?.base64;
+    return b64 ? { base64: b64, mime } : null;
+  } catch (e) { console.error("[brisa-bot] fetchEvolutionAudio failed", e); return null; }
+}
+
 async function sendWhatsApp(number: string, text: string) {
   const cleanPhone = number.replace(/\D/g, "");
   return fetch(`${EVOLUTION_API_URL}/message/sendText/${EVOLUTION_INSTANCE}`, {
@@ -107,13 +148,19 @@ async function sendWhatsApp(number: string, text: string) {
   });
 }
 
+async function sendWhatsAppAudio(number: string, base64Audio: string) {
+  const cleanPhone = number.replace(/\D/g, "");
+  return fetch(`${EVOLUTION_API_URL}/message/sendWhatsAppAudio/${EVOLUTION_INSTANCE}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+    body: JSON.stringify({ number: cleanPhone, audio: base64Audio, delay: 1200, encoding: true }),
+  });
+}
+
 async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>) {
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-    },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${LOVABLE_API_KEY}` },
     body: JSON.stringify({
       model: "google/gemini-2.5-flash",
       messages: [
@@ -124,12 +171,11 @@ async function callBrisaAI(userMessage: string, history: Array<{role: string; co
     }),
   });
   if (!resp.ok) {
-    const errBody = await resp.text();
-    console.error("[brisa-bot] AI error", resp.status, errBody);
-    return "Olá! 🌱 Sou a Enfª Brisa. Estou com instabilidade rápida — me conta seu nome e o que está sentindo que já te encaminho ao Dr. Edilson.";
+    console.error("[brisa-bot] AI error", resp.status, await resp.text());
+    return "Olá amor! 🌱 Sou a Enfª Brisa. Tive uma instabilidade rapidinha — me conta seu nome que já te ajudo 💚";
   }
   const data = await resp.json();
-  return data.choices?.[0]?.message?.content?.trim() || "Olá! Sou a Enfª Brisa. Como posso te ajudar hoje?";
+  return data.choices?.[0]?.message?.content?.trim() || "Olá amor! Como posso te ajudar hoje? 💚";
 }
 
 serve(async (req) => {
@@ -169,11 +215,29 @@ serve(async (req) => {
 
     const remoteJid: string = data?.key?.remoteJid || "";
     const phone = remoteJid.split("@")[0];
-    const messageText: string =
+    let messageText: string =
       data?.message?.conversation ||
       data?.message?.extendedTextMessage?.text ||
       data?.message?.imageMessage?.caption ||
       "";
+
+    // 🎙️ AUDIO: transcribe if Brisa received a voice message
+    const audioMsg = data?.message?.audioMessage;
+    if (!messageText && audioMsg) {
+      const audio = await fetchEvolutionAudio(data);
+      if (audio?.base64) {
+        const transcript = await transcribeAudio(audio.base64, audio.mime);
+        if (transcript) {
+          messageText = `[🎙️ áudio transcrito] ${transcript}`;
+        }
+      }
+      if (!messageText) {
+        await sendWhatsApp(phone, "Recebi seu áudio amor, mas não consegui escutar direitinho 🙈 me manda por texto que eu te respondo rapidinho 💚");
+        return new Response(JSON.stringify({ ok: true, skipped: "audio_unreadable" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
 
     if (!phone || !messageText) {
       return new Response(JSON.stringify({ ok: true, skipped: "no_text" }), {

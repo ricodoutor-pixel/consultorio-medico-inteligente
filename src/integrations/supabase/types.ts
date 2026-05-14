@@ -1669,6 +1669,7 @@ export type Database = {
           crm: string
           crm_state: string
           document_type: string
+          fraud_score: number | null
           id: string
           is_crm_valid: boolean
           is_online: boolean
@@ -1683,6 +1684,8 @@ export type Database = {
           rating: number | null
           rqe: string | null
           specialty: string
+          suspended_at: string | null
+          suspension_reason: string | null
           total_consultations: number | null
           updated_at: string
           user_id: string
@@ -1695,6 +1698,7 @@ export type Database = {
           crm: string
           crm_state?: string
           document_type?: string
+          fraud_score?: number | null
           id?: string
           is_crm_valid?: boolean
           is_online?: boolean
@@ -1709,6 +1713,8 @@ export type Database = {
           rating?: number | null
           rqe?: string | null
           specialty?: string
+          suspended_at?: string | null
+          suspension_reason?: string | null
           total_consultations?: number | null
           updated_at?: string
           user_id: string
@@ -1721,6 +1727,7 @@ export type Database = {
           crm?: string
           crm_state?: string
           document_type?: string
+          fraud_score?: number | null
           id?: string
           is_crm_valid?: boolean
           is_online?: boolean
@@ -1735,6 +1742,8 @@ export type Database = {
           rating?: number | null
           rqe?: string | null
           specialty?: string
+          suspended_at?: string | null
+          suspension_reason?: string | null
           total_consultations?: number | null
           updated_at?: string
           user_id?: string
@@ -2011,6 +2020,48 @@ export type Database = {
           total_revenue?: number
           updated_at?: string
           vendor_revenue?: number
+        }
+        Relationships: []
+      }
+      financial_reconciliation: {
+        Row: {
+          actual_amount: number | null
+          details: Json | null
+          diff: number | null
+          expected_amount: number | null
+          id: string
+          mp_payment_id: string | null
+          order_id: string | null
+          reconciled_at: string
+          reference_date: string
+          source: string
+          status: string
+        }
+        Insert: {
+          actual_amount?: number | null
+          details?: Json | null
+          diff?: number | null
+          expected_amount?: number | null
+          id?: string
+          mp_payment_id?: string | null
+          order_id?: string | null
+          reconciled_at?: string
+          reference_date: string
+          source?: string
+          status?: string
+        }
+        Update: {
+          actual_amount?: number | null
+          details?: Json | null
+          diff?: number | null
+          expected_amount?: number | null
+          id?: string
+          mp_payment_id?: string | null
+          order_id?: string | null
+          reconciled_at?: string
+          reference_date?: string
+          source?: string
+          status?: string
         }
         Relationships: []
       }
@@ -3498,6 +3549,45 @@ export type Database = {
           },
         ]
       }
+      prescription_hash_audit: {
+        Row: {
+          audited_at: string
+          hash_present: boolean
+          http_status: number | null
+          id: string
+          is_valid: boolean
+          notes: string | null
+          pdf_reachable: boolean | null
+          prescription_id: string
+          signature_hash: string | null
+          signed_pdf_url: string | null
+        }
+        Insert: {
+          audited_at?: string
+          hash_present?: boolean
+          http_status?: number | null
+          id?: string
+          is_valid?: boolean
+          notes?: string | null
+          pdf_reachable?: boolean | null
+          prescription_id: string
+          signature_hash?: string | null
+          signed_pdf_url?: string | null
+        }
+        Update: {
+          audited_at?: string
+          hash_present?: boolean
+          http_status?: number | null
+          id?: string
+          is_valid?: boolean
+          notes?: string | null
+          pdf_reachable?: boolean | null
+          prescription_id?: string
+          signature_hash?: string | null
+          signed_pdf_url?: string | null
+        }
+        Relationships: []
+      }
       prescription_requests: {
         Row: {
           created_at: string
@@ -4322,6 +4412,30 @@ export type Database = {
           resolved_at?: string | null
           stack?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      system_settings: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
         }
         Relationships: []
       }

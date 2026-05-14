@@ -5385,6 +5385,7 @@ export type Database = {
         Args: { _window_hours?: number }
         Returns: {
           active: boolean
+          expected_window_hours: number
           hours_since_last_run: number
           is_overdue: boolean
           jobname: string

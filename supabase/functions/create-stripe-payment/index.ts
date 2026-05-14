@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
       line_items: [{
         price_data: {
           currency: currency.toLowerCase(),
-          product_data: { name: `Orientação Técnica - ${doctorName}`, description },
+          product_data: { name: `Orientação Técnica - ${doctorName}`, description: finalDescription },
           unit_amount: Math.round(amount * 100),
         },
         quantity: 1,
@@ -74,7 +74,8 @@ Deno.serve(async (req) => {
         appointmentId: appointmentId ?? "",
         doctorName,
         userId: user.id,
-        type: "orientacao_tecnica_internacional",
+        countryCode: countryCode ?? "",
+        type: isBrazil ? "orientacao_tecnica_br" : "orientacao_tecnica_internacional",
       },
     });
 

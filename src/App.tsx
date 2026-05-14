@@ -128,6 +128,7 @@ const GestãoPacientes = lazy(() => import("./pages/GestãoPacientes"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const QaRatingTest = lazy(() => import("./pages/QaRatingTest"));
 const RodizioMedicos = lazy(() => import("./pages/RodizioMedicos"));
+const BrisaOrientacaoRedirect = lazy(() => import("./pages/BrisaOrientacaoRedirect"));
 const AuditLog = lazy(() => import("./pages/admin/AuditLog"));
 const CronHealth = lazy(() => import("./pages/admin/CronHealth"));
 

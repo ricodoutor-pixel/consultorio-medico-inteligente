@@ -90,12 +90,13 @@ payload=$(printf '{"instanceName":"%s","qrcode":true%s}' \
   "${INSTANCE_NAME}" \
   "${token_fragment}")
 
-create_response=$(curl -fsS -X POST "${API_BASE}/instance/create" \
+create_response=$(curl -sS -w "\nHTTP_STATUS:%{http_code}" -X POST "${API_BASE}/instance/create" \
   -H "Content-Type: application/json" \
   -H "apikey: ${EVOLUTION_API_KEY}" \
+  -H "Authorization: Bearer ${EVOLUTION_API_KEY}" \
   -d "${payload}")
 
-echo "✅ Instância recriada. Resposta resumida:"
+echo "✅ Resposta da criação:"
 printf '%s\n' "${create_response}" | sed 's/"apikey":"[^"]*"/"apikey":"***"/g'
 
 echo ""

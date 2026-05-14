@@ -179,6 +179,7 @@ const App = () => (
                 <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />
                 <Route path="/telemedicina" element={<Telemedicina />} />
                 <Route path="/rodizio" element={<RodizioMedicos />} />
+                <Route path="/brisa-orientacao" element={<BrisaOrientacaoRedirect />} />
                 <Route path="/afiliados" element={<Indicacoes />} />
                 <Route path="/indicacoes" element={<Indicacoes />} />
                 <Route path="/legal" element={<Legal />} />

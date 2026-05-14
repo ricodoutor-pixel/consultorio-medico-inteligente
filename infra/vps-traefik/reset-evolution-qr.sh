@@ -26,10 +26,12 @@ set -a
 source "${ENV_FILE}"
 set +a
 
+: "${EVOLUTION_API_KEY:=${AUTHENTICATION_API_KEY:-${API_KEY:-}}}"
 if [ -z "${EVOLUTION_API_KEY:-}" ]; then
-  echo "❌ EVOLUTION_API_KEY não configurada em ${ENV_FILE}."
+  echo "❌ Nenhuma API key encontrada (EVOLUTION_API_KEY / AUTHENTICATION_API_KEY) em ${ENV_FILE}."
   exit 1
 fi
+echo "🔑 Usando API key terminada em ...${EVOLUTION_API_KEY: -6}"
 
 echo "🔄 [2/8] Atualizando arquivos do repositório..."
 git pull --ff-only || true
@@ -88,12 +90,13 @@ payload=$(printf '{"instanceName":"%s","qrcode":true%s}' \
   "${INSTANCE_NAME}" \
   "${token_fragment}")
 
-create_response=$(curl -fsS -X POST "${API_BASE}/instance/create" \
+create_response=$(curl -sS -w "\nHTTP_STATUS:%{http_code}" -X POST "${API_BASE}/instance/create" \
   -H "Content-Type: application/json" \
   -H "apikey: ${EVOLUTION_API_KEY}" \
+  -H "Authorization: Bearer ${EVOLUTION_API_KEY}" \
   -d "${payload}")
 
-echo "✅ Instância recriada. Resposta resumida:"
+echo "✅ Resposta da criação:"
 printf '%s\n' "${create_response}" | sed 's/"apikey":"[^"]*"/"apikey":"***"/g'
 
 echo ""

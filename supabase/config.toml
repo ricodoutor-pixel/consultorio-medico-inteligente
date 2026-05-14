@@ -140,3 +140,10 @@ verify_jwt = false
 
 [functions.whatsapp-brisa-bot]
 verify_jwt = false
+
+[functions.status-public]
+verify_jwt = false
+
+[functions.ai-error-gateway]
+verify_jwt = false
+

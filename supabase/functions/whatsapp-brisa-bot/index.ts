@@ -344,6 +344,7 @@ serve(async (req) => {
     await supabase.from("audit_log").insert({
       action: "brisa_message_scored",
       table_name: "whatsapp_brisa_log",
+      record_id: crypto.randomUUID(),
       new_data: {
         phone, message: messageText.slice(0, 500),
         sentiment_score, is_negative,

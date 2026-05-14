@@ -1873,6 +1873,66 @@ export type Database = {
         }
         Relationships: []
       }
+      error_autohealing: {
+        Row: {
+          ai_confidence: number | null
+          ai_diagnosis: string | null
+          ai_suggested_fix: string | null
+          context: Json | null
+          error_message: string
+          error_type: string | null
+          fingerprint: string | null
+          first_seen_at: string
+          id: string
+          last_seen_at: string
+          occurrences: number
+          resolved_at: string | null
+          severity: string
+          source: string
+          source_ref: string | null
+          stack: string | null
+          status: string
+        }
+        Insert: {
+          ai_confidence?: number | null
+          ai_diagnosis?: string | null
+          ai_suggested_fix?: string | null
+          context?: Json | null
+          error_message: string
+          error_type?: string | null
+          fingerprint?: string | null
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          occurrences?: number
+          resolved_at?: string | null
+          severity?: string
+          source: string
+          source_ref?: string | null
+          stack?: string | null
+          status?: string
+        }
+        Update: {
+          ai_confidence?: number | null
+          ai_diagnosis?: string | null
+          ai_suggested_fix?: string | null
+          context?: Json | null
+          error_message?: string
+          error_type?: string | null
+          fingerprint?: string | null
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          occurrences?: number
+          resolved_at?: string | null
+          severity?: string
+          source?: string
+          source_ref?: string | null
+          stack?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       error_logs: {
         Row: {
           created_at: string | null

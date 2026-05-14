@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
           `${CLICKSIGN_API_URL}/documents`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            headers: { "Content-Type": "application/json", Accept: "application/json", Authorization: `Bearer ${CLICKSIGN_API_TOKEN}` },
             body: JSON.stringify({
               document: {
                 path: `/${documentPath}`,
@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
           `${CLICKSIGN_API_URL}/signers`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            headers: { "Content-Type": "application/json", Accept: "application/json", Authorization: `Bearer ${CLICKSIGN_API_TOKEN}` },
             body: JSON.stringify({
               signer: {
                 email: doctorEmail,
@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
           `${CLICKSIGN_API_URL}/lists`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            headers: { "Content-Type": "application/json", Accept: "application/json", Authorization: `Bearer ${CLICKSIGN_API_TOKEN}` },
             body: JSON.stringify({
               list: {
                 document_key: documentKey,
@@ -181,7 +181,7 @@ Deno.serve(async (req) => {
 
         const statusRes = await fetch(
           `${CLICKSIGN_API_URL}/documents/${documentKey}`,
-          { headers: { Accept: "application/json" } }
+          { headers: { Accept: "application/json", Authorization: `Bearer ${CLICKSIGN_API_TOKEN}` } }
         );
 
         if (!statusRes.ok) {

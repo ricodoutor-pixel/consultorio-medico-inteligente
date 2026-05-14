@@ -2429,6 +2429,39 @@ export type Database = {
         }
         Relationships: []
       }
+      manus_ceo_reports: {
+        Row: {
+          created_at: string
+          delivery_status: string | null
+          id: string
+          markdown: string | null
+          metrics: Json
+          report_date: string
+          report_type: string
+          sent_to: string | null
+        }
+        Insert: {
+          created_at?: string
+          delivery_status?: string | null
+          id?: string
+          markdown?: string | null
+          metrics?: Json
+          report_date?: string
+          report_type?: string
+          sent_to?: string | null
+        }
+        Update: {
+          created_at?: string
+          delivery_status?: string | null
+          id?: string
+          markdown?: string | null
+          metrics?: Json
+          report_date?: string
+          report_type?: string
+          sent_to?: string | null
+        }
+        Relationships: []
+      }
       master_reports: {
         Row: {
           content_summary: Json
@@ -4808,25 +4841,31 @@ export type Database = {
           created_at: string
           direction: string
           id: string
+          is_negative: boolean | null
           message: string
           phone: string
           raw: Json | null
+          sentiment_score: number | null
         }
         Insert: {
           created_at?: string
           direction: string
           id?: string
+          is_negative?: boolean | null
           message: string
           phone: string
           raw?: Json | null
+          sentiment_score?: number | null
         }
         Update: {
           created_at?: string
           direction?: string
           id?: string
+          is_negative?: boolean | null
           message?: string
           phone?: string
           raw?: Json | null
+          sentiment_score?: number | null
         }
         Relationships: []
       }

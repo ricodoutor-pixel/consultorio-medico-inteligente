@@ -6,8 +6,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Server-side canonical pricing for orientação técnica internacional (USD).
-// Client-supplied amounts are NOT trusted.
+// Server-side canonical pricing for Orientação Técnica do Dr. Edilson.
+// Client-supplied amounts are NEVER trusted — preço sempre derivado do país.
+const OT_BR_BRL = 30;
 const OT_INTERNATIONAL_USD = 10;
 
 Deno.serve(async (req) => {
@@ -37,13 +38,20 @@ Deno.serve(async (req) => {
     const {
       appointmentId,
       doctorName = "Dr. Edilson Bezerra",
-      description = "Orientação Técnica Internacional - Planta y Raiz",
+      description,
       environment,
+      countryCode,
     } = body || {};
 
-    // Server-controlled amount + currency
-    const amount = OT_INTERNATIONAL_USD;
-    const currency = "USD";
+    // Server-controlled amount + currency. Brasil = BRL 30, demais países = USD 10.
+    const isBrazil = (countryCode || "").toUpperCase() === "BR";
+    const amount = isBrazil ? OT_BR_BRL : OT_INTERNATIONAL_USD;
+    const currency = isBrazil ? "BRL" : "USD";
+    const finalDescription =
+      description ||
+      (isBrazil
+        ? "Orientação Técnica - Planta y Raiz"
+        : "Orientação Técnica Internacional - Planta y Raiz");
 
     const env: StripeEnv = (environment === "live" ? "live" : "sandbox");
     const stripe = createStripeClient(env);
@@ -57,7 +65,7 @@ Deno.serve(async (req) => {
       line_items: [{
         price_data: {
           currency: currency.toLowerCase(),
-          product_data: { name: `Orientação Técnica - ${doctorName}`, description },
+          product_data: { name: `Orientação Técnica - ${doctorName}`, description: finalDescription },
           unit_amount: Math.round(amount * 100),
         },
         quantity: 1,
@@ -66,7 +74,8 @@ Deno.serve(async (req) => {
         appointmentId: appointmentId ?? "",
         doctorName,
         userId: user.id,
-        type: "orientacao_tecnica_internacional",
+        countryCode: countryCode ?? "",
+        type: isBrazil ? "orientacao_tecnica_br" : "orientacao_tecnica_internacional",
       },
     });
 

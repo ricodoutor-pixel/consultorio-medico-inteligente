@@ -33,14 +33,14 @@ serve(async (req) => {
 
     // 3. Retornar a resposta via POST para Evolution API
     if (triageData && triageData.reply) {
-      const evolutionResponse = await fetch(`${EVOLUTION_API_URL}/message/sendText`, {
+      const evolutionResponse = await fetch(`${EVOLUTION_API_URL}/message/sendText/${Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO"}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "apikey": EVOLUTION_API_KEY!
         },
         body: JSON.stringify({
-          number: payload.key.remoteJid,
+          number: payload.key.remoteJid.replace(/\D/g, ""),
           text: triageData.reply,
           delay: 1200,
           linkPreview: true

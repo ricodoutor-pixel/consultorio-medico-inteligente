@@ -77,6 +77,21 @@ docker compose logs -f n8n                    # logs específicos
 docker compose restart evolution              # reinicia 1 serviço
 ```
 
+### Recuperar QR do WhatsApp quando travar
+
+Se o QR não aparecer ou o estado do Baileys ficar corrompido, rode na VPS:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ricodoutor-pixel/consultorio-medico-inteligente/main/infra/vps-traefik/reset-evolution-qr.sh | bash
+```
+
+O script:
+1. Atualiza o repo local
+2. Para apenas o container `evolution`
+3. Remove e recria o volume `evolution_instances`
+4. Sobe a imagem estável com correção de QR
+5. Mostra os logs filtrados de boot (`qr`, `ready`, `error`, `baileys`)
+
 Snapshots semanais da VPS já são criados automaticamente pelo `hostinger-sync` (cron 03:00 UTC).
 
 ---

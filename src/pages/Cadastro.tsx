@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { linkReferralOnSignup } from "@/hooks/useReferralTracking";
 import { Navbar } from "@/components/Navbar";

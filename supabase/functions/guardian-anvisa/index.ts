@@ -45,6 +45,12 @@ Deno.serve(async (req) => {
       .eq("role", "admin")
       .maybeSingle();
 
+    if (!adminRole) {
+      return new Response(JSON.stringify({ error: "Forbidden — admin only" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { action } = await req.json();
 
     switch (action) {

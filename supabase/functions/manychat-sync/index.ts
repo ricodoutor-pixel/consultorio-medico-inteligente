@@ -11,12 +11,16 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Validate ManyChat webhook secret
+    // Validate ManyChat webhook secret via header (never URL — leaks into logs).
+    // Falls back to the legacy `?secret=` only if the dedicated webhook secret is not configured yet.
+    const headerSecret = req.headers.get('x-manychat-secret') || req.headers.get('X-ManyChat-Secret')
     const url = new URL(req.url)
-    const secret = url.searchParams.get('secret')
-    const expectedSecret = Deno.env.get('MANYCHAT_API_KEY')
-    
-    if (secret !== expectedSecret) {
+    const querySecret = url.searchParams.get('secret')
+    const webhookSecret = Deno.env.get('MANYCHAT_WEBHOOK_SECRET')
+    const expectedSecret = webhookSecret || Deno.env.get('MANYCHAT_API_KEY')
+    const provided = headerSecret || (webhookSecret ? null : querySecret)
+
+    if (!expectedSecret || provided !== expectedSecret) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

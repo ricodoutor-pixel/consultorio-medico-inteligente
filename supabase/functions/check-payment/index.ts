@@ -88,11 +88,22 @@ Deno.serve(async (req) => {
     if (paymentId) {
       const { data: webhook } = await supabase
         .from("payment_webhooks")
-        .select("status, amount")
+        .select("status, amount, action, external_reference")
         .eq("payment_id", paymentId)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
+
+      // Prevent payment-ID reuse: require this payment to actually reference THIS appointment.
+      const ref = String((webhook as any)?.external_reference ?? (webhook as any)?.action ?? "");
+      const matchesAppt = ref.includes(appointmentId);
+      if (webhook && !matchesAppt) {
+        console.error(`[check-payment] payment ${paymentId} does not reference appointment ${appointmentId} (ref=${ref})`);
+        return new Response(JSON.stringify({ error: "Pagamento não pertence a esta consulta", status: "mismatch" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
       if (webhook) {
         if (webhook.status === "approved") {

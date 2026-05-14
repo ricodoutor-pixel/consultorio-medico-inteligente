@@ -3,13 +3,15 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 import { createClient } from "npm:@supabase/supabase-js@2";
-
-
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
+
+  const guard = requireServiceAuth(req, corsHeaders);
+  if (guard) return guard;
 
   try {
     const { productName, category, productUrl } = await req.json();

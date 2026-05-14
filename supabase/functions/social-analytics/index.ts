@@ -16,7 +16,10 @@ interface AnalyticsRequest {
 }
 
 async function graphGet(endpoint: string, token: string) {
-  const res = await fetch(`${GRAPH_API}/${endpoint}&access_token=${token}`);
+  // Pass token via Authorization header to avoid leaking into Meta access logs.
+  const res = await fetch(`${GRAPH_API}/${endpoint}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return res.json();
 }
 

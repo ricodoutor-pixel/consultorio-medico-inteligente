@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
 
         // 1. Upload document
         const uploadRes = await fetch(
-          `${CLICKSIGN_API_URL}/documents?access_token=${CLICKSIGN_API_TOKEN}`,
+          `${CLICKSIGN_API_URL}/documents`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -86,7 +86,7 @@ Deno.serve(async (req) => {
 
         // 2. Create signer
         const signerRes = await fetch(
-          `${CLICKSIGN_API_URL}/signers?access_token=${CLICKSIGN_API_TOKEN}`,
+          `${CLICKSIGN_API_URL}/signers`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
 
         // 3. Link signer to document
         const linkRes = await fetch(
-          `${CLICKSIGN_API_URL}/lists?access_token=${CLICKSIGN_API_TOKEN}`,
+          `${CLICKSIGN_API_URL}/lists`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -180,7 +180,7 @@ Deno.serve(async (req) => {
         }
 
         const statusRes = await fetch(
-          `${CLICKSIGN_API_URL}/documents/${documentKey}?access_token=${CLICKSIGN_API_TOKEN}`,
+          `${CLICKSIGN_API_URL}/documents/${documentKey}`,
           { headers: { Accept: "application/json" } }
         );
 

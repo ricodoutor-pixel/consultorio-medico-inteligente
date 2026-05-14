@@ -40,7 +40,12 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { diagnosis, symptoms, current_medications } = await req.json();
+    const { diagnosis: rawDiag, symptoms: rawSymp, current_medications: rawMeds } = await req.json();
+    const sanitize = (v: unknown, max: number) =>
+      String(v ?? "").replace(/[\u0000-\u001F\u007F]/g, " ").slice(0, max);
+    const diagnosis = sanitize(rawDiag, 500);
+    const symptoms = sanitize(rawSymp, 1000);
+    const current_medications = sanitize(rawMeds, 500);
 
     // 1. Get patient history
     const { data: records } = await supabase

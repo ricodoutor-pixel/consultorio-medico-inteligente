@@ -214,11 +214,29 @@ serve(async (req) => {
 
     const remoteJid: string = data?.key?.remoteJid || "";
     const phone = remoteJid.split("@")[0];
-    const messageText: string =
+    let messageText: string =
       data?.message?.conversation ||
       data?.message?.extendedTextMessage?.text ||
       data?.message?.imageMessage?.caption ||
       "";
+
+    // 🎙️ AUDIO: transcribe if Brisa received a voice message
+    const audioMsg = data?.message?.audioMessage;
+    if (!messageText && audioMsg) {
+      const audio = await fetchEvolutionAudio(data);
+      if (audio?.base64) {
+        const transcript = await transcribeAudio(audio.base64, audio.mime);
+        if (transcript) {
+          messageText = `[🎙️ áudio transcrito] ${transcript}`;
+        }
+      }
+      if (!messageText) {
+        await sendWhatsApp(phone, "Recebi seu áudio amor, mas não consegui escutar direitinho 🙈 me manda por texto que eu te respondo rapidinho 💚");
+        return new Response(JSON.stringify({ ok: true, skipped: "audio_unreadable" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
 
     if (!phone || !messageText) {
       return new Response(JSON.stringify({ ok: true, skipped: "no_text" }), {

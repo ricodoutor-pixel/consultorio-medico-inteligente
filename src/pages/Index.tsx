@@ -238,29 +238,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Live Stats */}
-      <section className="section-padding border-b border-border bg-card/20 backdrop-blur-md">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
-          <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            {[
-              { value: "45K+", label: "Usuários Ativos", icon: Users },
-              { value: "4.9★", label: "Avaliação Média", icon: Star },
-              { value: "125K+", label: "Downloads App", icon: Download },
-              { value: "R$6.3M", label: "Projeção Anual", icon: TrendingUp },
-            ].map((stat, i) => (
-              <motion.div key={i} variants={fadeUp}>
-                <Card className="border-border text-center hover:border-primary/30 transition-all hover:shadow-xl bg-background/40">
-                  <CardContent className="p-5">
-                    <stat.icon size={24} className="text-primary mx-auto mb-2" />
-                    <p className="text-[clamp(1.25rem,3vw,2rem)] font-display font-black text-foreground">{stat.value}</p>
-                    <span className="text-[clamp(0.6rem,1.2vw,0.75rem)] text-muted-foreground font-bold uppercase tracking-wider">{stat.label}</span>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+      {/* Live Stats - removido a pedido */}
 
       {/* Dr. Edilson Bezerra — Orientação Técnica Destacada */}
       <section className="section-padding bg-gradient-to-br from-primary/10 via-background to-[hsl(280,80%,65%)]/10 border-y border-primary/20">

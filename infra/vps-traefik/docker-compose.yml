@@ -1,5 +1,3 @@
-version: "3.9"
-
 # 🌐 Stack soberano Planta y Raiz — VPS Hostinger srv1641464 (2.24.69.154)
 # Traefik faz reverse-proxy + SSL Let's Encrypt automático para os 4 subdomínios.
 #

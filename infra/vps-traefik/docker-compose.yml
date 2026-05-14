@@ -193,7 +193,7 @@ services:
     networks: [proxy]
 
   evolution:
-    image: atendai/evolution-api:v2.3.0
+    image: atendai/evolution-api:latest
     container_name: evolution
     restart: unless-stopped
     depends_on: [evolution_postgres, evolution_redis]

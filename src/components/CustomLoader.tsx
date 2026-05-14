@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import drVerdinho from "@/assets/dr-verdinho.png";
+import drVerdinho from "@/assets/verdinho-doctor.png";
 
 /**
  * Splash / Loader screen — Dr. Verdinho, mascote oficial da Planta y Raiz Ltda.

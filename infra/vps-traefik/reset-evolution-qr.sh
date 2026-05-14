@@ -26,10 +26,12 @@ set -a
 source "${ENV_FILE}"
 set +a
 
+: "${EVOLUTION_API_KEY:=${AUTHENTICATION_API_KEY:-${API_KEY:-}}}"
 if [ -z "${EVOLUTION_API_KEY:-}" ]; then
-  echo "❌ EVOLUTION_API_KEY não configurada em ${ENV_FILE}."
+  echo "❌ Nenhuma API key encontrada (EVOLUTION_API_KEY / AUTHENTICATION_API_KEY) em ${ENV_FILE}."
   exit 1
 fi
+echo "🔑 Usando API key terminada em ...${EVOLUTION_API_KEY: -6}"
 
 echo "🔄 [2/8] Atualizando arquivos do repositório..."
 git pull --ff-only || true

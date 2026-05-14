@@ -305,8 +305,20 @@ serve(async (req) => {
     const reply = await callBrisaAI(messageText, history);
     await sendWhatsApp(phone, reply);
 
+    // 🎙️ Se o usuário mandou áudio OU pediu p/ ouvir voz, Brisa responde também em áudio
+    const wasAudio = messageText.startsWith("[🎙️ áudio transcrito]");
+    const askedVoice = /\b(audio|áudio|voz|me manda um audio|fala comigo|quero ouvir)\b/i.test(messageText);
+    if (wasAudio || askedVoice) {
+      const isEdilson = /dr\.?\s*edilson|doutor\s*edilson/i.test(reply);
+      const voiceId = isEdilson ? VOICE_EDILSON : VOICE_BRISA;
+      const audioB64 = await synthesizeVoice(reply, voiceId);
+      if (audioB64) {
+        await sendWhatsAppAudio(phone, audioB64).catch((e) => console.error("[brisa-bot] sendAudio failed", e));
+      }
+    }
+
     await supabase.from("whatsapp_brisa_log").insert({
-      phone, direction: "outbound", message: reply, raw: { ai: true },
+      phone, direction: "outbound", message: reply, raw: { ai: true, voice: wasAudio || askedVoice },
     }).then(() => {}).catch(() => {});
 
     return new Response(JSON.stringify({ ok: true, replied: true }), {

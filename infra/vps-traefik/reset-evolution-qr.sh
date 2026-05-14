@@ -7,6 +7,7 @@ VOLUME_NAME="vps-traefik_evolution_instances"
 ENV_FILE="${TARGET}/.env"
 INSTANCE_NAME="${1:-Brisa_CEO}"
 INSTANCE_TOKEN="${2:-}"
+PHONE_NUMBER="${3:-}"
 API_BASE="https://api.plantayraiz.com.br"
 
 echo "🛠️ [1/8] Verificando stack local..."
@@ -86,18 +87,32 @@ if [ -n "${INSTANCE_TOKEN}" ]; then
   token_fragment=$(printf ',"token":"%s"' "${INSTANCE_TOKEN}")
 fi
 
-payload=$(printf '{"instanceName":"%s","qrcode":true%s}' \
+payload=$(printf '{"instanceName":"%s","integration":"WHATSAPP-BAILEYS","qrcode":true%s}' \
   "${INSTANCE_NAME}" \
   "${token_fragment}")
 
 create_response=$(curl -sS -w "\nHTTP_STATUS:%{http_code}" -X POST "${API_BASE}/instance/create" \
   -H "Content-Type: application/json" \
   -H "apikey: ${EVOLUTION_API_KEY}" \
-  -H "Authorization: Bearer ${EVOLUTION_API_KEY}" \
   -d "${payload}")
 
 echo "✅ Resposta da criação:"
 printf '%s\n' "${create_response}" | sed 's/"apikey":"[^"]*"/"apikey":"***"/g'
+
+connect_url="${API_BASE}/instance/connect/${INSTANCE_NAME}"
+if [ -n "${PHONE_NUMBER}" ]; then
+  connect_url="${connect_url}?number=${PHONE_NUMBER}"
+fi
+
+echo ""
+echo "🔌 Estado da conexão:"
+curl -sS "${API_BASE}/instance/connectionState/${INSTANCE_NAME}" \
+  -H "apikey: ${EVOLUTION_API_KEY}" || true
+
+echo ""
+echo "📲 QR code / pareamento:"
+curl -sS "${connect_url}" \
+  -H "apikey: ${EVOLUTION_API_KEY}" || true
 
 echo ""
 echo "📜 Logs úteis (Ctrl+C para sair):"

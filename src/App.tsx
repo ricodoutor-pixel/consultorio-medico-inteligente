@@ -88,6 +88,7 @@ const InvestorDashboard = lazy(() => import("./pages/InvestorDashboard"));
 const VideoCall = lazy(() => import("./pages/VideoCall"));
 const ConsultaRapida = lazy(() => import("./pages/ConsultaRapida"));
 const SEOCondicoes = lazy(() => import("./pages/SEOCondicoes"));
+const Status = lazy(() => import("./pages/Status"));
 const TratamentoDorCronica = lazy(() => import("./pages/TratamentoDorCronica"));
 const TratamentoAnsiedadeSaudeMental = lazy(() => import("./pages/TratamentoAnsiedadeSaudeMental"));
 const Club = lazy(() => import("./pages/Club"));
@@ -271,6 +272,7 @@ const App = () => (
                 <Route path="/checkout/return" element={<CheckoutReturn />} />
                 <Route path="/afiliados/dashboard" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
                 <Route path="/gestao-pacientes" element={<PrivateRoute><GestãoPacientes /></PrivateRoute>} />
+                <Route path="/status" element={<Status />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

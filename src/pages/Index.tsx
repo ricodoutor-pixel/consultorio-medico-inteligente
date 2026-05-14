@@ -280,7 +280,7 @@ const Index = () => {
                 <span className="text-gradient-green">Dr. Edilson Bezerra On</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                Orientador Técnico em Medicina Endocanabinoide e Especialista em Medicina Integrativa. Persona virtual autônoma (Gemini) trilíngue via WhatsApp, com acesso a banco de dados pessoal de mais de 40 mil estudos científicos publicados sobre modulação do sistema endocanabinoide humano. Cruza dados científicos e tratamentos divulgados para gerar relatório final preciso e personalizado, baseado em evidências. Atendimento educado, otimista e 100% autônomo, com suporte completo da Enfª Brisa via WhatsApp.
+                Orientador Técnico em Medicina Endocanabinoide e Especialista em Medicina Integrativa. Persona virtual autônoma Inteligente trilíngue via WhatsApp, com acesso a banco de dados pessoal com mais de 40 mil estudos científicos publicados sobre modulação do sistema endocanabinoide humano. Cruza dados científicos e tratamentos divulgados para gerar um relatório final preciso e personalizado, baseado em evidências. Atendimento 100% autônomo, com suporte completo da Enfª Brisa via WhatsApp.
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Triagem individual personalizada com Enfª Brisa</li>

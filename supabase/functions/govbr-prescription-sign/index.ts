@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
 
     const { data: rx } = await admin
       .from("prescriptions")
-      .select("id, doctor_id")
+      .select("id, doctor_id, patient_id, medications, diagnosis_cid, diagnosis, notes")
       .eq("id", prescriptionId)
       .maybeSingle();
 
@@ -69,10 +69,55 @@ Deno.serve(async (req) => {
 
     const doctorCRM = doctor.crm;
 
-    // Hash de autenticidade (SHA-256 do PDF)
+    // PDF bytes + size guard (max 5MB)
     const pdfBytes = Uint8Array.from(atob(contentBase64), (c) => c.charCodeAt(0));
-    const digest = await crypto.subtle.digest("SHA-256", pdfBytes);
-    const hash = Array.from(new Uint8Array(digest))
+    if (pdfBytes.length === 0 || pdfBytes.length > 5 * 1024 * 1024) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "PDF inválido ou excede 5MB.",
+      }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    // Must be a real PDF (magic bytes %PDF-)
+    if (!(pdfBytes[0] === 0x25 && pdfBytes[1] === 0x50 && pdfBytes[2] === 0x44 && pdfBytes[3] === 0x46)) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Arquivo enviado não é um PDF válido.",
+      }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Server-side canonical fingerprint of the prescription (bound to DB record).
+    // The signature is anchored to this hash, NOT to the client-supplied PDF bytes.
+    const canonical = JSON.stringify({
+      prescription_id: rx.id,
+      patient_id: rx.patient_id,
+      doctor_id: rx.doctor_id,
+      medications: rx.medications ?? null,
+      diagnosis_cid: rx.diagnosis_cid ?? null,
+      diagnosis: rx.diagnosis ?? null,
+      notes: rx.notes ?? null,
+    });
+    const canonicalDigest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(canonical));
+    const contentHash = Array.from(new Uint8Array(canonicalDigest))
+      .map((b) => b.toString(16).padStart(2, "0")).join("");
+
+    // Best-effort textual cross-check: ensure each medication name appears in the PDF stream
+    const pdfText = new TextDecoder("latin1").decode(pdfBytes);
+    const meds: any[] = Array.isArray(rx.medications) ? rx.medications : [];
+    const missing = meds
+      .map((m) => String(m?.name ?? m?.product ?? "").trim())
+      .filter((n) => n.length > 2)
+      .filter((n) => !pdfText.toLowerCase().includes(n.toLowerCase()));
+    if (meds.length > 0 && missing.length === meds.length) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "PDF não corresponde à prescrição (nenhum medicamento do prontuário foi encontrado no documento).",
+        missing,
+      }), { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // PDF byte hash (transport-level integrity, separate from canonical content hash)
+    const pdfDigest = await crypto.subtle.digest("SHA-256", pdfBytes);
+    const hash = Array.from(new Uint8Array(pdfDigest))
       .map((b) => b.toString(16).padStart(2, "0")).join("");
 
     // Upload no bucket privado `prescriptions`
@@ -88,11 +133,12 @@ Deno.serve(async (req) => {
       .createSignedUrl(objectPath, 7 * 24 * 60 * 60);
 
     const signedPdfUrl = signed?.signedUrl;
-    const documentKey = `govbr:${hash.substring(0, 16)}`;
+    // document_key binds to canonical (DB) hash, not client PDF
+    const documentKey = `govbr:${contentHash.substring(0, 16)}`;
 
     await admin.from("prescriptions").update({
       digital_signature: documentKey,
-      signature_hash: hash,
+      signature_hash: contentHash,
       signature_provider: "gov.br",
       signed_pdf_url: signedPdfUrl,
       status: "signed",

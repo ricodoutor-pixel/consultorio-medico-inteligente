@@ -3235,6 +3235,30 @@ export type Database = {
           },
         ]
       }
+      ot_token_access_log: {
+        Row: {
+          accessed_at: string
+          id: string
+          ip: string | null
+          order_id: string
+          session_token_hash: string
+        }
+        Insert: {
+          accessed_at?: string
+          id?: string
+          ip?: string | null
+          order_id: string
+          session_token_hash: string
+        }
+        Update: {
+          accessed_at?: string
+          id?: string
+          ip?: string | null
+          order_id?: string
+          session_token_hash?: string
+        }
+        Relationships: []
+      }
       pagamentos_audit: {
         Row: {
           amount: number
@@ -5510,6 +5534,19 @@ export type Database = {
           last_run_at: string
           last_status: string
           schedule: string
+        }[]
+      }
+      get_ot_order_by_token: {
+        Args: { _session_token: string }
+        Returns: {
+          amount: number
+          created_at: string
+          id: string
+          payment_status: string
+          pdf_url: string
+          qr_code: string
+          status: string
+          updated_at: string
         }[]
       }
       get_payment_status_summary: {

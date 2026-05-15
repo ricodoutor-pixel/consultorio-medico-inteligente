@@ -179,7 +179,6 @@ REGRAS RÍGIDAS:
 
 
     // Send reply via Evolution API (Enfª Brisa)
-    const phoneClean = (from || "").replace(/\D/g, "");
     const evoResponse = await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: EVO_KEY },

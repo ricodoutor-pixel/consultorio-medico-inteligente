@@ -160,9 +160,9 @@ Deno.serve(async (req) => {
       return twimlResponse("🌿 Olá! Sou a Brisa, Diretora Operacional da Planta & Raiz. Como posso ajudar você hoje?");
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("[Brisa COO] CRITICAL: LOVABLE_API_KEY missing");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      console.error("[Brisa COO] CRITICAL: GEMINI_API_KEY missing");
       return twimlResponse("🌿 Estou passando por uma manutenção rápida. Tente novamente em 1 minuto ou acesse plantayraiz.com.br 💚");
     }
 
@@ -229,14 +229,14 @@ Deno.serve(async (req) => {
     const aiTimer = timer();
     let brisaReply: string;
     try {
-      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const aiResponse = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          Authorization: `Bearer ${GEMINI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "gemini-2.5-flash",
           messages: [
             { role: "system", content: BRISA_SYSTEM_PROMPT },
             ...contextMessages,
@@ -320,8 +320,8 @@ async function generateClinicalSummary(
   messages: Array<{ role: string; content: string }>
 ) {
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) return;
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) return;
 
     const summaryPrompt = `Analise o histórico de conversa abaixo entre a enfermeira Brisa e um paciente via WhatsApp.
 Gere um RESUMO CLÍNICO DE TRIAGEM conciso para o médico, contendo:
@@ -338,14 +338,14 @@ ${messages.map(m => `[${m.role}]: ${m.content}`).join("\n")}
 
 Responda APENAS com o resumo clínico formatado. Sem saudações.`;
 
-    const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${GEMINI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gemini-2.5-flash",
         messages: [{ role: "user", content: summaryPrompt }],
       }),
     });

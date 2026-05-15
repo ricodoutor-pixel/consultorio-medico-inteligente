@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2.49.4";
+import { sendWhatsApp, RECOVERY_MESSAGES } from "../_shared/evolution.ts";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
@@ -61,7 +62,6 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const manychatKey = Deno.env.get("MANYCHAT_API_KEY");
     const supabase = createClient(supabaseUrl, serviceKey);
 
     const now = new Date();
@@ -132,19 +132,12 @@ Deno.serve(async (req) => {
         action_url: "/oferta-especial",
       });
 
-      // ManyChat dispatch
-      if (manychatKey && profile.phone) {
-        try {
-          await fetch("https://api.manychat.com/fb/sending/sendFlow", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${manychatKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ subscriber_id: profile.phone, flow_ns: "recovery_lead_frio_24h" }),
-          });
-        } catch (e) { console.error("ManyChat lead frio error:", e); }
+      if (profile.phone) {
+        await sendWhatsApp(profile.phone, RECOVERY_MESSAGES["recovery_lead_frio_24h"]).catch((e) => console.error("Evolution recovery_lead_frio_24h:", e));
       }
 
       // Notify affiliate
-      await notifyAffiliate(supabase, triage.patient_id, profile.full_name, trigger.affiliateMessage, manychatKey);
+      await notifyAffiliate(supabase, triage.patient_id, profile.full_name, trigger.affiliateMessage);
       results.lead_frio_24h++;
     }
 
@@ -194,17 +187,11 @@ Deno.serve(async (req) => {
         action_url: "/oferta-especial?cupom=RAIZ200",
       });
 
-      if (manychatKey && profile.phone) {
-        try {
-          await fetch("https://api.manychat.com/fb/sending/sendFlow", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${manychatKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ subscriber_id: profile.phone, flow_ns: "recovery_carrinho_48h" }),
-          });
-        } catch (e) { console.error("ManyChat carrinho error:", e); }
+      if (profile.phone) {
+        await sendWhatsApp(profile.phone, RECOVERY_MESSAGES["recovery_carrinho_48h"]).catch((e) => console.error("Evolution recovery_carrinho_48h:", e));
       }
 
-      await notifyAffiliate(supabase, tx.patient_id, profile.full_name, trigger.affiliateMessage, manychatKey);
+      await notifyAffiliate(supabase, tx.patient_id, profile.full_name, trigger.affiliateMessage);
       results.carrinho_48h++;
     }
 
@@ -256,17 +243,11 @@ Deno.serve(async (req) => {
         action_url: "/oferta-especial?cupom=RAIZ300",
       });
 
-      if (manychatKey && profile.phone) {
-        try {
-          await fetch("https://api.manychat.com/fb/sending/sendFlow", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${manychatKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ subscriber_id: profile.phone, flow_ns: "recovery_escassez_72h" }),
-          });
-        } catch (e) { console.error("ManyChat escassez error:", e); }
+      if (profile.phone) {
+        await sendWhatsApp(profile.phone, RECOVERY_MESSAGES["recovery_escassez_72h"]).catch((e) => console.error("Evolution recovery_escassez_72h:", e));
       }
 
-      await notifyAffiliate(supabase, tx.patient_id, profile.full_name, trigger.affiliateMessage, manychatKey);
+      await notifyAffiliate(supabase, tx.patient_id, profile.full_name, trigger.affiliateMessage);
       results.escassez_72h++;
     }
 
@@ -317,17 +298,11 @@ Deno.serve(async (req) => {
         action_url: "/consulta-rapida",
       });
 
-      if (manychatKey && profile.phone) {
-        try {
-          await fetch("https://api.manychat.com/fb/sending/sendFlow", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${manychatKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ subscriber_id: profile.phone, flow_ns: "recovery_renovacao_10d" }),
-          });
-        } catch (e) { console.error("ManyChat renovacao error:", e); }
+      if (profile.phone) {
+        await sendWhatsApp(profile.phone, RECOVERY_MESSAGES["recovery_renovacao_10d"]).catch((e) => console.error("Evolution recovery_renovacao_10d:", e));
       }
 
-      await notifyAffiliate(supabase, rx.patient_id, profile.full_name, trigger.affiliateMessage, manychatKey);
+      await notifyAffiliate(supabase, rx.patient_id, profile.full_name, trigger.affiliateMessage);
       results.renovacao_10d++;
     }
 
@@ -350,7 +325,6 @@ async function notifyAffiliate(
   patientId: string,
   patientName: string,
   messageTemplate: string,
-  manychatKey: string | undefined
 ) {
   const { data: referral } = await supabase
     .from("referral_links")
@@ -370,25 +344,14 @@ async function notifyAffiliate(
     action_url: "/afiliados",
   });
 
-  // Also notify via ManyChat
-  if (manychatKey) {
-    const { data: affiliateProfile } = await supabase
-      .from("profiles")
-      .select("phone")
-      .eq("id", referral.referred_by)
-      .single();
-
-    if (affiliateProfile?.phone) {
-      try {
-        await fetch("https://api.manychat.com/fb/sending/sendFlow", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${manychatKey}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            subscriber_id: affiliateProfile.phone,
-            flow_ns: "affiliate_lead_cold_alert",
-          }),
-        });
-      } catch (e) { console.error("ManyChat affiliate notify error:", e); }
-    }
+  // Notify affiliate via WhatsApp (Evolution API)
+  const { data: affiliateProfile } = await supabase
+    .from("profiles")
+    .select("phone")
+    .eq("id", referral.referred_by)
+    .single();
+  if (affiliateProfile?.phone) {
+    await sendWhatsApp(affiliateProfile.phone, RECOVERY_MESSAGES["affiliate_lead_cold_alert"])
+      .catch((e) => console.error("Evolution affiliate notify:", e));
   }
 }

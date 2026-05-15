@@ -1,26 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-
-const MANYCHAT_API = "https://api.manychat.com/fb";
-
-async function mcPost(endpoint: string, body: Record<string, unknown>) {
-  const key = Deno.env.get("MANYCHAT_API_KEY");
-  if (!key) return null;
-  return fetch(`${MANYCHAT_API}${endpoint}`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  }).then(r => r.json());
-}
-
-async function findSub(phone: string) {
-  const f = phone.startsWith("+") ? phone : phone.startsWith("55") ? `+${phone}` : `+55${phone}`;
-  return mcPost("/subscriber/findBySystemField", { field_name: "phone", field_value: f });
-}
-async function sendMsg(id: string, text: string) {
-  return mcPost("/sending/sendContent", { subscriber_id: id, data: { version: "v2", content: { messages: [{ type: "text", text }] } } });
-}
+import { sendWhatsApp } from "../_shared/evolution.ts";
 
 function jsonRes(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -114,14 +95,10 @@ Deno.serve(async (req) => {
 
         const totalBonus = (bonuses || []).reduce((s, b) => s + b.amount, 0);
 
-        // Send via ManyChat if phone available
+        // Send via Evolution API (WhatsApp) if phone available
         if (profile.phone) {
-          const mc = await findSub(profile.phone);
-          if (mc?.status === "success" && mc.data?.id) {
-            await sendMsg(mc.data.id,
-              `📊 Relatório ${reportType === "monthly" ? "Mensal" : "Diário"} — ${periodLabel}\n\nDr(a). ${profile.full_name}\n\n👥 Consultas: ${consultations || 0}\n💰 Receita: ${formatBRL(totalRevenue)}\n🏦 Taxa plataforma: ${formatBRL(platformFees)}\n🎁 Bônus NPS: ${formatBRL(totalBonus)}\n⭐ NPS Médio: ${npsAvg}\n\n${Number(npsAvg) >= 8 ? "Excelente trabalho! Continue assim! 🚀" : "Continue melhorando para ganhar mais bônus! 💪"}`
-            );
-          }
+          const text = `📊 Relatório ${reportType === "monthly" ? "Mensal" : "Diário"} — ${periodLabel}\n\nDr(a). ${profile.full_name}\n\n👥 Consultas: ${consultations || 0}\n💰 Receita: ${formatBRL(totalRevenue)}\n🏦 Taxa plataforma: ${formatBRL(platformFees)}\n🎁 Bônus NPS: ${formatBRL(totalBonus)}\n⭐ NPS Médio: ${npsAvg}\n\n${Number(npsAvg) >= 8 ? "Excelente trabalho! Continue assim! 🚀" : "Continue melhorando para ganhar mais bônus! 💪"}`;
+          await sendWhatsApp(profile.phone, text).catch((e) => console.error("Evolution report error:", e));
         }
 
         // Save internal notification

@@ -38,10 +38,10 @@ async function probeMercadoPago(token: string): Promise<ProbeResult> {
 async function probeLovableAI(key: string): Promise<ProbeResult> {
   const t0 = performance.now()
   try {
-    const res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'google/gemini-2.5-flash-lite', messages: [{ role: 'user', content: 'ping' }], max_tokens: 1 }),
+      body: JSON.stringify({ model: 'gemini-2.5-flash-lite', messages: [{ role: 'user', content: 'ping' }], max_tokens: 1 }),
       signal: AbortSignal.timeout(10000),
     })
     const latency = Math.round(performance.now() - t0)
@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
   const mpToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN') || ''
-  const aiKey = Deno.env.get('LOVABLE_API_KEY') || ''
+  const aiKey = Deno.env.get('GEMINI_API_KEY') || ''
 
   const probes = await Promise.all([probeMercadoPago(mpToken), probeLovableAI(aiKey)])
 

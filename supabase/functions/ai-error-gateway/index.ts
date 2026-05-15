@@ -11,7 +11,7 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")!;
 
 async function sha256Hex(input: string): Promise<string> {
   const buf = new TextEncoder().encode(input);
@@ -24,11 +24,11 @@ async function classifyError(payload: {
   error_message: string; stack?: string; context?: any;
 }): Promise<{ severity: string; diagnosis: string; suggested_fix: string; confidence: number }> {
   try {
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${LOVABLE_API_KEY}` },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${GEMINI_API_KEY}` },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gemini-2.5-flash",
         messages: [
           { role: "system", content: "Você é um SRE sênior da Planta y Raiz (telemedicina). Classifique o erro e sugira correção objetiva em pt-BR. severity: low (cosmético), medium (UX), high (funcionalidade quebrada), critical (perda de receita / dados / pagamento / prescrição)." },
           { role: "user", content: JSON.stringify(payload).slice(0, 4000) },

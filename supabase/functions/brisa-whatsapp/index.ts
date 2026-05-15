@@ -48,12 +48,12 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
     const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
     const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
 
-    if (!LOVABLE_API_KEY || !EVO_URL || !EVO_KEY) {
+    if (!GEMINI_API_KEY || !EVO_URL || !EVO_KEY) {
       return new Response(JSON.stringify({ error: "Missing credentials" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -84,14 +84,14 @@ Deno.serve(async (req) => {
       const welcome = BRISA_WELCOME[intent];
       replyText = `${welcome.message}\n\n👉 ${welcome.link}\n\nSe tiver dúvidas sobre a plataforma, estou aqui para ajudar! 💚`;
     } else {
-      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const aiResponse = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          Authorization: `Bearer ${GEMINI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "gemini-2.5-flash",
           messages: [
             {
               role: "system",

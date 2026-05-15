@@ -54,6 +54,9 @@ function bytesToB64(bytes: Uint8Array): string {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
+
   const ghToken =
     Deno.env.get("GITHUB_BACKUP_TOKEN") ||
     Deno.env.get("GITHUB_TOKEN") ||

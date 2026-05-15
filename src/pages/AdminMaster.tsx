@@ -151,7 +151,21 @@ const exportCSV = (headers: string[], rows: string[][], filename: string) => {
 /* ═══ MAIN COMPONENT ═══ */
 const AdminMaster = () => {
   const [activeTab, setActiveTab] = useState<Department>("overview");
-  const [userRole] = useState<string>("admin"); // Future: fetch from user_roles
+  const [userRole, setUserRole] = useState<string>("viewer");
+
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+      const roles = (data ?? []).map((r: any) => r.role as string);
+      // Prefer admin if present, otherwise first role, otherwise viewer
+      setUserRole(roles.includes("admin") ? "admin" : (roles[0] ?? "viewer"));
+    })();
+  }, []);
   const [markers, setMarkers] = useState(generateMarkers());
   const [revenueData] = useState(generateRevenueData());
   const [securityLogs] = useState(generateSecurityLogs());

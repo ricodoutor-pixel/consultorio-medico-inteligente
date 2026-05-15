@@ -71,7 +71,7 @@ const testimonialData = [
 
 const Index = () => {
   useEffect(() => {
-    document.title = "Planta y Raiz - Telemedicina Cannabis Medicinal | Orientações Técnicas a partir de R$30";
+    // Título da página é gerenciado por DynamicSEOHead/OpenGraphHead (rota-aware) — evita duplicação.
     // ManyChat widget (ID 11227069) é injetado centralizadamente via <ManyChatWidget /> após consentimento LGPD.
   }, []);
 

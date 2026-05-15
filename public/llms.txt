@@ -1,0 +1,31 @@
+# Planta y Raiz
+
+> Plataforma brasileira de telemedicina especializada em Cannabis Medicinal. Orientações Técnicas online com Dr. Edilson Bezerra (CRM-SP 10963) a partir de R$30, prescrição digital ANVISA (RDC 660/2022 e RDC 327/2019) e marketplace de produtos verificados.
+
+A Planta y Raiz é uma plataforma de intermediação digital (CNAE 6209-1/00), não uma clínica. Conecta pacientes a médicos prescritores habilitados, oferece triagem por IA (Brisa), videoconsultas, emissão de relatórios técnicos em PDF com selo gov.br e assinaturas do Club Planta y Raiz.
+
+## Pages
+
+- [Início](/): Teleconsulta de Cannabis Medicinal em São Paulo, Orientação Técnica por R$30.
+- [Profissionais](/profissionais): Médicos prescritores verificados de Cannabis Medicinal.
+- [Como Funciona](/como-funciona): Passo a passo da teleconsulta e prescrição ANVISA.
+- [Telemedicina](/telemedicina): Atendimento online 24/7 com especialistas.
+- [Shopping](/shopping): Marketplace de óleos CBD, cápsulas e acessórios.
+- [Tratamentos](/tratamentos): Indicações para ansiedade, dor crônica, epilepsia, fibromialgia, insônia, Parkinson, autismo, TDAH, depressão.
+- [Planos e Preços](/planos): Orientações Técnicas a partir de R$30 e assinatura Club.
+- [Agendamento](/agendamento): Marcar teleconsulta com médico especialista.
+- [FAQ](/faq): Perguntas frequentes sobre Cannabis Medicinal e ANVISA.
+- [Blog](/blog): Notícias, estudos e artigos sobre Cannabis Medicinal.
+- [Biblioteca](/biblioteca): Acervo científico, estudos clínicos e farmacologia.
+- [Comunidade](/comunidade): Fórum de pacientes e profissionais.
+- [Club Planta y Raiz](/club): Assinatura com benefícios exclusivos.
+- [E-book Gratuito](/ebook): Guia completo de Cannabis Medicinal em 12 capítulos.
+- [Contato](/contato): WhatsApp, e-mail e suporte.
+
+## Optional
+
+- [Cadastro](/cadastro): Criar conta gratuita.
+- [Login](/login): Acessar conta.
+- [Termos e Privacidade](/legal): Conformidade LGPD, RDC 660/2022 e CFM.
+- [Impacto Social](/impacto): Iniciativas de acesso democrático.
+- [Voluntários](/voluntarios): Programa de voluntariado.

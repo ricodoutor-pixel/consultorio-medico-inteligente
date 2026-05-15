@@ -132,15 +132,8 @@ Deno.serve(async (req) => {
         action_url: "/oferta-especial",
       });
 
-      // ManyChat dispatch
-      if (manychatKey && profile.phone) {
-        try {
-          await fetch("https://api.manychat.com/fb/sending/sendFlow", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${manychatKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ subscriber_id: profile.phone, flow_ns: "recovery_lead_frio_24h" }),
-          });
-        } catch (e) { console.error("ManyChat lead frio error:", e); }
+      if (profile.phone) {
+        await sendWhatsApp(profile.phone, RECOVERY_MESSAGES["recovery_lead_frio_24h"]).catch((e) => console.error("Evolution recovery_lead_frio_24h:", e));
       }
 
       // Notify affiliate
@@ -194,14 +187,8 @@ Deno.serve(async (req) => {
         action_url: "/oferta-especial?cupom=RAIZ200",
       });
 
-      if (manychatKey && profile.phone) {
-        try {
-          await fetch("https://api.manychat.com/fb/sending/sendFlow", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${manychatKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ subscriber_id: profile.phone, flow_ns: "recovery_carrinho_48h" }),
-          });
-        } catch (e) { console.error("ManyChat carrinho error:", e); }
+      if (profile.phone) {
+        await sendWhatsApp(profile.phone, RECOVERY_MESSAGES["recovery_carrinho_48h"]).catch((e) => console.error("Evolution recovery_carrinho_48h:", e));
       }
 
       await notifyAffiliate(supabase, tx.patient_id, profile.full_name, trigger.affiliateMessage);
@@ -256,14 +243,8 @@ Deno.serve(async (req) => {
         action_url: "/oferta-especial?cupom=RAIZ300",
       });
 
-      if (manychatKey && profile.phone) {
-        try {
-          await fetch("https://api.manychat.com/fb/sending/sendFlow", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${manychatKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ subscriber_id: profile.phone, flow_ns: "recovery_escassez_72h" }),
-          });
-        } catch (e) { console.error("ManyChat escassez error:", e); }
+      if (profile.phone) {
+        await sendWhatsApp(profile.phone, RECOVERY_MESSAGES["recovery_escassez_72h"]).catch((e) => console.error("Evolution recovery_escassez_72h:", e));
       }
 
       await notifyAffiliate(supabase, tx.patient_id, profile.full_name, trigger.affiliateMessage);
@@ -317,14 +298,8 @@ Deno.serve(async (req) => {
         action_url: "/consulta-rapida",
       });
 
-      if (manychatKey && profile.phone) {
-        try {
-          await fetch("https://api.manychat.com/fb/sending/sendFlow", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${manychatKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ subscriber_id: profile.phone, flow_ns: "recovery_renovacao_10d" }),
-          });
-        } catch (e) { console.error("ManyChat renovacao error:", e); }
+      if (profile.phone) {
+        await sendWhatsApp(profile.phone, RECOVERY_MESSAGES["recovery_renovacao_10d"]).catch((e) => console.error("Evolution recovery_renovacao_10d:", e));
       }
 
       await notifyAffiliate(supabase, rx.patient_id, profile.full_name, trigger.affiliateMessage);

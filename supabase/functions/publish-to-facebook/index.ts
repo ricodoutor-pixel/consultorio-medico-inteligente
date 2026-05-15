@@ -117,30 +117,8 @@ function buildCaption(content: string, authorName: string): string {
   );
 }
 
-// ─── ManyChat tracking ───
-async function trackToManyChat(
-  supabaseUrl: string, serviceKey: string,
-  postId: string, fbPostId: string, authorName: string, format: string
-) {
-  try {
-    await fetch(`${supabaseUrl}/functions/v1/manychat-webhook`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${serviceKey}` },
-      body: JSON.stringify({
-        action: "post_engagement_sync",
-        posts: [{
-          platform: "facebook",
-          post_id: fbPostId,
-          caption: `Club post ${postId}`,
-          campaign_source: "club_organic",
-          likes: 0, comments: 0, shares: 0, saves: 0,
-        }],
-      }),
-    });
-  } catch (e) {
-    console.warn("[FB→MC] Tracking error:", e);
-  }
-}
+// ─── Engagement tracking ───
+// (ManyChat removed — engagement now logged directly to social_interactions table below.)
 
 // ─── Cross-post to Instagram ───
 async function crossPostToInstagram(
@@ -226,10 +204,7 @@ Deno.serve(async (req) => {
       results.instagram = igResult;
     }
 
-    // ── TRACK VIA MANYCHAT ──
-    if (results.feed) {
-      await trackToManyChat(supabaseUrl, serviceKey, post_id, String(results.feed), author_name, String(results.format));
-    }
+    // ── ENGAGEMENT TRACKING (ManyChat removed; logged to social_interactions below) ──
 
     // ── LOG TO DB ──
     const supabase = createClient(supabaseUrl, serviceKey);

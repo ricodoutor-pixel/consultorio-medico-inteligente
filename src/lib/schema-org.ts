@@ -167,6 +167,113 @@ export const articleSchema: SchemaOrgConfig = {
 };
 
 /**
+ * Schema.org Physician — Dr. Edilson Bezerra (CRM-SP 10963)
+ * Persistido em todas as rotas após o React inicializar (substitui o que existia em index.html).
+ */
+export const physicianSchema: SchemaOrgConfig = {
+  type: 'Organization',
+  data: {
+    '@context': 'https://schema.org',
+    '@type': 'Physician',
+    '@id': 'https://plantayraiz.com.br/#dr-edilson',
+    name: 'Dr. Edilson Bezerra da Silva',
+    jobTitle: 'Médico Especialista em Cannabis Medicinal',
+    identifier: 'CRM-SP 10963',
+    medicalSpecialty: ['GeneralPractice', 'Pharmacology'],
+    memberOf: {
+      '@type': 'MedicalOrganization',
+      name: 'Conselho Regional de Medicina de São Paulo (CRM-SP)',
+    },
+    telephone: '+55-11-98713-1241',
+    url: 'https://plantayraiz.com.br',
+    knowsAbout: [
+      'Cannabis Medicinal',
+      'Canabidiol (CBD)',
+      'Tetrahidrocanabinol (THC)',
+      'RDC 660/2022 ANVISA',
+      'RDC 327/2019 ANVISA',
+      'Telemedicina',
+      'Prescrição Digital ICP-Brasil',
+    ],
+  },
+};
+
+/**
+ * Schema.org MedicalProcedure — Orientação Técnica
+ */
+export const medicalProcedureSchema: SchemaOrgConfig = {
+  type: 'MedicalBusiness',
+  data: {
+    '@context': 'https://schema.org',
+    '@type': 'MedicalProcedure',
+    name: 'Orientação Técnica em Cannabis Medicinal',
+    procedureType: 'https://schema.org/TherapeuticProcedure',
+    description: 'Consulta digital com médico habilitado para avaliação clínica e emissão de relatório técnico em PDF, válido para importação ANVISA via RDC 660/2022.',
+    performer: { '@id': 'https://plantayraiz.com.br/#dr-edilson' },
+    offers: {
+      '@type': 'Offer',
+      price: '30.00',
+      priceCurrency: 'BRL',
+      availability: 'https://schema.org/InStock',
+      url: 'https://plantayraiz.com.br',
+    },
+  },
+};
+
+/**
+ * Schema.org FAQPage — perguntas frequentes da rota /faq
+ */
+export const faqPageSchema: SchemaOrgConfig = {
+  type: 'Article',
+  data: {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Cannabis Medicinal é legal no Brasil?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Sim. A ANVISA regulamenta o acesso via RDC 660/2022 (importação por pessoa física) e RDC 327/2019 (produtos nacionais), mediante prescrição médica.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Quanto custa a Orientação Técnica?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A Orientação Técnica inicial custa R$30 (BRL) ou US$10. Inclui avaliação digital e relatório em PDF com selo gov.br.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Quem é o médico responsável?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Dr. Edilson Bezerra da Silva, CRM-SP 10963, especialista em Cannabis Medicinal, atende toda a plataforma.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Como recebo minha prescrição?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'A prescrição digital é emitida com selo gov.br e enviada via WhatsApp e e-mail. É válida em farmácias parceiras e para importação via ANVISA.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'O atendimento é seguro e em conformidade com a LGPD?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Sim. Todos os dados são criptografados em repouso (AES-256) e em trânsito (TLS 1.3). A plataforma cumpre integralmente a LGPD e o CFM.',
+        },
+      },
+    ],
+  },
+};
+
+/**
  * Gera tags Schema.org JSON-LD para HTML head
  */
 export function generateSchemaOrgTags(schemas: SchemaOrgConfig[]): string {
@@ -176,11 +283,21 @@ export function generateSchemaOrgTags(schemas: SchemaOrgConfig[]): string {
 }
 
 /**
- * Retorna schemas baseado na rota
+ * Retorna schemas baseado na rota.
+ * Inclui Physician + MedicalProcedure em TODAS as rotas para compensar
+ * a remoção de tags ld+json que SearchEngineOptimization faz a cada navegação.
  */
 export function getSchemaOrgByRoute(pathname: string): SchemaOrgConfig[] {
-  const baseSchemas = [organizationSchema, localBusinessSchema];
+  const baseSchemas = [
+    organizationSchema,
+    localBusinessSchema,
+    physicianSchema,
+    medicalProcedureSchema,
+  ];
 
+  if (pathname === '/faq' || pathname.startsWith('/faq/')) {
+    return [...baseSchemas, faqPageSchema];
+  }
   if (pathname.includes('/ebook')) {
     return [...baseSchemas, articleSchema];
   }
@@ -190,3 +307,4 @@ export function getSchemaOrgByRoute(pathname: string): SchemaOrgConfig[] {
 
   return baseSchemas;
 }
+

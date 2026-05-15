@@ -133,11 +133,12 @@ Deno.serve(async (req) => {
       .createSignedUrl(objectPath, 7 * 24 * 60 * 60);
 
     const signedPdfUrl = signed?.signedUrl;
-    const documentKey = `govbr:${hash.substring(0, 16)}`;
+    // document_key binds to canonical (DB) hash, not client PDF
+    const documentKey = `govbr:${contentHash.substring(0, 16)}`;
 
     await admin.from("prescriptions").update({
       digital_signature: documentKey,
-      signature_hash: hash,
+      signature_hash: contentHash,
       signature_provider: "gov.br",
       signed_pdf_url: signedPdfUrl,
       status: "signed",

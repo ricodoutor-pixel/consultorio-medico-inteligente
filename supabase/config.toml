@@ -159,3 +159,6 @@ verify_jwt = false
 
 [functions.brisa-whatsapp]
 verify_jwt = false
+
+[functions.brisa-fb-blast]
+verify_jwt = false

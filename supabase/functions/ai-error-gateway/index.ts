@@ -64,8 +64,45 @@ async function classifyError(payload: {
   }
 }
 
+// Per-IP rate limiter (in-memory, best-effort within an isolate)
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX = 30;
+const ipHits = new Map<string, { count: number; reset: number }>();
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  const cur = ipHits.get(ip);
+  if (!cur || cur.reset < now) {
+    ipHits.set(ip, { count: 1, reset: now + RATE_WINDOW_MS });
+    return false;
+  }
+  cur.count++;
+  return cur.count > RATE_MAX;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Require a valid Supabase key (anon or service) — blocks fully unauthenticated abuse
+  const ANON = Deno.env.get("SUPABASE_ANON_KEY");
+  const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const auth = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+  const apikey = req.headers.get("apikey") || "";
+  const presented = auth || apikey;
+  if (!presented || (presented !== ANON && presented !== SERVICE)) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // Per-IP rate limit
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim()
+    || req.headers.get("cf-connecting-ip")
+    || "unknown";
+  if (rateLimited(ip)) {
+    return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
+      status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   try {
     const body = await req.json();

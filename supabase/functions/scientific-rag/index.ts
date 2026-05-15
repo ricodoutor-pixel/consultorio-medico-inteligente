@@ -12,7 +12,7 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -66,15 +66,15 @@ serve(async (req) => {
 
     // 2) (Opcional) sintetizar resumo clínico via Lovable AI Gateway
     let summary: string | null = null;
-    if (summarize && LOVABLE_API_KEY && cleaned.length > 0) {
+    if (summarize && GEMINI_API_KEY && cleaned.length > 0) {
       try {
         const ctx = cleaned.map((a, i) =>
           `[${i + 1}] ${a.title} (${a.year || "s/d"}) — ${a.abstract}`).join("\n\n");
-        const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        const r = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
           method: "POST",
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+          headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: "gemini-2.5-flash",
             messages: [
               { role: "system", content: "Você é um assistente clínico. Resuma evidências em 3 frases curtas, em PT-BR, citando [n]." },
               { role: "user", content: `Condição: ${condition}\n\nEvidências:\n${ctx}` },

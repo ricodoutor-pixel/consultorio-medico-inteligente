@@ -1,8 +1,25 @@
 import { router, publicProcedure } from '../_core/trpc';
 import { z } from 'zod';
-import { handlePaymentApproved, validateWebhook } from '../services/mercadoPagoIntegration';
+import crypto from 'crypto';
+import { TRPCError } from '@trpc/server';
+import { handlePaymentApproved } from '../services/mercadoPagoIntegration';
 import { notifyDepositConfirmed } from '../services/notificationsService';
 import { ClickSignService } from '../services/clicksignService';
+
+function verifyMpSignature(rawBody: string, signature: string, timestamp: string): boolean {
+  const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+  if (!secret || !signature || !timestamp || !rawBody) return false;
+  try {
+    const message = `${timestamp}.${rawBody}`;
+    const expected = crypto.createHmac('sha256', secret).update(message).digest('hex');
+    const a = Buffer.from(expected, 'hex');
+    const b = Buffer.from(signature, 'hex');
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
+}
 
 export const webhookRouter = router({
   /**
@@ -19,11 +36,21 @@ export const webhookRouter = router({
         action: z.string().optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
+        const signature = (ctx.req.headers['x-signature'] as string) || '';
+        const timestamp = (ctx.req.headers['x-timestamp'] as string) || '';
+        const rawBody = (ctx.req as any).rawBody
+          ? (ctx.req as any).rawBody.toString('utf8')
+          : JSON.stringify(ctx.req.body ?? input);
+
+        if (!verifyMpSignature(rawBody, signature, timestamp)) {
+          console.error('[Webhook] Invalid Mercado Pago signature');
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid webhook signature' });
+        }
+
         console.log('[Webhook] Recebido webhook do Mercado Pago:', input);
 
-        // Validar tipo de notificação
         if (input.type !== 'payment') {
           console.log('[Webhook] Tipo de notificação ignorado:', input.type);
           return { success: true, message: 'Notificação ignorada' };

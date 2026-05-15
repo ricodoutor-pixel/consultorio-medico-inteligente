@@ -57,48 +57,55 @@ Deno.serve(async (req) => {
 
     const siteUrl = "https://consultorio-medico-inteligente.lovable.app";
 
-    // Validate items server-side: check prices from vendor_products
+    // SECURITY: every item MUST reference a real catalog product_id.
+    // Client-supplied prices are NEVER trusted — prices are looked up from vendor_products.
+    if (!items.every((i: { product_id?: string }) => typeof i.product_id === "string" && i.product_id.length > 0)) {
+      return new Response(JSON.stringify({ error: "Todos os itens devem referenciar um produto válido (product_id)." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const serviceClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const productIds = items.map((i: { product_id?: string }) => i.product_id).filter(Boolean);
+    const productIds = items.map((i: { product_id: string }) => i.product_id);
+
+    const { data: products, error: productsError } = await serviceClient
+      .from("vendor_products")
+      .select("id, name, price, is_active, vendor_id")
+      .in("id", productIds)
+      .eq("is_active", true);
+
+    if (productsError) {
+      console.error("[create-cart-payment] product lookup failed:", productsError);
+      return new Response(JSON.stringify({ error: "Falha ao validar produtos" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const productMap = new Map((products || []).map(p => [p.id, p]));
 
     let validatedTotal = 0;
     const mpItems = [];
 
-    if (productIds.length > 0) {
-      const { data: products } = await serviceClient
-        .from("vendor_products")
-        .select("id, name, price, is_active, vendor_id")
-        .in("id", productIds)
-        .eq("is_active", true);
-
-      const productMap = new Map((products || []).map(p => [p.id, p]));
-
-      for (const item of items) {
-        const product = item.product_id ? productMap.get(item.product_id) : null;
-        const price = product ? Number(product.price) : Number(item.price);
-        const title = product ? product.name : item.title;
-        const qty = Math.max(1, Math.floor(item.quantity || 1));
-
-        mpItems.push({
-          title: String(title).substring(0, 255),
-          quantity: qty,
-          unit_price: price,
-          currency_id: "BRL",
+    for (const item of items) {
+      const product = productMap.get(item.product_id);
+      if (!product) {
+        return new Response(JSON.stringify({ error: `Produto inválido ou inativo: ${item.product_id}` }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
-        validatedTotal += price * qty;
       }
-    } else {
-      // Fallback for items without product_id
-      for (const item of items) {
-        const qty = Math.max(1, Math.floor(item.quantity || 1));
-        mpItems.push({
-          title: String(item.title).substring(0, 255),
-          quantity: qty,
-          unit_price: Number(item.price),
-          currency_id: "BRL",
-        });
-        validatedTotal += Number(item.price) * qty;
-      }
+      const price = Number(product.price);
+      const qty = Math.max(1, Math.floor(item.quantity || 1));
+
+      mpItems.push({
+        title: String(product.name).substring(0, 255),
+        quantity: qty,
+        unit_price: price,
+        currency_id: "BRL",
+      });
+      validatedTotal += price * qty;
     }
 
     // Apply coupon discount if provided

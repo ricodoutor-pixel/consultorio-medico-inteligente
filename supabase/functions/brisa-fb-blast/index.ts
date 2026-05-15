@@ -83,6 +83,43 @@ Deno.serve(async (req) => {
     );
   }
 
+  const url = new URL(req.url);
+  if (url.searchParams.get("debug") === "1") {
+    const debug: Record<string, unknown> = {};
+    // 1) /me — quem é o token
+    try {
+      const r = await fetch(`${GRAPH_API}/me?fields=id,name&access_token=${fbToken}`);
+      debug.me = await r.json();
+    } catch (e) { debug.me = { error: String(e) }; }
+    // 2) /me/permissions — escopos concedidos
+    try {
+      const r = await fetch(`${GRAPH_API}/me/permissions?access_token=${fbToken}`);
+      debug.permissions = await r.json();
+    } catch (e) { debug.permissions = { error: String(e) }; }
+    // 3) debug_token — tipo (USER vs PAGE) e expiração
+    try {
+      const r = await fetch(`${GRAPH_API}/debug_token?input_token=${fbToken}&access_token=${fbToken}`);
+      debug.debug_token = await r.json();
+    } catch (e) { debug.debug_token = { error: String(e) }; }
+    // 4) /me/accounts — lista páginas que o token gerencia
+    try {
+      const r = await fetch(`${GRAPH_API}/me/accounts?access_token=${fbToken}`);
+      debug.accounts = await r.json();
+    } catch (e) { debug.accounts = { error: String(e) }; }
+    // 5) /{pageId} — confere acesso à página alvo
+    try {
+      const r = await fetch(`${GRAPH_API}/${pageId}?fields=id,name,access_token&access_token=${fbToken}`);
+      const j = await r.json();
+      if (j.access_token) j.access_token = "***present***";
+      debug.page = j;
+    } catch (e) { debug.page = { error: String(e) }; }
+
+    return new Response(JSON.stringify({ pageId, debug }, null, 2), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const results: unknown[] = [];
   for (const p of POSTS) {
     try {

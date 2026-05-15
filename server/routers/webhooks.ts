@@ -77,6 +77,7 @@ export const webhookRouter = router({
 
         return result;
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error('[Webhook] Erro ao processar webhook:', error);
         return {
           success: false,

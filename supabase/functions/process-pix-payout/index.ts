@@ -10,6 +10,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const getFirstEnv = (...names: string[]) => {
+  for (const name of names) {
+    const value = Deno.env.get(name);
+    if (value) return value;
+  }
+  return null;
+};
+
 const WITHDRAWAL_FEE_RATE = 0.05;
 const DAILY_LIMIT = 50.00;
 const MIN_WITHDRAWAL = 100.00;
@@ -254,7 +262,7 @@ Deno.serve(async (req) => {
   if (url.pathname.endsWith("/webhook") && req.method === "POST") {
     try {
       // HMAC-SHA256 signature verification (Mercado Pago x-signature)
-      const mpWebhookSecret = Deno.env.get("MERCADOPAGO_WEBHOOK_SECRET");
+      const mpWebhookSecret = getFirstEnv("MERCADOPAGO_WEBHOOK_SECRET", "MERCADO_PAGO_WEBHOOK_SECRET");
       const xSignature = req.headers.get("x-signature");
       const xRequestId = req.headers.get("x-request-id");
       if (!mpWebhookSecret) {
@@ -290,7 +298,7 @@ Deno.serve(async (req) => {
       if (parsed.data.action !== "payment.updated") return json({ ok: true });
 
       const supabase = await getAdminSupabase();
-      const mpToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") || Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
+      const mpToken = getFirstEnv("MERCADO_PAGO_ACCESS_TOKEN", "MERCADOPAGO_ACCESS_TOKEN", "MERCADO_PAGO_API_KEY");
       if (!mpToken) return json({ error: "Token MP não configurado" }, 500);
 
       const mpRes = await fetch(`https://api.mercadopago.com/v1/payments/${parsed.data.data.id}`, {

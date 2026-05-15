@@ -2,6 +2,14 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
+const getFirstEnv = (...names: string[]) => {
+  for (const name of names) {
+    const value = Deno.env.get(name);
+    if (value) return value;
+  }
+  return null;
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -49,7 +57,7 @@ serve(async (req) => {
 
       // 3. Mercado Pago check
       const mpStart = Date.now();
-      const MP_TOKEN = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN") || Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
+      const MP_TOKEN = getFirstEnv("MERCADO_PAGO_ACCESS_TOKEN", "MERCADOPAGO_ACCESS_TOKEN", "MERCADO_PAGO_API_KEY");
       if (MP_TOKEN) {
         try {
           const mpRes = await fetch("https://api.mercadopago.com/v1/payment_methods", {

@@ -1,5 +1,13 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
+const getFirstEnv = (...names: string[]) => {
+  for (const name of names) {
+    const value = Deno.env.get(name);
+    if (value) return value;
+  }
+  return null;
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -31,7 +39,7 @@ Deno.serve(async (req) => {
     }
 
     // Verify MercadoPago webhook signature
-    const mpWebhookSecret = Deno.env.get("MERCADOPAGO_WEBHOOK_SECRET");
+    const mpWebhookSecret = getFirstEnv("MERCADOPAGO_WEBHOOK_SECRET", "MERCADO_PAGO_WEBHOOK_SECRET");
     const xSignature = req.headers.get("x-signature");
     const xRequestId = req.headers.get("x-request-id");
 
@@ -90,7 +98,7 @@ Deno.serve(async (req) => {
     }
 
     // Fetch payment details from Mercado Pago API
-    const mpAccessToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
+    const mpAccessToken = getFirstEnv("MERCADO_PAGO_ACCESS_TOKEN", "MERCADOPAGO_ACCESS_TOKEN", "MERCADO_PAGO_API_KEY");
     if (!mpAccessToken) {
       console.error("MERCADO_PAGO_ACCESS_TOKEN not configured");
       return new Response(JSON.stringify({ status: "received", warning: "MP token not configured" }), {

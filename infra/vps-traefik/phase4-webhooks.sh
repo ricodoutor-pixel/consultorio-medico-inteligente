@@ -18,6 +18,8 @@ set -euo pipefail
 ENV_FILE="/opt/planta-infra/infra/vps-traefik/.env"
 [ -f "${ENV_FILE}" ] && set -a && . "${ENV_FILE}" && set +a || true
 
+MP_ACCESS_TOKEN="${MERCADOPAGO_ACCESS_TOKEN:-${MERCADO_PAGO_ACCESS_TOKEN:-${MERCADO_PAGO_API_KEY:-}}}"
+
 N8N_WEBHOOK_BASE="${N8N_WEBHOOK_BASE:-https://n8n.plantayraiz.com.br/webhook}"
 MP_HOOK="${N8N_WEBHOOK_BASE}/pagamentos"
 STRIPE_HOOK="${N8N_WEBHOOK_BASE}/pagamentos"
@@ -42,11 +44,11 @@ stripe_id="(skipped)"
 # ─── 1. Mercado Pago ───────────────────────────────────────────────
 echo ""
 echo "💳 [1/3] Mercado Pago..."
-if [[ -z "${MERCADOPAGO_ACCESS_TOKEN:-}" || "${MERCADOPAGO_ACCESS_TOKEN}" == *"PLACEHOLDER"* ]]; then
+if [[ -z "${MP_ACCESS_TOKEN:-}" || "${MP_ACCESS_TOKEN}" == *"PLACEHOLDER"* ]]; then
   echo "   ⚠️  MERCADOPAGO_ACCESS_TOKEN ausente/placeholder — pulando registro real."
 else
   mp_resp=$(curl -sk -X POST "https://api.mercadopago.com/v1/webhooks" \
-    -H "Authorization: Bearer ${MERCADOPAGO_ACCESS_TOKEN}" \
+    -H "Authorization: Bearer ${MP_ACCESS_TOKEN}" \
     -H "Content-Type: application/json" \
     -d "{
       \"url\": \"${MP_HOOK}\",

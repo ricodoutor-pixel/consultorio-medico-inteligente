@@ -56,12 +56,12 @@ interface MercadoPagoPayment {
  */
 export class MercadoPagoClubService {
   private apiUrl = 'https://api.mercadopago.com/v1';
-  private accessToken = process.env.MERCADO_PAGO_API_KEY || '';
+  private accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_API_KEY || '';
   private notificationUrl = `${process.env.BACKEND_URL}/api/webhooks/mercado-pago`;
 
   constructor() {
     if (!this.accessToken) {
-      console.error('❌ MERCADO_PAGO_API_KEY não configurada!');
+      console.error('❌ Token do Mercado Pago não configurado!');
     }
   }
 

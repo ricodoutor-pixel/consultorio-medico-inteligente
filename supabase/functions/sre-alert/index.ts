@@ -1,83 +1,128 @@
-import { requireServiceAuth } from "../_shared/service-auth.ts";
-// SRE Alert dispatcher → Discord webhook
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+
+const COLORS: Record<string, number> = {
+  SUCCESS: 0x00ff00,
+  WARNING: 0xffff00,
+  CRITICAL: 0xff0000,
+  AUDIT: 0xffff00,
+  FINANCIAL: 0x00ff00,
 };
 
-interface AlertBody {
-  title?: string;
-  message?: string;
-  severity?: "info" | "success" | "warning" | "critical";
-  context?: Record<string, unknown>;
+const ALLOWED_LEVELS = new Set(Object.keys(COLORS));
+
+// Simple in-memory rate limit (per isolate). Best-effort anti-spam.
+const RATE: Map<string, { count: number; reset: number }> = new Map();
+const WINDOW_MS = 60_000;
+const MAX_PER_WINDOW = 30;
+
+function rateLimit(key: string): boolean {
+  const now = Date.now();
+  const entry = RATE.get(key);
+  if (!entry || entry.reset < now) {
+    RATE.set(key, { count: 1, reset: now + WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= MAX_PER_WINDOW) return false;
+  entry.count += 1;
+  return true;
 }
 
-const COLOR = {
-  info: 0x3498db,
-  success: 0x2ecc71,
-  warning: 0xf39c12,
-  critical: 0xe74c3c,
-} as const;
+Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  try {
+    const webhookUrl = Deno.env.get("DISCORD_SRE_WEBHOOK_URL");
+    if (!webhookUrl) {
+      return new Response(JSON.stringify({ error: "Webhook not configured" }), {
+        status: 503,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-  const _unauth = requireServiceAuth(req, corsHeaders);
-  if (_unauth) return _unauth;
+    const ip =
+      req.headers.get("cf-connecting-ip") ||
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      "anon";
+    if (!rateLimit(ip)) {
+      return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-  if (req.method !== "POST") return new Response("Method not allowed", { status: 405, headers: corsHeaders });
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return new Response(JSON.stringify({ error: "Invalid body" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-  const url = Deno.env.get("DISCORD_SRE_WEBHOOK_URL");
-  if (!url) {
-    return new Response(JSON.stringify({ error: "DISCORD_SRE_WEBHOOK_URL not configured" }), {
+    const level = String(body.level || "").toUpperCase();
+    const description = typeof body.description === "string" ? body.description.slice(0, 1500) : "";
+    const title = typeof body.title === "string" ? body.title.slice(0, 200) : `Log: ${level}`;
+    const fieldsInput = Array.isArray(body.fields) ? body.fields.slice(0, 10) : [];
+
+    if (!ALLOWED_LEVELS.has(level)) {
+      return new Response(JSON.stringify({ error: "Invalid level" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!description) {
+      return new Response(JSON.stringify({ error: "description required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const fields = fieldsInput
+      .filter((f: any) => f && typeof f.name === "string" && typeof f.value === "string")
+      .map((f: any) => ({
+        name: String(f.name).slice(0, 200),
+        value: String(f.value).slice(0, 500),
+        inline: Boolean(f.inline),
+      }));
+
+    const payload = {
+      username: "Planta y Raiz",
+      embeds: [
+        {
+          title,
+          description,
+          color: COLORS[level],
+          fields,
+          timestamp: new Date().toISOString(),
+          footer: { text: "Torre de Controle - Planta y Raiz" },
+        },
+      ],
+    };
+
+    const r = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!r.ok) {
+      console.error("Discord webhook failed", r.status);
+      return new Response(JSON.stringify({ error: "Upstream failed" }), {
+        status: 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    console.error("sre-alert error", err);
+    return new Response(JSON.stringify({ error: "Internal error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-
-  let body: AlertBody = {};
-  try { body = await req.json(); } catch { /* empty body ok */ }
-
-  const severity = body.severity ?? "info";
-  const title = body.title ?? "🛰️ Planta y Raiz SRE Alert";
-  const message = body.message ?? "Sem detalhes.";
-
-  const fields = body.context
-    ? Object.entries(body.context).map(([name, value]) => ({
-        name: name.slice(0, 256),
-        value: String(value).slice(0, 1024),
-        inline: true,
-      }))
-    : [];
-
-  const payload = {
-    username: "Manus CEO • SRE",
-    embeds: [{
-      title: title.slice(0, 256),
-      description: message.slice(0, 4000),
-      color: COLOR[severity],
-      timestamp: new Date().toISOString(),
-      footer: { text: `severity=${severity} • plantayraiz.com.br` },
-      fields,
-    }],
-  };
-
-  const r = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  if (!r.ok) {
-    const txt = await r.text();
-    return new Response(JSON.stringify({ ok: false, status: r.status, body: txt }), {
-      status: 502,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
-  return new Response(JSON.stringify({ ok: true, dispatched_at: new Date().toISOString() }), {
-    status: 200,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
 });

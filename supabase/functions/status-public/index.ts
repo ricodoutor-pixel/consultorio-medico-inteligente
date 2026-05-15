@@ -61,24 +61,24 @@ serve(async (req) => {
       : "operational";
 
     const services = [
-      { name: "API & Database", status: classify(dbLatency, true), latency_ms: dbLatency },
-      { name: "Pagamentos (Mercado Pago)", status: mpStatus, since: contingency?.updated_at },
+      { name: "API & Database", status: classify(dbLatency, true) },
+      { name: "Pagamentos (Mercado Pago)", status: mpStatus },
       {
         name: "Enfª Brisa (WhatsApp)",
-        status: (brisaInbound ?? 0) > 0 ? "operational" : "operational",
-        messages_last_hour: brisaInbound ?? 0,
-      } as any,
+        status: "operational" as Status,
+      },
       {
         name: "Auditoria & Crons",
-        status: cronOverdue === 0 ? "operational" : cronOverdue > 2 ? "outage" : "degraded",
-        active_jobs: cronTotal,
-        overdue: cronOverdue,
-      } as any,
+        status: (cronOverdue === 0
+          ? "operational"
+          : cronOverdue > 2
+          ? "outage"
+          : "degraded") as Status,
+      },
       {
         name: "Detecção de Erros (AI Healing)",
-        status: (criticalErrors ?? 0) === 0 ? "operational" : "degraded",
-        open_critical: criticalErrors ?? 0,
-      } as any,
+        status: ((criticalErrors ?? 0) === 0 ? "operational" : "degraded") as Status,
+      },
     ];
 
     const overall: Status = services.some(s => s.status === "outage")

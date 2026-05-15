@@ -1,6 +1,7 @@
 // Daily encrypted off-site backup of critical tables → GitHub Release (private repo)
 // AES-256-GCM via SHA-256(BRISA_CEO_SECRET_KEY). No JWT (cron-invoked).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -52,6 +53,9 @@ function bytesToB64(bytes: Uint8Array): string {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   const ghToken =
     Deno.env.get("GITHUB_BACKUP_TOKEN") ||

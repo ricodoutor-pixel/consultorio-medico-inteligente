@@ -28,11 +28,32 @@ const BRISA_WELCOME: Record<string, { message: string; link: string }> = {
 
 function detectIntent(text: string): string {
   const lower = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (/(quero ser acompanhad|liberar orientac|quero pagar|gerar pix|link de pagamento|pode mandar o link|pagar agora|orientacao agora)/.test(lower)) return "pay";
+  if (/(sex|tesao|gostosa|safad|pelad|nudes|peit|bunda|transar|gozar|punheta|libido|ereca|impotenc)/.test(lower)) return "sexual";
   if (lower.includes("paciente") || lower.includes("consulta") || lower.includes("triagem") || lower.includes("medico prescritor")) return "paciente";
   if (lower.includes("medico") || lower.includes("doutor") || lower.includes("profissional") || lower.includes("crm")) return "medico";
   if (lower.includes("lojista") || lower.includes("loja") || lower.includes("produto") || lower.includes("shopping")) return "lojista";
   if (lower.includes("ebook") || lower.includes("e-book") || lower.includes("material") || lower.includes("baixar")) return "ebook";
   return "default";
+}
+
+async function generatePaymentLink(phone: string): Promise<string | null> {
+  try {
+    const url = `${Deno.env.get("SUPABASE_URL")}/functions/v1/brisa-payment-link`;
+    const r = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
+      },
+      body: JSON.stringify({ phone }),
+    });
+    const j = await r.json();
+    return j?.payment_url ?? null;
+  } catch (e) {
+    console.error("[Brisa] payment link error:", e);
+    return null;
+  }
 }
 
 Deno.serve(async (req) => {

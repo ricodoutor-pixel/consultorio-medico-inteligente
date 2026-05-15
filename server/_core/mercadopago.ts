@@ -166,11 +166,17 @@ export async function refundPayment(paymentId: string, amount?: number): Promise
   }
 }
 
-export function verifyWebhookSignature(body: any, signature: string, secret: string): boolean {
+export function verifyWebhookSignature(body: any, signature: string, secret: string, timestamp?: string): boolean {
   try {
-    // Implementar verificação de assinatura do Mercado Pago
-    // Detalhes em: https://www.mercadopago.com.br/developers/pt/docs/checkout-pro/additional-content/webhooks/v1/overview
-    return true; // Simplificado para exemplo
+    if (!secret || !signature || !body) return false;
+    const crypto = require('crypto');
+    const payload = typeof body === 'string' ? body : JSON.stringify(body);
+    const message = timestamp ? `${timestamp}.${payload}` : payload;
+    const expected = crypto.createHmac('sha256', secret).update(message).digest('hex');
+    const a = Buffer.from(expected, 'hex');
+    const b = Buffer.from(signature, 'hex');
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
   } catch (error) {
     console.error('[Mercado Pago] Erro ao verificar assinatura:', error);
     return false;

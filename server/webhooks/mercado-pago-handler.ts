@@ -318,9 +318,18 @@ async function handleInvoiceWebhook(payload: MercadoPagoWebhookPayload): Promise
  */
 function verifyWebhookSignature(req: Request): boolean {
   try {
-    // TODO: Implement signature verification using Mercado Pago's public key
-    // For now, accept all webhooks (implement in production)
-    return true;
+    const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+    const signature = (req.headers["x-signature"] as string) || "";
+    const timestamp = (req.headers["x-timestamp"] as string) || "";
+    if (!secret || !signature || !timestamp) return false;
+    const crypto = require("crypto");
+    const body = typeof req.body === "string" ? req.body : JSON.stringify(req.body ?? {});
+    const message = `${timestamp}.${body}`;
+    const expected = crypto.createHmac("sha256", secret).update(message).digest("hex");
+    const a = Buffer.from(expected, "hex");
+    const b = Buffer.from(signature, "hex");
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
   } catch (error) {
     console.error("[WEBHOOK] Signature verification error:", error);
     return false;

@@ -70,22 +70,25 @@ export async function setupWebhook(): Promise<void> {
 /**
  * Verify webhook signature
  */
+import crypto from "crypto";
+
 export function verifyWebhookSignature(
   body: string,
   signature: string,
   timestamp: string
 ): boolean {
   try {
-    console.log("[WEBHOOK] Verifying signature...");
-
-    // ✅ Signature verification implemented
-    // const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
-    // const message = `${timestamp}.${body}`;
-    // const hash = crypto.createHmac('sha256', secret).update(message).digest('hex');
-    // return hash === signature;
-
-    console.log("[WEBHOOK] ✓ Signature verified");
-    return true;
+    const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+    if (!secret || !signature || !timestamp || !body) {
+      console.error("[WEBHOOK] Missing signature, timestamp, body, or secret");
+      return false;
+    }
+    const message = `${timestamp}.${body}`;
+    const expected = crypto.createHmac("sha256", secret).update(message).digest("hex");
+    const a = Buffer.from(expected, "hex");
+    const b = Buffer.from(signature, "hex");
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
   } catch (error) {
     console.error("[WEBHOOK] Signature verification error:", error);
     return false;

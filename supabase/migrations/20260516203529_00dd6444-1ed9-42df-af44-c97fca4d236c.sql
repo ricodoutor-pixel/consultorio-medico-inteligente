@@ -1,0 +1,2 @@
+ALTER TABLE public.manus_social_queue ADD COLUMN IF NOT EXISTS image_url text;
+CREATE INDEX IF NOT EXISTS idx_social_queue_fb_dispatch ON public.manus_social_queue (platform, status, scheduled_for) WHERE platform = 'facebook';

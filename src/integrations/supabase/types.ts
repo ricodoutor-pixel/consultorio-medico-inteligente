@@ -3101,6 +3101,7 @@ export type Database = {
           created_by_run: string | null
           hashtags: string[] | null
           id: string
+          image_url: string | null
           platform: string
           posted_at: string | null
           scheduled_for: string | null
@@ -3114,6 +3115,7 @@ export type Database = {
           created_by_run?: string | null
           hashtags?: string[] | null
           id?: string
+          image_url?: string | null
           platform: string
           posted_at?: string | null
           scheduled_for?: string | null
@@ -3127,6 +3129,7 @@ export type Database = {
           created_by_run?: string | null
           hashtags?: string[] | null
           id?: string
+          image_url?: string | null
           platform?: string
           posted_at?: string | null
           scheduled_for?: string | null

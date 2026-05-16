@@ -199,15 +199,19 @@ const Index = () => {
             ))}
           </div>
           <div className="flex justify-center">
-            <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
-              <a
-                href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Enfª Brisa, eu preciso de uma orientação técnica com Dr Edilson Bezerra On Agora!")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                🎯 Iniciar Orientação Técnica <ArrowRight size={18} className="ml-2" />
-              </a>
-            </Button>
+            <div className="relative inline-block">
+              {/* Pulse verde leve atrás do botão da Enfª Brisa */}
+              <span aria-hidden className="pointer-events-none absolute -inset-2 rounded-3xl bg-primary/40 blur-2xl opacity-70 animate-brisa-pulse" />
+              <Button size="lg" className="relative text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/30 transition-all hover:scale-105" asChild>
+                <a
+                  href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Enfª Brisa, eu preciso de uma orientação técnica com Dr Edilson Bezerra On Agora!")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  🎯 Iniciar Orientação Técnica <ArrowRight size={18} className="ml-2" />
+                </a>
+              </Button>
+            </div>
           </div>
 
           {/* Card do Dr. Edilson reposicionado logo abaixo do botão verde */}

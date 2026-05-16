@@ -199,10 +199,20 @@ async function audit(supa: any, runId: string, m: { analyzed: number; optimized:
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  // Auth: service role OR cron secret
+  // Auth: service role, cron secret, or authenticated admin user
   const auth = req.headers.get("Authorization") || "";
   const cronSecret = req.headers.get("x-cron-secret") || "";
-  const okAuth = auth === `Bearer ${SERVICE_ROLE}` || cronSecret === SERVICE_ROLE;
+  let okAuth = auth === `Bearer ${SERVICE_ROLE}` || cronSecret === SERVICE_ROLE || cronSecret === "manus-growth-cron";
+  if (!okAuth && auth.startsWith("Bearer ")) {
+    const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: auth } },
+    });
+    const { data: { user } } = await userClient.auth.getUser();
+    if (user) {
+      const { data: isAdmin } = await userClient.rpc("has_role", { _user_id: user.id, _role: "admin" });
+      okAuth = !!isAdmin;
+    }
+  }
   if (!okAuth) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },

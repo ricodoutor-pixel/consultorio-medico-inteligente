@@ -162,3 +162,6 @@ verify_jwt = false
 
 [functions.brisa-fb-blast]
 verify_jwt = false
+
+[functions.manus-growth-agent]
+verify_jwt = false

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import drVerdinho from "@/assets/verdinho-doctor.png";
+import drVerdinho from "@/assets/dr-verdinho-floating.png";
 
 /**
  * Splash / Loader screen — Dr. Verdinho, mascote oficial da Planta y Raiz Ltda.
@@ -47,10 +47,11 @@ export function CustomLoader() {
           </p>
         </div>
 
-        {/* Spinner */}
-        <div className="relative h-8 w-8 mt-2">
-          <div className="absolute inset-0 rounded-full border-2 border-white/20" />
-          <div className="absolute inset-0 rounded-full border-2 border-t-emerald-300 animate-spin" />
+        {/* Dots de carregamento (substituindo a bola verde) */}
+        <div className="flex items-center gap-1.5 mt-1" aria-hidden>
+          <span className="w-2 h-2 rounded-full bg-emerald-300/80 animate-[float_1.2s_ease-in-out_infinite]" />
+          <span className="w-2 h-2 rounded-full bg-emerald-300/60 animate-[float_1.2s_ease-in-out_infinite] [animation-delay:150ms]" />
+          <span className="w-2 h-2 rounded-full bg-emerald-300/40 animate-[float_1.2s_ease-in-out_infinite] [animation-delay:300ms]" />
         </div>
       </div>
 

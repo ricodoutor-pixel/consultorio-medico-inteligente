@@ -4,6 +4,7 @@
 // pela Enfª Brisa e marca google_review_requested_at.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

@@ -291,11 +291,16 @@ const EbookLanding = () => {
                     <Button 
                       className="w-full h-12 font-black text-base bg-primary hover:bg-primary/90 rounded-lg"
                       onClick={handleDownload}
-                      disabled={isDownloading || !formData.email}
+                      disabled={isDownloading || !formData.whatsapp || !formData.name}
                     >
                       <Download size={18} className="mr-2" />
-                      {isDownloading ? "Processando..." : "CONFIRMAR E BAIXAR"}
+                      {isDownloading ? "Enviando..." : submitted ? "✅ ENVIADO NO WHATSAPP" : "RECEBER NO WHATSAPP"}
                     </Button>
+                    {submitted && (
+                      <p className="text-xs text-center text-primary font-medium">
+                        Confira seu WhatsApp! Em 24h você recebe um cupom exclusivo. 💚
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>

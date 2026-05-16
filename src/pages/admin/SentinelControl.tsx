@@ -137,12 +137,17 @@ export default function SentinelControl() {
           </div>
         </header>
 
-        <Tabs defaultValue="thresholds">
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs defaultValue="live">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="live" className="gap-2"><Radio className="w-4 h-4" />Ao Vivo</TabsTrigger>
             <TabsTrigger value="thresholds" className="gap-2"><Settings className="w-4 h-4" />Limiares</TabsTrigger>
             <TabsTrigger value="escalation" className="gap-2"><ShieldAlert className="w-4 h-4" />Escalonamento</TabsTrigger>
             <TabsTrigger value="audit" className="gap-2"><History className="w-4 h-4" />Auditoria</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="live" className="mt-4">
+            <SentinelLiveDashboard />
+          </TabsContent>
 
           {/* THRESHOLDS */}
           <TabsContent value="thresholds" className="mt-4">

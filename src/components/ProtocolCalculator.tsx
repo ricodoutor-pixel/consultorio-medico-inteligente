@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, ArrowLeft, Sparkles, CheckCircle2, Leaf } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { trackFunnelEvent } from "@/lib/funnel-tracking";
 
 /**
  * ProtocolCalculator — Public lead-gate quiz on homepage
- * 5 perguntas → prévia do perfil canabinoide + CTA WhatsApp Brisa (Orientação R$30)
- * Conversão esperada 3-5x maior que CTA estático (audit recommendation E)
+ * 5 perguntas → prévia do perfil canabinoide + captura de nome + lead salvo + WhatsApp Brisa
+ * Tracking completo do funil em `funnel_events`.
  */
 
 type Step = {
@@ -107,13 +109,21 @@ function suggestProfile(answers: Record<string, string>): Profile {
   };
 }
 
-const WHATSAPP_URL = (profile: Profile, answers: Record<string, string>) =>
+const buildWhatsappUrl = (
+  profile: Profile,
+  answers: Record<string, string>,
+  name: string,
+) =>
   `https://wa.me/5511991363154?text=${encodeURIComponent(
-    `Olá Enfª Brisa! Fiz a calculadora no site e meu perfil sugerido foi:\n\n` +
+    `Olá Enfª Brisa! Meu nome é ${name || "(não informado)"}.\n` +
+      `Fiz a Calculadora de Protocolo no site e meu perfil sugerido foi:\n\n` +
       `• Razão: ${profile.ratio}\n` +
       `• Espectro: ${profile.spectrum}\n` +
-      `• Condição: ${answers.condition}\n` +
-      `• Intensidade: ${answers.intensity}\n\n` +
+      `• Condição principal: ${answers.condition}\n` +
+      `• Faixa etária: ${answers.age}\n` +
+      `• Medicações contínuas: ${answers.meds}\n` +
+      `• Intensidade dos sintomas: ${answers.intensity}\n` +
+      `• Já experimentou cannabis: ${answers.tried}\n\n` +
       `Quero iniciar a Orientação Técnica com Dr. Edilson Bezerra On (R$30).`,
   )}`;
 
@@ -121,15 +131,35 @@ export function ProtocolCalculator() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [done, setDone] = useState(false);
+  const [leadName, setLeadName] = useState("");
+  const [leadWa, setLeadWa] = useState("");
+  const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
+  const [savingLead, setSavingLead] = useState(false);
+
+  // Track inicial uma única vez
+  useEffect(() => {
+    trackFunnelEvent("protocol_calculator", "calculator_viewed");
+  }, []);
 
   const handleAnswer = (value: string) => {
     const key = STEPS[step].key;
     const next = { ...answers, [key]: value };
     setAnswers(next);
+    trackFunnelEvent("protocol_calculator", "step_answered", {
+      step: step + 1,
+      key,
+      value,
+    });
     if (step < STEPS.length - 1) {
       setStep(step + 1);
     } else {
       setDone(true);
+      const p = suggestProfile(next);
+      trackFunnelEvent("protocol_calculator", "calculator_completed", {
+        ratio: p.ratio,
+        condition: next.condition,
+        intensity: next.intensity,
+      });
     }
   };
 
@@ -137,6 +167,60 @@ export function ProtocolCalculator() {
     setStep(0);
     setAnswers({});
     setDone(false);
+    setLeadName("");
+    setLeadWa("");
+    setSavedLeadId(null);
+  };
+
+  const formatWa = (v: string) => {
+    const d = v.replace(/\D/g, "").slice(0, 11);
+    if (d.length <= 2) return d;
+    if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+  };
+
+  const handleWhatsappClick = async (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    profile: Profile,
+  ) => {
+    e.preventDefault();
+    const digits = leadWa.replace(/\D/g, "");
+    const nameOk = leadName.trim().length >= 2;
+    const waOk = digits.length >= 10;
+
+    let leadId = savedLeadId;
+    if (nameOk && waOk && !leadId) {
+      setSavingLead(true);
+      try {
+        const { data } = await supabase
+          .from("leads" as any)
+          .insert({
+            name: leadName.trim(),
+            whatsapp: `+55${digits}`,
+            source: "protocol_calculator_home",
+            lead_score: 60,
+            condition_interest: answers.condition,
+            metadata: { answers, profile },
+          } as any)
+          .select("id")
+          .single();
+        leadId = (data as any)?.id ?? null;
+        if (leadId) setSavedLeadId(leadId);
+      } catch (err) {
+        console.warn("[ProtocolCalculator] lead insert failed:", err);
+      } finally {
+        setSavingLead(false);
+      }
+    }
+
+    await trackFunnelEvent(
+      "protocol_calculator",
+      "whatsapp_clicked",
+      { has_name: nameOk, has_whatsapp: waOk, ratio: profile.ratio },
+      leadId ?? undefined,
+    );
+
+    window.open(buildWhatsappUrl(profile, answers, leadName.trim()), "_blank", "noopener");
   };
 
   const profile = done ? suggestProfile(answers) : null;

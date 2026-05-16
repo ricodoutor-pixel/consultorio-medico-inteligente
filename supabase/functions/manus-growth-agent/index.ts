@@ -202,7 +202,7 @@ serve(async (req) => {
   // Auth: service role, cron secret, or authenticated admin user
   const auth = req.headers.get("Authorization") || "";
   const cronSecret = req.headers.get("x-cron-secret") || "";
-  let okAuth = auth === `Bearer ${SERVICE_ROLE}` || cronSecret === SERVICE_ROLE || cronSecret === "manus-growth-cron";
+  let okAuth = auth === `Bearer ${SERVICE_ROLE}` || cronSecret === SERVICE_ROLE;
   if (!okAuth && auth.startsWith("Bearer ")) {
     const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
       global: { headers: { Authorization: auth } },

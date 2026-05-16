@@ -3,6 +3,7 @@
 // Modo simulação (dry_run=true): NÃO aplica correções nem envia mensagens reais — apenas registra resultado.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -67,6 +68,9 @@ async function sendEmail(to: string, subject: string, html: string, dryRun: bool
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   let dryRun = false;
   let triggeredBy = "cron";

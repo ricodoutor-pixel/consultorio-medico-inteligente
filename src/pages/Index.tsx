@@ -19,6 +19,8 @@ import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { ScientificBadge } from "@/components/ScientificBadge";
+import { ProtocolCalculator } from "@/components/ProtocolCalculator";
+import { EbookGate } from "@/components/EbookGate";
 import drEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 
 
@@ -375,6 +377,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Calculadora de Protocolo — lead-gate público (Item E auditoria) */}
+      <ProtocolCalculator />
+
       {/* Depoimentos Reais */}
       <section className="section-padding bg-card/10 border-y border-border">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
@@ -448,6 +453,9 @@ const Index = () => {
 
       {/* Showcase da Biblioteca Científica (40k+ estudos PubMed) */}
       <ScientificBadge />
+
+      {/* Ebook Gate — lead capture Nome + WhatsApp (Item F auditoria) */}
+      <EbookGate />
 
       {/* Instalação do App PWA - Dr. Verdinho na tela inicial */}
       <PWAInstallSection />

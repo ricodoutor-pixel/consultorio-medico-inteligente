@@ -293,6 +293,8 @@ const ProductDetail = ({ id }: { id: string }) => {
 
           <h1 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-foreground leading-tight">{product.name}</h1>
 
+          {product.endorsed_by_doctor && <DoctorEndorsedBadge />}
+
           <div className="flex items-center gap-2">
             <div className="flex">{[1,2,3,4,5].map(s => <Star key={s} size={13} className={s <= Math.round(product.rating || 5) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/20"} />)}</div>
             <span className="text-xs sm:text-sm font-bold">{product.rating || 5}</span>

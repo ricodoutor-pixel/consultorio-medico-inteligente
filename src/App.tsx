@@ -200,6 +200,8 @@ const App = () => (
                 <Route path="/usuarios-online" element={<OnlineUsers />} />
                 <Route path="/admin-ceo" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+                <Route path="/admin/president" element={<AdminRoute><President360 /></AdminRoute>} />
+                <Route path="/admin/presidente" element={<AdminRoute><President360 /></AdminRoute>} />
                 <Route path="/admin/clinicas" element={<AdminRoute><AdminClinicas /></AdminRoute>} />
                 <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
                 <Route path="/admin/credit-audit" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />

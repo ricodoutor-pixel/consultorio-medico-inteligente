@@ -199,15 +199,19 @@ const Index = () => {
             ))}
           </div>
           <div className="flex justify-center">
-            <Button size="lg" className="text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-105" asChild>
-              <a
-                href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Enfª Brisa, eu preciso de uma orientação técnica com Dr Edilson Bezerra On Agora!")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                🎯 Iniciar Orientação Técnica <ArrowRight size={18} className="ml-2" />
-              </a>
-            </Button>
+            <div className="relative inline-block">
+              {/* Pulse verde leve atrás do botão da Enfª Brisa */}
+              <span aria-hidden className="pointer-events-none absolute -inset-2 rounded-3xl bg-primary/40 blur-2xl opacity-70 animate-brisa-pulse" />
+              <Button size="lg" className="relative text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/30 transition-all hover:scale-105" asChild>
+                <a
+                  href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Enfª Brisa, eu preciso de uma orientação técnica com Dr Edilson Bezerra On Agora!")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  🎯 Iniciar Orientação Técnica <ArrowRight size={18} className="ml-2" />
+                </a>
+              </Button>
+            </div>
           </div>
 
           {/* Card do Dr. Edilson reposicionado logo abaixo do botão verde */}
@@ -308,11 +312,15 @@ const Index = () => {
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <Button size="lg" className="text-sm font-black h-14 px-6 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all" asChild>
-                  <a href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20a%20triagem%20para%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20o%20Dr.%20Edilson%20Bezerra%20On" target="_blank" rel="noopener noreferrer">
-                    💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={18} className="ml-2" />
-                  </a>
-                </Button>
+                <div className="relative w-full sm:w-auto">
+                  {/* Pulse verde leve atrás do CTA da Brisa (Triagem) */}
+                  <span aria-hidden className="pointer-events-none absolute -inset-2 rounded-3xl bg-primary/40 blur-2xl opacity-70 animate-brisa-pulse" />
+                  <Button size="lg" className="relative w-full text-sm font-black h-14 px-6 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all" asChild>
+                    <a href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20a%20triagem%20para%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20o%20Dr.%20Edilson%20Bezerra%20On" target="_blank" rel="noopener noreferrer">
+                      💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={18} className="ml-2" />
+                    </a>
+                  </Button>
+                </div>
               </div>
 
               <p className="text-xs text-muted-foreground italic">

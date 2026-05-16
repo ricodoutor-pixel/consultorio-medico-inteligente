@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { LeadCaptureModal } from "@/components/LeadCaptureModal";
 import { strains, strainCategories, getTerpenosByType, terpenoInfo, type CannabisStrain } from "@/data/strains";
 import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck, BookOpen, CheckCircle } from "lucide-react";
-import { motion } from "framer-motion";
+// motion removido — wrapper sem animação causava jitter em scroll Android
 import { Link } from "react-router-dom";
 import { StrainImage } from "@/components/StrainImage";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -177,7 +177,7 @@ const BibliotecaCientifica = () => {
       {/* Hero */}
       <section className="pt-8 pb-8 hero-glow">
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div initial={false}>
+          <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center">
                 <Leaf size={24} className="text-primary" />
@@ -214,7 +214,7 @@ const BibliotecaCientifica = () => {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -323,14 +323,9 @@ const BibliotecaCientifica = () => {
               </Button>
             </div>
           ) : viewMode === "grid" ? (
-            <motion.div
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-              initial={useReducedMotionGrid ? false : "hidden"}
-              animate={useReducedMotionGrid ? undefined : "visible"}
-              variants={useReducedMotionGrid ? undefined : stagger}
-            >
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {filtered.map((strain) => (
-                <motion.div key={strain.id} variants={useReducedMotionGrid ? undefined : fadeUp}>
+                <div key={strain.id} style={{ contain: "content", transform: "translateZ(0)" }}>
                   <Card
                     className="border-border hover:border-primary/40 transition-colors cursor-pointer group overflow-hidden"
                     onClick={() => setSelected(strain)}
@@ -396,14 +391,14 @@ const BibliotecaCientifica = () => {
                       </Button>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           ) : (
             /* List View */
-            <motion.div className="space-y-2" initial={false}>
+            <div className="space-y-2">
               {filtered.map((strain) => (
-                <motion.div key={strain.id}>
+                <div key={strain.id} style={{ contain: "content", transform: "translateZ(0)" }}>
                   <Card
                     className="border-border hover:border-primary/30 transition-all cursor-pointer group"
                     onClick={() => setSelected(strain)}
@@ -445,9 +440,9 @@ const BibliotecaCientifica = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           )}
         </div>
       </section>

@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { LeadCaptureModal } from "@/components/LeadCaptureModal";
 import { strains, strainCategories, getTerpenosByType, terpenoInfo, type CannabisStrain } from "@/data/strains";
 import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck, BookOpen, CheckCircle } from "lucide-react";
-import { motion } from "framer-motion";
+// motion removido — wrapper sem animação causava jitter em scroll Android
 import { Link } from "react-router-dom";
 import { StrainImage } from "@/components/StrainImage";
 import { useIsMobile } from "@/hooks/use-mobile";

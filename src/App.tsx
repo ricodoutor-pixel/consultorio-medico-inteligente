@@ -117,6 +117,7 @@ const OmniChannelDashboard = lazy(() => import("./pages/OmniChannelDashboard"));
 const OfertaEspecial = lazy(() => import("./pages/OfertaEspecial"));
 const AdminFinanceiro = lazy(() => import("./pages/AdminFinanceiro"));
 const AdminCreditAudit = lazy(() => import("./pages/AdminCreditAudit"));
+const GrowthDashboard = lazy(() => import("./pages/admin/GrowthDashboard"));
 const AdminMonitoramento = lazy(() => import("./pages/AdminMonitoramento"));
 const QuizTriagem = lazy(() => import("./pages/QuizTriagem"));
 const CondicaoTratamento = lazy(() => import("./pages/CondicaoTratamento"));

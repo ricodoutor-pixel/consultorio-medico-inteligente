@@ -19,9 +19,7 @@
       /* Fundo verde instantâneo Planta y Raiz — cobre qualquer HTML pré-renderizado (SEO) antes do React montar */
       html, body { background-color: #1B4332 !important; margin: 0; padding: 0; }
       #root { min-height: 100dvh; background-color: #1B4332; }
-      /* Esconde TODO conteúdo dentro de #root (incl. SEO prerender) até React montar e remover a cortina */
-      #root > *:not(#__pyr_splash) { visibility: hidden; }
-      html.pyr-ready #root > * { visibility: visible; }
+      /* Splash cobre todo conteúdo via z-index máximo; sem precisar esconder #root */
       #__pyr_splash {
         position: fixed; inset: 0; z-index: 2147483647;
         background: #1B4332; display: flex; align-items: center; justify-content: center;

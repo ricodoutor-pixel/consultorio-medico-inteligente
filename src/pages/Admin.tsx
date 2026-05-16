@@ -308,7 +308,7 @@ const Admin = () => {
     setTimeout(() => setMessages([...msgs, { role: "assistant", content: "Comando recebido. Executando análise nos módulos de produção." }]), 800);
   };
 
-  const kpi = data.kpi;
+  // kpi already declared above
 
   // ---------- KPI definitions ----------
   const kpiCards = useMemo(() => [

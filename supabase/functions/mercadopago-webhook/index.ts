@@ -261,6 +261,52 @@ Deno.serve(async (req) => {
             action_url: "/dashboard",
           });
 
+          // 4b. Viral loop — WhatsApp pós-orientação com Planta-Coins + link de indicação
+          try {
+            const coinsEarned = Math.max(15, Math.floor(totalAmount / 2));
+            // Credit coins atomically (best-effort)
+            await supabase.rpc("increment_planta_coins", {
+              _user_id: appt.patient_id,
+              _coins: coinsEarned,
+            });
+
+            const { data: patientForViral } = await supabase
+              .from("profiles")
+              .select("full_name, phone")
+              .eq("id", appt.patient_id)
+              .single();
+
+            const firstName = (patientForViral?.full_name || "").split(" ")[0] || "amigo(a)";
+            const whatsappRaw = (patientForViral as any)?.phone as string | undefined;
+            const phone = whatsappRaw ? whatsappRaw.replace(/\D/g, "") : null;
+
+            if (phone && phone.length >= 10) {
+              const refLink = `https://plantayraiz.com.br/?ref=${appt.patient_id}`;
+              const viralMsg =
+                `Olá ${firstName}! 🌿\n\n` +
+                `Parabéns, sua orientação foi concluída com sucesso!\n` +
+                `Você ganhou *${coinsEarned} Planta-Coins* 🪙 que valem desconto no Shopping.\n\n` +
+                `💚 *Indique um amigo e ganhe +R$10 extras* quando ele fizer a primeira orientação:\n` +
+                `${refLink}\n\n` +
+                `Compartilhe pelo WhatsApp e transforme outras vidas com cannabis medicinal!`;
+
+              const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+              const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+              await fetch(`${supabaseUrl}/functions/v1/evolution-api-proxy`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${serviceKey}`,
+                },
+                body: JSON.stringify({ phone, message: viralMsg }),
+              }).catch((err) => console.error("[viral-loop] evolution dispatch error:", err));
+
+              console.log(`[viral-loop] sent to ${phone.slice(0, 4)}*** — ${coinsEarned} coins`);
+            }
+          } catch (viralErr) {
+            console.error("[viral-loop] non-fatal:", viralErr);
+          }
+
           // 5. Notify DOCTOR — new confirmed consultation
           const { data: doctorRecord } = await supabase
             .from("doctors")

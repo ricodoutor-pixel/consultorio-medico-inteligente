@@ -19,6 +19,7 @@ import { ProductAlertBell } from "@/components/ProductAlertBell";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { PrescriptionVerificationModal } from "@/components/PrescriptionVerificationModal";
+import { DoctorEndorsedBadge } from "@/components/DoctorEndorsedBadge";
 
 // Import product images
 import oleoCbd1 from "@/assets/products/oleo-cbd-1.jpg";
@@ -95,6 +96,7 @@ interface VendorProduct {
   rating: number | null;
   review_count: number;
   is_active: boolean;
+  endorsed_by_doctor?: boolean | null;
   vendors?: { id: string; store_name: string; rating: number | null };
 }
 
@@ -290,6 +292,8 @@ const ProductDetail = ({ id }: { id: string }) => {
           </p>
 
           <h1 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-foreground leading-tight">{product.name}</h1>
+
+          {product.endorsed_by_doctor && <DoctorEndorsedBadge />}
 
           <div className="flex items-center gap-2">
             <div className="flex">{[1,2,3,4,5].map(s => <Star key={s} size={13} className={s <= Math.round(product.rating || 5) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/20"} />)}</div>
@@ -639,6 +643,7 @@ const Shopping = () => {
                                   <span className="text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded-md bg-primary/90 text-primary-foreground font-bold shadow-sm w-fit">
                                     FRETE GRÁTIS
                                   </span>
+                                  {p.endorsed_by_doctor && <DoctorEndorsedBadge compact />}
                                 </div>
                                 {/* Favorite heart - outside Link */}
                                 <button
@@ -703,6 +708,7 @@ const Shopping = () => {
                                       <Link to={`/shopping/${p.id}`}>
                                         <h3 className="font-bold text-foreground hover:text-primary transition-colors text-xs sm:text-sm mb-0.5 line-clamp-1">{p.name}</h3>
                                       </Link>
+                                      {p.endorsed_by_doctor && <div className="mt-1"><DoctorEndorsedBadge compact /></div>}
                                     </div>
                                     <button
                                       onClick={() => toggleFav(p.id)}

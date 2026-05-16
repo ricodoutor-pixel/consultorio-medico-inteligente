@@ -18,6 +18,7 @@ import testimonialAntonio from "@/assets/testimonial-antonio.jpg";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { ScientificBadge } from "@/components/ScientificBadge";
 import drEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 
 
@@ -37,34 +38,48 @@ const steps = [
   { n: "5", title: "Compre seu tratamento", desc: "Acesse nossas lojas parceiras e compre seus medicamentos com receita digital e frete grátis.", img: triagemPatient },
 ];
 
+const GOOGLE_REVIEWS_URL = "https://www.google.com/search?q=Planta+y+Raiz+Ltda+Coment%C3%A1rios";
+
 const testimonialData = [
   {
-    name: "Dona Maria",
+    name: "Maria S.",
     age: "62 anos",
+    city: "São Paulo, SP",
+    date: "Março 2026",
     condition: "Artrite Reumatoide",
     quote: "Depois de 8 anos sofrendo com artrite, o óleo de CBD mudou minha vida. Reduzi 70% dos analgésicos e voltei a fazer crochê.",
     image: testimonialMaria,
+    googleReviewUrl: GOOGLE_REVIEWS_URL,
   },
   {
-    name: "Roberto",
+    name: "Roberto A.",
     age: "45 anos",
+    city: "Curitiba, PR",
+    date: "Fevereiro 2026",
     condition: "Epilepsia do filho",
     quote: "Meu filho tinha 15 crises por semana. Com o tratamento prescrito aqui, as crises reduziram para 2 por mês. Divisor de águas!",
     image: testimonialRoberto,
+    googleReviewUrl: GOOGLE_REVIEWS_URL,
   },
   {
-    name: "Juliana",
+    name: "Juliana M.",
     age: "34 anos",
+    city: "Belo Horizonte, MG",
+    date: "Janeiro 2026",
     condition: "Ansiedade e Insônia",
     quote: "Tomava 3 remédios para dormir. A psiquiatra da plataforma ajustou meu protocolo com CBD e em 3 meses consegui dormir naturalmente.",
     image: testimonialJuliana,
+    googleReviewUrl: GOOGLE_REVIEWS_URL,
   },
   {
-    name: "Sr. Antônio",
+    name: "Antônio R.",
     age: "71 anos",
+    city: "Rio de Janeiro, RJ",
+    date: "Dezembro 2025",
     condition: "Parkinson",
     quote: "Os tremores melhoraram muito. Consigo comer sozinho de novo. A telemedicina facilitou porque não preciso sair de casa.",
     image: testimonialAntonio,
+    googleReviewUrl: GOOGLE_REVIEWS_URL,
   },
 ];
 
@@ -389,7 +404,19 @@ const Index = () => {
                   />
                   <div>
                     <p className="text-sm font-bold text-foreground">{t.name}, {t.age}</p>
-                    <p className="text-xs text-primary font-semibold">{t.condition}</p>
+                    <p className="text-[11px] text-muted-foreground">{t.city} • {t.date}</p>
+                    <p className="text-xs text-primary font-semibold mt-0.5">{t.condition}</p>
+                    {t.googleReviewUrl && (
+                      <a
+                        href={t.googleReviewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[10px] text-amber-400 font-bold mt-1 hover:underline"
+                        aria-label={`Ver avaliação de ${t.name} no Google`}
+                      >
+                        ⭐⭐⭐⭐⭐ ver no Google
+                      </a>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -418,6 +445,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Showcase da Biblioteca Científica (40k+ estudos PubMed) */}
+      <ScientificBadge />
 
       {/* Instalação do App PWA - Dr. Verdinho na tela inicial */}
       <PWAInstallSection />

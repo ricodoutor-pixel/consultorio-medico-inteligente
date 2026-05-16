@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { Shield, Check, Cookie, BarChart3, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const COOKIE_KEY = "plr_cookie_consent";
 const CONSENT_VERSION = "1.0";
@@ -28,8 +30,11 @@ interface ConsentRecord {
  * O consentimento é armazenado com timestamp ISO-8601 e versão para auditoria.
  */
 export const CookieConsentBanner = () => {
+  const location = useLocation();
+  const isMobile = useIsMobile();
   const [visible, setVisible] = useState(false);
   const [exiting, setExiting] = useState(false);
+  const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
 
   useEffect(() => {
     try {
@@ -93,7 +98,11 @@ export const CookieConsentBanner = () => {
       }`}
     >
       <div className="mx-3 mb-3 sm:mx-6 sm:mb-6">
-        <div className="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-emerald-900/95 backdrop-blur-xl shadow-2xl shadow-emerald-900/40">
+        <div className={`relative overflow-hidden rounded-2xl border border-emerald-500/20 shadow-2xl shadow-emerald-900/40 ${
+          isDenseCatalogRoute && isMobile
+            ? "bg-emerald-950/95"
+            : "bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-emerald-900/95 backdrop-blur-xl"
+        }`}>
           {/* Decorative leaf pattern */}
           <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48cGF0aCBkPSJNMzAgNUMxNSAxMCA1IDIwIDUgMzVjMCAxNSAyMCAyMCAyNSAyMFM1NSA1MCA1NSAzNUM1NSAyMCA0NSAxMCAzMCA1eiIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC4zIi8+PC9zdmc+')] bg-repeat" />
           

@@ -407,6 +407,11 @@ const Admin = () => {
             ))}
           </div>
 
+          {/* HUB DE AGENTES IA — chat direto + execução manual */}
+          <div className="mb-6">
+            <AgentsHub />
+          </div>
+
           {/* LIVE ALERTS FEED */}
           {liveAlerts.length > 0 && (
             <Card className="border-red-500/40 bg-red-500/5 mb-6">

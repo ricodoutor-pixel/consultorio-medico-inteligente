@@ -95,6 +95,7 @@ interface VendorProduct {
   rating: number | null;
   review_count: number;
   is_active: boolean;
+  endorsed_by_doctor?: boolean | null;
   vendors?: { id: string; store_name: string; rating: number | null };
 }
 

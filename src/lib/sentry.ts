@@ -10,6 +10,12 @@ export async function initSentry() {
   try {
     const { data, error } = await supabase.functions.invoke("sentry-config");
     if (error || !data?.dsn) return;
+    // Validate DSN format (must be a URL like https://key@oXXX.ingest.sentry.io/YYY).
+    // Auth tokens (sntryu_...) are NOT valid DSNs and would throw at init.
+    if (!/^https?:\/\/.+@.+\/\d+$/.test(data.dsn)) {
+      console.warn("[sentry] invalid DSN format, skipping init");
+      return;
+    }
     Sentry.init({
       dsn: data.dsn,
       environment: data.environment ?? "production",

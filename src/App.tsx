@@ -128,7 +128,6 @@ const PrescriptionCheckout = lazy(() => import("./pages/PrescriptionCheckout"));
 const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
 const GestãoPacientes = lazy(() => import("./pages/GestãoPacientes"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const QaRatingTest = lazy(() => import("./pages/QaRatingTest"));
 const RodizioMedicos = lazy(() => import("./pages/RodizioMedicos"));
 const BrisaOrientacaoRedirect = lazy(() => import("./pages/BrisaOrientacaoRedirect"));
 const AuditLog = lazy(() => import("./pages/admin/AuditLog"));
@@ -208,7 +207,6 @@ const App = () => (
                 <Route path="/admin/clinicas" element={<AdminRoute><AdminClinicas /></AdminRoute>} />
                 <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
                 <Route path="/admin/credit-audit" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />
-                <Route path="/qa/rating-test" element={<QaRatingTest />} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/biblioteca" element={<BibliotecaCientifica />} />
                 <Route path="/download" element={<DownloadApp />} />

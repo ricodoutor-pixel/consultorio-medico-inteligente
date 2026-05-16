@@ -2,6 +2,7 @@
 // Fluxo: pega próximo item APROVADO em manus_social_queue (platform=facebook).
 // Se a fila estiver vazia, gera dinamicamente via Gemini (Lovable AI) e publica.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -53,6 +54,8 @@ async function generatePost(): Promise<string> {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   const pageId = Deno.env.get("FACEBOOK_PAGE_ID");
   const fbToken = Deno.env.get("FACEBOOK_PAGE_ACCESS_TOKEN") || Deno.env.get("FACEBOOK_GRAPH_API_TOKEN");

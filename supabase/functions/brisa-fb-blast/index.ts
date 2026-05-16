@@ -1,5 +1,7 @@
 // One-shot: publishes 3 Brisa posts to Facebook Page using FB Graph API directly.
 // Will be deleted after execution.
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -70,6 +72,8 @@ Sua saúde merece ciência de verdade. 💚
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   const pageId = Deno.env.get("FACEBOOK_PAGE_ID");
   const fbToken =

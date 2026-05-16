@@ -336,19 +336,55 @@ export function ProtocolCalculator() {
                     Edilson Bezerra On (CRM 10963), que cruza seus dados com 40k+ estudos PubMed e
                     entrega relatório PDF assinado digitalmente (ICP-Brasil / gov.br).
                   </div>
+
+                  {/* Mini lead-capture: nome + WhatsApp (opcionais — passam pra mensagem e salvam lead) */}
+                  <div className="grid sm:grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <label htmlFor="calc-name" className="text-[10px] font-black uppercase tracking-wider text-primary block mb-1.5">
+                        Seu nome <span className="text-muted-foreground font-bold">(para a Brisa)</span>
+                      </label>
+                      <input
+                        id="calc-name"
+                        type="text"
+                        value={leadName}
+                        onChange={(e) => setLeadName(e.target.value)}
+                        placeholder="Maria Silva"
+                        autoComplete="name"
+                        className="w-full h-11 px-3 rounded-xl bg-background/80 border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="calc-wa" className="text-[10px] font-black uppercase tracking-wider text-primary block mb-1.5">
+                        WhatsApp <span className="text-muted-foreground font-bold">(opcional)</span>
+                      </label>
+                      <input
+                        id="calc-wa"
+                        type="tel"
+                        inputMode="tel"
+                        value={leadWa}
+                        onChange={(e) => setLeadWa(formatWa(e.target.value))}
+                        placeholder="(11) 99999-9999"
+                        autoComplete="tel"
+                        className="w-full h-11 px-3 rounded-xl bg-background/80 border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm font-medium"
+                      />
+                    </div>
+                  </div>
+
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
                     <Button
                       size="lg"
+                      disabled={savingLead}
                       className="flex-1 text-sm font-black h-14 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all"
                       asChild
                     >
                       <a
-                        href={WHATSAPP_URL(profile, answers)}
+                        href={buildWhatsappUrl(profile, answers, leadName.trim())}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={(e) => handleWhatsappClick(e, profile)}
                       >
                         <Leaf size={18} className="mr-2" />
-                        {profile.cta} — R$30
+                        {savingLead ? "Enviando..." : `${profile.cta} — R$30`}
                       </a>
                     </Button>
                     <Button

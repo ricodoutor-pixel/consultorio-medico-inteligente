@@ -21,7 +21,7 @@ function getSessionId(): string {
   }
 }
 
-export type FunnelName = "protocol_calculator" | "ebook_gate";
+export type FunnelName = "protocol_calculator" | "ebook_gate" | "lead_status";
 
 export async function trackFunnelEvent(
   funnel: FunnelName,

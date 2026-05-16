@@ -106,7 +106,7 @@ const BibliotecaCientifica = () => {
     total: filtered.length,
   }), [filtered]);
 
-  const useReducedMotionGrid = isMobile;
+  const useReducedMotionGrid = true;
 
   return (
     <div className="min-h-screen bg-background">

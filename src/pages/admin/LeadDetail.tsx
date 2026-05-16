@@ -326,7 +326,7 @@ export default function AdminLeadDetail() {
                         ) : (
                           <XCircle size={14} className="text-rose-400 shrink-0 mt-0.5" />
                         )}
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                             WhatsApp {h.whatsapp_sent ? "enviado" : "falhou"}
                           </p>
@@ -335,6 +335,18 @@ export default function AdminLeadDetail() {
                             <p className="text-[10px] text-rose-400 mt-1">{h.whatsapp_error}</p>
                           )}
                         </div>
+                        {!h.whatsapp_sent && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={resendingId === h.id}
+                            onClick={() => resendWhatsApp(h.id)}
+                            className="h-7 px-2 text-[10px] font-black uppercase rounded-lg shrink-0"
+                          >
+                            <RefreshCw size={12} className={`mr-1 ${resendingId === h.id ? "animate-spin" : ""}`} />
+                            {resendingId === h.id ? "Enviando" : "Reenviar"}
+                          </Button>
+                        )}
                       </div>
                     )}
                   </li>

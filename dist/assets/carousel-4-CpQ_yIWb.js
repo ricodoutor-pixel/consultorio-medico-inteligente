@@ -1,1 +1,0 @@
-var a="/assets/carousel-4-kV_lx3nc.jpg";export{a as default};

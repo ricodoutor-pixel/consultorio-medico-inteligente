@@ -219,7 +219,47 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MKSBS7P"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
+    <!-- Cortina instantânea: oculta o HTML pré-renderizado de SEO até o React montar -->
+    <div id="__pyr_splash" aria-hidden="true"><div class="pyr-dot"></div></div>
+
     <div id="root"></div>
+
+    <script>
+      // Rotação diária de favicon (Verdinho ↔ Brisa ↔ logo) — muda a cada 24h
+      (function(){
+        try {
+          var icons = ['/favicon.svg','/favicon-verdinho.png','/favicon-brisa.png','/favicon.png'];
+          var day = Math.floor(Date.now() / 86400000);
+          var pick = icons[day % icons.length];
+          document.querySelectorAll('link[rel~="icon"], link[rel="shortcut icon"]').forEach(function(l){
+            l.href = pick;
+            if (pick.endsWith('.svg')) l.type = 'image/svg+xml'; else l.type = 'image/png';
+          });
+        } catch(e) {}
+      })();
+
+      // Remove a cortina assim que o React montar (MutationObserver no #root) ou após 2.5s de fallback
+      (function(){
+        var root = document.getElementById('root');
+        var splash = document.getElementById('__pyr_splash');
+        if (!root || !splash) return;
+        var done = false;
+        function reveal(){
+          if (done) return; done = true;
+          document.documentElement.classList.add('pyr-ready');
+          splash.classList.add('hide');
+          setTimeout(function(){ splash.remove(); }, 400);
+        }
+        // Detecta quando o React substitui o conteúdo prerender com nós reais (componentes hidratados)
+        var obs = new MutationObserver(function(){
+          // Heurística: React monta children React-controlados; aguardamos 1 frame após primeira mutação
+          requestAnimationFrame(function(){ requestAnimationFrame(reveal); });
+        });
+        obs.observe(root, { childList: true, subtree: false });
+        // Fallback de segurança
+        setTimeout(reveal, 2500);
+      })();
+    </script>
 
     <script type="module" src="/src/main.tsx"></script>
 

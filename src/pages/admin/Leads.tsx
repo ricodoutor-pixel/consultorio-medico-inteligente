@@ -61,6 +61,12 @@ export default function AdminLeads() {
   const [sourceFilter, setSourceFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [days, setDays] = useState(30);
+  const [minScore, setMinScore] = useState<string>("");
+  const [maxScore, setMaxScore] = useState<string>("");
+  const [conditionFilter, setConditionFilter] = useState("all");
+  const [metaKey, setMetaKey] = useState("");
+  const [metaValue, setMetaValue] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Modal status change
   const [pendingChange, setPendingChange] = useState<{ lead: Lead; toStatus: string } | null>(null);

@@ -4865,6 +4865,7 @@ export type Database = {
           compare_price: number | null
           created_at: string
           description: string | null
+          endorsed_by_doctor: boolean
           id: string
           image_url: string | null
           image_url_2: string | null
@@ -4884,6 +4885,7 @@ export type Database = {
           compare_price?: number | null
           created_at?: string
           description?: string | null
+          endorsed_by_doctor?: boolean
           id?: string
           image_url?: string | null
           image_url_2?: string | null
@@ -4903,6 +4905,7 @@ export type Database = {
           compare_price?: number | null
           created_at?: string
           description?: string | null
+          endorsed_by_doctor?: boolean
           id?: string
           image_url?: string | null
           image_url_2?: string | null

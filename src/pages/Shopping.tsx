@@ -641,6 +641,7 @@ const Shopping = () => {
                                   <span className="text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded-md bg-primary/90 text-primary-foreground font-bold shadow-sm w-fit">
                                     FRETE GRÁTIS
                                   </span>
+                                  {p.endorsed_by_doctor && <DoctorEndorsedBadge compact />}
                                 </div>
                                 {/* Favorite heart - outside Link */}
                                 <button

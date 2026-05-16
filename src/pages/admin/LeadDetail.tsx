@@ -3,7 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Phone, MessageCircle, CheckCircle2, XCircle, Activity, FileText } from "lucide-react";
+import { ArrowLeft, Phone, MessageCircle, CheckCircle2, XCircle, Activity, FileText, RefreshCw, Download, FileDown } from "lucide-react";
+import jsPDF from "jspdf";
 
 type Lead = {
   id: string;

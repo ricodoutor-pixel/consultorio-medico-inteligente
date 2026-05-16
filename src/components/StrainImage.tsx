@@ -7,15 +7,21 @@ interface StrainImageProps {
   alt?: string;
 }
 
-export function StrainImage({ strainId, strainName, strainType, fallbackUrl, className = "", alt }: StrainImageProps) {
+export function StrainImage({ strainName, fallbackUrl, className = "", alt }: StrainImageProps) {
   return (
     <img
       src={fallbackUrl}
-      alt={alt || strainName}
+      alt={alt || `${strainName} - cannabis medicinal`}
       className={className}
       loading="lazy"
+      decoding="async"
+      draggable={false}
       onError={(e) => {
-        e.currentTarget.src = "/placeholder.svg";
+        const img = e.currentTarget;
+        if (!img.dataset.fallback) {
+          img.dataset.fallback = "1";
+          img.src = "/placeholder.svg";
+        }
       }}
     />
   );

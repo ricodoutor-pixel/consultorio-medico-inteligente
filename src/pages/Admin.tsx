@@ -242,6 +242,8 @@ const Admin = () => {
     return () => clearInterval(i);
   }, [loadData]);
 
+  const kpi = data.kpi;
+
   // ---- Realtime sync + alerts ----
   useAdminRealtime({
     onChange: loadData,

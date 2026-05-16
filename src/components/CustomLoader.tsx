@@ -47,10 +47,11 @@ export function CustomLoader() {
           </p>
         </div>
 
-        {/* Spinner sutil abaixo do Dr. Verdinho */}
-        <div className="relative h-6 w-6 mt-1">
-          <div className="absolute inset-0 rounded-full border-2 border-white/15" />
-          <div className="absolute inset-0 rounded-full border-2 border-t-emerald-300 animate-spin" />
+        {/* Dots de carregamento (substituindo a bola verde) */}
+        <div className="flex items-center gap-1.5 mt-1" aria-hidden>
+          <span className="w-2 h-2 rounded-full bg-emerald-300/80 animate-[float_1.2s_ease-in-out_infinite]" />
+          <span className="w-2 h-2 rounded-full bg-emerald-300/60 animate-[float_1.2s_ease-in-out_infinite] [animation-delay:150ms]" />
+          <span className="w-2 h-2 rounded-full bg-emerald-300/40 animate-[float_1.2s_ease-in-out_infinite] [animation-delay:300ms]" />
         </div>
       </div>
 

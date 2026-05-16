@@ -277,27 +277,82 @@ export default function AdminLeads() {
 
         {/* Filtros */}
         <Card className="border-border bg-card/40">
-          <CardContent className="p-4 grid md:grid-cols-[1fr_180px_180px_140px] gap-3">
-            <input type="text" placeholder="Buscar nome, WhatsApp, condição..."
-              value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm" />
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm">
-              <option value="all">Todos os status</option>
-              {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
-            </select>
-            <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}
-              className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm">
-              <option value="all">Todas origens</option>
-              {sources.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <select value={days} onChange={(e) => setDays(Number(e.target.value))}
-              className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm">
-              <option value={7}>7 dias</option>
-              <option value={30}>30 dias</option>
-              <option value={90}>90 dias</option>
-              <option value={365}>1 ano</option>
-            </select>
+          <CardContent className="p-4 space-y-3">
+            <div className="grid md:grid-cols-[1fr_180px_180px_140px] gap-3">
+              <input type="text" placeholder="Buscar nome, WhatsApp, condição, metadata..."
+                value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm" />
+              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+                className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm">
+                <option value="all">Todos os status</option>
+                {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+              </select>
+              <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}
+                className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm">
+                <option value="all">Todas origens</option>
+                {sources.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+              <select value={days} onChange={(e) => setDays(Number(e.target.value))}
+                className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm">
+                <option value={7}>7 dias</option>
+                <option value={30}>30 dias</option>
+                <option value={90}>90 dias</option>
+                <option value={365}>1 ano</option>
+              </select>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowAdvanced((v) => !v)}
+              className="text-[10px] font-black uppercase tracking-wider text-primary hover:underline"
+            >
+              {showAdvanced ? "− Ocultar filtros avançados" : "+ Filtros avançados (score · condição · metadata)"}
+            </button>
+
+            {showAdvanced && (
+              <div className="grid md:grid-cols-[120px_120px_1fr_1fr_1fr] gap-3 pt-2 border-t border-border">
+                <input type="number" placeholder="Score min" min={0} max={100}
+                  value={minScore} onChange={(e) => setMinScore(e.target.value)}
+                  className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm tabular-nums" />
+                <input type="number" placeholder="Score max" min={0} max={100}
+                  value={maxScore} onChange={(e) => setMaxScore(e.target.value)}
+                  className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm tabular-nums" />
+                <select value={conditionFilter} onChange={(e) => setConditionFilter(e.target.value)}
+                  className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm">
+                  <option value="all">Todas condições</option>
+                  {conditions.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <select value={metaKey} onChange={(e) => setMetaKey(e.target.value)}
+                  className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm">
+                  <option value="">Campo da metadata...</option>
+                  {metaKeys.map((k) => <option key={k} value={k}>{k}</option>)}
+                </select>
+                <input type="text" placeholder="Valor do campo (contém)"
+                  value={metaValue} onChange={(e) => setMetaValue(e.target.value)}
+                  disabled={!metaKey}
+                  className="h-10 px-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none text-sm disabled:opacity-40" />
+              </div>
+            )}
+
+            <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+              <span>
+                {filtered.length} de {leads.length} leads
+                {(minScore || maxScore || conditionFilter !== "all" || metaKey || statusFilter !== "all" || sourceFilter !== "all" || searchTerm) && " (filtrado)"}
+              </span>
+              {(minScore || maxScore || conditionFilter !== "all" || metaKey || metaValue || searchTerm || statusFilter !== "all" || sourceFilter !== "all") && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm(""); setStatusFilter("all"); setSourceFilter("all");
+                    setMinScore(""); setMaxScore(""); setConditionFilter("all");
+                    setMetaKey(""); setMetaValue("");
+                  }}
+                  className="text-primary hover:underline font-black uppercase tracking-wider"
+                >
+                  Limpar filtros
+                </button>
+              )}
+            </div>
           </CardContent>
         </Card>
 

@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { Download, BookOpen, Users, Award, CheckCircle, ArrowRight, Leaf, Star } from "lucide-react";
+import { Download, BookOpen, Users, Award, CheckCircle, ArrowRight, Leaf, Star, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -15,42 +17,56 @@ const stagger = { visible: { transition: { staggerChildren: 0.12 } } };
 const EbookLanding = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
+    whatsapp: "",
     email: "",
     profession: "",
   });
 
   const handleDownload = async () => {
-    if (!formData.email) {
+    if (!formData.whatsapp || !formData.name) {
       setShowForm(true);
+      toast.info("Preencha nome e WhatsApp para receber o ebook.");
+      return;
+    }
+
+    const cleanPhone = formData.whatsapp.replace(/\D/g, "");
+    if (cleanPhone.length < 10) {
+      toast.error("WhatsApp inválido. Use DDD + número.");
       return;
     }
 
     setIsDownloading(true);
     try {
-      // Simular registro do usuário
-      const response = await fetch("/api/trpc/ebook.registerDownload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
+      const { data, error } = await supabase.functions.invoke("ebook-capture", {
+        body: {
           name: formData.name,
-          profession: formData.profession,
-        }),
+          whatsapp: cleanPhone,
+          email: formData.email || null,
+          profession: formData.profession || null,
+          source: "landing",
+        },
       });
 
-      if (response.ok) {
-        // Iniciar download
-        const link = document.createElement("a");
-        link.href = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/fnbZJMGCJUpGmwzl.pdf";
-        link.download = "EBOOK_CANNABIS_MEDICINAL_CURSO_COMPLETO.pdf";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    } catch (error) {
+      if (error) throw error;
+
+      toast.success("📲 Pronto! Você vai receber o PDF agora mesmo no WhatsApp.");
+      setSubmitted(true);
+
+      // Download imediato do PDF como bônus
+      const pdfUrl = (data as any)?.pdf_url || "https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/fnbZJMGCJUpGmwzl.pdf";
+      const link = document.createElement("a");
+      link.href = pdfUrl;
+      link.download = "Guia-Cannabis-Medicinal-2026.pdf";
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error: any) {
       console.error("Erro ao baixar e-book:", error);
+      toast.error(error?.message || "Erro ao processar. Tente novamente.");
     } finally {
       setIsDownloading(false);
     }
@@ -219,27 +235,42 @@ const EbookLanding = () => {
             >
               <Card className="border-border">
                 <CardContent className="p-8">
-                  <h3 className="text-2xl font-black mb-6">Registre-se para Baixar</h3>
+                  <h3 className="text-2xl font-black mb-2">Receba o PDF no WhatsApp</h3>
+                  <p className="text-sm text-muted-foreground mb-6 flex items-center gap-2">
+                    <MessageCircle size={16} className="text-primary" />
+                    A Enfª Brisa envia o ebook direto pra você + bônus em 24h.
+                  </p>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-bold mb-2">Nome Completo</label>
+                      <label className="block text-sm font-bold mb-2">Nome Completo *</label>
                       <input
                         type="text"
                         placeholder="Seu nome"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full px-4 py-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold mb-2">Email *</label>
+                      <label className="block text-sm font-bold mb-2">WhatsApp * <span className="text-xs text-muted-foreground font-normal">(com DDD)</span></label>
+                      <input
+                        type="tel"
+                        placeholder="11 99999-9999"
+                        value={formData.whatsapp}
+                        onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                        className="w-full px-4 py-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold mb-2">Email (opcional)</label>
                       <input
                         type="email"
                         placeholder="seu@email.com"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         className="w-full px-4 py-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                        required
                       />
                     </div>
                     <div>
@@ -260,11 +291,16 @@ const EbookLanding = () => {
                     <Button 
                       className="w-full h-12 font-black text-base bg-primary hover:bg-primary/90 rounded-lg"
                       onClick={handleDownload}
-                      disabled={isDownloading || !formData.email}
+                      disabled={isDownloading || !formData.whatsapp || !formData.name}
                     >
                       <Download size={18} className="mr-2" />
-                      {isDownloading ? "Processando..." : "CONFIRMAR E BAIXAR"}
+                      {isDownloading ? "Enviando..." : submitted ? "✅ ENVIADO NO WHATSAPP" : "RECEBER NO WHATSAPP"}
                     </Button>
+                    {submitted && (
+                      <p className="text-xs text-center text-primary font-medium">
+                        Confira seu WhatsApp! Em 24h você recebe um cupom exclusivo. 💚
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>

@@ -1963,6 +1963,57 @@ export type Database = {
         }
         Relationships: []
       }
+      ebook_funnel_log: {
+        Row: {
+          conversion_type: string | null
+          converted_at: string | null
+          created_at: string
+          ebook_slug: string
+          email: string | null
+          followup_sent_at: string | null
+          id: string
+          metadata: Json | null
+          name: string | null
+          pdf_sent_at: string | null
+          profession: string | null
+          source: string | null
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          conversion_type?: string | null
+          converted_at?: string | null
+          created_at?: string
+          ebook_slug?: string
+          email?: string | null
+          followup_sent_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string | null
+          pdf_sent_at?: string | null
+          profession?: string | null
+          source?: string | null
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          conversion_type?: string | null
+          converted_at?: string | null
+          created_at?: string
+          ebook_slug?: string
+          email?: string | null
+          followup_sent_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string | null
+          pdf_sent_at?: string | null
+          profession?: string | null
+          source?: string | null
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       error_autohealing: {
         Row: {
           ai_confidence: number | null
@@ -6100,6 +6151,7 @@ export type Database = {
         Returns: undefined
       }
       ensure_affiliate_wallet: { Args: { _user_id: string }; Returns: string }
+      ensure_referral_code: { Args: { _user_id: string }; Returns: string }
       get_active_contingency_pix: {
         Args: never
         Returns: {

@@ -281,12 +281,21 @@ Deno.serve(async (req) => {
             const phone = whatsappRaw ? whatsappRaw.replace(/\D/g, "") : null;
 
             if (phone && phone.length >= 10) {
-              const refLink = `https://plantayraiz.com.br/?ref=${appt.patient_id}`;
+              // Garante código curto único de indicação (6 chars) via SQL function
+              let refCode: string | null = null;
+              try {
+                const { data: codeData } = await supabase.rpc("ensure_referral_code", { _user_id: appt.patient_id });
+                refCode = (codeData as string) || null;
+              } catch (codeErr) {
+                console.error("[viral-loop] ensure_referral_code failed:", codeErr);
+              }
+              const refSlug = refCode || appt.patient_id;
+              const refLink = `https://plantayraiz.com.br/?ref=${refSlug}`;
               const viralMsg =
                 `Olá ${firstName}! 🌿\n\n` +
                 `Parabéns, sua orientação foi concluída com sucesso!\n` +
                 `Você ganhou *${coinsEarned} Planta-Coins* 🪙 que valem desconto no Shopping.\n\n` +
-                `💚 *Indique um amigo e ganhe +R$10 extras* quando ele fizer a primeira orientação:\n` +
+                `💚 *Indique um amigo e ganhe +20 coins extras* (ele ganha R$5 de desconto):\n` +
                 `${refLink}\n\n` +
                 `Compartilhe pelo WhatsApp e transforme outras vidas com cannabis medicinal!`;
 

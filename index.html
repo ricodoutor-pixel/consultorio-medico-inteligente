@@ -16,9 +16,25 @@
     <link rel="mask-icon" href="/favicon.svg" color="#15803d" />
 
     <style>
-      /* Fundo escuro instantâneo — evita flash branco antes do React montar */
-      html, body { background-color: #0A0E27 !important; margin: 0; padding: 0; }
-      #root { min-height: 100dvh; background-color: #0A0E27; }
+      /* Fundo verde instantâneo Planta y Raiz — cobre qualquer HTML pré-renderizado (SEO) antes do React montar */
+      html, body { background-color: #1B4332 !important; margin: 0; padding: 0; }
+      #root { min-height: 100dvh; background-color: #1B4332; }
+      /* Esconde TODO conteúdo dentro de #root (incl. SEO prerender) até React montar e remover a cortina */
+      #root > *:not(#__pyr_splash) { visibility: hidden; }
+      html.pyr-ready #root > * { visibility: visible; }
+      #__pyr_splash {
+        position: fixed; inset: 0; z-index: 2147483647;
+        background: #1B4332; display: flex; align-items: center; justify-content: center;
+        transition: opacity .35s ease; opacity: 1;
+      }
+      #__pyr_splash.hide { opacity: 0; pointer-events: none; }
+      #__pyr_splash .pyr-dot {
+        width: 56px; height: 56px; border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #6ee7b7, #15803d 70%);
+        box-shadow: 0 0 40px rgba(110,231,183,.55);
+        animation: pyrPulse 1.2s ease-in-out infinite;
+      }
+      @keyframes pyrPulse { 0%,100%{transform:scale(.9);opacity:.85} 50%{transform:scale(1.08);opacity:1} }
     </style>
 
     <script>

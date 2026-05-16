@@ -311,19 +311,19 @@ const Admin = () => {
   // kpi already declared above
 
   // ---------- KPI definitions ----------
-  const kpiCards = useMemo(() => [
-    { label: "Receita 30d", value: BRL(kpi.receita30d), icon: DollarSign, accent: "text-emerald-400", bg: "from-emerald-500/20" },
-    { label: "Receita Hoje", value: BRL(kpi.receitaHoje), icon: TrendingUp, accent: "text-emerald-400", bg: "from-emerald-500/20" },
-    { label: "Ticket Médio", value: BRL(kpi.ticketMedio), icon: CreditCard, accent: "text-yellow-400", bg: "from-yellow-500/20" },
-    { label: "Ordens Hoje", value: NUM(kpi.ordensHoje), icon: ShoppingBag, accent: "text-yellow-400", bg: "from-yellow-500/20" },
-    { label: "Consultas Hoje", value: NUM(kpi.consultasHoje), icon: Stethoscope, accent: "text-sky-400", bg: "from-sky-500/20" },
-    { label: "Fila Ativa", value: NUM(kpi.filaAtiva), icon: Clock, accent: "text-sky-400", bg: "from-sky-500/20" },
+  const kpiCards = useMemo<Array<{ label: string; value: string; icon: any; accent: string; bg: string; drill?: DrillSource }>>(() => [
+    { label: "Receita 30d", value: BRL(kpi.receita30d), icon: DollarSign, accent: "text-emerald-400", bg: "from-emerald-500/20", drill: "ot_orders" },
+    { label: "Receita Hoje", value: BRL(kpi.receitaHoje), icon: TrendingUp, accent: "text-emerald-400", bg: "from-emerald-500/20", drill: "ot_orders" },
+    { label: "Ticket Médio", value: BRL(kpi.ticketMedio), icon: CreditCard, accent: "text-yellow-400", bg: "from-yellow-500/20", drill: "orders" },
+    { label: "Ordens Hoje", value: NUM(kpi.ordensHoje), icon: ShoppingBag, accent: "text-yellow-400", bg: "from-yellow-500/20", drill: "orders" },
+    { label: "Consultas Hoje", value: NUM(kpi.consultasHoje), icon: Stethoscope, accent: "text-sky-400", bg: "from-sky-500/20", drill: "appointments" },
+    { label: "Fila Ativa", value: NUM(kpi.filaAtiva), icon: Clock, accent: "text-sky-400", bg: "from-sky-500/20", drill: "queue" },
     { label: "Pacientes", value: NUM(kpi.pacientes), icon: Users, accent: "text-fuchsia-400", bg: "from-fuchsia-500/20" },
     { label: "Médicos Ativos", value: NUM(kpi.medicos), icon: HeartPulse, accent: "text-fuchsia-400", bg: "from-fuchsia-500/20" },
-    { label: "Leads 24h", value: NUM(kpi.leads24h), icon: UserPlus, accent: "text-primary", bg: "from-primary/20" },
-    { label: "Conversão Leads", value: PCT(kpi.conversao), icon: BarChart3, accent: "text-primary", bg: "from-primary/20" },
+    { label: "Leads 24h", value: NUM(kpi.leads24h), icon: UserPlus, accent: "text-primary", bg: "from-primary/20", drill: "leads" },
+    { label: "Conversão Leads", value: PCT(kpi.conversao), icon: BarChart3, accent: "text-primary", bg: "from-primary/20", drill: "leads" },
     { label: "Prescrições 7d", value: NUM(kpi.prescricoes7d), icon: FileText, accent: "text-orange-400", bg: "from-orange-500/20" },
-    { label: "Erros 24h", value: NUM(kpi.erros24h), icon: AlertTriangle, accent: kpi.erros24h > 5 ? "text-red-500" : "text-emerald-400", bg: "from-red-500/20" },
+    { label: "Erros 24h", value: NUM(kpi.erros24h), icon: AlertTriangle, accent: kpi.erros24h > 5 ? "text-red-500" : "text-emerald-400", bg: "from-red-500/20", drill: "error_logs" },
   ], [kpi]);
 
   const quickLinks = [

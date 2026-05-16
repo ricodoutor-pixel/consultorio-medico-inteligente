@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { initAntiClone } from "./lib/anti-clone";
 import { registerServiceWorker } from "./lib/serviceWorkerRegistration";
+import "./lib/i18n"; // Initialize i18next before App
 import App from "./App.tsx";
 import "./index.css";
 

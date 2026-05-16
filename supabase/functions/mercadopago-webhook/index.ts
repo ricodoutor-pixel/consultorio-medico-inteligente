@@ -272,12 +272,12 @@ Deno.serve(async (req) => {
 
             const { data: patientForViral } = await supabase
               .from("profiles")
-              .select("full_name, whatsapp")
+              .select("full_name, phone")
               .eq("id", appt.patient_id)
               .single();
 
             const firstName = (patientForViral?.full_name || "").split(" ")[0] || "amigo(a)";
-            const whatsappRaw = (patientForViral as any)?.whatsapp as string | undefined;
+            const whatsappRaw = (patientForViral as any)?.phone as string | undefined;
             const phone = whatsappRaw ? whatsappRaw.replace(/\D/g, "") : null;
 
             if (phone && phone.length >= 10) {

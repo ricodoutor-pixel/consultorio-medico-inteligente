@@ -404,7 +404,19 @@ const Index = () => {
                   />
                   <div>
                     <p className="text-sm font-bold text-foreground">{t.name}, {t.age}</p>
-                    <p className="text-xs text-primary font-semibold">{t.condition}</p>
+                    <p className="text-[11px] text-muted-foreground">{t.city} • {t.date}</p>
+                    <p className="text-xs text-primary font-semibold mt-0.5">{t.condition}</p>
+                    {t.googleReviewUrl && (
+                      <a
+                        href={t.googleReviewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[10px] text-amber-400 font-bold mt-1 hover:underline"
+                        aria-label={`Ver avaliação de ${t.name} no Google`}
+                      >
+                        ⭐⭐⭐⭐⭐ ver no Google
+                      </a>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -433,6 +445,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Showcase da Biblioteca Científica (40k+ estudos PubMed) */}
+      <ScientificBadge />
 
       {/* Instalação do App PWA - Dr. Verdinho na tela inicial */}
       <PWAInstallSection />

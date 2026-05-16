@@ -54,6 +54,8 @@ async function generatePost(): Promise<string> {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   const pageId = Deno.env.get("FACEBOOK_PAGE_ID");
   const fbToken = Deno.env.get("FACEBOOK_PAGE_ACCESS_TOKEN") || Deno.env.get("FACEBOOK_GRAPH_API_TOKEN");

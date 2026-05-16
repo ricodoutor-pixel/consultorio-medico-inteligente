@@ -117,6 +117,7 @@ const OmniChannelDashboard = lazy(() => import("./pages/OmniChannelDashboard"));
 const OfertaEspecial = lazy(() => import("./pages/OfertaEspecial"));
 const AdminFinanceiro = lazy(() => import("./pages/AdminFinanceiro"));
 const AdminCreditAudit = lazy(() => import("./pages/AdminCreditAudit"));
+const GrowthDashboard = lazy(() => import("./pages/admin/GrowthDashboard"));
 const AdminMonitoramento = lazy(() => import("./pages/AdminMonitoramento"));
 const QuizTriagem = lazy(() => import("./pages/QuizTriagem"));
 const CondicaoTratamento = lazy(() => import("./pages/CondicaoTratamento"));
@@ -264,6 +265,7 @@ const App = () => (
                 <Route path="/admin/auditoria" element={<AdminRoute><AuditLog /></AdminRoute>} />
                 <Route path="/admin/cron-health" element={<AdminRoute><CronHealth /></AdminRoute>} />
                 <Route path="/admin/monitoramento" element={<AdminRoute><AdminMonitoramento /></AdminRoute>} />
+                <Route path="/admin/growth" element={<AdminRoute><GrowthDashboard /></AdminRoute>} />
                 <Route path="/admin/leads" element={<AdminRoute><AdminLeads /></AdminRoute>} />
                 <Route path="/admin/leads/:id" element={<AdminRoute><AdminLeadDetail /></AdminRoute>} />
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />

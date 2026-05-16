@@ -2736,6 +2736,270 @@ export type Database = {
         }
         Relationships: []
       }
+      manus_growth_kpis: {
+        Row: {
+          clicks: number | null
+          conv_rate: number | null
+          created_at: string
+          ctr: number | null
+          id: string
+          impressions: number | null
+          position: number | null
+          query: string | null
+          snapshot_date: string
+          url: string
+        }
+        Insert: {
+          clicks?: number | null
+          conv_rate?: number | null
+          created_at?: string
+          ctr?: number | null
+          id?: string
+          impressions?: number | null
+          position?: number | null
+          query?: string | null
+          snapshot_date?: string
+          url: string
+        }
+        Update: {
+          clicks?: number | null
+          conv_rate?: number | null
+          created_at?: string
+          ctr?: number | null
+          id?: string
+          impressions?: number | null
+          position?: number | null
+          query?: string | null
+          snapshot_date?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      manus_growth_logs: {
+        Row: {
+          action: string
+          after_state: Json | null
+          before_state: Json | null
+          created_at: string
+          error_message: string | null
+          id: string
+          kpi_delta: Json | null
+          phase: string
+          run_id: string | null
+          status: string
+          url: string | null
+        }
+        Insert: {
+          action: string
+          after_state?: Json | null
+          before_state?: Json | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          kpi_delta?: Json | null
+          phase: string
+          run_id?: string | null
+          status?: string
+          url?: string | null
+        }
+        Update: {
+          action?: string
+          after_state?: Json | null
+          before_state?: Json | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          kpi_delta?: Json | null
+          phase?: string
+          run_id?: string | null
+          status?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manus_growth_logs_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "manus_growth_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manus_growth_proposals: {
+        Row: {
+          body_md: string
+          created_at: string
+          github_issue_url: string | null
+          id: string
+          proposed_files: Json | null
+          status: string
+          title: string
+        }
+        Insert: {
+          body_md: string
+          created_at?: string
+          github_issue_url?: string | null
+          id?: string
+          proposed_files?: Json | null
+          status?: string
+          title: string
+        }
+        Update: {
+          body_md?: string
+          created_at?: string
+          github_issue_url?: string | null
+          id?: string
+          proposed_files?: Json | null
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      manus_growth_runs: {
+        Row: {
+          errors_count: number | null
+          finished_at: string | null
+          id: string
+          metrics: Json | null
+          pages_analyzed: number | null
+          pages_optimized: number | null
+          posts_generated: number | null
+          started_at: string
+          status: string
+          summary_md: string | null
+          triggered_by: string | null
+        }
+        Insert: {
+          errors_count?: number | null
+          finished_at?: string | null
+          id?: string
+          metrics?: Json | null
+          pages_analyzed?: number | null
+          pages_optimized?: number | null
+          posts_generated?: number | null
+          started_at?: string
+          status?: string
+          summary_md?: string | null
+          triggered_by?: string | null
+        }
+        Update: {
+          errors_count?: number | null
+          finished_at?: string | null
+          id?: string
+          metrics?: Json | null
+          pages_analyzed?: number | null
+          pages_optimized?: number | null
+          posts_generated?: number | null
+          started_at?: string
+          status?: string
+          summary_md?: string | null
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
+      manus_seo_overrides: {
+        Row: {
+          body_injection: string | null
+          created_at: string
+          created_by_run: string | null
+          h1: string | null
+          h2_list: Json | null
+          id: string
+          is_active: boolean | null
+          meta_description: string | null
+          meta_title: string | null
+          route: string
+          schema_org: Json | null
+          updated_at: string
+        }
+        Insert: {
+          body_injection?: string | null
+          created_at?: string
+          created_by_run?: string | null
+          h1?: string | null
+          h2_list?: Json | null
+          id?: string
+          is_active?: boolean | null
+          meta_description?: string | null
+          meta_title?: string | null
+          route: string
+          schema_org?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          body_injection?: string | null
+          created_at?: string
+          created_by_run?: string | null
+          h1?: string | null
+          h2_list?: Json | null
+          id?: string
+          is_active?: boolean | null
+          meta_description?: string | null
+          meta_title?: string | null
+          route?: string
+          schema_org?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manus_seo_overrides_created_by_run_fkey"
+            columns: ["created_by_run"]
+            isOneToOne: false
+            referencedRelation: "manus_growth_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manus_social_queue: {
+        Row: {
+          caption: string | null
+          created_at: string
+          created_by_run: string | null
+          hashtags: string[] | null
+          id: string
+          platform: string
+          posted_at: string | null
+          scheduled_for: string | null
+          script: string
+          status: string
+          topic: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          created_by_run?: string | null
+          hashtags?: string[] | null
+          id?: string
+          platform: string
+          posted_at?: string | null
+          scheduled_for?: string | null
+          script: string
+          status?: string
+          topic?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          created_by_run?: string | null
+          hashtags?: string[] | null
+          id?: string
+          platform?: string
+          posted_at?: string | null
+          scheduled_for?: string | null
+          script?: string
+          status?: string
+          topic?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manus_social_queue_created_by_run_fkey"
+            columns: ["created_by_run"]
+            isOneToOne: false
+            referencedRelation: "manus_growth_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       master_reports: {
         Row: {
           content_summary: Json

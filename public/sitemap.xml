@@ -235,4 +235,34 @@
   <url><loc>https://plantayraiz.com.br/impacto</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://plantayraiz.com.br/voluntarios</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://plantayraiz.com.br/oferta-especial</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+
+  <!-- Cadastro / acesso -->
+  <url><loc>https://plantayraiz.com.br/cadastro-profissional</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://plantayraiz.com.br/falar-com-especialista</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/afiliados</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://plantayraiz.com.br/consulta-rapida</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/quiz-triagem</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://plantayraiz.com.br/quiz</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+
+  <!-- Conteúdo educativo / engajamento -->
+  <url><loc>https://plantayraiz.com.br/ebook-gratis</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://plantayraiz.com.br/ebook-medicina-canabinoide</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://plantayraiz.com.br/dispensario</loc><lastmod>2026-05-16</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://plantayraiz.com.br/dispositivos</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://plantayraiz.com.br/acompanhamento</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://plantayraiz.com.br/badges</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://plantayraiz.com.br/conquistas</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://plantayraiz.com.br/distribuicao-renda</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://plantayraiz.com.br/status</loc><lastmod>2026-05-16</lastmod><changefreq>daily</changefreq><priority>0.3</priority></url>
+
+  <!-- Legal / compliance (URLs alternativas) -->
+  <url><loc>https://plantayraiz.com.br/termos</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://plantayraiz.com.br/termos-de-uso</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://plantayraiz.com.br/privacidade</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://plantayraiz.com.br/politica-de-privacidade</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://plantayraiz.com.br/reembolso</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://plantayraiz.com.br/politica-de-reembolso</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://plantayraiz.com.br/ripd</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://plantayraiz.com.br/lgpd</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://plantayraiz.com.br/compliance</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
 </urlset>

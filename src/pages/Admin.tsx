@@ -26,6 +26,7 @@ import { Download, FileDown, Crown } from "lucide-react";
 import { exportCSV, exportAdminPDF } from "@/lib/admin-export";
 import { KpiDrillDown, type DrillSource } from "@/components/admin/KpiDrillDown";
 import { useAdminRealtime } from "@/hooks/useAdminRealtime";
+import { AgentsHub } from "@/components/admin/AgentsHub";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };

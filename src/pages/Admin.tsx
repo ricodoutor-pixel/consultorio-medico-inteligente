@@ -747,6 +747,13 @@ const Admin = () => {
         )}
       </AnimatePresence>
 
+      <KpiDrillDown
+        open={drill.open}
+        onOpenChange={(o) => setDrill((d) => ({ ...d, open: o }))}
+        source={drill.source}
+        title={drill.title}
+      />
+
       <Footer />
     </div>
   );

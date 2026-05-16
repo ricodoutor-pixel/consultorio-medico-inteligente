@@ -47,9 +47,9 @@ export function CustomLoader() {
           </p>
         </div>
 
-        {/* Spinner */}
-        <div className="relative h-8 w-8 mt-2">
-          <div className="absolute inset-0 rounded-full border-2 border-white/20" />
+        {/* Spinner sutil abaixo do Dr. Verdinho */}
+        <div className="relative h-6 w-6 mt-1">
+          <div className="absolute inset-0 rounded-full border-2 border-white/15" />
           <div className="absolute inset-0 rounded-full border-2 border-t-emerald-300 animate-spin" />
         </div>
       </div>

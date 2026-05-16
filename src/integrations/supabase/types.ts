@@ -3067,6 +3067,7 @@ export type Database = {
           doctor_payout: number
           document_id: string | null
           external_reference: string
+          google_review_requested_at: string | null
           id: string
           mp_payment_id: string | null
           mp_preference_id: string | null
@@ -3101,6 +3102,7 @@ export type Database = {
           doctor_payout?: number
           document_id?: string | null
           external_reference: string
+          google_review_requested_at?: string | null
           id?: string
           mp_payment_id?: string | null
           mp_preference_id?: string | null
@@ -3135,6 +3137,7 @@ export type Database = {
           doctor_payout?: number
           document_id?: string | null
           external_reference?: string
+          google_review_requested_at?: string | null
           id?: string
           mp_payment_id?: string | null
           mp_preference_id?: string | null

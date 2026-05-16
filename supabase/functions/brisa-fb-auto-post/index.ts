@@ -2,6 +2,7 @@
 // Fluxo: pega próximo item APROVADO em manus_social_queue (platform=facebook).
 // Se a fila estiver vazia, gera dinamicamente via Gemini (Lovable AI) e publica.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

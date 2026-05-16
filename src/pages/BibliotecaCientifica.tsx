@@ -382,12 +382,12 @@ const BibliotecaCientifica = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="w-full text-[10px] h-7 font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-xl"
+                        className="w-full min-h-8 h-auto py-1.5 px-2 text-[10px] leading-tight whitespace-normal font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-xl"
                         asChild
                         onClick={(e) => e.stopPropagation()}
                       >
                         <Link to="/profissionais">
-                          Orientação Técnicar Especialista <ArrowRight size={10} className="ml-1" />
+                          Falar com especialista <ArrowRight size={10} className="ml-1 shrink-0" />
                         </Link>
                       </Button>
                     </CardContent>
@@ -625,7 +625,7 @@ const BibliotecaCientifica = () => {
               {/* CTA */}
               <Button className="w-full bg-primary text-primary-foreground font-black rounded-xl" asChild>
                 <Link to="/profissionais">
-                  Orientação Técnicar Especialista <ArrowRight size={16} className="ml-2" />
+                  Falar com especialista <ArrowRight size={16} className="ml-2" />
                 </Link>
               </Button>
 

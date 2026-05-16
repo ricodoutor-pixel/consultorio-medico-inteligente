@@ -2953,30 +2953,39 @@ export type Database = {
           checks: Json
           corrections: Json
           duration_ms: number | null
+          escalations: Json
           id: string
+          is_simulation: boolean
           issues: Json
           overall_status: string
           ran_at: string
+          triggered_by: string | null
           whatsapp_sent: boolean | null
         }
         Insert: {
           checks?: Json
           corrections?: Json
           duration_ms?: number | null
+          escalations?: Json
           id?: string
+          is_simulation?: boolean
           issues?: Json
           overall_status?: string
           ran_at?: string
+          triggered_by?: string | null
           whatsapp_sent?: boolean | null
         }
         Update: {
           checks?: Json
           corrections?: Json
           duration_ms?: number | null
+          escalations?: Json
           id?: string
+          is_simulation?: boolean
           issues?: Json
           overall_status?: string
           ran_at?: string
+          triggered_by?: string | null
           whatsapp_sent?: boolean | null
         }
         Relationships: []
@@ -3232,6 +3241,57 @@ export type Database = {
           plan_tier?: string
           started_at?: string
           status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      monitoring_profiles: {
+        Row: {
+          conv_drop_ratio: number
+          conv_min_baseline: number
+          created_at: string
+          cron_overdue_max: number
+          err_critical_max: number
+          err_total_max: number
+          id: string
+          is_active: boolean
+          mp_error_rate_max: number
+          name: string
+          notes: string | null
+          queue_stuck_max: number
+          queue_stuck_minutes: number
+          updated_at: string
+        }
+        Insert: {
+          conv_drop_ratio?: number
+          conv_min_baseline?: number
+          created_at?: string
+          cron_overdue_max?: number
+          err_critical_max?: number
+          err_total_max?: number
+          id?: string
+          is_active?: boolean
+          mp_error_rate_max?: number
+          name: string
+          notes?: string | null
+          queue_stuck_max?: number
+          queue_stuck_minutes?: number
+          updated_at?: string
+        }
+        Update: {
+          conv_drop_ratio?: number
+          conv_min_baseline?: number
+          created_at?: string
+          cron_overdue_max?: number
+          err_critical_max?: number
+          err_total_max?: number
+          id?: string
+          is_active?: boolean
+          mp_error_rate_max?: number
+          name?: string
+          notes?: string | null
+          queue_stuck_max?: number
+          queue_stuck_minutes?: number
           updated_at?: string
         }
         Relationships: []
@@ -4749,6 +4809,54 @@ export type Database = {
           payload?: Json | null
           related_user_id?: string | null
           severity?: string
+        }
+        Relationships: []
+      }
+      sentinel_escalation_rules: {
+        Row: {
+          consecutive_threshold: number
+          cooldown_minutes: number
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          issue_code: string
+          last_escalated_at: string | null
+          primary_channel: string
+          primary_target: string
+          secondary_channel: string | null
+          secondary_target: string | null
+          updated_at: string
+        }
+        Insert: {
+          consecutive_threshold?: number
+          cooldown_minutes?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          issue_code: string
+          last_escalated_at?: string | null
+          primary_channel?: string
+          primary_target: string
+          secondary_channel?: string | null
+          secondary_target?: string | null
+          updated_at?: string
+        }
+        Update: {
+          consecutive_threshold?: number
+          cooldown_minutes?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          issue_code?: string
+          last_escalated_at?: string | null
+          primary_channel?: string
+          primary_target?: string
+          secondary_channel?: string | null
+          secondary_target?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

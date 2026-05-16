@@ -1,34 +1,221 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Core pages -->
-  <url><loc>https://plantayraiz.com.br/</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>https://plantayraiz.com.br/profissionais</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>https://plantayraiz.com.br/como-funciona</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/telemedicina</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://plantayraiz.com.br/shopping</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>https://plantayraiz.com.br/faq</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://plantayraiz.com.br/contato</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://plantayraiz.com.br/planos</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/agendamento</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>https://plantayraiz.com.br/cadastro</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://plantayraiz.com.br/login</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://plantayraiz.com.br/precos</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/pay</loc><lastmod>2026-05-15</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://plantayraiz.com.br/carteira</loc><lastmod>2026-05-15</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0">
+  <!-- HOMEPAGE -->
+  <url>
+    <loc>https://plantayraiz.com.br/</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-home.jpg</image:loc>
+      <image:title>Planta & Raiz — Telemedicina Cannabis Medicinal #1 Brasil</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/profissionais</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-profissionais.jpg</image:loc>
+      <image:title>Médicos Prescritores Cannabis Medicinal SP</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/como-funciona</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-como-funciona.jpg</image:loc>
+      <image:title>Como Funciona Telemedicina Cannabis</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/telemedicina</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-telemedicina.jpg</image:loc>
+      <image:title>Telemedicina Cannabis 24/7</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/shopping</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-shopping.jpg</image:loc>
+      <image:title>Shopping CBD — Óleos e Acessórios</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/faq</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-faq.jpg</image:loc>
+      <image:title>FAQ Cannabis Medicinal</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/contato</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-contato.jpg</image:loc>
+      <image:title>Contato Planta & Raiz</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/planos</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-planos.jpg</image:loc>
+      <image:title>Planos Cannabis Medicinal</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/agendamento</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-agendamento.jpg</image:loc>
+      <image:title>Agende Teleconsulta Cannabis</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/cadastro</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-cadastro.jpg</image:loc>
+      <image:title>Cadastro Grátis Planta & Raiz</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/login</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-login.jpg</image:loc>
+      <image:title>Login Planta & Raiz</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/precos</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-precos.jpg</image:loc>
+      <image:title>Preços Consulta Cannabis Medicinal</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/pay</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-pay.jpg</image:loc>
+      <image:title>Pagamento Seguro Planta & Raiz</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/carteira</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-carteira.jpg</image:loc>
+      <image:title>Carteira Digital Planta & Raiz</image:title>
+    </image:image>
+  </url>
 
-  <!-- Content & SEO pages -->
-  <url><loc>https://plantayraiz.com.br/blog</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://plantayraiz.com.br/biblioteca</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://plantayraiz.com.br/comunidade</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-  <url><loc>https://plantayraiz.com.br/ebook</loc><lastmod>2026-04-29</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- CONTENT & SEO PAGES -->
+  <url>
+    <loc>https://plantayraiz.com.br/blog</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-blog.jpg</image:loc>
+      <image:title>Blog Cannabis Medicinal</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/biblioteca</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-biblioteca.jpg</image:loc>
+      <image:title>Biblioteca Científica Cannabis</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/comunidade</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-comunidade.jpg</image:loc>
+      <image:title>Comunidade Cannabis Medicinal</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/ebook</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-ebook.jpg</image:loc>
+      <image:title>E-book Cannabis Medicinal Grátis</image:title>
+    </image:image>
+  </url>
   <url><loc>https://plantayraiz.com.br/cursos</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://plantayraiz.com.br/forum</loc><lastmod>2026-04-29</lastmod><changefreq>daily</changefreq><priority>0.6</priority></url>
   <url><loc>https://plantayraiz.com.br/webinars</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
 
-  <!-- Treatment / long-tail SEO pages -->
-  <url><loc>https://plantayraiz.com.br/tratamentos</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamento-dor-cronica</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://plantayraiz.com.br/tratamento-ansiedade-saude-mental</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <!-- TREATMENT PAGES (Long-tail SEO) -->
+  <url>
+    <loc>https://plantayraiz.com.br/tratamentos</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/tratamento-dor-cronica</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-tratamento-dor.jpg</image:loc>
+      <image:title>Cannabis para Dor Crônica</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://plantayraiz.com.br/tratamento-ansiedade-saude-mental</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/og-tratamento-ansiedade.jpg</image:loc>
+      <image:title>Cannabis para Ansiedade</image:title>
+    </image:image>
+  </url>
   <url><loc>https://plantayraiz.com.br/tratamentos/ansiedade</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://plantayraiz.com.br/tratamentos/dor-cronica</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://plantayraiz.com.br/tratamentos/epilepsia</loc><lastmod>2026-04-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>

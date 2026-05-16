@@ -72,6 +72,8 @@ Sua saúde merece ciência de verdade. 💚
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   const pageId = Deno.env.get("FACEBOOK_PAGE_ID");
   const fbToken =

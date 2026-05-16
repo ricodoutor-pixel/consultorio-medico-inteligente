@@ -325,14 +325,14 @@ const BibliotecaCientifica = () => {
           ) : viewMode === "grid" ? (
             <motion.div
               className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-              initial="hidden"
-              animate="visible"
-              variants={stagger}
+              initial={useReducedMotionGrid ? false : "hidden"}
+              animate={useReducedMotionGrid ? undefined : "visible"}
+              variants={useReducedMotionGrid ? undefined : stagger}
             >
               {filtered.map((strain) => (
-                <motion.div key={strain.id} variants={fadeUp}>
+                <motion.div key={strain.id} variants={useReducedMotionGrid ? undefined : fadeUp}>
                   <Card
-                    className="border-border hover:border-primary/40 transition-all cursor-pointer group hover:-translate-y-1 overflow-hidden"
+                    className="border-border hover:border-primary/40 transition-colors cursor-pointer group overflow-hidden"
                     onClick={() => setSelected(strain)}
                   >
                     {/* Image */}
@@ -342,7 +342,7 @@ const BibliotecaCientifica = () => {
                         strainName={strain.nome}
                         strainType={strain.tipo}
                         fallbackUrl={strain.imagem}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover md:group-hover:scale-110 md:transition-transform md:duration-500"
                         alt={strain.nome}
                       />
                       {/* Overlay gradient */}
@@ -354,7 +354,7 @@ const BibliotecaCientifica = () => {
                         </Badge>
                         <button
                           onClick={(e) => toggleFavorite(strain.id, e)}
-                          className="p-1 rounded-full bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-colors"
+                          className="p-1 rounded-full bg-card/80 hover:bg-card transition-colors"
                         >
                           <Heart
                             size={14}

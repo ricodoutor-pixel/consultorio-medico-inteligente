@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, Download, CheckCircle2, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { trackFunnelEvent } from "@/lib/funnel-tracking";
 
 /**
  * EbookGate — Lead capture (Nome + WhatsApp) → libera ebook PDF
@@ -27,6 +28,10 @@ export function EbookGate() {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   };
 
+  useEffect(() => {
+    trackFunnelEvent("ebook_gate", "ebook_viewed");
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -35,26 +40,43 @@ export function EbookGate() {
     if (digits.length < 10) return setError("WhatsApp inválido. Use DDD + número.");
 
     setLoading(true);
+    let savedLeadId: string | null = null;
     try {
-      // Salva lead (tabela leads existente; ignora falha silenciosamente para não bloquear download)
-      await supabase.from("leads" as any).insert({
-        name: name.trim(),
-        whatsapp: `+55${digits}`,
-        source: "ebook_gate_home",
-        lead_score: 30,
-      } as any);
+      const { data } = await supabase
+        .from("leads" as any)
+        .insert({
+          name: name.trim(),
+          whatsapp: `+55${digits}`,
+          source: "ebook_gate_home",
+          lead_score: 30,
+        } as any)
+        .select("id")
+        .single();
+      savedLeadId = (data as any)?.id ?? null;
     } catch (err) {
-      // não bloqueia
       console.warn("[EbookGate] lead insert failed (non-blocking):", err);
     } finally {
       setLoading(false);
       setDone(true);
-      // dispara download
+
+      await trackFunnelEvent(
+        "ebook_gate",
+        "ebook_form_submitted",
+        { has_lead: !!savedLeadId },
+        savedLeadId ?? undefined,
+      );
+
       setTimeout(() => {
         const a = document.createElement("a");
         a.href = EBOOK_URL;
         a.download = "guia-cannabis-medicinal-planta-y-raiz.pdf";
         a.click();
+        trackFunnelEvent(
+          "ebook_gate",
+          "ebook_pdf_downloaded",
+          {},
+          savedLeadId ?? undefined,
+        );
       }, 400);
     }
   };

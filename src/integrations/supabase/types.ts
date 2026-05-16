@@ -2164,6 +2164,44 @@ export type Database = {
         }
         Relationships: []
       }
+      funnel_events: {
+        Row: {
+          created_at: string
+          event_name: string
+          funnel: string
+          id: string
+          lead_id: string | null
+          metadata: Json
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          funnel: string
+          id?: string
+          lead_id?: string | null
+          metadata?: Json
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          funnel?: string
+          id?: string
+          lead_id?: string | null
+          metadata?: Json
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funnel_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gamification_achievements: {
         Row: {
           badge_id: string
@@ -2552,6 +2590,7 @@ export type Database = {
           metadata: Json
           name: string
           source: string
+          status: string
           updated_at: string
           whatsapp: string
         }
@@ -2563,6 +2602,7 @@ export type Database = {
           metadata?: Json
           name: string
           source?: string
+          status?: string
           updated_at?: string
           whatsapp: string
         }
@@ -2574,6 +2614,7 @@ export type Database = {
           metadata?: Json
           name?: string
           source?: string
+          status?: string
           updated_at?: string
           whatsapp?: string
         }

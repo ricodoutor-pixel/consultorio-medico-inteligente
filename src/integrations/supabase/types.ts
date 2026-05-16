@@ -3320,6 +3320,39 @@ export type Database = {
         }
         Relationships: []
       }
+      meta_messenger_log: {
+        Row: {
+          channel: string
+          error: string | null
+          id: string
+          message_in: string | null
+          processed_at: string
+          red_flag: boolean
+          reply_out: string | null
+          sender_id: string
+        }
+        Insert: {
+          channel: string
+          error?: string | null
+          id?: string
+          message_in?: string | null
+          processed_at?: string
+          red_flag?: boolean
+          reply_out?: string | null
+          sender_id: string
+        }
+        Update: {
+          channel?: string
+          error?: string | null
+          id?: string
+          message_in?: string | null
+          processed_at?: string
+          red_flag?: boolean
+          reply_out?: string | null
+          sender_id?: string
+        }
+        Relationships: []
+      }
       monitoring_profiles: {
         Row: {
           conv_drop_ratio: number

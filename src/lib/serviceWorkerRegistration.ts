@@ -15,6 +15,8 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
       updateViaCache: 'none' // Sempre buscar SW atualizado
     });
 
+    await registration.update();
+
     console.log('[PWA] Service Worker registrado com sucesso.');
 
     // Verificar atualizações a cada 30 minutos
@@ -40,6 +42,17 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
       if (event.data?.type === 'ICON_UPDATED') {
         console.log('[PWA] Ícone atualizado para mood:', event.data.mood);
       }
+    });
+
+    if (registration.waiting) {
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+    }
+
+    let refreshed = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshed) return;
+      refreshed = true;
+      window.location.reload();
     });
 
     return registration;

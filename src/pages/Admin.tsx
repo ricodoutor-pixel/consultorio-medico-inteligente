@@ -90,8 +90,10 @@ const Admin = () => {
   const [lastSync, setLastSync] = useState<Date>(new Date());
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
+  const [drill, setDrill] = useState<{ open: boolean; source: DrillSource | null; title: string }>({ open: false, source: null, title: "" });
+  const [liveAlerts, setLiveAlerts] = useState<{ kind: string; title: string; message: string; created_at: string }[]>([]);
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Comandante Dr. Edilson, Command Center 360 online. Dados reais sincronizando a cada 30s." },
+    { role: "assistant", content: "Comandante Dr. Edilson, Command Center 360 online. Dados reais sincronizando em tempo real." },
   ]);
 
   // Auth gate

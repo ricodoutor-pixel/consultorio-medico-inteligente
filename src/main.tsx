@@ -47,10 +47,5 @@ if (isPreviewHost || isInIframe) {
 // Inicializa Sentry (não-bloqueante) — DSN vem do edge function sentry-config
 import("./lib/sentry").then(({ initSentry }) => initSentry()).catch(() => {});
 
-createRoot(document.getElementById("root")!).render(
-  <>
-    <CustomLoader />
-    <App />
-  </>
-);
+createRoot(document.getElementById("root")!).render(<App />);
 

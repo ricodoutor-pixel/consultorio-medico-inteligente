@@ -165,3 +165,9 @@ verify_jwt = false
 
 [functions.manus-growth-agent]
 verify_jwt = false
+
+[functions.manus-sentinel]
+verify_jwt = false
+
+[functions.agent-chat]
+verify_jwt = true

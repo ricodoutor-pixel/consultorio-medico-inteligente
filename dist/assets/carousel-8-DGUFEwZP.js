@@ -1,1 +1,0 @@
-var a="/assets/carousel-8-BRb7SqJZ.jpg";export{a as default};

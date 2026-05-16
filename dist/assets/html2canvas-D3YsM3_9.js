@@ -1,1 +1,0 @@
-import{o}from"./vendor-BPNFDHW1.js";export default o();

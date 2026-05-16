@@ -389,11 +389,14 @@ const Admin = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-6">
             {kpiCards.map((k, i) => (
               <motion.div key={k.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
-                <Card className={`relative overflow-hidden border-border bg-gradient-to-br ${k.bg} to-card/40 hover:border-primary/50 transition-all group`}>
+                <Card
+                  className={`relative overflow-hidden border-border bg-gradient-to-br ${k.bg} to-card/40 hover:border-primary/50 transition-all group ${k.drill ? "cursor-pointer hover:scale-[1.02]" : ""}`}
+                  onClick={k.drill ? () => openDrill(k.drill!, k.label) : undefined}
+                >
                   <CardContent className="p-3">
                     <div className="flex items-center justify-between mb-1.5">
                       <k.icon size={16} className={k.accent} />
-                      <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">LIVE</span>
+                      <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">{k.drill ? "DRILL ↗" : "LIVE"}</span>
                     </div>
                     <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider truncate">{k.label}</p>
                     <p className={`text-lg md:text-xl font-black ${k.accent} mt-0.5 truncate`}>{k.value}</p>
@@ -402,6 +405,32 @@ const Admin = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* LIVE ALERTS FEED */}
+          {liveAlerts.length > 0 && (
+            <Card className="border-red-500/40 bg-red-500/5 mb-6">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-display font-black text-sm flex items-center gap-2 text-red-400">
+                    <AlertTriangle size={16} className="animate-pulse" /> Alertas em Tempo Real
+                    <Badge variant="destructive" className="text-[9px]">{liveAlerts.length}</Badge>
+                  </h3>
+                  <Button size="sm" variant="ghost" className="h-6 text-[10px]" onClick={() => setLiveAlerts([])}>Limpar</Button>
+                </div>
+                <div className="max-h-32 overflow-y-auto space-y-1">
+                  {liveAlerts.slice(0, 8).map((a, i) => (
+                    <div key={i} className="flex items-center justify-between gap-2 text-[11px] p-1.5 rounded bg-background/40">
+                      <div className="flex-1 min-w-0">
+                        <span className="font-bold text-red-300">{a.title}</span>
+                        <span className="text-muted-foreground ml-2 truncate">{a.message}</span>
+                      </div>
+                      <span className="text-[9px] text-muted-foreground shrink-0">{since(a.created_at)}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* CHARTS ROW */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">

@@ -135,6 +135,7 @@ const AuditLog = lazy(() => import("./pages/admin/AuditLog"));
 const CronHealth = lazy(() => import("./pages/admin/CronHealth"));
 const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 const AdminLeadDetail = lazy(() => import("./pages/admin/LeadDetail"));
+const President360 = lazy(() => import("./pages/admin/President360"));
 
 const queryClient = new QueryClient();
 

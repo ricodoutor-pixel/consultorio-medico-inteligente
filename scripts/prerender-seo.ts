@@ -278,6 +278,93 @@ const STATIC_PAGES: StaticPage[] = [
       "Veja os tratamentos disponíveis: ansiedade, dor crônica, epilepsia, fibromialgia, insônia, Parkinson, autismo, esclerose múltipla, depressão e TDAH.",
     ],
   },
+  {
+    path: "/telemedicina",
+    title: "Telemedicina Cannabis Medicinal — Consulta Online | Planta y Raiz",
+    description: "Telemedicina especializada em Cannabis Medicinal 100% online. Consulta com Dr. Edilson Bezerra (CRM 10963) por videochamada criptografada, prescrição digital e suporte ANVISA.",
+    h1: "Telemedicina de Cannabis Medicinal — 100% Online",
+    intro: [
+      "Atendimento por videochamada segura (Jitsi WebRTC) com Dr. Edilson Bezerra da Silva — CRM-SP 10963.",
+      "Prescrição digital com assinatura ICP-Brasil e selo gov.br, válida em farmácias e para importação ANVISA.",
+      "Disponível em todo o Brasil — São Paulo, Rio de Janeiro, Brasília, Belo Horizonte, Salvador, Curitiba, Porto Alegre, Recife, Fortaleza e demais capitais.",
+    ],
+  },
+  {
+    path: "/profissionais",
+    title: "Médicos Prescritores de Cannabis Medicinal | Planta y Raiz",
+    description: "Conheça os médicos prescritores da Planta y Raiz — especialistas em Cannabis Medicinal regulamentados pela ANVISA e CFM. Dr. Edilson Bezerra CRM 10963 e equipe.",
+    h1: "Médicos Prescritores de Cannabis Medicinal",
+    intro: [
+      "Equipe médica especializada em Cannabis Medicinal, treinada na RDC 660/2022 e RDC 327/2019 da ANVISA.",
+      "Dr. Edilson Bezerra da Silva (CRM-SP 10963) — coordenador médico, especialista em Cannabis Medicinal e Farmacologia.",
+      "Atendimento ético, sigiloso e baseado em evidências científicas.",
+    ],
+  },
+  {
+    path: "/biblioteca",
+    title: "Biblioteca Científica de Cannabis Medicinal — Strains, Terpenos, Estudos",
+    description: "Maior biblioteca científica de Cannabis Medicinal do Brasil: variedades (strains), terpenos, canabinoides (CBD, THC, CBG, CBN), estudos clínicos e indicações terapêuticas.",
+    h1: "Biblioteca Científica de Cannabis Medicinal",
+    intro: [
+      "Mais de 100 variedades catalogadas: Sativa, Indica, Híbridas, Alto CBD e Medicinais.",
+      "Perfis de terpenos (mirceno, limoneno, pineno, linalol, cariofileno) e canabinoides (CBD, THC, CBG, CBN, CBC).",
+      "Mais de 1.000 estudos científicos sobre modulação do sistema endocanabinoide humano.",
+    ],
+  },
+  {
+    path: "/club",
+    title: "Club Planta y Raiz — Assinatura de Cannabis Medicinal",
+    description: "Club Planta y Raiz: assinatura mensal com descontos em produtos CBD, orientação técnica recorrente, conteúdo exclusivo e comunidade. Planos a partir de R$99/mês.",
+    h1: "Club Planta y Raiz — Sua Assinatura de Bem-Estar Canabinoide",
+    intro: [
+      "Assinatura mensal com benefícios exclusivos para pacientes de Cannabis Medicinal.",
+      "Planos: Basic R$99, Pro R$149, Premium R$199 — descontos no shopping, orientação técnica recorrente e comunidade ativa.",
+      "Sem taxa de intermediação para o assinante e cancelamento a qualquer momento.",
+    ],
+  },
+  {
+    path: "/blog",
+    title: "Blog Cannabis Medicinal — Notícias, Pesquisas e Casos | Planta y Raiz",
+    description: "Blog oficial da Planta y Raiz com artigos sobre Cannabis Medicinal, CBD, THC, regulamentação ANVISA, casos clínicos e novidades em medicina canabinoide.",
+    h1: "Blog Cannabis Medicinal — Planta y Raiz",
+    intro: [
+      "Artigos atualizados sobre Cannabis Medicinal, regulamentação brasileira e pesquisas científicas.",
+      "Casos clínicos reais, depoimentos de pacientes e novidades em produtos CBD e THC medicinal.",
+    ],
+  },
+  {
+    path: "/agendamento",
+    title: "Agendar Consulta de Cannabis Medicinal Online — Planta y Raiz",
+    description: "Agende sua consulta online de Cannabis Medicinal com médico especialista. Atendimento por videochamada com PIX a partir de R$30. Confirmação imediata via WhatsApp.",
+    h1: "Agende sua Orientação Técnica de Cannabis Medicinal",
+    intro: [
+      "Agendamento 100% online com confirmação imediata pelo WhatsApp.",
+      "Atendimento por videochamada segura com Dr. Edilson Bezerra (CRM-SP 10963).",
+      "Pagamento via PIX, Cartão de Crédito ou Bitcoin — a partir de R$30.",
+    ],
+  },
+  {
+    path: "/tratamento-dor-cronica",
+    title: "Tratamento de Dor Crônica com Cannabis Medicinal | Planta y Raiz",
+    description: "Tratamento de dor crônica (fibromialgia, lombalgia, neuropatia, artrite) com Cannabis Medicinal. Orientação técnica com Dr. Edilson Bezerra. CBD e THC regulamentados.",
+    h1: "Tratamento de Dor Crônica com Cannabis Medicinal",
+    intro: [
+      "A Cannabis Medicinal é uma alternativa baseada em evidências para o manejo da dor crônica.",
+      "Indicações: fibromialgia, dor lombar crônica, neuropatia diabética, dor oncológica, artrite e enxaqueca.",
+      "Orientação técnica especializada com Dr. Edilson Bezerra (CRM-SP 10963).",
+    ],
+  },
+  {
+    path: "/tratamento-ansiedade-saude-mental",
+    title: "Cannabis Medicinal para Ansiedade e Saúde Mental | Planta y Raiz",
+    description: "Tratamento de ansiedade, depressão, insônia e TEPT com Cannabis Medicinal (CBD). Atendimento online com Dr. Edilson Bezerra (CRM 10963) regulamentado ANVISA.",
+    h1: "Cannabis Medicinal para Ansiedade, Depressão e Saúde Mental",
+    intro: [
+      "O CBD (canabidiol) possui propriedades ansiolíticas e antidepressivas comprovadas em estudos clínicos.",
+      "Indicações: ansiedade generalizada, transtorno do pânico, depressão, insônia e TEPT.",
+      "Atendimento ético e baseado em evidências com Dr. Edilson Bezerra (CRM-SP 10963).",
+    ],
+  },
 ];
 
 function buildTreatmentHTML(t: TreatmentPage): string {

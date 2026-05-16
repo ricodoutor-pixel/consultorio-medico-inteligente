@@ -69,6 +69,9 @@ async function sendEmail(to: string, subject: string, html: string, dryRun: bool
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
+
   let dryRun = false;
   let triggeredBy = "cron";
   if (req.method === "POST") {

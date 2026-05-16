@@ -83,15 +83,21 @@ const cbdImages = [cbdFrosty, cbdEmerald, cbdSilver, cbdWhite, cbdMint];
 const medicinalImages = [medicinalPurple, medicinalSilver, medicinalGold, medicinalRose];
 
 const aiImg = (name: string, type: string) => {
-  // First check for named strain images
+  // 1) Named strain → imagem local 1:1
   if (namedStrainImages[name]) return namedStrainImages[name];
-  
+
+  // 2) Fallback determinístico por tipo usando imagens locais já bundladas
   const seed = Math.abs([...name].reduce((h, c) => ((h << 5) - h) + c.charCodeAt(0), 0));
   const t = type.toLowerCase();
-  
-  // Use pollinations.ai for dynamic image generation
-  const prompt = encodeURIComponent(`high quality cannabis flower strain ${name} ${type} macro photography realistic medicinal`);
-  return `https://image.pollinations.ai/prompt/${prompt}?seed=${seed}&width=1024&height=1024&nologo=true`;
+
+  let pool: string[];
+  if (t.includes("medicinal") || t.includes("especializada")) pool = medicinalImages;
+  else if (t.includes("cbd")) pool = cbdImages;
+  else if (t.includes("indica")) pool = indicaImages;
+  else if (t.includes("sativa")) pool = sativaImages;
+  else pool = hybridImages;
+
+  return pool[seed % pool.length];
 };
 
 export const getPlantImage = (id: number) => {

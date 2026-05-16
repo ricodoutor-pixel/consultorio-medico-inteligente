@@ -3,7 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Phone, MessageCircle, CheckCircle2, XCircle, Activity, FileText } from "lucide-react";
+import { ArrowLeft, Phone, MessageCircle, CheckCircle2, XCircle, Activity, FileText, RefreshCw, Download, FileDown } from "lucide-react";
+import jsPDF from "jspdf";
 
 type Lead = {
   id: string;
@@ -47,6 +48,135 @@ export default function AdminLeadDetail() {
   const [history, setHistory] = useState<HistoryRow[]>([]);
   const [events, setEvents] = useState<FunnelRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [resendingId, setResendingId] = useState<string | null>(null);
+
+  async function resendWhatsApp(historyId: string) {
+    setResendingId(historyId);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-lead-resend-whatsapp", {
+        body: { history_id: historyId },
+      });
+      if (error) throw error;
+      await load();
+      if (!data?.sent) alert(`Falha no reenvio: ${data?.error ?? "erro desconhecido"}`);
+    } catch (e: any) {
+      alert(`Erro: ${e?.message ?? e}`);
+    } finally {
+      setResendingId(null);
+    }
+  }
+
+  function exportCSV() {
+    if (!lead) return;
+    const lines: string[] = [];
+    lines.push("# LEAD");
+    lines.push("id,nome,whatsapp,origem,status,score,condicao,criado_em");
+    lines.push([
+      lead.id, lead.name.replace(/[",\n]/g, " "), lead.whatsapp, lead.source,
+      lead.status, String(lead.lead_score),
+      (lead.condition_interest ?? "").replace(/[",\n]/g, " "),
+      lead.created_at,
+    ].map((c) => `"${c}"`).join(","));
+
+    lines.push("");
+    lines.push("# METADATA");
+    Object.entries(lead.metadata ?? {}).forEach(([k, v]) => {
+      const val = (typeof v === "object" ? JSON.stringify(v) : String(v)).replace(/"/g, "'");
+      lines.push(`"${k}","${val}"`);
+    });
+
+    lines.push("");
+    lines.push("# HISTORICO STATUS");
+    lines.push("data,de,para,nota,whatsapp_enviado,mensagem,erro");
+    history.forEach((h) => {
+      lines.push([
+        h.created_at, h.from_status ?? "", h.to_status,
+        (h.note ?? "").replace(/[",\n]/g, " "),
+        h.whatsapp_sent ? "sim" : "nao",
+        (h.whatsapp_message ?? "").replace(/[",\n]/g, " "),
+        (h.whatsapp_error ?? "").replace(/[",\n]/g, " "),
+      ].map((c) => `"${c}"`).join(","));
+    });
+
+    lines.push("");
+    lines.push("# EVENTOS FUNIL");
+    lines.push("data,funnel,evento,metadata");
+    events.forEach((e) => {
+      lines.push([
+        e.created_at, e.funnel, e.event_name,
+        JSON.stringify(e.metadata ?? {}).replace(/"/g, "'"),
+      ].map((c) => `"${c}"`).join(","));
+    });
+
+    const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `lead-${lead.name.replace(/\W+/g, "_")}-${lead.id.slice(0, 8)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportPDF() {
+    if (!lead) return;
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const W = doc.internal.pageSize.getWidth();
+    const M = 40;
+    let y = M;
+
+    const line = (text: string, opts: { size?: number; bold?: boolean; color?: [number,number,number] } = {}) => {
+      const size = opts.size ?? 10;
+      doc.setFontSize(size);
+      doc.setFont("helvetica", opts.bold ? "bold" : "normal");
+      if (opts.color) doc.setTextColor(...opts.color); else doc.setTextColor(20, 20, 20);
+      const wrapped = doc.splitTextToSize(text, W - M * 2);
+      wrapped.forEach((l: string) => {
+        if (y > 780) { doc.addPage(); y = M; }
+        doc.text(l, M, y);
+        y += size + 4;
+      });
+    };
+    const hr = () => { if (y > 770) { doc.addPage(); y = M; } doc.setDrawColor(200); doc.line(M, y, W - M, y); y += 10; };
+
+    line("Planta y Raiz · CRM Lead", { size: 16, bold: true, color: [27, 67, 50] });
+    line(`Exportado em ${new Date().toLocaleString("pt-BR")}`, { size: 9, color: [120,120,120] });
+    hr();
+
+    line(lead.name, { size: 14, bold: true });
+    line(`WhatsApp: ${lead.whatsapp}   ·   Status: ${STATUS_LABELS[lead.status] ?? lead.status}   ·   Score: ${lead.lead_score}`);
+    line(`Origem: ${lead.source}   ·   Criado: ${new Date(lead.created_at).toLocaleString("pt-BR")}`);
+    if (lead.condition_interest) line(`Condição: ${lead.condition_interest}`);
+    hr();
+
+    const meta = Object.entries(lead.metadata ?? {}).filter(([k]) => k !== "session_id");
+    if (meta.length > 0) {
+      line("Dados do formulário", { size: 12, bold: true, color: [27, 67, 50] });
+      meta.forEach(([k, v]) => line(`• ${k}: ${typeof v === "object" ? JSON.stringify(v) : String(v)}`));
+      hr();
+    }
+
+    line(`Histórico de status (${history.length})`, { size: 12, bold: true, color: [27, 67, 50] });
+    if (history.length === 0) line("Nenhuma mudança registrada.", { color: [120,120,120] });
+    history.forEach((h) => {
+      line(`${new Date(h.created_at).toLocaleString("pt-BR")} — ${h.from_status ?? "—"} → ${h.to_status}`, { bold: true });
+      if (h.note) line(`  Nota: ${h.note}`);
+      if (h.whatsapp_message) {
+        line(`  WhatsApp ${h.whatsapp_sent ? "✓ enviado" : "✗ falhou"}: ${h.whatsapp_message}`);
+        if (h.whatsapp_error) line(`  Erro: ${h.whatsapp_error}`, { color: [200,40,40] });
+      }
+      y += 4;
+    });
+    hr();
+
+    line(`Eventos do funil (${events.length})`, { size: 12, bold: true, color: [27, 67, 50] });
+    if (events.length === 0) line("Nenhum evento registrado.", { color: [120,120,120] });
+    events.forEach((e) => {
+      line(`${new Date(e.created_at).toLocaleString("pt-BR")} — [${e.funnel}] ${e.event_name}`);
+    });
+
+    doc.save(`lead-${lead.name.replace(/\W+/g, "_")}-${lead.id.slice(0, 8)}.pdf`);
+  }
+
 
   async function load() {
     if (!id) return;
@@ -107,16 +237,24 @@ export default function AdminLeadDetail() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-6 max-w-5xl">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Button variant="outline" size="sm" asChild className="rounded-xl">
             <Link to="/admin/leads"><ArrowLeft size={14} className="mr-1" /> Leads</Link>
           </Button>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h1 className="font-display font-black text-2xl md:text-3xl truncate">{lead.name}</h1>
             <p className="text-xs text-muted-foreground">
               {lead.source} · Score {lead.lead_score} · Criado em{" "}
               {new Date(lead.created_at).toLocaleString("pt-BR")}
             </p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={exportCSV} className="rounded-xl">
+              <Download size={14} className="mr-1" /> CSV
+            </Button>
+            <Button size="sm" onClick={exportPDF} className="rounded-xl bg-primary text-primary-foreground">
+              <FileDown size={14} className="mr-1" /> PDF
+            </Button>
           </div>
         </div>
 
@@ -188,7 +326,7 @@ export default function AdminLeadDetail() {
                         ) : (
                           <XCircle size={14} className="text-rose-400 shrink-0 mt-0.5" />
                         )}
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                             WhatsApp {h.whatsapp_sent ? "enviado" : "falhou"}
                           </p>
@@ -197,6 +335,18 @@ export default function AdminLeadDetail() {
                             <p className="text-[10px] text-rose-400 mt-1">{h.whatsapp_error}</p>
                           )}
                         </div>
+                        {!h.whatsapp_sent && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={resendingId === h.id}
+                            onClick={() => resendWhatsApp(h.id)}
+                            className="h-7 px-2 text-[10px] font-black uppercase rounded-lg shrink-0"
+                          >
+                            <RefreshCw size={12} className={`mr-1 ${resendingId === h.id ? "animate-spin" : ""}`} />
+                            {resendingId === h.id ? "Enviando" : "Reenviar"}
+                          </Button>
+                        )}
                       </div>
                     )}
                   </li>

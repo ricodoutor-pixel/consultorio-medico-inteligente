@@ -242,6 +242,62 @@ const Admin = () => {
     return () => clearInterval(i);
   }, [loadData]);
 
+  // ---- Realtime sync + alerts ----
+  useAdminRealtime({
+    onChange: loadData,
+    onAlert: (a) => setLiveAlerts((prev) => [a, ...prev].slice(0, 25)),
+  });
+
+  // ---- Export handlers ----
+  const handleExportCSV = useCallback(() => {
+    exportCSV("command-center-kpis", [
+      { metrica: "Receita 30d", valor: kpi.receita30d },
+      { metrica: "Receita Hoje", valor: kpi.receitaHoje },
+      { metrica: "Ticket Medio", valor: kpi.ticketMedio.toFixed(2) },
+      { metrica: "Ordens 30d", valor: kpi.ordensTotal },
+      { metrica: "Ordens Hoje", valor: kpi.ordensHoje },
+      { metrica: "Consultas Hoje", valor: kpi.consultasHoje },
+      { metrica: "Fila Ativa", valor: kpi.filaAtiva },
+      { metrica: "Leads Total", valor: kpi.leadsTotal },
+      { metrica: "Leads 24h", valor: kpi.leads24h },
+      { metrica: "Conversao %", valor: kpi.conversao.toFixed(2) },
+      { metrica: "Medicos", valor: kpi.medicos },
+      { metrica: "Pacientes", valor: kpi.pacientes },
+      { metrica: "Prescricoes 7d", valor: kpi.prescricoes7d },
+      { metrica: "Erros 24h", valor: kpi.erros24h },
+      { metrica: "Eventos Auditoria 24h", valor: kpi.auditEventos24h },
+    ]);
+    toast.success("CSV exportado");
+  }, [kpi]);
+
+  const handleExportPDF = useCallback(() => {
+    exportAdminPDF({
+      kpis: [
+        { label: "Receita 30 dias", value: BRL(kpi.receita30d) },
+        { label: "Receita Hoje", value: BRL(kpi.receitaHoje) },
+        { label: "Ticket Médio", value: BRL(kpi.ticketMedio) },
+        { label: "Ordens Hoje", value: NUM(kpi.ordensHoje) },
+        { label: "Consultas Hoje", value: NUM(kpi.consultasHoje) },
+        { label: "Fila Ativa", value: NUM(kpi.filaAtiva) },
+        { label: "Leads 24h", value: NUM(kpi.leads24h) },
+        { label: "Conversão de Leads", value: PCT(kpi.conversao) },
+        { label: "Pacientes", value: NUM(kpi.pacientes) },
+        { label: "Médicos Ativos", value: NUM(kpi.medicos) },
+        { label: "Prescrições 7d", value: NUM(kpi.prescricoes7d) },
+        { label: "Erros 24h", value: NUM(kpi.erros24h) },
+      ],
+      revenue30d: data.receitaSerie,
+      funnel: data.funilSerie,
+      audit: data.ultimoAudit,
+      alerts: liveAlerts.map((a) => ({ title: a.title, message: a.message, created_at: a.created_at })),
+    });
+    toast.success("PDF gerado");
+  }, [kpi, data, liveAlerts]);
+
+  const openDrill = useCallback((source: DrillSource, title: string) => {
+    setDrill({ open: true, source, title });
+  }, []);
+
   const sendMessage = () => {
     if (!chatInput.trim()) return;
     const msgs = [...messages, { role: "user", content: chatInput }];

@@ -22,6 +22,10 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { Download, FileDown, Crown } from "lucide-react";
+import { exportCSV, exportAdminPDF } from "@/lib/admin-export";
+import { KpiDrillDown, type DrillSource } from "@/components/admin/KpiDrillDown";
+import { useAdminRealtime } from "@/hooks/useAdminRealtime";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -86,8 +90,10 @@ const Admin = () => {
   const [lastSync, setLastSync] = useState<Date>(new Date());
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
+  const [drill, setDrill] = useState<{ open: boolean; source: DrillSource | null; title: string }>({ open: false, source: null, title: "" });
+  const [liveAlerts, setLiveAlerts] = useState<{ kind: string; title: string; message: string; created_at: string }[]>([]);
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Comandante Dr. Edilson, Command Center 360 online. Dados reais sincronizando a cada 30s." },
+    { role: "assistant", content: "Comandante Dr. Edilson, Command Center 360 online. Dados reais sincronizando em tempo real." },
   ]);
 
   // Auth gate
@@ -236,6 +242,64 @@ const Admin = () => {
     return () => clearInterval(i);
   }, [loadData]);
 
+  const kpi = data.kpi;
+
+  // ---- Realtime sync + alerts ----
+  useAdminRealtime({
+    onChange: loadData,
+    onAlert: (a) => setLiveAlerts((prev) => [a, ...prev].slice(0, 25)),
+  });
+
+  // ---- Export handlers ----
+  const handleExportCSV = useCallback(() => {
+    exportCSV("command-center-kpis", [
+      { metrica: "Receita 30d", valor: kpi.receita30d },
+      { metrica: "Receita Hoje", valor: kpi.receitaHoje },
+      { metrica: "Ticket Medio", valor: kpi.ticketMedio.toFixed(2) },
+      { metrica: "Ordens 30d", valor: kpi.ordensTotal },
+      { metrica: "Ordens Hoje", valor: kpi.ordensHoje },
+      { metrica: "Consultas Hoje", valor: kpi.consultasHoje },
+      { metrica: "Fila Ativa", valor: kpi.filaAtiva },
+      { metrica: "Leads Total", valor: kpi.leadsTotal },
+      { metrica: "Leads 24h", valor: kpi.leads24h },
+      { metrica: "Conversao %", valor: kpi.conversao.toFixed(2) },
+      { metrica: "Medicos", valor: kpi.medicos },
+      { metrica: "Pacientes", valor: kpi.pacientes },
+      { metrica: "Prescricoes 7d", valor: kpi.prescricoes7d },
+      { metrica: "Erros 24h", valor: kpi.erros24h },
+      { metrica: "Eventos Auditoria 24h", valor: kpi.auditEventos24h },
+    ]);
+    toast.success("CSV exportado");
+  }, [kpi]);
+
+  const handleExportPDF = useCallback(() => {
+    exportAdminPDF({
+      kpis: [
+        { label: "Receita 30 dias", value: BRL(kpi.receita30d) },
+        { label: "Receita Hoje", value: BRL(kpi.receitaHoje) },
+        { label: "Ticket Médio", value: BRL(kpi.ticketMedio) },
+        { label: "Ordens Hoje", value: NUM(kpi.ordensHoje) },
+        { label: "Consultas Hoje", value: NUM(kpi.consultasHoje) },
+        { label: "Fila Ativa", value: NUM(kpi.filaAtiva) },
+        { label: "Leads 24h", value: NUM(kpi.leads24h) },
+        { label: "Conversão de Leads", value: PCT(kpi.conversao) },
+        { label: "Pacientes", value: NUM(kpi.pacientes) },
+        { label: "Médicos Ativos", value: NUM(kpi.medicos) },
+        { label: "Prescrições 7d", value: NUM(kpi.prescricoes7d) },
+        { label: "Erros 24h", value: NUM(kpi.erros24h) },
+      ],
+      revenue30d: data.receitaSerie,
+      funnel: data.funilSerie,
+      audit: data.ultimoAudit,
+      alerts: liveAlerts.map((a) => ({ title: a.title, message: a.message, created_at: a.created_at })),
+    });
+    toast.success("PDF gerado");
+  }, [kpi, data, liveAlerts]);
+
+  const openDrill = useCallback((source: DrillSource, title: string) => {
+    setDrill({ open: true, source, title });
+  }, []);
+
   const sendMessage = () => {
     if (!chatInput.trim()) return;
     const msgs = [...messages, { role: "user", content: chatInput }];
@@ -244,22 +308,22 @@ const Admin = () => {
     setTimeout(() => setMessages([...msgs, { role: "assistant", content: "Comando recebido. Executando análise nos módulos de produção." }]), 800);
   };
 
-  const kpi = data.kpi;
+  // kpi already declared above
 
   // ---------- KPI definitions ----------
-  const kpiCards = useMemo(() => [
-    { label: "Receita 30d", value: BRL(kpi.receita30d), icon: DollarSign, accent: "text-emerald-400", bg: "from-emerald-500/20" },
-    { label: "Receita Hoje", value: BRL(kpi.receitaHoje), icon: TrendingUp, accent: "text-emerald-400", bg: "from-emerald-500/20" },
-    { label: "Ticket Médio", value: BRL(kpi.ticketMedio), icon: CreditCard, accent: "text-yellow-400", bg: "from-yellow-500/20" },
-    { label: "Ordens Hoje", value: NUM(kpi.ordensHoje), icon: ShoppingBag, accent: "text-yellow-400", bg: "from-yellow-500/20" },
-    { label: "Consultas Hoje", value: NUM(kpi.consultasHoje), icon: Stethoscope, accent: "text-sky-400", bg: "from-sky-500/20" },
-    { label: "Fila Ativa", value: NUM(kpi.filaAtiva), icon: Clock, accent: "text-sky-400", bg: "from-sky-500/20" },
+  const kpiCards = useMemo<Array<{ label: string; value: string; icon: any; accent: string; bg: string; drill?: DrillSource }>>(() => [
+    { label: "Receita 30d", value: BRL(kpi.receita30d), icon: DollarSign, accent: "text-emerald-400", bg: "from-emerald-500/20", drill: "ot_orders" },
+    { label: "Receita Hoje", value: BRL(kpi.receitaHoje), icon: TrendingUp, accent: "text-emerald-400", bg: "from-emerald-500/20", drill: "ot_orders" },
+    { label: "Ticket Médio", value: BRL(kpi.ticketMedio), icon: CreditCard, accent: "text-yellow-400", bg: "from-yellow-500/20", drill: "orders" },
+    { label: "Ordens Hoje", value: NUM(kpi.ordensHoje), icon: ShoppingBag, accent: "text-yellow-400", bg: "from-yellow-500/20", drill: "orders" },
+    { label: "Consultas Hoje", value: NUM(kpi.consultasHoje), icon: Stethoscope, accent: "text-sky-400", bg: "from-sky-500/20", drill: "appointments" },
+    { label: "Fila Ativa", value: NUM(kpi.filaAtiva), icon: Clock, accent: "text-sky-400", bg: "from-sky-500/20", drill: "queue" },
     { label: "Pacientes", value: NUM(kpi.pacientes), icon: Users, accent: "text-fuchsia-400", bg: "from-fuchsia-500/20" },
     { label: "Médicos Ativos", value: NUM(kpi.medicos), icon: HeartPulse, accent: "text-fuchsia-400", bg: "from-fuchsia-500/20" },
-    { label: "Leads 24h", value: NUM(kpi.leads24h), icon: UserPlus, accent: "text-primary", bg: "from-primary/20" },
-    { label: "Conversão Leads", value: PCT(kpi.conversao), icon: BarChart3, accent: "text-primary", bg: "from-primary/20" },
+    { label: "Leads 24h", value: NUM(kpi.leads24h), icon: UserPlus, accent: "text-primary", bg: "from-primary/20", drill: "leads" },
+    { label: "Conversão Leads", value: PCT(kpi.conversao), icon: BarChart3, accent: "text-primary", bg: "from-primary/20", drill: "leads" },
     { label: "Prescrições 7d", value: NUM(kpi.prescricoes7d), icon: FileText, accent: "text-orange-400", bg: "from-orange-500/20" },
-    { label: "Erros 24h", value: NUM(kpi.erros24h), icon: AlertTriangle, accent: kpi.erros24h > 5 ? "text-red-500" : "text-emerald-400", bg: "from-red-500/20" },
+    { label: "Erros 24h", value: NUM(kpi.erros24h), icon: AlertTriangle, accent: kpi.erros24h > 5 ? "text-red-500" : "text-emerald-400", bg: "from-red-500/20", drill: "error_logs" },
   ], [kpi]);
 
   const quickLinks = [
@@ -299,15 +363,24 @@ const Admin = () => {
                 </p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Button onClick={loadData} variant="outline" size="sm" className="rounded-xl" disabled={loading}>
-                <RefreshCw size={14} className={`mr-2 ${loading ? "animate-spin" : ""}`} /> Sync
+                <RefreshCw size={14} className={`mr-1.5 ${loading ? "animate-spin" : ""}`} /> Sync
+              </Button>
+              <Button onClick={handleExportCSV} variant="outline" size="sm" className="rounded-xl">
+                <Download size={14} className="mr-1.5" /> CSV
+              </Button>
+              <Button onClick={handleExportPDF} variant="outline" size="sm" className="rounded-xl">
+                <FileDown size={14} className="mr-1.5" /> PDF
+              </Button>
+              <Button onClick={() => navigate("/admin/president")} variant="outline" size="sm" className="rounded-xl border-amber-500/40 text-amber-400 hover:bg-amber-500/10">
+                <Crown size={14} className="mr-1.5" /> Presidente
               </Button>
               <Button onClick={() => setChatOpen(!chatOpen)} className="bg-primary text-primary-foreground font-bold rounded-xl">
-                <Bot size={16} className="mr-2" /> Manus CEO
+                <Bot size={16} className="mr-1.5" /> Manus CEO
               </Button>
               <Button variant="outline" size="sm" className="rounded-xl text-destructive border-destructive/30" onClick={async () => { await supabase.auth.signOut(); navigate("/admin-login"); }}>
-                <LogOut size={14} className="mr-1" /> Sair
+                <LogOut size={14} />
               </Button>
             </div>
           </motion.div>
@@ -316,11 +389,14 @@ const Admin = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-6">
             {kpiCards.map((k, i) => (
               <motion.div key={k.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
-                <Card className={`relative overflow-hidden border-border bg-gradient-to-br ${k.bg} to-card/40 hover:border-primary/50 transition-all group`}>
+                <Card
+                  className={`relative overflow-hidden border-border bg-gradient-to-br ${k.bg} to-card/40 hover:border-primary/50 transition-all group ${k.drill ? "cursor-pointer hover:scale-[1.02]" : ""}`}
+                  onClick={k.drill ? () => openDrill(k.drill!, k.label) : undefined}
+                >
                   <CardContent className="p-3">
                     <div className="flex items-center justify-between mb-1.5">
                       <k.icon size={16} className={k.accent} />
-                      <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">LIVE</span>
+                      <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">{k.drill ? "DRILL ↗" : "LIVE"}</span>
                     </div>
                     <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider truncate">{k.label}</p>
                     <p className={`text-lg md:text-xl font-black ${k.accent} mt-0.5 truncate`}>{k.value}</p>
@@ -329,6 +405,32 @@ const Admin = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* LIVE ALERTS FEED */}
+          {liveAlerts.length > 0 && (
+            <Card className="border-red-500/40 bg-red-500/5 mb-6">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-display font-black text-sm flex items-center gap-2 text-red-400">
+                    <AlertTriangle size={16} className="animate-pulse" /> Alertas em Tempo Real
+                    <Badge variant="destructive" className="text-[9px]">{liveAlerts.length}</Badge>
+                  </h3>
+                  <Button size="sm" variant="ghost" className="h-6 text-[10px]" onClick={() => setLiveAlerts([])}>Limpar</Button>
+                </div>
+                <div className="max-h-32 overflow-y-auto space-y-1">
+                  {liveAlerts.slice(0, 8).map((a, i) => (
+                    <div key={i} className="flex items-center justify-between gap-2 text-[11px] p-1.5 rounded bg-background/40">
+                      <div className="flex-1 min-w-0">
+                        <span className="font-bold text-red-300">{a.title}</span>
+                        <span className="text-muted-foreground ml-2 truncate">{a.message}</span>
+                      </div>
+                      <span className="text-[9px] text-muted-foreground shrink-0">{since(a.created_at)}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* CHARTS ROW */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
@@ -644,6 +746,13 @@ const Admin = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <KpiDrillDown
+        open={drill.open}
+        onOpenChange={(o) => setDrill((d) => ({ ...d, open: o }))}
+        source={drill.source}
+        title={drill.title}
+      />
 
       <Footer />
     </div>

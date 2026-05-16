@@ -93,17 +93,43 @@ export default function AdminLeads() {
   useEffect(() => { loadAll(); /* eslint-disable-next-line */ }, [days]);
 
   const sources = useMemo(() => Array.from(new Set(leads.map((l) => l.source))).sort(), [leads]);
+  const conditions = useMemo(
+    () => Array.from(new Set(leads.map((l) => l.condition_interest).filter(Boolean) as string[])).sort(),
+    [leads],
+  );
+  const metaKeys = useMemo(() => {
+    const s = new Set<string>();
+    leads.forEach((l) => Object.keys(l.metadata ?? {}).forEach((k) => { if (k !== "session_id") s.add(k); }));
+    return Array.from(s).sort();
+  }, [leads]);
 
-  const filtered = useMemo(() => leads.filter((l) => {
-    if (statusFilter !== "all" && l.status !== statusFilter) return false;
-    if (sourceFilter !== "all" && l.source !== sourceFilter) return false;
-    if (searchTerm) {
-      const t = searchTerm.toLowerCase();
-      if (!l.name.toLowerCase().includes(t) && !l.whatsapp.includes(t) &&
-          !(l.condition_interest ?? "").toLowerCase().includes(t)) return false;
-    }
-    return true;
-  }), [leads, statusFilter, sourceFilter, searchTerm]);
+  const filtered = useMemo(() => {
+    const min = minScore === "" ? null : Number(minScore);
+    const max = maxScore === "" ? null : Number(maxScore);
+    const mv = metaValue.trim().toLowerCase();
+    return leads.filter((l) => {
+      if (statusFilter !== "all" && l.status !== statusFilter) return false;
+      if (sourceFilter !== "all" && l.source !== sourceFilter) return false;
+      if (conditionFilter !== "all" && l.condition_interest !== conditionFilter) return false;
+      if (min !== null && !Number.isNaN(min) && l.lead_score < min) return false;
+      if (max !== null && !Number.isNaN(max) && l.lead_score > max) return false;
+      if (metaKey && mv) {
+        const v = (l.metadata ?? {})[metaKey];
+        const str = v == null ? "" : (typeof v === "object" ? JSON.stringify(v) : String(v));
+        if (!str.toLowerCase().includes(mv)) return false;
+      }
+      if (searchTerm) {
+        const t = searchTerm.toLowerCase();
+        const inMeta = Object.values(l.metadata ?? {}).some((v) => {
+          const str = v == null ? "" : (typeof v === "object" ? JSON.stringify(v) : String(v));
+          return str.toLowerCase().includes(t);
+        });
+        if (!l.name.toLowerCase().includes(t) && !l.whatsapp.includes(t) &&
+            !(l.condition_interest ?? "").toLowerCase().includes(t) && !inMeta) return false;
+      }
+      return true;
+    });
+  }, [leads, statusFilter, sourceFilter, searchTerm, minScore, maxScore, conditionFilter, metaKey, metaValue]);
 
   const stats = useMemo(() => {
     const total = leads.length;

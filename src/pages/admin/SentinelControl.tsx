@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Activity, AlertTriangle, FlaskConical, History, Play, Settings, Shield, ShieldAlert } from "lucide-react";
+import { Activity, AlertTriangle, FlaskConical, History, Play, Radio, Settings, Shield, ShieldAlert } from "lucide-react";
+import SentinelLiveDashboard from "@/components/admin/SentinelLiveDashboard";
 
 interface Profile {
   id: string; name: string; is_active: boolean;

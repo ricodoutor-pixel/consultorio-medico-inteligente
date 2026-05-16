@@ -177,7 +177,7 @@ const BibliotecaCientifica = () => {
       {/* Hero */}
       <section className="pt-8 pb-8 hero-glow">
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+          <motion.div initial={false}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center">
                 <Leaf size={24} className="text-primary" />
@@ -401,9 +401,9 @@ const BibliotecaCientifica = () => {
             </motion.div>
           ) : (
             /* List View */
-            <motion.div className="space-y-2" initial="hidden" animate="visible" variants={stagger}>
+            <motion.div className="space-y-2" initial={false}>
               {filtered.map((strain) => (
-                <motion.div key={strain.id} variants={fadeUp}>
+                <motion.div key={strain.id}>
                   <Card
                     className="border-border hover:border-primary/30 transition-all cursor-pointer group"
                     onClick={() => setSelected(strain)}

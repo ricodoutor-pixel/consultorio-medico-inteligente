@@ -237,16 +237,24 @@ export default function AdminLeadDetail() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-6 max-w-5xl">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Button variant="outline" size="sm" asChild className="rounded-xl">
             <Link to="/admin/leads"><ArrowLeft size={14} className="mr-1" /> Leads</Link>
           </Button>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h1 className="font-display font-black text-2xl md:text-3xl truncate">{lead.name}</h1>
             <p className="text-xs text-muted-foreground">
               {lead.source} · Score {lead.lead_score} · Criado em{" "}
               {new Date(lead.created_at).toLocaleString("pt-BR")}
             </p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={exportCSV} className="rounded-xl">
+              <Download size={14} className="mr-1" /> CSV
+            </Button>
+            <Button size="sm" onClick={exportPDF} className="rounded-xl bg-primary text-primary-foreground">
+              <FileDown size={14} className="mr-1" /> PDF
+            </Button>
           </div>
         </div>
 

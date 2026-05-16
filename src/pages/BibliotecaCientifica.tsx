@@ -13,6 +13,7 @@ import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mount
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { StrainImage } from "@/components/StrainImage";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.03 } } };
@@ -48,6 +49,7 @@ type ViewMode = "grid" | "list";
 type SortMode = "relevancia" | "avaliacao" | "nome" | "thc";
 
 const BibliotecaCientifica = () => {
+  const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [filterTipo, setFilterTipo] = useState<string | null>(null);
   const [selected, setSelected] = useState<CannabisStrain | null>(null);
@@ -103,6 +105,8 @@ const BibliotecaCientifica = () => {
     avgRating: (filtered.reduce((a, b) => a + b.avaliacao, 0) / (filtered.length || 1)).toFixed(1),
     total: filtered.length,
   }), [filtered]);
+
+  const useReducedMotionGrid = true;
 
   return (
     <div className="min-h-screen bg-background">
@@ -173,7 +177,7 @@ const BibliotecaCientifica = () => {
       {/* Hero */}
       <section className="pt-8 pb-8 hero-glow">
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+          <motion.div initial={false}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center">
                 <Leaf size={24} className="text-primary" />
@@ -321,14 +325,14 @@ const BibliotecaCientifica = () => {
           ) : viewMode === "grid" ? (
             <motion.div
               className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-              initial="hidden"
-              animate="visible"
-              variants={stagger}
+              initial={useReducedMotionGrid ? false : "hidden"}
+              animate={useReducedMotionGrid ? undefined : "visible"}
+              variants={useReducedMotionGrid ? undefined : stagger}
             >
               {filtered.map((strain) => (
-                <motion.div key={strain.id} variants={fadeUp}>
+                <motion.div key={strain.id} variants={useReducedMotionGrid ? undefined : fadeUp}>
                   <Card
-                    className="border-border hover:border-primary/40 transition-all cursor-pointer group hover:-translate-y-1 overflow-hidden"
+                    className="border-border hover:border-primary/40 transition-colors cursor-pointer group overflow-hidden"
                     onClick={() => setSelected(strain)}
                   >
                     {/* Image */}
@@ -338,7 +342,7 @@ const BibliotecaCientifica = () => {
                         strainName={strain.nome}
                         strainType={strain.tipo}
                         fallbackUrl={strain.imagem}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover md:group-hover:scale-110 md:transition-transform md:duration-500"
                         alt={strain.nome}
                       />
                       {/* Overlay gradient */}
@@ -350,7 +354,7 @@ const BibliotecaCientifica = () => {
                         </Badge>
                         <button
                           onClick={(e) => toggleFavorite(strain.id, e)}
-                          className="p-1 rounded-full bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-colors"
+                          className="p-1 rounded-full bg-card/80 hover:bg-card transition-colors"
                         >
                           <Heart
                             size={14}
@@ -397,9 +401,9 @@ const BibliotecaCientifica = () => {
             </motion.div>
           ) : (
             /* List View */
-            <motion.div className="space-y-2" initial="hidden" animate="visible" variants={stagger}>
+            <motion.div className="space-y-2" initial={false}>
               {filtered.map((strain) => (
-                <motion.div key={strain.id} variants={fadeUp}>
+                <motion.div key={strain.id}>
                   <Card
                     className="border-border hover:border-primary/30 transition-all cursor-pointer group"
                     onClick={() => setSelected(strain)}

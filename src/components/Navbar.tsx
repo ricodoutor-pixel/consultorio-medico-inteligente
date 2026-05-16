@@ -9,6 +9,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +22,9 @@ export const Navbar = () => {
   const [user, setUser] = useState<{ id: string; email?: string; fullName?: string; avatarUrl?: string } | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
+  const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
+  const showNavbarMascot = !(isDenseCatalogRoute && isMobile);
 
   useEffect(() => {
     setIsOpen(false);
@@ -125,7 +129,10 @@ export const Navbar = () => {
   return (
     <>
       <nav
-        className="fixed top-0 left-0 right-0 glass border-b border-border z-50 will-change-transform sticky-header"
+        className={isDenseCatalogRoute
+          ? "fixed top-0 left-0 right-0 border-b border-border z-50 will-change-transform sticky-header bg-background/95"
+          : "fixed top-0 left-0 right-0 glass border-b border-border z-50 will-change-transform sticky-header"
+        }
         role="navigation"
         aria-label="Navegação principal"
       >
@@ -147,7 +154,7 @@ export const Navbar = () => {
               </NavLink>
               
               {/* Verdinho mais próximo do nome */}
-              <div className="hidden sm:block ml-1 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">
+              <div className={`ml-1 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden sm:block" : "hidden"}`}>
                 <FrogMascot size={48} mood="happy" onClick={openChat} enableJumpToNav={true} />
               </div>
             </div>

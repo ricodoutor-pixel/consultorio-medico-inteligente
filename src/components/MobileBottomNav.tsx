@@ -13,13 +13,17 @@ const NAV_ITEMS = [
 export const MobileBottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
 
   // Hide on video call / admin pages
   const hiddenPaths = ["/consulta-video", "/videochamada", "/admin"];
   if (hiddenPaths.some((p) => location.pathname.startsWith(p))) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-xl border-t border-border pb-[env(safe-area-inset-bottom,0px)]">
+    <nav className={cn(
+      "fixed bottom-0 left-0 right-0 z-50 border-t border-border pb-[env(safe-area-inset-bottom,0px)]",
+      isDenseCatalogRoute ? "bg-background/95" : "bg-black/95 backdrop-blur-xl"
+    )}>
       <div className="flex items-center justify-around h-16 px-2">
         {NAV_ITEMS.map(({ icon: Icon, label, path }) => {
           const isActive = location.pathname === path;

@@ -21,6 +21,7 @@ export const Navbar = () => {
   const [user, setUser] = useState<{ id: string; email?: string; fullName?: string; avatarUrl?: string } | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
 
   useEffect(() => {
     setIsOpen(false);
@@ -125,7 +126,10 @@ export const Navbar = () => {
   return (
     <>
       <nav
-        className="fixed top-0 left-0 right-0 glass border-b border-border z-50 will-change-transform sticky-header"
+        className={isDenseCatalogRoute
+          ? "fixed top-0 left-0 right-0 border-b border-border z-50 will-change-transform sticky-header bg-background/95"
+          : "fixed top-0 left-0 right-0 glass border-b border-border z-50 will-change-transform sticky-header"
+        }
         role="navigation"
         aria-label="Navegação principal"
       >

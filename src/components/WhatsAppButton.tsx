@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { X, Stethoscope, User, Store, BookOpen, HelpCircle, MessageCircle } from "lucide-react";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { BRISA_WHATSAPP } from "@/lib/whatsapp-brisa";
@@ -61,16 +62,25 @@ const VISITOR_OPTIONS = [
 ] as const;
 
 export const WhatsAppButton = () => {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
+  const buttonSize = isDenseCatalogRoute ? 56 : 64;
 
   useEffect(() => {
-    if (sessionStorage.getItem("pyr_brisa_hint_shown")) return;
+    if (isDenseCatalogRoute || sessionStorage.getItem("pyr_brisa_hint_shown")) return;
     // Badge "Oi! Posso ajudar?" após 3s como solicitado pelo usuário
     const t = setTimeout(() => setShowHint(true), 3000);
     return () => clearTimeout(t);
-  }, []);
+  }, [isDenseCatalogRoute]);
+
+  useEffect(() => {
+    if (!isDenseCatalogRoute) return;
+    setShowHint(false);
+    setIsOpen(false);
+  }, [isDenseCatalogRoute]);
 
   useEffect(() => {
     if (isOpen) {
@@ -137,7 +147,11 @@ export const WhatsAppButton = () => {
   };
 
   return (
-    <div ref={menuRef} className="fixed right-4 md:right-6 z-50" style={{ bottom: "calc(5rem + env(safe-area-inset-bottom, 0px))" }}>
+    <div
+      ref={menuRef}
+      className="fixed right-3 md:right-6 z-50"
+      style={{ bottom: "calc(5rem + env(safe-area-inset-bottom, 0px))" }}
+    >
 
       {isOpen && (
         <div className="absolute bottom-16 right-0 w-72 sm:w-80 rounded-2xl shadow-2xl border border-border overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300"
@@ -181,7 +195,7 @@ export const WhatsAppButton = () => {
         </div>
       )}
 
-      {showHint && !isOpen && (
+      {showHint && !isOpen && !isDenseCatalogRoute && (
         <div
           className="absolute right-16 bottom-2 md:bottom-3 whitespace-nowrap px-3 py-1.5 rounded-full shadow-lg border border-border animate-in fade-in slide-in-from-right-2 duration-300 cursor-pointer"
           style={{ background: "hsl(var(--card))" }}
@@ -197,8 +211,8 @@ export const WhatsAppButton = () => {
         style={{
           background: "linear-gradient(135deg, hsl(152 100% 74% / 0.25), hsl(152 100% 74% / 0.10))",
           border: "2px solid hsl(152 100% 74% / 0.5)",
-          width: 64,
-          height: 64,
+          width: buttonSize,
+          height: buttonSize,
         }}
         aria-label="Fale conosco — Enfª Brisa"
       >

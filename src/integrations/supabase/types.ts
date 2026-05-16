@@ -2014,6 +2014,27 @@ export type Database = {
         }
         Relationships: []
       }
+      edge_rate_limit: {
+        Row: {
+          bucket: string
+          created_at: string
+          id: number
+          key: string
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          id?: number
+          key: string
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          id?: number
+          key?: string
+        }
+        Relationships: []
+      }
       error_autohealing: {
         Row: {
           ai_confidence: number | null
@@ -6148,6 +6169,15 @@ export type Database = {
         Returns: Json
       }
       calculate_fuzzy_severity: { Args: { symptoms: Json }; Returns: Json }
+      check_edge_rate_limit: {
+        Args: {
+          p_bucket: string
+          p_key: string
+          p_max_hits: number
+          p_window_seconds: number
+        }
+        Returns: boolean
+      }
       cleanup_http_logs: { Args: never; Returns: Json }
       credit_affiliate_wallet: {
         Args: { _amount: number; _user_id: string }

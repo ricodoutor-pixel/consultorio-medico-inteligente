@@ -1,51 +1,66 @@
-## Plano de execução — 3 correções críticas da auditoria
+# Plano — 8 melhorias da auditoria
 
-### 1. SEO: Prerender estático das páginas (corrige "invisível no Google")
-**Problema:** SPA puro — Google recebe HTML vazio nas 40+ páginas de tratamento.
+Cada item é independente e pode ser entregue isoladamente sem alterar o visual existente da plataforma (memória `no-visual-changes`). Listo em ordem de **impacto x esforço**.
 
-**Solução:** Adicionar **prerender em build-time** usando `vite-plugin-prerender-spa` (puppeteer headless). O build atual (`vite build`) continua igual; após gerar o `dist/`, o plugin "navega" em cada rota listada e salva um `index.html` com o conteúdo já renderizado dentro de `dist/tratamentos/epilepsia/index.html`, etc.
+## Quick wins (baixo risco, alto impacto) — recomendo começar por aqui
 
-Rotas prerenderizadas (alta intenção SEO):
-- `/`, `/como-funciona`, `/profissionais`, `/shopping`, `/faq`, `/precos`, `/planos`, `/club`
-- `/tratamentos` + todas as 12 sub-rotas (`/tratamentos/epilepsia`, `/autismo`, `/parkinson`, `/dor-cronica`, `/ansiedade`, `/insonia`, `/fibromialgia`, `/esclerose-multipla`, `/tdah`, `/depressao`, `/tratamento-dor-cronica`, `/tratamento-ansiedade-saude-mental`)
-- `/blog`, `/biblioteca`, `/ebook`, `/contato`, `/legal`
+### A. Badge "✓ Indicado pelo Dr. Edilson" nos produtos do Shopping
+- Migration: `ALTER TABLE vendor_products ADD COLUMN endorsed_by_doctor BOOLEAN DEFAULT false`
+- Componente `<DoctorEndorsedBadge />` (verde, ícone check) nos cards
+- Toggle no admin (`AdminClinicas` ou novo `AdminProdutos`)
+- **Esforço: 30 min**
 
-Rotas dinâmicas (login, dashboard, /pay, /carteira) **não** são prerenderizadas — continuam SPA puro.
+### B. Showcase da biblioteca científica na homepage
+- Novo componente `ScientificBadge.tsx`: count de `scientific_articles` + 3 títulos reais com link PubMed
+- Inserido no `Index.tsx` entre depoimentos e gráfico de mercado
+- **Esforço: 20 min**
 
-**Resultado:** Googlebot recebe HTML completo com H1, descrição, sintomas, estudos clínicos, FAQ — tudo indexável. Tempo estimado para top 3 do Google em keywords como "cannabis medicinal epilepsia": 30–60 dias.
+### C. Loop de indicação no webhook do Mercado Pago
+- Após `payment.approved` no `mercadopago-webhook`, disparar `brisa-ceo-orchestrator` com evento `orientacao_concluida`
+- Mensagem WhatsApp via `evolution-api-proxy`: parabéns + Planta-Coins + link `plantayraiz.com.br?ref=USER_ID`
+- Já existe `PostConsultationViralLoop` na tela — isto complementa via WhatsApp
+- **Esforço: 30 min**
 
-### 2. Loop viral pós-orientação (Planta-Coins + indicação)
-**Problema:** Sistema de afiliados existe mas não aparece de forma proeminente após orientação.
+### D. Depoimentos com data + cidade + link Google Review
+- Atualizar `src/data/testimonials.ts`: campos `city`, `date` (Mês/Ano), `googleReviewUrl?`
+- Card mostra: "Maria S., São Paulo SP — Março 2026 — ⭐⭐⭐⭐⭐ ([ver no Google](url))"
+- **Esforço: 20 min** (dados reais vêm depois)
 
-**Solução:** Após o paciente concluir a sessão (página `PaymentSuccess` ou `Prontuario` pós-consulta), exibir um **card celebratório** automático:
+## Médios (1-2h cada)
 
-> 🎉 Você ganhou **R$15 em Planta-Coins** por concluir sua orientação!
-> Indique 1 amigo e ganhe **+R$10 extras** quando ele fizer a primeira orientação.
-> [Copiar link de indicação] [Enviar pelo WhatsApp]
+### E. Calculadora de tratamento na homepage
+- Componente `TreatmentCalculator.tsx`: 5 perguntas (condição, idade, medicamentos, intensidade, duração)
+- Reusa lógica do `QuizTriagem` simplificada (sem auth)
+- Resultado: perfil canabinoide sugerido + CTA "Orientação Técnica R$30"
+- Captura WhatsApp opcional no final → grava em `leads_contatos` (origem='calculadora')
 
-Componente novo: `PostConsultationViralLoop.tsx` — usa o sistema de afiliados existente (`useReferralTracking`), gera link personalizado, integra com WhatsApp Web (`wa.me/?text=...`).
+### F. Ebook como lead magnet com captura WhatsApp
+- `/ebook` ganha form: nome + WhatsApp (gate para download)
+- Insere em `leads_contatos` com origem='ebook', tag='ebook-lead'
+- Trigger: Brisa via Evolution envia link do PDF + sequência de nutrição
+- PDF do ebook já existe? Confirmar com você
 
-### 3. Avaliação Google automática via Brisa WhatsApp
-**Problema:** GMB sem fluxo ativo de coleta de reviews.
+## Maiores (precisam decisão de modelo de negócio)
 
-**Solução:** Adicionar trigger no edge function de finalização de orientação (`brisa-post-consultation` ou similar) que envia, **24h após a sessão**, mensagem via Twilio:
+### G. Plano de assinatura R$79/mês para condições crônicas
+- Tabela `subscriptions` já existe — criar plano "Crônico" no Mercado Pago
+- Página `/planos/cronico` (epilepsia, Parkinson, autismo, dor crônica)
+- Benefícios: 2 orientações/mês + renovação automática + 10% desconto shopping + acompanhamento Brisa
+- **Decisão necessária:** preço final, % desconto, frequência exata
 
-> Olá [nome]! Como foi sua orientação com o Dr. Edilson? 💚
-> Se ajudou, você pode deixar uma avaliação no Google em 30 segundos: https://g.page/r/[review-id]/review
+### H. Programa Médicos Embaixadores (30% + 10% MLM)
+- Landing `/seja-medico`: pitch + calculadora "ganhe R$X/mês"
+- Schema novo: `doctor_ambassador_referrals` (médico → paciente indicado)
+- Split: 30% do valor da orientação validada pelo médico + 10% das orientações de pacientes que ele cadastrou
+- Integração com sistema de afiliados existente (`useReferralTracking`)
+- Migration em `affiliate_wallets` para tier "médico embaixador"
+- **Decisão necessária:** valores finais, recorrência da comissão (vitalícia? 12 meses?), validação CRM obrigatória?
 
-Implementação: cron job `nps-and-google-review-cron` (pg_cron diário) que busca orientações concluídas há 24h sem review enviada, dispara Twilio, marca `google_review_requested_at`.
+---
 
-### Detalhes técnicos
-- `vite-plugin-prerender-spa` instalado como devDependency
-- Hook `vite.config.ts` no array de plugins (somente em mode='production')
-- `react-helmet-async` já está em uso → metadados ficam corretos no HTML prerenderizado
-- Schema.org JSON-LD existente (`SearchEngineOptimization.tsx`) também é capturado
-- Tabela `consultations` ganha coluna `google_review_requested_at TIMESTAMPTZ`
-- Para o loop viral, reuso de `src/hooks/useReferralTracking.ts` (já existe)
+## Recomendação de execução
+Sugiro fazer **A + B + C + D no primeiro batch** (sem decisões pendentes, ~2h total, sem mudança visual além dos badges/cards novos).
 
-### Ordem de execução
-1. Prerender (maior impacto, sem risco visual)
-2. Loop viral pós-orientação (componente novo na tela de sucesso)
-3. Cron Google Review (migration + edge function)
+Depois entrar em E + F. Por último G + H que precisam confirmar números com você.
 
-**O que NÃO mudo:** zero alterações visuais nas páginas existentes (memória `no-visual-changes`). Fluxo de pagamento e Brisa intactos.
+**Você confirma este batch (A→D) ou prefere outra ordem?**

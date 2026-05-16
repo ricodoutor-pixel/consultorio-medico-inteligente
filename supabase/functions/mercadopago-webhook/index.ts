@@ -97,6 +97,30 @@ Deno.serve(async (req) => {
       }
     }
 
+    // === IDEMPOTENCY GUARD ===
+    // Use x-request-id when present (MP retries reuse it). Fallback: paymentId+action.
+    const eventKey = xRequestId || `${paymentId}:${action || "unknown"}`;
+    const { error: idempErr } = await supabase
+      .from("webhook_events")
+      .insert({
+        gateway: "mercadopago",
+        event_id: eventKey,
+        event_type: action || null,
+        external_reference: String(paymentId),
+        payload: body,
+      });
+    if (idempErr) {
+      // 23505 = unique_violation → evento já processado, retorna 200 silencioso
+      if ((idempErr as any).code === "23505") {
+        console.log(`[idempotency] Duplicate webhook ${eventKey} — skipping`);
+        return new Response(JSON.stringify({ status: "duplicate", event_id: eventKey }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      console.error("[idempotency] Insert error (non-fatal):", idempErr);
+    }
+
     // Fetch payment details from Mercado Pago API
     const mpAccessToken = getFirstEnv("MERCADO_PAGO_ACCESS_TOKEN", "MERCADOPAGO_ACCESS_TOKEN", "MERCADO_PAGO_API_KEY");
     if (!mpAccessToken) {

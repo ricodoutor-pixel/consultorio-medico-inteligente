@@ -2543,6 +2543,42 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          condition_interest: string | null
+          created_at: string
+          id: string
+          lead_score: number
+          metadata: Json
+          name: string
+          source: string
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          condition_interest?: string | null
+          created_at?: string
+          id?: string
+          lead_score?: number
+          metadata?: Json
+          name: string
+          source?: string
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          condition_interest?: string | null
+          created_at?: string
+          id?: string
+          lead_score?: number
+          metadata?: Json
+          name?: string
+          source?: string
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       leads_contatos: {
         Row: {
           categoria: string | null

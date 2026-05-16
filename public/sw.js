@@ -45,7 +45,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Estratégia de Fetch: Network-First para API, Cache-First para assets
+// Estratégia de Fetch: Network-First para documentos/HTML e API, Cache-First para assets
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -56,6 +56,12 @@ self.addEventListener('fetch', (event) => {
   // Ignorar requests externos (analytics, etc.)
   if (!url.origin.includes(self.location.origin) && 
       !url.pathname.includes('supabase')) return;
+
+  // HTML/documentos da SPA: SEMPRE priorizar rede para evitar shell antigo preso em cache
+  if (request.mode === 'navigate' || request.destination === 'document') {
+    event.respondWith(networkFirst(request));
+    return;
+  }
 
   // manifest.json: SEMPRE buscar da rede (cache busting de ícones)
   if (url.pathname === '/manifest.json') {
@@ -77,7 +83,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Demais assets: Cache-First com fallback para rede
+  // Demais assets estáticos: Cache-First com fallback para rede
   event.respondWith(cacheFirst(request));
 });
 
@@ -105,7 +111,9 @@ async function networkFirst(request) {
     const response = await fetch(request);
     if (response.ok) {
       const cache = await caches.open(CACHE_VERSION);
-      cache.put(request, response.clone());
+      if (request.method === 'GET') {
+        cache.put(request, response.clone());
+      }
     }
     return response;
   } catch (err) {

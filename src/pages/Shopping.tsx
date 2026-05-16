@@ -706,6 +706,7 @@ const Shopping = () => {
                                       <Link to={`/shopping/${p.id}`}>
                                         <h3 className="font-bold text-foreground hover:text-primary transition-colors text-xs sm:text-sm mb-0.5 line-clamp-1">{p.name}</h3>
                                       </Link>
+                                      {p.endorsed_by_doctor && <div className="mt-1"><DoctorEndorsedBadge compact /></div>}
                                     </div>
                                     <button
                                       onClick={() => toggleFav(p.id)}

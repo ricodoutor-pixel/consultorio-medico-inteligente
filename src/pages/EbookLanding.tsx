@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { Download, BookOpen, Users, Award, CheckCircle, ArrowRight, Leaf, Star } from "lucide-react";
+import { Download, BookOpen, Users, Award, CheckCircle, ArrowRight, Leaf, Star, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -15,42 +17,56 @@ const stagger = { visible: { transition: { staggerChildren: 0.12 } } };
 const EbookLanding = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
+    whatsapp: "",
     email: "",
     profession: "",
   });
 
   const handleDownload = async () => {
-    if (!formData.email) {
+    if (!formData.whatsapp || !formData.name) {
       setShowForm(true);
+      toast.info("Preencha nome e WhatsApp para receber o ebook.");
+      return;
+    }
+
+    const cleanPhone = formData.whatsapp.replace(/\D/g, "");
+    if (cleanPhone.length < 10) {
+      toast.error("WhatsApp inválido. Use DDD + número.");
       return;
     }
 
     setIsDownloading(true);
     try {
-      // Simular registro do usuário
-      const response = await fetch("/api/trpc/ebook.registerDownload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
+      const { data, error } = await supabase.functions.invoke("ebook-capture", {
+        body: {
           name: formData.name,
-          profession: formData.profession,
-        }),
+          whatsapp: cleanPhone,
+          email: formData.email || null,
+          profession: formData.profession || null,
+          source: "landing",
+        },
       });
 
-      if (response.ok) {
-        // Iniciar download
-        const link = document.createElement("a");
-        link.href = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/fnbZJMGCJUpGmwzl.pdf";
-        link.download = "EBOOK_CANNABIS_MEDICINAL_CURSO_COMPLETO.pdf";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    } catch (error) {
+      if (error) throw error;
+
+      toast.success("📲 Pronto! Você vai receber o PDF agora mesmo no WhatsApp.");
+      setSubmitted(true);
+
+      // Download imediato do PDF como bônus
+      const pdfUrl = (data as any)?.pdf_url || "https://files.manuscdn.com/user_upload_by_module/session_file/310519663065229674/fnbZJMGCJUpGmwzl.pdf";
+      const link = document.createElement("a");
+      link.href = pdfUrl;
+      link.download = "Guia-Cannabis-Medicinal-2026.pdf";
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error: any) {
       console.error("Erro ao baixar e-book:", error);
+      toast.error(error?.message || "Erro ao processar. Tente novamente.");
     } finally {
       setIsDownloading(false);
     }

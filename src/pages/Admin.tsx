@@ -363,15 +363,24 @@ const Admin = () => {
                 </p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Button onClick={loadData} variant="outline" size="sm" className="rounded-xl" disabled={loading}>
-                <RefreshCw size={14} className={`mr-2 ${loading ? "animate-spin" : ""}`} /> Sync
+                <RefreshCw size={14} className={`mr-1.5 ${loading ? "animate-spin" : ""}`} /> Sync
+              </Button>
+              <Button onClick={handleExportCSV} variant="outline" size="sm" className="rounded-xl">
+                <Download size={14} className="mr-1.5" /> CSV
+              </Button>
+              <Button onClick={handleExportPDF} variant="outline" size="sm" className="rounded-xl">
+                <FileDown size={14} className="mr-1.5" /> PDF
+              </Button>
+              <Button onClick={() => navigate("/admin/president")} variant="outline" size="sm" className="rounded-xl border-amber-500/40 text-amber-400 hover:bg-amber-500/10">
+                <Crown size={14} className="mr-1.5" /> Presidente
               </Button>
               <Button onClick={() => setChatOpen(!chatOpen)} className="bg-primary text-primary-foreground font-bold rounded-xl">
-                <Bot size={16} className="mr-2" /> Manus CEO
+                <Bot size={16} className="mr-1.5" /> Manus CEO
               </Button>
               <Button variant="outline" size="sm" className="rounded-xl text-destructive border-destructive/30" onClick={async () => { await supabase.auth.signOut(); navigate("/admin-login"); }}>
-                <LogOut size={14} className="mr-1" /> Sair
+                <LogOut size={14} />
               </Button>
             </div>
           </motion.div>

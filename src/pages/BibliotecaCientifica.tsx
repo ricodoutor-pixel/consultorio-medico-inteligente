@@ -13,6 +13,7 @@ import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mount
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { StrainImage } from "@/components/StrainImage";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.03 } } };
@@ -48,6 +49,7 @@ type ViewMode = "grid" | "list";
 type SortMode = "relevancia" | "avaliacao" | "nome" | "thc";
 
 const BibliotecaCientifica = () => {
+  const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [filterTipo, setFilterTipo] = useState<string | null>(null);
   const [selected, setSelected] = useState<CannabisStrain | null>(null);
@@ -103,6 +105,8 @@ const BibliotecaCientifica = () => {
     avgRating: (filtered.reduce((a, b) => a + b.avaliacao, 0) / (filtered.length || 1)).toFixed(1),
     total: filtered.length,
   }), [filtered]);
+
+  const useReducedMotionGrid = isMobile;
 
   return (
     <div className="min-h-screen bg-background">

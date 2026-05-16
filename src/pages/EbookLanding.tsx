@@ -235,27 +235,42 @@ const EbookLanding = () => {
             >
               <Card className="border-border">
                 <CardContent className="p-8">
-                  <h3 className="text-2xl font-black mb-6">Registre-se para Baixar</h3>
+                  <h3 className="text-2xl font-black mb-2">Receba o PDF no WhatsApp</h3>
+                  <p className="text-sm text-muted-foreground mb-6 flex items-center gap-2">
+                    <MessageCircle size={16} className="text-primary" />
+                    A Enfª Brisa envia o ebook direto pra você + bônus em 24h.
+                  </p>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-bold mb-2">Nome Completo</label>
+                      <label className="block text-sm font-bold mb-2">Nome Completo *</label>
                       <input
                         type="text"
                         placeholder="Seu nome"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full px-4 py-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold mb-2">Email *</label>
+                      <label className="block text-sm font-bold mb-2">WhatsApp * <span className="text-xs text-muted-foreground font-normal">(com DDD)</span></label>
+                      <input
+                        type="tel"
+                        placeholder="11 99999-9999"
+                        value={formData.whatsapp}
+                        onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                        className="w-full px-4 py-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold mb-2">Email (opcional)</label>
                       <input
                         type="email"
                         placeholder="seu@email.com"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         className="w-full px-4 py-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                        required
                       />
                     </div>
                     <div>

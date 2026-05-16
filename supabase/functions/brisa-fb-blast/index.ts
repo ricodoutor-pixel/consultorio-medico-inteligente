@@ -1,5 +1,7 @@
 // One-shot: publishes 3 Brisa posts to Facebook Page using FB Graph API directly.
 // Will be deleted after execution.
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",

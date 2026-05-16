@@ -92,6 +92,10 @@ export default {
           "0%, 100%": { opacity: "0.85", transform: "scale(1)", filter: "brightness(1)" },
           "50%": { opacity: "1", transform: "scale(1.08)", filter: "brightness(1.4)" },
         },
+        "brisa-pulse": {
+          "0%, 100%": { opacity: "0.35", transform: "scale(0.96)" },
+          "50%": { opacity: "0.85", transform: "scale(1.06)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -99,6 +103,7 @@ export default {
         "float": "float 6s ease-in-out infinite",
         "pulse-glow": "pulse-glow 3s ease-in-out infinite",
         "starPulse": "starPulse 3s ease-in-out infinite",
+        "brisa-pulse": "brisa-pulse 2.2s ease-in-out infinite",
       },
     },
   },

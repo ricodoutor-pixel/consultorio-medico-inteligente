@@ -136,6 +136,7 @@ const CronHealth = lazy(() => import("./pages/admin/CronHealth"));
 const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 const AdminLeadDetail = lazy(() => import("./pages/admin/LeadDetail"));
 const President360 = lazy(() => import("./pages/admin/President360"));
+const SentinelControl = lazy(() => import("./pages/admin/SentinelControl"));
 
 const queryClient = new QueryClient();
 
@@ -202,6 +203,8 @@ const App = () => (
                 <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
                 <Route path="/admin/president" element={<AdminRoute><President360 /></AdminRoute>} />
                 <Route path="/admin/presidente" element={<AdminRoute><President360 /></AdminRoute>} />
+                <Route path="/admin/sentinela" element={<AdminRoute><SentinelControl /></AdminRoute>} />
+                <Route path="/admin/sentinel" element={<AdminRoute><SentinelControl /></AdminRoute>} />
                 <Route path="/admin/clinicas" element={<AdminRoute><AdminClinicas /></AdminRoute>} />
                 <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
                 <Route path="/admin/credit-audit" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />

@@ -132,6 +132,7 @@ const RodizioMedicos = lazy(() => import("./pages/RodizioMedicos"));
 const BrisaOrientacaoRedirect = lazy(() => import("./pages/BrisaOrientacaoRedirect"));
 const AuditLog = lazy(() => import("./pages/admin/AuditLog"));
 const CronHealth = lazy(() => import("./pages/admin/CronHealth"));
+const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 
 const queryClient = new QueryClient();
 
@@ -262,6 +263,7 @@ const App = () => (
                 <Route path="/admin/auditoria" element={<AdminRoute><AuditLog /></AdminRoute>} />
                 <Route path="/admin/cron-health" element={<AdminRoute><CronHealth /></AdminRoute>} />
                 <Route path="/admin/monitoramento" element={<AdminRoute><AdminMonitoramento /></AdminRoute>} />
+                <Route path="/admin/leads" element={<AdminRoute><AdminLeads /></AdminRoute>} />
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
                 <Route path="/quiz" element={<QuizTriagem />} />

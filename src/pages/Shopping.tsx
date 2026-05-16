@@ -19,6 +19,7 @@ import { ProductAlertBell } from "@/components/ProductAlertBell";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { PrescriptionVerificationModal } from "@/components/PrescriptionVerificationModal";
+import { DoctorEndorsedBadge } from "@/components/DoctorEndorsedBadge";
 
 // Import product images
 import oleoCbd1 from "@/assets/products/oleo-cbd-1.jpg";

@@ -130,6 +130,57 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_registry: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          edge_function: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          last_run_at: string | null
+          metrics: Json | null
+          name: string
+          role: string
+          slug: string
+          system_prompt: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          edge_function?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          metrics?: Json | null
+          name: string
+          role: string
+          slug: string
+          system_prompt: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          edge_function?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          metrics?: Json | null
+          name?: string
+          role?: string
+          slug?: string
+          system_prompt?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ai_events: {
         Row: {
           action: string | null
@@ -2894,6 +2945,39 @@ export type Database = {
           status?: string
           summary_md?: string | null
           triggered_by?: string | null
+        }
+        Relationships: []
+      }
+      manus_sentinel_runs: {
+        Row: {
+          checks: Json
+          corrections: Json
+          duration_ms: number | null
+          id: string
+          issues: Json
+          overall_status: string
+          ran_at: string
+          whatsapp_sent: boolean | null
+        }
+        Insert: {
+          checks?: Json
+          corrections?: Json
+          duration_ms?: number | null
+          id?: string
+          issues?: Json
+          overall_status?: string
+          ran_at?: string
+          whatsapp_sent?: boolean | null
+        }
+        Update: {
+          checks?: Json
+          corrections?: Json
+          duration_ms?: number | null
+          id?: string
+          issues?: Json
+          overall_status?: string
+          ran_at?: string
+          whatsapp_sent?: boolean | null
         }
         Relationships: []
       }

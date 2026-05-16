@@ -323,14 +323,9 @@ const BibliotecaCientifica = () => {
               </Button>
             </div>
           ) : viewMode === "grid" ? (
-            <motion.div
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-              initial={useReducedMotionGrid ? false : "hidden"}
-              animate={useReducedMotionGrid ? undefined : "visible"}
-              variants={useReducedMotionGrid ? undefined : stagger}
-            >
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {filtered.map((strain) => (
-                <motion.div key={strain.id} variants={useReducedMotionGrid ? undefined : fadeUp}>
+                <div key={strain.id} style={{ contain: "content", transform: "translateZ(0)" }}>
                   <Card
                     className="border-border hover:border-primary/40 transition-colors cursor-pointer group overflow-hidden"
                     onClick={() => setSelected(strain)}
@@ -396,14 +391,14 @@ const BibliotecaCientifica = () => {
                       </Button>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           ) : (
             /* List View */
-            <motion.div className="space-y-2" initial={false}>
+            <div className="space-y-2">
               {filtered.map((strain) => (
-                <motion.div key={strain.id}>
+                <div key={strain.id} style={{ contain: "content", transform: "translateZ(0)" }}>
                   <Card
                     className="border-border hover:border-primary/30 transition-all cursor-pointer group"
                     onClick={() => setSelected(strain)}
@@ -445,9 +440,9 @@ const BibliotecaCientifica = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           )}
         </div>
       </section>

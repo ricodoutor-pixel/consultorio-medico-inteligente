@@ -19,10 +19,13 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // CRÍTICO: keepNames preserva nomes de funções/classes durante minify.
+  // Sem isso, o Recharts (que usa padrão factory) quebra com "_ is not a function"
+  // em produção — causando tela preta no Hostinger.
+  esbuild: {
+    keepNames: true,
+  },
   build: {
-    // Em produção, Terser estava quebrando o bundle do Recharts no Hostinger
-    // (erro runtime: "u is not a function" no chunk charts-*.js), resultando em tela preta.
-    // Esbuild mantém a minificação sem corromper esse chunk.
     minify: "esbuild",
     cssMinify: false,
     chunkSizeWarningLimit: 1000,
@@ -38,7 +41,8 @@ export default defineConfig(({ mode }) => ({
           ) {
             return 'react-vendor';
           }
-          if (id.includes('recharts') || id.includes('d3')) return 'charts';
+          // Recharts/D3 NÃO devem ficar em chunk separado — caem junto do vendor
+          // para evitar ordem de execução cross-chunk que estava quebrando produção.
           if (id.includes('framer-motion')) return 'animation';
           if (id.includes('@radix-ui') || id.includes('cmdk')) return 'ui-primitives';
           if (id.includes('@supabase')) return 'supabase';

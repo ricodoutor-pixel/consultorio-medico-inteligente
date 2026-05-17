@@ -70,11 +70,14 @@ export default function CadastrosRealtime() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [live, setLive] = useState<LiveStats>(emptyLive);
+
   const fetchAll = useCallback(async () => {
     setError(null);
     try {
       const now = new Date();
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+      const activeSince = new Date(now.getTime() - ACTIVE_WINDOW_MS).toISOString();
       const d7 = new Date(now.getTime() - 7 * 86400_000).toISOString();
       const d30 = new Date(now.getTime() - 30 * 86400_000).toISOString();
 

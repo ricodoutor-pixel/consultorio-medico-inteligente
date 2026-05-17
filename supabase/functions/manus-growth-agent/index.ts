@@ -255,17 +255,6 @@ async function audit(
   return md;
 }
 
-  try {
-    await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${SERVICE_ROLE}` },
-      body: JSON.stringify({ phone: ADMIN_WHATSAPP, message: md, type: "text" }),
-    });
-  } catch (_) { /* silent */ }
-
-  return md;
-}
-
 // ============ SERVE ============
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });

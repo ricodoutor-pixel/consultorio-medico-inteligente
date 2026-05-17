@@ -14,7 +14,13 @@ const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 const FB_APP_SECRET = Deno.env.get("FACEBOOK_APP_SECRET")!;
 const FB_PAGE_TOKEN = Deno.env.get("FACEBOOK_PAGE_ACCESS_TOKEN")!;
 const IG_BUSINESS_ID = Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID") ?? "";
-const VERIFY_TOKEN = Deno.env.get("EVOLUTION_WEBHOOK_SECRET") ?? "brisa-meta-verify";
+// Verify tokens accepted by the Meta webhook handshake.
+// Includes the dedicated Meta token shared with the Meta App config and a fallback to the shared Evolution secret.
+const META_VERIFY_TOKEN_FIXED = "K0baZDESt89Cb9fI2I0Zskh+8Jtv2PpzgfQEScUfCFU=";
+const VERIFY_TOKENS = [
+  META_VERIFY_TOKEN_FIXED,
+  Deno.env.get("EVOLUTION_WEBHOOK_SECRET") ?? "",
+].filter(Boolean);
 const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL") ?? "";
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") ?? "";
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") ?? "";

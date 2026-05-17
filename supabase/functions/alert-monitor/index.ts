@@ -41,8 +41,6 @@ async function sendDiscord(
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  const unauthorized = requireServiceAuth(req, corsHeaders);
-  if (unauthorized) return unauthorized;
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,

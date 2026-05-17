@@ -64,33 +64,57 @@ Deno.serve(async (req) => {
       const theme = CONTENT_THEMES[dayIndex % CONTENT_THEMES.length];
       const siteLink = SITE_LINKS[theme.theme];
 
-      // Generate content via AI
-      const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${GEMINI_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gemini-2.5-flash-lite",
-          messages: [
-            {
-              role: "system",
-              content: `Você é a Brisa, Enfermeira e Gestora de Marketing da Planta & Raiz (Mega Clínica Digital de Cannabis Medicinal). Gere conteúdo para redes sociais. Sempre inclua o link: ${siteLink}. Tom: enfermeira técnica, acolhedora e profissional. A Planta & Raiz é uma plataforma de intermediação (CNAE 6209-1/00). Nunca faça promessas de cura. UTM: ?utm_source=brisa_ia&utm_medium=social&utm_campaign=${theme.theme}`,
-            },
-            { role: "user", content: theme.prompt },
-          ],
-        }),
-      });
-
+      // Generate content via Lovable AI Gateway (preferred) or Gemini fallback
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
       let postContent = "";
-      if (aiResp.ok) {
-        const aiData = await aiResp.json();
-        postContent = aiData.choices?.[0]?.message?.content || "";
+      let aiError = "";
+
+      if (LOVABLE_API_KEY) {
+        try {
+          const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-flash",
+              messages: [
+                { role: "system", content: `Você é a Brisa, Enfermeira e Gestora de Marketing da Planta & Raiz (Mega Clínica Digital de Cannabis Medicinal). Gere conteúdo para redes sociais. Sempre inclua o link: ${siteLink}. Tom: enfermeira técnica, acolhedora e profissional. CNAE 6209-1/00 (intermediação). Nunca prometa cura. UTM: ?utm_source=brisa_ia&utm_medium=social&utm_campaign=${theme.theme}` },
+                { role: "user", content: theme.prompt },
+              ],
+            }),
+          });
+          if (aiResp.ok) {
+            const aiData = await aiResp.json();
+            postContent = aiData.choices?.[0]?.message?.content || "";
+          } else {
+            aiError = `lovable-ai ${aiResp.status}: ${(await aiResp.text()).slice(0,200)}`;
+          }
+        } catch (e) { aiError = `lovable-ai exception: ${e}`; }
+      }
+
+      if (!postContent && GEMINI_API_KEY) {
+        try {
+          const aiResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ role: "user", parts: [{ text: `${theme.prompt}\n\nSempre inclua o link ${siteLink}. CNAE 6209-1/00. Nunca prometa cura.` }] }],
+            }),
+          });
+          if (aiResp.ok) {
+            const aiData = await aiResp.json();
+            postContent = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          } else {
+            aiError += ` | gemini ${aiResp.status}: ${(await aiResp.text()).slice(0,200)}`;
+          }
+        } catch (e) { aiError += ` | gemini exception: ${e}`; }
       }
 
       if (!postContent) {
-        return new Response(JSON.stringify({ error: "AI content generation failed" }), {
+        console.error("[Brisa Social] AI fail:", aiError);
+        return new Response(JSON.stringify({ error: "AI content generation failed", detail: aiError }), {
           status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }

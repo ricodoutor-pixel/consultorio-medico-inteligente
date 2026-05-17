@@ -26,13 +26,13 @@
         transition: opacity .35s ease; opacity: 1;
       }
       #__pyr_splash.hide { opacity: 0; pointer-events: none; }
-      #__pyr_splash .pyr-dot {
-        width: 56px; height: 56px; border-radius: 50%;
-        background: radial-gradient(circle at 35% 35%, #6ee7b7, #15803d 70%);
-        box-shadow: 0 0 40px rgba(110,231,183,.55);
-        animation: pyrPulse 1.2s ease-in-out infinite;
+      #__pyr_splash .pyr-verdinho {
+        width: 128px; height: 128px; object-fit: contain;
+        filter: drop-shadow(0 10px 30px rgba(0,0,0,.4));
+        animation: pyrFloat 2.4s ease-in-out infinite;
+        will-change: transform;
       }
-      @keyframes pyrPulse { 0%,100%{transform:scale(.9);opacity:.85} 50%{transform:scale(1.08);opacity:1} }
+      @keyframes pyrFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
     </style>
 
     <script>
@@ -218,7 +218,7 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <!-- Cortina instantânea: oculta o HTML pré-renderizado de SEO até o React montar -->
-    <div id="__pyr_splash" aria-hidden="true"><div class="pyr-dot"></div></div>
+    <div id="__pyr_splash" aria-hidden="true"><img class="pyr-verdinho" src="/dr-verdinho-192.png?v=6" alt="" decoding="async" fetchpriority="high" /></div>
 
     <div id="root"></div>
 
@@ -255,7 +255,7 @@
         });
         obs.observe(root, { childList: true, subtree: false });
         // Fallback de segurança
-        setTimeout(reveal, 2500);
+        setTimeout(reveal, 1500);
       })();
     </script>
 

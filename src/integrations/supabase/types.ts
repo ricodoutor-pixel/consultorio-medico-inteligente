@@ -3991,6 +3991,45 @@ export type Database = {
         }
         Relationships: []
       }
+      patient_passports: {
+        Row: {
+          access_count: number
+          appointment_id: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          last_accessed_at: string | null
+          metadata: Json
+          patient_id: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          access_count?: number
+          appointment_id?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          metadata?: Json
+          patient_id: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          access_count?: number
+          appointment_id?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_accessed_at?: string | null
+          metadata?: Json
+          patient_id?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_contingency_config: {
         Row: {
           beneficiary_doc: string | null
@@ -6251,6 +6290,17 @@ export type Database = {
           qr_code: string
           status: string
           updated_at: string
+        }[]
+      }
+      get_passport_by_token: {
+        Args: { _token: string }
+        Returns: {
+          appointment_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          is_expired: boolean
+          metadata: Json
         }[]
       }
       get_payment_status_summary: {

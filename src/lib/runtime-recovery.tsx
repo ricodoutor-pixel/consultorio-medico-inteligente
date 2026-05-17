@@ -99,7 +99,7 @@ export function lazyWithRecovery<T extends ComponentType<any>>(
   importer: () => LazyModule<T>,
   options: LazyRecoveryOptions<T> = {}
 ): LazyExoticComponent<T> {
-  const fallback = (options.fallback ?? (RouteRecoveryFallback as T));
+  const fallback = options.fallback ?? (RouteRecoveryFallback as unknown as T);
 
   return lazy(async () => {
     try {

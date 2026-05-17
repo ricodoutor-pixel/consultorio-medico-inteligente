@@ -122,6 +122,44 @@ export default function GrowthDashboard() {
           </Button>
         </div>
 
+        {/* Meta diária de Visitantes Published */}
+        {target && (() => {
+          const today = snaps[0];
+          const pct = today ? Math.min(100, Math.round((today.visitors_new / target.daily_new_visitors_target) * 100)) : 0;
+          const onTrack = today?.on_track ?? false;
+          const signupRate = today && today.visitors_total > 0 ? (today.signups / today.visitors_total) * 100 : 0;
+          const otRate = today && today.visitors_total > 0 ? (today.orientacao_starts / today.visitors_total) * 100 : 0;
+          return (
+            <Card className="border-2" style={{ borderColor: onTrack ? "hsl(var(--primary))" : "hsl(0 84% 60%)" }}>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center justify-between flex-wrap gap-2">
+                  <span>📈 Meta diária Published — base para todo marketing orgânico</span>
+                  <Badge variant={onTrack ? "default" : "destructive"}>{onTrack ? "🟢 no caminho" : "🔴 abaixo da meta"}</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-end justify-between flex-wrap gap-4">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Visitantes hoje · Baseline {target.baseline_visitors}</div>
+                    <div className="text-4xl font-bold">{today?.visitors_new ?? 0}<span className="text-lg text-muted-foreground"> / {target.daily_new_visitors_target}/dia</span></div>
+                  </div>
+                  <div className="text-right text-xs space-y-0.5">
+                    <div>Cadastros: <strong>{signupRate.toFixed(1)}%</strong> <span className="text-muted-foreground">(meta {(target.signup_conversion_target * 100).toFixed(0)}%)</span></div>
+                    <div>Orientação técnica: <strong>{otRate.toFixed(1)}%</strong> <span className="text-muted-foreground">(meta {(target.orientacao_conversion_target * 100).toFixed(0)}%)</span></div>
+                    <div>Leads p/ nutrição: <strong>{today?.leads ?? 0}</strong> <span className="text-muted-foreground">(meta {(target.lead_nurture_target * 100).toFixed(0)}%)</span></div>
+                  </div>
+                </div>
+                <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
+                  <div className="h-full transition-all" style={{ width: `${pct}%`, background: onTrack ? "hsl(var(--primary))" : "hsl(25 95% 53%)" }} />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Δ vs meta: <strong className={onTrack ? "text-primary" : "text-destructive"}>{(today?.delta_vs_target ?? 0) >= 0 ? "+" : ""}{today?.delta_vs_target ?? 0}</strong> · Total sessões dia: {today?.visitors_total ?? 0} · O agente amplifica SEO + posts virais até bater +{target.daily_new_visitors_target}/dia.
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })()}
+
         {/* KPI cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card><CardContent className="p-4">

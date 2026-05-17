@@ -140,6 +140,7 @@ const AdminLeads = lazyWithRecovery(() => import("./pages/admin/Leads"), { sourc
 const AdminLeadDetail = lazyWithRecovery(() => import("./pages/admin/LeadDetail"), { sourceRef: "/admin/leads/:id" });
 const President360 = lazyWithRecovery(() => import("./pages/admin/President360"), { sourceRef: "/admin/president" });
 const SentinelControl = lazyWithRecovery(() => import("./pages/admin/SentinelControl"), { sourceRef: "/admin/sentinel" });
+const CadastrosRealtime = lazyWithRecovery(() => import("./pages/admin/CadastrosRealtime"), { sourceRef: "/admin/cadastros" });
 
 const queryClient = new QueryClient();
 
@@ -297,6 +298,8 @@ const App = () => (
                 <Route path="/admin/monitoramento" element={<AdminRoute><AdminMonitoramento /></AdminRoute>} />
                 <Route path="/admin/growth" element={<AdminRoute><GrowthDashboard /></AdminRoute>} />
                 <Route path="/admin/leads" element={<AdminRoute><AdminLeads /></AdminRoute>} />
+                <Route path="/admin/cadastros" element={<AdminRoute><CadastrosRealtime /></AdminRoute>} />
+                <Route path="/admin/cadastros-tempo-real" element={<AdminRoute><CadastrosRealtime /></AdminRoute>} />
                 <Route path="/admin/leads/:id" element={<AdminRoute><AdminLeadDetail /></AdminRoute>} />
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />

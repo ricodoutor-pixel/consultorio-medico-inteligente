@@ -124,6 +124,38 @@ export default function CadastrosRealtime() {
 
       setCounters(nextCounters);
       setRecent(merged.slice(0, 30));
+
+      // === Métricas AO VIVO (paralelas, head-only) ===
+      const [
+        docTotal, docVerified, docOnline, docAvailable,
+        otPend, otPagasHoje, leadsHoje, ativos5,
+        otReceitaHoje,
+      ] = await Promise.all([
+        supabase.from("doctors").select("*", { count: "exact", head: true }),
+        supabase.from("doctors").select("*", { count: "exact", head: true }).eq("kyc_status", "approved"),
+        supabase.from("doctors").select("*", { count: "exact", head: true }).eq("is_online", true),
+        supabase.from("doctors").select("*", { count: "exact", head: true }).eq("is_online", true).eq("is_available", true),
+        supabase.from("orientacao_tecnica_orders").select("*", { count: "exact", head: true }).eq("payment_status", "pending"),
+        supabase.from("orientacao_tecnica_orders").select("*", { count: "exact", head: true }).eq("payment_status", "paid").gte("created_at", startOfDay),
+        supabase.from("leads_contatos").select("*", { count: "exact", head: true }).gte("created_at", startOfDay),
+        supabase.from("doctors").select("*", { count: "exact", head: true }).gte("last_seen_online", activeSince),
+        supabase.from("orientacao_tecnica_orders").select("amount").eq("payment_status", "paid").gte("created_at", startOfDay),
+      ]);
+
+      const receita = (otReceitaHoje.data ?? []).reduce((s: number, r: any) => s + Number(r.amount ?? 0), 0);
+
+      setLive({
+        doctors_total: docTotal.count ?? 0,
+        doctors_verified: docVerified.count ?? 0,
+        doctors_online: docOnline.count ?? 0,
+        doctors_available: docAvailable.count ?? 0,
+        ot_pendentes: otPend.count ?? 0,
+        ot_pagas_hoje: otPagasHoje.count ?? 0,
+        receita_hoje: receita,
+        leads_hoje: leadsHoje.count ?? 0,
+        ativos_5min: ativos5.count ?? 0,
+      });
+
       setUpdatedAt(new Date());
     } catch (e: any) {
       setError(e?.message ?? "Falha ao consultar");

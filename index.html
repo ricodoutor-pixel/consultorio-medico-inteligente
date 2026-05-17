@@ -240,6 +240,91 @@
       })();
     </script>
 
+    <!-- ESCUDO ANTI-TELA-PRETA (Salvaguarda #1)
+         Captura erros antes do React montar (chunk load, "_ is not a function", etc).
+         Se em 8s o #root continuar vazio, faz UM reload cache-busted (rollback-lite do browser).
+         Se já tentou recarregar, mostra fallback humano com botão e WhatsApp da Brisa. -->
+    <script>
+      (function(){
+        var RELOAD_KEY = '__pyr_boot_reload_v1';
+        var BREAD = window.__pyr_breadcrumbs = [];
+        function crumb(type, data){
+          try {
+            BREAD.push({ t: Date.now(), type: type, data: data });
+            if (BREAD.length > 50) BREAD.shift();
+          } catch(_){}
+        }
+        crumb('boot', { ua: navigator.userAgent.slice(0,80), url: location.href });
+
+        function showFallback(reason){
+          try {
+            var root = document.getElementById('root');
+            if (!root) return;
+            // Só mostra fallback se o React não conseguiu desenhar nada
+            if (root.childElementCount > 0) return;
+            root.innerHTML = ''
+              + '<div style="min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0A0E27;color:#fff;text-align:center">'
+              + '<div style="max-width:420px">'
+              +   '<div style="font-size:48px;margin-bottom:8px">🌱</div>'
+              +   '<h1 style="font-size:22px;margin:0 0 8px;font-weight:600">Estamos atualizando a plataforma</h1>'
+              +   '<p style="font-size:14px;opacity:.85;line-height:1.5;margin:0 0 20px">Recarregue a página para pegar a versão nova. Se persistir, fale com a Brisa pelo WhatsApp.</p>'
+              +   '<button id="__pyr_reload" style="background:#15803d;color:#fff;border:0;border-radius:10px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer;margin-right:8px">Recarregar</button>'
+              +   '<a href="https://wa.me/5511991363154" style="display:inline-block;background:transparent;color:#5cbdb9;border:1px solid #5cbdb9;border-radius:10px;padding:12px 18px;font-size:15px;font-weight:600;text-decoration:none">WhatsApp Brisa</a>'
+              +   '<p style="font-size:11px;opacity:.5;margin-top:18px">Código: ' + (reason || 'init') + '</p>'
+              + '</div></div>';
+            var btn = document.getElementById('__pyr_reload');
+            if (btn) btn.onclick = function(){
+              try { sessionStorage.removeItem(RELOAD_KEY); } catch(_){}
+              location.reload();
+            };
+          } catch(_){}
+        }
+
+        function reportEarlyError(err, source){
+          crumb('error', { src: source, msg: String(err && err.message || err).slice(0,200) });
+          // Tentar mandar para Sentry depois que ele subir
+          window.__pyr_earlyErrors = window.__pyr_earlyErrors || [];
+          window.__pyr_earlyErrors.push({ source: source, message: String(err && err.message || err), stack: err && err.stack });
+          console.error('[boot]', source, err);
+
+          var msg = String(err && err.message || err);
+          var isChunkErr = /Failed to fetch|dynamically imported module|Importing a module script failed|Loading chunk|is not a function/i.test(msg);
+          if (!isChunkErr) return;
+
+          var tried = false;
+          try { tried = sessionStorage.getItem(RELOAD_KEY) === '1'; } catch(_){}
+          if (tried) {
+            showFallback('chunk');
+            return;
+          }
+          try { sessionStorage.setItem(RELOAD_KEY, '1'); } catch(_){}
+          crumb('auto-reload', { msg: msg.slice(0,120) });
+          // cache-bust para forçar HTML novo
+          var url = location.pathname + (location.search ? location.search + '&' : '?') + '_v=' + Date.now() + location.hash;
+          location.replace(url);
+        }
+
+        window.addEventListener('error', function(e){
+          if (e && (e.message || e.error)) reportEarlyError(e.error || e.message, 'window.error');
+        }, true);
+        window.addEventListener('unhandledrejection', function(e){
+          reportEarlyError(e.reason, 'unhandledrejection');
+        });
+
+        // Watchdog: se em 8s o root ainda está vazio, é tela preta
+        setTimeout(function(){
+          var root = document.getElementById('root');
+          if (root && root.childElementCount === 0) {
+            crumb('watchdog-empty-root', {});
+            reportEarlyError(new Error('Root vazio após 8s'), 'watchdog');
+          } else {
+            // App montou — limpa flag de reload
+            try { sessionStorage.removeItem(RELOAD_KEY); } catch(_){}
+          }
+        }, 8000);
+      })();
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
 
     <script>

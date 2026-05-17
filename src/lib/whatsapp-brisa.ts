@@ -80,7 +80,10 @@ export function trackBrisaClick(source: string, extra: BrisaOptions = {}): void 
     has_user_name: extra.userName ? true : false,
     ...utm,
   });
-  // Meta Pixel standard event
+  // Internal conversion log + GA4 conv_whatsapp_click
+  import("@/lib/track-conversion").then(({ trackConversion }) => {
+    trackConversion("whatsapp_click", source, { ...extra, ...utm });
+  }).catch(() => {});
   try {
     (window as any).fbq?.("track", "Contact", { source, ...utm });
   } catch {

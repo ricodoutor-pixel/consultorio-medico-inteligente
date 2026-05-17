@@ -217,28 +217,6 @@
           });
         } catch(e) {}
       })();
-
-      // Remove a cortina assim que o React montar (MutationObserver no #root) ou após 2.5s de fallback
-      (function(){
-        var root = document.getElementById('root');
-        var splash = document.getElementById('__pyr_splash');
-        if (!root || !splash) return;
-        var done = false;
-        function reveal(){
-          if (done) return; done = true;
-          document.documentElement.classList.add('pyr-ready');
-          splash.classList.add('hide');
-          setTimeout(function(){ splash.remove(); }, 400);
-        }
-        // Detecta quando o React substitui o conteúdo prerender com nós reais (componentes hidratados)
-        var obs = new MutationObserver(function(){
-          // Heurística: React monta children React-controlados; aguardamos 1 frame após primeira mutação
-          requestAnimationFrame(function(){ requestAnimationFrame(reveal); });
-        });
-        obs.observe(root, { childList: true, subtree: false });
-        // Fallback de segurança
-        setTimeout(reveal, 1500);
-      })();
     </script>
 
     <script type="module" src="/src/main.tsx"></script>

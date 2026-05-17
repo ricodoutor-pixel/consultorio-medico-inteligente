@@ -37,12 +37,12 @@ export async function trackConversion(
 
   // 2) Supabase log (internal dashboard)
   try {
-    await supabase.from("conversion_events").insert({
+    await supabase.from("conversion_events").insert([{
       event_type,
       source: source ?? null,
       session_id: sessionId(),
-      metadata,
-    });
+      metadata: metadata as never,
+    }]);
   } catch {
     /* fire-and-forget */
   }

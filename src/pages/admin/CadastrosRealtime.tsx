@@ -215,6 +215,41 @@ export default function CadastrosRealtime() {
           ))}
         </div>
 
+        {/* AO VIVO 360° */}
+        <Card className="p-4 bg-gradient-to-br from-emerald-500/10 to-primary/5 border-emerald-500/30">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </span>
+            <h2 className="font-bold text-foreground">Ao Vivo • Rastreamento 360°</h2>
+            <Badge variant="secondary" className="ml-auto text-[10px]">atualiza 10s</Badge>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            {[
+              { label: "Médicos Online", value: live.doctors_online, icon: Wifi, accent: "text-emerald-400" },
+              { label: "Disponíveis Agora", value: live.doctors_available, icon: Activity, accent: "text-emerald-300" },
+              { label: "Médicos Verificados", value: live.doctors_verified, icon: ShieldCheck, accent: "text-sky-400" },
+              { label: "Médicos Cadastrados", value: live.doctors_total, icon: Stethoscope, accent: "text-primary" },
+              { label: "Ativos (5min)", value: live.ativos_5min, icon: Activity, accent: "text-emerald-400" },
+              { label: "Leads Hoje", value: live.leads_hoje, icon: UserPlus, accent: "text-amber-400" },
+              { label: "OT Pendentes", value: live.ot_pendentes, icon: FileText, accent: "text-amber-400" },
+              { label: "OT Pagas Hoje", value: live.ot_pagas_hoje, icon: FileText, accent: "text-emerald-400" },
+              { label: "Receita Hoje", value: `R$ ${live.receita_hoje.toFixed(2)}`, icon: DollarSign, accent: "text-emerald-400" },
+            ].map((s) => {
+              const I = s.icon;
+              return (
+                <div key={s.label} className="p-3 rounded-lg bg-card/60 border border-border">
+                  <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+                    <I className="h-3 w-3" /> {s.label}
+                  </div>
+                  <div className={`text-2xl font-black mt-1 ${s.accent}`}>{s.value}</div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
         {/* Detalhamento por fonte */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {SOURCES.map((src) => {

@@ -215,17 +215,45 @@ async function distribute(supa: any, runId: string, targets: GscRow[]) {
 }
 
 // ============ FASE 4: AUDITORIA + WHATSAPP ============
-async function audit(supa: any, runId: string, m: { analyzed: number; optimized: number; posts: number }) {
+async function audit(
+  supa: any, runId: string,
+  m: { analyzed: number; optimized: number; posts: number },
+  kpi: any, snap: any,
+) {
+  const signupRate = snap.visitors_total > 0 ? (snap.signups / snap.visitors_total) : 0;
+  const otRate = snap.visitors_total > 0 ? (snap.orientacao_starts / snap.visitors_total) : 0;
+  const onTrackIcon = snap.on_track ? "🟢" : "🔴";
+
   const md = [
     `🤖 *Manus Growth CEO — ${new Date().toLocaleDateString("pt-BR")}*`,
+    ``,
+    `${onTrackIcon} *Visitantes Published hoje:* ${snap.visitors_new} / meta ${snap.target_new_visitors} (Δ ${snap.delta_vs_target >= 0 ? "+" : ""}${snap.delta_vs_target})`,
+    `📐 Baseline: ${kpi.baseline_visitors} | Total dia: ${snap.visitors_total}`,
+    `📈 Conversão cadastro: ${(signupRate * 100).toFixed(1)}% (meta ${(kpi.signup_conversion_target * 100).toFixed(0)}%)`,
+    `🩺 Orientação técnica: ${(otRate * 100).toFixed(1)}% (meta ${(kpi.orientacao_conversion_target * 100).toFixed(0)}%) — ${snap.orientacao_starts}`,
+    `🌱 Leads p/ nutrição: ${snap.leads} (meta ${(kpi.lead_nurture_target * 100).toFixed(0)}%)`,
     ``,
     `🔍 Páginas GSC analisadas: ${m.analyzed}`,
     `✏️ SEO overrides escritos: ${m.optimized}`,
     `📱 Posts sociais gerados: ${m.posts}`,
     ``,
+    snap.on_track
+      ? `✅ No caminho certo — manter estratégia atual e dobrar nos posts que converteram.`
+      : `⚠️ Abaixo da meta — Manus vai amplificar SEO + posts virais nas próximas 24h até bater +${snap.target_new_visitors}/dia.`,
+    ``,
     `📊 Dashboard: /admin/growth`,
-    `_Próximo build aplicará as otimizações automaticamente._`,
   ].join("\n");
+
+  try {
+    await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${SERVICE_ROLE}` },
+      body: JSON.stringify({ phone: ADMIN_WHATSAPP, message: md, type: "text" }),
+    });
+  } catch (_) { /* silent */ }
+
+  return md;
+}
 
   try {
     await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {

@@ -2,3 +2,6 @@ project_id = "shmbwdjuddvquszwkvuq"
 
 [functions.ai-pharmacokinetic-profile]
 verify_jwt = false
+
+[functions.treatment-subscription-engine]
+verify_jwt = false

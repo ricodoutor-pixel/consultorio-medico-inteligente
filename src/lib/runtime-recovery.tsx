@@ -93,7 +93,7 @@ export function reportFrontendRuntimeError(
           }
         })();
       }
-    }).catch(() => {});
+    }, () => {});
 
     fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-error-gateway`, {
       method: "POST",

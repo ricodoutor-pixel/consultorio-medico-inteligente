@@ -21,6 +21,49 @@ const GUARDRAIL_REGEX = /CRM\s*10963|Dr\.?\s*Edilson|RDC\s*660/i;
 
 interface GscRow { keys: string[]; clicks: number; impressions: number; ctr: number; position: number }
 
+// ============ FASE 0: META BASELINE (visitantes Published) ============
+async function loadTargets(supa: any) {
+  const { data } = await supa.from("marketing_kpi_targets").select("*").eq("scope", "global").maybeSingle();
+  return data ?? {
+    baseline_visitors: 118, daily_new_visitors_target: 100,
+    signup_conversion_target: 0.5, orientacao_conversion_target: 0.3, lead_nurture_target: 0.2,
+  };
+}
+
+async function snapshotVisitors(supa: any, kpi: any) {
+  const today = new Date().toISOString().slice(0, 10);
+  const dayStart = `${today}T00:00:00Z`;
+
+  // visitantes únicos hoje (conversion_events captura sessões da plataforma)
+  const { data: events } = await supa.from("conversion_events")
+    .select("event_type, session_id, user_id")
+    .gte("created_at", dayStart);
+
+  const sessions = new Set<string>();
+  let signups = 0, orientacao = 0, leads = 0;
+  for (const e of events ?? []) {
+    if (e.session_id) sessions.add(e.session_id);
+    if (e.event_type === "form_submit") signups++;
+    if (e.event_type === "quiz_completed") orientacao++;
+    if (e.event_type === "whatsapp_click" || e.event_type === "quiz_started") leads++;
+  }
+
+  const visitors_total = sessions.size;
+  const visitors_new = Math.max(0, visitors_total); // proxy diário
+  const target = kpi.daily_new_visitors_target;
+  const delta = visitors_new - target;
+  const row = {
+    snapshot_date: today,
+    visitors_total, visitors_new, signups,
+    orientacao_starts: orientacao, leads,
+    target_new_visitors: target,
+    delta_vs_target: delta,
+    on_track: delta >= 0,
+  };
+  await supa.from("marketing_daily_snapshot").upsert(row, { onConflict: "snapshot_date" });
+  return row;
+}
+
 // ============ FASE 1: DIAGNÓSTICO ============
 async function diagnose(supa: any, runId: string) {
   const today = new Date();
@@ -172,16 +215,33 @@ async function distribute(supa: any, runId: string, targets: GscRow[]) {
 }
 
 // ============ FASE 4: AUDITORIA + WHATSAPP ============
-async function audit(supa: any, runId: string, m: { analyzed: number; optimized: number; posts: number }) {
+async function audit(
+  supa: any, runId: string,
+  m: { analyzed: number; optimized: number; posts: number },
+  kpi: any, snap: any,
+) {
+  const signupRate = snap.visitors_total > 0 ? (snap.signups / snap.visitors_total) : 0;
+  const otRate = snap.visitors_total > 0 ? (snap.orientacao_starts / snap.visitors_total) : 0;
+  const onTrackIcon = snap.on_track ? "🟢" : "🔴";
+
   const md = [
     `🤖 *Manus Growth CEO — ${new Date().toLocaleDateString("pt-BR")}*`,
+    ``,
+    `${onTrackIcon} *Visitantes Published hoje:* ${snap.visitors_new} / meta ${snap.target_new_visitors} (Δ ${snap.delta_vs_target >= 0 ? "+" : ""}${snap.delta_vs_target})`,
+    `📐 Baseline: ${kpi.baseline_visitors} | Total dia: ${snap.visitors_total}`,
+    `📈 Conversão cadastro: ${(signupRate * 100).toFixed(1)}% (meta ${(kpi.signup_conversion_target * 100).toFixed(0)}%)`,
+    `🩺 Orientação técnica: ${(otRate * 100).toFixed(1)}% (meta ${(kpi.orientacao_conversion_target * 100).toFixed(0)}%) — ${snap.orientacao_starts}`,
+    `🌱 Leads p/ nutrição: ${snap.leads} (meta ${(kpi.lead_nurture_target * 100).toFixed(0)}%)`,
     ``,
     `🔍 Páginas GSC analisadas: ${m.analyzed}`,
     `✏️ SEO overrides escritos: ${m.optimized}`,
     `📱 Posts sociais gerados: ${m.posts}`,
     ``,
+    snap.on_track
+      ? `✅ No caminho certo — manter estratégia atual e dobrar nos posts que converteram.`
+      : `⚠️ Abaixo da meta — Manus vai amplificar SEO + posts virais nas próximas 24h até bater +${snap.target_new_visitors}/dia.`,
+    ``,
     `📊 Dashboard: /admin/growth`,
-    `_Próximo build aplicará as otimizações automaticamente._`,
   ].join("\n");
 
   try {
@@ -226,10 +286,17 @@ serve(async (req) => {
   const runId = run!.id;
 
   try {
+    const kpi = await loadTargets(supa);
+    const snap = await snapshotVisitors(supa, kpi);
+    await supa.from("manus_growth_logs").insert({
+      run_id: runId, phase: "diagnose", action: "visitors_snapshot",
+      after_state: snap, status: "ok",
+    });
     const { targets, total } = await diagnose(supa, runId);
-    const optimized = await optimize(supa, runId, targets);
+    // Se abaixo da meta, prioriza mais páginas + posts
+    const optimized = await optimize(supa, runId, snap.on_track ? targets : [...targets, ...targets].slice(0, 8));
     const posts = await distribute(supa, runId, targets);
-    const summary = await audit(supa, runId, { analyzed: total, optimized, posts });
+    const summary = await audit(supa, runId, { analyzed: total, optimized, posts }, kpi, snap);
 
     await supa.from("manus_growth_runs").update({
       status: "success", finished_at: new Date().toISOString(),

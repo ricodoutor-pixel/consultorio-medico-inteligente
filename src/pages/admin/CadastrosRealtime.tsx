@@ -24,8 +24,25 @@ const SOURCES: SourceMeta[] = [
   { key: "leads_contatos", label: "Leads (Chat/WA/IG)", icon: UserPlus, nameCol: "nome", contactCol: "telefone" },
   { key: "pacientes_leads", label: "Leads Pacientes", icon: Sparkles, nameCol: "nome", contactCol: "whatsapp" },
   { key: "orientacao_tecnica_orders", label: "Orientações Técnicas", icon: FileText, nameCol: "patient_name", contactCol: "patient_whatsapp" },
-  { key: "doctors", label: "Médicos", icon: Stethoscope, nameCol: "full_name", contactCol: "crm" },
+  { key: "doctors", label: "Médicos", icon: Stethoscope, nameCol: "specialty", contactCol: "crm" },
 ];
+
+interface LiveStats {
+  doctors_total: number;
+  doctors_verified: number;
+  doctors_online: number;
+  doctors_available: number;
+  ot_pendentes: number;
+  ot_pagas_hoje: number;
+  receita_hoje: number;
+  leads_hoje: number;
+  ativos_5min: number;
+}
+
+const emptyLive: LiveStats = {
+  doctors_total: 0, doctors_verified: 0, doctors_online: 0, doctors_available: 0,
+  ot_pendentes: 0, ot_pagas_hoje: 0, receita_hoje: 0, leads_hoje: 0, ativos_5min: 0,
+};
 
 interface Counters {
   total: number;

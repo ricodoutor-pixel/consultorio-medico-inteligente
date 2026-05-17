@@ -329,6 +329,9 @@ const DashboardPaciente = () => {
                 {/* Passaporte Canábico Digital */}
                 <PassportQRCard autoCreateIfMissing />
 
+                {/* Meu Diário Planta y Raiz — sintomas, sono, humor, gotas */}
+                {profile?.id && <SymptomTracker patientId={profile.id} />}
+
                 <Card className="border-border">
                   <CardContent className="p-5">
                     <h3 className="font-display font-black text-foreground text-sm mb-4 flex items-center gap-2">

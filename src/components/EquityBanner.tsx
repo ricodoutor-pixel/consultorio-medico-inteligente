@@ -57,6 +57,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
             </div>
           </aside>
 
+          <div className="space-y-4">
            <p className="text-xs md:text-lg text-gray-700 leading-relaxed">
              A <span className="font-bold text-green-600">Planta & Raiz</span> democratiza o acesso à
              cannabis medicinal oferecendo{" "}

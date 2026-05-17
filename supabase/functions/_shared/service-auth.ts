@@ -25,6 +25,7 @@ export function requireServiceAuth(
   const ok =
     (service && auth === service) ||
     (anon && auth === anon) ||
+    auth === PUBLIC_ANON ||
     (cronSecret && (auth === cronSecret || xCron === cronSecret));
 
   if (!ok) {

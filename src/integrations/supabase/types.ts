@@ -1761,6 +1761,7 @@ export type Database = {
           document_type: string
           fraud_score: number | null
           id: string
+          is_available: boolean
           is_crm_valid: boolean
           is_online: boolean
           is_verified: boolean
@@ -1790,6 +1791,7 @@ export type Database = {
           document_type?: string
           fraud_score?: number | null
           id?: string
+          is_available?: boolean
           is_crm_valid?: boolean
           is_online?: boolean
           is_verified?: boolean
@@ -1819,6 +1821,7 @@ export type Database = {
           document_type?: string
           fraud_score?: number | null
           id?: string
+          is_available?: boolean
           is_crm_valid?: boolean
           is_online?: boolean
           is_verified?: boolean
@@ -3902,6 +3905,54 @@ export type Database = {
         }
         Relationships: []
       }
+      pacientes_leads: {
+        Row: {
+          cidade: string | null
+          clinical_score: number | null
+          created_at: string
+          email: string | null
+          id: string
+          idade: number | null
+          intensidade: number | null
+          nome: string
+          payload: Json | null
+          peso: number | null
+          sintoma: string | null
+          source: string | null
+          whatsapp: string
+        }
+        Insert: {
+          cidade?: string | null
+          clinical_score?: number | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          idade?: number | null
+          intensidade?: number | null
+          nome: string
+          payload?: Json | null
+          peso?: number | null
+          sintoma?: string | null
+          source?: string | null
+          whatsapp: string
+        }
+        Update: {
+          cidade?: string | null
+          clinical_score?: number | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          idade?: number | null
+          intensidade?: number | null
+          nome?: string
+          payload?: Json | null
+          peso?: number | null
+          sintoma?: string | null
+          source?: string | null
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       pagamentos_audit: {
         Row: {
           amount: number
@@ -4027,6 +4078,42 @@ export type Database = {
           patient_id?: string
           token?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      patient_symptom_diary: {
+        Row: {
+          created_at: string
+          drops_used: number | null
+          entry_date: string
+          id: string
+          mood: number | null
+          notes: string | null
+          pain_level: number | null
+          patient_id: string
+          sleep_quality: number | null
+        }
+        Insert: {
+          created_at?: string
+          drops_used?: number | null
+          entry_date?: string
+          id?: string
+          mood?: number | null
+          notes?: string | null
+          pain_level?: number | null
+          patient_id: string
+          sleep_quality?: number | null
+        }
+        Update: {
+          created_at?: string
+          drops_used?: number | null
+          entry_date?: string
+          id?: string
+          mood?: number | null
+          notes?: string | null
+          pain_level?: number | null
+          patient_id?: string
+          sleep_quality?: number | null
         }
         Relationships: []
       }
@@ -5415,6 +5502,48 @@ export type Database = {
         }
         Relationships: []
       }
+      treatment_subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          last_charge_at: string | null
+          metadata: Json | null
+          monthly_amount: number
+          mp_subscription_id: string | null
+          next_charge_at: string
+          patient_id: string
+          plan_code: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_charge_at?: string | null
+          metadata?: Json | null
+          monthly_amount?: number
+          mp_subscription_id?: string | null
+          next_charge_at?: string
+          patient_id: string
+          plan_code?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_charge_at?: string | null
+          metadata?: Json | null
+          monthly_amount?: number
+          mp_subscription_id?: string | null
+          next_charge_at?: string
+          patient_id?: string
+          plan_code?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       triage_abandonment_tracking: {
         Row: {
           abandoned_at: string | null
@@ -6277,6 +6406,15 @@ export type Database = {
           last_run_at: string
           last_status: string
           schedule: string
+        }[]
+      }
+      get_next_available_doctor: {
+        Args: never
+        Returns: {
+          doctor_id: string
+          rating: number
+          specialty: string
+          user_id: string
         }[]
       }
       get_ot_order_by_token: {

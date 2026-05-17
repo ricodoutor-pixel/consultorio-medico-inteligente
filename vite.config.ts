@@ -38,16 +38,21 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          if (id.includes('node_modules')) {
-            if (id.includes('react-dom') || id.includes('react-router')) return 'react-core';
-            if (id.includes('react')) return 'react-base';
-            if (id.includes('recharts') || id.includes('d3')) return 'charts';
-            if (id.includes('framer-motion')) return 'animation';
-            if (id.includes('@radix-ui') || id.includes('cmdk')) return 'ui-primitives';
-            if (id.includes('@supabase')) return 'supabase';
-            if (id.includes('i18next')) return 'i18n';
-            return 'vendor';
+          if (!id.includes('node_modules')) return;
+          // CRÍTICO: manter React + React-DOM + Scheduler + React-Router no MESMO chunk.
+          // Separar react/react-dom causa "Cannot set properties of undefined (setting 'Children')"
+          // em produção pois react-dom executa antes do react ser definido.
+          if (
+            /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler|react-is|use-sync-external-store)[\\/]/.test(id)
+          ) {
+            return 'react-vendor';
           }
+          if (id.includes('recharts') || id.includes('d3')) return 'charts';
+          if (id.includes('framer-motion')) return 'animation';
+          if (id.includes('@radix-ui') || id.includes('cmdk')) return 'ui-primitives';
+          if (id.includes('@supabase')) return 'supabase';
+          if (id.includes('i18next')) return 'i18n';
+          return 'vendor';
         },
       },
     },

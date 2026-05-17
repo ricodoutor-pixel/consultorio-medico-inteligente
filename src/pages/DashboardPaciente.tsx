@@ -21,6 +21,7 @@ import { PatientCheckinCard } from "@/components/PatientCheckinCard";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { ProgressReportGenerator } from "@/components/ProgressReportGenerator";
 import PassportQRCard from "@/components/passport/PassportQRCard";
+import { SymptomTracker } from "@/components/diary/SymptomTracker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { professionals } from "@/data/professionals";
 
@@ -327,6 +328,9 @@ const DashboardPaciente = () => {
 
                 {/* Passaporte Canábico Digital */}
                 <PassportQRCard autoCreateIfMissing />
+
+                {/* Meu Diário Planta y Raiz — sintomas, sono, humor, gotas */}
+                {profile?.id && <SymptomTracker patientId={profile.id} />}
 
                 <Card className="border-border">
                   <CardContent className="p-5">

@@ -125,6 +125,7 @@ const QuizTriagem = lazyWithRecovery(() => import("./pages/QuizTriagem"), { sour
 const CondicaoTratamento = lazyWithRecovery(() => import("./pages/CondicaoTratamento"), { sourceRef: "/condicao" });
 const Consultorio = lazyWithRecovery(() => import("./pages/Consultorio"), { sourceRef: "/consultorio" });
 const FastTrackCheckout = lazyWithRecovery(() => import("./pages/FastTrackCheckout"), { sourceRef: "/checkout/fast-track" });
+const PlanosTratamento = lazyWithRecovery(() => import("./pages/PlanosTratamento"), { sourceRef: "/planos-tratamento" });
 const AffiliateDashboard = lazyWithRecovery(() => import("./pages/AffiliateDashboard"), { sourceRef: "/afiliados/dashboard" });
 const PrescriptionCheckout = lazyWithRecovery(() => import("./pages/PrescriptionCheckout"), { sourceRef: "/checkout/:token" });
 const CheckoutReturn = lazyWithRecovery(() => import("./pages/CheckoutReturn"), { sourceRef: "/checkout/return" });
@@ -307,6 +308,7 @@ const App = () => (
                 <Route path="/gestao-pacientes" element={<PrivateRoute><GestãoPacientes /></PrivateRoute>} />
                 <Route path="/status" element={<Status />} />
                 <Route path="/passaporte/:token" element={<Passaporte />} />
+                <Route path="/planos-tratamento" element={<PlanosTratamento />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

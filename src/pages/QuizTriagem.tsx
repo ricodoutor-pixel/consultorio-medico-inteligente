@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { captureTriageLead, computeClinicalScore } from "@/lib/leads-capture";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Brain, HeartPulse, Moon, Flame, Activity, Pill, 
@@ -103,6 +104,24 @@ const QuizTriagem = () => {
         navigate("/login");
         return;
       }
+
+      // Persist clinical lead (RLS admin-only) — non-blocking
+      try {
+        const intensidade = answers.urgency === "alta" ? 9 : answers.urgency === "media" ? 6 : 3;
+        const diasSintoma = answers.duration === "muito_cronico" ? 730 : answers.duration === "cronico" ? 180 : answers.duration === "moderado" ? 60 : 15;
+        const clinical_score = computeClinicalScore({ intensidade, diasSintoma, sintomaAlvo: !!answers.condition });
+        const profile = (await supabase.from("profiles").select("full_name, whatsapp, email").eq("id", session.user.id).maybeSingle()).data as any;
+        await captureTriageLead({
+          nome: profile?.full_name || session.user.email?.split("@")[0] || "Paciente",
+          email: profile?.email || session.user.email || undefined,
+          whatsapp: (profile?.whatsapp || "5511000000000").replace(/\D/g, ""),
+          sintoma: answers.condition,
+          intensidade,
+          clinical_score,
+          payload: { answers, specialty },
+          source: "quiz_triagem",
+        });
+      } catch (e) { console.warn("captureTriageLead failed", e); }
 
       const { data, error } = await supabase.functions.invoke("match-doctor", {
         body: { specialty, urgency, symptoms: `Condição: ${answers.condition}, Duração: ${answers.duration}, Tratamento anterior: ${answers.tried}, Experiência cannabis: ${answers.experience}` },

@@ -297,10 +297,17 @@ serve(async (req) => {
   const runId = run!.id;
 
   try {
+    const kpi = await loadTargets(supa);
+    const snap = await snapshotVisitors(supa, kpi);
+    await supa.from("manus_growth_logs").insert({
+      run_id: runId, phase: "diagnose", action: "visitors_snapshot",
+      after_state: snap, status: "ok",
+    });
     const { targets, total } = await diagnose(supa, runId);
-    const optimized = await optimize(supa, runId, targets);
+    // Se abaixo da meta, prioriza mais páginas + posts
+    const optimized = await optimize(supa, runId, snap.on_track ? targets : [...targets, ...targets].slice(0, 8));
     const posts = await distribute(supa, runId, targets);
-    const summary = await audit(supa, runId, { analyzed: total, optimized, posts });
+    const summary = await audit(supa, runId, { analyzed: total, optimized, posts }, kpi, snap);
 
     await supa.from("manus_growth_runs").update({
       status: "success", finished_at: new Date().toISOString(),

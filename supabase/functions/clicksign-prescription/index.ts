@@ -53,6 +53,32 @@ Deno.serve(async (req) => {
           );
         }
 
+        // Ownership check: if a prescriptionId is supplied, caller MUST be the prescribing doctor (or admin)
+        if (body.prescriptionId) {
+          const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+          if (!serviceKey) {
+            return new Response(JSON.stringify({ success: false, error: "Server misconfigured" }), {
+              status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+          const adminClient = createClient(supabaseUrl, serviceKey);
+          const { data: rx } = await adminClient
+            .from("prescriptions").select("id, doctor_id").eq("id", body.prescriptionId).maybeSingle();
+          if (!rx) {
+            return new Response(JSON.stringify({ success: false, error: "Receita não encontrada" }), {
+              status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+          const { data: doctorRow } = await adminClient
+            .from("doctors").select("id").eq("user_id", user.id).maybeSingle();
+          const { data: isAdmin } = await adminClient.rpc("has_role", { _user_id: user.id, _role: "admin" });
+          if (!isAdmin && (!doctorRow || rx.doctor_id !== doctorRow.id)) {
+            return new Response(JSON.stringify({ success: false, error: "Apenas o médico prescritor pode assinar esta receita" }), {
+              status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+        }
+
         // 1. Upload document
         const uploadRes = await fetch(
           `${CLICKSIGN_API_URL}/documents`,

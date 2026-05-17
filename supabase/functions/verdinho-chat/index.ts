@@ -40,6 +40,27 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    // Per-IP rate limiting to protect Gemini API key from abuse
+    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim()
+      || req.headers.get("cf-connecting-ip") || "unknown";
+    try {
+      const rlAdmin = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      const { data: ok } = await rlAdmin.rpc("check_edge_rate_limit", {
+        p_bucket: "verdinho_chat",
+        p_key: ip,
+        p_max_hits: 30,
+        p_window_seconds: 60,
+      });
+      if (ok === false) {
+        return new Response(JSON.stringify({ error: "Calma, parça! Muitas mensagens. Tenta de novo em 1 min 🐸" }), {
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } catch { /* rate limit best-effort */ }
+
     const { messages, leadName, referralPage } = await req.json();
 
     if (!Array.isArray(messages) || messages.length === 0 || messages.length > 50) {

@@ -40,9 +40,17 @@ Deno.serve(async (req) => {
 
   try {
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    const FACEBOOK_GRAPH_API_TOKEN = Deno.env.get("FACEBOOK_GRAPH_API_TOKEN");
     const FACEBOOK_PAGE_ID = Deno.env.get("FACEBOOK_PAGE_ID");
     const INSTAGRAM_BUSINESS_ACCOUNT_ID = Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID");
+    let FACEBOOK_PAGE_TOKEN: string | null = null;
+    if (FACEBOOK_PAGE_ID) {
+      try {
+        const { getFacebookPageToken } = await import("../_shared/fb-page-token.ts");
+        FACEBOOK_PAGE_TOKEN = await getFacebookPageToken(FACEBOOK_PAGE_ID);
+      } catch (e) {
+        console.error("[Brisa Social] FB token swap failed:", e);
+      }
+    }
 
     if (!GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "GEMINI_API_KEY missing" }), {

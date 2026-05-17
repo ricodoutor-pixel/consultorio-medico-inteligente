@@ -74,12 +74,32 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 2. Registrar confirmação de entrega
-    await supabase.from("delivery_confirmations").insert({
+    // 2. Claim release atomically (prevents double-payout race).
+    //    Only one concurrent request can flip status held -> releasing.
+    const { data: claimed, error: claimErr } = await supabase
+      .from("escrow_transactions")
+      .update({ status: "releasing", confirmed_at: new Date().toISOString() })
+      .eq("id", escrowId)
+      .in("status", ["held", "pending"])
+      .select("id")
+      .maybeSingle();
+
+    if (claimErr || !claimed) {
+      return new Response(JSON.stringify({ error: "Pagamento já processado ou indisponível", status: "already_processing" }), {
+        status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Registrar confirmação de entrega (idempotent via unique constraint on escrow_id)
+    const { error: confErr } = await supabase.from("delivery_confirmations").insert({
       escrow_id: escrowId,
       patient_id: authData.user.id,
       payout_triggered: true,
     });
+    if (confErr && !String(confErr.message).match(/duplicate|unique/i)) {
+      console.error("[process-payout] delivery_confirmations insert error:", confErr);
+    }
+
 
     // 3. Calcular splits com bônus NPS
     const totalAmount = Number(escrow.amount);

@@ -689,11 +689,11 @@ function injectSEO(
     );
   }
 
-  // Injeta conteúdo SSR dentro de <div id="root"> — React vai substituir na hidratação
-  html = html.replace(
-    /<div id="root">\s*<\/div>/i,
-    `<div id="root"><div id="prerender-seo" data-prerendered="true">${opts.bodyHTML}</div></div>`
-  );
+  // ⚠️ NÃO injetar HTML dentro de <div id="root"> — causou "tela preta com texto SEO"
+  // em produção quando o bundle React falhava ou atrasava. O React limpa #root no mount,
+  // mas se o JS quebra, o usuário fica vendo o HTML estático em fundo preto.
+  // Mantemos apenas <title>, meta description, canonical, og:* e JSON-LD por rota.
+  void opts.bodyHTML;
 
   return html;
 }

@@ -20,21 +20,12 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    minify: "terser",
+    // Em produção, Terser estava quebrando o bundle do Recharts no Hostinger
+    // (erro runtime: "u is not a function" no chunk charts-*.js), resultando em tela preta.
+    // Esbuild mantém a minificação sem corromper esse chunk.
+    minify: "esbuild",
     cssMinify: false,
     chunkSizeWarningLimit: 1000,
-    terserOptions: {
-      compress: {
-        drop_debugger: true,
-        passes: 2,
-      },
-      mangle: {
-        safari10: true,
-      },
-      format: {
-        comments: false,
-      },
-    },
     rollupOptions: {
       output: {
         manualChunks: (id) => {

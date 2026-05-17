@@ -21,6 +21,7 @@ import { PatientCheckinCard } from "@/components/PatientCheckinCard";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { ProgressReportGenerator } from "@/components/ProgressReportGenerator";
 import PassportQRCard from "@/components/passport/PassportQRCard";
+import { SymptomTracker } from "@/components/diary/SymptomTracker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { professionals } from "@/data/professionals";
 

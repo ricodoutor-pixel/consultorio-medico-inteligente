@@ -179,13 +179,23 @@ Deno.serve(async (req) => {
   if (unauthorized) return unauthorized;
 
   const igAccountId = Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID");
-  const fbToken = Deno.env.get("FACEBOOK_GRAPH_API_TOKEN");
+  const pageId = Deno.env.get("FACEBOOK_PAGE_ID");
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-  if (!igAccountId || !fbToken) {
+  if (!igAccountId || !pageId) {
     return new Response(
-      JSON.stringify({ error: "Instagram credentials not configured" }),
+      JSON.stringify({ error: "Instagram credentials not configured (need INSTAGRAM_BUSINESS_ACCOUNT_ID + FACEBOOK_PAGE_ID)" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+  let fbToken: string;
+  try {
+    const { getFacebookPageToken } = await import("../_shared/fb-page-token.ts");
+    fbToken = await getFacebookPageToken(pageId);
+  } catch (e) {
+    return new Response(
+      JSON.stringify({ error: "FB/IG token resolution failed", detail: String(e) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

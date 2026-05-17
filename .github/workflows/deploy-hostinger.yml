@@ -8,9 +8,14 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node 20
         uses: actions/setup-node@v4
@@ -20,6 +25,9 @@ jobs:
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps --prefer-offline --no-audit
+
+      - name: Install smoke-test deps
+        run: npm install --no-save jsdom@^24
 
       - name: Build (Vite)
         env:
@@ -31,10 +39,15 @@ jobs:
           VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
         run: npm run build
 
+      - name: Smoke test (anti-tela-preta)
+        id: smoke
+        run: node scripts/smoke-test.mjs
+
       - name: Ensure SPA fallback (.htaccess)
         run: cp public/.htaccess dist/.htaccess
 
       - name: Deploy via FTP to Hostinger
+        id: deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.HOSTINGER_FTP_HOST }}
@@ -47,3 +60,14 @@ jobs:
             **/.git*
             **/.git*/**
             **/node_modules/**
+
+      # Rollback automático: se build/smoke/deploy falhar, reverte o último commit
+      # para que a próxima execução re-deploye a versão estável anterior.
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          git config user.name "manus-ceo-bot"
+          git config user.email "manus@plantayraiz.com.br"
+          echo "❌ Pipeline falhou — revertendo último commit para restaurar versão estável."
+          git revert --no-edit HEAD || exit 0
+          git push origin main || echo "⚠️ Push do revert falhou — revert manual necessário."

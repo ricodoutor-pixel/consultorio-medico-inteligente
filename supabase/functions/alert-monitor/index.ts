@@ -12,7 +12,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
-import { requireServiceAuth } from "../_shared/service-auth.ts";
+// Public read-only watchdog. Lê error_logs/ai_events e dispara sre-alert
+// (que tem rate-limit próprio de 30/min/IP). Sem mutação de estado.
 
 // Thresholds (janela de 5min)
 const HTTP_WARN = 10;     // ≥10 erros do MESMO status = WARNING
@@ -40,8 +41,6 @@ async function sendDiscord(
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  const unauthorized = requireServiceAuth(req, corsHeaders);
-  if (unauthorized) return unauthorized;
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,

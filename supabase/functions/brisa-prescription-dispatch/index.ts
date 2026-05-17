@@ -32,22 +32,61 @@ Deno.serve(async (req) => {
   );
 
   try {
-    const body = await req.json();
-    const {
-      patient_phone,
-      patient_name,
-      doctor_name,
-      prescription_url,
-      appointment_id,
-      prescription_id,
-    } = body;
+    const body = await req.json().catch(() => ({}));
+    const { prescription_id } = body ?? {};
 
-    if (!patient_phone || !prescription_url) {
+    if (!prescription_id || typeof prescription_id !== "string") {
       return new Response(
-        JSON.stringify({ error: "patient_phone and prescription_url required" }),
+        JSON.stringify({ error: "prescription_id required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Authoritative lookup — ignore any caller-supplied phone/url/name to prevent spam abuse
+    const { data: rx, error: rxErr } = await supabase
+      .from("prescriptions")
+      .select(
+        "id, appointment_id, signed_pdf_url, status, patient_id, doctor_id, doctors:doctor_id(specialty, user_id)"
+      )
+      .eq("id", prescription_id)
+      .maybeSingle();
+
+    if (rxErr || !rx) {
+      return new Response(
+        JSON.stringify({ error: "prescription not found" }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (rx.status !== "signed" || !rx.signed_pdf_url) {
+      return new Response(
+        JSON.stringify({ error: "prescription not signed yet" }),
+        { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Look up patient phone from auth.users (managed by Supabase)
+    const { data: patientUser } = await supabase.auth.admin.getUserById(rx.patient_id);
+    const patient_phone: string =
+      patientUser?.user?.phone ||
+      (patientUser?.user?.user_metadata as any)?.whatsapp ||
+      (patientUser?.user?.user_metadata as any)?.phone ||
+      "";
+    const patient_name: string =
+      (patientUser?.user?.user_metadata as any)?.full_name ||
+      (patientUser?.user?.user_metadata as any)?.name ||
+      "paciente";
+
+    if (!patient_phone) {
+      return new Response(
+        JSON.stringify({ error: "patient phone not on file" }),
+        { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const prescription_url = rx.signed_pdf_url;
+    const appointment_id = rx.appointment_id;
+    const doctor_name = "Dr. Edilson";
 
     if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
       return new Response(

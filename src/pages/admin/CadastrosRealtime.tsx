@@ -126,21 +126,15 @@ export default function CadastrosRealtime() {
       setRecent(merged.slice(0, 30));
 
       // === Métricas AO VIVO (paralelas, head-only) ===
-      const [
-        docTotal, docVerified, docOnline, docAvailable,
-        otPend, otPagasHoje, leadsHoje, ativos5,
-        otReceitaHoje,
-      ] = await Promise.all([
-        supabase.from("doctors").select("*", { count: "exact", head: true }),
-        supabase.from("doctors").select("*", { count: "exact", head: true }).eq("kyc_status", "approved"),
-        supabase.from("doctors").select("*", { count: "exact", head: true }).eq("is_online", true),
-        supabase.from("doctors").select("*", { count: "exact", head: true }).eq("is_online", true).eq("is_available", true),
-        supabase.from("orientacao_tecnica_orders").select("*", { count: "exact", head: true }).eq("payment_status", "pending"),
-        supabase.from("orientacao_tecnica_orders").select("*", { count: "exact", head: true }).eq("payment_status", "paid").gte("created_at", startOfDay),
-        supabase.from("leads_contatos").select("*", { count: "exact", head: true }).gte("created_at", startOfDay),
-        supabase.from("doctors").select("*", { count: "exact", head: true }).gte("last_seen_online", activeSince),
-        supabase.from("orientacao_tecnica_orders").select("amount").eq("payment_status", "paid").gte("created_at", startOfDay),
-      ]);
+      const docTotal = await supabase.from("doctors").select("*", { count: "exact", head: true });
+      const docVerified = await supabase.from("doctors").select("*", { count: "exact", head: true }).eq("kyc_status", "approved");
+      const docOnline = await supabase.from("doctors").select("*", { count: "exact", head: true }).eq("is_online", true);
+      const docAvailable = await supabase.from("doctors").select("*", { count: "exact", head: true }).eq("is_online", true).eq("is_available", true);
+      const otPend = await supabase.from("orientacao_tecnica_orders").select("*", { count: "exact", head: true }).eq("payment_status", "pending");
+      const otPagasHoje = await supabase.from("orientacao_tecnica_orders").select("*", { count: "exact", head: true }).eq("payment_status", "paid").gte("created_at", startOfDay);
+      const leadsHoje = await supabase.from("leads_contatos").select("*", { count: "exact", head: true }).gte("created_at", startOfDay);
+      const ativos5 = await supabase.from("doctors").select("*", { count: "exact", head: true }).gte("last_seen_online", activeSince);
+      const otReceitaHoje = await supabase.from("orientacao_tecnica_orders").select("amount").eq("payment_status", "paid").gte("created_at", startOfDay);
 
       const receita = (otReceitaHoje.data ?? []).reduce((s: number, r: any) => s + Number(r.amount ?? 0), 0);
 

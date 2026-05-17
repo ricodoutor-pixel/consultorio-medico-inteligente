@@ -146,16 +146,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 4. Atualizar escrow para "released"
+    // 4. Marcar escrow como released (após cálculo do doctor_payout final)
     await supabase
       .from("escrow_transactions")
       .update({
         status: "released",
         released_at: new Date().toISOString(),
-        confirmed_at: new Date().toISOString(),
         doctor_payout: doctorPayout,
       })
-      .eq("id", escrowId);
+      .eq("id", escrowId)
+      .eq("status", "releasing");
 
     // 5. Distribuir comissões de afiliados
     const affiliateResults = await distributeAffiliateCommissions(

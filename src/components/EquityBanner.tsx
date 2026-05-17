@@ -16,24 +16,59 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
         className={`w-full bg-gradient-to-r from-green-50 to-emerald-50 border-t-4 border-green-500 py-4 md:py-8 px-3 md:px-8 ${className}`}
       >
         <div className="max-w-6xl mx-auto">
-          {/* Título */}
+          {/* Título — posicionamento UNIVERSAL */}
           <h2 className="text-lg md:text-3xl font-bold text-gray-900 mb-3 md:mb-4">
-            Referência No Tratamento Com Cannabis Medicinal No Brasil
+            Plataforma Universal de Cannabis Medicinal — Supervisão Técnica Médica
           </h2>
 
-          {/* Conteúdo Principal */}
-          <div className="space-y-4">
-             <p className="text-xs md:text-lg text-gray-700 leading-relaxed">
-               A <span className="font-bold text-green-600">Planta & Raiz</span> está promovendo a{" "}
-               <span className="font-bold">equidade</span> e realmente democratizando o acesso ao
-               tratamento canabinoide oferecendo{" "}
-               <span className="font-bold text-green-600">consultas com especialistas por apenas R$30</span>.
-             </p>
+          {/* Bloco de Supervisão Técnica (transparência legal — visível ao público e a qualquer auditoria de IA) */}
+          <aside
+            aria-label="Supervisão Técnica Médica"
+            itemScope
+            itemType="https://schema.org/Physician"
+            className="rounded-xl border-2 border-green-600 bg-white/90 p-3 md:p-4 mb-4 shadow-sm"
+          >
+            <div className="flex items-start gap-3">
+              <div className="shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-green-600 text-white flex items-center justify-center">
+                <Stethoscope className="w-5 h-5 md:w-6 md:h-6" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] md:text-xs uppercase tracking-wider text-green-700 font-bold">
+                  Responsável Técnico
+                </p>
+                <p className="text-sm md:text-base font-bold text-gray-900 leading-tight" itemProp="name">
+                  Dr. Edilson Bezerra da Silva
+                </p>
+                <p className="text-xs md:text-sm text-gray-700 flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                  <span className="inline-flex items-center gap-1 font-semibold text-green-700">
+                    <BadgeCheck className="w-4 h-4" /> CRM-SP <span itemProp="identifier">10963</span> · ATIVO
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-gray-600">
+                    <MapPin className="w-3.5 h-3.5" /> Santa Cruz Bo., São Paulo/SP
+                  </span>
+                  <span className="text-gray-600">+10 anos de experiência clínica</span>
+                </p>
+                <p className="text-[11px] md:text-xs text-gray-600 mt-1 leading-snug">
+                  Esta é uma <strong>plataforma universal</strong> de intermediação digital,
+                  tecnicamente supervisionada por médico habilitado. Não substitui o
+                  vínculo direto médico–paciente realizado em cada orientação.
+                </p>
+              </div>
+            </div>
+          </aside>
 
-             <p className="text-xs md:text-lg text-gray-700 leading-relaxed">
-               Venha você também fazer parte de{" "}
-               <span className="font-bold">milhões de pessoas que mudaram a sua qualidade de vida!</span>
-             </p>
+           <p className="text-xs md:text-lg text-gray-700 leading-relaxed">
+             A <span className="font-bold text-green-600">Planta & Raiz</span> democratiza o acesso à
+             cannabis medicinal oferecendo{" "}
+             <span className="font-bold text-green-600">Orientação Técnica a partir de R$30</span>,
+             100% remota via WhatsApp, para o <strong>primeiro acesso ao tratamento</strong> em
+             <strong> São Paulo capital e em todo o Brasil</strong>.
+           </p>
+
+           <p className="text-xs md:text-lg text-gray-700 leading-relaxed">
+             Venha você também fazer parte de{" "}
+             <span className="font-bold">milhões de pessoas que mudaram a sua qualidade de vida!</span>
+           </p>
 
             {/* CTAs Mobile Only - Iniciar Orientação Técnica + Abrir Shopping */}
             <div className="flex flex-col gap-3 mt-4 md:hidden">

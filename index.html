@@ -16,23 +16,8 @@
     <link rel="mask-icon" href="/favicon.svg" color="#15803d" />
 
     <style>
-      /* Fundo verde instantâneo Planta y Raiz — cobre qualquer HTML pré-renderizado (SEO) antes do React montar */
-      html, body { background-color: #1B4332 !important; margin: 0; padding: 0; }
-      #root { min-height: 100dvh; background-color: #1B4332; }
-      /* Splash cobre todo conteúdo via z-index máximo; sem precisar esconder #root */
-      #__pyr_splash {
-        position: fixed; inset: 0; z-index: 2147483647;
-        background: #1B4332; display: flex; align-items: center; justify-content: center;
-        transition: opacity .35s ease; opacity: 1;
-      }
-      #__pyr_splash.hide { opacity: 0; pointer-events: none; }
-      #__pyr_splash .pyr-verdinho {
-        width: 128px; height: 128px; object-fit: contain;
-        filter: drop-shadow(0 10px 30px rgba(0,0,0,.4));
-        animation: pyrFloat 2.4s ease-in-out infinite;
-        will-change: transform;
-      }
-      @keyframes pyrFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+      html, body { background-color: #0A0E27; margin: 0; padding: 0; }
+      #root { min-height: 100dvh; }
     </style>
 
     <script>

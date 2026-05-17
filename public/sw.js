@@ -4,8 +4,8 @@
  * Protocolo: Cache-First com Network Fallback
  */
 
-const CACHE_VERSION = 'plantayraiz-v2.1';
-const DYNAMIC_CACHE = 'plantayraiz-dynamic-v2.1';
+const CACHE_VERSION = 'plantayraiz-v2.2';
+const DYNAMIC_CACHE = 'plantayraiz-dynamic-v2.2';
 
 // Assets essenciais para cache imediato (apenas arquivos garantidamente existentes)
 const PRECACHE_ASSETS = [
@@ -80,6 +80,12 @@ self.addEventListener('fetch', (event) => {
       url.pathname.includes('/auth/') ||
       url.pathname.includes('/functions/')) {
     event.respondWith(fetch(request));
+    return;
+  }
+
+  // Bundles versionados: network-first para evitar servir chunk antigo após publish
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(networkFirst(request));
     return;
   }
 

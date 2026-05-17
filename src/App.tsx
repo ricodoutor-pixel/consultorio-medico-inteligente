@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -29,6 +29,7 @@ import { DynamicSEOHead } from "@/components/DynamicSEOHead";
 import { LocalCTABanner } from "@/components/LocalCTABanner";
 import { OnboardingModal } from "@/components/OnboardingModal";
 import { ConsentManager } from "@/components/ConsentManager";
+import { lazyWithRecovery, reportFrontendRuntimeError } from "@/lib/runtime-recovery";
 
 const Loading = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
@@ -37,107 +38,128 @@ const Loading = () => (
 );
 
 // Code splitting - lazy load all routes
-const Index = lazy(() => import("./pages/Index"));
-const ComoFunciona = lazy(() => import("./pages/ComoFunciona"));
-const Profissionais = lazy(() => import("./pages/Profissionais"));
-const Shopping = lazy(() => import("./pages/Shopping"));
-const Precos = lazy(() => import("./pages/Precos"));
-const FAQ = lazy(() => import("./pages/FAQ"));
-const Contato = lazy(() => import("./pages/Contato"));
-const Pay = lazy(() => import("./pages/Pay"));
-const Carteira = lazy(() => import("./pages/Carteira"));
-const Admin = lazy(() => import("./pages/Admin"));
-const AdminClinicas = lazy(() => import("./pages/AdminClinicas"));
-const AdminLogin = lazy(() => import("./pages/AdminLogin"));
-const BibliotecaCientifica = lazy(() => import("./pages/BibliotecaCientifica"));
-const CadastroProfissional = lazy(() => import("./pages/CadastroProfissional"));
-const FalarComEspecialista = lazy(() => import("./pages/FalarComEspecialista"));
-const Legal = lazy(() => import("./pages/Legal"));
-const TermosDeUso = lazy(() => import("./pages/TermosDeUso"));
-const PoliticaDePrivacidade = lazy(() => import("./pages/PoliticaDePrivacidade"));
-const PoliticaDeReembolso = lazy(() => import("./pages/PoliticaDeReembolso"));
-const Indicacoes = lazy(() => import("./pages/Indicacoes"));
-const Telemedicina = lazy(() => import("./pages/Telemedicina"));
-const Cadastro = lazy(() => import("./pages/Cadastro"));
-const Login = lazy(() => import("./pages/Login"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const ConsultationPayment = lazy(() => import("./pages/ConsultationPayment"));
-const SpecialistDashboard = lazy(() => import("./pages/SpecialistDashboard"));
-const InfluencerDashboard = lazy(() => import("./pages/InfluencerDashboard"));
-const OnlineUsers = lazy(() => import("./pages/OnlineUsers"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-const DownloadApp = lazy(() => import("./pages/DownloadApp"));
-const Comunidade = lazy(() => import("./pages/Comunidade"));
-const DashboardPaciente = lazy(() => import("./pages/DashboardPaciente"));
-const Agendamento = lazy(() => import("./pages/Agendamento"));
-const Prontuario = lazy(() => import("./pages/Prontuario"));
-const DashboardMedico = lazy(() => import("./pages/DashboardMedico"));
-const DashboardExecutivo = lazy(() => import("./pages/DashboardExecutivo"));
-const Notificacoes = lazy(() => import("./pages/Notificacoes"));
-const SalaEspera = lazy(() => import("./pages/SalaEspera"));
-const ConsultaVideo = lazy(() => import("./pages/ConsultaVideo"));
-const RIPD = lazy(() => import("./pages/RIPD"));
-const LGPDDireitos = lazy(() => import("./pages/LGPDDireitos"));
-const GlobalCompliance = lazy(() => import("./pages/GlobalCompliance"));
-const TreatmentTracker = lazy(() => import("./pages/TreatmentTracker"));
-const Dispensario = lazy(() => import("./pages/Dispensario"));
-const IoMTHub = lazy(() => import("./pages/IoMTHub"));
-const Blog = lazy(() => import("./pages/Blog"));
-const ShoppingDashboard = lazy(() => import("./pages/ShoppingDashboard"));
-const InvestorDashboard = lazy(() => import("./pages/InvestorDashboard"));
-const VideoCall = lazy(() => import("./pages/VideoCall"));
-const ConsultaRapida = lazy(() => import("./pages/ConsultaRapida"));
-const SEOCondicoes = lazy(() => import("./pages/SEOCondicoes"));
-const Status = lazy(() => import("./pages/Status"));
-const TratamentoDorCronica = lazy(() => import("./pages/TratamentoDorCronica"));
-const TratamentoAnsiedadeSaudeMental = lazy(() => import("./pages/TratamentoAnsiedadeSaudeMental"));
-const Club = lazy(() => import("./pages/Club"));
-const Deposits = lazy(() => import("./pages/Deposits"));
-const CartCheckout = lazy(() => import("./pages/CartCheckout"));
-const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
-const PaymentFailure = lazy(() => import("./pages/PaymentFailure"));
-const PaymentPending = lazy(() => import("./pages/PaymentPending"));
-const Cursos = lazy(() => import("./pages/Cursos"));
-const Forum = lazy(() => import("./pages/Forum"));
-const Webinars = lazy(() => import("./pages/Webinars"));
-const Voluntarios = lazy(() => import("./pages/Voluntarios"));
-const ImpactoSocial = lazy(() => import("./pages/ImpactoSocial"));
-const EbookLanding = lazy(() => import("./pages/EbookLanding"));
-const EbookMedicinaCanabinoide = lazy(() => import("./pages/EbookMedicinaCanabinoide"));
-const EbookAnalyticsDashboard = lazy(() => import("./pages/EbookAnalyticsDashboard"));
-const RevenueDistribution = lazy(() => import("./pages/RevenueDistribution"));
-const ProfessionalDashboard = lazy(() => import("./pages/ProfessionalDashboard"));
-const AdminMaster = lazy(() => import("./pages/AdminMaster"));
-const AdminMasterControl = lazy(() => import("./pages/AdminMasterControl"));
-const AdminBI = lazy(() => import("./pages/AdminBI"));
-const Badges = lazy(() => import("./pages/Badges"));
-const HealthCheck = lazy(() => import("./pages/HealthCheck"));
-const AutomationsDashboard = lazy(() => import("./pages/AutomationsDashboard"));
-const OmniChannelDashboard = lazy(() => import("./pages/OmniChannelDashboard"));
-const OfertaEspecial = lazy(() => import("./pages/OfertaEspecial"));
-const AdminFinanceiro = lazy(() => import("./pages/AdminFinanceiro"));
-const AdminCreditAudit = lazy(() => import("./pages/AdminCreditAudit"));
-const GrowthDashboard = lazy(() => import("./pages/admin/GrowthDashboard"));
-const AdminMonitoramento = lazy(() => import("./pages/AdminMonitoramento"));
-const QuizTriagem = lazy(() => import("./pages/QuizTriagem"));
-const CondicaoTratamento = lazy(() => import("./pages/CondicaoTratamento"));
-const Consultorio = lazy(() => import("./pages/Consultorio"));
-const FastTrackCheckout = lazy(() => import("./pages/FastTrackCheckout"));
-const AffiliateDashboard = lazy(() => import("./pages/AffiliateDashboard"));
-const PrescriptionCheckout = lazy(() => import("./pages/PrescriptionCheckout"));
-const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn"));
-const GestãoPacientes = lazy(() => import("./pages/GestãoPacientes"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const RodizioMedicos = lazy(() => import("./pages/RodizioMedicos"));
-const BrisaOrientacaoRedirect = lazy(() => import("./pages/BrisaOrientacaoRedirect"));
-const AuditLog = lazy(() => import("./pages/admin/AuditLog"));
-const CronHealth = lazy(() => import("./pages/admin/CronHealth"));
-const AdminLeads = lazy(() => import("./pages/admin/Leads"));
-const AdminLeadDetail = lazy(() => import("./pages/admin/LeadDetail"));
-const President360 = lazy(() => import("./pages/admin/President360"));
-const SentinelControl = lazy(() => import("./pages/admin/SentinelControl"));
+const Index = lazyWithRecovery(() => import("./pages/Index"), { sourceRef: "/" });
+const ComoFunciona = lazyWithRecovery(() => import("./pages/ComoFunciona"), { sourceRef: "/como-funciona" });
+const Profissionais = lazyWithRecovery(() => import("./pages/Profissionais"), { sourceRef: "/profissionais" });
+const Shopping = lazyWithRecovery(() => import("./pages/Shopping"), { sourceRef: "/shopping" });
+const Precos = lazyWithRecovery(() => import("./pages/Precos"), { sourceRef: "/precos" });
+const FAQ = lazyWithRecovery(() => import("./pages/FAQ"), { sourceRef: "/faq" });
+const Contato = lazyWithRecovery(() => import("./pages/Contato"), { sourceRef: "/contato" });
+const Pay = lazyWithRecovery(() => import("./pages/Pay"), { sourceRef: "/pay" });
+const Carteira = lazyWithRecovery(() => import("./pages/Carteira"), { sourceRef: "/carteira" });
+const Admin = lazyWithRecovery(() => import("./pages/Admin"), { sourceRef: "/admin" });
+const AdminClinicas = lazyWithRecovery(() => import("./pages/AdminClinicas"), { sourceRef: "/admin/clinicas" });
+const AdminLogin = lazyWithRecovery(() => import("./pages/AdminLogin"), { sourceRef: "/admin-login" });
+const BibliotecaCientifica = lazyWithRecovery(() => import("./pages/BibliotecaCientifica"), { sourceRef: "/biblioteca" });
+const CadastroProfissional = lazyWithRecovery(() => import("./pages/CadastroProfissional"), { sourceRef: "/cadastro-profissional" });
+const FalarComEspecialista = lazyWithRecovery(() => import("./pages/FalarComEspecialista"), { sourceRef: "/falar-com-especialista" });
+const Legal = lazyWithRecovery(() => import("./pages/Legal"), { sourceRef: "/legal" });
+const TermosDeUso = lazyWithRecovery(() => import("./pages/TermosDeUso"), { sourceRef: "/termos" });
+const PoliticaDePrivacidade = lazyWithRecovery(() => import("./pages/PoliticaDePrivacidade"), { sourceRef: "/privacidade" });
+const PoliticaDeReembolso = lazyWithRecovery(() => import("./pages/PoliticaDeReembolso"), { sourceRef: "/reembolso" });
+const Indicacoes = lazyWithRecovery(() => import("./pages/Indicacoes"), { sourceRef: "/indicacoes" });
+const Telemedicina = lazyWithRecovery(() => import("./pages/Telemedicina"), { sourceRef: "/telemedicina" });
+const Cadastro = lazyWithRecovery(() => import("./pages/Cadastro"), { sourceRef: "/cadastro" });
+const Login = lazyWithRecovery(() => import("./pages/Login"), { sourceRef: "/login" });
+const ResetPassword = lazyWithRecovery(() => import("./pages/ResetPassword"), { sourceRef: "/reset-password" });
+const ConsultationPayment = lazyWithRecovery(() => import("./pages/ConsultationPayment"), { sourceRef: "/pagamento" });
+const SpecialistDashboard = lazyWithRecovery(() => import("./pages/SpecialistDashboard"), { sourceRef: "/dashboard-especialista" });
+const InfluencerDashboard = lazyWithRecovery(() => import("./pages/InfluencerDashboard"), { sourceRef: "/influenciadores" });
+const OnlineUsers = lazyWithRecovery(() => import("./pages/OnlineUsers"), { sourceRef: "/usuarios-online" });
+const AdminDashboard = lazyWithRecovery(() => import("./pages/AdminDashboard"), { sourceRef: "/admin-ceo" });
+const DownloadApp = lazyWithRecovery(() => import("./pages/DownloadApp"), { sourceRef: "/download" });
+const Comunidade = lazyWithRecovery(() => import("./pages/Comunidade"), { sourceRef: "/comunidade" });
+const DashboardPaciente = lazyWithRecovery(() => import("./pages/DashboardPaciente"), { sourceRef: "/dashboard" });
+const Agendamento = lazyWithRecovery(() => import("./pages/Agendamento"), { sourceRef: "/agendamento" });
+const Prontuario = lazyWithRecovery(() => import("./pages/Prontuario"), { sourceRef: "/prontuario" });
+const DashboardMedico = lazyWithRecovery(() => import("./pages/DashboardMedico"), { sourceRef: "/dashboard-medico" });
+const DashboardExecutivo = lazyWithRecovery(() => import("./pages/DashboardExecutivo"), { sourceRef: "/dashboard-executivo" });
+const Notificacoes = lazyWithRecovery(() => import("./pages/Notificacoes"), { sourceRef: "/notificacoes" });
+const SalaEspera = lazyWithRecovery(() => import("./pages/SalaEspera"), { sourceRef: "/sala-espera" });
+const ConsultaVideo = lazyWithRecovery(() => import("./pages/ConsultaVideo"), { sourceRef: "/consulta-video" });
+const RIPD = lazyWithRecovery(() => import("./pages/RIPD"), { sourceRef: "/ripd" });
+const LGPDDireitos = lazyWithRecovery(() => import("./pages/LGPDDireitos"), { sourceRef: "/lgpd" });
+const GlobalCompliance = lazyWithRecovery(() => import("./pages/GlobalCompliance"), { sourceRef: "/compliance" });
+const TreatmentTracker = lazyWithRecovery(() => import("./pages/TreatmentTracker"), { sourceRef: "/treatment-tracker" });
+const Dispensario = lazyWithRecovery(() => import("./pages/Dispensario"), { sourceRef: "/dispensario" });
+const IoMTHub = lazyWithRecovery(() => import("./pages/IoMTHub"), { sourceRef: "/iomt" });
+const Blog = lazyWithRecovery(() => import("./pages/Blog"), { sourceRef: "/blog" });
+const ShoppingDashboard = lazyWithRecovery(() => import("./pages/ShoppingDashboard"), { sourceRef: "/dashboard-loja" });
+const InvestorDashboard = lazyWithRecovery(() => import("./pages/InvestorDashboard"), { sourceRef: "/investidores" });
+const VideoCall = lazyWithRecovery(() => import("./pages/VideoCall"), { sourceRef: "/videochamada" });
+const ConsultaRapida = lazyWithRecovery(() => import("./pages/ConsultaRapida"), { sourceRef: "/consulta-rapida" });
+const SEOCondicoes = lazyWithRecovery(() => import("./pages/SEOCondicoes"), { sourceRef: "/tratamentos" });
+const Status = lazyWithRecovery(() => import("./pages/Status"), { sourceRef: "/status" });
+const TratamentoDorCronica = lazyWithRecovery(() => import("./pages/TratamentoDorCronica"), { sourceRef: "/tratamento-dor-cronica" });
+const TratamentoAnsiedadeSaudeMental = lazyWithRecovery(() => import("./pages/TratamentoAnsiedadeSaudeMental"), { sourceRef: "/tratamento-ansiedade-saude-mental" });
+const Club = lazyWithRecovery(() => import("./pages/Club"), { sourceRef: "/club" });
+const Deposits = lazyWithRecovery(() => import("./pages/Deposits"), { sourceRef: "/deposits" });
+const CartCheckout = lazyWithRecovery(() => import("./pages/CartCheckout"), { sourceRef: "/cart-checkout" });
+const PaymentSuccess = lazyWithRecovery(() => import("./pages/PaymentSuccess"), { sourceRef: "/payment/success" });
+const PaymentFailure = lazyWithRecovery(() => import("./pages/PaymentFailure"), { sourceRef: "/payment/failure" });
+const PaymentPending = lazyWithRecovery(() => import("./pages/PaymentPending"), { sourceRef: "/payment/pending" });
+const Cursos = lazyWithRecovery(() => import("./pages/Cursos"), { sourceRef: "/cursos" });
+const Forum = lazyWithRecovery(() => import("./pages/Forum"), { sourceRef: "/forum" });
+const Webinars = lazyWithRecovery(() => import("./pages/Webinars"), { sourceRef: "/webinars" });
+const Voluntarios = lazyWithRecovery(() => import("./pages/Voluntarios"), { sourceRef: "/voluntarios" });
+const ImpactoSocial = lazyWithRecovery(() => import("./pages/ImpactoSocial"), { sourceRef: "/impacto" });
+const EbookLanding = lazyWithRecovery(() => import("./pages/EbookLanding"), { sourceRef: "/ebook" });
+const EbookMedicinaCanabinoide = lazyWithRecovery(() => import("./pages/EbookMedicinaCanabinoide"), { sourceRef: "/ebook-medicina-canabinoide" });
+const EbookAnalyticsDashboard = lazyWithRecovery(() => import("./pages/EbookAnalyticsDashboard"), { sourceRef: "/admin/ebook-analytics" });
+const RevenueDistribution = lazyWithRecovery(() => import("./pages/RevenueDistribution"), { sourceRef: "/revenue-distribution" });
+const ProfessionalDashboard = lazyWithRecovery(() => import("./pages/ProfessionalDashboard"), { sourceRef: "/dashboard/professional" });
+const AdminMaster = lazyWithRecovery(() => import("./pages/AdminMaster"), { sourceRef: "/admin-master" });
+const AdminMasterControl = lazyWithRecovery(() => import("./pages/AdminMasterControl"), { sourceRef: "/admin/master-control" });
+const AdminBI = lazyWithRecovery(() => import("./pages/AdminBI"), { sourceRef: "/admin/bi" });
+const Badges = lazyWithRecovery(() => import("./pages/Badges"), { sourceRef: "/badges" });
+const HealthCheck = lazyWithRecovery(() => import("./pages/HealthCheck"), { sourceRef: "/health" });
+const AutomationsDashboard = lazyWithRecovery(() => import("./pages/AutomationsDashboard"), { sourceRef: "/admin/automations" });
+const OmniChannelDashboard = lazyWithRecovery(() => import("./pages/OmniChannelDashboard"), { sourceRef: "/admin/omni-channel" });
+const OfertaEspecial = lazyWithRecovery(() => import("./pages/OfertaEspecial"), { sourceRef: "/oferta-especial" });
+const AdminFinanceiro = lazyWithRecovery(() => import("./pages/AdminFinanceiro"), { sourceRef: "/admin/financeiro" });
+const AdminCreditAudit = lazyWithRecovery(() => import("./pages/AdminCreditAudit"), { sourceRef: "/admin/credit-audit" });
+const GrowthDashboard = lazyWithRecovery(() => import("./pages/admin/GrowthDashboard"), { sourceRef: "/admin/growth" });
+const AdminMonitoramento = lazyWithRecovery(() => import("./pages/AdminMonitoramento"), { sourceRef: "/admin/monitoramento" });
+const QuizTriagem = lazyWithRecovery(() => import("./pages/QuizTriagem"), { sourceRef: "/quiz-triagem" });
+const CondicaoTratamento = lazyWithRecovery(() => import("./pages/CondicaoTratamento"), { sourceRef: "/condicao" });
+const Consultorio = lazyWithRecovery(() => import("./pages/Consultorio"), { sourceRef: "/consultorio" });
+const FastTrackCheckout = lazyWithRecovery(() => import("./pages/FastTrackCheckout"), { sourceRef: "/checkout/fast-track" });
+const AffiliateDashboard = lazyWithRecovery(() => import("./pages/AffiliateDashboard"), { sourceRef: "/afiliados/dashboard" });
+const PrescriptionCheckout = lazyWithRecovery(() => import("./pages/PrescriptionCheckout"), { sourceRef: "/checkout/:token" });
+const CheckoutReturn = lazyWithRecovery(() => import("./pages/CheckoutReturn"), { sourceRef: "/checkout/return" });
+const GestãoPacientes = lazyWithRecovery(() => import("./pages/GestãoPacientes"), { sourceRef: "/gestao-pacientes" });
+const NotFound = lazyWithRecovery(() => import("./pages/NotFound"), { sourceRef: "*" });
+const RodizioMedicos = lazyWithRecovery(() => import("./pages/RodizioMedicos"), { sourceRef: "/rodizio" });
+const BrisaOrientacaoRedirect = lazyWithRecovery(() => import("./pages/BrisaOrientacaoRedirect"), { sourceRef: "/brisa-orientacao" });
+const AuditLog = lazyWithRecovery(() => import("./pages/admin/AuditLog"), { sourceRef: "/admin/audit-log" });
+const CronHealth = lazyWithRecovery(() => import("./pages/admin/CronHealth"), { sourceRef: "/admin/cron-health" });
+const AdminLeads = lazyWithRecovery(() => import("./pages/admin/Leads"), { sourceRef: "/admin/leads" });
+const AdminLeadDetail = lazyWithRecovery(() => import("./pages/admin/LeadDetail"), { sourceRef: "/admin/leads/:id" });
+const President360 = lazyWithRecovery(() => import("./pages/admin/President360"), { sourceRef: "/admin/president" });
+const SentinelControl = lazyWithRecovery(() => import("./pages/admin/SentinelControl"), { sourceRef: "/admin/sentinel" });
 
 const queryClient = new QueryClient();
+
+if (typeof window !== "undefined") {
+  window.addEventListener("error", (event) => {
+    reportFrontendRuntimeError(event.error ?? event.message, {
+      sourceRef: window.location.pathname,
+      phase: "fatal-runtime",
+      context: {
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+      },
+    });
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    reportFrontendRuntimeError(event.reason, {
+      sourceRef: window.location.pathname,
+      phase: "unhandled-rejection",
+    });
+  });
+}
 
 const App = () => (
   <ErrorBoundary>

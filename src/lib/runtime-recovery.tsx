@@ -1,6 +1,7 @@
-import { lazy, type ComponentType, type LazyExoticComponent } from "react";
+import { Component, lazy, Suspense, type ComponentType, type LazyExoticComponent, type ReactNode } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 type LazyModule<T extends ComponentType<any>> = Promise<{ default: T }>;
 
@@ -61,6 +62,39 @@ export function reportFrontendRuntimeError(
   };
 
   try {
+    void supabase.from("error_logs").insert({
+      source: "frontend",
+      error_type: normalized.name,
+      message: normalized.message.slice(0, 500),
+      metadata: {
+        source_ref: meta.sourceRef ?? window.location.pathname,
+        phase: meta.phase ?? "runtime",
+        chunk_load_error: isChunkLoadError(normalized),
+        stack: normalized.stack?.slice(0, 4000) ?? null,
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        ...meta.context,
+      },
+    }).then(() => {
+      if (isChunkLoadError(normalized) || meta.phase === "fatal-runtime") {
+        void (async () => {
+          try {
+            await supabase.functions.invoke("manus-sentinel", {
+              body: {
+                dry_run: false,
+                triggered_by: "frontend-runtime-error",
+                source_ref: meta.sourceRef ?? window.location.pathname,
+                error_type: normalized.name,
+                error_message: normalized.message,
+              },
+            });
+          } catch {
+            // noop
+          }
+        })();
+      }
+    }, () => {});
+
     fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-error-gateway`, {
       method: "POST",
       headers: {
@@ -73,6 +107,50 @@ export function reportFrontendRuntimeError(
     }).catch(() => {});
   } catch {
     // noop
+  }
+}
+
+export function RecoverableRender({
+  fallback,
+  sourceRef,
+  children,
+}: {
+  fallback?: ReactNode;
+  sourceRef: string;
+  children: ReactNode;
+}) {
+  return (
+    <Suspense fallback={fallback ?? null}>
+      <SafeRenderBoundary sourceRef={sourceRef} fallback={fallback}>
+        {children}
+      </SafeRenderBoundary>
+    </Suspense>
+  );
+}
+
+class SafeRenderBoundary extends Component<
+  { children: ReactNode; sourceRef: string; fallback?: ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: unknown) {
+    reportFrontendRuntimeError(error, {
+      sourceRef: this.props.sourceRef,
+      phase: "component-render",
+    });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback ?? null;
+    }
+
+    return this.props.children;
   }
 }
 

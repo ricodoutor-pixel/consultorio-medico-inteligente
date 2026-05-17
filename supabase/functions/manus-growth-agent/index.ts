@@ -21,6 +21,49 @@ const GUARDRAIL_REGEX = /CRM\s*10963|Dr\.?\s*Edilson|RDC\s*660/i;
 
 interface GscRow { keys: string[]; clicks: number; impressions: number; ctr: number; position: number }
 
+// ============ FASE 0: META BASELINE (visitantes Published) ============
+async function loadTargets(supa: any) {
+  const { data } = await supa.from("marketing_kpi_targets").select("*").eq("scope", "global").maybeSingle();
+  return data ?? {
+    baseline_visitors: 118, daily_new_visitors_target: 100,
+    signup_conversion_target: 0.5, orientacao_conversion_target: 0.3, lead_nurture_target: 0.2,
+  };
+}
+
+async function snapshotVisitors(supa: any, kpi: any) {
+  const today = new Date().toISOString().slice(0, 10);
+  const dayStart = `${today}T00:00:00Z`;
+
+  // visitantes únicos hoje (conversion_events captura sessões da plataforma)
+  const { data: events } = await supa.from("conversion_events")
+    .select("event_type, session_id, user_id")
+    .gte("created_at", dayStart);
+
+  const sessions = new Set<string>();
+  let signups = 0, orientacao = 0, leads = 0;
+  for (const e of events ?? []) {
+    if (e.session_id) sessions.add(e.session_id);
+    if (e.event_type === "form_submit") signups++;
+    if (e.event_type === "quiz_completed") orientacao++;
+    if (e.event_type === "whatsapp_click" || e.event_type === "quiz_started") leads++;
+  }
+
+  const visitors_total = sessions.size;
+  const visitors_new = Math.max(0, visitors_total); // proxy diário
+  const target = kpi.daily_new_visitors_target;
+  const delta = visitors_new - target;
+  const row = {
+    snapshot_date: today,
+    visitors_total, visitors_new, signups,
+    orientacao_starts: orientacao, leads,
+    target_new_visitors: target,
+    delta_vs_target: delta,
+    on_track: delta >= 0,
+  };
+  await supa.from("marketing_daily_snapshot").upsert(row, { onConflict: "snapshot_date" });
+  return row;
+}
+
 // ============ FASE 1: DIAGNÓSTICO ============
 async function diagnose(supa: any, runId: string) {
   const today = new Date();

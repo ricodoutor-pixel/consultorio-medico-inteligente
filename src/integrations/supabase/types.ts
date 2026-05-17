@@ -3201,6 +3201,84 @@ export type Database = {
           },
         ]
       }
+      marketing_daily_snapshot: {
+        Row: {
+          created_at: string
+          delta_vs_target: number
+          leads: number
+          on_track: boolean
+          orientacao_starts: number
+          signups: number
+          snapshot_date: string
+          target_new_visitors: number
+          visitors_new: number
+          visitors_total: number
+        }
+        Insert: {
+          created_at?: string
+          delta_vs_target?: number
+          leads?: number
+          on_track?: boolean
+          orientacao_starts?: number
+          signups?: number
+          snapshot_date: string
+          target_new_visitors?: number
+          visitors_new?: number
+          visitors_total?: number
+        }
+        Update: {
+          created_at?: string
+          delta_vs_target?: number
+          leads?: number
+          on_track?: boolean
+          orientacao_starts?: number
+          signups?: number
+          snapshot_date?: string
+          target_new_visitors?: number
+          visitors_new?: number
+          visitors_total?: number
+        }
+        Relationships: []
+      }
+      marketing_kpi_targets: {
+        Row: {
+          baseline_set_at: string
+          baseline_visitors: number
+          daily_new_visitors_target: number
+          id: string
+          lead_nurture_target: number
+          notes: string | null
+          orientacao_conversion_target: number
+          scope: string
+          signup_conversion_target: number
+          updated_at: string
+        }
+        Insert: {
+          baseline_set_at?: string
+          baseline_visitors?: number
+          daily_new_visitors_target?: number
+          id?: string
+          lead_nurture_target?: number
+          notes?: string | null
+          orientacao_conversion_target?: number
+          scope?: string
+          signup_conversion_target?: number
+          updated_at?: string
+        }
+        Update: {
+          baseline_set_at?: string
+          baseline_visitors?: number
+          daily_new_visitors_target?: number
+          id?: string
+          lead_nurture_target?: number
+          notes?: string | null
+          orientacao_conversion_target?: number
+          scope?: string
+          signup_conversion_target?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       master_reports: {
         Row: {
           content_summary: Json

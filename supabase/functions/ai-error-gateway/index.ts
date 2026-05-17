@@ -82,13 +82,25 @@ function rateLimited(ip: string): boolean {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  // Require a valid Supabase key (anon or service) — blocks fully unauthenticated abuse
-  const ANON = Deno.env.get("SUPABASE_ANON_KEY");
+  // Accept ONLY service-role key or a valid Supabase user JWT.
+  // The anon/publishable key is shipped in the frontend bundle and MUST NOT grant access.
   const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const ANON = Deno.env.get("SUPABASE_ANON_KEY");
   const auth = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
-  const apikey = req.headers.get("apikey") || "";
-  const presented = auth || apikey;
-  if (!presented || (presented !== ANON && presented !== SERVICE)) {
+  let authorized = false;
+  if (auth && SERVICE && auth === SERVICE) {
+    authorized = true;
+  } else if (auth && ANON && auth !== ANON) {
+    // Treat as a user JWT — verify via Supabase
+    try {
+      const client = createClient(Deno.env.get("SUPABASE_URL")!, ANON, {
+        global: { headers: { Authorization: `Bearer ${auth}` } },
+      });
+      const { data, error } = await client.auth.getClaims(auth);
+      if (!error && data?.claims?.sub) authorized = true;
+    } catch { /* unauthorized */ }
+  }
+  if (!authorized) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

@@ -27,7 +27,7 @@ export const APP_CONFIG = {
 
   // Analytics
   GOOGLE_ANALYTICS_ID: 'G-QY3HFCG64L',
-  GOOGLE_TAG_MANAGER_ID: 'GTM-MKSBS7P',
+  GOOGLE_TAG_MANAGER_ID: 'GT-MRLXCRGK',
 
   // Company Info
   COMPANY: {

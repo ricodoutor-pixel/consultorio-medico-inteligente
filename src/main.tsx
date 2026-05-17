@@ -10,11 +10,21 @@ initAntiClone();
 
 // 🔄 Recupera de chunks falhados (Hostinger 429 ou deploy invalidando hashes)
 const RELOAD_KEY = "__pr_chunk_reload__";
+const clearRuntimeCaches = async () => {
+  try {
+    const regs = await navigator.serviceWorker?.getRegistrations?.();
+    await Promise.all((regs ?? []).map((reg) => reg.unregister()));
+    const keys = await caches.keys();
+    await Promise.all(keys.map((key) => caches.delete(key)));
+  } catch {
+    // noop
+  }
+};
 const reloadOnce = () => {
   if (!sessionStorage.getItem(RELOAD_KEY)) {
     sessionStorage.setItem(RELOAD_KEY, "1");
     console.warn("⚠️ Chunk falhou ao carregar. Recarregando…");
-    window.location.reload();
+    void clearRuntimeCaches().finally(() => window.location.reload());
   }
 };
 window.addEventListener("vite:preloadError", (e) => { e.preventDefault(); reloadOnce(); });

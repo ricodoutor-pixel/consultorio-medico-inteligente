@@ -130,7 +130,7 @@ Deno.serve(async (req) => {
       const results: Record<string, any> = { content: postContent, theme: theme.theme };
 
       // ─── Post to Facebook Page ───
-      if (FACEBOOK_GRAPH_API_TOKEN && FACEBOOK_PAGE_ID) {
+      if (FACEBOOK_PAGE_TOKEN && FACEBOOK_PAGE_ID) {
         try {
           const fbResp = await fetch(
             `https://graph.facebook.com/v19.0/${FACEBOOK_PAGE_ID}/feed`,
@@ -140,7 +140,7 @@ Deno.serve(async (req) => {
               body: JSON.stringify({
                 message: postContent,
                 link: `${siteLink}?utm_source=brisa_ia&utm_medium=facebook&utm_campaign=${theme.theme}`,
-                access_token: FACEBOOK_GRAPH_API_TOKEN,
+                access_token: FACEBOOK_PAGE_TOKEN,
               }),
             }
           );
@@ -154,7 +154,7 @@ Deno.serve(async (req) => {
       }
 
       // ─── Post to Instagram (requires image - create container) ───
-      if (FACEBOOK_GRAPH_API_TOKEN && INSTAGRAM_BUSINESS_ACCOUNT_ID) {
+      if (FACEBOOK_PAGE_TOKEN && INSTAGRAM_BUSINESS_ACCOUNT_ID) {
         try {
           // Instagram requires an image. We'll create a text-only carousel caption post
           // For now, log the content for manual posting or future image generation

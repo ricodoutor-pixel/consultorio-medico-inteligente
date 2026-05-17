@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
     const mode = u.searchParams.get("hub.mode");
     const token = u.searchParams.get("hub.verify_token");
     const challenge = u.searchParams.get("hub.challenge");
-    if (mode === "subscribe" && token === VERIFY_TOKEN) {
+    if (mode === "subscribe" && token && VERIFY_TOKENS.includes(token)) {
       return new Response(challenge ?? "", { status: 200 });
     }
     return new Response("Forbidden", { status: 403 });

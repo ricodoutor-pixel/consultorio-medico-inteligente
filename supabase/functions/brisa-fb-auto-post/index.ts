@@ -58,10 +58,17 @@ Deno.serve(async (req) => {
   if (unauth) return unauth;
 
   const pageId = Deno.env.get("FACEBOOK_PAGE_ID");
-  const fbToken = Deno.env.get("FACEBOOK_PAGE_ACCESS_TOKEN") || Deno.env.get("FACEBOOK_GRAPH_API_TOKEN");
-
-  if (!pageId || !fbToken) {
-    return new Response(JSON.stringify({ error: "FB credentials missing" }), {
+  if (!pageId) {
+    return new Response(JSON.stringify({ error: "FACEBOOK_PAGE_ID missing" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  let fbToken: string;
+  try {
+    const { getFacebookPageToken } = await import("../_shared/fb-page-token.ts");
+    fbToken = await getFacebookPageToken(pageId);
+  } catch (e) {
+    return new Response(JSON.stringify({ error: "FB token resolution failed", detail: String(e) }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

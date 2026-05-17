@@ -148,13 +148,22 @@ Deno.serve(async (req) => {
 
 
   const pageId = Deno.env.get("FACEBOOK_PAGE_ID");
-  const fbToken = Deno.env.get("FACEBOOK_GRAPH_API_TOKEN");
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-  if (!pageId || !fbToken) {
+  if (!pageId) {
     return new Response(
-      JSON.stringify({ error: "Facebook credentials not configured" }),
+      JSON.stringify({ error: "FACEBOOK_PAGE_ID not configured" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+  let fbToken: string;
+  try {
+    const { getFacebookPageToken } = await import("../_shared/fb-page-token.ts");
+    fbToken = await getFacebookPageToken(pageId);
+  } catch (e) {
+    return new Response(
+      JSON.stringify({ error: "FB token resolution failed", detail: String(e) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

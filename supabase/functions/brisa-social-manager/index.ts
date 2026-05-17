@@ -40,9 +40,17 @@ Deno.serve(async (req) => {
 
   try {
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    const FACEBOOK_GRAPH_API_TOKEN = Deno.env.get("FACEBOOK_GRAPH_API_TOKEN");
     const FACEBOOK_PAGE_ID = Deno.env.get("FACEBOOK_PAGE_ID");
     const INSTAGRAM_BUSINESS_ACCOUNT_ID = Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID");
+    let FACEBOOK_PAGE_TOKEN: string | null = null;
+    if (FACEBOOK_PAGE_ID) {
+      try {
+        const { getFacebookPageToken } = await import("../_shared/fb-page-token.ts");
+        FACEBOOK_PAGE_TOKEN = await getFacebookPageToken(FACEBOOK_PAGE_ID);
+      } catch (e) {
+        console.error("[Brisa Social] FB token swap failed:", e);
+      }
+    }
 
     if (!GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "GEMINI_API_KEY missing" }), {
@@ -122,7 +130,7 @@ Deno.serve(async (req) => {
       const results: Record<string, any> = { content: postContent, theme: theme.theme };
 
       // ─── Post to Facebook Page ───
-      if (FACEBOOK_GRAPH_API_TOKEN && FACEBOOK_PAGE_ID) {
+      if (FACEBOOK_PAGE_TOKEN && FACEBOOK_PAGE_ID) {
         try {
           const fbResp = await fetch(
             `https://graph.facebook.com/v19.0/${FACEBOOK_PAGE_ID}/feed`,
@@ -132,7 +140,7 @@ Deno.serve(async (req) => {
               body: JSON.stringify({
                 message: postContent,
                 link: `${siteLink}?utm_source=brisa_ia&utm_medium=facebook&utm_campaign=${theme.theme}`,
-                access_token: FACEBOOK_GRAPH_API_TOKEN,
+                access_token: FACEBOOK_PAGE_TOKEN,
               }),
             }
           );
@@ -146,7 +154,7 @@ Deno.serve(async (req) => {
       }
 
       // ─── Post to Instagram (requires image - create container) ───
-      if (FACEBOOK_GRAPH_API_TOKEN && INSTAGRAM_BUSINESS_ACCOUNT_ID) {
+      if (FACEBOOK_PAGE_TOKEN && INSTAGRAM_BUSINESS_ACCOUNT_ID) {
         try {
           // Instagram requires an image. We'll create a text-only carousel caption post
           // For now, log the content for manual posting or future image generation

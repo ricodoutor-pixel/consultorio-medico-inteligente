@@ -90,6 +90,7 @@ const VideoCall = lazyWithRecovery(() => import("./pages/VideoCall"), { sourceRe
 const ConsultaRapida = lazyWithRecovery(() => import("./pages/ConsultaRapida"), { sourceRef: "/consulta-rapida" });
 const SEOCondicoes = lazyWithRecovery(() => import("./pages/SEOCondicoes"), { sourceRef: "/tratamentos" });
 const Status = lazyWithRecovery(() => import("./pages/Status"), { sourceRef: "/status" });
+const Passaporte = lazyWithRecovery(() => import("./pages/Passaporte"), { sourceRef: "/passaporte" });
 const TratamentoDorCronica = lazyWithRecovery(() => import("./pages/TratamentoDorCronica"), { sourceRef: "/tratamento-dor-cronica" });
 const TratamentoAnsiedadeSaudeMental = lazyWithRecovery(() => import("./pages/TratamentoAnsiedadeSaudeMental"), { sourceRef: "/tratamento-ansiedade-saude-mental" });
 const Club = lazyWithRecovery(() => import("./pages/Club"), { sourceRef: "/club" });
@@ -305,6 +306,7 @@ const App = () => (
                 <Route path="/afiliados/dashboard" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
                 <Route path="/gestao-pacientes" element={<PrivateRoute><GestãoPacientes /></PrivateRoute>} />
                 <Route path="/status" element={<Status />} />
+                <Route path="/passaporte/:token" element={<Passaporte />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

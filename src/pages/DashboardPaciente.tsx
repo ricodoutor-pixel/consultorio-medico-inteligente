@@ -20,6 +20,7 @@ import { FrogMoodBanner } from "@/components/FrogMoodBanner";
 import { PatientCheckinCard } from "@/components/PatientCheckinCard";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { ProgressReportGenerator } from "@/components/ProgressReportGenerator";
+import PassportQRCard from "@/components/passport/PassportQRCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { professionals } from "@/data/professionals";
 
@@ -323,6 +324,9 @@ const DashboardPaciente = () => {
                     </CardContent>
                   </Card>
                 )}
+
+                {/* Passaporte Canábico Digital */}
+                <PassportQRCard autoCreateIfMissing />
 
                 <Card className="border-border">
                   <CardContent className="p-5">

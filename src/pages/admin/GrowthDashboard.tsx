@@ -24,6 +24,16 @@ interface Log {
 interface Kpi { snapshot_date: string; url: string; clicks: number; impressions: number; ctr: number; position: number; }
 interface SocialPost { id: string; platform: string; topic: string | null; status: string; created_at: string; }
 
+interface KpiTarget {
+  baseline_visitors: number; daily_new_visitors_target: number;
+  signup_conversion_target: number; orientacao_conversion_target: number; lead_nurture_target: number;
+}
+interface DailySnap {
+  snapshot_date: string; visitors_total: number; visitors_new: number;
+  signups: number; orientacao_starts: number; leads: number;
+  target_new_visitors: number; delta_vs_target: number; on_track: boolean;
+}
+
 export default function GrowthDashboard() {
   const [runs, setRuns] = useState<Run[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
@@ -31,18 +41,24 @@ export default function GrowthDashboard() {
   const [posts, setPosts] = useState<SocialPost[]>([]);
   const [running, setRunning] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [target, setTarget] = useState<KpiTarget | null>(null);
+  const [snaps, setSnaps] = useState<DailySnap[]>([]);
 
   const load = async () => {
-    const [r, l, k, p] = await Promise.all([
+    const [r, l, k, p, t, s] = await Promise.all([
       supabase.from("manus_growth_runs").select("*").order("started_at", { ascending: false }).limit(14),
       supabase.from("manus_growth_logs").select("*").order("created_at", { ascending: false }).limit(50),
       supabase.from("manus_growth_kpis").select("*").order("snapshot_date", { ascending: false }).limit(500),
       supabase.from("manus_social_queue").select("id,platform,topic,status,created_at").order("created_at", { ascending: false }).limit(20),
+      supabase.from("marketing_kpi_targets").select("*").eq("scope", "global").maybeSingle(),
+      supabase.from("marketing_daily_snapshot").select("*").order("snapshot_date", { ascending: false }).limit(30),
     ]);
     setRuns((r.data as Run[]) || []);
     setLogs((l.data as Log[]) || []);
     setKpis((k.data as Kpi[]) || []);
     setPosts((p.data as SocialPost[]) || []);
+    setTarget((t.data as KpiTarget) || null);
+    setSnaps((s.data as DailySnap[]) || []);
     setLoading(false);
   };
 

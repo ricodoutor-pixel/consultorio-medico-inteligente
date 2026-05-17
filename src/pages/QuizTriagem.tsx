@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { captureTriageLead, computeClinicalScore } from "@/lib/leads-capture";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Brain, HeartPulse, Moon, Flame, Activity, Pill, 

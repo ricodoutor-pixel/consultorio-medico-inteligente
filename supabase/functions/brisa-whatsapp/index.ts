@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { BRISA_PERSONA } from "../_shared/brisa-persona.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

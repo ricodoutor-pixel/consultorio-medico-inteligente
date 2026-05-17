@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, UserPlus, Stethoscope, FileText, Sparkles, RefreshCw, Activity, Wifi, ShieldCheck, DollarSign, ListChecks, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -27,12 +27,12 @@ function generateSlots(startTime: string, endTime: string): string[] {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders }
+    return new Response("ok", { headers: corsHeaders });
+  }
 
   const _unauth = requireServiceAuth(req, corsHeaders);
   if (_unauth) return _unauth;
-);
-  }
+
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;

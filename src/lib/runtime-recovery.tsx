@@ -1,4 +1,4 @@
-import { lazy, Suspense, type ComponentType, type LazyExoticComponent, type ReactNode } from "react";
+import { Component, lazy, Suspense, type ComponentType, type LazyExoticComponent, type ReactNode } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,15 +77,21 @@ export function reportFrontendRuntimeError(
       },
     }).then(() => {
       if (isChunkLoadError(normalized) || meta.phase === "fatal-runtime") {
-        return supabase.functions.invoke("manus-sentinel", {
-          body: {
-            dry_run: false,
-            triggered_by: "frontend-runtime-error",
-            source_ref: meta.sourceRef ?? window.location.pathname,
-            error_type: normalized.name,
-            error_message: normalized.message,
-          },
-        }).catch(() => {});
+        void (async () => {
+          try {
+            await supabase.functions.invoke("manus-sentinel", {
+              body: {
+                dry_run: false,
+                triggered_by: "frontend-runtime-error",
+                source_ref: meta.sourceRef ?? window.location.pathname,
+                error_type: normalized.name,
+                error_message: normalized.message,
+              },
+            });
+          } catch {
+            // noop
+          }
+        })();
       }
     }).catch(() => {});
 
@@ -122,7 +128,7 @@ export function RecoverableRender({
   );
 }
 
-class SafeRenderBoundary extends (await import("react")).Component<
+class SafeRenderBoundary extends Component<
   { children: ReactNode; sourceRef: string; fallback?: ReactNode },
   { hasError: boolean }
 > {

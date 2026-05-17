@@ -308,6 +308,7 @@ const App = () => (
                 <Route path="/gestao-pacientes" element={<PrivateRoute><GestãoPacientes /></PrivateRoute>} />
                 <Route path="/status" element={<Status />} />
                 <Route path="/passaporte/:token" element={<Passaporte />} />
+                <Route path="/planos-tratamento" element={<PlanosTratamento />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

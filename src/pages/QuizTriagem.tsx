@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { captureTriageLead, computeClinicalScore } from "@/lib/leads-capture";
+import { trackConversion } from "@/lib/track-conversion";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Brain, HeartPulse, Moon, Flame, Activity, Pill, 
@@ -82,6 +83,8 @@ const QuizTriagem = () => {
   const step = QUIZ_STEPS[currentStep];
   const progress = ((currentStep + 1) / QUIZ_STEPS.length) * 100;
 
+  useEffect(() => { trackConversion("quiz_started", "quiz_triagem"); }, []);
+
   const selectOption = useCallback((value: string) => {
     setAnswers(prev => ({ ...prev, [step.id]: value }));
     if (currentStep < QUIZ_STEPS.length - 1) {
@@ -129,6 +132,8 @@ const QuizTriagem = () => {
 
       if (error) throw error;
       setMatchResult(data);
+      trackConversion("quiz_completed", "quiz_triagem", { specialty, urgency });
+      trackConversion("form_submit", "quiz_triagem", { specialty });
     } catch (err: any) {
       toast({ title: "Erro no matching", description: err.message, variant: "destructive" });
     } finally {

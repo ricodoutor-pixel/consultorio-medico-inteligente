@@ -1449,6 +1449,36 @@ export type Database = {
         }
         Relationships: []
       }
+      conversion_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          session_id: string | null
+          source: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          session_id?: string | null
+          source?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          session_id?: string | null
+          source?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       conversion_leads: {
         Row: {
           created_at: string
@@ -5589,6 +5619,66 @@ export type Database = {
           session_id?: string
           triage_started_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      uptime_alerts: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          resolved_at: string | null
+          route: string
+          status_code: number | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          resolved_at?: string | null
+          route: string
+          status_code?: number | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          resolved_at?: string | null
+          route?: string
+          status_code?: number | null
+        }
+        Relationships: []
+      }
+      uptime_log: {
+        Row: {
+          checked_at: string
+          error: string | null
+          id: string
+          is_up: boolean
+          latency_ms: number | null
+          route: string
+          status_code: number | null
+          url: string
+        }
+        Insert: {
+          checked_at?: string
+          error?: string | null
+          id?: string
+          is_up: boolean
+          latency_ms?: number | null
+          route: string
+          status_code?: number | null
+          url: string
+        }
+        Update: {
+          checked_at?: string
+          error?: string | null
+          id?: string
+          is_up?: boolean
+          latency_ms?: number | null
+          route?: string
+          status_code?: number | null
+          url?: string
         }
         Relationships: []
       }

@@ -22,6 +22,7 @@ import { ScientificBadge } from "@/components/ScientificBadge";
 import { ProtocolCalculator } from "@/components/ProtocolCalculator";
 import { EbookGate } from "@/components/EbookGate";
 import drEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
+import { RecoverableRender } from "@/lib/runtime-recovery";
 
 
 import { useEffect } from "react";
@@ -469,7 +470,9 @@ const Index = () => {
       <PWAInstallSection />
 
       {/* Mercado Cannabis Medicinal - Projeção Interativa */}
-      <CannabisMarketChart />
+      <RecoverableRender sourceRef="home-cannabis-market-chart">
+        <CannabisMarketChart />
+      </RecoverableRender>
 
       <LocalMapSection />
 

@@ -98,6 +98,7 @@ export const Navbar = () => {
     { to: "/dashboard", label: "Meu Painel" },
     { to: "/afiliados", label: "Afiliados" },
     { to: "/planos", label: "Planos" },
+    { to: "/planos-tratamento", label: "Tratamento" },
   ];
 
   const openChat = useCallback(() => window.dispatchEvent(new Event("open-frog-chat")), []);

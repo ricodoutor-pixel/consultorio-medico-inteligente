@@ -1,11 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, UserPlus, Stethoscope, FileText, Sparkles, RefreshCw } from "lucide-react";
+import { Users, UserPlus, Stethoscope, FileText, Sparkles, RefreshCw, Activity, Wifi, ShieldCheck, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 const POLL_MS = 10_000;
+// Janela considerada "ativo agora" (5min sem heartbeat = offline)
+const ACTIVE_WINDOW_MS = 5 * 60 * 1000;
 
 type SourceKey = "profiles" | "leads_contatos" | "pacientes_leads" | "orientacao_tecnica_orders" | "doctors";
 

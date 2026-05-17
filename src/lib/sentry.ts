@@ -33,6 +33,31 @@ export async function initSentry() {
     });
     initialized = true;
     console.info("[sentry] initialized");
+
+    // Drena breadcrumbs e erros capturados antes do React montar (escudo anti-tela-preta)
+    try {
+      const crumbs = (window as any).__pyr_breadcrumbs as Array<{ t: number; type: string; data: any }> | undefined;
+      if (Array.isArray(crumbs)) {
+        crumbs.forEach((c) =>
+          Sentry.addBreadcrumb({
+            category: `boot.${c.type}`,
+            level: c.type === "error" ? "error" : "info",
+            message: typeof c.data === "object" ? JSON.stringify(c.data) : String(c.data),
+            timestamp: c.t / 1000,
+          })
+        );
+      }
+      const early = (window as any).__pyr_earlyErrors as Array<{ source: string; message: string; stack?: string }> | undefined;
+      if (Array.isArray(early)) {
+        early.forEach((e) => {
+          const err = new Error(`[early/${e.source}] ${e.message}`);
+          if (e.stack) err.stack = e.stack;
+          Sentry.captureException(err);
+        });
+      }
+    } catch (_) {
+      /* noop */
+    }
   } catch (e) {
     console.warn("[sentry] init failed:", e);
   }

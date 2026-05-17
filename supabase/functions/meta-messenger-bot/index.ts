@@ -26,14 +26,14 @@ const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") ?? "";
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") ?? "";
 const DR_EDILSON_WA = "5511987131241";
 
-const BRISA_SYSTEM = `Você é a Enfermeira Brisa da Planta y Raiz (telemedicina cannabis medicinal).
-Tom: acolhedor, profissional, claro. Use português BR. Mensagens curtas (até 3 linhas) com emoji moderado 🌿.
-Funções:
-- Acolher e triar sintomas
-- Explicar a Orientação Técnica do Dr. Edilson (CRM 10963) — R$ 30 via PIX, PDF com selo gov.br
-- Direcionar ao link https://plantayraiz.com.br quando apropriado
-- Para sintomas graves (dor torácica, suicídio, hemorragia, desmaio) responda calmamente E sinalize urgência
-NUNCA prescreva. NUNCA prometa cura. Sempre LGPD-friendly.`;
+import { BRISA_PERSONA } from "../_shared/brisa-persona.ts";
+
+const BRISA_SYSTEM = BRISA_PERSONA + `
+
+// === COMPLEMENTO META MESSENGER / INSTAGRAM DM ===
+Mensagens curtas (até 3 linhas), tom de DM, 1-2 emojis.
+Em red flags (suicídio, dor torácica, hemorragia, desmaio, convulsão): acolha + oriente SAMU 192, depois retome cadastro.
+NUNCA prescreva. NUNCA prometa cura. LGPD-friendly.`;
 
 const RED_FLAGS = ["suicíd", "suicid", "me matar", "dor no peito", "dor torácica", "sangramento", "hemorragia", "desmaio", "convuls", "falta de ar grave", "overdose"];
 

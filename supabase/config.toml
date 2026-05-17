@@ -1,4 +1,4 @@
 project_id = "shmbwdjuddvquszwkvuq"
 
-[functions._test-meta-bot]
+[functions.test-meta-bot]
 verify_jwt = false

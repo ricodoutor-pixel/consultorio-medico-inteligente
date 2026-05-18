@@ -2,6 +2,9 @@
  * Club Planta y Raiz - Catálogo de Produtos
  * E-commerce de Lifestyle focado em público jovem (18-24 anos)
  */
+import feedMarinaCachoeira from '@/assets/club-feed-marina-cachoeira.jpg';
+import feedLucasTrilha from '@/assets/club-feed-lucas-trilha.jpg';
+import feedAnaPousada from '@/assets/club-feed-ana-pousada.jpg';
 
 export interface ClubProduct {
   id: string;

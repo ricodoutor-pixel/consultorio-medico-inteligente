@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Gift, Copy, QrCode, Users, DollarSign, TrendingUp, Medal, Share2,
   CheckCircle2, ArrowRight, Lock, Crown, Star, Zap, BarChart3,
-  Wallet, Clock, Award, ChevronRight, Percent, Layers
+  Wallet, Clock, Award, ChevronRight, Percent, Layers,
+  Sparkles, MessageCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
@@ -213,6 +214,64 @@ const Indicacoes = () => {
                 Já Tenho Conta
               </Button>
             </div>
+
+            {/* Influencer Special Conditions */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="mt-10 text-left"
+            >
+              <Card className="border-primary/30 bg-gradient-to-br from-primary/10 via-card/60 to-accent/10 overflow-hidden">
+                <CardContent className="p-5 md:p-6">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        <Badge className="bg-primary/20 text-primary border-primary/30 font-bold">Programa Influencer</Badge>
+                      </div>
+                      <h2 className="text-lg md:text-xl font-display font-black text-foreground mb-2">
+                        Condições Especiais para Influenciadores
+                      </h2>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Tem audiência nas redes? Ganhe comissões premium, materiais exclusivos e acompanhamento dedicado da nossa equipe.
+                      </p>
+                      <ul className="space-y-2 mb-4">
+                        {[
+                          "Comissões de até 35% (vs. 25% padrão)",
+                          "Materiais de divulgação personalizados com sua marca",
+                          "Acompanhamento 1:1 com nossa equipe de growth",
+                          "Pagamento prioritário toda terça-feira",
+                          "Acesso antecipado a lançamentos e campanhas",
+                        ].map((item) => (
+                          <li key={item} className="flex items-start gap-2 text-sm text-foreground">
+                            <Star className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="md:w-auto shrink-0">
+                      <a
+                        href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá! Sou influenciador/criador de conteúdo e quero conhecer as condições especiais de afiliado da Planta y Raiz. Pode me orientar?")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button className="w-full md:w-auto gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold rounded-2xl h-12 px-6">
+                          <MessageCircle className="h-4 w-4" />
+                          Cadastre-se e fale com a Enfª Brisa
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </a>
+                      <p className="text-[10px] text-muted-foreground text-center md:text-left mt-2">
+                        Tire suas dúvidas agora pelo WhatsApp
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
         </section>
         <Footer />

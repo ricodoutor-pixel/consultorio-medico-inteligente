@@ -2,6 +2,8 @@
  * Open Graph Configuration for Social Media Sharing
  * Otimiza compartilhamento no Facebook, WhatsApp e outras redes sociais
  */
+import { getPageSEO } from '@/lib/seo-config';
+
 
 export interface OpenGraphConfig {
   title: string;

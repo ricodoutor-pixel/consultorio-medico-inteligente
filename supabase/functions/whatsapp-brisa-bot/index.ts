@@ -245,6 +245,31 @@ serve(async (req) => {
       });
     }
 
+    // 🔒 IDEMPOTÊNCIA — descarta reprocessamentos do mesmo message id (Evolution costuma retentar)
+    const messageId: string = data?.key?.id || data?.messageId || "";
+    if (messageId) {
+      const { data: dedup, error: dedupErr } = await supabase
+        .from("webhook_idempotency")
+        .insert({
+          provider: "evolution_whatsapp",
+          message_id: messageId,
+          channel: "whatsapp",
+          sender: (data?.key?.remoteJid || "").split("@")[0] || null,
+        })
+        .select("id")
+        .maybeSingle();
+      if (dedupErr && (dedupErr as any).code === "23505") {
+        return new Response(JSON.stringify({ ok: true, skipped: "duplicate", message_id: messageId }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (!dedup && !dedupErr) {
+        return new Response(JSON.stringify({ ok: true, skipped: "duplicate", message_id: messageId }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const remoteJid: string = data?.key?.remoteJid || "";
     const phone = remoteJid.split("@")[0];
     let messageText: string =

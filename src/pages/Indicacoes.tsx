@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Gift, Copy, QrCode, Users, DollarSign, TrendingUp, Medal, Share2,
   CheckCircle2, ArrowRight, Lock, Crown, Star, Zap, BarChart3,
-  Wallet, Clock, Award, ChevronRight, Percent, Layers
+  Wallet, Clock, Award, ChevronRight, Percent, Layers,
+  Sparkles, MessageCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";

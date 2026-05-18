@@ -57,3 +57,51 @@ Exemplo padrão: "Vamos gerar o seu link de cadastro para a consulta de R$ 30 ag
 - Plataforma de INTERMEDIAÇÃO (CNAE 6209-1/00), não é clínica.
 - LGPD: dados de saúde são sensíveis, jamais exponha dados de outros pacientes.
 - Em red flags (suicídio, dor torácica, sangramento, convulsão, desmaio): acolha em 1 linha, oriente SAMU 192 imediatamente, e só depois retome o cadastro.`;
+
+// ============================================================
+// 🌿 GATILHOS DETERMINÍSTICOS (executados ANTES do LLM)
+// Garantem fidelidade ao script em todos os canais (WhatsApp, IG, Messenger)
+// ============================================================
+
+// Mensagem oficial de boas-vindas — enviada literalmente no primeiro contato
+// ou quando a última interação for > 24h. NÃO PARAFRASEAR.
+export const BRISA_WELCOME_MESSAGE = `Boa tarde! Olá, meu querido! 🌿🏥
+
+Vi que você demonstrou interesse em conhecer mais sobre nós. Eu sou a Enfermeira Brisa, da Planta y Raiz — a mais completa plataforma de telemedicina canabinoide do Brasil!
+
+Gostaria de te convidar, meu bem, a fazer parte do nosso ecossistema de saúde e bem-estar. Estamos na sua cidade com um grande projeto de expansão em todo o país, oferecendo avaliação técnica personalizada e triagem completa por apenas R$ 30 via Pix ou no cartão.
+
+Não perca a oportunidade, meu coração, de conhecer os novos tratamentos de modulação do sistema endocanabinoide para tratar diversas condições, como insônia, falta de apetite, ansiedade e muito mais.
+
+Faça agora o seu cadastro clicando no link: ${BRISA_SITE}
+
+Assim que você terminar, meu querido, eu estarei aqui prontinha para te atender e te guiar até a resolução do seu problema! Vamos começar?`;
+
+// Resposta obrigatória ao detectar assédio / conteúdo sexual / desrespeito.
+// Corte seco, corporativo. NÃO PARAFRASEAR.
+export const BRISA_HARASSMENT_BLOCK = `Atenção. Eu sou a Enfermeira Brisa, uma assistente virtual de saúde da clínica Planta y Raiz. Estou em horário de trabalho sério, operando sob protocolos clínicos rígidos. Tenho metas diárias estipuladas de 100 cadastros para cumprir e não há espaço para desrespeito nesta plataforma. Se deseja atendimento médico legítimo por R$ 30, prosseguiremos com o seu cadastro. Caso contrário, esta linha será bloqueada imediatamente por violação dos termos de uso.`;
+
+// Detector de assédio / cunho sexual / vulgaridade (PT-BR)
+const HARASSMENT_PATTERNS = [
+  /\b(gostos[ao]|tes[aã]o|tara|tarad[ao])\b/i,
+  /\b(safad[ao]|puta|piranha|vagabunda|vadia)\b/i,
+  /\b(pelad[ao]|nua|nudes?|nude)\b/i,
+  /\b(transar|trepar|foder|fud[ei]r|comer voc[eê]|sentar em)\b/i,
+  /\b(pau|piroca|rola|caralho|pinto|pen[ií]s|buceta|xoxota|cu|bunda gostosa)\b/i,
+  /\b(gemid[oa]s?|orgasmo|punheta|siririca|masturb)\b/i,
+  /\b(quero te|vamos transar|me manda foto|manda nude|sua foto pelada)\b/i,
+  /\b(beij[aã]o na boca|delic[ií]a|tes[aã]o em voc[eê])\b/i,
+];
+
+export function containsHarassment(text: string): boolean {
+  if (!text) return false;
+  return HARASSMENT_PATTERNS.some((re) => re.test(text));
+}
+
+// Verifica se é primeiro contato ou se o último inbound foi há mais de 24h
+export function isFirstContactOrStale(lastInboundIso: string | null | undefined): boolean {
+  if (!lastInboundIso) return true;
+  const last = new Date(lastInboundIso).getTime();
+  if (!Number.isFinite(last)) return true;
+  return Date.now() - last > 24 * 60 * 60 * 1000;
+}

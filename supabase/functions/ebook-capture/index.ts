@@ -30,6 +30,18 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
+    // SECURITY: IP + phone rate limit to prevent WhatsApp spam abuse
+    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+    const { data: ipOk } = await supabase.rpc("check_edge_rate_limit", {
+      p_bucket: "ebook_capture_ip", p_key: ip, p_max_hits: 3, p_window_seconds: 3600,
+    });
+    if (ipOk === false) return json({ error: "Muitas tentativas. Tente novamente em 1 hora." }, 429);
+
+    const { data: phoneOk } = await supabase.rpc("check_edge_rate_limit", {
+      p_bucket: "ebook_capture_phone", p_key: whatsappRaw, p_max_hits: 1, p_window_seconds: 86400,
+    });
+    if (phoneOk === false) return json({ error: "Este WhatsApp já recebeu o ebook nas últimas 24h." }, 429);
+
     // 1) Insert no funil (com upsert manual: se já existe nas últimas 24h, reusa)
     const { data: existing } = await supabase
       .from("ebook_funnel_log")

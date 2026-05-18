@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
 import { EarningsNotificationBell } from "@/components/affiliates/EarningsNotificationBell";
+import { AffiliateEarningsSimulator, AffiliateActionPlan } from "@/components/affiliates/AffiliateEarningsSimulator";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar
@@ -154,6 +155,12 @@ export default function AffiliateDashboard() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Simulador de Ganhos + Plano de Ação */}
+          <div className="grid lg:grid-cols-2 gap-6 mb-6">
+            <AffiliateEarningsSimulator />
+            <AffiliateActionPlan />
+          </div>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">

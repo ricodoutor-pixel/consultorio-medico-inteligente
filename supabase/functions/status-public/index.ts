@@ -103,7 +103,7 @@ serve(async (req) => {
   } catch (e) {
     console.error("[status-public] error:", e);
     return new Response(
-      JSON.stringify({ ok: false, overall: "outage", error: String(e) }),
+      JSON.stringify({ ok: false, overall: "outage", error: "Service temporarily unavailable" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }

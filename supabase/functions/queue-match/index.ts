@@ -70,17 +70,20 @@ Deno.serve(async (req) => {
       const uid = await getUserFromAuth(req);
       if (!uid) return jsonRes({ error: "Unauthorized" }, 401);
 
-      const { specialty, amount, payment_id } = body;
+      const { specialty, amount } = body;
       const jitsiRoom = `plr-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
+      // SECURITY: payment_confirmed MUST be set only by mercadopago-webhook after
+      // HMAC-verified payment. Client-supplied payment_id is ignored here to
+      // prevent free-consultation bypass.
       const { data: entry, error } = await supabase
         .from("consultation_queue")
         .insert({
           patient_id: uid, // forced to authenticated user
           specialty: specialty || "Cannabis Medicinal",
           amount: amount || 30,
-          payment_id: payment_id || null,
-          payment_confirmed: !!payment_id,
+          payment_id: null,
+          payment_confirmed: false,
           jitsi_room: jitsiRoom,
         })
         .select("id, jitsi_room")

@@ -6172,6 +6172,33 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_idempotency: {
+        Row: {
+          channel: string | null
+          created_at: string
+          id: string
+          message_id: string
+          provider: string
+          sender: string | null
+        }
+        Insert: {
+          channel?: string | null
+          created_at?: string
+          id?: string
+          message_id: string
+          provider: string
+          sender?: string | null
+        }
+        Update: {
+          channel?: string | null
+          created_at?: string
+          id?: string
+          message_id?: string
+          provider?: string
+          sender?: string | null
+        }
+        Relationships: []
+      }
       whatsapp_brisa_log: {
         Row: {
           created_at: string
@@ -6649,6 +6676,7 @@ export type Database = {
         Args: { _counter_id: string }
         Returns: undefined
       }
+      prune_webhook_idempotency: { Args: never; Returns: undefined }
       search_scientific_articles: {
         Args: { limit_count?: number; query_text: string }
         Returns: {

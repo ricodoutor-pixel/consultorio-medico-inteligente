@@ -34,11 +34,11 @@ const BRISA_SYSTEM_PROMPT = BRISA_PERSONA + `
 async function transcribeAudio(base64Audio: string, mimeType: string): Promise<string> {
   try {
     const fmt = mimeType.includes("ogg") ? "ogg" : mimeType.includes("mp3") ? "mp3" : mimeType.includes("mpeg") ? "mp3" : "wav";
-    const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+    const resp = await fetch("" + AI_GATEWAY_URL + "", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${GEMINI_API_KEY}` },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${LOVABLE_API_KEY}` },
       body: JSON.stringify({
-        model: "gemini-2.5-flash",
+        model: "google/gemini-2.5-flash",
         messages: [{
           role: "user",
           content: [
@@ -131,11 +131,11 @@ async function synthesizeVoice(text: string, voiceId: string): Promise<string | 
 
 async function classifySentiment(text: string): Promise<{ sentiment_score: number; is_negative: boolean }> {
   try {
-    const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+    const resp = await fetch("" + AI_GATEWAY_URL + "", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${GEMINI_API_KEY}` },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${LOVABLE_API_KEY}` },
       body: JSON.stringify({
-        model: "gemini-2.5-flash-lite",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: "Você classifica sentimento de mensagens em pt-BR. Responda APENAS chamando a função classify_sentiment. score: 0 (muito negativo, raivoso, sofrimento, suicídio, frustração extrema) a 1 (muito positivo, gratidão, alegria). is_negative=true se score<0.4 ou houver hostilidade/sofrimento." },
           { role: "user", content: text.slice(0, 2000) },
@@ -176,11 +176,11 @@ async function classifySentiment(text: string): Promise<{ sentiment_score: numbe
 }
 
 async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>) {
-  const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+  const resp = await fetch("" + AI_GATEWAY_URL + "", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${GEMINI_API_KEY}` },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${LOVABLE_API_KEY}` },
     body: JSON.stringify({
-      model: "gemini-2.5-flash",
+      model: "google/gemini-2.5-flash",
       messages: [
         { role: "system", content: BRISA_SYSTEM_PROMPT },
         ...history.slice(-6),

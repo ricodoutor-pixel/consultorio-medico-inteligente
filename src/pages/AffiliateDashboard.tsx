@@ -6,7 +6,8 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Link2, Copy, Users, DollarSign, TrendingUp, Eye,
-  ArrowUpRight, Wallet, Download, CheckCircle2, BarChart3
+  ArrowUpRight, Wallet, Download, CheckCircle2, BarChart3,
+  Sparkles, MessageCircle, ChevronRight, Star
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";

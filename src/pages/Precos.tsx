@@ -183,20 +183,20 @@ const Precos = () => {
 
       <section className="pt-20 pb-10 md:pt-32 md:pb-16 hero-glow">
         <div className="container mx-auto px-3 sm:px-4 relative z-10">
-          <motion.div className="mb-8 md:mb-16 text-center" initial="hidden" animate="visible" variants={fadeUp}>
+          <div className="mb-8 md:mb-16 text-center">
             <h1 className="text-2xl sm:text-4xl md:text-6xl font-display font-black text-foreground mb-3 md:mb-4 tracking-tight">
               Planos <span className="text-gradient-green">SaaS</span>
             </h1>
             <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
               Escolha o plano ideal para seu perfil. Pagamento via Pix (Mercado Pago), PayPal (USD) ou BTC.
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 max-w-7xl mx-auto" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 max-w-7xl mx-auto">
             {plans.map((plan) => {
               const Icon = plan.icon;
               return (
-                <motion.div key={plan.id} variants={fadeUp}>
+                <div key={plan.id}>
                   <Card className={`relative h-full border-border transition-all hover:-translate-y-1 ${plan.highlighted ? 'border-primary/50 glow-green scale-[1.03]' : ''} ${plan.id === 'clinica-familia' ? 'border-amber-500/40 bg-gradient-to-b from-amber-950/20 to-background' : ''} ${plan.id === 'empresa-parceiros' ? 'border-secondary/40 bg-gradient-purple' : ''}`}>
                     {plan.tag && (
                       <div className={`absolute -top-3 right-4 px-3 py-1 rounded-full text-xs font-black ${
@@ -264,20 +264,20 @@ const Precos = () => {
                       </Button>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
+          </div>
 
           {/* Comparison highlights */}
-          <motion.div className="mt-12 flex flex-wrap justify-center gap-6" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+          <div className="mt-12 flex flex-wrap justify-center gap-6">
             {["✓ Pagamento via Pix", "✓ Cancelamento livre", "✓ Conformidade LGPD", "✓ Frete grátis obrigatório", "✓ Comissão por indicação"].map((item, i) => (
               <span key={i} className="text-sm font-bold text-muted-foreground">{item}</span>
             ))}
-          </motion.div>
+          </div>
 
-          <motion.div className="mt-8 text-center" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <motion.a
+          <div className="mt-8 text-center">
+            <a
               href="https://doutorpark.com.br/"
               target="_blank"
               rel="noopener noreferrer"
@@ -287,12 +287,12 @@ const Precos = () => {
                 color: '#1a0a00',
                 boxShadow: '0 0 30px hsl(45 100% 50% / 0.5), 0 0 60px hsl(30 100% 55% / 0.3), 0 4px 20px rgba(0,0,0,0.3)',
               }}
-              whileHover={{ scale: 1.07 }}
-              whileTap={{ scale: 0.95 }}
+             
+             
             >
               🌿 Invista Em Cannabis Medicinal <ArrowRight size={22} />
-            </motion.a>
-          </motion.div>
+            </a>
+          </div>
         </div>
       </section>
 
@@ -300,7 +300,7 @@ const Precos = () => {
       <section className="py-20 md:py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-purple pointer-events-none opacity-20" />
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div className="max-w-3xl mx-auto text-center" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+          <div className="max-w-3xl mx-auto text-center">
             <Users size={48} className="text-secondary mb-4 mx-auto" />
             <h2 className="text-3xl md:text-5xl font-display font-black text-foreground mb-4 tracking-tight">
               Programa de <span className="text-gradient-purple">Afiliados</span>
@@ -324,14 +324,14 @@ const Precos = () => {
               ))}
             </div>
             <p className="text-xs text-muted-foreground">Taxa de saque: 5% (isento para Plano Clínica Família)</p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Health Subscription Plans (SaaS de Saúde) */}
       <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-black text-foreground mb-4 tracking-tight">
               <Heart className="inline w-8 h-8 text-primary mr-2" />
               Planos de Saúde Digital
@@ -339,7 +339,7 @@ const Precos = () => {
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Assinaturas recorrentes com acesso ilimitado à Brisa IA, descontos exclusivos no Shopping e consultas inclusas.
             </p>
-          </motion.div>
+          </div>
           <HealthSubscriptionPlans />
         </div>
       </section>

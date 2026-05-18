@@ -266,4 +266,9 @@
   <url><loc>https://plantayraiz.com.br/ripd</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
   <url><loc>https://plantayraiz.com.br/lgpd</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://plantayraiz.com.br/compliance</loc><lastmod>2026-05-16</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>
+
+  <!-- Outras rotas indexáveis -->
+  <url><loc>https://plantayraiz.com.br/rodizio</loc><lastmod>2026-05-18</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://plantayraiz.com.br/brisa-orientacao</loc><lastmod>2026-05-18</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://plantayraiz.com.br/reset-password</loc><lastmod>2026-05-18</lastmod><changefreq>yearly</changefreq><priority>0.1</priority></url>
 </urlset>

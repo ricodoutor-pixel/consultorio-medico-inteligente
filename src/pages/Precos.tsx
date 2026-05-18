@@ -196,8 +196,8 @@ const Precos = () => {
             {plans.map((plan) => {
               const Icon = plan.icon;
               return (
-                <div key={plan.id}>
-                  <Card className={`relative h-full border-border transition-all hover:-translate-y-1 ${plan.highlighted ? 'border-primary/50 glow-green scale-[1.03]' : ''} ${plan.id === 'clinica-familia' ? 'border-amber-500/40 bg-gradient-to-b from-amber-950/20 to-background' : ''} ${plan.id === 'empresa-parceiros' ? 'border-secondary/40 bg-gradient-purple' : ''}`}>
+                <div key={plan.id} className="relative">
+                  <Card className={`relative h-full border-border transition-colors ${plan.highlighted ? 'border-primary/60 ring-1 ring-primary/30' : ''} ${plan.id === 'clinica-familia' ? 'border-amber-500/40' : ''} ${plan.id === 'empresa-parceiros' ? 'border-secondary/40' : ''}`}>
                     {plan.tag && (
                       <div className={`absolute -top-3 right-4 px-3 py-1 rounded-full text-xs font-black ${
                         plan.highlighted ? 'bg-gradient-green border border-green text-primary' :

@@ -163,6 +163,24 @@ Deno.serve(async (req) => {
           // Detect channel: IG entries usually have entry.id == IG_BUSINESS_ID
           const channel = (IG_BUSINESS_ID && entry.id === IG_BUSINESS_ID) ? "instagram" : "messenger";
 
+          // 🔒 IDEMPOTÊNCIA — Meta reenvia o mesmo mid em caso de retry/timeout
+          const mid: string = ev.message?.mid || "";
+          if (mid) {
+            const { data: dedup, error: dedupErr } = await supabase
+              .from("webhook_idempotency")
+              .insert({
+                provider: `meta_${channel}`,
+                message_id: mid,
+                channel,
+                sender: senderId,
+              })
+              .select("id")
+              .maybeSingle();
+            if ((dedupErr && (dedupErr as any).code === "23505") || (!dedup && !dedupErr)) {
+              continue;
+            }
+          }
+
           // Dedup / rate-limit per sender (10 min window)
           const { data: allowed } = await supabase.rpc("check_edge_rate_limit", {
             p_bucket: `meta_${channel}`,

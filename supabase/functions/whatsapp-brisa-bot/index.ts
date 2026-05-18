@@ -133,32 +133,23 @@ async function synthesizeVoice(text: string, voiceId: string): Promise<string | 
 
 async function classifySentiment(text: string): Promise<{ sentiment_score: number; is_negative: boolean }> {
   try {
-    const resp = await fetch("" + AI_GATEWAY_URL + "", {
+    const resp = await fetch(`${GEMINI_BASE}/${GEMINI_LITE_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${LOVABLE_API_KEY}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: "Você classifica sentimento de mensagens em pt-BR. Responda APENAS chamando a função classify_sentiment. score: 0 (muito negativo, raivoso, sofrimento, suicídio, frustração extrema) a 1 (muito positivo, gratidão, alegria). is_negative=true se score<0.4 ou houver hostilidade/sofrimento." },
-          { role: "user", content: text.slice(0, 2000) },
-        ],
-        tools: [{
-          type: "function",
-          function: {
-            name: "classify_sentiment",
-            description: "Retorna score 0-1 e flag de negatividade",
-            parameters: {
-              type: "object",
-              properties: {
-                score: { type: "number", minimum: 0, maximum: 1 },
-                is_negative: { type: "boolean" },
-              },
-              required: ["score", "is_negative"],
-              additionalProperties: false,
+        systemInstruction: { parts: [{ text: "Você classifica sentimento de mensagens em pt-BR. score: 0 (muito negativo, raivoso, sofrimento, suicídio, frustração extrema) a 1 (muito positivo, gratidão, alegria). is_negative=true se score<0.4 ou houver hostilidade/sofrimento." }] },
+        contents: [{ role: "user", parts: [{ text: text.slice(0, 2000) }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              score: { type: "number" },
+              is_negative: { type: "boolean" },
             },
+            required: ["score", "is_negative"],
           },
-        }],
-        tool_choice: { type: "function", function: { name: "classify_sentiment" } },
+        },
       }),
     });
     if (!resp.ok) {
@@ -166,9 +157,8 @@ async function classifySentiment(text: string): Promise<{ sentiment_score: numbe
       return { sentiment_score: 0.5, is_negative: false };
     }
     const data = await resp.json();
-    const args = data.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-    if (!args) return { sentiment_score: 0.5, is_negative: false };
-    const parsed = JSON.parse(args);
+    const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    const parsed = JSON.parse(raw);
     const score = Math.max(0, Math.min(1, Number(parsed.score) || 0.5));
     return { sentiment_score: score, is_negative: Boolean(parsed.is_negative) || score < 0.4 };
   } catch (e) {
@@ -178,16 +168,19 @@ async function classifySentiment(text: string): Promise<{ sentiment_score: numbe
 }
 
 async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>) {
-  const resp = await fetch("" + AI_GATEWAY_URL + "", {
+  const contents = [
+    ...history.slice(-6).map((h) => ({
+      role: h.role === "assistant" ? "model" : "user",
+      parts: [{ text: h.content }],
+    })),
+    { role: "user", parts: [{ text: userMessage }] },
+  ];
+  const resp = await fetch(`${GEMINI_BASE}/${GEMINI_CHAT_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${LOVABLE_API_KEY}` },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
-      messages: [
-        { role: "system", content: BRISA_SYSTEM_PROMPT },
-        ...history.slice(-6),
-        { role: "user", content: userMessage },
-      ],
+      systemInstruction: { parts: [{ text: BRISA_SYSTEM_PROMPT }] },
+      contents,
     }),
   });
   if (!resp.ok) {
@@ -195,7 +188,7 @@ async function callBrisaAI(userMessage: string, history: Array<{role: string; co
     return "Olá amor! 🌱 Sou a Enfª Brisa. Tive uma instabilidade rapidinha — me conta seu nome que já te ajudo 💚";
   }
   const data = await resp.json();
-  return data.choices?.[0]?.message?.content?.trim() || "Olá amor! Como posso te ajudar hoje? 💚";
+  return (data?.candidates?.[0]?.content?.parts?.[0]?.text || "Olá amor! Como posso te ajudar hoje? 💚").trim();
 }
 
 serve(async (req) => {

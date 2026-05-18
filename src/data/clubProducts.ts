@@ -218,9 +218,7 @@ export const socialPosts: SocialPost[] = [
     author: 'Marina Silva',
     avatar: '👩‍🦱',
     content: 'Que manhã perfeita na Cachoeira do Poço Verde! A água estava tão cristalina... 💚 Já vou voltar!',
-    images: [
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=500&fit=crop',
-    ],
+    images: [feedMarinaCachoeira],
     location: 'Cachoeira do Poço Verde, RJ',
     locationType: 'cachoeira',
     likes: 342,
@@ -234,9 +232,7 @@ export const socialPosts: SocialPost[] = [
     author: 'Lucas Oliveira',
     avatar: '👨‍🦱',
     content: 'Trilha da Serra da Mantiqueira no amanhecer... Nada se compara! 🏔️✨',
-    images: [
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=500&fit=crop',
-    ],
+    images: [feedLucasTrilha],
     location: 'Serra da Mantiqueira, SP',
     locationType: 'trilha',
     likes: 567,
@@ -250,9 +246,7 @@ export const socialPosts: SocialPost[] = [
     author: 'Ana Costa',
     avatar: '👩‍🦲',
     content: 'Pousada Refúgio da Natureza é simplesmente incrível! Recomendo demais para quem quer desconectar. 🌿',
-    images: [
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=500&fit=crop',
-    ],
+    images: [feedAnaPousada],
     location: 'Pousada Refúgio da Natureza, MG',
     locationType: 'pousada',
     likes: 289,

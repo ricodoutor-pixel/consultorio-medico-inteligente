@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, ArrowRight, Users, Stethoscope, Loader2, Bitcoin, Crown, Store, Building2, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+// motion removido — wrappers com whileInView/transform escondiam seções e quebravam position:fixed do MobileBottomNav (mesmo bug da Biblioteca)
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";

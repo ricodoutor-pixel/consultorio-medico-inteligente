@@ -26,6 +26,19 @@ Deno.serve(async (req) => {
     const { phone = "", name = "", email = "" } = body || {};
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supaService = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+
+    // SECURITY: IP rate limit to prevent MP API quota abuse
+    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+    const { data: ipOk } = await supaService.rpc("check_edge_rate_limit", {
+      p_bucket: "brisa_payment_ip", p_key: ip, p_max_hits: 5, p_window_seconds: 600,
+    });
+    if (ipOk === false) {
+      return new Response(JSON.stringify({ error: "Too many requests. Try again later." }), {
+        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const externalRef = `brisa-orientacao-${phone || "anon"}-${Date.now()}`;
 
     const preference = {

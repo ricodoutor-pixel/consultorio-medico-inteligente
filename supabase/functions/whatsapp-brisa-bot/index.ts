@@ -22,7 +22,26 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-import { BRISA_PERSONA } from "../_shared/brisa-persona.ts";
+import {
+  BRISA_PERSONA,
+  BRISA_WELCOME_MESSAGE,
+  BRISA_HARASSMENT_BLOCK,
+  containsHarassment,
+  isFirstContactOrStale,
+} from "../_shared/brisa-persona.ts";
+
+async function logGrowth(action: string, phase: string, state: Record<string, unknown>) {
+  try {
+    await supabase.from("manus_growth_logs").insert({
+      phase,
+      action,
+      after_state: state,
+      status: "ok",
+    });
+  } catch (e) {
+    console.error("[brisa-bot] manus_growth_logs insert failed", e);
+  }
+}
 
 const BRISA_SYSTEM_PROMPT = BRISA_PERSONA + `
 
@@ -281,10 +300,39 @@ serve(async (req) => {
 
     const { data: rows } = await supabase
       .from("whatsapp_brisa_log")
-      .select("direction, message")
+      .select("direction, message, created_at")
       .eq("phone", phone)
       .order("created_at", { ascending: false })
-      .limit(6);
+      .limit(8);
+
+    // 🛡️ MÓDULO 2 — Filtro de assédio (corte seco, pré-LLM)
+    if (containsHarassment(messageText)) {
+      await sendWhatsApp(phone, BRISA_HARASSMENT_BLOCK);
+      await supabase.from("whatsapp_brisa_log").insert({
+        phone, direction: "outbound", message: BRISA_HARASSMENT_BLOCK,
+        raw: { trigger: "harassment_block" },
+      }).then(() => {}).catch(() => {});
+      await logGrowth("harassment_block", "brisa_omnichannel", { channel: "whatsapp", phone, message: messageText.slice(0, 300) });
+      return new Response(JSON.stringify({ ok: true, blocked: "harassment" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // 🌿 MÓDULO 1 — Mensagem oficial de boas-vindas (1º contato ou >24h)
+    const lastInbound = (rows || []).find((r: any) => r.direction === "inbound" && r.created_at)?.created_at;
+    // O insert do inbound atual já aconteceu acima; usamos o ANTERIOR.
+    const previousInbound = (rows || []).filter((r: any) => r.direction === "inbound")[1]?.created_at ?? null;
+    if (isFirstContactOrStale(previousInbound)) {
+      await sendWhatsApp(phone, BRISA_WELCOME_MESSAGE);
+      await supabase.from("whatsapp_brisa_log").insert({
+        phone, direction: "outbound", message: BRISA_WELCOME_MESSAGE,
+        raw: { trigger: "welcome_24h" },
+      }).then(() => {}).catch(() => {});
+      await logGrowth("welcome_sent", "brisa_omnichannel", { channel: "whatsapp", phone, link: "https://plantayraiz.com.br" });
+      return new Response(JSON.stringify({ ok: true, welcome: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const history = (rows || []).reverse().map((r: any) => ({
       role: r.direction === "inbound" ? "user" : "assistant",
@@ -309,6 +357,11 @@ serve(async (req) => {
     await supabase.from("whatsapp_brisa_log").insert({
       phone, direction: "outbound", message: reply, raw: { ai: true, voice: wasAudio || askedVoice },
     }).then(() => {}).catch(() => {});
+
+    // Telemetria: detectar se a resposta contém o link de cadastro
+    if (/plantayraiz\.com\.br/i.test(reply)) {
+      await logGrowth("registration_link_sent", "brisa_omnichannel", { channel: "whatsapp", phone });
+    }
 
     return new Response(JSON.stringify({ ok: true, replied: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

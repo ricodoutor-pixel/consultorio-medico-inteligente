@@ -26,7 +26,13 @@ const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") ?? "";
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") ?? "";
 const DR_EDILSON_WA = "5511987131241";
 
-import { BRISA_PERSONA } from "../_shared/brisa-persona.ts";
+import {
+  BRISA_PERSONA,
+  BRISA_WELCOME_MESSAGE,
+  BRISA_HARASSMENT_BLOCK,
+  containsHarassment,
+  isFirstContactOrStale,
+} from "../_shared/brisa-persona.ts";
 
 const BRISA_SYSTEM = BRISA_PERSONA + `
 
@@ -169,7 +175,43 @@ Deno.serve(async (req) => {
           const lower = text.toLowerCase();
           const isRed = RED_FLAGS.some(f => lower.includes(f));
 
-          const reply = await callBrisaAI(text);
+          // 🛡️ MÓDULO 2 — Filtro de assédio (corte seco, pré-LLM)
+          if (containsHarassment(text)) {
+            if (channel === "instagram") await sendInstagram(senderId, BRISA_HARASSMENT_BLOCK);
+            else await sendMessenger(senderId, BRISA_HARASSMENT_BLOCK);
+            await supabase.from("meta_messenger_log").insert({
+              channel, sender_id: senderId, message_in: text, reply_out: BRISA_HARASSMENT_BLOCK, red_flag: false,
+            });
+            await supabase.from("manus_growth_logs").insert({
+              phase: "brisa_omnichannel", action: "harassment_block", status: "ok",
+              after_state: { channel, sender_id: senderId, message: text.slice(0, 300) },
+            }).then(() => {}).catch(() => {});
+            continue;
+          }
+
+          // 🌿 MÓDULO 1 — Mensagem oficial de boas-vindas (1º contato ou >24h)
+          const { data: lastRow } = await supabase
+            .from("meta_messenger_log")
+            .select("created_at")
+            .eq("sender_id", senderId)
+            .eq("channel", channel)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          const lastTs = (lastRow as any)?.created_at ?? null;
+
+          let reply: string;
+          let trigger = "ai";
+          if (isFirstContactOrStale(lastTs)) {
+            reply = BRISA_WELCOME_MESSAGE;
+            trigger = "welcome_24h";
+            await supabase.from("manus_growth_logs").insert({
+              phase: "brisa_omnichannel", action: "welcome_sent", status: "ok",
+              after_state: { channel, sender_id: senderId, link: "https://plantayraiz.com.br" },
+            }).then(() => {}).catch(() => {});
+          } else {
+            reply = await callBrisaAI(text);
+          }
 
           if (channel === "instagram") await sendInstagram(senderId, reply);
           else await sendMessenger(senderId, reply);
@@ -179,6 +221,13 @@ Deno.serve(async (req) => {
           await supabase.from("meta_messenger_log").insert({
             channel, sender_id: senderId, message_in: text, reply_out: reply, red_flag: isRed,
           });
+
+          if (/plantayraiz\.com\.br/i.test(reply)) {
+            await supabase.from("manus_growth_logs").insert({
+              phase: "brisa_omnichannel", action: "registration_link_sent", status: "ok",
+              after_state: { channel, sender_id: senderId, trigger },
+            }).then(() => {}).catch(() => {});
+          }
         } catch (e) {
           console.error("event handler error", e);
           await supabase.from("meta_messenger_log").insert({

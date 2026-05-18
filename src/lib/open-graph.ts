@@ -133,20 +133,33 @@ export function updateOpenGraphTags(config: OpenGraphConfig): void {
 }
 
 /**
- * Retorna configuração baseada na rota atual
+ * Retorna configuração baseada na rota atual (gera dinamicamente p/ rotas não mapeadas
+ * a partir de seo-config para evitar duplicar og:title/description com a home).
  */
 export function getOpenGraphConfig(pathname: string): OpenGraphConfig {
-  if (pathname.includes('/ebook')) {
-    return openGraphConfigs.ebook;
+  if (pathname === '/' || pathname === '') return openGraphConfigs.home;
+  if (pathname.startsWith('/ebook')) return openGraphConfigs.ebook;
+  if (pathname.startsWith('/biblioteca')) return openGraphConfigs.biblioteca;
+  if (pathname.startsWith('/club')) return openGraphConfigs.club;
+  if (pathname.startsWith('/agendamento')) return openGraphConfigs.agendamento;
+
+  // Fallback dinâmico: usa seo-config para garantir og:title/description únicos por rota
+  try {
+    // Import dinâmico evita ciclo; resolvido em tempo de execução do bundler
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { getPageSEO } = require('@/lib/seo-config') as typeof import('@/lib/seo-config');
+    const seo = getPageSEO(pathname);
+    return {
+      title: seo.title,
+      description: seo.description,
+      image: openGraphConfigs.home.image,
+      url: seo.canonical,
+      type: 'website',
+      imageWidth: 1200,
+      imageHeight: 630,
+      imageType: 'image/jpeg',
+    };
+  } catch {
+    return { ...openGraphConfigs.home, url: `https://plantayraiz.com.br${pathname}` };
   }
-  if (pathname.includes('/biblioteca')) {
-    return openGraphConfigs.biblioteca;
-  }
-  if (pathname.includes('/club')) {
-    return openGraphConfigs.club;
-  }
-  if (pathname.includes('/agendamento')) {
-    return openGraphConfigs.agendamento;
-  }
-  return openGraphConfigs.home;
 }

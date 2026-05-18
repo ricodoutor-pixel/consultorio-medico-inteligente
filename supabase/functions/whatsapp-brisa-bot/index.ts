@@ -22,7 +22,26 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-import { BRISA_PERSONA } from "../_shared/brisa-persona.ts";
+import {
+  BRISA_PERSONA,
+  BRISA_WELCOME_MESSAGE,
+  BRISA_HARASSMENT_BLOCK,
+  containsHarassment,
+  isFirstContactOrStale,
+} from "../_shared/brisa-persona.ts";
+
+async function logGrowth(action: string, phase: string, state: Record<string, unknown>) {
+  try {
+    await supabase.from("manus_growth_logs").insert({
+      phase,
+      action,
+      after_state: state,
+      status: "ok",
+    });
+  } catch (e) {
+    console.error("[brisa-bot] manus_growth_logs insert failed", e);
+  }
+}
 
 const BRISA_SYSTEM_PROMPT = BRISA_PERSONA + `
 

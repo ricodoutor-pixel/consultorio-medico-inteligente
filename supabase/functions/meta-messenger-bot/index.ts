@@ -26,7 +26,13 @@ const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") ?? "";
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") ?? "";
 const DR_EDILSON_WA = "5511987131241";
 
-import { BRISA_PERSONA } from "../_shared/brisa-persona.ts";
+import {
+  BRISA_PERSONA,
+  BRISA_WELCOME_MESSAGE,
+  BRISA_HARASSMENT_BLOCK,
+  containsHarassment,
+  isFirstContactOrStale,
+} from "../_shared/brisa-persona.ts";
 
 const BRISA_SYSTEM = BRISA_PERSONA + `
 

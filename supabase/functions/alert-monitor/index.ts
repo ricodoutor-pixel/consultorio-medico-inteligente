@@ -152,6 +152,95 @@ Deno.serve(async (req) => {
     }
   }
 
+  // ---------- 3) Social Auto-Post Cron Health (IG + FB) ----------
+  // Se a JWT do cron foi revogada, a função NUNCA executa e nada chega em ai_events.
+  // Detectamos a AUSÊNCIA de eventos (70min cobre 2 ciclos de 30min).
+  const sinceCron = new Date(Date.now() - 70 * 60_000).toISOString();
+  const socialChecks = [
+    { ai: "brisa_ig_auto", label: "Instagram auto-post", cron: "brisa-ig-auto-post-30min" },
+    { ai: "brisa_fb_auto", label: "Facebook auto-post", cron: "brisa-fb-auto-post-30min" },
+  ];
+  for (const c of socialChecks) {
+    const { data: evs } = await supabase
+      .from("ai_events")
+      .select("event_type, status, created_at")
+      .eq("ai_name", c.ai)
+      .gte("created_at", sinceCron)
+      .limit(50);
+    const total = evs?.length ?? 0;
+    const failed = (evs ?? []).filter(
+      (e) => String(e.event_type).endsWith("_failed") || e.status === "error",
+    ).length;
+    if (total === 0) {
+      await sendDiscord(
+        supabase,
+        "CRITICAL",
+        `🚨 ${c.label} SEM EXECUÇÃO`,
+        `Nenhum evento de \`${c.ai}\` nos últimos 70min. Provável cron quebrado (JWT revogada após rotação) ou função fora do ar.`,
+        [
+          { name: "Cron", value: c.cron, inline: true },
+          { name: "Janela", value: "70min", inline: true },
+          { name: "Ação", value: "Rotacionar BRISA_CEO_SECRET_KEY e recriar cron com service_role atual" },
+        ],
+      );
+      alerts.push(`${c.ai}_no_runs`);
+    } else if (failed > 0 && failed === total) {
+      await sendDiscord(
+        supabase,
+        "CRITICAL",
+        `🔴 ${c.label} 100% falhando`,
+        `Todos os ${total} eventos em 70min falharam.`,
+        [{ name: "Cron", value: c.cron, inline: true }, { name: "Falhas", value: String(failed), inline: true }],
+      );
+      alerts.push(`${c.ai}_all_failed`);
+    }
+  }
+
+  // ---------- 4) Comunicação com usuários (WhatsApp/Messenger/IG DM) ----------
+  const COMM_FUNCS = [
+    "whatsapp-brisa-bot", "brisa-whatsapp", "meta-messenger-bot",
+    "twilio-whatsapp", "evolution-api-proxy", "brisa-prescription-dispatch",
+  ];
+  const commErrs = (httpErrs ?? []).filter((r) =>
+    COMM_FUNCS.includes(String((r.metadata as any)?.fn ?? "")),
+  );
+  if (commErrs.length >= 3) {
+    const byFn: Record<string, number> = {};
+    for (const r of commErrs) {
+      const fn = String((r.metadata as any)?.fn ?? "unknown");
+      byFn[fn] = (byFn[fn] ?? 0) + 1;
+    }
+    const level = commErrs.length >= 10 ? "CRITICAL" : "WARNING";
+    await sendDiscord(
+      supabase,
+      level,
+      "📵 Falhas de comunicação com usuários",
+      `${commErrs.length} erros em funções de WhatsApp/Messenger nos últimos 5min. Mensagens podem não estar sendo entregues.`,
+      [
+        { name: "Total", value: String(commErrs.length), inline: true },
+        { name: "Por função", value: Object.entries(byFn).map(([k, v]) => `${k}: ${v}`).join("\n") || "n/d" },
+      ],
+    );
+    alerts.push(`comm_errs=${commErrs.length}`);
+  }
+
+  // ---------- 5) HTTP 401 imediato (signature/auth) — threshold = 1 ----------
+  const auth401 = (httpErrs ?? []).filter((r) => Number((r.metadata as any)?.status_code) === 401);
+  if (auth401.length >= 1 && !alerts.some((a) => a.startsWith("http_401"))) {
+    const fns = [...new Set(auth401.map((r) => String((r.metadata as any)?.fn ?? "unknown")))];
+    await sendDiscord(
+      supabase,
+      "WARNING",
+      "🔐 HTTP 401 detectado (signature/auth)",
+      `${auth401.length} erro(s) 401 em 5min. JWT/HMAC/Access Token pode ter sido revogado ou rotacionado.`,
+      [
+        { name: "Funções", value: fns.join(", ").slice(0, 500) || "n/d" },
+        { name: "Causas comuns", value: "• service_role rotacionada\n• BRISA_CEO_SECRET_KEY trocada\n• FACEBOOK_PAGE_ACCESS_TOKEN expirou" },
+      ],
+    );
+    alerts.push(`http_401_early=${auth401.length}`);
+  }
+
   return new Response(
     JSON.stringify({ ok: true, alerts, window_min: 5 }),
     { headers: { ...corsHeaders, "Content-Type": "application/json" } },

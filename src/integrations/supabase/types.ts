@@ -3464,6 +3464,33 @@ export type Database = {
         }
         Relationships: []
       }
+      meta_token_storage: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          refreshed_at: string
+          token: string
+          user_token: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id: string
+          refreshed_at?: string
+          token: string
+          user_token?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          refreshed_at?: string
+          token?: string
+          user_token?: string | null
+        }
+        Relationships: []
+      }
       monitoring_profiles: {
         Row: {
           conv_drop_ratio: number

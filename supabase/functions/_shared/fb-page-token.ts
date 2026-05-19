@@ -17,17 +17,44 @@ const GRAPH = "https://graph.facebook.com/v19.0";
 
 let cached: { pageId: string; token: string; ts: number } | null = null;
 
+async function readStoredPageToken(): Promise<string | null> {
+  try {
+    const { createClient } = await import("npm:@supabase/supabase-js@2");
+    const sb = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+    const { data } = await sb
+      .from("meta_token_storage")
+      .select("token, expires_at")
+      .eq("id", "facebook_page")
+      .maybeSingle();
+    if (!data?.token) return null;
+    if (data.expires_at && new Date(data.expires_at).getTime() < Date.now()) return null;
+    return data.token as string;
+  } catch {
+    return null;
+  }
+}
+
 export async function getFacebookPageToken(pageId: string): Promise<string> {
+  // Use cached page token for 30 minutes
+  if (cached && cached.pageId === pageId && Date.now() - cached.ts < 30 * 60 * 1000) {
+    return cached.token;
+  }
+
+  // Prefer DB-stored refreshed token (long-lived, auto-renewed weekly)
+  const stored = await readStoredPageToken();
+  if (stored) {
+    cached = { pageId, token: stored, ts: Date.now() };
+    return stored;
+  }
+
   const rawToken =
     Deno.env.get("FACEBOOK_PAGE_ACCESS_TOKEN") ||
     Deno.env.get("FACEBOOK_GRAPH_API_TOKEN") ||
     "";
   if (!rawToken) throw new Error("FB token not configured");
-
-  // Use cached page token for 30 minutes
-  if (cached && cached.pageId === pageId && Date.now() - cached.ts < 30 * 60 * 1000) {
-    return cached.token;
-  }
 
   // 1) Inspect token type
   try {

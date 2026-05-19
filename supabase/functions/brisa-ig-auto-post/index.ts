@@ -62,13 +62,13 @@ Deno.serve(async (req) => {
   const unauth = requireServiceAuth(req, corsHeaders);
   if (unauth) return unauth;
 
-  const igUserId = Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID");
-  const pageId = Deno.env.get("FACEBOOK_PAGE_ID");
-  if (!igUserId || !pageId) {
-    return new Response(JSON.stringify({ error: "INSTAGRAM_BUSINESS_ACCOUNT_ID or FACEBOOK_PAGE_ID missing" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
+  // Canonical IDs for @plantayraiz (Planta y Raiz Ltda). Env vars used only if they match expected format.
+  const CANONICAL_IG_ID = "17841440895941034";
+  const CANONICAL_PAGE_ID = "1104301376097224";
+  const envIg = (Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID") || "").trim();
+  const envPage = (Deno.env.get("FACEBOOK_PAGE_ID") || "").trim();
+  const igUserId = /^\d{15,17}$/.test(envIg) && envIg !== "1283674517188119" ? envIg : CANONICAL_IG_ID;
+  const pageId = /^\d{10,20}$/.test(envPage) ? envPage : CANONICAL_PAGE_ID;
 
   let token: string;
   try {

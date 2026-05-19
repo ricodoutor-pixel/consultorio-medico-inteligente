@@ -13,6 +13,10 @@ const GRAPH = "https://graph.facebook.com/v19.0";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const envLen = (Deno.env.get("BRISA_CEO_SECRET_KEY") || "").length;
+  const xCron = req.headers.get("x-cron-secret") || "";
+  const auth = req.headers.get("Authorization") || "";
+  console.log(JSON.stringify({ debug: "auth_attempt", envLen, xCronLen: xCron.length, authLen: auth.length, xCronFirst3: xCron.slice(0,3), envFirst3: (Deno.env.get("BRISA_CEO_SECRET_KEY")||"").slice(0,3) }));
   const unauth = requireServiceAuth(req, corsHeaders);
   if (unauth) return unauth;
 

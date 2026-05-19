@@ -35,6 +35,7 @@ export const CookieConsentBanner = () => {
   const [visible, setVisible] = useState(false);
   const [exiting, setExiting] = useState(false);
   const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
+  const isPlansRoute = location.pathname === "/planos" || location.pathname === "/precos";
 
   useEffect(() => {
     try {
@@ -97,7 +98,7 @@ export const CookieConsentBanner = () => {
         exiting ? "translate-y-full opacity-0" : "translate-y-0 opacity-100"
       }`}
     >
-      <div className="mx-2 mb-2 sm:mx-6 sm:mb-6">
+      <div className={`mx-2 sm:mx-6 ${isPlansRoute && isMobile ? "mb-[5.75rem]" : "mb-2 sm:mb-6"}`}>
         <div className={`relative overflow-hidden rounded-xl sm:rounded-2xl border border-emerald-500/20 shadow-2xl shadow-emerald-900/40 ${
           isDenseCatalogRoute && isMobile
             ? "bg-emerald-950/95"

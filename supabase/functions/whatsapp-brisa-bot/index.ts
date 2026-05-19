@@ -15,8 +15,8 @@ const EVOLUTION_WEBHOOK_SECRET = Deno.env.get("EVOLUTION_WEBHOOK_SECRET") || "";
 // 🔑 Gemini DIRETO (sem cobrar Lovable AI). Usa GEMINI_API_KEY do Google AI Studio.
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "";
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
-const GEMINI_CHAT_MODEL = "gemini-2.0-flash";
-const GEMINI_LITE_MODEL = "gemini-2.0-flash-lite";
+const GEMINI_CHAT_MODEL = "gemini-2.5-flash";
+const GEMINI_LITE_MODEL = "gemini-2.5-flash-lite";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 

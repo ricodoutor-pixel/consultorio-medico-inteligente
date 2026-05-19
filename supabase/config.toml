@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.treatment-subscription-engine]
 verify_jwt = false
+
+[functions.sync-vault-secret]
+verify_jwt = false

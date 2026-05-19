@@ -67,20 +67,25 @@ export const WhatsAppButton = () => {
   const [showHint, setShowHint] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
+  const isPlansRoute = location.pathname === "/planos" || location.pathname === "/precos";
   const buttonSize = isDenseCatalogRoute ? 56 : 64;
 
   useEffect(() => {
+    if (isPlansRoute) {
+      setShowHint(false);
+      return;
+    }
     if (isDenseCatalogRoute || sessionStorage.getItem("pyr_brisa_hint_shown")) return;
     // Badge "Oi! Posso ajudar?" após 3s como solicitado pelo usuário
     const t = setTimeout(() => setShowHint(true), 3000);
     return () => clearTimeout(t);
-  }, [isDenseCatalogRoute]);
+  }, [isDenseCatalogRoute, isPlansRoute]);
 
   useEffect(() => {
-    if (!isDenseCatalogRoute) return;
+    if (!isDenseCatalogRoute && !isPlansRoute) return;
     setShowHint(false);
     setIsOpen(false);
-  }, [isDenseCatalogRoute]);
+  }, [isDenseCatalogRoute, isPlansRoute]);
 
   useEffect(() => {
     if (isOpen) {
@@ -195,7 +200,7 @@ export const WhatsAppButton = () => {
         </div>
       )}
 
-      {showHint && !isOpen && !isDenseCatalogRoute && (
+      {showHint && !isOpen && !isDenseCatalogRoute && !isPlansRoute && (
         <div
           className="absolute right-16 bottom-2 md:bottom-3 whitespace-nowrap px-3 py-1.5 rounded-full shadow-lg border border-border animate-in fade-in slide-in-from-right-2 duration-300 cursor-pointer"
           style={{ background: "hsl(var(--card))" }}

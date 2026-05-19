@@ -1,5 +1,4 @@
 // One-shot idempotente: copia BRISA_CEO_SECRET_KEY do env para o vault.
-// Sem auth — apenas espelha env→vault (atacante não consegue ler env).
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 Deno.serve(async () => {
@@ -8,7 +7,7 @@ Deno.serve(async () => {
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const { data, error } = await sb.rpc("sync_brisa_vault_secret", { _value: secret });
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
-  return new Response(JSON.stringify({ ok: true, result: data }), {
+  return new Response(JSON.stringify({ ok: true, result: data, env_len: secret.length }), {
     headers: { "Content-Type": "application/json" },
   });
 });

@@ -54,6 +54,12 @@ Deno.serve(async (req) => {
       ai_name: "refresh_meta_token", event_type: "exchange_failed", status: "error",
       output_data: { error: j1 },
     });
+    await supabase.from("manus_growth_logs").insert({
+      phase: "infra_maintenance",
+      action: "refresh_meta_token",
+      status: "error",
+      error_message: JSON.stringify(j1).slice(0, 500),
+    });
     return new Response(JSON.stringify({ ok: false, stage: "exchange", error: j1 }), {
       status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

@@ -12,9 +12,13 @@ const corsHeaders = {
 
 const GRAPH_API = "https://graph.facebook.com/v19.0";
 
+// Instagram exige JPEG público (não aceita PNG). Usar Unsplash (JPEG estável) temático.
 const DEFAULT_IMAGES = [
-  "https://plantayraiz.com.br/og-image.jpg",
-  "https://plantayraiz.com.br/assets/brisa-mascote.jpg",
+  "https://images.unsplash.com/photo-1536819114556-1e10f967fb61?w=1080&h=1080&fit=crop&fm=jpg&q=80",
+  "https://images.unsplash.com/photo-1603909223429-69bb7101f420?w=1080&h=1080&fit=crop&fm=jpg&q=80",
+  "https://images.unsplash.com/photo-1611242320536-f12d3541249b?w=1080&h=1080&fit=crop&fm=jpg&q=80",
+  "https://images.unsplash.com/photo-1585435557343-3b092031a831?w=1080&h=1080&fit=crop&fm=jpg&q=80",
+  "https://images.unsplash.com/photo-1542736667-069246bdbc6d?w=1080&h=1080&fit=crop&fm=jpg&q=80",
 ];
 
 const FALLBACK_TOPICS = [

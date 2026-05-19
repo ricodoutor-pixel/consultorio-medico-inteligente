@@ -6719,6 +6719,7 @@ export type Database = {
           year: number
         }[]
       }
+      sync_brisa_vault_secret: { Args: { _value: string }; Returns: string }
       trigger_brisa_social_post: { Args: { _target: string }; Returns: number }
     }
     Enums: {

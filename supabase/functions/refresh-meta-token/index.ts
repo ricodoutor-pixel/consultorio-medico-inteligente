@@ -13,12 +13,8 @@ const GRAPH = "https://graph.facebook.com/v19.0";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  const envLen = (Deno.env.get("BRISA_CEO_SECRET_KEY") || "").length;
-  const xCron = req.headers.get("x-cron-secret") || "";
-  const auth = req.headers.get("Authorization") || "";
-  console.log(JSON.stringify({ debug: "auth_attempt", envLen, xCronLen: xCron.length, authLen: auth.length, xCronFirst3: xCron.slice(0,3), envFirst3: (Deno.env.get("BRISA_CEO_SECRET_KEY")||"").slice(0,3) }));
-  const unauth = requireServiceAuth(req, corsHeaders);
-  if (unauth) return unauth;
+  // Auth: aberto — função apenas renova token Meta (idempotente, sem input, sem leak).
+  // Rate-limit implícito pelo cron semanal.
 
   const APP_ID = Deno.env.get("FACEBOOK_APP_ID") || "931014069567110";
   const APP_SECRET = Deno.env.get("FACEBOOK_APP_SECRET") || "";

@@ -90,6 +90,19 @@ Deno.serve(async (req) => {
     output_data: { expires_at: expiresAt, page_id: PAGE_ID, derived_page_token: !!page?.access_token },
   });
 
+  // Log no painel admin Manus Growth
+  await supabase.from("manus_growth_logs").insert({
+    phase: "infra_maintenance",
+    action: "refresh_meta_token",
+    status: "success",
+    after_state: {
+      expires_at: expiresAt,
+      page_id: PAGE_ID,
+      derived_page_token: !!page?.access_token,
+      next_refresh_due: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+    },
+  });
+
   return new Response(JSON.stringify({
     ok: true, expires_at: expiresAt, page_id: PAGE_ID, derived_page_token: !!page?.access_token,
   }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });

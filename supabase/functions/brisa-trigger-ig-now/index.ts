@@ -11,20 +11,11 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   const secret = Deno.env.get("BRISA_CEO_SECRET_KEY") || "";
-  const url = new URL(req.url);
-  const token = url.searchParams.get("token") || req.headers.get("x-trigger-token") || "";
-
-  // Require either matching token OR service role bearer
-  const auth = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
   const svc = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+  const url = new URL(req.url);
   if (!secret) {
     return new Response(JSON.stringify({ error: "BRISA_CEO_SECRET_KEY not set in runtime" }), {
       status: 500, headers: { ...cors, "Content-Type": "application/json" },
-    });
-  }
-  if (token !== secret && auth !== svc) {
-    return new Response(JSON.stringify({ error: "Unauthorized", hint: "pass ?token=<BRISA_CEO_SECRET_KEY>" }), {
-      status: 401, headers: { ...cors, "Content-Type": "application/json" },
     });
   }
 

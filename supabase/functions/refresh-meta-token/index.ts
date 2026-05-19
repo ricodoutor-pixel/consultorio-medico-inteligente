@@ -92,10 +92,10 @@ Deno.serve(async (req) => {
 
   // Log no painel admin Manus Growth
   await supabase.from("manus_growth_logs").insert({
-    source: "refresh_meta_token",
-    action: "token_renewed",
+    phase: "infra_maintenance",
+    action: "refresh_meta_token",
     status: "success",
-    payload: {
+    after_state: {
       expires_at: expiresAt,
       page_id: PAGE_ID,
       derived_page_token: !!page?.access_token,

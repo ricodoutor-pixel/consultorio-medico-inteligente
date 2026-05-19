@@ -6692,6 +6692,7 @@ export type Database = {
           year: number
         }[]
       }
+      trigger_brisa_social_post: { Args: { _target: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

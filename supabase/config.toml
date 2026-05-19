@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.sync-vault-secret]
 verify_jwt = false
+
+[functions.refresh-meta-token]
+verify_jwt = false

@@ -3,63 +3,47 @@
  *
  * Accepts:
  *  - Bearer SUPABASE_SERVICE_ROLE_KEY
- *  - Bearer BRISA_CEO_SECRET_KEY (env)
- *  - Header x-cron-secret matching BRISA_CEO_SECRET_KEY (env)
- *  - Header x-cron-secret matching public.private_get_brisa_cron_secret() (vault fallback)
- *
- * The vault fallback uses the service-role key to call the SECURITY DEFINER
- * RPC and pull the canonical secret, so env drift (corrupted/old values)
- * stops blocking legit cron requests.
+ *  - Bearer/x-cron-secret matching BRISA_CEO_SECRET_KEY (env)
+ *  - x-cron-secret matching the vault value of BRISA_CEO_SECRET_KEY
+ *    (loaded once at module init via top-level await — keeps the guard sync)
  */
-let _vaultCache: { value: string; at: number } | null = null;
 
-async function readVaultSecret(): Promise<string> {
-  const now = Date.now();
-  if (_vaultCache && now - _vaultCache.at < 60_000) return _vaultCache.value;
+const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+const CRON_ENV = Deno.env.get("BRISA_CEO_SECRET_KEY") || "";
 
+async function loadVaultSecret(): Promise<string> {
   const url = Deno.env.get("SUPABASE_URL");
-  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!url || !key) return "";
-
+  if (!url || !SERVICE) return "";
   try {
     const r = await fetch(`${url}/rest/v1/rpc/private_get_brisa_cron_secret`, {
       method: "POST",
       headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
+        apikey: SERVICE,
+        Authorization: `Bearer ${SERVICE}`,
         "Content-Type": "application/json",
       },
       body: "{}",
     });
-    if (!r.ok) {
-      await r.text();
-      return "";
-    }
-    const v = (await r.text()).trim().replace(/^"|"$/g, "");
-    _vaultCache = { value: v, at: now };
-    return v;
+    if (!r.ok) { await r.text(); return ""; }
+    return (await r.text()).trim().replace(/^"|"$/g, "");
   } catch {
     return "";
   }
 }
 
-export async function requireServiceAuth(
+const CRON_VAULT = await loadVaultSecret();
+
+export function requireServiceAuth(
   req: Request,
   corsHeaders: Record<string, string>,
-): Promise<Response | null> {
-  const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-  const cronEnv = Deno.env.get("BRISA_CEO_SECRET_KEY") || "";
+): Response | null {
   const auth = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
   const xCron = req.headers.get("x-cron-secret") || "";
 
-  let ok =
-    (service && auth === service) ||
-    (cronEnv && (auth === cronEnv || xCron === cronEnv));
-
-  if (!ok && xCron) {
-    const vaultSecret = await readVaultSecret();
-    if (vaultSecret && xCron === vaultSecret) ok = true;
-  }
+  const ok =
+    (SERVICE && auth === SERVICE) ||
+    (CRON_ENV && (auth === CRON_ENV || xCron === CRON_ENV)) ||
+    (CRON_VAULT && (auth === CRON_VAULT || xCron === CRON_VAULT));
 
   if (!ok) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {

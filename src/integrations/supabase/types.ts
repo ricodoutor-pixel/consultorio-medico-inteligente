@@ -6676,6 +6676,7 @@ export type Database = {
         Args: { _counter_id: string }
         Returns: undefined
       }
+      private_get_brisa_cron_secret: { Args: never; Returns: string }
       prune_webhook_idempotency: { Args: never; Returns: undefined }
       search_scientific_articles: {
         Args: { limit_count?: number; query_text: string }

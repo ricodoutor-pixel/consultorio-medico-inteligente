@@ -24,7 +24,7 @@ export function requireServiceAuth(
   const ok =
     (service && auth === service) ||
     (cronSecret && (auth === cronSecret || xCron === cronSecret));
-  if (!ok) console.log("[svc-auth]", JSON.stringify({cronLen: cronSecret.length, xCronLen: xCron.length}));
+
 
 
 

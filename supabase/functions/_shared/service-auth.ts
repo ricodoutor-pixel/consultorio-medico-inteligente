@@ -26,6 +26,17 @@ export function requireServiceAuth(
     (cronSecret && (auth === cronSecret || xCron === cronSecret));
 
   if (!ok) {
+    console.log("[service-auth DEBUG]", JSON.stringify({
+      hasService: !!service, serviceLen: service.length,
+      hasCron: !!cronSecret, cronLen: cronSecret.length,
+      authLen: auth.length, xCronLen: xCron.length,
+      xCronFirst3: xCron.slice(0,3), xCronLast3: xCron.slice(-3),
+      cronFirst3: cronSecret.slice(0,3), cronLast3: cronSecret.slice(-3),
+    }));
+  }
+
+
+  if (!ok) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

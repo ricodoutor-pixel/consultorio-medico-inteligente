@@ -25,6 +25,8 @@ export function requireServiceAuth(
     (service && auth === service) ||
     (cronSecret && (auth === cronSecret || xCron === cronSecret));
 
+
+
   if (!ok) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,

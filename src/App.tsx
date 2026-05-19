@@ -58,6 +58,7 @@ const TermosDeUso = lazyWithRecovery(() => import("./pages/TermosDeUso"), { sour
 const PoliticaDePrivacidade = lazyWithRecovery(() => import("./pages/PoliticaDePrivacidade"), { sourceRef: "/privacidade" });
 const PoliticaDeReembolso = lazyWithRecovery(() => import("./pages/PoliticaDeReembolso"), { sourceRef: "/reembolso" });
 const Indicacoes = lazyWithRecovery(() => import("./pages/Indicacoes"), { sourceRef: "/indicacoes" });
+const Unsubscribe = lazyWithRecovery(() => import("./pages/Unsubscribe"), { sourceRef: "/unsubscribe" });
 const Telemedicina = lazyWithRecovery(() => import("./pages/Telemedicina"), { sourceRef: "/telemedicina" });
 const Cadastro = lazyWithRecovery(() => import("./pages/Cadastro"), { sourceRef: "/cadastro" });
 const Login = lazyWithRecovery(() => import("./pages/Login"), { sourceRef: "/login" });
@@ -314,6 +315,7 @@ const App = () => (
                 <Route path="/status" element={<Status />} />
                 <Route path="/passaporte/:token" element={<Passaporte />} />
                 <Route path="/planos-tratamento" element={<PlanosTratamento />} />
+                <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

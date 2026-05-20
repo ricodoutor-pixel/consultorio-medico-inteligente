@@ -232,20 +232,9 @@
 
     <div id="root"></div>
 
-    <script>
-      // Rotação diária de favicon (Verdinho ↔ Brisa ↔ logo) — muda a cada 24h
-      (function(){
-        try {
-          var icons = ['/favicon.svg','/favicon-verdinho.png','/favicon-brisa.png','/favicon.png'];
-          var day = Math.floor(Date.now() / 86400000);
-          var pick = icons[day % icons.length];
-          document.querySelectorAll('link[rel~="icon"], link[rel="shortcut icon"]').forEach(function(l){
-            l.href = pick;
-            if (pick.endsWith('.svg')) l.type = 'image/svg+xml'; else l.type = 'image/png';
-          });
-        } catch(e) {}
-      })();
-    </script>
+    <!-- Favicon rotation REMOVIDO: Google exige URL estável.
+         A rotação diária fazia o Googlebot cair no globo padrão da SERP. -->
+
 
     <!-- ESCUDO ANTI-TELA-PRETA (Salvaguarda #1)
          Captura erros antes do React montar (chunk load, "_ is not a function", etc).

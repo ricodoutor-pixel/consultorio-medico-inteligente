@@ -2803,6 +2803,51 @@ export type Database = {
         }
         Relationships: []
       }
+      infra_services: {
+        Row: {
+          category: string
+          cost_brl: number | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          last_alert_at: string | null
+          name: string
+          notes: string | null
+          provider: string | null
+          renewal_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          cost_brl?: number | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          last_alert_at?: string | null
+          name: string
+          notes?: string | null
+          provider?: string | null
+          renewal_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          cost_brl?: number | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          last_alert_at?: string | null
+          name?: string
+          notes?: string | null
+          provider?: string | null
+          renewal_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       intent_routing_rules: {
         Row: {
           active: boolean

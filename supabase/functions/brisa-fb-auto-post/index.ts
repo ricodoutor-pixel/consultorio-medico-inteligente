@@ -11,24 +11,15 @@ const corsHeaders = {
 
 const GRAPH_API = "https://graph.facebook.com/v19.0";
 
-const FALLBACK_TOPICS = [
-  "Cannabis Medicinal para dor crônica - Dr. Edilson Bezerra CRM 10963",
-  "Tratamento de ansiedade com canabinoides - RDC 660/2022",
-  "Sistema Endocanabinoide e insônia - ciência aplicada",
-  "Importação ANVISA RDC 660 com frete grátis Planta y Raiz",
-  "Orientação Técnica R$30 - acompanhamento com Enf. Brisa 24h",
-  "Queda capilar e CBD - pesquisas recentes",
-  "Telemedicina Cannabis - como funciona pela Planta y Raiz",
-  "Selo gov.br e prescrição digital ICP-Brasil",
-];
+import { AUTO_POST_SYSTEM_PROMPT, pickTopic, sanitizeCaption } from "../_shared/auto-post-topics.ts";
 
 async function generatePost(): Promise<string> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  const topic = FALLBACK_TOPICS[Math.floor(Math.random() * FALLBACK_TOPICS.length)];
-  const base = `Acesse: https://plantayraiz.com.br/login | WhatsApp Enf. Brisa: (11) 99136-3154`;
+  const topic = pickTopic();
+  const base = `Acesse: https://plantayraiz.com.br | WhatsApp Enf. Brisa: (11) 99136-3154`;
 
   if (!LOVABLE_API_KEY) {
-    return `🌱 Planta y Raiz — Mega Clínica Digital de Cannabis Medicinal com Dr. Edilson Bezerra (CRM 10963).\n\n${topic}\n\nOrientação Técnica por R$ 30 (PIX). ${base}\n\n#CannabisMedicinal #PlantaYRaiz #SaúdeDigital`;
+    return sanitizeCaption(`🌱 Planta y Raiz — a maior plataforma digital de Cannabis Medicinal do Brasil.\n\n${topic}\n\n${base}\n\n#CannabisMedicinal #PlantaYRaiz #SaúdeDigital`);
   }
 
   try {
@@ -38,18 +29,18 @@ async function generatePost(): Promise<string> {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "Você é a Enf. Brisa da Planta y Raiz. Escreva 1 post para Facebook (máx 600 caracteres), tom acolhedor e científico, com emojis sutis, encerrando SEMPRE com o link https://plantayraiz.com.br/login e WhatsApp (11) 99136-3154. Inclua 3 hashtags. Mencione Dr. Edilson Bezerra CRM 10963 quando fizer sentido. Disclaimer ANVISA RDC 660/2022 implícito." },
-          { role: "user", content: `Tópico: ${topic}` },
+          { role: "system", content: AUTO_POST_SYSTEM_PROMPT + "\n\nFormato: post de Facebook, máx 600 caracteres, 3-5 hashtags." },
+          { role: "user", content: `Tópico: ${topic}\n\nEncerre com: ${base}` },
         ],
       }),
     });
     const j = await res.json();
     const text = j?.choices?.[0]?.message?.content?.trim();
-    if (text && text.includes("plantayraiz.com.br")) return text;
+    if (text && text.includes("plantayraiz.com.br")) return sanitizeCaption(text);
   } catch (e) {
     console.error("[fb-auto-post] AI gen error:", e);
   }
-  return `🌿 ${topic}\n\nOrientação Técnica R$30 via PIX. ${base}\n\n#CannabisMedicinal #PlantaYRaiz #Telemedicina`;
+  return sanitizeCaption(`🌿 ${topic}\n\n${base}\n\n#CannabisMedicinal #PlantaYRaiz #Telemedicina`);
 }
 
 Deno.serve(async (req) => {

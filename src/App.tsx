@@ -136,6 +136,7 @@ const RodizioMedicos = lazyWithRecovery(() => import("./pages/RodizioMedicos"), 
 const BrisaOrientacaoRedirect = lazyWithRecovery(() => import("./pages/BrisaOrientacaoRedirect"), { sourceRef: "/brisa-orientacao" });
 const AuditLog = lazyWithRecovery(() => import("./pages/admin/AuditLog"), { sourceRef: "/admin/audit-log" });
 const CronHealth = lazyWithRecovery(() => import("./pages/admin/CronHealth"), { sourceRef: "/admin/cron-health" });
+const ConversionsUnified = lazyWithRecovery(() => import("./pages/admin/ConversionsUnified"), { sourceRef: "/admin/conversoes" });
 const ConversoesUptime = lazyWithRecovery(() => import("./pages/admin/ConversoesUptime"), { sourceRef: "/admin/conversoes-uptime" });
 const AdminLeads = lazyWithRecovery(() => import("./pages/admin/Leads"), { sourceRef: "/admin/leads" });
 const AdminLeadDetail = lazyWithRecovery(() => import("./pages/admin/LeadDetail"), { sourceRef: "/admin/leads/:id" });
@@ -296,6 +297,7 @@ const App = () => (
                 <Route path="/admin/auditoria" element={<AdminRoute><AuditLog /></AdminRoute>} />
                 <Route path="/admin/cron-health" element={<AdminRoute><CronHealth /></AdminRoute>} />
                 <Route path="/admin/conversoes-uptime" element={<AdminRoute><ConversoesUptime /></AdminRoute>} />
+                <Route path="/admin/conversoes" element={<AdminRoute><ConversionsUnified /></AdminRoute>} />
                 <Route path="/admin/monitoramento" element={<AdminRoute><AdminMonitoramento /></AdminRoute>} />
                 <Route path="/admin/growth" element={<AdminRoute><GrowthDashboard /></AdminRoute>} />
                 <Route path="/admin/leads" element={<AdminRoute><AdminLeads /></AdminRoute>} />

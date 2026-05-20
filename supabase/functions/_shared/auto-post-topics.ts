@@ -51,6 +51,28 @@ export function pickImage(): string {
   return PUBLIC_IMAGE_POOL[Math.floor(Math.random() * PUBLIC_IMAGE_POOL.length)];
 }
 
+// Tenta pegar a imagem menos usada do pool dinâmico (brisa_image_pool); se vazio, cai no static.
+export async function pickImageFromPool(supabase: any): Promise<string> {
+  try {
+    const { data } = await supabase
+      .from("brisa_image_pool")
+      .select("id, image_url, used_count")
+      .order("used_count", { ascending: true })
+      .order("last_used_at", { ascending: true, nullsFirst: true })
+      .limit(1)
+      .maybeSingle();
+    if (data?.image_url) {
+      await supabase.from("brisa_image_pool")
+        .update({ used_count: (data.used_count || 0) + 1, last_used_at: new Date().toISOString() })
+        .eq("id", data.id);
+      return data.image_url;
+    }
+  } catch (e) {
+    console.error("[pickImageFromPool] fallback to static", e);
+  }
+  return pickImage();
+}
+
 // Aguarda container IG ficar FINISHED antes de publicar (resolve erro 9007 "Media ID is not available").
 // Faz polling em /{containerId}?fields=status_code com timeout máximo de ~25s.
 export async function waitIgContainerReady(

@@ -1,17 +1,15 @@
-// Diagnóstico TEMPORÁRIO: retorna apenas o comprimento e SHA-256 do BRISA_CEO_SECRET_KEY do env.
-// Não expõe o valor. Útil para alinhar com o vault.
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+// Diagnostic endpoint — DISABLED.
+// Previously leaked SHA-256 + length + first/last bytes of BRISA_CEO_SECRET_KEY.
+// Kept as a 410 Gone stub to avoid breaking deployed routes.
+const cors = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
-Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
-  const v = Deno.env.get('BRISA_CEO_SECRET_KEY') || '';
-  const bytes = new TextEncoder().encode(v);
-  const hash = await crypto.subtle.digest('SHA-256', bytes);
-  const hex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
-  return new Response(JSON.stringify({
-    env_len: v.length,
-    env_sha256: hex,
-    env_first2: v.slice(0, 2),
-    env_last2: v.slice(-2),
-  }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+Deno.serve((req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  return new Response(
+    JSON.stringify({ error: "Endpoint disabled for security reasons." }),
+    { status: 410, headers: { ...cors, "Content-Type": "application/json" } },
+  );
 });

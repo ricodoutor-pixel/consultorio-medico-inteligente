@@ -1,6 +1,7 @@
-// One-shot trigger that uses the runtime env var to invoke brisa-ig-auto-post
-// and records the result. Safe to call: returns 401 unless ?token=BRISA_CEO_SECRET_KEY.
+// One-shot trigger that invokes brisa-ig-auto-post or brisa-fb-auto-post.
+// Requires authentication: ?token=BRISA_CEO_SECRET_KEY OR Bearer service-role/cron secret.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -13,6 +14,15 @@ Deno.serve(async (req) => {
   const secret = Deno.env.get("BRISA_CEO_SECRET_KEY") || "";
   const svc = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
   const url = new URL(req.url);
+
+  // Accept ?token=… as an additional auth path; otherwise enforce service auth.
+  const providedToken = url.searchParams.get("token") || "";
+  const tokenOk = secret && providedToken === secret;
+  if (!tokenOk) {
+    const unauth = requireServiceAuth(req, cors);
+    if (unauth) return unauth;
+  }
+
   if (!secret) {
     return new Response(JSON.stringify({ error: "BRISA_CEO_SECRET_KEY not set in runtime" }), {
       status: 500, headers: { ...cors, "Content-Type": "application/json" },
@@ -40,7 +50,6 @@ Deno.serve(async (req) => {
   }
   const latency = Date.now() - started;
 
-  // Log to ai_events
   try {
     const sb = createClient(supabaseUrl, svc);
     await sb.from("ai_events").insert({

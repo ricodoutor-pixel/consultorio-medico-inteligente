@@ -104,6 +104,20 @@ async function sendInstagram(recipientId: string, text: string) {
   });
 }
 
+async function replyComment(commentId: string, text: string) {
+  // Funciona para FB Page comments E IG comments (mesmo endpoint Graph)
+  try {
+    const r = await fetch(`https://graph.facebook.com/v19.0/${commentId}/replies?access_token=${FB_PAGE_TOKEN}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text }),
+    });
+    if (!r.ok) console.error("[meta] reply comment failed", r.status, await r.text());
+  } catch (e) {
+    console.error("[meta] reply comment error", e);
+  }
+}
+
 async function notifyDoctorRedFlag(channel: string, senderId: string, msg: string) {
   if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY || !EVOLUTION_INSTANCE) return;
   try {
@@ -252,6 +266,89 @@ Deno.serve(async (req) => {
             channel: "messenger", sender_id: ev?.sender?.id ?? "unknown",
             message_in: ev?.message?.text ?? null, error: String(e),
           });
+        }
+      }
+
+      // ===== COMENTÁRIOS (FB Page feed + Instagram posts) =====
+      const changes = entry.changes ?? [];
+      for (const ch of changes) {
+        try {
+          const field = ch.field;
+          const v = ch.value ?? {};
+          // FB feed: { item:'comment', verb:'add', comment_id, message, from:{id,name} }
+          // IG: { id (comment_id), text, from:{id,username}, media:{id} }
+          const isFbComment = field === "feed" && v.item === "comment" && v.verb === "add";
+          const isIgComment = field === "comments";
+          if (!isFbComment && !isIgComment) continue;
+
+          const channel = isIgComment ? "instagram_comment" : "facebook_comment";
+          const commentId: string = v.comment_id || v.id;
+          const senderId: string = v.from?.id || "unknown";
+          const text: string = v.message || v.text || "";
+          if (!commentId || !text) continue;
+
+          // Não responder a si mesmo (evita loop)
+          if (senderId === IG_BUSINESS_ID || senderId === Deno.env.get("FACEBOOK_PAGE_ID")) continue;
+
+          // Idempotência
+          const { data: dedup, error: dedupErr } = await supabase
+            .from("webhook_idempotency")
+            .insert({ provider: `meta_${channel}`, message_id: commentId, channel, sender: senderId })
+            .select("id")
+            .maybeSingle();
+          if ((dedupErr && (dedupErr as any).code === "23505") || (!dedup && !dedupErr)) continue;
+
+          // Rate-limit por usuário (5/h para não floodar)
+          const { data: allowed } = await supabase.rpc("check_edge_rate_limit", {
+            p_bucket: `meta_${channel}`, p_key: senderId, p_max_hits: 5, p_window_seconds: 3600,
+          });
+          if (allowed === false) continue;
+
+          // Filtro assédio
+          if (containsHarassment(text)) {
+            await replyComment(commentId, "Comentário removido por violar nossas diretrizes. 🌿");
+            continue;
+          }
+
+          const lower = text.toLowerCase();
+          const isRed = RED_FLAGS.some(f => lower.includes(f));
+
+          // Resposta curta para comentário público (máx 280 chars, sem dados sensíveis)
+          const sysComment = BRISA_PERSONA + `
+// === COMPLEMENTO COMENTÁRIO PÚBLICO (${channel}) ===
+Máx 2 linhas, tom acolhedor, 1 emoji.
+NUNCA peça dados pessoais em público.
+Convide para conversar no WhatsApp: (11) 99136-3154 ou plantayraiz.com.br.
+NUNCA prescreva. NUNCA prometa cura.`;
+
+          let reply: string;
+          try {
+            const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${LOVABLE_API_KEY}` },
+              body: JSON.stringify({
+                model: "google/gemini-2.5-flash",
+                messages: [
+                  { role: "system", content: sysComment },
+                  { role: "user", content: text },
+                ],
+              }),
+            });
+            const j = await r.json();
+            reply = j?.choices?.[0]?.message?.content?.trim()?.slice(0, 280) ||
+              "Oi 🌿 chama no WhatsApp (11) 99136-3154 que te ajudo!";
+          } catch {
+            reply = "Oi 🌿 chama no WhatsApp (11) 99136-3154 que te ajudo!";
+          }
+
+          await replyComment(commentId, reply);
+          if (isRed) await notifyDoctorRedFlag(channel, senderId, text);
+
+          await supabase.from("meta_messenger_log").insert({
+            channel, sender_id: senderId, message_in: text, reply_out: reply, red_flag: isRed,
+          });
+        } catch (e) {
+          console.error("[meta] comment handler error", e);
         }
       }
     }

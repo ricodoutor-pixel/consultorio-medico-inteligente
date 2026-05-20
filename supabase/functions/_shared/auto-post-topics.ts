@@ -31,14 +31,16 @@ REGRAS RÍGIDAS DE CONTEÚDO:
 - Emojis sutis (🌿 💚 🤍 ✨).
 - Nunca prometa cura. Nunca cite paciente real. LGPD sempre.`;
 
+// Pool de imagens — Pexels CDN (mais confiável que Unsplash p/ Graph API).
+// IG/FB exigem URL pública estável que responde 200 com content-type image/jpeg.
 export const PUBLIC_IMAGE_POOL = [
-  "https://images.unsplash.com/photo-1536819114556-1e10f967fb61?w=1080&h=1080&fit=crop&fm=jpg&q=80",
-  "https://images.unsplash.com/photo-1603909223429-69bb7101f420?w=1080&h=1080&fit=crop&fm=jpg&q=80",
-  "https://images.unsplash.com/photo-1611242320536-f12d3541249b?w=1080&h=1080&fit=crop&fm=jpg&q=80",
-  "https://images.unsplash.com/photo-1585435557343-3b092031a831?w=1080&h=1080&fit=crop&fm=jpg&q=80",
-  "https://images.unsplash.com/photo-1542736667-069246bdbc6d?w=1080&h=1080&fit=crop&fm=jpg&q=80",
-  "https://images.unsplash.com/photo-1559757175-08f3a2c9b16f?w=1080&h=1080&fit=crop&fm=jpg&q=80",
-  "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1080&h=1080&fit=crop&fm=jpg&q=80",
+  "https://images.pexels.com/photos/7667731/pexels-photo-7667731.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1080&fit=crop",
+  "https://images.pexels.com/photos/7668021/pexels-photo-7668021.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1080&fit=crop",
+  "https://images.pexels.com/photos/3825529/pexels-photo-3825529.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1080&fit=crop",
+  "https://images.pexels.com/photos/3735149/pexels-photo-3735149.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1080&fit=crop",
+  "https://images.pexels.com/photos/4021779/pexels-photo-4021779.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1080&fit=crop",
+  "https://images.pexels.com/photos/7615460/pexels-photo-7615460.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1080&fit=crop",
+  "https://images.pexels.com/photos/3683074/pexels-photo-3683074.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1080&fit=crop",
 ];
 
 export function pickTopic(): string {
@@ -47,6 +49,31 @@ export function pickTopic(): string {
 
 export function pickImage(): string {
   return PUBLIC_IMAGE_POOL[Math.floor(Math.random() * PUBLIC_IMAGE_POOL.length)];
+}
+
+// Aguarda container IG ficar FINISHED antes de publicar (resolve erro 9007 "Media ID is not available").
+// Faz polling em /{containerId}?fields=status_code com timeout máximo de ~25s.
+export async function waitIgContainerReady(
+  containerId: string,
+  accessToken: string,
+  maxAttempts = 12,
+): Promise<{ ready: boolean; finalStatus: string }> {
+  const GRAPH = "https://graph.facebook.com/v19.0";
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise((r) => setTimeout(r, i === 0 ? 1500 : 2000));
+    try {
+      const r = await fetch(
+        `${GRAPH}/${containerId}?fields=status_code&access_token=${accessToken}`,
+      );
+      const j = await r.json();
+      const s = j?.status_code as string | undefined;
+      if (s === "FINISHED") return { ready: true, finalStatus: s };
+      if (s === "ERROR" || s === "EXPIRED") return { ready: false, finalStatus: s };
+    } catch {
+      // tenta de novo
+    }
+  }
+  return { ready: false, finalStatus: "TIMEOUT" };
 }
 
 // Remove qualquer menção a médico/CRM que possa ter vazado da fila manus_social_queue

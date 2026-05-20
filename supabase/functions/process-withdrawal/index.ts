@@ -64,6 +64,36 @@ Deno.serve(async (req) => {
 
     const totalToday = dailyWithdrawals?.reduce((sum: number, r: any) => sum + Number(r.amount || 0), 0) || 0;
 
+    // Verificar saldo disponível na carteira do afiliado
+    const { data: wallet, error: walletErr } = await supabase
+      .from("affiliate_wallets")
+      .select("available_balance")
+      .eq("user_id", authData.user.id)
+      .maybeSingle();
+
+    if (walletErr) {
+      console.error("Erro ao consultar carteira:", walletErr);
+      return new Response(JSON.stringify({ error: "Erro ao verificar saldo" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const availableBalance = Number(wallet?.available_balance || 0);
+    if (availableBalance < amount) {
+      await supabase.from("audit_log").insert({
+        user_id: authData.user.id,
+        action: "withdrawal_insufficient_balance",
+        table_name: "withdrawal_requests",
+        record_id: authData.user.id,
+        new_data: { attempted: amount, available: availableBalance },
+      });
+      return new Response(JSON.stringify({
+        error: `Saldo insuficiente. Disponível: R$ ${availableBalance.toFixed(2)}`,
+      }), {
+        status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (totalToday + amount > DAILY_LIMIT) {
       // Alerta de segurança via ManyChat webhook
       const manychatUrl = Deno.env.get("MANYCHAT_WEBHOOK_URL");

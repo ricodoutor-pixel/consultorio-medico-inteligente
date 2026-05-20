@@ -1,9 +1,14 @@
-// Auto-publica 1 post no Instagram Business a cada 30 min (via pg_cron).
-// Fluxo: pega próximo item APROVADO em manus_social_queue (platform=instagram).
-// Se a fila estiver vazia, gera dinamicamente via Gemini (Lovable AI) e publica.
-// IG exige image_url (Graph API IG Container -> media_publish).
+// Auto-publica 1 post no Instagram Business a cada 30 min.
+// Após publicar no IG, espelha automaticamente no Facebook Page e no Threads.
+// REGRA: zero menções a médicos específicos / CRM (ver _shared/auto-post-topics.ts).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import {
+  AUTO_POST_SYSTEM_PROMPT,
+  pickImage,
+  pickTopic,
+  sanitizeCaption,
+} from "../_shared/auto-post-topics.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,34 +16,17 @@ const corsHeaders = {
 };
 
 const GRAPH_API = "https://graph.facebook.com/v19.0";
-
-// Instagram exige JPEG público (não aceita PNG). Usar Unsplash (JPEG estável) temático.
-const DEFAULT_IMAGES = [
-  "https://images.unsplash.com/photo-1536819114556-1e10f967fb61?w=1080&h=1080&fit=crop&fm=jpg&q=80",
-  "https://images.unsplash.com/photo-1603909223429-69bb7101f420?w=1080&h=1080&fit=crop&fm=jpg&q=80",
-  "https://images.unsplash.com/photo-1611242320536-f12d3541249b?w=1080&h=1080&fit=crop&fm=jpg&q=80",
-  "https://images.unsplash.com/photo-1585435557343-3b092031a831?w=1080&h=1080&fit=crop&fm=jpg&q=80",
-  "https://images.unsplash.com/photo-1542736667-069246bdbc6d?w=1080&h=1080&fit=crop&fm=jpg&q=80",
-];
-
-const FALLBACK_TOPICS = [
-  "Cannabis Medicinal para dor crônica - Dr. Edilson Bezerra CRM 10963",
-  "Tratamento de ansiedade com canabinoides - RDC 660/2022",
-  "Sistema Endocanabinoide e insônia - ciência aplicada",
-  "Importação ANVISA RDC 660 com frete grátis Planta y Raiz",
-  "Orientação Técnica R$30 - acompanhamento com Enf. Brisa 24h",
-  "Queda capilar e CBD - pesquisas recentes",
-  "Telemedicina Cannabis - como funciona pela Planta y Raiz",
-  "Selo gov.br e prescrição digital ICP-Brasil",
-];
+const THREADS_API = "https://graph.threads.net/v1.0";
 
 async function generateCaption(): Promise<string> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  const topic = FALLBACK_TOPICS[Math.floor(Math.random() * FALLBACK_TOPICS.length)];
-  const base = `Link na bio 🌿 plantayraiz.com.br | Enf. Brisa: (11) 99136-3154`;
+  const topic = pickTopic();
+  const base = `Acesse: plantayraiz.com.br 🌿 | WhatsApp Enf. Brisa: (11) 99136-3154`;
 
   if (!LOVABLE_API_KEY) {
-    return `🌱 Planta y Raiz — Mega Clínica Digital de Cannabis Medicinal com Dr. Edilson Bezerra (CRM 10963).\n\n${topic}\n\nOrientação Técnica R$30 (PIX). ${base}\n\n#CannabisMedicinal #PlantaYRaiz #SaúdeDigital #Telemedicina`;
+    return sanitizeCaption(
+      `🌱 Planta y Raiz — a maior plataforma digital de Cannabis Medicinal do Brasil.\n\n${topic}\n\n${base}\n\n#CannabisMedicinal #PlantaYRaiz #SaúdeDigital #Telemedicina #BemEstar`,
+    );
   }
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -47,18 +35,78 @@ async function generateCaption(): Promise<string> {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "Você é a Enf. Brisa da Planta y Raiz. Escreva 1 caption para Instagram (máx 1500 caracteres), tom acolhedor e científico, com emojis sutis, mencionando o link na bio plantayraiz.com.br e WhatsApp (11) 99136-3154. Use 8-12 hashtags relevantes ao tema. Mencione Dr. Edilson Bezerra CRM 10963 quando fizer sentido. Disclaimer ANVISA RDC 660/2022 implícito." },
-          { role: "user", content: `Tópico: ${topic}` },
+          { role: "system", content: AUTO_POST_SYSTEM_PROMPT + "\n\nFormato: caption de Instagram, máx 1500 caracteres, 8-12 hashtags." },
+          { role: "user", content: `Tópico: ${topic}\n\nEncerre com: ${base}` },
         ],
       }),
     });
     const j = await res.json();
     const text = j?.choices?.[0]?.message?.content?.trim();
-    if (text && text.length > 30) return text;
+    if (text && text.length > 30) return sanitizeCaption(text);
   } catch (e) {
     console.error("[ig-auto-post] AI gen error:", e);
   }
-  return `🌿 ${topic}\n\nOrientação Técnica R$30 via PIX. ${base}\n\n#CannabisMedicinal #PlantaYRaiz #Telemedicina #SaudeDigital`;
+  return sanitizeCaption(`🌿 ${topic}\n\n${base}\n\n#CannabisMedicinal #PlantaYRaiz #Telemedicina #SaudeDigital #BemEstar`);
+}
+
+// ============================================================
+// FACEBOOK MIRROR — publica a mesma imagem + caption na Page
+// ============================================================
+async function mirrorToFacebook(pageId: string, imageUrl: string, message: string): Promise<unknown> {
+  try {
+    const { getFacebookPageToken } = await import("../_shared/fb-page-token.ts");
+    const fbToken = await getFacebookPageToken(pageId);
+    const r = await fetch(`${GRAPH_API}/${pageId}/photos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: imageUrl, caption: message, access_token: fbToken }),
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(JSON.stringify(j));
+    return { ok: true, fb: j };
+  } catch (e) {
+    return { ok: false, error: String(e) };
+  }
+}
+
+// ============================================================
+// THREADS MIRROR — exige THREADS_ACCESS_TOKEN + THREADS_USER_ID
+// (token específico do Threads via graph.threads.net)
+// ============================================================
+async function mirrorToThreads(imageUrl: string, message: string): Promise<unknown> {
+  const token = Deno.env.get("THREADS_ACCESS_TOKEN") || "";
+  const userId = Deno.env.get("THREADS_USER_ID") || "";
+  if (!token || !userId) {
+    return { ok: false, skipped: true, reason: "THREADS_ACCESS_TOKEN/THREADS_USER_ID não configurados" };
+  }
+  try {
+    // 1) Criar container IMAGE
+    const r1 = await fetch(`${THREADS_API}/${userId}/threads`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        media_type: "IMAGE",
+        image_url: imageUrl,
+        text: message.slice(0, 500),
+        access_token: token,
+      }),
+    });
+    const j1 = await r1.json();
+    if (!r1.ok || !j1.id) throw new Error(`container: ${JSON.stringify(j1)}`);
+
+    // 2) Publicar
+    await new Promise((r) => setTimeout(r, 2000));
+    const r2 = await fetch(`${THREADS_API}/${userId}/threads_publish`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ creation_id: j1.id, access_token: token }),
+    });
+    const j2 = await r2.json();
+    if (!r2.ok) throw new Error(`publish: ${JSON.stringify(j2)}`);
+    return { ok: true, threads: j2 };
+  } catch (e) {
+    return { ok: false, error: String(e) };
+  }
 }
 
 Deno.serve(async (req) => {
@@ -66,7 +114,6 @@ Deno.serve(async (req) => {
   const unauth = requireServiceAuth(req, corsHeaders);
   if (unauth) return unauth;
 
-  // Canonical IDs for @plantayraiz (Planta y Raiz Ltda). Env vars used only if they match expected format.
   const CANONICAL_IG_ID = "17841440895941034";
   const CANONICAL_PAGE_ID = "1104301376097224";
   const envIg = (Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID") || "").trim();
@@ -103,16 +150,16 @@ Deno.serve(async (req) => {
   let imageUrl: string;
 
   if (queued) {
-    caption = (queued.caption || queued.script || "").trim();
+    caption = sanitizeCaption((queued.caption || queued.script || "").trim());
     if (queued.hashtags?.length)
       caption += "\n\n" + queued.hashtags.map((t: string) => (t.startsWith("#") ? t : `#${t}`)).join(" ");
-    imageUrl = queued.image_url || DEFAULT_IMAGES[Math.floor(Math.random() * DEFAULT_IMAGES.length)];
+    imageUrl = queued.image_url || pickImage();
   } else {
     caption = await generateCaption();
-    imageUrl = DEFAULT_IMAGES[Math.floor(Math.random() * DEFAULT_IMAGES.length)];
+    imageUrl = pickImage();
   }
 
-  // 2) Criar IG Media Container
+  // 2) IG container
   let containerId: string | null = null;
   try {
     const r1 = await fetch(`${GRAPH_API}/${igUserId}/media`, {
@@ -134,7 +181,7 @@ Deno.serve(async (req) => {
     });
   }
 
-  // 3) Publicar
+  // 3) IG publish
   let igResult: unknown;
   try {
     const r2 = await fetch(`${GRAPH_API}/${igUserId}/media_publish`, {
@@ -155,7 +202,13 @@ Deno.serve(async (req) => {
     });
   }
 
-  // 4) Marcar postado
+  // 4) Mirror em paralelo — Facebook Page + Threads
+  const [fbMirror, threadsMirror] = await Promise.all([
+    mirrorToFacebook(pageId, imageUrl, caption),
+    mirrorToThreads(imageUrl, caption),
+  ]);
+
+  // 5) Marcar como postado
   if (postId) {
     await supabase
       .from("manus_social_queue")
@@ -169,11 +222,27 @@ Deno.serve(async (req) => {
   }
 
   await supabase.from("ai_events").insert({
-    ai_name: "brisa_ig_auto", event_type: "ig_post_published", status: "completed",
-    output_data: { ig_response: igResult, container_id: containerId, caption_preview: caption.slice(0, 120) },
+    ai_name: "brisa_ig_auto",
+    event_type: "ig_post_published",
+    status: "completed",
+    output_data: {
+      ig_response: igResult,
+      container_id: containerId,
+      caption_preview: caption.slice(0, 120),
+      fb_mirror: fbMirror,
+      threads_mirror: threadsMirror,
+    },
   });
 
-  return new Response(JSON.stringify({ ok: true, posted_id: postId, container_id: containerId, ig: igResult }), {
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
+  return new Response(
+    JSON.stringify({
+      ok: true,
+      posted_id: postId,
+      container_id: containerId,
+      ig: igResult,
+      fb_mirror: fbMirror,
+      threads_mirror: threadsMirror,
+    }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+  );
 });

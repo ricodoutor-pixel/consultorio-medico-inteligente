@@ -9,8 +9,8 @@
     <!-- Favicon (CRÍTICO Google SERP — Googlebot busca /favicon.ico PRIMEIRO) -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
@@ -232,20 +232,9 @@
 
     <div id="root"></div>
 
-    <script>
-      // Rotação diária de favicon (Verdinho ↔ Brisa ↔ logo) — muda a cada 24h
-      (function(){
-        try {
-          var icons = ['/favicon.svg','/favicon-verdinho.png','/favicon-brisa.png','/favicon.png'];
-          var day = Math.floor(Date.now() / 86400000);
-          var pick = icons[day % icons.length];
-          document.querySelectorAll('link[rel~="icon"], link[rel="shortcut icon"]').forEach(function(l){
-            l.href = pick;
-            if (pick.endsWith('.svg')) l.type = 'image/svg+xml'; else l.type = 'image/png';
-          });
-        } catch(e) {}
-      })();
-    </script>
+    <!-- Favicon rotation REMOVIDO: Google exige URL estável.
+         A rotação diária fazia o Googlebot cair no globo padrão da SERP. -->
+
 
     <!-- ESCUDO ANTI-TELA-PRETA (Salvaguarda #1)
          Captura erros antes do React montar (chunk load, "_ is not a function", etc).

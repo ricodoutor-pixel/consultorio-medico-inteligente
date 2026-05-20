@@ -363,6 +363,46 @@ const Precos = () => {
         </div>
       </section>
 
+      {/* Bloco de Conformidade Legal / Autorizações */}
+      <section className="py-10 border-t border-border/40 bg-card/30">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <h3 className="text-sm font-display font-black text-foreground mb-4 text-center uppercase tracking-wider">
+            Autorizações & Conformidade
+          </h3>
+          <div className="grid sm:grid-cols-2 gap-3 text-[11px] text-muted-foreground leading-relaxed">
+            <p>
+              <strong className="text-foreground">Razão Social:</strong> Planta y Raiz Ltda · <strong>CNAE 6209-1/00</strong> —
+              plataforma digital de intermediação entre pacientes e profissionais de saúde. Não somos uma clínica médica.
+            </p>
+            <p>
+              <strong className="text-foreground">Responsável Técnico:</strong> Dr. Edilson Bezerra da Silva ·
+              <strong> CRM-PE 10963</strong>. Atendimentos realizados conforme <strong>CFM Resolução nº 2.314/2022</strong> (Telemedicina).
+            </p>
+            <p>
+              <strong className="text-foreground">Cannabis Medicinal:</strong> prescrições e importações seguem a
+              <strong> RDC ANVISA nº 660/2022 e nº 327/2019</strong>. Produtos exigem receita médica válida.
+            </p>
+            <p>
+              <strong className="text-foreground">LGPD (Lei 13.709/2018):</strong> dados criptografados em repouso (AES-256).
+              Veja <Link to="/politica-de-privacidade" className="text-primary underline">Privacidade</Link>,
+              {" "}<Link to="/termos-de-uso" className="text-primary underline">Termos</Link> e
+              {" "}<Link to="/lgpd-direitos" className="text-primary underline">Direitos LGPD</Link>.
+            </p>
+            <p>
+              <strong className="text-foreground">Direito de Arrependimento:</strong> CDC Art. 49 — 7 dias para cancelar
+              assinaturas digitais. Veja <Link to="/politica-de-reembolso" className="text-primary underline">Política de Reembolso</Link>.
+            </p>
+            <p>
+              <strong className="text-foreground">Renovação Automática:</strong> as assinaturas mensais renovam-se
+              automaticamente via Mercado Pago/Pix. Você pode cancelar a qualquer momento no painel da sua conta.
+            </p>
+          </div>
+          <p className="text-center text-[10px] text-muted-foreground/70 mt-4">
+            Pagamentos processados por Mercado Pago Brasil (PCI-DSS Nível 1). Em caso de urgência médica, ligue 192 (SAMU).
+          </p>
+        </div>
+      </section>
+
       <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
       <div className="pb-[calc(8.5rem+env(safe-area-inset-bottom,0px))] sm:pb-0">
         <Footer />

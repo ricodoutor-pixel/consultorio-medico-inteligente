@@ -22,18 +22,19 @@ export default function ConversionsUnified() {
   const load = useCallback(async () => {
     setLoading(true);
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const sb = supabase as any;
     const [
       visitors, leads, orders, paid, capi,
       imgPool, btcPending, btcConfirmed,
     ] = await Promise.all([
-      supabase.from("site_counters").select("count").eq("id", "total_visitors").maybeSingle(),
-      supabase.from("pacientes_leads").select("id", { count: "exact", head: true }).gte("created_at", since),
-      supabase.from("orientacao_tecnica_orders").select("id", { count: "exact", head: true }).gte("created_at", since),
-      supabase.from("orientacao_tecnica_orders").select("amount").eq("payment_status", "paid").gte("created_at", since),
-      supabase.from("ai_events").select("status").eq("ai_name", "meta_capi").gte("created_at", since),
-      supabase.from("brisa_image_pool").select("id", { count: "exact", head: true }),
-      supabase.from("btc_payment_verifications").select("id", { count: "exact", head: true }).eq("status", "pending"),
-      supabase.from("btc_payment_verifications").select("id", { count: "exact", head: true })
+      sb.from("site_counters").select("count").eq("id", "total_visitors").maybeSingle(),
+      sb.from("pacientes_leads").select("id", { count: "exact", head: true }).gte("created_at", since),
+      sb.from("orientacao_tecnica_orders").select("id", { count: "exact", head: true }).gte("created_at", since),
+      sb.from("orientacao_tecnica_orders").select("amount").eq("payment_status", "paid").gte("created_at", since),
+      sb.from("ai_events").select("status").eq("ai_name", "meta_capi").gte("created_at", since),
+      sb.from("brisa_image_pool").select("id", { count: "exact", head: true }),
+      sb.from("btc_payment_verifications").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      sb.from("btc_payment_verifications").select("id", { count: "exact", head: true })
         .eq("status", "confirmed").gte("confirmed_at", since),
     ]);
 

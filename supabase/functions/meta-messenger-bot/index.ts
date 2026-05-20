@@ -104,6 +104,20 @@ async function sendInstagram(recipientId: string, text: string) {
   });
 }
 
+async function replyComment(commentId: string, text: string) {
+  // Funciona para FB Page comments E IG comments (mesmo endpoint Graph)
+  try {
+    const r = await fetch(`https://graph.facebook.com/v19.0/${commentId}/replies?access_token=${FB_PAGE_TOKEN}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text }),
+    });
+    if (!r.ok) console.error("[meta] reply comment failed", r.status, await r.text());
+  } catch (e) {
+    console.error("[meta] reply comment error", e);
+  }
+}
+
 async function notifyDoctorRedFlag(channel: string, senderId: string, msg: string) {
   if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY || !EVOLUTION_INSTANCE) return;
   try {

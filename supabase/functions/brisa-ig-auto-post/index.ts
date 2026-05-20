@@ -6,6 +6,7 @@ import { requireServiceAuth } from "../_shared/service-auth.ts";
 import {
   AUTO_POST_SYSTEM_PROMPT,
   pickImage,
+  pickImageFromPool,
   pickTopic,
   sanitizeCaption,
   waitIgContainerReady,
@@ -154,10 +155,10 @@ Deno.serve(async (req) => {
     caption = sanitizeCaption((queued.caption || queued.script || "").trim());
     if (queued.hashtags?.length)
       caption += "\n\n" + queued.hashtags.map((t: string) => (t.startsWith("#") ? t : `#${t}`)).join(" ");
-    imageUrl = queued.image_url || pickImage();
+    imageUrl = queued.image_url || await pickImageFromPool(supabase);
   } else {
     caption = await generateCaption();
-    imageUrl = pickImage();
+    imageUrl = await pickImageFromPool(supabase);
   }
 
   // 2) IG container

@@ -8,6 +8,7 @@ import {
   pickImage,
   pickTopic,
   sanitizeCaption,
+  waitIgContainerReady,
 } from "../_shared/auto-post-topics.ts";
 
 const corsHeaders = {

@@ -8,6 +8,7 @@ import {
   pickImage,
   pickTopic,
   sanitizeCaption,
+  waitIgContainerReady,
 } from "../_shared/auto-post-topics.ts";
 
 const corsHeaders = {
@@ -177,6 +178,18 @@ Deno.serve(async (req) => {
       output_data: { error: String(e), post_id: postId, image_url: imageUrl },
     });
     return new Response(JSON.stringify({ ok: false, stage: "container", error: String(e) }), {
+      status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // 2.5) Aguardar container FINISHED (evita erro 9007 "Media ID is not available")
+  const waitRes = await waitIgContainerReady(containerId!, token);
+  if (!waitRes.ready) {
+    await supabase.from("ai_events").insert({
+      ai_name: "brisa_ig_auto", event_type: "ig_container_not_ready", status: "error",
+      output_data: { container_id: containerId, final_status: waitRes.finalStatus, image_url: imageUrl },
+    });
+    return new Response(JSON.stringify({ ok: false, stage: "wait", final_status: waitRes.finalStatus }), {
       status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

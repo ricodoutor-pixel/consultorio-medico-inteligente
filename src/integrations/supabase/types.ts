@@ -795,6 +795,36 @@ export type Database = {
         }
         Relationships: []
       }
+      brisa_image_pool: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          last_used_at: string | null
+          prompt: string
+          theme: string | null
+          used_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          last_used_at?: string | null
+          prompt: string
+          theme?: string | null
+          used_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          last_used_at?: string | null
+          prompt?: string
+          theme?: string | null
+          used_count?: number
+        }
+        Relationships: []
+      }
       brisa_triage_severity: {
         Row: {
           created_at: string
@@ -905,6 +935,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      btc_payment_verifications: {
+        Row: {
+          btc_address: string
+          confirmations: number
+          confirmed_at: string | null
+          created_at: string
+          expected_amount_btc: number
+          id: string
+          order_id: string | null
+          status: string
+          tx_hash: string | null
+          updated_at: string
+        }
+        Insert: {
+          btc_address: string
+          confirmations?: number
+          confirmed_at?: string | null
+          created_at?: string
+          expected_amount_btc: number
+          id?: string
+          order_id?: string | null
+          status?: string
+          tx_hash?: string | null
+          updated_at?: string
+        }
+        Update: {
+          btc_address?: string
+          confirmations?: number
+          confirmed_at?: string | null
+          created_at?: string
+          expected_amount_btc?: number
+          id?: string
+          order_id?: string | null
+          status?: string
+          tx_hash?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       btc_subscriptions: {
         Row: {
@@ -3238,6 +3307,7 @@ export type Database = {
       manus_social_queue: {
         Row: {
           caption: string | null
+          caption_hash: string | null
           created_at: string
           created_by_run: string | null
           hashtags: string[] | null
@@ -3252,6 +3322,7 @@ export type Database = {
         }
         Insert: {
           caption?: string | null
+          caption_hash?: string | null
           created_at?: string
           created_by_run?: string | null
           hashtags?: string[] | null
@@ -3266,6 +3337,7 @@ export type Database = {
         }
         Update: {
           caption?: string | null
+          caption_hash?: string | null
           created_at?: string
           created_by_run?: string | null
           hashtags?: string[] | null

@@ -107,11 +107,11 @@ export const CookieConsentBanner = () => {
           {/* Decorative leaf pattern — desktop only para manter o banner enxuto no mobile */}
           <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-1/3 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48cGF0aCBkPSJNMzAgNUMxNSAxMCA1IDIwIDUgMzVjMCAxNSAyMCAyMCAyNSAyMFM1NSA1MCA1NSAzNUM1NSAyMCA0NSAxMCAzMCA1eiIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC4zIi8+PC9zdmc+')] bg-repeat" />
 
-          <div className={`relative flex flex-row items-center gap-2 sm:gap-5 p-2.5 sm:p-5 ${isPlansRoute && isMobile ? "pr-2" : ""}`}>
+          <div className={`relative flex flex-row items-center gap-2 sm:gap-5 p-2.5 sm:p-5 ${isPlansRoute && isMobile ? "px-2.5 py-2 pr-2" : ""}`}>
             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
               <Shield size={18} className="text-emerald-300 shrink-0 hidden sm:block" />
               <div className="min-w-0">
-                <p className="font-display font-bold text-white text-xs sm:text-base leading-tight sm:mb-1 truncate sm:whitespace-normal">
+                <p className={`font-display font-bold text-white leading-tight sm:mb-1 truncate sm:whitespace-normal ${isPlansRoute && isMobile ? 'text-[11px]' : 'text-xs sm:text-base'}`}>
                   🍪 Cookies & Privacidade
                 </p>
                 <p className="hidden sm:block text-emerald-100/80 text-xs sm:text-sm leading-relaxed">
@@ -120,7 +120,7 @@ export const CookieConsentBanner = () => {
                     Política de Privacidade
                   </Link>.
                 </p>
-                <Link to="/privacidade" className="sm:hidden text-[10px] text-emerald-300 underline underline-offset-2">
+                <Link to="/privacidade" className={`sm:hidden text-emerald-300 underline underline-offset-2 ${isPlansRoute && isMobile ? 'text-[9px]' : 'text-[10px]'}`}>
                   Política de Privacidade
                 </Link>
                 {/* Micro-badges só no desktop */}
@@ -140,7 +140,7 @@ export const CookieConsentBanner = () => {
 
             <button
               onClick={handleAccept}
-              className="shrink-0 flex items-center gap-1 sm:gap-2 bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-4 sm:px-6 py-2 sm:py-2.5 rounded-full shadow-lg shadow-emerald-500/30 hover:shadow-emerald-400/40 transition-all duration-300 hover:scale-105 text-xs sm:text-base"
+              className={`shrink-0 flex items-center gap-1 sm:gap-2 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-full shadow-lg shadow-emerald-500/30 hover:shadow-emerald-400/40 transition-all duration-300 hover:scale-105 ${isPlansRoute && isMobile ? 'px-3 py-2 text-[11px]' : 'px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-base'}`}
             >
               Aceitar
               <Check size={14} className="text-white" />

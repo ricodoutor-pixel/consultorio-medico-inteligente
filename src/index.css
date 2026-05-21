@@ -330,6 +330,11 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
   .hero-glow {
     position: relative;
     overflow: hidden;
+    /* contain:paint + isolation isolam a camada e impedem vazamento de
+       pseudo-elementos entre seções empilhadas (causa de scanlines em /planos) */
+    contain: paint;
+    isolation: isolate;
+    transform: translateZ(0);
   }
 
   .hero-glow::before {

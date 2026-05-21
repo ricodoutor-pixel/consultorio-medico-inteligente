@@ -10,6 +10,7 @@ import {
   type LeadClass,
 } from "@/hooks/useBrisaConversations";
 import { toast } from "sonner";
+import BrisaHealthChecklist from "@/components/admin/BrisaHealthChecklist";
 
 const CHANNEL_META: Record<Channel, { label: string; Icon: any; color: string }> = {
   whatsapp: { label: "WhatsApp", Icon: Phone, color: "text-green-400" },
@@ -83,8 +84,13 @@ export default function BrisaCEO() {
         </div>
       </header>
 
+      {/* Checklist Virada Meta */}
+      <div className="container mx-auto px-4 pt-4">
+        <BrisaHealthChecklist />
+      </div>
+
       {/* Métricas */}
-      <section className="container mx-auto px-4 py-6 grid grid-cols-2 md:grid-cols-5 gap-3">
+      <section className="container mx-auto px-4 pb-6 grid grid-cols-2 md:grid-cols-5 gap-3">
         <MetricCard label="Ativas 24h" value={metrics.active24h} Icon={MessageCircle} />
         <MetricCard label="Leads R$30" value={metrics.leadsR30} Icon={TrendingUp} accent="text-emerald-400" />
         <MetricCard label="Profissionais" value={metrics.leadsProfessional} Icon={UserCheck} accent="text-blue-400" />

@@ -11,6 +11,7 @@ import {
 } from "@/hooks/useBrisaConversations";
 import { toast } from "sonner";
 import BrisaHealthChecklist from "@/components/admin/BrisaHealthChecklist";
+import BrisaMetaDebugPanel from "@/components/admin/BrisaMetaDebugPanel";
 
 const CHANNEL_META: Record<Channel, { label: string; Icon: any; color: string }> = {
   whatsapp: { label: "WhatsApp", Icon: Phone, color: "text-green-400" },
@@ -87,6 +88,7 @@ export default function BrisaCEO() {
       {/* Checklist Virada Meta */}
       <div className="container mx-auto px-4 pt-4">
         <BrisaHealthChecklist />
+        <BrisaMetaDebugPanel />
       </div>
 
       {/* Métricas */}

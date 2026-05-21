@@ -30,6 +30,11 @@ import {
   containsHarassment,
   isFirstContactOrStale,
 } from "../_shared/brisa-persona.ts";
+import {
+  upsertUnifiedContact,
+  logUnifiedMessage,
+  isHumanTakeoverActive,
+} from "../_shared/brisa-memory.ts";
 
 async function logGrowth(action: string, phase: string, state: Record<string, unknown>) {
   try {

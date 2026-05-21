@@ -211,9 +211,42 @@ const Club = () => {
   const handleCreatePost = async () => {
     if (!user) { toast({ title: "Login necessário", variant: "destructive" }); return; }
     if (!newPost.trim()) return;
-    await supabase.from("club_posts").insert({ user_id: user.id, content: newPost, images: postImages.length > 0 ? postImages : [] });
+    const imagesToPost = postImages.slice(0, 3);
+    const { data: inserted } = await supabase
+      .from("club_posts")
+      .insert({ user_id: user.id, content: newPost, images: imagesToPost.length > 0 ? imagesToPost : [] })
+      .select("id")
+      .single();
+
+    // Auto-publica no Instagram (IG cross-posta no Facebook nativamente).
+    // Só publica se tiver pelo menos 1 imagem — IG não aceita post só de texto.
+    if (inserted?.id && imagesToPost.length > 0) {
+      const authorName =
+        (user.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ||
+        (user.user_metadata as { full_name?: string; name?: string } | undefined)?.name ||
+        user.email?.split("@")[0] ||
+        "Membro Club";
+      supabase.functions
+        .invoke("publish-to-instagram", {
+          body: {
+            post_id: inserted.id,
+            content: newPost,
+            images: imagesToPost,
+            author_name: authorName,
+          },
+        })
+        .then(({ error }) => {
+          if (error) console.warn("[Club→IG] publish error:", error);
+        });
+    }
+
     setNewPost(""); setPostImages([]); loadPosts();
-    toast({ title: "Post criado! 🌿" });
+    toast({
+      title: "Post criado! 🌿",
+      description: imagesToPost.length > 0
+        ? "Compartilhando também no Instagram (e Facebook via cross-post)"
+        : "Adicione uma foto para publicar também no Instagram",
+    });
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -370,6 +370,12 @@ serve(async (req) => {
         phone, direction: "outbound", message: BRISA_HARASSMENT_BLOCK,
         raw: { trigger: "harassment_block" },
       }).then(() => {}).catch(() => {});
+      if (unifiedContactId) {
+        await logUnifiedMessage({
+          contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
+          content: BRISA_HARASSMENT_BLOCK, intent: "harassment_block",
+        });
+      }
       await logGrowth("harassment_block", "brisa_omnichannel", { channel: "whatsapp", phone, message: messageText.slice(0, 300) });
       return new Response(JSON.stringify({ ok: true, blocked: "harassment" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

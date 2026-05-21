@@ -290,7 +290,7 @@ serve(async (req) => {
         }
       }
       if (!messageText) {
-        await sendWhatsApp(phone, "Recebi seu áudio amor, mas não consegui escutar direitinho 🙈 me manda por texto que eu te respondo rapidinho 💚");
+        await sendWhatsApp(phone, "Recebi seu áudio, mas não consegui processá-lo. Por gentileza, envie por texto que eu te respondo em seguida. 🌿");
         return new Response(JSON.stringify({ ok: true, skipped: "audio_unreadable" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });

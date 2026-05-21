@@ -26,6 +26,7 @@ import {
   BRISA_PERSONA,
   BRISA_WELCOME_MESSAGE,
   BRISA_HARASSMENT_BLOCK,
+  BRISA_FALLBACK_MESSAGE,
   containsHarassment,
   isFirstContactOrStale,
 } from "../_shared/brisa-persona.ts";

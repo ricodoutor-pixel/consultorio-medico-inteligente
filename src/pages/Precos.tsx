@@ -208,11 +208,6 @@ const Precos = () => {
                         {plan.tag}
                       </div>
                     )}
-                    {plan.id === 'clinica-familia' && (
-                      <div className="absolute top-3 left-3 max-w-[calc(100%-8.5rem)] px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-300 truncate">
-                        ⭐ Recomendado por +320 famílias
-                      </div>
-                    )}
                     <CardContent className={`p-5 ${plan.id === 'clinica-familia' ? 'pt-12' : ''}`}>
                       <Icon size={28} className={`mb-2 ${
                         plan.highlighted ? 'text-primary' :
@@ -230,6 +225,11 @@ const Precos = () => {
                         }`}>{plan.price}</span>
                         <span className="text-muted-foreground text-sm">{plan.period}</span>
                       </div>
+                      {plan.id === 'clinica-familia' && (
+                        <div className="mb-3 inline-flex max-w-full items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-300">
+                          ⭐ Recomendado por +320 famílias
+                        </div>
+                      )}
                       <p className="text-xs text-muted-foreground mb-5 leading-relaxed">{plan.description}</p>
                       <ul className="space-y-2 mb-5">
                         {plan.features.map((feature, i) => (

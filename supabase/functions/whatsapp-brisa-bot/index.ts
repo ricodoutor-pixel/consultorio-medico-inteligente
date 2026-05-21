@@ -392,6 +392,12 @@ serve(async (req) => {
         phone, direction: "outbound", message: BRISA_WELCOME_MESSAGE,
         raw: { trigger: "welcome_24h" },
       }).then(() => {}).catch(() => {});
+      if (unifiedContactId) {
+        await logUnifiedMessage({
+          contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
+          content: BRISA_WELCOME_MESSAGE, intent: "welcome_24h",
+        });
+      }
       await logGrowth("welcome_sent", "brisa_omnichannel", { channel: "whatsapp", phone, link: "https://plantayraiz.com.br" });
       return new Response(JSON.stringify({ ok: true, welcome: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -421,6 +427,14 @@ serve(async (req) => {
     await supabase.from("whatsapp_brisa_log").insert({
       phone, direction: "outbound", message: reply, raw: { ai: true, voice: wasAudio || askedVoice },
     }).then(() => {}).catch(() => {});
+
+    if (unifiedContactId) {
+      await logUnifiedMessage({
+        contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
+        content: reply, intent: "ai_reply",
+        messageType: (wasAudio || askedVoice) ? "audio" : "text",
+      });
+    }
 
     // Telemetria: detectar se a resposta contém o link de cadastro
     if (/plantayraiz\.com\.br/i.test(reply)) {

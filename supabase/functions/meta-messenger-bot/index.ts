@@ -102,7 +102,7 @@ async function sendMessenger(recipientId: string, text: string) {
 
 async function sendInstagram(recipientId: string, text: string) {
   // Instagram uses the same /me/messages endpoint when token has IG permissions
-  const url = `https://graph.facebook.com/v18.0/me/messages?access_token=${FB_PAGE_TOKEN}`;
+  const url = `https://graph.facebook.com/v18.0/me/messages?access_token=${IG_PAGE_TOKEN}`;
   await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

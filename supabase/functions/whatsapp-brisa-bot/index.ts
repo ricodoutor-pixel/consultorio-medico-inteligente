@@ -49,7 +49,7 @@ async function logGrowth(action: string, phase: string, state: Record<string, un
   }
 }
 
-const BRISA_SYSTEM_PROMPT = BRISA_PERSONA + `
+const BRISA_WHATSAPP_SUFFIX = `
 
 // === COMPLEMENTO WHATSAPP (canal Evolution) ===
 - Mensagens CURTAS (2-4 frases máximo), tom de WhatsApp corporativo.
@@ -58,6 +58,38 @@ const BRISA_SYSTEM_PROMPT = BRISA_PERSONA + `
 - Pode responder em áudio (TTS) quando o paciente enviar áudio ou pedir explicitamente.
 - Atendimento por vídeo: apenas dentro da plataforma após o cadastro e pagamento da Orientação Técnica.
 `;
+
+const BRISA_STATIC_PROMPT = BRISA_PERSONA + BRISA_WHATSAPP_SUFFIX;
+
+// 🎛️ Prompt dinâmico — consulta system_settings (cache 60s)
+let _promptCache: { value: string; at: number } = { value: BRISA_STATIC_PROMPT, at: 0 };
+async function getBrisaSystemPrompt(): Promise<string> {
+  const now = Date.now();
+  if (now - _promptCache.at < 60_000) return _promptCache.value;
+  try {
+    const { data } = await supabase
+      .from("system_settings")
+      .select("value")
+      .eq("key", "brisa_system_prompt")
+      .maybeSingle();
+    const override = (data?.value as any)?.prompt;
+    const pricing = await supabase
+      .from("system_settings")
+      .select("value")
+      .eq("key", "brisa_pricing")
+      .maybeSingle();
+    const p = (pricing.data?.value as any) || {};
+    const pricingLine = `\n[PREÇOS ATUAIS] Orientação Técnica: R$ ${p.orientacao_tecnica_brl ?? 30} (BR) / US$ ${p.orientacao_tecnica_usd ?? 10} (intl).`;
+    const base = (override && typeof override === "string" && override.trim().length > 50)
+      ? override + BRISA_WHATSAPP_SUFFIX
+      : BRISA_STATIC_PROMPT;
+    _promptCache = { value: base + pricingLine, at: now };
+  } catch (e) {
+    console.error("[brisa-bot] getBrisaSystemPrompt failed", e);
+    _promptCache = { value: BRISA_STATIC_PROMPT, at: now };
+  }
+  return _promptCache.value;
+}
 
 async function transcribeAudio(base64Audio: string, mimeType: string): Promise<string> {
   try {
@@ -204,7 +236,7 @@ async function callBrisaAI(userMessage: string, history: Array<{role: string; co
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: BRISA_SYSTEM_PROMPT }] },
+      systemInstruction: { parts: [{ text: await getBrisaSystemPrompt() }] },
       contents,
     }),
   });

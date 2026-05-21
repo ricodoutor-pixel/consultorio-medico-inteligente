@@ -11,8 +11,13 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
-const FB_APP_SECRET = Deno.env.get("FACEBOOK_APP_SECRET")!;
-const FB_PAGE_TOKEN = Deno.env.get("FACEBOOK_PAGE_ACCESS_TOKEN")!;
+import {
+  META_APP_SECRET as FB_APP_SECRET,
+  FB_PAGE_ACCESS_TOKEN,
+  IG_PAGE_ACCESS_TOKEN,
+} from "../_shared/meta-secrets.ts";
+const FB_PAGE_TOKEN = FB_PAGE_ACCESS_TOKEN;
+const IG_PAGE_TOKEN = IG_PAGE_ACCESS_TOKEN || FB_PAGE_ACCESS_TOKEN;
 const IG_BUSINESS_ID = Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID") ?? "";
 // Verify tokens accepted by the Meta webhook handshake.
 // Sourced exclusively from secrets — never hardcode.
@@ -32,6 +37,11 @@ import {
   containsHarassment,
   isFirstContactOrStale,
 } from "../_shared/brisa-persona.ts";
+import {
+  upsertUnifiedContact,
+  logUnifiedMessage,
+  isHumanTakeoverActive,
+} from "../_shared/brisa-memory.ts";
 
 const BRISA_SYSTEM = BRISA_PERSONA + `
 
@@ -92,7 +102,7 @@ async function sendMessenger(recipientId: string, text: string) {
 
 async function sendInstagram(recipientId: string, text: string) {
   // Instagram uses the same /me/messages endpoint when token has IG permissions
-  const url = `https://graph.facebook.com/v18.0/me/messages?access_token=${FB_PAGE_TOKEN}`;
+  const url = `https://graph.facebook.com/v18.0/me/messages?access_token=${IG_PAGE_TOKEN}`;
   await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -203,6 +213,26 @@ Deno.serve(async (req) => {
           });
           if (allowed === false) continue;
 
+          // 🧠 BRISA 360° — memória unificada cross-channel
+          const unifiedChannel = channel === "instagram" ? "instagram_dm" : "messenger";
+          const unifiedContactId = await upsertUnifiedContact({
+            channel: unifiedChannel,
+            instagramId: channel === "instagram" ? senderId : undefined,
+            facebookPsid: channel === "messenger" ? senderId : undefined,
+          });
+          if (unifiedContactId) {
+            await logUnifiedMessage({
+              contactId: unifiedContactId,
+              channel: unifiedChannel,
+              direction: "inbound",
+              content: text,
+              externalId: mid || undefined,
+            });
+            if (await isHumanTakeoverActive(unifiedContactId)) {
+              continue; // humano assumiu — bot silencia
+            }
+          }
+
           const lower = text.toLowerCase();
           const isRed = RED_FLAGS.some(f => lower.includes(f));
 
@@ -213,6 +243,12 @@ Deno.serve(async (req) => {
             await supabase.from("meta_messenger_log").insert({
               channel, sender_id: senderId, message_in: text, reply_out: BRISA_HARASSMENT_BLOCK, red_flag: false,
             });
+            if (unifiedContactId) {
+              await logUnifiedMessage({
+                contactId: unifiedContactId, channel: unifiedChannel, direction: "outbound",
+                content: BRISA_HARASSMENT_BLOCK, intent: "harassment_block",
+              });
+            }
             await supabase.from("manus_growth_logs").insert({
               phase: "brisa_omnichannel", action: "harassment_block", status: "ok",
               after_state: { channel, sender_id: senderId, message: text.slice(0, 300) },
@@ -252,6 +288,13 @@ Deno.serve(async (req) => {
           await supabase.from("meta_messenger_log").insert({
             channel, sender_id: senderId, message_in: text, reply_out: reply, red_flag: isRed,
           });
+
+          if (unifiedContactId) {
+            await logUnifiedMessage({
+              contactId: unifiedContactId, channel: unifiedChannel, direction: "outbound",
+              content: reply, intent: trigger, urgency: isRed ? 1.0 : undefined,
+            });
+          }
 
           if (/plantayraiz\.com\.br/i.test(reply)) {
             await supabase.from("manus_growth_logs").insert({
@@ -346,6 +389,27 @@ NUNCA prescreva. NUNCA prometa cura.`;
           await supabase.from("meta_messenger_log").insert({
             channel, sender_id: senderId, message_in: text, reply_out: reply, red_flag: isRed,
           });
+
+          // 🧠 BRISA 360° — comentário público também alimenta a memória cross-channel
+          const cChannel = channel === "instagram_comment" ? "ig_comment" : "fb_comment";
+          const cContactId = await upsertUnifiedContact({
+            channel: cChannel,
+            instagramId: channel === "instagram_comment" ? senderId : undefined,
+            facebookPsid: channel === "facebook_comment" ? senderId : undefined,
+            instagramUsername: v.from?.username || undefined,
+            displayName: v.from?.name || v.from?.username || undefined,
+          });
+          if (cContactId) {
+            await logUnifiedMessage({
+              contactId: cContactId, channel: cChannel, direction: "inbound",
+              content: text, externalId: commentId,
+            });
+            await logUnifiedMessage({
+              contactId: cContactId, channel: cChannel, direction: "outbound",
+              content: reply, intent: "public_comment_reply",
+              urgency: isRed ? 1.0 : undefined,
+            });
+          }
         } catch (e) {
           console.error("[meta] comment handler error", e);
         }

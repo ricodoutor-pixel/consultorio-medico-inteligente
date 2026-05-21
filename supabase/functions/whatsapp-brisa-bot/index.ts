@@ -30,6 +30,11 @@ import {
   containsHarassment,
   isFirstContactOrStale,
 } from "../_shared/brisa-persona.ts";
+import {
+  upsertUnifiedContact,
+  logUnifiedMessage,
+  isHumanTakeoverActive,
+} from "../_shared/brisa-memory.ts";
 
 async function logGrowth(action: string, phase: string, state: Record<string, unknown>) {
   try {
@@ -306,6 +311,33 @@ serve(async (req) => {
     // Classify sentiment (Gemini) → habilita brisa-crisis-alert
     const { sentiment_score, is_negative } = await classifySentiment(messageText);
 
+    // 🧠 BRISA 360° — Memória cross-channel unificada
+    const unifiedContactId = await upsertUnifiedContact({
+      channel: "whatsapp",
+      phone,
+      whatsappJid: remoteJid,
+      displayName: data?.pushName || undefined,
+    });
+    if (unifiedContactId) {
+      await logUnifiedMessage({
+        contactId: unifiedContactId,
+        channel: "whatsapp",
+        direction: "inbound",
+        content: messageText,
+        externalId: messageId || undefined,
+        messageType: messageText.startsWith("[🎙️ áudio transcrito]") ? "audio" : "text",
+        urgency: is_negative ? 0.8 : Math.max(0, 1 - sentiment_score),
+        audioTranscript: messageText.startsWith("[🎙️ áudio transcrito]") ? messageText.replace("[🎙️ áudio transcrito] ", "") : undefined,
+        raw: { sentiment_score, is_negative },
+      });
+      // Se humano assumiu o atendimento, NÃO responde com bot
+      if (await isHumanTakeoverActive(unifiedContactId)) {
+        return new Response(JSON.stringify({ ok: true, skipped: "human_takeover", contact_id: unifiedContactId }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     // Persist inbound message com sentiment + load short history
     await supabase.from("whatsapp_brisa_log").insert({
       phone, direction: "inbound", message: messageText, raw: data,
@@ -338,6 +370,12 @@ serve(async (req) => {
         phone, direction: "outbound", message: BRISA_HARASSMENT_BLOCK,
         raw: { trigger: "harassment_block" },
       }).then(() => {}).catch(() => {});
+      if (unifiedContactId) {
+        await logUnifiedMessage({
+          contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
+          content: BRISA_HARASSMENT_BLOCK, intent: "harassment_block",
+        });
+      }
       await logGrowth("harassment_block", "brisa_omnichannel", { channel: "whatsapp", phone, message: messageText.slice(0, 300) });
       return new Response(JSON.stringify({ ok: true, blocked: "harassment" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -354,6 +392,12 @@ serve(async (req) => {
         phone, direction: "outbound", message: BRISA_WELCOME_MESSAGE,
         raw: { trigger: "welcome_24h" },
       }).then(() => {}).catch(() => {});
+      if (unifiedContactId) {
+        await logUnifiedMessage({
+          contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
+          content: BRISA_WELCOME_MESSAGE, intent: "welcome_24h",
+        });
+      }
       await logGrowth("welcome_sent", "brisa_omnichannel", { channel: "whatsapp", phone, link: "https://plantayraiz.com.br" });
       return new Response(JSON.stringify({ ok: true, welcome: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -383,6 +427,14 @@ serve(async (req) => {
     await supabase.from("whatsapp_brisa_log").insert({
       phone, direction: "outbound", message: reply, raw: { ai: true, voice: wasAudio || askedVoice },
     }).then(() => {}).catch(() => {});
+
+    if (unifiedContactId) {
+      await logUnifiedMessage({
+        contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
+        content: reply, intent: "ai_reply",
+        messageType: (wasAudio || askedVoice) ? "audio" : "text",
+      });
+    }
 
     // Telemetria: detectar se a resposta contém o link de cadastro
     if (/plantayraiz\.com\.br/i.test(reply)) {

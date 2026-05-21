@@ -1,5 +1,10 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { BRISA_PERSONA } from "../_shared/brisa-persona.ts";
+import {
+  upsertUnifiedContact,
+  logUnifiedMessage,
+  isHumanTakeoverActive,
+} from "../_shared/brisa-memory.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -101,6 +106,29 @@ Deno.serve(async (req) => {
 
     const intent = detectIntent(incomingText);
     const phoneClean = (from || "").replace(/\D/g, "");
+
+    // 🧠 BRISA 360° — alimenta memória cross-channel e checa takeover humano
+    const unifiedContactId = await upsertUnifiedContact({
+      channel: "whatsapp",
+      phone: phoneClean,
+      whatsappJid: from,
+    });
+    if (unifiedContactId) {
+      await logUnifiedMessage({
+        contactId: unifiedContactId,
+        channel: "whatsapp",
+        direction: "inbound",
+        content: incomingText,
+        externalId: messageSid || undefined,
+        intent,
+      });
+      if (await isHumanTakeoverActive(unifiedContactId)) {
+        return new Response(JSON.stringify({ ok: true, skipped: "human_takeover" }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     let replyText: string;
 
     if (intent === "pay") {
@@ -171,6 +199,16 @@ Quando a pessoa responder "sim", "quero", "pode mandar o link" ou variação cla
       input_data: { from, message: incomingText, intent, message_sid: messageSid },
       output_data: { reply: replyText, evolution_id: evoData?.key?.id || evoData?.messageId },
     });
+
+    if (unifiedContactId) {
+      await logUnifiedMessage({
+        contactId: unifiedContactId,
+        channel: "whatsapp",
+        direction: "outbound",
+        content: replyText,
+        intent: `reply_${intent}`,
+      });
+    }
 
     return new Response(JSON.stringify({ ok: evoResponse.ok }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

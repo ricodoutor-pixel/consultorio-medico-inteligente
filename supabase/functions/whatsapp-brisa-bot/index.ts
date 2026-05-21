@@ -236,7 +236,7 @@ async function callBrisaAI(userMessage: string, history: Array<{role: string; co
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: BRISA_SYSTEM_PROMPT }] },
+      systemInstruction: { parts: [{ text: await getBrisaSystemPrompt() }] },
       contents,
     }),
   });

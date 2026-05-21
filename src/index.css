@@ -386,3 +386,26 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
 .recharts-surface {
   overflow: hidden;
 }
+
+@media print {
+  nav,
+  footer,
+  .sticky-header,
+  .hero-glow::before,
+  .hero-glow::after,
+  [role="dialog"],
+  [aria-label="Consentimento de Cookies — LGPD"] {
+    display: none !important;
+  }
+
+  .fixed,
+  .glow-green {
+    box-shadow: none !important;
+  }
+
+  body,
+  #root {
+    background: white !important;
+    color: black !important;
+  }
+}

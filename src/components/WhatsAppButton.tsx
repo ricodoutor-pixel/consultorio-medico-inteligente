@@ -110,6 +110,8 @@ export const WhatsAppButton = () => {
     };
   }, [isOpen]);
 
+  if (isPlansRoute) return null;
+
   const handleOptionClick = async (option: (typeof VISITOR_OPTIONS)[number]) => {
     trackPixelEvent("Contact", { content_name: `brisa_${option.id}` });
 

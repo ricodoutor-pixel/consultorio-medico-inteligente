@@ -70,6 +70,8 @@ export const WhatsAppButton = () => {
   const isPlansRoute = location.pathname === "/planos" || location.pathname === "/precos";
   const buttonSize = isDenseCatalogRoute ? 56 : 64;
 
+  if (isPlansRoute) return null;
+
   useEffect(() => {
     if (isPlansRoute) {
       setShowHint(false);

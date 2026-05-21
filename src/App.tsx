@@ -300,6 +300,8 @@ const App = () => (
                 <Route path="/admin/audit-log" element={<AdminRoute><AuditLog /></AdminRoute>} />
                 <Route path="/admin/auditoria" element={<AdminRoute><AuditLog /></AdminRoute>} />
                 <Route path="/admin/cron-health" element={<AdminRoute><CronHealth /></AdminRoute>} />
+                <Route path="/admin/remote-commands" element={<AdminRoute><RemoteCommandLog /></AdminRoute>} />
+                <Route path="/admin/comandos-remotos" element={<AdminRoute><RemoteCommandLog /></AdminRoute>} />
                 <Route path="/admin/conversoes-uptime" element={<AdminRoute><ConversoesUptime /></AdminRoute>} />
                 <Route path="/admin/conversoes" element={<AdminRoute><ConversionsUnified /></AdminRoute>} />
                 <Route path="/admin/monitoramento" element={<AdminRoute><AdminMonitoramento /></AdminRoute>} />

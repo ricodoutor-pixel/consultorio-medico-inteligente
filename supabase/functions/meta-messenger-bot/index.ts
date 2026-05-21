@@ -389,6 +389,27 @@ NUNCA prescreva. NUNCA prometa cura.`;
           await supabase.from("meta_messenger_log").insert({
             channel, sender_id: senderId, message_in: text, reply_out: reply, red_flag: isRed,
           });
+
+          // 🧠 BRISA 360° — comentário público também alimenta a memória cross-channel
+          const cChannel = channel === "instagram_comment" ? "ig_comment" : "fb_comment";
+          const cContactId = await upsertUnifiedContact({
+            channel: cChannel,
+            instagramId: channel === "instagram_comment" ? senderId : undefined,
+            facebookPsid: channel === "facebook_comment" ? senderId : undefined,
+            instagramUsername: v.from?.username || undefined,
+            displayName: v.from?.name || v.from?.username || undefined,
+          });
+          if (cContactId) {
+            await logUnifiedMessage({
+              contactId: cContactId, channel: cChannel, direction: "inbound",
+              content: text, externalId: commentId,
+            });
+            await logUnifiedMessage({
+              contactId: cContactId, channel: cChannel, direction: "outbound",
+              content: reply, intent: "public_comment_reply",
+              urgency: isRed ? 1.0 : undefined,
+            });
+          }
         } catch (e) {
           console.error("[meta] comment handler error", e);
         }

@@ -70,8 +70,6 @@ export const WhatsAppButton = () => {
   const isPlansRoute = location.pathname === "/planos" || location.pathname === "/precos";
   const buttonSize = isDenseCatalogRoute ? 56 : 64;
 
-  if (isPlansRoute) return null;
-
   useEffect(() => {
     if (isPlansRoute) {
       setShowHint(false);
@@ -111,6 +109,8 @@ export const WhatsAppButton = () => {
       document.removeEventListener("touchstart", handler);
     };
   }, [isOpen]);
+
+  if (isPlansRoute) return null;
 
   const handleOptionClick = async (option: (typeof VISITOR_OPTIONS)[number]) => {
     trackPixelEvent("Contact", { content_name: `brisa_${option.id}` });

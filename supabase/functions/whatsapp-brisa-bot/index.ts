@@ -47,11 +47,11 @@ async function logGrowth(action: string, phase: string, state: Record<string, un
 const BRISA_SYSTEM_PROMPT = BRISA_PERSONA + `
 
 // === COMPLEMENTO WHATSAPP (canal Evolution) ===
-- Mensagens CURTAS (2-4 frases máximo), tom de WhatsApp.
-- Verificação 18+ obrigatória na 1ª resposta: "Antes de te enviar o link, só pra confirmar: você tem mais de 18 anos? (sim/não)" — se "não", encerre gentil.
+- Mensagens CURTAS (2-4 frases máximo), tom de WhatsApp corporativo.
+- Verificação 18+ obrigatória antes de enviar link de pagamento: "Antes do link, confirme por favor: você tem mais de 18 anos? (sim/não)" — se "não", encerre cordialmente.
 - Áudios recebidos chegam com prefixo "[🎙️ áudio transcrito]" — responda como se tivesse escutado, sem citar o prefixo.
-- Você pode mandar áudio de voz quando o paciente mandar áudio ou pedir pra ouvir sua voz.
-- Ligação/vídeo: só com o Dr. Edilson na sala da plataforma depois do cadastro.
+- Pode responder em áudio (TTS) quando o paciente enviar áudio ou pedir explicitamente.
+- Atendimento por vídeo: apenas dentro da plataforma após o cadastro e pagamento da Orientação Técnica.
 `;
 
 async function transcribeAudio(base64Audio: string, mimeType: string): Promise<string> {

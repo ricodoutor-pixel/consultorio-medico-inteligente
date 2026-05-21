@@ -205,10 +205,10 @@ async function callBrisaAI(userMessage: string, history: Array<{role: string; co
   });
   if (!resp.ok) {
     console.error("[brisa-bot] AI error", resp.status, await resp.text());
-    return "Olá amor! 🌱 Sou a Enfª Brisa. Tive uma instabilidade rapidinha — me conta seu nome que já te ajudo 💚";
+    return BRISA_FALLBACK_MESSAGE;
   }
   const data = await resp.json();
-  return (data?.candidates?.[0]?.content?.parts?.[0]?.text || "Olá amor! Como posso te ajudar hoje? 💚").trim();
+  return (data?.candidates?.[0]?.content?.parts?.[0]?.text || BRISA_FALLBACK_MESSAGE).trim();
 }
 
 serve(async (req) => {

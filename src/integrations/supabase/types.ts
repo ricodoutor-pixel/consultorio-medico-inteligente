@@ -5386,6 +5386,39 @@ export type Database = {
         }
         Relationships: []
       }
+      remote_command_log: {
+        Row: {
+          action: string
+          created_at: string
+          error: string | null
+          id: string
+          key: string | null
+          payload: Json | null
+          source_ip: string | null
+          success: boolean
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          key?: string | null
+          payload?: Json | null
+          source_ip?: string | null
+          success?: boolean
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          key?: string | null
+          payload?: Json | null
+          source_ip?: string | null
+          success?: boolean
+        }
+        Relationships: []
+      }
       revenue_distribution_pool: {
         Row: {
           created_at: string

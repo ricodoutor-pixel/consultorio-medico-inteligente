@@ -106,6 +106,29 @@ Deno.serve(async (req) => {
 
     const intent = detectIntent(incomingText);
     const phoneClean = (from || "").replace(/\D/g, "");
+
+    // 🧠 BRISA 360° — alimenta memória cross-channel e checa takeover humano
+    const unifiedContactId = await upsertUnifiedContact({
+      channel: "whatsapp",
+      phone: phoneClean,
+      whatsappJid: from,
+    });
+    if (unifiedContactId) {
+      await logUnifiedMessage({
+        contactId: unifiedContactId,
+        channel: "whatsapp",
+        direction: "inbound",
+        content: incomingText,
+        externalId: messageSid || undefined,
+        intent,
+      });
+      if (await isHumanTakeoverActive(unifiedContactId)) {
+        return new Response(JSON.stringify({ ok: true, skipped: "human_takeover" }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     let replyText: string;
 
     if (intent === "pay") {

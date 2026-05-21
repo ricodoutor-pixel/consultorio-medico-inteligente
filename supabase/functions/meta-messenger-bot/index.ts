@@ -213,6 +213,26 @@ Deno.serve(async (req) => {
           });
           if (allowed === false) continue;
 
+          // 🧠 BRISA 360° — memória unificada cross-channel
+          const unifiedChannel = channel === "instagram" ? "instagram_dm" : "messenger";
+          const unifiedContactId = await upsertUnifiedContact({
+            channel: unifiedChannel,
+            instagramId: channel === "instagram" ? senderId : undefined,
+            facebookPsid: channel === "messenger" ? senderId : undefined,
+          });
+          if (unifiedContactId) {
+            await logUnifiedMessage({
+              contactId: unifiedContactId,
+              channel: unifiedChannel,
+              direction: "inbound",
+              content: text,
+              externalId: mid || undefined,
+            });
+            if (await isHumanTakeoverActive(unifiedContactId)) {
+              continue; // humano assumiu — bot silencia
+            }
+          }
+
           const lower = text.toLowerCase();
           const isRed = RED_FLAGS.some(f => lower.includes(f));
 
@@ -223,6 +243,12 @@ Deno.serve(async (req) => {
             await supabase.from("meta_messenger_log").insert({
               channel, sender_id: senderId, message_in: text, reply_out: BRISA_HARASSMENT_BLOCK, red_flag: false,
             });
+            if (unifiedContactId) {
+              await logUnifiedMessage({
+                contactId: unifiedContactId, channel: unifiedChannel, direction: "outbound",
+                content: BRISA_HARASSMENT_BLOCK, intent: "harassment_block",
+              });
+            }
             await supabase.from("manus_growth_logs").insert({
               phase: "brisa_omnichannel", action: "harassment_block", status: "ok",
               after_state: { channel, sender_id: senderId, message: text.slice(0, 300) },
@@ -262,6 +288,13 @@ Deno.serve(async (req) => {
           await supabase.from("meta_messenger_log").insert({
             channel, sender_id: senderId, message_in: text, reply_out: reply, red_flag: isRed,
           });
+
+          if (unifiedContactId) {
+            await logUnifiedMessage({
+              contactId: unifiedContactId, channel: unifiedChannel, direction: "outbound",
+              content: reply, intent: trigger, urgency: isRed ? 1.0 : undefined,
+            });
+          }
 
           if (/plantayraiz\.com\.br/i.test(reply)) {
             await supabase.from("manus_growth_logs").insert({

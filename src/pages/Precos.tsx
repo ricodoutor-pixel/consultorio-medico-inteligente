@@ -192,14 +192,14 @@ const Precos = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 max-w-7xl mx-auto items-stretch">
             {plans.map((plan) => {
               const Icon = plan.icon;
               return (
                 <div key={plan.id} className="relative">
                   <Card className={`relative h-full border-border transition-colors ${plan.highlighted ? 'border-primary/60 ring-1 ring-primary/30' : ''} ${plan.id === 'clinica-familia' ? 'border-amber-500/40' : ''} ${plan.id === 'empresa-parceiros' ? 'border-secondary/40' : ''}`}>
                     {plan.tag && (
-                      <div className={`absolute -top-3 right-4 px-3 py-1 rounded-full text-xs font-black ${
+                      <div className={`absolute ${plan.id === 'clinica-familia' ? 'top-3 right-3' : '-top-3 right-4'} max-w-[calc(100%-1.5rem)] px-3 py-1 rounded-full text-xs font-black whitespace-nowrap ${
                         plan.highlighted ? 'bg-gradient-green border border-green text-primary' :
                         plan.id === 'clinica-familia' ? 'bg-amber-500/20 border border-amber-500/40 text-amber-400' :
                         plan.id === 'empresa-parceiros' ? 'bg-secondary/20 border border-secondary/30 text-secondary' :
@@ -209,11 +209,11 @@ const Precos = () => {
                       </div>
                     )}
                     {plan.id === 'clinica-familia' && (
-                      <div className="absolute -top-3 left-4 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                      <div className="absolute top-3 left-3 max-w-[calc(100%-8.5rem)] px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-300 truncate">
                         ⭐ Recomendado por +320 famílias
                       </div>
                     )}
-                    <CardContent className="p-5">
+                    <CardContent className={`p-5 ${plan.id === 'clinica-familia' ? 'pt-12' : ''}`}>
                       <Icon size={28} className={`mb-2 ${
                         plan.highlighted ? 'text-primary' :
                         plan.id === 'clinica-familia' ? 'text-amber-400' :

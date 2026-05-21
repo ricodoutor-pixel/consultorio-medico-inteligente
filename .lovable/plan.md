@@ -1,152 +1,93 @@
-# 🤖 Manus Growth CEO — Agente Autônomo de Crescimento
+# Plano: Brisa 360° Omnichannel — Execução em Cascata
 
-Plano de implementação completo, versionado em GitHub (código-fonte, não dados), auditável e com dashboard gráfico no admin.
-
----
-
-## 1. Banco de dados (migrations versionadas)
-
-Novas tabelas em `public` (todas com RLS admin-only via `has_role(auth.uid(),'admin')`):
-
-| Tabela | Função |
-|---|---|
-| `manus_growth_logs` | Log imutável de cada ação do agente (fase, url, antes/depois, kpi_delta, status) |
-| `manus_growth_runs` | 1 linha por execução diária (started_at, finished_at, pages_analyzed, pages_optimized, posts_generated, errors, summary_md) |
-| `manus_growth_kpis` | Snapshot diário por URL (clicks, impressions, ctr, position, conv_rate) — série histórica para os gráficos |
-| `manus_growth_proposals` | Mudanças pendentes que tocam código estrutural → vira **GitHub Issue** antes de aplicar |
-| `manus_seo_overrides` | Patches de metadata/H1/H2/Schema.org por rota (consumidos pelo `prerender-seo.ts`) |
-| `manus_social_queue` | Roteiros gerados para IG/FB/YT/TikTok (status: draft/approved/posted) |
-
-Trigger imutabilidade em `manus_growth_logs` (sem UPDATE/DELETE para não-admin).
+Vou executar as 4 frentes em sequência (não dá pra paralelizar totalmente porque a #3 depende da tabela criada na #1, e a #4 valida tudo). Ordem por impacto no funil de receita.
 
 ---
 
-## 2. Edge Function orquestradora
+## 🥇 PRIORIDADE 1 — Memória Cross-Channel (base de tudo)
 
-**`supabase/functions/manus-growth-agent/index.ts`** — 4 fases sequenciais:
+**Por quê primeiro:** sem isso, paciente que vem do Insta e migra pro WhatsApp repete triagem e abandona. É a fundação que os outros 3 usam.
 
-```text
-┌─ Fase 1: DIAGNÓSTICO ──────────────────────────┐
-│ GSC API → últimos 7d de cliques/CTR/pos        │
-│ Filtra páginas pos 4-15 ("quase lá")           │
-│ Lê conversões internas (orientacao_tecnica)    │
-│ Grava snapshot em manus_growth_kpis            │
-└────────────────────────────────────────────────┘
-            ↓
-┌─ Fase 2: OTIMIZAÇÃO ON-PAGE ───────────────────┐
-│ Gemini analisa páginas alvo                    │
-│ Gera novo Meta Title/Desc/H1/H2 + Schema.org   │
-│ Injeta evidência via pubmed-search (RAG)       │
-│ Grava em manus_seo_overrides (consumido no     │
-│ próximo build pelo scripts/prerender-seo.ts)   │
-│ ⚠️ Valida disclaimer ANVISA + CRM 10963        │
-└────────────────────────────────────────────────┘
-            ↓
-┌─ Fase 3: DISTRIBUIÇÃO ─────────────────────────┐
-│ Gera roteiros IG/FB/YT/TikTok → social_queue   │
-│ Envia insights p/ brisa-ceo-orchestrator       │
-│ (dores top-pesquisadas viram script da Brisa)  │
-└────────────────────────────────────────────────┘
-            ↓
-┌─ Fase 4: AUTO-AUDITORIA ───────────────────────┐
-│ Resumo markdown + métricas → manus_growth_runs │
-│ WhatsApp p/ Dr. Edilson (5511987131241)        │
-└────────────────────────────────────────────────┘
-```
-
-**Stack:**
-- IA: Lovable AI Gateway → `google/gemini-2.5-pro` (raciocínio analítico)
-- GSC: connector já conectado (`GOOGLE_SEARCH_CONSOLE_API_KEY` + `LOVABLE_API_KEY`)
-- WhatsApp: `evolution-api-proxy` existente
-- Auth: `requireServiceAuth` (cron only)
+**O que entra:**
+- Nova tabela `brisa_unified_contacts` (telefone E.164 como chave primária + handles instagram_id, facebook_psid, whatsapp_jid)
+- Tabela `brisa_unified_conversations` (channel, last_message_at, lead_classification, stage do funil, intent_history jsonb)
+- Função `upsert_unified_contact(phone, channel, handle, payload)` SECURITY DEFINER
+- RLS: só admins e service_role leem; usuários comuns sem acesso (PII)
+- Helper `_shared/brisa-memory.ts` para os 4 edge functions chamarem antes de responder
+- Migration de backfill: importa logs existentes de `whatsapp_brisa_log` + `instagram_dm_log` (se houver)
 
 ---
 
-## 3. Guardrails inegociáveis
+## 🥈 PRIORIDADE 2 — Comentários FB/IG → DM Automático (motor de captação)
 
-| Regra | Implementação |
-|---|---|
-| Não tocar código estrutural | Whitelist: só pode escrever em `manus_seo_overrides` e `manus_social_queue`. Qualquer outra mudança → `manus_growth_proposals` + GitHub Issue via `GITHUB_BACKUP_TOKEN` |
-| Preservar disclaimer ANVISA | Regex obrigatório no output: `RDC 660` ∧ `CRM 10963` ∧ `Dr. Edilson` |
-| Moeda BRL | Forçado em todo Schema.org gerado |
-| Rate-limit IA | Máx 30 páginas/dia para não estourar créditos |
+**Por quê:** maior alavanca de top-funnel hoje. Cada comentário "PROTOCOLO/QUERO/INFO" vira lead capturado.
 
----
-
-## 4. Cron diário (pg_cron)
-
-```sql
-select cron.schedule(
-  'manus-growth-daily',
-  '0 9 * * *',  -- 06h BRT
-  $$ select net.http_post(
-       url:='https://shmbwdjuddvquszwkvuq.supabase.co/functions/v1/manus-growth-agent',
-       headers:=jsonb_build_object('Authorization','Bearer '||current_setting('app.service_role_key'))
-     ) $$
-);
-```
+**O que entra:**
+- Edge function `meta-comment-to-dm` (webhook Meta `feed`/`comments`)
+- Keywords-trigger configuráveis: `PROTOCOLO`, `QUERO`, `INFO`, `CANNABIS`, `RECEITA`, `PRECO`
+- Resposta pública no comentário (curta, sem CRM/Dr. Edilson) + Private Reply API → puxa para DM
+- Anti-spam: dedup por `comment_id` (idempotência via `webhook_idempotency`)
+- Rate-limit por author_id (3 comentários/hora) via `check_edge_rate_limit`
+- Integração com Memória Unificada (P1): cria contact + abre conversation no DM
+- HMAC validação do Meta signature (X-Hub-Signature-256)
 
 ---
 
-## 5. Dashboard admin (gráfico em tempo real)
+## 🥉 PRIORIDADE 3 — Dashboard Brisa CEO (visibilidade + takeover)
 
-**Rota nova:** `/admin/growth` → `src/pages/admin/GrowthDashboard.tsx`
+**Por quê:** sem painel, Dr. Edilson voa cego. Precisa ver conversas dos 4 canais ao vivo.
 
-Componentes:
-- **KPI cards**: posição média (7d/30d), CTR delta, páginas otimizadas hoje
-- **Gráfico Recharts**: série temporal de clicks/impressions/position por URL top-10
-- **Tabela `manus_growth_logs`**: últimas 50 ações (fase, página, kpi_delta, status)
-- **Tabela `manus_social_queue`**: posts pendentes de aprovação
-- **Botão "Executar agora"** (admin only) → invoca edge function manualmente
-- **Relatório semanal**: agregação automática segunda-feira 8h → PDF salvo em `master-reports` bucket
-
-Link no menu admin existente (`AdminDashboard.tsx`).
+**O que entra:**
+- Rota `/admin/brisa-ceo` (protegida por `has_role admin`)
+- Vista unificada: lista de conversas (todos canais), badge de canal, classificação de lead, último intent, score de urgência
+- Polling 15s (não Realtime — segue regra do projeto) via `useBrisaConversations`
+- Drawer de conversa: histórico cross-channel, transcript de áudio, takeover humano (botão "Assumir → silencia bot por 30min")
+- Métricas topo: conversas ativas / leads R$30 / leads B2B / leads profissionais / taxa conversão 24h
+- Filtros: canal, classificação, urgência, status
 
 ---
 
-## 6. Versionamento GitHub (auditoria permanente)
+## 🏁 PRIORIDADE 4 — Validação ao Vivo (smoke test)
 
-Tudo nasce como código-fonte em:
-```
-supabase/functions/manus-growth-agent/
-  ├── index.ts            (orquestrador)
-  ├── phases/
-  │   ├── diagnose.ts
-  │   ├── optimize.ts
-  │   ├── distribute.ts
-  │   └── audit.ts
-  ├── guardrails.ts
-  └── github-issue.ts     (propostas de mudança estrutural)
+**Por quê:** garante que P1+P2+P3 estão integrados de verdade antes de declarar live.
 
-supabase/migrations/<ts>_manus_growth_ceo.sql
-src/pages/admin/GrowthDashboard.tsx
-scripts/prerender-seo.ts (patch: consome manus_seo_overrides)
-```
-
-Commit automático no repo `ricodoutor-pixel/consultorio-medico-inteligente` via webhook Lovable → Hostinger sync.
+**O que entra:**
+- Script `bun run brisa:smoke` que dispara:
+  - 1 mensagem WhatsApp Evolution simulada → confirma log + contact criado
+  - 1 webhook Instagram DM simulado → confirma cross-channel merge se mesmo telefone
+  - 1 webhook Messenger simulado → idem
+  - 1 webhook comentário FB/IG com keyword PROTOCOLO → confirma reply + DM
+- Saída JSON em `/mnt/documents/brisa-smoke-report.json` com latência, status, persona-check
+- Logs via `supabase--edge_function_logs` filtrados pelos 4 functions
 
 ---
 
-## 7. Ordem de execução
+## 📋 Detalhes técnicos (consolidado)
 
-1. **Migration** (tabelas + RLS + cron) — `supabase--migration`
-2. **Edge function** `manus-growth-agent` (4 fases + guardrails) — deploy automático
-3. **Patch** `scripts/prerender-seo.ts` para ler `manus_seo_overrides`
-4. **Dashboard** `/admin/growth` com Recharts
-5. **Link** no AdminDashboard
-6. **Smoke test**: invocar manualmente e validar log + WhatsApp recebido
+**Edge functions afetadas/criadas:**
+- ✅ existentes: `whatsapp-brisa-bot`, `meta-messenger-bot`, `brisa-whatsapp`, `whatsapp-chatbot` (atualizar para usar memória unificada)
+- 🆕 `meta-comment-to-dm`
 
----
+**Migrations:** 1 só, atômica — tabelas + funções + RLS + backfill.
 
-## 8. KPIs alvo (90 dias)
+**Frontend:** 1 página nova (`src/pages/admin/BrisaCEO.tsx`) + 1 hook (`src/hooks/useBrisaConversations.ts`) + 1 component (`BrisaConversationDrawer.tsx`). Usa tokens de design existentes — zero mudança visual fora dessa rota nova.
 
-| Métrica | Baseline | Meta |
-|---|---|---|
-| Posição média GSC | ~12 | < 5 |
-| CTR médio | ~2% | > 6% |
-| Páginas em top-3 | 0 | 15+ |
-| Tráfego orgânico/mês | — | +300% |
+**Segurança:** RLS restritiva em todas tabelas novas (admin-only), HMAC nos webhooks Meta, rate-limit por author_id, dedup por comment_id/message_id.
+
+**Memória do projeto:** atualizo `mem://architecture/brisa-omnichannel-360` no final.
 
 ---
 
-**Aprova para executar?** Vou começar pela migration (passo 1) assim que confirmar.
+## ⏱ Ordem real de execução (sem pausas)
+
+1. Migration P1 (memória) → aprovação
+2. `_shared/brisa-memory.ts` + atualizar 4 bots existentes
+3. Edge `meta-comment-to-dm` + deploy
+4. Página `/admin/brisa-ceo` + hook + drawer
+5. Script smoke test + rodar + relatório
+6. Atualizar memória do projeto
+7. Sugerir publish
+
+**Único bloqueio possível:** aprovação da migration P1 (precisa do seu clique). Resto roda direto.
+
+Confirmo execução?

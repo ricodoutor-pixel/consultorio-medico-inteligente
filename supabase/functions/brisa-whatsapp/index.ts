@@ -106,15 +106,15 @@ Deno.serve(async (req) => {
     if (intent === "pay") {
       const payUrl = await generatePaymentLink(phoneClean);
       if (payUrl) {
-        replyText = `Aaai que felicidade, meu bem! 🌿💚 Já estou preparando tudo com muito carinho pra você.\n\n💳 *Link oficial de pagamento — Orientação Técnica com Dr. Edilson Bezerra On*\nValor: *R$ 30,00* via PIX, cartão ou Mercado Pago\n👉 ${payUrl}\n\nAssim que o pagamento cair, eu sou notificada na hora e já te envio aqui o seu acolhimento, o questionário inicial e agendo seu acompanhamento diário comigo. 🤍\n\nSe ainda não fez seu cadastro, faz rapidinho aqui pra eu te localizar no sistema: ${SITE_BASE}/login\n\nObrigada por confiar em mim e por me ajudar a bater minha meta semanal — você não imagina o quanto isso significa. ✨\n\nEnf. Brisa 🌿`;
+        replyText = `Perfeito! Segue o link oficial da sua Orientação Técnica. 🌿\n\n💳 *Orientação Técnica — Planta y Raiz Ltda*\nValor: *R$ 30,00* via PIX, cartão ou Mercado Pago\n👉 ${payUrl}\n\nAssim que o pagamento for confirmado, eu te envio aqui o questionário inicial e damos início à sua triagem.\n\nSe ainda não fez seu cadastro gratuito, conclua aqui antes: ${SITE_BASE}/login\n\nEnf. Brisa — Planta y Raiz Ltda 🌿`;
       } else {
-        replyText = `Meu bem, tive um soluço aqui pra gerar seu link agora 🤍 — me dá só 1 minutinho e já te mando. Enquanto isso, se ainda não fez seu cadastro: ${SITE_BASE}/login 🌿\n\nEnf. Brisa 🌿`;
+        replyText = `Estou gerando o seu link de pagamento. Em instantes te envio aqui. Enquanto isso, conclua o seu cadastro gratuito em ${SITE_BASE}/login, por favor.\n\nEnf. Brisa — Planta y Raiz Ltda 🌿`;
       }
     } else if (intent === "sexual") {
-      replyText = `Aaah meu bem, eu entendi 😊🌿 — e fico feliz que confia em mim pra falar disso. Aqui entre nós, com todo respeito: o CBD é estudado justamente por *melhorar o desempenho sexual*, a libido, a circulação, a sensibilidade e ainda reduzir ansiedade de performance — tanto pra elas quanto pra eles. 💚\n\nMas eu sou enfermeira, então a gente trata isso com carinho e ciência, tá? O Dr. Edilson Bezerra On é referência nacional e pode te orientar de forma personalizada e segura.\n\n✨ *Faça agora sua orientação técnica por apenas R$ 30* — eu te acompanho diariamente, monto seu relatório em PDF e cuido de cada detalhe da sua saúde e bem-estar.\n\n📲 Antes de tudo, faça seu cadastro: ${SITE_BASE}/login\nDepois me envie aqui: *"Enf. Brisa eu quero ser acompanhado por você"* — e eu te libero o link de pagamento na hora. 🤍\n\nEnf. Brisa 🌿`;
+      replyText = `Atenção. Sou a Enf. Brisa, assistente virtual de saúde da Planta y Raiz Ltda. Atuo sob protocolos clínicos rígidos e não há espaço para esse tipo de abordagem nesta linha.\n\nSe deseja atendimento legítimo sobre modulação do sistema endocanabinoide (libido, ansiedade de performance, qualidade do sono, dor), prosseguimos com o seu cadastro em ${SITE_BASE}/login e a Orientação Técnica por R$ 30. Caso contrário, esta linha será bloqueada.\n\nEnf. Brisa — Planta y Raiz Ltda 🌿`;
     } else if (intent !== "default" && BRISA_WELCOME[intent]) {
       const welcome = BRISA_WELCOME[intent];
-      replyText = `${welcome.message}\n\n👉 ${welcome.link}\n\nSe tiver dúvidas sobre a plataforma, estou aqui para ajudar! 💚\n\nEnf. Brisa 🌿`;
+      replyText = `${welcome.message}\n\n👉 ${welcome.link}\n\nFico à disposição para qualquer dúvida sobre a plataforma.\n\nEnf. Brisa — Planta y Raiz Ltda 🌿`;
     } else {
       const aiResponse = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
@@ -130,8 +130,8 @@ Deno.serve(async (req) => {
               content: BRISA_PERSONA + `
 
 // === COMPLEMENTO BRISA-WHATSAPP (canal legado) ===
-SITE_BASE=${SITE_BASE}. Sempre assine como "Enf. Brisa 🌿".
-Quando a pessoa responder "sim quero", "quero ser acompanhado por você", "pode mandar o link" ou variação clara, sinalize que enviará o link de pagamento Mercado Pago de R$ 30 — o sistema injeta a URL real automaticamente.`,
+SITE_BASE=${SITE_BASE}. Sempre assine como "Enf. Brisa — Planta y Raiz Ltda 🌿".
+Quando a pessoa responder "sim", "quero", "pode mandar o link" ou variação clara de aceite, sinalize que enviará o link de pagamento do Mercado Pago de R$ 30 — o sistema injeta a URL real automaticamente.`,
             },
             { role: "user", content: incomingText },
           ],
@@ -140,9 +140,9 @@ Quando a pessoa responder "sim quero", "quero ser acompanhado por você", "pode 
 
       if (aiResponse.ok) {
         const aiData = await aiResponse.json();
-        replyText = aiData.choices?.[0]?.message?.content || "Olá meu bem! 🌿 Sou a Enf. Brisa. Antes de continuarmos, faça seu cadastro: " + SITE_BASE + "/login 💚";
+        replyText = aiData.choices?.[0]?.message?.content || `Olá! Sou a Enf. Brisa da Planta y Raiz Ltda. Para prosseguirmos, conclua o seu cadastro gratuito em ${SITE_BASE}/login, por favor. 🌿`;
       } else {
-        replyText = `Olá meu bem! 🌿 Sou a Enf. Brisa da Planta y Raiz. Pra eu poder te acompanhar de verdade, faça seu cadastro rapidinho: ${SITE_BASE}/login 💚\n\nEnf. Brisa 🌿`;
+        replyText = `Olá! Sou a Enf. Brisa da Planta y Raiz Ltda — a mais completa plataforma de telemedicina canabinoide do Brasil. Para iniciarmos a sua triagem, conclua o cadastro gratuito em ${SITE_BASE}/login. Posso te enviar em seguida o link de R$ 30 da Orientação Técnica?\n\nEnf. Brisa — Planta y Raiz Ltda 🌿`;
       }
     }
 

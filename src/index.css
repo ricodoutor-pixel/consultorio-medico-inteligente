@@ -375,3 +375,14 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
     display: none;
   }
 }
+
+/* Anti-anomaly guard: prevent recharts ResponsiveContainer from collapsing to -1
+   (causes ghost SVG noise on Dashboard / Planos when parent has no explicit height) */
+.recharts-responsive-container {
+  min-width: 1px !important;
+  min-height: 200px;
+}
+.recharts-wrapper,
+.recharts-surface {
+  overflow: hidden;
+}

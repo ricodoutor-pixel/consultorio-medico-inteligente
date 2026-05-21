@@ -98,7 +98,7 @@ export const CookieConsentBanner = () => {
         exiting ? "translate-y-full opacity-0" : "translate-y-0 opacity-100"
       }`}
     >
-      <div className={`mx-2 sm:mx-6 ${isPlansRoute && isMobile ? "mb-[5.75rem]" : "mb-2 sm:mb-6"}`}>
+      <div className={`mx-2 sm:mx-6 ${isPlansRoute && isMobile ? "mb-[8.75rem]" : "mb-2 sm:mb-6"}`}>
         <div className={`relative overflow-hidden rounded-xl sm:rounded-2xl border border-emerald-500/20 shadow-2xl shadow-emerald-900/40 ${
           isDenseCatalogRoute && isMobile
             ? "bg-emerald-950/95"
@@ -107,7 +107,7 @@ export const CookieConsentBanner = () => {
           {/* Decorative leaf pattern — desktop only para manter o banner enxuto no mobile */}
           <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-1/3 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48cGF0aCBkPSJNMzAgNUMxNSAxMCA1IDIwIDUgMzVjMCAxNSAyMCAyMCAyNSAyMFM1NSA1MCA1NSAzNUM1NSAyMCA0NSAxMCAzMCA1eiIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC4zIi8+PC9zdmc+')] bg-repeat" />
 
-          <div className="relative flex flex-row items-center gap-2 sm:gap-5 p-2.5 sm:p-5">
+          <div className={`relative flex flex-row items-center gap-2 sm:gap-5 p-2.5 sm:p-5 ${isPlansRoute && isMobile ? "pr-2" : ""}`}>
             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
               <Shield size={18} className="text-emerald-300 shrink-0 hidden sm:block" />
               <div className="min-w-0">

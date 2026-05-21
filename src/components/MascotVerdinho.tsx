@@ -1,4 +1,5 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useMemo, useState, useRef, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import { MessageCircle, X, Send, ArrowLeft } from "lucide-react";
 
 interface MascotVerdinhoProps {
@@ -23,6 +24,7 @@ const STAR_WARS_STORY = [
 ];
 
 export default function MascotVerdinho({ onChatOpen, className = "", inline = false }: MascotVerdinhoProps) {
+  const location = useLocation();
   const [showStory, setShowStory] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -71,7 +73,12 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
     }, 800);
   };
 
+  const isPlansRoute = location.pathname === "/planos" || location.pathname === "/precos";
   const scale = isHovered ? 1.15 : 1;
+  const floatingOffset = useMemo(() => {
+    if (isPlansRoute) return "max(8.5rem, calc(env(safe-area-inset-bottom) + 8rem))";
+    return "max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem))";
+  }, [isPlansRoute]);
   const wrapperClasses = inline
     ? `relative cursor-pointer transition-all duration-300 ease-out ${className}`
     : `fixed bottom-20 left-3 z-40 cursor-pointer transition-transform duration-300 ease-out ${className}`;
@@ -85,7 +92,7 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
           transformOrigin: inline ? "center center" : "bottom left",
           transform: `scale(${scale})`,
           zIndex: inline ? "auto" : 40,
-          bottom: !inline ? `max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem))` : undefined,
+          bottom: !inline ? floatingOffset : undefined,
           left: !inline ? `max(0.75rem, env(safe-area-inset-left))` : undefined,
         }}
         onClick={handleInteraction}

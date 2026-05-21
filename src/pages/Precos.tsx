@@ -285,7 +285,7 @@ const Precos = () => {
               style={{
                 background: 'linear-gradient(135deg, hsl(45 100% 50%), hsl(30 100% 55%), hsl(15 100% 50%))',
                 color: '#1a0a00',
-                boxShadow: '0 0 30px hsl(45 100% 50% / 0.5), 0 0 60px hsl(30 100% 55% / 0.3), 0 4px 20px rgba(0,0,0,0.3)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.3), 0 0 24px hsl(45 100% 50% / 0.35)',
               }}
              
              

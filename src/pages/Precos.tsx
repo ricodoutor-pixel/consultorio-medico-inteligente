@@ -208,6 +208,11 @@ const Precos = () => {
                         {plan.tag}
                       </div>
                     )}
+                    {plan.id === 'clinica-familia' && (
+                      <div className="absolute -top-3 left-4 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                        ⭐ Recomendado por +320 famílias
+                      </div>
+                    )}
                     <CardContent className="p-5">
                       <Icon size={28} className={`mb-2 ${
                         plan.highlighted ? 'text-primary' :

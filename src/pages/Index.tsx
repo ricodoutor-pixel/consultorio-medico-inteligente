@@ -23,6 +23,8 @@ import { ProtocolCalculator } from "@/components/ProtocolCalculator";
 import { EbookGate } from "@/components/EbookGate";
 import drEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 import { RecoverableRender } from "@/lib/runtime-recovery";
+import { DoctorsOnlineWidget } from "@/components/DoctorsOnlineWidget";
+import { HomeFAQ } from "@/components/HomeFAQ";
 
 
 import { useEffect } from "react";
@@ -198,6 +200,9 @@ const Index = () => {
                 <p className="text-muted-foreground leading-relaxed text-xs md:text-sm">{step.desc}</p>
               </motion.div>
             ))}
+          </div>
+          <div className="flex justify-center mb-4">
+            <DoctorsOnlineWidget />
           </div>
           <div className="flex justify-center">
             <div className="relative inline-block">
@@ -459,6 +464,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* FAQ Home com Schema.org FAQPage para rich snippets do Google */}
+      <HomeFAQ />
 
       {/* Showcase da Biblioteca Científica (40k+ estudos PubMed) */}
       <ScientificBadge />

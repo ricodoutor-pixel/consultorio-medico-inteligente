@@ -216,11 +216,11 @@ Deno.serve(async (req) => {
     });
   }
 
-  // 4) Mirror em paralelo — Facebook Page + Threads
-  const [fbMirror, threadsMirror] = await Promise.all([
-    mirrorToFacebook(pageId, imageUrl, caption),
-    mirrorToThreads(imageUrl, caption),
-  ]);
+  // 4) Mirror — FB nativo via Meta (cross-post automático IG→FB).
+  //    Removido mirrorToFacebook para evitar duplicação.
+  const fbMirror = { ok: true, skipped: true, reason: "native Meta IG→FB cross-post" };
+  const threadsMirror = await mirrorToThreads(imageUrl, caption);
+  void pageId;
 
   // 5) Marcar como postado
   if (postId) {

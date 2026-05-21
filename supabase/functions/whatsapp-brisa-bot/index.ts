@@ -311,6 +311,33 @@ serve(async (req) => {
     // Classify sentiment (Gemini) → habilita brisa-crisis-alert
     const { sentiment_score, is_negative } = await classifySentiment(messageText);
 
+    // 🧠 BRISA 360° — Memória cross-channel unificada
+    const unifiedContactId = await upsertUnifiedContact({
+      channel: "whatsapp",
+      phone,
+      whatsappJid: remoteJid,
+      displayName: data?.pushName || undefined,
+    });
+    if (unifiedContactId) {
+      await logUnifiedMessage({
+        contactId: unifiedContactId,
+        channel: "whatsapp",
+        direction: "inbound",
+        content: messageText,
+        externalId: messageId || undefined,
+        messageType: messageText.startsWith("[🎙️ áudio transcrito]") ? "audio" : "text",
+        urgency: is_negative ? 0.8 : Math.max(0, 1 - sentiment_score),
+        audioTranscript: messageText.startsWith("[🎙️ áudio transcrito]") ? messageText.replace("[🎙️ áudio transcrito] ", "") : undefined,
+        raw: { sentiment_score, is_negative },
+      });
+      // Se humano assumiu o atendimento, NÃO responde com bot
+      if (await isHumanTakeoverActive(unifiedContactId)) {
+        return new Response(JSON.stringify({ ok: true, skipped: "human_takeover", contact_id: unifiedContactId }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     // Persist inbound message com sentiment + load short history
     await supabase.from("whatsapp_brisa_log").insert({
       phone, direction: "inbound", message: messageText, raw: data,

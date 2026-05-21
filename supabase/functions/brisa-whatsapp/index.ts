@@ -200,6 +200,16 @@ Quando a pessoa responder "sim", "quero", "pode mandar o link" ou variação cla
       output_data: { reply: replyText, evolution_id: evoData?.key?.id || evoData?.messageId },
     });
 
+    if (unifiedContactId) {
+      await logUnifiedMessage({
+        contactId: unifiedContactId,
+        channel: "whatsapp",
+        direction: "outbound",
+        content: replyText,
+        intent: `reply_${intent}`,
+      });
+    }
+
     return new Response(JSON.stringify({ ok: evoResponse.ok }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

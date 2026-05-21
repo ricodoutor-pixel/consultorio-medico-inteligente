@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 import BrisaHealthChecklist from "@/components/admin/BrisaHealthChecklist";
 import BrisaMetaDebugPanel from "@/components/admin/BrisaMetaDebugPanel";
+import AutoPostCountdown from "@/components/admin/AutoPostCountdown";
 
 const CHANNEL_META: Record<Channel, { label: string; Icon: any; color: string }> = {
   whatsapp: { label: "WhatsApp", Icon: Phone, color: "text-green-400" },
@@ -85,8 +86,9 @@ export default function BrisaCEO() {
         </div>
       </header>
 
-      {/* Checklist Virada Meta */}
-      <div className="container mx-auto px-4 pt-4">
+      {/* Countdown auto-post + Checklist */}
+      <div className="container mx-auto px-4 pt-4 space-y-3">
+        <AutoPostCountdown />
         <BrisaHealthChecklist />
         <BrisaMetaDebugPanel />
       </div>

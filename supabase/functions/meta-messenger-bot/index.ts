@@ -11,8 +11,13 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
-const FB_APP_SECRET = Deno.env.get("FACEBOOK_APP_SECRET")!;
-const FB_PAGE_TOKEN = Deno.env.get("FACEBOOK_PAGE_ACCESS_TOKEN")!;
+import {
+  META_APP_SECRET as FB_APP_SECRET,
+  FB_PAGE_ACCESS_TOKEN,
+  IG_PAGE_ACCESS_TOKEN,
+} from "../_shared/meta-secrets.ts";
+const FB_PAGE_TOKEN = FB_PAGE_ACCESS_TOKEN;
+const IG_PAGE_TOKEN = IG_PAGE_ACCESS_TOKEN || FB_PAGE_ACCESS_TOKEN;
 const IG_BUSINESS_ID = Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID") ?? "";
 // Verify tokens accepted by the Meta webhook handshake.
 // Sourced exclusively from secrets — never hardcode.
@@ -32,6 +37,11 @@ import {
   containsHarassment,
   isFirstContactOrStale,
 } from "../_shared/brisa-persona.ts";
+import {
+  upsertUnifiedContact,
+  logUnifiedMessage,
+  isHumanTakeoverActive,
+} from "../_shared/brisa-memory.ts";
 
 const BRISA_SYSTEM = BRISA_PERSONA + `
 

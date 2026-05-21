@@ -10,19 +10,19 @@ const SITE_BASE = "https://plantayraiz.com.br";
 
 const BRISA_WELCOME: Record<string, { message: string; link: string }> = {
   paciente: {
-    message: "Olá! 🌿 Sou a Enf. Brisa, da Planta & Raiz. Que bom ter você aqui! Para iniciar sua triagem e encontrar o melhor profissional para você, acesse:",
+    message: "Olá! Sou a Enf. Brisa da Planta y Raiz Ltda. Para iniciarmos a sua triagem e direcionarmos o melhor atendimento, comece pela nossa triagem rápida:",
     link: `${SITE_BASE}/quiz-triagem`,
   },
   medico: {
-    message: "Olá, Doutor(a)! 🩺 Sou a Enf. Brisa. Bem-vindo à Planta & Raiz! Para se cadastrar como profissional parceiro e começar a atender, acesse:",
+    message: "Olá, profissional! Sou a Enf. Brisa da Planta y Raiz Ltda. Estamos em fase de expansão da rede clínica nacional. Para iniciar o credenciamento como profissional parceiro, acesse:",
     link: `${SITE_BASE}/cadastro-profissional`,
   },
   lojista: {
-    message: "Olá! 🛒 Sou a Enf. Brisa. Que bom seu interesse no Shopping Planta & Raiz! Para conhecer nossos produtos e oportunidades de parceria, acesse:",
+    message: "Olá! Sou a Enf. Brisa da Planta y Raiz Ltda. Obrigada pelo interesse no Shopping da plataforma. Para parcerias B2B e fornecimento, acesse:",
     link: `${SITE_BASE}/shopping`,
   },
   ebook: {
-    message: "Olá! 📚 Sou a Enf. Brisa. Fico feliz pelo seu interesse em aprender sobre Cannabis Medicinal! Baixe nosso e-book gratuito aqui:",
+    message: "Olá! Sou a Enf. Brisa da Planta y Raiz Ltda. Para aprofundar seu conhecimento sobre a modulação do sistema endocanabinoide, acesse nosso material:",
     link: `${SITE_BASE}/como-funciona`,
   },
 };

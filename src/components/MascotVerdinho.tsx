@@ -71,10 +71,10 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
     }, 800);
   };
 
-  const scale = isHovered ? 2.5 : 1;
+  const scale = isHovered ? 1.15 : 1;
   const wrapperClasses = inline
-    ? `relative cursor-pointer transition-all duration-500 ease-out ${className}`
-    : `fixed bottom-20 left-4 z-40 cursor-pointer transition-all duration-500 ease-out ${className}`;
+    ? `relative cursor-pointer transition-all duration-300 ease-out ${className}`
+    : `fixed bottom-20 left-3 z-40 cursor-pointer transition-transform duration-300 ease-out ${className}`;
 
   return (
     <>
@@ -84,23 +84,24 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
         style={{
           transformOrigin: inline ? "center center" : "bottom left",
           transform: `scale(${scale})`,
-          zIndex: isHovered ? 9999 : inline ? "auto" : 40,
+          zIndex: inline ? "auto" : 40,
           bottom: !inline ? `max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem))` : undefined,
-          left: !inline ? `max(1rem, env(safe-area-inset-left))` : undefined,
+          left: !inline ? `max(0.75rem, env(safe-area-inset-left))` : undefined,
         }}
         onClick={handleInteraction}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onTouchStart={() => setIsHovered(true)}
-        onTouchEnd={() => setTimeout(() => setIsHovered(false), 1500)}
+        onTouchEnd={() => setTimeout(() => setIsHovered(false), 1200)}
+        aria-label="Abrir Verdinho IA"
       >
-        <div className="relative w-12 h-12 md:w-16 md:h-16">
-          <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-lg" xmlns="http://www.w3.org/2000/svg">
+        <div className="relative w-11 h-11 md:w-12 md:h-12 rounded-full bg-card/70 backdrop-blur-md shadow-md ring-1 ring-emerald-500/25 hover:ring-emerald-400/40 transition">
+          <svg viewBox="0 0 100 100" className="w-full h-full p-1" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="35" r="20" fill="#10b981" />
             <circle cx="42" cy="30" r="3" fill="#ffffff" />
             <circle cx="58" cy="30" r="3" fill="#ffffff" />
-            <circle cx="42" cy="30" r="1.5" fill="#000000" className="animate-pulse" />
-            <circle cx="58" cy="30" r="1.5" fill="#000000" className="animate-pulse" />
+            <circle cx="42" cy="30" r="1.5" fill="#000000" />
+            <circle cx="58" cy="30" r="1.5" fill="#000000" />
             <path d="M 42 38 Q 50 42 58 38" stroke="#ffffff" strokeWidth="2" fill="none" />
             <ellipse cx="50" cy="60" rx="18" ry="22" fill="#10b981" />
             <rect x="25" y="50" width="12" height="8" rx="4" fill="#10b981" />
@@ -109,7 +110,6 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
             <rect x="52" y="78" width="8" height="15" rx="4" fill="#10b981" />
             <path d="M 50 15 Q 55 8 60 12 Q 55 5 50 10" fill="#059669" />
           </svg>
-          <div className="absolute inset-0 rounded-full border-2 border-emerald-500/50 animate-ping" style={{ animationDuration: "2s" }} />
         </div>
 
         {/* Tooltip on hover */}

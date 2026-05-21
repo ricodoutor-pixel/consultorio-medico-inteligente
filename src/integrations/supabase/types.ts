@@ -795,6 +795,38 @@ export type Database = {
         }
         Relationships: []
       }
+      brisa_human_takeover: {
+        Row: {
+          contact_id: string
+          expires_at: string
+          reason: string | null
+          taken_at: string | null
+          taken_by: string
+        }
+        Insert: {
+          contact_id: string
+          expires_at: string
+          reason?: string | null
+          taken_at?: string | null
+          taken_by: string
+        }
+        Update: {
+          contact_id?: string
+          expires_at?: string
+          reason?: string | null
+          taken_at?: string | null
+          taken_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brisa_human_takeover_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: true
+            referencedRelation: "brisa_unified_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brisa_image_pool: {
         Row: {
           created_at: string
@@ -932,6 +964,125 @@ export type Database = {
             columns: ["matched_doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brisa_unified_contacts: {
+        Row: {
+          created_at: string | null
+          display_name: string | null
+          facebook_psid: string | null
+          first_seen_at: string | null
+          funnel_stage: string | null
+          id: string
+          instagram_id: string | null
+          instagram_username: string | null
+          intent_history: Json | null
+          last_channel: string | null
+          last_message_at: string | null
+          lead_classification: string | null
+          metadata: Json | null
+          phone_e164: string | null
+          total_messages: number | null
+          updated_at: string | null
+          whatsapp_jid: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_name?: string | null
+          facebook_psid?: string | null
+          first_seen_at?: string | null
+          funnel_stage?: string | null
+          id?: string
+          instagram_id?: string | null
+          instagram_username?: string | null
+          intent_history?: Json | null
+          last_channel?: string | null
+          last_message_at?: string | null
+          lead_classification?: string | null
+          metadata?: Json | null
+          phone_e164?: string | null
+          total_messages?: number | null
+          updated_at?: string | null
+          whatsapp_jid?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string | null
+          facebook_psid?: string | null
+          first_seen_at?: string | null
+          funnel_stage?: string | null
+          id?: string
+          instagram_id?: string | null
+          instagram_username?: string | null
+          intent_history?: Json | null
+          last_channel?: string | null
+          last_message_at?: string | null
+          lead_classification?: string | null
+          metadata?: Json | null
+          phone_e164?: string | null
+          total_messages?: number | null
+          updated_at?: string | null
+          whatsapp_jid?: string | null
+        }
+        Relationships: []
+      }
+      brisa_unified_conversations: {
+        Row: {
+          audio_transcript: string | null
+          channel: string
+          contact_id: string
+          content: string | null
+          created_at: string | null
+          direction: string
+          external_message_id: string | null
+          human_takeover_by: string | null
+          id: string
+          intent: string | null
+          is_bot_handled: boolean | null
+          message_type: string | null
+          raw_payload: Json | null
+          urgency_score: number | null
+        }
+        Insert: {
+          audio_transcript?: string | null
+          channel: string
+          contact_id: string
+          content?: string | null
+          created_at?: string | null
+          direction: string
+          external_message_id?: string | null
+          human_takeover_by?: string | null
+          id?: string
+          intent?: string | null
+          is_bot_handled?: boolean | null
+          message_type?: string | null
+          raw_payload?: Json | null
+          urgency_score?: number | null
+        }
+        Update: {
+          audio_transcript?: string | null
+          channel?: string
+          contact_id?: string
+          content?: string | null
+          created_at?: string | null
+          direction?: string
+          external_message_id?: string | null
+          human_takeover_by?: string | null
+          id?: string
+          intent?: string | null
+          is_bot_handled?: boolean | null
+          message_type?: string | null
+          raw_payload?: Json | null
+          urgency_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brisa_unified_conversations_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "brisa_unified_contacts"
             referencedColumns: ["id"]
           },
         ]
@@ -6939,6 +7090,25 @@ export type Database = {
         Args: { _counter_id: string }
         Returns: undefined
       }
+      is_human_takeover_active: {
+        Args: { _contact_id: string }
+        Returns: boolean
+      }
+      log_unified_message: {
+        Args: {
+          _audio_transcript?: string
+          _channel: string
+          _contact_id: string
+          _content: string
+          _direction: string
+          _external_id?: string
+          _intent?: string
+          _message_type?: string
+          _raw?: Json
+          _urgency?: number
+        }
+        Returns: string
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -6974,6 +7144,18 @@ export type Database = {
       }
       sync_brisa_vault_secret: { Args: { _value: string }; Returns: string }
       trigger_brisa_social_post: { Args: { _target: string }; Returns: number }
+      upsert_unified_contact: {
+        Args: {
+          _channel: string
+          _display_name?: string
+          _facebook_psid?: string
+          _instagram_id?: string
+          _instagram_username?: string
+          _phone?: string
+          _whatsapp_jid?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

@@ -17,6 +17,8 @@ project_id = "shmbwdjuddvquszwkvuq"
     verify_jwt = true
   [functions.meta-messenger-bot]
     verify_jwt = false
+  [functions.meta-comment-to-dm]
+    verify_jwt = false
   [functions.preview-transactional-email]
     verify_jwt = false
   [functions.handle-email-unsubscribe]

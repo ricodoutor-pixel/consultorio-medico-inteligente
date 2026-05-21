@@ -117,6 +117,7 @@ const Badges = lazyWithRecovery(() => import("./pages/Badges"), { sourceRef: "/b
 const HealthCheck = lazyWithRecovery(() => import("./pages/HealthCheck"), { sourceRef: "/health" });
 const AutomationsDashboard = lazyWithRecovery(() => import("./pages/AutomationsDashboard"), { sourceRef: "/admin/automations" });
 const OmniChannelDashboard = lazyWithRecovery(() => import("./pages/OmniChannelDashboard"), { sourceRef: "/admin/omni-channel" });
+const BrisaCEO = lazyWithRecovery(() => import("./pages/admin/BrisaCEO"), { sourceRef: "/admin/brisa-ceo" });
 const OfertaEspecial = lazyWithRecovery(() => import("./pages/OfertaEspecial"), { sourceRef: "/oferta-especial" });
 const AdminFinanceiro = lazyWithRecovery(() => import("./pages/AdminFinanceiro"), { sourceRef: "/admin/financeiro" });
 const AdminCreditAudit = lazyWithRecovery(() => import("./pages/AdminCreditAudit"), { sourceRef: "/admin/credit-audit" });
@@ -292,6 +293,8 @@ const App = () => (
                 <Route path="/health" element={<AdminRoute><HealthCheck /></AdminRoute>} />
                 <Route path="/admin/automations" element={<AdminRoute><AutomationsDashboard /></AdminRoute>} />
                 <Route path="/admin/omni-channel" element={<AdminRoute><OmniChannelDashboard /></AdminRoute>} />
+                <Route path="/admin/brisa-ceo" element={<AdminRoute><BrisaCEO /></AdminRoute>} />
+                <Route path="/admin/brisa" element={<AdminRoute><BrisaCEO /></AdminRoute>} />
                 <Route path="/admin/auditoria-de-crédito" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />
                 <Route path="/admin/audit-log" element={<AdminRoute><AuditLog /></AdminRoute>} />
                 <Route path="/admin/auditoria" element={<AdminRoute><AuditLog /></AdminRoute>} />

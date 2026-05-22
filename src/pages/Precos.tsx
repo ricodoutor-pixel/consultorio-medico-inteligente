@@ -192,11 +192,14 @@ const Precos = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 max-w-7xl mx-auto items-stretch">
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 max-w-7xl mx-auto items-stretch relative"
+            style={{ zIndex: 10, isolation: 'isolate', transform: 'translateZ(0)' }}
+          >
             {plans.map((plan) => {
               const Icon = plan.icon;
               return (
-                <div key={plan.id} className="relative">
+                <div key={plan.id} className="relative flex" style={{ zIndex: 10 }}>
                   <Card className={`relative h-full border-border transition-colors ${plan.highlighted ? 'border-primary/60 ring-1 ring-primary/30' : ''} ${plan.id === 'clinica-familia' ? 'border-amber-500/40' : ''} ${plan.id === 'empresa-parceiros' ? 'border-secondary/40' : ''}`}>
                     {plan.tag && (
                       <div className={`absolute ${plan.id === 'clinica-familia' ? 'top-3 right-3' : '-top-3 right-4'} max-w-[calc(100%-1.5rem)] px-3 py-1 rounded-full text-xs font-black whitespace-nowrap ${

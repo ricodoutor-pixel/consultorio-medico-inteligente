@@ -269,7 +269,7 @@ Deno.serve(async (req) => {
               after_state: { channel, sender_id: senderId, link: "https://plantayraiz.com.br" },
             }).then(() => {}).catch(() => {});
           } else {
-            reply = await callBrisaAI(text);
+            reply = await callBrisaAI(text, senderId, unifiedChannel);
           }
 
           if (channel === "instagram") await sendInstagram(senderId, reply);

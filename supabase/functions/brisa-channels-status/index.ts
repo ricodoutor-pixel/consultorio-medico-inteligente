@@ -15,6 +15,8 @@ const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
 const FB_PAGE_TOKEN = FB_PAGE_ACCESS_TOKEN;
 const IG_PAGE_TOKEN = IG_PAGE_ACCESS_TOKEN || FB_PAGE_ACCESS_TOKEN;
+const IG_BUSINESS_ID = Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID") || "";
+const FB_PAGE_ID = Deno.env.get("FACEBOOK_PAGE_ID") || "";
 const EVOLUTION_WA_DR = "5511987131241";
 
 type Status = { ok: boolean; status: number; latency_ms: number; detail?: string };
@@ -56,13 +58,15 @@ Deno.serve(async (req) => {
       })
     : { ok: false, status: 0, latency_ms: 0, detail: "no_evolution_creds" };
 
-  // 2) Facebook Page (usa /me — não precisa do ID)
+  // 2) Facebook Page — usa FACEBOOK_PAGE_ID quando disponível
   const fb: Status = FB_PAGE_TOKEN
-    ? await check(`https://graph.facebook.com/v19.0/me?fields=id,name&access_token=${FB_PAGE_TOKEN}`)
+    ? await check(`https://graph.facebook.com/v19.0/${FB_PAGE_ID || "me"}?fields=id,name&access_token=${FB_PAGE_TOKEN}`)
     : { ok: false, status: 0, latency_ms: 0, detail: "no_fb_creds" };
 
-  // 3) Instagram Business (usa /me — não precisa do ID)
-  const ig: Status = IG_PAGE_TOKEN
+  // 3) Instagram Business — usa INSTAGRAM_BUSINESS_ACCOUNT_ID (mais confiável que /me)
+  const ig: Status = IG_PAGE_TOKEN && IG_BUSINESS_ID
+    ? await check(`https://graph.facebook.com/v19.0/${IG_BUSINESS_ID}?fields=id,username&access_token=${IG_PAGE_TOKEN}`)
+    : IG_PAGE_TOKEN
     ? await check(`https://graph.facebook.com/v19.0/me?fields=id,username&access_token=${IG_PAGE_TOKEN}`)
     : { ok: false, status: 0, latency_ms: 0, detail: "no_ig_creds" };
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GestãoPacientesSidebar } from "@/components/gestao-pacientes/Sidebar";
+import { GestaoPacientesSidebar } from "@/components/gestao-pacientes/Sidebar";
 import { SummaryCards } from "@/components/gestao-pacientes/SummaryCards";
 import { PatientTable } from "@/components/gestao-pacientes/PatientTable";
 import { NewPatientModal } from "@/components/gestao-pacientes/NewPatientModal";
@@ -16,7 +16,7 @@ const GestaoPacientes = () => {
   return (
     <div className="flex min-h-screen bg-[#F1F5F9]">
       {/* Sidebar */}
-      <GestãoPacientesSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <GestaoPacientesSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">

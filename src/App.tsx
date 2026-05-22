@@ -131,7 +131,7 @@ const PlanosTratamento = lazyWithRecovery(() => import("./pages/PlanosTratamento
 const AffiliateDashboard = lazyWithRecovery(() => import("./pages/AffiliateDashboard"), { sourceRef: "/afiliados/dashboard" });
 const PrescriptionCheckout = lazyWithRecovery(() => import("./pages/PrescriptionCheckout"), { sourceRef: "/checkout/:token" });
 const CheckoutReturn = lazyWithRecovery(() => import("./pages/CheckoutReturn"), { sourceRef: "/checkout/return" });
-const GestãoPacientes = lazyWithRecovery(() => import("./pages/GestãoPacientes"), { sourceRef: "/gestao-pacientes" });
+const GestaoPacientes = lazyWithRecovery(() => import("./pages/GestaoPacientes"), { sourceRef: "/gestao-pacientes" });
 const NotFound = lazyWithRecovery(() => import("./pages/NotFound"), { sourceRef: "*" });
 const RodizioMedicos = lazyWithRecovery(() => import("./pages/RodizioMedicos"), { sourceRef: "/rodizio" });
 const BrisaOrientacaoRedirect = lazyWithRecovery(() => import("./pages/BrisaOrientacaoRedirect"), { sourceRef: "/brisa-orientacao" });
@@ -319,7 +319,7 @@ const App = () => (
                 <Route path="/checkout/:token" element={<PrescriptionCheckout />} />
                 <Route path="/checkout/return" element={<CheckoutReturn />} />
                 <Route path="/afiliados/dashboard" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
-                <Route path="/gestao-pacientes" element={<PrivateRoute><GestãoPacientes /></PrivateRoute>} />
+                <Route path="/gestao-pacientes" element={<PrivateRoute><GestaoPacientes /></PrivateRoute>} />
                 <Route path="/status" element={<Status />} />
                 <Route path="/passaporte/:token" element={<Passaporte />} />
                 <Route path="/planos-tratamento" element={<PlanosTratamento />} />

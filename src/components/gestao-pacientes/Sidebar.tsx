@@ -14,7 +14,7 @@ const navItems = [
   { icon: Settings, label: "Configurações", active: false },
 ];
 
-export function GestãoPacientesSidebar({ open, onClose }: SidebarProps) {
+export function GestaoPacientesSidebar({ open, onClose }: SidebarProps) {
   return (
     <>
       {/* Overlay mobile */}

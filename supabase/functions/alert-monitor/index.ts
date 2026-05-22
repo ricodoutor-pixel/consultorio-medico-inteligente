@@ -289,6 +289,7 @@ Deno.serve(async (req) => {
         { name: "Total", value: String(commErrs.length), inline: true },
         { name: "Por função", value: Object.entries(byFn).map(([k, v]) => `${k}: ${v}`).join("\n") || "n/d" },
       ],
+      `comm_failures_${level}`,
     );
     alerts.push(`comm_errs=${commErrs.length}`);
   }

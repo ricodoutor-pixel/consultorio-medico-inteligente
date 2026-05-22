@@ -214,22 +214,18 @@ async function synthesizeVoice(text: string, voiceId: string): Promise<string | 
 }
 
 async function classifySentiment(text: string): Promise<{ sentiment_score: number; is_negative: boolean }> {
-  if (!LOVABLE_API_KEY) return { sentiment_score: 0.5, is_negative: false };
+  if (!HAS_AI_KEY) return { sentiment_score: 0.5, is_negative: false };
   try {
-    const resp = await fetch(LOVABLE_AI_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: BRISA_LITE_MODEL,
-        messages: [
-          { role: "system", content: "Você classifica sentimento de mensagens em pt-BR. score: 0 (muito negativo, raivoso, sofrimento, suicídio, frustração extrema) a 1 (muito positivo). is_negative=true se score<0.4 ou houver hostilidade/sofrimento. Responda APENAS JSON: {\"score\":number,\"is_negative\":boolean}" },
-          { role: "user", content: text.slice(0, 2000) },
-        ],
-        response_format: { type: "json_object" },
-      }),
+    const resp = await aiChat({
+      model: BRISA_LITE_MODEL,
+      messages: [
+        { role: "system", content: "Você classifica sentimento de mensagens em pt-BR. score: 0 (muito negativo, raivoso, sofrimento, suicídio, frustração extrema) a 1 (muito positivo). is_negative=true se score<0.4 ou houver hostilidade/sofrimento. Responda APENAS JSON: {\"score\":number,\"is_negative\":boolean}" },
+        { role: "user", content: text.slice(0, 2000) },
+      ],
+      response_format: { type: "json_object" },
     });
-    if (!resp.ok) {
-      console.error("[brisa-bot] sentiment error", resp.status);
+    if (!resp || !resp.ok) {
+      console.error("[brisa-bot] sentiment error", resp?.status);
       return { sentiment_score: 0.5, is_negative: false };
     }
     const data = await resp.json();
@@ -244,8 +240,8 @@ async function classifySentiment(text: string): Promise<{ sentiment_score: numbe
 }
 
 async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>) {
-  if (!LOVABLE_API_KEY) {
-    console.error("[brisa-bot] LOVABLE_API_KEY ausente — usando fallback");
+  if (!HAS_AI_KEY) {
+    console.error("[brisa-bot] Nenhuma chave de IA configurada — fallback");
     return BRISA_FALLBACK_MESSAGE;
   }
   const systemPrompt = await getBrisaSystemPrompt();
@@ -257,16 +253,12 @@ async function callBrisaAI(userMessage: string, history: Array<{role: string; co
     })),
     { role: "user", content: userMessage },
   ];
-  const resp = await fetch(LOVABLE_AI_URL, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: BRISA_MODEL, messages }),
-  });
-  if (!resp.ok) {
-    const errBody = await resp.text().catch(() => "");
-    console.error("[brisa-bot] AI error", resp.status, errBody);
-    if (resp.status === 429) return "Muita gente conversando comigo agora 🌿 Pode me chamar de novo em 1 minutinho?";
-    if (resp.status === 402) return "Tive uma instabilidade técnica momentânea. Pode me chamar novamente em alguns minutos? 🌿";
+  const resp = await aiChat({ model: BRISA_MODEL, messages });
+  if (!resp || !resp.ok) {
+    const errBody = await resp?.text().catch(() => "") ?? "";
+    console.error("[brisa-bot] AI error", resp?.status, errBody);
+    if (resp?.status === 429) return "Muita gente conversando comigo agora 🌿 Pode me chamar de novo em 1 minutinho?";
+    if (resp?.status === 402) return "Tive uma instabilidade técnica momentânea. Pode me chamar novamente em alguns minutos? 🌿";
     return BRISA_FALLBACK_MESSAGE;
   }
   const data = await resp.json();

@@ -357,20 +357,8 @@ NUNCA prescreva. NUNCA prometa cura.`;
 
           let reply: string;
           try {
-            const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-              method: "POST",
-              headers: { "Content-Type": "application/json", Authorization: `Bearer ${LOVABLE_API_KEY}` },
-              body: JSON.stringify({
-                model: "google/gemini-2.5-flash",
-                messages: [
-                  { role: "system", content: sysComment },
-                  { role: "user", content: text },
-                ],
-              }),
-            });
-            const j = await r.json();
-            reply = j?.choices?.[0]?.message?.content?.trim()?.slice(0, 280) ||
-              "Oi 🌿 chama no WhatsApp (11) 99136-3154 que te ajudo!";
+            const r = await processar_triagem_brisa(text, senderId, channel, { systemPrompt: sysComment });
+            reply = (r.reply || "").slice(0, 280) || "Oi 🌿 chama no WhatsApp (11) 99136-3154 que te ajudo!";
           } catch {
             reply = "Oi 🌿 chama no WhatsApp (11) 99136-3154 que te ajudo!";
           }

@@ -1,7 +1,8 @@
 // Edge function: brisa-google-review-request
 // Roda diariamente via pg_cron. Para cada orientação técnica concluída há >24h
-// que ainda não recebeu pedido de avaliação Google, envia mensagem via Twilio WhatsApp
-// pela Enfª Brisa e marca google_review_requested_at.
+// que ainda não recebeu pedido de avaliação Google, envia mensagem via Evolution API
+// (Enfª Brisa) através do edge function evolution-api-proxy e marca
+// google_review_requested_at.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
@@ -13,12 +14,8 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
-const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
-const TWILIO_WHATSAPP_FROM = "whatsapp:+551191363154"; // Enfª Brisa
 
 // Link curto da página de avaliação no Google Meu Negócio da Planta y Raiz.
-// Substitua pelo link real (Google Business → "Compartilhar avaliação").
 const GOOGLE_REVIEW_URL = "https://g.page/r/plantayraiz/review";
 
 function buildMessage(firstName: string) {
@@ -33,29 +30,25 @@ Se puder, sua avaliação de 30 segundos no Google nos ajuda MUITO a alcançar o
 Obrigada por confiar na gente! Qualquer dúvida, é só me chamar aqui. 🌱`;
 }
 
-async function sendWhatsApp(to: string, body: string): Promise<boolean> {
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
-    console.warn("[google-review] Twilio não configurado — apenas log");
-    console.log("[google-review] msg → ", to, body.substring(0, 60));
-    return true; // simula sucesso em dev
-  }
-  const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
-  const auth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
-  const params = new URLSearchParams({
-    From: TWILIO_WHATSAPP_FROM,
-    To: `whatsapp:+${to.replace(/\D/g, "")}`,
-    Body: body,
-  });
-  const r = await fetch(url, {
-    method: "POST",
-    headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/x-www-form-urlencoded" },
-    body: params.toString(),
-  });
-  if (!r.ok) {
-    console.error("[google-review] Twilio erro:", r.status, await r.text());
+async function sendWhatsAppViaEvolution(to: string, body: string): Promise<boolean> {
+  try {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ phone: to.replace(/\D/g, ""), message: body }),
+    });
+    if (!r.ok) {
+      console.error("[google-review] evolution-api-proxy erro:", r.status, await r.text());
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error("[google-review] evolution-api-proxy exception:", e);
     return false;
   }
-  return true;
 }
 
 Deno.serve(async (req) => {
@@ -66,7 +59,6 @@ Deno.serve(async (req) => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
   try {
-    // Busca orientações concluídas há entre 24h e 14 dias sem review enviada
     const { data: orders, error } = await supabase
       .from("orientacao_tecnica_orders")
       .select("id, patient_name, patient_whatsapp, dispatched_at")
@@ -90,7 +82,7 @@ Deno.serve(async (req) => {
     for (const o of orders) {
       const firstName = (o.patient_name || "").split(" ")[0];
       const message = buildMessage(firstName);
-      const ok = await sendWhatsApp(o.patient_whatsapp, message);
+      const ok = await sendWhatsAppViaEvolution(o.patient_whatsapp, message);
 
       if (ok) {
         await supabase
@@ -103,7 +95,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ ok: true, sent, failed, total: orders.length }), {
+    return new Response(JSON.stringify({ ok: true, sent, failed, total: orders.length, channel: "evolution-api" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

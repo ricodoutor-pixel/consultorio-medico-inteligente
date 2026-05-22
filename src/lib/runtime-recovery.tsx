@@ -76,24 +76,10 @@ export function reportFrontendRuntimeError(
         ...meta.context,
       },
     }).then(() => {
-      if (isChunkLoadError(normalized) || meta.phase === "fatal-runtime") {
-        void (async () => {
-          try {
-            await supabase.functions.invoke("manus-sentinel", {
-              body: {
-                dry_run: false,
-                triggered_by: "frontend-runtime-error",
-                source_ref: meta.sourceRef ?? window.location.pathname,
-                error_type: normalized.name,
-                error_message: normalized.message,
-              },
-            });
-          } catch {
-            // noop
-          }
-        })();
-      }
+      // Nota: manus-sentinel exige service-auth e não pode ser invocado do browser.
+      // O alerta server-side é disparado pelo cron/edge, não daqui.
     }, () => {});
+
 
     fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-error-gateway`, {
       method: "POST",

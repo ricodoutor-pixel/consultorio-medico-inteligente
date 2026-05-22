@@ -191,24 +191,18 @@ async function synthesizeVoice(text: string, voiceId: string): Promise<string | 
 }
 
 async function classifySentiment(text: string): Promise<{ sentiment_score: number; is_negative: boolean }> {
+  if (!LOVABLE_API_KEY) return { sentiment_score: 0.5, is_negative: false };
   try {
-    const resp = await fetch(`${GEMINI_BASE}/${GEMINI_LITE_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+    const resp = await fetch(LOVABLE_AI_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: "Você classifica sentimento de mensagens em pt-BR. score: 0 (muito negativo, raivoso, sofrimento, suicídio, frustração extrema) a 1 (muito positivo, gratidão, alegria). is_negative=true se score<0.4 ou houver hostilidade/sofrimento." }] },
-        contents: [{ role: "user", parts: [{ text: text.slice(0, 2000) }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: "object",
-            properties: {
-              score: { type: "number" },
-              is_negative: { type: "boolean" },
-            },
-            required: ["score", "is_negative"],
-          },
-        },
+        model: BRISA_LITE_MODEL,
+        messages: [
+          { role: "system", content: "Você classifica sentimento de mensagens em pt-BR. score: 0 (muito negativo, raivoso, sofrimento, suicídio, frustração extrema) a 1 (muito positivo). is_negative=true se score<0.4 ou houver hostilidade/sofrimento. Responda APENAS JSON: {\"score\":number,\"is_negative\":boolean}" },
+          { role: "user", content: text.slice(0, 2000) },
+        ],
+        response_format: { type: "json_object" },
       }),
     });
     if (!resp.ok) {
@@ -216,7 +210,7 @@ async function classifySentiment(text: string): Promise<{ sentiment_score: numbe
       return { sentiment_score: 0.5, is_negative: false };
     }
     const data = await resp.json();
-    const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    const raw = data?.choices?.[0]?.message?.content || "{}";
     const parsed = JSON.parse(raw);
     const score = Math.max(0, Math.min(1, Number(parsed.score) || 0.5));
     return { sentiment_score: score, is_negative: Boolean(parsed.is_negative) || score < 0.4 };
@@ -227,27 +221,33 @@ async function classifySentiment(text: string): Promise<{ sentiment_score: numbe
 }
 
 async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>) {
-  const contents = [
+  if (!LOVABLE_API_KEY) {
+    console.error("[brisa-bot] LOVABLE_API_KEY ausente — usando fallback");
+    return BRISA_FALLBACK_MESSAGE;
+  }
+  const systemPrompt = await getBrisaSystemPrompt();
+  const messages = [
+    { role: "system", content: systemPrompt },
     ...history.slice(-6).map((h) => ({
-      role: h.role === "assistant" ? "model" : "user",
-      parts: [{ text: h.content }],
+      role: h.role === "assistant" ? "assistant" : "user",
+      content: h.content,
     })),
-    { role: "user", parts: [{ text: userMessage }] },
+    { role: "user", content: userMessage },
   ];
-  const resp = await fetch(`${GEMINI_BASE}/${GEMINI_CHAT_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+  const resp = await fetch(LOVABLE_AI_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: await getBrisaSystemPrompt() }] },
-      contents,
-    }),
+    headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ model: BRISA_MODEL, messages }),
   });
   if (!resp.ok) {
-    console.error("[brisa-bot] AI error", resp.status, await resp.text());
+    const errBody = await resp.text().catch(() => "");
+    console.error("[brisa-bot] AI error", resp.status, errBody);
+    if (resp.status === 429) return "Muita gente conversando comigo agora 🌿 Pode me chamar de novo em 1 minutinho?";
+    if (resp.status === 402) return "Tive uma instabilidade técnica momentânea. Pode me chamar novamente em alguns minutos? 🌿";
     return BRISA_FALLBACK_MESSAGE;
   }
   const data = await resp.json();
-  return (data?.candidates?.[0]?.content?.parts?.[0]?.text || BRISA_FALLBACK_MESSAGE).trim();
+  return (data?.choices?.[0]?.message?.content || BRISA_FALLBACK_MESSAGE).trim();
 }
 
 serve(async (req) => {

@@ -3,6 +3,8 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { breakerSnapshot } from "../_shared/brisa-ai.ts";
 
+import { FB_PAGE_ACCESS_TOKEN, IG_PAGE_ACCESS_TOKEN } from "../_shared/meta-secrets.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -11,10 +13,8 @@ const corsHeaders = {
 const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL") || "";
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
-const FB_PAGE_TOKEN = Deno.env.get("FACEBOOK_PAGE_ACCESS_TOKEN") || Deno.env.get("META_PAGE_ACCESS_TOKEN") || "";
-const IG_PAGE_TOKEN = Deno.env.get("INSTAGRAM_PAGE_ACCESS_TOKEN") || FB_PAGE_TOKEN;
-const FB_PAGE_ID = Deno.env.get("FACEBOOK_PAGE_ID") || "";
-const IG_BUSINESS_ID = Deno.env.get("INSTAGRAM_BUSINESS_ACCOUNT_ID") || "";
+const FB_PAGE_TOKEN = FB_PAGE_ACCESS_TOKEN;
+const IG_PAGE_TOKEN = IG_PAGE_ACCESS_TOKEN || FB_PAGE_ACCESS_TOKEN;
 const EVOLUTION_WA_DR = "5511987131241";
 
 type Status = { ok: boolean; status: number; latency_ms: number; detail?: string };

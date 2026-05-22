@@ -199,7 +199,7 @@ const Precos = () => {
             {plans.map((plan) => {
               const Icon = plan.icon;
               return (
-                <div key={plan.id} className="relative">
+                <div key={plan.id} className="relative flex" style={{ zIndex: 10 }}>
                   <Card className={`relative h-full border-border transition-colors ${plan.highlighted ? 'border-primary/60 ring-1 ring-primary/30' : ''} ${plan.id === 'clinica-familia' ? 'border-amber-500/40' : ''} ${plan.id === 'empresa-parceiros' ? 'border-secondary/40' : ''}`}>
                     {plan.tag && (
                       <div className={`absolute ${plan.id === 'clinica-familia' ? 'top-3 right-3' : '-top-3 right-4'} max-w-[calc(100%-1.5rem)] px-3 py-1 rounded-full text-xs font-black whitespace-nowrap ${

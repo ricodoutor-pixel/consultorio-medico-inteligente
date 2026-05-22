@@ -305,6 +305,8 @@ const App = () => (
                 <Route path="/admin/cron-health" element={<AdminRoute><CronHealth /></AdminRoute>} />
                 <Route path="/admin/remote-commands" element={<AdminRoute><RemoteCommandLog /></AdminRoute>} />
                 <Route path="/admin/comandos-remotos" element={<AdminRoute><RemoteCommandLog /></AdminRoute>} />
+                <Route path="/admin/infra-services" element={<AdminRoute><InfraServices /></AdminRoute>} />
+                <Route path="/admin/pagamentos-externos" element={<AdminRoute><InfraServices /></AdminRoute>} />
                 <Route path="/admin/conversoes-uptime" element={<AdminRoute><ConversoesUptime /></AdminRoute>} />
                 <Route path="/admin/conversoes" element={<AdminRoute><ConversionsUnified /></AdminRoute>} />
                 <Route path="/admin/monitoramento" element={<AdminRoute><AdminMonitoramento /></AdminRoute>} />

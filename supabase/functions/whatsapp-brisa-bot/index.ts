@@ -373,10 +373,12 @@ serve(async (req) => {
     }
 
     // Persist inbound message com sentiment + load short history
+    // IMPORTANTE: aguardar o insert para que o SELECT abaixo enxergue a msg atual
+    // (sem isso, previousInbound vinha undefined e o welcome disparava a cada msg)
     await supabase.from("whatsapp_brisa_log").insert({
       phone, direction: "inbound", message: messageText, raw: data,
       sentiment_score, is_negative,
-    }).then(() => {}).catch(() => {});
+    });
 
     // Espelha em audit_log para auditoria centralizada (Manus CEO)
     await supabase.from("audit_log").insert({

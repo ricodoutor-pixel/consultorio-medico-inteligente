@@ -249,6 +249,7 @@ Deno.serve(async (req) => {
           { name: "Janela", value: "70min", inline: true },
           { name: "Ação", value: "Rotacionar BRISA_CEO_SECRET_KEY e recriar cron com service_role atual" },
         ],
+        `${c.ai}_no_runs`,
       );
       alerts.push(`${c.ai}_no_runs`);
     } else if (failed > 0 && failed === total) {
@@ -258,6 +259,7 @@ Deno.serve(async (req) => {
         `🔴 ${c.label} 100% falhando`,
         `Todos os ${total} eventos em 70min falharam.`,
         [{ name: "Cron", value: c.cron, inline: true }, { name: "Falhas", value: String(failed), inline: true }],
+        `${c.ai}_all_failed`,
       );
       alerts.push(`${c.ai}_all_failed`);
     }

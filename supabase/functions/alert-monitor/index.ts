@@ -44,13 +44,53 @@ async function sendWhatsAppAdmin(title: string, description: string) {
   }
 }
 
+// Dedupe: garante 1 alerta por alert_key/dia. Retorna true se foi inserido (novo),
+// false se já existia (apenas incrementa contador). Usa data BRT.
+async function shouldSendAlert(
+  supabase: ReturnType<typeof createClient>,
+  alertKey: string,
+  level: "WARNING" | "CRITICAL",
+  title: string,
+): Promise<boolean> {
+  try {
+    const { error } = await supabase.from("sre_alert_dedup").insert({
+      alert_key: alertKey,
+      level,
+      title,
+    });
+    if (!error) return true;
+    // Já existe hoje — incrementa contador silenciosamente
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
+    await supabase.rpc("exec", { sql: "" }).catch(() => {});
+    await supabase
+      .from("sre_alert_dedup")
+      .update({ occurrences: 999, last_seen_at: new Date().toISOString() })
+      .eq("alert_key", alertKey)
+      .eq("alert_date", today)
+      .then(() => {}, () => {});
+    return false;
+  } catch (e) {
+    console.error("[alert-monitor] dedup failed, sending anyway", e);
+    return true;
+  }
+}
+
 async function sendDiscord(
   supabase: ReturnType<typeof createClient>,
   level: "WARNING" | "CRITICAL",
   title: string,
   description: string,
   fields: { name: string; value: string; inline?: boolean }[],
+  alertKey?: string,
 ) {
+  // Se uma chave foi fornecida e já foi enviado hoje, suprime.
+  if (alertKey) {
+    const ok = await shouldSendAlert(supabase, alertKey, level, title);
+    if (!ok) {
+      console.log(`[alert-monitor] suprimido (já enviado hoje): ${alertKey}`);
+      return;
+    }
+  }
   try {
     await supabase.functions.invoke("sre-alert", {
       body: { level, title, description, fields },

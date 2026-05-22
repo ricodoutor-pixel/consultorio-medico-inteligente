@@ -66,25 +66,17 @@ async function verifySignature(req: Request, raw: string): Promise<boolean> {
   return expected === sig;
 }
 
-async function callBrisaAI(userMsg: string): Promise<string> {
-  const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${LOVABLE_API_KEY}` },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
-      messages: [
-        { role: "system", content: BRISA_SYSTEM },
-        { role: "user", content: userMsg },
-      ],
-    }),
-  });
-  if (!r.ok) {
-    const t = await r.text();
-    console.error("AI Gateway error", r.status, t);
-    return "Oi! Sou a Enfª Brisa 🌿 Tive uma instabilidade aqui. Pode me contar de novo o que está sentindo?";
-  }
-  const j = await r.json();
-  return j?.choices?.[0]?.message?.content?.trim() || "Estou aqui pra te ajudar 🌿";
+import { processar_triagem_brisa, BRISA_SYSTEM_PROMPT } from "../_shared/brisa-ai.ts";
+
+async function callBrisaAI(userMsg: string, senderId: string, channel: string): Promise<string> {
+  const sysPrompt = BRISA_SYSTEM_PROMPT + `
+
+// === COMPLEMENTO META MESSENGER / INSTAGRAM DM ===
+Mensagens curtas (até 3 linhas), tom de DM, 1-2 emojis.
+Em red flags (suicídio, dor torácica, hemorragia, desmaio, convulsão): acolha + oriente SAMU 192, depois retome cadastro.
+NUNCA prescreva. NUNCA prometa cura. LGPD-friendly.`;
+  const r = await processar_triagem_brisa(userMsg, senderId, channel, { systemPrompt: sysPrompt });
+  return r.reply || "Oi! Sou a Enfª Brisa 🌿 Tive uma instabilidade aqui. Pode me contar de novo o que está sentindo?";
 }
 
 async function sendMessenger(recipientId: string, text: string) {
@@ -277,7 +269,7 @@ Deno.serve(async (req) => {
               after_state: { channel, sender_id: senderId, link: "https://plantayraiz.com.br" },
             }).then(() => {}).catch(() => {});
           } else {
-            reply = await callBrisaAI(text);
+            reply = await callBrisaAI(text, senderId, unifiedChannel);
           }
 
           if (channel === "instagram") await sendInstagram(senderId, reply);
@@ -365,20 +357,8 @@ NUNCA prescreva. NUNCA prometa cura.`;
 
           let reply: string;
           try {
-            const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-              method: "POST",
-              headers: { "Content-Type": "application/json", Authorization: `Bearer ${LOVABLE_API_KEY}` },
-              body: JSON.stringify({
-                model: "google/gemini-2.5-flash",
-                messages: [
-                  { role: "system", content: sysComment },
-                  { role: "user", content: text },
-                ],
-              }),
-            });
-            const j = await r.json();
-            reply = j?.choices?.[0]?.message?.content?.trim()?.slice(0, 280) ||
-              "Oi 🌿 chama no WhatsApp (11) 99136-3154 que te ajudo!";
+            const r = await processar_triagem_brisa(text, senderId, channel, { systemPrompt: sysComment });
+            reply = (r.reply || "").slice(0, 280) || "Oi 🌿 chama no WhatsApp (11) 99136-3154 que te ajudo!";
           } catch {
             reply = "Oi 🌿 chama no WhatsApp (11) 99136-3154 que te ajudo!";
           }

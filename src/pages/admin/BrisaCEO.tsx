@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import BrisaHealthChecklist from "@/components/admin/BrisaHealthChecklist";
 import BrisaMetaDebugPanel from "@/components/admin/BrisaMetaDebugPanel";
 import AutoPostCountdown from "@/components/admin/AutoPostCountdown";
+import BrisaChannelsStatus from "@/components/admin/BrisaChannelsStatus";
 
 const CHANNEL_META: Record<Channel, { label: string; Icon: any; color: string }> = {
   whatsapp: { label: "WhatsApp", Icon: Phone, color: "text-green-400" },
@@ -89,6 +90,7 @@ export default function BrisaCEO() {
       {/* Countdown auto-post + Checklist */}
       <div className="container mx-auto px-4 pt-4 space-y-3">
         <AutoPostCountdown />
+        <BrisaChannelsStatus />
         <BrisaHealthChecklist />
         <BrisaMetaDebugPanel />
       </div>

@@ -239,30 +239,18 @@ async function classifySentiment(text: string): Promise<{ sentiment_score: numbe
   }
 }
 
-async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>) {
+import { processar_triagem_brisa } from "../_shared/brisa-ai.ts";
+
+async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>, phone: string) {
   if (!HAS_AI_KEY) {
     console.error("[brisa-bot] Nenhuma chave de IA configurada — fallback");
     return BRISA_FALLBACK_MESSAGE;
   }
   const systemPrompt = await getBrisaSystemPrompt();
-  const messages = [
-    { role: "system", content: systemPrompt },
-    ...history.slice(-6).map((h) => ({
-      role: h.role === "assistant" ? "assistant" : "user",
-      content: h.content,
-    })),
-    { role: "user", content: userMessage },
-  ];
-  const resp = await aiChat({ model: BRISA_MODEL, messages });
-  if (!resp || !resp.ok) {
-    const errBody = await resp?.text().catch(() => "") ?? "";
-    console.error("[brisa-bot] AI error", resp?.status, errBody);
-    if (resp?.status === 429) return "Muita gente conversando comigo agora 🌿 Pode me chamar de novo em 1 minutinho?";
-    if (resp?.status === 402) return "Tive uma instabilidade técnica momentânea. Pode me chamar novamente em alguns minutos? 🌿";
-    return BRISA_FALLBACK_MESSAGE;
-  }
-  const data = await resp.json();
-  return (data?.choices?.[0]?.message?.content || BRISA_FALLBACK_MESSAGE).trim();
+  const r = await processar_triagem_brisa(userMessage, phone, "whatsapp", {
+    history, model: BRISA_MODEL, systemPrompt,
+  });
+  return r.reply || BRISA_FALLBACK_MESSAGE;
 }
 
 serve(async (req) => {
@@ -470,7 +458,7 @@ serve(async (req) => {
       content: r.message,
     }));
 
-    const reply = await callBrisaAI(messageText, history);
+    const reply = await callBrisaAI(messageText, history, phone);
     await sendWhatsApp(phone, reply);
 
     // 🎙️ Se o usuário mandou áudio OU pediu p/ ouvir voz, Brisa responde também em áudio

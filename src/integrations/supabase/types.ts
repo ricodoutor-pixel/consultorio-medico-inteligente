@@ -857,6 +857,54 @@ export type Database = {
         }
         Relationships: []
       }
+      brisa_interaction_logs: {
+        Row: {
+          channel: string
+          created_at: string
+          error: string | null
+          http_status: number | null
+          id: string
+          latency_ms: number | null
+          message_in: string | null
+          message_out: string | null
+          meta: Json
+          model: string | null
+          provider: string | null
+          status: string
+          user_ref: string | null
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          error?: string | null
+          http_status?: number | null
+          id?: string
+          latency_ms?: number | null
+          message_in?: string | null
+          message_out?: string | null
+          meta?: Json
+          model?: string | null
+          provider?: string | null
+          status?: string
+          user_ref?: string | null
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          error?: string | null
+          http_status?: number | null
+          id?: string
+          latency_ms?: number | null
+          message_in?: string | null
+          message_out?: string | null
+          meta?: Json
+          model?: string | null
+          provider?: string | null
+          status?: string
+          user_ref?: string | null
+        }
+        Relationships: []
+      }
       brisa_triage_severity: {
         Row: {
           created_at: string

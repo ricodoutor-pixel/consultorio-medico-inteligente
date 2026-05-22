@@ -12,7 +12,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
-const SILENCE_MINUTES = 60;
+const SILENCE_MINUTES = 120;
 
 async function sendWhatsAppAdmin(text: string) {
   const url = Deno.env.get("EVOLUTION_API_URL");

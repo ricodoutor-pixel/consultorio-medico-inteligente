@@ -119,24 +119,20 @@ async function getBrisaSystemPrompt(): Promise<string> {
 }
 
 async function transcribeAudio(base64Audio: string, mimeType: string): Promise<string> {
-  if (!LOVABLE_API_KEY) return "";
+  if (!HAS_AI_KEY) return "";
   try {
     const fmt = mimeType.includes("mp3") || mimeType.includes("mpeg") ? "mp3" : "wav";
-    const resp = await fetch(LOVABLE_AI_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: BRISA_MODEL,
-        messages: [{
-          role: "user",
-          content: [
-            { type: "text", text: "Transcreva exatamente este áudio em português brasileiro. Responda APENAS com a transcrição, sem comentários." },
-            { type: "input_audio", input_audio: { data: base64Audio, format: fmt } },
-          ],
-        }],
-      }),
+    const resp = await aiChat({
+      model: BRISA_MODEL,
+      messages: [{
+        role: "user",
+        content: [
+          { type: "text", text: "Transcreva exatamente este áudio em português brasileiro. Responda APENAS com a transcrição, sem comentários." },
+          { type: "input_audio", input_audio: { data: base64Audio, format: fmt } },
+        ],
+      }],
     });
-    if (!resp.ok) { console.error("[brisa-bot] STT error", resp.status, await resp.text().catch(() => "")); return ""; }
+    if (!resp || !resp.ok) { console.error("[brisa-bot] STT error", resp?.status, await resp?.text().catch(() => "")); return ""; }
     const data = await resp.json();
     return (data?.choices?.[0]?.message?.content || "").trim();
   } catch (e) { console.error("[brisa-bot] transcribeAudio failed", e); return ""; }

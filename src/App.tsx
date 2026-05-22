@@ -264,7 +264,8 @@ const App = () => (
                 <Route path="/dashboard-loja" element={<ShoppingDashboard />} />
                 <Route path="/investidores" element={<InvestorDashboard />} />
                 <Route path="/videochamada" element={<VideoCall />} />
-                <Route path="/consulta-rapida" element={<ConsultaRapida />} />
+                <Route path="/orientacao-rapida" element={<OrientacaoRapida />} />
+                <Route path="/consulta-rapida" element={<OrientacaoRapida />} />
                 <Route path="/tratamento-dor-cronica" element={<TratamentoDorCronica />} />
                 <Route path="/tratamento-ansiedade-saude-mental" element={<TratamentoAnsiedadeSaudeMental />} />
                 <Route path="/tratamentos" element={<SEOCondicoes />} />

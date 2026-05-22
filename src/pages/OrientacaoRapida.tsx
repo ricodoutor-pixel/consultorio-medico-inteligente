@@ -24,7 +24,7 @@ type MatchResult = {
   message?: string;
 };
 
-const ConsultaRapida = () => {
+const OrientacaoRapida = () => {
   const { toast } = useToast();
   const [step, setStep] = useState<"symptoms" | "matching" | "result">("symptoms");
   const [symptoms, setSymptoms] = useState(() => {
@@ -337,4 +337,4 @@ const ConsultaRapida = () => {
   );
 };
 
-export default ConsultaRapida;
+export default OrientacaoRapida;

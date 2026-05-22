@@ -36,7 +36,7 @@ type ChatMessage = {
   fileName?: string;
 };
 
-const ConsultaVideo = () => {
+const OrientacaoVideo = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { log } = useAuditLog();
@@ -475,4 +475,4 @@ const CID10QuickSearch = () => {
   );
 };
 
-export default ConsultaVideo;
+export default OrientacaoVideo;

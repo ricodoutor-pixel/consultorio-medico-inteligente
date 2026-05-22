@@ -77,7 +77,7 @@ const DashboardMedico = lazyWithRecovery(() => import("./pages/DashboardMedico")
 const DashboardExecutivo = lazyWithRecovery(() => import("./pages/DashboardExecutivo"), { sourceRef: "/dashboard-executivo" });
 const Notificacoes = lazyWithRecovery(() => import("./pages/Notificacoes"), { sourceRef: "/notificacoes" });
 const SalaEspera = lazyWithRecovery(() => import("./pages/SalaEspera"), { sourceRef: "/sala-espera" });
-const ConsultaVideo = lazyWithRecovery(() => import("./pages/ConsultaVideo"), { sourceRef: "/consulta-video" });
+const OrientacaoVideo = lazyWithRecovery(() => import("./pages/OrientacaoVideo"), { sourceRef: "/orientacao-video" });
 const RIPD = lazyWithRecovery(() => import("./pages/RIPD"), { sourceRef: "/ripd" });
 const LGPDDireitos = lazyWithRecovery(() => import("./pages/LGPDDireitos"), { sourceRef: "/lgpd" });
 const GlobalCompliance = lazyWithRecovery(() => import("./pages/GlobalCompliance"), { sourceRef: "/compliance" });
@@ -88,7 +88,7 @@ const Blog = lazyWithRecovery(() => import("./pages/Blog"), { sourceRef: "/blog"
 const ShoppingDashboard = lazyWithRecovery(() => import("./pages/ShoppingDashboard"), { sourceRef: "/dashboard-loja" });
 const InvestorDashboard = lazyWithRecovery(() => import("./pages/InvestorDashboard"), { sourceRef: "/investidores" });
 const VideoCall = lazyWithRecovery(() => import("./pages/VideoCall"), { sourceRef: "/videochamada" });
-const ConsultaRapida = lazyWithRecovery(() => import("./pages/ConsultaRapida"), { sourceRef: "/consulta-rapida" });
+const OrientacaoRapida = lazyWithRecovery(() => import("./pages/OrientacaoRapida"), { sourceRef: "/orientacao-rapida" });
 const SEOCondicoes = lazyWithRecovery(() => import("./pages/SEOCondicoes"), { sourceRef: "/tratamentos" });
 const Status = lazyWithRecovery(() => import("./pages/Status"), { sourceRef: "/status" });
 const Passaporte = lazyWithRecovery(() => import("./pages/Passaporte"), { sourceRef: "/passaporte" });
@@ -131,7 +131,7 @@ const PlanosTratamento = lazyWithRecovery(() => import("./pages/PlanosTratamento
 const AffiliateDashboard = lazyWithRecovery(() => import("./pages/AffiliateDashboard"), { sourceRef: "/afiliados/dashboard" });
 const PrescriptionCheckout = lazyWithRecovery(() => import("./pages/PrescriptionCheckout"), { sourceRef: "/checkout/:token" });
 const CheckoutReturn = lazyWithRecovery(() => import("./pages/CheckoutReturn"), { sourceRef: "/checkout/return" });
-const GestãoPacientes = lazyWithRecovery(() => import("./pages/GestãoPacientes"), { sourceRef: "/gestao-pacientes" });
+const GestaoPacientes = lazyWithRecovery(() => import("./pages/GestaoPacientes"), { sourceRef: "/gestao-pacientes" });
 const NotFound = lazyWithRecovery(() => import("./pages/NotFound"), { sourceRef: "*" });
 const RodizioMedicos = lazyWithRecovery(() => import("./pages/RodizioMedicos"), { sourceRef: "/rodizio" });
 const BrisaOrientacaoRedirect = lazyWithRecovery(() => import("./pages/BrisaOrientacaoRedirect"), { sourceRef: "/brisa-orientacao" });
@@ -248,7 +248,8 @@ const App = () => (
                 <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />
                 <Route path="/notificacoes" element={<Notificacoes />} />
                 <Route path="/sala-espera" element={<SalaEspera />} />
-                <Route path="/consulta-video" element={<ConsultaVideo />} />
+                <Route path="/orientacao-video" element={<OrientacaoVideo />} />
+                <Route path="/consulta-video" element={<OrientacaoVideo />} />
                 <Route path="/ripd" element={<RIPD />} />
                 <Route path="/lgpd" element={<LGPDDireitos />} />
                 <Route path="/meus-dados" element={<LGPDDireitos />} />
@@ -263,7 +264,8 @@ const App = () => (
                 <Route path="/dashboard-loja" element={<ShoppingDashboard />} />
                 <Route path="/investidores" element={<InvestorDashboard />} />
                 <Route path="/videochamada" element={<VideoCall />} />
-                <Route path="/consulta-rapida" element={<ConsultaRapida />} />
+                <Route path="/orientacao-rapida" element={<OrientacaoRapida />} />
+                <Route path="/consulta-rapida" element={<OrientacaoRapida />} />
                 <Route path="/tratamento-dor-cronica" element={<TratamentoDorCronica />} />
                 <Route path="/tratamento-ansiedade-saude-mental" element={<TratamentoAnsiedadeSaudeMental />} />
                 <Route path="/tratamentos" element={<SEOCondicoes />} />
@@ -319,7 +321,7 @@ const App = () => (
                 <Route path="/checkout/:token" element={<PrescriptionCheckout />} />
                 <Route path="/checkout/return" element={<CheckoutReturn />} />
                 <Route path="/afiliados/dashboard" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
-                <Route path="/gestao-pacientes" element={<PrivateRoute><GestãoPacientes /></PrivateRoute>} />
+                <Route path="/gestao-pacientes" element={<PrivateRoute><GestaoPacientes /></PrivateRoute>} />
                 <Route path="/status" element={<Status />} />
                 <Route path="/passaporte/:token" element={<Passaporte />} />
                 <Route path="/planos-tratamento" element={<PlanosTratamento />} />

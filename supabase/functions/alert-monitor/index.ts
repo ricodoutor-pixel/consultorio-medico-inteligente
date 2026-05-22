@@ -160,6 +160,7 @@ Deno.serve(async (req) => {
         { name: "Total", value: String(b.count), inline: true },
         { name: "Top funções", value: topFns || "n/d" },
       ],
+      `http_${sc}_${level}`,
     );
     alerts.push(`http_${sc}=${b.count}`);
   }

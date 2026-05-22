@@ -58,6 +58,14 @@ body {
   min-height: 100dvh;
 }
 
+/* Reserve space for MobileBottomNav (h-16 = 64px) on mobile/tablet to prevent
+   page CTAs from being hidden behind the fixed bottom navigation on Android/iOS. */
+@media (max-width: 1279px) {
+  body {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 /* ============================================================
    RESPONSIVE BREAKPOINTS — mobile-first
    480px (celular) / 768px (tablet) / 1024px+ (desktop)

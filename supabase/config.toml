@@ -23,5 +23,7 @@ project_id = "shmbwdjuddvquszwkvuq"
     verify_jwt = false
   [functions.handle-email-unsubscribe]
     verify_jwt = false
+  [functions.brisa-channels-status]
+    verify_jwt = false
   [functions.handle-email-suppression]
     verify_jwt = false

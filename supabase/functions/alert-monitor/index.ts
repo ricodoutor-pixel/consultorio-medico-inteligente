@@ -307,6 +307,7 @@ Deno.serve(async (req) => {
         { name: "Funções", value: fns.join(", ").slice(0, 500) || "n/d" },
         { name: "Causas comuns", value: "• service_role rotacionada\n• BRISA_CEO_SECRET_KEY trocada\n• FACEBOOK_PAGE_ACCESS_TOKEN expirou" },
       ],
+      "http_401_early",
     );
     alerts.push(`http_401_early=${auth401.length}`);
   }

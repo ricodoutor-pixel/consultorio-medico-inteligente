@@ -92,24 +92,26 @@ async function getBrisaSystemPrompt(): Promise<string> {
 }
 
 async function transcribeAudio(base64Audio: string, mimeType: string): Promise<string> {
+  if (!LOVABLE_API_KEY) return "";
   try {
-    const mime = mimeType.includes("ogg") ? "audio/ogg" : mimeType.includes("mp3") || mimeType.includes("mpeg") ? "audio/mp3" : "audio/wav";
-    const resp = await fetch(`${GEMINI_BASE}/${GEMINI_CHAT_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+    const fmt = mimeType.includes("mp3") || mimeType.includes("mpeg") ? "mp3" : "wav";
+    const resp = await fetch(LOVABLE_AI_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{
+        model: BRISA_MODEL,
+        messages: [{
           role: "user",
-          parts: [
-            { text: "Transcreva exatamente este áudio em português brasileiro. Responda APENAS com a transcrição, sem comentários." },
-            { inline_data: { mime_type: mime, data: base64Audio } },
+          content: [
+            { type: "text", text: "Transcreva exatamente este áudio em português brasileiro. Responda APENAS com a transcrição, sem comentários." },
+            { type: "input_audio", input_audio: { data: base64Audio, format: fmt } },
           ],
         }],
       }),
     });
-    if (!resp.ok) { console.error("[brisa-bot] STT error", resp.status, await resp.text()); return ""; }
+    if (!resp.ok) { console.error("[brisa-bot] STT error", resp.status, await resp.text().catch(() => "")); return ""; }
     const data = await resp.json();
-    return (data?.candidates?.[0]?.content?.parts?.[0]?.text || "").trim();
+    return (data?.choices?.[0]?.message?.content || "").trim();
   } catch (e) { console.error("[brisa-bot] transcribeAudio failed", e); return ""; }
 }
 

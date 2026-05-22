@@ -114,27 +114,27 @@ Gere a predição farmacocinética.`;
       tool_choice: { type: "function", function: { name: "pharmacokinetic_prediction" } },
     };
 
-    // 1) Tenta Lovable AI Gateway (sempre provisionado, sem expiração).
+    // 1) PRIMÁRIO: GEMINI_API_KEY direto no Google (evita 402 do gateway).
     let r: Response | null = null;
     let lastErr = "";
-    if (LOVABLE_API_KEY) {
+    if (GEMINI_API_KEY) {
       try {
-        r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        r = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
           method: "POST",
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ ...payload, model: "gemini-2.5-flash" }),
         });
-        if (!r.ok) { lastErr = `gateway ${r.status}`; r = null; }
-      } catch (e) { lastErr = `gateway exception: ${String(e)}`; r = null; }
+        if (!r.ok) { lastErr = `gemini ${r.status}`; r = null; }
+      } catch (e) { lastErr = `gemini exception: ${String(e)}`; r = null; }
     }
 
-    // 2) Fallback: GEMINI_API_KEY direto (compat com chave antiga).
-    if (!r && GEMINI_API_KEY) {
-      console.warn("[ai-pk] gateway falhou, fallback Gemini direct:", lastErr);
-      r = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+    // 2) FALLBACK: Lovable AI Gateway se Gemini direto falhar.
+    if (!r && LOVABLE_API_KEY) {
+      console.warn("[ai-pk] Gemini direct falhou, fallback gateway:", lastErr);
+      r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
-        headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, model: "gemini-2.5-flash" }),
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
     }
 

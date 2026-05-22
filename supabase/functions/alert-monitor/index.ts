@@ -59,19 +59,19 @@ async function shouldSendAlert(
       title,
     });
     if (!error) return true;
-    // Já existe hoje — incrementa contador silenciosamente
+    // Já existe hoje (unique violation) — incrementa contador silenciosamente
     const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
-    await supabase.rpc("exec", { sql: "" }).catch(() => {});
-    await supabase
-      .from("sre_alert_dedup")
-      .update({ occurrences: 999, last_seen_at: new Date().toISOString() })
-      .eq("alert_key", alertKey)
-      .eq("alert_date", today)
-      .then(() => {}, () => {});
+    try {
+      await supabase
+        .from("sre_alert_dedup")
+        .update({ last_seen_at: new Date().toISOString() })
+        .eq("alert_key", alertKey)
+        .eq("alert_date", today);
+    } catch (_) { /* noop */ }
     return false;
   } catch (e) {
-    console.error("[alert-monitor] dedup failed, sending anyway", e);
-    return true;
+    console.error("[alert-monitor] dedup failed — SUPPRESSING to avoid WhatsApp spam", e);
+    return false;
   }
 }
 

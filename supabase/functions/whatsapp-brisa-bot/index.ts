@@ -373,10 +373,12 @@ serve(async (req) => {
     }
 
     // Persist inbound message com sentiment + load short history
+    // IMPORTANTE: aguardar o insert para que o SELECT abaixo enxergue a msg atual
+    // (sem isso, previousInbound vinha undefined e o welcome disparava a cada msg)
     await supabase.from("whatsapp_brisa_log").insert({
       phone, direction: "inbound", message: messageText, raw: data,
       sentiment_score, is_negative,
-    }).then(() => {}).catch(() => {});
+    });
 
     // Espelha em audit_log para auditoria centralizada (Manus CEO)
     await supabase.from("audit_log").insert({
@@ -416,16 +418,26 @@ serve(async (req) => {
       });
     }
 
-    // 🌿 MÓDULO 1 — Mensagem oficial de boas-vindas (1º contato ou >24h)
-    const lastInbound = (rows || []).find((r: any) => r.direction === "inbound" && r.created_at)?.created_at;
-    // O insert do inbound atual já aconteceu acima; usamos o ANTERIOR.
-    const previousInbound = (rows || []).filter((r: any) => r.direction === "inbound")[1]?.created_at ?? null;
-    if (isFirstContactOrStale(previousInbound)) {
+    // 🌿 MÓDULO 1 — Boas-vindas APENAS no 1º contato real ou após 24h de silêncio.
+    // Critério à prova de race: olhar o último OUTBOUND de welcome enviado p/ este phone.
+    const { data: lastWelcome } = await supabase
+      .from("whatsapp_brisa_log")
+      .select("created_at")
+      .eq("phone", phone)
+      .eq("direction", "outbound")
+      .contains("raw", { trigger: "welcome_24h" })
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const hoursSinceWelcome = lastWelcome?.created_at
+      ? (Date.now() - new Date(lastWelcome.created_at).getTime()) / 36e5
+      : Infinity;
+    if (hoursSinceWelcome >= 24) {
       await sendWhatsApp(phone, BRISA_WELCOME_MESSAGE);
       await supabase.from("whatsapp_brisa_log").insert({
         phone, direction: "outbound", message: BRISA_WELCOME_MESSAGE,
         raw: { trigger: "welcome_24h" },
-      }).then(() => {}).catch(() => {});
+      });
       if (unifiedContactId) {
         await logUnifiedMessage({
           contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",

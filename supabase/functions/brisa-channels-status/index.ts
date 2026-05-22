@@ -56,14 +56,14 @@ Deno.serve(async (req) => {
       })
     : { ok: false, status: 0, latency_ms: 0, detail: "no_evolution_creds" };
 
-  // 2) Facebook Page
-  const fb: Status = FB_PAGE_TOKEN && FB_PAGE_ID
-    ? await check(`https://graph.facebook.com/v19.0/${FB_PAGE_ID}?fields=id,name&access_token=${FB_PAGE_TOKEN}`)
+  // 2) Facebook Page (usa /me — não precisa do ID)
+  const fb: Status = FB_PAGE_TOKEN
+    ? await check(`https://graph.facebook.com/v19.0/me?fields=id,name&access_token=${FB_PAGE_TOKEN}`)
     : { ok: false, status: 0, latency_ms: 0, detail: "no_fb_creds" };
 
-  // 3) Instagram Business
-  const ig: Status = IG_PAGE_TOKEN && IG_BUSINESS_ID
-    ? await check(`https://graph.facebook.com/v19.0/${IG_BUSINESS_ID}?fields=id,username&access_token=${IG_PAGE_TOKEN}`)
+  // 3) Instagram Business (usa /me — não precisa do ID)
+  const ig: Status = IG_PAGE_TOKEN
+    ? await check(`https://graph.facebook.com/v19.0/me?fields=id,username&access_token=${IG_PAGE_TOKEN}`)
     : { ok: false, status: 0, latency_ms: 0, detail: "no_ig_creds" };
 
   // Alerta o Dr. Edilson quando qualquer canal cai (1x a cada 10min por canal)

@@ -213,6 +213,7 @@ Deno.serve(async (req) => {
           { name: "Fail rate", value: `${(failRate * 100).toFixed(1)}%`, inline: true },
           { name: "Warn / Crit", value: `${RX_LAT_WARN_MS}ms / ${RX_LAT_CRIT_MS}ms`, inline: true },
         ],
+        `rx_dispatch_degraded_${level}`,
       );
       alerts.push(`rx_${level.toLowerCase()}`);
     }

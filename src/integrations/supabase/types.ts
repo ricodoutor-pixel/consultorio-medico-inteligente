@@ -5731,6 +5731,39 @@ export type Database = {
         }
         Relationships: []
       }
+      sre_alert_dedup: {
+        Row: {
+          alert_date: string
+          alert_key: string
+          first_sent_at: string
+          id: string
+          last_seen_at: string
+          level: string
+          occurrences: number
+          title: string | null
+        }
+        Insert: {
+          alert_date?: string
+          alert_key: string
+          first_sent_at?: string
+          id?: string
+          last_seen_at?: string
+          level: string
+          occurrences?: number
+          title?: string | null
+        }
+        Update: {
+          alert_date?: string
+          alert_key?: string
+          first_sent_at?: string
+          id?: string
+          last_seen_at?: string
+          level?: string
+          occurrences?: number
+          title?: string | null
+        }
+        Relationships: []
+      }
       strain_images: {
         Row: {
           created_at: string

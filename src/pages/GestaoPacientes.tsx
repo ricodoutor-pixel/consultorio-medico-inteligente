@@ -7,7 +7,7 @@ import { Menu, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const GestãoPacientes = () => {
+const GestaoPacientes = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -78,4 +78,4 @@ const GestãoPacientes = () => {
   );
 };
 
-export default GestãoPacientes;
+export default GestaoPacientes;

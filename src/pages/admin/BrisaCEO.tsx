@@ -90,6 +90,7 @@ export default function BrisaCEO() {
       {/* Countdown auto-post + Checklist */}
       <div className="container mx-auto px-4 pt-4 space-y-3">
         <AutoPostCountdown />
+        <BrisaChannelsStatus />
         <BrisaHealthChecklist />
         <BrisaMetaDebugPanel />
       </div>

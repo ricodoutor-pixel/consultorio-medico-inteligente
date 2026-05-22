@@ -248,7 +248,8 @@ const App = () => (
                 <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />
                 <Route path="/notificacoes" element={<Notificacoes />} />
                 <Route path="/sala-espera" element={<SalaEspera />} />
-                <Route path="/consulta-video" element={<ConsultaVideo />} />
+                <Route path="/orientacao-video" element={<OrientacaoVideo />} />
+                <Route path="/consulta-video" element={<OrientacaoVideo />} />
                 <Route path="/ripd" element={<RIPD />} />
                 <Route path="/lgpd" element={<LGPDDireitos />} />
                 <Route path="/meus-dados" element={<LGPDDireitos />} />

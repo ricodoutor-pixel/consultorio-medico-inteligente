@@ -55,9 +55,9 @@ export default function PlanosTratamento() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 pt-24 pb-16 max-w-6xl">
+      <main className="container mx-auto px-4 pt-24 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] xl:pb-16 max-w-6xl">
         <div className="text-center mb-10">
           <h1 className="font-display font-black text-3xl md:text-5xl mb-3">
             Escolha seu <span className="text-gradient-green">Plano de Tratamento</span>

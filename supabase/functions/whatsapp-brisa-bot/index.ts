@@ -12,11 +12,38 @@ const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL")!;
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY")!;
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
 const EVOLUTION_WEBHOOK_SECRET = Deno.env.get("EVOLUTION_WEBHOOK_SECRET") || "";
-// 🔑 Lovable AI Gateway — usa LOVABLE_API_KEY já configurada (sem chave externa).
+// 🔑 IA: GEMINI_API_KEY direto (primário, sem 402) + LOVABLE_API_KEY fallback.
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "";
+const HAS_AI_KEY = !!(GEMINI_API_KEY || LOVABLE_API_KEY);
 const LOVABLE_AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const GEMINI_AI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
 const BRISA_MODEL = "google/gemini-2.5-flash";
 const BRISA_LITE_MODEL = "google/gemini-2.5-flash-lite";
+const stripPrefix = (m: string) => m.replace(/^google\//, "");
+
+// Tenta Gemini direto primeiro (bypassa o gateway p/ evitar 402), fallback Lovable AI Gateway.
+async function aiChat(body: Record<string, unknown>): Promise<Response | null> {
+  if (GEMINI_API_KEY) {
+    try {
+      const r = await fetch(GEMINI_AI_URL, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ ...body, model: stripPrefix(String((body as Record<string, unknown>).model || BRISA_MODEL)) }),
+      });
+      if (r.ok) return r;
+      console.warn("[brisa-bot] Gemini direct falhou", r.status, "— tentando gateway");
+    } catch (e) { console.warn("[brisa-bot] Gemini direct exception", String(e)); }
+  }
+  if (LOVABLE_API_KEY) {
+    return await fetch(LOVABLE_AI_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  }
+  return null;
+}
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -92,24 +119,20 @@ async function getBrisaSystemPrompt(): Promise<string> {
 }
 
 async function transcribeAudio(base64Audio: string, mimeType: string): Promise<string> {
-  if (!LOVABLE_API_KEY) return "";
+  if (!HAS_AI_KEY) return "";
   try {
     const fmt = mimeType.includes("mp3") || mimeType.includes("mpeg") ? "mp3" : "wav";
-    const resp = await fetch(LOVABLE_AI_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: BRISA_MODEL,
-        messages: [{
-          role: "user",
-          content: [
-            { type: "text", text: "Transcreva exatamente este áudio em português brasileiro. Responda APENAS com a transcrição, sem comentários." },
-            { type: "input_audio", input_audio: { data: base64Audio, format: fmt } },
-          ],
-        }],
-      }),
+    const resp = await aiChat({
+      model: BRISA_MODEL,
+      messages: [{
+        role: "user",
+        content: [
+          { type: "text", text: "Transcreva exatamente este áudio em português brasileiro. Responda APENAS com a transcrição, sem comentários." },
+          { type: "input_audio", input_audio: { data: base64Audio, format: fmt } },
+        ],
+      }],
     });
-    if (!resp.ok) { console.error("[brisa-bot] STT error", resp.status, await resp.text().catch(() => "")); return ""; }
+    if (!resp || !resp.ok) { console.error("[brisa-bot] STT error", resp?.status, await resp?.text().catch(() => "")); return ""; }
     const data = await resp.json();
     return (data?.choices?.[0]?.message?.content || "").trim();
   } catch (e) { console.error("[brisa-bot] transcribeAudio failed", e); return ""; }
@@ -191,22 +214,18 @@ async function synthesizeVoice(text: string, voiceId: string): Promise<string | 
 }
 
 async function classifySentiment(text: string): Promise<{ sentiment_score: number; is_negative: boolean }> {
-  if (!LOVABLE_API_KEY) return { sentiment_score: 0.5, is_negative: false };
+  if (!HAS_AI_KEY) return { sentiment_score: 0.5, is_negative: false };
   try {
-    const resp = await fetch(LOVABLE_AI_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: BRISA_LITE_MODEL,
-        messages: [
-          { role: "system", content: "Você classifica sentimento de mensagens em pt-BR. score: 0 (muito negativo, raivoso, sofrimento, suicídio, frustração extrema) a 1 (muito positivo). is_negative=true se score<0.4 ou houver hostilidade/sofrimento. Responda APENAS JSON: {\"score\":number,\"is_negative\":boolean}" },
-          { role: "user", content: text.slice(0, 2000) },
-        ],
-        response_format: { type: "json_object" },
-      }),
+    const resp = await aiChat({
+      model: BRISA_LITE_MODEL,
+      messages: [
+        { role: "system", content: "Você classifica sentimento de mensagens em pt-BR. score: 0 (muito negativo, raivoso, sofrimento, suicídio, frustração extrema) a 1 (muito positivo). is_negative=true se score<0.4 ou houver hostilidade/sofrimento. Responda APENAS JSON: {\"score\":number,\"is_negative\":boolean}" },
+        { role: "user", content: text.slice(0, 2000) },
+      ],
+      response_format: { type: "json_object" },
     });
-    if (!resp.ok) {
-      console.error("[brisa-bot] sentiment error", resp.status);
+    if (!resp || !resp.ok) {
+      console.error("[brisa-bot] sentiment error", resp?.status);
       return { sentiment_score: 0.5, is_negative: false };
     }
     const data = await resp.json();
@@ -221,8 +240,8 @@ async function classifySentiment(text: string): Promise<{ sentiment_score: numbe
 }
 
 async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>) {
-  if (!LOVABLE_API_KEY) {
-    console.error("[brisa-bot] LOVABLE_API_KEY ausente — usando fallback");
+  if (!HAS_AI_KEY) {
+    console.error("[brisa-bot] Nenhuma chave de IA configurada — fallback");
     return BRISA_FALLBACK_MESSAGE;
   }
   const systemPrompt = await getBrisaSystemPrompt();
@@ -234,16 +253,12 @@ async function callBrisaAI(userMessage: string, history: Array<{role: string; co
     })),
     { role: "user", content: userMessage },
   ];
-  const resp = await fetch(LOVABLE_AI_URL, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: BRISA_MODEL, messages }),
-  });
-  if (!resp.ok) {
-    const errBody = await resp.text().catch(() => "");
-    console.error("[brisa-bot] AI error", resp.status, errBody);
-    if (resp.status === 429) return "Muita gente conversando comigo agora 🌿 Pode me chamar de novo em 1 minutinho?";
-    if (resp.status === 402) return "Tive uma instabilidade técnica momentânea. Pode me chamar novamente em alguns minutos? 🌿";
+  const resp = await aiChat({ model: BRISA_MODEL, messages });
+  if (!resp || !resp.ok) {
+    const errBody = await resp?.text().catch(() => "") ?? "";
+    console.error("[brisa-bot] AI error", resp?.status, errBody);
+    if (resp?.status === 429) return "Muita gente conversando comigo agora 🌿 Pode me chamar de novo em 1 minutinho?";
+    if (resp?.status === 402) return "Tive uma instabilidade técnica momentânea. Pode me chamar novamente em alguns minutos? 🌿";
     return BRISA_FALLBACK_MESSAGE;
   }
   const data = await resp.json();

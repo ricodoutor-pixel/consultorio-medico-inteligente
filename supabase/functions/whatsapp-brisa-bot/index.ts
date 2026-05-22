@@ -458,7 +458,7 @@ serve(async (req) => {
       content: r.message,
     }));
 
-    const reply = await callBrisaAI(messageText, history);
+    const reply = await callBrisaAI(messageText, history, phone);
     await sendWhatsApp(phone, reply);
 
     // 🎙️ Se o usuário mandou áudio OU pediu p/ ouvir voz, Brisa responde também em áudio

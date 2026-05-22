@@ -12,7 +12,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
-const SILENCE_MINUTES = 60;
+const SILENCE_MINUTES = 120;
 
 async function sendWhatsAppAdmin(text: string) {
   const url = Deno.env.get("EVOLUTION_API_URL");
@@ -43,11 +43,16 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  // Janela comercial BRT (UTC-3): 08-22h => UTC 11-01h
-  const nowUtcHour = new Date().getUTCHours();
-  const inBusiness = nowUtcHour >= 11 || nowUtcHour <= 1;
+  // Janela comercial BRT (UTC-3): seg-sex 08-22h => UTC 11-01h
+  const now = new Date();
+  const nowUtcHour = now.getUTCHours();
+  const utcDay = now.getUTCDay(); // 0=Dom, 6=Sáb
+  // Considera dia BRT (subtrai ~3h): se UTC<3, dia BRT = utcDay-1
+  const brtDay = nowUtcHour < 3 ? (utcDay + 6) % 7 : utcDay;
+  const isWeekend = brtDay === 0 || brtDay === 6;
+  const inBusiness = !isWeekend && (nowUtcHour >= 11 || nowUtcHour <= 1);
   if (!inBusiness) {
-    return new Response(JSON.stringify({ ok: true, skipped: "off_hours", utcHour: nowUtcHour }), {
+    return new Response(JSON.stringify({ ok: true, skipped: isWeekend ? "weekend" : "off_hours", utcHour: nowUtcHour, brtDay }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

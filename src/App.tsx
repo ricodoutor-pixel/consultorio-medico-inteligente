@@ -88,7 +88,7 @@ const Blog = lazyWithRecovery(() => import("./pages/Blog"), { sourceRef: "/blog"
 const ShoppingDashboard = lazyWithRecovery(() => import("./pages/ShoppingDashboard"), { sourceRef: "/dashboard-loja" });
 const InvestorDashboard = lazyWithRecovery(() => import("./pages/InvestorDashboard"), { sourceRef: "/investidores" });
 const VideoCall = lazyWithRecovery(() => import("./pages/VideoCall"), { sourceRef: "/videochamada" });
-const ConsultaRapida = lazyWithRecovery(() => import("./pages/ConsultaRapida"), { sourceRef: "/consulta-rapida" });
+const OrientacaoRapida = lazyWithRecovery(() => import("./pages/OrientacaoRapida"), { sourceRef: "/orientacao-rapida" });
 const SEOCondicoes = lazyWithRecovery(() => import("./pages/SEOCondicoes"), { sourceRef: "/tratamentos" });
 const Status = lazyWithRecovery(() => import("./pages/Status"), { sourceRef: "/status" });
 const Passaporte = lazyWithRecovery(() => import("./pages/Passaporte"), { sourceRef: "/passaporte" });

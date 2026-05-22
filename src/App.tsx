@@ -138,6 +138,7 @@ const BrisaOrientacaoRedirect = lazyWithRecovery(() => import("./pages/BrisaOrie
 const AuditLog = lazyWithRecovery(() => import("./pages/admin/AuditLog"), { sourceRef: "/admin/audit-log" });
 const CronHealth = lazyWithRecovery(() => import("./pages/admin/CronHealth"), { sourceRef: "/admin/cron-health" });
 const RemoteCommandLog = lazyWithRecovery(() => import("./pages/admin/RemoteCommandLog"), { sourceRef: "/admin/remote-commands" });
+const InfraServices = lazyWithRecovery(() => import("./pages/admin/InfraServices"), { sourceRef: "/admin/infra-services" });
 const ConversionsUnified = lazyWithRecovery(() => import("./pages/admin/ConversionsUnified"), { sourceRef: "/admin/conversoes" });
 const ConversoesUptime = lazyWithRecovery(() => import("./pages/admin/ConversoesUptime"), { sourceRef: "/admin/conversoes-uptime" });
 const AdminLeads = lazyWithRecovery(() => import("./pages/admin/Leads"), { sourceRef: "/admin/leads" });

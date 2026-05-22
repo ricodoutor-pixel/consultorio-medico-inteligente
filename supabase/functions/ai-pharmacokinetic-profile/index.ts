@@ -50,8 +50,11 @@ serve(async (req) => {
       });
     }
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY missing");
+    // Lovable AI Gateway (LOVABLE_API_KEY) é o canal primário e sempre provisionado.
+    // GEMINI_API_KEY direto fica como fallback se o gateway falhar.
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "";
+    if (!LOVABLE_API_KEY && !GEMINI_API_KEY) throw new Error("No AI key configured");
 
     const body = await req.json().catch(() => ({}));
     const sanitize = (v: unknown, max = 2000) =>
@@ -80,45 +83,67 @@ Responda em PT-BR, em formato JSON estrito conforme schema.`;
 
 Gere a predição farmacocinética.`;
 
-    const r = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMsg },
-        ],
-        tools: [{
-          type: "function",
-          function: {
-            name: "pharmacokinetic_prediction",
-            description: "Predição farmacocinética para cannabis medicinal",
-            parameters: {
-              type: "object",
-              properties: {
-                metabolic_profile: { type: "string", enum: ["Lento", "Normal", "Rápido"] },
-                sensitivity: { type: "string", enum: ["Alta", "Média", "Baixa"] },
-                drug_interactions: { type: "array", items: { type: "string" } },
-                suggested_ratio: { type: "string", description: "Ex: CBD Full Spectrum 20:1" },
-                titration_plan: { type: "string", description: "Ex: 2 gotas a cada 12h por 7 dias" },
-                clinical_rationale: { type: "string" },
-                doctor_minute: { type: "string", description: "Minuta de prescrição para o médico" },
-                disclaimers: { type: "array", items: { type: "string" } },
-              },
-              required: ["metabolic_profile", "sensitivity", "suggested_ratio", "titration_plan", "clinical_rationale", "doctor_minute"],
-              additionalProperties: false,
+    const payload = {
+      model: "google/gemini-2.5-flash",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMsg },
+      ],
+      tools: [{
+        type: "function",
+        function: {
+          name: "pharmacokinetic_prediction",
+          description: "Predição farmacocinética para cannabis medicinal",
+          parameters: {
+            type: "object",
+            properties: {
+              metabolic_profile: { type: "string", enum: ["Lento", "Normal", "Rápido"] },
+              sensitivity: { type: "string", enum: ["Alta", "Média", "Baixa"] },
+              drug_interactions: { type: "array", items: { type: "string" } },
+              suggested_ratio: { type: "string", description: "Ex: CBD Full Spectrum 20:1" },
+              titration_plan: { type: "string", description: "Ex: 2 gotas a cada 12h por 7 dias" },
+              clinical_rationale: { type: "string" },
+              doctor_minute: { type: "string", description: "Minuta de prescrição para o médico" },
+              disclaimers: { type: "array", items: { type: "string" } },
             },
+            required: ["metabolic_profile", "sensitivity", "suggested_ratio", "titration_plan", "clinical_rationale", "doctor_minute"],
+            additionalProperties: false,
           },
-        }],
-        tool_choice: { type: "function", function: { name: "pharmacokinetic_prediction" } },
-      }),
-    });
+        },
+      }],
+      tool_choice: { type: "function", function: { name: "pharmacokinetic_prediction" } },
+    };
 
+    // 1) Tenta Lovable AI Gateway (sempre provisionado, sem expiração).
+    let r: Response | null = null;
+    let lastErr = "";
+    if (LOVABLE_API_KEY) {
+      try {
+        r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!r.ok) { lastErr = `gateway ${r.status}`; r = null; }
+      } catch (e) { lastErr = `gateway exception: ${String(e)}`; r = null; }
+    }
+
+    // 2) Fallback: GEMINI_API_KEY direto (compat com chave antiga).
+    if (!r && GEMINI_API_KEY) {
+      console.warn("[ai-pk] gateway falhou, fallback Gemini direct:", lastErr);
+      r = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ ...payload, model: "gemini-2.5-flash" }),
+      });
+    }
+
+    if (!r) throw new Error(`AI unavailable: ${lastErr || "no key"}`);
     if (!r.ok) {
       if (r.status === 429) return new Response(JSON.stringify({ error: "Rate limit" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       if (r.status === 402) return new Response(JSON.stringify({ error: "AI credits exhausted" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error(`AI gateway error: ${r.status}`);
+      const errBody = await r.text().catch(() => "");
+      throw new Error(`AI gateway error: ${r.status} ${errBody.slice(0, 200)}`);
     }
 
     const result = await r.json();

@@ -94,7 +94,7 @@ Responda *SIM* para que eu te envie o link de pagamento, ok?`;
 export const BRISA_HARASSMENT_BLOCK = `Atenção. Sou a Enf. Brisa, assistente virtual de saúde da Planta y Raiz Ltda. Estou em horário de trabalho, operando sob protocolos clínicos rígidos, com meta diária de 100 cadastros a cumprir. Não há espaço para desrespeito nesta plataforma. Se deseja atendimento legítimo por R$ 30, prosseguiremos com o seu cadastro. Caso contrário, esta linha será bloqueada por violação dos termos de uso.`;
 
 // Fallback institucional em caso de erro do provedor de IA — sem termos íntimos.
-export const BRISA_FALLBACK_MESSAGE = `Olá! Sou a Enf. Brisa da Planta y Raiz Ltda. Tive uma instabilidade momentânea. Para prosseguirmos com a sua Orientação Técnica de R$ 30, por favor confirme se já realizou o cadastro em ${BRISA_SITE}. Posso te enviar o link do Mercado Pago em seguida?`;
+export const BRISA_FALLBACK_MESSAGE = `Recebi sua mensagem e estamos processando sua solicitação com prioridade. Em instantes te retorno por aqui 🌿`;
 
 // Detector de assédio / cunho sexual / vulgaridade (PT-BR)
 const HARASSMENT_PATTERNS = [

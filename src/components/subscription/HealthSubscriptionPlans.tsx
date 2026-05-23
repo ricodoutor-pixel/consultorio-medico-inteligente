@@ -132,7 +132,7 @@ export function HealthSubscriptionPlans() {
               </Button>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       ))}
     </div>
   );

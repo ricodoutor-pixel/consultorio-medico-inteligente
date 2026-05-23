@@ -54,6 +54,7 @@ const BibliotecaCientifica = lazyWithRecovery(() => import("./pages/BibliotecaCi
 const CadastroProfissional = lazyWithRecovery(() => import("./pages/CadastroProfissional"), { sourceRef: "/cadastro-profissional" });
 const FalarComEspecialista = lazyWithRecovery(() => import("./pages/FalarComEspecialista"), { sourceRef: "/falar-com-especialista" });
 const Legal = lazyWithRecovery(() => import("./pages/Legal"), { sourceRef: "/legal" });
+const NossaHistoria = lazyWithRecovery(() => import("./pages/NossaHistoria"), { sourceRef: "/nossa-historia" });
 const TermosDeUso = lazyWithRecovery(() => import("./pages/TermosDeUso"), { sourceRef: "/termos" });
 const PoliticaDePrivacidade = lazyWithRecovery(() => import("./pages/PoliticaDePrivacidade"), { sourceRef: "/privacidade" });
 const PoliticaDeReembolso = lazyWithRecovery(() => import("./pages/PoliticaDeReembolso"), { sourceRef: "/reembolso" });
@@ -219,6 +220,7 @@ const App = () => (
                 <Route path="/afiliados" element={<Indicacoes />} />
                 <Route path="/indicacoes" element={<Indicacoes />} />
                 <Route path="/legal" element={<Legal />} />
+                <Route path="/nossa-historia" element={<NossaHistoria />} />
                 <Route path="/termos" element={<TermosDeUso />} />
                 <Route path="/termos-de-uso" element={<TermosDeUso />} />
                 <Route path="/privacidade" element={<PoliticaDePrivacidade />} />

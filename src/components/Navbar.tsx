@@ -90,6 +90,7 @@ export const Navbar = () => {
 
   const links = [
     { to: "/", label: "Início" },
+    { to: "/nossa-historia", label: "Nossa História" },
     { to: "/profissionais", label: "Profissionais" },
     { to: "/telemedicina", label: "Telemedicina" },
     { to: "/shopping", label: "Shopping" },

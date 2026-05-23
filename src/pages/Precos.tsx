@@ -265,11 +265,15 @@ const Precos = () => {
                       </Button>
                       <Button
                         variant="outline"
-                        className="w-full mt-2 font-black rounded-2xl border-amber-500/40 text-amber-500 hover:bg-amber-500/10 text-xs h-8"
+                        className="w-full mt-2 font-black rounded-2xl border-amber-500/40 text-amber-500 hover:bg-amber-500/10 text-xs h-8 hidden sm:flex"
                         onClick={() => setBtcModal({ open: true, planName: plan.name, planId: plan.id, amount: plan.price })}
                       >
                         <Bitcoin size={12} className="mr-1" /> Pague Com BTC
                       </Button>
+                      <p className="text-xs text-center text-muted-foreground mt-3 sm:hidden">
+                        Quer pagar com BTC?
+                        <button onClick={() => setBtcModal({ open: true, planName: plan.name, planId: plan.id, amount: plan.price })} className="text-amber-400 underline ml-1">clique aqui</button>
+                      </p>
                     </CardContent>
                   </Card>
                 </div>

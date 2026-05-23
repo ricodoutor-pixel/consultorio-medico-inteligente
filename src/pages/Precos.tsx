@@ -223,7 +223,7 @@ const Precos = () => {
                         <span className={`text-3xl font-display font-black ${
                           plan.highlighted ? 'text-gradient-green' :
                           plan.id === 'clinica-familia' ? 'text-amber-400' :
-                          plan.id === 'empresa-parceiros' ? 'text-gradient-purple' :
+                          plan.id === 'empresa-parceiros' ? 'text-[#a78bfa]' :
                           'text-foreground'
                         }`}>{plan.price}</span>
                         <span className="text-muted-foreground text-sm">{plan.period}</span>

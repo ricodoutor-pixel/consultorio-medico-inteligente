@@ -14,10 +14,11 @@ export const MobileBottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
+  const isPlansRoute = location.pathname === "/planos" || location.pathname === "/precos";
 
   // Hide on video call / admin pages
   const hiddenPaths = ["/consulta-video", "/videochamada", "/admin"];
-  if (hiddenPaths.some((p) => location.pathname.startsWith(p))) return null;
+  if (isPlansRoute || hiddenPaths.some((p) => location.pathname.startsWith(p))) return null;
 
   return (
     <nav className={cn(

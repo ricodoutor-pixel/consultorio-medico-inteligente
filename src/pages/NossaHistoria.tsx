@@ -54,7 +54,7 @@ export default function NossaHistoria() {
 
             <motion.p variants={fadeUp}>
               Impactado por esta perda irreparável de colegas queridos, o{" "}
-              <strong className="text-white">Dr. Edilson Bezerra</strong>, nosso atual Diretor
+              <strong className="text-white">Dr. Edilson Bezerra</strong>, um sobrevivente, nosso atual Diretor
               Técnico, concebeu uma ideia visionária para resolver, de uma vez por todas, o desafio
               da medicina à distância. Se aplicada com excelência no início da pandemia, esta
               tecnologia teria evitado a morte de milhares de profissionais e pacientes em todo o
@@ -77,7 +77,7 @@ export default function NossaHistoria() {
               de um sistema <strong className="text-white">100% autônomo</strong>, criado,
               administrado, auditado e autocorrigível, a Planta y Raiz conta com uma equipe
               especializada, garantindo aos nossos clientes agilidade, segurança e eficiência em todos
-              os atendimentos realizados ao redor do mundo.
+              os atendimentos realizados ao redor do mundo. <strong className="text-white">"Nós Realmente entendemos o valor da vida, porque sabemos a dor e o preço da ausência."</strong>
             </motion.p>
           </motion.article>
 

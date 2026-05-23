@@ -65,14 +65,14 @@ export const ResponsiveNavbar = () => {
           <a href="/" className="text-gray-700 hover:text-green-600 font-medium transition">
             Início
           </a>
+          <a href="/nossa-historia" className="text-gray-700 hover:text-green-600 font-medium transition">
+            Nossa História
+          </a>
           <a href="/consultas" className="text-gray-700 hover:text-green-600 font-medium transition">
             Orientações Técnicas
           </a>
           <a href="/medicos" className="text-gray-700 hover:text-green-600 font-medium transition">
             Médicos
-          </a>
-          <a href="/sobre" className="text-gray-700 hover:text-green-600 font-medium transition">
-            Sobre
           </a>
         </div>
 
@@ -140,14 +140,14 @@ export const ResponsiveNavbar = () => {
             <a href="/" className="block text-gray-700 hover:text-green-600 font-medium py-2">
               Início
             </a>
+            <a href="/nossa-historia" className="block text-gray-700 hover:text-green-600 font-medium py-2">
+              Nossa História
+            </a>
             <a href="/consultas" className="block text-gray-700 hover:text-green-600 font-medium py-2">
               Orientações Técnicas
             </a>
             <a href="/medicos" className="block text-gray-700 hover:text-green-600 font-medium py-2">
               Médicos
-            </a>
-            <a href="/sobre" className="block text-gray-700 hover:text-green-600 font-medium py-2">
-              Sobre
             </a>
 
             {/* Divisor */}

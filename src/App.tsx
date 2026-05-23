@@ -222,6 +222,8 @@ const App = () => (
                 <Route path="/indicacoes" element={<Indicacoes />} />
                 <Route path="/legal" element={<Legal />} />
                 <Route path="/nossa-historia" element={<NossaHistoria />} />
+                <Route path="/saude-plus/meu-cartao" element={<MeuCartao />} />
+                <Route path="/meu-cartao" element={<MeuCartao />} />
                 <Route path="/termos" element={<TermosDeUso />} />
                 <Route path="/termos-de-uso" element={<TermosDeUso />} />
                 <Route path="/privacidade" element={<PoliticaDePrivacidade />} />

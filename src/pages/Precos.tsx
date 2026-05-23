@@ -322,9 +322,9 @@ const Precos = () => {
             </p>
             <div className="grid sm:grid-cols-3 gap-4 mb-8">
               {[
-                { level: "Nível 1", pct: "50%", desc: "comissão direta" },
-                { level: "Nível 2", pct: "5%", desc: "sub-indicação" },
-                { level: "Nível 3", pct: "2%", desc: "rede expandida" },
+                { level: "Nível 1", pct: "25%", desc: "comissão direta" },
+                { level: "Nível 2", pct: "15%", desc: "sub-indicação" },
+                { level: "Nível 3", pct: "10%", desc: "rede expandida" },
               ].map((l, i) => (
                 <Card key={i} className="border-border">
                   <CardContent className="p-4 text-center">

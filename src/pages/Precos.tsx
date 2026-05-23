@@ -340,21 +340,7 @@ const Precos = () => {
         </div>
       </section>
 
-      {/* Health Subscription Plans (SaaS de Saúde) */}
-      <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-black text-foreground mb-4 tracking-tight">
-              <Heart className="inline w-8 h-8 text-primary mr-2" />
-              Planos de Saúde Digital
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Assinaturas recorrentes com acesso ilimitado à Brisa IA, descontos exclusivos no Shopping e consultas inclusas.
-            </p>
-          </div>
-          <HealthSubscriptionPlans />
-        </div>
-      </section>
+      {/* Health Subscription Plans removidos — consolidados nos 5 planos SaaS acima para evitar duplicação. */}
 
       {/* CTA */}
       {/* PWA Install CTA */}

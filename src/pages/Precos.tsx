@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
-import { HealthSubscriptionPlans } from "@/components/subscription/HealthSubscriptionPlans";
+// HealthSubscriptionPlans removido para evitar duplicação de planos.
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
@@ -199,7 +199,7 @@ const Precos = () => {
             {plans.map((plan) => {
               const Icon = plan.icon;
               return (
-                <div key={plan.id} className="relative flex" style={{ zIndex: 10 }}>
+                <div key={plan.id} className="relative flex pt-4 sm:pt-0" style={{ zIndex: 10 }}>
                   <Card className={`relative h-full border-border transition-colors ${plan.highlighted ? 'border-primary/60 ring-1 ring-primary/30' : ''} ${plan.id === 'clinica-familia' ? 'border-amber-500/40' : ''} ${plan.id === 'empresa-parceiros' ? 'border-secondary/40' : ''}`}>
                     {plan.tag && (
                       <div className={`absolute ${plan.id === 'clinica-familia' ? 'top-3 right-3' : '-top-3 right-4'} max-w-[calc(100%-1.5rem)] px-3 py-1 rounded-full text-xs font-black whitespace-nowrap ${
@@ -223,7 +223,7 @@ const Precos = () => {
                         <span className={`text-3xl font-display font-black ${
                           plan.highlighted ? 'text-gradient-green' :
                           plan.id === 'clinica-familia' ? 'text-amber-400' :
-                          plan.id === 'empresa-parceiros' ? 'text-gradient-purple' :
+                          plan.id === 'empresa-parceiros' ? 'text-[#a78bfa]' :
                           'text-foreground'
                         }`}>{plan.price}</span>
                         <span className="text-muted-foreground text-sm">{plan.period}</span>
@@ -265,11 +265,15 @@ const Precos = () => {
                       </Button>
                       <Button
                         variant="outline"
-                        className="w-full mt-2 font-black rounded-2xl border-amber-500/40 text-amber-500 hover:bg-amber-500/10 text-xs h-8"
+                        className="w-full mt-2 font-black rounded-2xl border-amber-500/40 text-amber-500 hover:bg-amber-500/10 text-xs h-8 hidden sm:flex"
                         onClick={() => setBtcModal({ open: true, planName: plan.name, planId: plan.id, amount: plan.price })}
                       >
                         <Bitcoin size={12} className="mr-1" /> Pague Com BTC
                       </Button>
+                      <p className="text-xs text-center text-muted-foreground mt-3 sm:hidden">
+                        Quer pagar com BTC?
+                        <button onClick={() => setBtcModal({ open: true, planName: plan.name, planId: plan.id, amount: plan.price })} className="text-amber-400 underline ml-1">clique aqui</button>
+                      </p>
                     </CardContent>
                   </Card>
                 </div>
@@ -289,7 +293,7 @@ const Precos = () => {
               href="https://doutorpark.com.br/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-display font-black text-lg cursor-pointer border-2 border-transparent"
+              className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-display font-black text-lg cursor-pointer border-2 border-transparent min-h-[44px] justify-center"
               style={{
                 background: 'linear-gradient(135deg, hsl(45 100% 50%), hsl(30 100% 55%), hsl(15 100% 50%))',
                 color: '#1a0a00',
@@ -318,9 +322,9 @@ const Precos = () => {
             </p>
             <div className="grid sm:grid-cols-3 gap-4 mb-8">
               {[
-                { level: "Nível 1", pct: "50%", desc: "comissão direta" },
-                { level: "Nível 2", pct: "5%", desc: "sub-indicação" },
-                { level: "Nível 3", pct: "2%", desc: "rede expandida" },
+                { level: "Nível 1", pct: "25%", desc: "comissão direta" },
+                { level: "Nível 2", pct: "15%", desc: "sub-indicação" },
+                { level: "Nível 3", pct: "10%", desc: "rede expandida" },
               ].map((l, i) => (
                 <Card key={i} className="border-border">
                   <CardContent className="p-4 text-center">
@@ -336,21 +340,7 @@ const Precos = () => {
         </div>
       </section>
 
-      {/* Health Subscription Plans (SaaS de Saúde) */}
-      <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-black text-foreground mb-4 tracking-tight">
-              <Heart className="inline w-8 h-8 text-primary mr-2" />
-              Planos de Saúde Digital
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Assinaturas recorrentes com acesso ilimitado à Brisa IA, descontos exclusivos no Shopping e consultas inclusas.
-            </p>
-          </div>
-          <HealthSubscriptionPlans />
-        </div>
-      </section>
+      {/* Health Subscription Plans removidos — consolidados nos 5 planos SaaS acima para evitar duplicação. */}
 
       {/* CTA */}
       {/* PWA Install CTA */}
@@ -412,7 +402,7 @@ const Precos = () => {
       </section>
 
       <WhatsAppProofModal open={modalState.open} onOpenChange={setModalOpen} context={modalState.context} onProceed={modalState.onProceed} />
-      <div className="pb-[calc(8.5rem+env(safe-area-inset-bottom,0px))] sm:pb-0">
+      <div className="pb-[max(env(safe-area-inset-bottom,0px),1rem)] sm:pb-0">
         <Footer />
       </div>
       <BTCPaymentModal

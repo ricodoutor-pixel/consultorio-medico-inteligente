@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { motion } from "framer-motion";
+// framer-motion removido — animações na montagem desperdiçavam recursos em mobile.
 import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
 import { getStripeEnvironment } from "@/lib/stripe";
 
@@ -97,12 +97,7 @@ export function HealthSubscriptionPlans() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {PLANS.map((plan, i) => (
-        <motion.div
-          key={plan.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.1 }}
-        >
+        <div key={plan.id}>
           <Card className={`relative border-border/50 bg-card/80 backdrop-blur-sm h-full flex flex-col ${
             plan.badge ? "border-primary/50 shadow-lg shadow-primary/10" : ""
           }`}>
@@ -137,7 +132,7 @@ export function HealthSubscriptionPlans() {
               </Button>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       ))}
     </div>
   );

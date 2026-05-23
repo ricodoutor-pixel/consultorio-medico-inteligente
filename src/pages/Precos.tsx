@@ -293,7 +293,7 @@ const Precos = () => {
               href="https://doutorpark.com.br/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-display font-black text-lg cursor-pointer border-2 border-transparent"
+              className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-display font-black text-lg cursor-pointer border-2 border-transparent min-h-[44px] justify-center"
               style={{
                 background: 'linear-gradient(135deg, hsl(45 100% 50%), hsl(30 100% 55%), hsl(15 100% 50%))',
                 color: '#1a0a00',

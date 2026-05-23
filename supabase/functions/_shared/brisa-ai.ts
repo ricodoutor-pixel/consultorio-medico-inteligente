@@ -150,64 +150,76 @@ export async function processar_triagem_brisa(
   let lastErr = "no_provider";
   let lastStatus = 0;
 
+  // 🔁 RETRY EXPONENCIAL — 3 tentativas por provedor com backoff 400ms/800ms/1600ms
+  const MAX_ATTEMPTS = 3;
   for (const provider of order) {
     if (isOpen(provider)) {
       lastErr = `${provider}_circuit_open`;
       continue;
     }
-    try {
-      const r = await callProvider(provider, body);
-      if (r.ok) {
-        const data = await r.json();
-        const reply = (data?.choices?.[0]?.message?.content || "").trim();
-        if (!reply) {
-          recordFailure(provider);
-          lastErr = `${provider}_empty_reply`;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        const r = await callProvider(provider, body);
+        if (r.ok) {
+          const data = await r.json();
+          const reply = (data?.choices?.[0]?.message?.content || "").trim();
+          if (!reply) {
+            lastErr = `${provider}_empty_reply`;
+            if (attempt < MAX_ATTEMPTS) { await new Promise((res) => setTimeout(res, 200 * 2 ** attempt)); continue; }
+            recordFailure(provider); break;
+          }
+          recordSuccess(provider);
+          const result: BrisaCallResult = {
+            ok: true, reply, provider, http_status: r.status, latency_ms: Date.now() - t0,
+          };
+          if (options?.log !== false) {
+            logInteraction({
+              channel: canal, user_ref: usuario_id, message_in: mensagem, message_out: reply,
+              provider, model, status: "ok", http_status: r.status, latency_ms: result.latency_ms,
+              meta: { attempt },
+            }).catch(() => {});
+          }
+          return result;
+        }
+        const errText = await r.text().catch(() => "");
+        lastErr = errText.slice(0, 400);
+        lastStatus = r.status;
+        console.error(`[brisa-ai] ${provider} attempt ${attempt}/${MAX_ATTEMPTS} HTTP ${r.status}`, errText.slice(0, 200));
+        // 401/403 = chave inválida — não adianta repetir
+        if (r.status === 401 || r.status === 403) { recordFailure(provider); break; }
+        if (attempt < MAX_ATTEMPTS) {
+          await new Promise((res) => setTimeout(res, 200 * 2 ** attempt));
           continue;
         }
-        recordSuccess(provider);
-        const result: BrisaCallResult = {
-          ok: true, reply, provider, http_status: r.status, latency_ms: Date.now() - t0,
-        };
-        if (options?.log !== false) {
-          logInteraction({
-            channel: canal, user_ref: usuario_id, message_in: mensagem, message_out: reply,
-            provider, model, status: "ok", http_status: r.status, latency_ms: result.latency_ms,
-          }).catch(() => {});
-        }
-        return result;
+        if ([400, 402, 429, 500, 502, 503].includes(r.status)) recordFailure(provider);
+      } catch (e) {
+        lastErr = String(e).slice(0, 400);
+        console.error(`[brisa-ai] ${provider} attempt ${attempt}/${MAX_ATTEMPTS} exception`, e);
+        if (attempt < MAX_ATTEMPTS) { await new Promise((res) => setTimeout(res, 200 * 2 ** attempt)); continue; }
+        recordFailure(provider);
       }
-      // not ok
-      const errText = await r.text().catch(() => "");
-      lastErr = errText.slice(0, 400);
-      lastStatus = r.status;
-      // 400/402/500/429/503 contam pra abrir o breaker
-      if ([400, 402, 429, 500, 502, 503].includes(r.status)) recordFailure(provider);
-      console.error(`[brisa-ai] ${provider} HTTP ${r.status}`, errText.slice(0, 200));
-    } catch (e) {
-      lastErr = String(e).slice(0, 400);
-      recordFailure(provider);
-      console.error(`[brisa-ai] ${provider} exception`, e);
     }
   }
 
-  // Todos os provedores falharam OU circuito aberto
-  const breakerOpen = order.length > 0 && order.every(isOpen);
-  const reply = breakerOpen
-    ? BRISA_BREAKER_FALLBACK_MESSAGE
-    : "Tive uma instabilidade técnica momentânea. Pode me chamar novamente em alguns minutos? 🌿";
+  // ❌ Todos os provedores + retries falharam — NUNCA expõe instabilidade ao usuário
+  const errorId = crypto.randomUUID().slice(0, 8);
+  const reply = BRISA_BREAKER_FALLBACK_MESSAGE;
+  // Dispara alerta INTERNO ao Dr. Edilson (não bloqueia)
+  alertEdilson(errorId, `canal=${canal} usuario=${usuario_id}`, `${lastStatus} ${lastErr}`).catch(() => {});
   const result: BrisaCallResult = {
-    ok: false, reply, provider: breakerOpen ? "breaker" : "none",
-    http_status: lastStatus || undefined, error: lastErr, latency_ms: Date.now() - t0,
+    ok: false, reply, provider: "breaker",
+    http_status: lastStatus || undefined, error: `${errorId}:${lastErr}`, latency_ms: Date.now() - t0,
   };
   if (options?.log !== false) {
     logInteraction({
       channel: canal, user_ref: usuario_id, message_in: mensagem, message_out: reply,
-      provider: result.provider, model, status: breakerOpen ? "breaker_open" : "error",
+      provider: result.provider, model, status: "error_alerted",
       http_status: result.http_status, latency_ms: result.latency_ms, error: lastErr,
+      meta: { error_id: errorId, alerted_admin: true },
     }).catch(() => {});
   }
   return result;
+
 }
 
 export async function logInteraction(row: {

@@ -61,8 +61,34 @@ export function breakerSnapshot() {
   }]));
 }
 
+// Mensagem ao usuário NUNCA expõe instabilidade — apenas prioridade
 export const BRISA_BREAKER_FALLBACK_MESSAGE =
-  "Olá! A Brisa está com uma atualização técnica rápida, mas nossa equipe já está sendo notificada. O que você gostaria de tratar hoje? 🌿";
+  "Recebi sua mensagem e estamos processando sua solicitação com prioridade. Em instantes te retorno por aqui 🌿";
+
+const ADMIN_WHATSAPP = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
+const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL") || "";
+const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
+const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+
+async function alertEdilson(errorId: string, context: string, detail: string) {
+  if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) return;
+  const text = `[ALERTA BRISA] Falha de IA. Log: ${errorId}\nCtx: ${context}\n${detail.slice(0, 400)}`;
+  try {
+    await fetch(`${EVOLUTION_API_URL}/message/sendText/${EVOLUTION_INSTANCE}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+      body: JSON.stringify({ number: ADMIN_WHATSAPP, text, delay: 800 }),
+    });
+  } catch (e) { console.error("[brisa-ai] alertEdilson failed", e); }
+}
+
+// Heartbeat de erro crítico (Stripe, Supabase, etc.) — exportado p/ outras edge fns
+export async function brisaHeartbeatAlert(endpoint: string, log: string) {
+  const id = crypto.randomUUID().slice(0, 8);
+  await alertEdilson(id, `endpoint=${endpoint}`, log);
+  return id;
+}
+
 
 export type BrisaCallResult = {
   ok: boolean;

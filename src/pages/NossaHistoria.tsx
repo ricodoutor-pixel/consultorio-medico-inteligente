@@ -39,26 +39,10 @@ export default function NossaHistoria() {
             Quem somos: Nossa História e DNA — Planta y Raiz Ltda.
           </motion.p>
 
-          {/* Vídeo Embed */}
-          <motion.div variants={fadeUp} className="mb-14">
-            <div
-              className="relative w-full overflow-hidden rounded-2xl border border-[#22C55E]/20 shadow-[0_0_40px_rgba(34,197,94,0.12)]"
-              style={{ paddingBottom: "56.25%" }}
-            >
-              <iframe
-                className="absolute top-0 left-0 w-full h-full rounded-2xl"
-                src="https://www.youtube.com/embed/sdYdmaBP-ic?autoplay=1&mute=1&rel=0&modestbranding=1&loop=1&playlist=sdYdmaBP-ic"
-                title="Nossa História — Planta y Raiz"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-            </div>
-          </motion.div>
-
           {/* Texto */}
           <motion.article
             variants={stagger}
-            className="space-y-6 text-justify leading-[1.6] text-sm sm:text-base text-gray-200/90"
+            className="space-y-6 text-justify leading-[1.6] text-sm sm:text-base text-gray-200/90 mb-14"
           >
             <motion.p variants={fadeUp}>
               Olá, somos a <strong className="text-white">Planta y Raiz Ltda.</strong>, a plataforma de
@@ -96,6 +80,22 @@ export default function NossaHistoria() {
               os atendimentos realizados ao redor do mundo.
             </motion.p>
           </motion.article>
+
+          {/* Vídeo Embed */}
+          <motion.div variants={fadeUp} className="mb-14">
+            <div
+              className="relative w-full overflow-hidden rounded-2xl border border-[#22C55E]/20 shadow-[0_0_40px_rgba(34,197,94,0.12)]"
+              style={{ paddingBottom: "56.25%" }}
+            >
+              <iframe
+                className="absolute top-0 left-0 w-full h-full rounded-2xl"
+                src="https://www.youtube.com/embed/sdYdmaBP-ic?autoplay=1&mute=1&rel=0&modestbranding=1&loop=1&playlist=sdYdmaBP-ic"
+                title="Nossa História — Planta y Raiz"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          </motion.div>
 
           {/* CTA YouTube */}
           <motion.div variants={fadeUp} className="mt-14 flex justify-center">

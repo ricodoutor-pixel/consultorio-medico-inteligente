@@ -55,6 +55,7 @@ const CadastroProfissional = lazyWithRecovery(() => import("./pages/CadastroProf
 const FalarComEspecialista = lazyWithRecovery(() => import("./pages/FalarComEspecialista"), { sourceRef: "/falar-com-especialista" });
 const Legal = lazyWithRecovery(() => import("./pages/Legal"), { sourceRef: "/legal" });
 const NossaHistoria = lazyWithRecovery(() => import("./pages/NossaHistoria"), { sourceRef: "/nossa-historia" });
+const MeuCartao = lazyWithRecovery(() => import("./pages/MeuCartao"), { sourceRef: "/saude-plus/meu-cartao" });
 const TermosDeUso = lazyWithRecovery(() => import("./pages/TermosDeUso"), { sourceRef: "/termos" });
 const PoliticaDePrivacidade = lazyWithRecovery(() => import("./pages/PoliticaDePrivacidade"), { sourceRef: "/privacidade" });
 const PoliticaDeReembolso = lazyWithRecovery(() => import("./pages/PoliticaDeReembolso"), { sourceRef: "/reembolso" });
@@ -221,6 +222,8 @@ const App = () => (
                 <Route path="/indicacoes" element={<Indicacoes />} />
                 <Route path="/legal" element={<Legal />} />
                 <Route path="/nossa-historia" element={<NossaHistoria />} />
+                <Route path="/saude-plus/meu-cartao" element={<MeuCartao />} />
+                <Route path="/meu-cartao" element={<MeuCartao />} />
                 <Route path="/termos" element={<TermosDeUso />} />
                 <Route path="/termos-de-uso" element={<TermosDeUso />} />
                 <Route path="/privacidade" element={<PoliticaDePrivacidade />} />

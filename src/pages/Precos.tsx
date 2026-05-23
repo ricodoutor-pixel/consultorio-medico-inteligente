@@ -178,10 +178,10 @@ const Precos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-6 sm:pb-0">
       <Navbar />
 
-      <section className="pt-20 pb-10 md:pt-32 md:pb-16 hero-glow">
+      <section className="pt-20 pb-24 md:pt-32 md:pb-16 hero-glow">
         <div className="container mx-auto px-3 sm:px-4 relative z-10">
           <div className="mb-8 md:mb-16 text-center">
             <h1 className="text-2xl sm:text-4xl md:text-6xl font-display font-black text-foreground mb-3 md:mb-4 tracking-tight">
@@ -193,8 +193,8 @@ const Precos = () => {
           </div>
 
           <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 max-w-7xl mx-auto items-stretch relative"
-            style={{ zIndex: 10, isolation: 'isolate', transform: 'translateZ(0)' }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 max-w-7xl mx-auto items-stretch relative overflow-visible"
+            style={{ zIndex: 10, isolation: 'isolate', transform: 'translateZ(0)', paddingBottom: '1rem' }}
           >
             {plans.map((plan) => {
               const Icon = plan.icon;

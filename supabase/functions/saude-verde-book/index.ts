@@ -118,6 +118,7 @@ Deno.serve(async (req) => {
       savings,
       discount_pct: discountPct,
       partner_name: partner.name,
+      planta_coins_earned: COINS_PER_BOOKING,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   } catch (e) {

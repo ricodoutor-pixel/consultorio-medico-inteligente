@@ -21,11 +21,11 @@ type Partner = {
 
 type PartnerRequest = {
   id: string;
-  name: string;
+  company_name: string;
   category: string | null;
   city: string | null;
-  whatsapp: string | null;
-  email: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
   status: string | null;
   created_at: string;
 };

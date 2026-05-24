@@ -5817,6 +5817,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "saude_verde_appointments_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "saude_verde_partners_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "saude_verde_appointments_specialty_id_fkey"
             columns: ["specialty_id"]
             isOneToOne: false
@@ -7690,6 +7697,93 @@ export type Database = {
         Update: {
           code?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      saude_verde_partners_public: {
+        Row: {
+          accepts_online: boolean | null
+          address: string | null
+          available_exams: Json | null
+          available_specialties: Json | null
+          category: string | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          discount_pct: number | null
+          discount_pct_max: number | null
+          id: string | null
+          is_active: boolean | null
+          is_verified: boolean | null
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          name: string | null
+          opening_hours: Json | null
+          price_from_brl: number | null
+          rating: number | null
+          slug: string | null
+          state: string | null
+          subcategory: string | null
+          total_reviews: number | null
+          website: string | null
+          zipcode: string | null
+        }
+        Insert: {
+          accepts_online?: boolean | null
+          address?: string | null
+          available_exams?: Json | null
+          available_specialties?: Json | null
+          category?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          discount_pct?: number | null
+          discount_pct_max?: number | null
+          id?: string | null
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          opening_hours?: Json | null
+          price_from_brl?: number | null
+          rating?: number | null
+          slug?: string | null
+          state?: string | null
+          subcategory?: string | null
+          total_reviews?: number | null
+          website?: string | null
+          zipcode?: string | null
+        }
+        Update: {
+          accepts_online?: boolean | null
+          address?: string | null
+          available_exams?: Json | null
+          available_specialties?: Json | null
+          category?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          discount_pct?: number | null
+          discount_pct_max?: number | null
+          id?: string | null
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          opening_hours?: Json | null
+          price_from_brl?: number | null
+          rating?: number | null
+          slug?: string | null
+          state?: string | null
+          subcategory?: string | null
+          total_reviews?: number | null
+          website?: string | null
+          zipcode?: string | null
         }
         Relationships: []
       }

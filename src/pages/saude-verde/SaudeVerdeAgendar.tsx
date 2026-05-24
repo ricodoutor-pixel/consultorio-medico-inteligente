@@ -49,7 +49,7 @@ export default function SaudeVerdeAgendar() {
 
   useEffect(() => {
     if (!specialty) return;
-    let q = supabase.from("saude_verde_partners" as never)
+    let q = supabase.from("saude_verde_partners_public" as never)
       .select("id, name, city, state, rating, discount_pct_max")
       .eq("is_active", true).order("rating", { ascending: false }).limit(20);
     if (specialty.category === "consulta") q = q.eq("category", "clinica");

@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
     const limit = Math.min(parseInt(url.searchParams.get("limit") || "20"), 100);
 
     let query = supabase
-      .from("saude_verde_partners")
+      .from("saude_verde_partners_public")
       .select("*")
       .eq("is_active", true)
       .eq("country", country)

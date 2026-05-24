@@ -7798,6 +7798,16 @@ export type Database = {
           schedule: string
         }[]
       }
+      get_my_sv_renewal_history: {
+        Args: never
+        Returns: {
+          amount: number
+          event_type: string
+          payment_id: string
+          processed_at: string
+          status: string
+        }[]
+      }
       get_next_available_doctor: {
         Args: never
         Returns: {

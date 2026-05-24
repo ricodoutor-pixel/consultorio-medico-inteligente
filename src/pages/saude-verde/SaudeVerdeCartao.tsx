@@ -228,9 +228,8 @@ export default function SaudeVerdeCartao() {
         {isSubscriber ? (
           // =================== ACTIVE SUBSCRIBER ===================
           <>
-            <Card className="relative overflow-hidden p-5 sm:p-8 mb-8 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 border-primary/30">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,hsl(var(--primary)/0.3),transparent_60%)]" />
-              <div className="relative">
+            <Card className="p-5 sm:p-8 mb-8 bg-emerald-900 border-primary/30">
+              <div>
                 <div className="flex items-start justify-between mb-8 sm:mb-10 gap-3">
                   <div className="min-w-0">
                     <div className="text-emerald-300 text-xs sm:text-sm font-medium mb-1">{BRAND}</div>
@@ -285,9 +284,8 @@ export default function SaudeVerdeCartao() {
           // =================== LANDING (não assinante) ===================
           <>
             {/* HERO */}
-            <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-emerald-950 via-background to-background p-6 sm:p-12 mb-12">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,hsl(var(--primary)/0.18),transparent_55%)]" />
-              <div className="relative grid md:grid-cols-2 gap-8 items-center">
+            <section className="rounded-3xl border border-primary/20 bg-emerald-950/40 p-6 sm:p-12 mb-12">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
                   <Badge className="mb-4 bg-primary/15 text-primary border-primary/30">
                     <Sparkles className="w-3 h-3 mr-1" /> A sua assinatura de saúde
@@ -310,9 +308,8 @@ export default function SaudeVerdeCartao() {
                   </div>
                 </div>
                 <div className="hidden md:block">
-                  <Card className="relative overflow-hidden p-6 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 border-primary/30">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,hsl(var(--primary)/0.3),transparent_60%)]" />
-                    <div className="relative">
+                  <Card className="p-6 bg-emerald-900 border-primary/30">
+                    <div>
                       <div className="flex items-start justify-between mb-8">
                         <div>
                           <div className="text-emerald-300 text-xs font-medium mb-1">{BRAND}</div>
@@ -549,7 +546,7 @@ export default function SaudeVerdeCartao() {
 
             {/* CONTACT FOOTER */}
             <section className="mb-12">
-              <Card className="p-6 sm:p-8 bg-gradient-to-br from-emerald-950/60 to-background border-primary/20">
+              <Card className="p-6 sm:p-8 bg-emerald-950/40 border-primary/20">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <ShieldCheck className="w-8 h-8 text-primary mb-3" />

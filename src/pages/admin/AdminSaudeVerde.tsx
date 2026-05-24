@@ -127,12 +127,12 @@ export default function AdminSaudeVerde() {
                 <div key={r.id} className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3 rounded-lg border border-border bg-card/50">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <p className="font-bold">{r.name}</p>
+                      <p className="font-bold">{r.company_name}</p>
                       <Badge variant={r.status === "approved" ? "default" : r.status === "rejected" ? "destructive" : "secondary"}>
                         {r.status || "pending"}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground">{r.category} · {r.city} · {r.whatsapp} · {r.email}</p>
+                    <p className="text-xs text-muted-foreground">{r.category} · {r.city} · {r.contact_phone} · {r.contact_email}</p>
                   </div>
                   {(r.status === "pending" || !r.status) && (
                     <div className="flex gap-2">

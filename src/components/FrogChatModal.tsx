@@ -101,7 +101,7 @@ const getFallback = (text: string): string => {
 };
 
 const QUICK_ACTIONS = [
-  { label: "🩺 Agendar consulta", msg: "Como faço para agendar uma consulta?", cta: true },
+  { label: "🩺 Iniciar Orientação Técnica", msg: "Como faço para iniciar minha Orientação Técnica?", cta: true },
   { label: "💊 Cannabis medicinal", msg: "O que é cannabis medicinal e quais condições trata?" },
   { label: "💰 Preços", msg: "Quais são os preços das consultas?" },
   { label: "🛒 Shopping", msg: "Quais produtos vocês vendem?" },

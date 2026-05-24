@@ -157,23 +157,69 @@ Deno.serve(async (req) => {
     const metadata = payment.metadata || {};
     const isMarketplace = metadata.type === "marketplace";
 
-    // === SAÚDE VERDE — Subscription activation (handled inline, returns early) ===
+    // === SAÚDE VERDE — Subscription activation/renewal (handled inline, returns early) ===
     if (metadata.module === "saude_verde" && metadata.user_id) {
       if (payment.status === "approved") {
-        const { data: sub } = await supabase
+        const { data: existing } = await supabase
           .from("saude_verde_subscriptions")
-          .update({
-            status: "active",
-            started_at: new Date().toISOString(),
-            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-            updated_at: new Date().toISOString(),
-          })
+          .select("id, expires_at, renewal_count, affiliate_referrer, plan_id, card_number, saude_verde_plans(period)")
           .eq("user_id", metadata.user_id)
           .eq("card_number", metadata.card_number)
-          .select("card_number, plan_id")
           .maybeSingle();
 
-        // WhatsApp notification via Evolution
+        const planPeriod = (existing?.saude_verde_plans as { period?: string } | null)?.period || "mensal";
+        const days = planPeriod === "anual" ? 365 : 30;
+        const nowTs = Date.now();
+        const baseTs = existing?.expires_at && new Date(existing.expires_at).getTime() > nowTs
+          ? new Date(existing.expires_at).getTime()
+          : nowTs;
+        const newExpiresAt = new Date(baseTs + days * 24 * 60 * 60 * 1000).toISOString();
+        const isRenewal = (existing?.renewal_count ?? 0) > 0 || (existing?.expires_at && new Date(existing.expires_at).getTime() > nowTs);
+
+        const updatePayload: Record<string, unknown> = {
+          status: "active",
+          expires_at: newExpiresAt,
+          renewal_count: (existing?.renewal_count ?? 0) + (isRenewal ? 1 : 0),
+          last_payment_id: String(paymentId),
+          expiry_reminded_at: null,
+          updated_at: new Date().toISOString(),
+        };
+        if (!existing?.expires_at) updatePayload.started_at = new Date().toISOString();
+
+        const { data: sub } = await supabase
+          .from("saude_verde_subscriptions")
+          .update(updatePayload)
+          .eq("user_id", metadata.user_id)
+          .eq("card_number", metadata.card_number)
+          .select("id, card_number, plan_id, affiliate_referrer")
+          .maybeSingle();
+
+        // === AFFILIATE COMMISSION (R$ 5, first activation only) ===
+        if (sub && !isRenewal && sub.affiliate_referrer) {
+          try {
+            const { error: commErr } = await supabase
+              .from("saude_verde_referral_commissions")
+              .insert({
+                affiliate_user_id: sub.affiliate_referrer,
+                referred_user_id: metadata.user_id,
+                subscription_id: sub.id,
+                payment_id: String(paymentId),
+                amount_brl: 5.00,
+                status: "paid",
+              });
+            if (!commErr) {
+              await supabase.rpc("credit_affiliate_wallet", {
+                _user_id: sub.affiliate_referrer,
+                _amount: 5.00,
+              });
+              console.log(`💸 R$5 commission credited to affiliate ${sub.affiliate_referrer}`);
+            }
+          } catch (e) {
+            console.error("[saude_verde] commission error:", e);
+          }
+        }
+
+        // WhatsApp notification
         try {
           const { data: profile } = await supabase
             .from("profiles")
@@ -185,12 +231,14 @@ Deno.serve(async (req) => {
           const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");
           const instance = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
           if (profile?.whatsapp && sub && evolutionUrl && evolutionKey) {
+            const expFmt = new Date(newExpiresAt).toLocaleDateString("pt-BR");
+            const title = isRenewal ? "RENOVADO" : "ATIVADO";
             await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
               method: "POST",
               headers: { "Content-Type": "application/json", apikey: evolutionKey },
               body: JSON.stringify({
                 number: profile.whatsapp,
-                text: `🌿 *Cartão Saúde Verde ATIVADO!*\n\nOlá ${profile.full_name || ""}! Seu cartão *${sub.card_number}* já está ativo.\n\n✅ Até 80% de desconto em consultas, exames e farmácias\n✅ Válido por 30 dias\n\nAcesse: https://plantayraiz.com.br/saude-verde/cartao`,
+                text: `🌿 *Cartão Saúde Verde ${title}!*\n\nOlá ${profile.full_name || ""}! Seu cartão *${sub.card_number}* está ativo.\n\n✅ Até 80% de desconto em consultas, exames e farmácias\n📅 Válido até *${expFmt}* (${days} dias)\n🔁 Renovação automática ativada\n\nAcesse: https://plantayraiz.com.br/saude-verde/cartao`,
               }),
             }).catch((err) => console.error("[saude_verde] WhatsApp dispatch:", err));
           }
@@ -198,7 +246,7 @@ Deno.serve(async (req) => {
           console.error("[saude_verde] notify error:", notifyErr);
         }
 
-        console.log(`🌿 Saúde Verde subscription activated for user ${metadata.user_id}`);
+        console.log(`🌿 Saúde Verde ${isRenewal ? "renewed" : "activated"} for user ${metadata.user_id}, expires ${newExpiresAt}`);
       }
 
       return new Response(

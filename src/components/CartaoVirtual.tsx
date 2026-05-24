@@ -12,14 +12,14 @@ export interface CartaoVirtualProps {
   validade: string;           // MM/AAAA
 }
 
-/** Token dinâmico que expira a cada 5 minutos (anti-print). */
+/** Token dinâmico que expira a cada 5 minutos (anti-print).
+ *  Formato: `<window>.<hash>` — compatível com RPC validate_card_token. */
 function buildDynamicToken(numeroCartao: string) {
   const window5min = Math.floor(Date.now() / (5 * 60 * 1000));
   const raw = `${numeroCartao}.${window5min}`;
-  // hash leve client-side (não-criptográfico, só para variar o QR)
   let h = 0;
   for (let i = 0; i < raw.length; i++) h = (h * 31 + raw.charCodeAt(i)) | 0;
-  return `${numeroCartao}|t=${window5min}|s=${(h >>> 0).toString(36)}`;
+  return `${window5min}.${(h >>> 0).toString(36)}`;
 }
 
 function maskNumber(num: string) {

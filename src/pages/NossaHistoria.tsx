@@ -81,21 +81,49 @@ export default function NossaHistoria() {
             </motion.p>
           </motion.article>
 
-          {/* Vídeo Embed */}
+          {/* Vídeo Intro (upload) - toca primeiro */}
+          <motion.div variants={fadeUp} className="mb-8">
+            <div
+              className="relative w-full overflow-hidden rounded-2xl border border-[#22C55E]/20 shadow-[0_0_40px_rgba(34,197,94,0.12)]"
+              style={{ paddingBottom: "56.25%" }}
+            >
+              <video
+                id="intro-video"
+                className="absolute top-0 left-0 w-full h-full rounded-2xl object-cover"
+                src="/videos/nossa-historia-intro.mp4"
+                autoPlay
+                muted
+                playsInline
+                controls
+                preload="auto"
+                onEnded={() => {
+                  const yt = document.getElementById("yt-historia") as HTMLIFrameElement | null;
+                  if (yt) {
+                    yt.src = "https://www.youtube.com/embed/sdYdmaBP-ic?autoplay=1&rel=0&modestbranding=1&loop=1&playlist=sdYdmaBP-ic";
+                    yt.scrollIntoView({ behavior: "smooth", block: "center" });
+                  }
+                }}
+              />
+            </div>
+          </motion.div>
+
+          {/* Vídeo YouTube - toca em seguida */}
           <motion.div variants={fadeUp} className="mb-14">
             <div
               className="relative w-full overflow-hidden rounded-2xl border border-[#22C55E]/20 shadow-[0_0_40px_rgba(34,197,94,0.12)]"
               style={{ paddingBottom: "56.25%" }}
             >
               <iframe
+                id="yt-historia"
                 className="absolute top-0 left-0 w-full h-full rounded-2xl"
-                src="https://www.youtube.com/embed/sdYdmaBP-ic?autoplay=1&mute=1&rel=0&modestbranding=1&loop=1&playlist=sdYdmaBP-ic"
+                src="https://www.youtube.com/embed/sdYdmaBP-ic?rel=0&modestbranding=1&loop=1&playlist=sdYdmaBP-ic"
                 title="Nossa História — Planta y Raiz"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
             </div>
           </motion.div>
+
 
           {/* CTA YouTube */}
           <motion.div variants={fadeUp} className="mt-14 flex justify-center">

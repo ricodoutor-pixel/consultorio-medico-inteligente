@@ -5741,6 +5741,393 @@ export type Database = {
         }
         Relationships: []
       }
+      saude_verde_appointments: {
+        Row: {
+          appointment_type: string | null
+          beneficiary_name: string | null
+          created_at: string | null
+          discount_pct: number | null
+          final_price_brl: number | null
+          id: string
+          mp_payment_id: string | null
+          notes: string | null
+          original_price_brl: number | null
+          partner_id: string | null
+          payment_method: string | null
+          payment_status: string | null
+          savings_brl: number | null
+          scheduled_date: string | null
+          scheduled_time: string | null
+          specialty_id: string | null
+          status: string | null
+          subscription_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          appointment_type?: string | null
+          beneficiary_name?: string | null
+          created_at?: string | null
+          discount_pct?: number | null
+          final_price_brl?: number | null
+          id?: string
+          mp_payment_id?: string | null
+          notes?: string | null
+          original_price_brl?: number | null
+          partner_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          savings_brl?: number | null
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          specialty_id?: string | null
+          status?: string | null
+          subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          appointment_type?: string | null
+          beneficiary_name?: string | null
+          created_at?: string | null
+          discount_pct?: number | null
+          final_price_brl?: number | null
+          id?: string
+          mp_payment_id?: string | null
+          notes?: string | null
+          original_price_brl?: number | null
+          partner_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          savings_brl?: number | null
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          specialty_id?: string | null
+          status?: string | null
+          subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saude_verde_appointments_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "saude_verde_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saude_verde_appointments_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "saude_verde_specialties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saude_verde_appointments_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "saude_verde_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saude_verde_partner_requests: {
+        Row: {
+          category: string | null
+          city: string | null
+          cnpj: string | null
+          company_name: string
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          country: string | null
+          created_at: string | null
+          id: string
+          message: string | null
+          state: string | null
+          status: string | null
+        }
+        Insert: {
+          category?: string | null
+          city?: string | null
+          cnpj?: string | null
+          company_name: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          state?: string | null
+          status?: string | null
+        }
+        Update: {
+          category?: string | null
+          city?: string | null
+          cnpj?: string | null
+          company_name?: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          state?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      saude_verde_partners: {
+        Row: {
+          accepts_online: boolean | null
+          address: string | null
+          available_exams: Json | null
+          available_specialties: Json | null
+          category: string
+          city: string | null
+          country: string | null
+          created_at: string | null
+          discount_pct: number | null
+          discount_pct_max: number | null
+          id: string
+          is_active: boolean | null
+          is_verified: boolean | null
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          name: string
+          opening_hours: Json | null
+          phone: string | null
+          price_from_brl: number | null
+          rating: number | null
+          slug: string | null
+          state: string | null
+          subcategory: string | null
+          total_reviews: number | null
+          website: string | null
+          whatsapp: string | null
+          zipcode: string | null
+        }
+        Insert: {
+          accepts_online?: boolean | null
+          address?: string | null
+          available_exams?: Json | null
+          available_specialties?: Json | null
+          category: string
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          discount_pct?: number | null
+          discount_pct_max?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name: string
+          opening_hours?: Json | null
+          phone?: string | null
+          price_from_brl?: number | null
+          rating?: number | null
+          slug?: string | null
+          state?: string | null
+          subcategory?: string | null
+          total_reviews?: number | null
+          website?: string | null
+          whatsapp?: string | null
+          zipcode?: string | null
+        }
+        Update: {
+          accepts_online?: boolean | null
+          address?: string | null
+          available_exams?: Json | null
+          available_specialties?: Json | null
+          category?: string
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          discount_pct?: number | null
+          discount_pct_max?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string
+          opening_hours?: Json | null
+          phone?: string | null
+          price_from_brl?: number | null
+          rating?: number | null
+          slug?: string | null
+          state?: string | null
+          subcategory?: string | null
+          total_reviews?: number | null
+          website?: string | null
+          whatsapp?: string | null
+          zipcode?: string | null
+        }
+        Relationships: []
+      }
+      saude_verde_plans: {
+        Row: {
+          created_at: string | null
+          discount_pct_max: number | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          max_beneficiaries: number | null
+          name: string
+          period: string
+          price_brl: number
+          price_eur: number | null
+          price_usd: number | null
+          slug: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          discount_pct_max?: number | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_beneficiaries?: number | null
+          name: string
+          period?: string
+          price_brl: number
+          price_eur?: number | null
+          price_usd?: number | null
+          slug: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          discount_pct_max?: number | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_beneficiaries?: number | null
+          name?: string
+          period?: string
+          price_brl?: number
+          price_eur?: number | null
+          price_usd?: number | null
+          slug?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      saude_verde_specialties: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_featured: boolean | null
+          name: string
+          partners_count: number | null
+          price_from_brl: number | null
+          slug: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_featured?: boolean | null
+          name: string
+          partners_count?: number | null
+          price_from_brl?: number | null
+          slug?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_featured?: boolean | null
+          name?: string
+          partners_count?: number | null
+          price_from_brl?: number | null
+          slug?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      saude_verde_subscriptions: {
+        Row: {
+          beneficiaries: Json | null
+          card_number: string | null
+          card_qrcode_url: string | null
+          created_at: string | null
+          currency: string | null
+          expires_at: string | null
+          id: string
+          mp_subscription_id: string | null
+          plan_id: string | null
+          started_at: string | null
+          status: string | null
+          stripe_subscription_id: string | null
+          total_appointments: number | null
+          total_savings_brl: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          beneficiaries?: Json | null
+          card_number?: string | null
+          card_qrcode_url?: string | null
+          created_at?: string | null
+          currency?: string | null
+          expires_at?: string | null
+          id?: string
+          mp_subscription_id?: string | null
+          plan_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          stripe_subscription_id?: string | null
+          total_appointments?: number | null
+          total_savings_brl?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          beneficiaries?: Json | null
+          card_number?: string | null
+          card_qrcode_url?: string | null
+          created_at?: string | null
+          currency?: string | null
+          expires_at?: string | null
+          id?: string
+          mp_subscription_id?: string | null
+          plan_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          stripe_subscription_id?: string | null
+          total_appointments?: number | null
+          total_savings_brl?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saude_verde_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "saude_verde_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scientific_articles: {
         Row: {
           abstract: string

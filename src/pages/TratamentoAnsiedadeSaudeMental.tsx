@@ -99,7 +99,7 @@ const TratamentoAnsiedadeSaudeMental = () => {
                   <a href="https://wa.me/5511991363154?text=Olá Brisa, quero agendar uma Orientação Técnica de Saúde Mental (R$30)." target="_blank" rel="noopener noreferrer">Agendar Teleconsulta de Saúde Mental - R$30 <ArrowRight size={16} className="ml-1" /></a>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
-                  <a href="https://wa.me/5511987131241?text=Olá, gostaria de saber mais sobre tratamento para ansiedade com cannabis medicinal" target="_blank" rel="noopener noreferrer">
+                  <a href="https://wa.me/5511991363154?text=Olá, gostaria de saber mais sobre tratamento para ansiedade com cannabis medicinal" target="_blank" rel="noopener noreferrer">
                     <MessageCircle size={16} className="mr-1" /> Pergunte à Brisa IA
                   </a>
                 </Button>
@@ -151,7 +151,7 @@ const TratamentoAnsiedadeSaudeMental = () => {
                 <a href="https://wa.me/5511991363154?text=Olá Brisa, quero agendar minha Teleconsulta (R$30)." target="_blank" rel="noopener noreferrer">Agendar Teleconsulta - R$30 <ArrowRight size={16} className="ml-1" /></a>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
-                <a href="https://wa.me/5511987131241?text=Gostaria de fazer uma pré-triagem para ansiedade" target="_blank" rel="noopener noreferrer">
+                <a href="https://wa.me/5511991363154?text=Gostaria de fazer uma pré-triagem para ansiedade" target="_blank" rel="noopener noreferrer">
                   <MessageCircle size={16} className="mr-1" /> Triagem com Brisa IA
                 </a>
               </Button>
@@ -209,7 +209,7 @@ const TratamentoAnsiedadeSaudeMental = () => {
                 <a href="https://wa.me/5511991363154?text=Olá Brisa, quero agendar minha Teleconsulta (R$30)." target="_blank" rel="noopener noreferrer">Agendar Teleconsulta - R$30 <ArrowRight size={16} className="ml-1" /></a>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
-                <a href="https://wa.me/5511987131241?text=Dúvida sobre tratamento para ansiedade e insônia com CBD" target="_blank" rel="noopener noreferrer">
+                <a href="https://wa.me/5511991363154?text=Dúvida sobre tratamento para ansiedade e insônia com CBD" target="_blank" rel="noopener noreferrer">
                   <MessageCircle size={16} className="mr-1" /> Dúvida? Pergunte à Brisa
                 </a>
               </Button>

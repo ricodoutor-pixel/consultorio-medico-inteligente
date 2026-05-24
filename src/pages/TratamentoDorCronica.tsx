@@ -99,7 +99,7 @@ const TratamentoDorCronica = () => {
                   <Link to="/agendamento">Agendar Teleconsulta por R$30 <ArrowRight size={16} className="ml-1" /></Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
-                  <a href="https://wa.me/5511987131241?text=Olá, tenho dúvida sobre tratamento de dor crônica" target="_blank" rel="noopener noreferrer">
+                  <a href="https://wa.me/5511991363154?text=Olá, tenho dúvida sobre tratamento de dor crônica" target="_blank" rel="noopener noreferrer">
                     <MessageCircle size={16} className="mr-1" /> Pergunte à Brisa IA
                   </a>
                 </Button>
@@ -200,7 +200,7 @@ const TratamentoDorCronica = () => {
                 <Link to="/agendamento">Agendar Teleconsulta por R$30 <ArrowRight size={16} className="ml-1" /></Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
-                <a href="https://wa.me/5511987131241?text=Dúvida sobre meu caso de dor crônica" target="_blank" rel="noopener noreferrer">
+                <a href="https://wa.me/5511991363154?text=Dúvida sobre meu caso de dor crônica" target="_blank" rel="noopener noreferrer">
                   <MessageCircle size={16} className="mr-1" /> Dúvida? Pergunte à Brisa
                 </a>
               </Button>

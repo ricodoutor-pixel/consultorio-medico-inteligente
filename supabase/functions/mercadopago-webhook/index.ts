@@ -66,10 +66,12 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Verify MercadoPago webhook signature
+    // Verify MercadoPago webhook signature (skipped on admin replay)
     const mpWebhookSecret = getFirstEnv("MERCADOPAGO_WEBHOOK_SECRET", "MERCADO_PAGO_WEBHOOK_SECRET");
     const xSignature = req.headers.get("x-signature");
     const xRequestId = req.headers.get("x-request-id");
+
+    if (!isAdminReplay) {
 
     if (!mpWebhookSecret) {
       console.error("MERCADOPAGO_WEBHOOK_SECRET not configured — refusing webhook");

@@ -38,6 +38,34 @@ Deno.serve(async (req) => {
       });
     }
 
+    // === ADMIN REPLAY MODE (skip signature + idempotency for admin-triggered reprocess) ===
+    let isAdminReplay = false;
+    if (req.headers.get("x-admin-replay") === "1") {
+      const authHeader = req.headers.get("Authorization") || "";
+      const jwt = authHeader.replace(/^Bearer\s+/i, "");
+      if (jwt) {
+        const { data: { user } } = await supabase.auth.getUser(jwt);
+        if (user) {
+          const { data: roleRow } = await supabase
+            .from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
+          if (roleRow) {
+            isAdminReplay = true;
+            console.log(`[admin-replay] Authorized for user ${user.id}, payment ${paymentId}`);
+            // Remove existing webhook_events row(s) for this payment so reprocessing isn't blocked
+            await supabase.from("webhook_events")
+              .delete()
+              .eq("gateway", "mercadopago")
+              .eq("external_reference", String(paymentId));
+          }
+        }
+      }
+      if (!isAdminReplay) {
+        return new Response(JSON.stringify({ error: "Admin replay not authorized" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     // Verify MercadoPago webhook signature
     const mpWebhookSecret = getFirstEnv("MERCADOPAGO_WEBHOOK_SECRET", "MERCADO_PAGO_WEBHOOK_SECRET");
     const xSignature = req.headers.get("x-signature");

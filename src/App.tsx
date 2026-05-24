@@ -118,6 +118,14 @@ const AdminBI = lazyWithRecovery(() => import("./pages/AdminBI"), { sourceRef: "
 const Badges = lazyWithRecovery(() => import("./pages/Badges"), { sourceRef: "/badges" });
 const HealthCheck = lazyWithRecovery(() => import("./pages/HealthCheck"), { sourceRef: "/health" });
 const AutomationsDashboard = lazyWithRecovery(() => import("./pages/AutomationsDashboard"), { sourceRef: "/admin/automations" });
+
+// ── Cartão Saúde Verde ──
+const SaudeVerdeLanding = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeLanding"), { sourceRef: "/saude-verde" });
+const SaudeVerdeRede = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeRede"), { sourceRef: "/saude-verde/rede" });
+const SaudeVerdeCartao = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeCartao"), { sourceRef: "/saude-verde/cartao" });
+const SaudeVerdeAgendar = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeAgendar"), { sourceRef: "/saude-verde/agendar" });
+const SaudeVerdeEmpresas = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeEmpresas"), { sourceRef: "/saude-verde/empresas" });
+const SaudeVerdeParceiros = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeParceiros"), { sourceRef: "/saude-verde/seja-parceiro" });
 const OmniChannelDashboard = lazyWithRecovery(() => import("./pages/OmniChannelDashboard"), { sourceRef: "/admin/omni-channel" });
 const BrisaCEO = lazyWithRecovery(() => import("./pages/admin/BrisaCEO"), { sourceRef: "/admin/brisa-ceo" });
 const OfertaEspecial = lazyWithRecovery(() => import("./pages/OfertaEspecial"), { sourceRef: "/oferta-especial" });
@@ -334,6 +342,17 @@ const App = () => (
                 <Route path="/passaporte/:token" element={<Passaporte />} />
                 <Route path="/planos-tratamento" element={<PlanosTratamento />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
+                {/* ── MÓDULO: CARTÃO SAÚDE VERDE ── */}
+                <Route path="/saude-verde" element={<SaudeVerdeLanding />} />
+                <Route path="/saude-verde/rede" element={<SaudeVerdeRede />} />
+                <Route path="/saude-verde/cartao" element={<PrivateRoute><SaudeVerdeCartao /></PrivateRoute>} />
+                <Route path="/saude-verde/agendar" element={<PrivateRoute><SaudeVerdeAgendar /></PrivateRoute>} />
+                <Route path="/saude-verde/empresas" element={<SaudeVerdeEmpresas />} />
+                <Route path="/saude-verde/seja-parceiro" element={<SaudeVerdeParceiros />} />
+                <Route path="/cartao-saude" element={<SaudeVerdeLanding />} />
+                <Route path="/desconto-saude" element={<SaudeVerdeLanding />} />
+                <Route path="/exames-com-desconto" element={<SaudeVerdeRede />} />
+                <Route path="/consultas-com-desconto" element={<SaudeVerdeRede />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

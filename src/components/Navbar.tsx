@@ -94,6 +94,7 @@ export const Navbar = () => {
     { to: "/profissionais", label: "Profissionais" },
     { to: "/telemedicina", label: "Telemedicina" },
     { to: "/shopping", label: "Shopping" },
+    { to: "/saude-verde", label: "Saúde Verde" },
     { to: "/biblioteca", label: "Biblioteca" },
     { to: "/comunidade", label: "Comunidade" },
     { to: "/dashboard", label: "Meu Painel" },

@@ -284,9 +284,8 @@ export default function SaudeVerdeCartao() {
           // =================== LANDING (não assinante) ===================
           <>
             {/* HERO */}
-            <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-emerald-950 via-background to-background p-6 sm:p-12 mb-12">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,hsl(var(--primary)/0.18),transparent_55%)]" />
-              <div className="relative grid md:grid-cols-2 gap-8 items-center">
+            <section className="rounded-3xl border border-primary/20 bg-emerald-950/40 p-6 sm:p-12 mb-12">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
                   <Badge className="mb-4 bg-primary/15 text-primary border-primary/30">
                     <Sparkles className="w-3 h-3 mr-1" /> A sua assinatura de saúde

@@ -6021,6 +6021,47 @@ export type Database = {
         }
         Relationships: []
       }
+      saude_verde_referral_commissions: {
+        Row: {
+          affiliate_user_id: string
+          amount_brl: number
+          created_at: string
+          id: string
+          payment_id: string | null
+          referred_user_id: string
+          status: string
+          subscription_id: string | null
+        }
+        Insert: {
+          affiliate_user_id: string
+          amount_brl?: number
+          created_at?: string
+          id?: string
+          payment_id?: string | null
+          referred_user_id: string
+          status?: string
+          subscription_id?: string | null
+        }
+        Update: {
+          affiliate_user_id?: string
+          amount_brl?: number
+          created_at?: string
+          id?: string
+          payment_id?: string | null
+          referred_user_id?: string
+          status?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saude_verde_referral_commissions_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "saude_verde_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saude_verde_specialties: {
         Row: {
           category: string
@@ -6065,15 +6106,20 @@ export type Database = {
       }
       saude_verde_subscriptions: {
         Row: {
+          affiliate_referrer: string | null
+          auto_renew: boolean
           beneficiaries: Json | null
           card_number: string | null
           card_qrcode_url: string | null
           created_at: string | null
           currency: string | null
           expires_at: string | null
+          expiry_reminded_at: string | null
           id: string
+          last_payment_id: string | null
           mp_subscription_id: string | null
           plan_id: string | null
+          renewal_count: number
           started_at: string | null
           status: string | null
           stripe_subscription_id: string | null
@@ -6083,15 +6129,20 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          affiliate_referrer?: string | null
+          auto_renew?: boolean
           beneficiaries?: Json | null
           card_number?: string | null
           card_qrcode_url?: string | null
           created_at?: string | null
           currency?: string | null
           expires_at?: string | null
+          expiry_reminded_at?: string | null
           id?: string
+          last_payment_id?: string | null
           mp_subscription_id?: string | null
           plan_id?: string | null
+          renewal_count?: number
           started_at?: string | null
           status?: string | null
           stripe_subscription_id?: string | null
@@ -6101,15 +6152,20 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          affiliate_referrer?: string | null
+          auto_renew?: boolean
           beneficiaries?: Json | null
           card_number?: string | null
           card_qrcode_url?: string | null
           created_at?: string | null
           currency?: string | null
           expires_at?: string | null
+          expiry_reminded_at?: string | null
           id?: string
+          last_payment_id?: string | null
           mp_subscription_id?: string | null
           plan_id?: string | null
+          renewal_count?: number
           started_at?: string | null
           status?: string | null
           stripe_subscription_id?: string | null

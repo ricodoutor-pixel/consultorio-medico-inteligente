@@ -84,6 +84,14 @@ Deno.serve(async (req) => {
       })
       .eq("id", sub.id);
 
+    // === GAMIFICAÇÃO: +10 Planta-Coins por agendamento via Cartão Verde ===
+    const COINS_PER_BOOKING = 10;
+    try {
+      await supabase.rpc("increment_planta_coins", { _user_id: user.id, _coins: COINS_PER_BOOKING });
+    } catch (coinErr) {
+      console.error("[saude-verde-book] planta_coins error:", coinErr);
+    }
+
     // Fire-and-forget WhatsApp notification
     const waUrl = Deno.env.get("EVOLUTION_API_URL");
     const waKey = Deno.env.get("EVOLUTION_API_KEY");
@@ -97,7 +105,7 @@ Deno.serve(async (req) => {
           headers: { apikey: waKey, "Content-Type": "application/json" },
           body: JSON.stringify({
             number: phone.replace(/\D/g, ""),
-            text: `🌿 *Agendamento Confirmado — Cartão Saúde Verde*\n\n📅 ${date} às ${time}\n🏥 ${partner.name}\n🔬 ${specialty?.name || appointmentType}\n💰 De R$${originalPrice.toFixed(2)} por *R$${finalPrice.toFixed(2)}*\n✅ Economia de R$${savings.toFixed(2)} (${discountPct}% OFF)\n\nApresente seu *Cartão Verde Digital*: *${sub.card_number}*\n\nQualquer dúvida, fale comigo aqui! 💚`,
+            text: `🌿 *Agendamento Confirmado — Cartão Saúde Verde*\n\n📅 ${date} às ${time}\n🏥 ${partner.name}\n🔬 ${specialty?.name || appointmentType}\n💰 De R$${originalPrice.toFixed(2)} por *R$${finalPrice.toFixed(2)}*\n✅ Economia de R$${savings.toFixed(2)} (${discountPct}% OFF)\n🌱 *+${COINS_PER_BOOKING} Planta-Coins* creditados!\n\nApresente seu *Cartão Verde Digital*: *${sub.card_number}*\n\nQualquer dúvida, fale comigo aqui! 💚`,
           }),
         }).catch(() => {});
       }
@@ -110,6 +118,7 @@ Deno.serve(async (req) => {
       savings,
       discount_pct: discountPct,
       partner_name: partner.name,
+      planta_coins_earned: COINS_PER_BOOKING,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   } catch (e) {

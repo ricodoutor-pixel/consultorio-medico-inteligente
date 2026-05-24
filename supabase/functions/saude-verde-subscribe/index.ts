@@ -23,7 +23,18 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { planSlug, currency = "BRL", beneficiaries = [] } = await req.json();
+    const { planSlug, currency = "BRL", beneficiaries = [], referralCode } = await req.json();
+
+    // Resolve affiliate referrer from referralCode (if provided)
+    let affiliateReferrer: string | null = null;
+    if (referralCode && typeof referralCode === "string") {
+      const { data: ref } = await supabase
+        .from("referral_links")
+        .select("user_id")
+        .eq("code", referralCode.toUpperCase())
+        .maybeSingle();
+      if (ref?.user_id && ref.user_id !== user.id) affiliateReferrer = ref.user_id;
+    }
 
     const { data: plan, error: planError } = await supabase
       .from("saude_verde_plans")
@@ -101,6 +112,8 @@ Deno.serve(async (req) => {
       beneficiaries,
       expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       mp_subscription_id: mpData.id,
+      affiliate_referrer: affiliateReferrer,
+      auto_renew: true,
     });
 
     return new Response(JSON.stringify({

@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
           headers: { apikey: waKey, "Content-Type": "application/json" },
           body: JSON.stringify({
             number: phone.replace(/\D/g, ""),
-            text: `🌿 *Agendamento Confirmado — Cartão Saúde Verde*\n\n📅 ${date} às ${time}\n🏥 ${partner.name}\n🔬 ${specialty?.name || appointmentType}\n💰 De R$${originalPrice.toFixed(2)} por *R$${finalPrice.toFixed(2)}*\n✅ Economia de R$${savings.toFixed(2)} (${discountPct}% OFF)\n\nApresente seu *Cartão Verde Digital*: *${sub.card_number}*\n\nQualquer dúvida, fale comigo aqui! 💚`,
+            text: `🌿 *Agendamento Confirmado — Cartão Saúde Verde*\n\n📅 ${date} às ${time}\n🏥 ${partner.name}\n🔬 ${specialty?.name || appointmentType}\n💰 De R$${originalPrice.toFixed(2)} por *R$${finalPrice.toFixed(2)}*\n✅ Economia de R$${savings.toFixed(2)} (${discountPct}% OFF)\n🌱 *+${COINS_PER_BOOKING} Planta-Coins* creditados!\n\nApresente seu *Cartão Verde Digital*: *${sub.card_number}*\n\nQualquer dúvida, fale comigo aqui! 💚`,
           }),
         }).catch(() => {});
       }

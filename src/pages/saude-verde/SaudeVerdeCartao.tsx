@@ -228,9 +228,8 @@ export default function SaudeVerdeCartao() {
         {isSubscriber ? (
           // =================== ACTIVE SUBSCRIBER ===================
           <>
-            <Card className="relative overflow-hidden p-5 sm:p-8 mb-8 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 border-primary/30">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,hsl(var(--primary)/0.3),transparent_60%)]" />
-              <div className="relative">
+            <Card className="p-5 sm:p-8 mb-8 bg-emerald-900 border-primary/30">
+              <div>
                 <div className="flex items-start justify-between mb-8 sm:mb-10 gap-3">
                   <div className="min-w-0">
                     <div className="text-emerald-300 text-xs sm:text-sm font-medium mb-1">{BRAND}</div>

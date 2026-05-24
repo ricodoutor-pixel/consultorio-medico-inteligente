@@ -112,6 +112,8 @@ Deno.serve(async (req) => {
       beneficiaries,
       expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       mp_subscription_id: mpData.id,
+      affiliate_referrer: affiliateReferrer,
+      auto_renew: true,
     });
 
     return new Response(JSON.stringify({

@@ -1,0 +1,3 @@
+# SPA fallback — Cloudflare Pages / Netlify
+# Qualquer rota client-side cai no index.html para o React Router resolver.
+/*  /index.html  200

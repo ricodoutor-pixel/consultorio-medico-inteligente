@@ -1,0 +1,53 @@
+# ⚡ Deploy automático para Cloudflare Pages a cada push em main
+#
+# PRÉ-REQUISITOS (configurar 1x em GitHub → Settings → Secrets → Actions):
+#   • CLOUDFLARE_API_TOKEN  → criar em https://dash.cloudflare.com/profile/api-tokens
+#                              Template: "Edit Cloudflare Workers" + permissão Pages:Edit
+#   • CLOUDFLARE_ACCOUNT_ID → painel Cloudflare → barra lateral direita
+#
+# Como obter os secrets do Vite (já existem no .env do Lovable):
+#   Adicione também como GitHub Secrets para o build ler:
+#   • VITE_SUPABASE_URL
+#   • VITE_SUPABASE_PUBLISHABLE_KEY
+#   • VITE_SUPABASE_PROJECT_ID
+#   • VITE_DOCTOR_WHATSAPP_NUMBER
+
+name: Deploy → Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install deps
+        run: bun install --frozen-lockfile
+
+      - name: Build (Vite)
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+          VITE_DOCTOR_WHATSAPP_NUMBER: ${{ secrets.VITE_DOCTOR_WHATSAPP_NUMBER }}
+        run: bun run build
+
+      - name: Publish → Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=plantayraiz --branch=main

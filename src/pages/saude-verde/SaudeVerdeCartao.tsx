@@ -308,9 +308,8 @@ export default function SaudeVerdeCartao() {
                   </div>
                 </div>
                 <div className="hidden md:block">
-                  <Card className="relative overflow-hidden p-6 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 border-primary/30">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,hsl(var(--primary)/0.3),transparent_60%)]" />
-                    <div className="relative">
+                  <Card className="p-6 bg-emerald-900 border-primary/30">
+                    <div>
                       <div className="flex items-start justify-between mb-8">
                         <div>
                           <div className="text-emerald-300 text-xs font-medium mb-1">{BRAND}</div>

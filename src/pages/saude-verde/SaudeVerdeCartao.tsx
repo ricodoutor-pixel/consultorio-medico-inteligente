@@ -546,7 +546,7 @@ export default function SaudeVerdeCartao() {
 
             {/* CONTACT FOOTER */}
             <section className="mb-12">
-              <Card className="p-6 sm:p-8 bg-gradient-to-br from-emerald-950/60 to-background border-primary/20">
+              <Card className="p-6 sm:p-8 bg-emerald-950/40 border-primary/20">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <ShieldCheck className="w-8 h-8 text-primary mb-3" />

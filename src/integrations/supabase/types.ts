@@ -2945,6 +2945,208 @@ export type Database = {
         }
         Relationships: []
       }
+      health_card_redemptions: {
+        Row: {
+          created_at: string
+          discount_amount: number
+          discount_percent: number
+          final_amount: number
+          id: string
+          metadata: Json | null
+          original_amount: number
+          partner_name: string
+          partner_type: string | null
+          redeemed_at: string
+          service_description: string | null
+          subscription_id: string
+          user_id: string
+          validated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          discount_amount?: number
+          discount_percent?: number
+          final_amount: number
+          id?: string
+          metadata?: Json | null
+          original_amount: number
+          partner_name: string
+          partner_type?: string | null
+          redeemed_at?: string
+          service_description?: string | null
+          subscription_id: string
+          user_id: string
+          validated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          discount_amount?: number
+          discount_percent?: number
+          final_amount?: number
+          id?: string
+          metadata?: Json | null
+          original_amount?: number
+          partner_name?: string
+          partner_type?: string | null
+          redeemed_at?: string
+          service_description?: string | null
+          subscription_id?: string
+          user_id?: string
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_card_redemptions_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "health_card_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_card_subscriptions: {
+        Row: {
+          activated_at: string | null
+          amount: number
+          billing_cycle: string
+          cancelled_at: string | null
+          card_number: string
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          metadata: Json | null
+          mp_preapproval_id: string | null
+          mp_subscription_id: string | null
+          next_billing_date: string | null
+          plan_type: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string | null
+          amount: number
+          billing_cycle: string
+          cancelled_at?: string | null
+          card_number: string
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          metadata?: Json | null
+          mp_preapproval_id?: string | null
+          mp_subscription_id?: string | null
+          next_billing_date?: string | null
+          plan_type: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activated_at?: string | null
+          amount?: number
+          billing_cycle?: string
+          cancelled_at?: string | null
+          card_number?: string
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          metadata?: Json | null
+          mp_preapproval_id?: string | null
+          mp_subscription_id?: string | null
+          next_billing_date?: string | null
+          plan_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      health_card_wallet: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          total_loaded: number
+          total_spent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          total_loaded?: number
+          total_spent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          total_loaded?: number
+          total_spent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      health_card_wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          mp_payment_id: string | null
+          partner_name: string | null
+          status: string
+          tx_type: string
+          user_id: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          mp_payment_id?: string | null
+          partner_name?: string | null
+          status?: string
+          tx_type: string
+          user_id: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          mp_payment_id?: string | null
+          partner_name?: string | null
+          status?: string
+          tx_type?: string
+          user_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_card_wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "health_card_wallet"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       health_subscriptions: {
         Row: {
           amount: number
@@ -7099,6 +7301,28 @@ export type Database = {
         Args: { _amount: number; _user_id: string }
         Returns: undefined
       }
+      credit_health_card_wallet: {
+        Args: { _amount: number; _mp_payment_id: string; _user_id: string }
+        Returns: {
+          new_balance: number
+          success: boolean
+          tx_id: string
+        }[]
+      }
+      debit_health_card_wallet: {
+        Args: {
+          _amount: number
+          _description: string
+          _partner_name?: string
+          _user_id: string
+        }
+        Returns: {
+          new_balance: number
+          reason: string
+          success: boolean
+          tx_id: string
+        }[]
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -7269,6 +7493,16 @@ export type Database = {
           _whatsapp_jid?: string
         }
         Returns: string
+      }
+      validate_card_token: {
+        Args: { _card_number: string; _token: string; _window_seconds?: number }
+        Returns: {
+          plan_type: string
+          reason: string
+          status: string
+          user_id: string
+          valid: boolean
+        }[]
       }
     }
     Enums: {

@@ -350,6 +350,7 @@ const App = () => (
                 <Route path="/saude-verde/agendar" element={<PrivateRoute><SaudeVerdeAgendar /></PrivateRoute>} />
                 <Route path="/saude-verde/empresas" element={<SaudeVerdeEmpresas />} />
                 <Route path="/saude-verde/seja-parceiro" element={<SaudeVerdeParceiros />} />
+                <Route path="/admin/saude-verde" element={<AdminRoute><AdminSaudeVerde /></AdminRoute>} />
                 <Route path="/cartao-saude" element={<SaudeVerdeLanding />} />
                 <Route path="/desconto-saude" element={<SaudeVerdeLanding />} />
                 <Route path="/exames-com-desconto" element={<SaudeVerdeRede />} />

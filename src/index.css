@@ -98,7 +98,12 @@ body {
    retrai (100vw recalcula em cada wrapper aninhado → scroll trava/pula). */
 section, article, aside, main, header, footer {
   max-width: 100vw;
+  /* Isolamento de pintura por seção — corrige scanlines/ghosting de GPU
+     observados no Chrome Android quando seções longas compartilham camada. */
+  isolation: isolate;
+  contain: layout paint style;
 }
+
 
 /* Responsive images inside cards/grids */
 .card img, [class*="Card"] img {

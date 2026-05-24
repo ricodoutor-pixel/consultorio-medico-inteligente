@@ -156,6 +156,58 @@ Deno.serve(async (req) => {
     const totalAmount = payment.transaction_amount || 0;
     const metadata = payment.metadata || {};
     const isMarketplace = metadata.type === "marketplace";
+
+    // === SAÚDE VERDE — Subscription activation (handled inline, returns early) ===
+    if (metadata.module === "saude_verde" && metadata.user_id) {
+      if (payment.status === "approved") {
+        const { data: sub } = await supabase
+          .from("saude_verde_subscriptions")
+          .update({
+            status: "active",
+            started_at: new Date().toISOString(),
+            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("user_id", metadata.user_id)
+          .eq("card_number", metadata.card_number)
+          .select("card_number, plan_id")
+          .maybeSingle();
+
+        // WhatsApp notification via Evolution
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name, whatsapp")
+            .eq("id", metadata.user_id)
+            .maybeSingle();
+
+          const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
+          const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");
+          const instance = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+          if (profile?.whatsapp && sub && evolutionUrl && evolutionKey) {
+            await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", apikey: evolutionKey },
+              body: JSON.stringify({
+                number: profile.whatsapp,
+                text: `🌿 *Cartão Saúde Verde ATIVADO!*\n\nOlá ${profile.full_name || ""}! Seu cartão *${sub.card_number}* já está ativo.\n\n✅ Até 80% de desconto em consultas, exames e farmácias\n✅ Válido por 30 dias\n\nAcesse: https://plantayraiz.com.br/saude-verde/cartao`,
+              }),
+            }).catch((err) => console.error("[saude_verde] WhatsApp dispatch:", err));
+          }
+        } catch (notifyErr) {
+          console.error("[saude_verde] notify error:", notifyErr);
+        }
+
+        console.log(`🌿 Saúde Verde subscription activated for user ${metadata.user_id}`);
+      }
+
+      return new Response(
+        JSON.stringify({ status: "processed", module: "saude_verde", payment_status: payment.status }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+
     const externalRef = payment.external_reference || "";
     const isCartPayment = externalRef.startsWith("cart-");
 

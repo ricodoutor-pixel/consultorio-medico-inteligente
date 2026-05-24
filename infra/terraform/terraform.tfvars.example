@@ -1,0 +1,14 @@
+# Copie para terraform.tfvars e preencha com seus dados Oracle Cloud
+# Onde achar cada valor:
+#   tenancy_ocid    → Oracle Console → User Menu → Tenancy
+#   compartment_ocid → Oracle Console → Identity → Compartments (use o "root" se for primeira VM)
+#   availability_domain_name → Oracle Console → Governance → Availability Domains
+
+tenancy_ocid             = "ocid1.tenancy.oc1..aaaaaa..."
+compartment_ocid         = "ocid1.compartment.oc1..aaaaaa..."
+region                   = "sa-saopaulo-1"
+availability_domain_name = "Uocm:SA-SAOPAULO-1-AD-1"
+
+# Gere com: ssh-keygen -t ed25519 -C "planta-oracle"
+# Cole o conteúdo de ~/.ssh/id_ed25519.pub aqui
+ssh_public_key = "ssh-ed25519 AAAA... planta-oracle"

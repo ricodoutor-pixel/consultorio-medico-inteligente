@@ -14,7 +14,7 @@ const VISITOR_OPTIONS = [
     keyword: "#PACIENTE",
     label: "Paciente",
     icon: User,
-    description: "Agendar consulta ou tirar dúvidas",
+    description: "Iniciar Orientação Técnica ou tirar dúvidas",
     greeting: "#PACIENTE\n\nOlá, Enfª Brisa! 🌿 Sou paciente e gostaria de iniciar meu atendimento na Planta y Raiz. Pode me ajudar?",
     landing: null,
     color: "hsl(152 100% 74%)",
@@ -157,7 +157,7 @@ export const WhatsAppButton = () => {
     <div
       ref={menuRef}
       className="fixed right-3 md:right-6 z-50"
-      style={{ bottom: "calc(5rem + env(safe-area-inset-bottom, 0px))" }}
+      style={{ bottom: "calc(6rem + env(safe-area-inset-bottom, 0px))" }}
     >
 
       {isOpen && (

@@ -10,7 +10,7 @@ const getFirstEnv = (...names: string[]) => {
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-signature, x-request-id, x-admin-replay",
 };
 
 Deno.serve(async (req) => {

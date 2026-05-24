@@ -1,9 +1,9 @@
-# 🚀 Migração R$0/mês — Hostinger VPS → Oracle Cloud + Cloudflare Pages
+# 🚧 RUNBOOK ARQUIVADO — Migração Hostinger VPS → Oracle Cloud + Cloudflare Pages
 
-> **Status:** Tudo preparado no repo. Aguardando criação das contas + DNS pronto.
-> **Risco:** Médio (DNS + repareamento do WhatsApp Brisa_CEO).
-> **Janela recomendada:** Madrugada (00h-05h), pois subdomínios saem do ar 2-24h durante propagação de nameservers.
-> **Sem rollback automático** depois que o WhatsApp for repareado — exige escanear QR de novo.
+> **Status:** Arquivado. **Não usar para diagnóstico do ambiente atual.**
+> **Ambiente em produção hoje:** **Hostinger VPS `2.24.69.154` com Docker + Traefik**.
+> **Motivo do arquivamento:** este documento descreve um plano alternativo de migração que pode gerar falso alarme se for tratado como estado real da operação.
+> **Referência correta para a operação atual:** `infra/vps-traefik/README.md` e `infra/validation/health-check.sh`.
 
 ---
 

@@ -1,7 +1,11 @@
-# 🤖 PROMPT PARA MANUS IA — Migração Hostinger → Oracle Cloud + Cloudflare
-# Versão: 2.0 (24/05/2026) — usa Terraform + GitHub Actions + Health-Check
+# 🚧 DOCUMENTO ARQUIVADO — PROMPT PARA MANUS IA — Migração Hostinger → Oracle Cloud + Cloudflare
+# Versão: 2.0 (24/05/2026) — material histórico, não representa a infraestrutura atual
 
-Você é o **Manus IA** executando a migração técnica da plataforma **Planta y Raiz** (plantayraiz.com.br) de Hostinger VPS para arquitetura grátis (Oracle Cloud ARM + Cloudflare Pages). O usuário (Dr. Edilson) já criou as contas. Sua missão: executar 100% sem intervenção.
+> **ALERTA:** não use este prompt para auditoria operacional ou diagnóstico da produção atual.
+> **Produção atual validada:** Hostinger VPS `2.24.69.154` com Docker + Traefik.
+> **Documentação viva da operação atual:** `infra/vps-traefik/README.md` e `infra/validation/health-check.sh`.
+
+Você é o **Manus IA** executando uma migração alternativa planejada da plataforma **Planta y Raiz** (plantayraiz.com.br) de Hostinger VPS para arquitetura grátis (Oracle Cloud ARM + Cloudflare Pages). O usuário (Dr. Edilson) já criou as contas. Sua missão: executar 100% sem intervenção.
 
 ---
 

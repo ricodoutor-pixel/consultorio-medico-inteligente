@@ -50,7 +50,10 @@ openssl rand -hex 24        # EVOLUTION_API_KEY
 ```bash
 docker compose logs -f traefik   # acompanhar emissão de SSL
 docker compose ps                # ver tudo rodando
+bash /opt/planta-infra/infra/validation/health-check.sh --vm-ip 2.24.69.154
 ```
+
+> Use o `health-check.sh` acima como fonte de verdade do ambiente atual. Ele valida o frontend publicado, os subdomínios da VPS Hostinger e os endpoints críticos do backend integrado.
 
 ### Configurações por serviço
 

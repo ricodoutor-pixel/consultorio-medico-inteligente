@@ -206,7 +206,13 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
     @apply bg-background text-foreground;
     font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
     -webkit-overflow-scrolling: touch;
+    /* Força camada de composição própria do body para evitar leak do backbuffer
+       da GPU (faixas coloridas tipo scanlines) no Chrome Android. */
+    background-color: hsl(var(--background));
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
+
 
   #root {
     min-height: 100vh;

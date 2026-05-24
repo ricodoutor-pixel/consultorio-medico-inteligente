@@ -33,7 +33,7 @@ export default function SaudeVerdeRede() {
 
   useEffect(() => {
     setLoading(true);
-    let q = supabase.from("saude_verde_partners" as never)
+    let q = supabase.from("saude_verde_partners_public" as never)
       .select("*").eq("is_active", true).order("rating", { ascending: false }).limit(50);
     if (city) q = q.ilike("city", `%${city}%`);
     if (category !== "all") q = q.eq("category", category);

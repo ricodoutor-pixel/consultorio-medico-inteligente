@@ -84,6 +84,14 @@ Deno.serve(async (req) => {
       })
       .eq("id", sub.id);
 
+    // === GAMIFICAÇÃO: +10 Planta-Coins por agendamento via Cartão Verde ===
+    const COINS_PER_BOOKING = 10;
+    try {
+      await supabase.rpc("increment_planta_coins", { _user_id: user.id, _coins: COINS_PER_BOOKING });
+    } catch (coinErr) {
+      console.error("[saude-verde-book] planta_coins error:", coinErr);
+    }
+
     // Fire-and-forget WhatsApp notification
     const waUrl = Deno.env.get("EVOLUTION_API_URL");
     const waKey = Deno.env.get("EVOLUTION_API_KEY");

@@ -10,7 +10,7 @@ const getFirstEnv = (...names: string[]) => {
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-signature, x-request-id, x-admin-replay",
 };
 
 Deno.serve(async (req) => {
@@ -38,10 +38,40 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Verify MercadoPago webhook signature
+    // === ADMIN REPLAY MODE (skip signature + idempotency for admin-triggered reprocess) ===
+    let isAdminReplay = false;
+    if (req.headers.get("x-admin-replay") === "1") {
+      const authHeader = req.headers.get("Authorization") || "";
+      const jwt = authHeader.replace(/^Bearer\s+/i, "");
+      if (jwt) {
+        const { data: { user } } = await supabase.auth.getUser(jwt);
+        if (user) {
+          const { data: roleRow } = await supabase
+            .from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
+          if (roleRow) {
+            isAdminReplay = true;
+            console.log(`[admin-replay] Authorized for user ${user.id}, payment ${paymentId}`);
+            // Remove existing webhook_events row(s) for this payment so reprocessing isn't blocked
+            await supabase.from("webhook_events")
+              .delete()
+              .eq("gateway", "mercadopago")
+              .eq("external_reference", String(paymentId));
+          }
+        }
+      }
+      if (!isAdminReplay) {
+        return new Response(JSON.stringify({ error: "Admin replay not authorized" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // Verify MercadoPago webhook signature (skipped on admin replay)
     const mpWebhookSecret = getFirstEnv("MERCADOPAGO_WEBHOOK_SECRET", "MERCADO_PAGO_WEBHOOK_SECRET");
     const xSignature = req.headers.get("x-signature");
     const xRequestId = req.headers.get("x-request-id");
+
+    if (!isAdminReplay) {
 
     if (!mpWebhookSecret) {
       console.error("MERCADOPAGO_WEBHOOK_SECRET not configured — refusing webhook");
@@ -96,6 +126,8 @@ Deno.serve(async (req) => {
         });
       }
     }
+
+    } // end !isAdminReplay (signature check)
 
     // === IDEMPOTENCY GUARD ===
     // Use x-request-id when present (MP retries reuse it). Fallback: paymentId+action.

@@ -1,0 +1,25 @@
+# ⚡ Cloudflare Pages — Variáveis de Ambiente
+# Cole estas no painel: Cloudflare Pages → Project → Settings → Environment Variables
+# Aba "Production" E aba "Preview" (mesmos valores).
+#
+# ⚠️ NÃO commitar valores reais. Este arquivo é só referência.
+
+# Supabase (públicos — OK no client)
+VITE_SUPABASE_URL=https://shmbwdjuddvquszwkvuq.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobWJ3ZGp1ZGR2cXVzendrdnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE4MDksImV4cCI6MjA4Nzg2NzgwOX0.wGL0NQi2gKWyiC4L1ca1xxzSvEbvq2Uc8jvM7XOH9xQ
+VITE_SUPABASE_PROJECT_ID=shmbwdjuddvquszwkvuq
+
+# WhatsApp Dr. Edilson
+VITE_DOCTOR_WHATSAPP_NUMBER=+5511987131241
+
+# Twilio (Account SID é semi-público; Auth Token NUNCA aqui — só Supabase Edge Function)
+VITE_TWILIO_ACCOUNT_SID=AC1234567890abcdefghijklmnopqrst
+VITE_TWILIO_WHATSAPP_NUMBER=+14155238886
+VITE_TWILIO_WEBHOOK_URL=https://plantayraiz.com.br/api/webhooks/whatsapp
+
+# Facebook Pixel (se usar — peguei do GH Actions atual)
+# VITE_FACEBOOK_PIXEL_ID=<cole_aqui_se_aplicavel>
+
+# Build config (Cloudflare lê do wrangler.toml; estas duas garantem fallback)
+NODE_VERSION=20
+NPM_FLAGS=--legacy-peer-deps

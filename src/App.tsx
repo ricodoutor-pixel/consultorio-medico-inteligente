@@ -126,6 +126,7 @@ const SaudeVerdeCartao = lazyWithRecovery(() => import("./pages/saude-verde/Saud
 const SaudeVerdeAgendar = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeAgendar"), { sourceRef: "/saude-verde/agendar" });
 const SaudeVerdeEmpresas = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeEmpresas"), { sourceRef: "/saude-verde/empresas" });
 const SaudeVerdeParceiros = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeParceiros"), { sourceRef: "/saude-verde/seja-parceiro" });
+const AdminSaudeVerde = lazyWithRecovery(() => import("./pages/admin/AdminSaudeVerde"), { sourceRef: "/admin/saude-verde" });
 const OmniChannelDashboard = lazyWithRecovery(() => import("./pages/OmniChannelDashboard"), { sourceRef: "/admin/omni-channel" });
 const BrisaCEO = lazyWithRecovery(() => import("./pages/admin/BrisaCEO"), { sourceRef: "/admin/brisa-ceo" });
 const OfertaEspecial = lazyWithRecovery(() => import("./pages/OfertaEspecial"), { sourceRef: "/oferta-especial" });

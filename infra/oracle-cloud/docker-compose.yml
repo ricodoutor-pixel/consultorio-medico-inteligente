@@ -1,0 +1,243 @@
+# 🟠 Stack soberano Planta y Raiz — Oracle Cloud ARM Free Tier
+# VM.Standard.A1.Flex · 4 OCPU · 24GB RAM · 200GB SSD · Ubuntu 22.04 ARM64
+#
+# Equivalente 100% gratuito da stack que rodava na Hostinger VPS.
+# Sobe: Traefik (SSL Let's Encrypt) + n8n + DocuSeal + Plausible + Evolution API (WhatsApp).
+#
+# Uso:
+#   ssh ubuntu@<IP_PUBLICO_ORACLE>
+#   sudo apt update && sudo apt install -y git
+#   sudo git clone https://github.com/ricodoutor-pixel/consultorio-medico-inteligente.git /opt/planta-infra
+#   cd /opt/planta-infra/infra/oracle-cloud
+#   sudo cp .env.example .env && sudo nano .env   # preencher senhas fortes
+#   sudo bash bootstrap.sh
+#
+# ⚠️ TODAS as imagens abaixo têm builds linux/arm64 oficiais — validado em Maio/2026.
+
+networks:
+  proxy:
+    name: proxy
+    driver: bridge
+
+volumes:
+  traefik_letsencrypt:
+  n8n_data:
+  docuseal_data:
+  plausible_db_data:
+  plausible_event_data:
+  plausible_event_logs:
+  plausible_data:
+  postgres_evolution:
+  redis_evolution:
+  evolution_instances:
+
+services:
+  # ════════════════════════════════════════════════════════
+  # 🚦 TRAEFIK — Reverse proxy + SSL automático
+  # ════════════════════════════════════════════════════════
+  traefik:
+    image: traefik:v3.6.6
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - --api.dashboard=false
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=proxy
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.le.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      - --log.level=INFO
+      - --accesslog=true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_letsencrypt:/letsencrypt
+    networks: [proxy]
+
+  # ════════════════════════════════════════════════════════
+  # 🤖 n8n — Automações (n8n.plantayraiz.com.br)
+  # ════════════════════════════════════════════════════════
+  n8n:
+    image: n8nio/n8n:latest   # multi-arch: amd64 + arm64
+    container_name: n8n
+    restart: unless-stopped
+    environment:
+      - N8N_HOST=n8n.plantayraiz.com.br
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://n8n.plantayraiz.com.br/
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks: [proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.n8n.rule=Host(`n8n.plantayraiz.com.br`)
+      - traefik.http.routers.n8n.entrypoints=websecure
+      - traefik.http.routers.n8n.tls.certresolver=le
+      - traefik.http.services.n8n.loadbalancer.server.port=5678
+
+  # ════════════════════════════════════════════════════════
+  # ✍️ DocuSeal — Assinaturas (assinaturas.plantayraiz.com.br)
+  # ════════════════════════════════════════════════════════
+  docuseal:
+    image: docuseal/docuseal:latest   # multi-arch
+    container_name: docuseal
+    restart: unless-stopped
+    environment:
+      - HOST=assinaturas.plantayraiz.com.br
+      - FORCE_SSL=true
+    volumes:
+      - docuseal_data:/data
+    networks: [proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.docuseal.rule=Host(`assinaturas.plantayraiz.com.br`)
+      - traefik.http.routers.docuseal.entrypoints=websecure
+      - traefik.http.routers.docuseal.tls.certresolver=le
+      - traefik.http.services.docuseal.loadbalancer.server.port=3000
+
+  # ════════════════════════════════════════════════════════
+  # 📊 Plausible — Analytics (analytics.plantayraiz.com.br)
+  # ════════════════════════════════════════════════════════
+  plausible_db:
+    image: postgres:16-alpine
+    container_name: plausible_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=${PLAUSIBLE_DB_PASSWORD}
+    volumes:
+      - plausible_db_data:/var/lib/postgresql/data
+    networks: [proxy]
+
+  plausible_events_db:
+    image: clickhouse/clickhouse-server:24.3-alpine
+    container_name: plausible_events_db
+    restart: unless-stopped
+    environment:
+      - CLICKHOUSE_DB=plausible_db
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=${PLAUSIBLE_DB_PASSWORD}
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    volumes:
+      - plausible_event_data:/var/lib/clickhouse
+      - plausible_event_logs:/var/log/clickhouse-server
+      - ../vps-traefik/clickhouse/logs.xml:/etc/clickhouse-server/config.d/logs.xml:ro
+      - ../vps-traefik/clickhouse/ipv4-only.xml:/etc/clickhouse-server/config.d/ipv4-only.xml:ro
+      - ../vps-traefik/clickhouse/low-resources.xml:/etc/clickhouse-server/config.d/low-resources.xml:ro
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 -O - http://127.0.0.1:8123/ping || exit 1"]
+      start_period: 1m
+    networks: [proxy]
+
+  plausible:
+    image: ghcr.io/plausible/community-edition:v2.1
+    container_name: plausible
+    restart: unless-stopped
+    depends_on:
+      plausible_db:
+        condition: service_started
+      plausible_events_db:
+        condition: service_healthy
+    volumes:
+      - plausible_data:/var/lib/plausible
+    ulimits:
+      nofile: { soft: 65535, hard: 65535 }
+    environment:
+      - TMPDIR=/var/lib/plausible/tmp
+      - BASE_URL=https://analytics.plantayraiz.com.br
+      - SECRET_KEY_BASE=${PLAUSIBLE_SECRET_KEY_BASE}
+      - DATABASE_URL=postgres://postgres:${PLAUSIBLE_DB_PASSWORD}@plausible_db:5432/plausible_db
+      - CLICKHOUSE_DATABASE_URL=http://default:${PLAUSIBLE_DB_PASSWORD}@plausible_events_db:8123/plausible_db
+      - DISABLE_REGISTRATION=invite_only
+    command: sh -c "/entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
+    networks: [proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.plausible.rule=Host(`analytics.plantayraiz.com.br`)
+      - traefik.http.routers.plausible.entrypoints=websecure
+      - traefik.http.routers.plausible.tls.certresolver=le
+      - traefik.http.services.plausible.loadbalancer.server.port=8000
+
+  # ════════════════════════════════════════════════════════
+  # 💬 Evolution API — WhatsApp (api.plantayraiz.com.br)
+  # ⚠️ evoapicloud/evolution-api:v2.3.7 tem build linux/arm64 oficial.
+  # ════════════════════════════════════════════════════════
+  evolution_postgres:
+    image: postgres:16-alpine
+    container_name: evolution_postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=evolution
+      - POSTGRES_PASSWORD=${EVOLUTION_DB_PASSWORD}
+      - POSTGRES_DB=evolution
+    volumes:
+      - postgres_evolution:/var/lib/postgresql/data
+    networks: [proxy]
+
+  evolution_redis:
+    image: redis:7-alpine
+    container_name: evolution_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_evolution:/data
+    networks: [proxy]
+
+  evolution:
+    image: evoapicloud/evolution-api:v2.3.7
+    container_name: evolution
+    restart: unless-stopped
+    depends_on: [evolution_postgres, evolution_redis]
+    environment:
+      - SERVER_URL=https://api.plantayraiz.com.br
+      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY}
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://evolution:${EVOLUTION_DB_PASSWORD}@evolution_postgres:5432/evolution
+      - DATABASE_ENABLED=true
+      - DATABASE_SAVE_DATA_INSTANCE=true
+      - DATABASE_SAVE_DATA_NEW_MESSAGE=true
+      - DATABASE_SAVE_MESSAGE_UPDATE=true
+      - DATABASE_SAVE_DATA_CONTACTS=true
+      - DATABASE_SAVE_DATA_CHATS=true
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://evolution_redis:6379
+      - CACHE_REDIS_PREFIX_KEY=evolution
+      - CACHE_LOCAL_ENABLED=false
+      - LANGUAGE=pt-BR
+      # 🔑 Identidade do "celular" virtual — invioláveis (sem isto, Baileys loopa)
+      - CONFIG_SESSION_PHONE_CLIENT=Planta y Raiz
+      - CONFIG_SESSION_PHONE_NAME=Chrome
+      - CONFIG_SESSION_PHONE_VERSION=2.3000.1015901307
+      - QRCODE_LIMIT=30
+      - QRCODE_COLOR=#1B4332
+      - DEL_INSTANCE=false
+      - DEL_TEMP_INSTANCES=true
+      - LOG_LEVEL=ERROR,WARN,INFO
+      - LOG_COLOR=true
+      - LOG_BAILEYS=error
+      - WEBHOOK_GLOBAL_URL=${EVOLUTION_WEBHOOK_URL:-}
+      - WEBHOOK_GLOBAL_ENABLED=${EVOLUTION_WEBHOOK_ENABLED:-false}
+      - WEBHOOK_GLOBAL_WEBHOOK_BY_EVENTS=false
+    volumes:
+      - evolution_instances:/evolution/instances
+    networks: [proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.evolution.rule=Host(`api.plantayraiz.com.br`)
+      - traefik.http.routers.evolution.entrypoints=websecure
+      - traefik.http.routers.evolution.tls.certresolver=le
+      - traefik.http.services.evolution.loadbalancer.server.port=8080

@@ -22,7 +22,7 @@ function buildWhatsAppMessage(ctx: WhatsAppContext, userName: string): string {
     case "consulta":
       return `Olá Enf. Brisa, eu ${name} acabo de efetuar o pagamento da consulta${ctx.doctorName ? ` com Dr(a). ${ctx.doctorName}` : ""}${ctx.specialty ? ` (${ctx.specialty})` : ""} e estou enviando o comprovante do depósito para agilizar a minha solicitação! Obrigado(a).`;
     case "agendamento":
-      return `Olá Enf. Brisa, eu ${name} gostaria de agendar uma consulta${ctx.doctorName ? ` com Dr(a). ${ctx.doctorName}` : ""}${ctx.specialty ? ` na especialidade ${ctx.specialty}` : ""}. Obrigado(a).`;
+      return `Olá Enf. Brisa, eu ${name} gostaria de iniciar minha Orientação Técnica${ctx.doctorName ? ` com Dr(a). ${ctx.doctorName}` : ""}${ctx.specialty ? ` na especialidade ${ctx.specialty}` : ""}. Obrigado(a).`;
     case "duvida":
       return `Olá Enf. Brisa, eu ${name} gostaria de saber mais sobre ${ctx.assunto || "os serviços da Planta & Raiz"}. Obrigado(a).`;
     case "geral":

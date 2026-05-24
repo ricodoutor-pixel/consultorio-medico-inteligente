@@ -55,7 +55,7 @@ const SERVICE_TIERS = [
 ];
 
 const WhatsAppContactButton = ({ name, className = "" }: { name: string; className?: string }) => {
-  const message = encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${name}`);
+  const message = encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de iniciar Orientação Técnica com ${name}`);
   return (
     <a
       href={`https://wa.me/${BRISA_WHATSAPP}?text=${message}`}
@@ -374,7 +374,7 @@ const Profissionais = () => {
 
                         {/* Botão Agendar Orientação Técnica via WhatsApp */}
                         <a
-                          href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de agendar uma consulta online com ${p.name}`)}`}
+                          href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de iniciar Orientação Técnica com ${p.name}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}

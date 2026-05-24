@@ -127,6 +127,8 @@ Deno.serve(async (req) => {
       }
     }
 
+    } // end !isAdminReplay (signature check)
+
     // === IDEMPOTENCY GUARD ===
     // Use x-request-id when present (MP retries reuse it). Fallback: paymentId+action.
     const eventKey = xRequestId || `${paymentId}:${action || "unknown"}`;

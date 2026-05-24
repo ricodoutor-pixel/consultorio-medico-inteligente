@@ -96,7 +96,7 @@ const TratamentoDorCronica = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl">
-                  <Link to="/agendamento">Agendar Teleconsulta por R$30 <ArrowRight size={16} className="ml-1" /></Link>
+                  <Link to="/agendamento">Agendar Orientação Técnica por R$30 <ArrowRight size={16} className="ml-1" /></Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
                   <a href="https://wa.me/5511991363154?text=Olá, tenho dúvida sobre tratamento de dor crônica" target="_blank" rel="noopener noreferrer">
@@ -145,7 +145,7 @@ const TratamentoDorCronica = () => {
             <p className="text-lg font-bold text-foreground mb-2">Atendimento prioritário para pacientes de São Paulo</p>
             <p className="text-muted-foreground text-sm mb-4">Av. Paulista, 1000 — Teleconsulta 24/7 com médicos especializados</p>
             <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl">
-              <Link to="/agendamento">Agendar Teleconsulta por R$30 <ArrowRight size={16} className="ml-1" /></Link>
+              <Link to="/agendamento">Agendar Orientação Técnica por R$30 <ArrowRight size={16} className="ml-1" /></Link>
             </Button>
           </div>
         </div>
@@ -197,7 +197,7 @@ const TratamentoDorCronica = () => {
             <p className="text-muted-foreground text-sm mb-6">Converse com um de nossos especialistas e descubra o protocolo ideal para o seu caso.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl">
-                <Link to="/agendamento">Agendar Teleconsulta por R$30 <ArrowRight size={16} className="ml-1" /></Link>
+                <Link to="/agendamento">Agendar Orientação Técnica por R$30 <ArrowRight size={16} className="ml-1" /></Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-xl border-primary/30 text-primary hover:bg-primary/10">
                 <a href="https://wa.me/5511991363154?text=Dúvida sobre meu caso de dor crônica" target="_blank" rel="noopener noreferrer">

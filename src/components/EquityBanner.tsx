@@ -101,7 +101,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
 
               {/* CTA Principal */}
               <a
-                href="https://wa.me/5511991363154?text=Olá%20enfermeira%20Brisa%20gostaria%20de%20agendar%20uma%20consulta"
+                href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa!%20Gostaria%20de%20iniciar%20minha%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20de%20Cannabis%20Medicinal."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 md:flex-none px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition text-center"

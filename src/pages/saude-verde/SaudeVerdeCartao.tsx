@@ -75,7 +75,7 @@ export default function SaudeVerdeCartao() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-12">
+    <div className="min-h-screen bg-background text-foreground pt-6 pb-32 sm:py-12">
       <Helmet>
         <title>Meu Cartão Saúde Verde | Planta y Raiz</title>
       </Helmet>
@@ -88,26 +88,26 @@ export default function SaudeVerdeCartao() {
         {sub && sub.status === "active" ? (
           <>
             {/* ACTIVE CARD */}
-            <Card className="relative overflow-hidden p-8 mb-8 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 border-primary/30">
+            <Card className="relative overflow-hidden p-5 sm:p-8 mb-8 bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 border-primary/30">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,hsl(var(--primary)/0.3),transparent_60%)]" />
               <div className="relative">
-                <div className="flex items-start justify-between mb-10">
-                  <div>
-                    <div className="text-emerald-300 text-sm font-medium mb-1">Planta y Raiz</div>
-                    <div className="text-white text-2xl font-bold">Cartão Saúde Verde</div>
+                <div className="flex items-start justify-between mb-8 sm:mb-10 gap-3">
+                  <div className="min-w-0">
+                    <div className="text-emerald-300 text-xs sm:text-sm font-medium mb-1">Planta y Raiz</div>
+                    <div className="text-white text-lg sm:text-2xl font-bold truncate">Cartão Saúde Verde</div>
                   </div>
-                  <CreditCard className="w-10 h-10 text-emerald-300" />
+                  <CreditCard className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-300 flex-shrink-0" />
                 </div>
-                <div className="text-emerald-200 text-xs tracking-widest mb-1">NÚMERO DO CARTÃO</div>
-                <div className="text-white text-2xl font-mono tracking-wider mb-6">{sub.card_number}</div>
-                <div className="flex justify-between items-end">
-                  <div>
+                <div className="text-emerald-200 text-[10px] sm:text-xs tracking-widest mb-1">NÚMERO DO CARTÃO</div>
+                <div className="text-white text-lg sm:text-2xl font-mono tracking-wide sm:tracking-wider mb-6 break-all">{sub.card_number}</div>
+                <div className="flex justify-between items-end gap-3">
+                  <div className="min-w-0">
                     <div className="text-emerald-300 text-[10px] tracking-widest">PLANO</div>
-                    <div className="text-white font-semibold">{sub.plan?.name || "—"}</div>
+                    <div className="text-white font-semibold text-sm sm:text-base truncate">{sub.plan?.name || "—"}</div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right flex-shrink-0">
                     <div className="text-emerald-300 text-[10px] tracking-widest">VÁLIDO ATÉ</div>
-                    <div className="text-white font-semibold">
+                    <div className="text-white font-semibold text-sm sm:text-base">
                       {sub.expires_at ? new Date(sub.expires_at).toLocaleDateString("pt-BR", { month: "2-digit", year: "2-digit" }) : "—"}
                     </div>
                   </div>

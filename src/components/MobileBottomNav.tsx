@@ -22,9 +22,10 @@ export const MobileBottomNav = () => {
 
   return (
     <nav className={cn(
-      "fixed bottom-0 left-0 right-0 z-50 border-t border-border pb-[env(safe-area-inset-bottom,0px)]",
+      "fixed bottom-0 left-0 right-0 z-50 border-t border-border pb-[env(safe-area-inset-bottom,0px)] xl:hidden",
       isDenseCatalogRoute ? "bg-background/95" : "bg-black/95 backdrop-blur-xl"
     )}>
+
       <div className="flex items-center justify-around h-16 px-2">
         {NAV_ITEMS.map(({ icon: Icon, label, path }) => {
           const isActive = location.pathname === path;

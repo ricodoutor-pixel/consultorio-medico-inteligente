@@ -11,7 +11,12 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!; // usada APENAS para connector GSC (não-IA)
+const GEMINI_AI_KEY =
+  Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") ||
+  Deno.env.get("GEMINI_API_KEY") ||
+  "";
+const GEMINI_AI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
 const GSC_API_KEY = Deno.env.get("GOOGLE_SEARCH_CONSOLE_API_KEY")!;
 const ADMIN_WHATSAPP = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
 const SITE = "sc-domain:plantayraiz.com.br";

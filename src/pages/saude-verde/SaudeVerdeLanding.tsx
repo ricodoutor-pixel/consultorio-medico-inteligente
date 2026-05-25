@@ -88,9 +88,9 @@ export default function SaudeVerdeLanding() {
       <section className="py-20 container mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3">Tudo o que você precisa em um só cartão</h2>
         <p className="text-center text-muted-foreground mb-12">Saúde sem complicação, na rede inteira da Planta y Raiz.</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4">
           {benefits.map((b, i) => (
-            <Card key={i} className="p-5 border-border/50">
+            <Card key={i} className="relative z-10 p-5 border-border/50 bg-card">
               <b.icon className="w-8 h-8 text-primary mb-3" />
               <div className="font-semibold mb-1">{b.title}</div>
               <div className="text-sm text-muted-foreground">{b.desc}</div>

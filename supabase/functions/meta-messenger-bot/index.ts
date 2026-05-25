@@ -10,7 +10,7 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
+// IA agora 100% via Google Gemini direto (ver _shared/brisa-ai.ts). Sem Lovable AI Gateway.
 import {
   META_APP_SECRET as FB_APP_SECRET,
   FB_PAGE_ACCESS_TOKEN,

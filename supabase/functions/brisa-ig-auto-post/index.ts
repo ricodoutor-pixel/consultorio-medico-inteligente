@@ -22,39 +22,61 @@ const corsHeaders = {
 const GRAPH_API = "https://graph.facebook.com/v19.0";
 const THREADS_API = "https://graph.threads.net/v1.0";
 
-async function generateCaption(): Promise<string> {
+async function generateCaption(topic: string): Promise<string> {
   const GEMINI_API_KEY =
     Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") ||
     Deno.env.get("GEMINI_API_KEY") ||
     "";
-  const topic = pickTopic();
   const base = `Acesse: plantayraiz.com.br 🌿 | WhatsApp Enf. Brisa: (11) 99136-3154`;
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
 
-  if (!GEMINI_API_KEY) {
-    return sanitizeCaption(
-      `🌱 Planta y Raiz — a maior plataforma digital de Cannabis Medicinal do Brasil.\n\n${topic}\n\n${base}\n\n#CannabisMedicinal #PlantaYRaiz #SaúdeDigital #Telemedicina #BemEstar`,
-    );
+  // 1) Tenta Lovable AI Gateway (preferido)
+  if (LOVABLE_API_KEY) {
+    try {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: AUTO_POST_SYSTEM_PROMPT + "\n\nFormato: caption de Instagram, máx 1500 caracteres, 8-12 hashtags." },
+            { role: "user", content: `Tópico: ${topic}\n\nEncerre com: ${base}` },
+          ],
+        }),
+      });
+      const j = await res.json();
+      const text = j?.choices?.[0]?.message?.content?.trim();
+      if (text && text.length > 30) return sanitizeCaption(text);
+    } catch (e) {
+      console.error("[ig-auto-post] Lovable AI caption error:", e);
+    }
   }
-  try {
-    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "gemini-2.5-flash",
-        messages: [
-          { role: "system", content: AUTO_POST_SYSTEM_PROMPT + "\n\nFormato: caption de Instagram, máx 1500 caracteres, 8-12 hashtags." },
-          { role: "user", content: `Tópico: ${topic}\n\nEncerre com: ${base}` },
-        ],
-      }),
-    });
-    const j = await res.json();
-    const text = j?.choices?.[0]?.message?.content?.trim();
-    if (text && text.length > 30) return sanitizeCaption(text);
-  } catch (e) {
-    console.error("[ig-auto-post] Google Gemini error:", e);
+
+  // 2) Fallback Gemini direto
+  if (GEMINI_API_KEY) {
+    try {
+      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "gemini-2.5-flash",
+          messages: [
+            { role: "system", content: AUTO_POST_SYSTEM_PROMPT + "\n\nFormato: caption de Instagram, máx 1500 caracteres, 8-12 hashtags." },
+            { role: "user", content: `Tópico: ${topic}\n\nEncerre com: ${base}` },
+          ],
+        }),
+      });
+      const j = await res.json();
+      const text = j?.choices?.[0]?.message?.content?.trim();
+      if (text && text.length > 30) return sanitizeCaption(text);
+    } catch (e) {
+      console.error("[ig-auto-post] Gemini direct caption error:", e);
+    }
   }
+
   return sanitizeCaption(`🌿 ${topic}\n\n${base}\n\n#CannabisMedicinal #PlantaYRaiz #Telemedicina #SaudeDigital #BemEstar`);
 }
+
 
 // ============================================================
 // FACEBOOK MIRROR — publica a mesma imagem + caption na Page

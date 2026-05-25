@@ -36,6 +36,7 @@ export const CookieConsentBanner = () => {
   const [exiting, setExiting] = useState(false);
   const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
   const isPlansRoute = location.pathname === "/planos" || location.pathname === "/precos";
+  const isSaudeVerdeRoute = location.pathname.startsWith("/saude-verde") || location.pathname === "/cartao-saude";
 
   useEffect(() => {
     try {
@@ -100,7 +101,7 @@ export const CookieConsentBanner = () => {
     >
       <div className={`mx-2 sm:mx-6 ${isPlansRoute && isMobile ? "mb-2" : "mb-2 sm:mb-6"}`}>
         <div className={`relative overflow-hidden rounded-xl sm:rounded-2xl border border-emerald-500/20 shadow-2xl shadow-emerald-900/40 ${
-          isDenseCatalogRoute && isMobile
+          (isDenseCatalogRoute && isMobile) || (isSaudeVerdeRoute && isMobile)
             ? "bg-emerald-950/95"
             : "bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-emerald-900/95 backdrop-blur-xl"
         }`}>

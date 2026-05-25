@@ -128,13 +128,22 @@ export async function processar_triagem_brisa(
   const messages =
     options?.extra_messages ?? [
       { role: "system", content: systemPrompt },
-      ...((options?.history || []).slice(-6).map((h) => ({
+      // 🧠 Memória RAG estendida: 14 últimas mensagens (≈ 7 turnos) — evita "amnésia" robótica
+      ...((options?.history || []).slice(-14).map((h) => ({
         role: h.role === "assistant" ? "assistant" : "user",
         content: h.content,
       }))),
       { role: "user", content: mensagem },
     ];
-  const body: Record<string, unknown> = { model, messages };
+  // 🌡️ Temperature 0.8 + top_p 0.95 → variabilidade humana, evita respostas "marcadas"
+  // presence_penalty 0.6 → desencoraja repetição de frases ("Olá! Sou a Enf. Brisa...")
+  const body: Record<string, unknown> = {
+    model, messages,
+    temperature: 0.8,
+    top_p: 0.95,
+    presence_penalty: 0.6,
+    frequency_penalty: 0.4,
+  };
   if (options?.response_format) body.response_format = options.response_format;
 
   const order: Array<"gemini"> = [];

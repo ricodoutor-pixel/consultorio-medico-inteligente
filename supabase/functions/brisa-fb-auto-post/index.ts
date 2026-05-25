@@ -12,7 +12,7 @@ const corsHeaders = {
 const GRAPH_API = "https://graph.facebook.com/v19.0";
 
 import { AUTO_POST_SYSTEM_PROMPT, pickImageFromPool, pickTopic, sanitizeCaption } from "../_shared/auto-post-topics.ts";
-import { generateGeminiImageForTopic } from "../_shared/gemini-image-gen.ts";
+import { generateGeminiImageForTopic, rehostExternalImage } from "../_shared/gemini-image-gen.ts";
 
 async function generatePost(): Promise<string> {
   const GEMINI_API_KEY =
@@ -52,12 +52,11 @@ Deno.serve(async (req) => {
   const unauth = requireServiceAuth(req, corsHeaders);
   if (unauth) return unauth;
 
-  const pageId = Deno.env.get("FACEBOOK_PAGE_ID");
-  if (!pageId) {
-    return new Response(JSON.stringify({ error: "FACEBOOK_PAGE_ID missing" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
+  // Fallback canônico igual ao IG: se FACEBOOK_PAGE_ID estiver vazio OU
+  // contiver um valor de token (não-numérico), usa o ID hardcoded da Página.
+  const CANONICAL_PAGE_ID = "1104301376097224";
+  const envPage = (Deno.env.get("FACEBOOK_PAGE_ID") || "").trim();
+  const pageId = /^\d{10,20}$/.test(envPage) ? envPage : CANONICAL_PAGE_ID;
   let fbToken: string;
   try {
     const { getFacebookPageToken } = await import("../_shared/fb-page-token.ts");
@@ -99,6 +98,14 @@ Deno.serve(async (req) => {
     const gen = await generateGeminiImageForTopic(topic);
     imageUrl = gen.url || await pickImageFromPool(supabase);
     if (gen.error) console.error("[fb-auto-post] gemini image fallback:", gen.error);
+  }
+  // Re-hospedar imagens externas (Pexels etc.) — Meta falha em URLs com cookies
+  if (imageUrl && !imageUrl.includes("supabase.co/storage/")) {
+    const rehosted = await rehostExternalImage(imageUrl);
+    if (rehosted !== imageUrl) {
+      console.log("[fb-auto-post] rehosted external image →", rehosted);
+      imageUrl = rehosted;
+    }
   }
 
 

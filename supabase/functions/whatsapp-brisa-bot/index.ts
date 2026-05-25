@@ -411,14 +411,28 @@ function sanitizeForSpeech(text: string): string {
 
 async function sendVoiceReply(phone: string, text: string, preferredVoiceId = VOICE_BRISA): Promise<boolean> {
   const spoken = sanitizeForSpeech(text);
-  if (!spoken) return false;
+  console.log("[brisa-bot][voice] start", { phone: phone.slice(-4), len_in: text.length, len_spoken: spoken.length, hasEleven: !!ELEVENLABS_API_KEY, hasGoogle: !!GOOGLE_TTS_SERVICE_ACCOUNT_JSON });
+  if (!spoken) { console.warn("[brisa-bot][voice] empty spoken text after sanitize"); return false; }
+  const t0 = Date.now();
   const audioB64 = await synthesizeVoice(spoken, preferredVoiceId);
-  if (!audioB64) return false;
+  console.log("[brisa-bot][voice] tts done", { ms: Date.now() - t0, bytes_b64: audioB64?.length || 0 });
+  if (!audioB64) { console.error("[brisa-bot][voice] synthesizeVoice returned null — TTS falhou (Eleven+Google)"); return false; }
   const response = await sendWhatsAppAudio(phone, audioB64).catch((e) => {
-    console.error("[brisa-bot] sendVoiceReply failed", e);
+    console.error("[brisa-bot][voice] sendWhatsAppAudio threw", e);
     return null;
   });
-  return Boolean(response?.ok);
+  const ok = Boolean(response?.ok);
+  console.log("[brisa-bot][voice] evolution result", { ok, status: response?.status });
+  return ok;
+}
+
+// Extrai apenas a linha que contém URL para enviar como texto curto junto ao áudio
+function extractLinkLine(text: string): string | null {
+  const re = /(https?:\/\/\S+|(?:www\.)?[a-z0-9-]+\.(?:com\.br|com|br|net|org|app|io|me)(?:\/\S*)?)/i;
+  const m = text.match(re);
+  if (!m) return null;
+  const line = text.split(/\n+/).find(l => l.includes(m[0])) || m[0];
+  return line.trim();
 }
 
 async function classifySentiment(text: string): Promise<{ sentiment_score: number; is_negative: boolean }> {
@@ -715,19 +729,35 @@ serve(async (req) => {
       seniorCareStyle,
       audioNotes: audioUnderstanding?.notes,
     });
-    await sendWhatsApp(phone, reply);
 
-    // 🎙️ Responde em áudio sempre que a conversa indicar preferência por voz/leitura assistida
+    // 🎙️ Quando usuário pede áudio (ou é idoso/baixa leitura): áudio é a resposta principal.
+    // Texto só vai se o áudio falhar OU se houver link (TTS não lê URL — entrega o link em texto curto).
+    let audioOk = false;
     if (wantsAudioReply) {
       const isEdilson = /dr\.?\s*edilson|doutor\s*edilson/i.test(reply);
       const voiceId = isEdilson ? VOICE_EDILSON : VOICE_BRISA;
-      await sendVoiceReply(phone, reply, voiceId);
+      audioOk = await sendVoiceReply(phone, reply, voiceId);
+      console.log("[brisa-bot] audio-first path", { audioOk, voiceId });
+      if (audioOk) {
+        const linkLine = extractLinkLine(reply);
+        if (linkLine) {
+          // Manda APENAS a linha com o link, curto, pra acompanhar o áudio
+          await sendWhatsApp(phone, linkLine);
+        }
+      } else {
+        // Fallback: áudio falhou → manda texto completo pra não deixar o paciente sem resposta
+        console.warn("[brisa-bot] audio failed, falling back to full text");
+        await sendWhatsApp(phone, reply);
+      }
+    } else {
+      await sendWhatsApp(phone, reply);
     }
 
     await supabase.from("whatsapp_brisa_log").insert({
       phone, direction: "outbound", message: reply, raw: {
         ai: true,
         voice: wantsAudioReply,
+        audio_sent: audioOk,
         senior_care_style: seniorCareStyle,
         audio_notes: audioUnderstanding?.notes || null,
       },
@@ -737,7 +767,7 @@ serve(async (req) => {
       await logUnifiedMessage({
         contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
         content: reply, intent: "ai_reply",
-        messageType: wantsAudioReply ? "audio" : "text",
+        messageType: audioOk ? "audio" : "text",
       });
     }
 

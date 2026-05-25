@@ -263,8 +263,36 @@ function shouldUseSeniorCareStyle(text: string, history: Array<{ role: string; c
   return history.slice(-6).some((item) => item.role === "user" && /\b(idos[oa]|senhor[ae]?|aposentad[oa]|n[aã]o sei ler|n[aã]o consigo ler|fale devagar|explica devagar|tenho dificuldade pra ler)\b/i.test(item.content || ""));
 }
 
+// Remove URLs e markdown da fala — TTS não lê link (fica robótico).
+// Substitui por uma frase natural pedindo pra tocar no link enviado por texto.
+function sanitizeForSpeech(text: string): string {
+  if (!text) return text;
+  let cleaned = text;
+  // markdown links [label](url) -> label
+  cleaned = cleaned.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, "$1");
+  // urls cruas (http/https e domínios .com.br soltos)
+  const URL_RE = /\b(?:https?:\/\/\S+|(?:www\.)?[a-z0-9-]+\.(?:com|com\.br|br|net|org|app|io|me)(?:\/\S*)?)/gi;
+  let hadUrl = false;
+  cleaned = cleaned.replace(URL_RE, () => { hadUrl = true; return ""; });
+  // limpa pontuação solta deixada pelas remoções
+  cleaned = cleaned
+    .replace(/[ \t]+([.,;:!?])/g, "$1")
+    .replace(/\(\s*\)/g, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+([.,;:!?])/g, "$1")
+    .trim();
+  if (hadUrl) {
+    // Acrescenta cue natural sem ler o endereço
+    const cue = " Pra não te confundir com o endereço, é só tocar no link que eu mandei aqui em cima na conversa, tá?";
+    cleaned = cleaned.length ? `${cleaned}${cue}` : cue.trim();
+  }
+  return cleaned;
+}
+
 async function sendVoiceReply(phone: string, text: string, preferredVoiceId = VOICE_BRISA): Promise<boolean> {
-  const audioB64 = await synthesizeVoice(text, preferredVoiceId);
+  const spoken = sanitizeForSpeech(text);
+  if (!spoken) return false;
+  const audioB64 = await synthesizeVoice(spoken, preferredVoiceId);
   if (!audioB64) return false;
   const response = await sendWhatsAppAudio(phone, audioB64).catch((e) => {
     console.error("[brisa-bot] sendVoiceReply failed", e);

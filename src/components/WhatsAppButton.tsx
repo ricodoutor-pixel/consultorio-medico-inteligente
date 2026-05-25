@@ -68,6 +68,7 @@ export const WhatsAppButton = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
   const isPlansRoute = location.pathname === "/planos" || location.pathname === "/precos";
+  const isSaudeVerdeRoute = location.pathname.startsWith("/saude-verde") || location.pathname === "/cartao-saude";
   const buttonSize = isDenseCatalogRoute ? 56 : 64;
 
   useEffect(() => {
@@ -214,9 +215,11 @@ export const WhatsAppButton = () => {
 
       <button
         onClick={() => setIsOpen((o) => !o)}
-        className="relative p-1.5 rounded-full shadow-2xl hover:scale-110 transition-transform duration-300 flex items-center justify-center glow-green overflow-hidden"
+          className={`relative p-1.5 rounded-full transition-transform duration-300 flex items-center justify-center overflow-hidden ${isSaudeVerdeRoute ? "shadow-lg" : "shadow-2xl hover:scale-110 glow-green"}`}
         style={{
-          background: "linear-gradient(135deg, hsl(152 100% 74% / 0.25), hsl(152 100% 74% / 0.10))",
+            background: isSaudeVerdeRoute
+              ? "hsl(var(--card))"
+              : "linear-gradient(135deg, hsl(152 100% 74% / 0.25), hsl(152 100% 74% / 0.10))",
           border: "2px solid hsl(152 100% 74% / 0.5)",
           width: buttonSize,
           height: buttonSize,

@@ -6,7 +6,8 @@ import { BRISA_PERSONA } from "./brisa-persona.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-// 🔑 IA direta Google (sem Lovable AI Gateway). Suporta ambas as chaves.
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
+const LOVABLE_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const GEMINI_API_KEY =
   Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") ||
   Deno.env.get("GEMINI_API_KEY") ||
@@ -34,6 +35,7 @@ type BreakerState = { failures: number; openedAt: number };
 const BREAKER_THRESHOLD = 3;
 const BREAKER_COOLDOWN_MS = 60_000;
 const _breaker: Record<string, BreakerState> = {
+  lovable: { failures: 0, openedAt: 0 },
   gemini: { failures: 0, openedAt: 0 },
 };
 function isOpen(provider: string): boolean {
@@ -71,6 +73,14 @@ const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL") || "";
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
 
+function normalizePhone(value: string): string {
+  return String(value || "").replace(/\D/g, "");
+}
+
+function isQuotaOrBillingFailure(status: number, detail: string): boolean {
+  return status === 402 || status === 429 || /quota|rate limit|payment required|billing/i.test(detail);
+}
+
 async function alertEdilson(errorId: string, context: string, detail: string) {
   if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) return;
   const text = `[ALERTA BRISA] Falha de IA. Log: ${errorId}\nCtx: ${context}\n${detail.slice(0, 400)}`;
@@ -94,13 +104,26 @@ export async function brisaHeartbeatAlert(endpoint: string, log: string) {
 export type BrisaCallResult = {
   ok: boolean;
   reply: string;
-  provider: "gemini" | "breaker" | "none";
+  provider: "lovable" | "gemini" | "breaker" | "none";
   http_status?: number;
   error?: string;
   latency_ms: number;
 };
 
-async function callProvider(_provider: "gemini", body: Record<string, unknown>): Promise<Response> {
+async function callProvider(provider: "lovable" | "gemini", body: Record<string, unknown>): Promise<Response> {
+  if (provider === "lovable") {
+    return fetch(LOVABLE_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...body,
+        model: String((body as any).model || DEFAULT_MODEL).startsWith("google/")
+          ? String((body as any).model || DEFAULT_MODEL)
+          : `google/${stripPrefix(String((body as any).model || DEFAULT_MODEL))}`,
+      }),
+    });
+  }
+
   return fetch(GEMINI_URL, {
     method: "POST",
     headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
@@ -108,7 +131,7 @@ async function callProvider(_provider: "gemini", body: Record<string, unknown>):
   });
 }
 
-// 🎯 Função principal — UNIFICA todas as chamadas IA da Brisa (Google Gemini direto)
+// 🎯 Função principal — UNIFICA todas as chamadas IA da Brisa
 export async function processar_triagem_brisa(
   mensagem: string,
   usuario_id: string,
@@ -144,7 +167,8 @@ export async function processar_triagem_brisa(
   };
   if (options?.response_format) body.response_format = options.response_format;
 
-  const order: Array<"gemini"> = [];
+  const order: Array<"lovable" | "gemini"> = [];
+  if (LOVABLE_API_KEY) order.push("lovable");
   if (GEMINI_API_KEY) order.push("gemini");
 
   let lastErr = "no_provider";
@@ -185,6 +209,10 @@ export async function processar_triagem_brisa(
         lastErr = errText.slice(0, 400);
         lastStatus = r.status;
         console.error(`[brisa-ai] ${provider} attempt ${attempt}/${MAX_ATTEMPTS} HTTP ${r.status}`, errText.slice(0, 200));
+        if (provider === "lovable" && isQuotaOrBillingFailure(r.status, errText)) {
+          recordFailure(provider);
+          break;
+        }
         // 401/403 = chave inválida — não adianta repetir
         if (r.status === 401 || r.status === 403) { recordFailure(provider); break; }
         if (attempt < MAX_ATTEMPTS) {
@@ -204,8 +232,12 @@ export async function processar_triagem_brisa(
   // ❌ Todos os provedores + retries falharam — NUNCA expõe instabilidade ao usuário
   const errorId = crypto.randomUUID().slice(0, 8);
   const reply = BRISA_BREAKER_FALLBACK_MESSAGE;
-  // Dispara alerta INTERNO ao Dr. Edilson (não bloqueia)
-  alertEdilson(errorId, `canal=${canal} usuario=${usuario_id}`, `${lastStatus} ${lastErr}`).catch(() => {});
+  const sameAsAdmin = normalizePhone(usuario_id) && normalizePhone(usuario_id) === normalizePhone(ADMIN_WHATSAPP);
+  const quotaLikeFailure = isQuotaOrBillingFailure(lastStatus, lastErr);
+  // Dispara alerta INTERNO ao Dr. Edilson apenas quando fizer sentido e sem poluir o próprio chat de teste.
+  if (!sameAsAdmin && !quotaLikeFailure) {
+    alertEdilson(errorId, `canal=${canal} usuario=${usuario_id}`, `${lastStatus} ${lastErr}`).catch(() => {});
+  }
   const result: BrisaCallResult = {
     ok: false, reply, provider: "breaker",
     http_status: lastStatus || undefined, error: `${errorId}:${lastErr}`, latency_ms: Date.now() - t0,

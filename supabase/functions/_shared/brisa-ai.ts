@@ -35,7 +35,6 @@ const BREAKER_THRESHOLD = 3;
 const BREAKER_COOLDOWN_MS = 60_000;
 const _breaker: Record<string, BreakerState> = {
   gemini: { failures: 0, openedAt: 0 },
-  lovable: { failures: 0, openedAt: 0 },
 };
 function isOpen(provider: string): boolean {
   const s = _breaker[provider];

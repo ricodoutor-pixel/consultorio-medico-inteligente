@@ -11,7 +11,8 @@ const corsHeaders = {
 
 const GRAPH_API = "https://graph.facebook.com/v19.0";
 
-import { AUTO_POST_SYSTEM_PROMPT, pickTopic, sanitizeCaption } from "../_shared/auto-post-topics.ts";
+import { AUTO_POST_SYSTEM_PROMPT, pickImageFromPool, pickTopic, sanitizeCaption } from "../_shared/auto-post-topics.ts";
+import { generateGeminiImageForTopic } from "../_shared/gemini-image-gen.ts";
 
 async function generatePost(): Promise<string> {
   const GEMINI_API_KEY =
@@ -85,6 +86,7 @@ Deno.serve(async (req) => {
   let message: string;
   let imageUrl: string | null = null;
 
+  const topic = pickTopic();
   if (queued) {
     message = (queued.caption || queued.script || "").trim();
     if (queued.hashtags?.length) message += "\n\n" + queued.hashtags.map((t: string) => (t.startsWith("#") ? t : `#${t}`)).join(" ");
@@ -92,6 +94,13 @@ Deno.serve(async (req) => {
   } else {
     message = await generatePost();
   }
+  // Sempre tenta gerar imagem via Gemini (Nano Banana); fallback no pool Pexels
+  if (!imageUrl) {
+    const gen = await generateGeminiImageForTopic(topic);
+    imageUrl = gen.url || await pickImageFromPool(supabase);
+    if (gen.error) console.error("[fb-auto-post] gemini image fallback:", gen.error);
+  }
+
 
   // 2) Publicar no Facebook
   let fbResult: unknown;

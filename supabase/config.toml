@@ -27,3 +27,5 @@ project_id = "shmbwdjuddvquszwkvuq"
     verify_jwt = false
   [functions.handle-email-suppression]
     verify_jwt = false
+  [functions.ai-error-gateway]
+    verify_jwt = false

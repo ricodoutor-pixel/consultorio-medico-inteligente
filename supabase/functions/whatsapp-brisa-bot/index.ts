@@ -25,6 +25,10 @@ const BRISA_MODEL = "google/gemini-2.5-flash";
 const BRISA_LITE_MODEL = "google/gemini-2.5-flash-lite";
 const stripPrefix = (m: string) => m.replace(/^google\//, "");
 
+function shouldAvoidGeminiFallback(status: number): boolean {
+  return status === 402 || status === 429;
+}
+
 // Lovable AI Gateway primeiro (cota maior + sem 429 do free tier).
 // Se falhar (402/429/5xx) e existir GEMINI_API_KEY, cai pra Gemini direto.
 async function aiChat(body: Record<string, unknown>): Promise<Response | null> {
@@ -40,6 +44,7 @@ async function aiChat(body: Record<string, unknown>): Promise<Response | null> {
       });
       if (res.ok) return res;
       console.error("[brisa-bot] Lovable AI Gateway status", res.status);
+      if (shouldAvoidGeminiFallback(res.status)) return res;
       if (!GEMINI_API_KEY) return res; // sem fallback, devolve a resposta de erro
     } catch (e) {
       console.error("[brisa-bot] Lovable AI exception", String(e));

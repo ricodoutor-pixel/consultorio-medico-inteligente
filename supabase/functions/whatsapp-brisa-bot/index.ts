@@ -409,19 +409,22 @@ serve(async (req) => {
       data?.message?.extendedTextMessage?.text ||
       data?.message?.imageMessage?.caption ||
       "";
+    let audioUnderstanding: AudioUnderstanding | null = null;
 
     // 🎙️ AUDIO: transcribe if Brisa received a voice message
     const audioMsg = data?.message?.audioMessage;
     if (!messageText && audioMsg) {
       const audio = await fetchEvolutionAudio(data);
       if (audio?.base64) {
-        const transcript = await transcribeAudio(audio.base64, audio.mime);
-        if (transcript) {
-          messageText = `[🎙️ áudio transcrito] ${transcript}`;
+        audioUnderstanding = await transcribeAudio(audio.base64, audio.mime);
+        if (audioUnderstanding.transcript) {
+          messageText = `[🎙️ áudio transcrito] ${audioUnderstanding.transcript}`;
         }
       }
       if (!messageText) {
-        await sendWhatsApp(phone, "Recebi seu áudio, mas não consegui processá-lo. Por gentileza, envie por texto que eu te respondo em seguida. 🌿");
+        const fallbackText = "Ouvi seu áudio, mas ele veio com falha aqui pra mim. Se você quiser, pode mandar outro áudio mais curtinho que eu continuo te acompanhando por aqui. 🌿";
+        await sendWhatsApp(phone, fallbackText);
+        await sendVoiceReply(phone, fallbackText);
         return new Response(JSON.stringify({ ok: true, skipped: "audio_unreadable" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -547,30 +550,36 @@ serve(async (req) => {
       content: r.message,
     }));
 
-    const reply = await callBrisaAI(messageText, history, phone);
+    const wantsAudioReply = shouldUseAudioReply(messageText, history, audioUnderstanding);
+    const seniorCareStyle = shouldUseSeniorCareStyle(messageText, history, audioUnderstanding);
+    const reply = await callBrisaAI(messageText, history, phone, {
+      wantsAudioReply,
+      seniorCareStyle,
+      audioNotes: audioUnderstanding?.notes,
+    });
     await sendWhatsApp(phone, reply);
 
-    // 🎙️ Se o usuário mandou áudio OU pediu p/ ouvir voz, Brisa responde também em áudio
-    const wasAudio = messageText.startsWith("[🎙️ áudio transcrito]");
-    const askedVoice = /\b(audio|áudio|voz|me manda um audio|fala comigo|quero ouvir)\b/i.test(messageText);
-    if (wasAudio || askedVoice) {
+    // 🎙️ Responde em áudio sempre que a conversa indicar preferência por voz/leitura assistida
+    if (wantsAudioReply) {
       const isEdilson = /dr\.?\s*edilson|doutor\s*edilson/i.test(reply);
       const voiceId = isEdilson ? VOICE_EDILSON : VOICE_BRISA;
-      const audioB64 = await synthesizeVoice(reply, voiceId);
-      if (audioB64) {
-        await sendWhatsAppAudio(phone, audioB64).catch((e) => console.error("[brisa-bot] sendAudio failed", e));
-      }
+      await sendVoiceReply(phone, reply, voiceId);
     }
 
     await supabase.from("whatsapp_brisa_log").insert({
-      phone, direction: "outbound", message: reply, raw: { ai: true, voice: wasAudio || askedVoice },
+      phone, direction: "outbound", message: reply, raw: {
+        ai: true,
+        voice: wantsAudioReply,
+        senior_care_style: seniorCareStyle,
+        audio_notes: audioUnderstanding?.notes || null,
+      },
     }).then(() => {}).catch(() => {});
 
     if (unifiedContactId) {
       await logUnifiedMessage({
         contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
         content: reply, intent: "ai_reply",
-        messageType: (wasAudio || askedVoice) ? "audio" : "text",
+        messageType: wantsAudioReply ? "audio" : "text",
       });
     }
 

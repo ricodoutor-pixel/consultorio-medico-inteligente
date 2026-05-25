@@ -47,6 +47,11 @@ export default function SaudeVerdeLanding() {
       .then(({ data }) => setPlans((data as unknown as Plan[]) || []));
   }, []);
 
+  useEffect(() => {
+    document.body.classList.add("saude-verde-page");
+    return () => document.body.classList.remove("saude-verde-page");
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>

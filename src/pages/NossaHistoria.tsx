@@ -90,11 +90,34 @@ export default function NossaHistoria() {
               <iframe
                 id="yt-historia"
                 className="absolute top-0 left-0 w-full h-full rounded-2xl"
-                src="https://www.youtube.com/embed/pgGSJnoO4nE?rel=1&modestbranding=1"
+                src="https://www.youtube.com/embed/pgGSJnoO4nE?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&playlist=pgGSJnoO4nE&loop=0"
                 title="Nossa História — Planta y Raiz"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
+              <button
+                type="button"
+                onClick={(e) => {
+                  const iframe = document.getElementById("yt-historia") as HTMLIFrameElement | null;
+                  iframe?.contentWindow?.postMessage(
+                    JSON.stringify({ event: "command", func: "unMute", args: [] }),
+                    "*"
+                  );
+                  iframe?.contentWindow?.postMessage(
+                    JSON.stringify({ event: "command", func: "setVolume", args: [100] }),
+                    "*"
+                  );
+                  iframe?.contentWindow?.postMessage(
+                    JSON.stringify({ event: "command", func: "playVideo", args: [] }),
+                    "*"
+                  );
+                  (e.currentTarget as HTMLButtonElement).style.display = "none";
+                }}
+                className="absolute top-3 right-3 z-10 rounded-full bg-[#22C55E] px-4 py-2 text-sm font-bold text-black shadow-lg hover:bg-[#16A34A] transition-colors"
+                aria-label="Ativar som do vídeo"
+              >
+                🔊 Ativar som
+              </button>
             </div>
           </motion.div>
 

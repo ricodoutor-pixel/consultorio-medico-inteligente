@@ -404,6 +404,23 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
   overflow: hidden;
 }
 
+/* Guarda anti-glitch GPU em mobile na página /saude-verde
+   (Chrome Android compõe mal radial-gradient absoluto + bg-clip-text → scanlines verde/roxo) */
+@media (max-width: 767px) {
+  .saude-verde-hero {
+    background-image: none !important;
+    background: hsl(var(--background)) !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+  }
+  .saude-verde-hero canvas,
+  .saude-verde-hero [class*="noise"],
+  .saude-verde-hero [class*="grain"],
+  .saude-verde-hero [class*="particles"] {
+    display: none !important;
+  }
+}
+
 @media print {
   nav,
   footer,

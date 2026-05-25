@@ -206,11 +206,129 @@ async function sendWhatsAppAudio(number: string, base64Audio: string) {
 
 // 🎙️ ElevenLabs TTS — voz feminina sensual PT-BR (Laura) p/ Brisa, masculina firme (George) p/ Dr. Edilson
 const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY") || "";
+const GOOGLE_TTS_SERVICE_ACCOUNT_JSON = Deno.env.get("GOOGLE_TTS_SERVICE_ACCOUNT_JSON") || "";
 const VOICE_BRISA = "FGY2WhTYpPnrIDTdsKH5";   // Laura — feminina jovem, calorosa
 const VOICE_EDILSON = "JBFqnCBsd6RMkjVDRZzb"; // George — masculina firme, profissional
 
+type GoogleServiceAccount = {
+  client_email: string;
+  private_key: string;
+  token_uri?: string;
+};
+
+let googleTtsTokenCache: { token: string; expiresAt: number } | null = null;
+
+function toBase64Url(bytes: Uint8Array): string {
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function pemToArrayBuffer(pem: string): ArrayBuffer {
+  const cleaned = pem
+    .replace("-----BEGIN PRIVATE KEY-----", "")
+    .replace("-----END PRIVATE KEY-----", "")
+    .replace(/\s+/g, "");
+  const binary = atob(cleaned);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+async function getGoogleTtsAccessToken(): Promise<string | null> {
+  if (!GOOGLE_TTS_SERVICE_ACCOUNT_JSON) return null;
+  if (googleTtsTokenCache && googleTtsTokenCache.expiresAt > Date.now() + 60_000) {
+    return googleTtsTokenCache.token;
+  }
+  try {
+    const serviceAccount = JSON.parse(GOOGLE_TTS_SERVICE_ACCOUNT_JSON) as GoogleServiceAccount;
+    const now = Math.floor(Date.now() / 1000);
+    const encoder = new TextEncoder();
+    const tokenUri = serviceAccount.token_uri || "https://oauth2.googleapis.com/token";
+    const jwtHeader = toBase64Url(encoder.encode(JSON.stringify({ alg: "RS256", typ: "JWT" })));
+    const jwtPayload = toBase64Url(encoder.encode(JSON.stringify({
+      iss: serviceAccount.client_email,
+      scope: "https://www.googleapis.com/auth/cloud-platform",
+      aud: tokenUri,
+      iat: now,
+      exp: now + 3600,
+    })));
+    const unsignedToken = `${jwtHeader}.${jwtPayload}`;
+    const privateKey = await crypto.subtle.importKey(
+      "pkcs8",
+      pemToArrayBuffer(serviceAccount.private_key),
+      { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+      false,
+      ["sign"],
+    );
+    const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", privateKey, encoder.encode(unsignedToken));
+    const assertion = `${unsignedToken}.${toBase64Url(new Uint8Array(signature))}`;
+    const tokenResponse = await fetch(tokenUri, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        assertion,
+      }),
+    });
+    if (!tokenResponse.ok) {
+      console.error("[brisa-bot] Google TTS auth failed", tokenResponse.status, await tokenResponse.text().catch(() => ""));
+      return null;
+    }
+    const tokenData = await tokenResponse.json();
+    const token = String(tokenData?.access_token || "");
+    const expiresIn = Math.max(300, Number(tokenData?.expires_in) || 3600);
+    if (!token) return null;
+    googleTtsTokenCache = { token, expiresAt: Date.now() + expiresIn * 1000 };
+    return token;
+  } catch (e) {
+    console.error("[brisa-bot] Google TTS token error", e);
+    return null;
+  }
+}
+
+async function synthesizeVoiceWithGoogle(text: string, voiceId: string): Promise<string | null> {
+  const token = await getGoogleTtsAccessToken();
+  if (!token || !text) return null;
+  try {
+    const isEdilson = voiceId === VOICE_EDILSON;
+    const response = await fetch("https://texttospeech.googleapis.com/v1/text:synthesize", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        input: { text: text.replace(/[*_`#]/g, "").slice(0, 900) },
+        voice: {
+          languageCode: "pt-BR",
+          ssmlGender: isEdilson ? "MALE" : "FEMALE",
+        },
+        audioConfig: {
+          audioEncoding: "MP3",
+          speakingRate: isEdilson ? 0.98 : 1.01,
+          pitch: isEdilson ? -1 : 1,
+        },
+      }),
+    });
+    if (!response.ok) {
+      console.error("[brisa-bot] Google TTS failed", response.status, await response.text().catch(() => ""));
+      return null;
+    }
+    const data = await response.json();
+    return String(data?.audioContent || "") || null;
+  } catch (e) {
+    console.error("[brisa-bot] Google TTS synth error", e);
+    return null;
+  }
+}
+
 async function synthesizeVoice(text: string, voiceId: string): Promise<string | null> {
-  if (!ELEVENLABS_API_KEY || !text) return null;
+  if (!text) return null;
+  if (!ELEVENLABS_API_KEY) return await synthesizeVoiceWithGoogle(text, voiceId);
   try {
     // Limita a 600 chars p/ não estourar quota free
     const cleanText = text.replace(/[*_`#]/g, "").slice(0, 600);
@@ -232,7 +350,9 @@ async function synthesizeVoice(text: string, voiceId: string): Promise<string | 
     );
     if (!r.ok) {
       console.error("[brisa-bot] ElevenLabs TTS failed:", r.status, await r.text().catch(() => ""));
-      return null;
+      const googleAudio = await synthesizeVoiceWithGoogle(cleanText, voiceId);
+      if (googleAudio) console.log("[brisa-bot] Google TTS fallback used after ElevenLabs failure");
+      return googleAudio;
     }
     const buf = new Uint8Array(await r.arrayBuffer());
     // base64 sem stack overflow
@@ -244,7 +364,7 @@ async function synthesizeVoice(text: string, voiceId: string): Promise<string | 
     return btoa(binary);
   } catch (e) {
     console.error("[brisa-bot] synthesizeVoice error:", e);
-    return null;
+    return await synthesizeVoiceWithGoogle(text, voiceId);
   }
 }
 
@@ -541,8 +661,16 @@ serve(async (req) => {
       });
     }
 
+    const history = (rows || []).reverse().map((r: any) => ({
+      role: r.direction === "inbound" ? "user" : "assistant",
+      content: r.message,
+    }));
+
+    const wantsAudioReply = shouldUseAudioReply(messageText, history, audioUnderstanding);
+    const seniorCareStyle = shouldUseSeniorCareStyle(messageText, history, audioUnderstanding);
+
     // 🌿 MÓDULO 1 — Boas-vindas APENAS no 1º contato real ou após 24h de silêncio.
-    // Critério à prova de race: olhar o último OUTBOUND de welcome enviado p/ este phone.
+    // Se a pessoa pediu áudio, a mesma mensagem de boas-vindas sai também em voz.
     const { data: lastWelcome } = await supabase
       .from("whatsapp_brisa_log")
       .select("created_at")
@@ -557,29 +685,31 @@ serve(async (req) => {
       : Infinity;
     if (hoursSinceWelcome >= 24) {
       await sendWhatsApp(phone, BRISA_WELCOME_MESSAGE);
+      if (wantsAudioReply) {
+        await sendVoiceReply(phone, BRISA_WELCOME_MESSAGE, VOICE_BRISA);
+      }
       await supabase.from("whatsapp_brisa_log").insert({
         phone, direction: "outbound", message: BRISA_WELCOME_MESSAGE,
-        raw: { trigger: "welcome_24h" },
+        raw: { trigger: "welcome_24h", voice: wantsAudioReply },
       });
       if (unifiedContactId) {
         await logUnifiedMessage({
           contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
           content: BRISA_WELCOME_MESSAGE, intent: "welcome_24h",
+          messageType: wantsAudioReply ? "audio" : "text",
         });
       }
-      await logGrowth("welcome_sent", "brisa_omnichannel", { channel: "whatsapp", phone, link: "https://plantayraiz.com.br" });
-      return new Response(JSON.stringify({ ok: true, welcome: true }), {
+      await logGrowth("welcome_sent", "brisa_omnichannel", {
+        channel: "whatsapp",
+        phone,
+        link: "https://plantayraiz.com.br",
+        voice: wantsAudioReply,
+      });
+      return new Response(JSON.stringify({ ok: true, welcome: true, voice: wantsAudioReply }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const history = (rows || []).reverse().map((r: any) => ({
-      role: r.direction === "inbound" ? "user" : "assistant",
-      content: r.message,
-    }));
-
-    const wantsAudioReply = shouldUseAudioReply(messageText, history, audioUnderstanding);
-    const seniorCareStyle = shouldUseSeniorCareStyle(messageText, history, audioUnderstanding);
     const reply = await callBrisaAI(messageText, history, phone, {
       wantsAudioReply,
       seniorCareStyle,

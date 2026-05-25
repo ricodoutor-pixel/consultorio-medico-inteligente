@@ -815,7 +815,7 @@ serve(async (req) => {
       } else {
         // Fallback: áudio falhou → manda texto completo pra não deixar o paciente sem resposta
         console.warn("[brisa-bot] audio failed, falling back to full text");
-        await sendWhatsApp(phone, reply);
+        await sendWhatsApp(phone, buildHonestTextFallback(reply));
       }
     } else {
       await sendWhatsApp(phone, reply);

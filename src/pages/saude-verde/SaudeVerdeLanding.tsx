@@ -55,14 +55,14 @@ export default function SaudeVerdeLanding() {
         <link rel="canonical" href="https://plantayraiz.com.br/saude-verde" />
       </Helmet>
 
-      {/* HERO */}
-      <section className="relative overflow-hidden py-20 md:py-28 bg-gradient-to-br from-primary/10 via-background to-background">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.15),transparent_60%)]" />
-        <div className="container relative mx-auto px-4 text-center max-w-5xl">
+      {/* HERO — background sólido em mobile (evita glitch GPU Android com radial + bg-clip-text) */}
+      <section className="saude-verde-hero relative overflow-hidden py-20 md:py-28 md:bg-gradient-to-br md:from-primary/10 md:via-background md:to-background" style={{ backgroundColor: 'hsl(var(--background))' }}>
+        <div className="hidden md:block absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.15),transparent_60%)] pointer-events-none" />
+        <div className="container relative z-10 mx-auto px-4 text-center max-w-5xl">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
             <Leaf className="w-4 h-4" /> Novo módulo Planta y Raiz
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-emerald-400 to-primary bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 md:bg-gradient-to-r md:from-primary md:via-emerald-400 md:to-primary md:bg-clip-text md:text-transparent text-primary">
             Cartão Saúde Verde
           </h1>
           <p className="text-lg md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
@@ -88,9 +88,9 @@ export default function SaudeVerdeLanding() {
       <section className="py-20 container mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3">Tudo o que você precisa em um só cartão</h2>
         <p className="text-center text-muted-foreground mb-12">Saúde sem complicação, na rede inteira da Planta y Raiz.</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4">
           {benefits.map((b, i) => (
-            <Card key={i} className="p-5 border-border/50">
+            <Card key={i} className="relative z-10 p-5 border-border/50 bg-card">
               <b.icon className="w-8 h-8 text-primary mb-3" />
               <div className="font-semibold mb-1">{b.title}</div>
               <div className="text-sm text-muted-foreground">{b.desc}</div>

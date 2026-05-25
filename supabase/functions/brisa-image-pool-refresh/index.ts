@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
   ]).sort(() => Math.random() - 0.5).slice(0, count);
 
   for (const job of jobs) {
-    const img = await generateImage(job.prompt, lovableKey);
+    const img = await generateImage(job.prompt, geminiKey);
     if (!img) { results.push({ theme: job.theme, error: "gen_failed" }); continue; }
     const bytes = Uint8Array.from(atob(img.b64), (c) => c.charCodeAt(0));
     const ext = img.mime.includes("jpeg") ? "jpg" : "png";

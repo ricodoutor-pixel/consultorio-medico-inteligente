@@ -43,6 +43,7 @@ const ComoFunciona = lazyWithRecovery(() => import("./pages/ComoFunciona"), { so
 const Profissionais = lazyWithRecovery(() => import("./pages/Profissionais"), { sourceRef: "/profissionais" });
 const Shopping = lazyWithRecovery(() => import("./pages/Shopping"), { sourceRef: "/shopping" });
 const Precos = lazyWithRecovery(() => import("./pages/Precos"), { sourceRef: "/precos" });
+const SaudeDigital = lazyWithRecovery(() => import("./pages/SaudeDigital"), { sourceRef: "/saude-digital" });
 const FAQ = lazyWithRecovery(() => import("./pages/FAQ"), { sourceRef: "/faq" });
 const Contato = lazyWithRecovery(() => import("./pages/Contato"), { sourceRef: "/contato" });
 const Pay = lazyWithRecovery(() => import("./pages/Pay"), { sourceRef: "/pay" });
@@ -217,6 +218,7 @@ const App = () => (
                 <Route path="/shopping/:id" element={<Shopping />} />
                 <Route path="/planos" element={<Precos />} />
                 <Route path="/precos" element={<Precos />} />
+                <Route path="/saude-digital" element={<SaudeDigital />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/contato" element={<Contato />} />
                 <Route path="/pay" element={<Pay />} />

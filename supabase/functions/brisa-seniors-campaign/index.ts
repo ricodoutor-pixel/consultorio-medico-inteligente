@@ -35,24 +35,25 @@ function buildCaption(hook: string): string {
   return body + "\n\n" + HASHTAGS.slice(0, 6).map((h) => `#${h}`).join(" ");
 }
 
-async function genImage(prompt: string, lovableKey: string): Promise<{ b64: string; mime: string } | null> {
+async function genImage(prompt: string, geminiKey: string): Promise<{ b64: string; mime: string } | null> {
   try {
-    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${lovableKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-3.1-flash-image-preview",
-        messages: [{ role: "user", content: prompt }],
-        modalities: ["image", "text"],
-      }),
-    });
-    if (!r.ok) { console.error("[seniors] AI fail", r.status, await r.text()); return null; }
+    const r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${geminiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
+        }),
+      },
+    );
+    if (!r.ok) { console.error("[seniors] Google Gemini fail", r.status, await r.text()); return null; }
     const j = await r.json();
-    const img = j?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    if (!img?.startsWith("data:image")) return null;
-    const [meta, b64] = img.split(",");
-    const mime = meta.match(/data:([^;]+)/)?.[1] || "image/png";
-    return { b64, mime };
+    const parts = j?.candidates?.[0]?.content?.parts || [];
+    const inline = parts.find((p: any) => p?.inlineData?.data)?.inlineData;
+    if (!inline?.data) return null;
+    return { b64: inline.data, mime: inline.mimeType || "image/png" };
   } catch (e) { console.error("[seniors] gen err", e); return null; }
 }
 
@@ -61,9 +62,12 @@ Deno.serve(async (req) => {
   const unauth = requireServiceAuth(req, cors);
   if (unauth) return unauth;
 
-  const lovableKey = Deno.env.get("LOVABLE_API_KEY");
-  if (!lovableKey) {
-    return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), {
+  const geminiKey =
+    Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") ||
+    Deno.env.get("GEMINI_API_KEY") ||
+    "";
+  if (!geminiKey) {
+    return new Response(JSON.stringify({ error: "GOOGLE_GENERATIVE_AI_API_KEY missing" }), {
       status: 500, headers: { ...cors, "Content-Type": "application/json" },
     });
   }

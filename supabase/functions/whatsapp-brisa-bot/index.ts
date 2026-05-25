@@ -113,24 +113,52 @@ async function getBrisaSystemPrompt(): Promise<string> {
   return _promptCache.value;
 }
 
-async function transcribeAudio(base64Audio: string, mimeType: string): Promise<string> {
+type AudioUnderstanding = {
+  transcript: string;
+  needsAudioReply: boolean;
+  seniorCareStyle: boolean;
+  notes: string;
+};
+
+async function transcribeAudio(base64Audio: string, mimeType: string): Promise<AudioUnderstanding> {
   if (!HAS_AI_KEY) return "";
   try {
     const fmt = mimeType.includes("mp3") || mimeType.includes("mpeg") ? "mp3" : "wav";
     const resp = await aiChat({
       model: BRISA_MODEL,
+      response_format: { type: "json_object" },
       messages: [{
         role: "user",
         content: [
-          { type: "text", text: "Transcreva exatamente este áudio em português brasileiro. Responda APENAS com a transcrição, sem comentários." },
+          {
+            type: "text",
+            text: "Analise este áudio em português brasileiro e responda APENAS JSON com as chaves transcript, needs_audio_reply, senior_care_style e notes. Em transcript, escreva a fala literal. Em needs_audio_reply, marque true quando a pessoa deixar claro que prefere ouvir a resposta. Em senior_care_style, marque true quando houver sinais de idade avançada, fala lenta, confusão, fragilidade, dificuldade para ler ou necessidade de condução mais paciente. Em notes, resuma em uma frase curta o tipo de acolhimento ideal.",
+          },
           { type: "input_audio", input_audio: { data: base64Audio, format: fmt } },
         ],
       }],
     });
-    if (!resp || !resp.ok) { console.error("[brisa-bot] STT error", resp?.status, await resp?.text().catch(() => "")); return ""; }
+    if (!resp || !resp.ok) {
+      console.error("[brisa-bot] STT error", resp?.status, await resp?.text().catch(() => ""));
+      return { transcript: "", needsAudioReply: true, seniorCareStyle: false, notes: "" };
+    }
     const data = await resp.json();
-    return (data?.choices?.[0]?.message?.content || "").trim();
-  } catch (e) { console.error("[brisa-bot] transcribeAudio failed", e); return ""; }
+    const raw = (data?.choices?.[0]?.message?.content || "").trim();
+    try {
+      const parsed = JSON.parse(raw);
+      return {
+        transcript: String(parsed?.transcript || "").trim(),
+        needsAudioReply: Boolean(parsed?.needs_audio_reply),
+        seniorCareStyle: Boolean(parsed?.senior_care_style),
+        notes: String(parsed?.notes || "").trim(),
+      };
+    } catch {
+      return { transcript: raw, needsAudioReply: true, seniorCareStyle: false, notes: "" };
+    }
+  } catch (e) {
+    console.error("[brisa-bot] transcribeAudio failed", e);
+    return { transcript: "", needsAudioReply: true, seniorCareStyle: false, notes: "" };
+  }
 }
 
 async function fetchEvolutionAudio(messageData: any): Promise<{ base64: string; mime: string } | null> {
@@ -161,11 +189,19 @@ async function sendWhatsApp(number: string, text: string) {
 
 async function sendWhatsAppAudio(number: string, base64Audio: string) {
   const cleanPhone = number.replace(/\D/g, "");
-  return fetch(`${EVOLUTION_API_URL}/message/sendWhatsAppAudio/${EVOLUTION_INSTANCE}`, {
+  const response = await fetch(`${EVOLUTION_API_URL}/message/sendWhatsAppAudio/${EVOLUTION_INSTANCE}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
-    body: JSON.stringify({ number: cleanPhone, audio: base64Audio, delay: 1200, encoding: true }),
+    body: JSON.stringify({
+      number: cleanPhone,
+      audioMessage: { audio: base64Audio },
+      options: { delay: 1200, presence: "recording", encoding: true },
+    }),
   });
+  if (!response.ok) {
+    console.error("[brisa-bot] sendWhatsAppAudio failed", response.status, await response.text().catch(() => ""));
+  }
+  return response;
 }
 
 // 🎙️ ElevenLabs TTS — voz feminina sensual PT-BR (Laura) p/ Brisa, masculina firme (George) p/ Dr. Edilson
@@ -210,6 +246,31 @@ async function synthesizeVoice(text: string, voiceId: string): Promise<string | 
     console.error("[brisa-bot] synthesizeVoice error:", e);
     return null;
   }
+}
+
+const AUDIO_REPLY_PATTERNS = /\b([aá]udio|voz|ouvir|escutar|me fala|fale comigo|manda.*[aá]udio|responde.*[aá]udio|n[aã]o sei ler|n[aã]o consigo ler|tenho dificuldade pra ler|sou idos[oa]|sou senhor|sou senhora|fale devagar|explica devagar)\b/i;
+
+function shouldUseAudioReply(text: string, history: Array<{ role: string; content: string }>, audioUnderstanding: AudioUnderstanding | null): boolean {
+  if (text.startsWith("[🎙️ áudio transcrito]")) return true;
+  if (audioUnderstanding?.needsAudioReply) return true;
+  if (AUDIO_REPLY_PATTERNS.test(text)) return true;
+  return history.slice(-6).some((item) => item.role === "user" && AUDIO_REPLY_PATTERNS.test(item.content || ""));
+}
+
+function shouldUseSeniorCareStyle(text: string, history: Array<{ role: string; content: string }>, audioUnderstanding: AudioUnderstanding | null): boolean {
+  if (audioUnderstanding?.seniorCareStyle) return true;
+  if (/\b(idos[oa]|senhor[ae]?|aposentad[oa]|n[aã]o sei ler|n[aã]o consigo ler|fale devagar|explica devagar|tenho dificuldade pra ler)\b/i.test(text)) return true;
+  return history.slice(-6).some((item) => item.role === "user" && /\b(idos[oa]|senhor[ae]?|aposentad[oa]|n[aã]o sei ler|n[aã]o consigo ler|fale devagar|explica devagar|tenho dificuldade pra ler)\b/i.test(item.content || ""));
+}
+
+async function sendVoiceReply(phone: string, text: string, preferredVoiceId = VOICE_BRISA): Promise<boolean> {
+  const audioB64 = await synthesizeVoice(text, preferredVoiceId);
+  if (!audioB64) return false;
+  const response = await sendWhatsAppAudio(phone, audioB64).catch((e) => {
+    console.error("[brisa-bot] sendVoiceReply failed", e);
+    return null;
+  });
+  return Boolean(response?.ok);
 }
 
 async function classifySentiment(text: string): Promise<{ sentiment_score: number; is_negative: boolean }> {

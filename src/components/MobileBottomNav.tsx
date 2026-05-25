@@ -15,6 +15,7 @@ export const MobileBottomNav = () => {
   const navigate = useNavigate();
   const isDenseCatalogRoute = location.pathname.startsWith("/biblioteca");
   const isPlansRoute = location.pathname === "/planos" || location.pathname === "/precos";
+  const isSaudeVerdeRoute = location.pathname.startsWith("/saude-verde") || location.pathname === "/cartao-saude";
 
   // Hide on video call / admin pages
   const hiddenPaths = ["/consulta-video", "/videochamada", "/admin"];
@@ -23,7 +24,7 @@ export const MobileBottomNav = () => {
   return (
     <nav className={cn(
       "fixed bottom-0 left-0 right-0 z-50 border-t border-border pb-[env(safe-area-inset-bottom,0px)] xl:hidden",
-      isDenseCatalogRoute ? "bg-background/95" : "bg-black/95 backdrop-blur-xl"
+      isDenseCatalogRoute || isSaudeVerdeRoute ? "bg-background/95" : "bg-black/95 backdrop-blur-xl"
     )}>
 
       <div className="flex items-center justify-around h-16 px-2">

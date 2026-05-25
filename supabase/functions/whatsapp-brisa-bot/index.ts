@@ -183,8 +183,12 @@ async function synthesizeVoice(text: string, voiceId: string): Promise<string | 
         headers: { "xi-api-key": ELEVENLABS_API_KEY, "Content-Type": "application/json" },
         body: JSON.stringify({
           text: cleanText,
-          model_id: "eleven_multilingual_v2",
-          voice_settings: { stability: 0.45, similarity_boost: 0.8, style: 0.55, use_speaker_boost: true, speed: 1.0 },
+          // eleven_turbo_v2_5 → PT-BR mais natural, menos "metálico", latência baixa
+          model_id: "eleven_turbo_v2_5",
+          // stability 0.35 = mais expressiva e variável (humana, com respiração)
+          // similarity 0.85 = preserva o timbre feminino da Laura
+          // style 0.65 = entonação rica, pausas naturais
+          voice_settings: { stability: 0.35, similarity_boost: 0.85, style: 0.65, use_speaker_boost: true, speed: 1.02 },
         }),
       },
     );

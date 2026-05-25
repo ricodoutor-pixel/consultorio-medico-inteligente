@@ -419,6 +419,24 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
   .saude-verde-hero [class*="particles"] {
     display: none !important;
   }
+
+  body:has(.saude-verde-hero) .glass,
+  body:has(.saude-verde-hero) [class*="backdrop-blur"],
+  body:has(.saude-verde-hero) .glow-green,
+  body:has(.saude-verde-hero) .shadow-2xl {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  body:has(.saude-verde-hero) [role="dialog"][aria-label="Consentimento de Cookies — LGPD"],
+  body:has(.saude-verde-hero) nav.fixed.bottom-0,
+  body:has(.saude-verde-hero) .fixed.right-3,
+  body:has(.saude-verde-hero) .fixed.md\:right-6 {
+    transform: none !important;
+    will-change: auto !important;
+    background-image: none !important;
+  }
 }
 
 @media print {

@@ -135,14 +135,12 @@ export async function processar_triagem_brisa(
       }))),
       { role: "user", content: mensagem },
     ];
-  // 🌡️ Temperature 0.8 + top_p 0.95 → variabilidade humana, evita respostas "marcadas"
-  // presence_penalty 0.6 → desencoraja repetição de frases ("Olá! Sou a Enf. Brisa...")
+  // 🌡️ Temperature 0.8 + top_p 0.95 → variabilidade humana
+  // OBS: Gemini (OpenAI-compat) NÃO aceita presence_penalty/frequency_penalty → causa HTTP 400
   const body: Record<string, unknown> = {
     model, messages,
     temperature: 0.8,
     top_p: 0.95,
-    presence_penalty: 0.6,
-    frequency_penalty: 0.4,
   };
   if (options?.response_format) body.response_format = options.response_format;
 

@@ -11,6 +11,8 @@ import {
   sanitizeCaption,
   waitIgContainerReady,
 } from "../_shared/auto-post-topics.ts";
+import { generateGeminiImageForTopic } from "../_shared/gemini-image-gen.ts";
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

@@ -12,31 +12,56 @@ const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL")!;
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY")!;
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
 const EVOLUTION_WEBHOOK_SECRET = Deno.env.get("EVOLUTION_WEBHOOK_SECRET") || "";
-// 🔑 IA: Google Gemini DIRETO (sem Lovable AI Gateway).
+// 🔑 IA: Lovable AI Gateway (preferido) com fallback para Gemini direto.
+const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
 const GEMINI_API_KEY =
   Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") ||
   Deno.env.get("GEMINI_API_KEY") ||
   "";
-const HAS_AI_KEY = !!GEMINI_API_KEY;
+const HAS_AI_KEY = !!(LOVABLE_API_KEY || GEMINI_API_KEY);
+const LOVABLE_AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const GEMINI_AI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-const BRISA_MODEL = "gemini-2.5-flash";
-const BRISA_LITE_MODEL = "gemini-2.5-flash-lite";
+const BRISA_MODEL = "google/gemini-2.5-flash";
+const BRISA_LITE_MODEL = "google/gemini-2.5-flash-lite";
 const stripPrefix = (m: string) => m.replace(/^google\//, "");
 
-// Chamada direta à API do Google Gemini (OpenAI-compat). Sem fallback Lovable.
+// Lovable AI Gateway primeiro (cota maior + sem 429 do free tier).
+// Se falhar (402/429/5xx) e existir GEMINI_API_KEY, cai pra Gemini direto.
 async function aiChat(body: Record<string, unknown>): Promise<Response | null> {
-  if (!GEMINI_API_KEY) return null;
-  try {
-    return await fetch(GEMINI_AI_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ ...body, model: stripPrefix(String((body as Record<string, unknown>).model || BRISA_MODEL)) }),
-    });
-  } catch (e) {
-    console.error("[brisa-bot] Gemini direct exception", String(e));
-    return null;
+  if (!HAS_AI_KEY) return null;
+  const model = String((body as Record<string, unknown>).model || BRISA_MODEL);
+
+  if (LOVABLE_API_KEY) {
+    try {
+      const res = await fetch(LOVABLE_AI_URL, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ ...body, model: model.startsWith("google/") ? model : `google/${stripPrefix(model)}` }),
+      });
+      if (res.ok) return res;
+      console.error("[brisa-bot] Lovable AI Gateway status", res.status);
+      if (!GEMINI_API_KEY) return res; // sem fallback, devolve a resposta de erro
+    } catch (e) {
+      console.error("[brisa-bot] Lovable AI exception", String(e));
+      if (!GEMINI_API_KEY) return null;
+    }
   }
+
+  if (GEMINI_API_KEY) {
+    try {
+      return await fetch(GEMINI_AI_URL, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ ...body, model: stripPrefix(model) }),
+      });
+    } catch (e) {
+      console.error("[brisa-bot] Gemini direct exception", String(e));
+      return null;
+    }
+  }
+  return null;
 }
+
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 

@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
 
   for (let i = 0; i < count; i++) {
     const scene = SCENES[i % SCENES.length];
-    const img = await genImage(scene.scene, lovableKey);
+    const img = await genImage(scene.scene, geminiKey);
     if (!img) { results.push({ idx: i, ok: false, error: "image_gen_failed" }); continue; }
     const bytes = Uint8Array.from(atob(img.b64), (c) => c.charCodeAt(0));
     const ext = img.mime.includes("jpeg") ? "jpg" : "png";

@@ -729,14 +729,6 @@ serve(async (req) => {
       seniorCareStyle,
       audioNotes: audioUnderstanding?.notes,
     });
-    await sendWhatsApp(phone, reply);
-
-    // 🎙️ Responde em áudio sempre que a conversa indicar preferência por voz/leitura assistida
-    if (wantsAudioReply) {
-      const isEdilson = /dr\.?\s*edilson|doutor\s*edilson/i.test(reply);
-      const voiceId = isEdilson ? VOICE_EDILSON : VOICE_BRISA;
-      await sendVoiceReply(phone, reply, voiceId);
-    }
 
     // 🎙️ Quando usuário pede áudio (ou é idoso/baixa leitura): áudio é a resposta principal.
     // Texto só vai se o áudio falhar OU se houver link (TTS não lê URL — entrega o link em texto curto).

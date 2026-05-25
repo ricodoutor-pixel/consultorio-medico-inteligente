@@ -218,6 +218,53 @@ type GoogleServiceAccount = {
 
 let googleTtsTokenCache: { token: string; expiresAt: number } | null = null;
 
+function parseGoogleServiceAccountSecret(rawSecret: string): GoogleServiceAccount | null {
+  const trimmed = rawSecret.trim();
+  if (!trimmed) return null;
+
+  const candidates = new Set<string>();
+  candidates.add(trimmed);
+
+  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    candidates.add(trimmed.slice(1, -1));
+  }
+
+  const unescaped = trimmed.replace(/\\n/g, "\n").replace(/\\"/g, '"');
+  candidates.add(unescaped);
+
+  const braceMatch = trimmed.match(/\{[\s\S]*\}/);
+  if (braceMatch?.[0]) candidates.add(braceMatch[0]);
+
+  const maybeBase64 = trimmed.replace(/^base64:/i, "");
+  if (/^[A-Za-z0-9+/=_-]+$/.test(maybeBase64) && maybeBase64.length > 100) {
+    try {
+      const normalized = maybeBase64.replace(/-/g, "+").replace(/_/g, "/");
+      const decoded = atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "="));
+      candidates.add(decoded);
+    } catch {
+      // noop
+    }
+  }
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(candidate);
+      const resolved = typeof parsed === "string" ? JSON.parse(parsed) : parsed;
+      if (resolved?.client_email && resolved?.private_key) {
+        return {
+          client_email: String(resolved.client_email),
+          private_key: String(resolved.private_key).replace(/\\n/g, "\n"),
+          token_uri: resolved.token_uri ? String(resolved.token_uri) : undefined,
+        };
+      }
+    } catch {
+      // try next format
+    }
+  }
+
+  return null;
+}
+
 function toBase64Url(bytes: Uint8Array): string {
   let binary = "";
   const chunk = 0x8000;
@@ -244,7 +291,11 @@ async function getGoogleTtsAccessToken(): Promise<string | null> {
     return googleTtsTokenCache.token;
   }
   try {
-    const serviceAccount = JSON.parse(GOOGLE_TTS_SERVICE_ACCOUNT_JSON) as GoogleServiceAccount;
+    const serviceAccount = parseGoogleServiceAccountSecret(GOOGLE_TTS_SERVICE_ACCOUNT_JSON);
+    if (!serviceAccount) {
+      console.error("[brisa-bot] Google TTS secret format invalid — expected service account JSON or base64 JSON");
+      return null;
+    }
     const now = Math.floor(Date.now() / 1000);
     const encoder = new TextEncoder();
     const tokenUri = serviceAccount.token_uri || "https://oauth2.googleapis.com/token";
@@ -407,6 +458,23 @@ function sanitizeForSpeech(text: string): string {
     cleaned = cleaned.length ? `${cleaned}${cue}` : cue.trim();
   }
   return cleaned;
+}
+
+function buildHonestTextFallback(text: string): string {
+  const stripped = text
+    .replace(/você está me escutando agora[^.?!]*[.?!]?/gi, "")
+    .replace(/eu estou falando com você[^.?!]*áudio[^.?!]*[.?!]?/gi, "")
+    .replace(/tudo que eu escrevo aqui já é transformado em voz[^.?!]*[.?!]?/gi, "")
+    .replace(/então,? você está ouvindo a minha voz neste momento[^.?!]*[.?!]?/gi, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+
+  if (stripped !== text) {
+    return `Tive uma falha no áudio aqui, então vou te orientar por escrito, tá?\n\n${stripped}`.trim();
+  }
+
+  return stripped;
 }
 
 async function sendVoiceReply(phone: string, text: string, preferredVoiceId = VOICE_BRISA): Promise<boolean> {

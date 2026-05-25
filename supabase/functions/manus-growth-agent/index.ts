@@ -186,11 +186,11 @@ async function distribute(supa: any, runId: string, targets: GscRow[]) {
   if (!targets.length) return 0;
   const topQueries = targets.slice(0, 3).map((t) => t.keys[1]).join(", ");
 
-  const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+  const ai = await fetch(GEMINI_AI_URL, {
     method: "POST",
-    headers: { "Authorization": `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+    headers: { "Authorization": `Bearer ${GEMINI_AI_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
+      model: "gemini-2.5-flash",
       messages: [
         { role: "system", content: `Gere JSON {posts: [{platform: 'instagram'|'facebook'|'tiktok'|'youtube', topic, script, caption, hashtags: string[]}]} — 1 post por plataforma. Tom acolhedor, citar Dr. Edilson CRM 10963 e RDC 660. Mencionar Planta y Raiz.` },
         { role: "user", content: `Dores top-pesquisadas hoje: ${topQueries}. Gere posts para captar esse tráfego.` },
@@ -202,6 +202,7 @@ async function distribute(supa: any, runId: string, targets: GscRow[]) {
   const aiData = await ai.json();
   const parsed = JSON.parse(aiData.choices?.[0]?.message?.content || '{"posts":[]}');
   const posts = (parsed.posts || []).filter((p: any) => GUARDRAIL_REGEX.test(JSON.stringify(p)));
+
 
   if (posts.length) {
     await supa.from("manus_social_queue").insert(

@@ -178,15 +178,28 @@ Deno.serve(async (req) => {
   let caption: string;
   let imageUrl: string;
 
+  const topic = pickTopic();
+  let geminiError: string | undefined;
+
   if (queued) {
     caption = sanitizeCaption((queued.caption || queued.script || "").trim());
     if (queued.hashtags?.length)
       caption += "\n\n" + queued.hashtags.map((t: string) => (t.startsWith("#") ? t : `#${t}`)).join(" ");
-    imageUrl = queued.image_url || await pickImageFromPool(supabase);
+    if (queued.image_url) {
+      imageUrl = queued.image_url;
+    } else {
+      const gen = await generateGeminiImageForTopic(caption.slice(0, 200) || topic);
+      if (gen.url) imageUrl = gen.url;
+      else { geminiError = gen.error; imageUrl = await pickImageFromPool(supabase); }
+    }
   } else {
-    caption = await generateCaption();
-    imageUrl = await pickImageFromPool(supabase);
+    caption = await generateCaption(topic);
+    const gen = await generateGeminiImageForTopic(topic);
+    if (gen.url) imageUrl = gen.url;
+    else { geminiError = gen.error; imageUrl = await pickImageFromPool(supabase); }
   }
+  if (geminiError) console.error("[ig-auto-post] gemini image fallback:", geminiError);
+
 
   // 2) IG container
   let containerId: string | null = null;

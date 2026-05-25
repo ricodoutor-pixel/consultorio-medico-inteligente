@@ -94,28 +94,21 @@ export async function brisaHeartbeatAlert(endpoint: string, log: string) {
 export type BrisaCallResult = {
   ok: boolean;
   reply: string;
-  provider: "gemini" | "lovable" | "breaker" | "none";
+  provider: "gemini" | "breaker" | "none";
   http_status?: number;
   error?: string;
   latency_ms: number;
 };
 
-async function callProvider(provider: "gemini" | "lovable", body: Record<string, unknown>): Promise<Response> {
-  if (provider === "gemini") {
-    return fetch(GEMINI_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ ...body, model: stripPrefix(String((body as any).model || DEFAULT_MODEL)) }),
-    });
-  }
-  return fetch(LOVABLE_URL, {
+async function callProvider(_provider: "gemini", body: Record<string, unknown>): Promise<Response> {
+  return fetch(GEMINI_URL, {
     method: "POST",
-    headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ ...body, model: stripPrefix(String((body as any).model || DEFAULT_MODEL)) }),
   });
 }
 
-// 🎯 Função principal — UNIFICA todas as chamadas IA da Brisa
+// 🎯 Função principal — UNIFICA todas as chamadas IA da Brisa (Google Gemini direto)
 export async function processar_triagem_brisa(
   mensagem: string,
   usuario_id: string,
@@ -144,9 +137,8 @@ export async function processar_triagem_brisa(
   const body: Record<string, unknown> = { model, messages };
   if (options?.response_format) body.response_format = options.response_format;
 
-  const order: Array<"gemini" | "lovable"> = [];
+  const order: Array<"gemini"> = [];
   if (GEMINI_API_KEY) order.push("gemini");
-  if (LOVABLE_API_KEY) order.push("lovable");
 
   let lastErr = "no_provider";
   let lastStatus = 0;

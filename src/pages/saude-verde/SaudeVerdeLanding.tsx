@@ -90,7 +90,7 @@ export default function SaudeVerdeLanding() {
         <p className="text-center text-muted-foreground mb-12">Saúde sem complicação, na rede inteira da Planta y Raiz.</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {benefits.map((b, i) => (
-            <Card key={i} className="p-5 border-border/50 hover:border-primary/40 transition-colors">
+            <Card key={i} className="p-5 border-border/50">
               <b.icon className="w-8 h-8 text-primary mb-3" />
               <div className="font-semibold mb-1">{b.title}</div>
               <div className="text-sm text-muted-foreground">{b.desc}</div>

@@ -343,7 +343,7 @@ export default function SaudeVerdeCartao() {
                 {BENEFITS.map((b, i) => {
                   const Icon = b.icon;
                   return (
-                    <Card key={i} className="p-5 hover:border-primary/40 transition-colors">
+                    <Card key={i} className="p-5">
                       <Icon className="w-7 h-7 text-primary mb-3" />
                       <div className="text-sm font-medium mb-1">{b.title}</div>
                       <div className="text-2xl font-bold text-primary mb-1">{b.value}</div>

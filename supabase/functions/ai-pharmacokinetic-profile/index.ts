@@ -50,11 +50,12 @@ serve(async (req) => {
       });
     }
 
-    // Lovable AI Gateway (LOVABLE_API_KEY) é o canal primário e sempre provisionado.
-    // GEMINI_API_KEY direto fica como fallback se o gateway falhar.
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "";
-    if (!LOVABLE_API_KEY && !GEMINI_API_KEY) throw new Error("No AI key configured");
+    // Google Gemini DIRETO (sem Lovable AI Gateway).
+    const GEMINI_API_KEY =
+      Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") ||
+      Deno.env.get("GEMINI_API_KEY") ||
+      "";
+    if (!GEMINI_API_KEY) throw new Error("No Google Gemini key configured");
 
     const body = await req.json().catch(() => ({}));
     const sanitize = (v: unknown, max = 2000) =>
@@ -84,7 +85,7 @@ Responda em PT-BR, em formato JSON estrito conforme schema.`;
 Gere a predição farmacocinética.`;
 
     const payload = {
-      model: "google/gemini-2.5-flash",
+      model: "gemini-2.5-flash",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userMsg },
@@ -114,36 +115,22 @@ Gere a predição farmacocinética.`;
       tool_choice: { type: "function", function: { name: "pharmacokinetic_prediction" } },
     };
 
-    // 1) PRIMÁRIO: GEMINI_API_KEY direto no Google (evita 402 do gateway).
-    let r: Response | null = null;
-    let lastErr = "";
-    if (GEMINI_API_KEY) {
-      try {
-        r = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ ...payload, model: "gemini-2.5-flash" }),
-        });
-        if (!r.ok) { lastErr = `gemini ${r.status}`; r = null; }
-      } catch (e) { lastErr = `gemini exception: ${String(e)}`; r = null; }
-    }
-
-    // 2) FALLBACK: Lovable AI Gateway se Gemini direto falhar.
-    if (!r && LOVABLE_API_KEY) {
-      console.warn("[ai-pk] Gemini direct falhou, fallback gateway:", lastErr);
-      r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Chamada direta ao Google Gemini (OpenAI-compat). Sem fallback gateway.
+    let r: Response;
+    try {
+      r = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+    } catch (e) {
+      throw new Error(`Google Gemini network error: ${String(e)}`);
     }
 
-    if (!r) throw new Error(`AI unavailable: ${lastErr || "no key"}`);
     if (!r.ok) {
-      if (r.status === 429) return new Response(JSON.stringify({ error: "Rate limit" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (r.status === 402) return new Response(JSON.stringify({ error: "AI credits exhausted" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (r.status === 429) return new Response(JSON.stringify({ error: "Google Gemini rate limit" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       const errBody = await r.text().catch(() => "");
-      throw new Error(`AI gateway error: ${r.status} ${errBody.slice(0, 200)}`);
+      throw new Error(`Google Gemini error: ${r.status} ${errBody.slice(0, 200)}`);
     }
 
     const result = await r.json();

@@ -22,27 +22,29 @@ const THEMES = [
   { theme: "natureza_planta", prompt: "Folha de cannabis fresca em close-up macro com gotas de orvalho, fundo verde profundo desfocado, luz natural cinematográfica, 1080x1080" },
 ];
 
-async function generateImage(prompt: string, lovableKey: string): Promise<{ b64: string; mime: string } | null> {
+async function generateImage(prompt: string, geminiKey: string): Promise<{ b64: string; mime: string } | null> {
   try {
-    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${lovableKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-3.1-flash-image-preview",
-        messages: [{ role: "user", content: prompt }],
-        modalities: ["image", "text"],
-      }),
-    });
+    // Google Gemini DIRETO — native generateContent com responseModalities
+    const r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${geminiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
+        }),
+      },
+    );
     if (!r.ok) {
-      console.error("[image-pool] AI gen failed", r.status, await r.text());
+      console.error("[image-pool] Google Gemini failed", r.status, await r.text());
       return null;
     }
     const j = await r.json();
-    const img = j?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    if (!img?.startsWith("data:image")) return null;
-    const [meta, b64] = img.split(",");
-    const mime = meta.match(/data:([^;]+)/)?.[1] || "image/png";
-    return { b64, mime };
+    const parts = j?.candidates?.[0]?.content?.parts || [];
+    const inline = parts.find((p: any) => p?.inlineData?.data)?.inlineData;
+    if (!inline?.data) return null;
+    return { b64: inline.data, mime: inline.mimeType || "image/png" };
   } catch (e) {
     console.error("[image-pool] gen error", e);
     return null;
@@ -55,9 +57,12 @@ Deno.serve(async (req) => {
   if (unauth) return unauth;
 
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-  const lovableKey = Deno.env.get("LOVABLE_API_KEY") || "";
-  if (!lovableKey) {
-    return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), {
+  const geminiKey =
+    Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") ||
+    Deno.env.get("GEMINI_API_KEY") ||
+    "";
+  if (!geminiKey) {
+    return new Response(JSON.stringify({ error: "GOOGLE_GENERATIVE_AI_API_KEY missing" }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
@@ -73,7 +78,7 @@ Deno.serve(async (req) => {
   ]).sort(() => Math.random() - 0.5).slice(0, count);
 
   for (const job of jobs) {
-    const img = await generateImage(job.prompt, lovableKey);
+    const img = await generateImage(job.prompt, geminiKey);
     if (!img) { results.push({ theme: job.theme, error: "gen_failed" }); continue; }
     const bytes = Uint8Array.from(atob(img.b64), (c) => c.charCodeAt(0));
     const ext = img.mime.includes("jpeg") ? "jpg" : "png";

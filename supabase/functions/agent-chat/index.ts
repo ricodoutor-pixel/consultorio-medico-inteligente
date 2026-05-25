@@ -9,7 +9,10 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
+const GEMINI_API_KEY =
+  Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") ||
+  Deno.env.get("GEMINI_API_KEY") ||
+  "";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -35,11 +38,11 @@ serve(async (req) => {
     const { data: agent } = await supa.from("agent_registry").select("name, system_prompt").eq("slug", slug).maybeSingle();
     if (!agent) return new Response(JSON.stringify({ error: "agent not found" }), { status: 404, headers: corsHeaders });
 
-    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const aiRes = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",
-      headers: { "Authorization": `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      headers: { "Authorization": `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gemini-2.5-flash",
         messages: [
           { role: "system", content: agent.system_prompt + "\n\nContexto: você está conversando com o admin (Dr. Edilson) via painel ADM. Responda objetivo, em PT-BR, com sugestões acionáveis." },
           ...messages.slice(-10),
@@ -47,9 +50,8 @@ serve(async (req) => {
       }),
     });
 
-    if (aiRes.status === 429) return new Response(JSON.stringify({ error: "rate_limit" }), { status: 429, headers: corsHeaders });
-    if (aiRes.status === 402) return new Response(JSON.stringify({ error: "credits_exhausted" }), { status: 402, headers: corsHeaders });
-    if (!aiRes.ok) return new Response(JSON.stringify({ error: `ai_${aiRes.status}` }), { status: 502, headers: corsHeaders });
+    if (aiRes.status === 429) return new Response(JSON.stringify({ error: "google_rate_limit" }), { status: 429, headers: corsHeaders });
+    if (!aiRes.ok) return new Response(JSON.stringify({ error: `google_gemini_${aiRes.status}` }), { status: 502, headers: corsHeaders });
 
     const data = await aiRes.json();
     const reply = data.choices?.[0]?.message?.content || "(sem resposta)";

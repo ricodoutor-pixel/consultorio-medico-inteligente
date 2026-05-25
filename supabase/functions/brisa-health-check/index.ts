@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
     { name: "EVOLUTION_API_URL", ok: hasEnv("EVOLUTION_API_URL").ok, hint: "URL da Evolution API (WhatsApp)" },
     { name: "EVOLUTION_API_KEY", ok: hasEnv("EVOLUTION_API_KEY").ok, hint: "API key da instância Brisa_CEO" },
     { name: "EVOLUTION_WEBHOOK_SECRET", ok: hasEnv("EVOLUTION_WEBHOOK_SECRET").ok, hint: "Shared secret do webhook Evolution" },
-    { name: "GEMINI_API_KEY / LOVABLE_API_KEY", ok: hasEnv("GEMINI_API_KEY", "LOVABLE_API_KEY").ok, hint: "Motor de IA da Brisa" },
+    { name: "GOOGLE_GENERATIVE_AI_API_KEY / GEMINI_API_KEY", ok: hasEnv("GOOGLE_GENERATIVE_AI_API_KEY", "GEMINI_API_KEY").ok, hint: "Motor de IA da Brisa (Google Gemini direto)" },
     { name: "MERCADO_PAGO_ACCESS_TOKEN", ok: hasEnv("MERCADO_PAGO_ACCESS_TOKEN").ok, hint: "Geração de links PIX R$30" },
   ];
 

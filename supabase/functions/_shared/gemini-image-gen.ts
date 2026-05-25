@@ -63,3 +63,31 @@ export async function generateGeminiImageForTopic(
     return { url: null, error: String(e) };
   }
 }
+
+/**
+ * Re-hospeda uma imagem externa (ex.: Pexels) no bucket público `social-posts`.
+ * A Meta Graph API frequentemente falha em baixar URLs de domínios externos
+ * com cookies/rate-limit (Pexels). Hospedar no Supabase Storage resolve.
+ */
+export async function rehostExternalImage(externalUrl: string): Promise<string> {
+  try {
+    if (externalUrl.includes("supabase.co/storage/")) return externalUrl;
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const r = await fetch(externalUrl);
+    if (!r.ok) return externalUrl;
+    const mime = r.headers.get("content-type")?.split(";")[0] || "image/jpeg";
+    const ext = mime.split("/")[1] || "jpg";
+    const bytes = new Uint8Array(await r.arrayBuffer());
+    const supabase = createClient(SUPABASE_URL, SERVICE);
+    const path = `rehost/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const up = await supabase.storage.from(BUCKET).upload(path, bytes, {
+      contentType: mime, upsert: false,
+    });
+    if (up.error) return externalUrl;
+    const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+    return data.publicUrl;
+  } catch {
+    return externalUrl;
+  }
+}

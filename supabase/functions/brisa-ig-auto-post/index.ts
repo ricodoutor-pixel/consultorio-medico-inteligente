@@ -11,7 +11,7 @@ import {
   sanitizeCaption,
   waitIgContainerReady,
 } from "../_shared/auto-post-topics.ts";
-import { generateGeminiImageForTopic } from "../_shared/gemini-image-gen.ts";
+import { generateGeminiImageForTopic, rehostExternalImage } from "../_shared/gemini-image-gen.ts";
 
 
 const corsHeaders = {
@@ -199,6 +199,16 @@ Deno.serve(async (req) => {
     else { geminiError = gen.error; imageUrl = await pickImageFromPool(supabase); }
   }
   if (geminiError) console.error("[ig-auto-post] gemini image fallback:", geminiError);
+
+  // Re-hospedar imagens externas (Pexels etc.) no bucket público para evitar
+  // timeout do container IG ao baixar de domínios com cookies/rate-limit.
+  if (imageUrl && !imageUrl.includes("supabase.co/storage/")) {
+    const rehosted = await rehostExternalImage(imageUrl);
+    if (rehosted !== imageUrl) {
+      console.log("[ig-auto-post] rehosted external image →", rehosted);
+      imageUrl = rehosted;
+    }
+  }
 
 
   // 2) IG container

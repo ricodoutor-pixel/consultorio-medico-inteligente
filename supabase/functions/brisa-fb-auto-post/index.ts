@@ -11,7 +11,8 @@ const corsHeaders = {
 
 const GRAPH_API = "https://graph.facebook.com/v19.0";
 
-import { AUTO_POST_SYSTEM_PROMPT, pickTopic, sanitizeCaption } from "../_shared/auto-post-topics.ts";
+import { AUTO_POST_SYSTEM_PROMPT, pickImageFromPool, pickTopic, sanitizeCaption } from "../_shared/auto-post-topics.ts";
+import { generateGeminiImageForTopic } from "../_shared/gemini-image-gen.ts";
 
 async function generatePost(): Promise<string> {
   const GEMINI_API_KEY =

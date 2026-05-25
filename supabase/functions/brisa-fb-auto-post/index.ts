@@ -14,20 +14,23 @@ const GRAPH_API = "https://graph.facebook.com/v19.0";
 import { AUTO_POST_SYSTEM_PROMPT, pickTopic, sanitizeCaption } from "../_shared/auto-post-topics.ts";
 
 async function generatePost(): Promise<string> {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  const GEMINI_API_KEY =
+    Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") ||
+    Deno.env.get("GEMINI_API_KEY") ||
+    "";
   const topic = pickTopic();
   const base = `Acesse: https://plantayraiz.com.br | WhatsApp Enf. Brisa: (11) 99136-3154`;
 
-  if (!LOVABLE_API_KEY) {
+  if (!GEMINI_API_KEY) {
     return sanitizeCaption(`🌱 Planta y Raiz — a maior plataforma digital de Cannabis Medicinal do Brasil.\n\n${topic}\n\n${base}\n\n#CannabisMedicinal #PlantaYRaiz #SaúdeDigital`);
   }
 
   try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gemini-2.5-flash",
         messages: [
           { role: "system", content: AUTO_POST_SYSTEM_PROMPT + "\n\nFormato: post de Facebook, máx 600 caracteres, 3-5 hashtags." },
           { role: "user", content: `Tópico: ${topic}\n\nEncerre com: ${base}` },
@@ -38,7 +41,7 @@ async function generatePost(): Promise<string> {
     const text = j?.choices?.[0]?.message?.content?.trim();
     if (text && text.includes("plantayraiz.com.br")) return sanitizeCaption(text);
   } catch (e) {
-    console.error("[fb-auto-post] AI gen error:", e);
+    console.error("[fb-auto-post] Google Gemini error:", e);
   }
   return sanitizeCaption(`🌿 ${topic}\n\n${base}\n\n#CannabisMedicinal #PlantaYRaiz #Telemedicina`);
 }

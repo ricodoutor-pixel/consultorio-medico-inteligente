@@ -121,7 +121,7 @@ type AudioUnderstanding = {
 };
 
 async function transcribeAudio(base64Audio: string, mimeType: string): Promise<AudioUnderstanding> {
-  if (!HAS_AI_KEY) return "";
+  if (!HAS_AI_KEY) return { transcript: "", needsAudioReply: true, seniorCareStyle: false, notes: "" };
   try {
     const fmt = mimeType.includes("mp3") || mimeType.includes("mpeg") ? "mp3" : "wav";
     const resp = await aiChat({
@@ -301,12 +301,41 @@ async function classifySentiment(text: string): Promise<{ sentiment_score: numbe
 
 import { processar_triagem_brisa } from "../_shared/brisa-ai.ts";
 
-async function callBrisaAI(userMessage: string, history: Array<{role: string; content: string}>, phone: string) {
+async function callBrisaAI(
+  userMessage: string,
+  history: Array<{role: string; content: string}>,
+  phone: string,
+  options?: { seniorCareStyle?: boolean; wantsAudioReply?: boolean; audioNotes?: string },
+) {
   if (!HAS_AI_KEY) {
     console.error("[brisa-bot] Nenhuma chave de IA configurada — fallback");
     return BRISA_FALLBACK_MESSAGE;
   }
-  const systemPrompt = await getBrisaSystemPrompt();
+  let systemPrompt = await getBrisaSystemPrompt();
+  if (options?.seniorCareStyle) {
+    systemPrompt += `
+
+// === ACOLHIMENTO SÊNIOR / BAIXA LETRABILIDADE ===
+- A pessoa pode ser idosa, ter dificuldade para ler ou precisar de mais calma.
+- Fale de forma mais paciente, simples e acolhedora, sem infantilizar.
+- Dê uma instrução por vez.
+- Confirme se a pessoa entendeu antes de avançar para o próximo passo.
+- Quando houver link, explique em 1 frase o que vai acontecer ao abrir o link.`;
+  }
+  if (options?.wantsAudioReply) {
+    systemPrompt += `
+
+// === RESPOSTA QUE VAI SER OUVIDA ===
+- Esta resposta será enviada também em áudio.
+- Escreva como fala humana natural, sem listas longas, sem blocos extensos e sem termos técnicos desnecessários.
+- Se precisar passar um link, anuncie antes com uma frase curta e tranquilizadora.`;
+  }
+  if (options?.audioNotes) {
+    systemPrompt += `
+
+// === CONTEXTO DE ESCUTA ===
+- Observação do áudio recebido: ${options.audioNotes.slice(0, 220)}`;
+  }
   const r = await processar_triagem_brisa(userMessage, phone, "whatsapp", {
     history, model: BRISA_MODEL, systemPrompt,
   });

@@ -50,11 +50,12 @@ serve(async (req) => {
       });
     }
 
-    // Lovable AI Gateway (LOVABLE_API_KEY) é o canal primário e sempre provisionado.
-    // GEMINI_API_KEY direto fica como fallback se o gateway falhar.
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "";
-    if (!LOVABLE_API_KEY && !GEMINI_API_KEY) throw new Error("No AI key configured");
+    // Google Gemini DIRETO (sem Lovable AI Gateway).
+    const GEMINI_API_KEY =
+      Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") ||
+      Deno.env.get("GEMINI_API_KEY") ||
+      "";
+    if (!GEMINI_API_KEY) throw new Error("No Google Gemini key configured");
 
     const body = await req.json().catch(() => ({}));
     const sanitize = (v: unknown, max = 2000) =>

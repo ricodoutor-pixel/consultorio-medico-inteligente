@@ -132,6 +132,7 @@ const AdminMpWebhooks = lazyWithRecovery(() => import("./pages/admin/AdminMpWebh
 const SaudeVerdeAssinatura = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeAssinatura"), { sourceRef: "/saude-verde/assinatura" });
 const OmniChannelDashboard = lazyWithRecovery(() => import("./pages/OmniChannelDashboard"), { sourceRef: "/admin/omni-channel" });
 const BrisaCEO = lazyWithRecovery(() => import("./pages/admin/BrisaCEO"), { sourceRef: "/admin/brisa-ceo" });
+const BrisaOrientacoes = lazyWithRecovery(() => import("./pages/admin/BrisaOrientacoes"), { sourceRef: "/admin/brisa-orientacoes" });
 const OfertaEspecial = lazyWithRecovery(() => import("./pages/OfertaEspecial"), { sourceRef: "/oferta-especial" });
 const AdminFinanceiro = lazyWithRecovery(() => import("./pages/AdminFinanceiro"), { sourceRef: "/admin/financeiro" });
 const AdminCreditAudit = lazyWithRecovery(() => import("./pages/AdminCreditAudit"), { sourceRef: "/admin/credit-audit" });

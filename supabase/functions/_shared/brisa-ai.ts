@@ -229,7 +229,46 @@ export async function processar_triagem_brisa(
     }
   }
 
-  // ❌ Todos os provedores + retries falharam — NUNCA expõe instabilidade ao usuário
+  // 🛟 ÚLTIMO RECURSO: tenta modelo mais barato/leve (gemini-2.5-flash-lite) via Gemini direto
+  // Cobre cenário: Lovable sem créditos (402) + flash sobrecarregado (503)
+  if (GEMINI_API_KEY) {
+    const fallbackModels = ["gemini-2.5-flash-lite", "gemini-2.0-flash-lite"];
+    for (const fm of fallbackModels) {
+      try {
+        const r = await fetch(GEMINI_URL, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ ...body, model: fm }),
+        });
+        if (r.ok) {
+          const data = await r.json();
+          const reply = (data?.choices?.[0]?.message?.content || "").trim();
+          if (reply) {
+            const result: BrisaCallResult = {
+              ok: true, reply, provider: "gemini", http_status: r.status, latency_ms: Date.now() - t0,
+            };
+            if (options?.log !== false) {
+              logInteraction({
+                channel: canal, user_ref: usuario_id, message_in: mensagem, message_out: reply,
+                provider: "gemini", model: fm, status: "ok", http_status: r.status,
+                latency_ms: result.latency_ms, meta: { fallback_model: true },
+              }).catch(() => {});
+            }
+            return result;
+          }
+        } else {
+          const errText = await r.text().catch(() => "");
+          console.error(`[brisa-ai] fallback ${fm} HTTP ${r.status}`, errText.slice(0, 200));
+          lastStatus = r.status; lastErr = errText.slice(0, 400);
+        }
+      } catch (e) {
+        console.error(`[brisa-ai] fallback ${fm} exception`, e);
+        lastErr = String(e).slice(0, 400);
+      }
+    }
+  }
+
+  // ❌ Todos os provedores + retries + fallback falharam
   const errorId = crypto.randomUUID().slice(0, 8);
   const reply = BRISA_BREAKER_FALLBACK_MESSAGE;
   const sameAsAdmin = normalizePhone(usuario_id) && normalizePhone(usuario_id) === normalizePhone(ADMIN_WHATSAPP);

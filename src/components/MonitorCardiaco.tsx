@@ -27,6 +27,7 @@ interface Result {
   classification: "normal" | "atencao" | "critico";
   label: string;
   message: string;
+  biomarkers: Biomarkers;
 }
 
 function classify(bpm: number): Pick<Result, "classification" | "label" | "message"> {

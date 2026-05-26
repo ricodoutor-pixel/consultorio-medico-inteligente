@@ -9,6 +9,8 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
+import { butterworthBandpassPPG } from "@/lib/ppg-butterworth";
+import { trackEvent } from "@/lib/analytics";
 
 type Phase = "idle" | "permission" | "measuring" | "result" | "error";
 type Quality = "fraca" | "boa" | "otima";

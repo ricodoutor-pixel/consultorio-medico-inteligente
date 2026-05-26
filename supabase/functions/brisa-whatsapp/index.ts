@@ -1,5 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { BRISA_PERSONA } from "../_shared/brisa-persona.ts";
+import { BRISA_PERSONA, shouldUseVoice, classifyLead } from "../_shared/brisa-persona.ts";
 import {
   upsertUnifiedContact,
   logUnifiedMessage,

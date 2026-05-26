@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
+
+const WidgetMonitorRapido = lazy(() => import("@/components/WidgetMonitorRapido"));
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import CartaoVirtual from "@/components/CartaoVirtual";
@@ -112,6 +114,12 @@ export default function MeuCartao() {
         <p className="text-center text-sm text-emerald-300/80 mb-6">
           Descontos em clínicas + saldo PIX para farmácia.
         </p>
+
+        <Suspense fallback={null}>
+          <div className="mb-5">
+            <WidgetMonitorRapido />
+          </div>
+        </Suspense>
 
         {loading ? (
           <div className="flex justify-center py-12">

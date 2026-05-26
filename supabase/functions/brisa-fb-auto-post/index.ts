@@ -69,8 +69,21 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-  // 1) Buscar próximo post agendado ou aprovado
-  const { data: queued } = await supabase
+  // Override manual via body { caption, image_url } — Admin "Publicar Agora"
+  let manualCaption = "";
+  let manualImageUrl = "";
+  try {
+    if (req.method === "POST") {
+      const body = await req.clone().json().catch(() => ({}));
+      manualCaption = (body?.caption || "").toString().trim();
+      manualImageUrl = (body?.image_url || body?.media_url || "").toString().trim();
+    }
+  } catch { /* ignore */ }
+
+  // 1) Buscar próximo post agendado ou aprovado (pulado se houver override manual)
+  const { data: queued } = manualCaption
+    ? { data: null as any }
+    : await supabase
     .from("manus_social_queue")
     .select("id, caption, script, image_url, hashtags")
     .eq("platform", "facebook")
@@ -80,6 +93,7 @@ Deno.serve(async (req) => {
     .order("created_at", { ascending: true })
     .limit(1)
     .maybeSingle();
+
 
   let postId: string | null = queued?.id ?? null;
   let message: string;

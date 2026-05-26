@@ -350,9 +350,9 @@ export default function MonitorCardiaco() {
       <canvas ref={canvasRef} className="hidden" />
 
       {phase === "idle" && (
-        <Card className="p-6 bg-card/80 backdrop-blur border border-primary/20 text-center space-y-5">
+        <Card className="p-6 bg-card border border-primary/20 text-center space-y-5">
           <div className="flex justify-center">
-            <Heart className="text-primary animate-pulse" size={64} strokeWidth={1.5} />
+            <Heart className="text-primary" size={64} strokeWidth={1.5} />
           </div>
           <div>
             <h2 className="text-2xl font-bold">Monitor Cardíaco</h2>

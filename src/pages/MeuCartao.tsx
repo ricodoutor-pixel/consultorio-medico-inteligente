@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
+
+const WidgetMonitorRapido = lazy(() => import("@/components/WidgetMonitorRapido"));
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import CartaoVirtual from "@/components/CartaoVirtual";

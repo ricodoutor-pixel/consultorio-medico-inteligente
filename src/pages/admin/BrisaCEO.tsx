@@ -97,7 +97,9 @@ export default function BrisaCEO() {
         <BrisaAudioPanel />
         <BrisaHealthChecklist />
         <BrisaMetaDebugPanel />
+        <MetaContentManager />
       </div>
+
 
       {/* Métricas */}
       <section className="container mx-auto px-4 pb-6 grid grid-cols-2 md:grid-cols-5 gap-3">

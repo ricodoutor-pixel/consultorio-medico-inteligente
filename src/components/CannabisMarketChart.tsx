@@ -162,7 +162,7 @@ const CannabisMarketChart = () => {
           viewport={{ once: true }}
           transition={{ delay: 0.25 }}
         >
-          <Card className="border-border bg-card/60 backdrop-blur-md overflow-hidden">
+          <Card className="border-border bg-card overflow-hidden">
             <CardContent className="p-4 md:p-8">
               {/* Toggle Segmented Control */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">

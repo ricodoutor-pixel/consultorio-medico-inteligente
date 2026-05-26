@@ -78,24 +78,16 @@ export default function MonitorCardiacoPage() {
         </Button>
       </section>
 
-      {/* 3 passos */}
-      <section className="px-4 max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
-        {[
-          { i: Camera, t: "1. Apoie o dedo", d: "Câmera traseira + flash" },
-          { i: Timer, t: "2. Aguarde 30s", d: "Mantenha o dedo firme" },
-          { i: MessageCircleHeart, t: "3. Veja e converse", d: "Brisa interpreta seu resultado" },
-        ].map(({ i: Icon, t, d }) => (
-          <Card key={t} className="p-4 text-center bg-card border border-primary/10">
-            <Icon className="mx-auto text-primary mb-2" size={28} />
-            <p className="font-semibold text-sm">{t}</p>
-            <p className="text-xs text-muted-foreground">{d}</p>
-          </Card>
-        ))}
+      {/* Monitor */}
+      <section id="monitor" className="px-4 mb-6">
+        <MonitorCardiaco />
       </section>
 
-      {/* Monitor */}
-      <section id="monitor" className="px-4 mb-10">
-        <MonitorCardiaco />
+      {/* Passos — texto analógico simples, sem animações */}
+      <section className="px-4 max-w-2xl mx-auto mb-10">
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          <strong className="text-foreground">Como usar:</strong> 1. Apoie o dedo na câmera traseira (com flash). 2. Aguarde 30 segundos mantendo o dedo firme. 3. Veja seu BPM e converse com a Brisa para interpretar o resultado.
+        </p>
       </section>
 
       {/* O que significa */}

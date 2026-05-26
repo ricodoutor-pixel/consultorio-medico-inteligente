@@ -350,9 +350,9 @@ export default function MonitorCardiaco() {
       <canvas ref={canvasRef} className="hidden" />
 
       {phase === "idle" && (
-        <Card className="p-6 bg-card/80 backdrop-blur border border-primary/20 text-center space-y-5">
+        <Card className="p-6 bg-card border border-primary/20 text-center space-y-5">
           <div className="flex justify-center">
-            <Heart className="text-primary animate-pulse" size={64} strokeWidth={1.5} />
+            <Heart className="text-primary" size={64} strokeWidth={1.5} />
           </div>
           <div>
             <h2 className="text-2xl font-bold">Monitor Cardíaco</h2>
@@ -391,7 +391,7 @@ export default function MonitorCardiaco() {
       )}
 
       {phase === "measuring" && (
-        <Card className="p-5 space-y-4 bg-card/90 border border-primary/30">
+        <Card className="p-5 space-y-4 bg-card border border-primary/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Heart className="text-red-400 animate-pulse" size={22} />
@@ -422,7 +422,7 @@ export default function MonitorCardiaco() {
       )}
 
       {phase === "result" && result && (
-        <Card className="p-6 space-y-5 bg-card/90 border border-primary/30">
+        <Card className="p-6 space-y-5 bg-card border border-primary/30">
           <div className="text-center">
             <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Sua Frequência Cardíaca</p>
             <div className="flex items-end justify-center gap-2">

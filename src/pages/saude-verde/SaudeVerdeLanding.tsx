@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,8 @@ import {
   CreditCard, Stethoscope, FlaskConical, Syringe, SmilePlus, Pill, Leaf,
   Bot, ShieldCheck, Check, ArrowRight, Star, Users, MapPin
 } from "lucide-react";
+
+const WidgetMonitorRapido = lazy(() => import("@/components/WidgetMonitorRapido"));
 
 type Plan = {
   id: string; slug: string; name: string;

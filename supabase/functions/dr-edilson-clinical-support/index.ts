@@ -2,6 +2,7 @@
 // Streaming via Lovable AI Gateway (gemini-2.5-pro) — raciocínio clínico em tempo real
 // Foco: evidência, ANVISA/CFM/RDC 660, CYP450, interações, exames, monitoramento.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

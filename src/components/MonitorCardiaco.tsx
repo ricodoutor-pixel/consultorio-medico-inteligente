@@ -544,3 +544,22 @@ export default function MonitorCardiaco() {
     </div>
   );
 }
+
+type Tone = "good" | "warn" | "bad" | "neutral";
+function BiomarkerCard({ icon, label, value, detail, tone }: { icon: React.ReactNode; label: string; value: string; detail: string; tone: Tone }) {
+  const toneColor =
+    tone === "good" ? "text-green-400 border-green-500/30"
+    : tone === "warn" ? "text-yellow-400 border-yellow-500/30"
+    : tone === "bad" ? "text-red-400 border-red-500/30"
+    : "text-foreground border-border";
+  return (
+    <div className={`rounded-lg border ${toneColor} bg-muted/20 p-2.5`}>
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+        <span className={toneColor.split(" ")[0]}>{icon}</span>
+        {label}
+      </div>
+      <p className={`text-sm font-bold mt-0.5 ${toneColor.split(" ")[0]}`}>{value}</p>
+      <p className="text-[10px] text-muted-foreground">{detail}</p>
+    </div>
+  );
+}

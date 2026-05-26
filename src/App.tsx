@@ -318,6 +318,8 @@ const App = () => (
                 <Route path="/admin/omni-channel" element={<AdminRoute><OmniChannelDashboard /></AdminRoute>} />
                 <Route path="/admin/brisa-ceo" element={<AdminRoute><BrisaCEO /></AdminRoute>} />
                 <Route path="/admin/brisa" element={<AdminRoute><BrisaCEO /></AdminRoute>} />
+                <Route path="/admin/brisa-orientacoes" element={<AdminRoute><BrisaOrientacoes /></AdminRoute>} />
+                <Route path="/admin/orientacoes" element={<AdminRoute><BrisaOrientacoes /></AdminRoute>} />
                 <Route path="/admin/auditoria-de-crédito" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />
                 <Route path="/admin/audit-log" element={<AdminRoute><AuditLog /></AdminRoute>} />
                 <Route path="/admin/auditoria" element={<AdminRoute><AuditLog /></AdminRoute>} />

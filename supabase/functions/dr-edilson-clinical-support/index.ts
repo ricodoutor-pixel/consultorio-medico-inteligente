@@ -68,6 +68,42 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    // 🔐 Auth: only authenticated doctors (or admins) may use this clinical agent
+    const authHeader = req.headers.get("Authorization") || "";
+    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+    if (!token) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const authedClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+    const { data: claimsData, error: claimsErr } = await authedClient.auth.getClaims(token);
+    if (claimsErr || !claimsData?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const uid = claimsData.claims.sub as string;
+
+    // Verify the caller is a doctor or admin (use service role to bypass RLS for this check)
+    const adminClient = createClient(supabaseUrl, serviceKey);
+    const [{ data: doctorRow }, { data: adminRow }] = await Promise.all([
+      adminClient.from("doctors").select("id").eq("user_id", uid).maybeSingle(),
+      adminClient.from("user_roles").select("role").eq("user_id", uid).in("role", ["admin", "doctor", "moderator"]).maybeSingle(),
+    ]);
+    if (!doctorRow && !adminRow) {
+      return new Response(JSON.stringify({ error: "Forbidden: clinical agent restricted to doctors" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { messages } = await req.json();
     if (!Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: "messages array required" }), {

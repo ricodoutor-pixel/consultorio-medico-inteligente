@@ -512,10 +512,6 @@ export default function MonitorCardiaco() {
           {history.length > 1 && (
             <div>
               <p className="text-xs text-muted-foreground mb-1">Últimas medições</p>
-
-          {history.length > 1 && (
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Últimas medições</p>
               <div className="flex items-end gap-1 h-12">
                 {history.map((v, i) => {
                   const max = Math.max(...history, 100);

@@ -69,8 +69,21 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-  // 1) Buscar próximo post agendado ou aprovado
-  const { data: queued } = await supabase
+  // Override manual via body { caption, image_url } — Admin "Publicar Agora"
+  let manualCaption = "";
+  let manualImageUrl = "";
+  try {
+    if (req.method === "POST") {
+      const body = await req.clone().json().catch(() => ({}));
+      manualCaption = (body?.caption || "").toString().trim();
+      manualImageUrl = (body?.image_url || body?.media_url || "").toString().trim();
+    }
+  } catch { /* ignore */ }
+
+  // 1) Buscar próximo post agendado ou aprovado (pulado se houver override manual)
+  const { data: queued } = manualCaption
+    ? { data: null as any }
+    : await supabase
     .from("manus_social_queue")
     .select("id, caption, script, image_url, hashtags")
     .eq("platform", "facebook")
@@ -81,12 +94,16 @@ Deno.serve(async (req) => {
     .limit(1)
     .maybeSingle();
 
+
   let postId: string | null = queued?.id ?? null;
   let message: string;
   let imageUrl: string | null = null;
 
   const topic = pickTopic();
-  if (queued) {
+  if (manualCaption) {
+    message = manualCaption;
+    imageUrl = manualImageUrl || null;
+  } else if (queued) {
     message = (queued.caption || queued.script || "").trim();
     if (queued.hashtags?.length) message += "\n\n" + queued.hashtags.map((t: string) => (t.startsWith("#") ? t : `#${t}`)).join(" ");
     imageUrl = queued.image_url || null;
@@ -94,11 +111,12 @@ Deno.serve(async (req) => {
     message = await generatePost();
   }
   // Sempre tenta gerar imagem via Gemini (Nano Banana); fallback no pool Pexels
-  if (!imageUrl) {
+  if (!imageUrl && !manualCaption) {
     const gen = await generateGeminiImageForTopic(topic);
     imageUrl = gen.url || await pickImageFromPool(supabase);
     if (gen.error) console.error("[fb-auto-post] gemini image fallback:", gen.error);
   }
+
   // Re-hospedar imagens externas (Pexels etc.) — Meta falha em URLs com cookies
   if (imageUrl && !imageUrl.includes("supabase.co/storage/")) {
     const rehosted = await rehostExternalImage(imageUrl);

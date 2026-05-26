@@ -92,6 +92,7 @@ export default function BrisaCEO() {
       <div className="container mx-auto px-4 pt-4 space-y-3">
         <AutoPostCountdown />
         <BrisaChannelsStatus />
+        <BrisaAudioPanel />
         <BrisaHealthChecklist />
         <BrisaMetaDebugPanel />
       </div>

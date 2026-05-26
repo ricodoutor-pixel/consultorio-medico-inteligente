@@ -12,7 +12,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
-const SILENCE_MINUTES = 120;
+const SILENCE_MINUTES = 180;
 
 async function sendWhatsAppAdmin(text: string) {
   const url = Deno.env.get("EVOLUTION_API_URL");
@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
   }
 
   const title = "🔕 SILÊNCIO ANORMAL DA BRISA";
-  const desc = `Sem mensagens inbound há *${minutesSilent} min* (limite ${SILENCE_MINUTES}min).\nÚltima inbound: ${lastAt ? lastAt.toISOString() : "NUNCA"}\n\nProvável causa: Evolution API desconectada / webhook quebrado / VPS down.\n\nChecklist:\n1) curl ${Deno.env.get("EVOLUTION_API_URL") || "https://api.plantayraiz.com.br"}/instance/connectionState/Brisa_CEO\n2) Verificar QR Code em /manager\n3) Reconfigurar webhook se preciso`;
+  const desc = `Sem mensagens inbound há *${minutesSilent} min* (limite ${SILENCE_MINUTES}min).\nÚltima inbound: ${lastAt ? lastAt.toISOString() : "NUNCA"}\n\nCausas possíveis (ordem de probabilidade):\n1) ⚠️ Lovable AI Gateway sem créditos (HTTP 402) — checar Settings → Workspace → Usage\n2) Gemini direto em sobrecarga (HTTP 503) — temporário\n3) Evolution desconectada — curl ${Deno.env.get("EVOLUTION_API_URL") || "https://api.plantayraiz.com.br"}/instance/connectionState/Brisa_CEO\n4) Webhook quebrado / VPS down`;
 
   // Discord SRE
   try {

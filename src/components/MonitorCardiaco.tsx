@@ -213,7 +213,8 @@ export default function MonitorCardiaco() {
   const finalize = useCallback(async () => {
     const { bpm, hrv, quality } = computeBPM(signalRef.current, TARGET_FPS);
     const cls = classify(bpm);
-    const res: Result = { bpm, hrv, quality, ...cls };
+    const biomarkers = computeBiomarkers(bpm, hrv);
+    const res: Result = { bpm, hrv, quality, ...cls, biomarkers };
     stopAll();
     setResult(res);
     setPhase("result");
@@ -222,7 +223,15 @@ export default function MonitorCardiaco() {
     setHistory(newHistory);
     try { localStorage.setItem("ppg_history", JSON.stringify(newHistory)); } catch { /* noop */ }
 
-    trackEvent("monitor_concluido", { bpm, hrv: hrv ?? 0, quality });
+    trackEvent("monitor_concluido", {
+      bpm,
+      hrv: hrv ?? 0,
+      quality,
+      stress_score: biomarkers.stressScore,
+      stress_level: biomarkers.stressLevel,
+      metabolic_age: biomarkers.metabolicAge ?? 0,
+      vo2max: biomarkers.vo2maxEstimate ?? 0,
+    });
     trackEvent(res.classification === "normal" ? "monitor_resultado_normal" : "monitor_resultado_atencao", { bpm });
   }, [history, stopAll]);
 

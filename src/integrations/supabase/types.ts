@@ -7874,6 +7874,7 @@ export type Database = {
     }
     Functions: {
       anonymize_old_ot_orders: { Args: never; Returns: undefined }
+      auto_release_brisa_orientacao: { Args: never; Returns: Json }
       calculate_doctor_performance: {
         Args: {
           _consultations: number
@@ -7894,6 +7895,10 @@ export type Database = {
         Returns: boolean
       }
       cleanup_http_logs: { Args: never; Returns: Json }
+      complete_brisa_orientacao: {
+        Args: { _notes?: string; _payment_row_id: string }
+        Returns: Json
+      }
       credit_affiliate_wallet: {
         Args: { _amount: number; _user_id: string }
         Returns: undefined

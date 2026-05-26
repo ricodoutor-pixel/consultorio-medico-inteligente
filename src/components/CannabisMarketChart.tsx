@@ -138,7 +138,7 @@ const CannabisMarketChart = () => {
           transition={{ delay: 0.15 }}
         >
           {liveCounters.map((c, i) => (
-            <Card key={i} className={`border ${c.bg} backdrop-blur-sm`}>
+            <Card key={i} className={`border ${c.bg}`}>
               <CardContent className="p-4 md:p-6 flex items-center gap-4">
                 <div className={`p-3 rounded-xl ${c.bg}`}>
                   <c.icon size={22} className={c.color} />

@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import { TrendingUp, Users, Search, Leaf, Activity } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type ViewMode = "planta" | "mercado";
 

@@ -4182,6 +4182,42 @@ export type Database = {
         }
         Relationships: []
       }
+      medicoes_cardiacas: {
+        Row: {
+          bpm: number
+          classificacao: string
+          created_at: string
+          device_info: Json | null
+          duracao_segundos: number | null
+          hrv_sdnn: number | null
+          id: string
+          qualidade_sinal: string | null
+          user_id: string | null
+        }
+        Insert: {
+          bpm: number
+          classificacao: string
+          created_at?: string
+          device_info?: Json | null
+          duracao_segundos?: number | null
+          hrv_sdnn?: number | null
+          id?: string
+          qualidade_sinal?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          bpm?: number
+          classificacao?: string
+          created_at?: string
+          device_info?: Json | null
+          duracao_segundos?: number | null
+          hrv_sdnn?: number | null
+          id?: string
+          qualidade_sinal?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       meta_messenger_log: {
         Row: {
           channel: string

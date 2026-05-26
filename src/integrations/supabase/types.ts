@@ -7783,6 +7783,56 @@ export type Database = {
         }
         Relationships: []
       }
+      consultation_credit_audit_professional: {
+        Row: {
+          amount: number | null
+          audit_phone_masked: string | null
+          consultation_id: string | null
+          created_at: string | null
+          id: string | null
+          patient_id: string | null
+          professional_id: string | null
+          rating_id: string | null
+          reason: string | null
+          stars: number | null
+          status: string | null
+        }
+        Insert: {
+          amount?: number | null
+          audit_phone_masked?: never
+          consultation_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          patient_id?: string | null
+          professional_id?: string | null
+          rating_id?: string | null
+          reason?: string | null
+          stars?: number | null
+          status?: string | null
+        }
+        Update: {
+          amount?: number | null
+          audit_phone_masked?: never
+          consultation_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          patient_id?: string | null
+          professional_id?: string | null
+          rating_id?: string | null
+          reason?: string | null
+          stars?: number | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_credit_audit_rating_id_fkey"
+            columns: ["rating_id"]
+            isOneToOne: false
+            referencedRelation: "consultation_ratings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doctors_public: {
         Row: {
           available_hours: Json | null

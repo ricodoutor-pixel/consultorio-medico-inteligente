@@ -795,6 +795,86 @@ export type Database = {
         }
         Relationships: []
       }
+      brisa_audio_config: {
+        Row: {
+          audio_enabled: boolean
+          id: boolean
+          monthly_budget_brl: number
+          paused_reason: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          audio_enabled?: boolean
+          id?: boolean
+          monthly_budget_brl?: number
+          paused_reason?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          audio_enabled?: boolean
+          id?: boolean
+          monthly_budget_brl?: number
+          paused_reason?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      brisa_audio_usage: {
+        Row: {
+          channel: string
+          contact_id: string | null
+          cost_brl: number
+          created_at: string
+          error: string | null
+          id: string
+          intent: string | null
+          phone: string | null
+          reason: string | null
+          success: boolean
+          text_length: number
+          voice_id: string
+        }
+        Insert: {
+          channel?: string
+          contact_id?: string | null
+          cost_brl?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          intent?: string | null
+          phone?: string | null
+          reason?: string | null
+          success?: boolean
+          text_length: number
+          voice_id: string
+        }
+        Update: {
+          channel?: string
+          contact_id?: string | null
+          cost_brl?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          intent?: string | null
+          phone?: string | null
+          reason?: string | null
+          success?: boolean
+          text_length?: number
+          voice_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brisa_audio_usage_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "brisa_unified_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brisa_human_takeover: {
         Row: {
           contact_id: string
@@ -1078,6 +1158,7 @@ export type Database = {
       }
       brisa_unified_contacts: {
         Row: {
+          age_bracket: string
           created_at: string | null
           display_name: string | null
           facebook_psid: string | null
@@ -1092,11 +1173,13 @@ export type Database = {
           lead_classification: string | null
           metadata: Json | null
           phone_e164: string | null
+          prefers_audio: boolean
           total_messages: number | null
           updated_at: string | null
           whatsapp_jid: string | null
         }
         Insert: {
+          age_bracket?: string
           created_at?: string | null
           display_name?: string | null
           facebook_psid?: string | null
@@ -1111,11 +1194,13 @@ export type Database = {
           lead_classification?: string | null
           metadata?: Json | null
           phone_e164?: string | null
+          prefers_audio?: boolean
           total_messages?: number | null
           updated_at?: string | null
           whatsapp_jid?: string | null
         }
         Update: {
+          age_bracket?: string
           created_at?: string | null
           display_name?: string | null
           facebook_psid?: string | null
@@ -1130,6 +1215,7 @@ export type Database = {
           lead_classification?: string | null
           metadata?: Json | null
           phone_e164?: string | null
+          prefers_audio?: boolean
           total_messages?: number | null
           updated_at?: string | null
           whatsapp_jid?: string | null

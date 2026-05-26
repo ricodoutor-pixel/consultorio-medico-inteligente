@@ -183,3 +183,65 @@ export function classifyLead(text: string): LeadCategory {
   }
   return "unknown";
 }
+
+// ============================================================
+// 🔊 ÁUDIO HÍBRIDO — decide se a Brisa responde em voz
+// Regras:
+//  • Sempre áudio: idoso, intent=pay, intent=sexual (corte seco), pessoa pediu áudio
+//  • Sempre áudio: resposta > 400 chars
+//  • Texto: 22h-7h (não acordar ninguém), saudações curtas, links puros, profissionais/B2B
+// ============================================================
+export type AudioDecision = {
+  useVoice: boolean;
+  reason: string;
+};
+
+export function shouldUseVoice(opts: {
+  text: string;
+  intent?: string;
+  ageBracket?: "adult" | "senior" | "unknown";
+  prefersAudio?: boolean;
+  leadCategory?: LeadCategory;
+  userMessage?: string;
+  hourLocal?: number; // 0-23 horário Brasília
+}): AudioDecision {
+  const {
+    text,
+    intent,
+    ageBracket = "unknown",
+    prefersAudio = false,
+    leadCategory = "unknown",
+    userMessage = "",
+    hourLocal = new Date().getUTCHours() - 3,
+  } = opts;
+
+  const t = (text || "").trim();
+  const um = (userMessage || "").toLowerCase();
+  const hour = ((hourLocal % 24) + 24) % 24;
+
+  // BLOQUEIOS — texto obrigatório
+  if (!t) return { useVoice: false, reason: "empty_text" };
+  if (hour >= 22 || hour < 7) return { useVoice: false, reason: "quiet_hours" };
+  if (leadCategory === "profissional" || leadCategory === "b2b") {
+    return { useVoice: false, reason: "professional_lead" };
+  }
+  // Link puro / muito curto
+  if (t.length < 40) return { useVoice: false, reason: "too_short" };
+  if (/^https?:\/\/\S+$/i.test(t)) return { useVoice: false, reason: "raw_link" };
+
+  // GATILHOS — áudio obrigatório
+  if (ageBracket === "senior") return { useVoice: true, reason: "senior" };
+  if (prefersAudio) return { useVoice: true, reason: "user_preference" };
+  if (/\b(me manda (no |em )?audio|prefiro audio|manda audio|fala por audio|nao consigo ler|nao sei ler)\b/i.test(um)) {
+    return { useVoice: true, reason: "user_requested_audio" };
+  }
+  if (intent === "pay") return { useVoice: true, reason: "payment_intent" };
+  if (intent === "sexual") return { useVoice: true, reason: "harassment_authority" };
+  if (t.length > 400) return { useVoice: true, reason: "long_response" };
+
+  return { useVoice: false, reason: "default_text" };
+}
+
+// Sarah — voz oficial da Brisa (PT-BR feminina, acolhedora e profissional)
+export const BRISA_VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
+

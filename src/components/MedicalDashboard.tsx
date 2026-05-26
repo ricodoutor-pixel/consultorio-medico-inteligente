@@ -17,6 +17,7 @@ import { doctorChannel } from "@/lib/realtime-channels";
 import { toast } from "sonner";
 import { generatePrescriptionPDF, type PrescriptionData } from "@/lib/prescriptionPDF";
 import { APP_CONFIG } from "@/lib/app-config";
+import { DrEdilsonClinicalAgent } from "@/components/DrEdilsonClinicalAgent";
 
 // ─── Types ──────────────────────────────────────────────────
 interface WaitingPatient {
@@ -673,6 +674,12 @@ export function MedicalDashboard() {
           </>
         )}
       </aside>
+
+      <DrEdilsonClinicalAgent
+        patientContext={activePatient
+          ? `${activePatient.name}, ${activePatient.age} anos. Tags: ${activePatient.tags.join(", ")}. Sintomas: ${activePatient.symptoms}`
+          : undefined}
+      />
     </div>
   );
 }

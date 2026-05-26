@@ -100,11 +100,8 @@ export const CookieConsentBanner = () => {
       }`}
     >
       <div className={`mx-2 sm:mx-6 ${isPlansRoute && isMobile ? "mb-2" : "mb-2 sm:mb-6"}`}>
-        <div className={`relative overflow-hidden rounded-xl sm:rounded-2xl border border-emerald-500/20 shadow-2xl shadow-emerald-900/40 ${
-          (isDenseCatalogRoute && isMobile) || (isSaudeVerdeRoute && isMobile)
-            ? "bg-emerald-950/95"
-            : "bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-emerald-900/95 backdrop-blur-xl"
-        }`}>
+        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-emerald-500/20 shadow-2xl shadow-emerald-900/40 bg-gradient-to-r from-emerald-900/95 via-emerald-800/95 to-emerald-900/95 backdrop-blur-xl">
+
           {/* Decorative leaf pattern — desktop only para manter o banner enxuto no mobile */}
           <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-1/3 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48cGF0aCBkPSJNMzAgNUMxNSAxMCA1IDIwIDUgMzVjMCAxNSAyMCAyMCAyNSAyMFM1NSA1MCA1NSAzNUM1NSAyMCA0NSAxMCAzMCA1eiIgZmlsbD0iIzRhZGU4MCIgb3BhY2l0eT0iMC4zIi8+PC9zdmc+')] bg-repeat" />
 

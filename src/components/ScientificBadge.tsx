@@ -91,7 +91,7 @@ export const ScientificBadge = () => {
               <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary">
                 Ver no PubMed <ExternalLink size={11} />
               </span>
-            </motion.a>
+            </a>
           ))}
         </div>
       </div>

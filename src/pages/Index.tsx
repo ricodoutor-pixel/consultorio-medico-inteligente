@@ -480,7 +480,9 @@ const Index = () => {
 
       {/* Mercado Cannabis Medicinal - Projeção Interativa */}
       <RecoverableRender sourceRef="home-cannabis-market-chart">
-        <CannabisMarketChart />
+        <Suspense fallback={<div className="py-20 text-center text-muted-foreground text-sm">Carregando dados do mercado...</div>}>
+          <CannabisMarketChart />
+        </Suspense>
       </RecoverableRender>
 
       <LocalMapSection />

@@ -115,6 +115,12 @@ export default function MeuCartao() {
           Descontos em clínicas + saldo PIX para farmácia.
         </p>
 
+        <Suspense fallback={null}>
+          <div className="mb-5">
+            <WidgetMonitorRapido />
+          </div>
+        </Suspense>
+
         {loading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />

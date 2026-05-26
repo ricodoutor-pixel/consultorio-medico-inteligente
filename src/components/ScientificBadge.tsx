@@ -73,17 +73,13 @@ export const ScientificBadge = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-4 max-w-5xl mx-auto">
-          {SAMPLE_STUDIES.map((s, i) => (
-            <motion.a
+          {SAMPLE_STUDIES.map((s) => (
+            <a
               key={s.pubmedId}
               href={`https://pubmed.ncbi.nlm.nih.gov/${s.pubmedId}/`}
               target="_blank"
               rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="group p-5 rounded-2xl bg-card/40 border border-border hover:border-primary/40 transition-all backdrop-blur-sm"
+              className="group p-5 rounded-2xl bg-card border border-border hover:border-primary/40 transition-colors"
             >
               <BookOpen size={20} className="text-primary mb-3" />
               <p className="text-sm font-bold text-foreground leading-snug mb-2 line-clamp-3 group-hover:text-primary transition-colors">

@@ -85,7 +85,7 @@ export default function MonitorCardiacoPage() {
           { i: Timer, t: "2. Aguarde 30s", d: "Mantenha o dedo firme" },
           { i: MessageCircleHeart, t: "3. Veja e converse", d: "Brisa interpreta seu resultado" },
         ].map(({ i: Icon, t, d }) => (
-          <Card key={t} className="p-4 text-center bg-card/60 border border-primary/10">
+          <Card key={t} className="p-4 text-center bg-card border border-primary/10">
             <Icon className="mx-auto text-primary mb-2" size={28} />
             <p className="font-semibold text-sm">{t}</p>
             <p className="text-xs text-muted-foreground">{d}</p>

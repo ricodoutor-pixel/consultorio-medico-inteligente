@@ -3,13 +3,14 @@
  * 100% local. Nenhum frame sai do dispositivo.
  */
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Heart, Camera, AlertTriangle, Share2, MessageCircle, RotateCw, Save } from "lucide-react";
+import { Heart, Camera, AlertTriangle, Share2, MessageCircle, RotateCw, Save, Brain, Activity, Gauge, Wind, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
 import { butterworthBandpassPPG } from "@/lib/ppg-butterworth";
+import { computeBiomarkers, stressLabel, recoveryLabel, autonomicLabel, type Biomarkers } from "@/lib/ppg-biomarkers";
 
 
 type Phase = "idle" | "permission" | "measuring" | "result" | "error";
@@ -26,6 +27,7 @@ interface Result {
   classification: "normal" | "atencao" | "critico";
   label: string;
   message: string;
+  biomarkers: Biomarkers;
 }
 
 function classify(bpm: number): Pick<Result, "classification" | "label" | "message"> {
@@ -211,7 +213,8 @@ export default function MonitorCardiaco() {
   const finalize = useCallback(async () => {
     const { bpm, hrv, quality } = computeBPM(signalRef.current, TARGET_FPS);
     const cls = classify(bpm);
-    const res: Result = { bpm, hrv, quality, ...cls };
+    const biomarkers = computeBiomarkers(bpm, hrv);
+    const res: Result = { bpm, hrv, quality, ...cls, biomarkers };
     stopAll();
     setResult(res);
     setPhase("result");
@@ -220,7 +223,15 @@ export default function MonitorCardiaco() {
     setHistory(newHistory);
     try { localStorage.setItem("ppg_history", JSON.stringify(newHistory)); } catch { /* noop */ }
 
-    trackEvent("monitor_concluido", { bpm, hrv: hrv ?? 0, quality });
+    trackEvent("monitor_concluido", {
+      bpm,
+      hrv: hrv ?? 0,
+      quality,
+      stress_score: biomarkers.stressScore,
+      stress_level: biomarkers.stressLevel,
+      metabolic_age: biomarkers.metabolicAge ?? 0,
+      vo2max: biomarkers.vo2maxEstimate ?? 0,
+    });
     trackEvent(res.classification === "normal" ? "monitor_resultado_normal" : "monitor_resultado_atencao", { bpm });
   }, [history, stopAll]);
 
@@ -426,11 +437,72 @@ export default function MonitorCardiaco() {
 
           {result.hrv != null && (
             <div className="rounded-lg border border-border bg-muted/30 p-3 text-center">
-              <p className="text-xs text-muted-foreground">Variabilidade (HRV)</p>
+              <p className="text-xs text-muted-foreground">Variabilidade (HRV · SDNN)</p>
               <p className="text-xl font-bold">{result.hrv} ms</p>
               <p className="text-xs text-muted-foreground mt-1">{hrvMessage(result.hrv)}</p>
             </div>
           )}
+
+          {/* Biomarcadores derivados */}
+          <div className="space-y-2">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground text-center">Biomarcadores</p>
+            <div className="grid grid-cols-2 gap-2">
+              <BiomarkerCard
+                icon={<Brain size={14} />}
+                label="Estresse"
+                value={stressLabel[result.biomarkers.stressLevel]}
+                detail={`${result.biomarkers.stressScore}/100`}
+                tone={
+                  result.biomarkers.stressLevel === "baixo" ? "good"
+                  : result.biomarkers.stressLevel === "moderado" ? "warn" : "bad"
+                }
+              />
+              <BiomarkerCard
+                icon={<Flame size={14} />}
+                label="Idade metabólica"
+                value={result.biomarkers.metabolicAge != null ? `${result.biomarkers.metabolicAge} anos` : "—"}
+                detail="estimada por HRV"
+                tone="neutral"
+              />
+              <BiomarkerCard
+                icon={<Wind size={14} />}
+                label="Recuperação"
+                value={recoveryLabel[result.biomarkers.recoveryLevel]}
+                detail="parassimpático"
+                tone={
+                  result.biomarkers.recoveryLevel === "excelente" || result.biomarkers.recoveryLevel === "boa"
+                    ? "good" : result.biomarkers.recoveryLevel === "regular" ? "warn" : "bad"
+                }
+              />
+              <BiomarkerCard
+                icon={<Activity size={14} />}
+                label="Eq. autonômico"
+                value={autonomicLabel[result.biomarkers.autonomicBalance]}
+                detail="SNA"
+                tone={result.biomarkers.autonomicBalance === "equilibrado" ? "good" : "warn"}
+              />
+              <BiomarkerCard
+                icon={<Gauge size={14} />}
+                label="Eficiência cardíaca"
+                value={`${result.biomarkers.cardiacEfficiency}/100`}
+                detail="BPM + HRV"
+                tone={
+                  result.biomarkers.cardiacEfficiency >= 70 ? "good"
+                  : result.biomarkers.cardiacEfficiency >= 45 ? "warn" : "bad"
+                }
+              />
+              <BiomarkerCard
+                icon={<Heart size={14} />}
+                label="VO₂ máx est."
+                value={result.biomarkers.vo2maxEstimate != null ? `${result.biomarkers.vo2maxEstimate}` : "—"}
+                detail="ml/kg/min"
+                tone="neutral"
+              />
+            </div>
+            <p className="text-[10px] text-muted-foreground text-center">
+              Estimativas educativas baseadas em literatura de HRV. Não são diagnóstico.
+            </p>
+          </div>
 
           <div className="text-xs text-muted-foreground flex justify-between">
             <span>Qualidade do sinal: <strong className="text-foreground capitalize">{result.quality}</strong></span>
@@ -469,6 +541,25 @@ export default function MonitorCardiaco() {
           </p>
         </Card>
       )}
+    </div>
+  );
+}
+
+type Tone = "good" | "warn" | "bad" | "neutral";
+function BiomarkerCard({ icon, label, value, detail, tone }: { icon: React.ReactNode; label: string; value: string; detail: string; tone: Tone }) {
+  const toneColor =
+    tone === "good" ? "text-green-400 border-green-500/30"
+    : tone === "warn" ? "text-yellow-400 border-yellow-500/30"
+    : tone === "bad" ? "text-red-400 border-red-500/30"
+    : "text-foreground border-border";
+  return (
+    <div className={`rounded-lg border ${toneColor} bg-muted/20 p-2.5`}>
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+        <span className={toneColor.split(" ")[0]}>{icon}</span>
+        {label}
+      </div>
+      <p className={`text-sm font-bold mt-0.5 ${toneColor.split(" ")[0]}`}>{value}</p>
+      <p className="text-[10px] text-muted-foreground">{detail}</p>
     </div>
   );
 }

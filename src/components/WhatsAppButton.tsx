@@ -215,17 +215,16 @@ export const WhatsAppButton = () => {
 
       <button
         onClick={() => setIsOpen((o) => !o)}
-          className={`relative p-1.5 rounded-full transition-transform duration-300 flex items-center justify-center overflow-hidden ${isSaudeVerdeRoute ? "shadow-lg" : "shadow-2xl hover:scale-110 glow-green"}`}
+        className="relative p-1.5 rounded-full transition-transform duration-300 hover:scale-110 flex items-center justify-center shadow-2xl glow-green overflow-hidden"
         style={{
-            background: isSaudeVerdeRoute
-              ? "hsl(var(--card))"
-              : "linear-gradient(135deg, hsl(152 100% 74% / 0.25), hsl(152 100% 74% / 0.10))",
+          background: "linear-gradient(135deg, hsl(152 100% 74% / 0.25), hsl(152 100% 74% / 0.10))",
           border: "2px solid hsl(152 100% 74% / 0.5)",
           width: buttonSize,
           height: buttonSize,
         }}
         aria-label="Fale conosco — Enfª Brisa"
       >
+
         {isOpen ? (
           <X size={28} className="text-secondary" />
         ) : (

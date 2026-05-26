@@ -9,6 +9,8 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
+import { butterworthBandpassPPG } from "@/lib/ppg-butterworth";
+
 
 type Phase = "idle" | "permission" | "measuring" | "result" | "error";
 type Quality = "fraca" | "boa" | "otima";
@@ -41,30 +43,16 @@ function hrvMessage(hrv: number | null): string {
   return "Boa recuperação — sistema nervoso equilibrado.";
 }
 
-/** Detecta picos em sinal 1D (algoritmo simples baseado em média móvel + threshold). */
+/** Detecta picos em sinal PPG após filtro Butterworth band-pass 0.5–3.5 Hz. */
 function detectPeaks(signal: number[], fps: number): number[] {
   if (signal.length < fps * 3) return [];
-  // Detrend: subtrai média móvel longa
-  const win = Math.round(fps * 1.5);
-  const detr = signal.map((v, i) => {
-    const a = Math.max(0, i - win);
-    const b = Math.min(signal.length, i + win);
-    let s = 0;
-    for (let k = a; k < b; k++) s += signal[k];
-    return v - s / (b - a);
-  });
-  // Suavização (média móvel curta)
-  const sm = detr.map((_, i) => {
-    const a = Math.max(0, i - 2);
-    const b = Math.min(detr.length, i + 3);
-    let s = 0;
-    for (let k = a; k < b; k++) s += detr[k];
-    return s / (b - a);
-  });
-  // Std para threshold
+  // Filtro Butterworth band-pass 4ª ordem (0.5–3.5 Hz, zero-phase)
+  const sm = butterworthBandpassPPG(signal, fps);
+  // Std para threshold dinâmico
   const mean = sm.reduce((a, b) => a + b, 0) / sm.length;
   const std = Math.sqrt(sm.reduce((a, b) => a + (b - mean) ** 2, 0) / sm.length);
   const thr = mean + std * 0.5;
+
   const minDist = Math.round(fps * 0.4); // 150 BPM máx
   const peaks: number[] = [];
   for (let i = 1; i < sm.length - 1; i++) {

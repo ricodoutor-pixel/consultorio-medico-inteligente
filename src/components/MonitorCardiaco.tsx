@@ -391,7 +391,7 @@ export default function MonitorCardiaco() {
       )}
 
       {phase === "measuring" && (
-        <Card className="p-5 space-y-4 bg-card/90 border border-primary/30">
+        <Card className="p-5 space-y-4 bg-card border border-primary/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Heart className="text-red-400 animate-pulse" size={22} />

@@ -50,21 +50,27 @@ const CustomTooltip = ({ active, payload, mode }: any) => {
 };
 
 const CannabisMarketChart = () => {
+  const isMobile = useIsMobile();
   const [mode, setMode] = useState<ViewMode>("planta");
-  const [medUsers, setMedUsers] = useState(347_200);
-  const [googleSearches, setGoogleSearches] = useState(12_580);
-  const [plantaUsers, setPlantaUsers] = useState(1_000);
-
-  const tick = useCallback(() => {
-    setMedUsers((p) => p + Math.floor(Math.random() * 3) + 1);
-    setGoogleSearches((p) => p + Math.floor(Math.random() * 8) + 2);
-    setPlantaUsers((p) => p + (Math.random() < 0.08 ? 5 : Math.random() < 0.4 ? 1 : 0));
-  }, []);
+  const medUsersRef = useRef(347_200);
+  const googleRef = useRef(12_580);
+  const plantaRef = useRef(1_000);
+  const [, setTick] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(tick, 1000);
+    const id = setInterval(() => {
+      medUsersRef.current += Math.floor(Math.random() * 3) + 1;
+      googleRef.current += Math.floor(Math.random() * 8) + 2;
+      if (Math.random() < 0.08) plantaRef.current += 5;
+      else if (Math.random() < 0.4) plantaRef.current += 1;
+      setTick((t) => t + 1);
+    }, 2000);
     return () => clearInterval(id);
-  }, [tick]);
+  }, []);
+
+  const medUsers = medUsersRef.current;
+  const googleSearches = googleRef.current;
+  const plantaUsers = plantaRef.current;
 
   const data = mode === "planta" ? plantaData : mercadoData;
   const color = mode === "planta" ? "#39FF14" : "#FFD700";

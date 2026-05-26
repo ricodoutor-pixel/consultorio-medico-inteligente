@@ -3,13 +3,14 @@
  * 100% local. Nenhum frame sai do dispositivo.
  */
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Heart, Camera, AlertTriangle, Share2, MessageCircle, RotateCw, Save } from "lucide-react";
+import { Heart, Camera, AlertTriangle, Share2, MessageCircle, RotateCw, Save, Brain, Activity, Gauge, Wind, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
 import { butterworthBandpassPPG } from "@/lib/ppg-butterworth";
+import { computeBiomarkers, stressLabel, recoveryLabel, autonomicLabel, type Biomarkers } from "@/lib/ppg-biomarkers";
 
 
 type Phase = "idle" | "permission" | "measuring" | "result" | "error";

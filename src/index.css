@@ -404,38 +404,58 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
   overflow: hidden;
 }
 
-/* Guarda anti-glitch GPU em mobile na página /saude-verde
-   (Chrome Android compõe mal radial-gradient absoluto + bg-clip-text → scanlines verde/roxo) */
+/* Guarda anti-glitch GPU MÁXIMA em mobile na página /saude-verde
+   Chrome Android compõe mal radial-gradient + sombras grandes + bg-clip-text → scanlines verde/branco.
+   Solução: anula todos os disparadores de composição (transform, filter, shadow, gradient, blur)
+   e isola pintura por seção (contain: paint) para evitar tiles compartilhados corrompidos. */
 @media (max-width: 767px) {
-  .saude-verde-hero {
-    background-image: none !important;
-    background: hsl(var(--background)) !important;
-    filter: none !important;
-    backdrop-filter: none !important;
-  }
-  .saude-verde-hero canvas,
-  .saude-verde-hero [class*="noise"],
-  .saude-verde-hero [class*="grain"],
-  .saude-verde-hero [class*="particles"] {
-    display: none !important;
-  }
-
-  body.saude-verde-page .glass,
-  body.saude-verde-page [class*="backdrop-blur"],
-  body.saude-verde-page .glow-green,
-  body.saude-verde-page .shadow-2xl {
+  body.saude-verde-page,
+  body.saude-verde-page *,
+  body.saude-verde-page *::before,
+  body.saude-verde-page *::after {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    will-change: auto !important;
     filter: none !important;
+    text-shadow: none !important;
+    background-attachment: scroll !important;
+    background-image: none !important;
+    box-shadow: none !important;
   }
 
-  body.saude-verde-page [role="dialog"][aria-label="Consentimento de Cookies — LGPD"],
-  body.saude-verde-page nav.fixed.bottom-0,
-  body.saude-verde-page .fixed.right-3,
-  body.saude-verde-page .fixed.md\:right-6 {
+  body.saude-verde-page {
+    background: hsl(var(--background)) !important;
+  }
+  body.saude-verde-page .bg-card,
+  body.saude-verde-page [class*="bg-card"] {
+    background: hsl(var(--card)) !important;
+  }
+  body.saude-verde-page .bg-primary,
+  body.saude-verde-page button.bg-primary,
+  body.saude-verde-page a.bg-primary,
+  body.saude-verde-page [class*="bg-primary"]:not([class*="bg-primary/"]) {
+    background: hsl(var(--primary)) !important;
+  }
+
+  /* Texto com gradient-clip → fallback sólido */
+  body.saude-verde-page .bg-clip-text,
+  body.saude-verde-page .text-transparent {
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    color: hsl(var(--primary)) !important;
+  }
+
+  /* Isola pintura de seções altas para evitar corrupção de tiles entre sections */
+  body.saude-verde-page section {
+    contain: layout paint;
     transform: none !important;
-    will-change: auto !important;
-    background-image: none !important;
+  }
+
+  /* Mata animações que mantêm layers GPU vivos */
+  body.saude-verde-page [class*="animate-in"],
+  body.saude-verde-page [class*="slide-in"],
+  body.saude-verde-page [class*="fade-in"] {
+    animation: none !important;
   }
 }
 

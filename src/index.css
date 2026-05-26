@@ -404,60 +404,20 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
   overflow: hidden;
 }
 
-/* Guarda anti-glitch GPU MÁXIMA em mobile na página /saude-verde
-   Chrome Android compõe mal radial-gradient + sombras grandes + bg-clip-text → scanlines verde/branco.
-   Solução: anula todos os disparadores de composição (transform, filter, shadow, gradient, blur)
-   e isola pintura por seção (contain: paint) para evitar tiles compartilhados corrompidos. */
+/* Guarda mínima anti-glitch GPU em mobile na página /saude-verde.
+   Apenas desabilita backdrop-filter e blur pesado — NÃO altera cores,
+   sombras, gradientes nem animações (preserva 100% do visual original). */
 @media (max-width: 767px) {
-  body.saude-verde-page,
-  body.saude-verde-page *,
-  body.saude-verde-page *::before,
-  body.saude-verde-page *::after {
-    backdrop-filter: none !important;
+  body.saude-verde-page [class*="backdrop-blur"] {
     -webkit-backdrop-filter: none !important;
-    will-change: auto !important;
+    backdrop-filter: none !important;
+  }
+  body.saude-verde-page [class*="blur-["] {
     filter: none !important;
-    text-shadow: none !important;
-    background-attachment: scroll !important;
-    background-image: none !important;
-    box-shadow: none !important;
-  }
-
-  body.saude-verde-page {
-    background: hsl(var(--background)) !important;
-  }
-  body.saude-verde-page .bg-card,
-  body.saude-verde-page [class*="bg-card"] {
-    background: hsl(var(--card)) !important;
-  }
-  body.saude-verde-page .bg-primary,
-  body.saude-verde-page button.bg-primary,
-  body.saude-verde-page a.bg-primary,
-  body.saude-verde-page [class*="bg-primary"]:not([class*="bg-primary/"]) {
-    background: hsl(var(--primary)) !important;
-  }
-
-  /* Texto com gradient-clip → fallback sólido */
-  body.saude-verde-page .bg-clip-text,
-  body.saude-verde-page .text-transparent {
-    -webkit-background-clip: border-box !important;
-    background-clip: border-box !important;
-    color: hsl(var(--primary)) !important;
-  }
-
-  /* Isola pintura de seções altas para evitar corrupção de tiles entre sections */
-  body.saude-verde-page section {
-    contain: layout paint;
-    transform: none !important;
-  }
-
-  /* Mata animações que mantêm layers GPU vivos */
-  body.saude-verde-page [class*="animate-in"],
-  body.saude-verde-page [class*="slide-in"],
-  body.saude-verde-page [class*="fade-in"] {
-    animation: none !important;
+    -webkit-filter: none !important;
   }
 }
+
 
 @media print {
   nav,

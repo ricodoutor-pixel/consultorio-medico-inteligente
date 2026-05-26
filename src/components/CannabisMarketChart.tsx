@@ -271,7 +271,7 @@ const CannabisMarketChart = () => {
                         fill={`url(#${gradientId})`}
                         dot={{ r: 6, fill: color, stroke: "#0A0E27", strokeWidth: 3 }}
                         activeDot={{ r: 10, fill: color, stroke: "#fff", strokeWidth: 3 }}
-                        animationDuration={800}
+                        animationDuration={isMobile ? 0 : 800}
                       />
                     </AreaChart>
                   </ResponsiveContainer>

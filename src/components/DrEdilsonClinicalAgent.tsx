@@ -52,16 +52,25 @@ export function DrEdilsonClinicalAgent({ patientContext }: { patientContext?: st
     let assistantText = "";
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error("Faça login como médico para usar o apoio clínico.");
+        throw new Error("no-session");
+      }
+
       const resp = await fetch(CHAT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${session.access_token}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({ messages: newMessages }),
         signal: abortRef.current.signal,
       });
 
+      if (resp.status === 401) { toast.error("Sessão expirada. Faça login novamente."); throw new Error("401"); }
+      if (resp.status === 403) { toast.error("Acesso restrito a médicos cadastrados."); throw new Error("403"); }
       if (resp.status === 429) { toast.error("Limite de uso. Tente em instantes."); throw new Error("429"); }
       if (resp.status === 402) { toast.error("Créditos de IA esgotados."); throw new Error("402"); }
       if (!resp.ok || !resp.body) throw new Error("stream error");

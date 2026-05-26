@@ -162,8 +162,21 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-  // 1) Próximo IG na fila
-  const { data: queued } = await supabase
+  // Override manual via body { caption, image_url } — Admin "Publicar Agora"
+  let manualCaption = "";
+  let manualImageUrl = "";
+  try {
+    if (req.method === "POST") {
+      const body = await req.clone().json().catch(() => ({}));
+      manualCaption = (body?.caption || "").toString().trim();
+      manualImageUrl = (body?.image_url || body?.media_url || "").toString().trim();
+    }
+  } catch { /* ignore */ }
+
+  // 1) Próximo IG na fila (pulado se houver override manual)
+  const { data: queued } = manualCaption
+    ? { data: null as any }
+    : await supabase
     .from("manus_social_queue")
     .select("id, caption, script, image_url, hashtags")
     .eq("platform", "instagram")
@@ -181,7 +194,16 @@ Deno.serve(async (req) => {
   const topic = pickTopic();
   let geminiError: string | undefined;
 
-  if (queued) {
+  if (manualCaption) {
+    caption = sanitizeCaption(manualCaption);
+    if (manualImageUrl) {
+      imageUrl = manualImageUrl;
+    } else {
+      const gen = await generateGeminiImageForTopic(caption.slice(0, 200));
+      if (gen.url) imageUrl = gen.url;
+      else { geminiError = gen.error; imageUrl = await pickImageFromPool(supabase); }
+    }
+  } else if (queued) {
     caption = sanitizeCaption((queued.caption || queued.script || "").trim());
     if (queued.hashtags?.length)
       caption += "\n\n" + queued.hashtags.map((t: string) => (t.startsWith("#") ? t : `#${t}`)).join(" ");
@@ -198,6 +220,7 @@ Deno.serve(async (req) => {
     if (gen.url) imageUrl = gen.url;
     else { geminiError = gen.error; imageUrl = await pickImageFromPool(supabase); }
   }
+
   if (geminiError) console.error("[ig-auto-post] gemini image fallback:", geminiError);
 
   // Re-hospedar imagens externas (Pexels etc.) no bucket público para evitar

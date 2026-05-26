@@ -100,7 +100,10 @@ Deno.serve(async (req) => {
   let imageUrl: string | null = null;
 
   const topic = pickTopic();
-  if (queued) {
+  if (manualCaption) {
+    message = manualCaption;
+    imageUrl = manualImageUrl || null;
+  } else if (queued) {
     message = (queued.caption || queued.script || "").trim();
     if (queued.hashtags?.length) message += "\n\n" + queued.hashtags.map((t: string) => (t.startsWith("#") ? t : `#${t}`)).join(" ");
     imageUrl = queued.image_url || null;
@@ -108,11 +111,12 @@ Deno.serve(async (req) => {
     message = await generatePost();
   }
   // Sempre tenta gerar imagem via Gemini (Nano Banana); fallback no pool Pexels
-  if (!imageUrl) {
+  if (!imageUrl && !manualCaption) {
     const gen = await generateGeminiImageForTopic(topic);
     imageUrl = gen.url || await pickImageFromPool(supabase);
     if (gen.error) console.error("[fb-auto-post] gemini image fallback:", gen.error);
   }
+
   // Re-hospedar imagens externas (Pexels etc.) — Meta falha em URLs com cookies
   if (imageUrl && !imageUrl.includes("supabase.co/storage/")) {
     const rehosted = await rehostExternalImage(imageUrl);

@@ -10,7 +10,10 @@ const corsHeaders = {
 
 async function verifyMpSignature(req: Request, rawBody: string, paymentId: string): Promise<boolean> {
   const secret = Deno.env.get("MERCADO_PAGO_WEBHOOK_SECRET");
-  if (!secret) return true; // sem secret configurado → permissivo (compat). Configure no Vault para hardening.
+  if (!secret) {
+    console.error("[saude-plus-webhook] MERCADO_PAGO_WEBHOOK_SECRET not configured — refusing request");
+    return false;
+  }
   const sigHeader = req.headers.get("x-signature") || "";
   const reqId = req.headers.get("x-request-id") || "";
   if (!sigHeader || !reqId) return false;

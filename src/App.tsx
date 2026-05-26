@@ -72,6 +72,7 @@ const InfluencerDashboard = lazyWithRecovery(() => import("./pages/InfluencerDas
 const OnlineUsers = lazyWithRecovery(() => import("./pages/OnlineUsers"), { sourceRef: "/usuarios-online" });
 const AdminDashboard = lazyWithRecovery(() => import("./pages/AdminDashboard"), { sourceRef: "/admin-ceo" });
 const DownloadApp = lazyWithRecovery(() => import("./pages/DownloadApp"), { sourceRef: "/download" });
+const MonitorCardiacoPage = lazyWithRecovery(() => import("./pages/MonitorCardiaco"), { sourceRef: "/monitor-cardiaco" });
 const Comunidade = lazyWithRecovery(() => import("./pages/Comunidade"), { sourceRef: "/comunidade" });
 const DashboardPaciente = lazyWithRecovery(() => import("./pages/DashboardPaciente"), { sourceRef: "/dashboard" });
 const Agendamento = lazyWithRecovery(() => import("./pages/Agendamento"), { sourceRef: "/agendamento" });
@@ -260,6 +261,8 @@ const App = () => (
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/biblioteca" element={<BibliotecaCientifica />} />
                 <Route path="/download" element={<DownloadApp />} />
+                <Route path="/monitor-cardiaco" element={<MonitorCardiacoPage />} />
+                <Route path="/check-up-rapido" element={<MonitorCardiacoPage />} />
                 <Route path="/comunidade" element={<Comunidade />} />
                 <Route path="/dashboard" element={<DashboardPaciente />} />
                 <Route path="/agendamento" element={<Agendamento />} />

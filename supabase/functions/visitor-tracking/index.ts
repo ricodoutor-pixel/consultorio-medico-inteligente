@@ -81,6 +81,54 @@ Deno.serve(async (req) => {
         return jsonResponse({ error: "action and page are required" }, 400);
       }
 
+      // Runtime allowlist for action (prevents arbitrary interaction_type pollution)
+      const ALLOWED_ACTIONS = new Set([
+        "page_view","cta_click","scroll_depth","time_on_page","exit_intent",
+        "form_start","form_submit","product_view","add_to_cart","checkout_start",
+        "video_play","ebook_download","whatsapp_click","schedule_click",
+      ]);
+      if (!ALLOWED_ACTIONS.has(event.action)) {
+        return jsonResponse({ error: "Invalid action" }, 400);
+      }
+
+      // Length limits to prevent storage flooding
+      if (typeof event.page !== "string" || event.page.length > 500) {
+        return jsonResponse({ error: "page must be a string ≤500 chars" }, 400);
+      }
+      const tooLong = (v: unknown, max: number) =>
+        typeof v === "string" && v.length > max;
+      if (
+        tooLong(event.referrer, 500) ||
+        tooLong(event.utm_source, 100) ||
+        tooLong(event.utm_medium, 100) ||
+        tooLong(event.utm_campaign, 200) ||
+        tooLong(event.utm_content, 200) ||
+        tooLong(event.visitor_id, 128) ||
+        tooLong(event.phone, 32) ||
+        tooLong(event.user_id, 64)
+      ) {
+        return jsonResponse({ error: "Field length exceeded" }, 400);
+      }
+      if (event.metadata && JSON.stringify(event.metadata).length > 4000) {
+        return jsonResponse({ error: "metadata too large" }, 400);
+      }
+
+      // Per-IP rate limit (best-effort; ignore failures)
+      const ip =
+        req.headers.get("cf-connecting-ip") ||
+        req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        "unknown";
+      try {
+        const { data: allowed } = await supabase.rpc("check_edge_rate_limit", {
+          _identifier: `visitor-tracking:${ip}`,
+          _max_requests: 120,
+          _window_seconds: 60,
+        });
+        if (allowed === false) {
+          return jsonResponse({ error: "Rate limit exceeded" }, 429);
+        }
+      } catch { /* rate limiter optional */ }
+
       // Verify caller before trusting phone/user_id (prevents WhatsApp spam to arbitrary numbers).
       const authHeader = req.headers.get("Authorization") || "";
       let callerIsService = authHeader === `Bearer ${serviceKey}`;

@@ -1,29 +1,26 @@
-import { useState } from "react";
-import { MapPin, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
+/**
+ * LocalCTABanner — SEO-only.
+ * Renderiza brevemente (3s) menção local "São Paulo / Av. Paulista" para crawlers,
+ * mas NÃO é visível para usuários (sr-only após mount). Some automaticamente.
+ * Atendemos todo o Brasil — não há preferência geográfica real.
+ */
 export function LocalCTABanner() {
-  const [visible, setVisible] = useState(true);
+  const [mounted, setMounted] = useState(true);
 
-  if (!visible) return null;
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
 
+  if (!mounted) return null;
+
+  // sr-only: invisível ao usuário, lido por crawlers/SEO
   return (
-    <div className="bg-primary/90 text-primary-foreground text-center text-[11px] sm:text-xs md:text-sm py-1 sm:py-1.5 px-8 sm:px-4 relative z-50 flex items-center justify-center gap-1 sm:gap-2 leading-tight">
-      <MapPin size={12} className="shrink-0 hidden sm:block" />
-      <span className="truncate sm:truncate-none">
-        <span className="sm:hidden">Atendimento SP — <strong>Av. Paulista</strong> · </span>
-        <span className="hidden sm:inline">Atendimento prioritário · <strong>São Paulo</strong> · <strong>Av. Paulista</strong> — </span>
-        <Link to="/agendamento" className="underline font-semibold hover:opacity-80 transition-opacity">
-          Agende agora
-        </Link>
-      </span>
-      <button
-        onClick={() => setVisible(false)}
-        className="absolute right-1.5 sm:right-3 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 transition-opacity p-1"
-        aria-label="Fechar banner"
-      >
-        <X size={12} />
-      </button>
+    <div className="sr-only" aria-hidden="false">
+      Planta y Raiz — Telemedicina Cannabis Medicinal com atendimento em todo o Brasil.
+      Sede administrativa em São Paulo, Av. Paulista. Agendamento 100% online.
     </div>
   );
 }

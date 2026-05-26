@@ -513,11 +513,6 @@ export default function MonitorCardiaco() {
             <div>
               <p className="text-xs text-muted-foreground mb-1">Últimas medições</p>
 
-          <div className="text-xs text-muted-foreground flex justify-between">
-            <span>Qualidade do sinal: <strong className="text-foreground capitalize">{result.quality}</strong></span>
-            <span>{DURATION_S}s</span>
-          </div>
-
           {history.length > 1 && (
             <div>
               <p className="text-xs text-muted-foreground mb-1">Últimas medições</p>

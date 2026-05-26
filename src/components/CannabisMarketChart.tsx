@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import { TrendingUp, Users, Search, Leaf, Activity } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type ViewMode = "planta" | "mercado";
 
@@ -49,21 +50,27 @@ const CustomTooltip = ({ active, payload, mode }: any) => {
 };
 
 const CannabisMarketChart = () => {
+  const isMobile = useIsMobile();
   const [mode, setMode] = useState<ViewMode>("planta");
-  const [medUsers, setMedUsers] = useState(347_200);
-  const [googleSearches, setGoogleSearches] = useState(12_580);
-  const [plantaUsers, setPlantaUsers] = useState(1_000);
-
-  const tick = useCallback(() => {
-    setMedUsers((p) => p + Math.floor(Math.random() * 3) + 1);
-    setGoogleSearches((p) => p + Math.floor(Math.random() * 8) + 2);
-    setPlantaUsers((p) => p + (Math.random() < 0.08 ? 5 : Math.random() < 0.4 ? 1 : 0));
-  }, []);
+  const medUsersRef = useRef(347_200);
+  const googleRef = useRef(12_580);
+  const plantaRef = useRef(1_000);
+  const [, setTick] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(tick, 1000);
+    const id = setInterval(() => {
+      medUsersRef.current += Math.floor(Math.random() * 3) + 1;
+      googleRef.current += Math.floor(Math.random() * 8) + 2;
+      if (Math.random() < 0.08) plantaRef.current += 5;
+      else if (Math.random() < 0.4) plantaRef.current += 1;
+      setTick((t) => t + 1);
+    }, 2000);
     return () => clearInterval(id);
-  }, [tick]);
+  }, []);
+
+  const medUsers = medUsersRef.current;
+  const googleSearches = googleRef.current;
+  const plantaUsers = plantaRef.current;
 
   const data = mode === "planta" ? plantaData : mercadoData;
   const color = mode === "planta" ? "#39FF14" : "#FFD700";
@@ -99,8 +106,8 @@ const CannabisMarketChart = () => {
 
   return (
     <section className="py-20 md:py-32 bg-background relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]" />
+      <div className="absolute inset-0 pointer-events-none hidden md:block">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.08)_0%,transparent_70%)]" />
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10">
@@ -131,7 +138,7 @@ const CannabisMarketChart = () => {
           transition={{ delay: 0.15 }}
         >
           {liveCounters.map((c, i) => (
-            <Card key={i} className={`border ${c.bg} backdrop-blur-sm`}>
+            <Card key={i} className={`border ${c.bg}`}>
               <CardContent className="p-4 md:p-6 flex items-center gap-4">
                 <div className={`p-3 rounded-xl ${c.bg}`}>
                   <c.icon size={22} className={c.color} />
@@ -155,7 +162,7 @@ const CannabisMarketChart = () => {
           viewport={{ once: true }}
           transition={{ delay: 0.25 }}
         >
-          <Card className="border-border bg-card/60 backdrop-blur-md overflow-hidden">
+          <Card className="border-border bg-card overflow-hidden">
             <CardContent className="p-4 md:p-8">
               {/* Toggle Segmented Control */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
@@ -264,7 +271,7 @@ const CannabisMarketChart = () => {
                         fill={`url(#${gradientId})`}
                         dot={{ r: 6, fill: color, stroke: "#0A0E27", strokeWidth: 3 }}
                         activeDot={{ r: 10, fill: color, stroke: "#fff", strokeWidth: 3 }}
-                        animationDuration={800}
+                        animationDuration={isMobile ? 0 : 800}
                       />
                     </AreaChart>
                   </ResponsiveContainer>

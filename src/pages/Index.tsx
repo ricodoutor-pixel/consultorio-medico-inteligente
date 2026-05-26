@@ -4,7 +4,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Leaf, Users, Star, ArrowRight, TrendingUp, UserPlus, Download, Quote } from "lucide-react";
 import { motion } from "framer-motion";
-import CannabisMarketChart from "@/components/CannabisMarketChart";
+import { lazy, Suspense } from "react";
+const CannabisMarketChart = lazy(() => import("@/components/CannabisMarketChart"));
 import { Link } from "react-router-dom";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { LocalMapSection } from "@/components/LocalMapSection";
@@ -479,7 +480,9 @@ const Index = () => {
 
       {/* Mercado Cannabis Medicinal - Projeção Interativa */}
       <RecoverableRender sourceRef="home-cannabis-market-chart">
-        <CannabisMarketChart />
+        <Suspense fallback={<div className="py-20 text-center text-muted-foreground text-sm">Carregando dados do mercado...</div>}>
+          <CannabisMarketChart />
+        </Suspense>
       </RecoverableRender>
 
       <LocalMapSection />

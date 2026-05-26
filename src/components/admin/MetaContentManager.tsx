@@ -37,13 +37,13 @@ export default function MetaContentManager() {
     const ext = file.name.split(".").pop() || "bin";
     const path = `manual-posts/${Date.now()}.${ext}`;
     const { data, error } = await supabase.storage
-      .from("public-assets")
+      .from("social-posts")
       .upload(path, file, { upsert: false, contentType: file.type });
     if (error) {
       toast.error(`Upload falhou: ${error.message}`);
       return;
     }
-    const { data: pub } = supabase.storage.from("public-assets").getPublicUrl(data.path);
+    const { data: pub } = supabase.storage.from("social-posts").getPublicUrl(data.path);
     setMediaUrl(pub.publicUrl);
     toast.success("Mídia enviada.");
   }

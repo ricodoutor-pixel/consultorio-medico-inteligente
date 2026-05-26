@@ -421,8 +421,11 @@ Deno.serve(async (req) => {
       console.error("DB insert error:", insertError);
     }
 
-    // Handle payment status
-    const appointmentId = isCartPayment ? null : (externalRef || metadata.appointment_id);
+    // Handle payment status — only treat external_reference as appointmentId if it's a valid UUID
+    const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const candidateRef = externalRef && uuidRe.test(externalRef) ? externalRef : null;
+    const candidateMeta = metadata.appointment_id && uuidRe.test(metadata.appointment_id) ? metadata.appointment_id : null;
+    const appointmentId = isCartPayment ? null : (candidateRef || candidateMeta);
 
     if (payment.status === "approved") {
       console.log(`✅ Payment ${paymentId} approved — R$ ${totalAmount} | Platform: R$ ${platformFee} | Payout: R$ ${doctorPayout}`);

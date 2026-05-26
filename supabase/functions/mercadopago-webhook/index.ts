@@ -290,6 +290,102 @@ Deno.serve(async (req) => {
 
     const externalRef = payment.external_reference || "";
     const isCartPayment = externalRef.startsWith("cart-");
+    const isBrisaOrientacao = externalRef.startsWith("brisa-orientacao-");
+
+    // === BRISA ORIENTAÇÃO TÉCNICA (R$30 via WhatsApp) — branch dedicado ===
+    // Não existe appointment pré-criado; registramos pagamento, notificamos Dr. Edilson
+    // e o paciente direto pelo WhatsApp. Escrow/NPS/payout virão quando o appointment
+    // for criado após a consulta.
+    if (isBrisaOrientacao) {
+      const orientacaoPhone = String(metadata.phone || "").replace(/\D/g, "") || null;
+      const orientacaoName = metadata.name || payment.payer?.first_name || null;
+      const orientacaoEmail = payment.payer?.email || null;
+
+      // Upsert idempotente
+      const { error: upsertErr } = await supabase
+        .from("brisa_orientacao_payments")
+        .upsert({
+          payment_id: String(payment.id),
+          external_reference: externalRef,
+          status: payment.status,
+          amount: payment.transaction_amount || 0,
+          patient_phone: orientacaoPhone,
+          patient_name: orientacaoName,
+          patient_email: orientacaoEmail,
+          raw_payload: payment,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "payment_id" });
+      if (upsertErr) console.error("[brisa-orientacao] upsert error:", upsertErr);
+
+      if (payment.status === "approved") {
+        const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
+        const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");
+        const instance = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+        const drEdilsonPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
+        const amount = (payment.transaction_amount || 30).toFixed(2);
+
+        // 1) Notifica Dr. Edilson
+        if (evolutionUrl && evolutionKey) {
+          const drMsg =
+            `🩺 *NOVO PAGAMENTO ORIENTAÇÃO TÉCNICA*\n\n` +
+            `💰 Valor: R$ ${amount} (confirmado)\n` +
+            `👤 Paciente: ${orientacaoName || "—"}\n` +
+            `📱 WhatsApp: ${orientacaoPhone ? `+${orientacaoPhone}` : "—"}\n` +
+            `🆔 Ref: ${externalRef}\n\n` +
+            `Inicie a consulta pelo WhatsApp do paciente. Após concluir, registre a orientação para liberar o repasse.`;
+          await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", apikey: evolutionKey },
+            body: JSON.stringify({ number: drEdilsonPhone, text: drMsg }),
+          }).catch((err) => console.error("[brisa-orientacao] dr notify:", err));
+
+          // 2) Confirma para o paciente
+          if (orientacaoPhone) {
+            const patientMsg =
+              `✅ *Pagamento confirmado — Planta y Raiz*\n\n` +
+              `Olá ${orientacaoName?.split(" ")[0] || ""}! Recebemos seu pagamento de *R$ ${amount}*.\n\n` +
+              `🩺 O *Dr. Edilson Bezerra* (CRM 10963) entrará em contato em breve por aqui mesmo no WhatsApp para sua *Orientação Técnica em Cannabis Medicinal*.\n\n` +
+              `Qualquer dúvida fale comigo, a Enfª Brisa, neste número.`;
+            await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", apikey: evolutionKey },
+              body: JSON.stringify({ number: orientacaoPhone, text: patientMsg }),
+            }).catch((err) => console.error("[brisa-orientacao] patient notify:", err));
+          }
+
+          await supabase
+            .from("brisa_orientacao_payments")
+            .update({
+              doctor_notified_at: new Date().toISOString(),
+              patient_notified_at: orientacaoPhone ? new Date().toISOString() : null,
+            })
+            .eq("payment_id", String(payment.id));
+        }
+
+        // 3) Notifica admins no app
+        const { data: adminRoles } = await supabase
+          .from("user_roles").select("user_id").eq("role", "admin");
+        if (adminRoles) {
+          for (const admin of adminRoles) {
+            await supabase.from("notifications").insert({
+              user_id: admin.user_id,
+              title: "💰 Orientação Técnica paga",
+              message: `R$ ${amount} de ${orientacaoName || "paciente"} (${orientacaoPhone || "sem telefone"}). Dr. Edilson notificado.`,
+              type: "payment_received",
+              action_url: "/admin-master",
+            });
+          }
+        }
+
+        console.log(`✅ [brisa-orientacao] R$ ${amount} processado — paciente ${orientacaoPhone?.slice(0, 4)}*** notificado`);
+      }
+
+      return new Response(
+        JSON.stringify({ status: "processed", module: "brisa_orientacao", payment_status: payment.status }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
 
     // Determine split rate
     let platformFeeRate: number;

@@ -905,6 +905,66 @@ export type Database = {
         }
         Relationships: []
       }
+      brisa_orientacao_payments: {
+        Row: {
+          amount: number
+          consultation_completed_at: string | null
+          consultation_scheduled_at: string | null
+          created_at: string
+          doctor_notified_at: string | null
+          external_reference: string
+          id: string
+          patient_email: string | null
+          patient_name: string | null
+          patient_notified_at: string | null
+          patient_phone: string | null
+          patient_user_id: string | null
+          payment_id: string
+          payout_released_at: string | null
+          raw_payload: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          consultation_completed_at?: string | null
+          consultation_scheduled_at?: string | null
+          created_at?: string
+          doctor_notified_at?: string | null
+          external_reference: string
+          id?: string
+          patient_email?: string | null
+          patient_name?: string | null
+          patient_notified_at?: string | null
+          patient_phone?: string | null
+          patient_user_id?: string | null
+          payment_id: string
+          payout_released_at?: string | null
+          raw_payload?: Json | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          consultation_completed_at?: string | null
+          consultation_scheduled_at?: string | null
+          created_at?: string
+          doctor_notified_at?: string | null
+          external_reference?: string
+          id?: string
+          patient_email?: string | null
+          patient_name?: string | null
+          patient_notified_at?: string | null
+          patient_phone?: string | null
+          patient_user_id?: string | null
+          payment_id?: string
+          payout_released_at?: string | null
+          raw_payload?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       brisa_triage_severity: {
         Row: {
           created_at: string

@@ -442,28 +442,9 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
   }
 }
 
-/* ── ANDROID GPU FIX ──────────────────────────────────────────
-   Mobile (<1024px): desabilita backdrop-filter e blur pesado
-   para evitar crash do compositor GPU do Android Chrome.
-────────────────────────────────────────────────────────────── */
-@media (max-width: 1023px) {
-  .backdrop-blur-sm,
-  .backdrop-blur,
-  .backdrop-blur-md,
-  .backdrop-blur-lg,
-  .backdrop-blur-xl,
-  [class*="backdrop-blur"] {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
-  [class*="blur-["] {
-    filter: none !important;
-    -webkit-filter: none !important;
-  }
-  section, .container, main {
-    will-change: auto !important;
-  }
-}
+/* Guard mobile global removido — restaura visual original (backdrop-blur, will-change).
+   Fix anti-glitch agora escopado apenas em body.saude-verde-page (acima). */
+
 .phone-frame, .card-float {
   transform: translateZ(0);
   -webkit-transform: translateZ(0);

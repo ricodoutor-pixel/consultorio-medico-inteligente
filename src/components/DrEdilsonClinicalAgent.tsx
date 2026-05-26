@@ -9,6 +9,7 @@ import { Stethoscope, X, Send, Sparkles, BookOpen, AlertTriangle, FlaskConical, 
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
 

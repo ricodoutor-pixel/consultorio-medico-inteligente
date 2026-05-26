@@ -422,7 +422,7 @@ export default function MonitorCardiaco() {
       )}
 
       {phase === "result" && result && (
-        <Card className="p-6 space-y-5 bg-card/90 border border-primary/30">
+        <Card className="p-6 space-y-5 bg-card border border-primary/30">
           <div className="text-center">
             <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Sua Frequência Cardíaca</p>
             <div className="flex items-end justify-center gap-2">

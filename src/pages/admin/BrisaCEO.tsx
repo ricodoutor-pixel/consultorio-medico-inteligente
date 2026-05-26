@@ -14,6 +14,7 @@ import BrisaHealthChecklist from "@/components/admin/BrisaHealthChecklist";
 import BrisaMetaDebugPanel from "@/components/admin/BrisaMetaDebugPanel";
 import AutoPostCountdown from "@/components/admin/AutoPostCountdown";
 import BrisaChannelsStatus from "@/components/admin/BrisaChannelsStatus";
+import BrisaAudioPanel from "@/components/admin/BrisaAudioPanel";
 
 const CHANNEL_META: Record<Channel, { label: string; Icon: any; color: string }> = {
   whatsapp: { label: "WhatsApp", Icon: Phone, color: "text-green-400" },
@@ -91,6 +92,7 @@ export default function BrisaCEO() {
       <div className="container mx-auto px-4 pt-4 space-y-3">
         <AutoPostCountdown />
         <BrisaChannelsStatus />
+        <BrisaAudioPanel />
         <BrisaHealthChecklist />
         <BrisaMetaDebugPanel />
       </div>

@@ -1,5 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { BRISA_PERSONA } from "../_shared/brisa-persona.ts";
+import { BRISA_PERSONA, shouldUseVoice, classifyLead } from "../_shared/brisa-persona.ts";
 import {
   upsertUnifiedContact,
   logUnifiedMessage,
@@ -191,6 +191,45 @@ Quando a pessoa responder "sim", "quero", "pode mandar o link" ou variação cla
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    // 🔊 Decisão híbrida de áudio (não bloqueia: roda em background após o texto)
+    try {
+      let ageBracket: "adult" | "senior" | "unknown" = "unknown";
+      let prefersAudio = false;
+      if (unifiedContactId) {
+        const { data: c } = await supabase
+          .from("brisa_unified_contacts")
+          .select("age_bracket, prefers_audio")
+          .eq("id", unifiedContactId)
+          .single();
+        ageBracket = (c?.age_bracket as any) || "unknown";
+        prefersAudio = !!c?.prefers_audio;
+      }
+      const decision = shouldUseVoice({
+        text: replyText,
+        intent,
+        ageBracket,
+        prefersAudio,
+        leadCategory: classifyLead(incomingText),
+        userMessage: incomingText,
+      });
+      if (decision.useVoice) {
+        fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/brisa-tts-elevenlabs`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+          },
+          body: JSON.stringify({
+            text: replyText, phone: phoneClean, contactId: unifiedContactId,
+            intent, reason: decision.reason, channel: "whatsapp",
+          }),
+        }).catch((e) => console.error("[Brisa TTS] dispatch error:", e));
+      }
+    } catch (e) {
+      console.error("[Brisa Voice Decision] error:", e);
+    }
+
 
     await supabase.from("ai_events").insert({
       ai_name: "brisa_coo",

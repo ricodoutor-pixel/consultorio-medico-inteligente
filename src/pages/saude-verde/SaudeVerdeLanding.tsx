@@ -225,6 +225,30 @@ export default function SaudeVerdeLanding() {
           </Button>
         </div>
       </section>
+
+      {/* TUDO INCLUSO — versão sóbria, sem efeitos pesados */}
+      <section className="py-20 border-t border-border/40">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">Tudo o que está incluso</h2>
+            <p className="text-muted-foreground">Um único cartão. Acesso completo ao ecossistema Planta y Raiz.</p>
+          </div>
+          <ul className="divide-y divide-border/40 border-y border-border/40">
+            {benefits.map((b) => (
+              <li key={b.title} className="flex items-center justify-between gap-4 py-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span className="font-medium truncate">{b.title}</span>
+                </div>
+                <span className="text-sm text-muted-foreground text-right flex-shrink-0">{b.desc}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-center text-xs text-muted-foreground mt-8">
+            Disponível em todos os planos conforme cobertura contratada.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Heart, Camera, Timer, MessageCircleHeart, Info, Activity } from "lucide-react";
 import MonitorCardiaco from "@/components/MonitorCardiaco";
+import BrisaVoiceAssistant from "@/components/BrisaVoiceAssistant";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";

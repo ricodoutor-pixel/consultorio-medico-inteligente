@@ -41,6 +41,12 @@ Deno.serve(async (req) => {
   const unauth = requireServiceAuth(req, corsHeaders);
   if (unauth) return unauth;
 
+  if (WATCHDOG_DISABLED) {
+    return new Response(JSON.stringify({ ok: true, disabled: true, reason: "Dr. Edilson pediu apenas alertas de novos cadastros (27/05/2026)" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,

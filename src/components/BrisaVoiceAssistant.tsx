@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Mic, Loader2, Volume2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 interface Props {
   contextBpm?: number | null;
@@ -9,8 +8,11 @@ interface Props {
 
 type Status = "idle" | "recording" | "processing" | "speaking" | "error";
 
+const RECORD_MS = 5000;
+
 export default function BrisaVoiceAssistant({ contextBpm }: Props) {
   const [status, setStatus] = useState<Status>("idle");
+  const [countdown, setCountdown] = useState<number>(0);
   const [lastTranscript, setLastTranscript] = useState<string>("");
   const [lastReply, setLastReply] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
@@ -19,10 +21,13 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
   const chunksRef = useRef<BlobPart[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const stopTimerRef = useRef<number | null>(null);
+  const tickTimerRef = useRef<number | null>(null);
   const historyRef = useRef<Array<{ role: "user" | "assistant"; content: string }>>([]);
 
   useEffect(() => {
     return () => {
+      cleanupTimers();
       streamRef.current?.getTracks().forEach((t) => t.stop());
       if (audioRef.current) {
         audioRef.current.pause();
@@ -31,10 +36,24 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
     };
   }, []);
 
+  const cleanupTimers = () => {
+    if (stopTimerRef.current) { clearTimeout(stopTimerRef.current); stopTimerRef.current = null; }
+    if (tickTimerRef.current) { clearInterval(tickTimerRef.current); tickTimerRef.current = null; }
+  };
+
+  const handleTap = async () => {
+    if (status === "processing" || status === "speaking") return;
+    if (status === "recording") {
+      // toque novamente para encerrar antes dos 5s
+      stopRecording();
+      return;
+    }
+    await startRecording();
+  };
+
   const startRecording = async () => {
     setErrorMsg("");
     try {
-      // pausa qualquer áudio anterior
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
@@ -57,18 +76,28 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
       mr.start();
       mediaRecorderRef.current = mr;
       setStatus("recording");
+      setCountdown(Math.ceil(RECORD_MS / 1000));
+
+      // contador visual
+      tickTimerRef.current = window.setInterval(() => {
+        setCountdown((c) => (c > 0 ? c - 1 : 0));
+      }, 1000);
+
+      // auto-stop em 5 segundos
+      stopTimerRef.current = window.setTimeout(() => {
+        stopRecording();
+      }, RECORD_MS);
     } catch (e) {
       console.error(e);
-      setErrorMsg("Não consegui acessar o microfone. Permita o acesso e tente de novo.");
+      setErrorMsg("Preciso de permissão para usar o microfone e o auto-falante. Toque novamente e permita.");
       setStatus("error");
     }
   };
 
   const stopRecording = () => {
+    cleanupTimers();
     const mr = mediaRecorderRef.current;
-    if (mr && mr.state !== "inactive") {
-      mr.stop();
-    }
+    if (mr && mr.state !== "inactive") mr.stop();
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
   };
@@ -79,7 +108,6 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
       const mr = mediaRecorderRef.current;
       const mime = mr?.mimeType || "audio/webm";
       const blob = new Blob(chunksRef.current, { type: mime });
-      // Mesmo se o áudio for muito curto, mandamos: a Brisa cumprimenta no silêncio
       const audioBase64 = await blobToBase64(blob);
 
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brisa-voice-chat`;
@@ -97,25 +125,13 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
         }),
       });
 
-      if (res.status === 429) {
-        setErrorMsg("Muitas perguntas seguidas. Espere alguns segundos.");
-        setStatus("error");
-        return;
-      }
-      if (res.status === 402) {
-        setErrorMsg("Serviço temporariamente indisponível. Tente mais tarde.");
-        setStatus("error");
-        return;
-      }
+      if (res.status === 429) { setErrorMsg("Muitas perguntas seguidas. Espere alguns segundos."); setStatus("error"); return; }
+      if (res.status === 402) { setErrorMsg("Serviço temporariamente indisponível."); setStatus("error"); return; }
 
       const data = await res.json();
       if (!res.ok || !data.audioBase64) {
         console.error("Brisa voice error:", data);
-        setErrorMsg(
-          data.error === "no_speech_detected"
-            ? "Não entendi. Fale mais perto do microfone."
-            : "A Brisa não conseguiu responder agora. Tente novamente.",
-        );
+        setErrorMsg("A Brisa não conseguiu responder. Toque e fale novamente.");
         setStatus("error");
         return;
       }
@@ -127,7 +143,6 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
         { role: "assistant", content: data.reply || "" },
       );
 
-      // toca a resposta
       const audioUrl = `data:${data.mimeType || "audio/mpeg"};base64,${data.audioBase64}`;
       const audio = new Audio(audioUrl);
       audioRef.current = audio;
@@ -137,13 +152,14 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
       await audio.play().catch(() => setStatus("idle"));
     } catch (e) {
       console.error(e);
-      setErrorMsg("Algo deu errado. Tente novamente.");
+      setErrorMsg("Algo deu errado. Toque novamente.");
       setStatus("error");
     }
   };
 
   const isRecording = status === "recording";
-  const isBusy = status === "processing" || status === "speaking";
+  const isProcessing = status === "processing";
+  const isSpeaking = status === "speaking";
 
   return (
     <Card className="p-5 bg-card border-primary/30">
@@ -153,51 +169,39 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
         </div>
         <h3 className="font-bold text-lg">Fale com a Enfermeira Brisa</h3>
         <p className="text-sm text-muted-foreground max-w-xs">
-          Segure o botão, faça sua pergunta, solte. Ela responde por voz.
+          Toque no botão e faça sua pergunta. A Brisa escuta 5 segundos e responde por voz.
         </p>
       </div>
 
       <div className="flex flex-col items-center gap-3">
         <button
           type="button"
-          aria-label="Segure para falar com a Brisa"
-          disabled={isBusy}
-          onMouseDown={startRecording}
-          onMouseUp={stopRecording}
-          onMouseLeave={() => isRecording && stopRecording()}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            startRecording();
-          }}
-          onTouchEnd={(e) => {
-            e.preventDefault();
-            stopRecording();
-          }}
-          className={`relative w-28 h-28 rounded-full flex items-center justify-center transition-all select-none touch-none ${
+          aria-label="Toque para falar com a Brisa"
+          onClick={handleTap}
+          disabled={isProcessing || isSpeaking}
+          className={`relative w-28 h-28 rounded-full flex items-center justify-center transition-all select-none ${
             isRecording
               ? "bg-red-600 scale-110 shadow-[0_0_40px_rgba(239,68,68,0.6)]"
-              : isBusy
+              : isProcessing || isSpeaking
               ? "bg-primary/40 cursor-wait"
               : "bg-primary hover:bg-primary/90 active:scale-95 animate-pulse shadow-[0_0_30px_hsl(var(--primary)/0.5)]"
           } disabled:opacity-70`}
         >
-          {status === "processing" ? (
+          {isProcessing ? (
             <Loader2 className="text-white animate-spin" size={42} />
-          ) : status === "speaking" ? (
+          ) : isSpeaking ? (
             <Volume2 className="text-white animate-pulse" size={42} />
           ) : (
             <Mic className="text-white animate-pulse" size={42} />
           )}
-          {(isRecording || status === "idle") && (
-            <span className={`absolute inset-0 rounded-full border-4 ${isRecording ? "border-red-300/60" : "border-primary/40"} animate-ping`} />
-          )}
+          <span className={`absolute inset-0 rounded-full border-4 ${isRecording ? "border-red-300/60" : "border-primary/40"} animate-ping pointer-events-none`} />
         </button>
 
         <p className="text-sm text-center font-medium min-h-[1.5rem]">
-          {status === "idle" && "Segure e fale com a Brisa"}
-          {status === "recording" && "Estou ouvindo… solte para enviar"}
-          {status === "processing" && "Brisa está pensando…"}
-          {status === "speaking" && "Brisa está respondendo…"}
+          {status === "idle" && "Toque para falar com a Brisa"}
+          {isRecording && `Ouvindo… ${countdown}s`}
+          {isProcessing && "Brisa está pensando…"}
+          {isSpeaking && "Brisa está respondendo…"}
           {status === "error" && (errorMsg || "Tente novamente")}
         </p>
       </div>
@@ -229,7 +233,6 @@ function blobToBase64(blob: Blob): Promise<string> {
     const reader = new FileReader();
     reader.onloadend = () => {
       const result = reader.result as string;
-      // remove "data:...;base64,"
       const comma = result.indexOf(",");
       resolve(comma >= 0 ? result.slice(comma + 1) : result);
     };

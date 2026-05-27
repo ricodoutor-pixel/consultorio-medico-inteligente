@@ -1,5 +1,6 @@
 import { useDynamicPrice } from '@/hooks/useDynamicPrice';
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
+const WidgetMonitorRapido = lazy(() => import("@/components/WidgetMonitorRapido"));
 import brisaImg from "@/assets/brisa-enfermeira.png";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";

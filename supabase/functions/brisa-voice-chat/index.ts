@@ -20,6 +20,8 @@ REGRAS DE RESPOSTA:
 - Nunca diga que houve erro técnico, falha de sistema ou que você não conseguiu ouvir.
 - Nunca dê diagnóstico. Sempre encaminhe ao Dr. Edilson em caso de dúvida clínica.`;
 
+const DIRECT_GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+
 interface ChatBody {
   transcript?: string;
   contextBpm?: number | null;
@@ -67,15 +69,47 @@ Deno.serve(async (req) => {
       }),
     });
 
-    if (!aiRes.ok) {
+    let aiData: any = null;
+    if (aiRes.ok) {
+      aiData = await aiRes.json();
+    } else {
       const err = await aiRes.text();
-      console.error("AI failed:", aiRes.status, err);
-      if (aiRes.status === 429) return json({ error: "rate_limited" }, 429);
-      if (aiRes.status === 402) return json({ error: "payment_required" }, 402);
-      return json({ error: "ai_failed" }, 502);
+      console.error("Lovable AI failed:", aiRes.status, err);
+
+      const directGeminiKey =
+        Deno.env.get("GOOGLE_GENERATIVE_AI_API_KEY") ||
+        Deno.env.get("GEMINI_API_KEY") ||
+        "";
+
+      if (!directGeminiKey) {
+        if (aiRes.status === 429) return json({ error: "rate_limited" }, 429);
+        if (aiRes.status === 402) return json({ error: "payment_required" }, 402);
+        return json({ error: "ai_failed" }, 502);
+      }
+
+      const directRes = await fetch(DIRECT_GEMINI_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${directGeminiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gemini-2.5-flash",
+          messages,
+        }),
+      });
+
+      if (!directRes.ok) {
+        const directErr = await directRes.text();
+        console.error("Direct Gemini failed:", directRes.status, directErr);
+        if (directRes.status === 429) return json({ error: "rate_limited" }, 429);
+        if (directRes.status === 402) return json({ error: "payment_required" }, 402);
+        return json({ error: "ai_failed" }, 502);
+      }
+
+      aiData = await directRes.json();
     }
 
-    const aiData = await aiRes.json();
     const rawReply = (aiData.choices?.[0]?.message?.content || "").trim();
     const reply = rawReply.replace(/\s+/g, " ").slice(0, 240) || "Sim, estou aqui com você. Em que posso ajudar agora?";
 

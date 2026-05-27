@@ -1,5 +1,6 @@
 import { useDynamicPrice } from '@/hooks/useDynamicPrice';
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
+const WidgetMonitorRapido = lazy(() => import("@/components/WidgetMonitorRapido"));
 import brisaImg from "@/assets/brisa-enfermeira.png";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -216,9 +217,14 @@ const Telemedicina = () => {
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground leading-tight mb-4">
               Orientação Técnica <span className="text-gradient-green">Inteligente</span>
             </h1>
-            <p className="text-muted-foreground max-w-2xl font-medium">
+            <p className="text-muted-foreground max-w-2xl font-medium mb-6">
               Triagem conduzida pela Brisa IA + análise clínica + receita digital ANVISA — supervisionado por IA de última geração 24×7.
             </p>
+            <Suspense fallback={null}>
+              <div className="max-w-2xl mb-2">
+                <WidgetMonitorRapido />
+              </div>
+            </Suspense>
           </motion.div>
         </div>
       </section>

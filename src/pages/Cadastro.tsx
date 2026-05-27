@@ -132,6 +132,11 @@ const Cadastro = () => {
         }
         // 4. Link referral (3-level MLM tree)
         await linkReferralOnSignup(authData.user.id);
+
+        // 5. Alerta WhatsApp ao Dr. Edilson — Modo Cadastro Ativado (signup)
+        supabase.functions
+          .invoke("brisa-signup-alert", { body: { user_id: authData.user.id, event: "signup" } })
+          .catch((e) => console.warn("[brisa-signup-alert] signup", e));
       }
 
       trackPixelEvent("Lead", { content_name: "patient_signup", content_category: type }, {

@@ -2,6 +2,7 @@
 // Chamado pelo painel /admin/brisa-ceo a cada 30s. Retorna 200 OK sempre, com map de status.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { breakerSnapshot } from "../_shared/brisa-ai.ts";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 import { FB_PAGE_ACCESS_TOKEN, IG_PAGE_ACCESS_TOKEN } from "../_shared/meta-secrets.ts";
 

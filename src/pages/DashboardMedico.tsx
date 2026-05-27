@@ -20,6 +20,7 @@ import { DoctorFinancialCards } from "@/components/doctor/DoctorFinancialCards";
 import { DoctorBICockpit } from "@/components/doctor/DoctorBICockpit";
 import { DominationMonitor } from "@/components/doctor/DominationMonitor";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
+import { DoctorAuxDiagnosticTools } from "@/components/doctor/DoctorAuxDiagnosticTools";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
@@ -358,6 +359,9 @@ const DashboardMedico = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Ferramentas Auxiliares de Monitoramento e Diagnóstico */}
+            <DoctorAuxDiagnosticTools />
 
             {/* Quick Access — Cannabis & Clinical Tools */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">

@@ -64,42 +64,44 @@ Deno.serve(async (req) => {
       return json({ error: "stt_failed", detail: err.slice(0, 200) }, 502);
     }
     const sttData = await sttRes.json();
-    const transcript = (sttData.text || "").trim();
+    let transcript = (sttData.text || "").trim();
+    let forcedReply = "";
     if (!transcript) {
-      return json({ error: "no_speech_detected" }, 200);
+      transcript = "[silêncio]";
+      forcedReply = "Olá! Em que posso te ajudar hoje?";
     }
 
-    // 2) Gemini via Lovable AI Gateway
-    const contextMsg = body.contextBpm
-      ? `\n[Contexto: o último BPM medido do paciente foi ${body.contextBpm}.]`
-      : "";
-    const messages = [
-      { role: "system", content: SYSTEM_PROMPT + contextMsg },
-      ...(body.history || []).slice(-6),
-      { role: "user", content: transcript },
-    ];
+    let reply = forcedReply;
+    if (!reply) {
+      // 2) Gemini via Lovable AI Gateway
+      const contextMsg = body.contextBpm
+        ? `\n[Contexto: o último BPM medido do paciente foi ${body.contextBpm}.]`
+        : "";
+      const messages = [
+        { role: "system", content: SYSTEM_PROMPT + contextMsg },
+        ...(body.history || []).slice(-6),
+        { role: "user", content: transcript },
+      ];
 
-    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages,
-      }),
-    });
-    if (!aiRes.ok) {
-      const err = await aiRes.text();
-      console.error("AI failed:", aiRes.status, err);
-      if (aiRes.status === 429) return json({ error: "rate_limited" }, 429);
-      if (aiRes.status === 402) return json({ error: "payment_required" }, 402);
-      return json({ error: "ai_failed" }, 502);
+      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ model: "google/gemini-2.5-flash", messages }),
+      });
+      if (!aiRes.ok) {
+        const err = await aiRes.text();
+        console.error("AI failed:", aiRes.status, err);
+        if (aiRes.status === 429) return json({ error: "rate_limited" }, 429);
+        if (aiRes.status === 402) return json({ error: "payment_required" }, 402);
+        return json({ error: "ai_failed" }, 502);
+      }
+      const aiData = await aiRes.json();
+      reply = (aiData.choices?.[0]?.message?.content || "").trim();
+      if (!reply) return json({ transcript, error: "empty_reply" }, 200);
     }
-    const aiData = await aiRes.json();
-    const reply = (aiData.choices?.[0]?.message?.content || "").trim();
-    if (!reply) return json({ transcript, error: "empty_reply" }, 200);
 
     // 3) TTS — ElevenLabs Sarah
     const ttsRes = await fetch(

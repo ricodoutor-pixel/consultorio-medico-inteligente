@@ -79,11 +79,7 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
       const mr = mediaRecorderRef.current;
       const mime = mr?.mimeType || "audio/webm";
       const blob = new Blob(chunksRef.current, { type: mime });
-      if (blob.size < 1000) {
-        setStatus("idle");
-        setErrorMsg("Áudio muito curto. Segure o botão e fale.");
-        return;
-      }
+      // Mesmo se o áudio for muito curto, mandamos: a Brisa cumprimenta no silêncio
       const audioBase64 = await blobToBase64(blob);
 
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brisa-voice-chat`;
@@ -151,16 +147,14 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
 
   return (
     <Card className="p-5 bg-card border-primary/30">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
-          <Volume2 className="text-primary" size={20} />
+      <div className="flex flex-col items-center text-center gap-2 mb-4">
+        <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center animate-pulse">
+          <Volume2 className="text-primary" size={22} />
         </div>
-        <div>
-          <h3 className="font-bold text-base">Fale com a Enfermeira Brisa</h3>
-          <p className="text-xs text-muted-foreground">
-            Segure o botão, faça sua pergunta, solte. Ela responde por voz.
-          </p>
-        </div>
+        <h3 className="font-bold text-lg">Fale com a Enfermeira Brisa</h3>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          Segure o botão, faça sua pergunta, solte. Ela responde por voz.
+        </p>
       </div>
 
       <div className="flex flex-col items-center gap-3">
@@ -184,7 +178,7 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
               ? "bg-red-600 scale-110 shadow-[0_0_40px_rgba(239,68,68,0.6)]"
               : isBusy
               ? "bg-primary/40 cursor-wait"
-              : "bg-primary hover:bg-primary/90 active:scale-95"
+              : "bg-primary hover:bg-primary/90 active:scale-95 animate-pulse shadow-[0_0_30px_hsl(var(--primary)/0.5)]"
           } disabled:opacity-70`}
         >
           {status === "processing" ? (
@@ -192,10 +186,10 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
           ) : status === "speaking" ? (
             <Volume2 className="text-white animate-pulse" size={42} />
           ) : (
-            <Mic className={`text-white ${isRecording ? "animate-pulse" : ""}`} size={42} />
+            <Mic className="text-white animate-pulse" size={42} />
           )}
-          {isRecording && (
-            <span className="absolute inset-0 rounded-full border-4 border-red-300/60 animate-ping" />
+          {(isRecording || status === "idle") && (
+            <span className={`absolute inset-0 rounded-full border-4 ${isRecording ? "border-red-300/60" : "border-primary/40"} animate-ping`} />
           )}
         </button>
 

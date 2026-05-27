@@ -15,25 +15,26 @@ export const organizationSchema: SchemaOrgConfig = {
   type: 'Organization',
   data: {
     '@context': 'https://schema.org',
-    '@type': 'MedicalBusiness',
-    name: 'Planta & Raiz',
-    alternateName: 'Planta y Raiz',
-    description: 'Referência no tratamento com cannabis medicinal no Brasil. Telemedicina com especialistas.',
+    '@type': 'MedicalOrganization',
+    '@id': 'https://plantayraiz.com.br/#org',
+    name: 'Planta y Raiz — Cannabis Medicinal',
+    alternateName: ['Planta & Raiz', 'Mega Clínica Digital Planta y Raiz'],
+    description:
+      'A maior plataforma de cannabis medicinal do Brasil, com sede em São Paulo e atendimento nacional via telemedicina 24/7.',
     url: 'https://plantayraiz.com.br',
     logo: 'https://plantayraiz.com.br/dr-verdinho-512.png',
     image: 'https://plantayraiz.com.br/og-home.jpg',
-    
-    // Contato
+    slogan: 'Cannabis Medicinal em São Paulo e Brasil — Telemedicina 24/7',
+
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
       telephone: '+55-11-99136-3154',
       email: 'contato@plantayraiz.com.br',
-      areaServed: 'BR',
-      availableLanguage: ['pt-BR', 'en'],
+      areaServed: ['BR', 'São Paulo'],
+      availableLanguage: ['pt-BR', 'en', 'es'],
     },
-    
-    // Localização
+
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Av. Paulista, 1000 — Bela Vista',
@@ -42,38 +43,64 @@ export const organizationSchema: SchemaOrgConfig = {
       postalCode: '01310-100',
       addressCountry: 'BR',
     },
-    
-    // Redes Sociais
-    sameAs: [
-      'https://www.facebook.com/plantayraiz',
-      'https://www.instagram.com/plantayraiz',
-      'https://www.linkedin.com/company/plantayraiz',
-      'https://www.youtube.com/channel/UC_Azx7mmS0_edjCxv4MXQ1Q',
-      'https://www.tiktok.com/@plantayraiz',
+
+    // Alcance local (SP) + nacional (Brasil)
+    areaServed: [
+      { '@type': 'City', name: 'São Paulo' },
+      { '@type': 'State', name: 'São Paulo' },
+      { '@type': 'Country', name: 'Brazil' },
     ],
-    
-    // Médicos e Profissionais
+
+    // Especialidade — Medicina Canabinoide
     medicalSpecialty: [
       'CannabinoidMedicine',
       'Psychiatry',
       'Neurology',
       'Rheumatology',
       'Oncology',
+      'PainMedicine',
     ],
-    
-    // Serviços
-    areaServed: {
-      '@type': 'Country',
-      name: 'Brazil',
-    },
-    
-    // Certificações
+
     knowsAbout: [
       'Cannabis Medicinal',
-      'Telemedicina',
-      'Conformidade ANVISA',
+      'Telemedicina Canabinoide',
+      'RDC 660/2022 ANVISA',
+      'RDC 327/2019 ANVISA',
       'Conformidade LGPD',
       'Conformidade CFM',
+    ],
+
+    // Autoridade — estrelas nos resultados de busca
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      reviewCount: '3200',
+      bestRating: '5',
+      worstRating: '1',
+    },
+    review: [
+      {
+        '@type': 'Review',
+        reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+        author: { '@type': 'Person', name: 'Mariana S.' },
+        reviewBody:
+          'Atendimento humano e rápido em São Paulo. Recebi a prescrição ANVISA no mesmo dia pela telemedicina.',
+      },
+      {
+        '@type': 'Review',
+        reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+        author: { '@type': 'Person', name: 'Carlos R.' },
+        reviewBody:
+          'Melhor plataforma de cannabis medicinal do Brasil. Equipe especialista e suporte 24/7 pela Brisa IA.',
+      },
+    ],
+
+    sameAs: [
+      'https://www.facebook.com/plantayraiz',
+      'https://www.instagram.com/plantayraiz',
+      'https://www.linkedin.com/company/plantayraiz',
+      'https://www.youtube.com/channel/UC_Azx7mmS0_edjCxv4MXQ1Q',
+      'https://www.tiktok.com/@plantayraiz',
     ],
   },
 };

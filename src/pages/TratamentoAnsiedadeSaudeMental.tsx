@@ -21,10 +21,10 @@ const testimonials = [
 const faqs = [
   { q: "O CBD vicia?", a: "Não. O CBD (Canabidiol) não possui propriedades aditivas. A Organização Mundial da Saúde (OMS) reconhece que o CBD não apresenta potencial de abuso ou dependência. Ele atua modulando o sistema endocanabinoide de forma equilibrada." },
   { q: "Vou ficar 'dopado' com o tratamento?", a: "Não. O CBD é um composto não-psicotrópico. Diferente do THC recreativo, o CBD medicinal não causa alteração de consciência, euforia ou comprometimento cognitivo. Você continua 100% funcional." },
-  { q: "Como é feita a prescrição digital?", a: "Após a teleconsulta, o médico emite uma prescrição digital com assinatura eletrônica ICP-Brasil, válida em todo o Brasil. O documento segue os protocolos da ANVISA (RDC 660/2022) e é enviado diretamente ao seu e-mail." },
+  { q: "Como é feita a prescrição digital?", a: "Após a orientação técnica online, o médico emite uma prescrição digital com assinatura eletrônica ICP-Brasil, válida em todo o Brasil. O documento segue os protocolos da ANVISA (RDC 660/2022) e é enviado diretamente ao seu e-mail." },
   { q: "O tratamento com cannabis para ansiedade é legalizado?", a: "Sim. A ANVISA regulamenta o uso medicinal de cannabis no Brasil. A prescrição é feita por médico habilitado com receita tipo B, seguindo protocolos rigorosos de segurança e eficácia." },
   { q: "Quanto tempo leva para sentir os efeitos no sono e na ansiedade?", a: "A maioria dos pacientes relata melhora significativa na qualidade do sono entre 1 a 3 semanas. Para ansiedade, os efeitos costumam ser percebidos entre 2 a 4 semanas de uso contínuo." },
-  { q: "Posso usar CBD junto com meu antidepressivo?", a: "A interação medicamentosa deve ser avaliada pelo médico durante a teleconsulta. Em muitos casos, o CBD pode ser utilizado de forma complementar, mas a dosagem precisa ser ajustada individualmente." },
+  { q: "Posso usar CBD junto com meu antidepressivo?", a: "A interação medicamentosa deve ser avaliada pelo médico durante a orientação técnica online. Em muitos casos, o CBD pode ser utilizado de forma complementar, mas a dosagem precisa ser ajustada individualmente." },
 ];
 
 const TratamentoAnsiedadeSaudeMental = () => {
@@ -54,7 +54,7 @@ const TratamentoAnsiedadeSaudeMental = () => {
       "@context": "https://schema.org",
       "@type": "MedicalBusiness",
       name: "Planta & Raiz — Tratamento de Ansiedade e Saúde Mental",
-      description: "Teleconsulta especializada em tratamento de ansiedade, insônia e saúde mental com cannabis medicinal em São Paulo.",
+      description: "Orientação Técnica Online especializada em tratamento de ansiedade, insônia e saúde mental com cannabis medicinal em São Paulo.",
       url: "https://plantayraiz.com.br/tratamento-ansiedade-saude-mental",
       telephone: "+55-11-99136-3154",
       priceRange: "R$30 - R$200",
@@ -92,7 +92,7 @@ const TratamentoAnsiedadeSaudeMental = () => {
                 Tratamento com <span className="text-primary">Cannabis Medicinal</span> para Ansiedade e Insônia em São Paulo
               </h1>
               <p className="text-muted-foreground text-base md:text-lg mb-6 max-w-xl">
-                Protocolo médico personalizado com CBD para equilíbrio emocional e qualidade do sono. Teleconsulta a partir de <strong className="text-primary">R$30</strong>.
+                Protocolo médico personalizado com CBD para equilíbrio emocional e qualidade do sono. Orientação Técnica Online a partir de <strong className="text-primary">R$30</strong>.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl">

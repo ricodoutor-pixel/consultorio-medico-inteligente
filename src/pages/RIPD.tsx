@@ -23,7 +23,7 @@ const sections = [
     title: "2. Descrição do Tratamento de Dados",
     icon: Database,
     content: [
-      "Finalidade: Prestação de serviços de telemedicina em cannabis medicinal, incluindo agendamento de consultas, teleconsultas (vídeo/chat), emissão de prescrições digitais, e gestão de prontuários eletrônicos.",
+      "Finalidade: Prestação de serviços de telemedicina em cannabis medicinal, incluindo agendamento de consultas, orientação técnica onlines (vídeo/chat), emissão de prescrições digitais, e gestão de prontuários eletrônicos.",
       "Base Legal: Consentimento explícito do titular (Art. 11, II, 'a', LGPD) e tutela da saúde (Art. 7º, VIII e Art. 11, II, 'f').",
       "Dados Coletados: Nome completo, CPF, data de nascimento, e-mail, telefone, dados clínicos (queixas, diagnósticos, medicações, CID-10), dados biométricos de wearables (quando autorizados), endereço IP e logs de acesso.",
       "Tempo de Retenção: Prontuários eletrônicos: 20 anos (Resolução CFM nº 1.821/2007). Dados de pagamento: 5 anos (legislação fiscal). Logs de auditoria: 5 anos.",
@@ -34,7 +34,7 @@ const sections = [
     icon: Eye,
     content: [
       "Os dados pessoais são coletados estritamente para a finalidade de atendimento médico e são proporcionais às necessidades clínicas.",
-      "Dados sensíveis de saúde são tratados sob consentimento explícito (TCLE digital) assinado antes de cada teleconsulta.",
+      "Dados sensíveis de saúde são tratados sob consentimento explícito (TCLE digital) assinado antes de cada orientação técnica online.",
       "Dados de wearables (frequência cardíaca, sono, etc.) são opcionais e coletados apenas com autorização expressa.",
       "Não há compartilhamento de dados com terceiros para fins de marketing ou publicidade.",
     ],
@@ -49,7 +49,7 @@ const sections = [
       "Controle de Acesso: RBAC (Role-Based Access Control) com tabela de roles separada — admin, moderator, user.",
       "Row-Level Security (RLS): Políticas granulares que restringem acesso a dados por usuário/role.",
       "Auditoria: Tabela audit_log com registro de todas as operações sobre dados sensíveis (quem, quando, o quê).",
-      "Teleconsulta: Vídeo via WebRTC (Jitsi) sem gravação por padrão (Art. 7º, CFM 2.314/2022). Chat criptografado E2E.",
+      "Orientação Técnica Online: Vídeo via WebRTC (Jitsi) sem gravação por padrão (Art. 7º, CFM 2.314/2022). Chat criptografado E2E.",
       "Assinatura Digital: Prescrições assinadas com certificado ICP-Brasil (Lei 14.063/2020).",
       "Headers de Segurança: HSTS, CSP, X-Frame-Options, X-XSS-Protection, X-Content-Type-Options.",
       "Backups: Automáticos a cada 6 horas com criptografia.",
@@ -60,7 +60,7 @@ const sections = [
     icon: AlertTriangle,
     risks: [
       { risk: "Acesso não autorizado a prontuários", mitigation: "RLS + RBAC + auditoria + criptografia AES-256", severity: "Alto" },
-      { risk: "Interceptação de teleconsulta", mitigation: "WebRTC com SRTP + TLS 1.3 + sem gravação padrão", severity: "Alto" },
+      { risk: "Interceptação de orientação técnica online", mitigation: "WebRTC com SRTP + TLS 1.3 + sem gravação padrão", severity: "Alto" },
       { risk: "Vazamento de dados sensíveis", mitigation: "Criptografia em repouso/trânsito + backup criptografado", severity: "Crítico" },
       { risk: "Uso indevido de IA para diagnóstico", mitigation: "IA como apoio apenas — revisão médica obrigatória (CFM 2454/2026)", severity: "Médio" },
       { risk: "Manipulação de prescrições", mitigation: "Assinatura digital ICP-Brasil + validação ITI + RLS", severity: "Alto" },

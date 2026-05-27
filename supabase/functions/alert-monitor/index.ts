@@ -23,20 +23,22 @@ const RX_LAT_CRIT_MS = 15000;  // p95 acima disto = CRITICAL
 const RX_FAIL_RATE_CRIT = 0.20; // >20% falhas = CRITICAL
 const WATCHED_STATUSES = [401, 403, 404, 409];
 
-async function sendWhatsAppAdmin(title: string, description: string) {
+async function sendWhatsAppAdmin(title: string, description: string, level: "WARNING" | "CRITICAL" = "CRITICAL") {
   const url = Deno.env.get("EVOLUTION_API_URL");
   const key = Deno.env.get("EVOLUTION_API_KEY");
   const inst = Deno.env.get("EVOLUTION_INSTANCE");
   const to = Deno.env.get("ADMIN_WHATSAPP");
   if (!url || !key || !inst || !to) return;
   const number = to.replace(/\D/g, "");
+  const emoji = level === "CRITICAL" ? "🔴 CRÍTICO" : "🟡 ATENÇÃO";
+  const ts = new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
   try {
     await fetch(`${url}/message/sendText/${inst}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: key },
       body: JSON.stringify({
         number,
-        text: `🚨 *ALERTA CRÍTICO Planta y Raiz*\n\n*${title}*\n\n${description}\n\n_Verifique: /admin/cron-health_`,
+        text: `${emoji} *Planta y Raiz — SRE*\n🕐 ${ts} BRT\n\n*${title}*\n\n${description}\n\n📊 Painel: ${Deno.env.get("SITE_URL") || "https://plantayraiz.com.br"}/admin/cron-health\n🩺 SEO: /admin/conversoes-uptime`,
       }),
     });
   } catch (e) {

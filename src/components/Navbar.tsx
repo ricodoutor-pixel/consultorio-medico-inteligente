@@ -224,11 +224,11 @@ export const Navbar = () => {
                 {user ? (
                   <UserMenu compact />
                 ) : (
-                  <div className="flex items-center gap-1">
-                    <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1 text-[10px] h-7 px-2" asChild>
-                      <NavLink to="/login"><LogIn size={10} /> Login</NavLink>
+                  <div className="flex items-center gap-1.5">
+                    <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1 text-xs h-9 px-3" asChild>
+                      <NavLink to="/login"><LogIn size={14} /> Login</NavLink>
                     </Button>
-                    <Button size="sm" variant="outline" className="hidden xl:inline-flex font-bold rounded-xl border-primary/30 text-primary text-[10px] h-7 px-2" asChild>
+                    <Button size="sm" variant="outline" className="hidden xl:inline-flex font-bold rounded-xl border-primary/40 text-primary text-xs h-9 px-3" asChild>
                       <NavLink to="/cadastro">Cadastro</NavLink>
                     </Button>
                   </div>

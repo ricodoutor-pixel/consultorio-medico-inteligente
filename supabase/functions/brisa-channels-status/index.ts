@@ -47,10 +47,28 @@ async function alertDoctor(channelLabel: string, st: Status) {
   } catch (e) { console.error("[channels-status] alertDoctor failed", e); }
 }
 
+async function isAdminJwt(req: Request): Promise<boolean> {
+  const auth = req.headers.get("Authorization") || "";
+  if (!auth.startsWith("Bearer ")) return false;
+  try {
+    const sb = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: auth } } },
+    );
+    const { data } = await sb.auth.getClaims(auth.replace("Bearer ", ""));
+    const uid = data?.claims?.sub;
+    if (!uid) return false;
+    const svc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const { data: row } = await svc.from("user_roles").select("role").eq("user_id", uid).eq("role", "admin").maybeSingle();
+    return !!row;
+  } catch { return false; }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const unauth = requireServiceAuth(req, corsHeaders);
-  if (unauth) return unauth;
+  if (unauth && !(await isAdminJwt(req))) return unauth;
 
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 

@@ -247,7 +247,7 @@ export const Navbar = () => {
 
       {/* MOBILE MENU OVERLAY - Embutido e Padronizado */}
       <div 
-        className={`fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl xl:hidden flex flex-col pt-[env(safe-area-inset-top,20px)] pb-[env(safe-area-inset-bottom,20px)] overflow-y-auto transition-all duration-300 ease-in-out ${
+        className={`fixed inset-0 z-[55] bg-background/98 backdrop-blur-xl lg:hidden flex flex-col pt-[env(safe-area-inset-top,20px)] pb-[env(safe-area-inset-bottom,20px)] overflow-y-auto transition-all duration-300 ease-in-out ${
           isOpen ? "opacity-100 pointer-events-auto translate-x-0" : "opacity-0 pointer-events-none translate-x-full"
         }`}
       >

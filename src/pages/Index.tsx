@@ -326,13 +326,13 @@ const Index = () => {
                   <p className="text-[10px] text-muted-foreground">Orientação Técnica</p>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <div className="relative w-full sm:w-auto">
+              <div className="flex justify-center pt-4">
+                <div className="relative">
                   {/* Pulse verde leve atrás do CTA da Brisa (Triagem) */}
-                  <span aria-hidden className="pointer-events-none absolute -inset-2 rounded-3xl bg-primary/40 blur-2xl opacity-70 animate-brisa-pulse" />
-                  <Button size="lg" className="relative w-full text-sm font-black h-14 px-6 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all" asChild>
+                  <span aria-hidden className="pointer-events-none absolute -inset-3 rounded-3xl bg-primary/40 blur-2xl opacity-70 animate-brisa-pulse" />
+                  <Button size="lg" className="relative text-sm sm:text-base font-black h-14 sm:h-16 px-8 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all" asChild>
                     <a href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20a%20triagem%20para%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20o%20Dr.%20Edilson%20Bezerra%20On" target="_blank" rel="noopener noreferrer">
-                      💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={18} className="ml-2" />
+                      💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={20} className="ml-2" />
                     </a>
                   </Button>
                 </div>

@@ -292,7 +292,9 @@ const App = () => (
                 <Route path="/tratamento-dor-cronica" element={<TratamentoDorCronica />} />
                 <Route path="/tratamento-ansiedade-saude-mental" element={<TratamentoAnsiedadeSaudeMental />} />
                 <Route path="/tratamentos" element={<SEOCondicoes />} />
+                <Route path="/tratamento" element={<SEOCondicoes />} />
                 <Route path="/tratamentos/:condicao" element={<SEOCondicoes />} />
+                <Route path="/tratamento/:condicao" element={<SEOCondicoes />} />
                 <Route path="/club" element={<Club />} />
                 <Route path="/deposits" element={<Deposits />} />
                 <Route path="/cart-checkout" element={<CartCheckout />} />

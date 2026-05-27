@@ -52,19 +52,24 @@ Deno.serve(async (req) => {
     sttForm.append("model_id", "scribe_v2");
     sttForm.append("language_code", "por");
 
-    const sttRes = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
-      method: "POST",
-      headers: { "xi-api-key": ELEVEN_KEY },
-      body: sttForm,
-    });
-    if (!sttRes.ok) {
-      const err = await sttRes.text();
-      console.error("STT failed:", sttRes.status, err);
-      return json({ error: "stt_failed", detail: err.slice(0, 200) }, 502);
-    }
-    const sttData = await sttRes.json();
-    let transcript = (sttData.text || "").trim();
+    let transcript = "";
     let forcedReply = "";
+    try {
+      const sttRes = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
+        method: "POST",
+        headers: { "xi-api-key": ELEVEN_KEY },
+        body: sttForm,
+      });
+      if (sttRes.ok) {
+        const sttData = await sttRes.json();
+        transcript = (sttData.text || "").trim();
+      } else {
+        const err = await sttRes.text();
+        console.error("STT failed (tratando como silêncio):", sttRes.status, err.slice(0, 200));
+      }
+    } catch (e) {
+      console.error("STT exception:", e);
+    }
     if (!transcript) {
       transcript = "[silêncio]";
       forcedReply = "Olá! Em que posso te ajudar hoje?";

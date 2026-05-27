@@ -2,6 +2,9 @@
   RewriteEngine On
   RewriteBase /
 
+  # 301 canonical: /tratamento → /tratamentos (evita soft 404 + consolida SEO)
+  RewriteRule ^tratamento/?$ /tratamentos [R=301,L]
+
   # Real /api/health → Supabase Edge Function (302 redirect; Hostinger não tem mod_proxy)
   RewriteRule ^api/health/?$ https://shmbwdjuddvquszwkvuq.supabase.co/functions/v1/health [R=302,L]
 

@@ -79,11 +79,7 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
       const mr = mediaRecorderRef.current;
       const mime = mr?.mimeType || "audio/webm";
       const blob = new Blob(chunksRef.current, { type: mime });
-      if (blob.size < 1000) {
-        setStatus("idle");
-        setErrorMsg("Áudio muito curto. Segure o botão e fale.");
-        return;
-      }
+      // Mesmo se o áudio for muito curto, mandamos: a Brisa cumprimenta no silêncio
       const audioBase64 = await blobToBase64(blob);
 
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brisa-voice-chat`;

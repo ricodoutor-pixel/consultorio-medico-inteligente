@@ -196,7 +196,15 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
           width={displaySize}
           height={displaySize}
           className="drop-shadow-lg pointer-events-none"
-          style={{ clipPath: `inset(${displaySize * 0.45}px 0 0 0)` }}
+          style={{
+            clipPath: `inset(${displaySize * 0.45}px 0 0 0)`,
+            imageRendering: "auto",
+            WebkitBackfaceVisibility: "hidden",
+            backfaceVisibility: "hidden",
+            transform: "translateZ(0)",
+          }}
+          decoding="async"
+          loading="eager"
           draggable={false}
         />
         <FrogAccessories

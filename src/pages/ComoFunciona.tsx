@@ -101,8 +101,8 @@ const ComoFunciona = () => {
 
       <section className="pt-24 pb-16 md:pt-32 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[10%] left-[10%] w-[500px] h-[300px] rounded-full bg-secondary/8 blur-[100px]" />
-          <div className="absolute top-[30%] right-[10%] w-[400px] h-[250px] rounded-full bg-primary/8 blur-[100px]" />
+          <div className="absolute top-[10%] left-[10%] w-[500px] h-[300px] rounded-full bg-secondary/8 blur-3xl" />
+          <div className="absolute top-[30%] right-[10%] w-[400px] h-[250px] rounded-full bg-primary/8 blur-3xl" />
         </div>
         <div className="container mx-auto px-4 relative">
           <motion.div className="text-center mb-16" initial="hidden" animate="visible" variants={fadeUp}>

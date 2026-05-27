@@ -2,8 +2,7 @@
 // Recebe áudio (base64) → STT (ElevenLabs Scribe) → Gemini (Lovable AI) → TTS (ElevenLabs Sarah)
 // Retorna { transcript, reply, audioBase64 } para o frontend tocar.
 
-import { encode as base64Encode } from "https://deno.land/std@0.224.0/encoding/base64.ts";
-import { decode as base64Decode } from "https://deno.land/std@0.224.0/encoding/base64.ts";
+import { encodeBase64, decodeBase64 } from "https://deno.land/std@0.224.0/encoding/base64.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

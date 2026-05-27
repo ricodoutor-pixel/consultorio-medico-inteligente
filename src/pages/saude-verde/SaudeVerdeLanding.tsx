@@ -70,13 +70,8 @@ export default function SaudeVerdeLanding() {
             <Leaf className="w-4 h-4" /> Novo módulo Planta y Raiz
           </div>
           <h1 className="text-4xl md:text-6xl font-bold mb-6 md:bg-gradient-to-r md:from-primary md:via-emerald-400 md:to-primary md:bg-clip-text md:text-transparent text-primary">
-            Cartão Saúde Verde
+            Solicite Agora o Seu Cartão Saúde Verde Planta y Raiz Ltda
           </h1>
-          <Suspense fallback={null}>
-            <div className="max-w-2xl mx-auto mb-6">
-              <WidgetMonitorRapido />
-            </div>
-          </Suspense>
           <p className="text-lg md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
             Até <span className="text-primary font-bold">80% de desconto</span> em consultas, exames, vacinas, terapias, odontologia e medicamentos.
           </p>

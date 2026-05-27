@@ -166,7 +166,7 @@ export const Navbar = () => {
               
               {/* Verdinho mais próximo do nome — visível a partir de lg (desktop) */}
               <div className={`ml-1 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>
-                <FrogMascot size={48} mood="happy" onClick={openChat} enableJumpToNav={true} />
+                <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
               </div>
             </div>
 

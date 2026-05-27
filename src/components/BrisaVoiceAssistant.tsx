@@ -182,7 +182,7 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
               ? "bg-red-600 scale-110 shadow-[0_0_40px_rgba(239,68,68,0.6)]"
               : isBusy
               ? "bg-primary/40 cursor-wait"
-              : "bg-primary hover:bg-primary/90 active:scale-95"
+              : "bg-primary hover:bg-primary/90 active:scale-95 animate-pulse shadow-[0_0_30px_hsl(var(--primary)/0.5)]"
           } disabled:opacity-70`}
         >
           {status === "processing" ? (
@@ -190,10 +190,10 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
           ) : status === "speaking" ? (
             <Volume2 className="text-white animate-pulse" size={42} />
           ) : (
-            <Mic className={`text-white ${isRecording ? "animate-pulse" : ""}`} size={42} />
+            <Mic className="text-white animate-pulse" size={42} />
           )}
-          {isRecording && (
-            <span className="absolute inset-0 rounded-full border-4 border-red-300/60 animate-ping" />
+          {(isRecording || status === "idle") && (
+            <span className={`absolute inset-0 rounded-full border-4 ${isRecording ? "border-red-300/60" : "border-primary/40"} animate-ping`} />
           )}
         </button>
 

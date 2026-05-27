@@ -159,6 +159,6 @@ export default function MonitorCardiacoPage() {
           </p>
         </Card>
       </section>
-    </main>
+    </SiteLayout>
   );
 }

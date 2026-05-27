@@ -112,7 +112,7 @@ const Index = () => {
                 variants={fadeUp} 
                 className="text-[clamp(2rem,6vw+0.5rem,4.5rem)] font-display font-black leading-[0.95] mb-4 tracking-tight"
               >
-                <span className="text-gradient-green">Mais que Acesso,</span>
+                <span className="text-gradient-green">Mais que acesso,</span>
                 <br />
                 <span className="text-gradient-purple animate-[starPulse_3s_ease-in-out_infinite] hover:scale-[2] transition-transform duration-700 ease-in-out origin-left inline-block cursor-pointer drop-shadow-[0_0_20px_hsl(280,80%,65%)] hover:drop-shadow-[0_0_40px_hsl(280,80%,75%)]">Equidade.</span>
               </motion.h1>

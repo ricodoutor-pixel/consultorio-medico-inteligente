@@ -66,6 +66,10 @@ export default function SaudeVerdeLanding() {
         <link rel="canonical" href="https://plantayraiz.com.br/saude-verde" />
       </Helmet>
 
+      <Navbar />
+
+
+
       {/* HERO — background sólido em mobile (evita glitch GPU Android com radial + bg-clip-text) */}
       <section className="saude-verde-hero relative overflow-hidden py-20 md:py-28 md:bg-gradient-to-br md:from-primary/10 md:via-background md:to-background" style={{ backgroundColor: 'hsl(var(--background))' }}>
         <div className="hidden md:block absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.15),transparent_60%)] pointer-events-none" />

@@ -259,6 +259,8 @@ export default function SaudeVerdeLanding() {
           </p>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }
+

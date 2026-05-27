@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Heart, Camera, Timer, MessageCircleHeart, Info, Activity } from "lucide-react";
 import MonitorCardiaco from "@/components/MonitorCardiaco";
+import BrisaVoiceAssistant from "@/components/BrisaVoiceAssistant";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,6 +83,11 @@ export default function MonitorCardiacoPage() {
       {/* Monitor */}
       <section id="monitor" className="px-4 mb-6">
         <MonitorCardiaco />
+      </section>
+
+      {/* Enfermeira Brisa por voz — push-to-talk */}
+      <section className="px-4 max-w-2xl mx-auto mb-8">
+        <BrisaVoiceAssistant contextBpm={history[0]?.bpm ?? null} />
       </section>
 
       {/* Passos — texto analógico simples, sem animações */}

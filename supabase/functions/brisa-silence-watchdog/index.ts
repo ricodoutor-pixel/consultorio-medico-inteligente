@@ -12,7 +12,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
-const SILENCE_MINUTES = 180;
+// Dr. Edilson pediu (27/05/2026): receber APENAS alertas de novos cadastros.
+// Silence watchdog desativado — mantido o arquivo para auditoria/histórico.
+const SILENCE_MINUTES = 100000; // ~70 dias = efetivamente desligado
+const WATCHDOG_DISABLED = true;
 
 async function sendWhatsAppAdmin(text: string) {
   const url = Deno.env.get("EVOLUTION_API_URL");

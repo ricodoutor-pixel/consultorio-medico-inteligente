@@ -4,6 +4,7 @@ import MonitorCardiaco from "@/components/MonitorCardiaco";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { SiteLayout } from "@/layouts/SiteLayout";
 
 interface Medicao { bpm: number; created_at: string; classificacao: string }
 

@@ -26,6 +26,7 @@ import drEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 import { RecoverableRender } from "@/lib/runtime-recovery";
 import { DoctorsOnlineWidget } from "@/components/DoctorsOnlineWidget";
 import { HomeFAQ } from "@/components/HomeFAQ";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 import { useEffect } from "react";
@@ -33,6 +34,10 @@ import { useEffect } from "react";
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.7 } },
+};
+const fadeUpMobile = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
 };
 const stagger = { visible: { transition: { staggerChildren: 0.12 } } };
 
@@ -91,6 +96,9 @@ const testimonialData = [
 
 
 const Index = () => {
+  const isMobile = useIsMobile();
+  const heroFadeUp = isMobile ? fadeUpMobile : fadeUp;
+
   useEffect(() => {
     // Título da página é gerenciado por DynamicSEOHead/OpenGraphHead (rota-aware) — evita duplicação.
     // ManyChat widget (ID 11227069) é injetado centralizadamente via <ManyChatWidget /> após consentimento LGPD.
@@ -101,15 +109,15 @@ const Index = () => {
       <Navbar />
 
       {/* Hero Section - Otimizado para Mobile/Desktop */}
-      <section className="hero-glow section-padding min-h-[70dvh] lg:min-h-[85dvh] flex items-start overflow-hidden pt-44 md:pt-48 pb-12 md:pb-24">
+      <section className="hero-glow min-h-[70dvh] lg:min-h-[85dvh] flex items-start overflow-hidden pt-[calc(5.5rem+env(safe-area-inset-top,0px))] sm:pt-28 md:pt-32 lg:pt-36 pb-12 md:pb-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
-          <div className="grid lg:grid-cols-2 gap-6 lg:gap-14 items-start">
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-14 items-start">
             
             {/* Text Content */}
-            <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col justify-center">
+            <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col justify-center pt-2 sm:pt-3 md:pt-0">
 
               <motion.h1 
-                variants={fadeUp} 
+                variants={heroFadeUp} 
                 className="text-[clamp(2rem,6vw+0.5rem,4.5rem)] font-display font-black leading-[0.95] mb-4 tracking-tight"
               >
                 <span className="text-gradient-green">Mais que acesso,</span>
@@ -117,7 +125,7 @@ const Index = () => {
                 <span className="text-gradient-purple animate-[starPulse_3s_ease-in-out_infinite] hover:scale-[2] transition-transform duration-700 ease-in-out origin-left inline-block cursor-pointer drop-shadow-[0_0_20px_hsl(280,80%,65%)] hover:drop-shadow-[0_0_40px_hsl(280,80%,75%)]">Equidade.</span>
               </motion.h1>
 
-              <motion.div variants={fadeUp} className="max-w-2xl mb-4">
+              <motion.div variants={heroFadeUp} className="max-w-2xl mb-4">
                 <div className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium">
                   Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎<span className="inline-flex align-middle ml-1"><GlobalComplianceBadge /></span>
                 </div>
@@ -142,10 +150,10 @@ const Index = () => {
 
             {/* Phone Mockup Area */}
             <motion.div
-              className="relative flex flex-col justify-center items-center gap-6"
-              initial={{ opacity: 0, scale: 0.8, y: 100 }}
+              className="relative flex flex-col justify-center items-center gap-4 sm:gap-5 lg:gap-6"
+              initial={isMobile ? { opacity: 0, scale: 0.96, y: 20 } : { opacity: 0, scale: 0.8, y: 100 }}
               animate={{ opacity: 1, scale: 1, y: 0 }} 
-              transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+              transition={{ duration: isMobile ? 0.45 : 1, delay: 0.15, ease: "easeOut" }}
             >
               {/* Cadastro Gratuito Button - Above Phone */}
               <Link to="/cadastro" className="self-center">
@@ -159,7 +167,7 @@ const Index = () => {
                 </motion.span>
               </Link>
 
-              <div className="relative group w-full flex flex-col items-center mt-8 lg:mt-0">
+              <div className="relative group w-full flex flex-col items-center mt-2 sm:mt-3 lg:mt-0">
                 <div className="relative scale-90 sm:scale-100 transition-transform duration-500">
                   <div className="absolute -inset-10 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-[80px] opacity-40 group-hover:opacity-70 transition duration-1000"></div>
                   <div className="relative z-10">

@@ -455,7 +455,7 @@ const Club = () => {
               <ShoppingCart size={16} /> Loja
             </Button>
             <Button variant={activeTab === "feed" ? "default" : "outline"} onClick={() => setActiveTab("feed")} className="gap-2">
-              <MessageCircle size={16} /> Feed
+              <MessageCircle size={16} /> Post
             </Button>
           </div>
         </div>

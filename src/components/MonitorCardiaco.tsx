@@ -368,7 +368,8 @@ export default function MonitorCardiaco() {
           {!supported && (
             <p className="text-xs text-red-400">Seu navegador não suporta câmera. Use Chrome ou Safari atualizado.</p>
           )}
-          <Button onClick={start} disabled={!supported} size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white font-bold h-14 text-lg">
+          <Button onClick={start} disabled={!supported} size="lg" className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-14 text-lg gap-3">
+            <Heart className="animate-pulse text-white" size={24} fill="white" />
             Iniciar Medição
           </Button>
           <p className="text-[10px] text-muted-foreground uppercase tracking-wider">PPG · usado em oxímetros profissionais</p>

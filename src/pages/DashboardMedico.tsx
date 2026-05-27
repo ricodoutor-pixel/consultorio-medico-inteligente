@@ -360,6 +360,9 @@ const DashboardMedico = () => {
               </Card>
             )}
 
+            {/* Ferramentas Auxiliares de Monitoramento e Diagnóstico */}
+            <DoctorAuxDiagnosticTools />
+
             {/* Quick Access — Cannabis & Clinical Tools */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
               {[

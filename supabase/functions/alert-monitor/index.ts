@@ -100,9 +100,12 @@ async function sendDiscord(
   } catch (e) {
     console.error("[alert-monitor] sre-alert failed", e);
   }
-  // CRITICAL também notifica Dr. Edilson via WhatsApp
+  // CRITICAL notifica Dr. Edilson no WhatsApp (formato crítico); WARNING também
+  // dispara um aviso amarelo (útil durante a indexação SEO ativa).
   if (level === "CRITICAL") {
-    await sendWhatsAppAdmin(title, description);
+    await sendWhatsAppAdmin(title, description, "CRITICAL");
+  } else if (level === "WARNING" && alertKey?.startsWith("seo_")) {
+    await sendWhatsAppAdmin(title, description, "WARNING");
   }
 }
 

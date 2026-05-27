@@ -264,7 +264,7 @@ export const Navbar = () => {
 
           {/* Verdinho dentro do menu mobile — versão 30% maior */}
           <div className="flex justify-center mb-6 relative" style={{ minHeight: 156 }}>
-            <FrogMascot size={36} mood="happy" onClick={() => { setIsOpen(false); openChat(); }} enableJumpToNav={false} />
+            <FrogMascot size={54} mood="happy" onClick={() => { setIsOpen(false); openChat(); }} enableJumpToNav={false} />
           </div>
 
           <div className="grid grid-cols-1 gap-1 flex-1">

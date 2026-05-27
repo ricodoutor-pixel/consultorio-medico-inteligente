@@ -195,6 +195,13 @@ export const routeSEOMap: Record<string, PageSEO> = {
     keywords: "carteira planta raiz, saldo cannabis medicinal, créditos consulta",
     canonical: `${BASE}/carteira`,
   },
+  "/monitor-cardiaco": {
+    title: "Monitor Cardíaco IA — Saúde Digital Cannabis SP e Brasil",
+    description: "Monitor cardíaco por IA da Planta y Raiz: avalie batimentos, estresse e variabilidade direto do celular. Saúde digital integrada ao tratamento canabinoide no Brasil.",
+    keywords: "monitor cardíaco IA, check-up rápido cannabis, saúde digital cannabis medicinal, PPG batimentos celular, plataforma saúde digital completa Brasil",
+    canonical: `${BASE}/monitor-cardiaco`,
+    h1: "Monitor Cardíaco IA — Saúde Digital Integrada à Cannabis Medicinal",
+  },
 };
 
 /**

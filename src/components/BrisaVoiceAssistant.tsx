@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Mic, Loader2, Volume2 } from "lucide-react";
+import { Loader2, Mic, Volume2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface Props {
   contextBpm?: number | null;
@@ -8,153 +9,317 @@ interface Props {
 
 type Status = "idle" | "recording" | "processing" | "speaking" | "error";
 
-const RECORD_MS = 5000;
+type ChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+type SpeechRecognitionLike = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  maxAlternatives: number;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+};
+
+type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
+
+type SpeechRecognitionEventLike = {
+  results: ArrayLike<{
+    0: { transcript: string };
+    isFinal?: boolean;
+    length: number;
+  }>;
+};
+
+type SpeechRecognitionErrorEventLike = {
+  error: string;
+  message?: string;
+};
+
+declare global {
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionCtor;
+    webkitSpeechRecognition?: SpeechRecognitionCtor;
+  }
+}
+
+const LISTEN_MS = 5000;
 
 export default function BrisaVoiceAssistant({ contextBpm }: Props) {
   const [status, setStatus] = useState<Status>("idle");
-  const [countdown, setCountdown] = useState<number>(0);
-  const [lastTranscript, setLastTranscript] = useState<string>("");
-  const [lastReply, setLastReply] = useState<string>("");
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const [countdown, setCountdown] = useState(0);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<BlobPart[]>([]);
-  const streamRef = useRef<MediaStream | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const sessionRef = useRef(0);
+  const finalizedSessionRef = useRef<number | null>(null);
   const stopTimerRef = useRef<number | null>(null);
   const tickTimerRef = useRef<number | null>(null);
-  const historyRef = useRef<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const voiceReadyRef = useRef(false);
+  const historyRef = useRef<ChatMessage[]>([]);
 
   useEffect(() => {
+    const hydrateVoices = () => {
+      window.speechSynthesis?.getVoices();
+      voiceReadyRef.current = true;
+    };
+
+    hydrateVoices();
+    window.speechSynthesis?.addEventListener?.("voiceschanged", hydrateVoices);
+
     return () => {
       cleanupTimers();
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-      }
+      recognitionRef.current?.abort();
+      window.speechSynthesis?.cancel();
+      window.speechSynthesis?.removeEventListener?.("voiceschanged", hydrateVoices);
     };
   }, []);
 
   const cleanupTimers = () => {
-    if (stopTimerRef.current) { clearTimeout(stopTimerRef.current); stopTimerRef.current = null; }
-    if (tickTimerRef.current) { clearInterval(tickTimerRef.current); tickTimerRef.current = null; }
+    if (stopTimerRef.current) {
+      window.clearTimeout(stopTimerRef.current);
+      stopTimerRef.current = null;
+    }
+    if (tickTimerRef.current) {
+      window.clearInterval(tickTimerRef.current);
+      tickTimerRef.current = null;
+    }
+  };
+
+  const getRecognitionCtor = () => {
+    return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  };
+
+  const prepareUtterance = () => {
+    const utterance = new SpeechSynthesisUtterance("");
+    utterance.lang = "pt-BR";
+    utterance.rate = 0.96;
+    utterance.pitch = 1.1;
+    utterance.volume = 1;
+    utterance.voice = pickVoice();
+    utterance.onstart = () => setStatus("speaking");
+    utterance.onend = () => setStatus("idle");
+    utterance.onerror = () => setStatus("idle");
+    utteranceRef.current = utterance;
+    return utterance;
+  };
+
+  const pickVoice = () => {
+    const voices = window.speechSynthesis?.getVoices?.() || [];
+    const preferred = [
+      /google português do brasil/i,
+      /português do brasil/i,
+      /female/i,
+      /maria/i,
+      /luciana/i,
+    ];
+
+    return (
+      voices.find((voice) => voice.lang?.toLowerCase() === "pt-br" && preferred.some((rule) => rule.test(voice.name))) ||
+      voices.find((voice) => voice.lang?.toLowerCase() === "pt-br") ||
+      voices.find((voice) => voice.lang?.toLowerCase().startsWith("pt")) ||
+      null
+    );
+  };
+
+  const ensureMicrophonePermission = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    });
+    stream.getTracks().forEach((track) => track.stop());
   };
 
   const handleTap = async () => {
-    if (status === "processing" || status === "speaking") return;
+    if (status === "processing") return;
+
+    if (status === "speaking") {
+      window.speechSynthesis.cancel();
+    }
+
     if (status === "recording") {
-      // toque novamente para encerrar antes dos 5s
-      stopRecording();
+      recognitionRef.current?.stop();
+      setStatus("processing");
       return;
     }
-    await startRecording();
-  };
 
-  const startRecording = async () => {
-    setErrorMsg("");
+    const RecognitionCtor = getRecognitionCtor();
+    if (!RecognitionCtor) {
+      setErrorMsg("Seu navegador não liberou a escuta por voz. Abra no Chrome do Android e tente novamente.");
+      setStatus("error");
+      return;
+    }
+
     try {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-      });
-      streamRef.current = stream;
-      const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-        ? "audio/webm;codecs=opus"
-        : MediaRecorder.isTypeSupported("audio/webm")
-        ? "audio/webm"
-        : "audio/mp4";
-      const mr = new MediaRecorder(stream, { mimeType: mime });
-      chunksRef.current = [];
-      mr.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
-      };
-      mr.onstop = handleStop;
-      mr.start();
-      mediaRecorderRef.current = mr;
-      setStatus("recording");
-      setCountdown(Math.ceil(RECORD_MS / 1000));
+      setErrorMsg("");
+      finalizedSessionRef.current = null;
+      window.speechSynthesis.cancel();
+      const utterance = prepareUtterance();
+      if (!voiceReadyRef.current) pickVoice();
 
-      // contador visual
-      tickTimerRef.current = window.setInterval(() => {
-        setCountdown((c) => (c > 0 ? c - 1 : 0));
-      }, 1000);
-
-      // auto-stop em 5 segundos
-      stopTimerRef.current = window.setTimeout(() => {
-        stopRecording();
-      }, RECORD_MS);
-    } catch (e) {
-      console.error(e);
-      setErrorMsg("Preciso de permissão para usar o microfone e o auto-falante. Toque novamente e permita.");
+      await ensureMicrophonePermission();
+      startRecognition(RecognitionCtor, utterance);
+    } catch (error) {
+      console.error("Brisa mic permission failed", error);
+      setErrorMsg("Permita o uso do microfone para falar com a Brisa.");
       setStatus("error");
     }
   };
 
-  const stopRecording = () => {
+  const startRecognition = (RecognitionCtor: SpeechRecognitionCtor, utterance: SpeechSynthesisUtterance) => {
     cleanupTimers();
-    const mr = mediaRecorderRef.current;
-    if (mr && mr.state !== "inactive") mr.stop();
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
+
+    const sessionId = Date.now();
+    sessionRef.current = sessionId;
+
+    const recognition = new RecognitionCtor();
+    let heardText = "";
+    let hardError = false;
+
+    recognition.lang = "pt-BR";
+    recognition.interimResults = false;
+    recognition.continuous = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results || [])
+        .map((result) => result?.[0]?.transcript || "")
+        .join(" ")
+        .trim();
+
+      heardText = transcript;
+      setStatus("processing");
+      cleanupTimers();
+      recognition.stop();
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Brisa recognition error", event.error, event.message);
+
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+        hardError = true;
+        finalizeError(sessionId, "Permita o uso do microfone para falar com a Brisa.");
+        return;
+      }
+
+      if (event.error === "audio-capture") {
+        hardError = true;
+        finalizeError(sessionId, "Não consegui acessar o microfone do celular.");
+        return;
+      }
+
+      if (event.error !== "no-speech" && event.error !== "aborted") {
+        hardError = true;
+        finalizeError(sessionId, "Não consegui te ouvir agora. Toque e fale novamente.");
+      }
+    };
+
+    recognition.onend = () => {
+      if (hardError) return;
+      void finalizeConversation(sessionId, heardText, utterance);
+    };
+
+    recognitionRef.current = recognition;
+    setStatus("recording");
+    setCountdown(Math.ceil(LISTEN_MS / 1000));
+
+    tickTimerRef.current = window.setInterval(() => {
+      setCountdown((value) => (value > 0 ? value - 1 : 0));
+    }, 1000);
+
+    stopTimerRef.current = window.setTimeout(() => {
+      recognition.stop();
+    }, LISTEN_MS);
+
+    recognition.start();
   };
 
-  const handleStop = async () => {
-    setStatus("processing");
-    try {
-      const mr = mediaRecorderRef.current;
-      const mime = mr?.mimeType || "audio/webm";
-      const blob = new Blob(chunksRef.current, { type: mime });
-      const audioBase64 = await blobToBase64(blob);
+  const finalizeConversation = async (
+    sessionId: number,
+    transcript: string,
+    utterance: SpeechSynthesisUtterance,
+  ) => {
+    if (finalizedSessionRef.current === sessionId) return;
+    finalizedSessionRef.current = sessionId;
+    cleanupTimers();
+    recognitionRef.current = null;
 
+    const cleanedTranscript = transcript.trim();
+    if (!cleanedTranscript) {
+      speakReply("Olá! Em que posso ajudar hoje?", utterance);
+      return;
+    }
+
+    setStatus("processing");
+
+    try {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brisa-voice-chat`;
-      const res = await fetch(url, {
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
-          audioBase64,
-          mimeType: mime,
+          transcript: cleanedTranscript,
           contextBpm: contextBpm ?? null,
           history: historyRef.current.slice(-6),
         }),
       });
 
-      if (res.status === 429) { setErrorMsg("Muitas perguntas seguidas. Espere alguns segundos."); setStatus("error"); return; }
-      if (res.status === 402) { setErrorMsg("Serviço temporariamente indisponível."); setStatus("error"); return; }
-
-      const data = await res.json();
-      if (!res.ok || !data.audioBase64) {
-        console.error("Brisa voice error:", data);
-        setErrorMsg("A Brisa não conseguiu responder. Toque e fale novamente.");
-        setStatus("error");
+      if (response.status === 429) {
+        finalizeError(sessionId, "Muitas perguntas seguidas. Espere alguns segundos.");
         return;
       }
 
-      setLastTranscript(data.transcript || "");
-      setLastReply(data.reply || "");
+      if (response.status === 402) {
+        finalizeError(sessionId, "O serviço de voz está indisponível no momento.");
+        return;
+      }
+
+      const data = await response.json();
+      if (!response.ok || !data?.reply) {
+        console.error("Brisa backend error", data);
+        finalizeError(sessionId, "A Brisa não conseguiu responder agora. Toque e fale novamente.");
+        return;
+      }
+
       historyRef.current.push(
-        { role: "user", content: data.transcript || "" },
-        { role: "assistant", content: data.reply || "" },
+        { role: "user", content: cleanedTranscript },
+        { role: "assistant", content: data.reply },
       );
 
-      const audioUrl = `data:${data.mimeType || "audio/mpeg"};base64,${data.audioBase64}`;
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-      setStatus("speaking");
-      audio.onended = () => setStatus("idle");
-      audio.onerror = () => setStatus("idle");
-      await audio.play().catch(() => setStatus("idle"));
-    } catch (e) {
-      console.error(e);
-      setErrorMsg("Algo deu errado. Toque novamente.");
-      setStatus("error");
+      speakReply(data.reply, utterance);
+    } catch (error) {
+      console.error("Brisa conversation failed", error);
+      finalizeError(sessionId, "A Brisa não conseguiu responder agora. Toque e fale novamente.");
     }
+  };
+
+  const speakReply = (text: string, utterance?: SpeechSynthesisUtterance) => {
+    const activeUtterance = utterance || utteranceRef.current || prepareUtterance();
+    activeUtterance.voice = pickVoice();
+    activeUtterance.text = text;
+    setStatus("speaking");
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(activeUtterance);
+  };
+
+  const finalizeError = (sessionId: number, message: string) => {
+    if (finalizedSessionRef.current === sessionId) return;
+    finalizedSessionRef.current = sessionId;
+    cleanupTimers();
+    recognitionRef.current?.abort();
+    recognitionRef.current = null;
+    window.speechSynthesis.cancel();
+    setErrorMsg(message);
+    setStatus("error");
   };
 
   const isRecording = status === "recording";
@@ -162,14 +327,14 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
   const isSpeaking = status === "speaking";
 
   return (
-    <Card className="p-5 bg-card border-primary/30">
-      <div className="flex flex-col items-center text-center gap-2 mb-4">
-        <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center animate-pulse">
+    <Card className="border-primary/30 bg-card p-5">
+      <div className="mb-4 flex flex-col items-center gap-2 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 animate-pulse">
           <Volume2 className="text-primary" size={22} />
         </div>
-        <h3 className="font-bold text-lg">Fale com a Enfermeira Brisa</h3>
-        <p className="text-sm text-muted-foreground max-w-xs">
-          Toque no botão e faça sua pergunta. A Brisa escuta 5 segundos e responde por voz.
+        <h3 className="text-lg font-bold">Fale com a Enfermeira Brisa</h3>
+        <p className="max-w-xs text-sm text-muted-foreground">
+          Toque no botão, fale por até 5 segundos e a Brisa responde com voz no seu celular.
         </p>
       </div>
 
@@ -178,65 +343,43 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
           type="button"
           aria-label="Toque para falar com a Brisa"
           onClick={handleTap}
-          disabled={isProcessing || isSpeaking}
-          className={`relative w-28 h-28 rounded-full flex items-center justify-center transition-all select-none ${
-            isRecording
-              ? "bg-red-600 scale-110 shadow-[0_0_40px_rgba(239,68,68,0.6)]"
-              : isProcessing || isSpeaking
-              ? "bg-primary/40 cursor-wait"
-              : "bg-primary hover:bg-primary/90 active:scale-95 animate-pulse shadow-[0_0_30px_hsl(var(--primary)/0.5)]"
-          } disabled:opacity-70`}
+          className={cn(
+            "relative flex h-28 w-28 select-none items-center justify-center rounded-full transition-all active:scale-95",
+            isRecording && "bg-destructive text-destructive-foreground ring-4 ring-destructive/30 scale-110",
+            isProcessing && "bg-secondary text-secondary-foreground cursor-wait",
+            isSpeaking && "bg-primary text-primary-foreground ring-4 ring-primary/30",
+            status === "idle" && "bg-primary text-primary-foreground animate-pulse shadow-lg shadow-primary/20",
+            status === "error" && "bg-destructive/90 text-destructive-foreground"
+          )}
         >
           {isProcessing ? (
-            <Loader2 className="text-white animate-spin" size={42} />
+            <Loader2 className="animate-spin" size={42} />
           ) : isSpeaking ? (
-            <Volume2 className="text-white animate-pulse" size={42} />
+            <Volume2 className="animate-pulse" size={42} />
           ) : (
-            <Mic className="text-white animate-pulse" size={42} />
+            <Mic className={cn("size-[42px]", (status === "idle" || isRecording) && "animate-pulse")} />
           )}
-          <span className={`absolute inset-0 rounded-full border-4 ${isRecording ? "border-red-300/60" : "border-primary/40"} animate-ping pointer-events-none`} />
+
+          <span
+            className={cn(
+              "pointer-events-none absolute inset-0 rounded-full border-4 animate-ping",
+              isRecording ? "border-destructive/50" : "border-primary/40"
+            )}
+          />
         </button>
 
-        <p className="text-sm text-center font-medium min-h-[1.5rem]">
+        <p className="min-h-[1.5rem] text-center text-sm font-medium">
           {status === "idle" && "Toque para falar com a Brisa"}
-          {isRecording && `Ouvindo… ${countdown}s`}
-          {isProcessing && "Brisa está pensando…"}
-          {isSpeaking && "Brisa está respondendo…"}
+          {isRecording && `Ouvindo... ${countdown}s`}
+          {isProcessing && "Brisa está pensando..."}
+          {isSpeaking && "Brisa está respondendo..."}
           {status === "error" && (errorMsg || "Tente novamente")}
         </p>
       </div>
 
-      {(lastTranscript || lastReply) && (
-        <div className="mt-4 space-y-2 text-xs">
-          {lastTranscript && (
-            <p className="text-muted-foreground">
-              <span className="font-semibold text-foreground">Você:</span> {lastTranscript}
-            </p>
-          )}
-          {lastReply && (
-            <p className="text-muted-foreground">
-              <span className="font-semibold text-primary">Brisa:</span> {lastReply}
-            </p>
-          )}
-        </div>
-      )}
-
-      <p className="text-[10px] text-muted-foreground mt-4 text-center">
-        Ferramenta de bem-estar. Não substitui avaliação médica. Em emergência, ligue 192 (SAMU).
+      <p className="mt-4 text-center text-[10px] text-muted-foreground">
+        Ferramenta de bem-estar. Não substitui avaliação médica. Em emergência, ligue 192.
       </p>
     </Card>
   );
-}
-
-function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result as string;
-      const comma = result.indexOf(",");
-      resolve(comma >= 0 ? result.slice(comma + 1) : result);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
 }

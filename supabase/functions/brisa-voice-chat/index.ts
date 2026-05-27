@@ -1,32 +1,27 @@
-// 🎙️ Brisa Voice Chat — Push-to-Talk para idosos
-// Recebe áudio (base64) → STT (ElevenLabs Scribe) → Gemini (Lovable AI) → TTS (ElevenLabs Sarah)
-// Retorna { transcript, reply, audioBase64 } para o frontend tocar.
+// 🎙️ Brisa Voice Chat — Gemini no bastidor
+// Recebe transcript do navegador → camada compartilhada da Brisa → retorna texto curto para o frontend falar com voz nativa.
 
-import { encodeBase64, decodeBase64 } from "https://deno.land/std@0.224.0/encoding/base64.ts";
+import { processar_triagem_brisa } from "../_shared/brisa-ai.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const BRISA_VOICE_ID = "EXAVITQu4vr4xnSDxMaL"; // Sarah
-
-const SYSTEM_PROMPT = `Você é a Enfermeira Brisa, da Planta y Raiz Ltda. 
-Fala em português brasileiro, voz calorosa, calma e MUITO clara — atende idosos que não conseguem ler na tela.
-REGRAS DE RESPOSTA:
-- Máximo 2 frases curtas. Nunca mais de 40 palavras.
-- Nunca use markdown, emojis, links ou listas. Só texto natural pra ser falado.
-- Sempre confirme o que o paciente pediu antes de explicar ("Sim, com certeza, vou te ajudar...").
-- Se o paciente perguntar sobre o resultado do batimento cardíaco, diga que está bom mas recomenda uma orientação técnica personalizada com o Dr. Edilson Bezerra por R$ 30 — ele vai saber orientar melhor.
-- Se pedir pra medir pressão: explique que aqui medimos batimentos cardíacos pelo dedo na câmera, e oriente a apertar o botão vermelho "Iniciar Medição".
-- Se pedir pra ler o resultado: leia o BPM informado e classifique (abaixo de 60 baixo, 60 a 100 normal, acima de 100 alto).
-- Nunca dê diagnóstico. Sempre encaminhe ao Dr. Edilson em caso de dúvida clínica.`;
+const SYSTEM_PROMPT = `Você é a Enfermeira Brisa, da Planta y Raiz Ltda.
+Fala em português brasileiro, de forma calorosa, calma e muito clara para idosos.
+Regras:
+- Máximo 2 frases curtas e diretas.
+- Nunca use markdown, links, listas ou emojis.
+- Sempre confirme o pedido do paciente antes de explicar.
+- Se pedir pressão, explique que aqui medimos batimentos cardíacos pelo dedo na câmera e oriente a iniciar a medição.
+- Se pedir leitura do resultado, use o BPM informado: abaixo de 60 baixo, de 60 a 100 normal, acima de 100 alto.
+- Nunca diga que houve erro técnico ou que você não conseguiu ouvir.
+- Nunca dê diagnóstico definitivo.`;
 
 interface ChatBody {
-  audioBase64: string;
-  mimeType?: string;
+  transcript?: string;
   contextBpm?: number | null;
   history?: Array<{ role: "user" | "assistant"; content: string }>;
 }
@@ -35,112 +30,34 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const ELEVEN_KEY = Deno.env.get("ELEVENLABS_API_KEY");
-    const LOVABLE_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!ELEVEN_KEY || !LOVABLE_KEY) {
-      return json({ error: "missing_credentials" }, 500);
-    }
-
     const body = (await req.json()) as ChatBody;
-    if (!body.audioBase64) return json({ error: "audioBase64_required" }, 400);
+    const transcript = (body.transcript || "").trim();
 
-    // 1) STT — ElevenLabs Scribe
-    const audioBytes = decodeBase64(body.audioBase64);
-    const audioBlob = new Blob([audioBytes], { type: body.mimeType || "audio/webm" });
-    const sttForm = new FormData();
-    sttForm.append("file", audioBlob, "audio.webm");
-    sttForm.append("model_id", "scribe_v2");
-    sttForm.append("language_code", "por");
-
-    let transcript = "";
-    let forcedReply = "";
-    try {
-      const sttRes = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
-        method: "POST",
-        headers: { "xi-api-key": ELEVEN_KEY },
-        body: sttForm,
-      });
-      if (sttRes.ok) {
-        const sttData = await sttRes.json();
-        transcript = (sttData.text || "").trim();
-      } else {
-        const err = await sttRes.text();
-        console.error("STT failed (tratando como silêncio):", sttRes.status, err.slice(0, 200));
-      }
-    } catch (e) {
-      console.error("STT exception:", e);
-    }
     if (!transcript) {
-      transcript = "[silêncio]";
-      forcedReply = "Olá! Em que posso te ajudar hoje?";
+      return json({ ok: true, transcript: "[silêncio]", reply: "Olá! Em que posso ajudar hoje?" });
     }
 
-    let reply = forcedReply;
-    if (!reply) {
-      // 2) Gemini via Lovable AI Gateway
-      const contextMsg = body.contextBpm
-        ? `\n[Contexto: o último BPM medido do paciente foi ${body.contextBpm}.]`
-        : "";
-      const messages = [
-        { role: "system", content: SYSTEM_PROMPT + contextMsg },
-        ...(body.history || []).slice(-6),
-        { role: "user", content: transcript },
-      ];
+    const contextMsg = body.contextBpm
+      ? ` Último BPM medido do paciente: ${body.contextBpm}.`
+      : "";
 
-      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ model: "google/gemini-2.5-flash", messages }),
-      });
-      if (!aiRes.ok) {
-        const err = await aiRes.text();
-        console.error("AI failed:", aiRes.status, err);
-        if (aiRes.status === 429) return json({ error: "rate_limited" }, 429);
-        if (aiRes.status === 402) return json({ error: "payment_required" }, 402);
-        return json({ error: "ai_failed" }, 502);
-      }
-      const aiData = await aiRes.json();
-      reply = (aiData.choices?.[0]?.message?.content || "").trim();
-      if (!reply) return json({ transcript, error: "empty_reply" }, 200);
-    }
-
-    // 3) TTS — ElevenLabs Sarah
-    const ttsRes = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${BRISA_VOICE_ID}?output_format=mp3_44100_128`,
+    const result = await processar_triagem_brisa(
+      transcript,
+      "monitor-cardiaco-web",
+      "web_voice",
       {
-        method: "POST",
-        headers: { "xi-api-key": ELEVEN_KEY, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: reply,
-          model_id: "eleven_multilingual_v2",
-          voice_settings: {
-            stability: 0.6,
-            similarity_boost: 0.85,
-            style: 0.3,
-            use_speaker_boost: true,
-            speed: 0.95,
-          },
-        }),
+        history: (body.history || []).slice(-6),
+        systemPrompt: `${SYSTEM_PROMPT}${contextMsg}`,
+        model: "gemini-2.5-flash",
+        log: false,
       },
     );
-    if (!ttsRes.ok) {
-      const err = await ttsRes.text();
-      console.error("TTS failed:", ttsRes.status, err);
-      return json({ transcript, reply, error: "tts_failed", detail: err.slice(0, 200) }, 502);
-    }
-    const ttsBuf = await ttsRes.arrayBuffer();
-    const audioOutBase64 = encodeBase64(new Uint8Array(ttsBuf));
 
-    return json({
-      ok: true,
-      transcript,
-      reply,
-      audioBase64: audioOutBase64,
-      mimeType: "audio/mpeg",
-    });
+    const reply = (result.reply || "Sim, estou aqui com você. Em que posso ajudar agora?")
+      .replace(/\s+/g, " ")
+      .slice(0, 240);
+
+    return json({ ok: true, transcript, reply });
   } catch (e) {
     console.error("[brisa-voice-chat] error:", e);
     return json({ error: e instanceof Error ? e.message : String(e) }, 500);

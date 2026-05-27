@@ -151,16 +151,14 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
 
   return (
     <Card className="p-5 bg-card border-primary/30">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
-          <Volume2 className="text-primary" size={20} />
+      <div className="flex flex-col items-center text-center gap-2 mb-4">
+        <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center animate-pulse">
+          <Volume2 className="text-primary" size={22} />
         </div>
-        <div>
-          <h3 className="font-bold text-base">Fale com a Enfermeira Brisa</h3>
-          <p className="text-xs text-muted-foreground">
-            Segure o botão, faça sua pergunta, solte. Ela responde por voz.
-          </p>
-        </div>
+        <h3 className="font-bold text-lg">Fale com a Enfermeira Brisa</h3>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          Segure o botão, faça sua pergunta, solte. Ela responde por voz.
+        </p>
       </div>
 
       <div className="flex flex-col items-center gap-3">

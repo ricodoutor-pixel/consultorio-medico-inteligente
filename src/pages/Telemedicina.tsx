@@ -207,7 +207,7 @@ const Telemedicina = () => {
 
       <section className="pt-24 pb-8 md:pt-32 hero-glow">
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} className="flex flex-col items-center text-center">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
                 <Stethoscope size={24} className="text-primary" />
@@ -217,7 +217,7 @@ const Telemedicina = () => {
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground leading-tight mb-4">
               Orientação Técnica <span className="text-gradient-green">Inteligente</span>
             </h1>
-            <p className="text-muted-foreground max-w-2xl font-medium mb-6">
+            <p className="text-muted-foreground max-w-2xl font-medium mb-6 mx-auto">
               Triagem conduzida pela Brisa IA + análise clínica + receita digital ANVISA — supervisionado por IA de última geração 24×7.
             </p>
           </motion.div>

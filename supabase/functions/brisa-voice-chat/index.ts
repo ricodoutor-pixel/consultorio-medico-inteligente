@@ -2,8 +2,7 @@
 // Recebe áudio (base64) → STT (ElevenLabs Scribe) → Gemini (Lovable AI) → TTS (ElevenLabs Sarah)
 // Retorna { transcript, reply, audioBase64 } para o frontend tocar.
 
-import { encode as base64Encode } from "https://deno.land/std@0.224.0/encoding/base64.ts";
-import { decode as base64Decode } from "https://deno.land/std@0.224.0/encoding/base64.ts";
+import { encodeBase64, decodeBase64 } from "https://deno.land/std@0.224.0/encoding/base64.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -46,26 +45,31 @@ Deno.serve(async (req) => {
     if (!body.audioBase64) return json({ error: "audioBase64_required" }, 400);
 
     // 1) STT — ElevenLabs Scribe
-    const audioBytes = base64Decode(body.audioBase64);
+    const audioBytes = decodeBase64(body.audioBase64);
     const audioBlob = new Blob([audioBytes], { type: body.mimeType || "audio/webm" });
     const sttForm = new FormData();
     sttForm.append("file", audioBlob, "audio.webm");
     sttForm.append("model_id", "scribe_v2");
     sttForm.append("language_code", "por");
 
-    const sttRes = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
-      method: "POST",
-      headers: { "xi-api-key": ELEVEN_KEY },
-      body: sttForm,
-    });
-    if (!sttRes.ok) {
-      const err = await sttRes.text();
-      console.error("STT failed:", sttRes.status, err);
-      return json({ error: "stt_failed", detail: err.slice(0, 200) }, 502);
-    }
-    const sttData = await sttRes.json();
-    let transcript = (sttData.text || "").trim();
+    let transcript = "";
     let forcedReply = "";
+    try {
+      const sttRes = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
+        method: "POST",
+        headers: { "xi-api-key": ELEVEN_KEY },
+        body: sttForm,
+      });
+      if (sttRes.ok) {
+        const sttData = await sttRes.json();
+        transcript = (sttData.text || "").trim();
+      } else {
+        const err = await sttRes.text();
+        console.error("STT failed (tratando como silêncio):", sttRes.status, err.slice(0, 200));
+      }
+    } catch (e) {
+      console.error("STT exception:", e);
+    }
     if (!transcript) {
       transcript = "[silêncio]";
       forcedReply = "Olá! Em que posso te ajudar hoje?";
@@ -128,7 +132,7 @@ Deno.serve(async (req) => {
       return json({ transcript, reply, error: "tts_failed", detail: err.slice(0, 200) }, 502);
     }
     const ttsBuf = await ttsRes.arrayBuffer();
-    const audioOutBase64 = base64Encode(new Uint8Array(ttsBuf));
+    const audioOutBase64 = encodeBase64(new Uint8Array(ttsBuf));
 
     return json({
       ok: true,

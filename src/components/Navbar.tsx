@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft } from "lucide-react";
+import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
 
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { GlobalComplianceBadge } from "@/components/GlobalComplianceBadge";

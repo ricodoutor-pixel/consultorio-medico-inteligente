@@ -10,7 +10,7 @@ import {
   Bot, ShieldCheck, Check, ArrowRight, Star, Users, MapPin
 } from "lucide-react";
 
-const WidgetMonitorRapido = lazy(() => import("@/components/WidgetMonitorRapido"));
+
 
 type Plan = {
   id: string; slug: string; name: string;

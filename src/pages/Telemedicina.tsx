@@ -220,11 +220,6 @@ const Telemedicina = () => {
             <p className="text-muted-foreground max-w-2xl font-medium mb-6">
               Triagem conduzida pela Brisa IA + análise clínica + receita digital ANVISA — supervisionado por IA de última geração 24×7.
             </p>
-            <Suspense fallback={null}>
-              <div className="max-w-2xl mb-2">
-                <WidgetMonitorRapido />
-              </div>
-            </Suspense>
           </motion.div>
         </div>
       </section>
@@ -322,7 +317,26 @@ const Telemedicina = () => {
                        onClick={() => setStep(1)}
                      >
                        Iniciar Triagem com Brisa <ArrowRight className="ml-2" size={18} />
-                    </Button>
+                     </Button>
+                   </CardContent>
+                 </Card>
+               </motion.div>
+             )}
+
+            {/* Monitor Cardíaco - PPG */}
+            {step === 0 && (
+              <motion.div initial="hidden" animate="visible" variants={fadeUp} className="mt-6">
+                <Card className="border-border shadow-xl">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Activity size={20} className="text-primary" />
+                      <h3 className="text-sm font-bold text-foreground">Monitoramento Cardíaco ao Vivo</h3>
+                    </div>
+                    <Suspense fallback={null}>
+                      <div className="max-w-full">
+                        <WidgetMonitorRapido />
+                      </div>
+                    </Suspense>
                   </CardContent>
                 </Card>
               </motion.div>

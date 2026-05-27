@@ -100,8 +100,8 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
   const prepareUtterance = () => {
     const utterance = new SpeechSynthesisUtterance("");
     utterance.lang = "pt-BR";
-    utterance.rate = 0.96;
-    utterance.pitch = 1.1;
+    utterance.rate = 1.12;
+    utterance.pitch = 1.0;
     utterance.volume = 1;
     utterance.voice = pickVoice();
     utterance.onstart = () => setStatus("speaking");
@@ -111,22 +111,26 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
     return utterance;
   };
 
+  // Prefer high-quality neural voices (Google/Microsoft Natural) over the metallic eSpeak default.
   const pickVoice = () => {
     const voices = window.speechSynthesis?.getVoices?.() || [];
-    const preferred = [
-      /google português do brasil/i,
-      /português do brasil/i,
+    const ptVoices = voices.filter((v) => v.lang?.toLowerCase().startsWith("pt"));
+    if (ptVoices.length === 0) return null;
+
+    const tiers: RegExp[] = [
+      /google.*português.*brasil/i,        // Chrome Android/Desktop — natural neural
+      /microsoft.*(francisca|thalita|brenda|leticia|yara).*online.*natural/i, // Edge Natural
+      /microsoft.*(francisca|thalita|brenda|leticia|yara)/i,
+      /(luciana|joana|fernanda|camila|helena|maria)/i,
       /female/i,
-      /maria/i,
-      /luciana/i,
+      /pt-br/i,
     ];
 
-    return (
-      voices.find((voice) => voice.lang?.toLowerCase() === "pt-br" && preferred.some((rule) => rule.test(voice.name))) ||
-      voices.find((voice) => voice.lang?.toLowerCase() === "pt-br") ||
-      voices.find((voice) => voice.lang?.toLowerCase().startsWith("pt")) ||
-      null
-    );
+    for (const rule of tiers) {
+      const found = ptVoices.find((v) => rule.test(v.name));
+      if (found) return found;
+    }
+    return ptVoices[0];
   };
 
   const ensureMicrophonePermission = async () => {
@@ -270,6 +274,11 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
           transcript: cleanedTranscript,
           contextBpm: contextBpm ?? null,
           history: historyRef.current.slice(-6),
+          now: {
+            iso: new Date().toISOString(),
+            human: new Date().toLocaleString("pt-BR", { dateStyle: "full", timeStyle: "short", timeZone: "America/Sao_Paulo" }),
+            timezone: "America/Sao_Paulo",
+          },
         }),
       });
 

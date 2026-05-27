@@ -13,8 +13,8 @@ const GRAPH = "https://graph.facebook.com/v19.0";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  // Auth: aberto — função apenas renova token Meta (idempotente, sem input, sem leak).
-  // Rate-limit implícito pelo cron semanal.
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   const APP_ID = Deno.env.get("FACEBOOK_APP_ID") || "931014069567110";
   const APP_SECRET = Deno.env.get("FACEBOOK_APP_SECRET") || "";

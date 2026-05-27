@@ -1,6 +1,7 @@
 // Treatment Subscription Engine — R$ 79/mês recurrent charge orchestrator
 // Runs on cron: charges due subscriptions via Mercado Pago PIX, logs results.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -42,6 +43,8 @@ async function createMpPixCharge(amount: number, externalRef: string, payerEmail
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
   const results: ChargeResult[] = [];

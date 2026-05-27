@@ -23,20 +23,22 @@ const RX_LAT_CRIT_MS = 15000;  // p95 acima disto = CRITICAL
 const RX_FAIL_RATE_CRIT = 0.20; // >20% falhas = CRITICAL
 const WATCHED_STATUSES = [401, 403, 404, 409];
 
-async function sendWhatsAppAdmin(title: string, description: string) {
+async function sendWhatsAppAdmin(title: string, description: string, level: "WARNING" | "CRITICAL" = "CRITICAL") {
   const url = Deno.env.get("EVOLUTION_API_URL");
   const key = Deno.env.get("EVOLUTION_API_KEY");
   const inst = Deno.env.get("EVOLUTION_INSTANCE");
   const to = Deno.env.get("ADMIN_WHATSAPP");
   if (!url || !key || !inst || !to) return;
   const number = to.replace(/\D/g, "");
+  const emoji = level === "CRITICAL" ? "🔴 CRÍTICO" : "🟡 ATENÇÃO";
+  const ts = new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
   try {
     await fetch(`${url}/message/sendText/${inst}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: key },
       body: JSON.stringify({
         number,
-        text: `🚨 *ALERTA CRÍTICO Planta y Raiz*\n\n*${title}*\n\n${description}\n\n_Verifique: /admin/cron-health_`,
+        text: `${emoji} *Planta y Raiz — SRE*\n🕐 ${ts} BRT\n\n*${title}*\n\n${description}\n\n📊 Painel: ${Deno.env.get("SITE_URL") || "https://plantayraiz.com.br"}/admin/cron-health\n🩺 SEO: /admin/conversoes-uptime`,
       }),
     });
   } catch (e) {
@@ -98,9 +100,12 @@ async function sendDiscord(
   } catch (e) {
     console.error("[alert-monitor] sre-alert failed", e);
   }
-  // CRITICAL também notifica Dr. Edilson via WhatsApp
+  // CRITICAL notifica Dr. Edilson no WhatsApp (formato crítico); WARNING também
+  // dispara um aviso amarelo (útil durante a indexação SEO ativa).
   if (level === "CRITICAL") {
-    await sendWhatsAppAdmin(title, description);
+    await sendWhatsAppAdmin(title, description, "CRITICAL");
+  } else if (level === "WARNING" && alertKey?.startsWith("seo_")) {
+    await sendWhatsAppAdmin(title, description, "WARNING");
   }
 }
 
@@ -310,6 +315,49 @@ Deno.serve(async (req) => {
       "http_401_early",
     );
     alerts.push(`http_401_early=${auth401.length}`);
+  }
+
+  // ---------- 6) Páginas SEO-críticas com 404/410 (durante indexação) ----------
+  // Se o Googlebot ou usuário bater 404 em uma das 12 rotas priority=1.0 do
+  // sitemap-final.xml, o alerta vai DIRETO para o WhatsApp do Dr. Edilson —
+  // 1 ocorrência já dispara WARNING (durante indexação ativa cada hit conta).
+  const SEO_CRITICAL_PATHS = [
+    "/", "/nossa-historia", "/profissionais", "/telemedicina", "/shopping",
+    "/saude-verde", "/biblioteca", "/comunidade", "/dashboard", "/afiliados",
+    "/planos", "/tratamentos", "/tratamento-dor-cronica",
+    "/tratamento-ansiedade-saude-mental", "/como-funciona", "/oferta-especial",
+    "/quiz-triagem", "/blog", "/ebook", "/club", "/sitemap-final.xml",
+    "/sitemap.xml", "/robots.txt",
+  ];
+  const { data: seoErrs } = await supabase
+    .from("error_logs")
+    .select("metadata, created_at")
+    .eq("source", "frontend_404")
+    .gte("created_at", since)
+    .limit(500);
+
+  const byPath: Record<string, number> = {};
+  for (const r of seoErrs ?? []) {
+    const path = String((r.metadata as any)?.path ?? "");
+    if (!SEO_CRITICAL_PATHS.includes(path)) continue;
+    byPath[path] = (byPath[path] ?? 0) + 1;
+  }
+  const seoBreaks = Object.entries(byPath);
+  if (seoBreaks.length > 0) {
+    const total = seoBreaks.reduce((s, [, n]) => s + n, 0);
+    const level = total >= 5 ? "CRITICAL" : "WARNING";
+    await sendDiscord(
+      supabase,
+      level,
+      `🌐 404 em página SEO-crítica (indexação em risco)`,
+      `${total} hit(s) 404 em rotas priority=1.0 nos últimos 5min. Google pode desindexar.`,
+      [
+        { name: "Rotas afetadas", value: seoBreaks.map(([p, n]) => `${p}: ${n}`).join("\n") },
+        { name: "Ação", value: "Verificar deploy + sitemap-final.xml + roteador React" },
+      ],
+      `seo_404_${level}`,
+    );
+    alerts.push(`seo_404=${total}`);
   }
 
   return new Response(

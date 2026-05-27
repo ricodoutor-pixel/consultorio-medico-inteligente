@@ -1,8 +1,14 @@
 # Cloudflare Pages / Netlify redirects
 
-# 301 canonical: /tratamento → /tratamentos (consolida SEO, evita soft 404)
+# 301 canonical: /tratamento → /tratamentos
 /tratamento      /tratamentos   301
 /tratamento/     /tratamentos   301
 
-# SPA fallback — qualquer rota client-side cai no index.html para o React Router resolver.
+# Arquivos estáticos XML/TXT — servir como estáticos, NUNCA cair no SPA fallback
+/sitemap.xml         /sitemap.xml         200
+/sitemap-final.xml   /sitemap-final.xml   200
+/robots.txt          /robots.txt          200
+/*.xml               /:splat              200
+
+# SPA fallback — apenas para rotas client-side
 /*  /index.html  200

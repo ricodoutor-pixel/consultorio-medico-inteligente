@@ -26,6 +26,7 @@ import drEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 import { RecoverableRender } from "@/lib/runtime-recovery";
 import { DoctorsOnlineWidget } from "@/components/DoctorsOnlineWidget";
 import { HomeFAQ } from "@/components/HomeFAQ";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 import { useEffect } from "react";
@@ -33,6 +34,10 @@ import { useEffect } from "react";
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.7 } },
+};
+const fadeUpMobile = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
 };
 const stagger = { visible: { transition: { staggerChildren: 0.12 } } };
 
@@ -91,6 +96,9 @@ const testimonialData = [
 
 
 const Index = () => {
+  const isMobile = useIsMobile();
+  const heroFadeUp = isMobile ? fadeUpMobile : fadeUp;
+
   useEffect(() => {
     // Título da página é gerenciado por DynamicSEOHead/OpenGraphHead (rota-aware) — evita duplicação.
     // ManyChat widget (ID 11227069) é injetado centralizadamente via <ManyChatWidget /> após consentimento LGPD.
@@ -109,7 +117,7 @@ const Index = () => {
             <motion.div initial="hidden" animate="visible" variants={stagger} className="flex flex-col justify-center pt-2 sm:pt-3 md:pt-0">
 
               <motion.h1 
-                variants={fadeUp} 
+                variants={heroFadeUp} 
                 className="text-[clamp(2rem,6vw+0.5rem,4.5rem)] font-display font-black leading-[0.95] mb-4 tracking-tight"
               >
                 <span className="text-gradient-green">Mais que acesso,</span>
@@ -117,7 +125,7 @@ const Index = () => {
                 <span className="text-gradient-purple animate-[starPulse_3s_ease-in-out_infinite] hover:scale-[2] transition-transform duration-700 ease-in-out origin-left inline-block cursor-pointer drop-shadow-[0_0_20px_hsl(280,80%,65%)] hover:drop-shadow-[0_0_40px_hsl(280,80%,75%)]">Equidade.</span>
               </motion.h1>
 
-              <motion.div variants={fadeUp} className="max-w-2xl mb-4">
+              <motion.div variants={heroFadeUp} className="max-w-2xl mb-4">
                 <div className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium">
                   Democratizando a telemedicina e terapias canabinoides para transformar vidas, no mundo todo. 🌎<span className="inline-flex align-middle ml-1"><GlobalComplianceBadge /></span>
                 </div>
@@ -143,9 +151,9 @@ const Index = () => {
             {/* Phone Mockup Area */}
             <motion.div
               className="relative flex flex-col justify-center items-center gap-4 sm:gap-5 lg:gap-6"
-              initial={{ opacity: 0, scale: 0.8, y: 100 }}
+              initial={isMobile ? { opacity: 0, scale: 0.96, y: 20 } : { opacity: 0, scale: 0.8, y: 100 }}
               animate={{ opacity: 1, scale: 1, y: 0 }} 
-              transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+              transition={{ duration: isMobile ? 0.45 : 1, delay: 0.15, ease: "easeOut" }}
             >
               {/* Cadastro Gratuito Button - Above Phone */}
               <Link to="/cadastro" className="self-center">

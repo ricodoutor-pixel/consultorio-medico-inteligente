@@ -122,11 +122,32 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
   // On mobile (small size ≤ 73), limit enlargement to 2x to prevent overflow
   const maxScale = size <= 73 ? 2 : 3;
   const displaySize = isEnlarged ? size * maxScale : showStory ? size * 1.8 : size;
+  const isFloating = isEnlarged || showStory;
+
+  // Anchor enlarged frog with position:fixed so it escapes navbar overflow and is fully visible
+  const placeholderRef = useRef<HTMLDivElement>(null);
+  const [rect, setRect] = useState<{ top: number; left: number } | null>(null);
+  useEffect(() => {
+    if (isFloating && placeholderRef.current) {
+      const r = placeholderRef.current.getBoundingClientRect();
+      const left = r.left + r.width / 2 - displaySize / 2;
+      // Keep the enlarged frog below any fixed top bar (min 8px from top) and roughly centered on the trigger
+      const top = Math.max(8, r.top + r.height / 2 - displaySize * 0.35);
+      setRect({ top, left });
+    } else {
+      setRect(null);
+    }
+  }, [isFloating, displaySize]);
+
+  const floatingStyle: React.CSSProperties = isFloating && rect
+    ? { position: "fixed", top: rect.top, left: rect.left, zIndex: 9999 }
+    : {};
 
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
         <TooltipTrigger asChild>
+    <div ref={placeholderRef} style={{ width: size, height: size, position: "relative" }}>
     <motion.div
       ref={anim.containerRef as any}
       onClick={handleClick}
@@ -141,7 +162,7 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
         WebkitTapHighlightColor: "transparent",
         WebkitUserSelect: "none",
         userSelect: "none",
-        zIndex: isEnlarged ? 60 : undefined,
+        ...floatingStyle,
       }}
       role="button"
       tabIndex={0}
@@ -149,7 +170,6 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
       
       whileTap={{ scale: 0.9, rotate: -5 }}
       animate={anim.controls}
-      layout
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
 

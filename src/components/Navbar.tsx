@@ -88,20 +88,28 @@ export const Navbar = () => {
     return name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
   };
 
-  const links = [
+  // Links primários sempre visíveis no desktop
+  const primaryLinks = [
     { to: "/", label: "Início" },
-    { to: "/nossa-historia", label: "Nossa História" },
     { to: "/profissionais", label: "Profissionais" },
     { to: "/telemedicina", label: "Telemedicina" },
     { to: "/shopping", label: "Shopping" },
     { to: "/saude-verde", label: "Saúde Verde" },
     { to: "/biblioteca", label: "Biblioteca" },
-    { to: "/comunidade", label: "Comunidade" },
-    { to: "/dashboard", label: "Meu Painel" },
-    { to: "/afiliados", label: "Afiliados" },
     { to: "/planos", label: "Planos" },
-    { to: "/planos-tratamento", label: "Tratamento" },
   ];
+
+  // Links secundários agrupados em "Mais"
+  const secondaryLinks = [
+    { to: "/nossa-historia", label: "Nossa História" },
+    { to: "/comunidade", label: "Comunidade" },
+    { to: "/planos-tratamento", label: "Tratamento" },
+    { to: "/afiliados", label: "Afiliados" },
+    { to: "/dashboard", label: "Meu Painel" },
+  ];
+
+  // União para o menu mobile (mostra tudo)
+  const links = [...primaryLinks, ...secondaryLinks];
 
   const openChat = useCallback(() => window.dispatchEvent(new Event("open-frog-chat")), []);
 

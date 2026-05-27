@@ -62,7 +62,7 @@ export default function MonitorCardiacoPage() {
   const scrollToMonitor = () => document.getElementById("monitor")?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <main className="min-h-screen bg-background text-foreground pb-24">
+    <SiteLayout withTopPadding mainClassName="bg-background text-foreground pb-24">
       {/* HERO */}
       <section className="px-4 pt-10 pb-8 text-center max-w-2xl mx-auto">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-xs text-primary mb-4">

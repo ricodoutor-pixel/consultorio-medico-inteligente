@@ -172,14 +172,14 @@ export const Navbar = () => {
             </div>
 
             {/* Desktop: Menu Centralizado (aparece a partir de lg = 1024px) */}
-            <div className="hidden lg:flex items-center gap-1 xl:gap-2 2xl:gap-3 flex-1 justify-end">
-              <div className="flex items-center gap-0.5 xl:gap-1 2xl:gap-2" role="menubar">
+            <div className="hidden lg:flex items-center gap-2 xl:gap-3 flex-1 justify-end">
+              <div className="flex items-center gap-1 xl:gap-2" role="menubar">
                 {primaryLinks.map((link) => (
                   <NavLink
                     key={link.to}
                     to={link.to}
-                    className="text-[10px] xl:text-[11px] 2xl:text-xs font-black text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1.5 py-1 uppercase tracking-tight"
-                    activeClassName="text-primary border-b-2 border-primary"
+                    className="text-[13px] xl:text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors whitespace-nowrap px-3 py-2 rounded-lg tracking-tight"
+                    activeClassName="text-primary bg-primary/10"
                   >
                     {link.label}
                   </NavLink>
@@ -188,14 +188,14 @@ export const Navbar = () => {
                 {/* Dropdown "Mais" — agrupa links secundários */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-0.5 text-[10px] xl:text-[11px] 2xl:text-xs font-black text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1.5 py-1 uppercase tracking-tight">
-                      Mais <ChevronDown size={11} />
+                    <button className="flex items-center gap-1 text-[13px] xl:text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors whitespace-nowrap px-3 py-2 rounded-lg tracking-tight">
+                      Mais <ChevronDown size={14} />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuContent align="end" className="w-56">
                     {secondaryLinks.map((link) => (
                       <DropdownMenuItem key={link.to} asChild className="cursor-pointer">
-                        <Link to={link.to} className="font-bold text-xs uppercase tracking-tight">
+                        <Link to={link.to} className="font-semibold text-sm">
                           {link.label}
                         </Link>
                       </DropdownMenuItem>
@@ -204,15 +204,22 @@ export const Navbar = () => {
                 </DropdownMenu>
               </div>
 
-              <div className="flex items-center gap-1.5 border-l border-border pl-2 xl:pl-3 ml-1">
+              <div className="flex items-center gap-2 border-l border-border pl-3 ml-1">
                 <div className="hidden xl:block scale-90">
                   <LanguageSwitcher />
                 </div>
 
-                {/* Botão pulsátil — CTA principal */}
-                <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-xl text-[10px] xl:text-xs h-8 xl:h-9 px-2.5 xl:px-4 hover:scale-105 transition-all shadow-lg shadow-secondary/40 animate-pulse" asChild>
-                  <NavLink to="/telemedicina">Consulta</NavLink>
+                {/* Botão CTA principal — vivo, brilhante, com ícone */}
+                <Button
+                  size="sm"
+                  className="relative overflow-hidden bg-gradient-to-r from-secondary via-primary to-secondary bg-[length:200%_100%] animate-[shine_3s_linear_infinite] text-secondary-foreground font-black rounded-xl text-sm h-10 px-5 hover:scale-105 transition-all shadow-lg shadow-secondary/50 ring-2 ring-secondary/30 hover:ring-secondary/60"
+                  asChild
+                >
+                  <NavLink to="/telemedicina">
+                    <span className="mr-1.5">🩺</span> Consulta
+                  </NavLink>
                 </Button>
+
 
                 {user ? (
                   <UserMenu compact />

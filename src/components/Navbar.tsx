@@ -164,9 +164,9 @@ export const Navbar = () => {
                 </div>
               </NavLink>
               
-              {/* Verdinho mais próximo do nome (oculto em telas estreitas para dar espaço ao menu) */}
-              <div className={`ml-1 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden 2xl:block" : "hidden"}`}>
-                <FrogMascot size={40} mood="happy" onClick={openChat} enableJumpToNav={true} />
+              {/* Verdinho mais próximo do nome — visível a partir de lg (desktop) */}
+              <div className={`ml-1 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>
+                <FrogMascot size={32} mood="happy" onClick={openChat} enableJumpToNav={true} />
               </div>
             </div>
 

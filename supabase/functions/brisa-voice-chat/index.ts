@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
     const transcript = (body.transcript || "").trim();
 
     if (!transcript) {
-      return json({ ok: true, transcript: "[silêncio]", reply: "Oi, querido! Sou a Brisa. Em que posso te ajudar agora?" });
+      return json({ ok: true, transcript: "[silêncio]", reply: "Olá, sou a Enfermeira Brisa. Em que posso ajudar hoje?" });
     }
 
     const systemPrompt = montarSystemPrompt(body);

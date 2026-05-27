@@ -301,6 +301,59 @@ export const faqPageSchema: SchemaOrgConfig = {
 };
 
 /**
+ * BreadcrumbList — gerado dinamicamente por rota.
+ * Sempre começa em Home; demais segmentos viram crumbs legíveis.
+ */
+const BREADCRUMB_LABELS: Record<string, string> = {
+  afiliados: 'Afiliados',
+  biblioteca: 'Biblioteca',
+  cadastro: 'Cadastro',
+  club: 'Club Planta y Raiz',
+  comunidade: 'Comunidade',
+  login: 'Login',
+  'monitor-cardiaco': 'Monitor Cardíaco',
+  'nossa-historia': 'Nossa História',
+  planos: 'Planos',
+  profissionais: 'Profissionais',
+  'saude-verde': 'Saúde Verde',
+  shopping: 'Shopping',
+  telemedicina: 'Telemedicina',
+  tratamentos: 'Tratamentos',
+  'como-funciona': 'Como Funciona',
+  faq: 'FAQ',
+  ebook: 'E-book',
+  blog: 'Blog',
+  contato: 'Contato',
+  precos: 'Preços',
+};
+
+export function buildBreadcrumbSchema(pathname: string): SchemaOrgConfig {
+  const segments = pathname.split('/').filter(Boolean);
+  const items: any[] = [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://plantayraiz.com.br/' },
+  ];
+  let acc = '';
+  segments.forEach((seg, idx) => {
+    acc += `/${seg}`;
+    const name = BREADCRUMB_LABELS[seg] || seg.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    items.push({
+      '@type': 'ListItem',
+      position: idx + 2,
+      name,
+      item: `https://plantayraiz.com.br${acc}`,
+    });
+  });
+  return {
+    type: 'Article',
+    data: {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: items,
+    },
+  };
+}
+
+/**
  * Gera tags Schema.org JSON-LD para HTML head
  */
 export function generateSchemaOrgTags(schemas: SchemaOrgConfig[]): string {
@@ -311,15 +364,15 @@ export function generateSchemaOrgTags(schemas: SchemaOrgConfig[]): string {
 
 /**
  * Retorna schemas baseado na rota.
- * Inclui Physician + MedicalProcedure em TODAS as rotas para compensar
- * a remoção de tags ld+json que SearchEngineOptimization faz a cada navegação.
+ * Inclui Physician + MedicalProcedure + BreadcrumbList em TODAS as rotas.
  */
 export function getSchemaOrgByRoute(pathname: string): SchemaOrgConfig[] {
-  const baseSchemas = [
+  const baseSchemas: SchemaOrgConfig[] = [
     organizationSchema,
     localBusinessSchema,
     physicianSchema,
     medicalProcedureSchema,
+    buildBreadcrumbSchema(pathname),
   ];
 
   if (pathname === '/faq' || pathname.startsWith('/faq/')) {
@@ -334,4 +387,5 @@ export function getSchemaOrgByRoute(pathname: string): SchemaOrgConfig[] {
 
   return baseSchemas;
 }
+
 

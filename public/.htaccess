@@ -1,12 +1,30 @@
+<IfModule mod_mime.c>
+  AddType application/xml .xml
+  AddType text/xml .xml
+  AddType text/plain .txt
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.xml$">
+    Header set Content-Type "application/xml; charset=UTF-8"
+    Header set X-Robots-Tag "noindex"
+  </FilesMatch>
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
-  # 301 canonical: /tratamento → /tratamentos (evita soft 404 + consolida SEO)
+  # 301 canonical: /tratamento → /tratamentos
   RewriteRule ^tratamento/?$ /tratamentos [R=301,L]
 
-  # Real /api/health → Supabase Edge Function (302 redirect; Hostinger não tem mod_proxy)
+  # Real /api/health → Supabase Edge Function
   RewriteRule ^api/health/?$ https://shmbwdjuddvquszwkvuq.supabase.co/functions/v1/health [R=302,L]
+
+  # NUNCA reescrever arquivos estáticos (.xml, .txt, .json, .ico, sitemap*, robots)
+  RewriteRule \.(xml|txt|json|ico|webmanifest)$ - [L]
+  RewriteRule ^sitemap.*$ - [L]
+  RewriteRule ^robots\.txt$ - [L]
 
   # SPA fallback
   RewriteRule ^index\.html$ - [L]

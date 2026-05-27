@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { Stethoscope, ArrowRight, ArrowLeft, CheckCircle2, Brain, Heart, Activity, Shield, Leaf, Watch, FileText, Download, Printer, UserCheck, Scale, AlertTriangle, Loader2, MessageCircle, X } from "lucide-react";
+import { Stethoscope, ArrowRight, ArrowLeft, CheckCircle2, Brain, Heart, Activity, Shield, Leaf, Watch, FileText, Download, Printer, UserCheck, Scale, AlertTriangle, Loader2, MessageCircle, X, CreditCard, Wallet } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { TCLEConsentModal } from "@/components/TCLEConsentModal";
@@ -373,43 +373,159 @@ const Telemedicina = () => {
               </motion.div>
             )}
 
-            {/* Resultado Final e Seleção de Médicos */}
+            {/* Resultado Final — Orientação Técnica Personalizada */}
             {step > 10 && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-8">
-                 <Card className="border-primary/30 bg-primary/5">
-                   <CardContent className="p-4 sm:p-8 text-center">
-                     <CheckCircle2 size={36} className="text-primary mx-auto mb-3 sm:mb-4" />
-                     <h2 className="text-xl sm:text-2xl font-display font-black text-foreground mb-2">Triagem Concluída!</h2>
-                     <p className="text-sm text-muted-foreground font-medium mb-4 sm:mb-6">A Brisa IA já preparou seu resumo clínico. Selecione um especialista para uma **Orientação Técnica (20 min)** personalizada com supervisão do Dr. Edilson Bezerra (CRM 10963).</p>
-                    <div className="grid gap-4">
-                      {medicos.map(med => (
-                        <Card key={med.id} className="border-border hover:border-primary/50 transition-all">
-                           <CardContent className="p-3 sm:p-4 flex items-center justify-between gap-2">
-                             <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-                               <img src={med.imageUrl} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover shrink-0" />
-                               <div className="text-left min-w-0">
-                                 <p className="font-black text-xs sm:text-sm truncate">{med.name}</p>
-                                 <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{med.category}</p>
-                               </div>
-                             </div>
-                              <Button
-                                size="sm"
-                                className="bg-primary text-white font-black rounded-lg text-[10px] sm:text-xs shrink-0 px-2 sm:px-3"
-                                onClick={() => {
-                                  if (typeof window !== "undefined" && (window as any).fbq) {
-                                    (window as any).fbq("track", "InitiateCheckout", { value: 30, currency: "BRL", content_name: med.name });
-                                  }
-                                  navigate(`/pagamento?pro=${med.id}`);
-                                }}
-                              >
-                                {`Agendar ${dynamicSymbol} ${dynamicPrice}`}
-                              </Button>
-                          </CardContent>
-                        </Card>
-                      ))}
+                {/* Card Principal — CTA Orientação Técnica */}
+                <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10 shadow-2xl">
+                  <CardContent className="p-4 sm:p-8 text-center">
+                    <motion.div 
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.2, type: "spring" }}
+                    >
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4 border-4 border-primary/30">
+                        <Stethoscope size={36} className="text-primary" />
+                      </div>
+                    </motion.div>
+                    
+                    <h2 className="text-2xl sm:text-3xl font-display font-black text-foreground mb-2">
+                      Inicie Agora<br />
+                      <span className="text-gradient-green">Sua Orientação Técnica Personalizada</span>
+                    </h2>
+                    
+                    <p className="text-sm text-muted-foreground font-medium mb-6 max-w-lg mx-auto">
+                      Após a triagem com a Brisa, você receberá um link para o pagamento da taxa de <span className="text-primary font-black">{dynamicSymbol} {dynamicPrice}</span>. 
+                      Após confirmação do pagamento, você será atendido pelo <span className="text-primary font-black">Dr. Edilson Bezerra On</span> para sua Orientação Técnica via Chat autônomo no WhatsApp.
+                    </p>
+
+                    {/* Fluxo Visual */}
+                    <div className="flex items-center justify-center gap-2 sm:gap-4 mb-6 flex-wrap">
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                          <Brain size={18} className="text-primary" />
+                        </div>
+                        <span className="text-[10px] text-muted-foreground font-bold uppercase">Triagem</span>
+                      </div>
+                      <ArrowRight size={16} className="text-muted-foreground hidden sm:block" />
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                          <CreditCard size={18} className="text-primary" />
+                        </div>
+                        <span className="text-[10px] text-muted-foreground font-bold uppercase">Pagamento</span>
+                      </div>
+                      <ArrowRight size={16} className="text-muted-foreground hidden sm:block" />
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                          <MessageCircle size={18} className="text-green-500" />
+                        </div>
+                        <span className="text-[10px] text-green-500 font-bold uppercase">WhatsApp</span>
+                      </div>
+                    </div>
+
+                    {/* Botão Principal — Pagamento */}
+                    <div className="space-y-3">
+                      <Button 
+                        className="w-full h-14 sm:h-16 bg-primary text-primary-foreground font-black rounded-2xl text-base sm:text-lg shadow-lg hover:shadow-xl transition-all"
+                        onClick={async () => {
+                          setAiLoading(true);
+                          try {
+                            // Chama o edge function para gerar o link de pagamento
+                            const { data, error } = await supabase.functions.invoke("brisa-payment-link", {
+                              body: {
+                                name: patientData.nome,
+                                phone: patientData.telefone,
+                                email: patientData.email,
+                              }
+                            });
+                            if (error || !data?.payment_url) throw new Error("Falha ao gerar link");
+                            
+                            if (typeof window !== "undefined" && (window as any).fbq) {
+                              (window as any).fbq("track", "InitiateCheckout", { 
+                                value: isInternational ? 10 : 30, 
+                                currency: isInternational ? "USD" : "BRL", 
+                                content_name: "Orientação Técnica — Dr. Edilson Bezerra On" 
+                              });
+                            }
+                            window.open(data.payment_url, "_blank", "noopener,noreferrer");
+                            toast({ 
+                              title: "Link de pagamento gerado!", 
+                              description: "Confirme o pagamento para liberar sua orientação técnica." 
+                            });
+                          } catch (e) {
+                            toast({ 
+                              title: "Erro ao gerar link", 
+                              description: "Tente novamente ou entre em contato via WhatsApp.", 
+                              variant: "destructive" 
+                            });
+                          } finally {
+                            setAiLoading(false);
+                          }
+                        }}
+                        disabled={aiLoading}
+                      >
+                        {aiLoading ? (
+                          <Loader2 className="animate-spin mr-2" size={20} />
+                        ) : (
+                          <Wallet className="mr-2" size={20} />
+                        )}
+                        Pagar {dynamicSymbol} {dynamicPrice} — Orientação Técnica
+                      </Button>
+
+                      {/* Botão Secundário — WhatsApp Dr. Edilson */}
+                      <Button 
+                        variant="outline"
+                        className="w-full h-12 sm:h-14 border-green-500/30 text-green-500 font-black rounded-2xl text-sm sm:text-base hover:bg-green-500/10 transition-all"
+                        onClick={() => {
+                          const message = `Olá Dr. Edilson, finalizei minha triagem com a Brisa! Meu nome é ${patientData.nome || "paciente"} e gostaria de agendar minha Orientação Técnica. Triagem concluída: ${selectedPathology || "Cannabis Medicinal"}.`;
+                          window.open(`https://wa.me/5511987131241?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+                        }}
+                      >
+                        <MessageCircle className="mr-2" size={18} />
+                        Já pagou? Fale com Dr. Edilson no WhatsApp
+                      </Button>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
+                      <Shield size={12} />
+                      <span>Pagamento seguro via Mercado Pago · Receita digital ANVISA</span>
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Médicos Disponíveis (seção secundária) */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-display font-black text-foreground text-center">
+                    Ou escolha outro especialista
+                  </h3>
+                  <div className="grid gap-3">
+                    {medicos.map(med => (
+                      <Card key={med.id} className="border-border hover:border-primary/50 transition-all">
+                        <CardContent className="p-3 sm:p-4 flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                            <img src={med.imageUrl} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover shrink-0" />
+                            <div className="text-left min-w-0">
+                              <p className="font-black text-xs sm:text-sm truncate">{med.name}</p>
+                              <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{med.category}</p>
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            className="bg-primary/80 text-white font-black rounded-lg text-[10px] sm:text-xs shrink-0 px-2 sm:px-3"
+                            onClick={() => {
+                              if (typeof window !== "undefined" && (window as any).fbq) {
+                                (window as any).fbq("track", "InitiateCheckout", { value: 30, currency: "BRL", content_name: med.name });
+                              }
+                              navigate(`/pagamento?pro=${med.id}`);
+                            }}
+                          >
+                            Agendar
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
               </motion.div>
             )}
           </div>

@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     if (!body.audioBase64) return json({ error: "audioBase64_required" }, 400);
 
     // 1) STT — ElevenLabs Scribe
-    const audioBytes = base64Decode(body.audioBase64);
+    const audioBytes = decodeBase64(body.audioBase64);
     const audioBlob = new Blob([audioBytes], { type: body.mimeType || "audio/webm" });
     const sttForm = new FormData();
     sttForm.append("file", audioBlob, "audio.webm");
@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
       return json({ transcript, reply, error: "tts_failed", detail: err.slice(0, 200) }, 502);
     }
     const ttsBuf = await ttsRes.arrayBuffer();
-    const audioOutBase64 = base64Encode(new Uint8Array(ttsBuf));
+    const audioOutBase64 = encodeBase64(new Uint8Array(ttsBuf));
 
     return json({
       ok: true,

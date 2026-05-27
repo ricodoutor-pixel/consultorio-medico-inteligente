@@ -43,6 +43,8 @@ async function createMpPixCharge(amount: number, externalRef: string, payerEmail
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
   const results: ChargeResult[] = [];

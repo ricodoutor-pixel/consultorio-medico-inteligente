@@ -274,6 +274,11 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
           transcript: cleanedTranscript,
           contextBpm: contextBpm ?? null,
           history: historyRef.current.slice(-6),
+          now: {
+            iso: new Date().toISOString(),
+            human: new Date().toLocaleString("pt-BR", { dateStyle: "full", timeStyle: "short", timeZone: "America/Sao_Paulo" }),
+            timezone: "America/Sao_Paulo",
+          },
         }),
       });
 

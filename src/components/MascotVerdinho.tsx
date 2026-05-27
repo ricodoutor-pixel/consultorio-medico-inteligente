@@ -102,7 +102,7 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
         onTouchEnd={() => setTimeout(() => setIsHovered(false), 1200)}
         aria-label="Abrir Verdinho IA"
       >
-        <div className="relative w-11 h-11 md:w-12 md:h-12 rounded-full bg-card/70 backdrop-blur-md shadow-md ring-1 ring-emerald-500/25 hover:ring-emerald-400/40 transition">
+        <div className="relative w-5 h-5 md:w-6 md:h-6 rounded-full bg-card/70 backdrop-blur-md shadow-md ring-1 ring-emerald-500/25 hover:ring-emerald-400/40 transition">
           <svg viewBox="0 0 100 100" className="w-full h-full p-1" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="35" r="20" fill="#10b981" />
             <circle cx="42" cy="30" r="3" fill="#ffffff" />

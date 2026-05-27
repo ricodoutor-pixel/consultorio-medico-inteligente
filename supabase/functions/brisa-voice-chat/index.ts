@@ -64,9 +64,11 @@ Deno.serve(async (req) => {
       return json({ error: "stt_failed", detail: err.slice(0, 200) }, 502);
     }
     const sttData = await sttRes.json();
-    const transcript = (sttData.text || "").trim();
+    let transcript = (sttData.text || "").trim();
+    let forcedReply = "";
     if (!transcript) {
-      return json({ error: "no_speech_detected" }, 200);
+      transcript = "[silêncio]";
+      forcedReply = "Olá! Em que posso te ajudar hoje?";
     }
 
     // 2) Gemini via Lovable AI Gateway

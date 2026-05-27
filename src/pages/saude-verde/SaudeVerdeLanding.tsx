@@ -9,6 +9,10 @@ import {
   CreditCard, Stethoscope, FlaskConical, Syringe, SmilePlus, Pill, Leaf,
   Bot, ShieldCheck, Check, ArrowRight, Star, Users, MapPin
 } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+
+
 
 
 
@@ -61,6 +65,10 @@ export default function SaudeVerdeLanding() {
         <meta name="description" content="Cartão de desconto em saúde com até 80% OFF em consultas, exames, vacinas e terapias. A partir de R$35/mês, sem carência, cancele quando quiser." />
         <link rel="canonical" href="https://plantayraiz.com.br/saude-verde" />
       </Helmet>
+
+      <Navbar />
+
+
 
       {/* HERO — background sólido em mobile (evita glitch GPU Android com radial + bg-clip-text) */}
       <section className="saude-verde-hero relative overflow-hidden py-20 md:py-28 md:bg-gradient-to-br md:from-primary/10 md:via-background md:to-background" style={{ backgroundColor: 'hsl(var(--background))' }}>
@@ -251,6 +259,8 @@ export default function SaudeVerdeLanding() {
           </p>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }
+

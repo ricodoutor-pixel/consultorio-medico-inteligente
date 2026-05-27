@@ -53,6 +53,11 @@ const Login = () => {
         const name = profile?.full_name || "usuário";
         toast({ title: `Bem-vindo, ${name}! 🌿` });
 
+        // Alerta WhatsApp ao Dr. Edilson — Modo Cadastro Ativado (login)
+        supabase.functions
+          .invoke("brisa-signup-alert", { body: { user_id: data.user.id, event: "login" } })
+          .catch((e) => console.warn("[brisa-signup-alert] login", e));
+
         // Redirect: prioritize ?redirect= param, then role-based default
         if (redirectTo) {
           navigate(decodeURIComponent(redirectTo));

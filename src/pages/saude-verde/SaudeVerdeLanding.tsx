@@ -9,6 +9,10 @@ import {
   CreditCard, Stethoscope, FlaskConical, Syringe, SmilePlus, Pill, Leaf,
   Bot, ShieldCheck, Check, ArrowRight, Star, Users, MapPin
 } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+
+
 
 
 

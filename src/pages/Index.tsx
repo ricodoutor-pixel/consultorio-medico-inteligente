@@ -101,7 +101,7 @@ const Index = () => {
       <Navbar />
 
       {/* Hero Section - Otimizado para Mobile/Desktop */}
-      <section className="hero-glow section-padding min-h-[70dvh] lg:min-h-[85dvh] flex items-start overflow-hidden pt-24 md:pt-32 pb-12 md:pb-24">
+      <section className="hero-glow section-padding min-h-[70dvh] lg:min-h-[85dvh] flex items-start overflow-hidden pt-32 md:pt-40 pb-12 md:pb-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24 relative z-10 w-full">
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-14 items-start">
             

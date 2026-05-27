@@ -375,7 +375,10 @@ const App = () => (
             
             
             
-            {/* Mascote Verdinho removido — presente apenas na Navbar */}
+            {/* Mascote Verdinho flutuante — apenas mobile (no desktop fica na Navbar) */}
+            <div className="lg:hidden">
+              <MascotVerdinho />
+            </div>
             {/* WhatsApp Brisa Button */}
             <WhatsAppButton />
             {/* ManyChatWidget removido — Brisa agora é nativa no WhatsAppButton */}

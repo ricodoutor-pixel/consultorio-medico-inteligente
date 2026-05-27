@@ -164,58 +164,74 @@ export const Navbar = () => {
                 </div>
               </NavLink>
               
-              {/* Verdinho mais próximo do nome */}
-              <div className={`ml-1 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden sm:block" : "hidden"}`}>
-                <FrogMascot size={48} mood="happy" onClick={openChat} enableJumpToNav={true} />
+              {/* Verdinho mais próximo do nome (oculto em telas estreitas para dar espaço ao menu) */}
+              <div className={`ml-1 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden 2xl:block" : "hidden"}`}>
+                <FrogMascot size={40} mood="happy" onClick={openChat} enableJumpToNav={true} />
               </div>
             </div>
 
-            {/* Desktop: Menu Centralizado */}
-            <div className="hidden xl:flex items-center gap-2 2xl:gap-4">
-              <div className="flex items-center gap-2 2xl:gap-4" role="menubar">
-                {links.map((link) => (
+            {/* Desktop: Menu Centralizado (aparece a partir de lg = 1024px) */}
+            <div className="hidden lg:flex items-center gap-1 xl:gap-2 2xl:gap-3 flex-1 justify-end">
+              <div className="flex items-center gap-0.5 xl:gap-1 2xl:gap-2" role="menubar">
+                {primaryLinks.map((link) => (
                   <NavLink
                     key={link.to}
                     to={link.to}
-                    className="text-[10px] 2xl:text-xs font-black text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1 py-1 uppercase tracking-tight"
+                    className="text-[10px] xl:text-[11px] 2xl:text-xs font-black text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1.5 py-1 uppercase tracking-tight"
                     activeClassName="text-primary border-b-2 border-primary"
                   >
                     {link.label}
                   </NavLink>
                 ))}
+
+                {/* Dropdown "Mais" — agrupa links secundários */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-0.5 text-[10px] xl:text-[11px] 2xl:text-xs font-black text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap px-1.5 py-1 uppercase tracking-tight">
+                      Mais <ChevronDown size={11} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52">
+                    {secondaryLinks.map((link) => (
+                      <DropdownMenuItem key={link.to} asChild className="cursor-pointer">
+                        <Link to={link.to} className="font-bold text-xs uppercase tracking-tight">
+                          {link.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
-              <div className="flex items-center gap-2 border-l border-border pl-3">
-                <div className="flex items-center gap-1.5">
-                  <div className="scale-90">
-                    <LanguageSwitcher />
-                  </div>
-                  
-                  {/* Botão pulsátil — Triagem → Pagamento → Médico Online */}
-                  <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-xl text-xs h-9 px-4 hover:scale-105 transition-all shadow-lg shadow-secondary/40 animate-pulse" asChild>
-                    <NavLink to="/telemedicina">Iniciar Consulta</NavLink>
-                  </Button>
-
-                  {user ? (
-                    <UserMenu />
-                  ) : (
-                    <div className="flex items-center gap-1">
-                      <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1 text-[10px] h-7 px-2" asChild>
-                        <NavLink to="/login"><LogIn size={10} /> Login</NavLink>
-                      </Button>
-                      <Button size="sm" variant="outline" className="font-bold rounded-xl border-primary/30 text-primary text-[10px] h-7 px-2" asChild>
-                        <NavLink to="/cadastro">Cadastro</NavLink>
-                      </Button>
-                    </div>
-                  )}
+              <div className="flex items-center gap-1.5 border-l border-border pl-2 xl:pl-3 ml-1">
+                <div className="hidden xl:block scale-90">
+                  <LanguageSwitcher />
                 </div>
+
+                {/* Botão pulsátil — CTA principal */}
+                <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-xl text-[10px] xl:text-xs h-8 xl:h-9 px-2.5 xl:px-4 hover:scale-105 transition-all shadow-lg shadow-secondary/40 animate-pulse" asChild>
+                  <NavLink to="/telemedicina">Consulta</NavLink>
+                </Button>
+
+                {user ? (
+                  <UserMenu compact />
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <Button size="sm" variant="ghost" className="font-bold rounded-xl text-muted-foreground hover:text-foreground gap-1 text-[10px] h-7 px-2" asChild>
+                      <NavLink to="/login"><LogIn size={10} /> Login</NavLink>
+                    </Button>
+                    <Button size="sm" variant="outline" className="hidden xl:inline-flex font-bold rounded-xl border-primary/30 text-primary text-[10px] h-7 px-2" asChild>
+                      <NavLink to="/cadastro">Cadastro</NavLink>
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Mobile Actions */}
-            <div className="xl:hidden flex items-center gap-2">
+            {/* Mobile Actions (até lg) */}
+            <div className="lg:hidden flex items-center gap-2">
                <Button size="sm" className="bg-secondary text-secondary-foreground font-black rounded-lg text-[10px] h-8 px-2 animate-pulse shadow-lg shadow-secondary/40" asChild>
-                <NavLink to="/telemedicina">INICIAR CONSULTA</NavLink>
+                <NavLink to="/telemedicina">CONSULTA</NavLink>
               </Button>
               <button
                 className="p-2 text-foreground flex-shrink-0 relative z-[60]"

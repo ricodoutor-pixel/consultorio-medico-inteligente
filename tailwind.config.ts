@@ -96,6 +96,10 @@ export default {
           "0%, 100%": { opacity: "0.35", transform: "scale(0.96)" },
           "50%": { opacity: "0.85", transform: "scale(1.06)" },
         },
+        "shine": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "100%": { backgroundPosition: "200% 50%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -104,6 +108,7 @@ export default {
         "pulse-glow": "pulse-glow 3s ease-in-out infinite",
         "starPulse": "starPulse 3s ease-in-out infinite",
         "brisa-pulse": "brisa-pulse 2.2s ease-in-out infinite",
+        "shine": "shine 3s linear infinite",
       },
     },
   },

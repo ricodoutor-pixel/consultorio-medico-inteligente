@@ -43,6 +43,12 @@ jobs:
         id: smoke
         run: node scripts/smoke-test.mjs
 
+      - name: Assert static XML assets
+        run: |
+          test -f dist/sitemap-final.xml
+          test -f dist/robots.txt
+          test -f dist/.htaccess
+
       - name: Ensure SPA fallback (.htaccess)
         run: cp public/.htaccess dist/.htaccess
 

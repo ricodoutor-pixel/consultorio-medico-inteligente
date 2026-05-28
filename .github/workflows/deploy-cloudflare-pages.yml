@@ -45,6 +45,12 @@ jobs:
           VITE_DOCTOR_WHATSAPP_NUMBER: ${{ secrets.VITE_DOCTOR_WHATSAPP_NUMBER }}
         run: bun run build
 
+      - name: Assert static XML assets
+        run: |
+          test -f dist/sitemap-final.xml
+          test -f dist/_redirects
+          test -f dist/_headers
+
       - name: Publish → Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:

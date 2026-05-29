@@ -20,6 +20,9 @@ async function sendWhatsAppAdmin(text: string) {
   const inst = Deno.env.get("EVOLUTION_INSTANCE");
   const to = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
   if (!url || !key || !inst) return false;
+  const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+  if (shouldSilenceAdminAlert("infra-expiry-monitor")) return false;
+
   try {
     const r = await fetch(`${url}/message/sendText/${inst}`, {
       method: "POST",

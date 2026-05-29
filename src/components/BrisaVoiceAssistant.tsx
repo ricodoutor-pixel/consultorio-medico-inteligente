@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, Mic, Volume2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import brisaPortrait from "@/assets/enf-brisa-portrait.jpeg";
 
 interface Props {
   contextBpm?: number | null;
@@ -337,11 +338,21 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
 
   return (
     <Card className="border-primary/30 bg-card p-5">
-      <div className="mb-4 flex flex-col items-center gap-2 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 animate-pulse">
-          <Volume2 className="text-primary" size={22} />
+      <div className="mb-4 flex flex-col items-center gap-3 text-center">
+        {/* Portrait da Enf. Brisa em moldura elegante */}
+        <div className="relative">
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-primary via-emerald-400 to-secondary opacity-70 blur-sm" />
+          <img
+            src={brisaPortrait}
+            alt="Enfermeira Brisa"
+            loading="lazy"
+            className="relative h-20 w-20 rounded-full object-cover ring-2 ring-background shadow-lg"
+          />
         </div>
-        <h3 className="text-lg font-bold">Fale com a Enfermeira Brisa</h3>
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 animate-pulse">
+          <Volume2 className="text-primary" size={18} />
+        </div>
+        <h3 className="text-lg font-bold">Pergunte a Enf. Brisa</h3>
         <p className="max-w-xs text-sm text-muted-foreground">
           Toque no botão, fale por até 5 segundos e a Brisa responde com voz no seu celular.
         </p>

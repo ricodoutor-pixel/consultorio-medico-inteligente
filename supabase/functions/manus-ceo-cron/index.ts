@@ -19,7 +19,10 @@ function fmtBRL(n: number) {
 }
 
 async function sendWhatsApp(message: string) {
+  const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+  if (shouldSilenceAdminAlert("manus-ceo-cron")) return true;
   try {
+
     const r = await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
       method: "POST",
       headers: {

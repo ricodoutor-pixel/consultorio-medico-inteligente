@@ -44,6 +44,9 @@ const DEFAULTS: Profile = {
 
 async function sendWhatsApp(phone: string, message: string, dryRun: boolean) {
   if (dryRun) return true;
+  const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+  if (shouldSilenceAdminAlert("manus-sentinel")) return true;
+
   try {
     const res = await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
       method: "POST",

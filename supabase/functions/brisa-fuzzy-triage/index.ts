@@ -75,15 +75,21 @@ serve(async (req) => {
       ].join("\n");
 
       try {
-        const r = await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE}` },
-          body: JSON.stringify({ phone: ADMIN_WHATSAPP, message: msg }),
-        });
-        notified = r.ok;
+        const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+        if (shouldSilenceAdminAlert("brisa-fuzzy-triage")) {
+          notified = false;
+        } else {
+          const r = await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE}` },
+            body: JSON.stringify({ phone: ADMIN_WHATSAPP, message: msg }),
+          });
+          notified = r.ok;
+        }
       } catch (_) {
         notified = false;
       }
+
 
       if (notified && row?.id) {
         await supabase

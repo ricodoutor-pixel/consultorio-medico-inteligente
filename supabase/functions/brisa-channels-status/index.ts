@@ -35,7 +35,10 @@ async function check(url: string, init?: RequestInit): Promise<Status> {
 
 async function alertDoctor(channelLabel: string, st: Status) {
   if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) return;
+  const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+  if (shouldSilenceAdminAlert("brisa-channels-status")) return;
   try {
+
     await fetch(`${EVOLUTION_API_URL}/message/sendText/${EVOLUTION_INSTANCE}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: EVOLUTION_API_KEY },

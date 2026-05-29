@@ -62,12 +62,16 @@ serve(async (req) => {
       "_Revisar em /admin/doctors_",
     ].join("\n");
     try {
-      await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE}` },
-        body: JSON.stringify({ phone: ADMIN_WHATSAPP, message: msg }),
-      });
+      const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+      if (!shouldSilenceAdminAlert("pool-sanitizer")) {
+        await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE}` },
+          body: JSON.stringify({ phone: ADMIN_WHATSAPP, message: msg }),
+        });
+      }
     } catch (_) {}
+
   }
 
   return new Response(JSON.stringify({ ok: true, scanned: risky?.length ?? 0, suspended: suspended.length }), {

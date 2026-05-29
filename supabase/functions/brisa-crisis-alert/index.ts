@@ -22,7 +22,10 @@ function maskPhone(p?: string | null) {
 }
 
 async function sendWhatsApp(message: string) {
+  const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+  if (shouldSilenceAdminAlert("brisa-crisis-alert")) return true;
   try {
+
     const r = await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE}` },

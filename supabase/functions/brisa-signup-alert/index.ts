@@ -105,29 +105,24 @@ Deno.serve(async (req) => {
       .select("id", { count: "exact", head: true })
       .gte("created_at", startBRT.toISOString());
 
-    let text: string;
-    if (event === "signup") {
-      text =
-`${emoji} *NOVO CADASTRO — ${label.toUpperCase()}*
-
-👤 ${name}${phone}
-🕒 ${hora} (BRT)
-
-📊 Hoje já temos *${todaySignups ?? 1} cadastro(s)* novos.
-Parabéns, Doutor! 🌿
-
-— Enf. Brisa · Planta y Raiz`;
-    } else {
-      text =
-`${emoji} *USUÁRIO LOGADO — ${label}*
-
-👤 ${name}${phone}
-🕒 ${hora} (BRT)
-
-📊 Cadastros novos hoje: *${todaySignups ?? 0}*
-
-— Enf. Brisa · Planta y Raiz`;
+    // Política Dr. Edilson: APENAS novos cadastros disparam WhatsApp.
+    // Logins NÃO notificam mais (até segunda ordem).
+    if (event !== "signup") {
+      return new Response(JSON.stringify({ ok: true, sent: false, event, reason: "login_silenced" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
+
+    const text =
+`${emoji} *Parabéns, Doutor!*
+
+Mais um(a) *${label}* cadastrado(a) e ativo(a) na plataforma. 🌿
+
+👤 ${name}${phone}
+🕒 ${hora} (BRT)
+📊 Hoje: *${todaySignups ?? 1} cadastro(s)* novo(s).
+
+— Enf. Brisa · Planta y Raiz`;
 
     const sent = await sendWhatsApp(text);
 

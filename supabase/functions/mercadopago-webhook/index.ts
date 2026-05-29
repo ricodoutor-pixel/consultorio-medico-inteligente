@@ -327,7 +327,8 @@ Deno.serve(async (req) => {
         // 1) Notifica Dr. Edilson
         if (evolutionUrl && evolutionKey) {
           const drMsg =
-            `🩺 *NOVO PAGAMENTO ORIENTAÇÃO TÉCNICA*\n\n` +
+            `🩺 *Parabéns, Doutor!*\n\n` +
+            `Mais uma *Orientação Técnica* realizada e auditada com sucesso! ✅\n\n` +
             `💰 Valor: R$ ${amount} (confirmado)\n` +
             `👤 Paciente: ${orientacaoName || "—"}\n` +
             `📱 WhatsApp: ${orientacaoPhone ? `+${orientacaoPhone}` : "—"}\n` +

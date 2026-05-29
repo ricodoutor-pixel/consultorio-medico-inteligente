@@ -194,12 +194,16 @@ Deno.serve(async (req) => {
 
         const reportText = `📊 RELATÓRIO SEMANAL - PLANTA Y RAIZ\n${new Date().toLocaleDateString("pt-BR")}\n\n💰 FINANCEIRO\n• Faturamento Bruto: R$ ${totalRevenue.toFixed(0)}\n• Receita Plataforma (7%): R$ ${platformRevenue.toFixed(0)}\n• Projeção Próx. Semana: R$ ${projectedRevenue}\n\n📋 OPERACIONAL\n• Consultas Agendadas: ${totalConsultas}\n• Consultas Realizadas: ${completedConsultas}\n• Taxa de Conclusão: ${totalConsultas > 0 ? ((completedConsultas / totalConsultas) * 100).toFixed(0) : 0}%\n\n👨‍⚕️ EQUIPE\n• Novos Médicos: ${newDoctorsCount}\n• NPS Médio: ${avgNPS}\n\n🎯 AÇÕES RECOMENDADAS\n${Number(avgNPS) < 8 ? "⚠️ NPS abaixo de 8 - Revisar qualidade" : "✅ NPS saudável"}\n${completedConsultas < totalConsultas * 0.8 ? "⚠️ Alta taxa de cancelamento" : "✅ Taxa de conclusão OK"}\n${newDoctorsCount < 5 ? "⚠️ Captar mais médicos" : "✅ Captação saudável"}`;
 
-        // Enviar para admin via WhatsApp
-        const adminPhone = Deno.env.get("ADMIN_WHATSAPP") || "+5511987131241";
-        const sub = await findSubscriber(adminPhone);
-        if (sub?.data?.id) {
-          await sendContent(sub.data.id, [{ type: "text", text: reportText }]);
+        // Enviar para admin via WhatsApp (gated por admin-alert-guard)
+        const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+        if (!shouldSilenceAdminAlert("retention-engine-weekly-report")) {
+          const adminPhone = Deno.env.get("ADMIN_WHATSAPP") || "+5511987131241";
+          const sub = await findSubscriber(adminPhone);
+          if (sub?.data?.id) {
+            await sendContent(sub.data.id, [{ type: "text", text: reportText }]);
+          }
         }
+
 
         // Salvar no banco
         await supabase.from("notifications").insert({

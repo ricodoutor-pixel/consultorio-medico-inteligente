@@ -251,12 +251,16 @@ async function audit(
   ].join("\n");
 
   try {
-    await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${SERVICE_ROLE}` },
-      body: JSON.stringify({ phone: ADMIN_WHATSAPP, message: md, type: "text" }),
-    });
+    const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+    if (!shouldSilenceAdminAlert("manus-growth-agent")) {
+      await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${SERVICE_ROLE}` },
+        body: JSON.stringify({ phone: ADMIN_WHATSAPP, message: md, type: "text" }),
+      });
+    }
   } catch (_) { /* silent */ }
+
 
   return md;
 }

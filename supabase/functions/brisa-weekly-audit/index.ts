@@ -20,12 +20,15 @@ const sb = createClient(SUPABASE_URL, SERVICE_ROLE);
 
 async function sendWhatsApp(number: string, text: string) {
   if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) return null;
+  const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+  if (shouldSilenceAdminAlert("brisa-weekly-audit")) return null;
   return fetch(`${EVOLUTION_API_URL}/message/sendText/${EVOLUTION_INSTANCE}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
     body: JSON.stringify({ number, text, delay: 800 }),
   });
 }
+
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });

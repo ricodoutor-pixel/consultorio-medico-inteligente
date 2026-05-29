@@ -121,6 +121,9 @@ async function replyComment(commentId: string, text: string) {
 
 async function notifyDoctorRedFlag(channel: string, senderId: string, msg: string) {
   if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY || !EVOLUTION_INSTANCE) return;
+  const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+  if (shouldSilenceAdminAlert("meta-messenger-red-flag")) return;
+
   try {
     await fetch(`${EVOLUTION_API_URL}/message/sendText/${EVOLUTION_INSTANCE}`, {
       method: "POST",

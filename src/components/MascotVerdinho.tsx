@@ -167,7 +167,8 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
       {/* Chat IA Modal */}
       {showChat && (
         <div className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center md:justify-end p-0 md:p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-card rounded-t-3xl md:rounded-2xl shadow-2xl w-full h-[100dvh] md:h-auto md:w-96 md:max-w-md flex flex-col border border-border md:max-h-[85dvh]">
+          <div className="bg-card rounded-t-3xl md:rounded-2xl shadow-2xl w-full h-[70dvh] md:h-auto md:w-96 md:max-w-md flex flex-col border border-border md:max-h-[85dvh] mb-[calc(env(safe-area-inset-bottom)+4.5rem)] md:mb-0">
+
             {/* Header */}
             <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-3 md:px-4 md:py-4 flex items-center gap-3 rounded-t-3xl md:rounded-t-2xl flex-shrink-0 safe-area-top">
               <button

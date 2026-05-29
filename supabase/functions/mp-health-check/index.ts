@@ -16,7 +16,10 @@ const ADMIN_WHATSAPP = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
 const LATENCY_THRESHOLD_MS = 5000;
 
 async function notifyAdmin(msg: string) {
+  const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+  if (shouldSilenceAdminAlert("mp-health-check")) return;
   try {
+
     await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE}` },

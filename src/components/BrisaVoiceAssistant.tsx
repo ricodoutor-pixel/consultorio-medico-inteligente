@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, Mic, Volume2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import brisaPortrait from "@/assets/enf-brisa-portrait.jpeg";
 
 interface Props {
   contextBpm?: number | null;

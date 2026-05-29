@@ -83,6 +83,9 @@ function isQuotaOrBillingFailure(status: number, detail: string): boolean {
 
 async function alertEdilson(errorId: string, context: string, detail: string) {
   if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) return;
+  // Guard signup-only (política Dr. Edilson)
+  const { shouldSilenceAdminAlert } = await import("./admin-alert-guard.ts");
+  if (shouldSilenceAdminAlert("brisa-ai-heartbeat")) return;
   const text = `[ALERTA BRISA] Falha de IA. Log: ${errorId}\nCtx: ${context}\n${detail.slice(0, 400)}`;
   try {
     await fetch(`${EVOLUTION_API_URL}/message/sendText/${EVOLUTION_INSTANCE}`, {
@@ -92,6 +95,7 @@ async function alertEdilson(errorId: string, context: string, detail: string) {
     });
   } catch (e) { console.error("[brisa-ai] alertEdilson failed", e); }
 }
+
 
 // Heartbeat de erro crítico (Stripe, Supabase, etc.) — exportado p/ outras edge fns
 export async function brisaHeartbeatAlert(endpoint: string, log: string) {

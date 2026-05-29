@@ -78,12 +78,16 @@ serve(async (req) => {
       ...failures.slice(0, 10).map((f) => `• ${f.id} — hash:${f.hash_present ? "✅" : "❌"} pdf:${f.http ?? "—"}`),
     ].join("\n");
     try {
-      await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE}` },
-        body: JSON.stringify({ phone: ADMIN_WHATSAPP, message: msg }),
-      });
+      const { shouldSilenceAdminAlert } = await import("../_shared/admin-alert-guard.ts");
+      if (!shouldSilenceAdminAlert("prescription-hash-audit")) {
+        await fetch(`${SUPABASE_URL}/functions/v1/evolution-api-proxy`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE}` },
+          body: JSON.stringify({ phone: ADMIN_WHATSAPP, message: msg }),
+        });
+      }
     } catch (_) {}
+
   }
 
   return new Response(JSON.stringify({ ok: true, audited: rows?.length ?? 0, valid, invalid }), {

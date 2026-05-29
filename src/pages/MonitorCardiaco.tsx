@@ -80,14 +80,14 @@ export default function MonitorCardiacoPage() {
         </Button>
       </section>
 
+      {/* Enfermeira Brisa por voz — push-to-talk (topo da página) */}
+      <section className="px-4 max-w-2xl mx-auto mt-2 mb-8">
+        <BrisaVoiceAssistant contextBpm={history[0]?.bpm ?? null} />
+      </section>
+
       {/* Monitor */}
       <section id="monitor" className="px-4 mb-6">
         <MonitorCardiaco />
-      </section>
-
-      {/* Enfermeira Brisa por voz — push-to-talk */}
-      <section className="px-4 max-w-2xl mx-auto mb-8">
-        <BrisaVoiceAssistant contextBpm={history[0]?.bpm ?? null} />
       </section>
 
       {/* Passos — texto analógico simples, sem animações */}

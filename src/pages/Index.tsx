@@ -9,6 +9,7 @@ const CannabisMarketChart = lazy(() => import("@/components/CannabisMarketChart"
 import { Link } from "react-router-dom";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { LocalMapSection } from "@/components/LocalMapSection";
+import { BrisaCTAGate } from "@/components/BrisaCTAGate";
 import triagemPatient from "@/assets/triagem-patient.png";
 import consultaChat from "@/assets/consulta-chat.png";
 import triagemForm from "@/assets/triagem-form.png";
@@ -217,15 +218,14 @@ const Index = () => {
             <div className="relative inline-block">
               {/* Pulse verde leve atrás do botão da Enfª Brisa */}
               <span aria-hidden className="pointer-events-none absolute -inset-2 rounded-3xl bg-primary/40 blur-2xl opacity-70 animate-brisa-pulse" />
-              <Button size="lg" className="relative text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/30 transition-all hover:scale-105" asChild>
-                <a
-                  href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Enfª Brisa, eu preciso de uma orientação técnica com Dr Edilson Bezerra On Agora!")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  🎯 Iniciar Orientação Técnica <ArrowRight size={18} className="ml-2" />
-                </a>
-              </Button>
+              <BrisaCTAGate
+                href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Enfª Brisa, eu preciso de uma orientação técnica com Dr Edilson Bezerra On Agora!")}`}
+                className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/30 transition-all hover:scale-105"
+                source="CTA_Index_Hero"
+                modalMessage="Antes de falar com a Enf. Brisa, deixe seu contato — assim agilizamos sua Orientação Técnica de apenas R$30 com o Dr. Edilson."
+              >
+                🎯 Iniciar Orientação Técnica <ArrowRight size={18} className="ml-2" />
+              </BrisaCTAGate>
             </div>
           </div>
 
@@ -330,11 +330,14 @@ const Index = () => {
                 <div className="relative">
                   {/* Pulse verde leve atrás do CTA da Brisa (Triagem) */}
                   <span aria-hidden className="pointer-events-none absolute -inset-3 rounded-3xl bg-primary/40 blur-2xl opacity-70 animate-brisa-pulse" />
-                  <Button size="lg" className="relative text-sm sm:text-base font-black h-14 sm:h-16 px-8 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all" asChild>
-                    <a href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20a%20triagem%20para%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20o%20Dr.%20Edilson%20Bezerra%20On" target="_blank" rel="noopener noreferrer">
-                      💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={20} className="ml-2" />
-                    </a>
-                  </Button>
+                  <BrisaCTAGate
+                    href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20a%20triagem%20para%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20o%20Dr.%20Edilson%20Bezerra%20On"
+                    className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-14 sm:h-16 px-8 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all"
+                    source="CTA_DrEdilson_Triagem"
+                    modalMessage="Antes da triagem com a Enf. Brisa, deixe seu contato — garantimos sua Orientação Técnica de R$30 com o Dr. Edilson Bezerra On."
+                  >
+                    💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={20} className="ml-2" />
+                  </BrisaCTAGate>
                 </div>
               </div>
 

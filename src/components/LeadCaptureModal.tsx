@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Send, Shield, CheckCircle } from "lucide-react";
+import { Send, Shield, CheckCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,6 +8,8 @@ interface LeadCaptureModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (data: { nome: string; telefone: string; email?: string; categoria?: string }) => void;
+  /** Chamado quando o usuário fecha (X) sem preencher — libera acesso mesmo assim. */
+  onSkip?: () => void;
   origem: "chat" | "ebook";
   message?: string;
   tags?: string[];
@@ -33,6 +35,7 @@ export const LeadCaptureModal = ({
   isOpen,
   onClose,
   onSuccess,
+  onSkip,
   origem,
   message,
   tags = [],
@@ -115,7 +118,18 @@ export const LeadCaptureModal = ({
 
       if (dbError) throw new Error(dbError.message);
 
-      // ManyChat webhook removed — lead is persisted via Supabase only.
+      // 🚀 Dispara convite automático WhatsApp + email com oferta R$30 (fire-and-forget)
+      supabase.functions
+        .invoke("lead-invite-orientacao", {
+          body: {
+            nome: nome.trim(),
+            telefone: phoneDigits,
+            email: email.trim() || null,
+            categoria: categoria || null,
+            origem,
+          },
+        })
+        .catch((err) => console.warn("[lead-invite-orientacao] dispatch failed:", err));
 
       localStorage.setItem("pr_lead_name", nome.trim());
       localStorage.setItem("pr_lead_phone", phoneDigits);
@@ -176,6 +190,14 @@ export const LeadCaptureModal = ({
                       {origem === "chat" ? "Antes de continuar..." : "Quase lá!"}
                     </h3>
                   </div>
+                  <button
+                    type="button"
+                    aria-label="Pular e continuar sem cadastrar"
+                    onClick={() => { (onSkip ?? onClose)(); }}
+                    className="text-muted-foreground hover:text-foreground transition-colors -mt-1 -mr-1 p-1 rounded-md hover:bg-muted"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
 
                 <p className="text-sm text-muted-foreground mb-4 leading-relaxed">

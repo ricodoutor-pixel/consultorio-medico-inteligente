@@ -118,7 +118,18 @@ export const LeadCaptureModal = ({
 
       if (dbError) throw new Error(dbError.message);
 
-      // ManyChat webhook removed — lead is persisted via Supabase only.
+      // 🚀 Dispara convite automático WhatsApp + email com oferta R$30 (fire-and-forget)
+      supabase.functions
+        .invoke("lead-invite-orientacao", {
+          body: {
+            nome: nome.trim(),
+            telefone: phoneDigits,
+            email: email.trim() || null,
+            categoria: categoria || null,
+            origem,
+          },
+        })
+        .catch((err) => console.warn("[lead-invite-orientacao] dispatch failed:", err));
 
       localStorage.setItem("pr_lead_name", nome.trim());
       localStorage.setItem("pr_lead_phone", phoneDigits);

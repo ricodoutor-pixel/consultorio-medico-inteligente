@@ -9,6 +9,7 @@ const CannabisMarketChart = lazy(() => import("@/components/CannabisMarketChart"
 import { Link } from "react-router-dom";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { LocalMapSection } from "@/components/LocalMapSection";
+import { BrisaCTAGate } from "@/components/BrisaCTAGate";
 import triagemPatient from "@/assets/triagem-patient.png";
 import consultaChat from "@/assets/consulta-chat.png";
 import triagemForm from "@/assets/triagem-form.png";

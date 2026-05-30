@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Send, Shield, CheckCircle } from "lucide-react";
+import { Send, Shield, CheckCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,6 +8,8 @@ interface LeadCaptureModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (data: { nome: string; telefone: string; email?: string; categoria?: string }) => void;
+  /** Chamado quando o usuário fecha (X) sem preencher — libera acesso mesmo assim. */
+  onSkip?: () => void;
   origem: "chat" | "ebook";
   message?: string;
   tags?: string[];

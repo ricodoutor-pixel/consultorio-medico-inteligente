@@ -35,6 +35,7 @@ export const LeadCaptureModal = ({
   isOpen,
   onClose,
   onSuccess,
+  onSkip,
   origem,
   message,
   tags = [],

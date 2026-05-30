@@ -190,6 +190,14 @@ export const LeadCaptureModal = ({
                       {origem === "chat" ? "Antes de continuar..." : "Quase lá!"}
                     </h3>
                   </div>
+                  <button
+                    type="button"
+                    aria-label="Pular e continuar sem cadastrar"
+                    onClick={() => { (onSkip ?? onClose)(); }}
+                    className="text-muted-foreground hover:text-foreground transition-colors -mt-1 -mr-1 p-1 rounded-md hover:bg-muted"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
 
                 <p className="text-sm text-muted-foreground mb-4 leading-relaxed">

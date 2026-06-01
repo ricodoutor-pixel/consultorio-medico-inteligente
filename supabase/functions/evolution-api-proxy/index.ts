@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL");
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY");
-const INSTANCE_NAME = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+const INSTANCE_NAME = encodeURIComponent(Deno.env.get("EVOLUTION_INSTANCE") || "Enf Brisa Bot whats");
 const ADMIN_WHATSAPP = (Deno.env.get("ADMIN_WHATSAPP") || "").replace(/\D/g, "");
 
 const supabase = createClient(

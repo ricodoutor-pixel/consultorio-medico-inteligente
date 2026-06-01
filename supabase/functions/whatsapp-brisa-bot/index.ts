@@ -10,7 +10,7 @@ const corsHeaders = {
 
 const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL")!;
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY")!;
-const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+const EVOLUTION_INSTANCE = encodeURIComponent(Deno.env.get("EVOLUTION_INSTANCE") || "Enf Brisa Bot whats");
 const EVOLUTION_WEBHOOK_SECRET = Deno.env.get("EVOLUTION_WEBHOOK_SECRET") || "";
 // 🔑 IA: Lovable AI Gateway (preferido) com fallback para Gemini direto.
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";

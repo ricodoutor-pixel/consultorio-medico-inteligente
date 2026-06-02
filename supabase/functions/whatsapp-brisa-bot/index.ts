@@ -748,12 +748,27 @@ serve(async (req) => {
       },
     }).then(() => {}).catch(() => {});
 
-    const { data: rows } = await supabase
-      .from("whatsapp_brisa_log")
-      .select("direction, message, created_at")
-      .eq("phone", phone)
-      .order("created_at", { ascending: false })
-      .limit(8);
+    // 🧠 MEMÓRIA 360° — histórico CROSS-CHANNEL (whatsapp + ig + messenger) com fallback local
+    let history: Array<{role: string; content: string}> = [];
+    if (unifiedContactId) {
+      const unified = await getRecentHistory(unifiedContactId, 12);
+      history = unified.map((m: any) => ({
+        role: m.direction === "inbound" ? "user" : "assistant",
+        content: `${m.channel !== "whatsapp" ? `[${m.channel}] ` : ""}${m.content || ""}`,
+      }));
+    }
+    if (history.length === 0) {
+      const { data: rows } = await supabase
+        .from("whatsapp_brisa_log")
+        .select("direction, message, created_at")
+        .eq("phone", phone)
+        .order("created_at", { ascending: false })
+        .limit(8);
+      history = (rows || []).reverse().map((r: any) => ({
+        role: r.direction === "inbound" ? "user" : "assistant",
+        content: r.message,
+      }));
+    }
 
     // 🛡️ MÓDULO 2 — Filtro de assédio (corte seco, pré-LLM)
     if (containsHarassment(messageText)) {
@@ -774,29 +789,24 @@ serve(async (req) => {
       });
     }
 
-    const history = (rows || []).reverse().map((r: any) => ({
-      role: r.direction === "inbound" ? "user" : "assistant",
-      content: r.message,
-    }));
-
     const wantsAudioReply = shouldUseAudioReply(messageText, history, audioUnderstanding);
     const seniorCareStyle = shouldUseSeniorCareStyle(messageText, history, audioUnderstanding);
 
-    // 🌿 MÓDULO 1 — Boas-vindas APENAS no 1º contato real ou após 24h de silêncio.
-    // Se a pessoa pediu áudio, a mesma mensagem de boas-vindas sai também em voz.
-    const { data: lastWelcome } = await supabase
+    // 🌿 MÓDULO 1 — Boas-vindas APENAS no 1º contato real (sem nenhuma resposta prévia)
+    // ou após 24h de silêncio TOTAL (sem qualquer mensagem outbound).
+    // Antes verificávamos `raw->trigger=welcome_24h` que poderia falhar e disparar o welcome a cada msg.
+    const { data: lastOutbound } = await supabase
       .from("whatsapp_brisa_log")
       .select("created_at")
       .eq("phone", phone)
       .eq("direction", "outbound")
-      .contains("raw", { trigger: "welcome_24h" })
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    const hoursSinceWelcome = lastWelcome?.created_at
-      ? (Date.now() - new Date(lastWelcome.created_at).getTime()) / 36e5
+    const hoursSinceLastReply = lastOutbound?.created_at
+      ? (Date.now() - new Date(lastOutbound.created_at).getTime()) / 36e5
       : Infinity;
-    if (hoursSinceWelcome >= 24) {
+    if (hoursSinceLastReply >= 24) {
       await sendWhatsApp(phone, BRISA_WELCOME_MESSAGE);
       await supabase.from("whatsapp_brisa_log").insert({
         phone, direction: "outbound", message: BRISA_WELCOME_MESSAGE,
@@ -812,8 +822,7 @@ serve(async (req) => {
       await logGrowth("welcome_sent", "brisa_omnichannel", {
         channel: "whatsapp", phone, link: "https://plantayraiz.com.br",
       });
-      // ⚡ NÃO retorna — segue para resposta inteligente do Gemini
-      // (welcome canned + resposta contextual na mesma rodada, como sábado 22:01)
+      // ⚡ NÃO retorna — segue para resposta inteligente do Gemini na mesma rodada
     }
 
     const reply = await callBrisaAI(messageText, history, phone, {

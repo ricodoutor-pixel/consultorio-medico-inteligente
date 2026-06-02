@@ -84,6 +84,7 @@ import {
   upsertUnifiedContact,
   logUnifiedMessage,
   isHumanTakeoverActive,
+  getRecentHistory,
 } from "../_shared/brisa-memory.ts";
 
 async function logGrowth(action: string, phase: string, state: Record<string, unknown>) {

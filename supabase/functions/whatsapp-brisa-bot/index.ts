@@ -797,29 +797,22 @@ serve(async (req) => {
       : Infinity;
     if (hoursSinceWelcome >= 24) {
       await sendWhatsApp(phone, BRISA_WELCOME_MESSAGE);
-      if (wantsAudioReply) {
-        await sendVoiceReply(phone, BRISA_WELCOME_MESSAGE, VOICE_BRISA);
-      }
       await supabase.from("whatsapp_brisa_log").insert({
         phone, direction: "outbound", message: BRISA_WELCOME_MESSAGE,
-        raw: { trigger: "welcome_24h", voice: wantsAudioReply },
+        raw: { trigger: "welcome_24h" },
       });
       if (unifiedContactId) {
         await logUnifiedMessage({
           contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
           content: BRISA_WELCOME_MESSAGE, intent: "welcome_24h",
-          messageType: wantsAudioReply ? "audio" : "text",
+          messageType: "text",
         });
       }
       await logGrowth("welcome_sent", "brisa_omnichannel", {
-        channel: "whatsapp",
-        phone,
-        link: "https://plantayraiz.com.br",
-        voice: wantsAudioReply,
+        channel: "whatsapp", phone, link: "https://plantayraiz.com.br",
       });
-      return new Response(JSON.stringify({ ok: true, welcome: true, voice: wantsAudioReply }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      // ⚡ NÃO retorna — segue para resposta inteligente do Gemini
+      // (welcome canned + resposta contextual na mesma rodada, como sábado 22:01)
     }
 
     const reply = await callBrisaAI(messageText, history, phone, {

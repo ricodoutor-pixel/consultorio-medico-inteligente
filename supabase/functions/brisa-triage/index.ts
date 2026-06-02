@@ -41,11 +41,47 @@ serve(async (req) => {
   }
 
   try {
-    const { symptoms: rawSymptoms, patientInfo, language = "pt" } = await req.json();
+        const { symptoms: rawSymptoms, patientInfo, language = "pt", unifiedContactId } = await req.json();
+
+    // Function to get recent history from Supabase
+    async function getRecentHistory(contactId: string, limit: number) {
+      const supabaseClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+      const { data, error } = await supabaseClient
+        .from('brisa_unified_conversations')
+        .select('message, sender, timestamp')
+        .eq('unified_contact_id', contactId)
+        .order('timestamp', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        console.error(\'Error fetching history:\', error.message);
+        return [];
+      }
+      return data.reverse(); // Return in chronological order
+    }
     const symptoms = String(rawSymptoms ?? "")
       .replace(/[\u0000-\u001F\u007F]/g, " ")
       .slice(0, 2000);
     const safeLang = ["pt", "en", "es"].includes(String(language)) ? language : "pt";
+
+    let contexto_historico = [];
+    if (unifiedContactId) {
+      contexto_historico = await getRecentHistory(unifiedContactId, 12);
+    }
+
+    // Debug: Log the historical context being sent to Gemini
+    console.log("Contexto Histórico para Gemini:", contexto_historico);
+
+    let welcomeMessage = "";
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    if (contexto_historico.length === 0 || (contexto_historico.length > 0 && new Date(contexto_historico[contexto_historico.length - 1].timestamp) < twentyFourHoursAgo)) {
+      welcomeMessage = `Olá! Sou o Dr. Edilson Bezerra (CRM 10963), especialista em Cannabis Medicinal. É um prazer atendê-lo(a) novamente.`;
+    }
+
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
     const systemPrompt = `Atue como o Clone Digital do Dr. Edilson Bezerra (CRM 10963), Especialista em Cannabis Medicinal.
@@ -69,12 +105,19 @@ ESTRUTURA:
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: "user", parts: [{ text: `Sintomas: ${symptoms}` }] }],
+        contents: [
+          ...contexto_historico.map(msg => ({ role: msg.sender === 'user' ? 'user' : 'model', parts: [{ text: msg.message }] })),
+          { role: "user", parts: [{ text: `Sintomas: ${symptoms}` }] }
+        ],
       }),
     });
 
     const aiData = await aiResponse.json();
-    const content = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    let content = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    if (welcomeMessage) {
+      content = `${welcomeMessage}\n\n${content}`;
+    }
 
     return new Response(JSON.stringify({ success: true, orientation: content }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

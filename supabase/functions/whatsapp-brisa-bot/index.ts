@@ -78,7 +78,6 @@ import {
   BRISA_HARASSMENT_BLOCK,
   BRISA_FALLBACK_MESSAGE,
   containsHarassment,
-  isFirstContactOrStale,
 } from "../_shared/brisa-persona.ts";
 import {
   upsertUnifiedContact,
@@ -237,295 +236,47 @@ async function sendWhatsAppAudio(number: string, base64Audio: string) {
 
 // 🎙️ ElevenLabs TTS — voz feminina sensual PT-BR (Laura) p/ Brisa, masculina firme (George) p/ Dr. Edilson
 const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY") || "";
-const GOOGLE_TTS_SERVICE_ACCOUNT_JSON = Deno.env.get("GOOGLE_TTS_SERVICE_ACCOUNT_JSON") || "";
 const VOICE_BRISA = "FGY2WhTYpPnrIDTdsKH5";   // Laura — feminina jovem, calorosa
 const VOICE_EDILSON = "JBFqnCBsd6RMkjVDRZzb"; // George — masculina firme, profissional
 
-type GoogleServiceAccount = {
-  client_email: string;
-  private_key: string;
-  token_uri?: string;
-};
-
-let googleTtsTokenCache: { token: string; expiresAt: number } | null = null;
-
-function parseGoogleServiceAccountSecret(rawSecret: string): GoogleServiceAccount | null {
-  const trimmed = rawSecret.trim();
-  if (!trimmed) return null;
-
-  const candidates = new Set<string>();
-  candidates.add(trimmed);
-
-  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
-    candidates.add(trimmed.slice(1, -1));
-  }
-
-  const unescaped = trimmed.replace(/\\n/g, "\n").replace(/\\"/g, '"');
-  candidates.add(unescaped);
-
-  const braceMatch = trimmed.match(/\{[\s\S]*\}/);
-  if (braceMatch?.[0]) candidates.add(braceMatch[0]);
-
-  const maybeBase64 = trimmed.replace(/^base64:/i, "");
-  if (/^[A-Za-z0-9+/=_-]+$/.test(maybeBase64) && maybeBase64.length > 100) {
+async function synthesizeVoice(text: string, voiceId: string): Promise<string | null> {
+  // Tenta ElevenLabs primeiro
+  if (ELEVENLABS_API_KEY) {
     try {
-      const normalized = maybeBase64.replace(/-/g, "+").replace(/_/g, "/");
-      const decoded = atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "="));
-      candidates.add(decoded);
-    } catch {
-      // noop
-    }
-  }
-
-  for (const candidate of candidates) {
-    try {
-      const parsed = JSON.parse(candidate);
-      const resolved = typeof parsed === "string" ? JSON.parse(parsed) : parsed;
-      if (resolved?.client_email && resolved?.private_key) {
-        return {
-          client_email: String(resolved.client_email),
-          private_key: String(resolved.private_key).replace(/\\n/g, "\n"),
-          token_uri: resolved.token_uri ? String(resolved.token_uri) : undefined,
-        };
+      const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: "POST",
+        headers: { "xi-api-key": ELEVENLABS_API_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ text, model_id: "eleven_multilingual_v2" }),
+      });
+      if (resp.ok) {
+        const arrayBuffer = await resp.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        let binary = "";
+        for (let i = 0; i < uint8Array.length; i++) binary += String.fromCharCode(uint8Array[i]);
+        return btoa(binary);
       }
-    } catch {
-      // try next format
-    }
+    } catch (e) { console.error("[brisa-bot] ElevenLabs failed", e); }
   }
-
   return null;
 }
 
-function toBase64Url(bytes: Uint8Array): string {
-  let binary = "";
-  const chunk = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunk) {
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
-  }
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-}
-
-function pemToArrayBuffer(pem: string): ArrayBuffer {
-  const cleaned = pem
-    .replace("-----BEGIN PRIVATE KEY-----", "")
-    .replace("-----END PRIVATE KEY-----", "")
-    .replace(/\s+/g, "");
-  const binary = atob(cleaned);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-  return bytes.buffer;
-}
-
-async function getGoogleTtsAccessToken(): Promise<string | null> {
-  if (!GOOGLE_TTS_SERVICE_ACCOUNT_JSON) return null;
-  if (googleTtsTokenCache && googleTtsTokenCache.expiresAt > Date.now() + 60_000) {
-    return googleTtsTokenCache.token;
-  }
-  try {
-    const serviceAccount = parseGoogleServiceAccountSecret(GOOGLE_TTS_SERVICE_ACCOUNT_JSON);
-    if (!serviceAccount) {
-      console.error("[brisa-bot] Google TTS secret format invalid — expected service account JSON or base64 JSON");
-      return null;
-    }
-    const now = Math.floor(Date.now() / 1000);
-    const encoder = new TextEncoder();
-    const tokenUri = serviceAccount.token_uri || "https://oauth2.googleapis.com/token";
-    const jwtHeader = toBase64Url(encoder.encode(JSON.stringify({ alg: "RS256", typ: "JWT" })));
-    const jwtPayload = toBase64Url(encoder.encode(JSON.stringify({
-      iss: serviceAccount.client_email,
-      scope: "https://www.googleapis.com/auth/cloud-platform",
-      aud: tokenUri,
-      iat: now,
-      exp: now + 3600,
-    })));
-    const unsignedToken = `${jwtHeader}.${jwtPayload}`;
-    const privateKey = await crypto.subtle.importKey(
-      "pkcs8",
-      pemToArrayBuffer(serviceAccount.private_key),
-      { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-      false,
-      ["sign"],
-    );
-    const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", privateKey, encoder.encode(unsignedToken));
-    const assertion = `${unsignedToken}.${toBase64Url(new Uint8Array(signature))}`;
-    const tokenResponse = await fetch(tokenUri, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-        assertion,
-      }),
-    });
-    if (!tokenResponse.ok) {
-      console.error("[brisa-bot] Google TTS auth failed", tokenResponse.status, await tokenResponse.text().catch(() => ""));
-      return null;
-    }
-    const tokenData = await tokenResponse.json();
-    const token = String(tokenData?.access_token || "");
-    const expiresIn = Math.max(300, Number(tokenData?.expires_in) || 3600);
-    if (!token) return null;
-    googleTtsTokenCache = { token, expiresAt: Date.now() + expiresIn * 1000 };
-    return token;
-  } catch (e) {
-    console.error("[brisa-bot] Google TTS token error", e);
-    return null;
-  }
-}
-
-async function synthesizeVoiceWithGoogle(text: string, voiceId: string): Promise<string | null> {
-  const token = await getGoogleTtsAccessToken();
-  if (!token || !text) return null;
-  try {
-    const isEdilson = voiceId === VOICE_EDILSON;
-    const response = await fetch("https://texttospeech.googleapis.com/v1/text:synthesize", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        input: { text: text.replace(/[*_`#]/g, "").slice(0, 900) },
-        voice: {
-          languageCode: "pt-BR",
-          ssmlGender: isEdilson ? "MALE" : "FEMALE",
-        },
-        audioConfig: {
-          audioEncoding: "MP3",
-          speakingRate: isEdilson ? 0.98 : 1.01,
-          pitch: isEdilson ? -1 : 1,
-        },
-      }),
-    });
-    if (!response.ok) {
-      console.error("[brisa-bot] Google TTS failed", response.status, await response.text().catch(() => ""));
-      return null;
-    }
-    const data = await response.json();
-    return String(data?.audioContent || "") || null;
-  } catch (e) {
-    console.error("[brisa-bot] Google TTS synth error", e);
-    return null;
-  }
-}
-
-async function synthesizeVoice(text: string, voiceId: string): Promise<string | null> {
-  if (!text) return null;
-  if (!ELEVENLABS_API_KEY) return await synthesizeVoiceWithGoogle(text, voiceId);
-  try {
-    // Limita a 600 chars p/ não estourar quota free
-    const cleanText = text.replace(/[*_`#]/g, "").slice(0, 600);
-    const r = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`,
-      {
-        method: "POST",
-        headers: { "xi-api-key": ELEVENLABS_API_KEY, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: cleanText,
-          // eleven_turbo_v2_5 → PT-BR mais natural, menos "metálico", latência baixa
-          model_id: "eleven_turbo_v2_5",
-          // stability 0.35 = mais expressiva e variável (humana, com respiração)
-          // similarity 0.85 = preserva o timbre feminino da Laura
-          // style 0.65 = entonação rica, pausas naturais
-          voice_settings: { stability: 0.35, similarity_boost: 0.85, style: 0.65, use_speaker_boost: true, speed: 1.02 },
-        }),
-      },
-    );
-    if (!r.ok) {
-      console.error("[brisa-bot] ElevenLabs TTS failed:", r.status, await r.text().catch(() => ""));
-      const googleAudio = await synthesizeVoiceWithGoogle(cleanText, voiceId);
-      if (googleAudio) console.log("[brisa-bot] Google TTS fallback used after ElevenLabs failure");
-      return googleAudio;
-    }
-    const buf = new Uint8Array(await r.arrayBuffer());
-    // base64 sem stack overflow
-    let binary = "";
-    const chunk = 0x8000;
-    for (let i = 0; i < buf.length; i += chunk) {
-      binary += String.fromCharCode(...buf.subarray(i, i + chunk));
-    }
-    return btoa(binary);
-  } catch (e) {
-    console.error("[brisa-bot] synthesizeVoice error:", e);
-    return await synthesizeVoiceWithGoogle(text, voiceId);
-  }
-}
-
-const AUDIO_REPLY_PATTERNS = /\b([aá]udio|voz|ouvir|escutar|me fala|fale comigo|manda.*[aá]udio|responde.*[aá]udio|n[aã]o sei ler|n[aã]o consigo ler|tenho dificuldade pra ler|sou idos[oa]|sou senhor|sou senhora|fale devagar|explica devagar)\b/i;
-
-function shouldUseAudioReply(text: string, history: Array<{ role: string; content: string }>, audioUnderstanding: AudioUnderstanding | null): boolean {
-  if (text.startsWith("[🎙️ áudio transcrito]")) return true;
-  if (audioUnderstanding?.needsAudioReply) return true;
-  if (AUDIO_REPLY_PATTERNS.test(text)) return true;
-  return history.slice(-6).some((item) => item.role === "user" && AUDIO_REPLY_PATTERNS.test(item.content || ""));
-}
-
-function shouldUseSeniorCareStyle(text: string, history: Array<{ role: string; content: string }>, audioUnderstanding: AudioUnderstanding | null): boolean {
-  if (audioUnderstanding?.seniorCareStyle) return true;
-  if (/\b(idos[oa]|senhor[ae]?|aposentad[oa]|n[aã]o sei ler|n[aã]o consigo ler|fale devagar|explica devagar|tenho dificuldade pra ler)\b/i.test(text)) return true;
-  return history.slice(-6).some((item) => item.role === "user" && /\b(idos[oa]|senhor[ae]?|aposentad[oa]|n[aã]o sei ler|n[aã]o consigo ler|fale devagar|explica devagar|tenho dificuldade pra ler)\b/i.test(item.content || ""));
-}
-
-// Remove URLs e markdown da fala — TTS não lê link (fica robótico).
-// Substitui por uma frase natural pedindo pra tocar no link enviado por texto.
 function sanitizeForSpeech(text: string): string {
-  if (!text) return text;
-  let cleaned = text;
-  // markdown links [label](url) -> label
-  cleaned = cleaned.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, "$1");
-  // urls cruas (http/https e domínios .com.br soltos)
-  const URL_RE = /\b(?:https?:\/\/\S+|(?:www\.)?[a-z0-9-]+\.(?:com|com\.br|br|net|org|app|io|me)(?:\/\S*)?)/gi;
-  let hadUrl = false;
-  cleaned = cleaned.replace(URL_RE, () => { hadUrl = true; return ""; });
-  // limpa pontuação solta deixada pelas remoções
-  cleaned = cleaned
-    .replace(/[ \t]+([.,;:!?])/g, "$1")
-    .replace(/\(\s*\)/g, "")
-    .replace(/\s{2,}/g, " ")
-    .replace(/\s+([.,;:!?])/g, "$1")
+  return text
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/\*/g, "")
+    .replace(/#/g, "")
     .trim();
-  if (hadUrl) {
-    // Acrescenta cue natural sem ler o endereço
-    const cue = " Pra não te confundir com o endereço, é só tocar no link que eu mandei aqui em cima na conversa, tá?";
-    cleaned = cleaned.length ? `${cleaned}${cue}` : cue.trim();
-  }
-  return cleaned;
-}
-
-function buildHonestTextFallback(text: string): string {
-  const stripped = text
-    .replace(/você está me escutando agora[^.?!]*[.?!]?/gi, "")
-    .replace(/eu estou falando com você[^.?!]*áudio[^.?!]*[.?!]?/gi, "")
-    .replace(/tudo que eu escrevo aqui já é transformado em voz[^.?!]*[.?!]?/gi, "")
-    .replace(/então,? você está ouvindo a minha voz neste momento[^.?!]*[.?!]?/gi, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .replace(/[ \t]{2,}/g, " ")
-    .trim();
-
-  if (stripped !== text) {
-    return `Tive uma falha no áudio aqui, então vou te orientar por escrito, tá?\n\n${stripped}`.trim();
-  }
-
-  return stripped;
 }
 
 async function sendVoiceReply(phone: string, text: string, preferredVoiceId = VOICE_BRISA): Promise<boolean> {
   const spoken = sanitizeForSpeech(text);
-  console.log("[brisa-bot][voice] start", { phone: phone.slice(-4), len_in: text.length, len_spoken: spoken.length, hasEleven: !!ELEVENLABS_API_KEY, hasGoogle: !!GOOGLE_TTS_SERVICE_ACCOUNT_JSON });
-  if (!spoken) { console.warn("[brisa-bot][voice] empty spoken text after sanitize"); return false; }
-  const t0 = Date.now();
+  if (!spoken) return false;
   const audioB64 = await synthesizeVoice(spoken, preferredVoiceId);
-  console.log("[brisa-bot][voice] tts done", { ms: Date.now() - t0, bytes_b64: audioB64?.length || 0 });
-  if (!audioB64) { console.error("[brisa-bot][voice] synthesizeVoice returned null — TTS falhou (Eleven+Google)"); return false; }
-  const response = await sendWhatsAppAudio(phone, audioB64).catch((e) => {
-    console.error("[brisa-bot][voice] sendWhatsAppAudio threw", e);
-    return null;
-  });
-  const ok = Boolean(response?.ok);
-  console.log("[brisa-bot][voice] evolution result", { ok, status: response?.status });
-  return ok;
+  if (!audioB64) return false;
+  const response = await sendWhatsAppAudio(phone, audioB64);
+  return !!response?.ok;
 }
 
-// Extrai apenas a linha que contém URL para enviar como texto curto junto ao áudio
 function extractLinkLine(text: string): string | null {
   const re = /(https?:\/\/\S+|(?:www\.)?[a-z0-9-]+\.(?:com\.br|com|br|net|org|app|io|me)(?:\/\S*)?)/i;
   const m = text.match(re);
@@ -540,24 +291,17 @@ async function classifySentiment(text: string): Promise<{ sentiment_score: numbe
     const resp = await aiChat({
       model: BRISA_LITE_MODEL,
       messages: [
-        { role: "system", content: "Você classifica sentimento de mensagens em pt-BR. score: 0 (muito negativo, raivoso, sofrimento, suicídio, frustração extrema) a 1 (muito positivo). is_negative=true se score<0.4 ou houver hostilidade/sofrimento. Responda APENAS JSON: {\"score\":number,\"is_negative\":boolean}" },
+        { role: "system", content: "Você classifica sentimento de mensagens em pt-BR. score: 0 (muito negativo) a 1 (muito positivo). is_negative=true se score<0.4. Responda APENAS JSON: {\"score\":number,\"is_negative\":boolean}" },
         { role: "user", content: text.slice(0, 2000) },
       ],
       response_format: { type: "json_object" },
     });
-    if (!resp || !resp.ok) {
-      console.error("[brisa-bot] sentiment error", resp?.status);
-      return { sentiment_score: 0.5, is_negative: false };
-    }
+    if (!resp || !resp.ok) return { sentiment_score: 0.5, is_negative: false };
     const data = await resp.json();
-    const raw = data?.choices?.[0]?.message?.content || "{}";
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(data?.choices?.[0]?.message?.content || "{}");
     const score = Math.max(0, Math.min(1, Number(parsed.score) || 0.5));
     return { sentiment_score: score, is_negative: Boolean(parsed.is_negative) || score < 0.4 };
-  } catch (e) {
-    console.error("[brisa-bot] classifySentiment failed", e);
-    return { sentiment_score: 0.5, is_negative: false };
-  }
+  } catch { return { sentiment_score: 0.5, is_negative: false }; }
 }
 
 import { processar_triagem_brisa } from "../_shared/brisa-ai.ts";
@@ -568,34 +312,13 @@ async function callBrisaAI(
   phone: string,
   options?: { seniorCareStyle?: boolean; wantsAudioReply?: boolean; audioNotes?: string },
 ) {
-  if (!HAS_AI_KEY) {
-    console.error("[brisa-bot] Nenhuma chave de IA configurada — fallback");
-    return BRISA_FALLBACK_MESSAGE;
-  }
+  if (!HAS_AI_KEY) return BRISA_FALLBACK_MESSAGE;
   let systemPrompt = await getBrisaSystemPrompt();
   if (options?.seniorCareStyle) {
-    systemPrompt += `
-
-// === ACOLHIMENTO SÊNIOR / BAIXA LETRABILIDADE ===
-- A pessoa pode ser idosa, ter dificuldade para ler ou precisar de mais calma.
-- Fale de forma mais paciente, simples e acolhedora, sem infantilizar.
-- Dê uma instrução por vez.
-- Confirme se a pessoa entendeu antes de avançar para o próximo passo.
-- Quando houver link, explique em 1 frase o que vai acontecer ao abrir o link.`;
+    systemPrompt += `\n\n// === ACOLHIMENTO SÊNIOR ===\n- Paciente idoso, fale com calma e paciência.`;
   }
   if (options?.wantsAudioReply) {
-    systemPrompt += `
-
-// === RESPOSTA QUE VAI SER OUVIDA ===
-- Esta resposta será enviada também em áudio.
-- Escreva como fala humana natural, sem listas longas, sem blocos extensos e sem termos técnicos desnecessários.
-- Se precisar passar um link, anuncie antes com uma frase curta e tranquilizadora.`;
-  }
-  if (options?.audioNotes) {
-    systemPrompt += `
-
-// === CONTEXTO DE ESCUTA ===
-- Observação do áudio recebido: ${options.audioNotes.slice(0, 220)}`;
+    systemPrompt += `\n\n// === RESPOSTA EM ÁUDIO ===\n- Resposta será ouvida, seja natural e evite termos técnicos.`;
   }
   const r = await processar_triagem_brisa(userMessage, phone, "whatsapp", {
     history, model: BRISA_MODEL, systemPrompt,
@@ -606,7 +329,6 @@ async function callBrisaAI(
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  // Webhook secret guard (Evolution sends it as query param ?token= or header)
   const url = new URL(req.url);
   const providedSecret =
     url.searchParams.get("token") ||
@@ -622,7 +344,6 @@ serve(async (req) => {
     const payload = await req.json();
     const event = payload?.event || payload?.eventName;
 
-    // Only react to incoming messages from real users
     if (event !== "messages.upsert" && event !== "MESSAGES_UPSERT") {
       return new Response(JSON.stringify({ ok: true, ignored: event }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -638,7 +359,6 @@ serve(async (req) => {
       });
     }
 
-    // 🔒 IDEMPOTÊNCIA — descarta reprocessamentos do mesmo message id (Evolution costuma retentar)
     const messageId: string = data?.key?.id || data?.messageId || "";
     if (messageId) {
       const { data: dedup, error: dedupErr } = await supabase
@@ -652,12 +372,7 @@ serve(async (req) => {
         .select("id")
         .maybeSingle();
       if (dedupErr && (dedupErr as any).code === "23505") {
-        return new Response(JSON.stringify({ ok: true, skipped: "duplicate", message_id: messageId }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (!dedup && !dedupErr) {
-        return new Response(JSON.stringify({ ok: true, skipped: "duplicate", message_id: messageId }), {
+        return new Response(JSON.stringify({ ok: true, skipped: "duplicate" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -670,9 +385,8 @@ serve(async (req) => {
       data?.message?.extendedTextMessage?.text ||
       data?.message?.imageMessage?.caption ||
       "";
+    
     let audioUnderstanding: AudioUnderstanding | null = null;
-
-    // 🎙️ AUDIO: transcribe if Brisa received a voice message
     const audioMsg = data?.message?.audioMessage;
     if (!messageText && audioMsg) {
       const audio = await fetchEvolutionAudio(data);
@@ -682,14 +396,6 @@ serve(async (req) => {
           messageText = `[🎙️ áudio transcrito] ${audioUnderstanding.transcript}`;
         }
       }
-      if (!messageText) {
-        const fallbackText = "Ouvi seu áudio, mas ele veio com falha aqui pra mim. Se você quiser, pode mandar outro áudio mais curtinho que eu continuo te acompanhando por aqui. 🌿";
-        await sendWhatsApp(phone, fallbackText);
-        await sendVoiceReply(phone, fallbackText);
-        return new Response(JSON.stringify({ ok: true, skipped: "audio_unreadable" }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
     }
 
     if (!phone || !messageText) {
@@ -698,7 +404,6 @@ serve(async (req) => {
       });
     }
 
-    // Classify sentiment (Gemini) → habilita brisa-crisis-alert
     const { sentiment_score, is_negative } = await classifySentiment(messageText);
 
     // 🧠 BRISA 360° — Memória cross-channel unificada
@@ -708,6 +413,7 @@ serve(async (req) => {
       whatsappJid: remoteJid,
       displayName: data?.pushName || undefined,
     });
+
     if (unifiedContactId) {
       await logUnifiedMessage({
         contactId: unifiedContactId,
@@ -717,106 +423,40 @@ serve(async (req) => {
         externalId: messageId || undefined,
         messageType: messageText.startsWith("[🎙️ áudio transcrito]") ? "audio" : "text",
         urgency: is_negative ? 0.8 : Math.max(0, 1 - sentiment_score),
-        audioTranscript: messageText.startsWith("[🎙️ áudio transcrito]") ? messageText.replace("[🎙️ áudio transcrito] ", "") : undefined,
-        raw: { sentiment_score, is_negative },
       });
-      // Se humano assumiu o atendimento, NÃO responde com bot
       if (await isHumanTakeoverActive(unifiedContactId)) {
-        return new Response(JSON.stringify({ ok: true, skipped: "human_takeover", contact_id: unifiedContactId }), {
+        return new Response(JSON.stringify({ ok: true, skipped: "human_takeover" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
     }
 
-    // Persist inbound message com sentiment + load short history
-    // IMPORTANTE: aguardar o insert para que o SELECT abaixo enxergue a msg atual
-    // (sem isso, previousInbound vinha undefined e o welcome disparava a cada msg)
-    await supabase.from("whatsapp_brisa_log").insert({
-      phone, direction: "inbound", message: messageText, raw: data,
-      sentiment_score, is_negative,
-    });
+    // 🧠 Recupera Histórico 360° Real
+    const rawHistory = unifiedContactId ? await getRecentHistory(unifiedContactId, 14) : [];
+    const history = rawHistory.map((h: any) => ({
+      role: h.direction === "inbound" ? "user" : "assistant",
+      content: h.content,
+    }));
 
-    // Espelha em audit_log para auditoria centralizada (Manus CEO)
-    await supabase.from("audit_log").insert({
-      action: "brisa_message_scored",
-      table_name: "whatsapp_brisa_log",
-      record_id: crypto.randomUUID(),
-      new_data: {
-        phone, message: messageText.slice(0, 500),
-        sentiment_score, is_negative,
-        scored_at: new Date().toISOString(),
-      },
-    }).then(() => {}).catch(() => {});
-
-    // 🧠 MEMÓRIA 360° — histórico CROSS-CHANNEL (whatsapp + ig + messenger) com fallback local
-    let history: Array<{role: string; content: string}> = [];
-    if (unifiedContactId) {
-      const unified = await getRecentHistory(unifiedContactId, 12);
-      history = unified.map((m: any) => ({
-        role: m.direction === "inbound" ? "user" : "assistant",
-        content: `${m.channel !== "whatsapp" ? `[${m.channel}] ` : ""}${m.content || ""}`,
-      }));
-    }
-    if (history.length === 0) {
-      const { data: rows } = await supabase
-        .from("whatsapp_brisa_log")
-        .select("direction, message, created_at")
-        .eq("phone", phone)
-        .order("created_at", { ascending: false })
-        .limit(8);
-      history = (rows || []).reverse().map((r: any) => ({
-        role: r.direction === "inbound" ? "user" : "assistant",
-        content: r.message,
-      }));
-    }
-
-    // 🛡️ MÓDULO 2 — Filtro de assédio (corte seco, pré-LLM)
     if (containsHarassment(messageText)) {
       await sendWhatsApp(phone, BRISA_HARASSMENT_BLOCK);
-      await supabase.from("whatsapp_brisa_log").insert({
-        phone, direction: "outbound", message: BRISA_HARASSMENT_BLOCK,
-        raw: { trigger: "harassment_block" },
-      }).then(() => {}).catch(() => {});
-      if (unifiedContactId) {
-        await logUnifiedMessage({
-          contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
-          content: BRISA_HARASSMENT_BLOCK, intent: "harassment_block",
-        });
-      }
-      await logGrowth("harassment_block", "brisa_omnichannel", { channel: "whatsapp", phone, message: messageText.slice(0, 300) });
       return new Response(JSON.stringify({ ok: true, blocked: "harassment" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const wantsAudioReply = shouldUseAudioReply(messageText, history, audioUnderstanding);
-    const seniorCareStyle = shouldUseSeniorCareStyle(messageText, history, audioUnderstanding);
-
-    // 🌿 MÓDULO 1 — Boas-vindas APENAS no 1º contato real (sem nenhuma resposta prévia)
-    // ou após 24h de silêncio TOTAL (sem qualquer mensagem outbound).
-    // Antes verificávamos `raw->trigger=welcome_24h` que poderia falhar e disparar o welcome a cada msg.
-    const { data: lastOutbound } = await supabase
-      .from("whatsapp_brisa_log")
-      .select("created_at")
-      .eq("phone", phone)
-      .eq("direction", "outbound")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    // 🌿 MÓDULO Boas-vindas (apenas se for o primeiro contato ou > 24h)
+    const lastOutbound = rawHistory.filter((h: any) => h.direction === "outbound").pop();
     const hoursSinceLastReply = lastOutbound?.created_at
       ? (Date.now() - new Date(lastOutbound.created_at).getTime()) / 36e5
       : Infinity;
+
     if (hoursSinceLastReply >= 24) {
       await sendWhatsApp(phone, BRISA_WELCOME_MESSAGE);
-      await supabase.from("whatsapp_brisa_log").insert({
-        phone, direction: "outbound", message: BRISA_WELCOME_MESSAGE,
-        raw: { trigger: "welcome_24h" },
-      });
       if (unifiedContactId) {
         await logUnifiedMessage({
           contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
           content: BRISA_WELCOME_MESSAGE, intent: "welcome_24h",
-          messageType: "text",
         });
       }
       await logGrowth("welcome_sent", "brisa_omnichannel", {
@@ -825,63 +465,29 @@ serve(async (req) => {
       // ⚡ NÃO retorna — segue para resposta inteligente do Gemini na mesma rodada
     }
 
+    // ⚡ Gemini Autônomo com Histórico 360°
     const reply = await callBrisaAI(messageText, history, phone, {
-      wantsAudioReply,
-      seniorCareStyle,
+      wantsAudioReply: !!audioUnderstanding,
+      seniorCareStyle: audioUnderstanding?.seniorCareStyle,
       audioNotes: audioUnderstanding?.notes,
     });
 
-    // 🎙️ Quando usuário pede áudio (ou é idoso/baixa leitura): áudio é a resposta principal.
-    // Texto só vai se o áudio falhar OU se houver link (TTS não lê URL — entrega o link em texto curto).
-    let audioOk = false;
-    if (wantsAudioReply) {
-      const isEdilson = /dr\.?\s*edilson|doutor\s*edilson/i.test(reply);
-      const voiceId = isEdilson ? VOICE_EDILSON : VOICE_BRISA;
-      audioOk = await sendVoiceReply(phone, reply, voiceId);
-      console.log("[brisa-bot] audio-first path", { audioOk, voiceId });
-      if (audioOk) {
-        const linkLine = extractLinkLine(reply);
-        if (linkLine) {
-          // Manda APENAS a linha com o link, curto, pra acompanhar o áudio
-          await sendWhatsApp(phone, linkLine);
-        }
-      } else {
-        // Fallback: áudio falhou → manda texto completo pra não deixar o paciente sem resposta
-        console.warn("[brisa-bot] audio failed, falling back to full text");
-        await sendWhatsApp(phone, buildHonestTextFallback(reply));
-      }
-    } else {
+    if (reply) {
       await sendWhatsApp(phone, reply);
+      if (unifiedContactId) {
+        await logUnifiedMessage({
+          contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
+          content: reply,
+        });
+      }
     }
 
-    await supabase.from("whatsapp_brisa_log").insert({
-      phone, direction: "outbound", message: reply, raw: {
-        ai: true,
-        voice: wantsAudioReply,
-        audio_sent: audioOk,
-        senior_care_style: seniorCareStyle,
-        audio_notes: audioUnderstanding?.notes || null,
-      },
-    }).then(() => {}).catch(() => {});
-
-    if (unifiedContactId) {
-      await logUnifiedMessage({
-        contactId: unifiedContactId, channel: "whatsapp", direction: "outbound",
-        content: reply, intent: "ai_reply",
-        messageType: audioOk ? "audio" : "text",
-      });
-    }
-
-    // Telemetria: detectar se a resposta contém o link de cadastro
-    if (/plantayraiz\.com\.br/i.test(reply)) {
-      await logGrowth("registration_link_sent", "brisa_omnichannel", { channel: "whatsapp", phone });
-    }
-
-    return new Response(JSON.stringify({ ok: true, replied: true }), {
+    return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+
   } catch (e) {
-    console.error("[whatsapp-brisa-bot] error:", e);
+    console.error("[brisa-bot] Global error", e);
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

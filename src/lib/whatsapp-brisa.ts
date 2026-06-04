@@ -19,6 +19,32 @@ export const CONSULTATION_TYPES = {
   hero: "iniciar triagem",
 };
 
+/**
+ * Mensagens prontas por perfil — abrem o WhatsApp direto com a frase de entrada certa.
+ * Use: openBrisaWhatsAppRole("medico")
+ */
+export const ROLE_MESSAGES = {
+  medico: "Olá, sou médico e gostaria de saber mais sobre a Planta y Raiz.",
+  lojista: "Olá, sou lojista e gostaria de saber mais sobre a parceria com a Planta y Raiz.",
+  paciente: "Olá, sou paciente e gostaria de iniciar minha orientação técnica.",
+  afiliado: "Olá, gostaria de saber como me tornar afiliado da Planta y Raiz.",
+  investidor: "Olá, sou investidor e gostaria de saber mais sobre a Planta y Raiz.",
+  imprensa: "Olá, sou da imprensa e gostaria de falar sobre a Planta y Raiz.",
+  geral: "Olá, gostaria de saber mais sobre a Planta y Raiz.",
+} as const;
+
+export type BrisaRole = keyof typeof ROLE_MESSAGES;
+
+export function generateBrisaRoleURL(role: BrisaRole): string {
+  return `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(ROLE_MESSAGES[role])}`;
+}
+
+export function openBrisaWhatsAppRole(role: BrisaRole): void {
+  const url = generateBrisaRoleURL(role);
+  trackBrisaClick(`role_${role}`);
+  if (typeof window !== "undefined") window.open(url, "_blank", "noopener,noreferrer");
+}
+
 interface BrisaOptions {
   userName?: string;
   doctorName?: string;

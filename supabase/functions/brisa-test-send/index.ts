@@ -3,7 +3,8 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
-  const url = Deno.env.get('EVOLUTION_API_URL')!;
+  let url = Deno.env.get('EVOLUTION_API_URL')!;
+  if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
   const key = Deno.env.get('EVOLUTION_API_KEY')!;
   const instance = Deno.env.get('EVOLUTION_INSTANCE')!;
   const admin = Deno.env.get('ADMIN_WHATSAPP') || '5511987131241';

@@ -1,38 +1,24 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useDiretoriaRealtimeData } from "@/hooks/useDiretoriaRealtimeData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, Activity, MessageSquare, Clock } from "lucide-react";
+import { TrendingUp, Activity, MessageSquare, Clock, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { RelatorioIA } from "@/hooks/useDiretoriaRealtimeData";
 
-interface RelatorioIA {
-  id: string;
-  departamento: string;
-  titulo: string;
-  conteudo_json: any;
-  status: string;
-  created_at: string;
+interface DiretorInfo {
+  nome: string;
+  cargo: string;
+  icon: React.ReactNode;
+  cor: string;
 }
 
 const DashboardDiretoria = () => {
-  const { data: relatorios, isLoading, error } = useQuery({
-    queryKey: ["diretoria_ia_relatorios"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("diretoria_ia_relatorios")
-        .select("*")
-        .order("created_at", { ascending: false });
+  const { relatorios, isLoading, error } = useDiretoriaRealtimeData();
 
-      if (error) throw error;
-      return data as RelatorioIA[];
-    },
-    refetchInterval: 5000, // Atualiza a cada 5 segundos para simular tempo real
-  });
-
-  const getDiretorInfo = (depto: string) => {
+  const getDiretorInfo = (depto: string): DiretorInfo => {
     switch (depto.toLowerCase()) {
       case "cfo":
         return { nome: "Mateus", cargo: "CFO", icon: <TrendingUp className="h-5 w-5 text-emerald-500" />, cor: "border-emerald-500" };
@@ -57,8 +43,14 @@ const DashboardDiretoria = () => {
 
   if (error) {
     return (
-      <div className="p-4 text-red-500">
-        Erro ao carregar relatórios da diretoria.
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
+          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+          <div>
+            <h3 className="font-semibold text-red-900">Erro ao carregar dados</h3>
+            <p className="text-sm text-red-700">Não foi possível conectar ao banco de dados. Verifique sua conexão com Supabase.</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -119,43 +111,44 @@ const DashboardDiretoria = () => {
       </div>
 
       <div className="mt-8">
-        <h3 className="text-xl font-semibold mb-4">Logs Recentes</h3>
+        <h3 className="text-xl font-semibold mb-4">Logs Recentes ({relatorios?.length || 0} registros)</h3>
         <div className="bg-card border rounded-lg overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/30">
-                <th className="text-left p-3 font-medium">Data/Hora</th>
-                <th className="text-left p-3 font-medium">Departamento</th>
-                <th className="text-left p-3 font-medium">Título</th>
-                <th className="text-left p-3 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {relatorios?.slice(0, 10).map((rel) => (
-                <tr key={rel.id} className="border-b hover:bg-muted/10 transition-colors">
-                  <td className="p-3 text-muted-foreground">
-                    {format(new Date(rel.created_at), "dd/MM HH:mm", { locale: ptBR })}
-                  </td>
-                  <td className="p-3">
-                    <Badge variant="secondary">{rel.departamento.toUpperCase()}</Badge>
-                  </td>
-                  <td className="p-3 font-medium">{rel.titulo}</td>
-                  <td className="p-3">
-                    <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">
-                      {rel.status}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
-              {(!relatorios || relatorios.length === 0) && (
-                <tr>
-                  <td colSpan={4} className="p-8 text-center text-muted-foreground italic">
-                    Nenhum relatório encontrado no banco de dados.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          {relatorios && relatorios.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/30">
+                    <th className="text-left p-3 font-medium">Data/Hora</th>
+                    <th className="text-left p-3 font-medium">Departamento</th>
+                    <th className="text-left p-3 font-medium">Título</th>
+                    <th className="text-left p-3 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {relatorios.slice(0, 10).map((rel) => (
+                    <tr key={rel.id} className="border-b hover:bg-muted/10 transition-colors">
+                      <td className="p-3 text-muted-foreground whitespace-nowrap">
+                        {format(new Date(rel.created_at), "dd/MM HH:mm", { locale: ptBR })}
+                      </td>
+                      <td className="p-3">
+                        <Badge variant="secondary">{rel.departamento.toUpperCase()}</Badge>
+                      </td>
+                      <td className="p-3 font-medium">{rel.titulo}</td>
+                      <td className="p-3">
+                        <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">
+                          {rel.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="p-8 text-center text-muted-foreground italic">
+              Nenhum relatório encontrado no banco de dados.
+            </div>
+          )}
         </div>
       </div>
     </div>

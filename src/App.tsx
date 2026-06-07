@@ -1,3 +1,4 @@
+import DashboardDiretoria from "./components/admin/DashboardDiretoria";
 import { Suspense } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
@@ -336,6 +337,7 @@ const App = () => (
                 <Route path="/admin/conversoes-uptime" element={<AdminRoute><ConversoesUptime /></AdminRoute>} />
                 <Route path="/admin/conversoes" element={<AdminRoute><ConversionsUnified /></AdminRoute>} />
                 <Route path="/admin/monitoramento" element={<AdminRoute><AdminMonitoramento /></AdminRoute>} />
+                <Route path="/admin/diretoria" element={<AdminRoute><DashboardDiretoria /></AdminRoute>} />
                 <Route path="/admin/growth" element={<AdminRoute><GrowthDashboard /></AdminRoute>} />
                 <Route path="/admin/leads" element={<AdminRoute><AdminLeads /></AdminRoute>} />
                 <Route path="/admin/cadastros" element={<AdminRoute><CadastrosRealtime /></AdminRoute>} />

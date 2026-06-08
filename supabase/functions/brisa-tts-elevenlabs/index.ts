@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
     const ELEVEN_KEY = Deno.env.get("ELEVENLABS_API_KEY");
     const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
     const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
-    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+    const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 

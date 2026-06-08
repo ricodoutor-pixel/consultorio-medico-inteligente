@@ -13,7 +13,7 @@ const ADMIN_WA = (Deno.env.get("ADMIN_WHATSAPP") || "5511987131241").replace(/\D
 async function sendWhatsApp(text: string): Promise<boolean> {
   const url = Deno.env.get("EVOLUTION_API_URL");
   const key = Deno.env.get("EVOLUTION_API_KEY");
-  const inst = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+  const inst = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
   if (!url || !key) return false;
   try {
     const r = await fetch(`${url}/message/sendText/${inst}`, {

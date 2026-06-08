@@ -29,7 +29,7 @@ function templateFor(status: Status, name: string): string | null {
 async function sendWhatsApp(phone: string, text: string) {
   const url = Deno.env.get("EVOLUTION_API_URL");
   const key = Deno.env.get("EVOLUTION_API_KEY");
-  const instance = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+  const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
   if (!url || !key) throw new Error("Evolution API not configured");
   const clean = phone.replace(/\D/g, "");
   const res = await fetch(`${url}/message/sendText/${instance}`, {

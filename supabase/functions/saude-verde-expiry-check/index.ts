@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
 
     const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
     const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");
-    const instance = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+    const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
 
     let sent = 0;
     for (const sub of subs ?? []) {

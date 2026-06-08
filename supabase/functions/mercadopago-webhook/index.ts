@@ -261,7 +261,7 @@ Deno.serve(async (req) => {
 
           const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
           const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");
-          const instance = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+          const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
           if (profile?.whatsapp && sub && evolutionUrl && evolutionKey) {
             const expFmt = new Date(newExpiresAt).toLocaleDateString("pt-BR");
             const title = isRenewal ? "RENOVADO" : "ATIVADO";
@@ -320,7 +320,7 @@ Deno.serve(async (req) => {
       if (payment.status === "approved") {
         const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
         const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");
-        const instance = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+        const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
         const drEdilsonPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
         const amount = (payment.transaction_amount || 30).toFixed(2);
 

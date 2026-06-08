@@ -19,7 +19,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const EVO_URL = Deno.env.get("EVOLUTION_API_URL") || "";
 const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
-const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
 
 function jsonRes(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {

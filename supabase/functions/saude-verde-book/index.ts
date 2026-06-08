@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
     // Fire-and-forget WhatsApp notification
     const waUrl = Deno.env.get("EVOLUTION_API_URL");
     const waKey = Deno.env.get("EVOLUTION_API_KEY");
-    const instance = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+    const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
     if (waUrl && waKey) {
       const { data: profile } = await supabase.from("profiles").select("phone").eq("id", user.id).maybeSingle();
       const phone = (profile as { phone?: string } | null)?.phone;

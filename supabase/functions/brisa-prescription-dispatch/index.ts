@@ -7,7 +7,7 @@ const corsHeaders = {
 
 const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL");
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY");
-const INSTANCE_NAME = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+const INSTANCE_NAME = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
 
 import { requireServiceAuth } from "../_shared/service-auth.ts";
 

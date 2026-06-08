@@ -46,7 +46,7 @@ function inviteMessage(nome: string, categoria: string | null) {
 async function sendWhatsApp(phoneDigits: string, message: string) {
   const EVO_URL = Deno.env.get("EVOLUTION_API_URL");
   const EVO_KEY = Deno.env.get("EVOLUTION_API_KEY");
-  const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "Brisa_CEO";
+  const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
   if (!EVO_URL || !EVO_KEY) return { ok: false, error: "EVOLUTION_API_URL/KEY missing" };
 
   const url = `${EVO_URL.replace(/\/$/, "")}/message/sendText/${EVO_INSTANCE}`;

@@ -4,7 +4,7 @@
 
 const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL");
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY");
-const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "planta_e_raiz";
+const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
 
 /** Normalize Brazilian phone -> E.164 digits only. */
 function normalizePhone(raw: string): string {

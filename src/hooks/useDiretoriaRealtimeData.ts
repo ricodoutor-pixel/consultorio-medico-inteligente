@@ -16,7 +16,7 @@ export const useDiretoriaRealtimeData = () => {
     queryKey: ["diretoria_ia_relatorios"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("diretoria_ia_relatorios")
+        .from("diretoria_ia_relatorios" as never)
         .select("*")
         .order("created_at", { ascending: false });
 

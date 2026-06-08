@@ -1,5 +1,23 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs = 12000) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const resp = await fetch(url, { ...init, signal: ctrl.signal });
+    const text = await resp.text().catch(() => '');
+    return { status: resp.status, text, error: '' };
+  } catch (e) {
+    return {
+      status: 0,
+      text: '',
+      error: e instanceof Error ? e.message : String(e),
+    };
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
@@ -15,30 +33,41 @@ Deno.serve(async (req) => {
   const text = body.text || `✅ Brisa 2.0 ONLINE — teste ${new Date().toLocaleString('pt-BR')}`;
 
   const endpoint = `${url.replace(/\/$/, '')}/message/sendText/${encodeURIComponent(instance)}`;
+  const stateEndpoint = `${url.replace(/\/$/, '')}/instance/connectionState/${encodeURIComponent(instance)}`;
+  const instancesEndpoint = `${url.replace(/\/$/, '')}/instance/fetchInstances`;
 
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), 12000);
-
-  let status = 0, respText = '', errMsg = '';
-  try {
-    const resp = await fetch(endpoint, {
+  const headers = { 'Content-Type': 'application/json', apikey: key };
+  const [stateResp, instancesResp, sendResp] = await Promise.all([
+    fetchWithTimeout(stateEndpoint, { method: 'GET', headers }, 10000),
+    fetchWithTimeout(instancesEndpoint, { method: 'GET', headers }, 10000),
+    fetchWithTimeout(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', apikey: key },
+      headers,
       body: JSON.stringify({ number, text }),
-      signal: ctrl.signal,
-    });
-    status = resp.status;
-    respText = await resp.text();
-  } catch (e) {
-    errMsg = e instanceof Error ? e.message : String(e);
-  } finally {
-    clearTimeout(t);
-  }
+    }, 12000),
+  ]);
 
   return new Response(JSON.stringify({
-    ok: status >= 200 && status < 300,
-    status, endpoint, instance, number,
-    response: respText.slice(0, 800),
-    error: errMsg || undefined,
+    ok: sendResp.status >= 200 && sendResp.status < 300,
+    status: sendResp.status,
+    endpoint,
+    instance,
+    number,
+    response: sendResp.text.slice(0, 1200),
+    error: sendResp.error || undefined,
+    diagnostics: {
+      connectionState: {
+        endpoint: stateEndpoint,
+        status: stateResp.status,
+        error: stateResp.error || undefined,
+        response: stateResp.text.slice(0, 1200),
+      },
+      fetchInstances: {
+        endpoint: instancesEndpoint,
+        status: instancesResp.status,
+        error: instancesResp.error || undefined,
+        response: instancesResp.text.slice(0, 2500),
+      },
+    },
   }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 });

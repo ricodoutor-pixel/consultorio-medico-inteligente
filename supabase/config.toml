@@ -29,3 +29,9 @@ project_id = "shmbwdjuddvquszwkvuq"
     verify_jwt = false
   [functions.ai-error-gateway]
     verify_jwt = false
+  [functions.whatsapp-brisa-bot]
+    verify_jwt = false
+  [functions.brisa-whatsapp]
+    verify_jwt = false
+  [functions.brisa-evolution-reconnect]
+    verify_jwt = false

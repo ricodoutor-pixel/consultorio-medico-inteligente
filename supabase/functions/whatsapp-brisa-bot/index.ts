@@ -4,7 +4,8 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const EVOLUTION_API_URL = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");
+let EVOLUTION_API_URL = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");
+if (EVOLUTION_API_URL && !/^https?:\/\//i.test(EVOLUTION_API_URL)) EVOLUTION_API_URL = `https://${EVOLUTION_API_URL}`;
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";

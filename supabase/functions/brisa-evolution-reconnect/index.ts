@@ -2,7 +2,8 @@
 // Use quando o Baileys cai com "Connection Closed" / disconnectionReasonCode 401.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
-const URL_BASE = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");
+let URL_BASE = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");
+if (URL_BASE && !/^https?:\/\//i.test(URL_BASE)) URL_BASE = `https://${URL_BASE}`;
 const KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
 const INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
 

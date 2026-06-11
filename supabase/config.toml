@@ -35,3 +35,5 @@ project_id = "shmbwdjuddvquszwkvuq"
     verify_jwt = false
   [functions.brisa-evolution-reconnect]
     verify_jwt = false
+  [functions.brisa-evolution-admin]
+    verify_jwt = false

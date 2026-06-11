@@ -32,9 +32,14 @@ Deno.serve(async (req) => {
   const steps: Record<string, unknown> = {};
 
   if (action === "delete" && instance) {
+    steps.restart = await call(`/instance/restart/${instance}`, "POST");
+    await new Promise((r) => setTimeout(r, 2500));
     steps.logout = await call(`/instance/logout/${instance}`, "DELETE");
+    await new Promise((r) => setTimeout(r, 2500));
+    steps.delete1 = await call(`/instance/delete/${instance}`, "DELETE");
     await new Promise((r) => setTimeout(r, 1500));
-    steps.delete = await call(`/instance/delete/${instance}`, "DELETE");
+    // try alternate method some Evolution forks accept
+    steps.delete2 = await call(`/instance/delete/${instance}`, "POST");
     await new Promise((r) => setTimeout(r, 1500));
   }
   steps.fetchInstances = await call(`/instance/fetchInstances`);

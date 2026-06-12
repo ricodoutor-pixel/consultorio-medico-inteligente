@@ -1,6 +1,10 @@
-# Migração VPS Pago → Oracle Cloud Always Free
+# ARQUIVADO — plano Oracle descontinuado
 
-**Objetivo:** zerar o custo do VPS Hostinger movendo todos os workloads de servidor para a Oracle VM gratuita (já provisionada, chave SSH salva como `ORACLE_VM_SSH_KEY`). O **site estático continua na Hostinger** (hospedagem web, não VPS), então o domínio `plantayraiz.com.br` não muda de IP.
+**Status atual:** este plano não é mais a base operacional do fluxo Brisa.
+
+**Regra vigente:** o runtime do WhatsApp/Evolution está no **Railway** e qualquer recuperação do fluxo deve partir dessa arquitetura, não de Oracle/Hostinger VPS.
+
+**Motivo do arquivamento:** o projeto migrou e este documento passou a induzir operação errada, QR errado e troubleshooting em infraestrutura fora de uso.
 
 ## O que migra para a Oracle VM (grátis)
 

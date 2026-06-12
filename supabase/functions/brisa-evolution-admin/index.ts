@@ -1,5 +1,5 @@
-// Admin helper to logout + delete a stale Evolution instance.
-// Call: POST /brisa-evolution-admin  body: { action:"delete", instance:"plantayraiz" }
+// Admin helper for Evolution instance maintenance on Railway.
+// Call: POST /brisa-evolution-admin  body: { action:"list|state|connect|restart|logout|delete", instance:"plantayraiz_nova" }
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 let URL_BASE = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");
@@ -30,6 +30,28 @@ Deno.serve(async (req) => {
   const action = body.action || "list";
   const instance = encodeURIComponent(body.instance || "");
   const steps: Record<string, unknown> = {};
+
+  if (action === "state" && instance) {
+    steps.connectionState = await call(`/instance/connectionState/${instance}`);
+  }
+
+  if (action === "connect" && instance) {
+    steps.connect = await call(`/instance/connect/${instance}`);
+    await new Promise((r) => setTimeout(r, 1000));
+    steps.connectionState = await call(`/instance/connectionState/${instance}`);
+  }
+
+  if (action === "restart" && instance) {
+    steps.restart = await call(`/instance/restart/${instance}`, "POST");
+    await new Promise((r) => setTimeout(r, 1500));
+    steps.connectionState = await call(`/instance/connectionState/${instance}`);
+  }
+
+  if (action === "logout" && instance) {
+    steps.logout = await call(`/instance/logout/${instance}`, "DELETE");
+    await new Promise((r) => setTimeout(r, 1500));
+    steps.connectionState = await call(`/instance/connectionState/${instance}`);
+  }
 
   if (action === "delete" && instance) {
     steps.restart = await call(`/instance/restart/${instance}`, "POST");

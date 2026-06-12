@@ -66,7 +66,11 @@ Deno.serve(async (req) => {
   // Optional shared-secret check
   if (WEBHOOK_SECRET) {
     const url = new URL(req.url);
-    const got = req.headers.get("x-webhook-secret") || url.searchParams.get("secret") || url.searchParams.get("token");
+    const got =
+      req.headers.get("x-webhook-secret") ||
+      req.headers.get("apikey") ||
+      url.searchParams.get("secret") ||
+      url.searchParams.get("token");
     if (got !== WEBHOOK_SECRET) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },

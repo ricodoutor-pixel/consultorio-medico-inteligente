@@ -7,7 +7,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 let EVOLUTION_API_URL = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");
 if (EVOLUTION_API_URL && !/^https?:\/\//i.test(EVOLUTION_API_URL)) EVOLUTION_API_URL = `https://${EVOLUTION_API_URL}`;
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
-const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
+const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz_nova";
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
 const WEBHOOK_SECRET = Deno.env.get("EVOLUTION_WEBHOOK_SECRET") || "";
 
@@ -65,7 +65,12 @@ Deno.serve(async (req) => {
 
   // Optional shared-secret check
   if (WEBHOOK_SECRET) {
-    const got = req.headers.get("x-webhook-secret") || new URL(req.url).searchParams.get("secret");
+    const url = new URL(req.url);
+    const got =
+      req.headers.get("x-webhook-secret") ||
+      req.headers.get("apikey") ||
+      url.searchParams.get("secret") ||
+      url.searchParams.get("token");
     if (got !== WEBHOOK_SECRET) {
       return new Response(JSON.stringify({ error: "unauthorized" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -76,8 +81,9 @@ Deno.serve(async (req) => {
   let payload: any = {};
   try { payload = await req.json(); } catch {}
 
-  const event = payload?.event || payload?.type;
+  const event = String(payload?.event || payload?.type || "");
   const data = payload?.data || payload;
+  const normalizedEvent = event.toLowerCase();
   const remoteJid: string = data?.key?.remoteJid || data?.remoteJid || "";
   const fromMe: boolean = !!data?.key?.fromMe;
   const text: string =
@@ -87,7 +93,7 @@ Deno.serve(async (req) => {
     data?.text || "";
 
   // Only react to incoming user messages
-  if (fromMe || !remoteJid || !text || remoteJid.endsWith("@g.us")) {
+  if ((normalizedEvent && !normalizedEvent.includes("message")) || fromMe || !remoteJid || !text || remoteJid.endsWith("@g.us")) {
     return new Response(JSON.stringify({ ok: true, ignored: true, event }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

@@ -72,11 +72,25 @@ Serviço `evolution` → **Settings** → **Volumes** → **+ New Volume**:
 
 Sem isso o QR re-aparece a cada redeploy.
 
-### 7. Apontar Brisa CEO pro novo endpoint
-**Me avise quando o passo 5 estiver pronto** — eu atualizo os secrets `EVOLUTION_API_URL` e `EVOLUTION_API_KEY` no Supabase pra apontar pra Railway. Depois disso o bot volta a operar 100%.
+### 7. Apontar Brisa pro endpoint ativo
+Use os secrets produtivos com a instância **`plantayraiz_nova`** e mantenha apenas uma instância conectada por número.
+
+**Obrigatório antes do go-live:**
+- remover a instância antiga `plantayraiz` do ambiente Evolution/Railway;
+- validar que `fetchInstances` retorna somente `plantayraiz_nova`;
+- confirmar que `connectionState` não volta com `401`, `conflict` ou `device_removed`.
 
 ### 8. (Opcional) Subdomínio próprio
 Em **Settings → Networking → Custom Domain** adicione `api.plantayraiz.com.br` e cole o CNAME no Cloudflare (DNS-only, sem proxy).
+
+### 9. Webhook da Brisa
+O webhook canônico deve apontar para:
+
+```bash
+https://shmbwdjuddvquszwkvuq.supabase.co/functions/v1/whatsapp-brisa-bot?token=<EVOLUTION_WEBHOOK_SECRET>
+```
+
+O endpoint aceita `?token=` e `?secret=` para compatibilidade, mas o padrão operacional deve ser `?token=`.
 
 ---
 

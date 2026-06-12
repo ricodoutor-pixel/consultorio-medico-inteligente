@@ -1,11 +1,11 @@
-// Brisa Evolution Reconnect — força logout + connect na instância para gerar novo QR.
+// Brisa Evolution Reconnect — força reconnect na instância ativa para gerar novo QR.
 // Use quando o Baileys cai com "Connection Closed" / disconnectionReasonCode 401.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 let URL_BASE = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");
 if (URL_BASE && !/^https?:\/\//i.test(URL_BASE)) URL_BASE = `https://${URL_BASE}`;
 const KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
-const INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
+const INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz_nova";
 
 async function call(path: string, method = "GET", body?: unknown) {
   const r = await fetch(`${URL_BASE}${path}`, {
@@ -26,10 +26,9 @@ Deno.serve(async (req) => {
   const inst = encodeURIComponent(INSTANCE);
   const steps: Record<string, unknown> = {};
   steps.before = await call(`/instance/connectionState/${inst}`);
-  steps.logout = await call(`/instance/logout/${inst}`, "DELETE").catch((e) => ({ error: String(e) }));
-  // small wait
+  steps.restart = await call(`/instance/restart/${inst}`, "POST").catch((e) => ({ error: String(e) }));
   await new Promise((r) => setTimeout(r, 1500));
-  steps.connect = await call(`/instance/connect/${inst}`);
+  steps.connect = await call(`/instance/connect/${inst}`).catch((e) => ({ error: String(e) }));
   await new Promise((r) => setTimeout(r, 1000));
   steps.after = await call(`/instance/connectionState/${inst}`);
 

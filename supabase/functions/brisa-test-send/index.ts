@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
   let url = Deno.env.get('EVOLUTION_API_URL') || '';
   if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
   const key = Deno.env.get('EVOLUTION_API_KEY') || '';
-  const instance = Deno.env.get('EVOLUTION_INSTANCE') || '';
+  const instance = Deno.env.get('EVOLUTION_INSTANCE') || 'plantayraiz_nova';
   const admin = Deno.env.get('ADMIN_WHATSAPP') || '5511987131241';
 
   let body: any = {};
@@ -35,6 +35,7 @@ Deno.serve(async (req) => {
   const endpoint = `${url.replace(/\/$/, '')}/message/sendText/${encodeURIComponent(instance)}`;
   const stateEndpoint = `${url.replace(/\/$/, '')}/instance/connectionState/${encodeURIComponent(instance)}`;
   const instancesEndpoint = `${url.replace(/\/$/, '')}/instance/fetchInstances`;
+  const managerUrl = `${url.replace(/\/$/, '')}/manager/`;
 
   const headers = { 'Content-Type': 'application/json', apikey: key };
   const [stateResp, instancesResp, sendResp] = await Promise.all([
@@ -51,6 +52,7 @@ Deno.serve(async (req) => {
     ok: sendResp.status >= 200 && sendResp.status < 300,
     status: sendResp.status,
     endpoint,
+    managerUrl,
     instance,
     number,
     response: sendResp.text.slice(0, 1200),

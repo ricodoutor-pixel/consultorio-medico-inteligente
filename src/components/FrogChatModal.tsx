@@ -308,7 +308,7 @@ export const FrogChatModal = () => {
         role="dialog"
         aria-label="Chat com Verdinho — Assistente IA"
         aria-modal="true"
-        className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-50 w-full sm:w-[400px] sm:max-w-[calc(100vw-2rem)] h-[85dvh] sm:h-[560px] sm:max-h-[75vh] rounded-t-2xl sm:rounded-2xl border-t sm:border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
+        className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-50 w-full sm:w-[400px] sm:max-w-[calc(100vw-2rem)] h-[min(70dvh,560px)] sm:h-[560px] sm:max-h-[75vh] rounded-t-2xl sm:rounded-2xl border-t sm:border border-border bg-card shadow-2xl flex flex-col overflow-hidden pb-[env(safe-area-inset-bottom,0px)]"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         {/* Header */}

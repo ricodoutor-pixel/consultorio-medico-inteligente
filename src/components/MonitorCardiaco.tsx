@@ -241,7 +241,9 @@ export default function MonitorCardiaco() {
       setPhase("error");
       return;
     }
-    setPhase("permission");
+    // Vai direto para o estado de "medindo" — o navegador pedirá permissão de câmera
+    // dentro do mesmo clique do usuário (gesto), sem tela extra de autorização.
+    setPhase("measuring");
     setError("");
     setResult(null);
     setPartialBpm(null);

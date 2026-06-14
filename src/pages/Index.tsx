@@ -28,6 +28,8 @@ import { RecoverableRender } from "@/lib/runtime-recovery";
 import { DoctorsOnlineWidget } from "@/components/DoctorsOnlineWidget";
 import { HomeFAQ } from "@/components/HomeFAQ";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { EmergencyCTA } from "@/components/EmergencyCTA";
+import { WelcomeMascotSplash } from "@/components/WelcomeMascotSplash";
 
 
 import { useEffect } from "react";
@@ -107,6 +109,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background w-full overflow-x-hidden">
+      <WelcomeMascotSplash />
       <Navbar />
 
       {/* Hero Section - Otimizado para Mobile/Desktop */}
@@ -193,6 +196,9 @@ const Index = () => {
       {/* Como Funciona — 5 Passos (logo após texto institucional do Hero) */}
       <section className="section-padding bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
+          {/* BOTÃO DE EMERGÊNCIA — acima do título dos 5 Passos */}
+          <EmergencyCTA />
+
           <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
             <h2 className="font-display font-black mb-4 md:mb-6">Tratamento em <span className="text-gradient-purple">5 Passos</span></h2>
             <p className="text-muted-foreground font-medium">Sua jornada completa, do diagnóstico à entrega do medicamento, com economia e segurança total.</p>

@@ -40,6 +40,7 @@ const Loading = () => (
 
 // Code splitting - lazy load all routes
 const Index = lazyWithRecovery(() => import("./pages/Index"), { sourceRef: "/" });
+const OnboardingFlow = lazyWithRecovery(() => import("./pages/OnboardingFlow").then(m => ({ default: m.OnboardingFlow })), { sourceRef: "/onboarding" });
 const ComoFunciona = lazyWithRecovery(() => import("./pages/ComoFunciona"), { sourceRef: "/como-funciona" });
 const Profissionais = lazyWithRecovery(() => import("./pages/Profissionais"), { sourceRef: "/profissionais" });
 const Shopping = lazyWithRecovery(() => import("./pages/Shopping"), { sourceRef: "/shopping" });
@@ -214,6 +215,8 @@ const App = () => (
               <main id="main-content" role="main">
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/onboarding" element={<OnboardingFlow />} />
+                <Route path="/cadastro-completo" element={<OnboardingFlow />} />
                 <Route path="/como-funciona" element={<ComoFunciona />} />
                 <Route path="/profissionais" element={<Profissionais />} />
                 <Route path="/profissionais/:id" element={<Profissionais />} />

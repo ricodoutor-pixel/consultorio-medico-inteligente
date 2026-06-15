@@ -24,6 +24,10 @@ export default defineConfig(({ mode }) => ({
   // em produção — causando tela preta no Hostinger.
   esbuild: {
     keepNames: true,
+    // Remove console.log/debug em produção (mantém warn/error para Sentry).
+    // Previne vazamento de logs internos (financeiro, triage, anti-clone) via DevTools.
+    pure: mode === "production" ? ["console.log", "console.debug", "console.info", "console.trace"] : [],
+    drop: mode === "production" ? ["debugger"] : [],
   },
   build: {
     minify: "esbuild",

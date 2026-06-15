@@ -40,6 +40,7 @@ const Loading = () => (
 
 // Code splitting - lazy load all routes
 const Index = lazyWithRecovery(() => import("./pages/Index"), { sourceRef: "/" });
+const OnboardingFlow = lazyWithRecovery(() => import("./pages/OnboardingFlow").then(m => ({ default: m.OnboardingFlow })), { sourceRef: "/onboarding" });
 const ComoFunciona = lazyWithRecovery(() => import("./pages/ComoFunciona"), { sourceRef: "/como-funciona" });
 const Profissionais = lazyWithRecovery(() => import("./pages/Profissionais"), { sourceRef: "/profissionais" });
 const Shopping = lazyWithRecovery(() => import("./pages/Shopping"), { sourceRef: "/shopping" });

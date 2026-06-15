@@ -461,7 +461,7 @@ export const FrogChatModal = () => {
         </div>
 
         {/* Input */}
-        <div className="p-3 border-t border-border flex gap-2">
+        <div className="p-3 pb-[max(12px,env(safe-area-inset-bottom,0px))] border-t border-border flex gap-2">
           <input
             type="text"
             value={inputValue}
@@ -470,7 +470,7 @@ export const FrogChatModal = () => {
             placeholder={leadName ? `${leadName}, pergunte ao Verdinho...` : "Pergunte qualquer coisa ao Verdinho..."}
             disabled={isStreaming}
             aria-label="Digite sua mensagem"
-            className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50"
+            className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors disabled:opacity-50"
           />
           <Button
             size="icon"

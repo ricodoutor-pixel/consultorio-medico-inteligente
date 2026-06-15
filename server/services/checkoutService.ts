@@ -36,7 +36,7 @@ export interface WebhookPayload {
 class CheckoutService {
   private mercadoPagoAccessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN || '';
   private mercadoPagoPublicKey = process.env.MERCADO_PAGO_PUBLIC_KEY || '';
-  private webhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET || 'webhook-secret';
+  private webhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET || '';
 
   /**
    * Cria sessão de checkout

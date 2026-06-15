@@ -194,7 +194,7 @@ export async function validateWebhook(signature: string, body: string): Promise<
     // Implementar validação de assinatura do Mercado Pago
     // Usar HMAC-SHA256 com chave secreta
     const crypto = require('crypto');
-    const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET || 'secret';
+    const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET || '';
     const hash = crypto.createHmac('sha256', secret).update(body).digest('hex');
     return hash === signature;
   } catch (error) {

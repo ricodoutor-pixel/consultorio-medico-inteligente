@@ -115,7 +115,7 @@ export function EmergencyCTA() {
       </p>
       {!isAuthed && (
         <p className="mt-1 text-center text-[11px] uppercase tracking-wider text-white/60">
-          Acesso exclusivo a pacientes cadastrados e logados
+          <br />
         </p>
       )}
     </div>

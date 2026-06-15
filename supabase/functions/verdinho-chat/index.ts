@@ -71,6 +71,17 @@ serve(async (req) => {
     }
 
     const ALLOWED_ROLES = ["user", "assistant"];
+    // Prompt-injection patterns to strip from user content
+    const INJECTION_PATTERNS = [
+      /ignore\s+(all\s+)?(previous|prior|above)\s+(instructions|prompts?|messages?|rules)/gi,
+      /disregard\s+(all\s+)?(previous|prior|above)\s+(instructions|prompts?|rules)/gi,
+      /forget\s+(all\s+)?(previous|prior|above)\s+(instructions|prompts?|rules)/gi,
+      /system\s*[:>]\s*/gi,
+      /\b(you\s+are\s+now|act\s+as|pretend\s+to\s+be|roleplay\s+as)\b/gi,
+      /reveal\s+(your\s+)?(system\s+)?(prompt|instructions)/gi,
+      /print\s+(your\s+)?(system\s+)?(prompt|instructions)/gi,
+      /<\s*\/?\s*(system|assistant|user)\s*>/gi,
+    ];
     for (const msg of messages) {
       if (!ALLOWED_ROLES.includes(msg.role)) {
         return new Response(JSON.stringify({ error: "Role inválido" }), {
@@ -83,6 +94,12 @@ serve(async (req) => {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+      }
+      // Sanitize user content to mitigate prompt injection
+      if (msg.role === "user") {
+        let cleaned = msg.content;
+        for (const re of INJECTION_PATTERNS) cleaned = cleaned.replace(re, "[filtrado]");
+        msg.content = cleaned;
       }
     }
 

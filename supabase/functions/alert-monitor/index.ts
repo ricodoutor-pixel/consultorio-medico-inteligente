@@ -6,6 +6,7 @@
 // Executado via pg_cron a cada 5 minutos com service_role.
 // ============================================================================
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -111,6 +112,8 @@ async function sendDiscord(
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const __unauth = requireServiceAuth(req, corsHeaders);
+  if (__unauth) return __unauth;
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,

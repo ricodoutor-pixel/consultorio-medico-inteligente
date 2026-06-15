@@ -1,4 +1,5 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs = 12000) {
   const ctrl = new AbortController();
@@ -20,6 +21,8 @@ async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs = 1200
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  const __unauth = requireServiceAuth(req, corsHeaders);
+  if (__unauth) return __unauth;
 
   let url = Deno.env.get('EVOLUTION_API_URL') || '';
   if (!/^https?:\/\//i.test(url)) url = `https://${url}`;

@@ -1,5 +1,6 @@
 // Verifica o FACEBOOK_PAGE_ACCESS_TOKEN: validade, permissões, páginas e contas IG.
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const REQUIRED = [
   'pages_show_list',
@@ -27,6 +28,8 @@ async function gget(path: string, token: string, params: Record<string, string> 
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  const __unauth = requireServiceAuth(req, corsHeaders);
+  if (__unauth) return __unauth;
 
   const token =
     Deno.env.get('FACEBOOK_PAGE_ACCESS_TOKEN') ||

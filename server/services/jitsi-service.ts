@@ -14,7 +14,8 @@ interface VideoConference {
 
 export const createTelemedicineRoom = (consultationId: string, doctorId: string, patientId: string): VideoConference => {
   const roomName = `PlantaYRaiz-Consult-${consultationId}`;
-  const secret = process.env.JITSI_SECRET || 'planta-y-raiz-secret';
+  const secret = process.env.JITSI_SECRET;
+  if (!secret) throw new Error('JITSI_SECRET not configured');
 
   console.log(`🎥 [Manus CEO] Criando sala de telemedicina para consulta ${consultationId}...`);
 

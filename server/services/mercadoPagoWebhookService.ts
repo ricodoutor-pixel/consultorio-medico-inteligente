@@ -25,7 +25,7 @@ export interface PaymentConfirmation {
 }
 
 export class MercadoPagoWebhookService {
-  private static readonly WEBHOOK_SECRET = process.env.MERCADO_PAGO_WEBHOOK_SECRET || 'webhook-secret';
+  private static readonly WEBHOOK_SECRET = process.env.MERCADO_PAGO_WEBHOOK_SECRET || '';
 
   /**
    * Valida assinatura do webhook

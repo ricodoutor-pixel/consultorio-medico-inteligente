@@ -1,6 +1,7 @@
 // Brisa Daily Summary — envia ao Dr. Edilson um resumo às 19:00 BRT (22:00 UTC)
 // Conteúdo: cadastros por tipo, orientações técnicas aprovadas, visitas (sessões únicas) e status do fluxo.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -52,6 +53,8 @@ function roleLabelPlural(t: string): string {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const __unauth = requireServiceAuth(req, corsHeaders);
+  if (__unauth) return __unauth;
 
   try {
     const sb = createClient(

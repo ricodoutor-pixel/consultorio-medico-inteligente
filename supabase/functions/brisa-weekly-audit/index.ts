@@ -1,6 +1,7 @@
 // Brisa Weekly Audit — relatório semanal de performance enviado ao Dr. Edilson via WhatsApp
 // Cron sugerido: domingo 09:00 BRT = 12:00 UTC
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { processar_triagem_brisa } from "../_shared/brisa-ai.ts";
 
@@ -32,6 +33,8 @@ async function sendWhatsApp(number: string, text: string) {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const __unauth = requireServiceAuth(req, corsHeaders);
+  if (__unauth) return __unauth;
   try {
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 

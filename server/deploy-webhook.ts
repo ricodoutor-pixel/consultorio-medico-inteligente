@@ -11,7 +11,11 @@ import crypto from 'crypto';
 export const deployWebhook = (req: Request, res: Response) => {
   const signature = req.headers['x-hub-signature-256'];
   const payload = JSON.stringify(req.body);
-  const secret = process.env.GITHUB_WEBHOOK_SECRET || 'planta-y-raiz-secret';
+  const secret = process.env.GITHUB_WEBHOOK_SECRET;
+  if (!secret) {
+    console.error('❌ GITHUB_WEBHOOK_SECRET not configured');
+    return res.status(500).send('Webhook secret not configured');
+  }
 
   // Validação de segurança do GitHub
   const hmac = crypto.createHmac('sha256', secret);

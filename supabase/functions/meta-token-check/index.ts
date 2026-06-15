@@ -1,5 +1,6 @@
 // Verifica o FACEBOOK_PAGE_ACCESS_TOKEN: validade, permissões, páginas e contas IG.
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const REQUIRED = [
   'pages_show_list',
@@ -27,6 +28,8 @@ async function gget(path: string, token: string, params: Record<string, string> 
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  const __unauth = requireServiceAuth(req, corsHeaders);
+  if (__unauth) return __unauth;
 
   const token =
     Deno.env.get('FACEBOOK_PAGE_ACCESS_TOKEN') ||
@@ -54,10 +57,16 @@ Deno.serve(async (req) => {
   out.debug_token = { status: dbg.status, data: dbg.body?.data };
   out.permissions = { has: scopes, missing };
 
-  // 3. Páginas acessíveis
+  // 3. Páginas acessíveis (scrub access_token from response)
   const pages = await gget('me/accounts', token, {
     fields: 'id,name,access_token,instagram_business_account,tasks',
   });
+  if (Array.isArray(pages.body?.data)) {
+    pages.body.data = pages.body.data.map((p: any) => {
+      const { access_token: _omit, ...rest } = p || {};
+      return { ...rest, has_access_token: Boolean(_omit) };
+    });
+  }
   out.pages = pages;
 
   // 4. Teste de leitura na página configurada

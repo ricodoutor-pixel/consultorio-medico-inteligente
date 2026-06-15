@@ -21,6 +21,13 @@ function haversineKm(a: {lat:number;lon:number}, b:{lat:number;lon:number}) {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  // Require a valid Bearer JWT (authenticated users only)
+  const authHeader = req.headers.get("Authorization") || "";
+  if (!authHeader.toLowerCase().startsWith("bearer ")) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
   try {
     const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const url = new URL(req.url);

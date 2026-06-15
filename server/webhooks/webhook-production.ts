@@ -19,7 +19,7 @@ interface WebhookPayload {
 
 class WebhookHandler {
   private router: Router;
-  private webhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET || "webhook-secret";
+  private webhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET || '';
 
   constructor() {
     this.router = Router();

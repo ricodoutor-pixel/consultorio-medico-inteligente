@@ -3,6 +3,7 @@
 // registra custo em brisa_audio_usage e respeita kill-switch global.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 import { encode as base64Encode } from "https://deno.land/std@0.224.0/encoding/base64.ts";
 import { BRISA_VOICE_ID } from "../_shared/brisa-persona.ts";
 
@@ -25,6 +26,8 @@ interface TtsRequest {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const __unauth = requireServiceAuth(req, corsHeaders);
+  if (__unauth) return __unauth;
 
   try {
     const ELEVEN_KEY = Deno.env.get("ELEVENLABS_API_KEY");

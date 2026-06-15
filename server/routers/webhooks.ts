@@ -122,12 +122,31 @@ export const webhookRouter = router({
    */
   clicksign: publicProcedure
     .input(z.any())
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        console.log('[Webhook] Recebido webhook da ClickSign:', input);
+        const secret = process.env.CLICKSIGN_WEBHOOK_SECRET;
+        const sig = (ctx.req.headers['x-clicksign-hmac-sha256'] as string) || '';
+        const rawBody = (ctx.req as any).rawBody
+          ? (ctx.req as any).rawBody.toString('utf8')
+          : JSON.stringify(ctx.req.body ?? input);
+
+        if (!secret || !sig) {
+          console.error('[Webhook] ClickSign: missing secret or signature');
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid webhook signature' });
+        }
+        const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+        const a = Buffer.from(expected, 'hex');
+        const b = Buffer.from(sig, 'hex');
+        if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+          console.error('[Webhook] ClickSign: invalid signature');
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid webhook signature' });
+        }
+
+        console.log('[Webhook] Recebido webhook da ClickSign');
         await ClickSignService.handleWebhook(input);
         return { success: true };
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error('[Webhook] Erro ao processar webhook ClickSign:', error);
         return { success: false, error: 'Erro ao processar webhook ClickSign' };
       }

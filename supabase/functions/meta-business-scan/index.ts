@@ -1,6 +1,7 @@
 // Escaneia um Business Manager: páginas próprias/clientes e contas Instagram vinculadas.
 // GET ?business_id=1421648866095076  (opcional; default abaixo)
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const DEFAULT_BIZ = '1421648866095076';
 
@@ -12,8 +13,40 @@ async function g(path: string, token: string, params: Record<string, string> = {
   return { status: r.status, body: await r.json() };
 }
 
+function unauth(msg = 'Unauthorized', status = 401) {
+  return new Response(JSON.stringify({ error: msg }), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+
+  // Require an authenticated admin user (anon JWT is not enough).
+  const authHeader = req.headers.get('Authorization') || '';
+  if (!authHeader.toLowerCase().startsWith('bearer ')) return unauth();
+  const jwt = authHeader.slice(7).trim();
+
+  const supaUrl = Deno.env.get('SUPABASE_URL')!;
+  const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+  const supaUser = createClient(supaUrl, anonKey, {
+    global: { headers: { Authorization: `Bearer ${jwt}` } },
+  });
+  const { data: claims, error: claimsErr } = await supaUser.auth.getClaims(jwt);
+  if (claimsErr || !claims?.claims?.sub) return unauth();
+  const userId = claims.claims.sub as string;
+
+  const supaAdmin = createClient(supaUrl, serviceKey);
+  const { data: roleRow } = await supaAdmin
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .eq('role', 'admin')
+    .maybeSingle();
+  if (!roleRow) return unauth('Forbidden', 403);
 
   const token = Deno.env.get('FACEBOOK_PAGE_ACCESS_TOKEN') || Deno.env.get('FACEBOOK_GRAPH_API_TOKEN') || '';
   if (!token) {

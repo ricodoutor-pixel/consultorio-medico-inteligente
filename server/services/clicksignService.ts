@@ -5,8 +5,11 @@ import fetch from 'node-fetch';
  * Handles digital signatures for prescriptions and documents
  */
 
-const CLICKSIGN_API_TOKEN = process.env.CLICKSIGN_API_TOKEN || "d37a2a07-c3a6-46ae-a2db-b780db02d127";
+const CLICKSIGN_API_TOKEN = process.env.CLICKSIGN_API_TOKEN;
 const CLICKSIGN_API_URL = process.env.CLICKSIGN_API_URL || "https://app.clicksign.com/api/v1";
+if (!CLICKSIGN_API_TOKEN) {
+  console.warn("[CLICKSIGN] CLICKSIGN_API_TOKEN not configured — ClickSign calls will fail until set.");
+}
 
 interface ClickSignDocument {
   path: string;

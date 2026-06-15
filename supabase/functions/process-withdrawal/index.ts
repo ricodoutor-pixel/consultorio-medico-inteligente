@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
       action: "withdrawal_requested",
       table_name: "withdrawal_requests",
       record_id: withdrawal.id,
-      new_data: { amount, fee, net_amount: netAmount, pix_key: pixKey },
+      new_data: { amount, fee, net_amount: netAmount, pix_key_last4: (pixKey || "").slice(-4) },
     });
 
     // Notificar

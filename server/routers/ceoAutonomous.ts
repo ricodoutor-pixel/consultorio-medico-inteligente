@@ -1,4 +1,4 @@
-import { router, publicProcedure, protectedProcedure } from '../_core/trpc';
+import { router, publicProcedure, protectedProcedure, adminProcedure } from '../_core/trpc';
 import { securityComplianceService } from '../services/securityComplianceService';
 import { aiProfitOptimizationService } from '../services/aiProfitOptimizationService';
 import { realtimeMonitoringService } from '../services/realtimeMonitoringService';
@@ -12,7 +12,7 @@ export const ceoAutonomousRouter = router({
   // ============================================================================
   
   security: router({
-    getSecurityMetrics: publicProcedure.query(async () => {
+    getSecurityMetrics: adminProcedure.query(async () => {
       try {
         const stats = securityComplianceService.getSecurityStats();
         return {
@@ -45,7 +45,7 @@ export const ceoAutonomousRouter = router({
       return securityComplianceService.getAuditLog(100);
     }),
 
-    getComplianceStatus: publicProcedure.query(async () => {
+    getComplianceStatus: adminProcedure.query(async () => {
       return securityComplianceService.getComplianceStatus();
     }),
   }),
@@ -55,7 +55,7 @@ export const ceoAutonomousRouter = router({
   // ============================================================================
 
   profitOptimization: router({
-    getRecommendations: publicProcedure.query(async () => {
+    getRecommendations: adminProcedure.query(async () => {
       try {
         const recommendations = aiProfitOptimizationService.getCurrentRecommendations();
         if (!recommendations) {
@@ -89,7 +89,7 @@ export const ceoAutonomousRouter = router({
       }
     }),
 
-    getAnnualProjection: publicProcedure.query(async () => {
+    getAnnualProjection: adminProcedure.query(async () => {
       try {
         return aiProfitOptimizationService.getAnnualProjection();
       } catch (error) {
@@ -101,7 +101,7 @@ export const ceoAutonomousRouter = router({
       }
     }),
 
-    getActionPlan: publicProcedure.query(async () => {
+    getActionPlan: adminProcedure.query(async () => {
       try {
         return aiProfitOptimizationService.exportActionPlan();
       } catch (error) {
@@ -119,7 +119,7 @@ export const ceoAutonomousRouter = router({
   // ============================================================================
 
   monitoring: router({
-    getWorldMapData: publicProcedure.query(async () => {
+    getWorldMapData: adminProcedure.query(async () => {
       try {
         const mapData = realtimeMonitoringService.getWorldMapData();
         if (!mapData) {
@@ -153,7 +153,7 @@ export const ceoAutonomousRouter = router({
       }
     }),
 
-    getMonitoringStats: publicProcedure.query(async () => {
+    getMonitoringStats: adminProcedure.query(async () => {
       try {
         return realtimeMonitoringService.getMonitoringStats();
       } catch (error) {
@@ -169,7 +169,7 @@ export const ceoAutonomousRouter = router({
       }
     }),
 
-    getMapMarkers: publicProcedure.query(async () => {
+    getMapMarkers: adminProcedure.query(async () => {
       try {
         return realtimeMonitoringService.exportMapData();
       } catch (error) {
@@ -183,7 +183,7 @@ export const ceoAutonomousRouter = router({
   // ============================================================================
 
   churnPrediction: router({
-    getChurnRisk: publicProcedure.query(async () => {
+    getChurnRisk: adminProcedure.query(async () => {
       try {
         const stats = churnPredictionService.getChurnStats();
         return {
@@ -204,7 +204,7 @@ export const ceoAutonomousRouter = router({
       }
     }),
 
-    getChurnAnalysis: publicProcedure.query(async () => {
+    getChurnAnalysis: adminProcedure.query(async () => {
       try {
         return churnPredictionService.getChurnAnalysis();
       } catch (error) {
@@ -222,7 +222,7 @@ export const ceoAutonomousRouter = router({
   // ============================================================================
 
   paymentOptimization: router({
-    getPriceOptimization: publicProcedure.query(async () => {
+    getPriceOptimization: adminProcedure.query(async () => {
       try {
         const optimization = paymentOptimizationService.getOptimization();
         return {
@@ -243,7 +243,7 @@ export const ceoAutonomousRouter = router({
       }
     }),
 
-    getPaymentMetrics: publicProcedure.query(async () => {
+    getPaymentMetrics: adminProcedure.query(async () => {
       try {
         return paymentOptimizationService.getMetrics();
       } catch (error) {
@@ -263,7 +263,7 @@ export const ceoAutonomousRouter = router({
   // ============================================================================
 
   dashboard: router({
-    getCEOMetrics: publicProcedure.query(async () => {
+    getCEOMetrics: adminProcedure.query(async () => {
       try {
         return {
           totalRevenue: 450000,
@@ -284,7 +284,7 @@ export const ceoAutonomousRouter = router({
       }
     }),
 
-    getRevenueProjection: publicProcedure.query(async () => {
+    getRevenueProjection: adminProcedure.query(async () => {
       try {
         return [
           { date: '01/03', revenue: 4500, projection: 4800 },
@@ -299,7 +299,7 @@ export const ceoAutonomousRouter = router({
       }
     }),
 
-    getRecommendations: publicProcedure.query(async () => {
+    getRecommendations: adminProcedure.query(async () => {
       try {
         return [
           '📈 Aumentar investimento em marketing de conteúdo (ROI: 3.5x)',

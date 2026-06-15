@@ -215,6 +215,8 @@ const App = () => (
               <main id="main-content" role="main">
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/onboarding" element={<OnboardingFlow />} />
+                <Route path="/cadastro-completo" element={<OnboardingFlow />} />
                 <Route path="/como-funciona" element={<ComoFunciona />} />
                 <Route path="/profissionais" element={<Profissionais />} />
                 <Route path="/profissionais/:id" element={<Profissionais />} />

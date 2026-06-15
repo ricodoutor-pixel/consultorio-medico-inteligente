@@ -57,10 +57,16 @@ Deno.serve(async (req) => {
   out.debug_token = { status: dbg.status, data: dbg.body?.data };
   out.permissions = { has: scopes, missing };
 
-  // 3. Páginas acessíveis
+  // 3. Páginas acessíveis (scrub access_token from response)
   const pages = await gget('me/accounts', token, {
     fields: 'id,name,access_token,instagram_business_account,tasks',
   });
+  if (Array.isArray(pages.body?.data)) {
+    pages.body.data = pages.body.data.map((p: any) => {
+      const { access_token: _omit, ...rest } = p || {};
+      return { ...rest, has_access_token: Boolean(_omit) };
+    });
+  }
   out.pages = pages;
 
   // 4. Teste de leitura na página configurada

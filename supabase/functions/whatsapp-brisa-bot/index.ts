@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
   const url0 = new URL(req.url);
   if (req.method === "GET" && url0.searchParams.get("bootstrap") === "1") {
     // One-shot: register THIS function as the Evolution webhook for the configured instance.
-    const target = `${url0.origin}/functions/v1/whatsapp-brisa-bot${WEBHOOK_SECRET ? `?secret=${encodeURIComponent(WEBHOOK_SECRET)}` : ""}`;
+    const target = `https://${url0.host}/functions/v1/whatsapp-brisa-bot${WEBHOOK_SECRET ? `?secret=${encodeURIComponent(WEBHOOK_SECRET)}` : ""}`;
     const events = ["MESSAGES_UPSERT", "MESSAGES_UPDATE", "CONNECTION_UPDATE", "QRCODE_UPDATED"];
     const inst = encodeURIComponent(EVOLUTION_INSTANCE);
     const headers = { "Content-Type": "application/json", apikey: EVOLUTION_API_KEY };

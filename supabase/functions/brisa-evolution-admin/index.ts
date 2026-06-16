@@ -7,11 +7,12 @@ let URL_BASE = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");
 if (URL_BASE && !/^https?:\/\//i.test(URL_BASE)) URL_BASE = `https://${URL_BASE}`;
 const KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
 
-async function call(path: string, method = "GET") {
+async function call(path: string, method = "GET", body?: unknown) {
   try {
     const r = await fetch(`${URL_BASE}${path}`, {
       method,
       headers: { "Content-Type": "application/json", apikey: KEY },
+      body: body ? JSON.stringify(body) : undefined,
     });
     return { status: r.status, body: (await r.text()).slice(0, 800) };
   } catch (e) {
@@ -67,6 +68,30 @@ Deno.serve(async (req) => {
     steps.delete2 = await call(`/instance/delete/${instance}`, "POST");
     await new Promise((r) => setTimeout(r, 1500));
   }
+
+  if (action === "setWebhook" && instance) {
+    const url = body.url as string;
+    const events = (body.events as string[]) || [
+      "MESSAGES_UPSERT",
+      "MESSAGES_UPDATE",
+      "CONNECTION_UPDATE",
+      "QRCODE_UPDATED",
+    ];
+    // Try Evolution v2 shape first
+    steps.setWebhook_v2 = await call(`/webhook/set/${instance}`, "POST", {
+      webhook: { url, enabled: true, webhookByEvents: false, webhookBase64: false, events },
+    });
+    // Fallback v1 shape
+    steps.setWebhook_v1 = await call(`/webhook/set/${instance}`, "POST", {
+      url, enabled: true, webhook_by_events: false, events,
+    });
+    steps.getWebhook = await call(`/webhook/find/${instance}`);
+  }
+
+  if (action === "getWebhook" && instance) {
+    steps.getWebhook = await call(`/webhook/find/${instance}`);
+  }
+
   steps.fetchInstances = await call(`/instance/fetchInstances`);
 
   return new Response(JSON.stringify({ ok: true, action, instance: body.instance, steps }), {

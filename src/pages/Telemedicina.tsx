@@ -126,6 +126,7 @@ const Telemedicina = () => {
   const { value: dynamicPrice, symbol: dynamicSymbol, isInternational } = useDynamicPrice();
   const navigate = useNavigate();
   const [showTCLE, setShowTCLE] = useState(true);
+  const [showFlowInfo, setShowFlowInfo] = useState(false);
   const [step, setStep] = useState(-1);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [sliderValue, setSliderValue] = useState([50]);

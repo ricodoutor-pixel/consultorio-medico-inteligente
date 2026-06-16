@@ -7,11 +7,12 @@ let URL_BASE = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");
 if (URL_BASE && !/^https?:\/\//i.test(URL_BASE)) URL_BASE = `https://${URL_BASE}`;
 const KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
 
-async function call(path: string, method = "GET") {
+async function call(path: string, method = "GET", body?: unknown) {
   try {
     const r = await fetch(`${URL_BASE}${path}`, {
       method,
       headers: { "Content-Type": "application/json", apikey: KEY },
+      body: body ? JSON.stringify(body) : undefined,
     });
     return { status: r.status, body: (await r.text()).slice(0, 800) };
   } catch (e) {

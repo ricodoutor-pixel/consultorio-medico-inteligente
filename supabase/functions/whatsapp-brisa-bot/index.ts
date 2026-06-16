@@ -67,6 +67,27 @@ async function aiReply(userText: string, phone: string): Promise<string> {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const url0 = new URL(req.url);
+  if (req.method === "GET" && url0.searchParams.get("bootstrap") === "1") {
+    // One-shot: register THIS function as the Evolution webhook for the configured instance.
+    const target = `${url0.origin}/functions/v1/whatsapp-brisa-bot${WEBHOOK_SECRET ? `?secret=${encodeURIComponent(WEBHOOK_SECRET)}` : ""}`;
+    const events = ["MESSAGES_UPSERT", "MESSAGES_UPDATE", "CONNECTION_UPDATE", "QRCODE_UPDATED"];
+    const inst = encodeURIComponent(EVOLUTION_INSTANCE);
+    const headers = { "Content-Type": "application/json", apikey: EVOLUTION_API_KEY };
+    const v2 = await fetch(`${EVOLUTION_API_URL}/webhook/set/${inst}`, {
+      method: "POST", headers,
+      body: JSON.stringify({ webhook: { url: target, enabled: true, webhookByEvents: false, webhookBase64: false, events } }),
+    }).then(async (r) => ({ status: r.status, body: (await r.text()).slice(0, 400) })).catch((e) => ({ status: 0, error: String(e) }));
+    const v1 = await fetch(`${EVOLUTION_API_URL}/webhook/set/${inst}`, {
+      method: "POST", headers,
+      body: JSON.stringify({ url: target, enabled: true, webhook_by_events: false, events }),
+    }).then(async (r) => ({ status: r.status, body: (await r.text()).slice(0, 400) })).catch((e) => ({ status: 0, error: String(e) }));
+    const find = await fetch(`${EVOLUTION_API_URL}/webhook/find/${inst}`, { headers })
+      .then(async (r) => ({ status: r.status, body: (await r.text()).slice(0, 400) })).catch((e) => ({ status: 0, error: String(e) }));
+    return new Response(JSON.stringify({ ok: true, target, instance: EVOLUTION_INSTANCE, v2, v1, find }, null, 2), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
   if (req.method === "GET") {
     return new Response(JSON.stringify({ ok: true, service: "whatsapp-brisa-bot", instance: EVOLUTION_INSTANCE }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

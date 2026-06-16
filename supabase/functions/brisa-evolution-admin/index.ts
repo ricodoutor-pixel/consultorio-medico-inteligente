@@ -68,6 +68,30 @@ Deno.serve(async (req) => {
     steps.delete2 = await call(`/instance/delete/${instance}`, "POST");
     await new Promise((r) => setTimeout(r, 1500));
   }
+
+  if (action === "setWebhook" && instance) {
+    const url = body.url as string;
+    const events = (body.events as string[]) || [
+      "MESSAGES_UPSERT",
+      "MESSAGES_UPDATE",
+      "CONNECTION_UPDATE",
+      "QRCODE_UPDATED",
+    ];
+    // Try Evolution v2 shape first
+    steps.setWebhook_v2 = await call(`/webhook/set/${instance}`, "POST", {
+      webhook: { url, enabled: true, webhookByEvents: false, webhookBase64: false, events },
+    });
+    // Fallback v1 shape
+    steps.setWebhook_v1 = await call(`/webhook/set/${instance}`, "POST", {
+      url, enabled: true, webhook_by_events: false, events,
+    });
+    steps.getWebhook = await call(`/webhook/find/${instance}`);
+  }
+
+  if (action === "getWebhook" && instance) {
+    steps.getWebhook = await call(`/webhook/find/${instance}`);
+  }
+
   steps.fetchInstances = await call(`/instance/fetchInstances`);
 
   return new Response(JSON.stringify({ ok: true, action, instance: body.instance, steps }), {

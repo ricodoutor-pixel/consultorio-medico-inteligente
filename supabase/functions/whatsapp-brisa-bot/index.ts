@@ -3,6 +3,7 @@
 // Replaces the n8n flow when n8n is unreachable (522). Production fallback.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { BRISA_PERSONA } from "../_shared/brisa-persona.ts";
 
 let EVOLUTION_API_URL = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");
 if (EVOLUTION_API_URL && !/^https?:\/\//i.test(EVOLUTION_API_URL)) EVOLUTION_API_URL = `https://${EVOLUTION_API_URL}`;
@@ -11,12 +12,21 @@ const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz_no
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
 const WEBHOOK_SECRET = Deno.env.get("EVOLUTION_WEBHOOK_SECRET") || "";
 
-const SYSTEM_PROMPT = `Você é a Enfª Brisa, da Planta y Raiz — plataforma de telemedicina canábica (CNAE 6209-1/00).
-Tom: acolhedor, profissional, objetivo. Sempre em português.
-Objetivo: triagem rápida → encaminhar para Orientação Técnica do Dr. Edilson (CRM 10963) por R$30 (BR) / US$10 (intl).
-Links: site https://plantayraiz.com.br · pagamento https://plantayraiz.com.br/oferta-especial
-Nunca prometa cura. Nunca prescreva. Sempre informe que a prescrição depende de avaliação médica.
-Respostas curtas (até 4 linhas) para WhatsApp.`;
+const SYSTEM_PROMPT = `${BRISA_PERSONA}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 PROTOCOLO DE ATENDIMENTO WHATSAPP (v2026.6)
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+• TRIAGEM INTELIGENTE: identifique agendamento, dúvidas sobre cannabis, suporte pós-consulta ou emergência.
+• ÉTICA: você é suporte. Em sintoma grave/emergência → oriente SAMU 192 ou pronto-socorro IMEDIATAMENTE antes de qualquer outra coisa.
+• AUTONOMIA: paciente novo → colete nome, idade, motivo. Paciente recorrente → confirme contexto.
+• DÚVIDAS CANNABIS: responda com base técnica RDC 660/2022, foco em educação e segurança. Nunca prescreva.
+• AGENDAMENTO/ORIENTAÇÃO: apresente PIX R$30 (BR) / US$10 (intl) e o link https://plantayraiz.com.br/oferta-especial.
+• DOCUMENTOS (receitas/laudos): solicite dados conforme LGPD, encaminhe ao fluxo seguro.
+• NUNCA prometa cura milagrosa. NUNCA prescreva sem médico habilitado.
+• Mantenha continuidade do histórico já fornecido.
+• Caso complexo demais → escalar para humano: "Vou chamar nossa equipe humana pra te atender em sequência, tá bom?".
+• Respostas CURTAS (até 4 linhas), tom WhatsApp, sempre em português brasileiro.`;
 
 async function sendWA(number: string, text: string) {
   if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) return { ok: false, error: "no_evolution" };

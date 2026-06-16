@@ -215,14 +215,100 @@ const Telemedicina = () => {
               <span className="text-sm font-bold text-primary">TELEMEDICINA AVANÇADA</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground leading-tight mb-4">
-              Orientação Técnica <span className="text-gradient-green">Inteligente</span>
+              Inicie Sua <span className="text-gradient-green">Triagem Inteligente</span>
             </h1>
             <p className="text-muted-foreground max-w-2xl font-medium mb-6 mx-auto">
-              Triagem conduzida pela Brisa IA + análise clínica + receita digital ANVISA — supervisionado por IA de última geração 24×7.
+              Triagem conduzida pela <strong>Enf. Brisa</strong> + análise clínica + receita + assinatura digital com ANVISA — supervisionado por nossa IA autônoma de última geração 24×7. O prontuário será encaminhado ao médico de sua escolha — defina um médico na página Profissionais.
             </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 items-center justify-center mb-4">
+              <Link to="/profissionais">
+                <Button
+                  size="lg"
+                  className="relative h-14 px-6 rounded-2xl font-black text-base bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-[0_0_30px_rgba(34,197,94,0.6)] hover:shadow-[0_0_40px_rgba(34,197,94,0.9)] transition-shadow"
+                >
+                  <span className="absolute -inset-1 rounded-2xl bg-green-500/40 blur-md animate-pulse pointer-events-none" />
+                  <span className="relative flex items-center gap-2">
+                    <Users size={20} />
+                    <span>Médicos Prescritores Online Agora</span>
+                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-white text-green-700 font-black text-sm animate-pulse">6</span>
+                    <ArrowRight size={18} />
+                  </span>
+                </Button>
+              </Link>
+
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-14 px-5 rounded-2xl font-bold border-primary/40 text-primary hover:bg-primary/10"
+                onClick={() => setShowFlowInfo(true)}
+              >
+                <HelpCircle size={18} className="mr-2" /> Como funciona o fluxo
+              </Button>
+            </div>
           </motion.div>
         </div>
       </section>
+
+      <AnimatePresence>
+        {showFlowInfo && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setShowFlowInfo(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-card border border-border rounded-3xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10">
+                <div className="flex items-center gap-2">
+                  <Info size={22} className="text-primary" />
+                  <h3 className="text-lg font-display font-black text-foreground">Como funciona o fluxo</h3>
+                </div>
+                <Button size="icon" variant="ghost" onClick={() => setShowFlowInfo(false)}><X size={18} /></Button>
+              </div>
+              <div className="p-6 space-y-5 text-sm text-foreground">
+                <p className="text-muted-foreground">
+                  Todo paciente passa primeiro pela <strong>Triagem da Enf. Brisa</strong>. Os dados são enviados para o médico escolhido — ou para o <strong>Dr. Edilson Bezerra</strong> em caso de Orientação Técnica.
+                </p>
+
+                <div className="space-y-3">
+                  <p className="text-xs font-black uppercase tracking-widest text-primary">Você tem 3 caminhos até a receita:</p>
+
+                  <div className="rounded-2xl border border-border p-4 bg-muted/30">
+                    <p className="font-black text-foreground mb-1">1 · Triagem + Consulta</p>
+                    <p className="text-xs text-muted-foreground">Brisa faz a triagem → você escolhe o médico prescritor → consulta e receita.</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-border p-4 bg-muted/30">
+                    <p className="font-black text-foreground mb-1">2 · Triagem + Orientação Técnica + Consulta</p>
+                    <p className="text-xs text-muted-foreground">Brisa triagem → Orientação com Dr. Edilson Bezerra → consulta com médico prescritor → receita.</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-border p-4 bg-muted/30">
+                    <p className="font-black text-foreground mb-1">3 · Triagem + Orientação Técnica (sem consulta)</p>
+                    <p className="text-xs text-muted-foreground">Brisa triagem → Orientação Técnica com Dr. Edilson → receita emitida diretamente.</p>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 text-xs">
+                  <strong className="text-primary">Importante:</strong> qualquer clique em "Consulta" ou nos cards de médicos passa antes pela Triagem da Enf. Brisa. Os dados coletados seguem com você até o médico escolhido.
+                </div>
+
+                <Button className="w-full h-12 rounded-2xl font-black bg-primary text-primary-foreground" onClick={() => setShowFlowInfo(false)}>
+                  Entendi, iniciar triagem <ArrowRight size={16} className="ml-2" />
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <section className="py-4 pb-20">
         <div className="container mx-auto px-4">

@@ -65,7 +65,12 @@ Deno.serve(async (req) => {
 
   try {
     const { nome, telefone, email, categoria, origem } = await req.json();
-    if (!nome || !telefone || String(telefone).replace(/\D/g, "").length < 10) {
+    const phoneDigitsRaw = String(telefone || "").replace(/\D/g, "");
+    // Strict BR E.164: 10–13 digits, must start with 55 or be a 10–11 digit local number
+    const isValidBR =
+      (phoneDigitsRaw.length >= 10 && phoneDigitsRaw.length <= 11) ||
+      (phoneDigitsRaw.length >= 12 && phoneDigitsRaw.length <= 13 && phoneDigitsRaw.startsWith("55"));
+    if (!nome || String(nome).trim().length < 2 || !isValidBR) {
       return new Response(JSON.stringify({ error: "invalid_payload" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -77,7 +82,27 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const phoneDigits = String(telefone).replace(/\D/g, "");
+    // IP-based rate limit: max 5 invites per hour per IP
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("cf-connecting-ip") ||
+      "unknown";
+    try {
+      const { data: rl } = await supabase.rpc("check_edge_rate_limit", {
+        _key: `lead-invite:${ip}`,
+        _max: 5,
+        _window_seconds: 3600,
+      });
+      if (rl === false) {
+        return new Response(JSON.stringify({ error: "rate_limited" }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } catch (_) { /* fail-open on RPC missing */ }
+
+    const phoneDigits = phoneDigitsRaw;
+
 
     // Anti-duplicação: se já existe tag de convite enviado, não dispara de novo.
     const { data: existing } = await supabase

@@ -131,9 +131,10 @@ const CadastroProfissional = () => {
       toast({ title: "Documento inválido", description: documentValidation.message, variant: "destructive" });
       return;
     }
-    if (!form.registroProfissional) {
-      trackKYCValidationFailed("CRM_MISSING", "CRM não informado");
-      toast({ title: "Registro profissional obrigatório", description: "Informe seu CRM.", variant: "destructive" });
+    const isCuidador = form.categoria === "Cuidadores de Idosos";
+    if (!isCuidador && !form.registroProfissional) {
+      trackKYCValidationFailed("CRM_MISSING", "Registro profissional não informado");
+      toast({ title: "Registro profissional obrigatório", description: "Informe seu registro de conselho (CRM, COREN, CRF, CRP etc.).", variant: "destructive" });
       return;
     }
     if (!lgpdConsent) {
@@ -288,34 +289,44 @@ const CadastroProfissional = () => {
                       </div>
                     </div>
 
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="registroProfissional">CRM / Registro Profissional *</Label>
-                        <Input
-                          id="registroProfissional"
-                          placeholder="123456"
-                          value={form.registroProfissional}
-                          onChange={(e) => handleChange("registroProfissional", e.target.value)}
-                          required
-                        />
+                    {form.categoria === "Cuidadores de Idosos" ? (
+                      <div className="rounded-xl bg-primary/5 border border-primary/20 p-3">
+                        <p className="text-xs text-foreground font-bold mb-1">👴 Cuidador de Idosos</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          Para esta categoria <strong>não é necessário registro em conselho profissional</strong>.
+                          A verificação é feita exclusivamente pelo CPF informado acima.
+                        </p>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="crmUF">UF do CRM *</Label>
-                        <Select value={form.crmUF} onValueChange={(v) => handleChange("crmUF", v)}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {UF_OPTIONS.map((uf) => (
-                              <SelectItem key={uf} value={uf}>{uf}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                    ) : (
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="registroProfissional">Registro Profissional (CRM / COREN / CRF / CRP) *</Label>
+                          <Input
+                            id="registroProfissional"
+                            placeholder="123456"
+                            value={form.registroProfissional}
+                            onChange={(e) => handleChange("registroProfissional", e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="crmUF">UF do Registro *</Label>
+                          <Select value={form.crmUF} onValueChange={(v) => handleChange("crmUF", v)}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {UF_OPTIONS.map((uf) => (
+                                <SelectItem key={uf} value={uf}>{uf}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     <p className="text-[10px] text-muted-foreground">
-                      🔒 Seus dados serão verificados automaticamente junto ao Conselho Federal de Medicina. Todas as tentativas são registradas para compliance ANVISA/CFM.
+                      🔒 Seus dados são verificados automaticamente junto ao conselho profissional informado (quando aplicável). Todas as tentativas são registradas para compliance ANVISA/CFM/LGPD.
                     </p>
                   </div>
 

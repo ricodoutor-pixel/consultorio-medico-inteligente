@@ -127,6 +127,19 @@ const Telemedicina = () => {
   const navigate = useNavigate();
   const [showTCLE, setShowTCLE] = useState(true);
   const [showFlowInfo, setShowFlowInfo] = useState(false);
+  // Médicos prescritores online — varia entre 3 e 6 a cada 30 minutos
+  const [onlineDoctors, setOnlineDoctors] = useState<number>(() => {
+    const slot = Math.floor(Date.now() / (30 * 60 * 1000));
+    return 3 + (slot % 4); // 3..6
+  });
+  useEffect(() => {
+    const tick = () => {
+      const slot = Math.floor(Date.now() / (30 * 60 * 1000));
+      setOnlineDoctors(3 + (slot % 4));
+    };
+    const id = setInterval(tick, 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
   const [step, setStep] = useState(-1);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [sliderValue, setSliderValue] = useState([50]);
@@ -226,14 +239,16 @@ const Telemedicina = () => {
               <Link to="/profissionais">
                 <Button
                   size="lg"
-                  className="relative h-14 px-6 rounded-2xl font-black text-base bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-[0_0_30px_rgba(34,197,94,0.6)] hover:shadow-[0_0_40px_rgba(34,197,94,0.9)] transition-shadow"
+                  className="relative h-14 px-6 rounded-2xl font-black text-base bg-card border-2 border-emerald-400/60 hover:border-emerald-300 shadow-[0_0_30px_rgba(52,211,153,0.45)] hover:shadow-[0_0_40px_rgba(52,211,153,0.75)] transition-shadow"
                 >
-                  <span className="absolute -inset-1 rounded-2xl bg-green-500/40 blur-md animate-pulse pointer-events-none" />
+                  <span className="absolute -inset-1 rounded-2xl bg-emerald-400/30 blur-md animate-pulse pointer-events-none" />
                   <span className="relative flex items-center gap-2">
-                    <Users size={20} />
-                    <span>Médicos Prescritores Online Agora</span>
-                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-white text-green-700 font-black text-sm animate-pulse">6</span>
-                    <ArrowRight size={18} />
+                    <Users size={20} className="text-emerald-400" />
+                    <span className="text-gradient-green">Médicos Prescritores Online Agora</span>
+                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-emerald-500/15 border border-emerald-400/60 text-emerald-300 font-black text-sm animate-pulse">
+                      {onlineDoctors}
+                    </span>
+                    <ArrowRight size={18} className="text-emerald-400" />
                   </span>
                 </Button>
               </Link>
@@ -294,7 +309,7 @@ const Telemedicina = () => {
 
                   <div className="rounded-2xl border border-border p-4 bg-muted/30">
                     <p className="font-black text-foreground mb-1">3 · Triagem + Orientação Técnica (sem consulta)</p>
-                    <p className="text-xs text-muted-foreground">Brisa triagem → Orientação Técnica com Dr. Edilson → receita emitida diretamente.</p>
+                    <p className="text-xs text-muted-foreground">Enf. Brisa triagem → Orientação Técnica personalizada com <strong>Dr. Edilson Bezerra On</strong> → relatório em PDF e encaminhamento emitido diretamente com assinatura digital.</p>
                   </div>
                 </div>
 

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2 } from "lucide-react";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
+import { CountryFlag } from "@/components/CountryFlag";
 import { motion } from "framer-motion";
 import { professionals as allProfessionals, categories, Professional } from "@/data/professionals";
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";
@@ -332,14 +333,7 @@ const Profissionais = () => {
                               <h3 className="font-black text-foreground text-sm md:text-base truncate">{p.name}</h3>
                               {p.id === "med-0" && <DoctorVIPSeal tier="basic" />}
                               {p.flags && p.flags.map((flag, i) => (
-                                <span
-                                  key={i}
-                                  className="text-base md:text-lg leading-none flex-shrink-0"
-                                  style={{ fontFamily: '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Twemoji Mozilla","EmojiOne Color","Android Emoji",sans-serif' }}
-                                  aria-label="bandeira"
-                                >
-                                  {flag}
-                                </span>
+                                <CountryFlag key={i} code={flag} />
                               ))}
                             </div>
                             <div className="flex items-center gap-1.5 mt-0.5">

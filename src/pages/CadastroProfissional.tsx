@@ -131,9 +131,10 @@ const CadastroProfissional = () => {
       toast({ title: "Documento inválido", description: documentValidation.message, variant: "destructive" });
       return;
     }
-    if (!form.registroProfissional) {
-      trackKYCValidationFailed("CRM_MISSING", "CRM não informado");
-      toast({ title: "Registro profissional obrigatório", description: "Informe seu CRM.", variant: "destructive" });
+    const isCuidador = form.categoria === "Cuidadores de Idosos";
+    if (!isCuidador && !form.registroProfissional) {
+      trackKYCValidationFailed("CRM_MISSING", "Registro profissional não informado");
+      toast({ title: "Registro profissional obrigatório", description: "Informe seu registro de conselho (CRM, COREN, CRF, CRP etc.).", variant: "destructive" });
       return;
     }
     if (!lgpdConsent) {

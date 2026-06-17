@@ -332,14 +332,7 @@ const Profissionais = () => {
                               <h3 className="font-black text-foreground text-sm md:text-base truncate">{p.name}</h3>
                               {p.id === "med-0" && <DoctorVIPSeal tier="basic" />}
                               {p.flags && p.flags.map((flag, i) => (
-                                <span
-                                  key={i}
-                                  className="text-base md:text-lg leading-none flex-shrink-0"
-                                  style={{ fontFamily: '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Twemoji Mozilla","EmojiOne Color","Android Emoji",sans-serif' }}
-                                  aria-label="bandeira"
-                                >
-                                  {flag}
-                                </span>
+                                <CountryFlag key={i} code={flag} />
                               ))}
                             </div>
                             <div className="flex items-center gap-1.5 mt-0.5">

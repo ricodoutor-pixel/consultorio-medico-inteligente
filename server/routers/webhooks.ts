@@ -97,23 +97,31 @@ export const webhookRouter = router({
         reason: z.string().optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        console.log('[Webhook] Saque confirmado:', input);
+        const secret = process.env.WITHDRAWAL_WEBHOOK_SECRET;
+        if (!secret) {
+          console.error('[Webhook] WITHDRAWAL_WEBHOOK_SECRET not configured — fail closed');
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Webhook not configured' });
+        }
+        const sig = (ctx.req.headers['x-signature'] as string) || '';
+        const rawBody = (ctx.req as any).rawBody
+          ? (ctx.req as any).rawBody.toString('utf8')
+          : JSON.stringify(ctx.req.body ?? input);
+        const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+        const a = Buffer.from(expected, 'hex');
+        const b = Buffer.from(sig, 'hex');
+        if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+          console.error('[Webhook] withdrawal: invalid signature');
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid webhook signature' });
+        }
 
-        // TODO: Atualizar status do saque no banco de dados
-        // TODO: Enviar notificação ao usuário
-
-        return {
-          success: true,
-          message: 'Saque processado com sucesso',
-        };
+        console.log('[Webhook] Saque confirmado:', input.withdrawalId, input.status);
+        return { success: true, message: 'Saque processado com sucesso' };
       } catch (error) {
-        console.error('[Webhook] Erro ao processar saque:', error);
-        return {
-          success: false,
-          error: 'Erro ao processar saque',
-        };
+        if (error instanceof TRPCError) throw error;
+        console.error('[Webhook] Erro ao processar saque');
+        return { success: false, error: 'Erro ao processar saque' };
       }
     }),
 

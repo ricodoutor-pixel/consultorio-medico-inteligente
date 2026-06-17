@@ -63,12 +63,37 @@ FLUXO:
 Nunca diga "houve erro" ou "não consegui te ouvir". Se a pergunta vier vaga, peça com educação para o paciente repetir em uma frase curta.`;
 }
 
+// Per-IP rate limit: 30 req/min
+const ipHits = new Map<string, { count: number; resetAt: number }>();
+const RL_WINDOW_MS = 60_000;
+const RL_MAX = 30;
+const MAX_TRANSCRIPT = 1000;
+
+function rateLimit(ip: string): boolean {
+  const now = Date.now();
+  const cur = ipHits.get(ip);
+  if (!cur || cur.resetAt < now) {
+    ipHits.set(ip, { count: 1, resetAt: now + RL_WINDOW_MS });
+    return true;
+  }
+  if (cur.count >= RL_MAX) return false;
+  cur.count++;
+  return true;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || req.headers.get("cf-connecting-ip")
+      || "unknown";
+    if (!rateLimit(ip)) {
+      return json({ ok: false, error: "rate_limited" }, 429);
+    }
+
     const body = (await req.json()) as ChatBody;
-    const transcript = (body.transcript || "").trim();
+    const transcript = (body.transcript || "").trim().slice(0, MAX_TRANSCRIPT);
 
     if (!transcript) {
       return json({ ok: true, transcript: "[silêncio]", reply: "Olá, sou a Enfermeira Brisa. Em que posso ajudar hoje?" });

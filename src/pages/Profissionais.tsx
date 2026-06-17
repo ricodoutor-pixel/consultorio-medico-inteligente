@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2 } from "lucide-react";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
+import { CountryFlag } from "@/components/CountryFlag";
 import { motion } from "framer-motion";
 import { professionals as allProfessionals, categories, Professional } from "@/data/professionals";
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";

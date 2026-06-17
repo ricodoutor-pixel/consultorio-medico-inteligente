@@ -94,8 +94,14 @@ Deno.serve(async (req) => {
     });
   }
 
-  // Optional shared-secret check
-  if (WEBHOOK_SECRET) {
+  // Mandatory shared-secret check — fail closed if not configured.
+  if (!WEBHOOK_SECRET) {
+    console.error("[whatsapp-brisa-bot] EVOLUTION_WEBHOOK_SECRET not configured — rejecting request");
+    return new Response(JSON.stringify({ error: "webhook_not_configured" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  {
     const url = new URL(req.url);
     const got =
       req.headers.get("x-webhook-secret") ||

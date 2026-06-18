@@ -109,6 +109,8 @@ export const Footer = () => {
                 <span>·</span>
               </>
             )}
+            <Link to="/confianca" className="hover:text-primary transition-colors">Central de Confiança</Link>
+            <span>·</span>
             <Link to="/legal" className="hover:text-primary transition-colors">Conformidade</Link>
             <span>·</span>
             <Link to="/afiliados" className="hover:text-primary transition-colors">Afiliados</Link>

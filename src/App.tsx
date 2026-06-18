@@ -57,6 +57,7 @@ const BibliotecaCientifica = lazyWithRecovery(() => import("./pages/BibliotecaCi
 const CadastroProfissional = lazyWithRecovery(() => import("./pages/CadastroProfissional"), { sourceRef: "/cadastro-profissional" });
 const FalarComEspecialista = lazyWithRecovery(() => import("./pages/FalarComEspecialista"), { sourceRef: "/falar-com-especialista" });
 const Legal = lazyWithRecovery(() => import("./pages/Legal"), { sourceRef: "/legal" });
+const Confianca = lazyWithRecovery(() => import("./pages/Confianca"), { sourceRef: "/confianca" });
 const NossaHistoria = lazyWithRecovery(() => import("./pages/NossaHistoria"), { sourceRef: "/nossa-historia" });
 const MeuCartao = lazyWithRecovery(() => import("./pages/MeuCartao"), { sourceRef: "/saude-plus/meu-cartao" });
 const TermosDeUso = lazyWithRecovery(() => import("./pages/TermosDeUso"), { sourceRef: "/termos" });
@@ -240,6 +241,8 @@ const App = () => (
                 <Route path="/afiliados" element={<Indicacoes />} />
                 <Route path="/indicacoes" element={<Indicacoes />} />
                 <Route path="/legal" element={<Legal />} />
+                <Route path="/confianca" element={<Confianca />} />
+                <Route path="/trust" element={<Confianca />} />
                 <Route path="/nossa-historia" element={<NossaHistoria />} />
                 <Route path="/saude-plus/meu-cartao" element={<MeuCartao />} />
                 <Route path="/meu-cartao" element={<MeuCartao />} />

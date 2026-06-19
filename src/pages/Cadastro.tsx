@@ -100,14 +100,24 @@ const Cadastro = () => {
       });
 
       if (authError) {
-        if (authError.message.includes("already registered")) {
+        const msg = authError.message || "";
+        if (msg.includes("already registered") || msg.includes("already been registered")) {
           toast({ title: "E-mail já cadastrado", description: "Tente fazer login ou use outro e-mail.", variant: "destructive" });
+        } else if (msg.toLowerCase().includes("weak") || msg.toLowerCase().includes("pwned") || msg.toLowerCase().includes("known to be")) {
+          toast({
+            title: "Senha muito fraca 🔒",
+            description: "Esta senha apareceu em vazamentos públicos. Crie uma senha forte: misture letras maiúsculas, minúsculas, números e símbolos (ex: Plant@Raiz2026!).",
+            variant: "destructive",
+          });
+        } else if (msg.toLowerCase().includes("password")) {
+          toast({ title: "Problema com a senha", description: "Use no mínimo 8 caracteres com letras, números e símbolos.", variant: "destructive" });
         } else {
-          toast({ title: "Erro no cadastro", description: authError.message, variant: "destructive" });
+          toast({ title: "Erro no cadastro", description: msg, variant: "destructive" });
         }
         setLoading(false);
         return;
       }
+
 
       // 2. Update profile with additional data
       if (authData.user) {

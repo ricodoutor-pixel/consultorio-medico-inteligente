@@ -5,6 +5,24 @@ import "./lib/i18n"; // Initialize i18next before App
 import App from "./App.tsx";
 import "./index.css";
 
+// 🔇 Silenciar console.log/info/debug/warn em produção (credibilidade técnica).
+// console.error é mantido para que Sentry/observability capturem erros reais.
+// Opt-out: ?debug=1 na URL ou localStorage.PR_DEBUG === "1".
+if (import.meta.env.PROD) {
+  const debugForced =
+    typeof window !== "undefined" &&
+    (new URLSearchParams(window.location.search).get("debug") === "1" ||
+      window.localStorage?.getItem("PR_DEBUG") === "1");
+  if (!debugForced) {
+    const noop = () => {};
+    console.log = noop;
+    console.info = noop;
+    console.debug = noop;
+    console.warn = noop;
+  }
+}
+
+
 // Inicializa proteções anti-clonagem ANTES do React
 initAntiClone();
 

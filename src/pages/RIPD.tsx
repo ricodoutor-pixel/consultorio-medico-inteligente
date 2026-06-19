@@ -12,12 +12,14 @@ const sections = [
     title: "1. Identificação do Controlador",
     icon: FileText,
     content: [
-      "Razão Social: Planta & Raiz Tecnologia em Saúde Ltda.",
-      "CNPJ: __.___.___ /0001-__",
-      "Encarregado de Dados (DPO): dpo@plantayraiz.com.br",
-      "Endereço: [Endereço da sede]",
-      "Diretor Técnico Médico: CRM ______/UF",
+      "Razão Social: Planta y Raiz — Tecnologia em Saúde Digital Ltda.",
+      "CNAE Principal: 6209-1/00 (Suporte técnico, manutenção e outros serviços em tecnologia da informação) — atuação como plataforma de intermediação digital em telessaúde.",
+      "Encarregado de Dados (DPO) — interino: Dr. Edilson Bezerra da Silva, CRM-PE 10963 · Diretor Técnico Médico.",
+      "Canal oficial do DPO: dpo@plantayraiz.com.br · WhatsApp +55 11 99136-3154 (Enfª Brisa redireciona ao DPO).",
+      "Substituição do DPO interino por DPO terceirizado especializado em LGPD está prevista para o próximo ciclo de governança; este RIPD será atualizado na nomeação.",
+      "Diretor Técnico Médico Responsável: Dr. Edilson Bezerra da Silva — CRM-PE 10963.",
     ],
+
   },
   {
     title: "2. Descrição do Tratamento de Dados",
@@ -117,7 +119,9 @@ const RIPD = () => {
               <Badge variant="outline" className="text-[10px] border-secondary/30 text-secondary">LGPD Lei 13.709/2018</Badge>
               <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">CFM 2.314/2022</Badge>
               <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">RDC ANVISA 660/2022</Badge>
-              <Badge variant="outline" className="text-[10px]">Última Revisão: {new Date().toLocaleDateString("pt-BR")}</Badge>
+              <Badge variant="outline" className="text-[10px]">RIPD v1.0 — Publicado em {new Date().toLocaleDateString("pt-BR")}</Badge>
+              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">DPO Interino: Dr. Edilson Bezerra (CRM-PE 10963)</Badge>
+
             </div>
 
             <div className="space-y-6">

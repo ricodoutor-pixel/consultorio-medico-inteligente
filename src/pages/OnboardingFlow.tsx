@@ -12,8 +12,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { ChevronRight, CheckCircle, AlertCircle, Loader, Zap } from 'lucide-react';
 import ContractSignature from '@/components/ContractSignature';
+import { openBrisaWhatsApp } from '@/lib/whatsapp-brisa';
+
 
 type UserType = 'medico' | 'lojista' | null;
 type OnboardingStep = 'type-selection' | 'personal-data' | 'email-verification' | 'whatsapp-verification' | 'contract-signature' | 'completion';
@@ -651,8 +653,39 @@ export const OnboardingFlow: React.FC = () => {
           <p className="text-gray-600">Mega Clínica Digital</p>
         </div>
 
+        {/* 🚀 MODO URGÊNCIA BRISA — atalho de 1 clique para WhatsApp da Enfª Brisa */}
+        <div className="mb-6 rounded-2xl border-2 border-green-500/40 bg-gradient-to-br from-green-50 to-emerald-50 p-5 shadow-lg shadow-green-500/10">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center animate-pulse">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-green-900 leading-tight">Quero falar AGORA com a Enfª Brisa</p>
+              <p className="text-xs text-green-700">Atalho de 3 passos · sem cadastro completo · WhatsApp imediato</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                openBrisaWhatsApp({ section: 'onboarding-urgencia', consultationType: 'initial' });
+              } catch {
+                window.open('https://wa.me/5511991363154?text=' + encodeURIComponent('Olá Brisa, quero iniciar minha orientação técnica agora.'), '_blank', 'noopener,noreferrer');
+              }
+            }}
+            className="w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2"
+          >
+            <Zap className="w-4 h-4" />
+            FALAR COM BRISA AGORA
+          </button>
+          <p className="text-[11px] text-green-800/70 text-center mt-2">
+            Prefere o cadastro completo (7 etapas)? Continue abaixo ⬇️
+          </p>
+        </div>
+
         {/* Progress Bar */}
         {renderProgressBar()}
+
 
         {/* Content */}
         <div className="bg-white rounded-lg shadow-xl p-8">

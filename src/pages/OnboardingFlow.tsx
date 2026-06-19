@@ -12,8 +12,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { ChevronRight, CheckCircle, AlertCircle, Loader, Zap } from 'lucide-react';
 import ContractSignature from '@/components/ContractSignature';
+import { openBrisaWhatsApp } from '@/lib/whatsapp-brisa';
+
 
 type UserType = 'medico' | 'lojista' | null;
 type OnboardingStep = 'type-selection' | 'personal-data' | 'email-verification' | 'whatsapp-verification' | 'contract-signature' | 'completion';

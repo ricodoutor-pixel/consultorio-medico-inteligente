@@ -119,7 +119,9 @@ const RIPD = () => {
               <Badge variant="outline" className="text-[10px] border-secondary/30 text-secondary">LGPD Lei 13.709/2018</Badge>
               <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">CFM 2.314/2022</Badge>
               <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">RDC ANVISA 660/2022</Badge>
-              <Badge variant="outline" className="text-[10px]">Última Revisão: {new Date().toLocaleDateString("pt-BR")}</Badge>
+              <Badge variant="outline" className="text-[10px]">RIPD v1.0 — Publicado em {new Date().toLocaleDateString("pt-BR")}</Badge>
+              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">DPO Interino: Dr. Edilson Bezerra (CRM-PE 10963)</Badge>
+
             </div>
 
             <div className="space-y-6">

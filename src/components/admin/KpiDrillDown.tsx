@@ -11,7 +11,8 @@ import { exportCSV } from "@/lib/admin-export";
 
 export type DrillSource =
   | "orders" | "ot_orders" | "leads" | "appointments"
-  | "audit_log" | "error_logs" | "queue" | "notifications";
+  | "audit_log" | "error_logs" | "queue" | "notifications"
+  | "patients" | "doctors" | "vendors" | "producers";
 
 const PERIODS = [
   { key: "24h", label: "24h", hours: 24 },
@@ -113,6 +114,61 @@ const SOURCE_CFG: Record<DrillSource, { table: string; cols: string; orderBy: st
       { key: "title", label: "Título" },
       { key: "type", label: "Tipo" },
       { key: "is_read", label: "Lida", fmt: (v) => v ? "✓" : "—" },
+    ],
+  },
+  patients: {
+    table: "profiles",
+    cols: "id,full_name,phone,city,region,country,user_type,created_at",
+    orderBy: "created_at",
+    columns: [
+      { key: "created_at", label: "Cadastro", fmt: (v) => new Date(v).toLocaleString("pt-BR") },
+      { key: "full_name", label: "Nome" },
+      { key: "phone", label: "WhatsApp" },
+      { key: "city", label: "Cidade" },
+      { key: "region", label: "UF" },
+      { key: "country", label: "País" },
+    ],
+  },
+  doctors: {
+    table: "doctors",
+    cols: "id,full_name,crm,crm_state,specialty,phone,email,created_at,is_verified",
+    orderBy: "created_at",
+    columns: [
+      { key: "created_at", label: "Cadastro", fmt: (v) => new Date(v).toLocaleString("pt-BR") },
+      { key: "full_name", label: "Nome" },
+      { key: "crm", label: "CRM" },
+      { key: "crm_state", label: "UF" },
+      { key: "specialty", label: "Especialidade" },
+      { key: "phone", label: "Telefone" },
+      { key: "email", label: "E-mail" },
+      { key: "is_verified", label: "Verificado", fmt: (v) => v ? "✓" : "—" },
+    ],
+  },
+  vendors: {
+    table: "vendors",
+    cols: "id,name,cnpj,email,phone,city,state,created_at,is_active",
+    orderBy: "created_at",
+    columns: [
+      { key: "created_at", label: "Cadastro", fmt: (v) => new Date(v).toLocaleString("pt-BR") },
+      { key: "name", label: "Lojista" },
+      { key: "cnpj", label: "CNPJ" },
+      { key: "email", label: "E-mail" },
+      { key: "phone", label: "Telefone" },
+      { key: "city", label: "Cidade" },
+      { key: "state", label: "UF" },
+      { key: "is_active", label: "Ativo", fmt: (v) => v ? "✓" : "—" },
+    ],
+  },
+  producers: {
+    table: "profiles",
+    cols: "id,full_name,phone,city,region,country,user_type,signup_role,created_at",
+    orderBy: "created_at",
+    columns: [
+      { key: "created_at", label: "Cadastro", fmt: (v) => new Date(v).toLocaleString("pt-BR") },
+      { key: "full_name", label: "Nome" },
+      { key: "phone", label: "WhatsApp" },
+      { key: "city", label: "Cidade" },
+      { key: "country", label: "País" },
     ],
   },
 };

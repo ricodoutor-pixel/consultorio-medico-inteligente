@@ -109,8 +109,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background w-full overflow-x-hidden">
-      <WelcomeMascotSplash />
       <Navbar />
+
 
       {/* Hero Section - Otimizado para Mobile/Desktop */}
       <section className="hero-glow min-h-[70dvh] lg:min-h-[85dvh] flex items-start overflow-hidden pt-[calc(5.5rem+env(safe-area-inset-top,0px))] sm:pt-28 md:pt-32 lg:pt-36 pb-12 md:pb-24">

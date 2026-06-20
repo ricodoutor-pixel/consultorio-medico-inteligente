@@ -351,6 +351,8 @@ const App = () => (
                 <Route path="/admin/leads" element={<AdminRoute><AdminLeads /></AdminRoute>} />
                 <Route path="/admin/cadastros" element={<AdminRoute><CadastrosRealtime /></AdminRoute>} />
                 <Route path="/admin/cadastros-tempo-real" element={<AdminRoute><CadastrosRealtime /></AdminRoute>} />
+                <Route path="/admin/global-ops" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
+                <Route path="/admin/mapa-global" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
                 <Route path="/admin/leads/:id" element={<AdminRoute><AdminLeadDetail /></AdminRoute>} />
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />

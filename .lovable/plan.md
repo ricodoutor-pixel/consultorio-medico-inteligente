@@ -1,107 +1,111 @@
-# ARQUIVADO — plano Oracle descontinuado
+# Plano — Atualizações Críticas Planta y Raiz (Fase de Testes)
 
-**Status atual:** este plano não é mais a base operacional do fluxo Brisa.
+Antes de executar preciso confirmar 2 pontos bloqueantes (ver fim). O restante segue abaixo.
 
-**Regra vigente:** o runtime do WhatsApp/Evolution está no **Railway** e qualquer recuperação do fluxo deve partir dessa arquitetura, não de Oracle/Hostinger VPS.
+## 1. Admin Dashboard — Drill-down de Dados
 
-**Motivo do arquivamento:** o projeto migrou e este documento passou a induzir operação errada, QR errado e troubleshooting em infraestrutura fora de uso.
+**Tiles clicáveis em `src/pages/admin/*` e `GestaoPacientes`:**
+- Criar componente reutilizável `AdminDrilldownModal.tsx` (lista + busca + export CSV).
+- Cada card (Pacientes / Médicos / Lojistas / Produtores / Novos Cadastros) vira `<button>` que abre modal com query Supabase:
+  - Pacientes → `profiles` join `auth.users` (nome, email, telefone, cidade/estado/país, criado_em).
+  - Médicos → `doctors` + `profiles`.
+  - Lojistas → `vendors`.
+  - Produtores → flag em `profiles.role` ou tabela dedicada (verificar).
+- Usar paginação 50/pág + filtros básicos.
+- RLS: somente `has_role(admin)`.
 
-## O que migra para a Oracle VM (grátis)
+## 2. Aba "Global Operations" — Mapa Mundial
 
-1. **Backend Node.js** (`dist/server.js` — tRPC v11, AI Gateway Router)
-2. **Evolution API** (Brisa Bot WhatsApp — container Docker)
-3. **PM2** para manter processos vivos + auto-restart
-4. **Nginx** como reverse proxy + TLS Let's Encrypt
-5. **Cron jobs** pesados (prerender SEO manual, backups)
+- Nova tab em `OmniChannelDashboard` (ou `AdminBI`): `GlobalOperationsMap.tsx`.
+- Google Maps JS API via `VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY` (connector já listado).
+- **Pré-requisito:** conectar o connector `google_maps` (vou disparar `standard_connectors--connect`).
+- Migration: adicionar `latitude numeric`, `longitude numeric`, `country text`, `region text`, `city text`, `geo_updated_at timestamptz` em `profiles` (se ainda não existir — verificar).
+- Marcadores verdes para pacientes com `lat/lng`. Click → popup com nome + última localização + botão "Ver Prontuário".
+- Realtime: subscribe em `profiles` para atualizar marcadores.
 
-## O que NÃO migra
+## 3. Google Auth por Categoria (Remover Login Universal)
 
-- Site estático (`dist/` build Vite) → continua na **Hospedagem Web Hostinger** (plano barato/grátis incluso no domínio, não é VPS)
-- Supabase Edge Functions → continuam na Lovable Cloud
-- Banco de dados → continua no Supabase
+- Cada página de cadastro (`/cadastro` paciente, `/cadastro-profissional` médico/cuidador, `/vendor-signup` lojista, `/produtor-signup` produtor) terá botão **"Entrar com Google"** próprio.
+- Após OAuth callback, gravar `profiles.role` com a categoria de origem (passada via `extraParams.state` ou localStorage `pending_signup_role`).
+- Redirecionar para painel da categoria:
+  - paciente → `/dashboard`
+  - médico/cuidador → `/consultorio`
+  - lojista → `/admin/vendor`
+  - produtor → `/admin/producer`
+- Usar `lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth/callback?role=<x>" })`.
+- Página `/auth/callback` aplica role e redireciona.
 
-## Arquitetura final
+## 4. Captura Granular de Geolocalização
 
-```text
-[Usuário] ─► plantayraiz.com.br (Hostinger Web Hosting — site estático)
-                │
-                ├─► api.plantayraiz.com.br ──► Oracle VM (Nginx → Node tRPC :3000)
-                └─► bot.plantayraiz.com.br ──► Oracle VM (Nginx → Evolution :8080)
-                                                    │
-                                                    └─► Supabase (DB + Edge Functions)
-```
+- No primeiro login após aceitar Termos (`ConsentManager`), chamar `navigator.geolocation.getCurrentPosition`.
+- Reverse-geocoding via gateway Google Maps (`/maps/api/geocode/json?latlng=...`) numa edge function `capture-user-location` (não expõe key).
+- Persistir em `profiles` (lat, lng, country, region, city, geo_updated_at).
+- Adicionar texto LGPD explícito no `ConsentManager` cobrindo: geolocalização contínua + dados de saúde (wearables futuros).
 
-## Passos de execução
+## 5. Protocolo de Emergência
 
-### 1. Preparar Oracle VM (via SSH usando `ORACLE_VM_SSH_KEY`)
-- Atualizar sistema (Ubuntu 22.04 ARM/AMD)
-- Instalar: Node.js 22, PM2, Docker, Nginx, certbot
-- Abrir portas 80, 443, 3000, 8080 no firewall (iptables + Oracle Security List)
-- Configurar swap 2GB (VM Always Free tem só 1GB RAM)
+- Botão "🚨 Emergência" no perfil paciente (admin/médico): exibe última localização + link `https://maps.google.com/?q=lat,lng` + WhatsApp do paciente.
+- Edge function `emergency-ping` força refresh da localização (envia push pedindo permissão).
 
-### 2. Deploy do backend Node.js
-- Clonar repo `ricodoutor-pixel/consultorio-medico-inteligente` na VM
-- `bun install && bun run build`
-- PM2 start `dist/server.js` com auto-restart e logs rotacionados
-- Webhook do GitHub para auto-deploy em cada push
+## 6. Splash Cleanup
 
-### 3. Deploy Evolution API (Docker)
-- `docker run` com volumes persistentes
-- Variáveis: `EVOLUTION_API_KEY`, conexão Supabase via secrets
-- Reconectar instância `Brisa_CEO` → reescanear QR no WhatsApp
+- Remover `CustomLoader` (verdinho fundo escuro) do `main.tsx`/`App.tsx`.
+- Manter apenas `WelcomeMascotSplash` (verdinho flutuante) OU o ícone flutuante global — confirmar com pergunta abaixo.
 
-### 4. Nginx + HTTPS
-- Subdomínios `api.` e `bot.` com Let's Encrypt (renovação automática)
-- Headers de segurança + rate limit
+## 7. Brisa Autônoma (WhatsApp + Gemini via Lovable AI)
 
-### 5. DNS (Cloudflare)
-- Criar registros A:
-  - `api.plantayraiz.com.br` → IP Oracle (proxy DESLIGADO para webhooks)
-  - `bot.plantayraiz.com.br` → IP Oracle (proxy DESLIGADO)
-- `plantayraiz.com.br` e `www` continuam apontando para Hostinger
+- A arquitetura já existe (edge `whatsapp-brisa-bot` com `google/gemini-2.5-flash`, fallback do Evolution+n8n na Oracle).
+- Auditoria + garantia de:
+  - `LOVABLE_API_KEY` presente (auto-provisioning se faltar).
+  - Edge `whatsapp-brisa-bot` ativa, com retry e logging em `whatsapp_brisa_log`.
+  - 12 agentes do `agent_registry` com `is_active=true` (UPDATE em massa).
+- Sem mudar visual, apenas backend.
 
-### 6. Atualizar referências no código
-- Trocar URL do webhook Evolution nos secrets Supabase: `EVOLUTION_API_URL=https://bot.plantayraiz.com.br`
-- Atualizar `VITE_API_BASE_URL` para `https://api.plantayraiz.com.br`
-- Rebuild + deploy na Hostinger Web Hosting
+## 8. Estabilidade do Cadastro
 
-### 7. Validação
-- `curl https://api.plantayraiz.com.br/health` → 200 OK
-- `curl https://bot.plantayraiz.com.br/manager` → Evolution UI
-- Testar checkout PIX completo (webhook MP chega na VM)
-- Mandar mensagem WhatsApp → Brisa responde
-
-### 8. Cancelar VPS Hostinger
-- Após 48h estáveis monitorando logs PM2 e Discord SRE
-- Você cancela manualmente no painel Hostinger (não tenho acesso)
-
-## Detalhes técnicos
-
-**Recursos Oracle Always Free usados:**
-- 1× VM.Standard.E2.1.Micro (1 OCPU AMD, 1GB RAM) OU 4× ARM Ampere (24GB RAM total grátis — recomendo ARM)
-- 200GB block storage
-- 10TB tráfego/mês
-- **Custo: R$ 0,00 para sempre** (tier perpétuo)
-
-**Pré-requisitos que eu preciso de você:**
-1. **IP público** da Oracle VM (você ainda não me passou — só a chave SSH)
-2. **Usuário SSH** (geralmente `ubuntu` ou `opc`)
-3. **Acesso ao painel Cloudflare** para criar os registros A (ou eu te dou o IP e você cria)
-4. **Confirmação** de que a VM é ARM Ampere ou x86 (muda comandos de instalação)
-
-## Riscos
-
-- Evolution API precisa **rescanear QR Code** ao migrar (Brisa fica offline ~5min)
-- Webhooks Mercado Pago precisam ser atualizados no painel MP para nova URL
-- Se Oracle VM tiver só 1GB RAM, Node + Evolution juntos podem ficar apertados → swap obrigatório, ou usar tier ARM 24GB
-
-## Entregáveis ao fim
-
-- VPS Hostinger desligável (você cancela)
-- Todos os serviços rodando em `api.` e `bot.plantayraiz.com.br` (Oracle grátis)
-- Documentação `docs/ORACLE_VM_DEPLOY.md` com runbook
-- Webhook GitHub → auto-deploy em cada push
+- Já corrigido na rodada anterior (HIBP messages). Adicionar:
+  - Try/catch robusto em todos OAuth callbacks.
+  - Log de erro em `error_logs` para diagnóstico.
 
 ---
 
-**Me confirme o IP público + usuário SSH da Oracle VM e eu começo pela etapa 1.**
+## Detalhes Técnicos
+
+**Migrations necessárias:**
+```sql
+ALTER TABLE profiles
+  ADD COLUMN IF NOT EXISTS latitude numeric,
+  ADD COLUMN IF NOT EXISTS longitude numeric,
+  ADD COLUMN IF NOT EXISTS country text,
+  ADD COLUMN IF NOT EXISTS region text,
+  ADD COLUMN IF NOT EXISTS city text,
+  ADD COLUMN IF NOT EXISTS geo_updated_at timestamptz,
+  ADD COLUMN IF NOT EXISTS signup_role text;
+```
+
+**Connectors:** `google_maps` (browser key + gateway para geocoding server-side).
+
+**Arquivos novos principais:**
+- `src/components/admin/AdminDrilldownModal.tsx`
+- `src/components/admin/GlobalOperationsMap.tsx`
+- `src/pages/AuthCallback.tsx`
+- `src/lib/geolocation-capture.ts`
+- `supabase/functions/capture-user-location/index.ts`
+- `supabase/functions/emergency-ping/index.ts`
+
+**Arquivos editados:**
+- `src/main.tsx` (remover CustomLoader)
+- `src/pages/Cadastro.tsx`, `CadastroProfissional.tsx`, `VendorSignup`, `ProdutorSignup` (botão Google por categoria)
+- `src/pages/OmniChannelDashboard.tsx` + `AdminBI.tsx` (drill-down + Global Ops tab)
+- `src/components/ConsentManager.tsx` (texto LGPD + trigger geo)
+- `src/App.tsx` (rota `/auth/callback`)
+
+---
+
+## ⚠️ Confirmações antes de executar
+
+1. **Splash:** remover **CustomLoader** (verde escuro inicial) e manter **WelcomeMascotSplash** (verdinho flutuante na 1ª visita) — correto?
+2. **Google Maps:** preciso ativar o connector `google_maps` (vai abrir diálogo para você autorizar). Confirma?
+3. **Produtor signup:** existe página dedicada hoje ou crio nova `/cadastro-produtor`?
+
+Se responder "ok tudo" eu assumo: (1) sim, (2) sim, (3) crio nova. Executo na sequência: connector → migration → componentes admin → auth por categoria → mapa → emergência → Brisa audit → splash → testes.

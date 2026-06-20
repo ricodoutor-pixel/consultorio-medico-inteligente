@@ -5655,17 +5655,24 @@ export type Database = {
           anvisa_protocol: string | null
           avatar_url: string | null
           cannabis_experience: string | null
+          city: string | null
+          country: string | null
           cpf: string | null
           created_at: string
           date_of_birth: string | null
           full_name: string
+          geo_updated_at: string | null
           health_goal: string | null
           id: string
           is_subscriber: boolean | null
+          latitude: number | null
+          longitude: number | null
           onboarding_completed: boolean
           phone: string | null
           planta_coins: number | null
           referred_by: string | null
+          region: string | null
+          signup_role: string | null
           updated_at: string
           user_type: string
         }
@@ -5673,17 +5680,24 @@ export type Database = {
           anvisa_protocol?: string | null
           avatar_url?: string | null
           cannabis_experience?: string | null
+          city?: string | null
+          country?: string | null
           cpf?: string | null
           created_at?: string
           date_of_birth?: string | null
           full_name?: string
+          geo_updated_at?: string | null
           health_goal?: string | null
           id: string
           is_subscriber?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           onboarding_completed?: boolean
           phone?: string | null
           planta_coins?: number | null
           referred_by?: string | null
+          region?: string | null
+          signup_role?: string | null
           updated_at?: string
           user_type?: string
         }
@@ -5691,17 +5705,24 @@ export type Database = {
           anvisa_protocol?: string | null
           avatar_url?: string | null
           cannabis_experience?: string | null
+          city?: string | null
+          country?: string | null
           cpf?: string | null
           created_at?: string
           date_of_birth?: string | null
           full_name?: string
+          geo_updated_at?: string | null
           health_goal?: string | null
           id?: string
           is_subscriber?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           onboarding_completed?: boolean
           phone?: string | null
           planta_coins?: number | null
           referred_by?: string | null
+          region?: string | null
+          signup_role?: string | null
           updated_at?: string
           user_type?: string
         }

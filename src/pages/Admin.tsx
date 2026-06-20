@@ -319,8 +319,8 @@ const Admin = () => {
     { label: "Ordens Hoje", value: NUM(kpi.ordensHoje), icon: ShoppingBag, accent: "text-yellow-400", bg: "from-yellow-500/20", drill: "orders" },
     { label: "Orientações Hoje", value: NUM(kpi.consultasHoje), icon: Stethoscope, accent: "text-sky-400", bg: "from-sky-500/20", drill: "appointments" },
     { label: "Fila Ativa", value: NUM(kpi.filaAtiva), icon: Clock, accent: "text-sky-400", bg: "from-sky-500/20", drill: "queue" },
-    { label: "Pacientes", value: NUM(kpi.pacientes), icon: Users, accent: "text-fuchsia-400", bg: "from-fuchsia-500/20" },
-    { label: "Médicos Ativos", value: NUM(kpi.medicos), icon: HeartPulse, accent: "text-fuchsia-400", bg: "from-fuchsia-500/20" },
+    { label: "Pacientes", value: NUM(kpi.pacientes), icon: Users, accent: "text-fuchsia-400", bg: "from-fuchsia-500/20", drill: "patients" },
+    { label: "Médicos Ativos", value: NUM(kpi.medicos), icon: HeartPulse, accent: "text-fuchsia-400", bg: "from-fuchsia-500/20", drill: "doctors" },
     { label: "Leads 24h", value: NUM(kpi.leads24h), icon: UserPlus, accent: "text-primary", bg: "from-primary/20", drill: "leads" },
     { label: "Conversão Leads", value: PCT(kpi.conversao), icon: BarChart3, accent: "text-primary", bg: "from-primary/20", drill: "leads" },
     { label: "Prescrições 7d", value: NUM(kpi.prescricoes7d), icon: FileText, accent: "text-orange-400", bg: "from-orange-500/20" },
@@ -328,6 +328,7 @@ const Admin = () => {
   ], [kpi]);
 
   const quickLinks = [
+    { label: "🌍 Mapa Global", path: "/admin/global-ops", icon: Globe },
     { label: "Clínicas", path: "/admin/clinicas", icon: Globe },
     { label: "Financeiro", path: "/admin/financeiro", icon: DollarSign },
     { label: "BI Avançado", path: "/admin/bi", icon: BarChart3 },

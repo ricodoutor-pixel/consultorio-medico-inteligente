@@ -178,17 +178,13 @@ Deno.serve(async (req) => {
 
         // 4. Update prescription status in DB if prescriptionId provided
         if (body.prescriptionId) {
-          const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-          if (serviceKey) {
-            const adminClient = createClient(supabaseUrl, serviceKey);
-            await adminClient
-              .from("prescriptions")
-              .update({
-                digital_signature: `clicksign:${documentKey}`,
-                status: "pending_signature",
-              })
-              .eq("id", body.prescriptionId);
-          }
+          await adminClient
+            .from("prescriptions")
+            .update({
+              digital_signature: `clicksign:${documentKey}`,
+              status: "pending_signature",
+            })
+            .eq("id", body.prescriptionId);
         }
 
         return new Response(

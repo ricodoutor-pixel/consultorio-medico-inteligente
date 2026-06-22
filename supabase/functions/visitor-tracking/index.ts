@@ -119,15 +119,23 @@ Deno.serve(async (req) => {
         req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
         "unknown";
       try {
-        const { data: allowed } = await supabase.rpc("check_edge_rate_limit", {
-          _identifier: `visitor-tracking:${ip}`,
-          _max_requests: 120,
-          _window_seconds: 60,
+        const { data: allowed, error: rlErr } = await supabase.rpc("check_edge_rate_limit", {
+          p_bucket: "visitor-tracking",
+          p_key: ip,
+          p_max_hits: 120,
+          p_window_seconds: 60,
         });
+        if (rlErr) {
+          console.error("[visitor-tracking] rate-limit RPC error:", rlErr);
+          return jsonResponse({ error: "Rate limit unavailable" }, 503);
+        }
         if (allowed === false) {
           return jsonResponse({ error: "Rate limit exceeded" }, 429);
         }
-      } catch { /* rate limiter optional */ }
+      } catch (e) {
+        console.error("[visitor-tracking] rate-limit exception:", e);
+        return jsonResponse({ error: "Rate limit unavailable" }, 503);
+      }
 
       // Verify caller before trusting phone/user_id (prevents WhatsApp spam to arbitrary numbers).
       const authHeader = req.headers.get("Authorization") || "";

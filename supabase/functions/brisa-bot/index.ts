@@ -49,9 +49,9 @@ Deno.serve(async (req) => {
   }
 
   const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-  const WHATSAPP_API_TOKEN = Deno.env.get("WHATSAPP_API_TOKEN");
+  const WHATSAPP_API_TOKEN = Deno.env.get("WHATSAPP_API_TOKEN") ?? Deno.env.get("EVOLUTION_API_KEY");
   if (!GEMINI_API_KEY || !WHATSAPP_API_TOKEN) {
-    console.error("[brisa-bot] missing env: GEMINI_API_KEY/WHATSAPP_API_TOKEN");
+    console.error("[brisa-bot] missing env: GEMINI_API_KEY/EVOLUTION_API_KEY");
     return new Response(JSON.stringify({ error: "server_misconfigured" }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

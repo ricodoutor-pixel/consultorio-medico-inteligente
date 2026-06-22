@@ -88,18 +88,32 @@ Deno.serve(async (req) => {
       req.headers.get("cf-connecting-ip") ||
       "unknown";
     try {
-      const { data: rl } = await supabase.rpc("check_edge_rate_limit", {
-        _key: `lead-invite:${ip}`,
-        _max: 5,
-        _window_seconds: 3600,
+      const { data: rl, error: rlErr } = await supabase.rpc("check_edge_rate_limit", {
+        p_bucket: "lead-invite-ip",
+        p_key: ip,
+        p_max_hits: 5,
+        p_window_seconds: 3600,
       });
+      if (rlErr) {
+        console.error("[lead-invite-orientacao] rate-limit RPC error:", rlErr);
+        return new Response(JSON.stringify({ error: "rate_limit_unavailable" }), {
+          status: 503,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       if (rl === false) {
         return new Response(JSON.stringify({ error: "rate_limited" }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-    } catch (_) { /* fail-open on RPC missing */ }
+    } catch (e) {
+      console.error("[lead-invite-orientacao] rate-limit exception:", e);
+      return new Response(JSON.stringify({ error: "rate_limit_unavailable" }), {
+        status: 503,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const phoneDigits = phoneDigitsRaw;
 

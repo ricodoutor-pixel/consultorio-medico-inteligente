@@ -7649,6 +7649,42 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_messages: {
+        Row: {
+          created_at: string
+          direction: string
+          id: string
+          message_text: string | null
+          message_type: string
+          remote_jid: string
+          sender_name: string | null
+          status: string
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          direction?: string
+          id?: string
+          message_text?: string | null
+          message_type?: string
+          remote_jid: string
+          sender_name?: string | null
+          status?: string
+          timestamp?: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          id?: string
+          message_text?: string | null
+          message_type?: string
+          remote_jid?: string
+          sender_name?: string | null
+          status?: string
+          timestamp?: string
+        }
+        Relationships: []
+      }
       whatsapp_routing_log: {
         Row: {
           created_at: string

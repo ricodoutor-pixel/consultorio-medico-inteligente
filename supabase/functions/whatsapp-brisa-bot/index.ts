@@ -137,10 +137,11 @@ Deno.serve(async (req) => {
   }
 
   const phone = remoteJid.split("@")[0];
+  const senderName = data?.pushName || data?.notifyName || null;
   const reply = await aiReply(text, phone);
   const sent = await sendWA(phone, reply);
 
-  // Log
+  // Log + dashboard inbox
   try {
     const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     await sb.from("brisa_interaction_logs").insert({
@@ -150,6 +151,10 @@ Deno.serve(async (req) => {
       http_status: sent.status ?? 0,
       meta: { event, text: text.slice(0, 500), reply: reply.slice(0, 500), send: sent },
     });
+    await sb.from("whatsapp_messages").insert([
+      { remote_jid: remoteJid, sender_name: senderName, message_text: text, message_type: "text", direction: "in", status: "received" },
+      { remote_jid: remoteJid, sender_name: "Brisa Bot", message_text: reply, message_type: "text", direction: "out", status: sent.ok ? "sent" : "failed" },
+    ]);
   } catch (e) { console.error("[whatsapp-brisa-bot] log error", e); }
 
   return new Response(JSON.stringify({ ok: true, phone, sent }), {

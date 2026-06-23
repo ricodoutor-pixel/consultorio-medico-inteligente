@@ -166,6 +166,7 @@ const President360 = lazyWithRecovery(() => import("./pages/admin/President360")
 const SentinelControl = lazyWithRecovery(() => import("./pages/admin/SentinelControl"), { sourceRef: "/admin/sentinel" });
 const CadastrosRealtime = lazyWithRecovery(() => import("./pages/admin/CadastrosRealtime"), { sourceRef: "/admin/cadastros" });
 const AdminGlobalOps = lazyWithRecovery(() => import("./pages/AdminGlobalOps"), { sourceRef: "/admin/global-ops" });
+const WhatsAppInbox = lazyWithRecovery(() => import("./pages/admin/WhatsAppInbox"), { sourceRef: "/admin/whatsapp-inbox" });
 const AuthCallback = lazyWithRecovery(() => import("./pages/AuthCallback"), { sourceRef: "/auth/callback" });
 
 const queryClient = new QueryClient();
@@ -335,6 +336,8 @@ const App = () => (
                 <Route path="/admin/brisa" element={<AdminRoute><BrisaCEO /></AdminRoute>} />
                 <Route path="/admin/brisa-orientacoes" element={<AdminRoute><BrisaOrientacoes /></AdminRoute>} />
                 <Route path="/admin/orientacoes" element={<AdminRoute><BrisaOrientacoes /></AdminRoute>} />
+                <Route path="/admin/whatsapp-inbox" element={<AdminRoute><WhatsAppInbox /></AdminRoute>} />
+                <Route path="/admin/inbox" element={<AdminRoute><WhatsAppInbox /></AdminRoute>} />
                 <Route path="/admin/auditoria-de-crédito" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />
                 <Route path="/admin/audit-log" element={<AdminRoute><AuditLog /></AdminRoute>} />
                 <Route path="/admin/auditoria" element={<AdminRoute><AuditLog /></AdminRoute>} />

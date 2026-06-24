@@ -53,6 +53,11 @@ export const validateDocument = (type: DocumentType, value: string): { valid: bo
         valid: validateRNE(cleaned),
         message: validateRNE(cleaned) ? "RNE válido ✓" : "Formato inválido (ex: V123456A)",
       };
+    case "ci":
+      return {
+        valid: validateCI(cleaned),
+        message: validateCI(cleaned) ? "Cédula válida ✓" : "Formato inválido (ej: 1234567 ó 1234567-LP)",
+      };
   }
 };
 
@@ -62,6 +67,7 @@ export const getDocumentPlaceholder = (type: DocumentType): string => {
     case "cpf": return "000.000.000-00";
     case "passport": return "AB1234567";
     case "rne": return "V123456A";
+    case "ci": return "1234567-LP";
   }
 };
 
@@ -71,5 +77,6 @@ export const getDocumentLabel = (type: DocumentType): string => {
     case "cpf": return "CPF";
     case "passport": return "Nº do Passaporte";
     case "rne": return "RNE (Registro Nacional de Estrangeiro)";
+    case "ci": return "Cédula de Identidad (CI)";
   }
 };

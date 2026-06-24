@@ -1,6 +1,11 @@
 import { validateCPF } from "./validators";
 
-export type DocumentType = "cpf" | "passport" | "rne";
+export type DocumentType = "cpf" | "passport" | "rne" | "ci";
+
+/** Validate Cédula de Identidad boliviana (5-10 dígitos, opcional sufijo de departamento) */
+export const validateCI = (ci: string): boolean => {
+  return /^\d{5,10}(-?[A-Z]{2})?$/i.test(ci.replace(/\s/g, ""));
+};
 
 /** Format CPF as 000.000.000-00 */
 export const formatCPFInput = (value: string): string => {

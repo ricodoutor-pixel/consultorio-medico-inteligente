@@ -1,6 +1,11 @@
 import { validateCPF } from "./validators";
 
-export type DocumentType = "cpf" | "passport" | "rne";
+export type DocumentType = "cpf" | "passport" | "rne" | "ci";
+
+/** Validate Cédula de Identidad boliviana (5-10 dígitos, opcional sufijo de departamento) */
+export const validateCI = (ci: string): boolean => {
+  return /^\d{5,10}(-?[A-Z]{2})?$/i.test(ci.replace(/\s/g, ""));
+};
 
 /** Format CPF as 000.000.000-00 */
 export const formatCPFInput = (value: string): string => {
@@ -48,6 +53,11 @@ export const validateDocument = (type: DocumentType, value: string): { valid: bo
         valid: validateRNE(cleaned),
         message: validateRNE(cleaned) ? "RNE válido ✓" : "Formato inválido (ex: V123456A)",
       };
+    case "ci":
+      return {
+        valid: validateCI(cleaned),
+        message: validateCI(cleaned) ? "Cédula válida ✓" : "Formato inválido (ej: 1234567 ó 1234567-LP)",
+      };
   }
 };
 
@@ -57,6 +67,7 @@ export const getDocumentPlaceholder = (type: DocumentType): string => {
     case "cpf": return "000.000.000-00";
     case "passport": return "AB1234567";
     case "rne": return "V123456A";
+    case "ci": return "1234567-LP";
   }
 };
 
@@ -66,5 +77,6 @@ export const getDocumentLabel = (type: DocumentType): string => {
     case "cpf": return "CPF";
     case "passport": return "Nº do Passaporte";
     case "rne": return "RNE (Registro Nacional de Estrangeiro)";
+    case "ci": return "Cédula de Identidad (CI)";
   }
 };

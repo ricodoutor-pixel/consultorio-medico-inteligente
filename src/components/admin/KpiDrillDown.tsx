@@ -183,7 +183,6 @@ export function KpiDrillDown({ open, onOpenChange, source, title }: Props) {
 
   useEffect(() => {
     if (!open || !source) return;
-    // Para listas de cadastros, abrir já com "Tudo"
     if (["doctors", "patients", "vendors", "producers"].includes(source)) {
       setPeriod((p) => (p === "7d" ? "all" : p));
     }
@@ -191,17 +190,32 @@ export function KpiDrillDown({ open, onOpenChange, source, title }: Props) {
     const hours = PERIODS.find((p) => p.key === period)?.hours ?? 24;
     const since = new Date(Date.now() - hours * 3600_000).toISOString();
     setLoading(true);
-    supabase
-      .from(cfg.table as any)
-      .select(cfg.cols)
-      .gte(cfg.orderBy, since)
-      .order(cfg.orderBy, { ascending: false })
-      .limit(500)
-      .then(({ data, error }) => {
-        if (error) console.error("[Drill]", error);
-        setRows((data as any[]) ?? []);
-        setLoading(false);
-      });
+    (async () => {
+      const { data, error } = await supabase
+        .from(cfg.table as any)
+        .select(cfg.cols)
+        .gte(cfg.orderBy, since)
+        .order(cfg.orderBy, { ascending: false })
+        .limit(500);
+      if (error) console.error("[Drill]", error);
+      let result: any[] = (data as any[]) ?? [];
+
+      // Enriquecer com profile (nome, telefone, cidade) para a lista de Médicos
+      if (source === "doctors" && result.length) {
+        const userIds = Array.from(new Set(result.map((d) => d.user_id).filter(Boolean)));
+        if (userIds.length) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("id,full_name,phone,country,city,region")
+            .in("id", userIds);
+          const map = new Map((profs ?? []).map((p: any) => [p.id, p]));
+          result = result.map((d) => ({ ...d, profile: map.get(d.user_id) ?? null }));
+        }
+      }
+
+      setRows(result);
+      setLoading(false);
+    })();
   }, [open, source, period]);
 
   if (!source) return null;

@@ -260,11 +260,14 @@ export function KpiDrillDown({ open, onOpenChange, source, title }: Props) {
               <TableBody>
                 {rows.map((r, i) => (
                   <TableRow key={r.id ?? i}>
-                    {cfg.columns.map((c) => (
-                      <TableCell key={c.key} className="text-xs whitespace-nowrap">
-                        {c.fmt ? c.fmt(r[c.key]) : String(r[c.key] ?? "—")}
-                      </TableCell>
-                    ))}
+                    {cfg.columns.map((c) => {
+                      const val = c.key.split(".").reduce<any>((acc, k) => (acc == null ? acc : acc[k]), r);
+                      return (
+                        <TableCell key={c.key} className="text-xs whitespace-nowrap">
+                          {c.fmt ? c.fmt(val) : (val == null || val === "" ? "—" : String(val))}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))}
               </TableBody>

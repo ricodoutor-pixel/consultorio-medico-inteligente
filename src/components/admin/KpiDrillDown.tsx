@@ -184,6 +184,10 @@ export function KpiDrillDown({ open, onOpenChange, source, title }: Props) {
 
   useEffect(() => {
     if (!open || !source) return;
+    // Para listas de cadastros, abrir já com "Tudo"
+    if (["doctors", "patients", "vendors", "producers"].includes(source)) {
+      setPeriod((p) => (p === "7d" ? "all" : p));
+    }
     const cfg = SOURCE_CFG[source];
     const hours = PERIODS.find((p) => p.key === period)?.hours ?? 24;
     const since = new Date(Date.now() - hours * 3600_000).toISOString();
@@ -193,7 +197,7 @@ export function KpiDrillDown({ open, onOpenChange, source, title }: Props) {
       .select(cfg.cols)
       .gte(cfg.orderBy, since)
       .order(cfg.orderBy, { ascending: false })
-      .limit(200)
+      .limit(500)
       .then(({ data, error }) => {
         if (error) console.error("[Drill]", error);
         setRows((data as any[]) ?? []);

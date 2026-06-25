@@ -2198,7 +2198,9 @@ export type Database = {
         Row: {
           available_hours: Json | null
           bio: string | null
+          city: string | null
           consultation_price: number
+          country: string | null
           created_at: string
           crm: string
           crm_state: string
@@ -2228,7 +2230,9 @@ export type Database = {
         Insert: {
           available_hours?: Json | null
           bio?: string | null
+          city?: string | null
           consultation_price?: number
+          country?: string | null
           created_at?: string
           crm: string
           crm_state?: string
@@ -2258,7 +2262,9 @@ export type Database = {
         Update: {
           available_hours?: Json | null
           bio?: string | null
+          city?: string | null
           consultation_price?: number
+          country?: string | null
           created_at?: string
           crm?: string
           crm_state?: string

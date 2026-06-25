@@ -19,6 +19,7 @@ const PERIODS = [
   { key: "7d", label: "7 dias", hours: 168 },
   { key: "30d", label: "30 dias", hours: 720 },
   { key: "90d", label: "90 dias", hours: 2160 },
+  { key: "all", label: "Tudo", hours: 24 * 365 * 10 },
 ];
 
 interface Props {

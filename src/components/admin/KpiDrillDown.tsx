@@ -132,8 +132,7 @@ const SOURCE_CFG: Record<DrillSource, { table: string; cols: string; orderBy: st
   },
   doctors: {
     table: "doctors",
-    // Embedded join via FK doctors.user_id → profiles.id (alias: profile)
-    cols: "id,user_id,crm,crm_state,specialty,country,city,document_type,kyc_status,is_verified,is_online,created_at,profile:profiles!doctors_user_id_fkey(full_name,phone,country,city,region)",
+    cols: "id,user_id,crm,crm_state,specialty,country,city,document_type,kyc_status,is_verified,is_online,created_at",
     orderBy: "created_at",
     columns: [
       { key: "created_at", label: "Cadastro", fmt: (v) => new Date(v).toLocaleString("pt-BR") },

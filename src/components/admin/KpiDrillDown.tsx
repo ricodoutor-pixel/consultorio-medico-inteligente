@@ -19,6 +19,7 @@ const PERIODS = [
   { key: "7d", label: "7 dias", hours: 168 },
   { key: "30d", label: "30 dias", hours: 720 },
   { key: "90d", label: "90 dias", hours: 2160 },
+  { key: "all", label: "Tudo", hours: 24 * 365 * 10 },
 ];
 
 interface Props {
@@ -131,16 +132,18 @@ const SOURCE_CFG: Record<DrillSource, { table: string; cols: string; orderBy: st
   },
   doctors: {
     table: "doctors",
-    cols: "id,full_name,crm,crm_state,specialty,phone,email,created_at,is_verified",
+    cols: "id,user_id,crm,crm_state,specialty,country,city,document_type,kyc_status,is_verified,is_online,created_at",
     orderBy: "created_at",
     columns: [
       { key: "created_at", label: "Cadastro", fmt: (v) => new Date(v).toLocaleString("pt-BR") },
-      { key: "full_name", label: "Nome" },
+      { key: "profile.full_name", label: "Nome" },
       { key: "crm", label: "CRM" },
-      { key: "crm_state", label: "UF" },
+      { key: "crm_state", label: "UF / Depto" },
       { key: "specialty", label: "Especialidade" },
-      { key: "phone", label: "Telefone" },
-      { key: "email", label: "E-mail" },
+      { key: "profile.phone", label: "WhatsApp" },
+      { key: "country", label: "País", fmt: (v) => v || "BR" },
+      { key: "profile.city", label: "Cidade" },
+      { key: "kyc_status", label: "KYC" },
       { key: "is_verified", label: "Verificado", fmt: (v) => v ? "✓" : "—" },
     ],
   },
@@ -180,21 +183,39 @@ export function KpiDrillDown({ open, onOpenChange, source, title }: Props) {
 
   useEffect(() => {
     if (!open || !source) return;
+    if (["doctors", "patients", "vendors", "producers"].includes(source)) {
+      setPeriod((p) => (p === "7d" ? "all" : p));
+    }
     const cfg = SOURCE_CFG[source];
     const hours = PERIODS.find((p) => p.key === period)?.hours ?? 24;
     const since = new Date(Date.now() - hours * 3600_000).toISOString();
     setLoading(true);
-    supabase
-      .from(cfg.table as any)
-      .select(cfg.cols)
-      .gte(cfg.orderBy, since)
-      .order(cfg.orderBy, { ascending: false })
-      .limit(200)
-      .then(({ data, error }) => {
-        if (error) console.error("[Drill]", error);
-        setRows((data as any[]) ?? []);
-        setLoading(false);
-      });
+    (async () => {
+      const { data, error } = await supabase
+        .from(cfg.table as any)
+        .select(cfg.cols)
+        .gte(cfg.orderBy, since)
+        .order(cfg.orderBy, { ascending: false })
+        .limit(500);
+      if (error) console.error("[Drill]", error);
+      let result: any[] = (data as any[]) ?? [];
+
+      // Enriquecer com profile (nome, telefone, cidade) para a lista de Médicos
+      if (source === "doctors" && result.length) {
+        const userIds = Array.from(new Set(result.map((d) => d.user_id).filter(Boolean)));
+        if (userIds.length) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("id,full_name,phone,country,city,region")
+            .in("id", userIds);
+          const map = new Map((profs ?? []).map((p: any) => [p.id, p]));
+          result = result.map((d) => ({ ...d, profile: map.get(d.user_id) ?? null }));
+        }
+      }
+
+      setRows(result);
+      setLoading(false);
+    })();
   }, [open, source, period]);
 
   if (!source) return null;
@@ -257,11 +278,14 @@ export function KpiDrillDown({ open, onOpenChange, source, title }: Props) {
               <TableBody>
                 {rows.map((r, i) => (
                   <TableRow key={r.id ?? i}>
-                    {cfg.columns.map((c) => (
-                      <TableCell key={c.key} className="text-xs whitespace-nowrap">
-                        {c.fmt ? c.fmt(r[c.key]) : String(r[c.key] ?? "—")}
-                      </TableCell>
-                    ))}
+                    {cfg.columns.map((c) => {
+                      const val = c.key.split(".").reduce<any>((acc, k) => (acc == null ? acc : acc[k]), r);
+                      return (
+                        <TableCell key={c.key} className="text-xs whitespace-nowrap">
+                          {c.fmt ? c.fmt(val) : (val == null || val === "" ? "—" : String(val))}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))}
               </TableBody>

@@ -37,3 +37,5 @@ project_id = "shmbwdjuddvquszwkvuq"
     verify_jwt = false
   [functions.brisa-evolution-admin]
     verify_jwt = false
+  [functions.admin-bootstrap-doctor]
+    verify_jwt = false

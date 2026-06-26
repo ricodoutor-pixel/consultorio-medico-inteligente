@@ -33,7 +33,7 @@ interface RealDoctor {
 
 interface RealProfile {
   id: string;
-  full_name: string;
+  full_name: string | null;
   avatar_url: string | null;
   phone: string | null;
 }
@@ -81,20 +81,17 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       try {
         const { data: doctors } = await supabase
           .from("doctors_public" as any)
-          .select("*") as { data: RealDoctor[] | null };
+          .select("*") as { data: (RealDoctor & { full_name?: string | null; avatar_url?: string | null })[] | null };
 
         if (doctors && doctors.length > 0) {
-          const userIds = doctors.map(d => d.user_id);
-          const { data: profiles } = await supabase
-            .from("profiles")
-            .select("id, full_name, avatar_url, phone")
-            .in("id", userIds);
-
-          const profileMap = new Map((profiles || []).map(p => [p.id, p]));
-
-          setRealDoctors(doctors.map(d => ({
+          setRealDoctors(doctors.map((d: any) => ({
             ...d,
-            profile: profileMap.get(d.user_id),
+            profile: {
+              id: d.user_id,
+              full_name: d.full_name ?? null,
+              avatar_url: d.avatar_url ?? null,
+              phone: null,
+            },
           })));
         }
       } catch (err) {

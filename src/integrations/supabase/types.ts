@@ -7899,6 +7899,7 @@ export type Database = {
       doctors_public: {
         Row: {
           available_hours: Json | null
+          avatar_url: string | null
           bio: string | null
           city: string | null
           consultation_price: number | null
@@ -7907,6 +7908,7 @@ export type Database = {
           crm: string | null
           crm_state: string | null
           document_type: string | null
+          full_name: string | null
           id: string | null
           is_available: boolean | null
           is_online: boolean | null
@@ -7917,48 +7919,6 @@ export type Database = {
           specialty: string | null
           total_consultations: number | null
           user_id: string | null
-        }
-        Insert: {
-          available_hours?: Json | null
-          bio?: string | null
-          city?: string | null
-          consultation_price?: number | null
-          country?: string | null
-          created_at?: string | null
-          crm?: string | null
-          crm_state?: string | null
-          document_type?: string | null
-          id?: string | null
-          is_available?: boolean | null
-          is_online?: boolean | null
-          is_verified?: boolean | null
-          plan_tier?: string | null
-          rating?: number | null
-          rqe?: string | null
-          specialty?: string | null
-          total_consultations?: number | null
-          user_id?: string | null
-        }
-        Update: {
-          available_hours?: Json | null
-          bio?: string | null
-          city?: string | null
-          consultation_price?: number | null
-          country?: string | null
-          created_at?: string | null
-          crm?: string | null
-          crm_state?: string | null
-          document_type?: string | null
-          id?: string | null
-          is_available?: boolean | null
-          is_online?: boolean | null
-          is_verified?: boolean | null
-          plan_tier?: string | null
-          rating?: number | null
-          rqe?: string | null
-          specialty?: string | null
-          total_consultations?: number | null
-          user_id?: string | null
         }
         Relationships: []
       }

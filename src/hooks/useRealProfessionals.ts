@@ -10,7 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { professionals as testProfessionals, Professional, categories } from "@/data/professionals";
 
 // IDs of the 6 test doctors to keep (diverse specialties)
-const KEPT_TEST_IDS = ["med-1", "med-2", "med-3", "med-4", "med-5", "psi-1"];
+// med-5 (Dra. Valentina Reyes) removido — substituído pela Dra. Olivia Zimeri (real, BO)
+const KEPT_TEST_IDS = ["med-1", "med-2", "med-3", "med-4", "psi-1"];
 const MAX_TEST_SLOTS = 6;
 
 interface RealDoctor {

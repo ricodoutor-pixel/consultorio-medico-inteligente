@@ -33,7 +33,7 @@ interface RealDoctor {
 
 interface RealProfile {
   id: string;
-  full_name: string;
+  full_name: string | null;
   avatar_url: string | null;
   phone: string | null;
 }

@@ -55,6 +55,13 @@ const SERVICE_TIERS = [
   { name: "Combo Full Vídeo", price: "R$ 150", value: 150, icon: Star, desc: "Vídeo + receita + laudo completo", highlight: false },
 ];
 
+type ServiceTier = typeof SERVICE_TIERS[number];
+
+const parseServiceValue = (price: string) => {
+  const parsed = Number(price.replace(/[^\d,.-]/g, "").replace(".", "").replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : 30;
+};
+
 const WhatsAppContactButton = ({ name, className = "" }: { name: string; className?: string }) => {
   const message = encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de iniciar Orientação Técnica com ${name}`);
   return (
@@ -71,16 +78,27 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
   );
 };
 
-const ServicePricingGrid = ({ doctorName }: { doctorName: string }) => {
+const ServicePricingGrid = ({ doctorName, services }: { doctorName: string; services?: Professional["services"] }) => {
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
 
-  const handleSelectService = async (service: typeof SERVICE_TIERS[0]) => {
+  const tiers: ServiceTier[] = services?.length
+    ? services.map((service, index) => ({
+        name: service.name,
+        price: service.price,
+        value: parseServiceValue(service.price),
+        icon: index === 0 ? Zap : MessageSquare,
+        desc: service.desc,
+        highlight: index === 0,
+      }))
+    : SERVICE_TIERS;
+
+  const handleSelectService = async (service: ServiceTier) => {
     setLoadingTier(service.name);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        toast.error("Faça login para contratar um serviço.", {
-          action: { label: "Login", onClick: () => window.location.href = "/login" },
+          toast.error("Faça seu cadastro para contratar um serviço.", {
+          action: { label: "Cadastro", onClick: () => window.location.href = "/cadastro" },
         });
         setLoadingTier(null);
         return;
@@ -119,7 +137,7 @@ const ServicePricingGrid = ({ doctorName }: { doctorName: string }) => {
 
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {SERVICE_TIERS.map((tier) => {
+      {tiers.map((tier) => {
         const Icon = tier.icon;
         const isLoading = loadingTier === tier.name;
         return (
@@ -168,7 +186,13 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
           <Card className="border-border sticky top-24">
             <CardContent className="p-6">
               <div className="relative">
-                <img src={pro.imageUrl} alt={`Ilustração - ${pro.name}`} className="w-20 h-20 rounded-2xl object-cover border border-border mb-4" />
+                {pro.imageUrl ? (
+                  <img src={pro.imageUrl} alt={`Foto profissional - ${pro.name}`} className="w-20 h-20 rounded-2xl object-cover border border-border mb-4" />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl border border-border mb-4 bg-primary/10 text-primary flex items-center justify-center font-black text-xl">
+                    {pro.avatar}
+                  </div>
+                )}
                 <OnlineStatusIndicator online={pro.online} size="lg" className="absolute -bottom-1 -right-1" />
               </div>
               <h1 className="text-xl font-display font-black text-foreground">{pro.name}</h1>
@@ -187,7 +211,7 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mb-1">Experiência: {pro.experience}</p>
-              <p className="text-2xl font-display font-black text-gradient-green mb-4">a partir de R$ 30 <span className="text-sm text-muted-foreground font-normal">/ serviço</span></p>
+              <p className="text-2xl font-display font-black text-gradient-green mb-4">a partir de {pro.price} <span className="text-sm text-muted-foreground font-normal">/ serviço</span></p>
               <div className="space-y-2">
                 <WhatsAppContactButton name={pro.name} />
               </div>
@@ -200,7 +224,7 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
           <Card className="border-border">
             <CardContent className="p-6">
               <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2">💳 Serviços & Valores</h2>
-              <ServicePricingGrid doctorName={pro.name} />
+              <ServicePricingGrid doctorName={pro.name} services={pro.services} />
             </CardContent>
           </Card>
 

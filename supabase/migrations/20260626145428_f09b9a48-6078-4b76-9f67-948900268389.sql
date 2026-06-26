@@ -1,0 +1,1 @@
+UPDATE public.profiles SET avatar_url = 'https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/doctors/dra-olivia-zimeri.jpg?v=20260626' WHERE id = '765d8ebb-525d-4964-918f-df6f4d5273f6';

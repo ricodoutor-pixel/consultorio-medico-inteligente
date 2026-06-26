@@ -153,8 +153,8 @@ const ServicePricingGrid = ({ doctorName }: { doctorName: string }) => {
   );
 };
 
-const ProfessionalDetail = ({ id }: { id: string }) => {
-  const pro = allProfessionals.find((p) => p.id === id);
+const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: string; professionals?: Professional[] }) => {
+  const pro = professionals.find((p) => p.id === id);
   if (!pro) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Profissional não encontrado.</div>;
 
   return (
@@ -256,7 +256,7 @@ const Profissionais = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <ProfessionalDetail id={id} />
+        <ProfessionalDetail id={id} professionals={professionals} />
         <Footer />
       </div>
     );

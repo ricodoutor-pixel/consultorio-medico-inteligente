@@ -26,6 +26,9 @@ interface RealDoctor {
   is_online: boolean;
   is_verified: boolean;
   document_type: string;
+  country?: string | null;
+  city?: string | null;
+  is_available?: boolean | null;
   rqe: string | null;
   available_hours: any;
   created_at: string;
@@ -50,6 +53,18 @@ function mapCategoryFromSpecialty(specialty: string): string {
   if (lower.includes("cuidador")) return "Cuidadores de Idosos";
   if (lower.includes("enferma")) return "Enfermagem";
   return "Médicos Prescritores";
+}
+
+function formatConsultationPrice(value: number, country?: string | null): string {
+  const normalized = Number.isFinite(value) ? value : 30;
+  const prefix = country === "BO" ? "US$" : "R$";
+  return `${prefix} ${normalized.toFixed(2).replace(".", ",")}`;
+}
+
+function flagForCountry(country?: string | null): string[] {
+  if (country === "BO") return ["🇧🇴"];
+  if (country === "BR") return ["🇧🇷"];
+  return ["🇧🇷"];
 }
 
 /**
@@ -107,32 +122,46 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     const edilson = testProfessionals.find(p => p.id === "med-0")!;
     const edilsonOnline = { ...edilson, online: true };
 
-    // Build real professionals list
-    const realPros: Professional[] = realDoctors.map((d) => ({
-      id: `real-${d.id}`,
-      name: d.profile?.full_name || `Dr(a). ${d.crm}`,
-      category: mapCategoryFromSpecialty(d.specialty),
-      bio: d.bio || `Profissional verificado na Planta & Raiz. Especialidade: ${d.specialty}. CRM ${d.crm}/${d.crm_state}.`,
-      experience: "Verificado",
-      tags: [d.specialty, `CRM ${d.crm_state}`],
-      price: `R$ ${d.consultation_price.toFixed(2).replace(".", ",")}`,
-      priceValue: d.consultation_price,
-      whatsapp: "5511991363154",
-      rating: d.rating || 5.0,
-      consults: d.total_consultations || 0,
-      avatar: (d.profile?.full_name || "PR").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase(),
-      imageUrl: d.profile?.avatar_url || "",
-      paymentLink: "https://mpago.la/12KAwmH",
-      online: d.is_online,
-      crm: `${d.crm} - ${d.crm_state}`,
-      services: [
-        { name: "Orientação Técnica Inicial", price: `R$ ${d.consultation_price.toFixed(2).replace(".", ",")}`, desc: "Avaliação completa + plano terapêutico" },
-        { name: "Retorno", price: `R$ ${(d.consultation_price * 0.6).toFixed(2).replace(".", ",")}`, desc: "Acompanhamento e ajuste" },
-      ],
-      slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
-      reviews: [],
-      flags: ["🇧🇷"],
-    }));
+    // Build real professionals list and avoid showing Dr. Edilson twice.
+    const realPros: Professional[] = realDoctors
+      .filter((d) => {
+        const name = (d.profile?.full_name || "").toLowerCase();
+        return d.crm !== "10963" && !name.includes("edilson bezerra");
+      })
+      .map((d) => {
+        const fullName = d.profile?.full_name || `Dr(a). ${d.crm}`;
+        const countryLabel = d.country === "BO" ? "Bolívia" : "Brasil";
+        const cityLabel = d.city ? `${d.city}, ${countryLabel}` : countryLabel;
+        const price = formatConsultationPrice(Number(d.consultation_price), d.country);
+        const documentLabel = d.document_type === "ci" ? "CI Bolívia" : `CRM ${d.crm_state}`;
+
+        return {
+          id: `real-${d.id}`,
+          name: fullName,
+          category: mapCategoryFromSpecialty(d.specialty),
+          bio: d.bio || `Profissional verificado na Planta & Raiz. Especialidade: ${d.specialty}. ${documentLabel}.`,
+          experience: "Verificado",
+          tags: [d.specialty, documentLabel, cityLabel],
+          price,
+          priceValue: Number(d.consultation_price) || 30,
+          whatsapp: "5511991363154",
+          rating: d.rating || 5.0,
+          consults: d.total_consultations || 0,
+          avatar: fullName.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "PR",
+          imageUrl: d.profile?.avatar_url || "",
+          paymentLink: "https://mpago.la/12KAwmH",
+          online: Boolean(d.is_online && (d.is_available ?? true)),
+          crm: d.document_type === "ci" ? `${d.crm} - BO` : `${d.crm} - ${d.crm_state}`,
+          hospital: cityLabel,
+          services: [
+            { name: "Orientação Técnica Inicial", price, desc: "Avaliação completa + plano terapêutico" },
+            { name: "Retorno", price: formatConsultationPrice((Number(d.consultation_price) || 30) * 0.6, d.country), desc: "Acompanhamento e ajuste" },
+          ],
+          slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+          reviews: [],
+          flags: flagForCountry(d.country),
+        };
+      });
 
     // How many test slots remain after real doctors fill spots
     const testSlotsRemaining = Math.max(0, MAX_TEST_SLOTS - realPros.length);

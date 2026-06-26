@@ -7900,11 +7900,15 @@ export type Database = {
         Row: {
           available_hours: Json | null
           bio: string | null
+          city: string | null
           consultation_price: number | null
+          country: string | null
           created_at: string | null
           crm: string | null
           crm_state: string | null
+          document_type: string | null
           id: string | null
+          is_available: boolean | null
           is_online: boolean | null
           is_verified: boolean | null
           plan_tier: string | null
@@ -7917,11 +7921,15 @@ export type Database = {
         Insert: {
           available_hours?: Json | null
           bio?: string | null
+          city?: string | null
           consultation_price?: number | null
+          country?: string | null
           created_at?: string | null
           crm?: string | null
           crm_state?: string | null
+          document_type?: string | null
           id?: string | null
+          is_available?: boolean | null
           is_online?: boolean | null
           is_verified?: boolean | null
           plan_tier?: string | null
@@ -7934,11 +7942,15 @@ export type Database = {
         Update: {
           available_hours?: Json | null
           bio?: string | null
+          city?: string | null
           consultation_price?: number | null
+          country?: string | null
           created_at?: string | null
           crm?: string | null
           crm_state?: string | null
+          document_type?: string | null
           id?: string | null
+          is_available?: boolean | null
           is_online?: boolean | null
           is_verified?: boolean | null
           plan_tier?: string | null

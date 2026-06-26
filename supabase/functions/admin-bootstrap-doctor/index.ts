@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       document_type: "ci",
       country, city,
       is_verified: true, is_online: true, is_available: true,
-      kyc_status: "approved", plan_tier: "premium",
+      kyc_status: "verified", plan_tier: "premium",
     };
     if (existingDoc) {
       await supabase.from("doctors").update(doctorPayload).eq("id", existingDoc.id);

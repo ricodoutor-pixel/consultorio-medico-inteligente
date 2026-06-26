@@ -35,13 +35,13 @@ function useRotatingOnline(base: Professional[]): Professional[] {
   }, []);
 
   return useMemo(() => {
-    const others = base.filter(p => p.id !== "med-0");
+    const others = base.filter(p => p.id !== "med-0" && !p.id.startsWith("real-"));
     // deterministic rotation based on hour tick
     const idx1 = tick % others.length;
     const idx2 = (tick + Math.floor(others.length / 2)) % others.length;
     const onlineIds = new Set(["med-0", others[idx1]?.id, others[idx2]?.id]);
 
-    return base.map(p => ({ ...p, online: onlineIds.has(p.id) }));
+    return base.map(p => p.id.startsWith("real-") ? p : ({ ...p, online: onlineIds.has(p.id) }));
   }, [base, tick]);
 }
 
@@ -246,6 +246,7 @@ const ProfessionalDetail = ({ id }: { id: string }) => {
 
 const Profissionais = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   // Use real professionals from DB, replacing test placeholders
   const { professionals: mergedPros, realCount } = useRealProfessionals();
@@ -311,21 +312,29 @@ const Profissionais = () => {
           <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} key={activeCategory}>
             {filtered.map((p) => (
               <motion.div key={p.id} variants={fadeUp}>
-                <Link to={`/profissionais/${p.id}`}>
-                  <Card className="group border-border hover:border-primary/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5 cursor-pointer overflow-hidden">
+                  <Card
+                    onClick={() => navigate(`/profissionais/${p.id}`)}
+                    className="group border-border hover:border-primary/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5 cursor-pointer overflow-hidden"
+                  >
                     <CardContent className="p-0">
                       {/* Header com gradiente */}
                       <div className="relative bg-gradient-to-br from-primary/5 to-primary/10 p-4 pb-3">
                         <div className="flex items-start gap-3">
                           <div className="relative flex-shrink-0">
-                            <img
-                              src={p.imageUrl}
-                              alt={`${p.name}`}
-                              className="w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300"
-                              loading="lazy"
-                              width={64}
-                              height={64}
-                            />
+                            {p.imageUrl ? (
+                              <img
+                                src={p.imageUrl}
+                                alt={`${p.name}`}
+                                className="w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300"
+                                loading="lazy"
+                                width={64}
+                                height={64}
+                              />
+                            ) : (
+                              <div className="w-16 h-16 md:w-18 md:h-18 rounded-2xl border-2 border-background shadow-md bg-primary/10 text-primary flex items-center justify-center font-black text-lg">
+                                {p.avatar}
+                              </div>
+                            )}
                             
                           </div>
                           <div className="flex-1 min-w-0">
@@ -374,21 +383,18 @@ const Profissionais = () => {
                         </div>
 
                         {/* Botão Agendar Orientação Técnica via WhatsApp */}
-                        <a
-                          href={`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de iniciar Orientação Técnica com ${p.name}`)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="mt-3 block"
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de iniciar Orientação Técnica com ${p.name}`)}`, "_blank", "noopener,noreferrer");
+                          }}
+                          className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white font-black rounded-xl gap-2 text-sm h-10"
                         >
-                          <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-black rounded-xl gap-2 text-sm h-10">
-                            <Phone size={14} /> Agendar Orientação Técnica
-                          </Button>
-                        </a>
+                          <Phone size={14} /> Agendar Orientação Técnica
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
-                </Link>
               </motion.div>
             ))}
           </motion.div>

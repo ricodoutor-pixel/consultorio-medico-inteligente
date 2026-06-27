@@ -286,10 +286,13 @@ const Cadastro = () => {
                   onClick={async () => {
                     localStorage.setItem("pr_pending_signup_role", type || "paciente");
                     if (redirectTo) localStorage.setItem("pr_pending_redirect", decodeURIComponent(redirectTo));
-                    const result = await lovable.auth.signInWithOAuth("google", {
-                      redirect_uri: `${window.location.origin}/auth/callback`,
+                    const { error } = await supabase.auth.signInWithOAuth({
+                      provider: "google",
+                      options: {
+                        redirectTo: `${window.location.origin}${redirectTo ? decodeURIComponent(redirectTo) : "/auth/callback"}`,
+                      },
                     });
-                    if (result.error) {
+                    if (error) {
                       toast({ title: "Erro com Google", description: "Não foi possível continuar com Google.", variant: "destructive" });
                       return;
                     }

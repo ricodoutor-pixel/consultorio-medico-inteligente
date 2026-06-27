@@ -37,6 +37,15 @@ jobs:
       - name: Install deps
         run: bun install --frozen-lockfile
 
+      - name: Validate required environment
+        run: |
+          test -n "${{ secrets.CLOUDFLARE_API_TOKEN }}"
+          test -n "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}"
+          test -n "${{ secrets.VITE_SUPABASE_URL }}"
+          test -n "${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}"
+          test -n "${{ secrets.VITE_SUPABASE_PROJECT_ID }}"
+          test -n "${{ secrets.VITE_DOCTOR_WHATSAPP_NUMBER }}"
+
       - name: Build (Vite)
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}

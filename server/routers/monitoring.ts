@@ -4,8 +4,12 @@
 // ============================================================================
 
 import { router, protectedProcedure, publicProcedure } from '../_core/trpc';
+import { createLogger } from '../_core/logger';
 import { z } from 'zod';
 import { paymentMonitoringService } from '../services/paymentMonitoringService';
+import { getIntegrationHealth, logIntegrationStatus } from '../services/integrationHealth';
+
+const logger = createLogger('monitoring');
 
 export const monitoringRouter = router({
   /**
@@ -20,7 +24,7 @@ export const monitoringRouter = router({
         data: metrics,
       };
     } catch (error) {
-      console.error('[Monitoring] Erro ao obter métricas:', error);
+      logger.error('erro ao obter métricas', { error });
       return {
         success: false,
         error: 'Erro ao obter métricas',
@@ -49,7 +53,7 @@ export const monitoringRouter = router({
         count: anomalies.length,
       };
     } catch (error) {
-      console.error('[Monitoring] Erro ao obter anomalias:', error);
+      logger.error('erro ao obter anomalias', { error });
       return {
         success: false,
         error: 'Erro ao obter anomalias',
@@ -77,7 +81,7 @@ export const monitoringRouter = router({
         data: report,
       };
     } catch (error) {
-      console.error('[Monitoring] Erro ao obter relatório:', error);
+      logger.error('erro ao obter relatório', { error });
       return {
         success: false,
         error: 'Erro ao obter relatório',
@@ -139,7 +143,7 @@ export const monitoringRouter = router({
         message: 'Monitoramento parado',
       };
     } catch (error) {
-      console.error('[Monitoring] Erro ao parar monitoramento:', error);
+      logger.error('erro ao parar monitoramento', { error });
       return {
         success: false,
         error: 'Erro ao parar monitoramento',
@@ -153,6 +157,8 @@ export const monitoringRouter = router({
   getSystemHealth: publicProcedure.query(async () => {
     try {
       const metrics = paymentMonitoringService.getCurrentMetrics();
+      const integrations = getIntegrationHealth();
+      logIntegrationStatus();
 
       const health = {
         status: 'healthy' as const,
@@ -163,6 +169,7 @@ export const monitoringRouter = router({
           fraudRate: metrics?.fraudRate || 0,
           averageAmount: metrics?.averageAmount || 0,
         },
+        integrations,
       };
 
       // Verificar se há problemas críticos
@@ -174,12 +181,16 @@ export const monitoringRouter = router({
         health.status = 'critical';
       }
 
+      if (integrations.some((integration) => !integration.configured)) {
+        health.status = health.status === 'critical' ? 'critical' : 'warning';
+      }
+
       return {
         success: true,
         data: health,
       };
     } catch (error) {
-      console.error('[Monitoring] Erro ao obter saúde do sistema:', error);
+      logger.error('erro ao obter saúde do sistema', { error });
       return {
         success: false,
         error: 'Erro ao obter saúde do sistema',

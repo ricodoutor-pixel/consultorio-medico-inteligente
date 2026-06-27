@@ -2,8 +2,11 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { createLogger } from './_core/logger';
 import type { InsertUserBalance, InsertInvestment, InsertTransaction, InsertReferral, InsertWithdrawalRequest, InsertNotification } from "../drizzle/schema";
 import { userBalances, investments, transactions, affiliates, referrals, withdrawalRequests, notifications, platformSettings, investmentPlans } from "../drizzle/schema";
+
+const logger = createLogger('db');
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -12,8 +15,9 @@ export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
       _db = drizzle(process.env.DATABASE_URL);
+      logger.info('database connection initialized', { databaseUrlConfigured: Boolean(process.env.DATABASE_URL) });
     } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
+      logger.warn('database connection failed', { error });
       _db = null;
     }
   }
@@ -27,7 +31,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 
   const db = await getDb();
   if (!db) {
-    console.warn("[Database] Cannot upsert user: database not available");
+    logger.warn('cannot upsert user because database is unavailable');
     return;
   }
 
@@ -74,7 +78,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       set: updateSet,
     });
   } catch (error) {
-    console.error("[Database] Failed to upsert user:", error);
+    logger.error('failed to upsert user', { error, openId: user.openId });
     throw error;
   }
 }

@@ -14,6 +14,8 @@ import cors from 'cors';
 import whatsappWebhookRouter from '../routers/whatsappWebhook';
 import { initializeSecurityMiddlewares } from './security-headers';
 import { initializeCompressionMiddlewares } from './compression';
+import { rateLimiters, corsConfig, helmetConfig } from './security-hardening';
+import helmet from 'helmet';
 
 const app = express();
 
@@ -27,8 +29,10 @@ initializeSecurityMiddlewares(app);
 // Inicializar middlewares de compressão
 initializeCompressionMiddlewares(app);
 
-// CORS seguro (já configurado em security-headers.ts)
-app.use(cors());
+// CORS seguro e hardening básico
+app.use(cors(corsConfig));
+app.use(helmet(helmetConfig));
+app.use(rateLimiters.global);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

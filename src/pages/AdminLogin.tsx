@@ -10,7 +10,6 @@ import { Shield, Lock, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");

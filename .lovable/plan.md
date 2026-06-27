@@ -1,111 +1,75 @@
-# Plano — Atualizações Críticas Planta y Raiz (Fase de Testes)
+# Plano de execução — Refatoração Cadastro Médico + Onboarding Brisa
 
-Antes de executar preciso confirmar 2 pontos bloqueantes (ver fim). O restante segue abaixo.
+Tarefa grande com múltiplas frentes. Vou executar em blocos paralelos sempre que possível.
 
-## 1. Admin Dashboard — Drill-down de Dados
+## 1. Storage — Bucket `medical-documents` (privado)
+- Criar bucket `medical-documents` (privado).
+- Estrutura de pastas:
+  ```
+  medicos/{slug_nome}_{cpf_ou_ci}/
+    ├── foto_perfil.jpg
+    ├── crm_frente.jpg
+    ├── crm_verso.jpg
+    └── dados_cadastro.json
+  ```
+- RLS em `storage.objects`:
+  - Médico (auth.uid()) lê/escreve só sua pasta.
+  - Admin lê tudo.
+  - Service role acesso total.
 
-**Tiles clicáveis em `src/pages/admin/*` e `GestaoPacientes`:**
-- Criar componente reutilizável `AdminDrilldownModal.tsx` (lista + busca + export CSV).
-- Cada card (Pacientes / Médicos / Lojistas / Produtores / Novos Cadastros) vira `<button>` que abre modal com query Supabase:
-  - Pacientes → `profiles` join `auth.users` (nome, email, telefone, cidade/estado/país, criado_em).
-  - Médicos → `doctors` + `profiles`.
-  - Lojistas → `vendors`.
-  - Produtores → flag em `profiles.role` ou tabela dedicada (verificar).
-- Usar paginação 50/pág + filtros básicos.
-- RLS: somente `has_role(admin)`.
+## 2. Cadastro Médico (`src/pages/CadastroProfissional.tsx`)
+- **Adicionar Plano Free** (acesso gratuito à plataforma — vê todos os cadastros, sem cobrança).
+- **Remover toggle "Orientação Técnica"** do médico (OT é exclusiva da plataforma, R$30/US$10 fixo).
+- Manter campo único: **valor da consulta** (videochamada + receita inclusos).
+- **3 uploads obrigatórios**: foto de perfil, CRM frente, CRM verso.
+- Mostrar card de exemplo (jaleco branco, esteto, fundo branco) como referência visual antes do upload.
+- Upload vai direto pro bucket `medical-documents` na pasta do médico.
 
-## 2. Aba "Global Operations" — Mapa Mundial
+## 3. Edge Function `doctor-welcome-brisa`
+- Triggered após cadastro aprovado.
+- Envia WhatsApp via Evolution API com mensagem da Enf. Brisa:
+  > "Olá Dr(a). {nome}! Bem-vindo(a) à Mega Clínica Planta y Raiz 🌱
+  > E-mail de acesso: {email}
+  > Senha temporária: {senha}
+  > Seu dashboard: {link_dashboard}
+  > Link público do seu perfil para compartilhar: {link_perfil}"
+- Hook chamado ao final do `handleSubmit` do cadastro.
 
-- Nova tab em `OmniChannelDashboard` (ou `AdminBI`): `GlobalOperationsMap.tsx`.
-- Google Maps JS API via `VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY` (connector já listado).
-- **Pré-requisito:** conectar o connector `google_maps` (vou disparar `standard_connectors--connect`).
-- Migration: adicionar `latitude numeric`, `longitude numeric`, `country text`, `region text`, `city text`, `geo_updated_at timestamptz` em `profiles` (se ainda não existir — verificar).
-- Marcadores verdes para pacientes com `lat/lng`. Click → popup com nome + última localização + botão "Ver Prontuário".
-- Realtime: subscribe em `profiles` para atualizar marcadores.
+## 4. Foto padrão Dra. Olivia (IA)
+- Gerar nova foto profissional via imagegen (jaleco branco, estetoscópio, fundo branco) baseada no rosto da carteira SEDES.
+- Substituir `avatar_url` no registro doctors da Olivia.
 
-## 3. Google Auth por Categoria (Remover Login Universal)
+## 5. Página `/admin-raiz`
+- Nova rota protegida, **sem botão Google**, login email+senha only.
+- Validação: somente users com role `admin` passam.
+- Redireciona ao dashboard admin existente.
 
-- Cada página de cadastro (`/cadastro` paciente, `/cadastro-profissional` médico/cuidador, `/vendor-signup` lojista, `/produtor-signup` produtor) terá botão **"Entrar com Google"** próprio.
-- Após OAuth callback, gravar `profiles.role` com a categoria de origem (passada via `extraParams.state` ou localStorage `pending_signup_role`).
-- Redirecionar para painel da categoria:
-  - paciente → `/dashboard`
-  - médico/cuidador → `/consultorio`
-  - lojista → `/admin/vendor`
-  - produtor → `/admin/producer`
-- Usar `lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth/callback?role=<x>" })`.
-- Página `/auth/callback` aplica role e redireciona.
+## 6. Acesso admin para `ricodoutor@gmail.com`
+- Verificar se user existe; se não, criar via service role com senha `95654045Pa#`.
+- Inserir role `admin` em `user_roles`.
 
-## 4. Captura Granular de Geolocalização
+## 7. Mensagem teste Brisa → Dr. Edilson
+- Chamar `whatsapp-brisa-send` para `+55 11 98713-1241`:
+  > "Olá Dr. Edilson, estou online ✅ — Enf. Brisa"
 
-- No primeiro login após aceitar Termos (`ConsentManager`), chamar `navigator.geolocation.getCurrentPosition`.
-- Reverse-geocoding via gateway Google Maps (`/maps/api/geocode/json?latlng=...`) numa edge function `capture-user-location` (não expõe key).
-- Persistir em `profiles` (lat, lng, country, region, city, geo_updated_at).
-- Adicionar texto LGPD explícito no `ConsentManager` cobrindo: geolocalização contínua + dados de saúde (wearables futuros).
+## 8. Completar cadastro Dra. Olivia
+- Atualizar registro doctors:
+  - CRM Bolívia Cochabamba: `Z-4466260` (Matrícula Min. Salud) / `Q-Z-014` (Colégio Médico)
+  - Especialidade: "Cirurgiã — Especialista em Medicina Integrativa e Modulação do Sistema Endocannabinoide (CBD/THC)"
+  - País: Bolívia, Cidade: Cochabamba
+  - Foto: nova versão padronizada
+- Salvar imagens dos carnets no bucket `medical-documents/medicos/olivia-zimeri_4466260/`
 
-## 5. Protocolo de Emergência
+## Detalhes técnicos
+- Migration: bucket + RLS + ensure role admin para ricodoutor.
+- Edge functions novas: `doctor-welcome-brisa`. Reaproveitar `_shared/evolution.ts`.
+- Frontend: editar `CadastroProfissional.tsx`, criar `src/pages/AdminRaiz.tsx`, adicionar rota.
+- Não alterar visual existente do site — apenas a página de cadastro (campos novos) e nova rota admin.
 
-- Botão "🚨 Emergência" no perfil paciente (admin/médico): exibe última localização + link `https://maps.google.com/?q=lat,lng` + WhatsApp do paciente.
-- Edge function `emergency-ping` força refresh da localização (envia push pedindo permissão).
+## Ordem de execução
+1. Migration (bucket + RLS + admin role + plano free no schema doctors se necessário).
+2. Em paralelo: editar `CadastroProfissional.tsx`, criar `AdminRaiz.tsx`, criar edge `doctor-welcome-brisa`, gerar foto Olivia via IA.
+3. Deploy edges, atualizar Olivia no DB, enviar mensagem teste.
+4. Verificar build e fluxo end-to-end.
 
-## 6. Splash Cleanup
-
-- Remover `CustomLoader` (verdinho fundo escuro) do `main.tsx`/`App.tsx`.
-- Manter apenas `WelcomeMascotSplash` (verdinho flutuante) OU o ícone flutuante global — confirmar com pergunta abaixo.
-
-## 7. Brisa Autônoma (WhatsApp + Gemini via Lovable AI)
-
-- A arquitetura já existe (edge `whatsapp-brisa-bot` com `google/gemini-2.5-flash`, fallback do Evolution+n8n na Oracle).
-- Auditoria + garantia de:
-  - `LOVABLE_API_KEY` presente (auto-provisioning se faltar).
-  - Edge `whatsapp-brisa-bot` ativa, com retry e logging em `whatsapp_brisa_log`.
-  - 12 agentes do `agent_registry` com `is_active=true` (UPDATE em massa).
-- Sem mudar visual, apenas backend.
-
-## 8. Estabilidade do Cadastro
-
-- Já corrigido na rodada anterior (HIBP messages). Adicionar:
-  - Try/catch robusto em todos OAuth callbacks.
-  - Log de erro em `error_logs` para diagnóstico.
-
----
-
-## Detalhes Técnicos
-
-**Migrations necessárias:**
-```sql
-ALTER TABLE profiles
-  ADD COLUMN IF NOT EXISTS latitude numeric,
-  ADD COLUMN IF NOT EXISTS longitude numeric,
-  ADD COLUMN IF NOT EXISTS country text,
-  ADD COLUMN IF NOT EXISTS region text,
-  ADD COLUMN IF NOT EXISTS city text,
-  ADD COLUMN IF NOT EXISTS geo_updated_at timestamptz,
-  ADD COLUMN IF NOT EXISTS signup_role text;
-```
-
-**Connectors:** `google_maps` (browser key + gateway para geocoding server-side).
-
-**Arquivos novos principais:**
-- `src/components/admin/AdminDrilldownModal.tsx`
-- `src/components/admin/GlobalOperationsMap.tsx`
-- `src/pages/AuthCallback.tsx`
-- `src/lib/geolocation-capture.ts`
-- `supabase/functions/capture-user-location/index.ts`
-- `supabase/functions/emergency-ping/index.ts`
-
-**Arquivos editados:**
-- `src/main.tsx` (remover CustomLoader)
-- `src/pages/Cadastro.tsx`, `CadastroProfissional.tsx`, `VendorSignup`, `ProdutorSignup` (botão Google por categoria)
-- `src/pages/OmniChannelDashboard.tsx` + `AdminBI.tsx` (drill-down + Global Ops tab)
-- `src/components/ConsentManager.tsx` (texto LGPD + trigger geo)
-- `src/App.tsx` (rota `/auth/callback`)
-
----
-
-## ⚠️ Confirmações antes de executar
-
-1. **Splash:** remover **CustomLoader** (verde escuro inicial) e manter **WelcomeMascotSplash** (verdinho flutuante na 1ª visita) — correto?
-2. **Google Maps:** preciso ativar o connector `google_maps` (vai abrir diálogo para você autorizar). Confirma?
-3. **Produtor signup:** existe página dedicada hoje ou crio nova `/cadastro-produtor`?
-
-Se responder "ok tudo" eu assumo: (1) sim, (2) sim, (3) crio nova. Executo na sequência: connector → migration → componentes admin → auth por categoria → mapa → emergência → Brisa audit → splash → testes.
+Confirma para eu executar?

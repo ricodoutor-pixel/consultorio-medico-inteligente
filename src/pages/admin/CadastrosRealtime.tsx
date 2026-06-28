@@ -528,6 +528,49 @@ export default function CadastrosRealtime() {
           </>
         )}
       </div>
+
+      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Detalhes • <span className="text-primary">{detail?.source}</span>
+            </DialogTitle>
+          </DialogHeader>
+          {detailLoading && <div className="text-sm text-muted-foreground">Carregando…</div>}
+          {detail?.row?.error && <div className="text-sm text-destructive">{detail.row.error}</div>}
+          {detail?.row && !detail.row.error && (
+            <div className="space-y-3">
+              {detail.row.profile?.avatar_url && (
+                <img src={detail.row.profile.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover border border-border" />
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                {Object.entries(detail.row)
+                  .filter(([k]) => !["profile", "documents", "loading"].includes(k))
+                  .map(([k, v]) => (
+                    <div key={k} className="p-2 rounded bg-muted/30 border border-border">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{k}</div>
+                      <div className="font-mono text-xs break-all text-foreground">
+                        {v === null || v === undefined ? "—" : typeof v === "object" ? JSON.stringify(v) : String(v)}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+              {detail.row.profile && (
+                <div className="p-3 rounded-lg bg-primary/5 border border-primary/30">
+                  <div className="font-bold text-sm mb-2 text-primary">Perfil vinculado</div>
+                  <pre className="text-[11px] whitespace-pre-wrap break-all">{JSON.stringify(detail.row.profile, null, 2)}</pre>
+                </div>
+              )}
+              {detail.row.documents && (
+                <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/30">
+                  <div className="font-bold text-sm mb-2 text-amber-400">Documentos KYC ({detail.row.documents.length})</div>
+                  <pre className="text-[11px] whitespace-pre-wrap break-all">{JSON.stringify(detail.row.documents, null, 2)}</pre>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

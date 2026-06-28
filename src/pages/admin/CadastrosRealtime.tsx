@@ -117,6 +117,29 @@ export default function CadastrosRealtime() {
   const [auditSamples, setAuditSamples] = useState<Record<string, any[]>>({});
   const [cleanupBusy, setCleanupBusy] = useState(false);
   const [cleanupResult, setCleanupResult] = useState<any>(null);
+  const [detail, setDetail] = useState<{ source: string; row: any } | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  const openDetail = useCallback(async (source: string, id: string) => {
+    setDetail({ source, row: { id, loading: true } });
+    setDetailLoading(true);
+    try {
+      const { data, error } = await supabase.from(source as any).select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      let extra: any = {};
+      if (source === "doctors" && data?.user_id) {
+        const { data: prof } = await supabase.from("profiles").select("full_name,phone,cpf,country,city,avatar_url").eq("id", data.user_id).maybeSingle();
+        extra.profile = prof;
+        const { data: docs } = await supabase.from("doctor_documents" as any).select("doc_type,file_path,created_at").eq("doctor_user_id", data.user_id);
+        extra.documents = docs;
+      }
+      setDetail({ source, row: { ...data, ...extra } });
+    } catch (e: any) {
+      setDetail({ source, row: { error: e?.message || String(e) } });
+    } finally {
+      setDetailLoading(false);
+    }
+  }, []);
 
   const fetchAll = useCallback(async () => {
     setError(null);

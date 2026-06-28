@@ -124,16 +124,17 @@ export default function CadastrosRealtime() {
     setDetail({ source, row: { id, loading: true } });
     setDetailLoading(true);
     try {
-      const { data, error } = await supabase.from(source as any).select("*").eq("id", id).maybeSingle();
+      const { data, error } = await (supabase.from(source as any) as any).select("*").eq("id", id).maybeSingle();
       if (error) throw error;
-      let extra: any = {};
-      if (source === "doctors" && data?.user_id) {
-        const { data: prof } = await supabase.from("profiles").select("full_name,phone,cpf,country,city,avatar_url").eq("id", data.user_id).maybeSingle();
+      const row: any = data ?? {};
+      const extra: any = {};
+      if (source === "doctors" && row.user_id) {
+        const { data: prof } = await (supabase.from("profiles") as any).select("full_name,phone,cpf,country,city,avatar_url").eq("id", row.user_id).maybeSingle();
         extra.profile = prof;
-        const { data: docs } = await supabase.from("doctor_documents" as any).select("doc_type,file_path,created_at").eq("doctor_user_id", data.user_id);
+        const { data: docs } = await (supabase.from("doctor_documents") as any).select("doc_type,file_path,created_at").eq("doctor_user_id", row.user_id);
         extra.documents = docs;
       }
-      setDetail({ source, row: { ...data, ...extra } });
+      setDetail({ source, row: { ...row, ...extra } });
     } catch (e: any) {
       setDetail({ source, row: { error: e?.message || String(e) } });
     } finally {

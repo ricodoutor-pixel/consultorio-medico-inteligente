@@ -234,10 +234,18 @@ const CadastroProfissional = () => {
     return /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(phone.replace(/\s/g, ""));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.nomeCompleto || !form.email || !form.telefone || !form.categoria || !form.valorCobrado || !form.resumoAtuacao) {
       toast({ title: country === "BO" ? "Complete todos los campos obligatorios" : "Preencha todos os campos obrigatórios", variant: "destructive" });
+      return;
+    }
+    if (form.password.length < 8) {
+      toast({ title: country === "BO" ? "Contraseña muy corta (mín. 8)" : "Senha muito curta (mín. 8 caracteres)", variant: "destructive" });
+      return;
+    }
+    if (form.password !== form.passwordConfirm) {
+      toast({ title: country === "BO" ? "Las contraseñas no coinciden" : "As senhas não coincidem", variant: "destructive" });
       return;
     }
     if (form.nomeCompleto.length < 3 || form.nomeCompleto.length > 100) {
@@ -293,17 +301,77 @@ const CadastroProfissional = () => {
 
     trackKYCSubmissionAttempt(documentType);
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      // 1) Create Supabase auth user with password (real persistence)
+      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard-medico`,
+          data: {
+            full_name: form.nomeCompleto,
+            role: "doctor",
+            country,
+            phone: form.telefone,
+          },
+        },
+      });
+      if (signUpErr) throw signUpErr;
+      const userId = signUpData.user?.id;
+      if (!userId) throw new Error("Falha ao criar usuário");
+
+      // 2) Upsert profile (id = auth user id)
+      const { error: profErr } = await supabase.from("profiles").upsert({
+        id: userId,
+        full_name: form.nomeCompleto,
+        phone: form.telefone,
+        cpf: documentType === "cpf" ? documentNumber : null,
+        country,
+        city: form.cidadeUF || null,
+        user_type: "doctor",
+        signup_role: "doctor",
+        avatar_url: fotoPreview, // base64 preview fallback
+      });
+      if (profErr) console.error("[profile upsert]", profErr);
+
+      // 3) Insert doctor record (status: pending verification)
+      const { error: docErr } = await supabase.from("doctors").insert({
+        user_id: userId,
+        crm: isCuidador ? `CUIDADOR-${documentNumber.slice(-6)}` : form.registroProfissional,
+        crm_state: form.crmUF,
+        specialty: form.categoria,
+        bio: form.resumoAtuacao,
+        consultation_price: Number(form.valorCobrado) || 0,
+        document_type: documentType,
+        country,
+        city: form.cidadeUF || null,
+        is_verified: false,
+        is_online: false,
+        is_available: false,
+        kyc_status: "pending",
+        plan_tier: form.plano,
+      });
+      if (docErr) console.error("[doctor insert]", docErr);
+
+      setSavedCredentials({ email: form.email.trim().toLowerCase(), password: form.password });
       setLoading(false);
       setSubmitted(true);
       trackKYCValidationSuccess(documentType);
       toast({
-        title: country === "BO" ? "¡Registro enviado!" : "Cadastro enviado!",
+        title: country === "BO" ? "¡Registro guardado!" : "Cadastro salvo com sucesso!",
         description: country === "BO"
-          ? "Estado: PENDIENTE DE VERIFICACIÓN KYC. Validando su matrícula con el Colegio Médico."
-          : "Status: PENDENTE DE VERIFICAÇÃO KYC. Aguarde validação automática do CRM.",
+          ? "Sus credenciales fueron creadas. Guarde su contraseña."
+          : "Suas credenciais foram criadas. Guarde sua senha.",
       });
-    }, 1500);
+    } catch (err: any) {
+      setLoading(false);
+      const msg = err?.message || String(err);
+      const friendly = /already registered|already exists/i.test(msg)
+        ? (country === "BO" ? "Este correo ya está registrado. Inicie sesión." : "Este e-mail já está cadastrado. Faça login.")
+        : msg;
+      toast({ title: country === "BO" ? "Error al guardar" : "Erro ao salvar cadastro", description: friendly, variant: "destructive" });
+    }
   };
 
   if (submitted) {

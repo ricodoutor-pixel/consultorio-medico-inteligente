@@ -507,6 +507,17 @@ const CadastroProfissional = () => {
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
+                      <Label htmlFor="password">{country === "BO" ? "Contraseña (mín. 8) *" : "Senha de acesso (mín. 8) *"}</Label>
+                      <Input id="password" type="password" autoComplete="new-password" placeholder="••••••••" value={form.password} onChange={(e) => handleChange("password", e.target.value)} required minLength={8} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="passwordConfirm">{country === "BO" ? "Confirmar contraseña *" : "Confirmar senha *"}</Label>
+                      <Input id="passwordConfirm" type="password" autoComplete="new-password" placeholder="••••••••" value={form.passwordConfirm} onChange={(e) => handleChange("passwordConfirm", e.target.value)} required minLength={8} />
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
                       <Label htmlFor="telefone">{t.phone}</Label>
                       <Input id="telefone" placeholder={t.phonePh} value={form.telefone} onChange={(e) => handleChange("telefone", e.target.value)} required />
                     </div>

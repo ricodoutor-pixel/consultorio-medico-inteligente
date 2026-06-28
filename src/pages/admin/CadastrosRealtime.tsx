@@ -432,7 +432,12 @@ export default function CadastrosRealtime() {
                   <div className="p-6 text-center text-sm text-muted-foreground">Nenhum cadastro encontrado ainda.</div>
                 )}
                 {recent.map((r) => (
-                  <div key={`${r.source}-${r.id}`} className="p-3 flex items-center justify-between gap-3 hover:bg-accent/30">
+                  <button
+                    type="button"
+                    key={`${r.source}-${r.id}`}
+                    onClick={() => openDetail(r.source, r.id)}
+                    className="w-full p-3 flex items-center justify-between gap-3 hover:bg-accent/30 text-left"
+                  >
                     <div className="min-w-0 flex-1">
                       <div className="font-semibold text-foreground truncate">{r.name}</div>
                       <div className="text-xs text-muted-foreground">
@@ -440,7 +445,7 @@ export default function CadastrosRealtime() {
                       </div>
                     </div>
                     <Badge variant="secondary" className="text-[10px] whitespace-nowrap">{r.source}</Badge>
-                  </div>
+                  </button>
                 ))}
               </div>
             </Card>

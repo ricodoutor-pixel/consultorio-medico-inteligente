@@ -144,6 +144,8 @@ const CadastroProfissional = () => {
   const [form, setForm] = useState({
     nomeCompleto: "",
     email: "",
+    password: "",
+    passwordConfirm: "",
     telefone: "",
     categoria: "",
     valorCobrado: "",
@@ -156,6 +158,7 @@ const CadastroProfissional = () => {
     plano: "basic",
   });
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
+  const [savedCredentials, setSavedCredentials] = useState<{ email: string; password: string } | null>(null);
 
   // Cuando cambia el país, ajustar tipos de documento y departamento por defecto
   useEffect(() => {

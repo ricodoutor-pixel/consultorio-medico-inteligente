@@ -4,6 +4,7 @@ import { Users, UserPlus, Stethoscope, FileText, Sparkles, RefreshCw, Activity, 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const POLL_MS = 10_000;
 const ACTIVE_WINDOW_MS = 5 * 60 * 1000;
@@ -116,6 +117,30 @@ export default function CadastrosRealtime() {
   const [auditSamples, setAuditSamples] = useState<Record<string, any[]>>({});
   const [cleanupBusy, setCleanupBusy] = useState(false);
   const [cleanupResult, setCleanupResult] = useState<any>(null);
+  const [detail, setDetail] = useState<{ source: string; row: any } | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  const openDetail = useCallback(async (source: string, id: string) => {
+    setDetail({ source, row: { id, loading: true } });
+    setDetailLoading(true);
+    try {
+      const { data, error } = await (supabase.from(source as any) as any).select("*").eq("id", id).maybeSingle();
+      if (error) throw error;
+      const row: any = data ?? {};
+      const extra: any = {};
+      if (source === "doctors" && row.user_id) {
+        const { data: prof } = await (supabase.from("profiles") as any).select("full_name,phone,cpf,country,city,avatar_url").eq("id", row.user_id).maybeSingle();
+        extra.profile = prof;
+        const { data: docs } = await ((supabase as any).from("doctor_documents")).select("doc_type,file_path,created_at").eq("doctor_user_id", row.user_id);
+        extra.documents = docs;
+      }
+      setDetail({ source, row: { ...row, ...extra } });
+    } catch (e: any) {
+      setDetail({ source, row: { error: e?.message || String(e) } });
+    } finally {
+      setDetailLoading(false);
+    }
+  }, []);
 
   const fetchAll = useCallback(async () => {
     setError(null);
@@ -407,7 +432,12 @@ export default function CadastrosRealtime() {
                   <div className="p-6 text-center text-sm text-muted-foreground">Nenhum cadastro encontrado ainda.</div>
                 )}
                 {recent.map((r) => (
-                  <div key={`${r.source}-${r.id}`} className="p-3 flex items-center justify-between gap-3 hover:bg-accent/30">
+                  <button
+                    type="button"
+                    key={`${r.source}-${r.id}`}
+                    onClick={() => openDetail(r.source, r.id)}
+                    className="w-full p-3 flex items-center justify-between gap-3 hover:bg-accent/30 text-left"
+                  >
                     <div className="min-w-0 flex-1">
                       <div className="font-semibold text-foreground truncate">{r.name}</div>
                       <div className="text-xs text-muted-foreground">
@@ -415,7 +445,7 @@ export default function CadastrosRealtime() {
                       </div>
                     </div>
                     <Badge variant="secondary" className="text-[10px] whitespace-nowrap">{r.source}</Badge>
-                  </div>
+                  </button>
                 ))}
               </div>
             </Card>
@@ -498,6 +528,49 @@ export default function CadastrosRealtime() {
           </>
         )}
       </div>
+
+      <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Detalhes • <span className="text-primary">{detail?.source}</span>
+            </DialogTitle>
+          </DialogHeader>
+          {detailLoading && <div className="text-sm text-muted-foreground">Carregando…</div>}
+          {detail?.row?.error && <div className="text-sm text-destructive">{detail.row.error}</div>}
+          {detail?.row && !detail.row.error && (
+            <div className="space-y-3">
+              {detail.row.profile?.avatar_url && (
+                <img src={detail.row.profile.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover border border-border" />
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                {Object.entries(detail.row)
+                  .filter(([k]) => !["profile", "documents", "loading"].includes(k))
+                  .map(([k, v]) => (
+                    <div key={k} className="p-2 rounded bg-muted/30 border border-border">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{k}</div>
+                      <div className="font-mono text-xs break-all text-foreground">
+                        {v === null || v === undefined ? "—" : typeof v === "object" ? JSON.stringify(v) : String(v)}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+              {detail.row.profile && (
+                <div className="p-3 rounded-lg bg-primary/5 border border-primary/30">
+                  <div className="font-bold text-sm mb-2 text-primary">Perfil vinculado</div>
+                  <pre className="text-[11px] whitespace-pre-wrap break-all">{JSON.stringify(detail.row.profile, null, 2)}</pre>
+                </div>
+              )}
+              {detail.row.documents && (
+                <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/30">
+                  <div className="font-bold text-sm mb-2 text-amber-400">Documentos KYC ({detail.row.documents.length})</div>
+                  <pre className="text-[11px] whitespace-pre-wrap break-all">{JSON.stringify(detail.row.documents, null, 2)}</pre>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

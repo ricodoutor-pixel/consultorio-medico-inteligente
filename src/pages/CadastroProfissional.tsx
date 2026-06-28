@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle2, Upload, UserPlus, ArrowRight, ShieldCheck, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Upload, UserPlus, ArrowRight, ShieldCheck, AlertTriangle, Lock, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { categories } from "@/data/professionals";
 import { motion } from "framer-motion";
 import {
@@ -143,6 +144,8 @@ const CadastroProfissional = () => {
   const [form, setForm] = useState({
     nomeCompleto: "",
     email: "",
+    password: "",
+    passwordConfirm: "",
     telefone: "",
     categoria: "",
     valorCobrado: "",
@@ -155,6 +158,7 @@ const CadastroProfissional = () => {
     plano: "basic",
   });
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
+  const [savedCredentials, setSavedCredentials] = useState<{ email: string; password: string } | null>(null);
 
   // Cuando cambia el país, ajustar tipos de documento y departamento por defecto
   useEffect(() => {
@@ -230,10 +234,18 @@ const CadastroProfissional = () => {
     return /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(phone.replace(/\s/g, ""));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.nomeCompleto || !form.email || !form.telefone || !form.categoria || !form.valorCobrado || !form.resumoAtuacao) {
       toast({ title: country === "BO" ? "Complete todos los campos obligatorios" : "Preencha todos os campos obrigatórios", variant: "destructive" });
+      return;
+    }
+    if (form.password.length < 8) {
+      toast({ title: country === "BO" ? "Contraseña muy corta (mín. 8)" : "Senha muito curta (mín. 8 caracteres)", variant: "destructive" });
+      return;
+    }
+    if (form.password !== form.passwordConfirm) {
+      toast({ title: country === "BO" ? "Las contraseñas no coinciden" : "As senhas não coincidem", variant: "destructive" });
       return;
     }
     if (form.nomeCompleto.length < 3 || form.nomeCompleto.length > 100) {
@@ -289,17 +301,77 @@ const CadastroProfissional = () => {
 
     trackKYCSubmissionAttempt(documentType);
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      // 1) Create Supabase auth user with password (real persistence)
+      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard-medico`,
+          data: {
+            full_name: form.nomeCompleto,
+            role: "doctor",
+            country,
+            phone: form.telefone,
+          },
+        },
+      });
+      if (signUpErr) throw signUpErr;
+      const userId = signUpData.user?.id;
+      if (!userId) throw new Error("Falha ao criar usuário");
+
+      // 2) Upsert profile (id = auth user id)
+      const { error: profErr } = await supabase.from("profiles").upsert({
+        id: userId,
+        full_name: form.nomeCompleto,
+        phone: form.telefone,
+        cpf: documentType === "cpf" ? documentNumber : null,
+        country,
+        city: form.cidadeUF || null,
+        user_type: "doctor",
+        signup_role: "doctor",
+        avatar_url: fotoPreview, // base64 preview fallback
+      });
+      if (profErr) console.error("[profile upsert]", profErr);
+
+      // 3) Insert doctor record (status: pending verification)
+      const { error: docErr } = await supabase.from("doctors").insert({
+        user_id: userId,
+        crm: isCuidador ? `CUIDADOR-${documentNumber.slice(-6)}` : form.registroProfissional,
+        crm_state: form.crmUF,
+        specialty: form.categoria,
+        bio: form.resumoAtuacao,
+        consultation_price: Number(form.valorCobrado) || 0,
+        document_type: documentType,
+        country,
+        city: form.cidadeUF || null,
+        is_verified: false,
+        is_online: false,
+        is_available: false,
+        kyc_status: "pending",
+        plan_tier: form.plano,
+      });
+      if (docErr) console.error("[doctor insert]", docErr);
+
+      setSavedCredentials({ email: form.email.trim().toLowerCase(), password: form.password });
       setLoading(false);
       setSubmitted(true);
       trackKYCValidationSuccess(documentType);
       toast({
-        title: country === "BO" ? "¡Registro enviado!" : "Cadastro enviado!",
+        title: country === "BO" ? "¡Registro guardado!" : "Cadastro salvo com sucesso!",
         description: country === "BO"
-          ? "Estado: PENDIENTE DE VERIFICACIÓN KYC. Validando su matrícula con el Colegio Médico."
-          : "Status: PENDENTE DE VERIFICAÇÃO KYC. Aguarde validação automática do CRM.",
+          ? "Sus credenciales fueron creadas. Guarde su contraseña."
+          : "Suas credenciais foram criadas. Guarde sua senha.",
       });
-    }, 1500);
+    } catch (err: any) {
+      setLoading(false);
+      const msg = err?.message || String(err);
+      const friendly = /already registered|already exists/i.test(msg)
+        ? (country === "BO" ? "Este correo ya está registrado. Inicie sesión." : "Este e-mail já está cadastrado. Faça login.")
+        : msg;
+      toast({ title: country === "BO" ? "Error al guardar" : "Erro ao salvar cadastro", description: friendly, variant: "destructive" });
+    }
   };
 
   if (submitted) {
@@ -323,6 +395,29 @@ const CadastroProfissional = () => {
                   ? "El sistema está validando automáticamente su matrícula con el Colegio Médico de Bolivia."
                   : "O sistema está validando automaticamente seu CRM junto ao conselho médico e verificando seus documentos."}
               </p>
+              {savedCredentials && (
+                <div className="p-4 rounded-2xl bg-primary/10 border-2 border-primary mb-6 text-left">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Lock size={18} className="text-primary" />
+                    <span className="font-black text-sm text-foreground">
+                      {isBO ? "🔐 Sus credenciales de acceso (guárdelas)" : "🔐 Suas credenciais de acesso (guarde agora)"}
+                    </span>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between gap-2 bg-background/60 rounded-lg px-3 py-2">
+                      <code className="text-foreground break-all">{savedCredentials.email}</code>
+                      <button type="button" onClick={() => { navigator.clipboard.writeText(savedCredentials.email); toast({ title: "E-mail copiado" }); }} className="text-primary"><Copy size={14} /></button>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 bg-background/60 rounded-lg px-3 py-2">
+                      <code className="text-foreground break-all">{savedCredentials.password}</code>
+                      <button type="button" onClick={() => { navigator.clipboard.writeText(savedCredentials.password); toast({ title: "Senha copiada" }); }} className="text-primary"><Copy size={14} /></button>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-2">
+                    {isBO ? "Acceda en /login. Esta es la única vez que mostraremos su contraseña." : "Acesse em /login. Esta é a única vez que mostramos sua senha."}
+                  </p>
+                </div>
+              )}
               <div className="p-4 rounded-2xl bg-muted/30 border border-border mb-8 text-left">
                 <div className="flex items-center gap-2 mb-2">
                   <ShieldCheck size={18} className="text-primary" />
@@ -330,10 +425,15 @@ const CadastroProfissional = () => {
                 </div>
                 <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
                   <li>✅ {isBO ? "Validación del formato del documento" : "Validação do formato do documento"} ({documentType.toUpperCase()})</li>
-                  <li>⏳ {isBO ? "Consulta al Colegio Médico / SEDES" : "Orientação Técnica ao Conselho Federal de Medicina (CRM)"}</li>
-                  <li>⏳ {isBO ? "Verificación de consistencia de datos" : "Verificação de consistência de dados"}</li>
-                  <li>⏳ {isBO ? "Liberación del Dashboard Médico" : "Liberação do Dashboard Médico"}</li>
+                  <li>✅ {isBO ? "Cuenta creada — puede iniciar sesión ahora" : "Conta criada — você já pode logar agora"}</li>
+                  <li>⏳ {isBO ? "Consulta al Colegio Médico / SEDES" : "Validação CRM junto ao Conselho Federal de Medicina"}</li>
+                  <li>⏳ {isBO ? "Liberación del Dashboard Médico (≤ 24h)" : "Liberação do Dashboard Médico (≤ 24h)"}</li>
                 </ul>
+              </div>
+              <div className="flex gap-3 justify-center flex-wrap mb-3">
+                <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
+                  <a href="/login">{isBO ? "Iniciar Sesión Ahora" : "Fazer Login Agora"} <ArrowRight size={16} className="ml-2" /></a>
+                </Button>
               </div>
               <div className="flex gap-3 justify-center flex-wrap">
                 <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
@@ -402,6 +502,17 @@ const CadastroProfissional = () => {
                     <div className="space-y-2">
                       <Label htmlFor="email">{t.email}</Label>
                       <Input id="email" type="email" placeholder="seu@email.com" value={form.email} onChange={(e) => handleChange("email", e.target.value)} required />
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="password">{country === "BO" ? "Contraseña (mín. 8) *" : "Senha de acesso (mín. 8) *"}</Label>
+                      <Input id="password" type="password" autoComplete="new-password" placeholder="••••••••" value={form.password} onChange={(e) => handleChange("password", e.target.value)} required minLength={8} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="passwordConfirm">{country === "BO" ? "Confirmar contraseña *" : "Confirmar senha *"}</Label>
+                      <Input id="passwordConfirm" type="password" autoComplete="new-password" placeholder="••••••••" value={form.passwordConfirm} onChange={(e) => handleChange("passwordConfirm", e.target.value)} required minLength={8} />
                     </div>
                   </div>
 

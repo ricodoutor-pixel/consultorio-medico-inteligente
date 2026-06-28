@@ -4,6 +4,7 @@ import { Users, UserPlus, Stethoscope, FileText, Sparkles, RefreshCw, Activity, 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const POLL_MS = 10_000;
 const ACTIVE_WINDOW_MS = 5 * 60 * 1000;

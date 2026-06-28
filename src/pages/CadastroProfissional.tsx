@@ -395,6 +395,29 @@ const CadastroProfissional = () => {
                   ? "El sistema está validando automáticamente su matrícula con el Colegio Médico de Bolivia."
                   : "O sistema está validando automaticamente seu CRM junto ao conselho médico e verificando seus documentos."}
               </p>
+              {savedCredentials && (
+                <div className="p-4 rounded-2xl bg-primary/10 border-2 border-primary mb-6 text-left">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Lock size={18} className="text-primary" />
+                    <span className="font-black text-sm text-foreground">
+                      {isBO ? "🔐 Sus credenciales de acceso (guárdelas)" : "🔐 Suas credenciais de acesso (guarde agora)"}
+                    </span>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between gap-2 bg-background/60 rounded-lg px-3 py-2">
+                      <code className="text-foreground break-all">{savedCredentials.email}</code>
+                      <button type="button" onClick={() => { navigator.clipboard.writeText(savedCredentials.email); toast({ title: "E-mail copiado" }); }} className="text-primary"><Copy size={14} /></button>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 bg-background/60 rounded-lg px-3 py-2">
+                      <code className="text-foreground break-all">{savedCredentials.password}</code>
+                      <button type="button" onClick={() => { navigator.clipboard.writeText(savedCredentials.password); toast({ title: "Senha copiada" }); }} className="text-primary"><Copy size={14} /></button>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-2">
+                    {isBO ? "Acceda en /login. Esta es la única vez que mostraremos su contraseña." : "Acesse em /login. Esta é a única vez que mostramos sua senha."}
+                  </p>
+                </div>
+              )}
               <div className="p-4 rounded-2xl bg-muted/30 border border-border mb-8 text-left">
                 <div className="flex items-center gap-2 mb-2">
                   <ShieldCheck size={18} className="text-primary" />
@@ -402,10 +425,15 @@ const CadastroProfissional = () => {
                 </div>
                 <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
                   <li>✅ {isBO ? "Validación del formato del documento" : "Validação do formato do documento"} ({documentType.toUpperCase()})</li>
-                  <li>⏳ {isBO ? "Consulta al Colegio Médico / SEDES" : "Orientação Técnica ao Conselho Federal de Medicina (CRM)"}</li>
-                  <li>⏳ {isBO ? "Verificación de consistencia de datos" : "Verificação de consistência de dados"}</li>
-                  <li>⏳ {isBO ? "Liberación del Dashboard Médico" : "Liberação do Dashboard Médico"}</li>
+                  <li>✅ {isBO ? "Cuenta creada — puede iniciar sesión ahora" : "Conta criada — você já pode logar agora"}</li>
+                  <li>⏳ {isBO ? "Consulta al Colegio Médico / SEDES" : "Validação CRM junto ao Conselho Federal de Medicina"}</li>
+                  <li>⏳ {isBO ? "Liberación del Dashboard Médico (≤ 24h)" : "Liberação do Dashboard Médico (≤ 24h)"}</li>
                 </ul>
+              </div>
+              <div className="flex gap-3 justify-center flex-wrap mb-3">
+                <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
+                  <a href="/login">{isBO ? "Iniciar Sesión Ahora" : "Fazer Login Agora"} <ArrowRight size={16} className="ml-2" /></a>
+                </Button>
               </div>
               <div className="flex gap-3 justify-center flex-wrap">
                 <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>

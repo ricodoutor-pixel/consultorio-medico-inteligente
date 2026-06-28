@@ -131,7 +131,7 @@ export default function CadastrosRealtime() {
       if (source === "doctors" && row.user_id) {
         const { data: prof } = await (supabase.from("profiles") as any).select("full_name,phone,cpf,country,city,avatar_url").eq("id", row.user_id).maybeSingle();
         extra.profile = prof;
-        const { data: docs } = await (supabase.from("doctor_documents") as any).select("doc_type,file_path,created_at").eq("doctor_user_id", row.user_id);
+        const { data: docs } = await ((supabase as any).from("doctor_documents")).select("doc_type,file_path,created_at").eq("doctor_user_id", row.user_id);
         extra.documents = docs;
       }
       setDetail({ source, row: { ...row, ...extra } });

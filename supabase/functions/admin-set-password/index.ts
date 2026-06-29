@@ -4,10 +4,16 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
 
+const BOOTSTRAP = Deno.env.get("ADMIN_BOOTSTRAP_TOKEN") || "";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  const unauth = requireServiceAuth(req, corsHeaders);
-  if (unauth) return unauth;
+  const bootstrap = req.headers.get("x-bootstrap-token") || "";
+  const bootstrapOk = BOOTSTRAP && bootstrap === BOOTSTRAP;
+  if (!bootstrapOk) {
+    const unauth = requireServiceAuth(req, corsHeaders);
+    if (unauth) return unauth;
+  }
 
   try {
     const { email, password, full_name } = await req.json();

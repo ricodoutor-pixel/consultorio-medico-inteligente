@@ -57,7 +57,7 @@ serve(async (req) => {
         .limit(limit);
 
       if (error) {
-        console.error(\'Error fetching history:\', error.message);
+        console.error('Error fetching history:', error.message);
         return [];
       }
       return data.reverse(); // Return in chronological order

@@ -66,7 +66,8 @@ export default function AdminSaudeVerde() {
   useEffect(() => { load(); }, []);
 
   const togglePartner = async (id: string, field: "is_active" | "is_verified", value: boolean) => {
-    const { error } = await supabase.from("saude_verde_partners").update({ [field]: value }).eq("id", id);
+    const patch: any = { [field]: value };
+    const { error } = await supabase.from("saude_verde_partners").update(patch).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Atualizado");
     load();

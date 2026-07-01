@@ -6100,6 +6100,7 @@ export type Database = {
         Row: {
           accepts_online: boolean | null
           address: string | null
+          api_key_hash: string | null
           available_exams: Json | null
           available_specialties: Json | null
           category: string
@@ -6130,6 +6131,7 @@ export type Database = {
         Insert: {
           accepts_online?: boolean | null
           address?: string | null
+          api_key_hash?: string | null
           available_exams?: Json | null
           available_specialties?: Json | null
           category: string
@@ -6160,6 +6162,7 @@ export type Database = {
         Update: {
           accepts_online?: boolean | null
           address?: string | null
+          api_key_hash?: string | null
           available_exams?: Json | null
           available_specialties?: Json | null
           category?: string

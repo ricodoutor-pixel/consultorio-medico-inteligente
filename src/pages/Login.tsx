@@ -58,9 +58,14 @@ const Login = () => {
           .invoke("brisa-signup-alert", { body: { user_id: data.user.id, event: "login" } })
           .catch((e) => console.warn("[brisa-signup-alert] login", e));
 
-        // Redirect: prioritize ?redirect= param, then role-based default
-        if (redirectTo) {
-          navigate(decodeURIComponent(redirectTo));
+        // Redirect: prioritize ?redirect= param (only if safe/relative), then role-based default
+        const safeRedirect = (() => {
+          if (!redirectTo) return null;
+          const d = decodeURIComponent(redirectTo);
+          return d.startsWith("/") && !d.startsWith("//") ? d : null;
+        })();
+        if (safeRedirect) {
+          navigate(safeRedirect);
         } else {
           const userType = profile?.user_type || "patient";
           if (userType === "doctor") {

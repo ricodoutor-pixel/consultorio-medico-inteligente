@@ -69,7 +69,16 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const url0 = new URL(req.url);
   if (req.method === "GET" && url0.searchParams.get("bootstrap") === "1") {
-    // One-shot: register THIS function as the Evolution webhook for the configured instance.
+    // One-shot: register THIS function as the Evolution webhook. Requires service-role auth
+    // (never expose WEBHOOK_SECRET in responses).
+    const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    const auth = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+    const xCron = req.headers.get("x-cron-secret") || "";
+    if (!SERVICE || (auth !== SERVICE && xCron !== SERVICE)) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const target = `https://${url0.host}/functions/v1/whatsapp-brisa-bot${WEBHOOK_SECRET ? `?secret=${encodeURIComponent(WEBHOOK_SECRET)}` : ""}`;
     const events = ["MESSAGES_UPSERT", "MESSAGES_UPDATE", "CONNECTION_UPDATE", "QRCODE_UPDATED"];
     const inst = encodeURIComponent(EVOLUTION_INSTANCE);
@@ -84,7 +93,8 @@ Deno.serve(async (req) => {
     }).then(async (r) => ({ status: r.status, body: (await r.text()).slice(0, 400) })).catch((e) => ({ status: 0, error: String(e) }));
     const find = await fetch(`${EVOLUTION_API_URL}/webhook/find/${inst}`, { headers })
       .then(async (r) => ({ status: r.status, body: (await r.text()).slice(0, 400) })).catch((e) => ({ status: 0, error: String(e) }));
-    return new Response(JSON.stringify({ ok: true, target, instance: EVOLUTION_INSTANCE, v2, v1, find }, null, 2), {
+    // NOTE: target intentionally omitted from response to avoid leaking WEBHOOK_SECRET.
+    return new Response(JSON.stringify({ ok: true, instance: EVOLUTION_INSTANCE, v2, v1, find }, null, 2), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

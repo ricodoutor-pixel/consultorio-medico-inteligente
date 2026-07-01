@@ -61,18 +61,37 @@ async function sendWhatsApp(token: string, remoteJid: string, text: string) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method === "GET") {
-    return new Response(JSON.stringify({
-      ok: true,
-      service: "brisa-bot",
-      instance: EVOLUTION_INSTANCE,
-      evolution: EVOLUTION_API_URL,
-      ai_ready: !!LOVABLE_API_KEY,
-    }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ ok: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "method_not_allowed" }), {
       status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+  }
+
+  // Require shared webhook secret — fail closed if not configured.
+  const WEBHOOK_SECRET = Deno.env.get("EVOLUTION_WEBHOOK_SECRET") || "";
+  if (!WEBHOOK_SECRET) {
+    console.error("[brisa-bot] EVOLUTION_WEBHOOK_SECRET not configured");
+    return new Response(JSON.stringify({ error: "not_configured" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  {
+    const u = new URL(req.url);
+    const got =
+      req.headers.get("x-webhook-secret") ||
+      req.headers.get("apikey") ||
+      u.searchParams.get("secret") ||
+      u.searchParams.get("token") ||
+      "";
+    if (got !== WEBHOOK_SECRET) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
   }
 
   const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY");

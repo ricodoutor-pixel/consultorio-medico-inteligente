@@ -1,4 +1,4 @@
-// One-shot admin bootstrap (idempotent) for Dra. Olivia Zimeri (Bolivia)
+// One-shot admin bootstrap (idempotent) — requires authenticated admin caller.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const cors = {
@@ -10,6 +10,38 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
 
   try {
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    // AUTH: require admin JWT
+    const authHeader = req.headers.get("Authorization") || "";
+    const token = authHeader.replace(/^Bearer\s+/i, "");
+    if (!token) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+    const { data: userRes, error: userErr } = await admin.auth.getUser(token);
+    if (userErr || !userRes?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+    const { data: role } = await admin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userRes.user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!role) {
+      return new Response(JSON.stringify({ error: "Admin required" }), {
+        status: 403, headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+
     const body = await req.json();
     const {
       email,
@@ -30,13 +62,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    );
+    const supabase = admin;
 
-    // Find or create user
     let userId: string | undefined;
     const { data: created, error: createErr } = await supabase.auth.admin.createUser({
       email, password, email_confirm: true,
@@ -44,7 +71,6 @@ Deno.serve(async (req) => {
     });
 
     if (createErr) {
-      // already exists -> find via listUsers paginated
       let page = 1;
       while (!userId) {
         const { data: list, error: listErr } = await supabase.auth.admin.listUsers({ page, perPage: 200 });
@@ -55,19 +81,16 @@ Deno.serve(async (req) => {
         page++;
       }
       if (!userId) throw createErr;
-      // reset password
       await supabase.auth.admin.updateUserById(userId, { password, email_confirm: true });
     } else {
       userId = created.user!.id;
     }
 
-    // Upsert profile
     await supabase.from("profiles").upsert({
       id: userId, full_name, phone: whatsapp ?? null, country,
       user_type: "doctor", signup_role: "doctor", avatar_url: avatar_url ?? null,
     });
 
-    // Upsert doctor (check existing)
     const { data: existingDoc } = await supabase.from("doctors").select("id").eq("user_id", userId).maybeSingle();
     const doctorPayload = {
       user_id: userId,
@@ -88,7 +111,6 @@ Deno.serve(async (req) => {
       if (docErr) throw docErr;
     }
 
-    // Role (idempotent)
     await supabase.from("user_roles").upsert({ user_id: userId, role: "user" }, { onConflict: "user_id,role" });
 
     return new Response(

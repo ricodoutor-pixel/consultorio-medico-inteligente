@@ -152,10 +152,13 @@ const Cadastro = () => {
         leadScore: 30, funnelStage: "intent", category: "conversion",
       });
 
-      // If session created immediately and we have a redirect target, go there
+      // If session created immediately and we have a safe (relative) redirect target, go there
       if (authData.session && redirectTo) {
-        window.location.href = decodeURIComponent(redirectTo);
-        return;
+        const dest = decodeURIComponent(redirectTo);
+        if (dest.startsWith("/") && !dest.startsWith("//")) {
+          window.location.href = dest;
+          return;
+        }
       }
 
       setSubmitted(true);

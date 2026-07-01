@@ -82,16 +82,16 @@ function rateLimited(ip: string): boolean {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  // Accept ONLY service-role key or a valid Supabase user JWT.
-  // The anon/publishable key is shipped in the frontend bundle and MUST NOT grant access.
+  // Public error-reporting endpoint: accept anon key, user JWT, or service-role.
+  // Abuse is bounded by per-IP rate limiting + fingerprint dedup below.
+  // We only accept the project's own anon/service keys — not arbitrary bearer strings.
   const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const ANON = Deno.env.get("SUPABASE_ANON_KEY");
+  const apikey = req.headers.get("apikey") || "";
   const auth = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
-  let authorized = false;
-  if (auth && SERVICE && auth === SERVICE) {
-    authorized = true;
-  } else if (auth && ANON && auth !== ANON) {
-    // Treat as a user JWT — verify via Supabase
+  const isKnownKey = (t: string) => !!t && ((SERVICE && t === SERVICE) || (ANON && t === ANON));
+  let authorized = isKnownKey(auth) || isKnownKey(apikey);
+  if (!authorized && auth && ANON && auth !== ANON) {
     try {
       const client = createClient(Deno.env.get("SUPABASE_URL")!, ANON, {
         global: { headers: { Authorization: `Bearer ${auth}` } },

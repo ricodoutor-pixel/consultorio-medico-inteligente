@@ -108,7 +108,7 @@ export const DoctorSubscriptionPlans = ({ doctorId, currentTier, onTierChange }:
         Escolha seu plano e aumente sua participação na distribuição de renda.
       </p>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid sm:grid-cols-2 gap-4 max-w-3xl">
         {PLANS.map((plan) => {
           const isActive = plan.id === currentTier;
           return (
@@ -124,50 +124,42 @@ export const DoctorSubscriptionPlans = ({ doctorId, currentTier, onTierChange }:
                 {plan.vip && (
                   <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary to-emerald-400" />
                 )}
-                {plan.tagline === "RECOMENDADO" && (
-                  <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 to-amber-600" />
-                )}
                 {isActive && (
                   <Badge className="absolute top-3 right-3 bg-primary text-primary-foreground text-[10px]">
                     Atual
                   </Badge>
                 )}
                 {plan.tagline && !isActive && (
-                  <Badge className={`absolute top-3 right-3 text-[10px] font-black ${
-                    plan.vip ? "bg-primary/20 text-primary border-primary/30" : "bg-amber-500/20 text-amber-400 border-amber-500/30"
-                  }`}>
+                  <Badge className="absolute top-3 right-3 text-[10px] font-black bg-primary/20 text-primary border-primary/30">
                     {plan.tagline}
                   </Badge>
                 )}
                 <CardContent className="p-5">
                   <plan.icon
                     size={28}
-                    className={
-                      plan.vip
-                        ? "text-primary"
-                        : plan.id === "premium"
-                        ? "text-amber-400"
-                        : plan.id === "enterprise"
-                        ? "text-purple-400"
-                        : plan.id === "professional"
-                        ? "text-blue-400"
-                        : "text-muted-foreground"
-                    }
+                    className={plan.vip ? "text-primary" : "text-muted-foreground"}
                   />
                   <h4 className="font-display font-black text-lg text-foreground mt-3 flex items-center gap-2">
                     {plan.name}
                     {plan.vip && <Sparkles size={14} className="text-primary" />}
                   </h4>
                   <div className="mt-1 mb-4">
-                    {plan.price ? (
-                      <span className="text-2xl font-display font-black text-foreground">
-                        R$ {plan.price}
-                        <span className="text-xs text-muted-foreground font-normal">/mês</span>
-                      </span>
+                    {plan.price > 0 ? (
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <span className="text-2xl font-display font-black text-foreground">
+                          R$ {plan.price}
+                          <span className="text-xs text-muted-foreground font-normal">/mês</span>
+                        </span>
+                        <span className="text-xs text-muted-foreground">ou US$ {plan.priceUSD}/mês</span>
+                      </div>
                     ) : (
-                      <span className="text-lg font-display font-black text-purple-400">Sob consulta</span>
+                      <span className="text-2xl font-display font-black text-foreground">
+                        Grátis
+                        <span className="text-xs text-muted-foreground font-normal ml-2">taxa 7% por consulta</span>
+                      </span>
                     )}
                   </div>
+
 
                   <Badge className="bg-amber-500/10 text-amber-400 text-xs mb-4 border-amber-500/20">
                     Multiplicador {plan.multiplier}

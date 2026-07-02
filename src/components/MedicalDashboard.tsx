@@ -18,6 +18,9 @@ import { toast } from "sonner";
 import { generatePrescriptionPDF, type PrescriptionData } from "@/lib/prescriptionPDF";
 import { APP_CONFIG } from "@/lib/app-config";
 import { DrEdilsonClinicalAgent } from "@/components/DrEdilsonClinicalAgent";
+import { PricingConfigModal } from "@/components/PricingConfigModal";
+import { PerformanceBonusWidget } from "@/components/PerformanceBonusWidget";
+import { NurseBrisaAlertSystem } from "@/components/NurseBrisaAlertSystem";
 
 // ─── Types ──────────────────────────────────────────────────
 interface WaitingPatient {
@@ -42,7 +45,7 @@ interface PrescriptionItem {
 // ─── Mock data (will be replaced by real queries) ───────────
 const MOCK_WAITING: WaitingPatient[] = [
   { id: "1", appointmentId: "a1", name: "Maria Silva", cpf: "***.***.789-01", age: 45, waitMinutes: 3, tags: ["Dor Crônica", "Retorno"], urgency: "medium", symptoms: "Lombalgia persistente, insônia leve" },
-  { id: "2", appointmentId: "a2", name: "João Santos", cpf: "***.***.456-78", age: 32, waitMinutes: 18, tags: ["Ansiedade", "1ª Orientação Técnica"], urgency: "low", symptoms: "Ansiedade generalizada, pânico noturno" },
+  { id: "2", appointmentId: "a2", name: "João Santos", cpf: "***.***.456-78", age: 32, waitMinutes: 18, tags: ["Ansiedade", "Retorno"], urgency: "low", symptoms: "Ansiedade generalizada, pânico noturno" },
   { id: "3", appointmentId: "a3", name: "Ana Costa", cpf: "***.***.123-45", age: 58, waitMinutes: 1, tags: ["Epilepsia", "Urgente"], urgency: "high", symptoms: "Crises refratárias, 3x/semana" },
   { id: "4", appointmentId: "a4", name: "Carlos Oliveira", cpf: "***.***.321-00", age: 67, waitMinutes: 22, tags: ["Parkinson", "Retorno"], urgency: "medium", symptoms: "Tremores, rigidez muscular progressiva" },
   { id: "5", appointmentId: "a5", name: "Fernanda Lima", cpf: "***.***.654-32", age: 29, waitMinutes: 5, tags: ["Insônia", "Fibromialgia"], urgency: "low", symptoms: "Dificuldade para dormir, dor difusa" },
@@ -61,7 +64,7 @@ function getProtocolForTags(tags: string[]) {
   for (const tag of tags) {
     if (AI_PROTOCOLS[tag]) return { tag, ...AI_PROTOCOLS[tag] };
   }
-  return { tag: "Geral", product: "CBD Full Spectrum 10%", dosage: "1 gota/kg/dia", notes: "Orientação Técnicar protocolo clínico" };
+  return { tag: "Geral", product: "CBD Full Spectrum 10%", dosage: "1 gota/kg/dia", notes: "Protocolo clínico padrão" };
 }
 
 // ─── Sub-components ─────────────────────────────────────────
@@ -528,7 +531,7 @@ export function MedicalDashboard() {
                     <div className="mt-1 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                     <div>
                       <span className="text-muted-foreground">15/04/2026 — </span>
-                      <span className="text-foreground/80">Orientação Técnica inicial. Paciente relata sintomas há 6 meses.</span>
+                      <span className="text-foreground/80">Primeira consulta. Paciente relata sintomas há 6 meses.</span>
                     </div>
                   </div>
                   <div className="flex items-start gap-2 text-xs">

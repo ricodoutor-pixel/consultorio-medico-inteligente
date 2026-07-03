@@ -160,6 +160,24 @@ const CadastroProfissional = () => {
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [savedCredentials, setSavedCredentials] = useState<{ email: string; password: string } | null>(null);
 
+  // KYC uploads (frente/verso obrigatórios)
+  type KycKind = "crm_front" | "crm_back" | "id_front" | "id_back";
+  const [kycFiles, setKycFiles] = useState<Record<KycKind, File | null>>({
+    crm_front: null, crm_back: null, id_front: null, id_back: null,
+  });
+  const MAX_KYC_BYTES = 5 * 1024 * 1024; // 5MB
+  const isCuidadorSel = form.categoria === "Cuidadores de Idosos";
+
+  const handleKycFile = (kind: KycKind) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] || null;
+    if (f && f.size > MAX_KYC_BYTES) {
+      toast({ title: "Arquivo muito grande", description: "Máximo 5MB (JPG/PNG/PDF).", variant: "destructive" });
+      e.target.value = "";
+      return;
+    }
+    setKycFiles((p) => ({ ...p, [kind]: f }));
+  };
+
   // Cuando cambia el país, ajustar tipos de documento y departamento por defecto
   useEffect(() => {
     if (country === "BO") {

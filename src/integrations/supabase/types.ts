@@ -2146,6 +2146,51 @@ export type Database = {
           },
         ]
       }
+      doctor_kyc_documents: {
+        Row: {
+          created_at: string
+          doctor_user_id: string
+          document_kind: string
+          id: string
+          mime_type: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          size_bytes: number | null
+          storage_path: string
+          updated_at: string
+          verification_notes: string | null
+          verification_status: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_user_id: string
+          document_kind: string
+          id?: string
+          mime_type?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size_bytes?: number | null
+          storage_path: string
+          updated_at?: string
+          verification_notes?: string | null
+          verification_status?: string
+        }
+        Update: {
+          created_at?: string
+          doctor_user_id?: string
+          document_kind?: string
+          id?: string
+          mime_type?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size_bytes?: number | null
+          storage_path?: string
+          updated_at?: string
+          verification_notes?: string | null
+          verification_status?: string
+        }
+        Relationships: []
+      }
       doctor_performance_metrics: {
         Row: {
           average_rating: number

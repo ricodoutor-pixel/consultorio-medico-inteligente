@@ -1,1 +1,302 @@
-import { useState, useEffect } from \"react\";\nimport { Card } from \"@/components/ui/card\";\nimport { Button } from \"@/components/ui/button\";\nimport { Badge } from \"@/components/ui/badge\";\nimport { Skeleton } from \"@/components/ui/skeleton\";\nimport { Bell, AlertCircle, CheckCircle2, Clock, Link as LinkIcon, X } from \"lucide-react\";\nimport { motion, AnimatePresence } from \"framer-motion\";\nimport { supabase } from \"@/integrations/supabase/client\";\nimport { toast } from \"sonner\";\n\ninterface Alert {\n  id: string;\n  type: \"new_appointment\" | \"urgent\" | \"follow_up\" | \"document_ready\";\n  title: string;\n  message: string;\n  actionUrl?: string;\n  isRead: boolean;\n  createdAt: Date;\n}\n\ninterface NurseBrisaAlertSystemProps {\n  doctorId: string;\n}\n\nconst ALERT_ICONS = {\n  new_appointment: Bell,\n  urgent: AlertCircle,\n  follow_up: Clock,\n  document_ready: CheckCircle2,\n};\n\nconst ALERT_COLORS = {\n  new_appointment: \"bg-blue-50 border-blue-200 text-blue-900\",\n  urgent: \"bg-red-50 border-red-200 text-red-900\",\n  follow_up: \"bg-amber-50 border-amber-200 text-amber-900\",\n  document_ready: \"bg-green-50 border-green-200 text-green-900\",\n};\n\nconst ALERT_BADGE_COLORS = {\n  new_appointment: \"bg-blue-600\",\n  urgent: \"bg-red-600\",\n  follow_up: \"bg-amber-600\",\n  document_ready: \"bg-green-600\",\n};\n\nexport function NurseBrisaAlertSystem({ doctorId }: NurseBrisaAlertSystemProps) {\n  const [alerts, setAlerts] = useState<Alert[]>([]);\n  const [loading, setLoading] = useState(true);\n  const [unreadCount, setUnreadCount] = useState(0);\n\n  useEffect(() => {\n    if (doctorId) {\n      loadAlerts();\n      subscribeToAlerts();\n    }\n  }, [doctorId]);\n\n  useEffect(() => {\n    const count = alerts.filter((a) => !a.isRead).length;\n    setUnreadCount(count);\n  }, [alerts]);\n\n  const loadAlerts = async () => {\n    try {\n      setLoading(true);\n      const { data, error } = await supabase\n        .from(\"nurse_brisa_alerts\")\n        .select(\"*\")\n        .eq(\"doctor_id\", doctorId)\n        .order(\"created_at\", { ascending: false })\n        .limit(20);\n\n      if (error) throw error;\n\n      if (data) {\n        setAlerts(\n          data.map((item) => ({\n            id: item.id,\n            type: item.alert_type as Alert[\"type\"],\n            title: item.title,\n            message: item.message,\n            actionUrl: item.action_url,\n            isRead: item.is_read,\n            createdAt: new Date(item.created_at),\n          }))\n        );\n      }\n    } catch (err) {\n      console.error(\"Erro ao carregar alertas:\", err);\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  const subscribeToAlerts = () => {\n    const channel = supabase\n      .channel(`nurse_brisa_alerts_${doctorId}`)\n      .on(\n        \"postgres_changes\",\n        {\n          event: \"INSERT\",\n          schema: \"public\",\n          table: \"nurse_brisa_alerts\",\n          filter: `doctor_id=eq.${doctorId}`,\n        },\n        (payload) => {\n          const newAlert: Alert = {\n            id: payload.new.id,\n            type: payload.new.alert_type,\n            title: payload.new.title,\n            message: payload.new.message,\n            actionUrl: payload.new.action_url,\n            isRead: false,\n            createdAt: new Date(payload.new.created_at),\n          };\n          setAlerts((prev) => [newAlert, ...prev]);\n          toast.info(`🔔 ${newAlert.title}`);\n        }\n      )\n      .subscribe();\n\n    return () => {\n      supabase.removeChannel(channel);\n    };\n  };\n\n  const handleMarkAsRead = async (alertId: string) => {\n    try {\n      const { error } = await supabase\n        .from(\"nurse_brisa_alerts\")\n        .update({ is_read: true, read_at: new Date().toISOString() })\n        .eq(\"id\", alertId);\n\n      if (error) throw error;\n\n      setAlerts((prev) =>\n        prev.map((a) => (a.id === alertId ? { ...a, isRead: true } : a))\n      );\n    } catch (err) {\n      console.error(\"Erro ao marcar como lido:\", err);\n    }\n  };\n\n  const handleDismiss = async (alertId: string) => {\n    try {\n      await handleMarkAsRead(alertId);\n      setAlerts((prev) => prev.filter((a) => a.id !== alertId));\n    } catch (err) {\n      console.error(\"Erro ao descartar alerta:\", err);\n    }\n  };\n\n  const handleActionClick = (alert: Alert) => {\n    if (alert.actionUrl) {\n      window.location.href = alert.actionUrl;\n    }\n    handleMarkAsRead(alert.id);\n  };\n\n  if (loading) {\n    return (\n      <Card className=\"p-6 rounded-xl border-purple-200/50 bg-purple-50/50\">\n        <div className=\"space-y-4\">\n          <Skeleton className=\"h-6 w-48\" />\n          <Skeleton className=\"h-20 w-full\" />\n          <Skeleton className=\"h-20 w-full\" />\n        </div>\n      </Card>\n    );\n  }\n\n  return (\n    <Card className=\"p-6 rounded-xl border-purple-200/50 bg-gradient-to-br from-purple-50/50 to-pink-50/50\">\n      {/* Header */}\n      <div className=\"flex items-center justify-between mb-4\">\n        <div className=\"flex items-center gap-3\">\n          <div className=\"h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center relative\">\n            <Bell className=\"h-5 w-5 text-purple-600\" />\n            {unreadCount > 0 && (\n              <span className=\"absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center\">\n                {unreadCount}\n              </span>\n            )}\n          </div>\n          <div>\n            <h3 className=\"text-sm font-bold uppercase tracking-wide text-purple-900\">\n              Alertas da Enf. Brisa\n            </h3>\n            <p className=\"text-xs text-purple-700\">Agente virtual de suporte</p>\n          </div>\n        </div>\n        <Badge variant=\"outline\" className=\"bg-purple-100 text-purple-900 border-purple-300\">\n          {alerts.length} alertas\n        </Badge>\n      </div>\n\n      {/* Alertas */}\n      <div className=\"space-y-3 max-h-96 overflow-y-auto\">\n        <AnimatePresence mode=\"popLayout\">\n          {alerts.length === 0 ? (\n            <div className=\"text-center py-8 text-purple-700/60\">\n              <Bell className=\"h-8 w-8 mx-auto mb-2 opacity-40\" />\n              <p className=\"text-sm\">Nenhum alerta no momento</p>\n            </div>\n          ) : (\n            alerts.map((alert) => {\n              const IconComponent = ALERT_ICONS[alert.type];\n              const colorClass = ALERT_COLORS[alert.type];\n              const badgeColorClass = ALERT_BADGE_COLORS[alert.type];\n\n              return (\n                <motion.div\n                  key={alert.id}\n                  layout\n                  initial={{ opacity: 0, x: -20 }}\n                  animate={{ opacity: 1, x: 0 }}\n                  exit={{ opacity: 0, x: 20, height: 0 }}\n                  transition={{ type: \"spring\", stiffness: 400, damping: 30 }}\n                >\n                  <Card\n                    className={`p-4 border rounded-lg transition-all ${\n                      alert.isRead\n                        ? `${colorClass} opacity-60`\n                        : `${colorClass} border-2 shadow-md`\n                    }`}\n                  >\n                    <div className=\"flex items-start gap-3\">\n                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${badgeColorClass}`}>\n                        <IconComponent className=\"h-4 w-4 text-white\" />\n                      </div>\n\n                      <div className=\"flex-1 min-w-0\">\n                        <div className=\"flex items-start justify-between gap-2 mb-1\">\n                          <h4 className=\"font-semibold text-sm\">{alert.title}</h4>\n                          <Button\n                            variant=\"ghost\"\n                            size=\"icon\"\n                            className=\"h-6 w-6 shrink-0\"\n                            onClick={() => handleDismiss(alert.id)}\n                          >\n                            <X className=\"h-3 w-3\" />\n                          </Button>\n                        </div>\n\n                        <p className=\"text-xs leading-relaxed mb-3\">{alert.message}</p>\n\n                        <div className=\"flex items-center gap-2 flex-wrap\">\n                          {!alert.isRead && (\n                            <Badge variant=\"secondary\" className=\"text-[10px]\">\n                              Novo\n                            </Badge>\n                          )}\n                          <span className=\"text-[10px] text-muted-foreground\">\n                            {alert.createdAt.toLocaleTimeString(\"pt-BR\", {\n                              hour: \"2-digit\",\n                              minute: \"2-digit\",\n                            })}\n                          </span>\n                          {alert.actionUrl && (\n                            <Button\n                              size=\"sm\"\n                              variant=\"outline\"\n                              className=\"h-6 text-[10px] gap-1\"\n                              onClick={() => handleActionClick(alert)}\n                            >\n                              <LinkIcon className=\"h-3 w-3\" />\n                              Abrir\n                            </Button>\n                          )}\n                        </div>\n                      </div>\n                    </div>\n                  </Card>\n                </motion.div>\n              );\n            })\n          )}\n        </AnimatePresence>\n      </div>\n\n      {/* Footer */}\n      {alerts.length > 0 && (\n        <div className=\"mt-4 pt-4 border-t border-purple-200/50 flex gap-2\">\n          <Button\n            size=\"sm\"\n            variant=\"outline\"\n            className=\"flex-1 text-xs\"\n            onClick={() => {\n              alerts.forEach((a) => {\n                if (!a.isRead) handleMarkAsRead(a.id);\n              });\n            }}\n          >\n            Marcar todos como lidos\n          </Button>\n        </div>\n      )}\n    </Card>\n  );\n}\n\nexport default NurseBrisaAlertSystem;
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Bell, AlertCircle, CheckCircle2, Clock, Link as LinkIcon, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface Alert {
+  id: string;
+  type: "new_appointment" | "urgent" | "follow_up" | "document_ready";
+  title: string;
+  message: string;
+  actionUrl?: string;
+  isRead: boolean;
+  createdAt: Date;
+}
+
+interface NurseBrisaAlertSystemProps {
+  doctorId: string;
+}
+
+const ALERT_ICONS = {
+  new_appointment: Bell,
+  urgent: AlertCircle,
+  follow_up: Clock,
+  document_ready: CheckCircle2,
+};
+
+const ALERT_COLORS = {
+  new_appointment: "bg-blue-50 border-blue-200 text-blue-900",
+  urgent: "bg-red-50 border-red-200 text-red-900",
+  follow_up: "bg-amber-50 border-amber-200 text-amber-900",
+  document_ready: "bg-green-50 border-green-200 text-green-900",
+};
+
+const ALERT_BADGE_COLORS = {
+  new_appointment: "bg-blue-600",
+  urgent: "bg-red-600",
+  follow_up: "bg-amber-600",
+  document_ready: "bg-green-600",
+};
+
+export function NurseBrisaAlertSystem({ doctorId }: NurseBrisaAlertSystemProps) {
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (doctorId) {
+      loadAlerts();
+      subscribeToAlerts();
+    }
+  }, [doctorId]);
+
+  useEffect(() => {
+    const count = alerts.filter((a) => !a.isRead).length;
+    setUnreadCount(count);
+  }, [alerts]);
+
+  const loadAlerts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("nurse_brisa_alerts")
+        .select("*")
+        .eq("doctor_id", doctorId)
+        .order("created_at", { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      if (data) {
+        setAlerts(
+          data.map((item) => ({
+            id: item.id,
+            type: item.alert_type as Alert["type"],
+            title: item.title,
+            message: item.message,
+            actionUrl: item.action_url,
+            isRead: item.is_read,
+            createdAt: new Date(item.created_at),
+          }))
+        );
+      }
+    } catch (err) {
+      console.error("Erro ao carregar alertas:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const subscribeToAlerts = () => {
+    const channel = supabase
+      .channel(`nurse_brisa_alerts_${doctorId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "nurse_brisa_alerts",
+          filter: `doctor_id=eq.${doctorId}`,
+        },
+        (payload) => {
+          const newAlert: Alert = {
+            id: payload.new.id,
+            type: payload.new.alert_type,
+            title: payload.new.title,
+            message: payload.new.message,
+            actionUrl: payload.new.action_url,
+            isRead: false,
+            createdAt: new Date(payload.new.created_at),
+          };
+          setAlerts((prev) => [newAlert, ...prev]);
+          toast.info(`🔔 ${newAlert.title}`);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
+
+  const handleMarkAsRead = async (alertId: string) => {
+    try {
+      const { error } = await supabase
+        .from("nurse_brisa_alerts")
+        .update({ is_read: true, read_at: new Date().toISOString() })
+        .eq("id", alertId);
+
+      if (error) throw error;
+
+      setAlerts((prev) =>
+        prev.map((a) => (a.id === alertId ? { ...a, isRead: true } : a))
+      );
+    } catch (err) {
+      console.error("Erro ao marcar como lido:", err);
+    }
+  };
+
+  const handleDismiss = async (alertId: string) => {
+    try {
+      await handleMarkAsRead(alertId);
+      setAlerts((prev) => prev.filter((a) => a.id !== alertId));
+    } catch (err) {
+      console.error("Erro ao descartar alerta:", err);
+    }
+  };
+
+  const handleActionClick = (alert: Alert) => {
+    if (alert.actionUrl) {
+      window.location.href = alert.actionUrl;
+    }
+    handleMarkAsRead(alert.id);
+  };
+
+  if (loading) {
+    return (
+      <Card className="p-6 rounded-xl border-purple-200/50 bg-purple-50/50">
+        <div className="space-y-4">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="p-6 rounded-xl border-purple-200/50 bg-gradient-to-br from-purple-50/50 to-pink-50/50">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center relative">
+            <Bell className="h-5 w-5 text-purple-600" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
+                {unreadCount}
+              </span>
+            )}
+          </div>
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wide text-purple-900">
+              Alertas da Enf. Brisa
+            </h3>
+            <p className="text-xs text-purple-700">Agente virtual de suporte</p>
+          </div>
+        </div>
+        <Badge variant="outline" className="bg-purple-100 text-purple-900 border-purple-300">
+          {alerts.length} alertas
+        </Badge>
+      </div>
+
+      {/* Alertas */}
+      <div className="space-y-3 max-h-96 overflow-y-auto">
+        <AnimatePresence mode="popLayout">
+          {alerts.length === 0 ? (
+            <div className="text-center py-8 text-purple-700/60">
+              <Bell className="h-8 w-8 mx-auto mb-2 opacity-40" />
+              <p className="text-sm">Nenhum alerta no momento</p>
+            </div>
+          ) : (
+            alerts.map((alert) => {
+              const IconComponent = ALERT_ICONS[alert.type];
+              const colorClass = ALERT_COLORS[alert.type];
+              const badgeColorClass = ALERT_BADGE_COLORS[alert.type];
+
+              return (
+                <motion.div
+                  key={alert.id}
+                  layout
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20, height: 0 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                >
+                  <Card
+                    className={`p-4 border rounded-lg transition-all ${
+                      alert.isRead
+                        ? `${colorClass} opacity-60`
+                        : `${colorClass} border-2 shadow-md`
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${badgeColorClass}`}>
+                        <IconComponent className="h-4 w-4 text-white" />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h4 className="font-semibold text-sm">{alert.title}</h4>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 shrink-0"
+                            onClick={() => handleDismiss(alert.id)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+
+                        <p className="text-xs leading-relaxed mb-3">{alert.message}</p>
+
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {!alert.isRead && (
+                            <Badge variant="secondary" className="text-[10px]">
+                              Novo
+                            </Badge>
+                          )}
+                          <span className="text-[10px] text-muted-foreground">
+                            {alert.createdAt.toLocaleTimeString("pt-BR", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                          {alert.actionUrl && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-6 text-[10px] gap-1"
+                              onClick={() => handleActionClick(alert)}
+                            >
+                              <LinkIcon className="h-3 w-3" />
+                              Abrir
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              );
+            })
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Footer */}
+      {alerts.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-purple-200/50 flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="flex-1 text-xs"
+            onClick={() => {
+              alerts.forEach((a) => {
+                if (!a.isRead) handleMarkAsRead(a.id);
+              });
+            }}
+          >
+            Marcar todos como lidos
+          </Button>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+export default NurseBrisaAlertSystem;

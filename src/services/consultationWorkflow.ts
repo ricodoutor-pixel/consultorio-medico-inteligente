@@ -1,1 +1,293 @@
-import { supabase } from \"@/integrations/supabase/client\";\nimport { toast } from \"sonner\";\n\ninterface ConsultationWorkflowPayload {\n  doctorId: string;\n  appointmentId: string;\n  patientId: string;\n  patientName: string;\n  patientPhone: string;\n  consultationType: \"video\" | \"chat\";\n  doctorDefinedPrice: number;\n}\n\nexport const consultationWorkflowService = {\n  /**\n   * Enviar alerta da Enf. Brisa para o médico com link de consulta\n   */\n  async sendNurseBrisaAlert(payload: ConsultationWorkflowPayload) {\n    try {\n      const consultationLink = `${window.location.origin}/consultation-monitor/${payload.appointmentId}`;\n\n      const { error } = await supabase.functions.invoke(\"send-nurse-brisa-alert\", {\n        body: {\n          doctorId: payload.doctorId,\n          appointmentId: payload.appointmentId,\n          patientId: payload.patientId,\n          alertType: \"new_appointment\",\n          title: `📞 Nova Consulta: ${payload.patientName}`,\n          message: `Paciente ${payload.patientName} aguardando atendimento via ${payload.consultationType === \"video\" ? \"vídeo\" : \"chat\"}. Clique para aceitar.`,\n          actionUrl: consultationLink,\n        },\n      });\n\n      if (error) throw error;\n      return { success: true };\n    } catch (err) {\n      console.error(\"Erro ao enviar alerta da Enf. Brisa:\", err);\n      throw err;\n    }\n  },\n\n  /**\n   * Aceitar consulta e iniciar atendimento\n   */\n  async acceptConsultation(appointmentId: string) {\n    try {\n      const { error } = await supabase\n        .from(\"appointments\")\n        .update({\n          status: \"in_progress\",\n          updated_at: new Date().toISOString(),\n        })\n        .eq(\"id\", appointmentId);\n\n      if (error) throw error;\n\n      // Criar registro inicial de prontuário\n      const { data: appointment } = await supabase\n        .from(\"appointments\")\n        .select(\"patient_id, doctor_id\")\n        .eq(\"id\", appointmentId)\n        .single();\n\n      if (appointment) {\n        await supabase.from(\"medical_records\").insert([\n          {\n            patient_id: appointment.patient_id,\n            doctor_id: appointment.doctor_id,\n            appointment_id: appointmentId,\n            chief_complaint: \"Consulta iniciada\",\n            created_at: new Date().toISOString(),\n          },\n        ]);\n      }\n\n      return { success: true };\n    } catch (err) {\n      console.error(\"Erro ao aceitar consulta:\", err);\n      throw err;\n    }\n  },\n\n  /**\n   * Rejeitar consulta\n   */\n  async rejectConsultation(appointmentId: string, reason: string) {\n    try {\n      const { error } = await supabase\n        .from(\"appointments\")\n        .update({\n          status: \"cancelled\",\n          cancellation_reason: reason,\n          updated_at: new Date().toISOString(),\n        })\n        .eq(\"id\", appointmentId);\n\n      if (error) throw error;\n      return { success: true };\n    } catch (err) {\n      console.error(\"Erro ao rejeitar consulta:\", err);\n      throw err;\n    }\n  },\n\n  /**\n   * Finalizar consulta e salvar prontuário\n   */\n  async finalizeConsultation(\n    appointmentId: string,\n    medicalRecord: {\n      chief_complaint: string;\n      diagnosis: string;\n      treatment_plan: string;\n      notes: string;\n    }\n  ) {\n    try {\n      // Atualizar status da consulta\n      const { error: appointmentError } = await supabase\n        .from(\"appointments\")\n        .update({\n          status: \"completed\",\n          updated_at: new Date().toISOString(),\n        })\n        .eq(\"id\", appointmentId);\n\n      if (appointmentError) throw appointmentError;\n\n      // Atualizar prontuário médico\n      const { error: recordError } = await supabase\n        .from(\"medical_records\")\n        .update({\n          chief_complaint: medicalRecord.chief_complaint,\n          diagnosis: medicalRecord.diagnosis,\n          treatment_plan: medicalRecord.treatment_plan,\n          notes: medicalRecord.notes,\n          updated_at: new Date().toISOString(),\n        })\n        .eq(\"appointment_id\", appointmentId);\n\n      if (recordError) throw recordError;\n\n      // Calcular performance bonus mensal\n      const { data: doctor } = await supabase\n        .from(\"appointments\")\n        .select(\"doctor_id\")\n        .eq(\"id\", appointmentId)\n        .single();\n\n      if (doctor) {\n        const now = new Date();\n        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);\n\n        // Chamar função de cálculo de bonus\n        await supabase.rpc(\"calculate_monthly_performance_bonus\", {\n          p_doctor_id: doctor.doctor_id,\n          p_month: monthStart.toISOString().split(\"T\")[0],\n        });\n      }\n\n      return { success: true };\n    } catch (err) {\n      console.error(\"Erro ao finalizar consulta:\", err);\n      throw err;\n    }\n  },\n\n  /**\n   * Salvar nota clínica durante a consulta\n   */\n  async saveClinicNote(appointmentId: string, note: string) {\n    try {\n      const { data: record } = await supabase\n        .from(\"medical_records\")\n        .select(\"id\")\n        .eq(\"appointment_id\", appointmentId)\n        .single();\n\n      if (!record) throw new Error(\"Prontuário não encontrado\");\n\n      const { error } = await supabase\n        .from(\"medical_records\")\n        .update({\n          notes: note,\n          updated_at: new Date().toISOString(),\n        })\n        .eq(\"id\", record.id);\n\n      if (error) throw error;\n      return { success: true };\n    } catch (err) {\n      console.error(\"Erro ao salvar nota clínica:\", err);\n      throw err;\n    }\n  },\n\n  /**\n   * Gerar prescrição e salvar automaticamente\n   */\n  async generatePrescription(\n    appointmentId: string,\n    medications: Array<{ name: string; dosage: string; instructions: string }>\n  ) {\n    try {\n      const { data: appointment } = await supabase\n        .from(\"appointments\")\n        .select(\"patient_id, doctor_id\")\n        .eq(\"id\", appointmentId)\n        .single();\n\n      if (!appointment) throw new Error(\"Consulta não encontrada\");\n\n      const { data: record } = await supabase\n        .from(\"medical_records\")\n        .select(\"id\")\n        .eq(\"appointment_id\", appointmentId)\n        .single();\n\n      const { data, error } = await supabase\n        .from(\"prescriptions\")\n        .insert([\n          {\n            patient_id: appointment.patient_id,\n            doctor_id: appointment.doctor_id,\n            appointment_id: appointmentId,\n            medical_record_id: record?.id || null,\n            medications: medications,\n            status: \"signed\",\n            signature_date: new Date().toISOString(),\n            digital_signature: crypto.randomUUID(),\n          },\n        ])\n        .select()\n        .single();\n\n      if (error) throw error;\n      return { success: true, prescription: data };\n    } catch (err) {\n      console.error(\"Erro ao gerar prescrição:\", err);\n      throw err;\n    }\n  },\n\n  /**\n   * Buscar paciente por CPF\n   */\n  async searchPatientByCPF(cpf: string) {\n    try {\n      const { data, error } = await supabase\n        .from(\"profiles\")\n        .select(\"id, full_name, cpf, phone, date_of_birth\")\n        .eq(\"cpf\", cpf)\n        .single();\n\n      if (error) throw error;\n      return { success: true, patient: data };\n    } catch (err) {\n      console.error(\"Erro ao buscar paciente:\", err);\n      throw err;\n    }\n  },\n\n  /**\n   * Obter histórico de consultas do paciente\n   */\n  async getPatientConsultationHistory(patientId: string) {\n    try {\n      const { data, error } = await supabase\n        .from(\"appointments\")\n        .select(\n          `\n          id,\n          scheduled_at,\n          status,\n          type,\n          doctors(id, crm, specialty),\n          medical_records(chief_complaint, diagnosis, treatment_plan)\n        `\n        )\n        .eq(\"patient_id\", patientId)\n        .order(\"scheduled_at\", { ascending: false })\n        .limit(10);\n\n      if (error) throw error;\n      return { success: true, history: data };\n    } catch (err) {\n      console.error(\"Erro ao buscar histórico:\", err);\n      throw err;\n    }\n  },\n};\n\nexport default consultationWorkflowService;
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface ConsultationWorkflowPayload {
+  doctorId: string;
+  appointmentId: string;
+  patientId: string;
+  patientName: string;
+  patientPhone: string;
+  consultationType: "video" | "chat";
+  doctorDefinedPrice: number;
+}
+
+export const consultationWorkflowService = {
+  /**
+   * Enviar alerta da Enf. Brisa para o médico com link de consulta
+   */
+  async sendNurseBrisaAlert(payload: ConsultationWorkflowPayload) {
+    try {
+      const consultationLink = `${window.location.origin}/consultation-monitor/${payload.appointmentId}`;
+
+      const { error } = await supabase.functions.invoke("send-nurse-brisa-alert", {
+        body: {
+          doctorId: payload.doctorId,
+          appointmentId: payload.appointmentId,
+          patientId: payload.patientId,
+          alertType: "new_appointment",
+          title: `📞 Nova Consulta: ${payload.patientName}`,
+          message: `Paciente ${payload.patientName} aguardando atendimento via ${payload.consultationType === "video" ? "vídeo" : "chat"}. Clique para aceitar.`,
+          actionUrl: consultationLink,
+        },
+      });
+
+      if (error) throw error;
+      return { success: true };
+    } catch (err) {
+      console.error("Erro ao enviar alerta da Enf. Brisa:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Aceitar consulta e iniciar atendimento
+   */
+  async acceptConsultation(appointmentId: string) {
+    try {
+      const { error } = await supabase
+        .from("appointments")
+        .update({
+          status: "in_progress",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", appointmentId);
+
+      if (error) throw error;
+
+      // Criar registro inicial de prontuário
+      const { data: appointment } = await supabase
+        .from("appointments")
+        .select("patient_id, doctor_id")
+        .eq("id", appointmentId)
+        .single();
+
+      if (appointment) {
+        await supabase.from("medical_records").insert([
+          {
+            patient_id: appointment.patient_id,
+            doctor_id: appointment.doctor_id,
+            appointment_id: appointmentId,
+            chief_complaint: "Consulta iniciada",
+            created_at: new Date().toISOString(),
+          },
+        ]);
+      }
+
+      return { success: true };
+    } catch (err) {
+      console.error("Erro ao aceitar consulta:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Rejeitar consulta
+   */
+  async rejectConsultation(appointmentId: string, reason: string) {
+    try {
+      const { error } = await supabase
+        .from("appointments")
+        .update({
+          status: "cancelled",
+          cancellation_reason: reason,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", appointmentId);
+
+      if (error) throw error;
+      return { success: true };
+    } catch (err) {
+      console.error("Erro ao rejeitar consulta:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Finalizar consulta e salvar prontuário
+   */
+  async finalizeConsultation(
+    appointmentId: string,
+    medicalRecord: {
+      chief_complaint: string;
+      diagnosis: string;
+      treatment_plan: string;
+      notes: string;
+    }
+  ) {
+    try {
+      // Atualizar status da consulta
+      const { error: appointmentError } = await supabase
+        .from("appointments")
+        .update({
+          status: "completed",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", appointmentId);
+
+      if (appointmentError) throw appointmentError;
+
+      // Atualizar prontuário médico
+      const { error: recordError } = await supabase
+        .from("medical_records")
+        .update({
+          chief_complaint: medicalRecord.chief_complaint,
+          diagnosis: medicalRecord.diagnosis,
+          treatment_plan: medicalRecord.treatment_plan,
+          notes: medicalRecord.notes,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("appointment_id", appointmentId);
+
+      if (recordError) throw recordError;
+
+      // Calcular performance bonus mensal
+      const { data: doctor } = await supabase
+        .from("appointments")
+        .select("doctor_id")
+        .eq("id", appointmentId)
+        .single();
+
+      if (doctor) {
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        // Chamar função de cálculo de bonus
+        await supabase.rpc("calculate_monthly_performance_bonus", {
+          p_doctor_id: doctor.doctor_id,
+          p_month: monthStart.toISOString().split("T")[0],
+        });
+      }
+
+      return { success: true };
+    } catch (err) {
+      console.error("Erro ao finalizar consulta:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Salvar nota clínica durante a consulta
+   */
+  async saveClinicNote(appointmentId: string, note: string) {
+    try {
+      const { data: record } = await supabase
+        .from("medical_records")
+        .select("id")
+        .eq("appointment_id", appointmentId)
+        .single();
+
+      if (!record) throw new Error("Prontuário não encontrado");
+
+      const { error } = await supabase
+        .from("medical_records")
+        .update({
+          notes: note,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", record.id);
+
+      if (error) throw error;
+      return { success: true };
+    } catch (err) {
+      console.error("Erro ao salvar nota clínica:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Gerar prescrição e salvar automaticamente
+   */
+  async generatePrescription(
+    appointmentId: string,
+    medications: Array<{ name: string; dosage: string; instructions: string }>
+  ) {
+    try {
+      const { data: appointment } = await supabase
+        .from("appointments")
+        .select("patient_id, doctor_id")
+        .eq("id", appointmentId)
+        .single();
+
+      if (!appointment) throw new Error("Consulta não encontrada");
+
+      const { data: record } = await supabase
+        .from("medical_records")
+        .select("id")
+        .eq("appointment_id", appointmentId)
+        .single();
+
+      const { data, error } = await supabase
+        .from("prescriptions")
+        .insert([
+          {
+            patient_id: appointment.patient_id,
+            doctor_id: appointment.doctor_id,
+            appointment_id: appointmentId,
+            medical_record_id: record?.id || null,
+            medications: medications,
+            status: "signed",
+            signature_date: new Date().toISOString(),
+            digital_signature: crypto.randomUUID(),
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { success: true, prescription: data };
+    } catch (err) {
+      console.error("Erro ao gerar prescrição:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Buscar paciente por CPF
+   */
+  async searchPatientByCPF(cpf: string) {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, cpf, phone, date_of_birth")
+        .eq("cpf", cpf)
+        .single();
+
+      if (error) throw error;
+      return { success: true, patient: data };
+    } catch (err) {
+      console.error("Erro ao buscar paciente:", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Obter histórico de consultas do paciente
+   */
+  async getPatientConsultationHistory(patientId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select(
+          `
+          id,
+          scheduled_at,
+          status,
+          type,
+          doctors(id, crm, specialty),
+          medical_records(chief_complaint, diagnosis, treatment_plan)
+        `
+        )
+        .eq("patient_id", patientId)
+        .order("scheduled_at", { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      return { success: true, history: data };
+    } catch (err) {
+      console.error("Erro ao buscar histórico:", err);
+      throw err;
+    }
+  },
+};
+
+export default consultationWorkflowService;

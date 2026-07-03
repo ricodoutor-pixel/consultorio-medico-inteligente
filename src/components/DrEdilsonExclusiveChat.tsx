@@ -8,7 +8,8 @@ import { Stethoscope, X, Send, Lock, AlertTriangle, Loader2, Clock } from "lucid
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as _supabase } from "@/integrations/supabase/client";
+const supabase: any = _supabase;
 
 type Message = { id: string; role: "doctor" | "assistant"; content: string; timestamp: Date };
 

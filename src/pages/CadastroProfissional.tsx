@@ -691,7 +691,40 @@ const CadastroProfissional = () => {
                         ? "Sus datos se verifican con el Colegio Médico de Bolivia / SEDES. Todos los intentos quedan registrados (Ley N° 1581)."
                         : "Seus dados são verificados automaticamente junto ao conselho profissional (compliance ANVISA/CFM/LGPD)."}
                     </p>
+
+                    {/* 🔐 KYC Uploads (frente/verso obrigatórios) */}
+                    <div className="mt-4 space-y-3 border rounded-lg p-3 bg-muted/30">
+                      <p className="text-sm font-medium">
+                        {isBO ? "Documentos obligatorios (frente y dorso)" : "Documentos obrigatórios (frente e verso)"}
+                      </p>
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {!isCuidadorSel && (
+                          <>
+                            <div className="space-y-1">
+                              <Label className="text-xs">{isBO ? "Matrícula — frente" : "CRM — frente"}</Label>
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} required />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">{isBO ? "Matrícula — dorso" : "CRM — verso"}</Label>
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_back")} required />
+                            </div>
+                          </>
+                        )}
+                        <div className="space-y-1">
+                          <Label className="text-xs">{isBO ? "CI — frente" : "RG/CNH — frente"}</Label>
+                          <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("id_front")} required />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">{isBO ? "CI — dorso" : "RG/CNH — verso"}</Label>
+                          <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("id_back")} required />
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">
+                        JPG/PNG/PDF · máx 5MB por arquivo · legível e sem cortes.
+                      </p>
+                    </div>
                   </div>
+
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">

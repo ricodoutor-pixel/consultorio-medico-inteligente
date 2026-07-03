@@ -160,6 +160,24 @@ const CadastroProfissional = () => {
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [savedCredentials, setSavedCredentials] = useState<{ email: string; password: string } | null>(null);
 
+  // KYC uploads (frente/verso obrigatórios)
+  type KycKind = "crm_front" | "crm_back" | "id_front" | "id_back";
+  const [kycFiles, setKycFiles] = useState<Record<KycKind, File | null>>({
+    crm_front: null, crm_back: null, id_front: null, id_back: null,
+  });
+  const MAX_KYC_BYTES = 5 * 1024 * 1024; // 5MB
+  const isCuidadorSel = form.categoria === "Cuidadores de Idosos";
+
+  const handleKycFile = (kind: KycKind) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] || null;
+    if (f && f.size > MAX_KYC_BYTES) {
+      toast({ title: "Arquivo muito grande", description: "Máximo 5MB (JPG/PNG/PDF).", variant: "destructive" });
+      e.target.value = "";
+      return;
+    }
+    setKycFiles((p) => ({ ...p, [kind]: f }));
+  };
+
   // Cuando cambia el país, ajustar tipos de documento y departamento por defecto
   useEffect(() => {
     if (country === "BO") {
@@ -299,6 +317,22 @@ const CadastroProfissional = () => {
       return;
     }
 
+    // 🔐 Documentos KYC obrigatórios
+    const requiredKyc: KycKind[] = isCuidador
+      ? ["id_front", "id_back"]
+      : ["crm_front", "crm_back", "id_front", "id_back"];
+    const missing = requiredKyc.filter((k) => !kycFiles[k]);
+    if (missing.length > 0) {
+      toast({
+        title: country === "BO" ? "Documentos obligatorios" : "Documentos obrigatórios",
+        description: country === "BO"
+          ? "Suba frente y dorso de la matrícula y del documento de identidad."
+          : "Envie frente e verso do registro profissional e do documento de identidade.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     trackKYCSubmissionAttempt(documentType);
     setLoading(true);
 
@@ -354,6 +388,46 @@ const CadastroProfissional = () => {
       });
       if (docErr) console.error("[doctor insert]", docErr);
 
+      // 4) Upload KYC (frente/verso) + registro
+      const uploads: Promise<unknown>[] = [];
+      for (const kind of Object.keys(kycFiles) as KycKind[]) {
+        const file = kycFiles[kind];
+        if (!file) continue;
+        const ext = (file.name.split(".").pop() || "bin").toLowerCase().slice(0, 5);
+        const path = `${userId}/${kind}.${ext}`;
+        uploads.push(
+          supabase.storage
+            .from("doctor-kyc-documents")
+            .upload(path, file, { upsert: true, contentType: file.type || undefined })
+            .then(async ({ error: upErr }) => {
+              if (upErr) { console.error("[kyc upload]", kind, upErr); return; }
+              await supabase.from("doctor_kyc_documents").upsert({
+                doctor_user_id: userId,
+                document_kind: kind,
+                storage_path: path,
+                mime_type: file.type || null,
+                size_bytes: file.size,
+                verification_status: "pending",
+              }, { onConflict: "doctor_user_id,document_kind" });
+            })
+        );
+      }
+      await Promise.all(uploads);
+
+      // 5) Disparo WhatsApp (Enf. Brisa) — não bloqueante
+      try {
+        await supabase.functions.invoke("send-doctor-welcome-whatsapp", {
+          body: {
+            phone: form.telefone,
+            fullName: form.nomeCompleto,
+            email: form.email.trim().toLowerCase(),
+            country,
+          },
+        });
+      } catch (waErr) {
+        console.warn("[whatsapp welcome] falhou:", waErr);
+      }
+
       setSavedCredentials({ email: form.email.trim().toLowerCase(), password: form.password });
       setLoading(false);
       setSubmitted(true);
@@ -361,8 +435,8 @@ const CadastroProfissional = () => {
       toast({
         title: country === "BO" ? "¡Registro guardado!" : "Cadastro salvo com sucesso!",
         description: country === "BO"
-          ? "Sus credenciales fueron creadas. Guarde su contraseña."
-          : "Suas credenciais foram criadas. Guarde sua senha.",
+          ? "Sus credenciales fueron creadas y enviadas por WhatsApp."
+          : "Suas credenciais foram enviadas para seu WhatsApp.",
       });
     } catch (err: any) {
       setLoading(false);
@@ -617,7 +691,40 @@ const CadastroProfissional = () => {
                         ? "Sus datos se verifican con el Colegio Médico de Bolivia / SEDES. Todos los intentos quedan registrados (Ley N° 1581)."
                         : "Seus dados são verificados automaticamente junto ao conselho profissional (compliance ANVISA/CFM/LGPD)."}
                     </p>
+
+                    {/* 🔐 KYC Uploads (frente/verso obrigatórios) */}
+                    <div className="mt-4 space-y-3 border rounded-lg p-3 bg-muted/30">
+                      <p className="text-sm font-medium">
+                        {isBO ? "Documentos obligatorios (frente y dorso)" : "Documentos obrigatórios (frente e verso)"}
+                      </p>
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {!isCuidadorSel && (
+                          <>
+                            <div className="space-y-1">
+                              <Label className="text-xs">{isBO ? "Matrícula — frente" : "CRM — frente"}</Label>
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} required />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">{isBO ? "Matrícula — dorso" : "CRM — verso"}</Label>
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_back")} required />
+                            </div>
+                          </>
+                        )}
+                        <div className="space-y-1">
+                          <Label className="text-xs">{isBO ? "CI — frente" : "RG/CNH — frente"}</Label>
+                          <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("id_front")} required />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">{isBO ? "CI — dorso" : "RG/CNH — verso"}</Label>
+                          <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("id_back")} required />
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">
+                        JPG/PNG/PDF · máx 5MB por arquivo · legível e sem cortes.
+                      </p>
+                    </div>
                   </div>
+
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">

@@ -1,1 +1,78 @@
-import { useEffect, useState } from \"react\";\nimport { useParams } from \"react-router-dom\";\nimport { ConsultationMonitorDashboard } from \"@/components/ConsultationMonitorDashboard\";\nimport { DrEdilsonExclusiveChat } from \"@/components/DrEdilsonExclusiveChat\";\nimport { NurseBrisaAlertSystem } from \"@/components/NurseBrisaAlertSystem\";\nimport { supabase } from \"@/integrations/supabase/client\";\nimport { toast } from \"sonner\";\n\nexport function ConsultationMonitorPage() {\n  const { appointmentId } = useParams<{ appointmentId: string }>();\n  const [doctorId, setDoctorId] = useState<string | null>(null);\n  const [loading, setLoading] = useState(true);\n\n  useEffect(() => {\n    loadDoctorInfo();\n  }, []);\n\n  const loadDoctorInfo = async () => {\n    try {\n      setLoading(true);\n      const { data: { user } } = await supabase.auth.getUser();\n\n      if (!user) {\n        toast.error(\"Você precisa estar logado como médico\");\n        return;\n      }\n\n      const { data, error } = await supabase\n        .from(\"doctors\")\n        .select(\"id\")\n        .eq(\"user_id\", user.id)\n        .single();\n\n      if (error) throw error;\n      if (data) setDoctorId(data.id);\n    } catch (err) {\n      console.error(\"Erro ao carregar informações do médico:\", err);\n      toast.error(\"Erro ao carregar informações do médico\");\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  if (loading) {\n    return (\n      <div className=\"flex items-center justify-center h-screen\">\n        <div className=\"text-center space-y-3\">\n          <div className=\"animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto\" />\n          <p className=\"text-muted-foreground\">Carregando Dashboard de Consulta...</p>\n        </div>\n      </div>\n    );\n  }\n\n  return (\n    <div className=\"relative\">\n      <ConsultationMonitorDashboard appointmentId={appointmentId} />\n\n      {/* Chat exclusivo com Dr. Edilson */}\n      {appointmentId && (\n        <DrEdilsonExclusiveChat\n          appointmentId={appointmentId}\n          patientName=\"Paciente\"\n          patientContext=\"Paciente em atendimento com sintomas de dor crônica\"\n        />\n      )}\n\n      {/* Sistema de alertas da Enf. Brisa */}\n      {doctorId && (\n        <div className=\"fixed bottom-4 left-4 w-96 max-h-96 z-30\">\n          <NurseBrisaAlertSystem doctorId={doctorId} />\n        </div>\n      )}\n    </div>\n  );\n}\n\nexport default ConsultationMonitorPage;
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { ConsultationMonitorDashboard } from "@/components/ConsultationMonitorDashboard";
+import { DrEdilsonExclusiveChat } from "@/components/DrEdilsonExclusiveChat";
+import { NurseBrisaAlertSystem } from "@/components/NurseBrisaAlertSystem";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+export function ConsultationMonitorPage() {
+  const { appointmentId } = useParams<{ appointmentId: string }>();
+  const [doctorId, setDoctorId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDoctorInfo();
+  }, []);
+
+  const loadDoctorInfo = async () => {
+    try {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        toast.error("Você precisa estar logado como médico");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("doctors")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (error) throw error;
+      if (data) setDoctorId(data.id);
+    } catch (err) {
+      console.error("Erro ao carregar informações do médico:", err);
+      toast.error("Erro ao carregar informações do médico");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center space-y-3">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
+          <p className="text-muted-foreground">Carregando Dashboard de Consulta...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      <ConsultationMonitorDashboard appointmentId={appointmentId} />
+
+      {/* Chat exclusivo com Dr. Edilson */}
+      {appointmentId && (
+        <DrEdilsonExclusiveChat
+          appointmentId={appointmentId}
+          patientName="Paciente"
+          patientContext="Paciente em atendimento com sintomas de dor crônica"
+        />
+      )}
+
+      {/* Sistema de alertas da Enf. Brisa */}
+      {doctorId && (
+        <div className="fixed bottom-4 left-4 w-96 max-h-96 z-30">
+          <NurseBrisaAlertSystem doctorId={doctorId} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default ConsultationMonitorPage;

@@ -388,6 +388,46 @@ const CadastroProfissional = () => {
       });
       if (docErr) console.error("[doctor insert]", docErr);
 
+      // 4) Upload KYC (frente/verso) + registro
+      const uploads: Promise<unknown>[] = [];
+      for (const kind of Object.keys(kycFiles) as KycKind[]) {
+        const file = kycFiles[kind];
+        if (!file) continue;
+        const ext = (file.name.split(".").pop() || "bin").toLowerCase().slice(0, 5);
+        const path = `${userId}/${kind}.${ext}`;
+        uploads.push(
+          supabase.storage
+            .from("doctor-kyc-documents")
+            .upload(path, file, { upsert: true, contentType: file.type || undefined })
+            .then(async ({ error: upErr }) => {
+              if (upErr) { console.error("[kyc upload]", kind, upErr); return; }
+              await supabase.from("doctor_kyc_documents").upsert({
+                doctor_user_id: userId,
+                document_kind: kind,
+                storage_path: path,
+                mime_type: file.type || null,
+                size_bytes: file.size,
+                verification_status: "pending",
+              }, { onConflict: "doctor_user_id,document_kind" });
+            })
+        );
+      }
+      await Promise.all(uploads);
+
+      // 5) Disparo WhatsApp (Enf. Brisa) — não bloqueante
+      try {
+        await supabase.functions.invoke("send-doctor-welcome-whatsapp", {
+          body: {
+            phone: form.telefone,
+            fullName: form.nomeCompleto,
+            email: form.email.trim().toLowerCase(),
+            country,
+          },
+        });
+      } catch (waErr) {
+        console.warn("[whatsapp welcome] falhou:", waErr);
+      }
+
       setSavedCredentials({ email: form.email.trim().toLowerCase(), password: form.password });
       setLoading(false);
       setSubmitted(true);
@@ -395,8 +435,8 @@ const CadastroProfissional = () => {
       toast({
         title: country === "BO" ? "¡Registro guardado!" : "Cadastro salvo com sucesso!",
         description: country === "BO"
-          ? "Sus credenciales fueron creadas. Guarde su contraseña."
-          : "Suas credenciais foram criadas. Guarde sua senha.",
+          ? "Sus credenciales fueron creadas y enviadas por WhatsApp."
+          : "Suas credenciais foram enviadas para seu WhatsApp.",
       });
     } catch (err: any) {
       setLoading(false);

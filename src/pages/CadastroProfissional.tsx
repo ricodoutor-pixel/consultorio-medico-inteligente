@@ -317,6 +317,22 @@ const CadastroProfissional = () => {
       return;
     }
 
+    // 🔐 Documentos KYC obrigatórios
+    const requiredKyc: KycKind[] = isCuidador
+      ? ["id_front", "id_back"]
+      : ["crm_front", "crm_back", "id_front", "id_back"];
+    const missing = requiredKyc.filter((k) => !kycFiles[k]);
+    if (missing.length > 0) {
+      toast({
+        title: country === "BO" ? "Documentos obligatorios" : "Documentos obrigatórios",
+        description: country === "BO"
+          ? "Suba frente y dorso de la matrícula y del documento de identidad."
+          : "Envie frente e verso do registro profissional e do documento de identidade.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     trackKYCSubmissionAttempt(documentType);
     setLoading(true);
 

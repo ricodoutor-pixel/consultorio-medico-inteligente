@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, DollarSign, Percent, TrendingUp } from "lucide-react";
+import { DollarSign, Percent, TrendingUp } from "lucide-react";
 import { supabase as _supabase } from "@/integrations/supabase/client";
 const supabase: any = _supabase;
 import { toast } from "sonner";

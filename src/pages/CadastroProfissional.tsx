@@ -246,12 +246,12 @@ const CadastroProfissional = () => {
   };
 
   const phoneIsValid = (phone: string): boolean => {
-    const clean = phone.replace(/\D/g, "");
-    if (country === "BO") {
-      // BO: 8 dígitos locales o con código país 591 (total 11)
-      return clean.length === 8 || (clean.startsWith("591") && clean.length === 11);
+    if (!phone) return false;
+    try {
+      return isValidPhoneNumber(phone);
+    } catch {
+      return false;
     }
-    return /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(phone.replace(/\s/g, ""));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

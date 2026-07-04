@@ -28,6 +28,8 @@ import {
   trackKYCValidationFailed,
   trackKYCValidationSuccess,
 } from "@/lib/analytics";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 

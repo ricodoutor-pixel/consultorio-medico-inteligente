@@ -122,7 +122,21 @@ export function MedicalDashboard() {
   const [prescriptionItems, setPrescriptionItems] = useState<PrescriptionItem[]>([]);
   const [productSearch, setProductSearch] = useState("");
   const [isVideoActive, setIsVideoActive] = useState(false);
+  const [doctorId, setDoctorId] = useState<string | null>(null);
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      const uid = data.user?.id;
+      if (!uid) return;
+      const { data: doc } = await supabase
+        .from("doctors")
+        .select("id")
+        .eq("user_id", uid)
+        .maybeSingle();
+      if (doc?.id) setDoctorId(doc.id);
+    });
+  }, []);
 
   // Simulated load + real-time subscription attempt
   useEffect(() => {
@@ -396,12 +410,17 @@ export function MedicalDashboard() {
         {loading ? (
           <CenterSkeleton />
         ) : !activePatient ? (
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center gap-6 p-4 overflow-auto">
             <div className="text-center text-muted-foreground">
               <Stethoscope className="h-16 w-16 mx-auto mb-4 opacity-20" />
               <p className="text-lg font-medium">Nenhum paciente na fila</p>
               <p className="text-sm">Aguardando novos agendamentos...</p>
             </div>
+            {doctorId && (
+              <div className="w-full max-w-xl">
+                <PerformanceBonusWidget doctorId={doctorId} />
+              </div>
+            )}
           </div>
         ) : (
           <>

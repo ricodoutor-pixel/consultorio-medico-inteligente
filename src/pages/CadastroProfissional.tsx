@@ -28,6 +28,8 @@ import {
   trackKYCValidationFailed,
   trackKYCValidationSuccess,
 } from "@/lib/analytics";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -244,12 +246,12 @@ const CadastroProfissional = () => {
   };
 
   const phoneIsValid = (phone: string): boolean => {
-    const clean = phone.replace(/\D/g, "");
-    if (country === "BO") {
-      // BO: 8 dígitos locales o con código país 591 (total 11)
-      return clean.length === 8 || (clean.startsWith("591") && clean.length === 11);
+    if (!phone) return false;
+    try {
+      return isValidPhoneNumber(phone);
+    } catch {
+      return false;
     }
-    return /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(phone.replace(/\s/g, ""));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -593,7 +595,15 @@ const CadastroProfissional = () => {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="telefone">{t.phone}</Label>
-                      <Input id="telefone" placeholder={t.phonePh} value={form.telefone} onChange={(e) => handleChange("telefone", e.target.value)} required />
+                      <PhoneInput
+                        id="telefone"
+                        international
+                        defaultCountry={country === "BO" ? "BO" : "BR"}
+                        placeholder={t.phonePh}
+                        value={form.telefone}
+                        onChange={(v) => handleChange("telefone", v || "")}
+                        className="phone-input-custom"
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="categoria">{t.category}</Label>

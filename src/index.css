@@ -449,3 +449,33 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
 }
+
+/* react-phone-number-input — match shadcn Input */
+.phone-input-custom {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid hsl(var(--input));
+  background: hsl(var(--background));
+}
+.phone-input-custom .PhoneInputInput {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  font-size: 0.875rem;
+  color: hsl(var(--foreground));
+}
+.phone-input-custom .PhoneInputCountry {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.phone-input-custom .PhoneInputCountrySelect {
+  color: hsl(var(--foreground));
+  background: transparent;
+}

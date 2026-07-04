@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, DollarSign, Percent, TrendingUp } from "lucide-react";
+import { DollarSign, Percent, TrendingUp } from "lucide-react";
 import { supabase as _supabase } from "@/integrations/supabase/client";
 const supabase: any = _supabase;
 import { toast } from "sonner";
@@ -94,19 +94,6 @@ export function PricingConfigModal({ open, onOpenChange, doctorId }: PricingConf
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Aviso sobre Orientação Técnica */}
-          <Card className="p-4 bg-amber-50/50 border-amber-200/50 rounded-lg">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <p className="font-semibold text-amber-900">Orientação Técnica</p>
-                <p className="text-sm text-amber-800">
-                  A taxa de "Orientação Técnica" tem valor fixo de <strong>R$ 30</strong> ou <strong>US$ 10</strong>, cobrado separadamente pela plataforma e é exclusiva do Dr. Edilson Bezerra.
-                </p>
-              </div>
-            </div>
-          </Card>
-
           {/* Configuração de Preços */}
           <div className="space-y-4">
             <div className="space-y-2">

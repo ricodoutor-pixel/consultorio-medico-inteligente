@@ -595,7 +595,15 @@ const CadastroProfissional = () => {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="telefone">{t.phone}</Label>
-                      <Input id="telefone" placeholder={t.phonePh} value={form.telefone} onChange={(e) => handleChange("telefone", e.target.value)} required />
+                      <PhoneInput
+                        id="telefone"
+                        international
+                        defaultCountry={country === "BO" ? "BO" : "BR"}
+                        placeholder={t.phonePh}
+                        value={form.telefone}
+                        onChange={(v) => handleChange("telefone", v || "")}
+                        className="phone-input-custom"
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="categoria">{t.category}</Label>

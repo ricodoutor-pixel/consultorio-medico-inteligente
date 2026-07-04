@@ -396,12 +396,17 @@ export function MedicalDashboard() {
         {loading ? (
           <CenterSkeleton />
         ) : !activePatient ? (
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center gap-6 p-4 overflow-auto">
             <div className="text-center text-muted-foreground">
               <Stethoscope className="h-16 w-16 mx-auto mb-4 opacity-20" />
               <p className="text-lg font-medium">Nenhum paciente na fila</p>
               <p className="text-sm">Aguardando novos agendamentos...</p>
             </div>
+            {doctorId && (
+              <div className="w-full max-w-xl">
+                <PerformanceBonusWidget doctorId={doctorId} />
+              </div>
+            )}
           </div>
         ) : (
           <>

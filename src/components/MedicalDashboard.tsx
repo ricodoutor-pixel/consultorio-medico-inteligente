@@ -122,7 +122,21 @@ export function MedicalDashboard() {
   const [prescriptionItems, setPrescriptionItems] = useState<PrescriptionItem[]>([]);
   const [productSearch, setProductSearch] = useState("");
   const [isVideoActive, setIsVideoActive] = useState(false);
+  const [doctorId, setDoctorId] = useState<string | null>(null);
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      const uid = data.user?.id;
+      if (!uid) return;
+      const { data: doc } = await supabase
+        .from("doctors")
+        .select("id")
+        .eq("user_id", uid)
+        .maybeSingle();
+      if (doc?.id) setDoctorId(doc.id);
+    });
+  }, []);
 
   // Simulated load + real-time subscription attempt
   useEffect(() => {

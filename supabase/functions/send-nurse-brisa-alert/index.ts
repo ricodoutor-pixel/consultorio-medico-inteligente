@@ -185,9 +185,9 @@ Deno.serve(async (req) => {
           appointment_id: payload.appointmentId ?? null,
           patient_id: payload.patientId ?? null,
           alert_type: payload.alertType,
-          title: payload.title,
-          message: payload.message,
-          action_url: payload.actionUrl ?? null,
+          title: safeTitle,
+          message: safeMessage,
+          action_url: safeActionUrl,
           is_read: false,
         },
       ])
@@ -199,9 +199,9 @@ Deno.serve(async (req) => {
     // Notifica médico via WhatsApp (best-effort)
     const wa = await notifyDoctorWhatsApp(
       payload.doctorId,
-      payload.title,
-      payload.message,
-      payload.actionUrl
+      safeTitle,
+      safeMessage,
+      safeActionUrl ?? undefined,
     );
 
     return new Response(

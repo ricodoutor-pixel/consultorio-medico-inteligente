@@ -29,6 +29,9 @@ async function ping(route: string) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
+
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,

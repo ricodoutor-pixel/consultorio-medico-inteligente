@@ -1,6 +1,7 @@
 // Daily cron: alerta clientes do Cartão Saúde Verde 3 dias antes de expirar.
 // Envia WhatsApp via Evolution e marca expiry_reminded_at para evitar duplicidade.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,6 +10,9 @@ const corsHeaders = {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
+
 
   try {
     const supabase = createClient(

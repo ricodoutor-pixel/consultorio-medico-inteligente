@@ -76,6 +76,7 @@ const OnlineUsers = lazyWithRecovery(() => import("./pages/OnlineUsers"), { sour
 const AdminDashboard = lazyWithRecovery(() => import("./pages/AdminDashboard"), { sourceRef: "/admin-ceo" });
 const DownloadApp = lazyWithRecovery(() => import("./pages/DownloadApp"), { sourceRef: "/download" });
 const MonitorCardiacoPage = lazyWithRecovery(() => import("./pages/MonitorCardiaco"), { sourceRef: "/monitor-cardiaco" });
+const ConsultationMonitorPage = lazyWithRecovery(() => import("./pages/ConsultationMonitor").then(m => ({ default: m.ConsultationMonitorPage })), { sourceRef: "/consultation-monitor" });
 const Comunidade = lazyWithRecovery(() => import("./pages/Comunidade"), { sourceRef: "/comunidade" });
 const DashboardPaciente = lazyWithRecovery(() => import("./pages/DashboardPaciente"), { sourceRef: "/dashboard" });
 const Agendamento = lazyWithRecovery(() => import("./pages/Agendamento"), { sourceRef: "/agendamento" });

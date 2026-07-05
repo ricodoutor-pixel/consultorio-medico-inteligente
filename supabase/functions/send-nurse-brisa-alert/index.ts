@@ -2,6 +2,7 @@
 // Cria alerta na tabela public.nurse_brisa_alerts e (opcional) dispara WhatsApp
 // via Evolution para o médico.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

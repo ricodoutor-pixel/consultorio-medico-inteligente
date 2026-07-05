@@ -275,6 +275,8 @@ const App = () => (
                 <Route path="/download" element={<DownloadApp />} />
                 <Route path="/monitor-cardiaco" element={<MonitorCardiacoPage />} />
                 <Route path="/check-up-rapido" element={<MonitorCardiacoPage />} />
+                <Route path="/consultation-monitor/:appointmentId" element={<PrivateRoute><ConsultationMonitorPage /></PrivateRoute>} />
+                <Route path="/consultation-monitor" element={<PrivateRoute><ConsultationMonitorPage /></PrivateRoute>} />
                 <Route path="/comunidade" element={<Comunidade />} />
                 <Route path="/dashboard" element={<DashboardPaciente />} />
                 <Route path="/agendamento" element={<Agendamento />} />

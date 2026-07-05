@@ -1,7 +1,10 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
   const u = new URL(req.url);
   const mode = u.searchParams.get("mode") || "state";
   const url = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");

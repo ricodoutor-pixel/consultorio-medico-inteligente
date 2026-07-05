@@ -2,6 +2,7 @@
 // Cria alerta na tabela public.nurse_brisa_alerts e (opcional) dispara WhatsApp
 // via Evolution para o médico.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -80,6 +81,54 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  // Auth: allow service role / cron secret OR an authenticated admin/doctor.
+  const serviceUnauth = requireServiceAuth(req, corsHeaders);
+  let callerUserId: string | null = null;
+  let callerIsAdmin = false;
+  let callerDoctorId: string | null = null;
+
+  if (serviceUnauth) {
+    // Not service-role — try JWT
+    const authHeader = req.headers.get("Authorization") || "";
+    if (!authHeader.toLowerCase().startsWith("bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const jwt = authHeader.slice(7).trim();
+    const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY") ?? "", {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: claimsData, error: claimsErr } = await (userClient as any).auth.getClaims(jwt);
+    if (claimsErr || !claimsData?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    callerUserId = claimsData.claims.sub as string;
+
+    // Admin?
+    const { data: adminRow } = await supabase
+      .from("user_roles")
+      .select("user_id")
+      .eq("user_id", callerUserId)
+      .eq("role", "admin")
+      .maybeSingle();
+    callerIsAdmin = !!adminRow;
+
+    // Doctor row?
+    if (!callerIsAdmin) {
+      const { data: docRow } = await supabase
+        .from("doctors")
+        .select("id")
+        .eq("user_id", callerUserId)
+        .maybeSingle();
+      callerDoctorId = (docRow as any)?.id ?? null;
+    }
+  }
+
   try {
     const payload = (await req.json()) as AlertPayload;
 
@@ -90,6 +139,44 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Authorization: service role & admin can target anyone; a doctor can only
+    // create alerts targeting their own doctor row.
+    if (serviceUnauth && !callerIsAdmin) {
+      if (!callerDoctorId || callerDoctorId !== payload.doctorId) {
+        return new Response(
+          JSON.stringify({ error: "Forbidden" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // Validate actionUrl (same-origin only)
+    let safeActionUrl: string | null = null;
+    if (payload.actionUrl) {
+      try {
+        const u = new URL(payload.actionUrl);
+        const allowed = [
+          "plantayraiz.com.br",
+          "www.plantayraiz.com.br",
+          "consultorio-medico-inteligente.lovable.app",
+        ];
+        if (
+          allowed.includes(u.hostname) ||
+          u.hostname.endsWith(".lovable.app") ||
+          u.hostname.endsWith(".lovable.dev")
+        ) {
+          safeActionUrl = u.toString();
+        }
+      } catch {
+        safeActionUrl = null;
+      }
+    }
+
+    // Cap free-text lengths to reduce phishing surface
+    const safeTitle = String(payload.title).slice(0, 160);
+    const safeMessage = String(payload.message).slice(0, 800);
+
+
     const { data, error } = await supabase
       .from("nurse_brisa_alerts")
       .insert([
@@ -98,9 +185,9 @@ Deno.serve(async (req) => {
           appointment_id: payload.appointmentId ?? null,
           patient_id: payload.patientId ?? null,
           alert_type: payload.alertType,
-          title: payload.title,
-          message: payload.message,
-          action_url: payload.actionUrl ?? null,
+          title: safeTitle,
+          message: safeMessage,
+          action_url: safeActionUrl,
           is_read: false,
         },
       ])
@@ -112,9 +199,9 @@ Deno.serve(async (req) => {
     // Notifica médico via WhatsApp (best-effort)
     const wa = await notifyDoctorWhatsApp(
       payload.doctorId,
-      payload.title,
-      payload.message,
-      payload.actionUrl
+      safeTitle,
+      safeMessage,
+      safeActionUrl ?? undefined,
     );
 
     return new Response(

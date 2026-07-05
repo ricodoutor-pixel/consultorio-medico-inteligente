@@ -76,6 +76,7 @@ const OnlineUsers = lazyWithRecovery(() => import("./pages/OnlineUsers"), { sour
 const AdminDashboard = lazyWithRecovery(() => import("./pages/AdminDashboard"), { sourceRef: "/admin-ceo" });
 const DownloadApp = lazyWithRecovery(() => import("./pages/DownloadApp"), { sourceRef: "/download" });
 const MonitorCardiacoPage = lazyWithRecovery(() => import("./pages/MonitorCardiaco"), { sourceRef: "/monitor-cardiaco" });
+const ConsultationMonitorPage = lazyWithRecovery(() => import("./pages/ConsultationMonitor").then(m => ({ default: m.ConsultationMonitorPage })), { sourceRef: "/consultation-monitor" });
 const Comunidade = lazyWithRecovery(() => import("./pages/Comunidade"), { sourceRef: "/comunidade" });
 const DashboardPaciente = lazyWithRecovery(() => import("./pages/DashboardPaciente"), { sourceRef: "/dashboard" });
 const Agendamento = lazyWithRecovery(() => import("./pages/Agendamento"), { sourceRef: "/agendamento" });
@@ -274,6 +275,8 @@ const App = () => (
                 <Route path="/download" element={<DownloadApp />} />
                 <Route path="/monitor-cardiaco" element={<MonitorCardiacoPage />} />
                 <Route path="/check-up-rapido" element={<MonitorCardiacoPage />} />
+                <Route path="/consultation-monitor/:appointmentId" element={<PrivateRoute><ConsultationMonitorPage /></PrivateRoute>} />
+                <Route path="/consultation-monitor" element={<PrivateRoute><ConsultationMonitorPage /></PrivateRoute>} />
                 <Route path="/comunidade" element={<Comunidade />} />
                 <Route path="/dashboard" element={<DashboardPaciente />} />
                 <Route path="/agendamento" element={<Agendamento />} />

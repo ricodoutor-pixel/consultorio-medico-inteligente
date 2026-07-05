@@ -53,9 +53,35 @@ async function invokeGeoMatch(opts: StartOptions): Promise<{ ok: boolean; redire
     });
     if (error) throw error;
     const room = (data as any)?.jitsi_room || (data as any)?.room;
+    const doctorId = (data as any)?.doctor_id || (data as any)?.doctorId;
+    const appointmentId = (data as any)?.appointment_id || (data as any)?.appointmentId;
     const redirectUrl = room
       ? `${window.location.origin}/consulta-video?room=${encodeURIComponent(room)}`
+      : appointmentId
+      ? `${window.location.origin}/consultation-monitor/${appointmentId}`
       : `${window.location.origin}/sala-espera`;
+
+    // Dispara alerta da Enf. Brisa para o médico (best-effort)
+    if (doctorId) {
+      const actionUrl = appointmentId
+        ? `${window.location.origin}/consultation-monitor/${appointmentId}`
+        : redirectUrl;
+      supabase.functions
+        .invoke("send-nurse-brisa-alert", {
+          body: {
+            doctorId,
+            appointmentId: appointmentId ?? null,
+            alertType: "new_appointment",
+            title: `Nova consulta: ${opts.userName ?? "Paciente"}`,
+            message: `A Enf. Brisa encaminhou um paciente para atendimento (${
+              opts.consultationType ?? "video"
+            }). Clique para abrir o prontuário e aceitar.`,
+            actionUrl,
+          },
+        })
+        .catch((e) => console.warn("[brisa-triage-flow] alert failed", e));
+    }
+
     return { ok: true, redirectUrl };
   } catch (e) {
     console.warn("[brisa-triage-flow] geo-match falhou, abrindo Brisa:", e);

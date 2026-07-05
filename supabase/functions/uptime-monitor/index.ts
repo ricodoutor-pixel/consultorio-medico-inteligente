@@ -1,5 +1,6 @@
 // Internal uptime monitor — pings critical routes, logs status, opens alerts on failure
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

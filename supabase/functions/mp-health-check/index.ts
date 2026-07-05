@@ -31,6 +31,8 @@ async function notifyAdmin(msg: string) {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
   // Ping MP

@@ -20,6 +20,7 @@ import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from 
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { PrescriptionVerificationModal } from "@/components/PrescriptionVerificationModal";
 import { DoctorEndorsedBadge } from "@/components/DoctorEndorsedBadge";
+import { AnvisaBadge } from "@/components/AnvisaBadge";
 
 // Import product images
 import oleoCbd1 from "@/assets/products/oleo-cbd-1.jpg";
@@ -293,7 +294,10 @@ const ProductDetail = ({ id }: { id: string }) => {
 
           <h1 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-foreground leading-tight">{product.name}</h1>
 
-          {product.endorsed_by_doctor && <DoctorEndorsedBadge />}
+          <div className="flex flex-wrap items-center gap-2">
+            {product.endorsed_by_doctor && <DoctorEndorsedBadge />}
+            <AnvisaBadge />
+          </div>
 
           <div className="flex items-center gap-2">
             <div className="flex">{[1,2,3,4,5].map(s => <Star key={s} size={13} className={s <= Math.round(product.rating || 5) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/20"} />)}</div>
@@ -644,6 +648,7 @@ const Shopping = () => {
                                     FRETE GRÁTIS
                                   </span>
                                   {p.endorsed_by_doctor && <DoctorEndorsedBadge compact />}
+                                  <AnvisaBadge compact />
                                 </div>
                                 {/* Favorite heart - outside Link */}
                                 <button
@@ -709,6 +714,7 @@ const Shopping = () => {
                                         <h3 className="font-bold text-foreground hover:text-primary transition-colors text-xs sm:text-sm mb-0.5 line-clamp-1">{p.name}</h3>
                                       </Link>
                                       {p.endorsed_by_doctor && <div className="mt-1"><DoctorEndorsedBadge compact /></div>}
+                                      <div className="mt-1"><AnvisaBadge compact /></div>
                                     </div>
                                     <button
                                       onClick={() => toggleFav(p.id)}

@@ -1,6 +1,7 @@
 import { Leaf, Instagram, MessageCircle, Lock, ShieldCheck, Download, Youtube, Linkedin, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { AnvisaBadge } from "@/components/AnvisaBadge";
 
 export const Footer = () => {
   const { canInstall, isInstalled, promptInstall } = usePWAInstall();

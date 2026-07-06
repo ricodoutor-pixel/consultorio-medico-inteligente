@@ -79,6 +79,15 @@ export const Footer = () => {
                 <Lock size={14} className="text-primary/60 shrink-0" />
                 <span className="text-[10px]">Site Protegido (SSL)</span>
               </div>
+              <div className="pt-1">
+                <AnvisaBadge registration="RDC 660/2022" />
+              </div>
+              <Link
+                to="/produtos-anvisa"
+                className="block text-[10px] text-muted-foreground/70 hover:text-primary transition-colors"
+              >
+                Produtos & Conformidade ANVISA →
+              </Link>
             </div>
           </div>
         </div>

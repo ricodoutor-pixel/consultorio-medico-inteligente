@@ -20,6 +20,7 @@ import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from 
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { PrescriptionVerificationModal } from "@/components/PrescriptionVerificationModal";
 import { DoctorEndorsedBadge } from "@/components/DoctorEndorsedBadge";
+import { AnvisaBadge } from "@/components/AnvisaBadge";
 
 // Import product images
 import oleoCbd1 from "@/assets/products/oleo-cbd-1.jpg";

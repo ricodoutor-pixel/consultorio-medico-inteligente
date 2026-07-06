@@ -11,6 +11,7 @@ import {
   Shield, Lock, Search, ShoppingCart, FileCheck, AlertTriangle,
   Pill, Leaf, ExternalLink, CheckCircle2
 } from "lucide-react";
+import { AnvisaBadge } from "@/components/AnvisaBadge";
 
 interface DispensaryProduct {
   id: string;

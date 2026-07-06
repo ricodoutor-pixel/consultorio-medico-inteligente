@@ -192,9 +192,10 @@ const Dispensario = () => {
                   )}
                   <Badge variant="outline" className="text-[10px]">{product.volume}</Badge>
                 </div>
-                <p className="text-[9px] text-muted-foreground font-mono">
-                  ANVISA: {product.anvisaReg}
-                </p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <AnvisaBadge registration={product.anvisaReg} compact />
+                  <span className="text-[9px] text-muted-foreground/70 font-mono">{product.anvisaReg}</span>
+                </div>
                 <div className="flex items-center justify-between">
                   <span className="text-lg font-bold text-primary">
                     R$ {product.price.toFixed(2)}

@@ -645,6 +645,7 @@ const Shopping = () => {
                                     FRETE GRÁTIS
                                   </span>
                                   {p.endorsed_by_doctor && <DoctorEndorsedBadge compact />}
+                                  <AnvisaBadge compact />
                                 </div>
                                 {/* Favorite heart - outside Link */}
                                 <button

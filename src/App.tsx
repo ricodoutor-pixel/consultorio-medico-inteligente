@@ -91,6 +91,7 @@ const LGPDDireitos = lazyWithRecovery(() => import("./pages/LGPDDireitos"), { so
 const GlobalCompliance = lazyWithRecovery(() => import("./pages/GlobalCompliance"), { sourceRef: "/compliance" });
 const TreatmentTracker = lazyWithRecovery(() => import("./pages/TreatmentTracker"), { sourceRef: "/treatment-tracker" });
 const Dispensario = lazyWithRecovery(() => import("./pages/Dispensario"), { sourceRef: "/dispensario" });
+const ProdutosAnvisa = lazyWithRecovery(() => import("./pages/ProdutosAnvisa"), { sourceRef: "/produtos-anvisa" });
 const IoMTHub = lazyWithRecovery(() => import("./pages/IoMTHub"), { sourceRef: "/iomt" });
 const Blog = lazyWithRecovery(() => import("./pages/Blog"), { sourceRef: "/blog" });
 const ShoppingDashboard = lazyWithRecovery(() => import("./pages/ShoppingDashboard"), { sourceRef: "/dashboard-loja" });

@@ -1,10 +1,11 @@
 // Pings Mercado Pago + Lovable AI Gateway, records status in payment_provider_health.
 // Trigger: pg_cron every 5 minutes.
 import { createClient } from 'npm:@supabase/supabase-js@2'
+import { requireServiceAuth } from '../_shared/service-auth.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-cron-secret',
 }
 
 interface ProbeResult {
@@ -54,6 +55,11 @@ async function probeLovableAI(key: string): Promise<ProbeResult> {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+
+  const authFail = requireServiceAuth(req, corsHeaders)
+  if (authFail) return authFail
+
+
 
   const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
   const mpToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN') || ''

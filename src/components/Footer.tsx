@@ -92,6 +92,22 @@ export const Footer = () => {
           </div>
         </div>
 
+        {/* Disclaimer Legal — Intermediação Tecnológica */}
+        <div className="border-t border-border/30 mt-8 pt-5">
+          <div className="rounded-lg border border-border/50 bg-muted/20 p-4">
+            <p className="text-[11px] leading-relaxed text-muted-foreground/80">
+              <strong className="text-foreground">Disclaimer Legal — Intermediação Tecnológica:</strong>{" "}
+              A Planta y Raiz Ltda é uma plataforma de intermediação tecnológica e não possui vínculo
+              com a produção, fabricação, comercialização, distribuição ou entrega de produtos
+              farmacêuticos ou fitoterápicos. Não realizamos vendas diretas nem detemos posse ou
+              propriedade dos produtos. Toda a responsabilidade técnica pelo ato médico é do
+              profissional prescritor cadastrado, e a responsabilidade pela qualidade, entrega,
+              eficácia e efeitos dos produtos é exclusiva das farmácias e importadoras parceiras
+              devidamente licenciadas pela ANVISA.
+            </p>
+          </div>
+        </div>
+
         {/* Bottom bar — heart admin à esquerda, evita sobreposição com FAB Brisa e MobileBottomNav */}
         <div className="border-t border-border/30 mt-8 pt-5 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:pb-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-muted-foreground/50">
           <div className="flex items-center gap-3 order-2 sm:order-1">

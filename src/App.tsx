@@ -296,6 +296,7 @@ const App = () => (
                 <Route path="/treatment-tracker" element={<TreatmentTracker />} />
                 <Route path="/acompanhamento" element={<TreatmentTracker />} />
                 <Route path="/dispensario" element={<Dispensario />} />
+                <Route path="/produtos-anvisa" element={<ProdutosAnvisa />} />
                 <Route path="/iomt" element={<IoMTHub />} />
                 <Route path="/dispositivos" element={<IoMTHub />} />
                 <Route path="/blog" element={<Blog />} />

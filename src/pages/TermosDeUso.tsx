@@ -32,10 +32,12 @@ const TermosDeUso = () => {
 
           {/* 1. Natureza */}
           <section className="space-y-3">
-            <h2 className="text-lg font-display font-black text-foreground">🌿 1. Natureza da Plataforma</h2>
-            <p>A <strong className="text-foreground">Planta y Raiz</strong> é uma plataforma digital de telemedicina e marketplace de saúde canabinoide que conecta pacientes a profissionais de saúde devidamente habilitados e a estabelecimentos autorizados pela ANVISA para comercialização de produtos à base de cannabis medicinal.</p>
-            <p>A plataforma <strong className="text-foreground">não pratica medicina, não prescreve medicamentos e não se responsabiliza por condutas clínicas individuais</strong> dos profissionais cadastrados. Todas as consultas são realizadas por profissionais independentes com registro ativo nos respectivos conselhos profissionais.</p>
+            <h2 className="text-lg font-display font-black text-foreground">🌿 1. Objeto e Natureza da Plataforma (Intermediação Tecnológica)</h2>
+            <p>A <strong className="text-foreground">Planta y Raiz Ltda</strong> é uma <strong className="text-foreground">plataforma de intermediação tecnológica</strong> (CNAE 6209-1/00) cujo único objeto é conectar, por meio digital, três partes independentes: (i) <strong className="text-foreground">Pacientes</strong> interessados em acessar orientação técnica em saúde canabinoide; (ii) <strong className="text-foreground">Médicos prescritores</strong> devidamente habilitados e registrados em seus respectivos conselhos profissionais; e (iii) <strong className="text-foreground">Farmácias e importadoras</strong> licenciadas pela ANVISA.</p>
+            <p>A Planta y Raiz <strong className="text-foreground">NÃO fabrica, NÃO produz, NÃO manipula, NÃO distribui, NÃO entrega e NÃO vende</strong> qualquer produto farmacêutico, fitoterápico ou insumo. A plataforma <strong className="text-foreground">não detém posse, custódia ou propriedade</strong> de nenhum produto em nenhum momento da cadeia. Qualquer transação financeira relacionada a produtos ocorre <strong className="text-foreground">diretamente entre o paciente e a farmácia/importadora parceira</strong>, ou entre o paciente e o médico (para honorários), podendo ser operacionalizada por gateway de pagamento terceirizado, sem que a Planta y Raiz figure como vendedora, revendedora ou intermediária comercial dos produtos.</p>
+            <p>A plataforma <strong className="text-foreground">não pratica medicina, não prescreve medicamentos e não interfere na cadeia de suprimentos farmacêutica</strong>. Todo atendimento é realizado por profissionais independentes com registro ativo em seus conselhos.</p>
           </section>
+
 
           {/* 2. Responsabilidade Médica */}
           <section className="space-y-3">

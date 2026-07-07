@@ -56,6 +56,11 @@ async function probeLovableAI(key: string): Promise<ProbeResult> {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
+  const authFail = requireServiceAuth(req, corsHeaders)
+  if (authFail) return authFail
+
+
+
   const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
   const mpToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN') || ''
   const aiKey = Deno.env.get('GEMINI_API_KEY') || ''

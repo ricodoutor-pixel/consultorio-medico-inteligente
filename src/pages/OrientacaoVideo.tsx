@@ -177,7 +177,7 @@ const OrientacaoVideo = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <TCLEConsentModal open={showTCLE && !tcleAccepted} onAccept={handleTCLEAccept} onDecline={handleTCLEDecline} />
+      <TCLEConsentModal open={showTCLE && !tcleAccepted} onAccept={handleTCLEAccept} onDecline={handleTCLEDecline} appointmentId={appointmentId || undefined} />
 
       {/* Mandatory NPS Modal (patient only, after consultation ends) */}
       {showNPS && !isDoctor && (

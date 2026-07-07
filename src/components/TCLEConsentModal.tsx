@@ -171,6 +171,10 @@ export const TCLEConsentModal = ({
           <div className="rounded-lg border border-border bg-muted/30 p-3 sm:p-3.5">
             <p><strong className="text-foreground">4. USO DE IA</strong> — Sugestões diagnósticas/terapêuticas por IA (CFM 2.454/2026). Você pode revogar este consentimento a qualquer momento em <em>Meus Direitos LGPD</em>.</p>
           </div>
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 sm:p-3.5">
+            <p><strong className="text-foreground">5. INTERMEDIAÇÃO TECNOLÓGICA</strong> — Declaro estar ciente de que a <strong className="text-foreground">Planta y Raiz Ltda</strong> é apenas um <strong className="text-foreground">meio tecnológico de conexão</strong> entre paciente, médico prescritor e farmácia/importadora licenciada. A plataforma <strong className="text-foreground">não faz parte da cadeia de suprimentos farmacêutica</strong>, não fabrica, não vende, não entrega e não detém posse de produtos. A responsabilidade pelo ato médico é do prescritor e a responsabilidade pelo produto (qualidade, entrega, eficácia) é da farmácia parceira.</p>
+          </div>
+
         </div>
       </div>
 

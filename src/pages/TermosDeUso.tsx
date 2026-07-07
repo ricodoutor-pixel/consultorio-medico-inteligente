@@ -32,10 +32,12 @@ const TermosDeUso = () => {
 
           {/* 1. Natureza */}
           <section className="space-y-3">
-            <h2 className="text-lg font-display font-black text-foreground">🌿 1. Natureza da Plataforma</h2>
-            <p>A <strong className="text-foreground">Planta y Raiz</strong> é uma plataforma digital de telemedicina e marketplace de saúde canabinoide que conecta pacientes a profissionais de saúde devidamente habilitados e a estabelecimentos autorizados pela ANVISA para comercialização de produtos à base de cannabis medicinal.</p>
-            <p>A plataforma <strong className="text-foreground">não pratica medicina, não prescreve medicamentos e não se responsabiliza por condutas clínicas individuais</strong> dos profissionais cadastrados. Todas as consultas são realizadas por profissionais independentes com registro ativo nos respectivos conselhos profissionais.</p>
+            <h2 className="text-lg font-display font-black text-foreground">🌿 1. Objeto e Natureza da Plataforma (Intermediação Tecnológica)</h2>
+            <p>A <strong className="text-foreground">Planta y Raiz Ltda</strong> é uma <strong className="text-foreground">plataforma de intermediação tecnológica</strong> (CNAE 6209-1/00) cujo único objeto é conectar, por meio digital, três partes independentes: (i) <strong className="text-foreground">Pacientes</strong> interessados em acessar orientação técnica em saúde canabinoide; (ii) <strong className="text-foreground">Médicos prescritores</strong> devidamente habilitados e registrados em seus respectivos conselhos profissionais; e (iii) <strong className="text-foreground">Farmácias e importadoras</strong> licenciadas pela ANVISA.</p>
+            <p>A Planta y Raiz <strong className="text-foreground">NÃO fabrica, NÃO produz, NÃO manipula, NÃO distribui, NÃO entrega e NÃO vende</strong> qualquer produto farmacêutico, fitoterápico ou insumo. A plataforma <strong className="text-foreground">não detém posse, custódia ou propriedade</strong> de nenhum produto em nenhum momento da cadeia. Qualquer transação financeira relacionada a produtos ocorre <strong className="text-foreground">diretamente entre o paciente e a farmácia/importadora parceira</strong>, ou entre o paciente e o médico (para honorários), podendo ser operacionalizada por gateway de pagamento terceirizado, sem que a Planta y Raiz figure como vendedora, revendedora ou intermediária comercial dos produtos.</p>
+            <p>A plataforma <strong className="text-foreground">não pratica medicina, não prescreve medicamentos e não interfere na cadeia de suprimentos farmacêutica</strong>. Todo atendimento é realizado por profissionais independentes com registro ativo em seus conselhos.</p>
           </section>
+
 
           {/* 2. Responsabilidade Médica */}
           <section className="space-y-3">
@@ -121,16 +123,19 @@ const TermosDeUso = () => {
 
           {/* 10. Limitação de Responsabilidade */}
           <section className="space-y-3">
-            <h2 className="text-lg font-display font-black text-foreground">⚖️ 10. Limitação de Responsabilidade</h2>
-            <p>A plataforma não se responsabiliza por:</p>
+            <h2 className="text-lg font-display font-black text-foreground">⚖️ 10. Limitação de Responsabilidade (Disclaimer)</h2>
+            <p>O usuário reconhece e concorda expressamente que a Planta y Raiz Ltda atua exclusivamente como <strong className="text-foreground">plataforma tecnológica de intermediação</strong> e, portanto, <strong className="text-foreground">não se responsabiliza, sob nenhuma hipótese</strong>, por:</p>
             <ul className="list-disc pl-6 space-y-1">
-              <li>Condutas clínicas, diagnósticos ou prescrições emitidas pelos profissionais — <strong className="text-foreground">a responsabilidade é do prescritor</strong>;</li>
-              <li>Qualidade dos produtos comercializados por terceiros autorizados;</li>
-              <li>Resultados terapêuticos individuais;</li>
-              <li>Uso inadequado de produtos adquiridos fora das orientações médicas;</li>
-              <li>Instabilidades de conexão atribuíveis ao dispositivo ou rede do usuário.</li>
+              <li><strong className="text-foreground">Ato médico:</strong> condutas clínicas, diagnósticos, prescrições, orientações terapêuticas ou omissões dos profissionais cadastrados — a responsabilidade técnica e legal é exclusiva do médico prescritor;</li>
+              <li><strong className="text-foreground">Produtos:</strong> qualidade, procedência, autenticidade, prazo de validade, entrega, extravio, avaria, eficácia terapêutica, reações adversas ou efeitos colaterais de produtos fornecidos por farmácias e importadoras parceiras — a responsabilidade é integral e exclusiva do estabelecimento farmacêutico licenciado que efetua a venda e a entrega;</li>
+              <li><strong className="text-foreground">Logística:</strong> prazos, custos, alfândega, importação, transporte ou qualquer etapa da cadeia de suprimentos, uma vez que a Planta y Raiz não integra tal cadeia;</li>
+              <li><strong className="text-foreground">Pagamentos a terceiros:</strong> valores pagos diretamente à farmácia, ao médico ou via gateway externo, os quais não transitam pelo patrimônio da Planta y Raiz;</li>
+              <li>Resultados terapêuticos individuais e uso inadequado de produtos fora das orientações médicas;</li>
+              <li>Instabilidades de conexão atribuíveis ao dispositivo, rede ou provedor do usuário.</li>
             </ul>
+            <p>O usuário declara ciência de que a <strong className="text-foreground">relação de consumo relativa ao produto</strong> se estabelece diretamente com a farmácia/importadora parceira, e a <strong className="text-foreground">relação médico-paciente</strong> se estabelece diretamente com o profissional prescritor, ficando a Planta y Raiz isenta de qualquer responsabilidade solidária ou subsidiária decorrente dessas relações.</p>
           </section>
+
 
           {/* 11. Consentimento LGPD */}
           <section className="space-y-3">

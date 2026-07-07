@@ -123,16 +123,19 @@ const TermosDeUso = () => {
 
           {/* 10. Limitação de Responsabilidade */}
           <section className="space-y-3">
-            <h2 className="text-lg font-display font-black text-foreground">⚖️ 10. Limitação de Responsabilidade</h2>
-            <p>A plataforma não se responsabiliza por:</p>
+            <h2 className="text-lg font-display font-black text-foreground">⚖️ 10. Limitação de Responsabilidade (Disclaimer)</h2>
+            <p>O usuário reconhece e concorda expressamente que a Planta y Raiz Ltda atua exclusivamente como <strong className="text-foreground">plataforma tecnológica de intermediação</strong> e, portanto, <strong className="text-foreground">não se responsabiliza, sob nenhuma hipótese</strong>, por:</p>
             <ul className="list-disc pl-6 space-y-1">
-              <li>Condutas clínicas, diagnósticos ou prescrições emitidas pelos profissionais — <strong className="text-foreground">a responsabilidade é do prescritor</strong>;</li>
-              <li>Qualidade dos produtos comercializados por terceiros autorizados;</li>
-              <li>Resultados terapêuticos individuais;</li>
-              <li>Uso inadequado de produtos adquiridos fora das orientações médicas;</li>
-              <li>Instabilidades de conexão atribuíveis ao dispositivo ou rede do usuário.</li>
+              <li><strong className="text-foreground">Ato médico:</strong> condutas clínicas, diagnósticos, prescrições, orientações terapêuticas ou omissões dos profissionais cadastrados — a responsabilidade técnica e legal é exclusiva do médico prescritor;</li>
+              <li><strong className="text-foreground">Produtos:</strong> qualidade, procedência, autenticidade, prazo de validade, entrega, extravio, avaria, eficácia terapêutica, reações adversas ou efeitos colaterais de produtos fornecidos por farmácias e importadoras parceiras — a responsabilidade é integral e exclusiva do estabelecimento farmacêutico licenciado que efetua a venda e a entrega;</li>
+              <li><strong className="text-foreground">Logística:</strong> prazos, custos, alfândega, importação, transporte ou qualquer etapa da cadeia de suprimentos, uma vez que a Planta y Raiz não integra tal cadeia;</li>
+              <li><strong className="text-foreground">Pagamentos a terceiros:</strong> valores pagos diretamente à farmácia, ao médico ou via gateway externo, os quais não transitam pelo patrimônio da Planta y Raiz;</li>
+              <li>Resultados terapêuticos individuais e uso inadequado de produtos fora das orientações médicas;</li>
+              <li>Instabilidades de conexão atribuíveis ao dispositivo, rede ou provedor do usuário.</li>
             </ul>
+            <p>O usuário declara ciência de que a <strong className="text-foreground">relação de consumo relativa ao produto</strong> se estabelece diretamente com a farmácia/importadora parceira, e a <strong className="text-foreground">relação médico-paciente</strong> se estabelece diretamente com o profissional prescritor, ficando a Planta y Raiz isenta de qualquer responsabilidade solidária ou subsidiária decorrente dessas relações.</p>
           </section>
+
 
           {/* 11. Consentimento LGPD */}
           <section className="space-y-3">

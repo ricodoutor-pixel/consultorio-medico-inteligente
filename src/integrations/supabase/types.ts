@@ -6985,6 +6985,45 @@ export type Database = {
         }
         Relationships: []
       }
+      tcle_consents: {
+        Row: {
+          accepted_at: string
+          appointment_id: string | null
+          checks: Json
+          created_at: string
+          doctor_name: string | null
+          id: string
+          ip_hint: string | null
+          user_agent: string | null
+          user_id: string
+          version: string
+        }
+        Insert: {
+          accepted_at?: string
+          appointment_id?: string | null
+          checks?: Json
+          created_at?: string
+          doctor_name?: string | null
+          id?: string
+          ip_hint?: string | null
+          user_agent?: string | null
+          user_id: string
+          version?: string
+        }
+        Update: {
+          accepted_at?: string
+          appointment_id?: string | null
+          checks?: Json
+          created_at?: string
+          doctor_name?: string | null
+          id?: string
+          ip_hint?: string | null
+          user_agent?: string | null
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       treatment_logs: {
         Row: {
           anxiety_level: number

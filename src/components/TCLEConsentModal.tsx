@@ -1,11 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, FileText, CheckCircle2 } from "lucide-react";
+import { Shield, FileText, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface TCLEConsentModalProps {
   open: boolean;
@@ -13,41 +15,99 @@ interface TCLEConsentModalProps {
   onDecline: () => void;
   doctorName?: string;
   patientName?: string;
+  appointmentId?: string;
 }
 
-export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Médico(a)", patientName = "Paciente" }: TCLEConsentModalProps) => {
+const TCLE_VERSION = "2026.1";
+
+/**
+ * TCLEConsentModal — versão auditável (Rodada 1 compliance)
+ *
+ * Regras:
+ *  - Sem auto-accept: usuário DEVE marcar todos os checkboxes e clicar "Li e Aceito".
+ *  - Grava o registro em `public.tcle_consents` (RLS protegida) antes de liberar acesso.
+ *  - Exige login. Se não houver sessão ativa, mostra bloco de autenticação obrigatória.
+ */
+export const TCLEConsentModal = ({
+  open,
+  onAccept,
+  onDecline,
+  doctorName = "Médico(a)",
+  patientName = "Paciente",
+  appointmentId,
+}: TCLEConsentModalProps) => {
   const isMobile = useIsMobile();
+  const { toast } = useToast();
   const [checks, setChecks] = useState({
     read: false,
     limitations: false,
     privacy: false,
-    recording: false,
+    ai: false,
   });
+  const [saving, setSaving] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
 
   const allChecked = Object.values(checks).every(Boolean);
-  const autoAcceptedRef = useRef(false);
 
   useEffect(() => {
     if (!open) {
-      autoAcceptedRef.current = false;
-      setChecks({
-        read: false,
-        limitations: false,
-        privacy: false,
-        recording: false,
-      });
+      setChecks({ read: false, limitations: false, privacy: false, ai: false });
+      setSaving(false);
+      return;
     }
+    supabase.auth.getSession().then(({ data }) => {
+      setIsAuthed(!!data.session);
+      setAuthChecked(true);
+    });
   }, [open]);
 
-  useEffect(() => {
-    if (open && allChecked && !autoAcceptedRef.current) {
-      autoAcceptedRef.current = true;
-      setTimeout(() => onAccept(), 600);
-    }
-  }, [allChecked, onAccept, open]);
-
   const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen) onDecline();
+    if (!isOpen && !saving) onDecline();
+  };
+
+  const handleAccept = async () => {
+    if (!allChecked || saving) return;
+    setSaving(true);
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    if (!session) {
+      toast({
+        title: "Login necessário",
+        description: "Faça login para registrar o consentimento (TCLE) na plataforma.",
+        variant: "destructive",
+      });
+      setSaving(false);
+      return;
+    }
+
+    const { error } = await supabase.from("tcle_consents").insert({
+      user_id: session.user.id,
+      appointment_id: appointmentId ?? null,
+      doctor_name: doctorName,
+      version: TCLE_VERSION,
+      checks,
+      user_agent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 400) : null,
+    });
+
+    if (error) {
+      console.error("[TCLE] Falha ao registrar consentimento", error);
+      toast({
+        title: "Não foi possível registrar o TCLE",
+        description: error.message || "Tente novamente em instantes.",
+        variant: "destructive",
+      });
+      setSaving(false);
+      return;
+    }
+
+    toast({
+      title: "TCLE registrado ✅",
+      description: "Seu consentimento foi assinado eletronicamente e arquivado com segurança.",
+    });
+    setSaving(false);
+    onAccept();
   };
 
   const headerContent = (
@@ -60,12 +120,24 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
           Termo de Consentimento (TCLE)
         </h2>
         <p className="mt-1 text-xs leading-4 text-muted-foreground sm:text-sm">
-          CFM Res. 2.314/2022 · 2.454/2026
+          CFM 2.314/2022 · 2.454/2026 · LGPD · Versão {TCLE_VERSION}
         </p>
       </div>
       <Badge variant="outline" className="shrink-0 border-primary/30 px-2 py-1 text-[10px] text-primary sm:text-xs">
         <Shield size={12} className="mr-1" /> Válido
       </Badge>
+    </div>
+  );
+
+  const authWarning = authChecked && !isAuthed && (
+    <div className="mb-4 flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200">
+      <AlertCircle size={16} className="mt-0.5 shrink-0" />
+      <div>
+        <p className="font-semibold">Login obrigatório</p>
+        <p className="opacity-90">
+          O registro do TCLE só pode ser feito por pacientes autenticados. Faça login antes de prosseguir.
+        </p>
+      </div>
     </div>
   );
 
@@ -77,24 +149,27 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5 sm:py-5">
         <div className="space-y-3 text-sm leading-6 text-muted-foreground sm:text-[15px]">
+          {authWarning}
           <p className="text-sm font-semibold leading-6 text-foreground sm:text-base">
             Prezado(a) {patientName},
           </p>
           <p>
-            Este TCLE informa sobre condições e riscos da teleconsulta conforme <strong>Res. CFM 2.314/2022</strong>, <strong>2.454/2026</strong> e <strong>LGPD</strong>.
+            Este TCLE informa sobre condições, benefícios e riscos da teleconsulta em cannabis
+            medicinal, conforme <strong>Res. CFM 2.314/2022</strong>, <strong>2.454/2026</strong> e
+            a <strong>LGPD (Lei 13.709/2018)</strong>.
           </p>
 
           <div className="rounded-lg border border-border bg-muted/30 p-3 sm:p-3.5">
-            <p><strong className="text-foreground">1. TELECONSULTA</strong> — Atendimento por áudio/vídeo pelo(a) Dr(a). <strong>{doctorName}</strong>.</p>
+            <p><strong className="text-foreground">1. TELECONSULTA</strong> — Atendimento por áudio/vídeo pelo(a) Dr(a). <strong>{doctorName}</strong>, mediante identificação civil.</p>
           </div>
           <div className="rounded-lg border border-border bg-muted/30 p-3 sm:p-3.5">
-            <p><strong className="text-foreground">2. LIMITAÇÕES</strong> — Não substitui urgência. Exame físico impossível. IA é apoio — decisão do médico.</p>
+            <p><strong className="text-foreground">2. LIMITAÇÕES</strong> — Não substitui atendimento de urgência/emergência. Exame físico é limitado. A IA é apoio — a decisão clínica é do médico.</p>
           </div>
           <div className="rounded-lg border border-border bg-muted/30 p-3 sm:p-3.5">
-            <p><strong className="text-foreground">3. PRIVACIDADE</strong> — Dados sensíveis criptografados (AES-256 + TLS 1.3). Vídeo não gravado.</p>
+            <p><strong className="text-foreground">3. PRIVACIDADE</strong> — Dados sensíveis criptografados (AES-256 + TLS 1.3). Videoconferência não é gravada por padrão.</p>
           </div>
           <div className="rounded-lg border border-border bg-muted/30 p-3 sm:p-3.5">
-            <p><strong className="text-foreground">4. IA E DIREITOS</strong> — Sugestões por IA (CFM 2.454/2026). Revogue consentimento a qualquer momento.</p>
+            <p><strong className="text-foreground">4. USO DE IA</strong> — Sugestões diagnósticas/terapêuticas por IA (CFM 2.454/2026). Você pode revogar este consentimento a qualquer momento em <em>Meus Direitos LGPD</em>.</p>
           </div>
         </div>
       </div>
@@ -102,16 +177,17 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
       <div className="shrink-0 border-t border-border bg-background px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:px-5 sm:pt-4">
         <div className="grid grid-cols-1 gap-2.5">
           {[
-            { key: 'read' as const, label: 'Li e compreendi este TCLE.' },
+            { key: 'read' as const, label: 'Li e compreendi integralmente este TCLE.' },
             { key: 'limitations' as const, label: 'Estou ciente das limitações da teleconsulta.' },
             { key: 'privacy' as const, label: 'Autorizo o tratamento dos meus dados conforme a LGPD.' },
-            { key: 'recording' as const, label: 'Estou ciente do uso de IA como apoio clínico.' },
+            { key: 'ai' as const, label: 'Autorizo o uso de IA como apoio clínico (CFM 2.454/2026).' },
           ].map(({ key, label }) => (
-            <label key={key} className="flex items-start gap-3 rounded-lg px-1 py-1.5">
+            <label key={key} className="flex items-start gap-3 rounded-lg px-1 py-1.5 cursor-pointer">
               <Checkbox
                 checked={checks[key]}
                 onCheckedChange={(value) => setChecks((prev) => ({ ...prev, [key]: !!value }))}
                 className="mt-0.5 h-5 w-5 shrink-0"
+                disabled={saving}
               />
               <span className="text-sm leading-5 text-muted-foreground sm:text-[15px]">{label}</span>
             </label>
@@ -119,17 +195,29 @@ export const TCLEConsentModal = ({ open, onAccept, onDecline, doctorName = "Méd
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <Button variant="outline" className="h-11 text-sm font-medium" onClick={onDecline}>
+          <Button
+            variant="outline"
+            className="h-11 text-sm font-medium"
+            onClick={onDecline}
+            disabled={saving}
+          >
             Recusar
           </Button>
-          <Button className="h-11 text-sm font-bold" disabled={!allChecked} onClick={onAccept}>
-            <CheckCircle2 size={16} className="mr-2" />
-            Aceito
+          <Button
+            className="h-11 text-sm font-bold"
+            disabled={!allChecked || saving || !isAuthed}
+            onClick={handleAccept}
+          >
+            {saving ? (
+              <><Loader2 size={16} className="mr-2 animate-spin" /> Registrando…</>
+            ) : (
+              <><CheckCircle2 size={16} className="mr-2" /> Li e Aceito</>
+            )}
           </Button>
         </div>
 
         <p className="mt-3 text-center text-xs leading-4 text-muted-foreground sm:text-sm">
-          Assinatura eletrônica — Lei nº 14.063/2020
+          Assinatura eletrônica — Lei nº 14.063/2020 · Registro auditável
         </p>
       </div>
     </div>

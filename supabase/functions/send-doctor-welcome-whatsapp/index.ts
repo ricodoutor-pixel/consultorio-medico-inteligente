@@ -20,19 +20,23 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   const authHeader = req.headers.get("Authorization") || "";
-  if (!authHeader.startsWith("Bearer ")) return json({ error: "unauthorized" }, 401);
-  const bearer = authHeader.slice(7);
+  const cronHeader = req.headers.get("x-cron-secret") || "";
+  const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+  const cronSecret = Deno.env.get("BRISA_CEO_SECRET_KEY") || "";
+
+  const isAdminCall =
+    (serviceKey && bearer === serviceKey) ||
+    (cronSecret && (cronHeader === cronSecret || bearer === cronSecret));
 
   let userData: { user: { email?: string } } = { user: {} };
-  if (serviceKey && bearer === serviceKey) {
-    // Admin / server-triggered call (retroactive welcome, cron, etc.)
-  } else {
+  if (!isAdminCall) {
+    if (!bearer) return json({ error: "unauthorized" }, 401);
     const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
+      global: { headers: { Authorization: `Bearer ${bearer}` } },
     });
     const { data, error: userErr } = await userClient.auth.getUser();
     if (userErr || !data?.user) return json({ error: "unauthorized" }, 401);

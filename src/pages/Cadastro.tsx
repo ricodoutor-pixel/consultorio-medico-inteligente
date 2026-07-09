@@ -193,13 +193,24 @@ const Cadastro = () => {
                   Dúvidas? Entre em contato: contato@plantayraiz.com.br ou (11) 99136-3154
                 </p>
               </div>
-              <div className="flex gap-3 justify-center">
-                <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
-                  <Link to="/login">Fazer Login <ArrowRight size={16} className="ml-2" /></Link>
-                </Button>
-                <Button variant="outline" className="font-bold rounded-2xl" asChild>
-                  <Link to="/">Voltar ao Início</Link>
-                </Button>
+              <div className="flex flex-col gap-3 justify-center">
+                {(type === "medico" || type === "profissional") && (
+                  <Button size="lg" className="font-black bg-primary text-primary-foreground rounded-2xl shadow-glow" asChild>
+                    <Link to="/dashboard-medico">
+                      <Stethoscope size={18} className="mr-2" />
+                      Entrar no Desktop Médico Agora
+                      <ArrowRight size={16} className="ml-2" />
+                    </Link>
+                  </Button>
+                )}
+                <div className="flex gap-3 justify-center">
+                  <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
+                    <Link to="/login">Fazer Login <ArrowRight size={16} className="ml-2" /></Link>
+                  </Button>
+                  <Button variant="outline" className="font-bold rounded-2xl" asChild>
+                    <Link to="/">Voltar ao Início</Link>
+                  </Button>
+                </div>
               </div>
             </motion.div>
           </div>

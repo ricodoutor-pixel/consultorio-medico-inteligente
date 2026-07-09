@@ -20,16 +20,28 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   const authHeader = req.headers.get("Authorization") || "";
-  if (!authHeader.startsWith("Bearer ")) return json({ error: "unauthorized" }, 401);
+  const cronHeader = req.headers.get("x-cron-secret") || "";
+  const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+  const cronSecret = Deno.env.get("BRISA_CEO_SECRET_KEY") || "";
 
-  const userClient = createClient(supabaseUrl, anonKey, {
-    global: { headers: { Authorization: authHeader } },
-  });
-  const { data: userData, error: userErr } = await userClient.auth.getUser();
-  if (userErr || !userData?.user) return json({ error: "unauthorized" }, 401);
+  const isAdminCall =
+    (serviceKey && bearer === serviceKey) ||
+    (cronSecret && (cronHeader === cronSecret || bearer === cronSecret));
+
+  let userData: { user: { email?: string } } = { user: {} };
+  if (!isAdminCall) {
+    if (!bearer) return json({ error: "unauthorized" }, 401);
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: `Bearer ${bearer}` } },
+    });
+    const { data, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !data?.user) return json({ error: "unauthorized" }, 401);
+    userData = data as any;
+  }
 
   let payload: { phone?: string; fullName?: string; email?: string; country?: string } = {};
   try { payload = await req.json(); } catch { return json({ error: "invalid_json" }, 400); }
@@ -40,7 +52,7 @@ Deno.serve(async (req) => {
     return json({ error: "invalid_number" }, 400);
   }
   const fullName = (payload.fullName || "Dr(a).").slice(0, 100);
-  const email = (payload.email || userData.user.email || "").slice(0, 200);
+  const email = (payload.email || userData.user?.email || "").slice(0, 200);
   const country = payload.country === "BO" ? "BO" : "BR";
 
   const loginUrl = "https://www.plantayraiz.com.br/login";

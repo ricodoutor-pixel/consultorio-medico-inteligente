@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
     return json({ error: "invalid_number" }, 400);
   }
   const fullName = (payload.fullName || "Dr(a).").slice(0, 100);
-  const email = (payload.email || userData.user.email || "").slice(0, 200);
+  const email = (payload.email || userData.user?.email || "").slice(0, 200);
   const country = payload.country === "BO" ? "BO" : "BR";
 
   const loginUrl = "https://www.plantayraiz.com.br/login";

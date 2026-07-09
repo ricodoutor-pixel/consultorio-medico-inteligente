@@ -21,15 +21,23 @@ Deno.serve(async (req) => {
 
   const authHeader = req.headers.get("Authorization") || "";
   if (!authHeader.startsWith("Bearer ")) return json({ error: "unauthorized" }, 401);
+  const bearer = authHeader.slice(7);
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
-  const userClient = createClient(supabaseUrl, anonKey, {
-    global: { headers: { Authorization: authHeader } },
-  });
-  const { data: userData, error: userErr } = await userClient.auth.getUser();
-  if (userErr || !userData?.user) return json({ error: "unauthorized" }, 401);
+  let userData: { user: { email?: string } } = { user: {} };
+  if (serviceKey && bearer === serviceKey) {
+    // Admin / server-triggered call (retroactive welcome, cron, etc.)
+  } else {
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !data?.user) return json({ error: "unauthorized" }, 401);
+    userData = data as any;
+  }
 
   let payload: { phone?: string; fullName?: string; email?: string; country?: string } = {};
   try { payload = await req.json(); } catch { return json({ error: "invalid_json" }, 400); }

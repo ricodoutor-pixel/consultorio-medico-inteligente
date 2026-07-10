@@ -266,15 +266,62 @@ const DashboardMedico = () => {
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-display font-black text-foreground">
-                  Dashboard <span className="text-gradient-green">Médico</span>
-                </h1>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-muted-foreground font-medium">
-                    {doctorData ? `CRM ${doctorData.crm}/${doctorData.crm_state} • ${doctorData.specialty}` : "Configure seu perfil médico"}
-                  </p>
-                  <DoctorVIPSeal tier={currentTier} />
+              <div className="flex items-center gap-4">
+                {/* Avatar do médico com upload */}
+                <div className="relative shrink-0">
+                  <label
+                    htmlFor="doctor-avatar-upload"
+                    className="group relative block w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-primary/40 bg-muted cursor-pointer shadow-glow"
+                    title="Clique para enviar sua foto"
+                  >
+                    {profileData?.avatar_url ? (
+                      <img
+                        src={profileData.avatar_url}
+                        alt={profileData.full_name || "Foto do profissional"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-primary/15 to-secondary/10 text-center px-1">
+                        <UserCircle2 size={28} className="text-primary mb-1" />
+                        <span className="text-[9px] font-bold text-primary leading-tight">Suba sua foto aqui</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      {uploadingAvatar ? (
+                        <Loader2 size={20} className="text-white animate-spin" />
+                      ) : (
+                        <Camera size={20} className="text-white" />
+                      )}
+                    </div>
+                  </label>
+                  <input
+                    id="doctor-avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={uploadingAvatar}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleAvatarUpload(f);
+                      e.target.value = "";
+                    }}
+                  />
+                </div>
+                <div>
+                  <h1 className="text-2xl md:text-4xl font-display font-black text-foreground">
+                    {profileData?.full_name ? `Olá, ${profileData.full_name.split(" ")[0]}` : "Dashboard"} <span className="text-gradient-green">Médico</span>
+                  </h1>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <p className="text-muted-foreground font-medium text-sm">
+                      {doctorData ? `CRM ${doctorData.crm}/${doctorData.crm_state} • ${doctorData.specialty}` : "Configure seu perfil médico"}
+                    </p>
+                    <DoctorVIPSeal tier={currentTier} />
+                  </div>
+                  {!profileData?.avatar_url && (
+                    <p className="text-[11px] text-primary/80 font-bold mt-1">
+                      📸 Clique na imagem para enviar sua foto profissional
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-3">

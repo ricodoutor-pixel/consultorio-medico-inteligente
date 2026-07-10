@@ -11,7 +11,8 @@ import { professionals as testProfessionals, Professional, categories } from "@/
 
 // IDs of the 6 test doctors to keep (diverse specialties)
 // med-5 (Dra. Valentina Reyes) removido — substituído pela Dra. Olivia Zimeri (real, BO)
-const KEPT_TEST_IDS = ["med-1", "med-2", "med-3", "med-4", "psi-1"];
+// med-4 (Dra. Juliana Ferreira) removida — card de teste descartado.
+const KEPT_TEST_IDS = ["med-1", "med-2", "med-3", "psi-1"];
 const MAX_TEST_SLOTS = 6;
 
 interface RealDoctor {

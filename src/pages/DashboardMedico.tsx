@@ -99,6 +99,40 @@ const DashboardMedico = () => {
     }
   };
 
+  const handleAvatarUpload = async (file: File) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({ title: "Faça login", description: "Sessão expirada. Entre novamente para enviar sua foto.", variant: "destructive" });
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Arquivo inválido", description: "Envie uma imagem (JPG, PNG ou WEBP).", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Imagem muito grande", description: "Limite máximo de 5MB.", variant: "destructive" });
+      return;
+    }
+    setUploadingAvatar(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${session.user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, cacheControl: "3600", contentType: file.type });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      const avatarUrl = pub.publicUrl;
+      await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("id", session.user.id);
+      setProfileData((p) => ({ full_name: p?.full_name ?? null, avatar_url: avatarUrl }));
+      toast({ title: "Foto atualizada ✅", description: "Sua imagem já aparece no Desktop Médico." });
+    } catch (err: any) {
+      toast({ title: "Falha ao enviar foto", description: err?.message || "Tente novamente.", variant: "destructive" });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const fetchTriageForPatient = async (patientId: string) => {
     const { data } = await supabase
       .from("brisa_triages")

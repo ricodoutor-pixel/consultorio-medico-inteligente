@@ -125,6 +125,7 @@ const Cadastro = () => {
           phone: formData.telefone || null,
           cpf: formData.cpf || null,
           user_type: dbType,
+          signup_role: type || "paciente",
           date_of_birth: formData.dataNascimento || null,
         }).eq("id", authData.user.id);
 
@@ -146,6 +147,14 @@ const Cadastro = () => {
         supabase.functions
           .invoke("brisa-signup-alert", { body: { user_id: authData.user.id, event: "signup" } })
           .catch((e) => console.warn("[brisa-signup-alert] signup", e));
+
+        // 6. Garante sessão ativa para que médico/profissional entre direto no Desktop Médico
+        if (!authData.session && (type === "medico" || type === "profissional" || type === "cuidador")) {
+          await supabase.auth.signInWithPassword({
+            email: formData.email,
+            password: formData.senha,
+          }).catch(() => {});
+        }
       }
 
       trackPixelEvent("Lead", { content_name: "patient_signup", content_category: type }, {

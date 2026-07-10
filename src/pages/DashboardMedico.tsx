@@ -33,6 +33,8 @@ const DashboardMedico = () => {
   const { toast } = useToast();
   const [isOnline, setIsOnline] = useState(false);
   const [doctorData, setDoctorData] = useState<any>(null);
+  const [profileData, setProfileData] = useState<{ full_name: string | null; avatar_url: string | null } | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [prescriptions, setPrescriptions] = useState<any[]>([]);
   const [currentTier, setCurrentTier] = useState("basic");

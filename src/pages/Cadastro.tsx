@@ -149,7 +149,7 @@ const Cadastro = () => {
           .catch((e) => console.warn("[brisa-signup-alert] signup", e));
 
         // 6. Garante sessão ativa para que médico/profissional entre direto no Desktop Médico
-        if (!authData.session && (type === "medico" || type === "profissional" || type === "cuidador")) {
+        if (!authData.session && (type === "medico" || type === "profissional")) {
           await supabase.auth.signInWithPassword({
             email: formData.email,
             password: formData.senha,

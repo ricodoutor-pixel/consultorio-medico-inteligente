@@ -58,8 +58,12 @@ const DashboardMedico = () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { setLoading(false); return; }
 
-    const { data: doctor } = await supabase.from("doctors").select("*").eq("user_id", session.user.id).single();
-    
+    const [{ data: doctor }, { data: profile }] = await Promise.all([
+      supabase.from("doctors").select("*").eq("user_id", session.user.id).single(),
+      supabase.from("profiles").select("full_name, avatar_url").eq("id", session.user.id).maybeSingle(),
+    ]);
+    setProfileData(profile ?? { full_name: session.user.email ?? null, avatar_url: null });
+
     if (doctor) {
       setDoctorData(doctor);
       setIsOnline(doctor.is_online);

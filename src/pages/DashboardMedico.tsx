@@ -20,6 +20,8 @@ import { DoctorFinancialCards } from "@/components/doctor/DoctorFinancialCards";
 import { DoctorBICockpit } from "@/components/doctor/DoctorBICockpit";
 import { DominationMonitor } from "@/components/doctor/DominationMonitor";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
+import { VIPExpirationAlert } from "@/components/doctor/VIPExpirationAlert";
+
 import { DoctorAuxDiagnosticTools } from "@/components/doctor/DoctorAuxDiagnosticTools";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -344,12 +346,16 @@ const DashboardMedico = () => {
               </Card>
             )}
 
+            {/* VIP Expiration Alert (5 days before end of trial/subscription) */}
+            {doctorData && <VIPExpirationAlert doctorId={doctorData.id} />}
+
             {/* Financial Cards - Revenue Distribution */}
             {doctorData && (
               <div className="mb-8">
                 <DoctorFinancialCards doctorId={doctorData.id} currentTier={currentTier} />
               </div>
             )}
+
 
             {/* === NEW KPI CARDS === */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

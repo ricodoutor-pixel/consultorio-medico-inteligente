@@ -8252,6 +8252,15 @@ export type Database = {
           schedule: string
         }[]
       }
+      get_doctor_for_country: {
+        Args: { _country: string }
+        Returns: {
+          doctor_id: string
+          rating: number
+          specialty: string
+          user_id: string
+        }[]
+      }
       get_my_sv_renewal_history: {
         Args: never
         Returns: {

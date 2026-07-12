@@ -16,6 +16,9 @@ import AutoPostCountdown from "@/components/admin/AutoPostCountdown";
 import BrisaChannelsStatus from "@/components/admin/BrisaChannelsStatus";
 import BrisaAudioPanel from "@/components/admin/BrisaAudioPanel";
 import MetaContentManager from "@/components/admin/MetaContentManager";
+import BrisaTestSendPanel from "@/components/admin/BrisaTestSendPanel";
+
+
 
 
 const CHANNEL_META: Record<Channel, { label: string; Icon: any; color: string }> = {
@@ -92,6 +95,7 @@ export default function BrisaCEO() {
 
       {/* Countdown auto-post + Checklist */}
       <div className="container mx-auto px-4 pt-4 space-y-3">
+        <BrisaTestSendPanel />
         <AutoPostCountdown />
         <BrisaChannelsStatus />
         <BrisaAudioPanel />
@@ -99,6 +103,8 @@ export default function BrisaCEO() {
         <BrisaMetaDebugPanel />
         <MetaContentManager />
       </div>
+
+
 
 
       {/* Métricas */}

@@ -390,7 +390,7 @@ const CadastroProfissional = () => {
       });
       if (docErr) console.error("[doctor insert]", docErr);
 
-      // 4) Upload KYC (frente/verso) + registro
+      // 4) Upload KYC (frente/verso) — não-bloqueante
       const uploads: Promise<unknown>[] = [];
       for (const kind of Object.keys(kycFiles) as KycKind[]) {
         const file = kycFiles[kind];
@@ -399,22 +399,16 @@ const CadastroProfissional = () => {
         const path = `${userId}/${kind}.${ext}`;
         uploads.push(
           supabase.storage
-            .from("doctor-kyc-documents")
+            .from("doctor-kyc")
             .upload(path, file, { upsert: true, contentType: file.type || undefined })
-            .then(async ({ error: upErr }) => {
-              if (upErr) { console.error("[kyc upload]", kind, upErr); return; }
-              await supabase.from("doctor_kyc_documents").upsert({
-                doctor_user_id: userId,
-                document_kind: kind,
-                storage_path: path,
-                mime_type: file.type || null,
-                size_bytes: file.size,
-                verification_status: "pending",
-              }, { onConflict: "doctor_user_id,document_kind" });
+            .catch((err) => {
+              console.error("[kyc upload]", kind, err);
+              // Não bloqueia o fluxo se o upload falhar
             })
         );
       }
-      await Promise.all(uploads);
+      // Não aguarda os uploads — permite que o cadastro complete mesmo se houver atraso
+      Promise.all(uploads).catch(() => {});
 
       // 5) Disparo WhatsApp (Enf. Brisa) — não bloqueante
       try {

@@ -1,8 +1,52 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
-import { Youtube, ArrowRight } from "lucide-react";
+import { Youtube, ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+
+/** Vídeo com poster (thumb do YouTube em alta) — evita a "janela preta" antes do play */
+function VideoWithPoster({ videoId, title }: { videoId: string; title: string }) {
+  const [playing, setPlaying] = useState(false);
+  const poster = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+  const fallback = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+  return (
+    <div
+      className="relative w-full overflow-hidden rounded-2xl border border-[#22C55E]/20 shadow-[0_0_40px_rgba(34,197,94,0.12)] bg-black"
+      style={{ paddingBottom: "56.25%" }}
+    >
+      {playing ? (
+        <iframe
+          className="absolute top-0 left-0 w-full h-full"
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&modestbranding=1`}
+          title={title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setPlaying(true)}
+          className="absolute inset-0 w-full h-full group"
+          aria-label={`Reproduzir vídeo: ${title}`}
+        >
+          <img
+            src={poster}
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = fallback; }}
+            alt={title}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+          <span className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
+          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-20 h-20 rounded-full bg-[#22C55E] shadow-[0_0_40px_rgba(34,197,94,0.6)] group-hover:scale-110 transition-transform">
+            <Play className="w-9 h-9 text-black fill-black ml-1" />
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -81,45 +125,11 @@ export default function NossaHistoria() {
             </motion.p>
           </motion.article>
 
-          {/* Vídeo YouTube Shorts */}
+          {/* Vídeo YouTube — capa (poster) até o clique para evitar tela preta */}
           <motion.div variants={fadeUp} className="mb-14">
-            <div
-              className="relative w-full overflow-hidden rounded-2xl border border-[#22C55E]/20 shadow-[0_0_40px_rgba(34,197,94,0.12)]"
-              style={{ paddingBottom: "56.25%" }}
-            >
-              <iframe
-                id="yt-historia"
-                className="absolute top-0 left-0 w-full h-full rounded-2xl"
-                src="https://www.youtube.com/embed/pgGSJnoO4nE?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&playlist=pgGSJnoO4nE&loop=0"
-                title="Nossa História — Planta y Raiz"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-              <button
-                type="button"
-                onClick={(e) => {
-                  const iframe = document.getElementById("yt-historia") as HTMLIFrameElement | null;
-                  iframe?.contentWindow?.postMessage(
-                    JSON.stringify({ event: "command", func: "unMute", args: [] }),
-                    "*"
-                  );
-                  iframe?.contentWindow?.postMessage(
-                    JSON.stringify({ event: "command", func: "setVolume", args: [100] }),
-                    "*"
-                  );
-                  iframe?.contentWindow?.postMessage(
-                    JSON.stringify({ event: "command", func: "playVideo", args: [] }),
-                    "*"
-                  );
-                  (e.currentTarget as HTMLButtonElement).style.display = "none";
-                }}
-                className="absolute top-3 right-3 z-10 rounded-full bg-[#22C55E] px-4 py-2 text-sm font-bold text-black shadow-lg hover:bg-[#16A34A] transition-colors"
-                aria-label="Ativar som do vídeo"
-              >
-                🔊 Ativar som
-              </button>
-            </div>
+            <VideoWithPoster videoId="pgGSJnoO4nE" title="Nossa História — Planta y Raiz" />
           </motion.div>
+
 
 
           {/* CTA YouTube */}

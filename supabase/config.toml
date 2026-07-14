@@ -41,3 +41,5 @@ project_id = "shmbwdjuddvquszwkvuq"
     verify_jwt = false
   [functions.brisa-send-now]
     verify_jwt = false
+  [functions.provision-sole-admin]
+    verify_jwt = false

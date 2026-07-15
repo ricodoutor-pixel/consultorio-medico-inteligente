@@ -13,6 +13,7 @@ import { professionals as allProfessionals, categories, Professional } from "@/d
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import DoctorsNearMeMap from "@/components/doctors/DoctorsNearMeMap";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -312,7 +313,13 @@ const Profissionais = () => {
             </p>
           </motion.div>
 
+          {/* Mapa: médicos próximos a você */}
+          <div className="mb-6 md:mb-10">
+            <DoctorsNearMeMap />
+          </div>
+
           {/* Tabs - scroll horizontal no mobile */}
+
           <div className="flex gap-1.5 md:gap-2 mb-6 md:mb-10 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
             {categories.map((cat) => {
               const count = professionals.filter(p => p.category === cat).length;

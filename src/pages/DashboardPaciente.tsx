@@ -24,6 +24,7 @@ import PassportQRCard from "@/components/passport/PassportQRCard";
 import { SymptomTracker } from "@/components/diary/SymptomTracker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { professionals } from "@/data/professionals";
+import AirQualityWidget from "@/components/health/AirQualityWidget";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -221,7 +222,13 @@ const DashboardPaciente = () => {
             ))}
           </div>
 
+          {/* Qualidade do ar (aviso clínico para vaporização) */}
+          <div className="mb-6">
+            <AirQualityWidget />
+          </div>
+
           {/* Stats */}
+
           <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8" initial="hidden" animate="visible" variants={stagger}>
             {[
               { label: "Orientações Técnicas", value: String(appointments.length), icon: Stethoscope, color: "primary" },

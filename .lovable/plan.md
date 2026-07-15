@@ -1,75 +1,64 @@
-# Plano de execução — Refatoração Cadastro Médico + Onboarding Brisa
+# Plano — Google Maps Platform em Planta y Raiz
 
-Tarefa grande com múltiplas frentes. Vou executar em blocos paralelos sempre que possível.
+Antes de escrever código quero alinhar 4 pontos para não desperdiçar créditos nem quebrar layout.
 
-## 1. Storage — Bucket `medical-documents` (privado)
-- Criar bucket `medical-documents` (privado).
-- Estrutura de pastas:
-  ```
-  medicos/{slug_nome}_{cpf_ou_ci}/
-    ├── foto_perfil.jpg
-    ├── crm_frente.jpg
-    ├── crm_verso.jpg
-    └── dados_cadastro.json
-  ```
-- RLS em `storage.objects`:
-  - Médico (auth.uid()) lê/escreve só sua pasta.
-  - Admin lê tudo.
-  - Service role acesso total.
+## Escopo confirmado
 
-## 2. Cadastro Médico (`src/pages/CadastroProfissional.tsx`)
-- **Adicionar Plano Free** (acesso gratuito à plataforma — vê todos os cadastros, sem cobrança).
-- **Remover toggle "Orientação Técnica"** do médico (OT é exclusiva da plataforma, R$30/US$10 fixo).
-- Manter campo único: **valor da consulta** (videochamada + receita inclusos).
-- **3 uploads obrigatórios**: foto de perfil, CRM frente, CRM verso.
-- Mostrar card de exemplo (jaleco branco, esteto, fundo branco) como referência visual antes do upload.
-- Upload vai direto pro bucket `medical-documents` na pasta do médico.
+**Feature 1 — DeliveryTrackerMap** (Shopping + Club)
+- Novo componente `src/components/logistics/DeliveryTrackerMap.tsx` (Maps JS + Routes API via gateway).
+- Origem: farmácia fixa (definir CEP/endereço padrão — ver pergunta 1).
+- Destino: endereço do pedido (do `orders`/`vendor_transactions`).
+- Exibe rota, distância, ETA. Sem tracking GPS do entregador (não temos dados de motorista) — ETA é do Routes API.
+- Onde renderizar: card "Meus Pedidos" em `Shopping.tsx` e `ClubFeed.tsx`.
 
-## 3. Edge Function `doctor-welcome-brisa`
-- Triggered após cadastro aprovado.
-- Envia WhatsApp via Evolution API com mensagem da Enf. Brisa:
-  > "Olá Dr(a). {nome}! Bem-vindo(a) à Mega Clínica Planta y Raiz 🌱
-  > E-mail de acesso: {email}
-  > Senha temporária: {senha}
-  > Seu dashboard: {link_dashboard}
-  > Link público do seu perfil para compartilhar: {link_perfil}"
-- Hook chamado ao final do `handleSubmit` do cadastro.
+**Feature 2 — Smart Address Autocomplete**
+- Novo componente `src/components/forms/AddressAutocomplete.tsx` usando **Places API (New)** `PlaceAutocompleteElement` (regra Lovable: não usar legacy Autocomplete).
+- Preenche rua, bairro, cidade, estado, CEP, país + lat/lng ocultos.
+- Aplicar em: `CadastroProfissional.tsx`, checkout do Shopping, onboarding do paciente (`Onboarding.tsx` se houver campo endereço).
 
-## 4. Foto padrão Dra. Olivia (IA)
-- Gerar nova foto profissional via imagegen (jaleco branco, estetoscópio, fundo branco) baseada no rosto da carteira SEDES.
-- Substituir `avatar_url` no registro doctors da Olivia.
+**Feature 3 — AirQualityWidget**
+- Novo `src/components/health/AirQualityWidget.tsx` no dashboard do paciente (`DashboardPaciente.tsx`).
+- Chama edge function `air-quality-lookup` (nova) que consulta `/airquality/v1/currentConditions:lookup` via gateway.
+- UI: badge colorida por AQI + alerta clínico sobre vaporização quando AQI ruim.
 
-## 5. Página `/admin-raiz`
-- Nova rota protegida, **sem botão Google**, login email+senha only.
-- Validação: somente users com role `admin` passam.
-- Redireciona ao dashboard admin existente.
+**Feature 4 — Doctors Near Me + Timezone Match**
+- Mini-mapa em `Profissionais.tsx` / página de agendamento com pins dos médicos (usa `doctors_public.latitude/longitude` — já existe).
+- No agendamento: converter horário exibido usando `timezone` do paciente e do médico (Google Time Zone API via gateway, cache por `user_id` em `profiles.timezone`).
 
-## 6. Acesso admin para `ricodoutor@gmail.com`
-- Verificar se user existe; se não, criar via service role com senha `95654045Pa#`.
-- Inserir role `admin` em `user_roles`.
+## Arquitetura compartilhada
 
-## 7. Mensagem teste Brisa → Dr. Edilson
-- Chamar `whatsapp-brisa-send` para `+55 11 98713-1241`:
-  > "Olá Dr. Edilson, estou online ✅ — Enf. Brisa"
+- **Loader único**: novo `src/lib/google-maps-loader.ts` (singleton Promise) usado por todos os mapas. Vou manter o padrão atual (script tag manual + callback) que já está em `GlobalOperationsMap.tsx` — sem adicionar `@react-google-maps/api` (dependência a mais e o padrão da casa já é vanilla loader). Se preferir a lib, aviso na pergunta 4.
+- **Edge functions** para chamadas server-side (Routes, Air Quality, Time Zone, Geocoding) via `connector-gateway.lovable.dev/google_maps` com `LOVABLE_API_KEY` + `GOOGLE_MAPS_API_KEY`.
+- **Browser key**: `VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY` já no `.env` — usado só para Maps JS + Places Autocomplete no cliente.
+- **Fallback**: se `navigator.geolocation` for negado, mostrar campo manual de CEP.
+- **Loading states**: skeleton em todos os widgets.
 
-## 8. Completar cadastro Dra. Olivia
-- Atualizar registro doctors:
-  - CRM Bolívia Cochabamba: `Z-4466260` (Matrícula Min. Salud) / `Q-Z-014` (Colégio Médico)
-  - Especialidade: "Cirurgiã — Especialista em Medicina Integrativa e Modulação do Sistema Endocannabinoide (CBD/THC)"
-  - País: Bolívia, Cidade: Cochabamba
-  - Foto: nova versão padronizada
-- Salvar imagens dos carnets no bucket `medical-documents/medicos/olivia-zimeri_4466260/`
+## Arquivos a criar
 
-## Detalhes técnicos
-- Migration: bucket + RLS + ensure role admin para ricodoutor.
-- Edge functions novas: `doctor-welcome-brisa`. Reaproveitar `_shared/evolution.ts`.
-- Frontend: editar `CadastroProfissional.tsx`, criar `src/pages/AdminRaiz.tsx`, adicionar rota.
-- Não alterar visual existente do site — apenas a página de cadastro (campos novos) e nova rota admin.
+- `src/lib/google-maps-loader.ts`
+- `src/components/logistics/DeliveryTrackerMap.tsx`
+- `src/components/forms/AddressAutocomplete.tsx`
+- `src/components/health/AirQualityWidget.tsx`
+- `src/components/doctors/DoctorsNearMeMap.tsx`
+- `supabase/functions/maps-route-eta/index.ts`
+- `supabase/functions/air-quality-lookup/index.ts`
+- `supabase/functions/maps-timezone/index.ts`
 
-## Ordem de execução
-1. Migration (bucket + RLS + admin role + plano free no schema doctors se necessário).
-2. Em paralelo: editar `CadastroProfissional.tsx`, criar `AdminRaiz.tsx`, criar edge `doctor-welcome-brisa`, gerar foto Olivia via IA.
-3. Deploy edges, atualizar Olivia no DB, enviar mensagem teste.
-4. Verificar build e fluxo end-to-end.
+## Arquivos a editar
 
-Confirma para eu executar?
+- `src/pages/Shopping.tsx` — DeliveryTrackerMap em pedidos ativos
+- `src/pages/ClubFeed.tsx` — idem
+- `src/pages/CadastroProfissional.tsx` — AddressAutocomplete
+- `src/pages/DashboardPaciente.tsx` — AirQualityWidget
+- `src/pages/Profissionais.tsx` — DoctorsNearMeMap
+- Página de agendamento — exibição com fuso horário do paciente
+- `supabase/config.toml` — registrar as 3 edge functions
+
+## Perguntas antes de executar
+
+1. **Endereço da farmácia/CDD de origem** para o DeliveryTrackerMap — qual CEP/cidade usar como ponto A? (Sugestão: usar o endereço cadastrado do Dr. Edilson ou um CEP fixo em SP.)
+2. **Página de agendamento** — é `AgendamentoConsulta.tsx`, `Agendar.tsx`, ou outra? Preciso confirmar o arquivo para aplicar o timezone match.
+3. **Formulário de onboarding do paciente** tem campo endereço hoje? Ou só CEP? Aplico Autocomplete em quais formulários exatamente?
+4. **Loader**: mantenho vanilla (padrão atual do projeto, zero deps) ou você prefere que eu adicione `@react-google-maps/api`? Recomendo manter vanilla.
+
+Assim que responder essas 4, executo tudo em sequência (criar arquivos, editar páginas, deploy das edge functions) e devolvo o log de conclusão.

@@ -42,7 +42,7 @@ export default function DoctorsNearMeMap() {
           .not("latitude", "is", null)
           .not("longitude", "is", null)
           .limit(200);
-        const list = ((data ?? []) as Doctor[]).filter(
+        const list = ((data ?? []) as unknown as Doctor[]).filter(
           (d) => Number.isFinite(Number(d.latitude)) && Number.isFinite(Number(d.longitude)),
         );
 

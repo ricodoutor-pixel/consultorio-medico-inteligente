@@ -63,6 +63,7 @@ import cuidSandraImg from "@/assets/cuid-sandra.jpg";
 import draMarianaIntImg from "@/assets/dra-mariana-integrativa.jpg";
 import drRobertoIntImg from "@/assets/dr-roberto-integrativa.jpg";
 import draBeatrizIntImg from "@/assets/dra-beatriz-integrativa.jpg";
+import draSuelenImg from "@/assets/dra-suelen-naves.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -1898,6 +1899,35 @@ export const professionals: Professional[] = [
       { name: "Patrícia V.", rating: 5, text: "A aromaterapia com terpenos foi incrível para minha ansiedade." },
       { name: "Marcos R.", rating: 5, text: "Abordagem natural e muito eficaz." },
       { name: "Daniela C.", rating: 5, text: "Me sinto outra pessoa após o protocolo da Dra. Beatriz." },
+    ],
+  },
+  {
+    id: "med-suelen",
+    name: "Dra. Suelen Naves Rodrigues",
+    category: "Médicos Prescritores",
+    bio: "Médica com atendimento humanizado e individualizado. Prescrição de cannabis medicinal baseada em evidências científicas, com foco na qualidade de vida, bem-estar e cuidado integral do paciente.",
+    experience: "8 anos",
+    tags: ["Cannabis Medicinal", "Qualidade de Vida", "Cuidado Integral"],
+    price: "R$ 100,00",
+    priceValue: 100,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511991363154",
+    rating: 4.9,
+    consults: 185,
+    avatar: "SR",
+    imageUrl: draSuelenImg,
+    crm: "49354",
+    flags: ["🇧🇷"],
+    services: [
+      { name: "Orientação Técnica Inicial", price: "R$ 100,00", desc: "Avaliação completa + plano terapêutico canábico" },
+      { name: "Retorno", price: "R$ 75,00", desc: "Acompanhamento e ajuste de dosagem" },
+      { name: "Laudo ANVISA", price: "R$ 60,00", desc: "Documentação para importação ou uso compassivo" },
+    ],
+    slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    reviews: [
+      { name: "Fernanda M.", rating: 5, text: "Atendimento humanizado e muito atencioso." },
+      { name: "Roberto S.", rating: 5, text: "Excelente profissional, recomendo muito." },
+      { name: "Carla T.", rating: 5, text: "Melhorou muito minha qualidade de vida com o tratamento." },
     ],
   },
 ];

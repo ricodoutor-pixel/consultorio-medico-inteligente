@@ -7,12 +7,15 @@ declare global {
   }
 }
 
-const BROWSER_KEY = (import.meta.env as any).VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as
-  | string
-  | undefined;
-const TRACKING_ID = (import.meta.env as any).VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID as
-  | string
-  | undefined;
+// Fallback order for the browser key:
+// 1. VITE_GOOGLE_API_KEY — chave própria do domínio customizado (plantayraiz.com.br) com
+//    HTTP referrers autorizados no Google Cloud Console.
+// 2. VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY — chave gerenciada pela Lovable
+//    (funciona somente em *.lovable.app / *.lovableproject.com).
+const env = import.meta.env as any;
+const BROWSER_KEY = (env.VITE_GOOGLE_API_KEY ||
+  env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY) as string | undefined;
+const TRACKING_ID = env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID as string | undefined;
 
 let loaderPromise: Promise<typeof window.google> | null = null;
 
@@ -28,7 +31,9 @@ export function loadGoogleMaps(): Promise<typeof window.google> {
   if (loaderPromise) return loaderPromise;
   if (!BROWSER_KEY) {
     return Promise.reject(
-      new Error("VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY não configurada"),
+      new Error(
+        "Google Maps key ausente: defina VITE_GOOGLE_API_KEY (custom domain) ou VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY (lovable.app).",
+      ),
     );
   }
 

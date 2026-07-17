@@ -31,7 +31,9 @@ export function loadGoogleMaps(): Promise<typeof window.google> {
   if (loaderPromise) return loaderPromise;
   if (!BROWSER_KEY) {
     return Promise.reject(
-      new Error("VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY não configurada"),
+      new Error(
+        "Google Maps key ausente: defina VITE_GOOGLE_API_KEY (custom domain) ou VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY (lovable.app).",
+      ),
     );
   }
 

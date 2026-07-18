@@ -1,7 +1,9 @@
 // Submits sitemap to Google Search Console via connector gateway
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret",
 };
 
 const SITE = "https://plantayraiz.com.br/";
@@ -10,6 +12,9 @@ const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
 
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   const GSC_API_KEY = Deno.env.get("GOOGLE_SEARCH_CONSOLE_API_KEY");

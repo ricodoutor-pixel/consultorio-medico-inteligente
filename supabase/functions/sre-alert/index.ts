@@ -39,6 +39,10 @@ Deno.serve(async (req: Request) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  const unauth = requireServiceAuth(req, corsHeaders);
+  if (unauth) return unauth;
+
+
   try {
     const webhookUrl = Deno.env.get("DISCORD_SRE_WEBHOOK_URL");
     if (!webhookUrl) {

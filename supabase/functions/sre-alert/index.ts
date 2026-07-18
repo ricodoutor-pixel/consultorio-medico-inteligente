@@ -1,4 +1,11 @@
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { corsHeaders as baseCors } from "npm:@supabase/supabase-js@2/cors";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+
+const corsHeaders = {
+  ...baseCors,
+  "Access-Control-Allow-Headers":
+    (baseCors["Access-Control-Allow-Headers"] || "") + ", x-cron-secret",
+};
 
 const COLORS: Record<string, number> = {
   SUCCESS: 0x00ff00,

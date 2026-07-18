@@ -1,10 +1,13 @@
 // Consulta Routes API via Google Maps gateway e devolve polyline + ETA para o mapa cliente.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { requireUserAuth } from "../_shared/user-auth.ts";
 
 const GATEWAY = "https://connector-gateway.lovable.dev/google_maps";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const unauth = await requireUserAuth(req, corsHeaders);
+  if (unauth) return unauth;
   try {
     const LOVABLE_KEY = Deno.env.get("LOVABLE_API_KEY");
     const GMAPS_KEY = Deno.env.get("GOOGLE_MAPS_API_KEY");

@@ -1,10 +1,18 @@
 // Enfermeira Brisa — WAHA WhatsApp bot (Supabase Edge Function)
 // Recebe webhook do WAHA, gera resposta via Google Gemini e envia de volta.
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { corsHeaders as baseCors } from "npm:@supabase/supabase-js@2/cors";
 
-const WAHA_API_URL = "https://waha-production-4e9c.up.railway.app";
-const WAHA_API_KEY = "planta123";
-const WAHA_SESSION = "default";
+const corsHeaders = {
+  ...baseCors,
+  "Access-Control-Allow-Headers":
+    (baseCors["Access-Control-Allow-Headers"] || "") + ", x-webhook-secret",
+};
+
+const WAHA_API_URL = Deno.env.get("WAHA_API_URL") || "";
+const WAHA_API_KEY = Deno.env.get("WAHA_API_KEY") || "";
+const WAHA_SESSION = Deno.env.get("WAHA_SESSION") || "default";
+const WAHA_WEBHOOK_SECRET = Deno.env.get("WAHA_WEBHOOK_SECRET") || "";
+
 
 const GEMINI_MODEL = "gemini-1.5-pro";
 

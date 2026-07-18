@@ -118,6 +118,32 @@ Deno.serve(async (req) => {
     });
   }
 
+  // Require a shared webhook secret from WAHA to prevent unauthenticated abuse.
+  if (!WAHA_WEBHOOK_SECRET) {
+    return new Response(JSON.stringify({ error: "webhook_secret_not_configured" }), {
+      status: 503,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const provided =
+    req.headers.get("x-webhook-secret") ||
+    req.headers.get("x-webhook-hmac") ||
+    (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+  if (provided !== WAHA_WEBHOOK_SECRET) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  if (!WAHA_API_URL || !WAHA_API_KEY) {
+    return new Response(JSON.stringify({ error: "waha_not_configured" }), {
+      status: 503,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+
   let payload: any = {};
   try {
     payload = await req.json();

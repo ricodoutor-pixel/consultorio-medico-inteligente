@@ -30,6 +30,15 @@ async function wahaPost(path: string, payload: unknown = {}) {
   catch { return { ok: r.ok, status: r.status, data: body }; }
 }
 
+async function wahaPut(path: string, payload: unknown = {}) {
+  const r = await fetch(`${wahaBase()}${path}`, {
+    method: 'PUT', headers: wahaHeaders, body: JSON.stringify(payload),
+  });
+  const body = await r.text();
+  try { return { ok: r.ok, status: r.status, data: JSON.parse(body) }; }
+  catch { return { ok: r.ok, status: r.status, data: body }; }
+}
+
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
 
@@ -99,17 +108,20 @@ serve(async (req: Request) => {
       return reply({ ok: r.ok, action: 'restart', session: WAHA_SESSION, data: r.data });
     }
 
-    // WEBHOOK — registra webhook no WAHA
+    // WEBHOOK — registra webhook no WAHA (CORRIGIDO: PUT /api/sessions/{session}, não /config/update)
     if (action === 'webhook') {
-      const webhookUrl = `${SB_URL.replace('.supabase.co', '.supabase.co')}/functions/v1/whatsapp-brisa-bot`;
-      const r = await wahaPost(`/api/sessions/${WAHA_SESSION}/config/update`, {
-        webhooks: [{
-          url: webhookUrl,
-          events: ['message'],
-          retries: { policy: 'constant', delaySeconds: 3, attempts: 5 },
-        }],
+      const webhookUrl = `${SB_URL}/functions/v1/whatsapp-brisa-bot`;
+      const r = await wahaPut(`/api/sessions/${WAHA_SESSION}`, {
+        name: WAHA_SESSION,
+        config: {
+          webhooks: [{
+            url: webhookUrl,
+            events: ['message'],
+            retries: { policy: 'constant', delaySeconds: 3, attempts: 5 },
+          }],
+        },
       });
-      return reply({ ok: r.ok, action: 'webhook', webhookUrl, session: WAHA_SESSION, data: r.data });
+      return reply({ ok: r.ok, action: 'webhook', webhookUrl, session: WAHA_SESSION, status: r.status, data: r.data });
     }
 
     // SEND TEST — envia mensagem de teste

@@ -86,6 +86,7 @@ const DashboardExecutivo = lazyWithRecovery(() => import("./pages/DashboardExecu
 const Notificacoes = lazyWithRecovery(() => import("./pages/Notificacoes"), { sourceRef: "/notificacoes" });
 const SalaEspera = lazyWithRecovery(() => import("./pages/SalaEspera"), { sourceRef: "/sala-espera" });
 const OrientacaoVideo = lazyWithRecovery(() => import("./pages/OrientacaoVideo"), { sourceRef: "/orientacao-video" });
+const Appointments = lazyWithRecovery(() => import("./pages/Appointments"), { sourceRef: "/consultas" });
 const RIPD = lazyWithRecovery(() => import("./pages/RIPD"), { sourceRef: "/ripd" });
 const LGPDDireitos = lazyWithRecovery(() => import("./pages/LGPDDireitos"), { sourceRef: "/lgpd" });
 const GlobalCompliance = lazyWithRecovery(() => import("./pages/GlobalCompliance"), { sourceRef: "/compliance" });
@@ -287,6 +288,8 @@ const App = () => (
                 <Route path="/notificacoes" element={<Notificacoes />} />
                 <Route path="/sala-espera" element={<SalaEspera />} />
                 <Route path="/orientacao-video" element={<OrientacaoVideo />} />
+                <Route path="/consultas" element={<Appointments />} />
+                <Route path="/appointments" element={<Appointments />} />
                 <Route path="/consulta-video" element={<OrientacaoVideo />} />
                 <Route path="/ripd" element={<RIPD />} />
                 <Route path="/lgpd" element={<LGPDDireitos />} />

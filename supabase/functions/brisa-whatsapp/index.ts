@@ -1,11 +1,12 @@
-// Alias for whatsapp-brisa-bot — kept for backwards compatibility with monitoring & n8n.
-// Forwards the raw payload to the canonical handler internally.
+// Alias for brisa-waha-bot — canonical WAHA WhatsApp entrypoint (migrated from Evolution API, 2026-07-19).
+// Kept for backwards compatibility with existing monitoring/health-check references to this path.
+// Forwards the raw payload to the canonical WAHA handler internally.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const url = new URL(req.url);
-  const target = `${Deno.env.get("SUPABASE_URL")}/functions/v1/whatsapp-brisa-bot${url.search}`;
+  const target = `${Deno.env.get("SUPABASE_URL")}/functions/v1/brisa-waha-bot${url.search}`;
   const init: RequestInit = {
     method: req.method,
     headers: {

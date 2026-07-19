@@ -1,52 +1,41 @@
-// ╔══════════════════════════════════════════════════════════════════════╗
-// ║  🌿 ENFERMEIRA BRISA — WhatsApp Bot PRODUÇÃO v2026.7.1              ║
-// ║  Planta y Raiz Ltda · Supabase Edge Function                       ║
-// ║                                                                      ║
-// ║  ✅ Anti-loop: fromMe === true → ignorado imediatamente             ║
-// ║  ✅ Anti-timeout: HTTP 200 retornado antes da IA processar          ║
-// ║  ✅ IA: gemini-1.5-pro EXCLUSIVO (Lovable Gateway removido)         ║
-// ║  ✅ Canal: 100% WAHA — Evolution API removida deste handler         ║
-// ║  ✅ Persona Brisa completa — CFM/ANVISA compliant                   ║
-// ╚══════════════════════════════════════════════════════════════════════╝
-
+// whatsapp-brisa-bot v2026.7.3 - com log de diagnostico + modo simulacao (isSimulation)
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-api-key, x-webhook-secret',
 };
 
-// ── Variáveis de ambiente ─────────────────────────────────────────────────
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "";
 const WAHA_API_URL    = (Deno.env.get("WAHA_API_URL") || "waha-production-4e9c.up.railway.app").replace(/\/$/,"");
 const WAHA_API_KEY    = Deno.env.get("WAHA_API_KEY") || "planta123";
 const WAHA_SESSION    = Deno.env.get("WAHA_SESSION") || "default";
+const SB_URL = Deno.env.get("SUPABASE_URL") || "";
+const SB_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
-// ── Persona Brisa (CFM/ANVISA compliant) ─────────────────────────────────
-const BRISA_PERSONA = `Você é a Brisa — Enfermeira Consultora e Especialista em Cannabis Medicinal da Planta y Raiz Ltda.
+const BRISA_PERSONA = `Voce e a Brisa - Enfermeira Consultora e Especialista em Cannabis Medicinal da Planta y Raiz Ltda.
 
-COMPLIANCE MESTRE (INEGOCIÁVEL): A Planta y Raiz Ltda (CNAE 6209-1/00) atua ESTRITAMENTE como plataforma de intermediação tecnológica. A plataforma NÃO fabrica, NÃO produz, NÃO importa, NÃO distribui, NÃO entrega, NÃO comercializa e NÃO vende nenhum produto farmacêutico. A plataforma NÃO pratica atos médicos, NÃO emite diagnósticos e NÃO prescreve.
+COMPLIANCE MESTRE (INEGOCIAVEL): A Planta y Raiz Ltda (CNAE 6209-1/00) atua ESTRITAMENTE como plataforma de intermediacao tecnologica. A plataforma NAO fabrica, NAO produz, NAO importa, NAO distribui, NAO entrega, NAO comercializa e NAO vende nenhum produto farmaceutico. A plataforma NAO pratica atos medicos, NAO emite diagnosticos e NAO prescreve.
 
 TOM E ESTILO (WhatsApp):
-• Frases CURTAS — máximo 4 linhas por mensagem, como quem digita no celular
-• Empático, acolhedor, técnico e profissional
-• PROIBIDO: "amor", "querido", "meu bem", "meu coração"
-• Emoji com parcimônia: 🌿 ou ✅ quando apropriado
-• Português brasileiro natural
+- Frases CURTAS, maximo 4 linhas por mensagem
+- Empatico, acolhedor, tecnico e profissional
+- PROIBIDO: "amor", "querido", "meu bem", "meu coracao"
+- Emoji com parcimonia
+- Portugues brasileiro natural
 
-SEGURANÇA CLÍNICA:
-• Para emergências → oriente SAMU 192 IMEDIATAMENTE
-• Nunca prescreve, nunca dá diagnóstico, nunca promete cura
-• Para casos complexos → "Vou chamar nossa equipe humana pra te atender"
-• Dentro das normas ANVISA RDC 660/2022, RDC 327/2019 e CFM 2.314/2022
+SEGURANCA CLINICA:
+- Para emergencias, oriente SAMU 192 IMEDIATAMENTE
+- Nunca prescreve, nunca da diagnostico, nunca promete cura
+- Para casos complexos, diga que vai chamar a equipe humana
+- Dentro das normas ANVISA RDC 660/2022, RDC 327/2019 e CFM 2.314/2022
 
 OFERTA (quando perguntarem):
-• Orientação Técnica: R$30 (Brasil) ou US$10 (internacional)
-• Realizada pelo Dr. Edilson Bezerra (CRM-SP 10963)
-• Link: https://plantayraiz.com.br
-• PIX ou cartão aceitos`;
+- Orientacao Tecnica: R$30 (Brasil) ou US$10 (internacional)
+- Realizada pelo Dr. Edilson Bezerra (CRM-SP 10963)
+- Link: https://plantayraiz.com.br`;
 
-// ── Parser de payload WAHA (evento message / message.any) ────────────────
 interface ParsedMsg {
   chatId: string;
   phone: string;
@@ -69,7 +58,7 @@ function parseWAHA(body: Record<string,unknown>): ParsedMsg {
 
   return {
     chatId,
-    phone: chatId.replace(/@.*/, "").replace(/\D/g, ""),
+    phone: chatId.replace(/@.*/, "").replace(/[^0-9]/g, ""),
     fromMe,
     text,
     senderName,
@@ -79,14 +68,30 @@ function parseWAHA(body: Record<string,unknown>): ParsedMsg {
   };
 }
 
-// ── Geração de resposta — gemini-1.5-pro EXCLUSIVO ────────────────────────
-async function generateReply(userText: string, phone: string, name: string | null): Promise<string> {
+async function logMsg(row: Record<string, unknown>) {
+  if (!SB_URL || !SB_KEY) return;
+  try {
+    await fetch(`${SB_URL}/rest/v1/whatsapp_messages`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SB_KEY,
+        "Authorization": `Bearer ${SB_KEY}`,
+        "Prefer": "return=minimal",
+      },
+      body: JSON.stringify(row),
+    });
+  } catch (e) {
+    console.error("[brisa] logMsg falhou:", e);
+  }
+}
+
+async function generateReply(userText: string, phone: string, name: string | null): Promise<{text: string, source: string}> {
   const ctx = name ? `[${name} | ${phone}]` : `[${phone}]`;
   const userContent = `${ctx}\n${userText}`;
 
   if (!GEMINI_API_KEY) {
-    console.error("[brisa] GEMINI_API_KEY ausente — sem fallback de IA configurado");
-    return "Olá! Sou a Enfª Brisa 🌿 da Planta y Raiz. Estou com instabilidade técnica agora. Em instantes retorno. Ou acesse: https://plantayraiz.com.br";
+    return { text: "Ola! Sou a Enfa Brisa da Planta y Raiz. Estou com instabilidade tecnica agora. Em instantes retorno. Ou acesse: https://plantayraiz.com.br", source: "fallback:no_key" };
   }
 
   try {
@@ -108,16 +113,17 @@ async function generateReply(userText: string, phone: string, name: string | nul
     if (r.ok) {
       const j = await r.json() as {candidates?:Array<{content?:{parts?:Array<{text?:string}>}}>};
       const reply = j?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      if (reply) { console.log("[brisa] IA: gemini-1.5-pro"); return reply; }
+      if (reply) return { text: reply, source: "gemini-1.5-pro" };
+      return { text: "Ola! Sou a Enfa Brisa da Planta y Raiz. Estou com instabilidade tecnica agora. Em instantes retorno.", source: "fallback:empty_candidate" };
     } else {
-      console.error(`[brisa] gemini-1.5-pro HTTP ${r.status}: ${(await r.text()).slice(0,200)}`);
+      const errBody = await r.text();
+      return { text: "Ola! Sou a Enfa Brisa da Planta y Raiz. Estou com instabilidade tecnica agora. Em instantes retorno.", source: `fallback:gemini_http_${r.status}:${errBody.slice(0,180)}` };
     }
-  } catch(e) { console.warn("[brisa] gemini-1.5-pro timeout/erro:", e); }
-
-  return "Olá! Sou a Enfª Brisa 🌿 da Planta y Raiz. Estou com instabilidade técnica agora. Em instantes retorno. Ou acesse: https://plantayraiz.com.br";
+  } catch(e) {
+    return { text: "Ola! Sou a Enfa Brisa da Planta y Raiz. Estou com instabilidade tecnica agora. Em instantes retorno.", source: `fallback:exception:${String(e).slice(0,180)}` };
+  }
 }
 
-// ── Envio via WAHA (único canal — Evolution removida) ─────────────────────
 async function sendWAHA(chatId: string, text: string): Promise<{ok:boolean, status?:number, error?:string}> {
   try {
     const base = WAHA_API_URL.startsWith("http") ? WAHA_API_URL : `https://${WAHA_API_URL}`;
@@ -130,26 +136,29 @@ async function sendWAHA(chatId: string, text: string): Promise<{ok:boolean, stat
       },
       body: JSON.stringify({ session: WAHA_SESSION, chatId, text }),
     });
-    if (!r.ok) console.error(`[brisa] WAHA HTTP ${r.status}: ${(await r.text()).slice(0,200)}`);
-    return { ok: r.ok, status: r.status };
-  } catch(e) { return { ok: false, error: String(e) }; }
+    const respBody = await r.text();
+    return { ok: r.ok, status: r.status, error: r.ok ? undefined : respBody.slice(0,300) };
+  } catch(e) { return { ok: false, error: String(e).slice(0,300) }; }
 }
 
-// ── Handler principal ─────────────────────────────────────────────────────
 serve(async (req: Request): Promise<Response> => {
 
+  // Preflight CORS
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   if (req.method === "GET") {
     return new Response(JSON.stringify({
       ok: true,
       service: "whatsapp-brisa-bot",
-      version: "2026.7.1-prod",
+      version: "2026.7.3-prod-sim",
       waha: WAHA_API_URL,
       session: WAHA_SESSION,
       ai: "gemini-1.5-pro (exclusivo)",
+      gemini_key_configured: Boolean(GEMINI_API_KEY),
+      gemini_key_prefix: GEMINI_API_KEY ? GEMINI_API_KEY.slice(0,4) : null,
+      simulation_mode: "POST com { isSimulation: true, text: '...' }",
     }, null, 2), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -167,10 +176,35 @@ serve(async (req: Request): Promise<Response> => {
     status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
   }); }
 
+  // ── MODO SIMULACAO: bypassa WAHA, retorna a resposta da IA direto no HTTP ──
+  const payloadObj = (body?.payload ?? {}) as Record<string, unknown>;
+  const isSimulation = Boolean(body?.isSimulation ?? payloadObj?.isSimulation ?? false);
+
+  if (isSimulation) {
+    const simText = String(body?.text ?? body?.message ?? payloadObj?.text ?? payloadObj?.body ?? "").trim();
+    const simName = String(body?.name ?? payloadObj?.name ?? body?.senderName ?? "") || null;
+    const simPhone = String(body?.phone ?? payloadObj?.phone ?? "simulation") || "simulation";
+
+    if (!simText) {
+      return new Response(JSON.stringify({ status: "error", error: "campo 'text' obrigatorio no modo simulacao" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const reply = await generateReply(simText, simPhone, simName);
+    return new Response(JSON.stringify({
+      status: "success",
+      isSimulation: true,
+      text: reply.text,
+      source: reply.source,
+      waha_bypassed: true,
+    }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 });
+  }
+
+  // ── FLUXO DE PRODUCAO NORMAL (WAHA -> Gemini -> WAHA) ──
   const { chatId, phone, fromMe, text, senderName, isGroup, isStatus, event } = parseWAHA(body);
 
   if (fromMe) {
-    console.log(`[brisa] ANTI-LOOP: ignorando fromMe=true → ${chatId}`);
     return new Response(JSON.stringify({ ok: true, ignored: true, reason: "fromMe" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -182,21 +216,20 @@ serve(async (req: Request): Promise<Response> => {
   if (!chatId || !text) return new Response(JSON.stringify({ ok: true, ignored: true, reason: "no_text" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   const background = async () => {
-    try {
-      console.log(`[brisa] Mensagem de ${phone} (${senderName ?? "?"}): "${text.slice(0, 100)}"`);
-      const reply = await generateReply(text, phone, senderName);
-      const send  = await sendWAHA(chatId, reply);
-      console.log(`[brisa] Enviado via WAHA (ok=${send.ok}): "${reply.slice(0, 80)}"`);
-    } catch(e) {
-      console.error("[brisa] background error:", e);
-    }
+    await logMsg({ remote_jid: chatId, sender_name: senderName, message_text: text, message_type: "text", direction: "in", status: "received", from_me: false, session: WAHA_SESSION });
+
+    const reply = await generateReply(text, phone, senderName);
+    await logMsg({ remote_jid: chatId, sender_name: senderName, message_text: reply.text, message_type: "text", direction: "out", status: `generated:${reply.source}`, from_me: true, session: WAHA_SESSION });
+
+    const send = await sendWAHA(chatId, reply.text);
+    await logMsg({ remote_jid: chatId, sender_name: senderName, message_text: reply.text, message_type: "text", direction: "out", status: send.ok ? "sent" : `send_failed:${send.status}:${send.error}`, from_me: true, session: WAHA_SESSION });
   };
 
   const runtime = (globalThis as unknown as {EdgeRuntime?: {waitUntil?: (p: Promise<unknown>) => void}}).EdgeRuntime;
   if (runtime?.waitUntil) {
     runtime.waitUntil(background());
   } else {
-    background().catch(console.error);
+    background().catch((e) => console.error("[brisa] background error:", e));
   }
 
   return new Response(

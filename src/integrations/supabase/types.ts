@@ -7610,6 +7610,60 @@ export type Database = {
         }
         Relationships: []
       }
+      video_rooms: {
+        Row: {
+          consultation_id: string
+          created_at: string
+          doctor_id: string
+          ended_at: string | null
+          id: string
+          patient_id: string
+          room_name: string
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          consultation_id: string
+          created_at?: string
+          doctor_id: string
+          ended_at?: string | null
+          id?: string
+          patient_id: string
+          room_name: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          consultation_id?: string
+          created_at?: string
+          doctor_id?: string
+          ended_at?: string | null
+          id?: string
+          patient_id?: string
+          room_name?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_rooms_consultation_id_fkey"
+            columns: ["consultation_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_rooms_consultation_id_fkey"
+            columns: ["consultation_id"]
+            isOneToOne: true
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+        ]
+      }
       webhook_events: {
         Row: {
           event_id: string

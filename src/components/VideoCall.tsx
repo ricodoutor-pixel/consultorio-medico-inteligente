@@ -90,7 +90,7 @@ export function VideoCall({ consultationId, displayName, isDoctor, onReady, onCl
           enableWelcomePage: false,
           defaultLanguage: "pt",
         }}
-        interfaceConfigOverwrite: {
+        interfaceConfigOverwrite={{
           DEFAULT_BACKGROUND: "#0a0c10",
           DEFAULT_REMOTE_DISPLAY_NAME: isDoctor ? "Paciente" : "Médico(a)",
           TOOLBAR_BUTTONS: [

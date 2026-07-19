@@ -1,135 +1,76 @@
-/**
- * BRISA HEALTH CHECK
- * --------------------------------------------------------------
- * Endpoint público (admin-only via verificação de role) que reporta
- * o status em tempo real dos secrets, webhooks e bots da Brisa 360°.
- *
- * Resposta:
- *   {
- *     secrets:  { name, ok, source }[],
- *     webhooks: { name, ok, url, hint }[],
- *     bots:     { name, ok, lastSeen }[],
- *     overall:  "green" | "yellow" | "red",
- *     checkedAt: ISO
- *   }
- */
-import { createClient } from "npm:@supabase/supabase-js@2";
-import { metaSecretsHealth } from "../_shared/meta-secrets.ts";
+// 🌿 Planta y Raiz — brisa-health-check
+// Monitoramento completo do sistema em produção
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type' };
 
-function hasEnv(...names: string[]): { ok: boolean; source: string } {
-  for (const n of names) {
-    const v = Deno.env.get(n);
-    if (v && v.length > 0) return { ok: true, source: n };
-  }
-  return { ok: false, source: names[0] };
-}
+const WAHA_URL  = (Deno.env.get('WAHA_API_URL') || 'waha-production-4e9c.up.railway.app').replace(/\/$/, '');
+const WAHA_KEY  = Deno.env.get('WAHA_API_KEY') || 'planta123';
+const SB_URL    = Deno.env.get('SUPABASE_URL') || '';
+const SB_KEY    = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+const EV_URL    = (Deno.env.get('EVOLUTION_API_URL') || '').replace(/\/$/, '');
+const EV_KEY    = Deno.env.get('EVOLUTION_API_KEY') || '';
+const EV_INST   = Deno.env.get('EVOLUTION_INSTANCE') || 'plantayraiz';
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+serve(async (req: Request) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
 
-  // ── Auth: só admins
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
-  const authHeader = req.headers.get("Authorization") || "";
-  const jwt = authHeader.replace(/^Bearer\s+/i, "");
-  if (!jwt) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  const ts = new Date().toISOString();
+  const results: Record<string, unknown> = { timestamp: ts, project: 'PLANTA Y RAIZ' };
+
+  // 1. WAHA
+  try {
+    const base = WAHA_URL.startsWith('http') ? WAHA_URL : `https://${WAHA_URL}`;
+    const r = await fetch(`${base}/api/sessions`, {
+      headers: { 'X-Api-Key': WAHA_KEY }, signal: AbortSignal.timeout(6000),
     });
+    const data = r.ok ? await r.json() : null;
+    const sess = Array.isArray(data) ? data.find((s: {name:string}) => s.name === 'default') : data;
+    results.waha = { ok: r.ok, status: r.status, session_status: sess?.status || 'unknown', connected: sess?.status === 'WORKING' };
+  } catch(e) { results.waha = { ok: false, error: String(e) }; }
+
+  // 2. Evolution
+  if (EV_URL && EV_KEY) {
+    try {
+      const base = EV_URL.startsWith('http') ? EV_URL : `https://${EV_URL}`;
+      const r = await fetch(`${base}/instance/connectionState/${encodeURIComponent(EV_INST)}`, {
+        headers: { apikey: EV_KEY }, signal: AbortSignal.timeout(6000),
+      });
+      const data = r.ok ? await r.json() : null;
+      results.evolution = { ok: r.ok, status: r.status, state: data?.instance?.state || data?.state || 'unknown', instance: EV_INST };
+    } catch(e) { results.evolution = { ok: false, error: String(e) }; }
+  } else {
+    results.evolution = { ok: false, error: 'EVOLUTION_API_URL ou EVOLUTION_API_KEY não configurados' };
   }
-  const { data: userData } = await supabase.auth.getUser(jwt);
-  const uid = userData?.user?.id;
-  if (!uid) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+
+  // 3. Supabase DB
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/whatsapp_messages?select=count&limit=1`, {
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }, signal: AbortSignal.timeout(5000),
     });
-  }
-  const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: uid, _role: "admin" });
-  if (!isAdmin) {
-    return new Response(JSON.stringify({ error: "Forbidden" }), {
-      status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
+    results.database = { ok: r.ok, status: r.status };
+  } catch(e) { results.database = { ok: false, error: String(e) }; }
 
-  // ── 1. SECRETS
-  const meta = metaSecretsHealth();
-  const secrets = [
-    { name: "META_APP_SECRET", ok: meta.META_APP_SECRET, hint: "Facebook Developers → App Settings → Basic" },
-    { name: "FB_PAGE_ACCESS_TOKEN", ok: meta.FB_PAGE_ACCESS_TOKEN, hint: "Graph API Explorer → Page Token permanente" },
-    { name: "IG_PAGE_ACCESS_TOKEN", ok: meta.IG_PAGE_ACCESS_TOKEN, hint: "Mesma página FB com IG Business vinculado" },
-    { name: "EVOLUTION_API_URL", ok: hasEnv("EVOLUTION_API_URL").ok, hint: "URL da Evolution API (WhatsApp)" },
-    { name: "EVOLUTION_API_KEY", ok: hasEnv("EVOLUTION_API_KEY").ok, hint: "API key da instância Brisa_CEO" },
-    { name: "EVOLUTION_WEBHOOK_SECRET", ok: hasEnv("EVOLUTION_WEBHOOK_SECRET").ok, hint: "Shared secret do webhook Evolution" },
-    { name: "GOOGLE_GENERATIVE_AI_API_KEY / GEMINI_API_KEY", ok: hasEnv("GOOGLE_GENERATIVE_AI_API_KEY", "GEMINI_API_KEY").ok, hint: "Motor de IA da Brisa (Google Gemini direto)" },
-    { name: "MERCADO_PAGO_ACCESS_TOKEN", ok: hasEnv("MERCADO_PAGO_ACCESS_TOKEN").ok, hint: "Geração de links PIX R$30" },
-  ];
+  // 4. Secrets
+  results.secrets = {
+    GEMINI_API_KEY: Boolean(Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY')),
+    LOVABLE_API_KEY: Boolean(Deno.env.get('LOVABLE_API_KEY')),
+    EVOLUTION_API_URL: Boolean(EV_URL),
+    EVOLUTION_API_KEY: Boolean(EV_KEY),
+    EVOLUTION_INSTANCE: EV_INST,
+    WAHA_API_URL: WAHA_URL,
+    ADMIN_PHONE_BR: Boolean(Deno.env.get('ADMIN_PHONE_BR')),
+  };
 
-  // ── 2. WEBHOOKS (ping HEAD nas próprias edge functions)
-  const base = Deno.env.get("SUPABASE_URL")!;
-  const webhookList = [
-    { name: "meta-comment-to-dm", url: `${base}/functions/v1/meta-comment-to-dm`, hint: "Configurar no Meta Developer Console (verify token: plantayraiz-verify)" },
-    { name: "whatsapp-brisa-bot", url: `${base}/functions/v1/whatsapp-brisa-bot`, hint: "Evolution API → Settings → Webhook URL" },
-    { name: "brisa-whatsapp", url: `${base}/functions/v1/brisa-whatsapp`, hint: "Webhook legado WhatsApp" },
-    { name: "meta-messenger-bot", url: `${base}/functions/v1/meta-messenger-bot`, hint: "Messenger + Instagram DM webhook" },
-  ];
-  const webhooks = await Promise.all(
-    webhookList.map(async (w) => {
-      try {
-        const r = await fetch(w.url, { method: "OPTIONS", signal: AbortSignal.timeout(3000) });
-        // 200/204/401/405 = endpoint vivo. 5xx ou network error = down.
-        return { ...w, ok: r.status < 500 };
-      } catch {
-        return { ...w, ok: false };
-      }
-    }),
-  );
+  // Score geral
+  const wahaOk  = (results.waha as {ok:boolean}).ok;
+  const dbOk    = (results.database as {ok:boolean}).ok;
+  const hasAI   = (results.secrets as {GEMINI_API_KEY:boolean}).GEMINI_API_KEY || (results.secrets as {LOVABLE_API_KEY:boolean}).LOVABLE_API_KEY;
+  const score   = [wahaOk, dbOk, hasAI].filter(Boolean).length;
+  results.health = score === 3 ? 'GREEN' : score >= 2 ? 'YELLOW' : 'RED';
+  results.score  = `${score}/3`;
 
-  // ── 3. BOTS — última mensagem registrada por canal
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const { data: lastMsgs } = await supabase
-    .from("brisa_unified_conversations")
-    .select("channel, created_at")
-    .gte("created_at", since)
-    .order("created_at", { ascending: false })
-    .limit(500);
-
-  const byChannel = new Map<string, string>();
-  for (const m of lastMsgs ?? []) {
-    if (!byChannel.has(m.channel)) byChannel.set(m.channel, m.created_at);
-  }
-  const bots = [
-    { name: "WhatsApp (Evolution)", channel: "whatsapp" },
-    { name: "Instagram DM", channel: "instagram_dm" },
-    { name: "Messenger", channel: "messenger" },
-    { name: "Comentários FB/IG", channel: "ig_comment" },
-  ].map((b) => ({
-    name: b.name,
-    lastSeen: byChannel.get(b.channel) ?? null,
-    ok: byChannel.has(b.channel),
-  }));
-
-  // ── Overall
-  const failingSecrets = secrets.filter((s) => !s.ok).length;
-  const failingWebhooks = webhooks.filter((w) => !w.ok).length;
-  let overall: "green" | "yellow" | "red" = "green";
-  if (failingWebhooks > 0 || failingSecrets >= 3) overall = "red";
-  else if (failingSecrets > 0) overall = "yellow";
-
-  return new Response(
-    JSON.stringify({
-      overall,
-      secrets,
-      webhooks,
-      bots,
-      checkedAt: new Date().toISOString(),
-    }),
-    { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-  );
+  return new Response(JSON.stringify(results, null, 2), {
+    headers: { ...cors, 'Content-Type': 'application/json' },
+  });
 });

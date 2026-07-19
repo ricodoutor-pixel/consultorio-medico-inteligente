@@ -8252,6 +8252,13 @@ export type Database = {
           schedule: string
         }[]
       }
+      get_doctor_display: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+        }[]
+      }
       get_doctor_for_country: {
         Args: { _country: string }
         Returns: {

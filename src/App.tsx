@@ -86,6 +86,7 @@ const DashboardExecutivo = lazyWithRecovery(() => import("./pages/DashboardExecu
 const Notificacoes = lazyWithRecovery(() => import("./pages/Notificacoes"), { sourceRef: "/notificacoes" });
 const SalaEspera = lazyWithRecovery(() => import("./pages/SalaEspera"), { sourceRef: "/sala-espera" });
 const OrientacaoVideo = lazyWithRecovery(() => import("./pages/OrientacaoVideo"), { sourceRef: "/orientacao-video" });
+const Appointments = lazyWithRecovery(() => import("./pages/Appointments"), { sourceRef: "/consultas" });
 const RIPD = lazyWithRecovery(() => import("./pages/RIPD"), { sourceRef: "/ripd" });
 const LGPDDireitos = lazyWithRecovery(() => import("./pages/LGPDDireitos"), { sourceRef: "/lgpd" });
 const GlobalCompliance = lazyWithRecovery(() => import("./pages/GlobalCompliance"), { sourceRef: "/compliance" });

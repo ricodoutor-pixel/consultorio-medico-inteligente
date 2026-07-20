@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FrogChatModal } from "./components/FrogChatModal";
 import { ShoppingCart } from "./components/ShoppingCart";
@@ -97,7 +97,13 @@ const IoMTHub = lazyWithRecovery(() => import("./pages/IoMTHub"), { sourceRef: "
 const Blog = lazyWithRecovery(() => import("./pages/Blog"), { sourceRef: "/blog" });
 const ShoppingDashboard = lazyWithRecovery(() => import("./pages/ShoppingDashboard"), { sourceRef: "/dashboard-loja" });
 const InvestorDashboard = lazyWithRecovery(() => import("./pages/InvestorDashboard"), { sourceRef: "/investidores" });
-const VideoCall = lazyWithRecovery(() => import("./pages/VideoCall"), { sourceRef: "/videochamada" });
+// /videochamada foi consolidada em /orientacao-video (mesmo backend real:
+// create-video-room + join-video-room). Mantemos a rota como redirect para
+// nao quebrar links antigos ja enviados a pacientes/medicos.
+const LegacyVideoCallRedirect = () => {
+  const location = useLocation();
+  return <Navigate to={`/orientacao-video${location.search}`} replace />;
+};
 const OrientacaoRapida = lazyWithRecovery(() => import("./pages/OrientacaoRapida"), { sourceRef: "/orientacao-rapida" });
 const SEOCondicoes = lazyWithRecovery(() => import("./pages/SEOCondicoes"), { sourceRef: "/tratamentos" });
 const Status = lazyWithRecovery(() => import("./pages/Status"), { sourceRef: "/status" });
@@ -305,7 +311,7 @@ const App = () => (
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/dashboard-loja" element={<ShoppingDashboard />} />
                 <Route path="/investidores" element={<InvestorDashboard />} />
-                <Route path="/videochamada" element={<VideoCall />} />
+                <Route path="/videochamada" element={<LegacyVideoCallRedirect />} />
                 <Route path="/orientacao-rapida" element={<OrientacaoRapida />} />
                 <Route path="/consulta-rapida" element={<OrientacaoRapida />} />
                 <Route path="/tratamento-dor-cronica" element={<TratamentoDorCronica />} />

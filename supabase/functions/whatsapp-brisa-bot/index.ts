@@ -1,5 +1,7 @@
 // whatsapp-brisa-bot v2026.7.3 - com log de diagnostico + modo simulacao (isSimulation)
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { sendWhatsApp } from "../_shared/evolution.ts";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -124,21 +126,59 @@ async function generateReply(userText: string, phone: string, name: string | nul
   }
 }
 
-async function sendWAHA(chatId: string, text: string): Promise<{ok:boolean, status?:number, error?:string}> {
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs = 7000): Promise<{ ok: boolean; status: number; body: string; error?: string }> {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort("timeout"), timeoutMs);
   try {
-    const base = WAHA_API_URL.startsWith("http") ? WAHA_API_URL : `https://${WAHA_API_URL}`;
-    const r = await fetch(`${base}/api/sendText`, {
+    const r = await fetch(url, { ...init, signal: ctrl.signal });
+    const body = await r.text().catch(() => "");
+    return { ok: r.ok, status: r.status, body };
+  } catch (e) {
+    return { ok: false, status: 0, body: "", error: e instanceof Error ? e.message : String(e) };
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+function chatIdFromPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return phone.includes("@") ? phone : `${digits}@c.us`;
+}
+
+async function sendWAHA(chatId: string, text: string): Promise<{ok:boolean, status?:number, error?:string, provider:string}> {
+  const base = WAHA_API_URL.startsWith("http") ? WAHA_API_URL : `https://${WAHA_API_URL}`;
+  const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "X-Api-Key": WAHA_API_KEY,
+  };
+  const body = JSON.stringify({ session: WAHA_SESSION, chatId, text });
+
+  const primary = await fetchWithTimeout(`${base}/api/sendText`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "X-Api-Key": WAHA_API_KEY,
-      },
-      body: JSON.stringify({ session: WAHA_SESSION, chatId, text }),
-    });
-    const respBody = await r.text();
-    return { ok: r.ok, status: r.status, error: r.ok ? undefined : respBody.slice(0,300) };
-  } catch(e) { return { ok: false, error: String(e).slice(0,300) }; }
+      headers,
+      body,
+    }, 7000);
+  if (primary.ok) return { ok: true, status: primary.status, provider: "waha:/api/sendText" };
+
+  const sessionRoute = await fetchWithTimeout(`${base}/api/${encodeURIComponent(WAHA_SESSION)}/sendText`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ chatId, text }),
+  }, 7000);
+  if (sessionRoute.ok) return { ok: true, status: sessionRoute.status, provider: "waha:/api/{session}/sendText" };
+
+  const fallback = await sendWhatsApp(chatId.replace(/@.*/, ""), text);
+  if (fallback.ok) return { ok: true, status: fallback.status, provider: "evolution:fallback" };
+
+  const primaryError = primary.error || primary.body.slice(0, 220);
+  const sessionError = sessionRoute.error || sessionRoute.body.slice(0, 220);
+  return {
+    ok: false,
+    status: primary.status || sessionRoute.status || fallback.status,
+    provider: "failed:waha+evolution",
+    error: `waha_primary=${primary.status}:${primaryError} | waha_session=${sessionRoute.status}:${sessionError} | evolution=${fallback.status || 0}:${fallback.error || "failed"}`.slice(0, 500),
+  };
 }
 
 serve(async (req: Request): Promise<Response> => {
@@ -152,7 +192,7 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(JSON.stringify({
       ok: true,
       service: "whatsapp-brisa-bot",
-      version: "2026.7.3-prod-sim",
+      version: "2026.7.4-waha-evolution-failover",
       waha: WAHA_API_URL,
       session: WAHA_SESSION,
       ai: "gemini-1.5-pro (exclusivo)",
@@ -179,6 +219,32 @@ serve(async (req: Request): Promise<Response> => {
   // ── MODO SIMULACAO: bypassa WAHA, retorna a resposta da IA direto no HTTP ──
   const payloadObj = (body?.payload ?? {}) as Record<string, unknown>;
   const isSimulation = Boolean(body?.isSimulation ?? payloadObj?.isSimulation ?? false);
+  const action = String(body?.action ?? payloadObj?.action ?? "").trim().toLowerCase();
+
+  if (action === "brisa_on" || action === "send_test") {
+    const unauth = requireServiceAuth(req, corsHeaders);
+    if (unauth) return unauth;
+
+    const target = String(body?.number ?? body?.phone ?? Deno.env.get("ADMIN_WHATSAPP") ?? "5511987131241");
+    const text = String(body?.text ?? "Olá Dr. Edilson Bezerra, estou on!");
+    const chatId = chatIdFromPhone(target);
+    const send = await sendWAHA(chatId, text);
+    await logMsg({
+      remote_jid: chatId,
+      sender_name: "Brisa Admin Test",
+      message_text: text,
+      message_type: "text",
+      direction: "out",
+      status: send.ok ? `sent:${send.provider}` : `send_failed:${send.provider}:${send.status}:${send.error}`,
+      from_me: true,
+      session: WAHA_SESSION,
+    });
+
+    return new Response(JSON.stringify({ ok: send.ok, action, chatId, provider: send.provider, status: send.status, error: send.error }), {
+      status: send.ok ? 200 : 502,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   if (isSimulation) {
     const simText = String(body?.text ?? body?.message ?? payloadObj?.text ?? payloadObj?.body ?? "").trim();
@@ -222,7 +288,7 @@ serve(async (req: Request): Promise<Response> => {
     await logMsg({ remote_jid: chatId, sender_name: senderName, message_text: reply.text, message_type: "text", direction: "out", status: `generated:${reply.source}`, from_me: true, session: WAHA_SESSION });
 
     const send = await sendWAHA(chatId, reply.text);
-    await logMsg({ remote_jid: chatId, sender_name: senderName, message_text: reply.text, message_type: "text", direction: "out", status: send.ok ? "sent" : `send_failed:${send.status}:${send.error}`, from_me: true, session: WAHA_SESSION });
+    await logMsg({ remote_jid: chatId, sender_name: senderName, message_text: reply.text, message_type: "text", direction: "out", status: send.ok ? `sent:${send.provider}` : `send_failed:${send.provider}:${send.status}:${send.error}`, from_me: true, session: WAHA_SESSION });
   };
 
   const runtime = (globalThis as unknown as {EdgeRuntime?: {waitUntil?: (p: Promise<unknown>) => void}}).EdgeRuntime;

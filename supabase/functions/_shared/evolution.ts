@@ -6,6 +6,12 @@ const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL");
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY");
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
 
+function evolutionBaseUrl(): string {
+  const raw = (EVOLUTION_API_URL || "").replace(/\/$/, "");
+  if (!raw) return "";
+  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+}
+
 /** Normalize Brazilian phone -> E.164 digits only. */
 function normalizePhone(raw: string): string {
   let p = (raw || "").replace(/\D/g, "");
@@ -32,8 +38,9 @@ export async function sendWhatsApp(
   if (!number) return { ok: false, error: "invalid phone" };
 
   try {
+    const base = evolutionBaseUrl();
     const res = await fetch(
-      `${EVOLUTION_API_URL.replace(/\/$/, "")}/message/sendText/${EVOLUTION_INSTANCE}`,
+      `${base}/message/sendText/${encodeURIComponent(EVOLUTION_INSTANCE)}`,
       {
         method: "POST",
         headers: {

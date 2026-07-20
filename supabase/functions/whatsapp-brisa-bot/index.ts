@@ -1,5 +1,6 @@
 // whatsapp-brisa-bot v2026.7.3 - com log de diagnostico + modo simulacao (isSimulation)
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { sendWhatsApp } from "../_shared/evolution.ts";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
 
@@ -85,6 +86,31 @@ async function logMsg(row: Record<string, unknown>) {
     });
   } catch (e) {
     console.error("[brisa] logMsg falhou:", e);
+  }
+}
+
+async function isAdminRequest(req: Request): Promise<boolean> {
+  if (!SB_URL || !SB_KEY) return false;
+  const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+  if (!token || token === SB_KEY) return false;
+
+  try {
+    const supabase = createClient(SB_URL, SB_KEY);
+    const { data: userData, error: userError } = await supabase.auth.getUser(token);
+    const userId = userData?.user?.id;
+    if (userError || !userId) return false;
+
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    return !error && data?.role === "admin";
+  } catch (e) {
+    console.error("[brisa] admin auth check failed:", e);
+    return false;
   }
 }
 
@@ -223,7 +249,7 @@ serve(async (req: Request): Promise<Response> => {
 
   if (action === "brisa_on" || action === "send_test") {
     const unauth = requireServiceAuth(req, corsHeaders);
-    if (unauth) return unauth;
+    if (unauth && !(await isAdminRequest(req))) return unauth;
 
     const target = String(body?.number ?? body?.phone ?? Deno.env.get("ADMIN_WHATSAPP") ?? "5511987131241");
     const text = String(body?.text ?? "Olá Dr. Edilson Bezerra, estou on!");

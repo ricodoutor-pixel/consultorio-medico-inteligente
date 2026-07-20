@@ -16,6 +16,9 @@ const WAHA_API_KEY    = Deno.env.get("WAHA_API_KEY") || "planta123";
 const WAHA_SESSION    = Deno.env.get("WAHA_SESSION") || "default";
 const SB_URL = Deno.env.get("SUPABASE_URL") || "";
 const SB_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID") || "";
+const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN") || "";
+const TWILIO_WHATSAPP_FROM = Deno.env.get("TWILIO_WHATSAPP_FROM") || "whatsapp:+14155238886";
 
 const BRISA_PERSONA = `Voce e a Brisa - Enfermeira Consultora e Especialista em Cannabis Medicinal da Planta y Raiz Ltda.
 
@@ -197,13 +200,50 @@ async function sendWAHA(chatId: string, text: string): Promise<{ok:boolean, stat
   const fallback = await sendWhatsApp(chatId.replace(/@.*/, ""), text);
   if (fallback.ok) return { ok: true, status: fallback.status, provider: "evolution:fallback" };
 
+  const twilio = await sendTwilioWhatsApp(chatId.replace(/@.*/, ""), text);
+  if (twilio.ok) return { ok: true, status: twilio.status, provider: "twilio:fallback" };
+
   const primaryError = primary.error || primary.body.slice(0, 220);
   const sessionError = sessionRoute.error || sessionRoute.body.slice(0, 220);
   return {
     ok: false,
-    status: primary.status || sessionRoute.status || fallback.status,
+    status: primary.status || sessionRoute.status || fallback.status || twilio.status,
     provider: "failed:waha+evolution",
-    error: `waha_primary=${primary.status}:${primaryError} | waha_session=${sessionRoute.status}:${sessionError} | evolution=${fallback.status || 0}:${fallback.error || "failed"}`.slice(0, 500),
+    error: `waha_primary=${primary.status}:${primaryError} | waha_session=${sessionRoute.status}:${sessionError} | evolution=${fallback.status || 0}:${fallback.error || "failed"} | twilio=${twilio.status || 0}:${twilio.error || "failed"}`.slice(0, 500),
+  };
+}
+
+async function sendTwilioWhatsApp(phone: string, text: string): Promise<{ ok: boolean; status?: number; error?: string }> {
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+    return { ok: false, error: "twilio_not_configured" };
+  }
+
+  const digits = phone.replace(/\D/g, "");
+  const to = digits.startsWith("+") ? `whatsapp:${digits}` : `whatsapp:+${digits}`;
+  const body = new URLSearchParams({
+    From: TWILIO_WHATSAPP_FROM,
+    To: to,
+    Body: text,
+  });
+
+  const auth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
+  const res = await fetchWithTimeout(
+    `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(TWILIO_ACCOUNT_SID)}/Messages.json`,
+    {
+      method: "POST",
+      headers: {
+        "Authorization": `Basic ${auth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body,
+    },
+    9000,
+  );
+
+  return {
+    ok: res.ok,
+    status: res.status,
+    error: res.ok ? undefined : (res.error || res.body.slice(0, 300)),
   };
 }
 

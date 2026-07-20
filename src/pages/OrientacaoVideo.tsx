@@ -42,6 +42,20 @@ const OrientacaoVideo = () => {
   const { log } = useAuditLog();
   const [searchParams] = useSearchParams();
   const appointmentId = searchParams.get("appointment");
+  const consultationParam = searchParams.get("consultation");
+  const patientToken = searchParams.get("token");
+  const [roomInfo, setRoomInfo] = useState<{
+    roomName: string;
+    domain: string;
+    jwt?: string;
+    consultationId: string;
+    patientAccessLink?: string;
+    lobbyEnabled?: boolean;
+  } | null>(null);
+  const [roomLoading, setRoomLoading] = useState(true);
+  const [roomError, setRoomError] = useState<{ code: string; message: string } | null>(null);
+  const roomFetchStarted = useRef(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [showChat, setShowChat] = useState(false);
@@ -70,6 +84,87 @@ const OrientacaoVideo = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Cria/entra na sala assim que soubermos se quem acessa e medico ou paciente
+  useEffect(() => {
+    if (roomFetchStarted.current) return;
+    if (!authChecked && !patientToken) {
+      // ainda checando sessao e nao ha token de paciente na URL: espera
+      return;
+    }
+    roomFetchStarted.current = true;
+    fetchOrCreateRoom();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDoctor, authChecked, patientToken]);
+
+  const mapRoomError = (status: number, error?: string): { code: string; message: string } => {
+    if (status === 404) return { code: "not_found", message: "A sala ainda não foi criada pelo médico. Aguarde o início da consulta." };
+    if (status === 403 && error?.toLowerCase().includes("expirad")) return { code: "expired", message: "Este link de consulta expirou. Solicite um novo link à clínica." };
+    if (status === 403 && error?.toLowerCase().includes("token")) return { code: "invalid_token", message: "Link de acesso inválido. Verifique se copiou o link completo enviado pela clínica." };
+    if (status === 403) return { code: "forbidden", message: "Você não tem permissão para acessar esta consulta." };
+    if (status === 401) return { code: "unauthorized", message: "É necessário estar autenticado para acessar esta consulta." };
+    return { code: "unknown", message: error || "Não foi possível conectar à sala. Tente novamente em instantes." };
+  };
+
+  const fetchOrCreateRoom = async () => {
+    setRoomLoading(true);
+    setRoomError(null);
+    try {
+      if (isDoctor && appointmentId) {
+        // Fluxo do medico: cria (ou reaproveita) a sala da consulta agendada
+        const { data, error } = await supabase.functions.invoke("create-video-room", {
+          body: { appointmentId },
+        });
+        if (error || !data?.ok) {
+          const status = (error as any)?.context?.status ?? 500;
+          setRoomError(mapRoomError(status, data?.error || error?.message));
+          return;
+        }
+        setRoomInfo({
+          roomName: data.roomName,
+          domain: data.domain,
+          jwt: data.doctorJwt,
+          consultationId: data.consultationId,
+          patientAccessLink: data.patientAccessLink,
+        });
+      } else {
+        // Fluxo do paciente: entra com token do link, ou autenticado
+        let consultationId = consultationParam;
+        if (!consultationId && appointmentId) {
+          // Paciente autenticado acessando por appointmentId (sem token no link):
+          // busca o consultation_id vinculado (RLS garante que so ve sua propria consulta).
+          const { data: appt } = await supabase
+            .from("appointments")
+            .select("consultation_id")
+            .eq("id", appointmentId)
+            .maybeSingle();
+          consultationId = appt?.consultation_id || null;
+        }
+        if (!consultationId) {
+          setRoomError({ code: "not_found", message: "A sala ainda não foi criada pelo médico. Aguarde o início da consulta." });
+          return;
+        }
+        const { data, error } = await supabase.functions.invoke("join-video-room", {
+          body: { consultationId, token: patientToken || undefined },
+        });
+        if (error || !data?.ok) {
+          const status = (error as any)?.context?.status ?? 500;
+          setRoomError(mapRoomError(status, data?.error || error?.message));
+          return;
+        }
+        setRoomInfo({
+          roomName: data.room,
+          domain: data.domain,
+          jwt: data.jwt,
+          consultationId,
+        });
+      }
+    } catch (e: any) {
+      setRoomError({ code: "unknown", message: e?.message || "Erro inesperado ao conectar à sala." });
+    } finally {
+      setRoomLoading(false);
+    }
+  };
+
   const handleTCLEAccept = () => {
     setTcleAccepted(true);
     setShowTCLE(false);
@@ -87,13 +182,17 @@ const OrientacaoVideo = () => {
   }, [chatMessages]);
 
   const checkUserType = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    setCurrentUserId(session.user.id);
-    const { data: doctor } = await supabase.from("doctors").select("id").eq("user_id", session.user.id).maybeSingle();
-    if (doctor) {
-      setIsDoctor(true);
-      setDoctorId(doctor.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      setCurrentUserId(session.user.id);
+      const { data: doctor } = await supabase.from("doctors").select("id").eq("user_id", session.user.id).maybeSingle();
+      if (doctor) {
+        setIsDoctor(true);
+        setDoctorId(doctor.id);
+      }
+    } finally {
+      setAuthChecked(true);
     }
   };
 
@@ -216,6 +315,19 @@ const OrientacaoVideo = () => {
             </Badge>
           </div>
           <div className="flex items-center gap-2">
+            {isDoctor && roomInfo?.patientAccessLink && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs"
+                onClick={() => {
+                  navigator.clipboard.writeText(roomInfo.patientAccessLink!);
+                  toast({ title: "Link copiado ✅", description: "Envie ao paciente pelo WhatsApp ou e-mail." });
+                }}
+              >
+                <Link2 size={12} className="mr-1" /> Copiar link do paciente
+              </Button>
+            )}
             <NetworkQualityIndicator />
             <span className="text-xs font-mono text-muted-foreground flex items-center gap-1">
               <Clock size={10} /> {formatTime(elapsedSeconds)}
@@ -237,13 +349,7 @@ const OrientacaoVideo = () => {
 
             {/* Main video — Jitsi Meet (WebRTC HD) */}
             <div className="flex-1 flex items-stretch justify-stretch">
-              {tcleAccepted ? (
-                <JitsiRoom
-                  roomName={searchParams.get("room") || appointmentId || `consulta-${currentUserId || "guest"}`}
-                  isDoctor={isDoctor}
-                  onClose={() => navigate("/")}
-                />
-              ) : (
+              {!tcleAccepted ? (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
                     <div className="w-32 h-32 md:w-48 md:h-48 rounded-full bg-muted/20 flex items-center justify-center mx-auto mb-4 border-2 border-primary/20">
@@ -252,7 +358,39 @@ const OrientacaoVideo = () => {
                     <p className="text-sm text-white/60">Aceite o TCLE para iniciar a teleconsulta com Jitsi Meet</p>
                   </div>
                 </div>
-              )}
+              ) : roomLoading ? (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center space-y-3">
+                    <Loader2 className="w-10 h-10 text-primary animate-spin mx-auto" />
+                    <p className="text-xs font-bold uppercase tracking-widest text-white/60">
+                      Carregando ambiente seguro...
+                    </p>
+                  </div>
+                </div>
+              ) : roomError ? (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center space-y-3 max-w-sm px-6">
+                    <Shield className="w-10 h-10 text-red-400 mx-auto" />
+                    <p className="text-sm font-bold text-red-300">
+                      {roomError.code === "not_found" ? "Aguardando o médico" : "Não foi possível entrar na sala"}
+                    </p>
+                    <p className="text-xs text-white/60">{roomError.message}</p>
+                    {roomError.code === "not_found" && (
+                      <Button size="sm" variant="outline" onClick={() => { roomFetchStarted.current = false; fetchOrCreateRoom(); }}>
+                        Tentar novamente
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ) : roomInfo ? (
+                <JitsiRoom
+                  roomName={roomInfo.roomName}
+                  domain={roomInfo.domain}
+                  jwt={roomInfo.jwt}
+                  isDoctor={isDoctor}
+                  onClose={() => navigate("/")}
+                />
+              ) : null}
             </div>
 
             {/* Controls */}

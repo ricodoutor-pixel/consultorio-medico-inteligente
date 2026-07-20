@@ -7,7 +7,7 @@ import { APP_CONFIG } from "@/lib/app-config";
 
 declare global {
   interface Window {
-    JitsiMeetExternalAPI?: any;
+    JitsiMeetExternalAPI: any;
   }
 }
 

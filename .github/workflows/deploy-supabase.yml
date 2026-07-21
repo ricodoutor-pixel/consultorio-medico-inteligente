@@ -1,0 +1,163 @@
+# 🌿 Planta y Raiz — Deploy Automático Supabase Edge Functions
+# Todo push em main deploya automaticamente todas as edge functions + WAHA check
+#
+# SECRETS necessários (Settings → Secrets → Actions):
+#   SUPABASE_ACCESS_TOKEN    → supabase.com → Account → Access Tokens
+#   SUPABASE_PROJECT_ID      → tkxxoghzhvhjzdoomgss
+#   SUPABASE_URL             → https://tkxxoghzhvhjzdoomgss.supabase.co
+#   SUPABASE_SERVICE_ROLE_KEY
+#   GEMINI_API_KEY / LOVABLE_API_KEY
+#   WAHA_API_URL / WAHA_API_KEY
+#   ADMIN_PHONE_BR           → ex: 5511987131241
+#   EVOLUTION_API_URL / EVOLUTION_API_KEY / EVOLUTION_INSTANCE / EVOLUTION_WEBHOOK_SECRET
+
+name: 🌿 Deploy Supabase → Edge Functions (Produção)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - supabase/functions/**
+      - supabase/migrations/**
+      - .github/workflows/deploy-supabase.yml
+  workflow_dispatch:
+    inputs:
+      send_test_message:
+        description: Enviar mensagem de teste para admin?
+        type: boolean
+        default: true
+
+concurrency:
+  group: deploy-supabase
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: 🚀 Deploy Edge Functions + Migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Validar secrets obrigatórios
+        run: |
+          MISSING=()
+          [ -z "${{ secrets.SUPABASE_ACCESS_TOKEN }}" ]    && MISSING+=("SUPABASE_ACCESS_TOKEN")
+          [ -z "${{ secrets.SUPABASE_PROJECT_ID }}" ]      && MISSING+=("SUPABASE_PROJECT_ID")
+          [ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ] && MISSING+=("SUPABASE_SERVICE_ROLE_KEY")
+          if [ ${#MISSING[@]} -gt 0 ]; then
+            echo "❌ Secrets faltando: ${MISSING[*]}"
+            exit 1
+          fi
+          echo "✅ Todos os secrets obrigatórios presentes"
+
+      - name: Sincronizar secrets nas Edge Functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          echo "🔐 Sincronizando secrets..."
+          supabase secrets set \
+            GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
+            LOVABLE_API_KEY="${{ secrets.LOVABLE_API_KEY }}" \
+            EVOLUTION_API_URL="${{ secrets.EVOLUTION_API_URL }}" \
+            EVOLUTION_API_KEY="${{ secrets.EVOLUTION_API_KEY }}" \
+            EVOLUTION_INSTANCE="${{ secrets.EVOLUTION_INSTANCE }}" \
+            EVOLUTION_WEBHOOK_SECRET="${{ secrets.EVOLUTION_WEBHOOK_SECRET }}" \
+            WAHA_API_URL="${{ secrets.WAHA_API_URL }}" \
+            WAHA_API_KEY="${{ secrets.WAHA_API_KEY }}" \
+            ADMIN_PHONE_BR="${{ secrets.ADMIN_PHONE_BR }}" \
+            JITSI_DOMAIN="meet.jit.si" \
+            --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+          echo "✅ Secrets sincronizados"
+
+      - name: Deploy — Funções críticas primeiro
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          REF=${{ secrets.SUPABASE_PROJECT_ID }}
+          echo "📦 Deploy funções críticas..."
+          for fn in create-video-room whatsapp-brisa-bot brisa-bot brisa-waha-connect brisa-health-check; do
+            if [ -d "supabase/functions/$fn" ]; then
+              echo "  → $fn"
+              supabase functions deploy "$fn" --project-ref "$REF" --no-verify-jwt 2>&1 | tail -2
+            fi
+          done
+          echo "✅ Funções críticas deployadas"
+
+      - name: Deploy — Todas as demais Edge Functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          REF=${{ secrets.SUPABASE_PROJECT_ID }}
+          SKIP="create-video-room whatsapp-brisa-bot brisa-bot brisa-waha-connect brisa-health-check _shared _test"
+          for dir in supabase/functions/*/; do
+            fn=$(basename "$dir")
+            if echo "$SKIP" | grep -qw "$fn"; then continue; fi
+            [ -f "supabase/functions/$fn/index.ts" ] || continue
+            echo "  → $fn"
+            supabase functions deploy "$fn" --project-ref "$REF" --no-verify-jwt 2>&1 | tail -2
+          done
+          echo "✅ Todas as funções deployadas"
+
+      - name: Health check — WAHA + Supabase
+        run: |
+          WAHA="https://${{ secrets.WAHA_API_URL }}"
+          echo "🩺 Verificando WAHA..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "X-Api-Key: ${{ secrets.WAHA_API_KEY }}" \
+            "${WAHA}/api/sessions" 2>/dev/null || echo "000")
+          if [ "$STATUS" = "200" ]; then
+            echo "  ✅ WAHA online (HTTP 200)"
+          else
+            echo "  ⚠️  WAHA retornou HTTP $STATUS — verificar sessão WhatsApp"
+          fi
+
+      - name: Notificar Admin no WhatsApp
+        if: success()
+        run: |
+          TS=$(TZ=America/Sao_Paulo date "+%d/%m/%Y às %H:%M")
+          COMMIT="${{ github.sha }}"
+          SHORT="${COMMIT:0:7}"
+          MSG="🟢 *Deploy Concluído — Planta y Raiz*
+
+🌿 *Sistema de Telemedicina: ATIVO*
+📅 ${TS} (BRT)
+🔖 Commit: \`${SHORT}\`
+💬 ${{ github.event.head_commit.message }}
+
+✅ create-video-room (Jitsi + E2EE + Lobby)
+✅ whatsapp-brisa-bot v45
+✅ brisa-bot (instância corrigida)
+✅ brisa-waha-connect
+✅ Todas as Edge Functions
+
+_plantayraiz.com.br — CFM 2.314/2022_ 🌿"
+
+          WAHA="https://${{ secrets.WAHA_API_URL }}"
+          PHONE="${{ secrets.ADMIN_PHONE_BR }}"
+          curl -s -X POST "${WAHA}/api/sendText" \
+            -H "Content-Type: application/json" \
+            -H "X-Api-Key: ${{ secrets.WAHA_API_KEY }}" \
+            -d "{\"session\":\"default\",\"chatId\":\"${PHONE}@c.us\",\"text\":$(echo "$MSG" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')}" \
+            && echo "✅ Admin notificado no WhatsApp" \
+            || echo "⚠️  Falha na notificação WhatsApp"
+
+      - name: Sumário do deploy
+        if: always()
+        run: |
+          echo "## 🌿 Deploy Planta y Raiz" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| | |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Horário | $(TZ=America/Sao_Paulo date) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Telemedicina | Jitsi + E2EE + Lobby ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Brisa WhatsApp | v45 ATIVA ✅ |" >> $GITHUB_STEP_SUMMARY

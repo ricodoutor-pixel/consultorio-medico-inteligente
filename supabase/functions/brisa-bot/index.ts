@@ -157,7 +157,7 @@ async function callGemini(
         signal:  ctrl.signal,
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${LOVABLE_API_KEY}` },
         body: JSON.stringify({
-          model:       'google/gemini-1.5-flash',
+          model:       'google/gemini-2.5-flash',
           max_tokens:  450,
           temperature: 0.75,
           messages: [
@@ -172,8 +172,8 @@ async function callGemini(
         const j = await r.json() as { choices?: Array<{ message?: { content?: string } }> };
         const reply = j?.choices?.[0]?.message?.content?.trim();
         if (reply) {
-          console.log('[brisa][IA] Respondido via Lovable Gateway (gemini-1.5-flash)');
-          return { text: reply, source: 'lovable:gemini-1.5-flash' };
+          console.log('[brisa][IA] Respondido via Lovable Gateway (gemini-2.5-flash)');
+          return { text: reply, source: 'lovable:gemini-2.5-flash' };
         }
         console.warn('[brisa][LOVABLE] Resposta vazia, caindo para Gemini direto');
       } else {
@@ -187,7 +187,7 @@ async function callGemini(
   }
 
   // ── OPÇÃO B: Gemini 1.5 Flash direto (DIRETRIZ 1 — endpoint v1beta correto)
-  const MODELS = ['gemini-1.5-flash', 'gemini-1.5-pro'];
+  const MODELS = ['gemini-2.5-flash', 'gemini-2.5-pro'];
 
   for (const model of MODELS) {
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
@@ -343,7 +343,7 @@ serve(async (req: Request): Promise<Response> => {
       waha_url:        WAHA_API_URL,
       waha_session:    WAHA_SESSION,
       evolution_inst:  EVOLUTION_INSTANCE,
-      ai_mode:         'gemini-1.5-flash (direto, v1beta) + flash→pro fallback',
+      ai_mode:         'gemini-2.5-flash (direto, v1beta) + flash→pro fallback',
       compliance:      'CFM 2.314/2022 · LGPD · ANVISA RDC 1.015/2026',
       diagnostics:     'gravando em whatsapp_messages para cada mensagem',
     }, null, 2), {

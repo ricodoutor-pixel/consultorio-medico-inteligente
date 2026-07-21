@@ -127,18 +127,9 @@ const OrientacaoVideo = () => {
           patientAccessLink: data.patientAccessLink,
         });
       } else {
-        // Fluxo do paciente: entra com token do link, ou autenticado
-        let consultationId = consultationParam;
-        if (!consultationId && appointmentId) {
-          // Paciente autenticado acessando por appointmentId (sem token no link):
-          // busca o consultation_id vinculado (RLS garante que so ve sua propria consulta).
-          const { data: appt } = await supabase
-            .from("appointments")
-            .select("consultation_id")
-            .eq("id", appointmentId)
-            .maybeSingle();
-          consultationId = appt?.consultation_id || null;
-        }
+        // Fluxo do paciente: entra com token do link, ou autenticado.
+        // O appointment.id e usado como consultation_id em video_rooms.
+        const consultationId = consultationParam || appointmentId || null;
         if (!consultationId) {
           setRoomError({ code: "not_found", message: "A sala ainda não foi criada pelo médico. Aguarde o início da consulta." });
           return;

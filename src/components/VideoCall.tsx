@@ -15,12 +15,10 @@ import { Loader2, ShieldCheck, AlertTriangle, Wifi, WifiOff } from "lucide-react
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-// Tipos do Jitsi External API (carregado via script tag)
-declare global {
-  interface Window {
-    JitsiMeetExternalAPI: new (domain: string, options: JitsiOptions) => JitsiAPI;
-  }
-}
+// Tipos do Jitsi External API (carregado via script tag).
+// Outro componente (JitsiRoom.tsx) já declara `JitsiMeetExternalAPI: any` no
+// escopo global; para evitar TS2717 (declarações duplicadas com tipos
+// divergentes), fazemos cast local em vez de re-declarar aqui.
 interface JitsiOptions {
   roomName: string;
   parentNode: HTMLElement;

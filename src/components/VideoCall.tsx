@@ -138,7 +138,8 @@ export function VideoCall({
       },
     };
 
-    const api = new window.JitsiMeetExternalAPI(jitsiDomain, opts);
+    const JitsiCtor = (window as unknown as { JitsiMeetExternalAPI: new (domain: string, options: JitsiOptions) => JitsiAPI }).JitsiMeetExternalAPI;
+    const api = new JitsiCtor(jitsiDomain, opts);
     apiRef.current = api;
 
     // Eventos

@@ -45,3 +45,27 @@ project_id = "shmbwdjuddvquszwkvuq"
     verify_jwt = false
   [functions.brisa-waha-bot]
     verify_jwt = false
+  [functions.brisa-bot]
+    verify_jwt = false
+  [functions.brisa-health-check]
+    verify_jwt = false
+  [functions.brisa-triage]
+    verify_jwt = false
+  [functions.brisa-voice-chat]
+    verify_jwt = false
+  [functions.brisa-social-manager]
+    verify_jwt = false
+  [functions.agent-chat]
+    verify_jwt = false
+  [functions.verdinho-chat]
+    verify_jwt = false
+  [functions.manus-growth-agent]
+    verify_jwt = false
+  [functions.triage-summary]
+    verify_jwt = false
+  [functions.scientific-rag]
+    verify_jwt = false
+  [functions.ai-recommendations]
+    verify_jwt = false
+  [functions.dr-edilson-clinical-support]
+    verify_jwt = false

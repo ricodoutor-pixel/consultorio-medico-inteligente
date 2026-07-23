@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
       } else {
         aiError = "GOOGLE_GENERATIVE_AI_API_KEY/GEMINI_API_KEY não configurada";
       }
-      }
+
 
       if (!postContent) {
         console.error("[Brisa Social] AI fail:", aiError);

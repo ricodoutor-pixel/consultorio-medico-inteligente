@@ -50,8 +50,10 @@ export const Footer = () => {
               <li><Link to="/reembolso" className="text-muted-foreground hover:text-primary transition-colors">Política de Reembolso</Link></li>
             </ul>
             <div className="pt-2 text-[10px] text-muted-foreground/70 leading-relaxed space-y-0.5">
-              
-              <p>Razão Social: Planta y Raiz Saúde Digital Ltda.</p>
+              <p>Razão Social: Bezerra Med Soluções Integradas Ltda.</p>
+              <p>CNPJ: 30.740.319/0001-14</p>
+              <p>Nome fantasia: Planta y Raiz — Mega Clínica Digital</p>
+              <p>CNAE 6209-1/00 — Intermediação digital em saúde.</p>
             </div>
           </div>
 
@@ -59,11 +61,11 @@ export const Footer = () => {
           <div className="space-y-3">
             <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Compliance Médico</h4>
             <div className="text-[10px] text-muted-foreground/70 leading-relaxed space-y-1">
-              <p className="text-xs text-muted-foreground">Diretor Técnico: Dr. Edilson Bezerra</p>
-              <p>CRM: 10963 — Bolívia</p>
+              <p className="text-xs text-muted-foreground">Supervisora Técnica: Dra. Suelen Rodrigues</p>
+              <p>CRM 49354/PR — Paraná, Brasil</p>
             </div>
             <p className="text-[10px] text-muted-foreground/60 leading-relaxed pt-1 max-w-[260px]">
-              O conteúdo deste site é informativo. A prescrição de terapias canabinoides depende de avaliação médica individual.
+              O conteúdo deste site é informativo. A prescrição de terapias canabinoides depende de avaliação médica individual do profissional prescritor cadastrado.
             </p>
           </div>
 

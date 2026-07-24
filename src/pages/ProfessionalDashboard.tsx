@@ -228,9 +228,39 @@ const ProfessionalDashboard = () => {
 
   // ── RENDER SECTIONS ──────────────────────────────────────────────────
 
-  const renderHome = () => (
-    <div className="space-y-6">
-      {/* Quick Stats */}
+  const renderHome = () => {
+    const isKycExpiring = (() => {
+      if (!doctorData?.kyc_valid_until) return false;
+      const validUntil = new Date(doctorData.kyc_valid_until).getTime();
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+      return validUntil - Date.now() <= thirtyDaysMs;
+    })();
+
+    return (
+      <div className="space-y-6">
+        {/* Banner de Revalidação KYC */}
+        {isKycExpiring && (
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-bold text-sm text-foreground">Revalidação Periódica de CRM / KYC Necessária</h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Sua validação de documentos vence em{" "}
+                <strong>
+                  {doctorData.kyc_valid_until
+                    ? format(new Date(doctorData.kyc_valid_until), "dd/MM/yyyy")
+                    : "breve"}
+                </strong>
+                . Por favor, reenvie a cópia do seu CRM atualizado para manter a verificação ativa.
+              </p>
+              <Button size="sm" variant="outline" className="mt-2 text-xs font-bold border-amber-500/30 text-amber-400 hover:bg-amber-500/10" asChild>
+                <Link to="/cadastro-profissional">Reenviar Documentos CRM</Link>
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { icon: Users, label: "Orientações Técnicas Hoje", value: appointments.length, color: "text-blue-400" },
@@ -305,7 +335,8 @@ const ProfessionalDashboard = () => {
         </CardContent>
       </Card>
     </div>
-  );
+    );
+  };
 
   const renderAgenda = () => (
     <div className="space-y-4">
@@ -573,45 +604,64 @@ const ProfessionalDashboard = () => {
     </div>
   );
 
-  const renderFinancial = () => (
-    <div className="space-y-4">
-      <h2 className="text-lg font-black text-foreground flex items-center gap-2">
-        <DollarSign size={18} className="text-primary" /> Financeiro (SPL)
-      </h2>
+  const renderFinancial = () => {
+    const completedApps = appointments.filter(a => a.status === "completed" || a.payment_status === "paid");
+    const totalBilled = completedApps.reduce((acc, a) => acc + (Number(a.amount_brl || a.amount) || 150), 0);
+    const pendingApps = appointments.filter(a => a.payment_status === "pending" || a.status === "scheduled");
+    const totalPending = pendingApps.reduce((acc, a) => acc + (Number(a.amount_brl || a.amount) || 150), 0);
 
-      {/* Tier + Seal */}
-      <div className="flex items-center gap-3">
-        <DoctorVIPSeal tier={currentTier} />
-        <span className="text-xs text-muted-foreground">Plano Ativo</span>
+    return (
+      <div className="space-y-4">
+        <h2 className="text-lg font-black text-foreground flex items-center gap-2">
+          <DollarSign size={18} className="text-primary" /> Painel Financeiro do Médico
+        </h2>
+
+        {/* Tier + Seal */}
+        <div className="flex items-center gap-3">
+          <DoctorVIPSeal tier={currentTier} />
+          <span className="text-xs text-muted-foreground">Plano Ativo</span>
+        </div>
+
+        {/* Real Financial Summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <Card className="border-border bg-card/60">
+            <CardContent className="p-4 text-center">
+              <DollarSign size={18} className="text-emerald-400 mx-auto mb-1" />
+              <p className="text-xl font-black text-emerald-400">R$ {totalBilled.toFixed(2)}</p>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold">Total Faturado</p>
+              <p className="text-[10px] text-muted-foreground">{completedApps.length} consultas concluídas</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border bg-card/60">
+            <CardContent className="p-4 text-center">
+              <Clock size={18} className="text-amber-400 mx-auto mb-1" />
+              <p className="text-xl font-black text-amber-400">R$ {totalPending.toFixed(2)}</p>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold">Pendente a Receber</p>
+              <p className="text-[10px] text-muted-foreground">{pendingApps.length} agendadas/pendentes</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border bg-card/60">
+            <CardContent className="p-4 text-center">
+              <TrendingUp size={18} className="text-primary mx-auto mb-1" />
+              <p className="text-xl font-black text-foreground">{appointments.length}</p>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold">Total Consultas</p>
+              <p className="text-[10px] text-muted-foreground">Período selecionado</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {doctorData && <DoctorPerformanceWidget doctorId={doctorData.id} />}
+
+        <Link to="/distribuicao-renda">
+          <Button variant="outline" className="w-full text-xs gap-2 mt-2">
+            <Activity size={14} /> Ver Distribuição de Renda Detalhada
+          </Button>
+        </Link>
       </div>
-
-      {doctorData && <DoctorPerformanceWidget doctorId={doctorData.id} />}
-
-      {/* Quick Financial Cards */}
-      <div className="grid grid-cols-2 gap-3">
-        <Card className="border-border bg-card/60">
-          <CardContent className="p-4 text-center">
-            <DollarSign size={16} className="text-emerald-400 mx-auto mb-1" />
-            <p className="text-lg font-black text-foreground">R$ 0,00</p>
-            <p className="text-[10px] text-muted-foreground">Saldo Disponível</p>
-          </CardContent>
-        </Card>
-        <Card className="border-border bg-card/60">
-          <CardContent className="p-4 text-center">
-            <TrendingUp size={16} className="text-primary mx-auto mb-1" />
-            <p className="text-lg font-black text-foreground">R$ 0,00</p>
-            <p className="text-[10px] text-muted-foreground">Bônus Distribuição</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Link to="/distribuicao-renda">
-        <Button variant="outline" className="w-full text-xs gap-2">
-          <Activity size={14} /> Ver Distribuição de Renda
-        </Button>
-      </Link>
-    </div>
-  );
+    );
+  };
 
   const renderLibrary = () => (
     <div className="text-center py-12 space-y-4">

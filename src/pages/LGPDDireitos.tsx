@@ -27,14 +27,18 @@ const LGPDDireitos = () => {
       return;
     }
 
-    // Log the LGPD request
-    await supabase.from("audit_log").insert({
-      user_id: session.user.id,
-      action: `lgpd_request_${type}`,
-      table_name: "profiles",
-      record_id: session.user.id,
-      new_data: { type, reason, timestamp: new Date().toISOString() } as any,
+    const requestType = type === "eliminacao" || type === "deletion" ? "deletion" : "export";
+
+    const { error } = await (supabase as any).from("data_subject_requests").insert({
+      patient_id: session.user.id,
+      request_type: requestType,
+      status: "pending",
+      notes: reason ? `[${type}] ${reason}` : `Solicitação de ${type}`,
     });
+
+    if (error) {
+      console.error("[LGPDDireitos] Erro ao gravar solicitação:", error);
+    }
 
     setLoading(null);
     setRequestSent(type);

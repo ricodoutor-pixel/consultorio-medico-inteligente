@@ -343,7 +343,7 @@ async function findNextDoctorInQueue(
 ): Promise<DoctorOnDuty | null> {
   try {
     const { data: doctors, error } = await supabase
-      .from('doctors')
+      .from('doctors_public' as any)
       .select('*')
       .eq('specialty', specialty)
       .eq('is_online', true)
@@ -404,7 +404,7 @@ async function triggerDoctorNotification(
   try {
     // Buscar médico escalado
     const { data: doctor } = await supabase
-      .from('doctors')
+      .from('doctors_public' as any)
       .select('*')
       .eq('specialty', specialty)
       .eq('is_online', true)

@@ -98,6 +98,7 @@ interface VendorProduct {
   review_count: number;
   is_active: boolean;
   endorsed_by_doctor?: boolean | null;
+  as_anvisa?: string | null;
   vendors?: { id: string; store_name: string; rating: number | null };
 }
 
@@ -296,7 +297,7 @@ const ProductDetail = ({ id }: { id: string }) => {
 
           <div className="flex flex-wrap items-center gap-2">
             {product.endorsed_by_doctor && <DoctorEndorsedBadge />}
-            <AnvisaBadge />
+            {product.as_anvisa && <AnvisaBadge registration={product.as_anvisa} />}
           </div>
 
           <div className="flex items-center gap-2">
@@ -648,7 +649,7 @@ const Shopping = () => {
                                     FRETE GRÁTIS
                                   </span>
                                   {p.endorsed_by_doctor && <DoctorEndorsedBadge compact />}
-                                  <AnvisaBadge compact />
+                                  {p.as_anvisa && <AnvisaBadge compact registration={p.as_anvisa} />}
                                 </div>
                                 {/* Favorite heart - outside Link */}
                                 <button
@@ -714,7 +715,7 @@ const Shopping = () => {
                                         <h3 className="font-bold text-foreground hover:text-primary transition-colors text-xs sm:text-sm mb-0.5 line-clamp-1">{p.name}</h3>
                                       </Link>
                                       {p.endorsed_by_doctor && <div className="mt-1"><DoctorEndorsedBadge compact /></div>}
-                                      <div className="mt-1"><AnvisaBadge compact /></div>
+                                      {p.as_anvisa && <div className="mt-1"><AnvisaBadge compact registration={p.as_anvisa} /></div>}
                                     </div>
                                     <button
                                       onClick={() => toggleFav(p.id)}

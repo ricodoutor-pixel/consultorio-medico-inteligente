@@ -99,13 +99,15 @@ export const Footer = () => {
           <div className="rounded-lg border border-border/50 bg-muted/20 p-4">
             <p className="text-[11px] leading-relaxed text-muted-foreground/80">
               <strong className="text-foreground">Disclaimer Legal — Intermediação Tecnológica:</strong>{" "}
-              A Planta y Raiz Ltda é uma plataforma de intermediação tecnológica e não possui vínculo
-              com a produção, fabricação, comercialização, distribuição ou entrega de produtos
-              farmacêuticos ou fitoterápicos. Não realizamos vendas diretas nem detemos posse ou
-              propriedade dos produtos. Toda a responsabilidade técnica pelo ato médico é do
-              profissional prescritor cadastrado, e a responsabilidade pela qualidade, entrega,
-              eficácia e efeitos dos produtos é exclusiva das farmácias e importadoras parceiras
-              devidamente licenciadas pela ANVISA.
+              A <strong>Bezerra Med Soluções Integradas Ltda.</strong> (CNPJ 30.740.319/0001-14),
+              operando sob o nome fantasia <strong>Planta y Raiz</strong>, é uma plataforma de
+              intermediação tecnológica (CNAE 6209-1/00) e não possui vínculo com a produção,
+              fabricação, comercialização, distribuição ou entrega de produtos farmacêuticos ou
+              fitoterápicos. Não realizamos vendas diretas nem detemos posse ou propriedade dos
+              produtos. Toda a responsabilidade técnica pelo ato médico é do profissional
+              prescritor cadastrado (supervisão técnica: Dra. Suelen Rodrigues — CRM 49354/PR),
+              e a responsabilidade pela qualidade, entrega, eficácia e efeitos dos produtos é
+              exclusiva das farmácias e importadoras parceiras devidamente licenciadas pela ANVISA.
             </p>
           </div>
         </div>

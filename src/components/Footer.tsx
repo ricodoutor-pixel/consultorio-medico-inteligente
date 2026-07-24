@@ -26,7 +26,7 @@ export const Footer = () => {
               <a href="https://www.instagram.com/plantayraizltda/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-200" aria-label="Instagram">
                 <Instagram size={14} />
               </a>
-              <a href="https://www.linkedin.com/in/dr-edilson-bezerra-bp-757391285/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-200" aria-label="LinkedIn — Dr. Edilson Bezerra">
+              <a href="https://www.linkedin.com/company/plantayraiz/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-200" aria-label="LinkedIn — Planta y Raiz">
                 <Linkedin size={14} />
               </a>
               <a href="https://www.facebook.com/profile.php?id=61572129577082" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-200" aria-label="Facebook">

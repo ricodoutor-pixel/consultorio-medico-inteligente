@@ -12,7 +12,7 @@ export interface SchemaConfig {
 
 const BASE_URL = 'https://plantayraiz.com.br';
 const ORGANIZATION_ID = `${BASE_URL}/#organization`;
-const DOCTOR_ID = `${BASE_URL}/#dr-edilson`;
+const DOCTOR_ID = `${BASE_URL}/#supervisora-tecnica`;
 
 /**
  * Schema.org para Página Médica (Tratamentos, Telemedicina, etc.)

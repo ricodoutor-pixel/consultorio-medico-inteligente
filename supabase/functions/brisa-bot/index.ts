@@ -102,8 +102,12 @@ Levar o paciente a agendar uma teleconsulta médica por vídeo:
 
 Lembre: você orienta e acolhe. A prescrição é sempre do Dr. Edilson.`;
 
+// ── Cache de Idempotência (Em memória) ────────────────────────────────────
+const processedMessages = new Set<string>();
+
 // ── Parser de payload WAHA ─────────────────────────────────────────────────
 interface ParsedMsg {
+  messageId:  string;
   chatId:     string;
   phone:      string;
   fromMe:     boolean;
@@ -121,7 +125,22 @@ function parseWAHA(body: Record<string, unknown>): ParsedMsg {
   const fromMe  = Boolean(payload?.fromMe ?? payload?.from_me ?? false);
   const text    = String(payload?.body ?? payload?.text ?? payload?.caption ?? '').trim();
   const name    = String(payload?.senderName ?? payload?.notifyName ?? (payload?._data as Record<string,unknown>)?.notifyName ?? '') || null;
+  
+  // Extração segura do messageId (Idempotência)
+  let messageId = '';
+  if (typeof payload?.id === 'string') messageId = payload.id;
+  else if (payload?.id && typeof payload.id === 'object') {
+    messageId = String((payload.id as Record<string,unknown>).id || (payload.id as Record<string,unknown>)._serialized || '');
+  }
+  if (!messageId && payload?._data) {
+    const dataId = (payload._data as Record<string,unknown>)?.id;
+    if (dataId && typeof dataId === 'object') {
+      messageId = String((dataId as Record<string,unknown>).id || (dataId as Record<string,unknown>)._serialized || '');
+    }
+  }
+
   return {
+    messageId,
     chatId,
     phone:      chatId.replace(/@.*/, '').replace(/\D/g, ''),
     fromMe,
@@ -289,6 +308,12 @@ async function sendWAHA(
     if (!r.ok) {
       const body = await r.text();
       console.error(`[brisa][WAHA] HTTP ${r.status}: ${body.slice(0, 300)}`);
+      
+      // Aviso sobre contas Business / Motor NOWEB
+      if (r.status >= 400) {
+        console.warn(`[brisa][WAHA] ⚠️ AVISO: Se a mensagem falhou para uma conta WhatsApp Business, verifique o motor do WAHA. Altere para 'WHATSAPP_DEFAULT_ENGINE=NOWEB' no servidor do WAHA.`);
+      }
+
       return { ok: false, status: r.status, error: body.slice(0, 300) };
     }
     return { ok: r.ok, status: r.status };
@@ -367,7 +392,25 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   const parsed = parseWAHA(body);
-  const { chatId, phone, fromMe, text, senderName, isGroup, isStatus, event } = parsed;
+  const { messageId, chatId, phone, fromMe, text, senderName, isGroup, isStatus, event } = parsed;
+
+  // 1. Verificação de Idempotência
+  if (messageId) {
+    if (processedMessages.has(messageId)) {
+      console.log(`[brisa][IDEMPOTENCIA] Mensagem duplicada ignorada (abortando): ${messageId}`);
+      return new Response(
+        JSON.stringify({ ok: true, ignored: true, reason: 'duplicate_message_id' }),
+        { headers: { ...cors, 'Content-Type': 'application/json' } }
+      );
+    }
+    processedMessages.add(messageId);
+    
+    // Controle de tamanho do cache para evitar vazamento de memória (máximo de 1000 IDs)
+    if (processedMessages.size > 1000) {
+      const it = processedMessages.values();
+      for (let i = 0; i < 200; i++) processedMessages.delete(it.next().value);
+    }
+  }
 
   if (fromMe) {
     const isBotSignature = text.includes('Brisa') || 

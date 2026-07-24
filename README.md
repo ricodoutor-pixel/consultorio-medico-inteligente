@@ -71,3 +71,15 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## ⚠️ Notas de Operação: Bot da Enfermeira Brisa (WAHA)
+
+O bot da Enfermeira Brisa utiliza o WAHA (WhatsApp HTTP API) para comunicação. 
+
+**Suporte a Contas WhatsApp Business:**
+Se você for conectar um número de WhatsApp Business e o bot parar de receber mensagens ou falhar ao enviar:
+1. Acesse o servidor onde o WAHA está hospedado (ex: Railway, VPS, Docker local).
+2. Altere (ou adicione) a variável de ambiente:
+   `WHATSAPP_DEFAULT_ENGINE=NOWEB`
+3. Reinicie o contêiner do WAHA.
+O motor `WEBJS` (padrão) possui limitações com contas comerciais. O `NOWEB` utiliza uma arquitetura baseada em WebSocket que é totalmente compatível.

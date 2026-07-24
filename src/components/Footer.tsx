@@ -26,7 +26,7 @@ export const Footer = () => {
               <a href="https://www.instagram.com/plantayraizltda/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-200" aria-label="Instagram">
                 <Instagram size={14} />
               </a>
-              <a href="https://www.linkedin.com/in/dr-edilson-bezerra-bp-757391285/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-200" aria-label="LinkedIn — Dr. Edilson Bezerra">
+              <a href="https://www.linkedin.com/company/plantayraiz/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-200" aria-label="LinkedIn — Planta y Raiz">
                 <Linkedin size={14} />
               </a>
               <a href="https://www.facebook.com/profile.php?id=61572129577082" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all duration-200" aria-label="Facebook">
@@ -50,8 +50,10 @@ export const Footer = () => {
               <li><Link to="/reembolso" className="text-muted-foreground hover:text-primary transition-colors">Política de Reembolso</Link></li>
             </ul>
             <div className="pt-2 text-[10px] text-muted-foreground/70 leading-relaxed space-y-0.5">
-              
-              <p>Razão Social: Planta y Raiz Saúde Digital Ltda.</p>
+              <p>Razão Social: Bezerra Med Soluções Integradas Ltda.</p>
+              <p>CNPJ: 30.740.319/0001-14</p>
+              <p>Nome fantasia: Planta y Raiz — Mega Clínica Digital</p>
+              <p>CNAE 6209-1/00 — Intermediação digital em saúde.</p>
             </div>
           </div>
 
@@ -59,11 +61,11 @@ export const Footer = () => {
           <div className="space-y-3">
             <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Compliance Médico</h4>
             <div className="text-[10px] text-muted-foreground/70 leading-relaxed space-y-1">
-              <p className="text-xs text-muted-foreground">Diretor Técnico: Dr. Edilson Bezerra</p>
-              <p>CRM: 10963 — Bolívia</p>
+              <p className="text-xs text-muted-foreground">Supervisora Técnica: Dra. Suelen Rodrigues</p>
+              <p>CRM 49354/PR — Paraná, Brasil</p>
             </div>
             <p className="text-[10px] text-muted-foreground/60 leading-relaxed pt-1 max-w-[260px]">
-              O conteúdo deste site é informativo. A prescrição de terapias canabinoides depende de avaliação médica individual.
+              O conteúdo deste site é informativo. A prescrição de terapias canabinoides depende de avaliação médica individual do profissional prescritor cadastrado.
             </p>
           </div>
 
@@ -97,13 +99,15 @@ export const Footer = () => {
           <div className="rounded-lg border border-border/50 bg-muted/20 p-4">
             <p className="text-[11px] leading-relaxed text-muted-foreground/80">
               <strong className="text-foreground">Disclaimer Legal — Intermediação Tecnológica:</strong>{" "}
-              A Planta y Raiz Ltda é uma plataforma de intermediação tecnológica e não possui vínculo
-              com a produção, fabricação, comercialização, distribuição ou entrega de produtos
-              farmacêuticos ou fitoterápicos. Não realizamos vendas diretas nem detemos posse ou
-              propriedade dos produtos. Toda a responsabilidade técnica pelo ato médico é do
-              profissional prescritor cadastrado, e a responsabilidade pela qualidade, entrega,
-              eficácia e efeitos dos produtos é exclusiva das farmácias e importadoras parceiras
-              devidamente licenciadas pela ANVISA.
+              A <strong>Bezerra Med Soluções Integradas Ltda.</strong> (CNPJ 30.740.319/0001-14),
+              operando sob o nome fantasia <strong>Planta y Raiz</strong>, é uma plataforma de
+              intermediação tecnológica (CNAE 6209-1/00) e não possui vínculo com a produção,
+              fabricação, comercialização, distribuição ou entrega de produtos farmacêuticos ou
+              fitoterápicos. Não realizamos vendas diretas nem detemos posse ou propriedade dos
+              produtos. Toda a responsabilidade técnica pelo ato médico é do profissional
+              prescritor cadastrado (supervisão técnica: Dra. Suelen Rodrigues — CRM 49354/PR),
+              e a responsabilidade pela qualidade, entrega, eficácia e efeitos dos produtos é
+              exclusiva das farmácias e importadoras parceiras devidamente licenciadas pela ANVISA.
             </p>
           </div>
         </div>
@@ -120,7 +124,7 @@ export const Footer = () => {
             >
               <Heart size={12} className="inline-block" fill="currentColor" />
             </Link>
-            <span className="opacity-70">© {new Date().getFullYear()} Planta y Raiz. Todos os direitos reservados.</span>
+            <span className="opacity-70">© {new Date().getFullYear()} Bezerra Med Soluções Integradas Ltda. — CNPJ 30.740.319/0001-14. Todos os direitos reservados.</span>
           </div>
           <div className="flex items-center gap-3 order-1 sm:order-2 flex-wrap justify-center">
             {canInstall && !isInstalled && (

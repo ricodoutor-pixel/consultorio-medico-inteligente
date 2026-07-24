@@ -194,24 +194,24 @@ export const articleSchema: SchemaOrgConfig = {
 };
 
 /**
- * Schema.org Physician — Dr. Edilson Bezerra (CRM-SP 10963)
- * Persistido em todas as rotas após o React inicializar (substitui o que existia em index.html).
+ * Schema.org Physician — Dra. Suelen Rodrigues (CRM 49354/PR)
+ * Supervisora Técnica da plataforma Planta y Raiz (Bezerra Med Soluções Integradas Ltda.).
  */
 export const physicianSchema: SchemaOrgConfig = {
   type: 'Organization',
   data: {
     '@context': 'https://schema.org',
     '@type': 'Physician',
-    '@id': 'https://plantayraiz.com.br/#dr-edilson',
-    name: 'Dr. Edilson Bezerra da Silva',
-    jobTitle: 'Médico Especialista em Cannabis Medicinal',
-    identifier: 'CRM-SP 10963',
+    '@id': 'https://plantayraiz.com.br/#supervisora-tecnica',
+    name: 'Dra. Suelen Rodrigues',
+    jobTitle: 'Supervisora Técnica da Plataforma Planta y Raiz',
+    identifier: 'CRM 49354/PR',
     medicalSpecialty: ['GeneralPractice', 'Pharmacology'],
     memberOf: {
       '@type': 'MedicalOrganization',
-      name: 'Conselho Regional de Medicina de São Paulo (CRM-SP)',
+      name: 'Conselho Regional de Medicina do Paraná (CRM-PR)',
     },
-    telephone: '+55-11-98713-1241',
+    worksFor: { '@id': 'https://plantayraiz.com.br/#business' },
     url: 'https://plantayraiz.com.br',
     knowsAbout: [
       'Cannabis Medicinal',
@@ -236,7 +236,7 @@ export const medicalProcedureSchema: SchemaOrgConfig = {
     name: 'Orientação Técnica em Cannabis Medicinal',
     procedureType: 'https://schema.org/TherapeuticProcedure',
     description: 'Consulta digital com médico habilitado para avaliação clínica e emissão de relatório técnico em PDF, válido para importação ANVISA via RDC 660/2022.',
-    performer: { '@id': 'https://plantayraiz.com.br/#dr-edilson' },
+    performer: { '@id': 'https://plantayraiz.com.br/#supervisora-tecnica' },
     offers: {
       '@type': 'Offer',
       price: '30.00',

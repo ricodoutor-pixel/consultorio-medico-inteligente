@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserPlus, Stethoscope, Building2, Leaf, Users, CheckCircle2, ArrowRight, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { UserPlus, Stethoscope, Building2, Leaf, Users, CheckCircle2, ArrowRight, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +34,7 @@ const Cadastro = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [tcleAccepted, setTcleAccepted] = useState(false);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -72,6 +74,10 @@ const Cadastro = () => {
     const cnpj = formData.cnpj || "";
     if (cnpj && !validateCNPJ(cnpj)) {
       toast({ title: "CNPJ inválido", description: "Insira um CNPJ válido.", variant: "destructive" });
+      return false;
+    }
+    if (!tcleAccepted) {
+      toast({ title: "TCLE Obrigatório", description: "Você precisa aceitar os termos do TCLE e LGPD para criar a conta.", variant: "destructive" });
       return false;
     }
     return true;
@@ -140,7 +146,27 @@ const Cadastro = () => {
             bio: formData.bio || null,
           });
         }
-        // 4. Link referral (3-level MLM tree)
+        // 4. Gravar consentimento TCLE obrigatório com hash criptográfico SHA-256
+        const timestamp = new Date().toISOString();
+        let consentHash = "";
+        try {
+          const msgUint8 = new TextEncoder().encode(`TCLE_${authData.user.id}_${timestamp}_v2026.1`);
+          const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
+          consentHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+        } catch {
+          consentHash = `sha256_fallback_${Date.now()}`;
+        }
+
+        await (supabase as any).from("tcle_consents").insert({
+          user_id: authData.user.id,
+          version: "2026.1",
+          accepted_at: timestamp,
+          hash: consentHash,
+          checks: { read: true, limitations: true, privacy: true, ai: true },
+          user_agent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 400) : null,
+        });
+
+        // 5. Link referral (3-level MLM tree)
         await linkReferralOnSignup(authData.user.id);
 
         // 5. Alerta WhatsApp ao Dr. Edilson — Modo Cadastro Ativado (signup)
@@ -436,7 +462,23 @@ const Cadastro = () => {
                       </div>
                     )}
 
-                    <Button type="submit" className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12" disabled={loading}>
+                    {/* Checkbox TCLE / LGPD Obrigatório */}
+                    <div className="p-3.5 rounded-xl border border-primary/20 bg-primary/5 space-y-2">
+                      <label className="flex items-start gap-3 cursor-pointer">
+                        <Checkbox
+                          checked={tcleAccepted}
+                          onCheckedChange={(v) => setTcleAccepted(!!v)}
+                          className="mt-0.5 h-5 w-5 border-primary"
+                        />
+                        <span className="text-xs text-foreground leading-relaxed">
+                          Li, compreendi e aceito integralmente o{" "}
+                          <strong className="text-primary font-bold">TCLE (Termo de Consentimento Livre e Esclarecido)</strong>{" "}
+                          e a Política de Privacidade (LGPD Lei nº 13.709/2018 e Resoluções CFM 2.314/2022 e 2.454/2026). Estou ciente das limitações da telemedicina e que os registros de assunção de responsabilidade serão armazenados com hash auditável.
+                        </span>
+                      </label>
+                    </div>
+
+                    <Button type="submit" className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12" disabled={loading || !tcleAccepted}>
                       {loading ? <Loader2 size={16} className="animate-spin mr-2" /> : <UserPlus size={16} className="mr-2" />}
                       Criar Conta
                     </Button>

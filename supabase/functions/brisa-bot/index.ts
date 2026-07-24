@@ -370,11 +370,17 @@ serve(async (req: Request): Promise<Response> => {
   const { chatId, phone, fromMe, text, senderName, isGroup, isStatus, event } = parsed;
 
   if (fromMe) {
-    console.log(`[brisa][ANTI-LOOP] fromMe=true → ignorando ${chatId}`);
-    return new Response(
-      JSON.stringify({ ok: true, ignored: true, reason: 'fromMe' }),
-      { headers: { ...cors, 'Content-Type': 'application/json' } }
-    );
+    const isBotSignature = text.includes('Brisa') || 
+                          text.includes('plantayraiz.com.br') || 
+                          text.toLowerCase().includes('instabilidade');
+    if (isBotSignature) {
+      console.log(`[brisa][ANTI-LOOP] Mensagem própria de resposta IA ignorada para evitar loop: ${chatId}`);
+      return new Response(
+        JSON.stringify({ ok: true, ignored: true, reason: 'fromMe_bot_signature' }),
+        { headers: { ...cors, 'Content-Type': 'application/json' } }
+      );
+    }
+    console.log(`[brisa][TESTE-ADMIN] Mensagem manual enviada pelo próprio número aceita para processamento: ${chatId}`);
   }
   if (isGroup)  return new Response(JSON.stringify({ ok: true, ignored: true, reason: 'group'  }), { headers: { ...cors, 'Content-Type': 'application/json' } });
   if (isStatus) return new Response(JSON.stringify({ ok: true, ignored: true, reason: 'status' }), { headers: { ...cors, 'Content-Type': 'application/json' } });

@@ -124,7 +124,7 @@ export const Footer = () => {
             >
               <Heart size={12} className="inline-block" fill="currentColor" />
             </Link>
-            <span className="opacity-70">© {new Date().getFullYear()} Planta y Raiz. Todos os direitos reservados.</span>
+            <span className="opacity-70">© {new Date().getFullYear()} Bezerra Med Soluções Integradas Ltda. — CNPJ 30.740.319/0001-14. Todos os direitos reservados.</span>
           </div>
           <div className="flex items-center gap-3 order-1 sm:order-2 flex-wrap justify-center">
             {canInstall && !isInstalled && (

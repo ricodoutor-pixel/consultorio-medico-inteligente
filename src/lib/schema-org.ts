@@ -277,7 +277,7 @@ export const faqPageSchema: SchemaOrgConfig = {
         name: 'Quem é o médico responsável?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Dr. Edilson Bezerra da Silva, CRM-SP 10963, especialista em Cannabis Medicinal, atende toda a plataforma.',
+          text: 'A supervisão técnica da plataforma Planta y Raiz é da Dra. Suelen Rodrigues (CRM 49354/PR). A plataforma conta com uma rede de médicos prescritores habilitados que atendem em todo o Brasil.',
         },
       },
       {

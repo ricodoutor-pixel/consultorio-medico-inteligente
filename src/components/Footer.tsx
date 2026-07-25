@@ -61,8 +61,7 @@ export const Footer = () => {
           <div className="space-y-3">
             <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Compliance Médico</h4>
             <div className="text-[10px] text-muted-foreground/70 leading-relaxed space-y-1">
-              <p className="text-xs text-muted-foreground">Supervisora Técnica: Dra. Suelen Rodrigues</p>
-              <p>CRM 49354/PR — Paraná, Brasil</p>
+              <p className="text-xs text-muted-foreground">Supervisora Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)</p>
             </div>
             <p className="text-[10px] text-muted-foreground/60 leading-relaxed pt-1 max-w-[260px]">
               O conteúdo deste site é informativo. A prescrição de terapias canabinoides depende de avaliação médica individual do profissional prescritor cadastrado.
@@ -99,13 +98,13 @@ export const Footer = () => {
           <div className="rounded-lg border border-border/50 bg-muted/20 p-4">
             <p className="text-[11px] leading-relaxed text-muted-foreground/80">
               <strong className="text-foreground">Disclaimer Legal — Intermediação Tecnológica:</strong>{" "}
-              A <strong>Bezerra Med Soluções Integradas Ltda.</strong> (CNPJ 30.740.319/0001-14),
-              operando sob o nome fantasia <strong>Planta y Raiz</strong>, é uma plataforma de
-              intermediação tecnológica (CNAE 6209-1/00) e não possui vínculo com a produção,
+              A Planta y Raiz atua estritamente como plataforma de tecnologia e intermediação em saúde digital.
+              A <strong>Bezerra Med Soluções Integradas Ltda.</strong> (CNPJ: 30.740.319/0001-14),
+              operando sob o nome fantasia <strong>Planta y Raiz</strong>, não possui vínculo com a produção,
               fabricação, comercialização, distribuição ou entrega de produtos farmacêuticos ou
               fitoterápicos. Não realizamos vendas diretas nem detemos posse ou propriedade dos
               produtos. Toda a responsabilidade técnica pelo ato médico é do profissional
-              prescritor cadastrado (supervisão técnica: Dra. Suelen Rodrigues — CRM 49354/PR),
+              prescritor cadastrado (supervisão técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)),
               e a responsabilidade pela qualidade, entrega, eficácia e efeitos dos produtos é
               exclusiva das farmácias e importadoras parceiras devidamente licenciadas pela ANVISA.
             </p>
@@ -124,7 +123,7 @@ export const Footer = () => {
             >
               <Heart size={12} className="inline-block" fill="currentColor" />
             </Link>
-            <span className="opacity-70">© {new Date().getFullYear()} Bezerra Med Soluções Integradas Ltda. — CNPJ 30.740.319/0001-14. Todos os direitos reservados.</span>
+            <span className="opacity-70">© {new Date().getFullYear()} Bezerra Med Soluções Integradas Ltda - CNPJ: 30.740.319/0001-14. Todos os direitos reservados.</span>
           </div>
           <div className="flex items-center gap-3 order-1 sm:order-2 flex-wrap justify-center">
             {canInstall && !isInstalled && (

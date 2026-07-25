@@ -2,7 +2,7 @@
  * 🔏 Roteador de Assinatura Digital — Planta y Raiz
  *
  * Regra de Negócio (Dr. Edilson — Comando Supremo):
- *  • Dr. Edilson Bezerra (CRM 10963) → assinatura GOV.BR (ICP-Brasil nativo).
+ *  • Dra. Suelen Naves Rodrigues (CRM-PR 49354) → assinatura GOV.BR (ICP-Brasil nativo).
  *  • Demais médicos com CRM válido    → ClickSign (e-mail + token).
  *
  * Após a assinatura, o PDF da receita em papel timbrado é despachado

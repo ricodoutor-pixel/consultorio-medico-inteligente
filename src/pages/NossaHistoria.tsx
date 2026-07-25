@@ -98,8 +98,8 @@ export default function NossaHistoria() {
 
             <motion.p variants={fadeUp}>
               Impactado por esta perda irreparável de colegas queridos, o{" "}
-              <strong className="text-white">Dr. Edilson Bezerra</strong>, um sobrevivente, nosso atual Diretor
-              Técnico, concebeu uma ideia visionária para resolver, de uma vez por todas, o desafio
+              <strong className="text-white">Dra. Suelen Naves Rodrigues</strong>, nossa atual Supervisora
+              Técnica, concebeu uma ideia visionária para resolver, de uma vez por todas, o desafio
               da medicina à distância. Se aplicada com excelência no início da pandemia, esta
               tecnologia teria evitado a morte de milhares de profissionais e pacientes em todo o
               mundo, ao permitir o isolamento seguro de infectados e a triagem remota, reservando o

@@ -1,4 +1,4 @@
-// 🏛️ gov.br Prescription Sign — Dr. Edilson Bezerra (CRM 10963)
+// 🏛️ gov.br Prescription Sign — Dra. Suelen Naves Rodrigues (CRM-PR 49354)
 // Assinatura digital ICP-Brasil via API gov.br Assina (https://www.gov.br/governodigital/assinatura-eletronica)
 // Caso o token gov.br não esteja configurado, opera em "modo selo" (PDF já contém o selo gov.br
 // e hash SHA-256), retornando uma URL pública do bucket `prescriptions`.
@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
     if (!doctor || String(doctor.crm).replace(/\D/g, "") !== "10963") {
       return new Response(JSON.stringify({
         success: false,
-        error: "Endpoint gov.br restrito ao Dr. Edilson Bezerra (CRM 10963). Use ClickSign para os demais médicos.",
+        error: "Endpoint gov.br restrito ao Dra. Suelen Naves Rodrigues (CRM-PR 49354). Use ClickSign para os demais médicos.",
       }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 

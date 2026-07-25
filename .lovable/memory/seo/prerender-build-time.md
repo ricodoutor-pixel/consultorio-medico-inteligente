@@ -6,7 +6,7 @@ type: feature
 
 **Status:** DESATIVADO em 17/05/2026.
 
-O script `scripts/prerender-seo.ts` gera HTML estático para 16 rotas em `dist/` injetando conteúdo SEO dentro de `<div id="root">`. Em produção (Hostinger), quando o React não conseguia hidratar/substituir esse conteúdo (bundle JS atrasado ou falha), o usuário ficava vendo apenas o texto SEO numa tela preta ("Orientação Técnica de Cannabis Medicinal — Dr. Edilson Bezerra...").
+O script `scripts/prerender-seo.ts` gera HTML estático para 16 rotas em `dist/` injetando conteúdo SEO dentro de `<div id="root">`. Em produção (Hostinger), quando o React não conseguia hidratar/substituir esse conteúdo (bundle JS atrasado ou falha), o usuário ficava vendo apenas o texto SEO numa tela preta ("Orientação Técnica de Cannabis Medicinal — Dra. Suelen Naves Rodrigues (CRM-PR 49354)...").
 
 **Mudança:** o hook `postbuild` em `package.json` foi renomeado para `prerender:seo` (manual). O `vite build` agora produz apenas o SPA padrão. Para rodar o prerender manualmente: `bun run prerender:seo` após o build.
 

@@ -88,7 +88,7 @@ export function EmergencyCTA() {
       {/* Botão pulsátil */}
       <button
         onClick={handleClick}
-        aria-label="Botão de Emergência — falar com o Dr. Edilson Bezerra agora"
+        aria-label="Botão de Emergência — falar com o Dra. Suelen Naves Rodrigues (CRM-PR 49354) agora"
         className="relative group inline-flex items-center justify-center gap-3 px-8 py-5 sm:px-12 sm:py-6 rounded-2xl font-display font-black text-xl sm:text-3xl tracking-wider text-white shadow-[0_0_40px_rgba(239,68,68,0.6)] overflow-hidden"
         style={{ background: "linear-gradient(135deg,#dc2626 0%,#ef4444 50%,#b91c1c 100%)" }}
       >

@@ -484,7 +484,7 @@ export function getSchemaForFAQPage(): string {
     },
     {
       question: 'Quem é o médico responsável?',
-      answer: 'A supervisão técnica da plataforma Planta y Raiz é da Dra. Suelen Rodrigues (CRM 49354/PR). A plataforma (operada pela Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14) conta com uma rede de médicos prescritores habilitados.'
+      answer: 'A supervisão técnica da plataforma Planta y Raiz é da Dra. Suelen Naves Rodrigues (CRM-PR 49354) (CRM 49354/PR). A plataforma (operada pela Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14) conta com uma rede de médicos prescritores habilitados.'
     }
   ]);
 

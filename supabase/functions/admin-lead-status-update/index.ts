@@ -14,7 +14,7 @@ const TEMPLATES: Partial<Record<Status, (name: string) => string>> = {
   contacted: (name) =>
     `Olá ${name}! 🌱 Aqui é a Enfermeira Brisa da Planta y Raiz. Recebi seus dados e estou entrando em contato para te orientar sobre o protocolo de cannabis medicinal. Pode falar agora?`,
   qualified: (name) =>
-    `${name}, ótima notícia! ✅ Seu perfil foi qualificado pela nossa equipe. O Dr. Edilson Bezerra (CRM 10963) já pode emitir sua orientação técnica. Quer agendar agora por R$ 30?`,
+    `${name}, ótima notícia! ✅ Seu perfil foi qualificado pela nossa equipe. O Dra. Suelen Naves Rodrigues (CRM-PR 49354) já pode emitir sua orientação técnica. Quer agendar agora por R$ 30?`,
   converted: (name) =>
     `Parabéns, ${name}! 🎉 Sua orientação técnica foi confirmada. Em até 24h você recebe o PDF assinado digitalmente (ICP-Brasil) por aqui. Qualquer dúvida, é só responder.`,
   lost: (name) =>

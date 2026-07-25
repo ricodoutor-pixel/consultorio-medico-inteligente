@@ -95,7 +95,7 @@ const PoliticaDeReembolso = () => {
           </section>
 
           <div className="border-t border-border/40 pt-6 text-xs text-muted-foreground/60">
-            <p><strong>Diretor Técnico:</strong> Dr. Edilson Bezerra — CRM 10963 (Bolívia)</p>
+            <p><strong>Supervisora Técnica:</strong> Dra. Suelen Naves Rodrigues — CRM-PR 49354</p>
             <p>Contato: contato@plantayraiz.com.br</p>
           </div>
         </div>

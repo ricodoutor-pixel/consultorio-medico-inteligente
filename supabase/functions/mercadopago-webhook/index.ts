@@ -345,7 +345,7 @@ Deno.serve(async (req) => {
             const patientMsg =
               `✅ *Pagamento confirmado — Planta y Raiz*\n\n` +
               `Olá ${orientacaoName?.split(" ")[0] || ""}! Recebemos seu pagamento de *R$ ${amount}*.\n\n` +
-              `🩺 O *Dr. Edilson Bezerra* (CRM 10963) entrará em contato em breve por aqui mesmo no WhatsApp para sua *Orientação Técnica em Cannabis Medicinal*.\n\n` +
+              `🩺 O *Dra. Suelen Naves Rodrigues (CRM-PR 49354)* (CRM 10963) entrará em contato em breve por aqui mesmo no WhatsApp para sua *Orientação Técnica em Cannabis Medicinal*.\n\n` +
               `Qualquer dúvida fale comigo, a Enfª Brisa, neste número.`;
             await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
               method: "POST",

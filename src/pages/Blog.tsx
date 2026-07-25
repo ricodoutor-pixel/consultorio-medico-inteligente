@@ -15,7 +15,7 @@ const FALLBACK_POSTS = [
     title: "Cannabis Medicinal no Brasil: Guia Completo 2026",
     slug: "cannabis-medicinal-brasil-guia-2026",
     excerpt: "Tudo o que você precisa saber sobre a regulamentação da ANVISA, como conseguir sua receita e os benefícios comprovados do CBD.",
-    author: "Dr. Edilson Bezerra",
+    author: "Dra. Suelen Naves Rodrigues (CRM-PR 49354)",
     created_at: "2026-03-13",
     category: "Educação",
     image_url: "https://images.unsplash.com/photo-1603903660314-2993d8302228?auto=format&fit=crop&q=80&w=800",

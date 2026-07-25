@@ -158,7 +158,7 @@ const PoliticaDePrivacidade = () => {
           </section>
 
           <div className="border-t border-border/40 pt-6 text-xs text-muted-foreground/60">
-            <p>🌿 <strong>Diretor Técnico:</strong> Dr. Edilson Bezerra — CRM 10963 (Bolívia)</p>
+            <p>🌿 <strong>Supervisora Técnica:</strong> Dra. Suelen Naves Rodrigues — CRM-PR 49354</p>
             <p>📧 Contato: contato@plantayraiz.com.br</p>
             <p className="mt-2">Este documento faz parte do sistema de governança da Planta y Raiz, com consentimento versionado (v2.0) e registro em log de auditoria imutável conforme a LGPD.</p>
           </div>

@@ -18,7 +18,7 @@ import {
   Activity, AlertTriangle, BarChart3, Bell, Bot, CheckCircle2, Clock,
   CreditCard, DollarSign, FileText, Globe, HeartPulse, LogOut, MessageSquare,
   RefreshCw, Send, Server, Shield, ShoppingBag, Stethoscope, TrendingUp,
-  UserPlus, Users, Wallet, XCircle, Zap,
+  UserPlus, Users, Wallet, XCircle, Zap, UserCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -340,7 +340,7 @@ const Admin = () => {
     { label: "Monitoramento", path: "/admin/monitoramento", icon: Server },
     { label: "Leads CRM", path: "/admin/leads", icon: UserPlus },
     { label: "Crédito", path: "/admin/credit-audit", icon: Wallet },
-    { label: "Master Control", path: "/admin/master-control", icon: Shield },
+    { label: "Aprovações KYC", path: "/admin/aprovacoes-medicas", icon: UserCheck },
   ];
 
   return (

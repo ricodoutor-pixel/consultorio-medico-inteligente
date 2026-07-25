@@ -205,7 +205,7 @@ export function CategoryChatModal({ open, category, onClose }: Props) {
             <p className="text-[10px] text-white/40 leading-relaxed pt-1">
               Ao continuar, você concorda com nossa Política de Privacidade. A Planta y Raiz é nome
               fantasia da Bezerra Med Soluções Integradas Ltda. (CNPJ 30.740.319/0001-14) —
-              plataforma de intermediação digital sob supervisão técnica da Dra. Suelen Rodrigues
+              plataforma de intermediação digital sob supervisão técnica da Dra. Suelen Naves Rodrigues (CRM-PR 49354)
               (CRM 49354/PR).
             </p>
           </form>

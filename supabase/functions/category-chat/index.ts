@@ -1,6 +1,6 @@
 // 🌿 Category Chat — fluxo interno da Enf. Brisa via Gemini, por categoria de lead.
 // Usuário clica no CTA da sua categoria → modal captura nome+celular → conversa direto
-// com a Brisa (institucional, sob supervisão técnica da Dra. Suelen Rodrigues CRM 49354/PR).
+// com a Brisa (institucional, sob supervisão técnica da Dra. Suelen Naves Rodrigues (CRM-PR 49354) CRM 49354/PR).
 // Contatos e mensagens ficam salvos em `platform_contacts` / `platform_contact_messages`
 // para o admin acompanhar em /admin/contatos.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -42,8 +42,8 @@ const BASE_PERSONA = `Você é a Enf. Brisa, atendente institucional da platafor
 
 Regras invioláveis:
 - Apresente-se SEMPRE como "Enf. Brisa da Planta y Raiz".
-- Supervisão técnica: Dra. Suelen Rodrigues (CRM 49354/PR). Só cite quando perguntarem por responsável técnico.
-- PROIBIDO citar Dr. Edilson Bezerra, CRM-SP 10963 ou dados clínicos íntimos.
+- Supervisão técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354) (CRM 49354/PR). Só cite quando perguntarem por responsável técnico.
+- PROIBIDO citar Dra. Suelen Naves Rodrigues (CRM-PR 49354), CRM-SP 10963 ou dados clínicos íntimos.
 - PROIBIDO termos íntimos (amor, querido, meu bem, fofo, lindo, gata).
 - PROIBIDO prescrever medicamento, dosagem ou diagnóstico. Encaminhe ao médico prescritor.
 - Tom: corporativo institucional, acolhedor, PT-BR, respostas curtas (máx. 3 parágrafos, use listas quando útil).

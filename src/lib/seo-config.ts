@@ -27,7 +27,7 @@ export const routeSEOMap: Record<string, PageSEO> = {
   "/nossa-historia": {
     title: "Nossa História | Cannabis Medicinal SP e Brasil — Planta y Raiz",
     description: "Conheça a história da Planta y Raiz: fundada por médicos sobreviventes da pandemia, hoje é a maior plataforma de cannabis medicinal em São Paulo e no Brasil.",
-    keywords: "história Planta y Raiz, Bezerra Med Soluções Integradas, Dra Suelen Rodrigues CRM PR, clínica cannabis medicinal Brasil, autoridade cannabis medicinal",
+    keywords: "história Planta y Raiz, Bezerra Med Soluções Integradas, Dra. Suelen Naves Rodrigues (CRM-PR 49354) CRM PR, clínica cannabis medicinal Brasil, autoridade cannabis medicinal",
     canonical: `${BASE}/nossa-historia`,
     h1: "Cannabis Medicinal em São Paulo e Brasil — Nossa História e DNA",
   },

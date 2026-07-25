@@ -39,7 +39,7 @@ SEGURANCA CLINICA:
 
 OFERTA (quando perguntarem):
 - Orientacao Tecnica: R$30 (Brasil) ou US$10 (internacional)
-- Realizada pelo Dr. Edilson Bezerra (CRM-SP 10963)
+- Realizada pelo Dra. Suelen Naves Rodrigues (CRM-PR 49354)
 - Link: https://plantayraiz.com.br`;
 
 interface ParsedMsg {
@@ -292,7 +292,7 @@ serve(async (req: Request): Promise<Response> => {
     if (unauth && !(await isAdminRequest(req))) return unauth;
 
     const target = String(body?.number ?? body?.phone ?? Deno.env.get("ADMIN_WHATSAPP") ?? "5511987131241");
-    const text = String(body?.text ?? "Olá Dr. Edilson Bezerra, estou on!");
+    const text = String(body?.text ?? "Olá Dra. Suelen Naves Rodrigues (CRM-PR 49354), estou on!");
     const chatId = chatIdFromPhone(target);
     const send = await sendWAHA(chatId, text);
     await logMsg({

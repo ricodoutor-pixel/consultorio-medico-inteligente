@@ -31,6 +31,7 @@ import { LocalCTABanner } from "@/components/LocalCTABanner";
 import { OnboardingModal } from "@/components/OnboardingModal";
 import { ConsentManager } from "@/components/ConsentManager";
 import { lazyWithRecovery, reportFrontendRuntimeError } from "@/lib/runtime-recovery";
+import { EmergencyWebChat } from "@/components/EmergencyWebChat";
 
 const Loading = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
@@ -171,12 +172,14 @@ const ConversionsUnified = lazyWithRecovery(() => import("./pages/admin/Conversi
 const ConversoesUptime = lazyWithRecovery(() => import("./pages/admin/ConversoesUptime"), { sourceRef: "/admin/conversoes-uptime" });
 const AdminLeads = lazyWithRecovery(() => import("./pages/admin/Leads"), { sourceRef: "/admin/leads" });
 const AdminLeadDetail = lazyWithRecovery(() => import("./pages/admin/LeadDetail"), { sourceRef: "/admin/leads/:id" });
+const AdminLeadsEmergencia = lazyWithRecovery(() => import("./pages/admin/LeadsEmergencia"), { sourceRef: "/admin/leads-emergencia" });
 const President360 = lazyWithRecovery(() => import("./pages/admin/President360"), { sourceRef: "/admin/president" });
 const SentinelControl = lazyWithRecovery(() => import("./pages/admin/SentinelControl"), { sourceRef: "/admin/sentinel" });
 const TelemedBrisaCheck = lazyWithRecovery(() => import("./pages/admin/TelemedBrisaCheck"), { sourceRef: "/admin/telemed-brisa-check" });
 const CadastrosRealtime = lazyWithRecovery(() => import("./pages/admin/CadastrosRealtime"), { sourceRef: "/admin/cadastros" });
 const AdminGlobalOps = lazyWithRecovery(() => import("./pages/AdminGlobalOps"), { sourceRef: "/admin/global-ops" });
 const WhatsAppInbox = lazyWithRecovery(() => import("./pages/admin/WhatsAppInbox"), { sourceRef: "/admin/whatsapp-inbox" });
+const AdminAprovacoes = lazyWithRecovery(() => import("./pages/admin/AdminAprovacoes"), { sourceRef: "/admin/aprovacoes-medicas" });
 const AuthCallback = lazyWithRecovery(() => import("./pages/AuthCallback"), { sourceRef: "/auth/callback" });
 
 const queryClient = new QueryClient();
@@ -368,10 +371,12 @@ const App = () => (
                 <Route path="/admin/diretoria" element={<AdminRoute><DashboardDiretoria /></AdminRoute>} />
                 <Route path="/admin/growth" element={<AdminRoute><GrowthDashboard /></AdminRoute>} />
                 <Route path="/admin/leads" element={<AdminRoute><AdminLeads /></AdminRoute>} />
+                <Route path="/admin/leads-emergencia" element={<AdminRoute><AdminLeadsEmergencia /></AdminRoute>} />
                 <Route path="/admin/cadastros" element={<AdminRoute><CadastrosRealtime /></AdminRoute>} />
                 <Route path="/admin/cadastros-tempo-real" element={<AdminRoute><CadastrosRealtime /></AdminRoute>} />
                 <Route path="/admin/global-ops" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
                 <Route path="/admin/mapa-global" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
+                <Route path="/admin/aprovacoes-medicas" element={<AdminRoute><AdminAprovacoes /></AdminRoute>} />
                 <Route path="/admin/leads/:id" element={<AdminRoute><AdminLeadDetail /></AdminRoute>} />
                 <Route path="/oferta-especial" element={<OfertaEspecial />} />
                 <Route path="/quiz-triagem" element={<QuizTriagem />} />
@@ -410,6 +415,8 @@ const App = () => (
             {/* Verdinho mobile flutuante removido por solicitação — fica só no menu mobile */}
             {/* WhatsApp Brisa Button */}
             <WhatsAppButton />
+            {/* Emergency Web Chat Modal */}
+            <EmergencyWebChat />
             {/* ManyChatWidget removido — Brisa agora é nativa no WhatsAppButton */}
             <MobileBottomNav />
             <CookieConsentBanner />

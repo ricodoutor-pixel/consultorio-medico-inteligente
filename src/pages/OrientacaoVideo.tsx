@@ -24,6 +24,7 @@ import { MandatoryNPSModal } from "@/components/MandatoryNPSModal";
 import { PatientFlowGuide } from "@/components/patient/PatientFlowGuide";
 import type { FlowStep } from "@/components/patient/PatientFlowGuide";
 import { JitsiRoom } from "@/components/consultation/JitsiRoom";
+import { WhatsAppTelemedicineChat } from "@/components/chat/WhatsAppTelemedicineChat";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
@@ -76,6 +77,8 @@ const OrientacaoVideo = () => {
   const [flowStep, setFlowStep] = useState<FlowStep>("consultation_completed");
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [doctorId, setDoctorId] = useState<string>("");
+  const [appointmentType, setAppointmentType] = useState<string>("video");
+  const [doctorInfo, setDoctorInfo] = useState<{ name: string; photo: string }>({ name: "Médico", photo: "" });
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -177,10 +180,37 @@ const OrientacaoVideo = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
       setCurrentUserId(session.user.id);
+      
       const { data: doctor } = await supabase.from("doctors").select("id").eq("user_id", session.user.id).maybeSingle();
       if (doctor) {
         setIsDoctor(true);
         setDoctorId(doctor.id);
+      }
+
+      // Fetch appointment details
+      const consultationId = searchParams.get("appointment") || searchParams.get("consultation");
+      if (consultationId) {
+        const { data: appt } = await supabase
+          .from("appointments")
+          .select("type, doctor_id")
+          .eq("id", consultationId)
+          .maybeSingle();
+          
+        if (appt) {
+          setAppointmentType(appt.type || "video");
+          const { data: docData } = await supabase
+            .from("doctors_public")
+            .select("full_name, avatar_url")
+            .eq("id", appt.doctor_id)
+            .maybeSingle();
+            
+          if (docData) {
+            setDoctorInfo({
+              name: docData.full_name || "Médico",
+              photo: docData.avatar_url || ""
+            });
+          }
+        }
       }
     } finally {
       setAuthChecked(true);
@@ -443,56 +473,22 @@ const OrientacaoVideo = () => {
 
           {/* Chat sidebar */}
           {showChat && (
-            <div className="w-80 border-l border-border bg-card flex flex-col shrink-0">
-              <div className="p-3 border-b border-border flex items-center justify-between">
-                <span className="text-sm font-bold text-foreground flex items-center gap-2">
-                  <MessageSquare size={14} /> Chat Criptografado
-                </span>
-                <Button variant="ghost" size="sm" onClick={() => setShowChat(false)}>
-                  <X size={14} />
-                </Button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-3 space-y-3">
-                {chatMessages.length === 0 && (
-                  <p className="text-xs text-muted-foreground text-center py-8">
-                    Chat criptografado AES-256.<br />Envie mensagens e compartilhe exames.
-                  </p>
-                )}
-                {chatMessages.map(msg => (
-                  <div key={msg.id} className={`flex ${msg.sender === (isDoctor ? "doctor" : "patient") ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[80%] rounded-2xl px-3 py-2 ${
-                      msg.sender === (isDoctor ? "doctor" : "patient")
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-foreground"
-                    }`}>
-                      <p className="text-sm">{msg.text}</p>
-                      <p className="text-[10px] opacity-60 mt-1">
-                        {msg.timestamp.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                <div ref={chatEndRef} />
-              </div>
-
-              <div className="p-3 border-t border-border">
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" onClick={handleFileShare} className="shrink-0">
-                    <Paperclip size={16} />
-                  </Button>
-                  <Input
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Digite..."
-                    className="bg-muted border-border text-sm"
-                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                  />
-                  <Button size="sm" className="bg-primary text-primary-foreground shrink-0" onClick={sendMessage}>
-                    <Send size={14} />
-                  </Button>
-                </div>
-              </div>
+            <div className="w-[400px] border-l border-border bg-card flex flex-col shrink-0">
+              <WhatsAppTelemedicineChat
+                appointmentId={appointmentId || consultationParam || ""}
+                currentUserRole={isDoctor ? "doctor" : "patient"}
+                currentUserId={currentUserId}
+                consultationType={appointmentType}
+                doctorName={doctorInfo.name}
+                doctorPhoto={doctorInfo.photo}
+                onVideoCallClick={() => {
+                  if (appointmentType.toLowerCase().includes("chat") && !appointmentType.toLowerCase().includes("video")) {
+                    toast({ title: "Bloqueado", description: "Sua consulta é apenas chat.", variant: "destructive" });
+                  } else {
+                    toast({ title: "Vídeo já ativo", description: "Utilize os controles da sala." });
+                  }
+                }}
+              />
             </div>
           )}
 

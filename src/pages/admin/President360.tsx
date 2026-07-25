@@ -192,7 +192,7 @@ const President360 = () => {
                 </h1>
                 <p className="text-xs md:text-sm text-muted-foreground flex items-center gap-2 mt-1">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Dr. Edilson Bezerra · CRM 10963 · Sincronização em tempo real
+                  Dra. Suelen Naves Rodrigues (CRM-PR 49354) · CRM 10963 · Sincronização em tempo real
                 </p>
               </div>
             </div>

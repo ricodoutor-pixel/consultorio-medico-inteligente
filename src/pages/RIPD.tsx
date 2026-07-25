@@ -14,10 +14,10 @@ const sections = [
     content: [
       "Razão Social: Planta y Raiz — Tecnologia em Saúde Digital Ltda.",
       "CNAE Principal: 6209-1/00 (Suporte técnico, manutenção e outros serviços em tecnologia da informação) — atuação como plataforma de intermediação digital em telessaúde.",
-      "Encarregado de Dados (DPO) — interino: Dr. Edilson Bezerra da Silva, CRM-PE 10963 · Diretor Técnico Médico.",
+      "Encarregado de Dados (DPO) — interino: Dra. Suelen Naves Rodrigues, CRM-PR 49354 · Supervisora Técnica Médica.",
       "Canal oficial do DPO: dpo@plantayraiz.com.br · WhatsApp +55 11 99136-3154 (Enfª Brisa redireciona ao DPO).",
       "Substituição do DPO interino por DPO terceirizado especializado em LGPD está prevista para o próximo ciclo de governança; este RIPD será atualizado na nomeação.",
-      "Diretor Técnico Médico Responsável: Dr. Edilson Bezerra da Silva — CRM-PE 10963.",
+      "Supervisora Técnica Médica Responsável: Dra. Suelen Naves Rodrigues — CRM-PR 49354.",
     ],
 
   },
@@ -120,7 +120,7 @@ const RIPD = () => {
               <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">CFM 2.314/2022</Badge>
               <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">RDC ANVISA 660/2022</Badge>
               <Badge variant="outline" className="text-[10px]">RIPD v1.0 — Publicado em {new Date().toLocaleDateString("pt-BR")}</Badge>
-              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">DPO Interino: Dr. Edilson Bezerra (CRM-PE 10963)</Badge>
+              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">DPO Interina: Dra. Suelen Naves Rodrigues (CRM-PR 49354)</Badge>
 
             </div>
 

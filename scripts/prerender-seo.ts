@@ -34,7 +34,7 @@ const TREATMENTS: TreatmentPage[] = [
   {
     slug: "ansiedade",
     title: "Cannabis Medicinal para Ansiedade | Planta & Raiz",
-    description: "Como o CBD ajuda no tratamento da ansiedade. Orientação técnica com Dr. Edilson Bezerra (CRM 10963) a partir de R$30. Regulamentado pela ANVISA.",
+    description: "Como o CBD ajuda no tratamento da ansiedade. Orientação técnica com Dra. Suelen Naves Rodrigues (CRM-PR 49354) a partir de R$30. Regulamentado pela ANVISA.",
     h1: "Tratamento de Ansiedade com Cannabis Medicinal",
     cid: "F41.1",
     paragraphs: [
@@ -52,7 +52,7 @@ const TREATMENTS: TreatmentPage[] = [
   {
     slug: "dor-cronica",
     title: "Cannabis Medicinal para Dor Crônica | Planta & Raiz",
-    description: "Cannabis medicinal no manejo da dor crônica. Orientação técnica a partir de R$30 com Dr. Edilson Bezerra (CRM 10963). 100% online e regulamentado.",
+    description: "Cannabis medicinal no manejo da dor crônica. Orientação técnica a partir de R$30 com Dra. Suelen Naves Rodrigues (CRM-PR 49354). 100% online e regulamentado.",
     h1: "Tratamento de Dor Crônica com Cannabis Medicinal",
     cid: "G89.4",
     paragraphs: [
@@ -70,7 +70,7 @@ const TREATMENTS: TreatmentPage[] = [
   {
     slug: "epilepsia",
     title: "Cannabis Medicinal para Epilepsia | Planta & Raiz",
-    description: "CBD reduz convulsões em epilepsias refratárias. Orientação técnica com Dr. Edilson Bezerra (CRM 10963) a partir de R$30. Regulamentado pela ANVISA.",
+    description: "CBD reduz convulsões em epilepsias refratárias. Orientação técnica com Dra. Suelen Naves Rodrigues (CRM-PR 49354) a partir de R$30. Regulamentado pela ANVISA.",
     h1: "Tratamento de Epilepsia com Cannabis Medicinal",
     cid: "G40",
     paragraphs: [
@@ -88,7 +88,7 @@ const TREATMENTS: TreatmentPage[] = [
   {
     slug: "insonia",
     title: "Cannabis Medicinal para Insônia | Planta & Raiz",
-    description: "Cannabis medicinal melhora qualidade do sono sem dependência. Orientação técnica online com Dr. Edilson Bezerra (CRM 10963) a partir de R$30.",
+    description: "Cannabis medicinal melhora qualidade do sono sem dependência. Orientação técnica online com Dra. Suelen Naves Rodrigues (CRM-PR 49354) a partir de R$30.",
     h1: "Tratamento de Insônia com Cannabis Medicinal",
     cid: "G47.0",
     paragraphs: [
@@ -103,7 +103,7 @@ const TREATMENTS: TreatmentPage[] = [
   {
     slug: "depressao",
     title: "Cannabis Medicinal para Depressão | Planta & Raiz",
-    description: "Como cannabis medicinal pode auxiliar no tratamento da depressão. Orientação técnica a partir de R$30 com Dr. Edilson Bezerra (CRM 10963).",
+    description: "Como cannabis medicinal pode auxiliar no tratamento da depressão. Orientação técnica a partir de R$30 com Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
     h1: "Cannabis Medicinal no Tratamento da Depressão",
     cid: "F32",
     paragraphs: [
@@ -121,7 +121,7 @@ const TREATMENTS: TreatmentPage[] = [
   {
     slug: "fibromialgia",
     title: "Cannabis Medicinal para Fibromialgia | Planta & Raiz",
-    description: "Cannabis medicinal reduz dor e melhora qualidade de vida em pacientes com fibromialgia. Orientação técnica a partir de R$30 com Dr. Edilson Bezerra.",
+    description: "Cannabis medicinal reduz dor e melhora qualidade de vida em pacientes com fibromialgia. Orientação técnica a partir de R$30 com Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
     h1: "Tratamento de Fibromialgia com Cannabis Medicinal",
     cid: "M79.7",
     paragraphs: [
@@ -139,7 +139,7 @@ const TREATMENTS: TreatmentPage[] = [
   {
     slug: "parkinson",
     title: "Cannabis Medicinal para Parkinson | Planta & Raiz",
-    description: "Cannabis medicinal alivia tremores, rigidez e melhora qualidade de vida em pacientes com Parkinson. Orientação técnica com Dr. Edilson Bezerra (CRM 10963).",
+    description: "Cannabis medicinal alivia tremores, rigidez e melhora qualidade de vida em pacientes com Parkinson. Orientação técnica com Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
     h1: "Tratamento de Parkinson com Cannabis Medicinal",
     cid: "G20",
     paragraphs: [
@@ -157,7 +157,7 @@ const TREATMENTS: TreatmentPage[] = [
   {
     slug: "autismo",
     title: "Cannabis Medicinal para Autismo (TEA) | Planta & Raiz",
-    description: "CBD melhora comportamento, sono e comunicação em pacientes com Transtorno do Espectro Autista. Orientação técnica a partir de R$30 com Dr. Edilson Bezerra.",
+    description: "CBD melhora comportamento, sono e comunicação em pacientes com Transtorno do Espectro Autista. Orientação técnica a partir de R$30 com Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
     h1: "Cannabis Medicinal no Tratamento do Autismo (TEA)",
     cid: "F84.0",
     paragraphs: [
@@ -175,7 +175,7 @@ const TREATMENTS: TreatmentPage[] = [
   {
     slug: "esclerose-multipla",
     title: "Cannabis Medicinal para Esclerose Múltipla | Planta & Raiz",
-    description: "Cannabis medicinal reduz espasticidade e dor na esclerose múltipla. Orientação técnica com Dr. Edilson Bezerra (CRM 10963) a partir de R$30.",
+    description: "Cannabis medicinal reduz espasticidade e dor na esclerose múltipla. Orientação técnica com Dra. Suelen Naves Rodrigues (CRM-PR 49354) a partir de R$30.",
     h1: "Tratamento de Esclerose Múltipla com Cannabis Medicinal",
     cid: "G35",
     paragraphs: [
@@ -193,7 +193,7 @@ const TREATMENTS: TreatmentPage[] = [
   {
     slug: "tdah",
     title: "Cannabis Medicinal para TDAH | Planta & Raiz",
-    description: "Pesquisas investigam o potencial do CBD no manejo de sintomas do TDAH. Orientação técnica a partir de R$30 com Dr. Edilson Bezerra (CRM 10963).",
+    description: "Pesquisas investigam o potencial do CBD no manejo de sintomas do TDAH. Orientação técnica a partir de R$30 com Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
     h1: "Cannabis Medicinal e TDAH — Transtorno de Déficit de Atenção",
     cid: "F90",
     paragraphs: [
@@ -212,24 +212,24 @@ interface StaticPage { path: string; title: string; description: string; h1: str
 const STATIC_PAGES: StaticPage[] = [
   {
     path: "/",
-    title: "Planta y Raiz | Orientação Técnica de Cannabis Medicinal | Dr. Edilson Bezerra",
-    description: "Orientação Técnica de Cannabis Medicinal com Dr. Edilson Bezerra (CRM 10963) a partir de R$30. 100% online e regulamentado pela ANVISA. Atendimento SP e Brasil.",
-    h1: "Orientação Técnica de Cannabis Medicinal — Dr. Edilson Bezerra",
+    title: "Planta y Raiz | Orientação Técnica de Cannabis Medicinal | Dra. Suelen Naves Rodrigues (CRM-PR 49354)",
+    description: "Orientação Técnica de Cannabis Medicinal com Dra. Suelen Naves Rodrigues (CRM-PR 49354) a partir de R$30. 100% online e regulamentado pela ANVISA. Atendimento SP e Brasil.",
+    h1: "Orientação Técnica de Cannabis Medicinal — Dra. Suelen Naves Rodrigues (CRM-PR 49354)",
     intro: [
       "Planta y Raiz é a plataforma de intermediação digital de Cannabis Medicinal regulamentada pela ANVISA (RDC 660/2022 e 327/2019).",
-      "Atendimento 100% online com Dr. Edilson Bezerra da Silva (CRM-SP 10963), médico especialista em Cannabis Medicinal e Farmacologia.",
+      "Atendimento 100% online com Dra. Suelen Naves Rodrigues (CRM-PR 49354) da Silva (CRM-SP 10963), médico especialista em Cannabis Medicinal e Farmacologia.",
       "Orientação Técnica a partir de R$30 (PIX, Cartão ou Bitcoin). PDF com selo gov.br válido para importação ANVISA.",
     ],
   },
   {
     path: "/como-funciona",
     title: "Como Funciona — Orientação Técnica de Cannabis Medicinal",
-    description: "Em 5 etapas: triagem com a Brisa, pagamento PIX, orientação técnica com Dr. Edilson Bezerra, emissão de PDF e suporte para importação ANVISA.",
+    description: "Em 5 etapas: triagem com a Brisa, pagamento PIX, orientação técnica com Dra. Suelen Naves Rodrigues (CRM-PR 49354), emissão de PDF e suporte para importação ANVISA.",
     h1: "Como Funciona a Orientação Técnica de Cannabis Medicinal",
     intro: [
       "1. Triagem inicial gratuita com a Enfermeira Brisa (IA) via WhatsApp.",
       "2. Pagamento seguro via PIX, Cartão de Crédito ou Bitcoin a partir de R$30.",
-      "3. Orientação Técnica digital com o Dr. Edilson Bezerra (CRM-SP 10963).",
+      "3. Orientação Técnica digital com o Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
       "4. Emissão do relatório técnico em PDF com selo gov.br.",
       "5. Suporte para importação ANVISA (RDC 660/2022) e indicação de produtos.",
     ],
@@ -254,7 +254,7 @@ const STATIC_PAGES: StaticPage[] = [
     intro: [
       "Sim, a Cannabis Medicinal é legal no Brasil via ANVISA (RDC 660/2022 e RDC 327/2019).",
       "A orientação técnica inicial custa R$30 (BRL) ou US$10. Inclui avaliação digital e relatório em PDF com selo gov.br.",
-      "Dr. Edilson Bezerra da Silva, CRM-SP 10963, é o médico responsável especializado em Cannabis Medicinal.",
+      "Dra. Suelen Naves Rodrigues (CRM-PR 49354) da Silva, CRM-SP 10963, é o médico responsável especializado em Cannabis Medicinal.",
     ],
   },
   {
@@ -281,10 +281,10 @@ const STATIC_PAGES: StaticPage[] = [
   {
     path: "/telemedicina",
     title: "Telemedicina Cannabis Medicinal — Consulta Online | Planta y Raiz",
-    description: "Telemedicina especializada em Cannabis Medicinal 100% online. Consulta com Dr. Edilson Bezerra (CRM 10963) por videochamada criptografada, prescrição digital e suporte ANVISA.",
+    description: "Telemedicina especializada em Cannabis Medicinal 100% online. Consulta com Dra. Suelen Naves Rodrigues (CRM-PR 49354) por videochamada criptografada, prescrição digital e suporte ANVISA.",
     h1: "Telemedicina de Cannabis Medicinal — 100% Online",
     intro: [
-      "Atendimento por videochamada segura (Jitsi WebRTC) com Dr. Edilson Bezerra da Silva — CRM-SP 10963.",
+      "Atendimento por videochamada segura (Jitsi WebRTC) com Dra. Suelen Naves Rodrigues (CRM-PR 49354) da Silva — CRM-SP 10963.",
       "Prescrição digital com assinatura ICP-Brasil e selo gov.br, válida em farmácias e para importação ANVISA.",
       "Disponível em todo o Brasil — São Paulo, Rio de Janeiro, Brasília, Belo Horizonte, Salvador, Curitiba, Porto Alegre, Recife, Fortaleza e demais capitais.",
     ],
@@ -292,11 +292,11 @@ const STATIC_PAGES: StaticPage[] = [
   {
     path: "/profissionais",
     title: "Médicos Prescritores de Cannabis Medicinal | Planta y Raiz",
-    description: "Conheça os médicos prescritores da Planta y Raiz — especialistas em Cannabis Medicinal regulamentados pela ANVISA e CFM. Dr. Edilson Bezerra CRM 10963 e equipe.",
+    description: "Conheça os médicos prescritores da Planta y Raiz — especialistas em Cannabis Medicinal regulamentados pela ANVISA e CFM. Dra. Suelen Naves Rodrigues (CRM-PR 49354) CRM 10963 e equipe.",
     h1: "Médicos Prescritores de Cannabis Medicinal",
     intro: [
       "Equipe médica especializada em Cannabis Medicinal, treinada na RDC 660/2022 e RDC 327/2019 da ANVISA.",
-      "Dr. Edilson Bezerra da Silva (CRM-SP 10963) — coordenador médico, especialista em Cannabis Medicinal e Farmacologia.",
+      "Dra. Suelen Naves Rodrigues (CRM-PR 49354) da Silva (CRM-SP 10963) — coordenador médico, especialista em Cannabis Medicinal e Farmacologia.",
       "Atendimento ético, sigiloso e baseado em evidências científicas.",
     ],
   },
@@ -339,40 +339,40 @@ const STATIC_PAGES: StaticPage[] = [
     h1: "Agende sua Orientação Técnica de Cannabis Medicinal",
     intro: [
       "Agendamento 100% online com confirmação imediata pelo WhatsApp.",
-      "Atendimento por videochamada segura com Dr. Edilson Bezerra (CRM-SP 10963).",
+      "Atendimento por videochamada segura com Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
       "Pagamento via PIX, Cartão de Crédito ou Bitcoin — a partir de R$30.",
     ],
   },
   {
     path: "/tratamento-dor-cronica",
     title: "Tratamento de Dor Crônica com Cannabis Medicinal | Planta y Raiz",
-    description: "Tratamento de dor crônica (fibromialgia, lombalgia, neuropatia, artrite) com Cannabis Medicinal. Orientação técnica com Dr. Edilson Bezerra. CBD e THC regulamentados.",
+    description: "Tratamento de dor crônica (fibromialgia, lombalgia, neuropatia, artrite) com Cannabis Medicinal. Orientação técnica com Dra. Suelen Naves Rodrigues (CRM-PR 49354). CBD e THC regulamentados.",
     h1: "Tratamento de Dor Crônica com Cannabis Medicinal",
     intro: [
       "A Cannabis Medicinal é uma alternativa baseada em evidências para o manejo da dor crônica.",
       "Indicações: fibromialgia, dor lombar crônica, neuropatia diabética, dor oncológica, artrite e enxaqueca.",
-      "Orientação técnica especializada com Dr. Edilson Bezerra (CRM-SP 10963).",
+      "Orientação técnica especializada com Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
     ],
   },
   {
     path: "/tratamento-ansiedade-saude-mental",
     title: "Cannabis Medicinal para Ansiedade e Saúde Mental | Planta y Raiz",
-    description: "Tratamento de ansiedade, depressão, insônia e TEPT com Cannabis Medicinal (CBD). Atendimento online com Dr. Edilson Bezerra (CRM 10963) regulamentado ANVISA.",
+    description: "Tratamento de ansiedade, depressão, insônia e TEPT com Cannabis Medicinal (CBD). Atendimento online com Dra. Suelen Naves Rodrigues (CRM-PR 49354) regulamentado ANVISA.",
     h1: "Cannabis Medicinal para Ansiedade, Depressão e Saúde Mental",
     intro: [
       "O CBD (canabidiol) possui propriedades ansiolíticas e antidepressivas comprovadas em estudos clínicos.",
       "Indicações: ansiedade generalizada, transtorno do pânico, depressão, insônia e TEPT.",
-      "Atendimento ético e baseado em evidências com Dr. Edilson Bezerra (CRM-SP 10963).",
+      "Atendimento ético e baseado em evidências com Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
     ],
   },
   {
     path: "/faq",
     title: "FAQ — Cannabis Medicinal, ANVISA e Legalidade | Planta y Raiz",
-    description: "Cannabis medicinal é legal? Como funciona a prescrição ANVISA? Quanto custa? Tire suas dúvidas com respostas claras do Dr. Edilson Bezerra (CRM-SP 10963).",
+    description: "Cannabis medicinal é legal? Como funciona a prescrição ANVISA? Quanto custa? Tire suas dúvidas com respostas claras do Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
     h1: "Perguntas Frequentes sobre Cannabis Medicinal",
     intro: [
       "Cannabis Medicinal é legal no Brasil — regulamentada pela ANVISA via RDC 660/2022 (importação) e RDC 327/2019 (produtos nacionais).",
-      "Orientação Técnica a partir de R$30 com Dr. Edilson Bezerra (CRM-SP 10963). PDF com selo gov.br.",
+      "Orientação Técnica a partir de R$30 com Dra. Suelen Naves Rodrigues (CRM-PR 49354). PDF com selo gov.br.",
       "Dúvidas sobre dosagem, indicações, importação, prescrição e segurança são respondidas por médico habilitado.",
     ],
   },
@@ -383,7 +383,7 @@ const STATIC_PAGES: StaticPage[] = [
     h1: "Fale Conosco — Planta y Raiz",
     intro: [
       "WhatsApp Enfª Brisa: +55 11 99136-3154 — triagem e suporte 24/7.",
-      "Atendimento humano com Dr. Edilson Bezerra (CRM-SP 10963) para Cannabis Medicinal.",
+      "Atendimento humano com Dra. Suelen Naves Rodrigues (CRM-PR 49354) para Cannabis Medicinal.",
       "Suporte para pacientes, médicos parceiros e importação ANVISA.",
     ],
   },
@@ -401,10 +401,10 @@ const STATIC_PAGES: StaticPage[] = [
   {
     path: "/falar-com-especialista",
     title: "Falar com Especialista em Cannabis Medicinal | Planta y Raiz",
-    description: "Fale agora com um médico especialista em Cannabis Medicinal. Atendimento online com Dr. Edilson Bezerra (CRM-SP 10963) a partir de R$30 via Pix.",
+    description: "Fale agora com um médico especialista em Cannabis Medicinal. Atendimento online com Dra. Suelen Naves Rodrigues (CRM-PR 49354) a partir de R$30 via Pix.",
     h1: "Falar com Especialista em Cannabis Medicinal",
     intro: [
-      "Atendimento direto com Dr. Edilson Bezerra (CRM-SP 10963), especialista em Cannabis Medicinal e Farmacologia.",
+      "Atendimento direto com Dra. Suelen Naves Rodrigues (CRM-PR 49354), especialista em Cannabis Medicinal e Farmacologia.",
       "Orientação Técnica online a partir de R$30 — PDF com selo gov.br válido para importação ANVISA.",
       "Resposta em até 24h via WhatsApp ou videochamada.",
     ],
@@ -423,7 +423,7 @@ const STATIC_PAGES: StaticPage[] = [
   {
     path: "/consulta-rapida",
     title: "Consulta Rápida de Cannabis Medicinal Online | Planta y Raiz",
-    description: "Consulta rápida online para Cannabis Medicinal em menos de 30 minutos. Orientação Técnica com Dr. Edilson Bezerra (CRM-SP 10963) por apenas R$30 via Pix.",
+    description: "Consulta rápida online para Cannabis Medicinal em menos de 30 minutos. Orientação Técnica com Dra. Suelen Naves Rodrigues (CRM-PR 49354) por apenas R$30 via Pix.",
     h1: "Consulta Rápida de Cannabis Medicinal",
     intro: [
       "Atendimento em até 30 minutos para casos urgentes (insônia, dor, ansiedade, importação ANVISA).",
@@ -439,7 +439,7 @@ const STATIC_PAGES: StaticPage[] = [
     intro: [
       "Triagem gratuita conduzida pela Enfª Brisa (IA clínica) em menos de 2 minutos.",
       "Avaliação baseada em sintomas, histórico e indicações da RDC 660/2022.",
-      "Você recebe um relatório personalizado e, se elegível, agenda Orientação Técnica com Dr. Edilson Bezerra.",
+      "Você recebe um relatório personalizado e, se elegível, agenda Orientação Técnica com Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
     ],
   },
   {
@@ -449,7 +449,7 @@ const STATIC_PAGES: StaticPage[] = [
     h1: "E-book Grátis — Guia Completo de Cannabis Medicinal",
     intro: [
       "12 capítulos sobre farmacologia, dosimetria, RDC 660/2022, casos clínicos reais e legislação ANVISA.",
-      "Material gratuito revisado por Dr. Edilson Bezerra (CRM-SP 10963).",
+      "Material gratuito revisado por Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
       "Indicado para pacientes, médicos, farmacêuticos e estudantes.",
     ],
   },
@@ -478,11 +478,11 @@ const STATIC_PAGES: StaticPage[] = [
   {
     path: "/acompanhamento",
     title: "Acompanhamento do Tratamento de Cannabis | Planta y Raiz",
-    description: "Acompanhe seu tratamento com Cannabis Medicinal em tempo real — dosagem, sintomas, evolução clínica e próximos passos com a Enfª Brisa e Dr. Edilson Bezerra.",
+    description: "Acompanhe seu tratamento com Cannabis Medicinal em tempo real — dosagem, sintomas, evolução clínica e próximos passos com a Enfª Brisa e Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
     h1: "Acompanhamento do Tratamento",
     intro: [
       "Dashboard com dosagem, sintomas e evolução clínica registrados pela Enfª Brisa.",
-      "Reavaliação periódica com Dr. Edilson Bezerra (CRM-SP 10963).",
+      "Reavaliação periódica com Dra. Suelen Naves Rodrigues (CRM-PR 49354).",
       "Alertas inteligentes para ajuste de dose, reposição e renovação de prescrição.",
     ],
   },
@@ -522,10 +522,10 @@ const STATIC_PAGES: StaticPage[] = [
   {
     path: "/webinars",
     title: "Webinars de Cannabis Medicinal | Planta y Raiz",
-    description: "Webinars ao vivo sobre Cannabis Medicinal com Dr. Edilson Bezerra (CRM-SP 10963) e convidados. Temas: dosimetria, indicações, importação ANVISA e mais.",
+    description: "Webinars ao vivo sobre Cannabis Medicinal com Dra. Suelen Naves Rodrigues (CRM-PR 49354) e convidados. Temas: dosimetria, indicações, importação ANVISA e mais.",
     h1: "Webinars de Cannabis Medicinal",
     intro: [
-      "Aulas ao vivo com Dr. Edilson Bezerra (CRM-SP 10963) e convidados especialistas.",
+      "Aulas ao vivo com Dra. Suelen Naves Rodrigues (CRM-PR 49354) e convidados especialistas.",
       "Temas: dosimetria, indicações clínicas, importação ANVISA, casos reais e novidades.",
       "Acesso gratuito mediante cadastro — gravações disponíveis para assinantes Club.",
     ],
@@ -602,7 +602,7 @@ function buildTreatmentHTML(t: TreatmentPage): string {
 
   <section>
     <h2>Pronto para iniciar seu tratamento?</h2>
-    <p>Orientação Técnica a partir de R$30 com Dr. Edilson Bezerra (CRM-SP 10963). 100% online.</p>
+    <p>Orientação Técnica a partir de R$30 com Dra. Suelen Naves Rodrigues (CRM-PR 49354). 100% online.</p>
     <p><a href="/quiz">Iniciar Avaliação Gratuita</a> · <a href="/falar-com-especialista">Falar com Especialista</a></p>
   </section>
 </article>`.trim();

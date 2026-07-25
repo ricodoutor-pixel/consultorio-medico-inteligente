@@ -1,5 +1,5 @@
 // Public endpoint — generates a Mercado Pago R$30 PIX/checkout link for
-// "Orientação Técnica com Dr. Edilson Bezerra On" that Enf. Brisa shares via WhatsApp.
+// "Orientação Técnica com Dra. Suelen Naves Rodrigues (CRM-PR 49354) On" that Enf. Brisa shares via WhatsApp.
 // No JWT required: leads come from WhatsApp without an active session.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
 
     const preference = {
       items: [{
-        title: "Orientação Técnica — Dr. Edilson Bezerra On",
+        title: "Orientação Técnica — Dra. Suelen Naves Rodrigues (CRM-PR 49354) On",
         description: "Avaliação técnica em Cannabis Medicinal com acompanhamento da Enf. Brisa, relatório PDF e encaminhamento clínico.",
         quantity: 1,
         unit_price: 30.0,

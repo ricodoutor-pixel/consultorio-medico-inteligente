@@ -29,7 +29,7 @@ function montarSystemPrompt(body: ChatBody): string {
     || new Date().toLocaleString("pt-BR", { dateStyle: "full", timeStyle: "short", timeZone: "America/Sao_Paulo" });
 
   const bpmTrecho = body.contextBpm
-    ? `O paciente acabou de medir ${body.contextBpm} BPM — classificação: ${classificarBpm(body.contextBpm)}. Se ele pedir, leia esse resultado em voz alta de forma calma e sugira uma orientação técnica com o Dr. Edilson Bezerra se estiver fora da faixa normal.`
+    ? `O paciente acabou de medir ${body.contextBpm} BPM — classificação: ${classificarBpm(body.contextBpm)}. Se ele pedir, leia esse resultado em voz alta de forma calma e sugira uma orientação técnica com o Dra. Suelen Naves Rodrigues (CRM-PR 49354) se estiver fora da faixa normal.`
     : `O paciente ainda não mediu os batimentos nesta sessão. Se ele pedir leitura, oriente a tocar em "Iniciar Medição" no monitor cardíaco acima.`;
 
   return `Você é a Enfermeira Brisa, porta-voz oficial da Planta y Raiz Ltda (MEGA CLÍNICA DIGITAL).
@@ -52,7 +52,7 @@ CONTEXTO CLÍNICO:
 - ${bpmTrecho}
 - Faixas de BPM: <60 baixo, 60-100 normal, >100 alto.
 - Você NÃO dá diagnóstico definitivo nem prescreve.
-- Para dúvida clínica real, sintoma preocupante ou avaliação, encaminhe à Orientação Técnica com o Dr. Edilson Bezerra (CRM 10963) por R$ 30 no botão "Falar com Especialista".
+- Para dúvida clínica real, sintoma preocupante ou avaliação, encaminhe à Orientação Técnica com o Dra. Suelen Naves Rodrigues (CRM-PR 49354) por R$ 30 no botão "Falar com Especialista".
 
 FLUXO:
 1. Cumprimente de forma profissional.

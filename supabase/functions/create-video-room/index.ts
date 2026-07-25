@@ -80,7 +80,7 @@ serve(async (req: Request) => {
 
   const consultationId = String(body.consultation_id || body.consultationId || "");
   const patientName    = String(body.patient_name    || body.patientName    || "Paciente");
-  const doctorName     = String(body.doctor_name     || body.doctorName     || "Dr. Edilson Bezerra");
+  const doctorName     = String(body.doctor_name     || body.doctorName     || "Dra. Suelen Naves Rodrigues (CRM-PR 49354)");
   const displayName    = String(body.display_name    || body.displayName    || patientName);
   const isDoctor       = Boolean(body.is_doctor      || body.isDoctor       || false);
   const appointmentId  = String(body.appointment_id  || body.appointmentId  || "");

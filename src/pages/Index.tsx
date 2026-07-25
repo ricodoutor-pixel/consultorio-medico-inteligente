@@ -225,7 +225,7 @@ const Index = () => {
               {/* Pulse verde leve atrás do botão da Enfª Brisa */}
               <span aria-hidden className="pointer-events-none absolute -inset-2 rounded-3xl bg-primary/40 blur-2xl opacity-70 animate-brisa-pulse" />
               <BrisaCTAGate
-                href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Enfª Brisa, eu preciso de uma orientação técnica com Dr Edilson Bezerra On Agora!")}`}
+                href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Enfª Brisa, eu preciso de uma orientação técnica com Dra. Suelen Naves Rodrigues (CRM-PR 49354) On Agora!")}`}
                 className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/30 transition-all hover:scale-105"
                 source="CTA_Index_Hero"
                 modalMessage="Antes de falar com a Enf. Brisa, deixe seu contato — assim agilizamos sua Orientação Técnica de apenas R$30 com o Dr. Edilson."
@@ -244,14 +244,14 @@ const Index = () => {
                   <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/40 shrink-0">
                     <img
                       src={drEdilsonPhoto}
-                      alt="Dr. Edilson Bezerra — CRM 10963"
+                      alt="Dra. Suelen Naves Rodrigues (CRM-PR 49354) — CRM 10963"
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"
                     />
                   </div>
                   <div>
-                    <p className="font-display font-black text-xl">Dr. Edilson Bezerra On</p>
+                    <p className="font-display font-black text-xl">Dra. Suelen Naves Rodrigues (CRM-PR 49354) On</p>
                     <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Cannabis Medicinal · CRM 10963</p>
                   </div>
                 </div>
@@ -282,7 +282,7 @@ const Index = () => {
 
       {/* Live Stats - removido a pedido */}
 
-      {/* Dr. Edilson Bezerra — Orientação Técnica Destacada */}
+      {/* Dra. Suelen Naves Rodrigues (CRM-PR 49354) — Orientação Técnica Destacada */}
       <section className="section-padding bg-gradient-to-br from-primary/10 via-background to-[hsl(280,80%,65%)]/10 border-y border-primary/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <motion.div
@@ -297,7 +297,7 @@ const Index = () => {
               </span>
             <h2 className="font-display font-black text-3xl md:text-5xl leading-tight">
                 Orientação e Avaliação Técnica com{" "}
-                <span className="text-gradient-green">Dr. Edilson Bezerra On</span>
+                <span className="text-gradient-green">Dra. Suelen Naves Rodrigues (CRM-PR 49354) On</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
                 Orientador Técnico em Medicina Endocanabinoide e Especialista em Medicina Integrativa. Persona virtual autônoma Inteligente trilíngue via WhatsApp, com acesso a banco de dados pessoal com mais de 40 mil estudos científicos publicados sobre modulação do sistema endocanabinoide humano. Cruza dados científicos e tratamentos divulgados para gerar um relatório final preciso e personalizado, baseado em evidências. Atendimento 100% autônomo, com suporte completo da Enfª Brisa via WhatsApp.
@@ -312,9 +312,9 @@ const Index = () => {
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Importação RDC 660/2022 facilitada com desconto e frete grátis</li>
               </ul>
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] leading-relaxed text-amber-100/90">
-                ⚖️ <strong>Aviso Legal:</strong> O Dr. Edilson Bezerra <strong>não emite receitas, não realiza consultas, não prescreve medicamentos e não fornece diagnósticos</strong> através desta plataforma. O serviço consiste exclusivamente em <strong>orientação técnica educativa</strong> sobre o sistema endocanabinoide, com entrega de <strong>relatório técnico em PDF assinado digitalmente (ICP-Brasil / gov.br)</strong>. Para prescrições, o paciente é encaminhado a profissional habilitado.
+                ⚖️ <strong>Aviso Legal:</strong> O Dra. Suelen Naves Rodrigues (CRM-PR 49354) <strong>não emite receitas, não realiza consultas, não prescreve medicamentos e não fornece diagnósticos</strong> através desta plataforma. O serviço consiste exclusivamente em <strong>orientação técnica educativa</strong> sobre o sistema endocanabinoide, com entrega de <strong>relatório técnico em PDF assinado digitalmente (ICP-Brasil / gov.br)</strong>. Para prescrições, o paciente é encaminhado a profissional habilitado.
               </div>
-              {/* Fluxo exclusivo deste card: Enfª Brisa (Triagem) → Pix Seguro Mercado Pago → Orientação Técnica Dr. Edilson Bezerra On */}
+              {/* Fluxo exclusivo deste card: Enfª Brisa (Triagem) → Pix Seguro Mercado Pago → Orientação Técnica Dra. Suelen Naves Rodrigues (CRM-PR 49354) On */}
               <div className="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-background/40 border border-primary/20">
                 <div className="text-center">
                   <div className="text-2xl mb-1">👩‍⚕️</div>
@@ -340,7 +340,7 @@ const Index = () => {
                     href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20a%20triagem%20para%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20o%20Dr.%20Edilson%20Bezerra%20On"
                     className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-14 sm:h-16 px-8 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all"
                     source="CTA_DrEdilson_Triagem"
-                    modalMessage="Antes da triagem com a Enf. Brisa, deixe seu contato — garantimos sua Orientação Técnica de R$30 com o Dr. Edilson Bezerra On."
+                    modalMessage="Antes da triagem com a Enf. Brisa, deixe seu contato — garantimos sua Orientação Técnica de R$30 com o Dra. Suelen Naves Rodrigues (CRM-PR 49354) On."
                   >
                     💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={20} className="ml-2" />
                   </BrisaCTAGate>
@@ -348,7 +348,7 @@ const Index = () => {
               </div>
 
               <p className="text-xs text-muted-foreground italic">
-                * Fluxo exclusivo deste card: <strong>Enfª Brisa (triagem) → Pix Seguro Mercado Pago → Orientação Técnica com Dr. Edilson Bezerra On</strong>. Nenhum paciente fala direto com o profissional antes do pagamento e auditoria. Pacientes internacionais: US$10.
+                * Fluxo exclusivo deste card: <strong>Enfª Brisa (triagem) → Pix Seguro Mercado Pago → Orientação Técnica com Dra. Suelen Naves Rodrigues (CRM-PR 49354) On</strong>. Nenhum paciente fala direto com o profissional antes do pagamento e auditoria. Pacientes internacionais: US$10.
               </p>
             </div>
           </motion.div>

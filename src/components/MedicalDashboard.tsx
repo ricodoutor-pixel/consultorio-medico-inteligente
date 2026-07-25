@@ -205,7 +205,7 @@ export function MedicalDashboard() {
       const prescriptionData: PrescriptionData = {
         clinicName: APP_CONFIG.COMPANY.NAME,
         clinicPhone: APP_CONFIG.COMPANY.PHONE,
-        doctorName: "Dr. Edilson Bezerra",
+        doctorName: "Dra. Suelen Naves Rodrigues (CRM-PR 49354)",
         doctorCRM: "123456",
         doctorCRMState: "SP",
         doctorRQE: "78901",
@@ -258,7 +258,7 @@ export function MedicalDashboard() {
             patientId: activePatient.id,
             patientPhone: "11999999999",
             patientName: activePatient.name,
-            doctorName: "Dr. Edilson Bezerra",
+            doctorName: "Dra. Suelen Naves Rodrigues (CRM-PR 49354)",
             items: cartItems,
           },
         });

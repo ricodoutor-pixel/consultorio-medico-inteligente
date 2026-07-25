@@ -144,7 +144,7 @@ const ProdutosAnvisa = () => {
         </section>
 
         <p className="mt-8 text-center text-xs text-muted-foreground/70">
-          Supervisão Técnica: Dra. Suelen Rodrigues · CRM 49354/PR · Bezerra Med Soluções Integradas Ltda. · CNPJ 30.740.319/0001-14
+          Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354) · CRM 49354/PR · Bezerra Med Soluções Integradas Ltda. · CNPJ 30.740.319/0001-14
         </p>
       </main>
 

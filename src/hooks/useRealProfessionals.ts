@@ -118,6 +118,25 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       }
     };
     fetchReal();
+
+    const channel = supabase
+      .channel("doctors_public_changes")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "doctors" },
+        (payload) => {
+          setRealDoctors((prev) => 
+            prev.map((d) => 
+              d.id === payload.new.id ? { ...d, is_online: payload.new.is_online, is_available: payload.new.is_available } : d
+            )
+          );
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const merged = useMemo(() => {

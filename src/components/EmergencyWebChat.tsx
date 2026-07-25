@@ -123,11 +123,11 @@ export function EmergencyWebChat() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
-            className="fixed bottom-[calc(max(env(safe-area-inset-bottom,0px),1rem)+60px)] sm:bottom-24 right-4 sm:right-6 z-[90] flex items-center justify-center gap-3 w-14 h-14 sm:w-auto sm:h-14 sm:px-6 rounded-full bg-[#22C55E] text-white shadow-lg shadow-[#22C55E]/30 hover:bg-[#16a34a] hover:scale-105 transition-all"
+            className="mt-2 flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#22C55E] text-white shadow-sm hover:bg-[#16a34a] hover:scale-105 transition-all text-xs w-max"
             aria-label="Atendimento de Emergência"
           >
-            <ShieldAlert className="h-6 w-6 sm:h-5 sm:w-5" />
-            <span className="hidden sm:inline font-bold">Suporte Brisa</span>
+            <MessageCircle className="h-4 w-4" />
+            <span className="font-bold">Suporte Brisa</span>
           </motion.button>
         )}
       </AnimatePresence>

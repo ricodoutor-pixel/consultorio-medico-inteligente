@@ -31,7 +31,6 @@ import { LocalCTABanner } from "@/components/LocalCTABanner";
 import { OnboardingModal } from "@/components/OnboardingModal";
 import { ConsentManager } from "@/components/ConsentManager";
 import { lazyWithRecovery, reportFrontendRuntimeError } from "@/lib/runtime-recovery";
-import { EmergencyWebChat } from "@/components/EmergencyWebChat";
 
 const Loading = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
@@ -415,8 +414,6 @@ const App = () => (
             {/* Verdinho mobile flutuante removido por solicitação — fica só no menu mobile */}
             {/* WhatsApp Brisa Button */}
             <WhatsAppButton />
-            {/* Emergency Web Chat Modal */}
-            <EmergencyWebChat />
             {/* ManyChatWidget removido — Brisa agora é nativa no WhatsAppButton */}
             <MobileBottomNav />
             <CookieConsentBanner />

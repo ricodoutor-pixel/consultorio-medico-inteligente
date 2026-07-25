@@ -2,6 +2,7 @@ import { Leaf, Instagram, MessageCircle, Lock, ShieldCheck, Download, Youtube, L
 import { Link } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { AnvisaBadge } from "@/components/AnvisaBadge";
+import { EmergencyWebChat } from "@/components/EmergencyWebChat";
 
 export const Footer = () => {
   const { canInstall, isInstalled, promptInstall } = usePWAInstall();
@@ -89,6 +90,9 @@ export const Footer = () => {
               >
                 Produtos & Conformidade ANVISA →
               </Link>
+            </div>
+            <div className="pt-2">
+              <EmergencyWebChat />
             </div>
           </div>
         </div>

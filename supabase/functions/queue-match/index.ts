@@ -47,11 +47,13 @@ async function getUserFromAuth(req: Request): Promise<string | null> {
 async function notifyDoctor(phone: string, patientName: string): Promise<boolean> {
   if (!EVO_URL || !EVO_KEY || !phone) return false;
   try {
+    const digits = phone.replace(/\D/g, "");
+    const jid = digits.startsWith("55") ? digits : `55${digits}`;
     const message = `🩺 Nova consulta na fila!\n\nPaciente: ${patientName}\nAceite agora no painel médico.\n\nPlanta y Raiz - Telemedicina`;
-    const resp = await fetch(`${EVO_URL}/message/sendText/${EVO_INSTANCE}`, {
+    const resp = await fetch(`${EVO_URL}/message/sendText/${encodeURIComponent(EVO_INSTANCE)}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: EVO_KEY },
-      body: JSON.stringify({ number: phone.replace(/\D/g, ""), text: message, delay: 1200 }),
+      body: JSON.stringify({ number: jid, text: message, delay: 1200 }),
     });
     return resp.ok;
   } catch { return false; }

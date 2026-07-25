@@ -49,7 +49,7 @@ async function sendWhatsApp(phoneDigits: string, message: string) {
   const EVO_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
   if (!EVO_URL || !EVO_KEY) return { ok: false, error: "EVOLUTION_API_URL/KEY missing" };
 
-  const url = `${EVO_URL.replace(/\/$/, "")}/message/sendText/${EVO_INSTANCE}`;
+  const url = `${EVO_URL.replace(/\/$/, "")}/message/sendText/${encodeURIComponent(EVO_INSTANCE)}`;
   const number = phoneDigits.startsWith("55") ? phoneDigits : `55${phoneDigits}`;
   const resp = await fetch(url, {
     method: "POST",

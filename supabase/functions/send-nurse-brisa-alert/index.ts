@@ -26,7 +26,7 @@ const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const EVOLUTION_URL = Deno.env.get("EVOLUTION_API_URL") ?? "";
 const EVOLUTION_KEY = Deno.env.get("EVOLUTION_API_KEY") ?? "";
 const EVOLUTION_INSTANCE =
-  Deno.env.get("EVOLUTION_INSTANCE_NAME") ?? "Enf Brisa Bot whats";
+  Deno.env.get("EVOLUTION_INSTANCE") ?? "plantayraiz";
 
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 

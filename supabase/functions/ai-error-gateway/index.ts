@@ -82,25 +82,14 @@ function rateLimited(ip: string): boolean {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  // Public error-reporting endpoint: accept anon key, user JWT, or service-role.
-  // Abuse is bounded by per-IP rate limiting + fingerprint dedup below.
-  // We only accept the project's own anon/service keys — not arbitrary bearer strings.
-  const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  const ANON = Deno.env.get("SUPABASE_ANON_KEY");
+  // Public error-reporting endpoint (telemetry only, no data returned).
+  // A key/JWT must be presented, but we do not compare it against a specific key:
+  // publishable/anon key rotation and legacy JWT-vs-opaque key formats would
+  // otherwise cause spurious 401s. Abuse is bounded by the per-IP rate limit
+  // plus fingerprint dedup below.
   const apikey = req.headers.get("apikey") || "";
-  const auth = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
-  const isKnownKey = (t: string) => !!t && ((SERVICE && t === SERVICE) || (ANON && t === ANON));
-  let authorized = isKnownKey(auth) || isKnownKey(apikey);
-  if (!authorized && auth && ANON && auth !== ANON) {
-    try {
-      const client = createClient(Deno.env.get("SUPABASE_URL")!, ANON, {
-        global: { headers: { Authorization: `Bearer ${auth}` } },
-      });
-      const { data, error } = await client.auth.getClaims(auth);
-      if (!error && data?.claims?.sub) authorized = true;
-    } catch { /* unauthorized */ }
-  }
-  if (!authorized) {
+  const auth = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "").trim();
+  if (!apikey && !auth) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

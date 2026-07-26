@@ -32,7 +32,7 @@ export default function LeadsEmergencia() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setLeads(data || []);
+      setLeads((data as any) || []);
     } catch (error) {
       console.error("Erro ao buscar leads de emergência:", error);
       toast.error("Não foi possível carregar os leads.");

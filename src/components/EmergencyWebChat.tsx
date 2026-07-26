@@ -49,7 +49,7 @@ export function EmergencyWebChat() {
     setLoading(true);
     try {
       // Save lead to emergency_leads
-      const { data, error } = await supabase.from("emergency_leads").insert([
+      const { data, error } = await (supabase as any).from("emergency_leads").insert([
         { name, phone, category }
       ]).select().single();
 
@@ -60,7 +60,7 @@ export function EmergencyWebChat() {
       }
 
       if (data) {
-        setLeadId(data.id);
+        setLeadId((data as any).id);
         setStep("chat");
       }
     } catch (err) {
@@ -98,7 +98,7 @@ export function EmergencyWebChat() {
         
         // Atualizar histórico no banco (opcional, se quisermos manter registro completo do chat)
         if (leadId) {
-          await supabase.from("emergency_leads").update({
+          await (supabase as any).from("emergency_leads").update({
             chat_history: [...currentMessages, assistantMsg]
           }).eq("id", leadId);
         }

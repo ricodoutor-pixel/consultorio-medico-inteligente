@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Paperclip, Camera, Mic, Video, Phone, Search, MoreVertical, Lock } from "lucide-react";
 import { format } from "date-fns";
@@ -106,7 +106,7 @@ export function WhatsAppTelemedicineChat({
     const messageText = newMessage.trim();
     setNewMessage(""); // optimistic clear
 
-    const { error } = await supabase.from("consultation_chats").insert({
+    const { error } = await (supabase as any).from("consultation_chats").insert({
       appointment_id: appointmentId,
       sender_type: currentUserRole,
       sender_id: currentUserId,
@@ -120,7 +120,7 @@ export function WhatsAppTelemedicineChat({
       // If doctor is sending first message, notify system
       if (currentUserRole === "doctor" && !isDoctorPresent) {
         setIsDoctorPresent(true);
-        await supabase.from("consultation_chats").insert({
+        await (supabase as any).from("consultation_chats").insert({
           appointment_id: appointmentId,
           sender_type: "system",
           sender_id: null,

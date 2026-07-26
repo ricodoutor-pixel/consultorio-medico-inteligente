@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Paperclip, Camera, Mic, Video, Phone, Search, MoreVertical, Lock } from "lucide-react";
 import { format } from "date-fns";
@@ -80,7 +80,7 @@ export function WhatsAppTelemedicineChat({
   }, [messages]);
 
   const fetchMessages = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("consultation_chats")
       .select("*")
       .eq("appointment_id", appointmentId)
@@ -91,10 +91,10 @@ export function WhatsAppTelemedicineChat({
       return;
     }
 
-    setMessages(data as ChatMessage[]);
+    setMessages((data as any) as ChatMessage[]);
     
     // Check if doctor has ever sent a message or system announced doctor
-    const doctorWasPresent = data.some(
+    const doctorWasPresent = (data as any[]).some(
       (m) => m.sender_type === "doctor" || (m.sender_type === "system" && m.content.includes("entrou na sala"))
     );
     setIsDoctorPresent(doctorWasPresent);
@@ -106,7 +106,7 @@ export function WhatsAppTelemedicineChat({
     const messageText = newMessage.trim();
     setNewMessage(""); // optimistic clear
 
-    const { error } = await supabase.from("consultation_chats").insert({
+    const { error } = await (supabase as any).from("consultation_chats").insert({
       appointment_id: appointmentId,
       sender_type: currentUserRole,
       sender_id: currentUserId,
@@ -120,7 +120,7 @@ export function WhatsAppTelemedicineChat({
       // If doctor is sending first message, notify system
       if (currentUserRole === "doctor" && !isDoctorPresent) {
         setIsDoctorPresent(true);
-        await supabase.from("consultation_chats").insert({
+        await (supabase as any).from("consultation_chats").insert({
           appointment_id: appointmentId,
           sender_type: "system",
           sender_id: null,

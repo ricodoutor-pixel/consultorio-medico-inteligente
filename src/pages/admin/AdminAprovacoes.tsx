@@ -42,7 +42,7 @@ const AdminAprovacoes = () => {
 
   const handleApprove = async (id: string, isApproved: boolean) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('doctors')
         .update({ 
           is_approved: isApproved,

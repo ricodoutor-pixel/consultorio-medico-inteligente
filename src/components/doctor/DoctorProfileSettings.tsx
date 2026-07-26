@@ -84,7 +84,7 @@ export const DoctorProfileSettings: React.FC<DoctorProfileSettingsProps> = ({ do
         return;
       }
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('doctors')
         .update({
           cpf: data.cpf,

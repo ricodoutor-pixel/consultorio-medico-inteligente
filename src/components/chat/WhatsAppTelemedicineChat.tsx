@@ -80,7 +80,7 @@ export function WhatsAppTelemedicineChat({
   }, [messages]);
 
   const fetchMessages = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("consultation_chats")
       .select("*")
       .eq("appointment_id", appointmentId)
@@ -91,10 +91,10 @@ export function WhatsAppTelemedicineChat({
       return;
     }
 
-    setMessages(data as ChatMessage[]);
+    setMessages((data as any) as ChatMessage[]);
     
     // Check if doctor has ever sent a message or system announced doctor
-    const doctorWasPresent = data.some(
+    const doctorWasPresent = (data as any[]).some(
       (m) => m.sender_type === "doctor" || (m.sender_type === "system" && m.content.includes("entrou na sala"))
     );
     setIsDoctorPresent(doctorWasPresent);

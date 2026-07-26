@@ -26,7 +26,7 @@ export default function LeadsEmergencia() {
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("emergency_leads")
         .select("*")
         .order("created_at", { ascending: false });

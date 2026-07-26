@@ -40,7 +40,7 @@ export default function Contatos() {
 
   const load = async () => {
     setLoading(true);
-    let q = supabase
+    let q = (supabase as any)
       .from("platform_contacts")
       .select("*")
       .order("created_at", { ascending: false })
@@ -60,7 +60,7 @@ export default function Contatos() {
 
   useEffect(() => {
     if (!selected) return setMessages([]);
-    supabase
+    (supabase as any)
       .from("platform_contact_messages")
       .select("*")
       .eq("contact_id", selected.id)

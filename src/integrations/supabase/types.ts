@@ -2241,16 +2241,6 @@ export type Database = {
       }
       doctors: {
         Row: {
-          address: Json | null
-          approval_status: string | null
-          approved_at: string | null
-          cpf: string | null
-          crm_back_url: string | null
-          crm_front_url: string | null
-          is_approved: boolean | null
-          personal_phone: string | null
-          pix_key: string | null
-          video_presentation_url: string | null
           available_hours: Json | null
           bio: string | null
           city: string | null
@@ -2283,16 +2273,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          address?: Json | null
-          approval_status?: string | null
-          approved_at?: string | null
-          cpf?: string | null
-          crm_back_url?: string | null
-          crm_front_url?: string | null
-          is_approved?: boolean | null
-          personal_phone?: string | null
-          pix_key?: string | null
-          video_presentation_url?: string | null
           available_hours?: Json | null
           bio?: string | null
           city?: string | null
@@ -2325,16 +2305,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-          address?: Json | null
-          approval_status?: string | null
-          approved_at?: string | null
-          cpf?: string | null
-          crm_back_url?: string | null
-          crm_front_url?: string | null
-          is_approved?: boolean | null
-          personal_phone?: string | null
-          pix_key?: string | null
-          video_presentation_url?: string | null
           available_hours?: Json | null
           bio?: string | null
           city?: string | null
@@ -8069,16 +8039,6 @@ export type Database = {
       }
       doctors_public: {
         Row: {
-          address: Json | null
-          approval_status: string | null
-          approved_at: string | null
-          cpf: string | null
-          crm_back_url: string | null
-          crm_front_url: string | null
-          is_approved: boolean | null
-          personal_phone: string | null
-          pix_key: string | null
-          video_presentation_url: string | null
           available_hours: Json | null
           avatar_url: string | null
           bio: string | null

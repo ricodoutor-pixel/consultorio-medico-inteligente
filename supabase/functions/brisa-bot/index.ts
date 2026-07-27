@@ -207,7 +207,7 @@ async function callGemini(
   }
 
   // ── OPÇÃO B: Gemini direto com fallback entre modelos oficiais
-  const MODELS = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-2.5-flash'];
+  const MODELS = ['gemini-2.5-flash', 'gemini-2.5-pro'];
 
   for (const model of MODELS) {
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
@@ -308,8 +308,7 @@ async function sendWAHA(
     if (!r.ok) {
       const body = await r.text();
       console.error(`[brisa][WAHA] HTTP ${r.status}: ${body.slice(0, 300)}`);
-      
-      // Aviso sobre contas Business / Motor NOWEB
+
       if (r.status >= 400) {
         console.warn(`[brisa][WAHA] ⚠️ AVISO: Se a mensagem falhou para uma conta WhatsApp Business, verifique o motor do WAHA. Altere para 'WHATSAPP_DEFAULT_ENGINE=NOWEB' no servidor do WAHA.`);
       }
@@ -363,13 +362,13 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(JSON.stringify({
       ok:              true,
       service:         'brisa-bot',
-      version:         '2026.7.21-debug',
+      version:         '2026.7.27-fixed',
       gemini_key:      GEMINI_API_KEY ? `configurada (${GEMINI_API_KEY.slice(0,8)}...)` : '❌ AUSENTE',
       lovable_key:     LOVABLE_API_KEY ? 'configurada (opcional)' : 'ausente (ok — opcional)',
       waha_url:        WAHA_API_URL,
       waha_session:    WAHA_SESSION,
       evolution_inst:  EVOLUTION_INSTANCE,
-      ai_mode:         'gemini-2.5-flash (direto, v1beta) + flash→pro fallback',
+      ai_mode:         'gemini-2.5-flash (direto, v1beta) + pro fallback — modelos 1.5/2.0 descontinuados REMOVIDOS',
       compliance:      'CFM 2.314/2022 · LGPD · ANVISA RDC 1.015/2026',
       diagnostics:     'gravando em whatsapp_messages para cada mensagem',
     }, null, 2), {
@@ -404,8 +403,7 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
     processedMessages.add(messageId);
-    
-    // Controle de tamanho do cache para evitar vazamento de memória (máximo de 1000 IDs)
+
     if (processedMessages.size > 1000) {
       const it = processedMessages.values();
       for (let i = 0; i < 200; i++) processedMessages.delete(it.next().value);
@@ -413,17 +411,11 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   if (fromMe) {
-    const isBotSignature = text.includes('Brisa') || 
-                          text.includes('plantayraiz.com.br') || 
-                          text.toLowerCase().includes('instabilidade');
-    if (isBotSignature) {
-      console.log(`[brisa][ANTI-LOOP] Mensagem própria de resposta IA ignorada para evitar loop: ${chatId}`);
-      return new Response(
-        JSON.stringify({ ok: true, ignored: true, reason: 'fromMe_bot_signature' }),
-        { headers: { ...cors, 'Content-Type': 'application/json' } }
-      );
-    }
-    console.log(`[brisa][TESTE-ADMIN] Mensagem manual enviada pelo próprio número aceita para processamento: ${chatId}`);
+    console.log(`[brisa][ANTI-LOOP] Mensagem enviada por mim (fromMe=true) ignorada: ${chatId}`);
+    return new Response(
+      JSON.stringify({ ok: true, ignored: true, reason: 'fromMe' }),
+      { headers: { ...cors, 'Content-Type': 'application/json' } }
+    );
   }
   if (isGroup)  return new Response(JSON.stringify({ ok: true, ignored: true, reason: 'group'  }), { headers: { ...cors, 'Content-Type': 'application/json' } });
   if (isStatus) return new Response(JSON.stringify({ ok: true, ignored: true, reason: 'status' }), { headers: { ...cors, 'Content-Type': 'application/json' } });

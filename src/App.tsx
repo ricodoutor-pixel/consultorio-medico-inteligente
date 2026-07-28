@@ -180,6 +180,7 @@ const AdminGlobalOps = lazyWithRecovery(() => import("./pages/AdminGlobalOps"), 
 const WhatsAppInbox = lazyWithRecovery(() => import("./pages/admin/WhatsAppInbox"), { sourceRef: "/admin/whatsapp-inbox" });
 const AdminAprovacoes = lazyWithRecovery(() => import("./pages/admin/AdminAprovacoes"), { sourceRef: "/admin/aprovacoes-medicas" });
 const AuthCallback = lazyWithRecovery(() => import("./pages/AuthCallback"), { sourceRef: "/auth/callback" });
+const MedSocio = lazyWithRecovery(() => import("./pages/MedSocio"), { sourceRef: "/medsocio" });
 
 const queryClient = new QueryClient();
 
@@ -405,6 +406,7 @@ const App = () => (
                 <Route path="/desconto-saude" element={<SaudeVerdeLanding />} />
                 <Route path="/exames-com-desconto" element={<SaudeVerdeRede />} />
                 <Route path="/consultas-com-desconto" element={<SaudeVerdeRede />} />
+                <Route path="/medsocio" element={<MedSocio />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

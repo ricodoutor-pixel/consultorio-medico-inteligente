@@ -303,7 +303,7 @@ async function sendWAHA(
       method:  'POST',
       headers: { 'Content-Type': 'application/json', 'X-Api-Key': WAHA_API_KEY },
       body:    JSON.stringify({ session: WAHA_SESSION, chatId, text }),
-      signal:  AbortSignal.timeout(10_000),
+      signal:  AbortSignal.timeout(40_000),
     });
     if (!r.ok) {
       const body = await r.text();
@@ -339,7 +339,7 @@ async function sendEvolution(
       method:  'POST',
       headers: { 'Content-Type': 'application/json', apikey: EVOLUTION_API_KEY },
       body:    JSON.stringify({ number: phone, text, options: { delay: 1200, presence: 'composing' } }),
-      signal:  AbortSignal.timeout(10_000),
+      signal:  AbortSignal.timeout(20_000),
     });
     if (!r.ok) {
       const body = await r.text();

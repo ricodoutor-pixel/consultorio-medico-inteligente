@@ -311,7 +311,7 @@ const DashboardMedico = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl md:text-4xl font-display font-black text-foreground">
-                    {profileData?.full_name ? `Olá, ${profileData.full_name.split(" ")[0]}` : "Dashboard"} <span className="text-gradient-green">Médico</span>
+                    Consultório <span className="text-gradient-green">Virtual</span>
                   </h1>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <p className="text-muted-foreground font-medium text-sm">

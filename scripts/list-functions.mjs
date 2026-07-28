@@ -1,5 +1,5 @@
 // scripts/list-functions.mjs
-const token = "sbp_ea0fc49e6c2f6f323c8dab849d25a0c65ae5c5ea";
+const token = process.env.SUPABASE_TOKEN || "";
 
 async function run() {
   try {

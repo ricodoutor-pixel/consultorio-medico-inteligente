@@ -2,7 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const token = "sbp_ea0fc49e6c2f6f323c8dab849d25a0c65ae5c5ea";
+const token = process.env.SUPABASE_TOKEN || "";
 
 async function fetchKeys(projectRef) {
   console.log(`Fetching keys for project: ${projectRef}...`);

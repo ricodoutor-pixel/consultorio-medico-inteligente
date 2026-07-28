@@ -134,7 +134,7 @@ export function checkRuntimeIntegrity(): boolean {
     const isValidAuthor =
       !metaAuthor ||
       authorContent.includes('Planta') ||
-      authorContent.includes('Edilson') ||
+      authorContent.includes('Suelen') ||
       authorContent.includes('CRM');
     if (!isValidAuthor) {
       console.warn('⚠️ Meta author não corresponde ao padrão esperado');

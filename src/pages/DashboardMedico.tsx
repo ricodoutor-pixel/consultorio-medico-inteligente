@@ -26,13 +26,14 @@ import { DoctorAuxDiagnosticTools } from "@/components/doctor/DoctorAuxDiagnosti
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 const tooltipStyle = { background: "hsl(240 15% 7%)", border: "1px solid hsl(240 10% 14%)", borderRadius: "14px", color: "hsl(240 10% 93%)" };
 
 const DashboardMedico = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isOnline, setIsOnline] = useState(false);
   const [doctorData, setDoctorData] = useState<any>(null);
   const [profileData, setProfileData] = useState<{ full_name: string | null; avatar_url: string | null } | null>(null);
@@ -652,6 +653,13 @@ const DashboardMedico = () => {
                   <p className="text-xs text-muted-foreground">Horário: {format(new Date(selectedPatientTriage.appointment.scheduled_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
                   <p className="text-xs text-muted-foreground">Tipo: {selectedPatientTriage.appointment.type}</p>
                   <Badge className="mt-2 text-[10px] bg-primary/10 text-primary border-green capitalize">{selectedPatientTriage.appointment.status}</Badge>
+                  
+                  <Button 
+                    className="w-full mt-4 bg-primary text-primary-foreground font-black h-12 rounded-xl" 
+                    onClick={() => navigate(`/orientacao-video?appointment=${selectedPatientTriage.appointment.id}`)}
+                  >
+                    <Video size={18} className="mr-2" /> Iniciar Atendimento
+                  </Button>
                 </CardContent>
               </Card>
 

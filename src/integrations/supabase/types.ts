@@ -527,6 +527,8 @@ export type Database = {
           status: string
           type: string
           updated_at: string
+          room_url: string | null
+          room_id: string | null
         }
         Insert: {
           amount?: number
@@ -544,6 +546,8 @@ export type Database = {
           status?: string
           type?: string
           updated_at?: string
+          room_url?: string | null
+          room_id?: string | null
         }
         Update: {
           amount?: number
@@ -561,6 +565,8 @@ export type Database = {
           status?: string
           type?: string
           updated_at?: string
+          room_url?: string | null
+          room_id?: string | null
         }
         Relationships: [
           {

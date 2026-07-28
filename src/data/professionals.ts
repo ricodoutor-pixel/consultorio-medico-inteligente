@@ -107,12 +107,12 @@ export const professionals: Professional[] = [
   // ═══════ Médicos Prescritores (6) ═══════
   {
     id: "med-0",
-    name: "Dra. Suelen Naves Rodrigues (CRM-PR 49354)",
+    name: "Dr. Edilson Bezerra (CRM-SP 185671)",
     category: "Médicos Prescritores",
-    bio: "Responsável Técnico e Jurídico da Planta y Raiz. Médico prescritor de cannabis medicinal com ampla experiência em dor crônica, neurologia e cuidados integrativos. Atua como responsável técnico pela hemodinâmica na Beneficência Portuguesa (SP) e no Hospital Menino Jesus. Referência soberana na plataforma Planta & Raiz.",
+    bio: "Médico prescritor de cannabis medicinal com ampla experiência em dor crônica, neurologia e cuidados integrativos. Atua pela hemodinâmica na Beneficência Portuguesa (SP) e no Hospital Menino Jesus. Referência na plataforma Planta & Raiz.",
     flags: ["🇧🇷", "🇧🇴"],
     experience: "18 anos",
-    tags: ["Responsável Técnico", "Hemodinâmica BP", "Cannabis Medicinal", "Dor Crônica"],
+    tags: ["Hemodinâmica BP", "Cannabis Medicinal", "Dor Crônica"],
     price: "R$ 30,00",
     priceValue: 30,
     paymentLink: "https://mpago.la/12KAwmH",

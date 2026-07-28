@@ -41,7 +41,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
                 </p>
                 <p className="text-xs md:text-sm text-gray-700 flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
                   <span className="inline-flex items-center gap-1 font-semibold text-green-700">
-                    <BadgeCheck className="w-4 h-4" /> CRM-SP <span itemProp="identifier">10963</span> · ATIVO
+                    <BadgeCheck className="w-4 h-4" /> CRM-PR <span itemProp="identifier">49354</span> · ATIVO
                   </span>
                   <span className="inline-flex items-center gap-1 text-gray-600">
                     <MapPin className="w-3.5 h-3.5" /> Santa Cruz Bo., São Paulo/SP

@@ -284,9 +284,12 @@ const DashboardMedico = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-primary/15 to-secondary/10 text-center px-1">
-                        <UserCircle2 size={28} className="text-primary mb-1" />
-                        <span className="text-[9px] font-bold text-primary leading-tight">Suba sua foto aqui</span>
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-primary/15 to-secondary/10 overflow-hidden">
+                        <img 
+                          src="/dr-verdinho.png" 
+                          alt="Dr. Verdinho"
+                          className="w-full h-full object-cover scale-110"
+                        />
                       </div>
                     )}
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

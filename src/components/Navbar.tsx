@@ -154,15 +154,11 @@ export const Navbar = () => {
             {/* Logo + Verdinho (Repisicionado 50% mais próximo) */}
             <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
               <NavLink to="/" className="flex items-center gap-2 md:gap-3">
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green flex-shrink-0">
-                  <Leaf size={20} className="text-primary-foreground" />
-                </div>
-                <div className="leading-tight flex-shrink-0">
-                  <span className="text-sm sm:text-base md:text-lg font-display font-black text-foreground block whitespace-nowrap">
-                    Planta <span className="text-gradient-purple">y</span> Raiz
-                  </span>
-                  <span className="text-[9px] sm:text-[10px] md:text-xs text-muted-foreground font-bold block uppercase tracking-tighter whitespace-nowrap">Mega Clínica Digital</span>
-                </div>
+                <img 
+                  src="/logo.jpg" 
+                  alt="Planta y Raíz - Mega Clínica Digital" 
+                  className="h-8 md:h-10 w-auto object-contain"
+                />
               </NavLink>
               
               {/* Verdinho mais próximo do nome — visível a partir de lg (desktop) */}

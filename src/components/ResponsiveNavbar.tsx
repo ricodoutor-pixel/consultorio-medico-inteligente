@@ -49,15 +49,13 @@ export const ResponsiveNavbar = () => {
       <nav className="hidden md:flex items-center justify-between bg-white shadow-md px-6 py-4 sticky top-0 z-40">
         {/* Logo e Título */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <Leaf className="w-8 h-8 text-green-600" />
-          <div className="flex flex-col">
-            <span className="font-bold text-lg text-gray-900">
-              Planta & Raiz
-            </span>
-            <span className="text-xs text-green-600 font-semibold">
-              Mega Clínica Digital
-            </span>
-          </div>
+          <a href="/">
+            <img 
+              src="/logo.jpg" 
+              alt="Planta y Raíz - Mega Clínica Digital" 
+              className="h-8 md:h-10 w-auto object-contain"
+            />
+          </a>
         </div>
 
         {/* Menu Central */}
@@ -101,10 +99,13 @@ export const ResponsiveNavbar = () => {
         <div className="flex items-center justify-between px-4 py-3">
           {/* Logo */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Leaf className="w-6 h-6 text-green-600" />
-            <span className="font-bold text-sm text-gray-900">
-              Planta & Raiz
-            </span>
+            <a href="/">
+              <img 
+                src="/logo.jpg" 
+                alt="Planta y Raíz - Mega Clínica Digital" 
+                className="h-8 w-auto object-contain"
+              />
+            </a>
           </div>
 
           {/* CTA Fixo em Mobile */}

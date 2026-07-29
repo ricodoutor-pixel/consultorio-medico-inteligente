@@ -33,8 +33,18 @@ import { ConsentManager } from "@/components/ConsentManager";
 import { lazyWithRecovery, reportFrontendRuntimeError } from "@/lib/runtime-recovery";
 
 const Loading = () => (
-  <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+  <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+    <div className="relative flex items-center justify-center">
+      <div className="absolute inset-[-15px] rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+      <div className="animate-bounce" style={{ animationDuration: '2s' }}>
+        <img 
+          src="/dr-verdinho.png" 
+          alt="Carregando Plataforma" 
+          className="w-24 h-24 object-contain rounded-full shadow-lg"
+        />
+      </div>
+    </div>
+    <p className="mt-8 text-primary font-bold animate-pulse">Carregando...</p>
   </div>
 );
 

@@ -6,7 +6,8 @@ import { DoctorProfileSettings } from "@/components/doctor/DoctorProfileSettings
 import { DoctorTeamDashboard } from "@/components/doctor/DoctorTeamDashboard";
 import { DoctorEducationDashboard } from "@/components/doctor/DoctorEducationDashboard";
 import { supabase } from "@/integrations/supabase/client";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { AlertTriangle, Loader2, MessageCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const Consultorio = () => {
@@ -86,6 +87,9 @@ const Consultorio = () => {
       
       {doctor && doctor.is_approved && (
         <div className="px-4 py-3 bg-card border-b flex justify-end items-center gap-3">
+          <Link to="/telemed-whatsapp" className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-[#00a884] text-white hover:bg-[#008f6f]">
+            <MessageCircle size={16} /> Telemed WhatsApp
+          </Link>
           <span className="text-sm font-medium">Status do Plantão:</span>
           <button
             onClick={toggleOnlineStatus}

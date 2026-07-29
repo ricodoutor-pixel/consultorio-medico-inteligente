@@ -203,6 +203,9 @@ const DashboardPaciente = () => {
               <Button variant="outline" size="sm" className="rounded-xl text-xs" onClick={handleLogout}>
                 <LogOut size={14} className="mr-1" /> Sair
               </Button>
+              <Button size="sm" className="rounded-xl text-xs bg-[#00a884] text-white hover:bg-[#008f6f]" asChild>
+                <Link to="/telemed-whatsapp"><MessageCircle size={14} className="mr-1" /> Telemed WhatsApp</Link>
+              </Button>
               <Button size="sm" className="rounded-xl text-xs bg-primary text-primary-foreground" asChild>
                 <a href={`https://wa.me/5511991363154?text=${encodeURIComponent(`Olá Enfermeira Brisa, ${profile?.full_name || "sou paciente"}, gostaria de iniciar uma nova Orientação Técnica.`)}`} target="_blank" rel="noopener noreferrer"><Stethoscope size={14} className="mr-1" /> Nova Orientação Técnica</a>
               </Button>

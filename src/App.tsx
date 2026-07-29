@@ -191,6 +191,7 @@ const WhatsAppInbox = lazyWithRecovery(() => import("./pages/admin/WhatsAppInbox
 const AdminAprovacoes = lazyWithRecovery(() => import("./pages/admin/AdminAprovacoes"), { sourceRef: "/admin/aprovacoes-medicas" });
 const AuthCallback = lazyWithRecovery(() => import("./pages/AuthCallback"), { sourceRef: "/auth/callback" });
 const MedSocio = lazyWithRecovery(() => import("./pages/MedSocio"), { sourceRef: "/medsocio" });
+const TelemedWhatsApp = lazyWithRecovery(() => import("./pages/TelemedWhatsApp"), { sourceRef: "/telemed-whatsapp" });
 
 const queryClient = new QueryClient();
 
@@ -417,6 +418,7 @@ const App = () => (
                 <Route path="/exames-com-desconto" element={<SaudeVerdeRede />} />
                 <Route path="/consultas-com-desconto" element={<SaudeVerdeRede />} />
                 <Route path="/medsocio" element={<MedSocio />} />
+                <Route path="/telemed-whatsapp" element={<PrivateRoute><TelemedWhatsApp /></PrivateRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

@@ -251,8 +251,15 @@ const DashboardPaciente = () => {
             ))}
           </motion.div>
 
-          {/* Hub Central de Ações Rápidas */}
-          <QuickActionHub onTabSwitch={(tab) => setActiveTab(tab as any)} />
+          {/* Hub Central de Ações Rápidas (only on overview) */}
+          {activeTab === "overview" && (
+            <QuickActionHub onTabSwitch={(tab) => setActiveTab(tab as any)} />
+          )}
+
+          {/* ── TELEMED CHAT TAB ── */}
+          {activeTab === "telemed" && (
+            <TelemedChat patientId={profile?.id} />
+          )}
 
           {activeTab === "overview" && (
             <div className="grid lg:grid-cols-3 gap-6">

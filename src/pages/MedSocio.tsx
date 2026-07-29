@@ -7,11 +7,23 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { Users, TrendingUp, Copy, Network, ShieldCheck, DollarSign, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 export const MedSocio = () => {
   const { toast } = useToast();
   const [directInvites, setDirectInvites] = useState([5]);
   const [indirectInvites, setIndirectInvites] = useState([3]);
+  const [doctor, setDoctor] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchDoctor = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase.from('doctors').select('*').eq('user_id', user.id).single();
+      setDoctor(data);
+    };
+    fetchDoctor();
+  }, []);
 
   // Constantes de pagamento
   const GEN1_PAY = 50;
@@ -25,7 +37,7 @@ export const MedSocio = () => {
   
   const totalMonthly = (calcGen1 * GEN1_PAY) + (calcGen2 * GEN2_PAY) + (calcGen3 * GEN3_PAY);
 
-  const referralCode = "DR" + Math.random().toString(36).substring(2, 8).toUpperCase();
+  const referralCode = doctor?.crm ? `DR_${doctor.full_name?.split(' ')[1] || 'MEDICO'}_CRM${doctor.crm}`.toUpperCase() : doctor?.id || "CONVIDADO_" + Math.random().toString(36).substring(2, 8).toUpperCase();
   const referralLink = `https://plantayraiz.com.br/cadastro-profissional?ref=${referralCode}`;
 
   const copyLink = () => {

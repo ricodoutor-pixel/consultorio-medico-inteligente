@@ -5,10 +5,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DoctorProfileSettings } from "@/components/doctor/DoctorProfileSettings";
 import { DoctorTeamDashboard } from "@/components/doctor/DoctorTeamDashboard";
 import { DoctorEducationDashboard } from "@/components/doctor/DoctorEducationDashboard";
-import { supabase } from "@/integrations/supabase/client";
-import { AlertTriangle, Loader2, MessageCircle } from "lucide-react";
+import { AlertTriangle, Loader2, MessageCircle, Gift } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 const Consultorio = () => {
   const [doctor, setDoctor] = useState<any>(null);
@@ -86,11 +86,24 @@ const Consultorio = () => {
       <Navbar />
       
       {doctor && doctor.is_approved && (
-        <div className="px-4 py-3 bg-card border-b flex justify-end items-center gap-3">
-          <Link to="/telemed-whatsapp" className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-[#00a884] text-white hover:bg-[#008f6f]">
-            <MessageCircle size={16} /> Telemed WhatsApp
-          </Link>
-          <span className="text-sm font-medium">Status do Plantão:</span>
+        <div className="px-4 py-3 bg-card border-b flex justify-between items-center flex-wrap gap-3">
+          <div className="flex items-center">
+            <button 
+              onClick={() => {
+                const refCode = doctor.crm ? `DR_${doctor.full_name?.split(' ')[1] || 'MEDICO'}_CRM${doctor.crm}`.toUpperCase() : doctor.id;
+                navigator.clipboard.writeText(`https://plantayraiz.com.br/cadastro-profissional?ref=${refCode}`);
+                toast.success("Link copiado! Envie para seus convidados.");
+              }}
+              className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:opacity-90"
+            >
+              <Gift size={16} /> Seu Link de Médico Sócio
+            </button>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link to="/telemed-whatsapp" className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-[#00a884] text-white hover:bg-[#008f6f]">
+              <MessageCircle size={16} /> Telemed WhatsApp
+            </Link>
+            <span className="text-sm font-medium">Status do Plantão:</span>
           <button
             onClick={toggleOnlineStatus}
             disabled={updatingStatus}

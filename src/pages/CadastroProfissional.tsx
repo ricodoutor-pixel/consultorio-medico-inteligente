@@ -150,7 +150,11 @@ const CadastroProfissional = () => {
     passwordConfirm: "",
     telefone: "",
     categoria: "",
-    valorCobrado: "",
+    priceVideoChat: "",
+    priceChatOnly: "",
+    priceReturn: "",
+    pixKey: "",
+    pixType: "cpf",
     resumoAtuacao: "",
     registroProfissional: "",
     crmUF: "SP",
@@ -256,7 +260,7 @@ const CadastroProfissional = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.nomeCompleto || !form.email || !form.telefone || !form.categoria || !form.valorCobrado || !form.resumoAtuacao) {
+    if (!form.nomeCompleto || !form.email || !form.telefone || !form.categoria || !form.priceVideoChat || !form.priceChatOnly || !form.priceReturn || !form.pixKey || !form.resumoAtuacao) {
       toast({ title: country === "BO" ? "Complete todos los campos obligatorios" : "Preencha todos os campos obrigatórios", variant: "destructive" });
       return;
     }
@@ -367,7 +371,9 @@ const CadastroProfissional = () => {
         city: form.cidadeUF || null,
         user_type: "doctor",
         signup_role: "doctor",
-        avatar_url: fotoPreview, // base64 preview fallback
+        avatar_url: fotoPreview,
+        pix_key: form.pixKey,
+        pix_type: form.pixType,
       });
       if (profErr) console.error("[profile upsert]", profErr);
 
@@ -378,7 +384,12 @@ const CadastroProfissional = () => {
         crm_state: form.crmUF,
         specialty: form.categoria,
         bio: form.resumoAtuacao,
-        consultation_price: Number(form.valorCobrado) || 0,
+        consultation_price: Number(form.priceVideoChat) || 0,
+        price_video_chat: Number(form.priceVideoChat) || 0,
+        price_chat_only: Number(form.priceChatOnly) || 0,
+        price_return: Number(form.priceReturn) || 0,
+        is_approved_by_admin: false,
+        approval_status: 'pending',
         document_type: documentType,
         country,
         city: form.cidadeUF || null,
@@ -399,7 +410,7 @@ const CadastroProfissional = () => {
         const path = `${userId}/${kind}.${ext}`;
         uploads.push(
           supabase.storage
-            .from("doctor-kyc")
+            .from("kyc_documents")
             .upload(path, file, { upsert: true, contentType: file.type || undefined })
             .catch((err) => {
               console.error("[kyc upload]", kind, err);
@@ -791,7 +802,36 @@ const CadastroProfissional = () => {
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
+                  
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="pixType">{country === "BO" ? "Tipo de Cuenta (Banco) *" : "Tipo de Chave PIX *"}</Label>
+                          <Select value={form.pixType} onValueChange={(v) => handleChange("pixType", v)}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              {country === "BO" ? (
+                                <>
+                                  <SelectItem value="banco_union">Banco Unión</SelectItem>
+                                  <SelectItem value="bnb">BNB</SelectItem>
+                                  <SelectItem value="bcp">BCP</SelectItem>
+                                </>
+                              ) : (
+                                <>
+                                  <SelectItem value="cpf">CPF / CNPJ</SelectItem>
+                                  <SelectItem value="email">E-mail</SelectItem>
+                                  <SelectItem value="phone">Celular</SelectItem>
+                                  <SelectItem value="random">Chave Aleatória</SelectItem>
+                                </>
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="pixKey">{country === "BO" ? "Número de Cuenta *" : "Chave PIX *"}</Label>
+                          <Input id="pixKey" placeholder={country === "BO" ? "12345678" : "Sua chave PIX"} value={form.pixKey} onChange={(e) => handleChange("pixKey", e.target.value)} required />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
                     <Label htmlFor="resumoAtuacao">{t.bio}</Label>
                     <Textarea id="resumoAtuacao" placeholder={t.bioPh} rows={4} value={form.resumoAtuacao} onChange={(e) => handleChange("resumoAtuacao", e.target.value)} required />
                   </div>

@@ -347,6 +347,18 @@ const DashboardMedico = () => {
               </Card>
             )}
 
+            {doctorData && !doctorData.is_approved_by_admin && (
+              <Card className="border-amber-500/30 bg-amber-500/10 mb-8">
+                <CardContent className="p-6 flex items-center gap-4">
+                  <Shield size={24} className="text-amber-500 shrink-0" />
+                  <div>
+                    <p className="font-bold text-foreground">Cadastro em Análise</p>
+                    <p className="text-sm text-muted-foreground">Seu cadastro e documentos estão em análise pela Administração. O seu Card Online será liberado em breve.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* VIP Expiration Alert (5 days before end of trial/subscription) */}
             {doctorData && <VIPExpirationAlert doctorId={doctorData.id} />}
 

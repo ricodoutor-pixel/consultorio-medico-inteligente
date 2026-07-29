@@ -45,7 +45,7 @@ const AdminAprovacoes = () => {
       const { error } = await (supabase as any)
         .from('doctors')
         .update({ 
-          is_approved: isApproved,
+          is_approved_by_admin: isApproved,
           approval_status: isApproved ? 'approved' : 'rejected'
         })
         .eq('id', id);
@@ -70,8 +70,8 @@ const AdminAprovacoes = () => {
     );
   }
 
-  const pending = doctors.filter(d => !d.is_approved && d.approval_status !== 'rejected');
-  const approved = doctors.filter(d => d.is_approved);
+  const pending = doctors.filter(d => !d.is_approved_by_admin && d.approval_status !== 'rejected');
+  const approved = doctors.filter(d => d.is_approved_by_admin);
 
   const renderTable = (list: any[]) => (
     <Table>
@@ -141,12 +141,12 @@ const AdminAprovacoes = () => {
               </div>
             </TableCell>
             <TableCell>
-              <Badge variant={doc.is_approved ? "default" : "secondary"}>
-                {doc.is_approved ? "Aprovado" : "Em Análise"}
+              <Badge variant={doc.is_approved_by_admin ? "default" : "secondary"}>
+                {doc.is_approved_by_admin ? "Aprovado" : "Em Análise"}
               </Badge>
             </TableCell>
             <TableCell className="text-right">
-              {!doc.is_approved ? (
+              {!doc.is_approved_by_admin ? (
                 <div className="flex justify-end gap-2">
                   <Button size="sm" variant="outline" className="text-destructive hover:bg-destructive/10" onClick={() => handleApprove(doc.id, false)}>
                     <XCircle className="w-4 h-4 mr-1" /> Rejeitar

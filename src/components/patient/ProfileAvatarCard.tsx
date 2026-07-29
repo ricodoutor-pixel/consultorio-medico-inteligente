@@ -82,37 +82,46 @@ export const ProfileAvatarCard = ({
 
   return (
     <div className="flex items-center gap-3">
-      <button
-        type="button"
-        onClick={handlePick}
-        className="relative w-14 h-14 rounded-2xl bg-gradient-green border border-green flex items-center justify-center overflow-hidden group focus:outline-none focus:ring-2 focus:ring-primary"
-        aria-label="Alterar foto de perfil"
-      >
-        {currentAvatar ? (
-          <img
-            src={currentAvatar}
-            alt={`Foto de ${firstName}`}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <span className="text-3xl" role="img" aria-label="Verdinho">🐸</span>
-        )}
-        <span className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-          {uploading ? (
-            <Loader2 size={18} className="text-white animate-spin" />
+      <div className="flex flex-col items-center gap-1">
+        <button
+          type="button"
+          onClick={handlePick}
+          className="relative w-14 h-14 rounded-2xl bg-gradient-green border border-green flex items-center justify-center overflow-hidden group focus:outline-none focus:ring-2 focus:ring-primary"
+          aria-label="Alterar foto de perfil"
+        >
+          {currentAvatar ? (
+            <img
+              src={currentAvatar}
+              alt={`Foto de ${firstName}`}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           ) : (
-            <Camera size={18} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="text-3xl" role="img" aria-label="Verdinho">🐸</span>
           )}
-        </span>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFile}
-        />
-      </button>
+          <span className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+            {uploading ? (
+              <Loader2 size={18} className="text-white animate-spin" />
+            ) : (
+              <Camera size={18} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+            )}
+          </span>
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFile}
+          />
+        </button>
+        <button
+          type="button"
+          onClick={handlePick}
+          className="text-[9px] text-primary/80 hover:text-primary font-bold transition-colors leading-tight text-center"
+        >
+          📸 Alterar Foto
+        </button>
+      </div>
 
       <div>
         <h1 className="text-2xl md:text-4xl font-display font-black text-foreground leading-tight">

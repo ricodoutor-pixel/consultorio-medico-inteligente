@@ -273,9 +273,33 @@ const Profissionais = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState(categories[0]);
-  // Use real professionals from DB, replacing test placeholders
   const { professionals: mergedPros, realCount } = useRealProfessionals();
   const professionals = useRotatingOnline(mergedPros);
+
+  const handleLoginRedirect = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/login");
+        return;
+      }
+      
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("user_type")
+        .eq("id", session.user.id)
+        .single();
+
+      if (profile?.user_type === "doctor") {
+        navigate("/dashboard-medico");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      console.error(err);
+      navigate("/login");
+    }
+  };
 
   if (id) {
     return (
@@ -443,11 +467,16 @@ const Profissionais = () => {
         <div className="container mx-auto px-4 text-center relative z-10">
           <h2 className="text-2xl md:text-5xl font-display font-black text-foreground mb-4 md:mb-6 tracking-tight">É Profissional de Saúde?</h2>
           <p className="text-base md:text-lg text-muted-foreground mb-6 md:mb-8 max-w-xl mx-auto font-medium">Cadastre-se e atenda pacientes de todo o Brasil com preços populares</p>
-          <Button size="lg" className="font-black bg-secondary text-secondary-foreground rounded-2xl h-12 md:h-14 px-6 md:px-8 text-sm md:text-base" asChild>
-            <Link to="/cadastro-profissional">
-              Cadastrar como Profissional <ArrowRight size={20} className="ml-2" />
-            </Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button size="lg" className="font-black bg-secondary text-secondary-foreground rounded-2xl h-12 md:h-14 px-6 md:px-8 text-sm md:text-base w-full sm:w-auto" asChild>
+              <Link to="/cadastro-profissional">
+                Cadastrar como Profissional <ArrowRight size={20} className="ml-2" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" className="font-black border-2 border-secondary/50 text-secondary-foreground hover:bg-secondary/10 rounded-2xl h-12 md:h-14 px-6 md:px-8 text-sm md:text-base w-full sm:w-auto" onClick={handleLoginRedirect}>
+              Já sou Profissional (Acessar)
+            </Button>
+          </div>
         </div>
       </section>
 

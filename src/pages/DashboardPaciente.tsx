@@ -25,6 +25,8 @@ import { SymptomTracker } from "@/components/diary/SymptomTracker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { professionals } from "@/data/professionals";
 import AirQualityWidget from "@/components/health/AirQualityWidget";
+import { QuickActionHub } from "@/components/patient/QuickActionHub";
+import { TelemedChat } from "@/components/patient/TelemedChat";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -40,7 +42,7 @@ const allBadges = [
 ];
 
 const DashboardPaciente = () => {
-  const [activeTab, setActiveTab] = useState<"overview" | "badges" | "prescriptions" | "triages" | "upgrade">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "badges" | "prescriptions" | "triages" | "telemed" | "upgrade">("overview");
   const [profile, setProfile] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -211,6 +213,7 @@ const DashboardPaciente = () => {
           <div className="flex gap-2 mb-6 flex-wrap">
             {([
               { key: "overview" as const, label: "Visão Geral", icon: Activity },
+              { key: "telemed" as const, label: "Telemed", icon: MessageCircle },
               { key: "prescriptions" as const, label: "Receitas", icon: FileText },
               { key: "triages" as const, label: "Triagens", icon: ClipboardList },
               { key: "badges" as const, label: "Badges", icon: Trophy },
@@ -248,29 +251,8 @@ const DashboardPaciente = () => {
             ))}
           </motion.div>
 
-          {/* Quick Access — Cannabis Tools */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-            {[
-              { label: "Treatment Tracker", desc: "Dosagem e efeitos", icon: Activity, to: "/treatment-tracker", color: "text-primary" },
-              { label: "Dispensário", desc: "Farmácia segura", icon: Leaf, to: "/dispensario", color: "text-secondary" },
-              { label: "IoMT Hub", desc: "Wearables & FHIR", icon: Watch, to: "/iomt", color: "text-blue-400" },
-              { label: "Meus Dados", desc: "LGPD & Direitos", icon: Shield, to: "/lgpd", color: "text-yellow-400" },
-            ].map((item, i) => (
-              <Link key={i} to={item.to}>
-                <Card className="border-border hover:border-primary/30 transition-all cursor-pointer group">
-                  <CardContent className="p-3 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
-                      <item.icon size={16} className={item.color} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-foreground">{item.label}</p>
-                      <p className="text-[10px] text-muted-foreground">{item.desc}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          {/* Hub Central de Ações Rápidas */}
+          <QuickActionHub onTabSwitch={(tab) => setActiveTab(tab as any)} />
 
           {activeTab === "overview" && (
             <div className="grid lg:grid-cols-3 gap-6">
@@ -337,7 +319,9 @@ const DashboardPaciente = () => {
                 <PassportQRCard autoCreateIfMissing />
 
                 {/* Meu Diário Planta y Raiz — sintomas, sono, humor, gotas */}
-                {profile?.id && <SymptomTracker patientId={profile.id} />}
+                <div id="symptom-diary-section">
+                  {profile?.id && <SymptomTracker patientId={profile.id} />}
+                </div>
 
                 <Card className="border-border">
                   <CardContent className="p-5">

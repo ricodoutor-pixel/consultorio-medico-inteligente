@@ -74,10 +74,7 @@ export const ResponsiveNavbar = () => {
           </a>
         </div>
 
-        {/* Espaço para Mascote */}
-        <div className="flex-1 flex justify-center items-center mx-4 h-16">
-          <FrogMascot size={90} />
-        </div>
+        {/* Espaço para Mascote Removido */}
 
         {/* Direita: Idiomas e CTA */}
         <div className="flex items-center gap-4 flex-shrink-0">
@@ -132,10 +129,7 @@ export const ResponsiveNavbar = () => {
         {/* Menu Expandido Mobile */}
         {isOpen && (
           <div className="bg-white border-t border-gray-200 px-4 py-4 space-y-4">
-            {/* Mascote — 50% maior no mobile */}
-            <div className="flex justify-center py-4 border-b border-gray-200">
-              <FrogMascot size={117} />
-            </div>
+            {/* Mascote Removido */}
 
             {/* Links do Menu */}
             <a href="/" className="block text-gray-700 hover:text-green-600 font-medium py-2">

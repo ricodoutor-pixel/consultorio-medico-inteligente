@@ -151,7 +151,7 @@ export const Navbar = () => {
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
-            {/* Logo + Verdinho (Repisicionado 50% mais próximo) */}
+            {/* Logo */}
             <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
               <NavLink to="/" className="flex items-center gap-2 md:gap-3">
                 <img 
@@ -160,11 +160,6 @@ export const Navbar = () => {
                   className="h-8 md:h-10 w-auto object-contain"
                 />
               </NavLink>
-              
-              {/* Verdinho mais próximo do nome — visível a partir de lg (desktop) */}
-              <div className={`ml-1 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>
-                <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
-              </div>
             </div>
 
             {/* Desktop: Menu Centralizado (aparece a partir de lg = 1024px) */}
@@ -266,10 +261,7 @@ export const Navbar = () => {
             <span>Voltar</span>
           </button>
 
-          {/* Verdinho dentro do menu mobile — versão 50% maior */}
-          <div className="flex justify-center mb-6 relative" style={{ minHeight: 180 }}>
-            <FrogMascot size={81} mood="happy" onClick={() => { setIsOpen(false); openChat(); }} enableJumpToNav={false} />
-          </div>
+          {/* Verdinho removido conforme solicitação */}
 
           <div className="grid grid-cols-1 gap-1 flex-1">
             {links.map((link) => (

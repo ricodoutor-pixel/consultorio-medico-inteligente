@@ -158,7 +158,7 @@ export const Navbar = () => {
                   <img 
                     src="/logo.jpg" 
                     alt="Planta y Raíz - Mega Clínica Digital" 
-                    className="absolute w-full h-full object-contain mix-blend-screen scale-[1.8] md:scale-[2.2]"
+                    className="absolute w-full h-full object-contain mix-blend-screen brightness-75 contrast-150 scale-[1.8] md:scale-[2.2]"
                   />
                 </div>
               </NavLink>

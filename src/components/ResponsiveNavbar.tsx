@@ -53,7 +53,7 @@ export const ResponsiveNavbar = () => {
             <img 
               src="/logo.jpg" 
               alt="Planta y Raíz - Mega Clínica Digital" 
-              className="h-8 md:h-10 w-auto object-contain"
+              className="h-16 md:h-24 w-auto object-contain mix-blend-screen scale-110"
             />
           </a>
         </div>
@@ -100,7 +100,7 @@ export const ResponsiveNavbar = () => {
               <img 
                 src="/logo.jpg" 
                 alt="Planta y Raíz - Mega Clínica Digital" 
-                className="h-8 w-auto object-contain"
+                className="h-16 w-auto object-contain mix-blend-screen scale-110"
               />
             </a>
           </div>

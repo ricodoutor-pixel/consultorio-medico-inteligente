@@ -154,7 +154,7 @@ export const Navbar = () => {
             {/* Logo */}
             <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
               <NavLink to="/" className="flex items-center gap-2 md:gap-3">
-                <div className="w-48 md:w-64 h-12 md:h-16 relative flex items-center justify-center">
+                <div className="w-48 md:w-64 h-12 md:h-16 relative flex items-center justify-center overflow-hidden">
                   <img 
                     src="/logo.jpg" 
                     alt="Planta y Raíz - Mega Clínica Digital" 

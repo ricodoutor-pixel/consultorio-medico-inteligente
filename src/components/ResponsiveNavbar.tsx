@@ -50,7 +50,7 @@ export const ResponsiveNavbar = () => {
         {/* Logo e Título */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <a href="/">
-            <div className="w-48 md:w-64 h-12 md:h-16 relative flex items-center justify-center">
+            <div className="w-48 md:w-64 h-12 md:h-16 relative flex items-center justify-center overflow-hidden">
               <img 
                 src="/logo.jpg" 
                 alt="Planta y Raíz - Mega Clínica Digital" 
@@ -99,7 +99,7 @@ export const ResponsiveNavbar = () => {
           {/* Logo */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <a href="/">
-              <div className="w-48 h-12 relative flex items-center justify-center">
+              <div className="w-48 h-12 relative flex items-center justify-center overflow-hidden">
                 <img 
                   src="/logo.jpg" 
                   alt="Planta y Raíz - Mega Clínica Digital" 

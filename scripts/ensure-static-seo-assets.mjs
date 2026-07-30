@@ -14,12 +14,16 @@ for (const [sourceRelative, destinationRelative] of assetsToCopy) {
   const source = resolve(sourceRelative);
   const destination = resolve(destinationRelative);
 
-  if (!existsSync(source)) {
-    console.warn(`[static-seo] skipping missing file: ${sourceRelative}`);
-    continue;
-  }
+  try {
+    if (!existsSync(source)) {
+      console.warn(`[static-seo] skipping missing file: ${sourceRelative}`);
+      continue;
+    }
 
-  mkdirSync(dirname(destination), { recursive: true });
-  copyFileSync(source, destination);
-  console.log(`[static-seo] copied ${sourceRelative} -> ${destinationRelative}`);
+    mkdirSync(dirname(destination), { recursive: true });
+    copyFileSync(source, destination);
+    console.log(`[static-seo] copied ${sourceRelative} -> ${destinationRelative}`);
+  } catch (err) {
+    console.warn(`[static-seo] Failed to copy ${sourceRelative} to ${destinationRelative}:`, err.message);
+  }
 }

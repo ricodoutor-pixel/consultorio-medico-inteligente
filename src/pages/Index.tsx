@@ -160,7 +160,7 @@ const Index = () => {
               transition={{ duration: isMobile ? 0.45 : 1, delay: 0.15, ease: "easeOut" }}
             >
               {/* Cadastro Gratuito Button - Above Phone */}
-              <div className="flex flex-col sm:flex-row gap-3 self-center">
+              <div className="flex justify-center self-center">
                 <Link to="/cadastro">
                   <motion.span 
                     className="inline-flex items-center justify-center gap-1.5 bg-primary text-primary-foreground rounded-full px-6 py-2.5 text-sm font-black hover:bg-primary/90 transition-all transform hover:scale-105 cursor-pointer shadow-xl shadow-primary/30 w-full sm:w-auto"
@@ -169,15 +169,6 @@ const Index = () => {
                   >
                     <UserPlus size={20} />
                     CADASTRO GRATUITO
-                  </motion.span>
-                </Link>
-
-                <Link to="/medsocio">
-                  <motion.span 
-                    className="inline-flex items-center justify-center gap-1.5 bg-transparent border-2 border-emerald-500 text-emerald-400 rounded-full px-6 py-2.5 text-sm font-black hover:bg-emerald-500/10 transition-all transform hover:scale-105 cursor-pointer shadow-[0_0_15px_rgba(16,185,129,0.2)] w-full sm:w-auto"
-                  >
-                    <Network size={20} />
-                    MÉDICO SÓCIO
                   </motion.span>
                 </Link>
               </div>

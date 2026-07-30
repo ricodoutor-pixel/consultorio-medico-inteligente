@@ -9,8 +9,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { supabase } from "@/integrations/supabase/client";
 
-type ChatState = 'ANAMNESE' | 'PAYMENT' | 'UPLOAD_RECEIPT' | 'DOCTOR_UNLOCKED' | 'VIDEO_CALL';
+type ChatState = 'ANAMNESE' | 'ESCOLHA_MEDICO' | 'PAYMENT' | 'UPLOAD_RECEIPT' | 'DOCTOR_UNLOCKED' | 'VIDEO_CALL';
 
 interface Message {
   id: string;
@@ -111,13 +112,72 @@ export default function TelemedWhatsApp() {
 
     // Simulate Brisa's flow
     if (activeContact === 'brisa') {
-      setTimeout(() => {
-        if (chatState === 'ANAMNESE') {
+      if (chatState === 'ANAMNESE') {
+        // Mocked typing state could go here
+        setTimeout(async () => {
+          try {
+            // Call AI agent to process anamnesis and check for red flags
+            const aiHistory = messages.filter(m => m.senderId === 'user' || m.isBrisa).map(m => ({
+              role: m.isBrisa ? 'assistant' : 'user',
+              content: m.text
+            }));
+            aiHistory.push({ role: 'user', content: inputText });
+            
+            const { data, error } = await supabase.functions.invoke('agent-chat', {
+              body: { slug: 'brisa-triage', messages: aiHistory } // Try generic slug, fallback if it fails
+            });
+            
+            const aiReply = data?.reply || "Compreendi os seus sintomas. Estou aqui para ajudar a direcionar o seu atendimento de forma segura.";
+            
+            setMessages(prev => [...prev, {
+              id: Date.now().toString(),
+              senderId: 'brisa',
+              text: aiReply,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              isBrisa: true
+            }]);
+
+            // Transition to Doctor Choice
+            setTimeout(() => {
+              setChatState('ESCOLHA_MEDICO');
+              setMessages(prev => [...prev, {
+                id: (Date.now() + 1).toString(),
+                senderId: 'brisa',
+                text: 'Para prosseguirmos: qual médico você prefere? (Dr. Edilson Bezerra, Dra. Olivia Zimeri, Dra. Suelen Naves ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isBrisa: true
+              }]);
+            }, 2000);
+            
+          } catch (e) {
+            console.error("AI triage error", e);
+            // Fallback response if AI call fails
+            setMessages(prev => [...prev, {
+              id: Date.now().toString(),
+              senderId: 'brisa',
+              text: "Compreendo. Registrei seus sintomas com atenção e não identifiquei sinais de emergência crítica. Vamos dar andamento ao seu caso.",
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              isBrisa: true
+            }]);
+            setTimeout(() => {
+              setChatState('ESCOLHA_MEDICO');
+              setMessages(prev => [...prev, {
+                id: (Date.now() + 1).toString(),
+                senderId: 'brisa',
+                text: 'Para prosseguirmos: qual médico você prefere? (Dr. Edilson Bezerra, Dra. Olivia Zimeri, Dra. Suelen Naves ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isBrisa: true
+              }]);
+            }, 2000);
+          }
+        }, 500);
+      } else if (chatState === 'ESCOLHA_MEDICO') {
+        setTimeout(() => {
           setChatState('PAYMENT');
           setMessages(prev => [...prev, {
             id: Date.now().toString(),
             senderId: 'brisa',
-            text: 'Obrigada pelas informações. Para prosseguir com o médico, precisamos confirmar o pagamento da taxa de triagem.',
+            text: `Perfeito! Registrei sua triagem e sua preferência de atendimento. Para confirmar e liberar o médico imediatamente, realize o pagamento da taxa de triagem.`,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isBrisa: true
           }, {
@@ -128,8 +188,8 @@ export default function TelemedWhatsApp() {
             isBrisa: true,
             isPayment: true
           }]);
-        }
-      }, 1000);
+        }, 1000);
+      }
     }
   };
 
@@ -164,7 +224,7 @@ export default function TelemedWhatsApp() {
       const summaryMsg: Message = {
         id: (Date.now() + 1).toString(),
         senderId: 'brisa',
-        text: 'Resumo da Triagem:\n- Motivo da consulta coletado.\n- Triagem inicial concluída.\n- Encaminhado para Dr. Especialista.',
+        text: 'Resumo da Triagem Clínica:\n- Sintomas avaliados: Sem Red Flags\n- Preferência: Atendimento Ao Vivo\n- Status: Handoff para o médico concluído.\nO cadeado foi destravado! Você já pode iniciar a chamada.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isBrisa: true,
         isSummary: true

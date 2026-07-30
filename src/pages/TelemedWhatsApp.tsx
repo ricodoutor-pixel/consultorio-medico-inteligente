@@ -121,13 +121,14 @@ export default function TelemedWhatsApp() {
               role: m.isBrisa ? 'assistant' : 'user',
               content: m.text
             }));
-            aiHistory.push({ role: 'user', content: inputText });
+            const internalMsg = `(Contexto interno do sistema: Tabela de preços: Orientação Técnica=R$ 30,00 | Consulta Vídeo=R$ 250,00 | Chat=R$ 150,00. Médicos: Dr. Edilson, Dra. Olivia, Dra. Suelen. Responda à dúvida do paciente se houver). Mensagem do paciente: ${inputText}`;
+            aiHistory.push({ role: 'user', content: internalMsg });
             
             const { data, error } = await supabase.functions.invoke('agent-chat', {
               body: { slug: 'brisa-triage', messages: aiHistory } // Try generic slug, fallback if it fails
             });
             
-            const aiReply = data?.reply || "Compreendi os seus sintomas. Estou aqui para ajudar a direcionar o seu atendimento de forma segura.";
+            const aiReply = data?.reply || "Compreendi. Estou aqui para ajudar a direcionar o seu atendimento de forma segura.";
             
             setMessages(prev => [...prev, {
               id: Date.now().toString(),
@@ -137,17 +138,22 @@ export default function TelemedWhatsApp() {
               isBrisa: true
             }]);
 
-            // Transition to Doctor Choice
-            setTimeout(() => {
-              setChatState('ESCOLHA_MEDICO');
-              setMessages(prev => [...prev, {
-                id: (Date.now() + 1).toString(),
-                senderId: 'brisa',
-                text: 'Para prosseguirmos: qual médico você prefere? (Dr. Edilson Bezerra, Dra. Olivia Zimeri, Dra. Suelen Naves ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                isBrisa: true
-              }]);
-            }, 2000);
+            // Transition to Doctor Choice only if the user didn't explicitly just ask for prices
+            const textLower = inputText.toLowerCase();
+            const isJustAskingPrice = textLower.includes('quanto') || textLower.includes('valor') || textLower.includes('preco') || textLower.includes('preço') || textLower.includes('custa');
+            
+            if (!isJustAskingPrice) {
+              setTimeout(() => {
+                setChatState('ESCOLHA_MEDICO');
+                setMessages(prev => [...prev, {
+                  id: (Date.now() + 1).toString(),
+                  senderId: 'brisa',
+                  text: 'Para prosseguirmos: qual médico você prefere? (Dr. Edilson Bezerra, Dra. Olivia Zimeri, Dra. Suelen Naves ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
+                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  isBrisa: true
+                }]);
+              }, 2000);
+            }
             
           } catch (e) {
             console.error("AI triage error", e);
@@ -172,23 +178,81 @@ export default function TelemedWhatsApp() {
           }
         }, 500);
       } else if (chatState === 'ESCOLHA_MEDICO') {
-        setTimeout(() => {
-          setChatState('PAYMENT');
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            senderId: 'brisa',
-            text: `Perfeito! Registrei sua triagem e sua preferência de atendimento. Para confirmar e liberar o médico imediatamente, realize o pagamento da taxa de triagem.`,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isBrisa: true
-          }, {
-            id: (Date.now() + 1).toString(),
-            senderId: 'brisa',
-            text: 'R$ 30,00',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isBrisa: true,
-            isPayment: true
-          }]);
-        }, 1000);
+        const textLower = inputText.toLowerCase();
+        const hasChoice = textLower.includes('orientacao') || textLower.includes('orientação') || textLower.includes('tecnica') || 
+                          textLower.includes('video') || textLower.includes('vídeo') || textLower.includes('vivo') ||
+                          textLower.includes('chat') || textLower.includes('agendamento') || textLower.includes('emergencia') || textLower.includes('emergência');
+        
+        if (hasChoice) {
+          let valor = "R$ 150,00"; // fallback
+          let tipoAtendimento = "Consulta Médica";
+          
+          if (textLower.includes('orientacao') || textLower.includes('orientação') || textLower.includes('tecnica') || textLower.includes('técnica')) {
+            valor = "R$ 30,00";
+            tipoAtendimento = "Orientação Técnica";
+          } else if (textLower.includes('video') || textLower.includes('vídeo') || textLower.includes('vivo')) {
+            valor = "R$ 250,00";
+            tipoAtendimento = "Atendimento Ao Vivo";
+          } else if (textLower.includes('chat')) {
+            valor = "R$ 150,00";
+            tipoAtendimento = "Consulta por Chat";
+          } else if (textLower.includes('emergencia') || textLower.includes('emergência')) {
+            valor = "R$ 350,00";
+            tipoAtendimento = "Emergência";
+          }
+
+          setTimeout(() => {
+            setChatState('PAYMENT');
+            setMessages(prev => [...prev, {
+              id: Date.now().toString(),
+              senderId: 'brisa',
+              text: `Perfeito! Registrei sua escolha para ${tipoAtendimento}. Para confirmar e liberar o médico imediatamente, realize o pagamento do PIX correspondente ao valor do atendimento.`,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              isBrisa: true
+            }, {
+              id: (Date.now() + 1).toString(),
+              senderId: 'brisa',
+              text: valor,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              isBrisa: true,
+              isPayment: true
+            }]);
+          }, 1000);
+        } else {
+          // User asked a question during ESCOLHA_MEDICO
+          setTimeout(async () => {
+            try {
+              const aiHistory = messages.filter(m => m.senderId === 'user' || m.isBrisa).map(m => ({
+                role: m.isBrisa ? 'assistant' : 'user',
+                content: m.text
+              }));
+              const internalMsg = `(Instrução interna: Valores são Orientação Técnica R$ 30,00, Consulta Vídeo R$ 250,00, Chat R$ 150,00. Responda a dúvida e repita a pergunta de qual modalidade ele prefere). Mensagem: ${inputText}`;
+              aiHistory.push({ role: 'user', content: internalMsg });
+              
+              const { data } = await supabase.functions.invoke('agent-chat', {
+                body: { slug: 'brisa-triage', messages: aiHistory }
+              });
+              
+              const aiReply = data?.reply || "Nossas modalidades são: Orientação Técnica (R$ 30), Consulta por Chat (R$ 150) e Consulta por Vídeo (R$ 250). Qual você prefere?";
+              
+              setMessages(prev => [...prev, {
+                id: Date.now().toString(),
+                senderId: 'brisa',
+                text: aiReply,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isBrisa: true
+              }]);
+            } catch (e) {
+              setMessages(prev => [...prev, {
+                id: Date.now().toString(),
+                senderId: 'brisa',
+                text: "Nossas modalidades são: Orientação Técnica (R$ 30), Consulta por Chat (R$ 150) e Consulta por Vídeo (R$ 250). Qual você prefere?",
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isBrisa: true
+              }]);
+            }
+          }, 500);
+        }
       }
     }
   };

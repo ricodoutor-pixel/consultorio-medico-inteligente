@@ -74,14 +74,15 @@ const DashboardMedico = () => {
       if (!doctor) {
          const email = session.user.email?.toLowerCase() || '';
          if (email.includes('olivia')) {
-             doctor = { id: 'mock-olivia', user_id: session.user.id, crm: '87654', crm_state: 'SP', specialty: 'Medicina Canábica', is_online: false };
+             doctor = { id: 'mock-olivia', user_id: session.user.id, crm: '87654', crm_state: 'SP', specialty: 'Médicos Prescritores', is_online: false };
              profile = { full_name: 'Dra. Olivia Zimeri', avatar_url: '/dra-olivia-avatar.jpg' };
          } else if (email.includes('suelen')) {
-             doctor = { id: 'mock-suelen', user_id: session.user.id, crm: '54321', crm_state: 'SP', specialty: 'Medicina Canábica', is_online: false };
+             doctor = { id: 'mock-suelen', user_id: session.user.id, crm: '49354', crm_state: 'SP', specialty: 'Médicos Prescritores', is_online: false };
              profile = { full_name: 'Dra. Suelen Naves Rodrigues', avatar_url: '/dra-suelen-avatar.jpg' };
-         } else if (email.includes('edilson')) {
-             doctor = { id: 'mock-edilson', user_id: session.user.id, crm: '10963', crm_state: 'SP', specialty: 'Medicina Canábica', is_online: false };
-             profile = { full_name: 'Dr. Edilson Bezerra On', avatar_url: '/dr-edilson-avatar.jpg' };
+         } else {
+             // Fallback default (Dr. Edilson)
+             doctor = { id: 'mock-edilson', user_id: session.user.id, crm: '10963', crm_state: 'Sta-Cruz Bo', specialty: 'Médicos Prescritores', is_online: false };
+             profile = { full_name: 'Dr. Edilson Bezerra', avatar_url: '/dr-edilson-avatar.jpg' };
          }
       }
 
@@ -345,9 +346,14 @@ const DashboardMedico = () => {
                   <h1 className="text-2xl md:text-4xl font-display font-black text-foreground">
                     Consultório <span className="text-gradient-green">Virtual</span>
                   </h1>
+                  {profileData?.full_name && (
+                    <h2 className="text-xl md:text-2xl font-bold text-foreground mt-2">
+                      {profileData.full_name}
+                    </h2>
+                  )}
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <p className="text-muted-foreground font-medium text-sm">
-                      {doctorData ? `CRM ${doctorData.crm}/${doctorData.crm_state} • ${doctorData.specialty}` : "Configure seu perfil médico"}
+                      {doctorData ? `${doctorData.specialty} CRM ${doctorData.crm} - ${doctorData.crm_state}` : "Configure seu perfil médico"}
                     </p>
                     <DoctorVIPSeal tier={currentTier} />
                   </div>

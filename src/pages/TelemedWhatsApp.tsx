@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
+import { JitsiRoom } from "@/components/consultation/JitsiRoom";
 
 type ChatState = 'ANAMNESE' | 'ESCOLHA_MEDICO' | 'PAYMENT' | 'UPLOAD_RECEIPT' | 'DOCTOR_UNLOCKED' | 'VIDEO_CALL';
 
@@ -522,35 +523,12 @@ export default function TelemedWhatsApp() {
         {/* Video Call Overlay */}
         {chatState === 'VIDEO_CALL' && activeContact === 'doctor' ? (
           <div className="flex-1 bg-black flex flex-col relative z-20">
-            {/* Main Video (Doctor) */}
-            <div className="flex-1 relative flex items-center justify-center">
-              <img src={currentContact?.avatar} className="w-48 h-48 rounded-full opacity-50 blur-sm absolute" alt="Video Placeholder" />
-              <div className="text-white z-10 text-xl font-medium animate-pulse">Conectando vídeo com {currentContact?.name}...</div>
-              
-              {/* Self Video (PIP) */}
-              <div className="absolute bottom-6 right-6 w-32 h-44 bg-gray-800 border-2 border-gray-600 rounded-lg overflow-hidden shadow-2xl flex items-center justify-center">
-                 <Camera size={32} className="text-gray-500" />
-              </div>
-            </div>
-            
-            {/* Video Controls */}
-            <div className="h-24 bg-[#111b21]/90 flex items-center justify-center gap-6 px-6 pb-4">
-              <button className="w-12 h-12 rounded-full bg-[#2a3942] flex items-center justify-center text-white hover:bg-[#3b4a54] transition-colors">
-                <MicOff size={22} />
-              </button>
-              <button className="w-12 h-12 rounded-full bg-[#2a3942] flex items-center justify-center text-white hover:bg-[#3b4a54] transition-colors">
-                <VideoOff size={22} />
-              </button>
-              <button 
-                className="w-14 h-14 rounded-full bg-red-500 flex items-center justify-center text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
-                onClick={handleEndVideoCall}
-              >
-                <PhoneOff size={26} />
-              </button>
-              <button className="w-12 h-12 rounded-full bg-[#2a3942] flex items-center justify-center text-white hover:bg-[#3b4a54] transition-colors">
-                <Maximize size={22} />
-              </button>
-            </div>
+            <JitsiRoom 
+              roomName={`telemed-${currentContact?.id || 'demo'}`}
+              displayName="Paciente Planta y Raiz"
+              isDoctor={false}
+              onClose={handleEndVideoCall}
+            />
           </div>
         ) : (
           /* Chat Background and Messages */
@@ -657,7 +635,23 @@ export default function TelemedWhatsApp() {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               />
-              <button className="text-[#54656f] p-1.5 hover:bg-black/5 rounded-full transition-colors ml-2">
+              <button 
+                className="text-[#54656f] p-1.5 hover:bg-black/5 rounded-full transition-colors ml-1"
+                onClick={() => {
+                  if (activeContact === 'doctor') {
+                    if (selectedModality !== 'VIDEO' && selectedModality !== 'TECHNICAL_ORIENTATION') {
+                      toast.error('Ligação de vídeo indisponível para a modalidade Chat.');
+                    } else {
+                      handleStartVideoCall();
+                    }
+                  } else {
+                    toast.info('Videochamada disponível apenas com médicos liberados.');
+                  }
+                }}
+              >
+                 <Video size={22} />
+              </button>
+              <button className="text-[#54656f] p-1.5 hover:bg-black/5 rounded-full transition-colors ml-1">
                  <Camera size={22} />
               </button>
             </div>

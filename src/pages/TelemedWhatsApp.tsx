@@ -46,6 +46,15 @@ export default function TelemedWhatsApp() {
       lastMsg: chatState === 'DOCTOR_UNLOCKED' ? 'Resumo gerado.' : 'Olá, como posso ajudar?'
     },
     {
+      id: 'verdinho',
+      name: 'Dr Verdinho ADM',
+      role: 'Patient Assistant',
+      avatar: '/dr-verdinho-avatar.jpg',
+      isOnline: true,
+      isLocked: false,
+      lastMsg: 'Olá, sou o Dr. Verdinho!'
+    },
+    {
       id: 'doctor',
       name: 'Dr. Edilson Bezerra On',
       role: 'Medicina Canábica - CRM 10963',
@@ -254,6 +263,38 @@ export default function TelemedWhatsApp() {
           }, 500);
         }
       }
+    } else if (activeContact === 'verdinho') {
+      // Verdinho handles general platform questions
+      setTimeout(async () => {
+        try {
+          const aiHistory = messages.filter(m => m.senderId === 'user' || m.senderId === 'verdinho').map(m => ({
+            role: m.senderId === 'verdinho' ? 'assistant' : 'user',
+            content: m.text
+          }));
+          aiHistory.push({ role: 'user', content: inputText });
+          
+          const { data } = await supabase.functions.invoke('agent-chat', {
+            body: { slug: 'verdinho', messages: aiHistory }
+          });
+          
+          const aiReply = data?.reply || "Ribbit! Sou o Dr. Verdinho, assistente da Plataforma. Como posso ajudar?";
+          
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            senderId: 'verdinho',
+            text: aiReply,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }]);
+        } catch (e) {
+          console.error("AI Verdinho error", e);
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            senderId: 'verdinho',
+            text: "Ribbit! Olá! Sou o Dr. Verdinho, assistente da Plataforma. Como posso ajudar?",
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }]);
+        }
+      }, 500);
     }
   };
 

@@ -39,16 +39,16 @@ export default function TelemedWhatsApp() {
       id: 'brisa',
       name: 'Enfª Brisa - Triagem 24h',
       role: 'Triagem e Orientações Técnicas',
-      avatar: '/dr-verdinho.png', // Using dr-verdinho as fallback for mascot
+      avatar: '/enfa-brisa-avatar.jpg',
       isOnline: true,
       isLocked: false,
       lastMsg: chatState === 'DOCTOR_UNLOCKED' ? 'Resumo gerado.' : 'Olá, como posso ajudar?'
     },
     {
       id: 'doctor',
-      name: 'Dr. Médico Especialista',
-      role: 'Clínico Geral - CRM 12345',
-      avatar: '/dr-verdinho.png', // User requested dr-verdinho as default doctor avatar
+      name: 'Dr. Edilson Bezerra On',
+      role: 'Medicina Canábica - CRM 10963',
+      avatar: '/dr-edilson-avatar.jpg',
       isOnline: true,
       isLocked: doctorLocked,
       lastMsg: doctorLocked ? 'Bloqueado aguardando triagem.' : 'Pronto para atendimento.'
@@ -216,8 +216,8 @@ export default function TelemedWhatsApp() {
               }}
               className={`flex items-center px-3 py-3 border-b cursor-pointer hover:bg-[#f5f6f6] transition-colors relative ${activeContact === contact.id ? 'bg-[#f0f2f5]' : ''} ${contact.isLocked ? 'opacity-60' : ''}`}
             >
-              <div className="w-[49px] h-[49px] rounded-full overflow-hidden flex-shrink-0 bg-gray-200">
-                <img src={contact.avatar} alt={contact.name} className="w-full h-full object-cover" />
+              <div className="w-[49px] h-[49px] rounded-full overflow-hidden flex-shrink-0 bg-gray-200 border border-gray-300">
+                <img src={contact.avatar} alt={contact.name} className="w-full h-full object-cover object-top" />
               </div>
               <div className="ml-3 flex-1 overflow-hidden">
                 <div className="flex justify-between items-center">
@@ -252,8 +252,8 @@ export default function TelemedWhatsApp() {
               >
                 <ArrowLeft size={24} />
               </button>
-              <div className="w-10 h-10 rounded-full overflow-hidden cursor-pointer">
-                <img src={currentContact.avatar} alt={currentContact.name} className="w-full h-full object-cover" />
+              <div className="w-10 h-10 rounded-full overflow-hidden cursor-pointer border border-gray-300">
+                <img src={currentContact.avatar} alt={currentContact.name} className="w-full h-full object-cover object-top" />
               </div>
               <div className="flex flex-col cursor-pointer">
                 <span className="font-medium text-[#111b21] text-base">{currentContact.name}</span>

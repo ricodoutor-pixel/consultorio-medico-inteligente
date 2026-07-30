@@ -52,6 +52,24 @@ export default function TelemedWhatsApp() {
       isOnline: true,
       isLocked: doctorLocked,
       lastMsg: doctorLocked ? 'Bloqueado aguardando triagem.' : 'Pronto para atendimento.'
+    },
+    {
+      id: 'olivia',
+      name: 'Dra. Olivia Zimeri',
+      role: 'Médica Prescritora',
+      avatar: '/dra-olivia-avatar.jpg',
+      isOnline: true,
+      isLocked: doctorLocked,
+      lastMsg: doctorLocked ? 'Bloqueado aguardando triagem.' : 'Pronto para atendimento.'
+    },
+    {
+      id: 'suelen',
+      name: 'Dra. Suelen Naves Rodrigues',
+      role: 'Médica Prescritora',
+      avatar: '/dra-suelen-avatar.jpg',
+      isOnline: true,
+      isLocked: doctorLocked,
+      lastMsg: doctorLocked ? 'Bloqueado aguardando triagem.' : 'Pronto para atendimento.'
     }
   ];
 

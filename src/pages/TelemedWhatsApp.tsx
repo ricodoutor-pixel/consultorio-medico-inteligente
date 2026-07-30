@@ -4,10 +4,11 @@ import {
   Search, Paperclip, Send, Mic, Phone, Video, 
   MoreVertical, Check, CheckCheck, Lock, Unlock, 
   ArrowLeft, PhoneOff, MicOff, VideoOff, Maximize,
-  FileImage, QrCode
+  FileImage, QrCode, Smile, Camera, Link, ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 
@@ -23,6 +24,10 @@ interface Message {
   attachment?: string;
   isPayment?: boolean;
   isSummary?: boolean;
+  replyTo?: {
+    sender: string;
+    text: string;
+  };
 }
 
 export default function TelemedWhatsApp() {
@@ -33,6 +38,7 @@ export default function TelemedWhatsApp() {
   const [inputText, setInputText] = useState('');
   const [isMobileList, setIsMobileList] = useState(true); // Control for mobile view
   const [doctorLocked, setDoctorLocked] = useState(true);
+  const [selectedModality, setSelectedModality] = useState<string>('Nenhuma');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const contacts = [
@@ -195,20 +201,27 @@ export default function TelemedWhatsApp() {
         if (hasChoice) {
           let valor = "R$ 150,00"; // fallback
           let tipoAtendimento = "Consulta Médica";
-          
+          let detectedModality = 'CHAT';
+
           if (textLower.includes('orientacao') || textLower.includes('orientação') || textLower.includes('tecnica') || textLower.includes('técnica')) {
             valor = "R$ 30,00";
             tipoAtendimento = "Orientação Técnica";
+            detectedModality = 'TECHNICAL_ORIENTATION';
           } else if (textLower.includes('video') || textLower.includes('vídeo') || textLower.includes('vivo')) {
             valor = "R$ 250,00";
             tipoAtendimento = "Atendimento Ao Vivo";
+            detectedModality = 'VIDEO';
           } else if (textLower.includes('chat')) {
             valor = "R$ 150,00";
             tipoAtendimento = "Consulta por Chat";
+            detectedModality = 'CHAT';
           } else if (textLower.includes('emergencia') || textLower.includes('emergência')) {
             valor = "R$ 350,00";
             tipoAtendimento = "Emergência";
+            detectedModality = 'VIDEO';
           }
+
+          setSelectedModality(detectedModality);
 
           setTimeout(() => {
             setChatState('PAYMENT');
@@ -335,7 +348,18 @@ export default function TelemedWhatsApp() {
         isSummary: true
       };
 
-      setMessages(prev => [...prev, confirmMsg, summaryMsg]);
+      const doctorGreeting: Message = {
+        id: (Date.now() + 2).toString(),
+        senderId: 'doctor',
+        text: 'Super que bom estamos todos ansioso !',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        replyTo: {
+          sender: 'Dra Suelen Naves Rodrigues',
+          text: 'Eu volto daqui a pouco com o diagnóstico.'
+        }
+      };
+
+      setMessages(prev => [...prev, confirmMsg, summaryMsg, doctorGreeting]);
       toast.success('Médico desbloqueado!');
     }, 1500);
   };
@@ -446,16 +470,48 @@ export default function TelemedWhatsApp() {
 
             <div className="flex items-center gap-5 text-[#54656f]">
               {activeContact === 'doctor' && (
-                <>
-                  <button 
-                    onClick={handleStartVideoCall}
-                    className="flex items-center justify-center bg-[#00a884] text-white p-2 rounded-full hover:bg-[#008f6f] transition-all shadow-md transform hover:scale-105"
-                    title="Iniciar Videochamada"
-                  >
-                    <Video size={18} fill="currentColor" />
-                  </button>
-                  <Phone size={20} className="cursor-pointer hover:text-primary transition-colors" />
-                </>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center justify-center p-2 rounded-full hover:bg-black/5 transition-colors group">
+                      <Phone size={20} className="text-[#54656f] group-hover:text-[#00a884] transition-colors" />
+                      <ChevronDown size={14} className="ml-1 text-[#54656f] group-hover:text-[#00a884] transition-colors" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 p-1 bg-white border border-gray-200 shadow-xl rounded-xl">
+                    <DropdownMenuItem 
+                      className="cursor-pointer py-3 px-4 text-[#111b21] hover:bg-[#f5f6f6] focus:bg-[#f5f6f6] rounded-lg mb-1"
+                      onClick={() => {
+                        if (selectedModality !== 'VIDEO' && selectedModality !== 'TECHNICAL_ORIENTATION') {
+                          toast.error('Ligação de voz indisponível para a modalidade Chat.');
+                        } else {
+                          toast.success('Iniciando ligação de voz...');
+                        }
+                      }}
+                    >
+                      <Phone size={18} className="mr-3 text-[#54656f]" /> Ligação de voz
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="cursor-pointer py-3 px-4 text-[#111b21] hover:bg-[#f5f6f6] focus:bg-[#f5f6f6] rounded-lg mb-1"
+                      onClick={() => {
+                        if (selectedModality !== 'VIDEO' && selectedModality !== 'TECHNICAL_ORIENTATION') {
+                          toast.error('Ligação de vídeo indisponível para a modalidade Chat.');
+                        } else {
+                          handleStartVideoCall();
+                        }
+                      }}
+                    >
+                      <Video size={18} className="mr-3 text-[#54656f]" /> Ligação de vídeo
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="cursor-pointer py-3 px-4 text-[#111b21] hover:bg-[#f5f6f6] focus:bg-[#f5f6f6] rounded-lg"
+                      onClick={() => {
+                         toast.success('Link de ligação copiado!');
+                      }}
+                    >
+                      <Link size={18} className="mr-3 text-[#54656f]" /> Enviar link de ligação
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
               <Search size={20} className="cursor-pointer" />
               <MoreVertical size={20} className="cursor-pointer" />
@@ -542,16 +598,22 @@ export default function TelemedWhatsApp() {
                     </div>
                   ) : (
                     <div 
-                      className={`px-3 py-1.5 text-[15px] rounded-lg max-w-[85%] md:max-w-[70%] shadow-sm relative pb-5
+                      className={`px-2 py-1.5 text-[15px] rounded-lg max-w-[85%] md:max-w-[70%] shadow-sm relative pb-5
                         ${msg.senderId === 'user' ? 'bg-[#d9fdd3] rounded-tr-none text-[#111b21]' : 'bg-white rounded-tl-none text-[#111b21]'}`}
                     >
+                      {msg.replyTo && (
+                        <div className="bg-black/5 border-l-4 border-[#00a884] p-2 rounded mb-1 text-sm cursor-pointer hover:bg-black/10 transition-colors">
+                          <span className="font-bold text-[#00a884] block mb-0.5">{msg.replyTo.sender}</span>
+                          <span className="text-gray-600 truncate block">{msg.replyTo.text}</span>
+                        </div>
+                      )}
                       {msg.attachment && (
                         <div className="flex items-center gap-2 bg-black/5 p-2 rounded mb-2 text-sm">
                           <FileImage size={16} className="text-gray-500" />
                           <span className="text-gray-700 italic">{msg.attachment}</span>
                         </div>
                       )}
-                      <span className="leading-snug">{msg.text}</span>
+                      <span className="leading-snug px-1 whitespace-pre-wrap">{msg.text}</span>
                       <span className="text-[10px] text-[#667781] absolute bottom-1 right-2 flex items-center gap-1">
                         {msg.timestamp}
                         {msg.senderId === 'user' && <CheckCheck size={14} className="text-[#53bdeb]" />}
@@ -567,9 +629,14 @@ export default function TelemedWhatsApp() {
 
         {/* Chat Input */}
         {chatState !== 'VIDEO_CALL' && (
-          <div className="bg-[#f0f2f5] min-h-[62px] px-4 py-2 flex items-center gap-3 w-full z-10">
+          <div className="bg-[#f0f2f5] min-h-[62px] px-3 py-2 flex items-end gap-2 w-full z-10">
             <button 
-              className="text-[#54656f] p-2 hover:bg-black/5 rounded-full transition-colors"
+              className="text-[#54656f] p-2 hover:bg-black/5 rounded-full transition-colors mb-1"
+            >
+              <Smile size={24} />
+            </button>
+            <button 
+              className="text-[#54656f] p-2 hover:bg-black/5 rounded-full transition-colors mb-1"
               onClick={() => {
                 if (chatState === 'PAYMENT' || chatState === 'UPLOAD_RECEIPT') {
                   handleUploadReceipt();
@@ -581,7 +648,7 @@ export default function TelemedWhatsApp() {
               <Paperclip size={24} />
             </button>
             
-            <div className="flex-1 bg-white rounded-lg flex items-center px-4 py-2 min-h-[42px] shadow-sm">
+            <div className="flex-1 bg-white rounded-xl flex items-center px-4 py-1 min-h-[44px] shadow-sm mb-1 border border-transparent focus-within:border-gray-200">
               <input 
                 type="text" 
                 placeholder="Mensagem" 
@@ -590,18 +657,21 @@ export default function TelemedWhatsApp() {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               />
+              <button className="text-[#54656f] p-1.5 hover:bg-black/5 rounded-full transition-colors ml-2">
+                 <Camera size={22} />
+              </button>
             </div>
             
             {inputText.trim() ? (
               <button 
-                className="text-[#54656f] p-2 hover:bg-black/5 rounded-full transition-colors"
+                className="w-[44px] h-[44px] bg-[#00a884] text-white rounded-full flex items-center justify-center shadow-md hover:bg-[#008f6f] transition-colors mb-1 flex-shrink-0"
                 onClick={handleSendMessage}
               >
-                <Send size={24} className="text-[#00a884] ml-1" />
+                <Send size={20} className="ml-1" />
               </button>
             ) : (
-              <button className="text-[#54656f] p-2 hover:bg-black/5 rounded-full transition-colors">
-                <Mic size={24} />
+              <button className="w-[44px] h-[44px] bg-[#00a884] text-white rounded-full flex items-center justify-center shadow-md hover:bg-[#008f6f] transition-colors mb-1 flex-shrink-0">
+                <Mic size={22} fill="currentColor" />
               </button>
             )}
           </div>

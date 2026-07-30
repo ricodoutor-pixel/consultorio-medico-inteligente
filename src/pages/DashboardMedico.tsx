@@ -11,7 +11,7 @@ import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, FileBarChart, Brain, Flame, RefreshCw, ClipboardCheck, Loader2, Camera, UserCircle2 } from "lucide-react";
+import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, FileBarChart, Brain, Flame, RefreshCw, ClipboardCheck, Loader2, Camera, UserCircle2, MessageCircle } from "lucide-react";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { motion } from "framer-motion";
 import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
@@ -61,35 +61,63 @@ const DashboardMedico = () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { setLoading(false); return; }
 
-    const [{ data: doctor }, { data: profile }] = await Promise.all([
-      supabase.from("doctors").select("*").eq("user_id", session.user.id).single(),
-      supabase.from("profiles").select("full_name, avatar_url").eq("id", session.user.id).maybeSingle(),
-    ]);
-    setProfileData(profile ?? { full_name: session.user.email ?? null, avatar_url: null });
-
-    if (doctor) {
-      setDoctorData(doctor);
-      setIsOnline(doctor.is_online);
-
-      const [apptRes, rxRes, renewRes] = await Promise.all([
-        supabase.from("appointments").select("*").eq("doctor_id", doctor.id).order("scheduled_at", { ascending: true }).limit(20),
-        supabase.from("prescriptions").select("*").eq("doctor_id", doctor.id).order("created_at", { ascending: false }).limit(10),
-        supabase.from("prescription_requests").select("*").eq("doctor_id", doctor.id).eq("status", "pending").order("created_at", { ascending: false }),
+    try {
+      const [{ data: doctorRaw }, { data: profileRaw }] = await Promise.all([
+        supabase.from("doctors").select("*").eq("user_id", session.user.id).single(),
+        supabase.from("profiles").select("full_name, avatar_url").eq("id", session.user.id).maybeSingle(),
       ]);
 
-      if (apptRes.data) setAppointments(apptRes.data);
-      if (rxRes.data) setPrescriptions(rxRes.data);
-      if (renewRes.data) setRenewalRequests(renewRes.data);
+      let doctor = doctorRaw;
+      let profile = profileRaw;
 
-      const { data: sub } = await supabase
-        .from("medical_subscriptions")
-        .select("plan_tier")
-        .eq("doctor_id", doctor.id)
-        .eq("status", "active")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (sub?.plan_tier) setCurrentTier(sub.plan_tier);
+      // Mock para Lovable Preview caso os dados não existam no Supabase
+      if (!doctor) {
+         const email = session.user.email?.toLowerCase() || '';
+         if (email.includes('olivia')) {
+             doctor = { id: 'mock-olivia', user_id: session.user.id, crm: '87654', crm_state: 'SP', specialty: 'Medicina Canábica', is_online: false };
+             profile = { full_name: 'Dra. Olivia Zimeri', avatar_url: '/dra-olivia-avatar.jpg' };
+         } else if (email.includes('suelen')) {
+             doctor = { id: 'mock-suelen', user_id: session.user.id, crm: '54321', crm_state: 'SP', specialty: 'Medicina Canábica', is_online: false };
+             profile = { full_name: 'Dra. Suelen Naves Rodrigues', avatar_url: '/dra-suelen-avatar.jpg' };
+         } else if (email.includes('edilson')) {
+             doctor = { id: 'mock-edilson', user_id: session.user.id, crm: '10963', crm_state: 'SP', specialty: 'Medicina Canábica', is_online: false };
+             profile = { full_name: 'Dr. Edilson Bezerra On', avatar_url: '/dr-edilson-avatar.jpg' };
+         }
+      }
+
+      setDoctorData(doctor);
+      setProfileData(profile ?? { full_name: session.user.email ?? null, avatar_url: null });
+
+      if (doctor) {
+        setIsOnline(doctor.is_online);
+
+        if (doctor.id.startsWith('mock-')) {
+          setLoading(false);
+          return;
+        }
+
+        const [apptRes, rxRes, renewRes] = await Promise.all([
+          supabase.from("appointments").select("*").eq("doctor_id", doctor.id).order("scheduled_at", { ascending: true }).limit(20),
+          supabase.from("prescriptions").select("*").eq("doctor_id", doctor.id).order("created_at", { ascending: false }).limit(10),
+          supabase.from("prescription_requests").select("*").eq("doctor_id", doctor.id).eq("status", "pending").order("created_at", { ascending: false }),
+        ]);
+
+        if (apptRes.data) setAppointments(apptRes.data);
+        if (rxRes.data) setPrescriptions(rxRes.data);
+        if (renewRes.data) setRenewalRequests(renewRes.data);
+
+        const { data: sub } = await supabase
+          .from("medical_subscriptions")
+          .select("plan_tier")
+          .eq("doctor_id", doctor.id)
+          .eq("status", "active")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (sub?.plan_tier) setCurrentTier(sub.plan_tier);
+      }
+    } catch (e) {
+      console.error(e);
     }
     setLoading(false);
   };
@@ -330,10 +358,20 @@ const DashboardMedico = () => {
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-muted-foreground"}`} />
-                <span className="text-sm font-bold text-foreground">{isOnline ? "Online" : "Offline"}</span>
-                <Switch checked={isOnline} onCheckedChange={toggleOnline} />
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <Button 
+                  onClick={() => navigate('/telemed-whatsapp')}
+                  variant="outline"
+                  className="bg-primary/10 border-primary/30 text-primary hover:bg-primary hover:text-white"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Acessar Telemed
+                </Button>
+                <div className="flex items-center gap-3">
+                  <div className={`w-3 h-3 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-muted-foreground"}`} />
+                  <span className="text-sm font-bold text-foreground">{isOnline ? "Online" : "Offline"}</span>
+                  <Switch checked={isOnline} onCheckedChange={toggleOnline} />
+                </div>
               </div>
             </div>
 

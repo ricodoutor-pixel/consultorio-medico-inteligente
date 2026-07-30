@@ -175,14 +175,17 @@ export default function TelemedWhatsApp() {
         
         {/* Header */}
         <div className="bg-[#f0f2f5] h-16 px-4 flex items-center justify-between border-b">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold overflow-hidden shadow-sm">
-              <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
-            </div>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => navigate('/dashboard')} 
+              className="text-[#54656f] hover:bg-black/5 p-1.5 rounded-full transition-colors flex items-center justify-center"
+            >
+              <ArrowLeft size={22} />
+            </button>
             <span className="font-semibold text-[#41525d]">Telemed - Planta y Raiz</span>
           </div>
           <div className="flex gap-4 text-[#54656f]">
-            <MoreVertical size={20} className="cursor-pointer" onClick={() => navigate('/dashboard')} />
+            <MoreVertical size={20} className="cursor-pointer" />
           </div>
         </div>
 
@@ -258,14 +261,16 @@ export default function TelemedWhatsApp() {
               </div>
             </div>
 
-            <div className="flex gap-5 text-[#54656f]">
+            <div className="flex items-center gap-5 text-[#54656f]">
               {activeContact === 'doctor' && (
                 <>
-                  <Video 
-                    size={20} 
-                    className="cursor-pointer hover:text-primary transition-colors" 
-                    onClick={handleStartVideoCall} 
-                  />
+                  <button 
+                    onClick={handleStartVideoCall}
+                    className="flex items-center justify-center bg-[#00a884] text-white p-2 rounded-full hover:bg-[#008f6f] transition-all shadow-md transform hover:scale-105"
+                    title="Iniciar Videochamada"
+                  >
+                    <Video size={18} fill="currentColor" />
+                  </button>
                   <Phone size={20} className="cursor-pointer hover:text-primary transition-colors" />
                 </>
               )}
@@ -380,9 +385,6 @@ export default function TelemedWhatsApp() {
         {/* Chat Input */}
         {chatState !== 'VIDEO_CALL' && (
           <div className="bg-[#f0f2f5] min-h-[62px] px-4 py-2 flex items-center gap-3 w-full z-10">
-            <button className="text-[#54656f] p-2 hover:bg-black/5 rounded-full transition-colors">
-              <Mic size={24} />
-            </button>
             <button 
               className="text-[#54656f] p-2 hover:bg-black/5 rounded-full transition-colors"
               onClick={() => {

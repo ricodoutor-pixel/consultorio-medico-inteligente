@@ -50,11 +50,13 @@ export const ResponsiveNavbar = () => {
         {/* Logo e Título */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <a href="/">
-            <img 
-              src="/logo.jpg" 
-              alt="Planta y Raíz - Mega Clínica Digital" 
-              className="h-16 md:h-24 w-auto object-contain mix-blend-screen scale-110"
-            />
+            <div className="w-48 md:w-64 h-12 md:h-16 relative flex items-center justify-center">
+              <img 
+                src="/logo.jpg" 
+                alt="Planta y Raíz - Mega Clínica Digital" 
+                className="absolute w-full h-full object-contain mix-blend-screen scale-[1.8] md:scale-[2.2]"
+              />
+            </div>
           </a>
         </div>
 
@@ -97,11 +99,13 @@ export const ResponsiveNavbar = () => {
           {/* Logo */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <a href="/">
-              <img 
-                src="/logo.jpg" 
-                alt="Planta y Raíz - Mega Clínica Digital" 
-                className="h-16 w-auto object-contain mix-blend-screen scale-110"
-              />
+              <div className="w-48 h-12 relative flex items-center justify-center">
+                <img 
+                  src="/logo.jpg" 
+                  alt="Planta y Raíz - Mega Clínica Digital" 
+                  className="absolute w-full h-full object-contain mix-blend-screen scale-[1.8]"
+                />
+              </div>
             </a>
           </div>
 

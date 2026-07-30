@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DoctorProfileSettings } from "@/components/doctor/DoctorProfileSettings";
 import { DoctorTeamDashboard } from "@/components/doctor/DoctorTeamDashboard";
 import { DoctorEducationDashboard } from "@/components/doctor/DoctorEducationDashboard";
-import { AlertTriangle, Loader2, MessageCircle, Gift } from "lucide-react";
+import { AlertTriangle, Loader2, MessageCircle, Gift, Video } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
@@ -100,6 +100,9 @@ const Consultorio = () => {
             </button>
           </div>
           <div className="flex items-center gap-3">
+            <Link to="/orientacao-video" className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-blue-600 text-white hover:bg-blue-700">
+              <Video size={16} /> Iniciar Vídeo
+            </Link>
             <Link to="/telemed-whatsapp" className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-[#00a884] text-white hover:bg-[#008f6f]">
               <MessageCircle size={16} /> Telemed WhatsApp
             </Link>
@@ -116,6 +119,7 @@ const Consultorio = () => {
             <span className={`w-2.5 h-2.5 rounded-full ${isOnline ? "bg-white animate-pulse" : "bg-white/70"}`} />
             {isOnline ? "ONLINE (Atendendo)" : "OFFLINE (Ausente)"}
           </button>
+          </div>
         </div>
       )}
 

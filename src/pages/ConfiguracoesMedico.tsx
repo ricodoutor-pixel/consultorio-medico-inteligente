@@ -172,7 +172,7 @@ export default function ConfiguracoesMedico() {
           <div className="flex items-center gap-4">
             <Button 
               variant="outline" 
-              onClick={() => navigate('/consultorio')}
+              onClick={() => navigate('/dashboard-medico')}
               className="bg-slate-800 border-slate-700 text-slate-300 hover:text-white"
             >
               <ArrowLeft size={16} className="mr-2" />

@@ -381,6 +381,14 @@ const DashboardMedico = () => {
                     CARD CONFIG
                   </span>
                 </Link>
+                <Link to="/sala-espera">
+                  <span 
+                    className="inline-flex items-center justify-center gap-1.5 bg-blue-500/20 border-2 border-blue-500/50 text-blue-400 rounded-full px-4 py-2 text-sm font-black hover:bg-blue-500/30 transition-all transform hover:scale-105 cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.2)]"
+                  >
+                    <Users size={16} />
+                    SALA DE ESPERA
+                  </span>
+                </Link>
                 <Button 
                   onClick={() => navigate('/telemed-whatsapp')}
                   variant="outline"

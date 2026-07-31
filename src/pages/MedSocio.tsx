@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Users, TrendingUp, Copy, Network, ShieldCheck, DollarSign, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { AffiliateTree } from "@/components/doctor/AffiliateTree";
 
 export const MedSocio = () => {
   const { toast } = useToast();
@@ -231,6 +232,8 @@ export const MedSocio = () => {
               </Card>
             </div>
           </div>
+          
+          <AffiliateTree />
         </motion.div>
       </main>
 

@@ -25,17 +25,7 @@ const PATIENT_MONITOR_URL = "https://plantayraiz.com.br/monitor-cardiaco";
 export function DoctorAuxDiagnosticTools() {
   const [bpOpen, setBpOpen] = useState(false);
 
-  const sharePatientLink = async () => {
-    const msg = `Olá! Antes da consulta, peço que faça uma aferição rápida (30s) de frequência cardíaca e estimativa de pressão arterial pelo celular:\n\n${PATIENT_MONITOR_URL}\n\nApós medir, me envie o resultado pelo WhatsApp. — Equipe Planta y Raiz`;
-    const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-    try {
-      await navigator.clipboard.writeText(PATIENT_MONITOR_URL);
-      toast({ title: "Link copiado", description: "Cole no chat do paciente." });
-    } catch {
-      // ignore
-    }
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
+
 
   return (
     <section className="mb-8" aria-labelledby="aux-diag-title">
@@ -78,14 +68,6 @@ export function DoctorAuxDiagnosticTools() {
                 size="sm"
               >
                 <Activity size={14} className="mr-1" /> Iniciar aferição agora
-              </Button>
-              <Button
-                onClick={sharePatientLink}
-                variant="outline"
-                size="sm"
-                className="flex-1"
-              >
-                <Share2 size={14} className="mr-1" /> Enviar ao paciente
               </Button>
             </div>
 

@@ -179,10 +179,11 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     // Helper to check if a mock is replaced by a real DB entry
     const isMockReplaced = (mock: Professional) => {
       return realPros.some(real => {
-        const realCrmNum = real.crm.replace(/\D/g, '');
-        const mockCrmNum = mock.crm.replace(/\D/g, '');
+        const realCrmNum = real.crm ? real.crm.replace(/\D/g, '') : '';
+        const mockCrmNum = mock.crm ? mock.crm.replace(/\D/g, '') : '';
         if (realCrmNum && mockCrmNum && realCrmNum === mockCrmNum) return true;
         // fallback to name matching (first and last name)
+        if (!mock.name || !real.name) return false;
         const mockNameParts = mock.name.toLowerCase().split(' ');
         const mockLastName = mockNameParts[mockNameParts.length - 1];
         return real.name.toLowerCase().includes(mockLastName);

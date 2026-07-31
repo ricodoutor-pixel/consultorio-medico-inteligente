@@ -154,13 +154,11 @@ export const Navbar = () => {
             {/* Logo */}
             <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
               <NavLink to="/" className="flex items-center gap-2 md:gap-3">
-                <div className="w-48 md:w-64 h-12 md:h-16 relative flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="/logo.jpg" 
-                    alt="Planta y Raíz - Mega Clínica Digital" 
-                    className="absolute w-full h-full object-contain mix-blend-screen brightness-75 contrast-150 scale-[1.8] md:scale-[2.2]"
-                  />
-                </div>
+                <img 
+                  src="/logo.jpg" 
+                  alt="Planta y Raíz - Mega Clínica Digital" 
+                  className="h-10 md:h-12 w-auto object-contain"
+                />
               </NavLink>
             </div>
 

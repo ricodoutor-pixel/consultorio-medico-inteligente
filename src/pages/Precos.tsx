@@ -148,7 +148,7 @@ const Precos = () => {
           </div>
 
           <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 max-w-7xl mx-auto items-stretch relative overflow-visible"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto items-stretch relative overflow-visible"
             style={{ zIndex: 10, isolation: 'isolate', transform: 'translateZ(0)', paddingBottom: '1rem' }}
           >
             {plans.map((plan) => {

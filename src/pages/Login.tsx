@@ -68,7 +68,16 @@ const Login = () => {
           navigate(safeRedirect);
         } else {
           const userType = profile?.user_type || "patient";
-          if (userType === "doctor") {
+          
+          const { data: doctorData } = await supabase
+            .from("doctors")
+            .select("id")
+            .eq("user_id", data.user.id)
+            .maybeSingle();
+            
+          const isDoctor = userType === "doctor" || !!doctorData;
+
+          if (isDoctor) {
             navigate("/dashboard-medico");
           } else {
             const { data: roleData } = await supabase

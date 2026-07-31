@@ -147,7 +147,9 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const cityLabel = d.city ? `${d.city}, ${countryLabel}` : countryLabel;
       const price = formatConsultationPrice(Number(d.consultation_price), d.country);
       const documentLabel = d.document_type === "ci" ? "CI Bolívia" : `CRM ${d.crm_state}`;
-      
+      const mockMatch = testProfessionals.find(p => p.crm === d.crm || (p.name && d.profile?.full_name && p.name.toLowerCase().includes(d.profile.full_name.toLowerCase())));
+      const finalImage = d.profile?.avatar_url || mockMatch?.imageUrl || "";
+
       return {
         id: `real-${d.id}`,
         name: fullName,
@@ -161,7 +163,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         rating: d.rating || 5.0,
         consults: d.total_consultations || 0,
         avatar: fullName.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "PR",
-        imageUrl: d.profile?.avatar_url || "",
+        imageUrl: finalImage,
         paymentLink: "https://mpago.la/12KAwmH",
         online: Boolean(d.is_online && (d.is_available ?? true)),
         crm: d.document_type === "ci" ? `${d.crm} - BO` : `${d.crm} - ${d.crm_state}`,

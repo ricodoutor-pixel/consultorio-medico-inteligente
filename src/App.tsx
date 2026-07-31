@@ -77,6 +77,7 @@ const Indicacoes = lazyWithRecovery(() => import("./pages/Indicacoes"), { source
 const Unsubscribe = lazyWithRecovery(() => import("./pages/Unsubscribe"), { sourceRef: "/unsubscribe" });
 const Telemedicina = lazyWithRecovery(() => import("./pages/Telemedicina"), { sourceRef: "/telemedicina" });
 const Cadastro = lazyWithRecovery(() => import("./pages/Cadastro"), { sourceRef: "/cadastro" });
+const ConfiguracoesMedico = lazyWithRecovery(() => import("./pages/ConfiguracoesMedico"), { sourceRef: "/configuracoes-medico" });
 const Login = lazyWithRecovery(() => import("./pages/Login"), { sourceRef: "/login" });
 const ResetPassword = lazyWithRecovery(() => import("./pages/ResetPassword"), { sourceRef: "/reset-password" });
 const ConsultationPayment = lazyWithRecovery(() => import("./pages/ConsultationPayment"), { sourceRef: "/pagamento" });
@@ -394,6 +395,7 @@ const App = () => (
                 <Route path="/quiz" element={<QuizTriagem />} />
                 <Route path="/condicao/:condicao" element={<CondicaoTratamento />} />
                 <Route path="/consultorio" element={<PrivateRoute><Consultorio /></PrivateRoute>} />
+                <Route path="/configuracoes-medico" element={<PrivateRoute><ConfiguracoesMedico /></PrivateRoute>} />
                 <Route path="/checkout/fast-track" element={<FastTrackCheckout />} />
                 <Route path="/checkout/:token" element={<PrescriptionCheckout />} />
                 <Route path="/checkout/return" element={<CheckoutReturn />} />

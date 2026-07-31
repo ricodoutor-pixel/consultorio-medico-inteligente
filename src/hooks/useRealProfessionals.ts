@@ -140,57 +140,73 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
   }, []);
 
   const merged = useMemo(() => {
-    const edilson = testProfessionals.find(p => p.id === "med-0")!;
-    const edilsonOnline = { ...edilson, online: true };
+    // Build real professionals list directly from DB
+    const realPros: Professional[] = realDoctors.map((d) => {
+      const fullName = d.profile?.full_name || `Dr(a). ${d.crm}`;
+      const countryLabel = d.country === "BO" ? "Bolívia" : "Brasil";
+      const cityLabel = d.city ? `${d.city}, ${countryLabel}` : countryLabel;
+      const price = formatConsultationPrice(Number(d.consultation_price), d.country);
+      const documentLabel = d.document_type === "ci" ? "CI Bolívia" : `CRM ${d.crm_state}`;
+      
+      return {
+        id: `real-${d.id}`,
+        name: fullName,
+        category: mapCategoryFromSpecialty(d.specialty),
+        bio: d.bio || `Profissional verificado na Planta & Raiz. Especialidade: ${d.specialty}. ${documentLabel}.`,
+        experience: "Verificado",
+        tags: [d.specialty, documentLabel, cityLabel],
+        price,
+        priceValue: Number(d.consultation_price) || 30,
+        whatsapp: "5511991363154",
+        rating: d.rating || 5.0,
+        consults: d.total_consultations || 0,
+        avatar: fullName.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "PR",
+        imageUrl: d.profile?.avatar_url || "",
+        paymentLink: "https://mpago.la/12KAwmH",
+        online: Boolean(d.is_online && (d.is_available ?? true)),
+        crm: d.document_type === "ci" ? `${d.crm} - BO` : `${d.crm} - ${d.crm_state}`,
+        hospital: cityLabel,
+        services: [
+          { name: "Orientação Técnica Inicial", price, desc: "Avaliação completa + plano terapêutico" },
+          { name: "Retorno", price: formatConsultationPrice((Number(d.consultation_price) || 30) * 0.6, d.country), desc: "Acompanhamento e ajuste" },
+        ],
+        slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+        reviews: [],
+        flags: flagForCountry(d.country),
+      };
+    });
 
-    // Build real professionals list and avoid showing Dr. Edilson twice.
-    const realPros: Professional[] = realDoctors
-      .filter((d) => {
-        const name = (d.profile?.full_name || "").toLowerCase();
-        return d.crm !== "10963" && !name.includes("edilson bezerra");
-      })
-      .map((d) => {
-        const fullName = d.profile?.full_name || `Dr(a). ${d.crm}`;
-        const countryLabel = d.country === "BO" ? "Bolívia" : "Brasil";
-        const cityLabel = d.city ? `${d.city}, ${countryLabel}` : countryLabel;
-        const price = formatConsultationPrice(Number(d.consultation_price), d.country);
-        const documentLabel = d.document_type === "ci" ? "CI Bolívia" : `CRM ${d.crm_state}`;
-
-        return {
-          id: `real-${d.id}`,
-          name: fullName,
-          category: mapCategoryFromSpecialty(d.specialty),
-          bio: d.bio || `Profissional verificado na Planta & Raiz. Especialidade: ${d.specialty}. ${documentLabel}.`,
-          experience: "Verificado",
-          tags: [d.specialty, documentLabel, cityLabel],
-          price,
-          priceValue: Number(d.consultation_price) || 30,
-          whatsapp: "5511991363154",
-          rating: d.rating || 5.0,
-          consults: d.total_consultations || 0,
-          avatar: fullName.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "PR",
-          imageUrl: d.profile?.avatar_url || "",
-          paymentLink: "https://mpago.la/12KAwmH",
-          online: Boolean(d.is_online && (d.is_available ?? true)),
-          crm: d.document_type === "ci" ? `${d.crm} - BO` : `${d.crm} - ${d.crm_state}`,
-          hospital: cityLabel,
-          services: [
-            { name: "Orientação Técnica Inicial", price, desc: "Avaliação completa + plano terapêutico" },
-            { name: "Retorno", price: formatConsultationPrice((Number(d.consultation_price) || 30) * 0.6, d.country), desc: "Acompanhamento e ajuste" },
-          ],
-          slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
-          reviews: [],
-          flags: flagForCountry(d.country),
-        };
+    // Helper to check if a mock is replaced by a real DB entry
+    const isMockReplaced = (mock: Professional) => {
+      return realPros.some(real => {
+        const realCrmNum = real.crm.replace(/\D/g, '');
+        const mockCrmNum = mock.crm.replace(/\D/g, '');
+        if (realCrmNum && mockCrmNum && realCrmNum === mockCrmNum) return true;
+        // fallback to name matching (first and last name)
+        const mockNameParts = mock.name.toLowerCase().split(' ');
+        const mockLastName = mockNameParts[mockNameParts.length - 1];
+        return real.name.toLowerCase().includes(mockLastName);
       });
+    };
+
+    let finalPros = [...realPros];
+
+    // Dr. Edilson fallback (always online)
+    const edilsonMock = testProfessionals.find(p => p.id === "med-0");
+    if (edilsonMock && !isMockReplaced(edilsonMock)) {
+      finalPros.unshift({ ...edilsonMock, online: true });
+    }
 
     // How many test slots remain after real doctors fill spots
-    const testSlotsRemaining = Math.max(0, MAX_TEST_SLOTS - realPros.length);
+    const testSlotsRemaining = Math.max(0, MAX_TEST_SLOTS - finalPros.length);
 
     // Get the 6 curated test doctors
-    const keptTests = KEPT_TEST_IDS
+    let keptTests = KEPT_TEST_IDS
       .map(id => testProfessionals.find(p => p.id === id))
       .filter(Boolean) as Professional[];
+
+    // Remove any mocks that are already represented by real DB doctors
+    keptTests = keptTests.filter(mock => !isMockReplaced(mock));
 
     // Only keep enough to fill remaining slots
     const finalTests = keptTests.slice(0, testSlotsRemaining);
@@ -199,10 +215,10 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     const shiftIndex = getOnlineShiftIndex();
     const rotatedTests = finalTests.map((p, i) => ({
       ...p,
-      online: i === (shiftIndex % finalTests.length),
+      online: i === (shiftIndex % Math.max(1, finalTests.length)),
     }));
 
-    return [edilsonOnline, ...realPros, ...rotatedTests];
+    return [...finalPros, ...rotatedTests];
   }, [realDoctors, currentHour]);
 
   return { professionals: merged, realCount: realDoctors.length, loading };

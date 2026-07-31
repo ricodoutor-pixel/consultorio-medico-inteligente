@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronRight, ChevronDown, User, Stethoscope, Users, UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 type Affiliate = {
   id: string;
@@ -12,47 +13,6 @@ type Affiliate = {
   level: 1 | 2 | 3;
   children?: Affiliate[];
 };
-
-const mockData: Affiliate[] = [
-  {
-    id: "1",
-    name: "Dra. Olivia Zimeri",
-    type: "doctor",
-    crm: "12345 SP",
-    level: 1,
-    children: [
-      {
-        id: "1-1",
-        name: "Dr. João Silva",
-        type: "doctor",
-        crm: "54321 SP",
-        level: 2,
-        children: [
-          { id: "1-1-1", name: "Dra. Ana Costa", type: "doctor", crm: "98765 MG", level: 3 },
-          { id: "1-1-2", name: "Carlos Mendes", type: "patient", level: 3 },
-        ],
-      },
-      { id: "1-2", name: "Maria Fernanda", type: "patient", level: 2 },
-    ],
-  },
-  {
-    id: "2",
-    name: "Dra. Suelen Rodrigues",
-    type: "doctor",
-    crm: "67890 RJ",
-    level: 1,
-    children: [
-      { id: "2-1", name: "Pedro Almeida", type: "patient", level: 2 },
-      { id: "2-2", name: "Dr. Roberto Gomes", type: "doctor", crm: "11223 BA", level: 2 },
-    ],
-  },
-  {
-    id: "3",
-    name: "Roberto Carlos (Paciente VIP)",
-    type: "patient",
-    level: 1,
-  },
-];
 
 const TreeNode = ({ node }: { node: Affiliate }) => {
   const [expanded, setExpanded] = useState(false);
@@ -79,7 +39,7 @@ const TreeNode = ({ node }: { node: Affiliate }) => {
             </div>
             <div>
               <p className="font-bold text-slate-200 text-sm">{node.name}</p>
-              {node.type === 'doctor' && (
+              {node.type === 'doctor' && node.crm && (
                 <p className="text-xs text-slate-400">CRM: {node.crm}</p>
               )}
             </div>
@@ -115,39 +75,121 @@ const TreeNode = ({ node }: { node: Affiliate }) => {
 };
 
 export const AffiliateTree = () => {
+  const [filter, setFilter] = useState<"all" | "doctor" | "patient">("all");
+  const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAffiliates = async () => {
+      setLoading(true);
+      try {
+        // Fetch real doctors
+        const { data: doctorsData, error: doctorsError } = await supabase
+          .from("doctors")
+          .select("id, full_name, crm, crm_state");
+          
+        // Fetch real patients (profiles with user_type = 'paciente' or similar)
+        const { data: patientsData, error: patientsError } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .eq("user_type", "paciente");
+
+        let network: Affiliate[] = [];
+
+        if (!doctorsError && doctorsData) {
+          const docs: Affiliate[] = doctorsData.map((d: any) => ({
+            id: d.id,
+            name: d.full_name || "Médico sem nome",
+            type: "doctor",
+            crm: d.crm ? `${d.crm} ${d.crm_state || ""}` : undefined,
+            level: 1,
+            children: [] // No dummy children, as requested by the user
+          }));
+          network = [...network, ...docs];
+        }
+
+        if (!patientsError && patientsData) {
+          const pats: Affiliate[] = patientsData.map((p: any) => ({
+            id: p.id,
+            name: p.full_name || "Paciente",
+            type: "patient",
+            level: 1,
+            children: [] // Patients don't indicate others yet
+          }));
+          network = [...network, ...pats];
+        }
+        
+        // Sort alphabetically to look nice
+        network.sort((a, b) => a.name.localeCompare(b.name));
+        
+        setAffiliates(network);
+      } catch (e) {
+        console.error("Error fetching network", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAffiliates();
+  }, []);
+
+  const filteredData = affiliates.filter(a => filter === "all" || a.type === filter);
+
   return (
     <Card className="bg-slate-900 border-slate-800 mt-12 overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.05)]">
       <CardHeader className="bg-slate-950/50 border-b border-slate-800">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <CardTitle className="text-xl text-white flex items-center gap-2">
             <Users className="text-emerald-500" />
             Meus Indicados (Rede em Tempo Real)
           </CardTitle>
-          <div className="flex gap-4">
-            <div className="flex items-center gap-2 text-xs text-slate-400">
+          <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-700">
+            <button
+              onClick={() => setFilter("all")}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${filter === "all" ? "bg-slate-700 text-white" : "text-slate-400 hover:text-slate-200"}`}
+            >
+              Todos
+            </button>
+            <button
+              onClick={() => setFilter("doctor")}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 ${filter === "doctor" ? "bg-primary/20 text-primary" : "text-slate-400 hover:text-slate-200"}`}
+            >
               <div className="w-2 h-2 rounded-full bg-primary" /> Médicos
-            </div>
-            <div className="flex items-center gap-2 text-xs text-slate-400">
+            </button>
+            <button
+              onClick={() => setFilter("patient")}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors flex items-center gap-1.5 ${filter === "patient" ? "bg-blue-500/20 text-blue-400" : "text-slate-400 hover:text-slate-200"}`}
+            >
               <div className="w-2 h-2 rounded-full bg-blue-500" /> Pacientes
-            </div>
+            </button>
           </div>
         </div>
       </CardHeader>
       <CardContent className="pt-6">
         <p className="text-sm text-slate-400 mb-6">
-          Acompanhe quem se cadastrou através do seu link exclusivo. Expanda os nomes para ver a 2ª e 3ª geração de indicados na sua rede.
+          Acompanhe quem se cadastrou através do seu link exclusivo.
         </p>
         
-        <div className="space-y-2 -ml-4">
-          {mockData.map((node) => (
-            <TreeNode key={node.id} node={node} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="text-center p-8 text-slate-500 text-sm">
+            Carregando rede...
+          </div>
+        ) : filteredData.length === 0 ? (
+          <div className="text-center p-8 text-slate-500 text-sm">
+            Nenhum registro encontrado nesta categoria.
+          </div>
+        ) : (
+          <div className="space-y-2 -ml-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+            {filteredData.map((node) => (
+              <TreeNode key={node.id} node={node} />
+            ))}
+          </div>
+        )}
         
         <div className="mt-8 flex items-center justify-center p-4 rounded-lg bg-emerald-950/20 border border-emerald-500/10">
-           <p className="text-xs text-emerald-500/70 flex items-center gap-2">
-             <UserCheck size={14} />
-             O sistema identifica automaticamente novos cadastros feitos através do seu link inteligente rastreado.
+           <p className="text-xs text-emerald-500/70 flex items-center gap-2 text-center sm:text-left">
+             <UserCheck size={14} className="shrink-0" />
+             O sistema puxa automaticamente todos os usuários da plataforma para sua indicação direta (1ª Geração).
            </p>
         </div>
       </CardContent>

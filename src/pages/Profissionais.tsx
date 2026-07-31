@@ -188,7 +188,7 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
             <CardContent className="p-6">
               <div className="relative">
                 {pro.imageUrl ? (
-                  <img src={pro.imageUrl} alt={`Foto profissional - ${pro.name}`} className="w-20 h-20 rounded-2xl object-cover object-top border border-border mb-4" />
+                  <img src={pro.imageUrl} alt={`Foto profissional - ${pro.name}`} className="w-20 h-20 rounded-2xl object-cover object-top border border-border mb-4" loading="lazy" decoding="async" />
                 ) : (
                   <div className="w-20 h-20 rounded-2xl border border-border mb-4 bg-primary/10 text-primary flex items-center justify-center font-black text-xl">
                     {pro.avatar}
@@ -382,6 +382,7 @@ const Profissionais = () => {
                                 alt={`${p.name}`}
                                 className="w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover object-top border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300"
                                 loading="lazy"
+                                decoding="async"
                                 width={64}
                                 height={64}
                               />

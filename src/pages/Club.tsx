@@ -138,7 +138,7 @@ function ProductImageCarousel({ images, name }: { images: string[]; name: string
   const [idx, setIdx] = useState(0);
   return (
     <div className="relative group overflow-hidden rounded-t-lg">
-      <img src={images[idx]} alt={name} className="w-full h-56 object-cover transition-transform group-hover:scale-105" loading="lazy" />
+      <img src={images[idx]} alt={name} className="w-full h-56 object-cover transition-transform group-hover:scale-105" loading="lazy" decoding="async" />
       {images.length > 1 && (
         <>
           <button onClick={(e) => { e.stopPropagation(); setIdx((p) => (p - 1 + images.length) % images.length); }}
@@ -583,7 +583,7 @@ const Club = () => {
                   <div className="grid grid-cols-3 gap-2 mt-3">
                     {postImages.map((img, i) => (
                       <div key={i} className="relative">
-                        <img src={img} alt="" className="w-full h-24 object-cover rounded-lg" />
+                        <img src={img} alt="" className="w-full h-24 object-cover rounded-lg" loading="lazy" decoding="async" />
                         <button onClick={() => setPostImages((prev) => prev.filter((_, idx) => idx !== i))}
                           className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5">
                           <X size={12} />
@@ -631,7 +631,7 @@ const Club = () => {
                   {post.images && post.images.length > 0 && (
                     <div className={`grid gap-2 mb-4 ${post.images.length === 1 ? "grid-cols-1" : post.images.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
                       {post.images.slice(0, 3).map((img: string, i: number) => (
-                        <img key={i} src={img} alt="" className={`w-full object-cover rounded-lg ${post.images.length === 1 ? "h-64" : "h-40"}`} loading="lazy" />
+                        <img key={i} src={img} alt="" className={`w-full object-cover rounded-lg ${post.images.length === 1 ? "h-64" : "h-40"}`} loading="lazy" decoding="async" />
                       ))}
                     </div>
                   )}
@@ -687,7 +687,7 @@ const Club = () => {
                   </div>
                 ) : cart.map((item) => (
                   <div key={item.product.id} className="flex gap-3 bg-muted/50 rounded-lg p-3">
-                    <img src={item.product.images[0]} alt={item.product.name} className="w-16 h-16 object-cover rounded-lg" />
+                    <img src={item.product.images[0]} alt={item.product.name} className="w-16 h-16 object-cover rounded-lg" loading="lazy" decoding="async" />
                     <div className="flex-1 min-w-0">
                       <h4 className="font-semibold text-sm text-foreground truncate">{item.product.name}</h4>
                       <p className="text-primary font-bold text-sm">R$ {item.product.price.toFixed(2)}</p>

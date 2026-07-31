@@ -54,6 +54,10 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('@radix-ui') || id.includes('cmdk')) return 'ui-primitives';
           if (id.includes('@supabase')) return 'supabase';
           if (id.includes('i18next')) return 'i18n';
+          if (id.includes('lucide-react')) return 'lucide';
+          if (id.includes('date-fns')) return 'date-fns';
+          if (id.includes('@hookform') || id.includes('react-hook-form') || id.includes('zod')) return 'forms';
+          if (id.includes('embla-carousel')) return 'carousel';
           return 'vendor';
         },
       },

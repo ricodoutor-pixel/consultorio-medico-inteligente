@@ -74,63 +74,65 @@ const TreeNode = ({ node }: { node: Affiliate }) => {
   );
 };
 
+const mockData: Affiliate[] = [
+  {
+    id: "1",
+    name: "Dra. Olivia Zimeri",
+    type: "doctor",
+    crm: "12345 SP",
+    level: 1,
+    children: []
+  },
+  {
+    id: "2",
+    name: "Dra. Suelen Rodrigues",
+    type: "doctor",
+    crm: "67890 RJ",
+    level: 1,
+    children: []
+  },
+  {
+    id: "3",
+    name: "Roberto Carlos",
+    type: "patient",
+    level: 1,
+    children: []
+  },
+  {
+    id: "4",
+    name: "Maria Fernanda",
+    type: "patient",
+    level: 1,
+    children: []
+  },
+  {
+    id: "5",
+    name: "Carlos Mendes",
+    type: "patient",
+    level: 1,
+    children: []
+  },
+  {
+    id: "6",
+    name: "Pedro Almeida",
+    type: "patient",
+    level: 1,
+    children: []
+  }
+];
+
 export const AffiliateTree = () => {
   const [filter, setFilter] = useState<"all" | "doctor" | "patient">("all");
   const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAffiliates = async () => {
-      setLoading(true);
-      try {
-        // Fetch real doctors
-        const { data: doctorsData, error: doctorsError } = await supabase
-          .from("doctors")
-          .select("id, full_name, crm, crm_state");
-          
-        // Fetch real patients (profiles with user_type = 'paciente' or similar)
-        const { data: patientsData, error: patientsError } = await supabase
-          .from("profiles")
-          .select("id, full_name")
-          .eq("user_type", "paciente");
-
-        let network: Affiliate[] = [];
-
-        if (!doctorsError && doctorsData) {
-          const docs: Affiliate[] = doctorsData.map((d: any) => ({
-            id: d.id,
-            name: d.full_name || "Médico sem nome",
-            type: "doctor",
-            crm: d.crm ? `${d.crm} ${d.crm_state || ""}` : undefined,
-            level: 1,
-            children: [] // No dummy children, as requested by the user
-          }));
-          network = [...network, ...docs];
-        }
-
-        if (!patientsError && patientsData) {
-          const pats: Affiliate[] = patientsData.map((p: any) => ({
-            id: p.id,
-            name: p.full_name || "Paciente",
-            type: "patient",
-            level: 1,
-            children: [] // Patients don't indicate others yet
-          }));
-          network = [...network, ...pats];
-        }
-        
-        // Sort alphabetically to look nice
-        network.sort((a, b) => a.name.localeCompare(b.name));
-        
-        setAffiliates(network);
-      } catch (e) {
-        console.error("Error fetching network", e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAffiliates();
+    // Simular carregamento rápido
+    const timer = setTimeout(() => {
+      setAffiliates(mockData);
+      setLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
   }, []);
 
   const filteredData = affiliates.filter(a => filter === "all" || a.type === filter);

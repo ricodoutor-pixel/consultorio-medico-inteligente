@@ -107,7 +107,7 @@ export const professionals: Professional[] = [
   // ═══════ Médicos Prescritores (6) ═══════
   {
     id: "med-0",
-    name: "Dr. Edilson Bezerra (CRM-SP 185671)",
+    name: "Dr. Edilson Bezerra",
     category: "Médicos Prescritores",
     bio: "Médico prescritor de cannabis medicinal com ampla experiência em dor crônica, neurologia e cuidados integrativos. Atua pela hemodinâmica na Beneficência Portuguesa (SP) e no Hospital Menino Jesus. Referência na plataforma Planta & Raiz.",
     flags: ["🇧🇷", "🇧🇴"],
@@ -122,7 +122,7 @@ export const professionals: Professional[] = [
     avatar: "EB",
     imageUrl: drEdilsonImg,
     online: true,
-    crm: "10963 - Bolívia",
+    crm: "10963 - Sta Cruz Bo",
     hospital: "Beneficência Portuguesa (SP) / Hospital Menino Jesus",
     hospitalUrl: "https://www.beneficencia.org.br",
     services: [

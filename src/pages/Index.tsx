@@ -246,15 +246,15 @@ const Index = () => {
                   <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/40 shrink-0">
                     <img
                       src={drEdilsonPhoto}
-                      alt="Dr. Edilson Bezerra — CRM-SP 185671"
+                      alt="Dr. Edilson Bezerra — CRM 10963 Sta Cruz Bo"
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"
                     />
                   </div>
                   <div>
-                    <p className="font-display font-black text-xl">Dr. Edilson Bezerra On</p>
-                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Cannabis Medicinal · CRM-SP 185671</p>
+                    <p className="font-display font-black text-xl">Dr. Edilson Bezerra</p>
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Médicos Prescritores · CRM 10963 Sta Cruz Bo</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3 pt-2">

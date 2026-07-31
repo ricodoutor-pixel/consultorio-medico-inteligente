@@ -12,6 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { JitsiRoom } from "@/components/consultation/JitsiRoom";
+import { invokeBrisaEngine, analyzeUserIntent } from "@/lib/brisaMasterEngine";
 
 type ChatState = 'ANAMNESE' | 'ESCOLHA_MEDICO' | 'PAYMENT' | 'UPLOAD_RECEIPT' | 'DOCTOR_UNLOCKED' | 'VIDEO_CALL';
 
@@ -129,22 +130,14 @@ export default function TelemedWhatsApp() {
     // Simulate Brisa's flow
     if (activeContact === 'brisa') {
       if (chatState === 'ANAMNESE') {
-        // Mocked typing state could go here
         setTimeout(async () => {
           try {
-            // Call AI agent to process anamnesis and check for red flags
-            const aiHistory = messages.filter(m => m.senderId === 'user' || m.isBrisa).map(m => ({
+            const aiHistory: any[] = messages.filter(m => m.senderId === 'user' || m.isBrisa).map(m => ({
               role: m.isBrisa ? 'assistant' : 'user',
               content: m.text
             }));
-            const internalMsg = `(Contexto interno do sistema: Tabela de preços: Orientação Técnica=R$ 30,00 | Consulta Vídeo=R$ 250,00 | Chat=R$ 150,00. Médicos: Dr. Edilson, Dra. Olivia, Dra. Suelen. Responda à dúvida do paciente se houver). Mensagem do paciente: ${inputText}`;
-            aiHistory.push({ role: 'user', content: internalMsg });
             
-            const { data, error } = await supabase.functions.invoke('agent-chat', {
-              body: { slug: 'brisa-triage', messages: aiHistory } // Try generic slug, fallback if it fails
-            });
-            
-            const aiReply = data?.reply || "Compreendi. Estou aqui para ajudar a direcionar o seu atendimento de forma segura.";
+            const aiReply = await invokeBrisaEngine(aiHistory, inputText);
             
             setMessages(prev => [...prev, {
               id: Date.now().toString(),
@@ -155,8 +148,8 @@ export default function TelemedWhatsApp() {
             }]);
 
             // Transition to Doctor Choice only if the user didn't explicitly just ask for prices
-            const textLower = inputText.toLowerCase();
-            const isJustAskingPrice = textLower.includes('quanto') || textLower.includes('valor') || textLower.includes('preco') || textLower.includes('preço') || textLower.includes('custa');
+            const intent = analyzeUserIntent(inputText);
+            const isJustAskingPrice = inputText.toLowerCase().includes('quanto') || inputText.toLowerCase().includes('valor') || inputText.toLowerCase().includes('preco');
             
             if (!isJustAskingPrice) {
               setTimeout(() => {
@@ -173,7 +166,6 @@ export default function TelemedWhatsApp() {
             
           } catch (e) {
             console.error("AI triage error", e);
-            // Fallback response if AI call fails
             setMessages(prev => [...prev, {
               id: Date.now().toString(),
               senderId: 'brisa',
@@ -194,48 +186,23 @@ export default function TelemedWhatsApp() {
           }
         }, 500);
       } else if (chatState === 'ESCOLHA_MEDICO') {
-        const textLower = inputText.toLowerCase();
-        const hasChoice = textLower.includes('orientacao') || textLower.includes('orientação') || textLower.includes('tecnica') || 
-                          textLower.includes('video') || textLower.includes('vídeo') || textLower.includes('vivo') ||
-                          textLower.includes('chat') || textLower.includes('agendamento') || textLower.includes('emergencia') || textLower.includes('emergência');
+        const intent = analyzeUserIntent(inputText);
         
-        if (hasChoice) {
-          let valor = "R$ 150,00"; // fallback
-          let tipoAtendimento = "Consulta Médica";
-          let detectedModality = 'CHAT';
-
-          if (textLower.includes('orientacao') || textLower.includes('orientação') || textLower.includes('tecnica') || textLower.includes('técnica')) {
-            valor = "R$ 30,00";
-            tipoAtendimento = "Orientação Técnica";
-            detectedModality = 'TECHNICAL_ORIENTATION';
-          } else if (textLower.includes('video') || textLower.includes('vídeo') || textLower.includes('vivo')) {
-            valor = "R$ 250,00";
-            tipoAtendimento = "Atendimento Ao Vivo";
-            detectedModality = 'VIDEO';
-          } else if (textLower.includes('chat')) {
-            valor = "R$ 150,00";
-            tipoAtendimento = "Consulta por Chat";
-            detectedModality = 'CHAT';
-          } else if (textLower.includes('emergencia') || textLower.includes('emergência')) {
-            valor = "R$ 350,00";
-            tipoAtendimento = "Emergência";
-            detectedModality = 'VIDEO';
-          }
-
-          setSelectedModality(detectedModality);
+        if (intent.detectedModality !== 'NONE') {
+          setSelectedModality(intent.detectedModality);
 
           setTimeout(() => {
             setChatState('PAYMENT');
             setMessages(prev => [...prev, {
               id: Date.now().toString(),
               senderId: 'brisa',
-              text: `Perfeito! Registrei sua escolha para ${tipoAtendimento}. Para confirmar e liberar o médico imediatamente, realize o pagamento do PIX correspondente ao valor do atendimento.`,
+              text: `Perfeito! Registrei sua escolha para ${intent.tipoAtendimento}. Para confirmar e liberar o médico imediatamente, realize o pagamento do PIX correspondente ao valor do atendimento.`,
               timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               isBrisa: true
             }, {
               id: (Date.now() + 1).toString(),
               senderId: 'brisa',
-              text: valor,
+              text: `R$ ${intent.value.toFixed(2)}`.replace('.', ','),
               timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               isBrisa: true,
               isPayment: true
@@ -245,18 +212,12 @@ export default function TelemedWhatsApp() {
           // User asked a question during ESCOLHA_MEDICO
           setTimeout(async () => {
             try {
-              const aiHistory = messages.filter(m => m.senderId === 'user' || m.isBrisa).map(m => ({
+              const aiHistory: any[] = messages.filter(m => m.senderId === 'user' || m.isBrisa).map(m => ({
                 role: m.isBrisa ? 'assistant' : 'user',
                 content: m.text
               }));
-              const internalMsg = `(Instrução interna: Valores são Orientação Técnica R$ 30,00, Consulta Vídeo R$ 250,00, Chat R$ 150,00. Responda a dúvida e repita a pergunta de qual modalidade ele prefere). Mensagem: ${inputText}`;
-              aiHistory.push({ role: 'user', content: internalMsg });
               
-              const { data } = await supabase.functions.invoke('agent-chat', {
-                body: { slug: 'brisa-triage', messages: aiHistory }
-              });
-              
-              const aiReply = data?.reply || "Nossas modalidades são: Orientação Técnica (R$ 30), Consulta por Chat (R$ 150) e Consulta por Vídeo (R$ 250). Qual você prefere?";
+              const aiReply = await invokeBrisaEngine(aiHistory, inputText);
               
               setMessages(prev => [...prev, {
                 id: Date.now().toString(),

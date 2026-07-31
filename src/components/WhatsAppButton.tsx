@@ -70,6 +70,7 @@ export const WhatsAppButton = () => {
   const isPlansRoute = location.pathname === "/planos" || location.pathname === "/precos";
   const isSaudeVerdeRoute = location.pathname.startsWith("/saude-verde") || location.pathname === "/cartao-saude";
   const isTelemedWhatsappRoute = location.pathname === "/telemed-whatsapp";
+  const isConsultorioRoute = location.pathname === "/consultorio";
   const buttonSize = isDenseCatalogRoute ? 56 : 64;
 
   useEffect(() => {
@@ -112,7 +113,7 @@ export const WhatsAppButton = () => {
     };
   }, [isOpen]);
 
-  if (isPlansRoute || isTelemedWhatsappRoute) return null;
+  if (isPlansRoute || isTelemedWhatsappRoute || isConsultorioRoute) return null;
 
   const handleOptionClick = async (option: (typeof VISITOR_OPTIONS)[number]) => {
     trackPixelEvent("Contact", { content_name: `brisa_${option.id}` });

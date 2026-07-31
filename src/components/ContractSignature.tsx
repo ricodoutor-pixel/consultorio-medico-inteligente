@@ -238,7 +238,7 @@ export const ContractSignature: React.FC<ContractSignatureProps> = ({
             {userType === 'medico' ? (
               <p className="mt-2">Médico VIP (R$ 99/mês) - Receita 100%, sem taxa de saque</p>
             ) : (
-              <p className="mt-2">Lojista Pro (R$ 49/mês) - Taxa zero, destaque nas recomendações</p>
+              <p className="mt-2">Lojista VIP (R$ 99/mês) - Taxa zero, destaque nas recomendações</p>
             )}
           </div>
 

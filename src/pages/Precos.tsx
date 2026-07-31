@@ -23,10 +23,10 @@ const Precos = () => {
 
   const plans = [
     {
-      id: "usuario",
-      name: "Usuário",
-      price: "R$ 29",
-      priceValue: 2900,
+      id: "paciente-vip",
+      name: "Paciente VIP",
+      price: "R$ 99",
+      priceValue: 9900,
       period: "/mês",
       tag: "PACIENTE",
       icon: Heart,
@@ -40,13 +40,12 @@ const Precos = () => {
         "Recomendações personalizadas",
       ],
       highlighted: false,
-      
     },
     {
-      id: "lojista-pro",
-      name: "Lojista Pro",
-      price: "R$ 49",
-      priceValue: 4900,
+      id: "lojista-vip",
+      name: "Lojista VIP",
+      price: "R$ 99",
+      priceValue: 9900,
       period: "/mês",
       tag: "VENDEDOR",
       icon: Store,
@@ -61,7 +60,6 @@ const Precos = () => {
         "Selo de loja verificada",
       ],
       highlighted: false,
-      
     },
     {
       id: "medico-vip",
@@ -83,50 +81,7 @@ const Precos = () => {
         "Suporte dedicado 24/7",
       ],
       highlighted: true,
-    },
-    {
-      id: "empresa-parceiros",
-      name: "Empresa & Parceiros",
-      price: "R$ 149",
-      priceValue: 14900,
-      period: "/mês",
-      tag: "ENTERPRISE",
-      icon: Building2,
-      description: "Banners publicitários, relatórios de mercado e API white-label.",
-      features: [
-        "Banners publicitários na plataforma",
-        "Relatórios de mercado mensais",
-        "API de integração white-label",
-        "Painel administrativo dedicado",
-        "Onboarding e treinamento",
-        "Suporte 24/7 com gerente de conta",
-        "SLA garantido 99.9%",
-      ],
-      highlighted: false,
-      
-    },
-    {
-      id: "clinica-familia",
-      name: "Clínica Família",
-      price: "R$ 195",
-      priceValue: 19500,
-      period: "/mês",
-      tag: "PREMIUM",
-      icon: Crown,
-      description: "Todos os benefícios + 5 perfis familiares + isenção de taxa de saque.",
-      features: [
-        "Todos os benefícios anteriores",
-        "Até 5 perfis familiares",
-        "Isenção total de taxa de saque",
-        "Taxa ZERO em consultas e shopping",
-        "Compartilhamento de prontuários",
-        "Relatórios de saúde mensais",
-        "Acesso prioritário a novos recursos",
-        "Gerente de conta dedicado",
-      ],
-      highlighted: false,
-      
-    },
+    }
   ];
 
   const executeDynamicCheckout = async (planId: string) => {

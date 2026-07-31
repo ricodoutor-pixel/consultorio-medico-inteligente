@@ -306,7 +306,7 @@ export const OnboardingFlow: React.FC = () => {
             >
               <h3 className="text-xl font-bold mb-2">💊 Lojista/Farmácia</h3>
               <p className="text-gray-600">
-                Plano Lojista Pro (R$ 49/mês) - Taxa zero, destaque nas recomendações
+                Plano Lojista VIP (R$ 99/mês) - Taxa zero, destaque nas recomendações
               </p>
             </button>
           </div>

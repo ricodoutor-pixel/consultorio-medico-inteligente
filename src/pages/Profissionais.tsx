@@ -337,10 +337,6 @@ const Profissionais = () => {
             </p>
           </motion.div>
 
-          {/* Mapa: médicos próximos a você */}
-          <div className="mb-6 md:mb-10">
-            <DoctorsNearMeMap />
-          </div>
 
           {/* Tabs - scroll horizontal no mobile */}
 
@@ -455,6 +451,11 @@ const Profissionais = () => {
               </motion.div>
             ))}
           </motion.div>
+
+          {/* Mapa: médicos próximos a você */}
+          <div className="mt-8 mb-6 md:mb-10">
+            <DoctorsNearMeMap />
+          </div>
 
           <p className="text-xs text-muted-foreground text-center mt-6 md:mt-8">
             ⚠️ Perfis ilustrativos. Prescrição e conduta dependem de avaliação individual.

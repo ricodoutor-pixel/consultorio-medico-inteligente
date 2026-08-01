@@ -151,18 +151,28 @@ export const Navbar = () => {
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
-            {/* Logo */}
-            <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
-              <NavLink to="/" className="flex items-center gap-2 md:gap-3">
-                <div className="w-48 md:w-64 h-12 md:h-16 relative flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="/logo.jpg" 
-                    alt="Planta y Raíz - Mega Clínica Digital" 
-                    className="absolute w-full h-full object-contain mix-blend-lighten scale-[1.8] md:scale-[2.2]"
-                  />
-                </div>
+            {/* Logo + Verdinho */}
+            <div className="flex items-center gap-4 md:gap-6 lg:gap-8 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
+              <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3">
+                <img
+                  src="/logo-planta-raiz.webp"
+                  alt="Planta y Raíz - Mega Clínica Digital"
+                  width={900}
+                  height={330}
+                  fetchPriority="high"
+                  decoding="async"
+                  className="h-[62px] md:h-[74px] w-auto max-w-[210px] md:max-w-[260px] object-contain object-left drop-shadow-[0_0_14px_rgba(34,197,94,0.25)]"
+                />
               </NavLink>
+
+
+              {/* Verdinho com respiro de ~30% — sem sobreposição com o logo */}
+              <div className={`ml-2 lg:ml-4 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>
+                <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
+              </div>
+
             </div>
+
 
             {/* Desktop: Menu Centralizado (aparece a partir de lg = 1024px) */}
             <div className="hidden lg:flex items-center gap-2 xl:gap-3 flex-1 justify-end">
@@ -263,7 +273,11 @@ export const Navbar = () => {
             <span>Voltar</span>
           </button>
 
-          {/* Verdinho removido conforme solicitação */}
+          {/* Verdinho dentro do menu mobile */}
+          <div className="flex justify-center mb-6 relative" style={{ minHeight: 180 }}>
+            <FrogMascot size={81} mood="happy" onClick={() => { setIsOpen(false); openChat(); }} enableJumpToNav={false} />
+          </div>
+
 
           <div className="grid grid-cols-1 gap-1 flex-1">
             {links.map((link) => (

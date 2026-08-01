@@ -14,48 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      affiliate_networks: {
-        Row: {
-          created_at: string
-          generation_level: number
-          id: string
-          referral_code: string
-          referred_id: string
-          referrer_id: string
-        }
-        Insert: {
-          created_at?: string
-          generation_level: number
-          id?: string
-          referral_code: string
-          referred_id: string
-          referrer_id: string
-        }
-        Update: {
-          created_at?: string
-          generation_level?: number
-          id?: string
-          referral_code?: string
-          referred_id?: string
-          referrer_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "affiliate_networks_referred_id_fkey"
-            columns: ["referred_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "affiliate_networks_referrer_id_fkey"
-            columns: ["referrer_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       affiliate_commissions: {
         Row: {
           amount: number
@@ -569,8 +527,6 @@ export type Database = {
           status: string
           type: string
           updated_at: string
-          room_url: string | null
-          room_id: string | null
         }
         Insert: {
           amount?: number
@@ -588,8 +544,6 @@ export type Database = {
           status?: string
           type?: string
           updated_at?: string
-          room_url?: string | null
-          room_id?: string | null
         }
         Update: {
           amount?: number
@@ -607,8 +561,6 @@ export type Database = {
           status?: string
           type?: string
           updated_at?: string
-          room_url?: string | null
-          room_id?: string | null
         }
         Relationships: [
           {
@@ -2289,6 +2241,7 @@ export type Database = {
       }
       doctors: {
         Row: {
+          approval_status: string
           available_hours: Json | null
           bio: string | null
           city: string | null
@@ -2300,6 +2253,7 @@ export type Database = {
           document_type: string
           fraud_score: number | null
           id: string
+          is_approved_by_admin: boolean
           is_available: boolean
           is_crm_valid: boolean
           is_online: boolean
@@ -2311,6 +2265,9 @@ export type Database = {
           longitude: number | null
           organization_id: string | null
           plan_tier: string
+          price_chat_only: number
+          price_return: number
+          price_video_chat: number
           rating: number | null
           rqe: string | null
           specialty: string
@@ -2321,6 +2278,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          approval_status?: string
           available_hours?: Json | null
           bio?: string | null
           city?: string | null
@@ -2332,6 +2290,7 @@ export type Database = {
           document_type?: string
           fraud_score?: number | null
           id?: string
+          is_approved_by_admin?: boolean
           is_available?: boolean
           is_crm_valid?: boolean
           is_online?: boolean
@@ -2343,6 +2302,9 @@ export type Database = {
           longitude?: number | null
           organization_id?: string | null
           plan_tier?: string
+          price_chat_only?: number
+          price_return?: number
+          price_video_chat?: number
           rating?: number | null
           rqe?: string | null
           specialty?: string
@@ -2353,6 +2315,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          approval_status?: string
           available_hours?: Json | null
           bio?: string | null
           city?: string | null
@@ -2364,6 +2327,7 @@ export type Database = {
           document_type?: string
           fraud_score?: number | null
           id?: string
+          is_approved_by_admin?: boolean
           is_available?: boolean
           is_crm_valid?: boolean
           is_online?: boolean
@@ -2375,6 +2339,9 @@ export type Database = {
           longitude?: number | null
           organization_id?: string | null
           plan_tier?: string
+          price_chat_only?: number
+          price_return?: number
+          price_video_chat?: number
           rating?: number | null
           rqe?: string | null
           specialty?: string
@@ -5768,16 +5735,12 @@ export type Database = {
           longitude: number | null
           onboarding_completed: boolean
           phone: string | null
+          pix_key: string | null
+          pix_type: string | null
           planta_coins: number | null
           referred_by: string | null
           region: string | null
           signup_role: string | null
-          referral_code: string | null
-          parent_referrer_id: string | null
-          is_vip: boolean | null
-          vip_status: string | null
-          pix_key: string | null
-          pix_type: string | null
           updated_at: string
           user_type: string
         }
@@ -5799,16 +5762,12 @@ export type Database = {
           longitude?: number | null
           onboarding_completed?: boolean
           phone?: string | null
+          pix_key?: string | null
+          pix_type?: string | null
           planta_coins?: number | null
           referred_by?: string | null
           region?: string | null
           signup_role?: string | null
-          referral_code?: string | null
-          parent_referrer_id?: string | null
-          is_vip?: boolean | null
-          vip_status?: string | null
-          pix_key?: string | null
-          pix_type?: string | null
           updated_at?: string
           user_type?: string
         }
@@ -5830,16 +5789,12 @@ export type Database = {
           longitude?: number | null
           onboarding_completed?: boolean
           phone?: string | null
+          pix_key?: string | null
+          pix_type?: string | null
           planta_coins?: number | null
           referred_by?: string | null
           region?: string | null
           signup_role?: string | null
-          referral_code?: string | null
-          parent_referrer_id?: string | null
-          is_vip?: boolean | null
-          vip_status?: string | null
-          pix_key?: string | null
-          pix_type?: string | null
           updated_at?: string
           user_type?: string
         }

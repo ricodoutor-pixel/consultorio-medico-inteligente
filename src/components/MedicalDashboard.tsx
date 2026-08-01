@@ -19,7 +19,9 @@ import { generatePrescriptionPDF, type PrescriptionData } from "@/lib/prescripti
 import { APP_CONFIG } from "@/lib/app-config";
 import { DrEdilsonClinicalAgent } from "@/components/DrEdilsonClinicalAgent";
 import { PricingConfigModal } from "@/components/PricingConfigModal";
-import { PerformanceBonusWidget } from "@/components/PerformanceBonusWidget";
+import { PerformanceBonusWidget } from "./doctor/PerformanceBonusWidget";
+import { BlockchainRecordPublisher } from "./BlockchainRecordPublisher";
+import { TitulacaoTrackerCard } from "./TitulacaoTrackerCard";
 import { NurseBrisaAlertSystem } from "@/components/NurseBrisaAlertSystem";
 
 // ─── Types ──────────────────────────────────────────────────
@@ -519,6 +521,9 @@ export function MedicalDashboard() {
                   </div>
                 </Card>
               )}
+
+              {/* Curva de Titulação Brisa 2.0 (Bot Start Low, Go Slow) */}
+              <TitulacaoTrackerCard role="doctor" simulateAlert={true} />
 
               {/* Urgency alert */}
               {activePatient.urgency === "high" && (

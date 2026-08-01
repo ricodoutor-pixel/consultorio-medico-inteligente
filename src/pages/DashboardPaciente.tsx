@@ -29,6 +29,7 @@ import { QuickActionHub } from "@/components/patient/QuickActionHub";
 import { TelemedChat } from "@/components/patient/TelemedChat";
 import { IoTBiometricTracker } from "@/components/IoTBiometricTracker";
 import { FarmacogenomicaCard } from "@/components/FarmacogenomicaCard";
+import { TitulacaoTrackerCard } from "@/components/TitulacaoTrackerCard";
 import { Anvisa1ClickButton } from "@/components/Anvisa1ClickButton";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
@@ -298,6 +299,9 @@ const DashboardPaciente = () => {
                 
                 {/* Integração IoT & Biometria Clínica */}
                 <IoTBiometricTracker />
+
+                {/* Titulação Autônoma (Brisa 2.0) */}
+                <TitulacaoTrackerCard role="patient" />
                 
                 {/* Integração Farmacogenômica (DNA Canabinoide) */}
                 <FarmacogenomicaCard patientId={profile?.id} />

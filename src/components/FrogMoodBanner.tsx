@@ -18,23 +18,38 @@ const DOCTOR_GREETINGS = [
   "Vamos acompanhar seu tratamento juntos 🌿",
 ];
 
-/** Tempo (ms) em que o Dr. Verdinho aparece antes de assumir o humor real */
-const DOCTOR_PHASE_MS = 12000;
+/** Carrossel de sapinhos — troca a cada 5 minutos */
+const FROG_CAROUSEL: { src: string; phrase: string }[] = [
+  { src: DOCTOR_IMG, phrase: "Olá! Sou o Dr. Verdinho, seu guia na Mega Clínica Digital 🩺" },
+  { src: "/dr-verdinho-mascot.png", phrase: "Seu tratamento é acompanhado de perto 💚" },
+  { src: "/frog-happy.png", phrase: "Que bom te ver por aqui! Vamos em frente 🌿" },
+  { src: "/dr-verdinho.png", phrase: "Dica: mantenha seu cadastro sempre atualizado 📋" },
+  { src: "/dr-verdinho-splash.webp", phrase: "Cuidar da saúde é um hábito diário 🌱" },
+];
+
+/** Tempo (ms) de cada sapinho no carrossel */
+const DOCTOR_PHASE_MS = 5 * 60 * 1000;
 
 export function FrogMoodBanner() {
   const { mood, message } = useFrogMood();
-  const [doctorPhase, setDoctorPhase] = useState(true);
+  const [frogIndex, setFrogIndex] = useState(0);
   const [greeting] = useState(
     () => DOCTOR_GREETINGS[Math.floor(Math.random() * DOCTOR_GREETINGS.length)]
   );
 
   useEffect(() => {
-    const t = setTimeout(() => setDoctorPhase(false), DOCTOR_PHASE_MS);
-    return () => clearTimeout(t);
+    const interval = setInterval(() => {
+      setFrogIndex((i) => (i + 1) % FROG_CAROUSEL.length);
+    }, DOCTOR_PHASE_MS);
+    return () => clearInterval(interval);
   }, []);
 
-  const showDoctor = doctorPhase || mood === "happy";
-  const imgSrc = showDoctor ? DOCTOR_IMG : moodImages[mood];
+  const showDoctor = mood === "happy";
+  const currentFrog = FROG_CAROUSEL[frogIndex];
+  const imgSrc = showDoctor ? currentFrog.src : moodImages[mood];
+  const doctorMessage = frogIndex === 0 ? greeting : currentFrog.phrase;
+
+
 
   return (
     <div className="flex flex-col items-center gap-1 py-3">
@@ -73,24 +88,23 @@ export function FrogMoodBanner() {
       </p>
 
       {/* Balão contextual */}
-      {(doctorPhase || mood !== "happy") && (
-        <motion.div
-          key={doctorPhase ? "greeting" : mood}
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`mt-1 px-3 py-1.5 rounded-lg text-xs font-medium text-center max-w-[260px] ${
-            doctorPhase
-              ? "bg-primary/10 text-primary border border-primary/20"
-              : mood === "warning"
-              ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
-              : mood === "critical"
-              ? "bg-red-500/10 text-red-400 border border-red-500/20"
-              : "bg-sky-500/10 text-sky-400 border border-sky-500/20"
-          }`}
-        >
-          {doctorPhase ? greeting : message}
-        </motion.div>
-      )}
+      <motion.div
+        key={showDoctor ? `frog-${frogIndex}` : mood}
+        initial={{ opacity: 0, y: -4 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`mt-1 px-3 py-1.5 rounded-lg text-xs font-medium text-center max-w-[260px] ${
+          showDoctor
+            ? "bg-primary/10 text-primary border border-primary/20"
+            : mood === "warning"
+            ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+            : mood === "critical"
+            ? "bg-red-500/10 text-red-400 border border-red-500/20"
+            : "bg-sky-500/10 text-sky-400 border border-sky-500/20"
+        }`}
+      >
+        {showDoctor ? doctorMessage : message}
+      </motion.div>
+
 
     </div>
   );

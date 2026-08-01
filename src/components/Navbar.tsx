@@ -269,7 +269,11 @@ export const Navbar = () => {
             <span>Voltar</span>
           </button>
 
-          {/* Verdinho removido conforme solicitação */}
+          {/* Verdinho dentro do menu mobile */}
+          <div className="flex justify-center mb-6 relative" style={{ minHeight: 180 }}>
+            <FrogMascot size={81} mood="happy" onClick={() => { setIsOpen(false); openChat(); }} enableJumpToNav={false} />
+          </div>
+
 
           <div className="grid grid-cols-1 gap-1 flex-1">
             {links.map((link) => (

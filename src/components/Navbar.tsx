@@ -151,18 +151,24 @@ export const Navbar = () => {
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
-            {/* Logo */}
-            <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+            {/* Logo + Verdinho */}
+            <div className="flex items-center gap-1 md:gap-2 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
               <NavLink to="/" className="flex items-center gap-2 md:gap-3">
-                <div className="w-48 md:w-64 h-12 md:h-16 relative flex items-center justify-center overflow-hidden">
+                <div className="w-40 sm:w-44 md:w-52 h-12 md:h-14 relative flex items-center justify-start overflow-hidden">
                   <img 
                     src="/logo.jpg" 
                     alt="Planta y Raíz - Mega Clínica Digital" 
-                    className="absolute w-full h-full object-contain mix-blend-lighten scale-[1.8] md:scale-[2.2]"
+                    className="absolute left-0 w-full h-full object-contain object-left mix-blend-lighten scale-[1.55] md:scale-[1.7] origin-left"
                   />
                 </div>
               </NavLink>
+
+              {/* Verdinho mais próximo do nome — visível a partir de lg (desktop) */}
+              <div className={`ml-0 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>
+                <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
+              </div>
             </div>
+
 
             {/* Desktop: Menu Centralizado (aparece a partir de lg = 1024px) */}
             <div className="hidden lg:flex items-center gap-2 xl:gap-3 flex-1 justify-end">
@@ -263,7 +269,11 @@ export const Navbar = () => {
             <span>Voltar</span>
           </button>
 
-          {/* Verdinho removido conforme solicitação */}
+          {/* Verdinho dentro do menu mobile */}
+          <div className="flex justify-center mb-6 relative" style={{ minHeight: 180 }}>
+            <FrogMascot size={81} mood="happy" onClick={() => { setIsOpen(false); openChat(); }} enableJumpToNav={false} />
+          </div>
+
 
           <div className="grid grid-cols-1 gap-1 flex-1">
             {links.map((link) => (

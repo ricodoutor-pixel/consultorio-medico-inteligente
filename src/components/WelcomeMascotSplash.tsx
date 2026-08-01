@@ -46,7 +46,11 @@ export function WelcomeMascotSplash() {
             transition={{ type: "spring", stiffness: 220, damping: 18 }}
           >
             <motion.img
-              src="/dr-verdinho-mascot.png?v=8"
+              src="/dr-verdinho-splash.webp"
+              width={360}
+              height={360}
+              decoding="async"
+              loading="eager"
               alt="Dr. Verdinho — Planta y Raiz"
               className="w-[clamp(180px,55vw,360px)] h-auto drop-shadow-[0_20px_40px_rgba(34,197,94,0.45)]"
               animate={{ y: [0, -10, 0] }}

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LeadCaptureModal } from "@/components/LeadCaptureModal";
 import { strains, strainCategories, getTerpenosByType, terpenoInfo, type CannabisStrain } from "@/data/strains";
-import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck, BookOpen, CheckCircle } from "lucide-react";
+import { Search, Star, Leaf, Heart, Droplets, Sprout, FlaskConical, Clock, Mountain, ArrowRight, Grid3X3, List, SlidersHorizontal, Eye, Beaker, ShieldCheck, BookOpen, CheckCircle, Network } from "lucide-react";
 // motion removido — wrapper sem animação causava jitter em scroll Android
 import { Link } from "react-router-dom";
 import { StrainImage } from "@/components/StrainImage";
@@ -214,6 +214,66 @@ const BibliotecaCientifica = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Casos Clínicos em Blockchain (Mock) */}
+      <section className="py-6 border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
+            <h3 className="font-display font-bold text-xl text-foreground flex items-center gap-2">
+              <Network className="text-blue-500" size={24} /> Casos Clínicos Registrados em Blockchain
+            </h3>
+            <Badge className="bg-blue-500/20 text-blue-500 font-bold border border-blue-500/30">Dados 100% Anonimizados</Badge>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Example 1 */}
+            <Card className="bg-card/50 border-border">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <Badge variant="outline" className="text-[10px]">CID: F41.1 (Ansiedade)</Badge>
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <Clock size={10} /> Há 2h
+                  </div>
+                </div>
+                <p className="text-sm text-foreground">Metabolizador normal (CYP2C9). Prescrito Óleo CBD 10%, 10 gotas/dia. Relatou melhora de 60% no sono e ansiedade controlada.</p>
+                <div className="pt-2 border-t border-border flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-mono bg-muted px-2 py-1 rounded">
+                    <ShieldCheck size={12} className="text-green-500" /> TxID: 0x9f8c...3a2c
+                  </div>
+                  <Badge className="bg-primary/10 text-primary text-[9px]">Dr. Roberto S.</Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Example 2 */}
+            <Card className="bg-card/50 border-border">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <Badge variant="outline" className="text-[10px]">CID: G43 (Enxaqueca)</Badge>
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <Clock size={10} /> Há 5h
+                  </div>
+                </div>
+                <p className="text-sm text-foreground">Metabolizador lento (CYP3A4). Prescrito THC/CBD 1:1, microdose. Redução de 80% na frequência de crises de enxaqueca com aura.</p>
+                <div className="pt-2 border-t border-border flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-mono bg-muted px-2 py-1 rounded">
+                    <ShieldCheck size={12} className="text-green-500" /> TxID: 0x1b4e...7d9e
+                  </div>
+                  <Badge className="bg-primary/10 text-primary text-[9px] flex items-center gap-1"><ShieldCheck size={10}/> Dra. Camila L.</Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* CTA */}
+            <Card className="border-blue-500/30 bg-blue-500/5 flex flex-col items-center justify-center text-center p-6 cursor-pointer hover:bg-blue-500/10 transition-colors">
+              <Network size={32} className="text-blue-500 mb-2" />
+              <p className="text-sm font-bold text-foreground">Você é médico associado?</p>
+              <p className="text-xs text-muted-foreground mb-3">Publique seus casos anonimizados e ganhe a badge "Pesquisador Verificado".</p>
+              <Button size="sm" className="bg-blue-500 text-white hover:bg-blue-600 rounded-xl w-full">Saber Mais</Button>
+            </Card>
           </div>
         </div>
       </section>

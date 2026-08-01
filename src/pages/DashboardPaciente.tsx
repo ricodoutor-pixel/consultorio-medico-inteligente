@@ -27,6 +27,9 @@ import { professionals } from "@/data/professionals";
 import AirQualityWidget from "@/components/health/AirQualityWidget";
 import { QuickActionHub } from "@/components/patient/QuickActionHub";
 import { TelemedChat } from "@/components/patient/TelemedChat";
+import { IoTBiometricTracker } from "@/components/IoTBiometricTracker";
+import { FarmacogenomicaCard } from "@/components/FarmacogenomicaCard";
+import { Anvisa1ClickButton } from "@/components/Anvisa1ClickButton";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -292,6 +295,13 @@ const DashboardPaciente = () => {
                     </CardContent>
                   </Card>
                 )}
+                
+                {/* Integração IoT & Biometria Clínica */}
+                <IoTBiometricTracker />
+                
+                {/* Integração Farmacogenômica (DNA Canabinoide) */}
+                <FarmacogenomicaCard patientId={profile?.id} />
+
                 {/* Check-in Card */}
                 <PatientCheckinCard userId={profile?.id || ""} onCheckinComplete={() => setCheckinRefresh(p => p + 1)} />
 
@@ -484,11 +494,31 @@ const DashboardPaciente = () => {
                           )}
                           {rx.instructions && <p className="text-xs text-muted-foreground mt-2 italic">{rx.instructions}</p>}
                           {rx.valid_until && <p className="text-[10px] text-muted-foreground mt-1">Válida até: {new Date(rx.valid_until).toLocaleDateString("pt-BR")}</p>}
-                          {nearExpiry && (
-                            <Button size="sm" variant="outline" className="mt-3 rounded-xl text-xs border-primary/30 text-primary hover:bg-primary/10" onClick={() => { setRenewTarget(rx); setRenewModalOpen(true); }}>
-                              <RefreshCw size={12} className="mr-1" /> Solicitar Renovação
-                            </Button>
-                          )}
+                          
+                          <div className="flex flex-col gap-2 mt-3">
+                            <Anvisa1ClickButton 
+                              patientData={{
+                                name: profile?.full_name || "Paciente",
+                                cpf: profile?.cpf || "000.000.000-00",
+                                rg: profile?.rg || "00.000.000-0",
+                                address: profile?.address || "Não informado",
+                                email: profile?.email || "email@exemplo.com"
+                              }}
+                              prescriptionData={{
+                                doctorName: "Dr(a). Especialista", 
+                                doctorCrm: "CRM 00000", 
+                                productName: meds[0]?.name || meds[0]?.medication || "Óleo CBD Premium", 
+                                posology: meds[0]?.dosage || "Conforme prescrição", 
+                                date: new Date(rx.created_at).toLocaleDateString("pt-BR")
+                              }}
+                              className="w-full text-xs"
+                            />
+                            {nearExpiry && (
+                              <Button size="sm" variant="outline" className="w-full rounded-xl text-xs border-primary/30 text-primary hover:bg-primary/10" onClick={() => { setRenewTarget(rx); setRenewModalOpen(true); }}>
+                                <RefreshCw size={12} className="mr-1" /> Solicitar Renovação
+                              </Button>
+                            )}
+                          </div>
                         </CardContent>
                       </Card>
                     );

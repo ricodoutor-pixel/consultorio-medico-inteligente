@@ -23,6 +23,10 @@ import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { VIPExpirationAlert } from "@/components/doctor/VIPExpirationAlert";
 
 import { DoctorAuxDiagnosticTools } from "@/components/doctor/DoctorAuxDiagnosticTools";
+import { IoTBiometricTracker } from "@/components/IoTBiometricTracker";
+import { FarmacogenomicaCard } from "@/components/FarmacogenomicaCard";
+import { BlockchainRecordPublisher } from "@/components/BlockchainRecordPublisher";
+import { Anvisa1ClickButton } from "@/components/Anvisa1ClickButton";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
@@ -671,22 +675,43 @@ const DashboardMedico = () => {
                   ) : (
                     <div className="space-y-3">
                       {prescriptions.slice(0, 5).map(rx => (
-                        <div key={rx.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border">
-                          <div>
-                            <p className="font-bold text-sm text-foreground">
-                              {Array.isArray(rx.medications) && rx.medications.length > 0 ? (rx.medications[0] as any)?.name || "Prescrição" : "Prescrição"}
-                            </p>
-                            <p className="text-xs text-muted-foreground">{rx.diagnosis_cid ? `CID: ${rx.diagnosis_cid}` : "Sem CID"}</p>
+                        <div key={rx.id} className="p-3 rounded-xl bg-muted/30 border border-border">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-bold text-sm text-foreground">
+                                {Array.isArray(rx.medications) && rx.medications.length > 0 ? (rx.medications[0] as any)?.name || "Prescrição" : "Prescrição"}
+                              </p>
+                              <p className="text-xs text-muted-foreground">{rx.diagnosis_cid ? `CID: ${rx.diagnosis_cid}` : "Sem CID"}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-muted-foreground">{format(new Date(rx.created_at), "dd/MM")}</p>
+                              <Badge className={`text-[10px] ${rx.status === "signed" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                                {rx.status === "signed" ? "Assinada" : rx.status === "draft" ? "Rascunho" : rx.status}
+                              </Badge>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <p className="text-xs text-muted-foreground">{format(new Date(rx.created_at), "dd/MM")}</p>
-                            <Badge className={`text-[10px] ${rx.status === "signed" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                              {rx.status === "signed" ? "Assinada" : rx.status === "draft" ? "Rascunho" : rx.status}
-                            </Badge>
+                          <div className="mt-3">
+                            <Anvisa1ClickButton
+                              patientData={{
+                                name: rx.patient?.full_name || "Paciente",
+                                cpf: rx.patient?.cpf || "000.000.000-00",
+                                rg: rx.patient?.rg || "00.000.000-0",
+                                address: rx.patient?.address || "Endereço não informado",
+                                email: rx.patient?.email || "email@exemplo.com"
+                              }}
+                              prescriptionData={{
+                                doctorName: profileData?.full_name || "Médico",
+                                doctorCrm: doctorData?.crm ? `CRM ${doctorData.crm}` : "CRM 00000",
+                                productName: (Array.isArray(rx.medications) && rx.medications.length > 0 ? (rx.medications[0] as any)?.name : "Óleo CBD Premium") || "Óleo CBD Premium",
+                                posology: (Array.isArray(rx.medications) && rx.medications.length > 0 ? (rx.medications[0] as any)?.dosage : "Uso contínuo") || "Uso contínuo",
+                                date: new Date(rx.created_at).toLocaleDateString("pt-BR")
+                              }}
+                              className="w-full text-xs py-1 h-8"
+                            />
                           </div>
                         </div>
                       ))}
-                    </div>
+                      </div>
                   )}
                 </CardContent>
               </Card>
@@ -729,6 +754,26 @@ const DashboardMedico = () => {
           {selectedPatientTriage && (
             <div className="mt-6 space-y-4">
               <EvolutionChart userId={selectedPatientTriage.appointment.patient_id} compact />
+              
+              {/* Integração IoT & Biometria Clínica no Triage */}
+              <IoTBiometricTracker />
+              
+              {/* Integração Farmacogenômica (DNA Canabinoide) */}
+              <FarmacogenomicaCard patientId={selectedPatientTriage.appointment.patient_id} isDoctorView />
+              
+              {/* Integração Prontuário Blockchain */}
+              <BlockchainRecordPublisher 
+                caseData={{
+                  diagnosisCid: "F41.1",
+                  symptoms: selectedPatientTriage.triage.symptoms || "Ansiedade generalizada",
+                  prescribedStrain: "Óleo CBD 10%",
+                  dosage: "10 gotas/dia",
+                  evolutionNotes: "Melhora no sono e redução da ansiedade.",
+                  ageRange: "30-40",
+                  gender: "Feminino"
+                }} 
+                doctorCrm={doctorData?.crm || "00000"} 
+              />
 
               <Card className="border-border">
                 <CardContent className="p-4">

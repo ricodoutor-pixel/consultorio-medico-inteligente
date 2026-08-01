@@ -54,8 +54,8 @@ const OnboardingFlow = lazyWithRecovery(() => import("./pages/OnboardingFlow").t
 const ComoFunciona = lazyWithRecovery(() => import("./pages/ComoFunciona"), { sourceRef: "/como-funciona" });
 const Profissionais = lazyWithRecovery(() => import("./pages/Profissionais"), { sourceRef: "/profissionais" });
 const Shopping = lazyWithRecovery(() => import("./pages/Shopping"), { sourceRef: "/shopping" });
-const Precos = lazyWithRecovery(() => import("./pages/Precos"), { sourceRef: "/precos" });
-const SaudeDigital = lazyWithRecovery(() => import("./pages/SaudeDigital"), { sourceRef: "/saude-digital" });
+const ComunidadeConteudoIA = lazyWithRecovery(() => import("./pages/ComunidadeConteudoIA"), { sourceRef: "/comunidade" });
+const Agendamento = lazyWithRecovery(() => import("./pages/Agendamento"), { sourceRef: "/agendamento" });
 const FAQ = lazyWithRecovery(() => import("./pages/FAQ"), { sourceRef: "/faq" });
 const Contato = lazyWithRecovery(() => import("./pages/Contato"), { sourceRef: "/contato" });
 const Pay = lazyWithRecovery(() => import("./pages/Pay"), { sourceRef: "/pay" });
@@ -88,9 +88,9 @@ const AdminDashboard = lazyWithRecovery(() => import("./pages/AdminDashboard"), 
 const DownloadApp = lazyWithRecovery(() => import("./pages/DownloadApp"), { sourceRef: "/download" });
 const MonitorCardiacoPage = lazyWithRecovery(() => import("./pages/MonitorCardiaco"), { sourceRef: "/monitor-cardiaco" });
 const ConsultationMonitorPage = lazyWithRecovery(() => import("./pages/ConsultationMonitor").then(m => ({ default: m.ConsultationMonitorPage })), { sourceRef: "/consultation-monitor" });
-const Comunidade = lazyWithRecovery(() => import("./pages/Comunidade"), { sourceRef: "/comunidade" });
+const Precos = lazyWithRecovery(() => import("./pages/Precos"), { sourceRef: "/precos" });
+const SaudeDigital = lazyWithRecovery(() => import("./pages/SaudeDigital"), { sourceRef: "/saude-digital" });
 const DashboardPaciente = lazyWithRecovery(() => import("./pages/DashboardPaciente"), { sourceRef: "/dashboard" });
-const Agendamento = lazyWithRecovery(() => import("./pages/Agendamento"), { sourceRef: "/agendamento" });
 const Prontuario = lazyWithRecovery(() => import("./pages/Prontuario"), { sourceRef: "/prontuario" });
 const DashboardMedico = lazyWithRecovery(() => import("./pages/DashboardMedico"), { sourceRef: "/dashboard-medico" });
 const DashboardExecutivo = lazyWithRecovery(() => import("./pages/DashboardExecutivo"), { sourceRef: "/dashboard-executivo" });
@@ -307,7 +307,7 @@ const App = () => (
                 <Route path="/check-up-rapido" element={<MonitorCardiacoPage />} />
                 <Route path="/consultation-monitor/:appointmentId" element={<PrivateRoute><ConsultationMonitorPage /></PrivateRoute>} />
                 <Route path="/consultation-monitor" element={<PrivateRoute><ConsultationMonitorPage /></PrivateRoute>} />
-                <Route path="/comunidade" element={<Comunidade />} />
+                <Route path="/comunidade" element={<ComunidadeConteudoIA />} />
                 <Route path="/dashboard" element={<DashboardPaciente />} />
                 <Route path="/telemedicina-assincrona" element={<PrivateRoute><TelemedicinaAssincrona /></PrivateRoute>} />
                 <Route path="/afiliados" element={<PrivateRoute><AfiliadosGamificado /></PrivateRoute>} />

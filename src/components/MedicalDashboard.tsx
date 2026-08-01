@@ -19,7 +19,7 @@ import { generatePrescriptionPDF, type PrescriptionData } from "@/lib/prescripti
 import { APP_CONFIG } from "@/lib/app-config";
 import { DrEdilsonClinicalAgent } from "@/components/DrEdilsonClinicalAgent";
 import { PricingConfigModal } from "@/components/PricingConfigModal";
-import { PerformanceBonusWidget } from "./doctor/PerformanceBonusWidget";
+import { PerformanceBonusWidget } from "@/components/PerformanceBonusWidget";
 import { BlockchainRecordPublisher } from "./BlockchainRecordPublisher";
 import { TitulacaoTrackerCard } from "./TitulacaoTrackerCard";
 import { NurseBrisaAlertSystem } from "@/components/NurseBrisaAlertSystem";

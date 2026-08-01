@@ -96,7 +96,7 @@ const TOOLS_ACTIONS: ActionItem[] = [
     label: "Indique e Ganhe",
     desc: "Programa de afiliados",
     icon: Gift,
-    to: "/indicacoes",
+    to: "/afiliados",
     gradient: "from-purple-500/15 to-purple-500/5",
     iconColor: "text-purple-400",
   },

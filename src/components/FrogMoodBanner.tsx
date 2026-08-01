@@ -88,24 +88,23 @@ export function FrogMoodBanner() {
       </p>
 
       {/* Balão contextual */}
-      {(doctorPhase || mood !== "happy") && (
-        <motion.div
-          key={doctorPhase ? "greeting" : mood}
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`mt-1 px-3 py-1.5 rounded-lg text-xs font-medium text-center max-w-[260px] ${
-            doctorPhase
-              ? "bg-primary/10 text-primary border border-primary/20"
-              : mood === "warning"
-              ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
-              : mood === "critical"
-              ? "bg-red-500/10 text-red-400 border border-red-500/20"
-              : "bg-sky-500/10 text-sky-400 border border-sky-500/20"
-          }`}
-        >
-          {doctorPhase ? greeting : message}
-        </motion.div>
-      )}
+      <motion.div
+        key={showDoctor ? `frog-${frogIndex}` : mood}
+        initial={{ opacity: 0, y: -4 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`mt-1 px-3 py-1.5 rounded-lg text-xs font-medium text-center max-w-[260px] ${
+          showDoctor
+            ? "bg-primary/10 text-primary border border-primary/20"
+            : mood === "warning"
+            ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+            : mood === "critical"
+            ? "bg-red-500/10 text-red-400 border border-red-500/20"
+            : "bg-sky-500/10 text-sky-400 border border-sky-500/20"
+        }`}
+      >
+        {showDoctor ? doctorMessage : message}
+      </motion.div>
+
 
     </div>
   );

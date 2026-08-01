@@ -743,8 +743,8 @@ const CadastroProfissional = () => {
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="valorCobrado">{t.value}</Label>
-                      <Input id="valorCobrado" type="number" min="0" step="0.01" placeholder={isBO ? "70.00" : "120.00"} value={form.valorCobrado} onChange={(e) => handleChange("valorCobrado", e.target.value)} required />
+                      <Label htmlFor="priceVideoChat">{t.value}</Label>
+                      <Input id="priceVideoChat" type="number" min="0" step="0.01" placeholder={isBO ? "70.00" : "120.00"} value={form.priceVideoChat} onChange={(e) => handleChange("priceVideoChat", e.target.value)} required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="cidadeUF">{t.cityUF}</Label>

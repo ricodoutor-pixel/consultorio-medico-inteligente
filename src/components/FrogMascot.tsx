@@ -1,6 +1,6 @@
 import { memo, useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import verdinhoImg from "@/assets/verdinho-mascot.png";
+import verdinhoImg from "@/assets/verdinho-mascot-256.webp";
 import { useFrogAnimations, FrogExpression } from "./frog/useFrogAnimations";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { FrogEyes } from "./frog/FrogEyes";

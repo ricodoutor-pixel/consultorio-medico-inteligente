@@ -32,7 +32,6 @@ const DOCTOR_PHASE_MS = 5 * 60 * 1000;
 
 export function FrogMoodBanner() {
   const { mood, message } = useFrogMood();
-  const [doctorPhase, setDoctorPhase] = useState(true);
   const [frogIndex, setFrogIndex] = useState(0);
   const [greeting] = useState(
     () => DOCTOR_GREETINGS[Math.floor(Math.random() * DOCTOR_GREETINGS.length)]
@@ -45,10 +44,11 @@ export function FrogMoodBanner() {
     return () => clearInterval(interval);
   }, []);
 
-  const showDoctor = doctorPhase || mood === "happy";
+  const showDoctor = mood === "happy";
   const currentFrog = FROG_CAROUSEL[frogIndex];
   const imgSrc = showDoctor ? currentFrog.src : moodImages[mood];
   const doctorMessage = frogIndex === 0 ? greeting : currentFrog.phrase;
+
 
 
   return (

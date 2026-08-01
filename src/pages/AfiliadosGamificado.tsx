@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Users, Copy, Wallet, Gift, Trophy, ArrowUpRight, Medal, Crown, Star } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Users, Copy, Wallet, Gift, Trophy, ArrowUpRight, Medal, Crown, Star, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const leaderboardData = [
   { rank: 1, name: "Dr. Marcos T.", coins: 14500, avatar: "MT", type: "medico" },
@@ -16,20 +21,109 @@ const leaderboardData = [
 
 export default function AfiliadosGamificado() {
   const { toast } = useToast();
-  const [balance] = useState(3250); // RaizCoins
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
+  const [balance, setBalance] = useState(0); 
+  const [pixModalOpen, setPixModalOpen] = useState(false);
+  const [pixKey, setPixKey] = useState("");
+  const [pixType, setPixType] = useState("cpf");
+  
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const generateRefCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = 'PRZ-';
+    for (let i = 0; i < 5; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
+  const fetchProfile = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate("/login");
+      return;
+    }
+
+    let { data } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
+    
+    if (data && !data.referral_code) {
+      const newRefCode = generateRefCode();
+      const { data: updated } = await supabase.from("profiles").update({ referral_code: newRefCode }).eq("id", session.user.id).select().single();
+      if (updated) data = updated;
+    }
+
+    setProfile(data);
+    setBalance(data?.planta_coins || 0);
+    setPixKey(data?.pix_key || "");
+    setPixType(data?.pix_type || "cpf");
+    setLoading(false);
+  };
+
   const brlEquivalent = (balance * 0.1).toFixed(2); // 10 RC = 1 BRL
-  const refCode = "PRZ-8X9L2";
+  const refCode = profile?.referral_code || "PRZ-00000";
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(`https://plantayraiz.com.br?ref=${refCode}`);
+    navigator.clipboard.writeText(`https://plantayraiz.com.br/cadastro?ref=${refCode}`);
     toast({ title: "Link copiado!", description: "Compartilhe com seus amigos e pacientes." });
   };
+
+  const handleWithdrawalRequest = async () => {
+    if (!profile?.is_vip) {
+      toast({
+        title: "Acesso Restrito",
+        description: "Você precisa ser assinante VIP para solicitar saques PIX.",
+        variant: "destructive"
+      });
+      navigate("/upgrade");
+      return;
+    }
+    
+    setPixModalOpen(true);
+  };
+
+  const submitPix = async () => {
+    if (!pixKey) {
+      toast({ title: "Chave PIX inválida", variant: "destructive" });
+      return;
+    }
+    
+    // Save PIX key to profile
+    await supabase.from("profiles").update({ pix_key: pixKey, pix_type: pixType }).eq("id", profile.id);
+    
+    // Simulate withdrawal request
+    toast({ title: "Saque Solicitado", description: "Sua solicitação de saque PIX está em análise." });
+    setPixModalOpen(false);
+  };
+
+  if (loading) {
+    return <div className="min-h-screen bg-background pt-24 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>;
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
       <div className="flex-1 container mx-auto py-8 px-4 space-y-8 pt-24">
+        {!profile?.is_vip && balance > 0 && (
+          <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="text-yellow-500" />
+              <div>
+                <p className="font-bold text-foreground">Você possui R$ {brlEquivalent} acumulados!</p>
+                <p className="text-sm text-muted-foreground">Ative seu Plano VIP para liberar a transferência via PIX.</p>
+              </div>
+            </div>
+            <Button size="sm" onClick={() => navigate("/upgrade")} className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold shrink-0 ml-4">
+              Ativar VIP
+            </Button>
+          </div>
+        )}
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-display font-black text-foreground flex items-center gap-3">
@@ -50,8 +144,13 @@ export default function AfiliadosGamificado() {
                 <span className="text-sm font-bold text-green-500">~ R$ {brlEquivalent}</span>
               </div>
             </div>
-            <Button size="sm" className="ml-2 font-bold rounded-xl" onClick={() => toast({ title: "Resgate", description: "Área de saque em manutenção." })}>
-              <Gift size={16} className="mr-1" /> Resgatar
+            <Button 
+              size="sm" 
+              className="ml-2 font-bold rounded-xl" 
+              variant={profile?.is_vip ? "default" : "secondary"}
+              onClick={handleWithdrawalRequest}
+            >
+              <Gift size={16} className="mr-1" /> Saque PIX
             </Button>
           </div>
         </div>
@@ -67,8 +166,8 @@ export default function AfiliadosGamificado() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="flex-1 bg-muted p-4 rounded-xl border border-border font-mono text-sm text-foreground overflow-hidden text-ellipsis">
-                    https://plantayraiz.com.br?ref={refCode}
+                  <div className="flex-1 bg-muted p-4 rounded-xl border border-border font-mono text-sm text-foreground overflow-hidden text-ellipsis whitespace-nowrap">
+                    https://plantayraiz.com.br/cadastro?ref={refCode}
                   </div>
                   <Button onClick={copyToClipboard} size="lg" className="rounded-xl px-6">
                     <Copy size={18} className="mr-2" /> Copiar Link
@@ -86,7 +185,7 @@ export default function AfiliadosGamificado() {
                       <p className="text-sm text-muted-foreground">Pessoas que você convidou diretamente</p>
                     </div>
                     <div className="text-right">
-                      <span className="block text-2xl font-black text-primary">10%</span>
+                      <span className="block text-2xl font-black text-primary">50%</span>
                       <span className="text-xs font-bold text-muted-foreground uppercase">Comissão</span>
                     </div>
                   </div>
@@ -99,7 +198,7 @@ export default function AfiliadosGamificado() {
                       <p className="text-sm text-muted-foreground">Convidados dos seus diretos</p>
                     </div>
                     <div className="text-right">
-                      <span className="block text-xl font-black text-foreground">3%</span>
+                      <span className="block text-xl font-black text-foreground">5%</span>
                       <span className="text-xs font-bold text-muted-foreground uppercase">Comissão</span>
                     </div>
                   </div>
@@ -168,6 +267,44 @@ export default function AfiliadosGamificado() {
 
         </div>
       </div>
+
+      <Dialog open={pixModalOpen} onOpenChange={setPixModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Solicitar Saque PIX</DialogTitle>
+            <DialogDescription>
+              Confirme sua chave PIX para receber R$ {brlEquivalent}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Tipo de Chave</Label>
+              <select 
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={pixType}
+                onChange={(e) => setPixType(e.target.value)}
+              >
+                <option value="cpf">CPF/CNPJ</option>
+                <option value="email">E-mail</option>
+                <option value="phone">Telefone</option>
+                <option value="random">Chave Aleatória</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Chave PIX</Label>
+              <Input 
+                placeholder="Sua chave PIX" 
+                value={pixKey}
+                onChange={(e) => setPixKey(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPixModalOpen(false)}>Cancelar</Button>
+            <Button onClick={submitPix}>Confirmar Solicitação</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

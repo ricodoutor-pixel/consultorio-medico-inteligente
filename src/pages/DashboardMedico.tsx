@@ -97,6 +97,10 @@ const DashboardMedico = () => {
         setIsOnline(doctor.is_online);
 
         if (doctor.id.startsWith('mock-')) {
+          const localStatus = localStorage.getItem(`mock_online_${doctor.id}`);
+          if (localStatus !== null) {
+            setIsOnline(localStatus === "true");
+          }
           setLoading(false);
           return;
         }
@@ -131,6 +135,13 @@ const DashboardMedico = () => {
     setIsOnline(val);
     if (doctorData) {
       await supabase.from("doctors").update({ is_online: val }).eq("id", doctorData.id);
+      
+      // Sync mock status across tabs for demo purposes
+      if (doctorData.id.startsWith("mock-")) {
+        localStorage.setItem(`mock_online_${doctorData.id}`, String(val));
+        window.dispatchEvent(new Event("mock_online_changed"));
+      }
+      
       toast({ title: val ? "Você está Online ✅" : "Você está Offline" });
     }
   };

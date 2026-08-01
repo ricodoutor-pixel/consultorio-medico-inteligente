@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Gift, Copy, QrCode, Users, DollarSign, TrendingUp, Medal, Share2,
@@ -17,6 +18,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
+import { Slider } from "@/components/ui/slider";
 import { AffiliateWalletCard } from "@/components/affiliates/AffiliateWalletCard";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
@@ -26,17 +28,17 @@ const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
 // Commission structure - 3 levels, up to 50% total
 const commissionLevels = [
-  { level: 1, name: "Nível 1 — Direto", rate: 20, desc: "Indicação direta do afiliado", color: "hsl(var(--primary))" },
-  { level: 2, name: "Nível 2 — Indireto", rate: 15, desc: "Indicação do seu indicado", color: "hsl(var(--accent-foreground))" },
-  { level: 3, name: "Nível 3 — Rede", rate: 15, desc: "Indicação do 2º nível", color: "hsl(45,76%,52%)" },
+  { level: 1, name: "Geração 1 — Diretos", rate: 50, desc: "Sua indicação direta", color: "hsl(var(--primary))" },
+  { level: 2, name: "Geração 2 — Indiretos", rate: 5, desc: "Indicação do seu direto", color: "hsl(var(--accent-foreground))" },
+  { level: 3, name: "Geração 3 — Rede", rate: 2, desc: "Indicação do seu indireto", color: "hsl(45,76%,52%)" },
 ];
 
 // Subscription plans with affiliate earnings
 const planEarnings = [
-  { plan: "Essencial", price: 50, l1: 10, l2: 7.5, l3: 7.5, total: 25 },
-  { plan: "Acesso Usuários", price: 100, l1: 20, l2: 15, l3: 15, total: 50 },
-  { plan: "Família", price: 250, l1: 50, l2: 37.5, l3: 37.5, total: 125 },
-  { plan: "Empresas", price: 300, l1: 60, l2: 45, l3: 45, total: 150 },
+  { plan: "Essencial", price: 50, l1: 25, l2: 2.5, l3: 1, total: 28.5 },
+  { plan: "Acesso VIP", price: 100, l1: 50, l2: 5, l3: 2, total: 57 },
+  { plan: "Família", price: 250, l1: 125, l2: 12.5, l3: 5, total: 142.5 },
+  { plan: "Empresas", price: 300, l1: 150, l2: 15, l3: 6, total: 171 },
 ];
 
 // Affiliate tiers
@@ -85,6 +87,20 @@ const Indicacoes = () => {
   const [totalReferrals, setTotalReferrals] = useState(0);
   const [commissions, setCommissions] = useState<any[]>([]);
   const [networkData, setNetworkData] = useState({ level1: 0, level2: 0, level3: 0 });
+
+  // Calculator states
+  const [diretos, setDiretos] = useState([10]);
+  const [indiretosPorPessoa, setIndiretosPorPessoa] = useState([5]);
+
+  const totalG1 = diretos[0];
+  const totalG2 = totalG1 * indiretosPorPessoa[0];
+  const totalG3 = totalG2 * indiretosPorPessoa[0];
+
+  const basePlan = 100;
+  const earningG1 = totalG1 * (basePlan * 0.50);
+  const earningG2 = totalG2 * (basePlan * 0.05);
+  const earningG3 = totalG3 * (basePlan * 0.02);
+  const totalEarning = earningG1 + earningG2 + earningG3;
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -206,13 +222,160 @@ const Indicacoes = () => {
               </Card>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
               <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-14 px-8" onClick={() => navigate("/cadastro")}>
                 Quero Ser Afiliado <ArrowRight size={18} className="ml-2" />
               </Button>
               <Button variant="outline" className="font-black rounded-2xl h-14 px-8" onClick={() => navigate("/login")}>
                 Já Tenho Conta
               </Button>
+            </div>
+
+            {/* Calculadora de Ganhos */}
+            <div className="mb-16 text-left" id="calculadora">
+              <div className="text-center mb-8">
+                <Badge className="bg-primary/20 text-primary border-primary/30 font-bold mb-3">Simulador de Ganhos</Badge>
+                <h2 className="text-2xl md:text-3xl font-display font-black text-foreground">Calcule sua Renda Recorrente</h2>
+                <p className="text-muted-foreground mt-2">Veja quanto você pode ganhar mensalmente indicando o Plano Acesso VIP (R$ 100).</p>
+              </div>
+
+              <Card className="border-border bg-card/50 backdrop-blur">
+                <CardContent className="p-6 md:p-8">
+                  <div className="grid md:grid-cols-2 gap-10 items-center">
+                    <div className="space-y-8">
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <Label className="font-bold">Quantas pessoas você indicaria? (Geração 1)</Label>
+                          <span className="font-black text-primary">{diretos[0]}</span>
+                        </div>
+                        <Slider value={diretos} onValueChange={setDiretos} max={100} min={1} step={1} className="py-2" />
+                        <p className="text-xs text-muted-foreground mt-1">Você ganha 50% de cada um.</p>
+                      </div>
+                      
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <Label className="font-bold">Quantas pessoas cada um indicaria? (Média G2 e G3)</Label>
+                          <span className="font-black text-primary">{indiretosPorPessoa[0]}</span>
+                        </div>
+                        <Slider value={indiretosPorPessoa} onValueChange={setIndiretosPorPessoa} max={20} min={1} step={1} className="py-2" />
+                        <p className="text-xs text-muted-foreground mt-1">Sua rede viraliza até a 3ª geração.</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-primary/5 rounded-3xl p-6 border border-primary/10 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+                      <h3 className="text-sm font-bold text-muted-foreground mb-4">Projeção Mensal Recorrente</h3>
+                      
+                      <div className="space-y-3 mb-6">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-foreground">Sua indicação (G1)</span>
+                          <span className="font-bold">R$ {earningG1.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-foreground">Rede Indireta (G2)</span>
+                          <span className="font-bold">R$ {earningG2.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-foreground">Profundidade (G3)</span>
+                          <span className="font-bold">R$ {earningG3.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-border pt-4">
+                        <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Total Estimado</p>
+                        <p className="text-4xl font-display font-black text-primary text-gradient-green">
+                          R$ {totalEarning.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                        <p className="text-xs font-medium text-muted-foreground mt-1">/mês enquanto os planos estiverem ativos</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Como Funciona & Automação */}
+            <div className="mb-16 text-left">
+              <div className="text-center mb-10">
+                <h2 className="text-2xl md:text-3xl font-display font-black text-foreground">Como Funciona a Parceria?</h2>
+                <p className="text-muted-foreground mt-2">Tecnologia, transparência e pagamentos automáticos na sua conta.</p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  { icon: Share2, title: "1. Link Exclusivo", desc: "No seu painel VIP, você ganha um código único (ex: PRZ-123) para compartilhar." },
+                  { icon: Zap, title: "2. Rastreamento Automático", desc: "Tudo é automatizado. O sistema reconhece quem veio pelo seu link em até 3 gerações." },
+                  { icon: DollarSign, title: "3. Saque PIX Rápido", desc: "Acumule RaizCoins no painel. Solicitou o saque? Cai no seu PIX sem burocracia." }
+                ].map((item, i) => (
+                  <Card key={i} className="border-border bg-card hover:border-primary/30 transition-colors">
+                    <CardContent className="p-6 text-center">
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                        <item.icon size={24} className="text-primary" />
+                      </div>
+                      <h3 className="font-black text-foreground text-lg mb-2">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Preview do Painel Pessoal */}
+            <div className="mb-16 text-left relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent pointer-events-none -z-10" />
+              <div className="text-center mb-10">
+                <Badge className="bg-primary/20 text-primary border-primary/30 font-bold mb-3">Transparência</Badge>
+                <h2 className="text-2xl md:text-3xl font-display font-black text-foreground">Seu Painel Pessoal Exclusivo</h2>
+                <p className="text-muted-foreground mt-2">Acompanhe sua rede, veja quem converteu e peça seus saques PIX em tempo real.</p>
+              </div>
+              
+              <div className="rounded-3xl border border-border shadow-2xl overflow-hidden bg-background relative max-w-4xl mx-auto">
+                {/* Mockup Topbar */}
+                <div className="h-10 border-b border-border bg-muted/30 flex items-center px-4 gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                  <div className="mx-auto bg-background border border-border rounded-md px-3 py-1 flex items-center gap-2">
+                    <Lock size={10} className="text-muted-foreground" />
+                    <span className="text-[10px] text-muted-foreground font-mono">painel.plantayraiz.com/afiliados</span>
+                  </div>
+                </div>
+                {/* Mockup Content */}
+                <div className="p-4 md:p-8 grid md:grid-cols-2 gap-6 opacity-90 grayscale-[20%] hover:grayscale-0 transition-all duration-500">
+                  <div className="space-y-4">
+                    <div className="h-24 rounded-2xl bg-muted/50 border border-border p-4 flex justify-between items-center">
+                      <div>
+                        <div className="h-4 w-24 bg-muted rounded mb-2" />
+                        <div className="h-8 w-32 bg-primary/20 rounded" />
+                      </div>
+                      <div className="h-12 w-12 rounded-full bg-primary/10" />
+                    </div>
+                    <div className="h-32 rounded-2xl bg-muted/50 border border-border p-4">
+                      <div className="h-4 w-32 bg-muted rounded mb-4" />
+                      <div className="flex gap-2">
+                        <div className="h-8 flex-1 bg-muted rounded" />
+                        <div className="h-8 w-10 bg-primary/20 rounded" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="h-60 rounded-2xl bg-muted/50 border border-border p-4">
+                     <div className="h-4 w-40 bg-muted rounded mb-6" />
+                     <div className="space-y-3">
+                       <div className="h-10 bg-background rounded-lg border border-border" />
+                       <div className="h-10 bg-background rounded-lg border border-border" />
+                       <div className="h-10 bg-background rounded-lg border border-border" />
+                     </div>
+                  </div>
+                </div>
+                
+                {/* Overlay CTA */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm z-10 p-4 text-center">
+                  <h3 className="text-xl md:text-2xl font-black text-foreground mb-4 shadow-sm">Destrave seu Acesso VIP</h3>
+                  <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-14 px-8 shadow-xl" onClick={() => navigate("/cadastro")}>
+                    Criar Minha Conta VIP
+                  </Button>
+                </div>
+              </div>
             </div>
 
             {/* Influencer Special Conditions */}

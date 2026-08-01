@@ -203,7 +203,10 @@ const DashboardPaciente = () => {
               completedCount={completedAppts.length}
               onUpdated={(url) => setProfile((p: any) => ({ ...p, avatar_url: url }))}
             />
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap items-center">
+              <Button size="sm" className="rounded-xl text-xs bg-purple-600 text-white hover:bg-purple-700 font-bold" asChild>
+                <Link to="/afiliados"><Gift size={14} className="mr-1" /> Indique e Ganhe</Link>
+              </Button>
               <Button variant="outline" size="sm" className="rounded-xl text-xs" onClick={handleLogout}>
                 <LogOut size={14} className="mr-1" /> Sair
               </Button>

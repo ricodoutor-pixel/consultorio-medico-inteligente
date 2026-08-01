@@ -83,6 +83,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
   const [realDoctors, setRealDoctors] = useState<(RealDoctor & { profile?: RealProfile })[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentHour, setCurrentHour] = useState(() => new Date().getHours());
+  const [mockTrigger, setMockTrigger] = useState(0);
 
   // Update shift every minute to catch hour changes
   useEffect(() => {
@@ -90,7 +91,14 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const h = new Date().getHours();
       setCurrentHour(prev => prev !== h ? h : prev);
     }, 60_000);
-    return () => clearInterval(interval);
+    
+    const handleMockChange = () => setMockTrigger(t => t + 1);
+    window.addEventListener("mock_online_changed", handleMockChange);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("mock_online_changed", handleMockChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -194,10 +202,27 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     let finalPros = [...realPros];
 
+    const getMockOnlineStatus = (id: string, defaultStatus: boolean) => {
+      const stored = localStorage.getItem(`mock_online_${id}`);
+      return stored !== null ? stored === "true" : defaultStatus;
+    };
+
     // Dr. Edilson fallback (always online)
     const edilsonMock = testProfessionals.find(p => p.id === "med-0");
     if (edilsonMock && !isMockReplaced(edilsonMock)) {
       finalPros.unshift({ ...edilsonMock, online: true });
+    }
+    
+    // Dra. Olivia fallback (offline by default, togglable)
+    const oliviaMock = testProfessionals.find(p => p.id === "mock-olivia");
+    if (oliviaMock && !isMockReplaced(oliviaMock)) {
+      finalPros.push({ ...oliviaMock, online: getMockOnlineStatus("mock-olivia", false) });
+    }
+
+    // Dra. Suelen fallback (offline by default, togglable)
+    const suelenMock = testProfessionals.find(p => p.id === "mock-suelen");
+    if (suelenMock && !isMockReplaced(suelenMock)) {
+      finalPros.push({ ...suelenMock, online: getMockOnlineStatus("mock-suelen", false) });
     }
 
     // How many test slots remain after real doctors fill spots
@@ -222,7 +247,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     }));
 
     return [...finalPros, ...rotatedTests];
-  }, [realDoctors, currentHour]);
+  }, [realDoctors, currentHour, mockTrigger]);
 
   return { professionals: merged, realCount: realDoctors.length, loading };
 }

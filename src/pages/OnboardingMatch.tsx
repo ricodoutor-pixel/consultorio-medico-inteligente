@@ -86,8 +86,8 @@ export default function OnboardingMatch() {
   };
 
   const handleStartConsultation = () => {
-    // In a real flow, this would create a guest/anonymous session and go straight to waiting room
-    navigate("/sala-espera?fastTrack=true");
+    // Redirecionar para o cadastro obrigatório repassando a flag de prioridade
+    navigate("/cadastro?fastTrack=true");
   };
 
   if (showMatch) {
@@ -124,10 +124,10 @@ export default function OnboardingMatch() {
                 
                 <div className="mt-8">
                   <Button onClick={handleStartConsultation} size="lg" className="w-full bg-[#00a884] hover:bg-[#008f6f] text-white font-black text-lg h-14 rounded-2xl shadow-lg shadow-[#00a884]/30 animate-pulse">
-                    🟢 Entrar na Consulta Agora
+                    🟢 Finalizar Cadastro e Ver Médico
                   </Button>
                   <p className="text-[10px] text-muted-foreground mt-3 uppercase tracking-wider font-bold">
-                    Sem cadastro burocrático
+                    Seus dados médicos são retidos com segurança e sigilo
                   </p>
                 </div>
               </CardContent>

@@ -146,6 +146,7 @@ const AutomationsDashboard = lazyWithRecovery(() => import("./pages/AutomationsD
 const OnboardingMatch = lazyWithRecovery(() => import("./pages/OnboardingMatch"), { sourceRef: "/onboarding-match" });
 const TelemedicinaAssincrona = lazyWithRecovery(() => import("./pages/TelemedicinaAssincrona"), { sourceRef: "/telemedicina-assincrona" });
 const AfiliadosGamificado = lazyWithRecovery(() => import("./pages/AfiliadosGamificado"), { sourceRef: "/afiliados" });
+const AdminAfiliados = lazyWithRecovery(() => import("./pages/admin/AdminAfiliados"), { sourceRef: "/admin/afiliados" });
 const LojistaDashboard = lazyWithRecovery(() => import("./pages/LojistaDashboard"), { sourceRef: "/lojistas" });
 
 // ── Cartão Saúde Verde ──
@@ -394,6 +395,7 @@ const App = () => (
                 <Route path="/admin/leads-emergencia" element={<AdminRoute><AdminLeadsEmergencia /></AdminRoute>} />
                 <Route path="/admin/cadastros" element={<AdminRoute><CadastrosRealtime /></AdminRoute>} />
                 <Route path="/admin/cadastros-tempo-real" element={<AdminRoute><CadastrosRealtime /></AdminRoute>} />
+                <Route path="/admin/afiliados" element={<AdminRoute><AdminAfiliados /></AdminRoute>} />
                 <Route path="/admin/global-ops" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
                 <Route path="/admin/mapa-global" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
                 <Route path="/admin/aprovacoes-medicas" element={<AdminRoute><AdminAprovacoes /></AdminRoute>} />

@@ -2241,6 +2241,7 @@ export type Database = {
       }
       doctors: {
         Row: {
+          approval_status: string
           available_hours: Json | null
           bio: string | null
           city: string | null
@@ -2252,6 +2253,7 @@ export type Database = {
           document_type: string
           fraud_score: number | null
           id: string
+          is_approved_by_admin: boolean
           is_available: boolean
           is_crm_valid: boolean
           is_online: boolean
@@ -2263,6 +2265,9 @@ export type Database = {
           longitude: number | null
           organization_id: string | null
           plan_tier: string
+          price_chat_only: number
+          price_return: number
+          price_video_chat: number
           rating: number | null
           rqe: string | null
           specialty: string
@@ -2273,6 +2278,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          approval_status?: string
           available_hours?: Json | null
           bio?: string | null
           city?: string | null
@@ -2284,6 +2290,7 @@ export type Database = {
           document_type?: string
           fraud_score?: number | null
           id?: string
+          is_approved_by_admin?: boolean
           is_available?: boolean
           is_crm_valid?: boolean
           is_online?: boolean
@@ -2295,6 +2302,9 @@ export type Database = {
           longitude?: number | null
           organization_id?: string | null
           plan_tier?: string
+          price_chat_only?: number
+          price_return?: number
+          price_video_chat?: number
           rating?: number | null
           rqe?: string | null
           specialty?: string
@@ -2305,6 +2315,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          approval_status?: string
           available_hours?: Json | null
           bio?: string | null
           city?: string | null
@@ -2316,6 +2327,7 @@ export type Database = {
           document_type?: string
           fraud_score?: number | null
           id?: string
+          is_approved_by_admin?: boolean
           is_available?: boolean
           is_crm_valid?: boolean
           is_online?: boolean
@@ -2327,6 +2339,9 @@ export type Database = {
           longitude?: number | null
           organization_id?: string | null
           plan_tier?: string
+          price_chat_only?: number
+          price_return?: number
+          price_video_chat?: number
           rating?: number | null
           rqe?: string | null
           specialty?: string
@@ -5720,6 +5735,8 @@ export type Database = {
           longitude: number | null
           onboarding_completed: boolean
           phone: string | null
+          pix_key: string | null
+          pix_type: string | null
           planta_coins: number | null
           referred_by: string | null
           region: string | null
@@ -5745,6 +5762,8 @@ export type Database = {
           longitude?: number | null
           onboarding_completed?: boolean
           phone?: string | null
+          pix_key?: string | null
+          pix_type?: string | null
           planta_coins?: number | null
           referred_by?: string | null
           region?: string | null
@@ -5770,6 +5789,8 @@ export type Database = {
           longitude?: number | null
           onboarding_completed?: boolean
           phone?: string | null
+          pix_key?: string | null
+          pix_type?: string | null
           planta_coins?: number | null
           referred_by?: string | null
           region?: string | null

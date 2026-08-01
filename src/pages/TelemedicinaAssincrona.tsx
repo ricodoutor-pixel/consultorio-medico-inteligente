@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Mic, Square, Play, Pause, Send, ShieldCheck, Clock, CheckCircle2 } from "lucide-react";
+import { Mic, Square, Play, Pause, Send, ShieldCheck, Clock, CheckCircle2, Loader2 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 

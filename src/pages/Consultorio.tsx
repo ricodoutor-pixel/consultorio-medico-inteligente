@@ -5,10 +5,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DoctorProfileSettings } from "@/components/doctor/DoctorProfileSettings";
 import { DoctorTeamDashboard } from "@/components/doctor/DoctorTeamDashboard";
 import { DoctorEducationDashboard } from "@/components/doctor/DoctorEducationDashboard";
+import { FilaAssincrona } from "@/components/doctor/FilaAssincrona";
 import { AlertTriangle, Loader2, MessageCircle, Gift, Video } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Consultorio = () => {
   const [doctor, setDoctor] = useState<any>(null);
@@ -141,6 +143,7 @@ const Consultorio = () => {
         <Tabs defaultValue="atendimentos" className="w-full">
           <TabsList className="mb-6 w-full justify-start overflow-x-auto">
             <TabsTrigger value="atendimentos">Atendimentos</TabsTrigger>
+            <TabsTrigger value="fila-assincrona">Fila Assíncrona</TabsTrigger>
             <TabsTrigger value="perfil">Perfil e KYC</TabsTrigger>
             <TabsTrigger value="time">Meu Time</TabsTrigger>
             <TabsTrigger value="educacao">Educação Continuada</TabsTrigger>
@@ -148,6 +151,10 @@ const Consultorio = () => {
           
           <TabsContent value="atendimentos" className="mt-0 border-0 p-0">
             <MedicalDashboard />
+          </TabsContent>
+
+          <TabsContent value="fila-assincrona" className="mt-0 border-0 p-0">
+            <FilaAssincrona />
           </TabsContent>
           
           <TabsContent value="perfil" className="mt-0">

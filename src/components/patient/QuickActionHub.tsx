@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import {
   Calendar, RefreshCw, Stethoscope, AlertTriangle,
-  Heart, BookOpen, Gift, FileText, Droplets, Scale,
+  Heart, BookOpen, Gift, FileText, Droplets, Scale, Zap
 } from "lucide-react";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } };
@@ -51,6 +51,15 @@ const CONSULT_ACTIONS: ActionItem[] = [
     href: "https://wa.me/5511991363154?text=Ol%C3%A1%20Brisa%2C%20quero%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20R%24%2030",
     gradient: "from-emerald-500/15 to-emerald-500/5",
     iconColor: "text-emerald-400",
+  },
+  {
+    emoji: "⚡",
+    label: "Renovação Express",
+    desc: "Renove sem vídeo",
+    icon: Zap,
+    to: "/telemedicina-assincrona",
+    gradient: "from-amber-500/15 to-amber-500/5",
+    iconColor: "text-amber-500",
   },
   {
     emoji: "🚨",

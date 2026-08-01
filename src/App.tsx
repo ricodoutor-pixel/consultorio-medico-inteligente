@@ -143,6 +143,8 @@ const AdminBI = lazyWithRecovery(() => import("./pages/AdminBI"), { sourceRef: "
 const Badges = lazyWithRecovery(() => import("./pages/Badges"), { sourceRef: "/badges" });
 const HealthCheck = lazyWithRecovery(() => import("./pages/HealthCheck"), { sourceRef: "/health" });
 const AutomationsDashboard = lazyWithRecovery(() => import("./pages/AutomationsDashboard"), { sourceRef: "/admin/automations" });
+const OnboardingMatch = lazyWithRecovery(() => import("./pages/OnboardingMatch"), { sourceRef: "/onboarding-match" });
+const TelemedicinaAssincrona = lazyWithRecovery(() => import("./pages/TelemedicinaAssincrona"), { sourceRef: "/telemedicina-assincrona" });
 
 // ── Cartão Saúde Verde ──
 const SaudeVerdeLanding = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeLanding"), { sourceRef: "/saude-verde" });
@@ -245,6 +247,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/onboarding" element={<OnboardingFlow />} />
+                <Route path="/onboarding-match" element={<OnboardingMatch />} />
                 <Route path="/cadastro-completo" element={<OnboardingFlow />} />
                 <Route path="/como-funciona" element={<ComoFunciona />} />
                 <Route path="/profissionais" element={<Profissionais />} />
@@ -304,6 +307,7 @@ const App = () => (
                 <Route path="/consultation-monitor" element={<PrivateRoute><ConsultationMonitorPage /></PrivateRoute>} />
                 <Route path="/comunidade" element={<Comunidade />} />
                 <Route path="/dashboard" element={<DashboardPaciente />} />
+                <Route path="/telemedicina-assincrona" element={<PrivateRoute><TelemedicinaAssincrona /></PrivateRoute>} />
                 <Route path="/agendamento" element={<Agendamento />} />
                 <Route path="/prontuario" element={<Prontuario />} />
                 <Route path="/dashboard-medico" element={<DashboardMedico />} />

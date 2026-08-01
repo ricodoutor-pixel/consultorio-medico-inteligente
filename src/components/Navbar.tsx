@@ -153,15 +153,18 @@ export const Navbar = () => {
             
             {/* Logo + Verdinho */}
             <div className="flex items-center gap-1 md:gap-2 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
-              <NavLink to="/" className="flex items-center gap-2 md:gap-3">
-                <div className="w-40 sm:w-44 md:w-52 h-12 md:h-14 relative flex items-center justify-start overflow-hidden">
-                  <img 
-                    src="/logo.jpg" 
-                    alt="Planta y Raíz - Mega Clínica Digital" 
-                    className="absolute left-0 w-full h-full object-contain object-left mix-blend-lighten scale-[1.55] md:scale-[1.7] origin-left"
-                  />
-                </div>
+              <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3">
+                <img
+                  src="/logo-planta-raiz.webp"
+                  alt="Planta y Raíz - Mega Clínica Digital"
+                  width={900}
+                  height={330}
+                  fetchPriority="high"
+                  decoding="async"
+                  className="h-[62px] md:h-[74px] w-auto max-w-[210px] md:max-w-[260px] object-contain object-left drop-shadow-[0_0_14px_rgba(34,197,94,0.25)]"
+                />
               </NavLink>
+
 
               {/* Verdinho mais próximo do nome — visível a partir de lg (desktop) */}
               <div className={`ml-0 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>

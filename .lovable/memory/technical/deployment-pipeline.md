@@ -1,17 +1,21 @@
 ---
 name: Deployment Pipeline
-description: Cloudflare Pages é o deploy oficial. Hostinger workflow desativado (causava auto-revert em failure).
+description: Hostinger (auto-deploy do GitHub main) é o único deploy oficial do frontend. Cloudflare Pages e workflow Hostinger antigo estão desativados.
 type: feature
 ---
 
-**Produção atual:** Cloudflare Pages no frontend + Railway no runtime do WhatsApp/Evolution.
-- Workflow ativo: `.github/workflows/deploy-cloudflare-pages.yml`
-- Domínio: www.plantayraiz.com.br (CF DNS proxy ON)
-- Endpoint operacional do WhatsApp: `https://api-whatsapp.plantayraiz.com.br/manager/`
+**Fonte única de verdade (02/08/2026):**
+- Código: repositório GitHub, branch `main` (publish do Lovable → commit em `main`).
+- Frontend em produção: **Hostinger** (Node.js app com auto-deploy do repo) servindo `www.plantayraiz.com.br`. DNS/domínio na Hostinger.
+- Backend: Supabase Edge Functions (deploy imediato, independente do frontend).
 
-**Hostinger workflow DESATIVADO** (`.github/workflows/deploy-hostinger.yml.disabled`):
-- Motivo: falhas frequentes no FTP/smoke test
-- Risco crítico removido: tinha `git revert HEAD` no `failure()` que revertia commits bons a cada falha
-- Hostinger continua hospedando: nada (só Hospedagem Web vazia agora)
+**Workflows desativados (não reativar sem decisão formal):**
+- `.github/workflows/deploy-cloudflare-pages.yml.disabled` — causava duas versões do site no ar/confusão de cache.
+- `.github/workflows/deploy-hostinger.yml.disabled` — tinha `git revert HEAD` em `failure()`.
 
-**Regra atual:** não usar mais Oracle/Hostinger VPS para o fluxo Brisa. A operação do WhatsApp deve considerar Railway como origem da Evolution até nova decisão formal.
+**Checklist quando o site no ar difere do ambiente de trabalho:**
+1. Publicar no Lovable (gera commit em `main`).
+2. Hostinger → hPanel → app Node.js → "Reimplantar" (ou confirmar deploy automático concluído).
+3. Hostinger → Limpar cache (LiteSpeed/CDN).
+4. Ctrl+Shift+R no navegador; se persistir, subir `CACHE_VERSION` em `public/sw.js`.
+NÃO recriar o site do zero — o problema é sempre cache/deploy duplicado, nunca o código.

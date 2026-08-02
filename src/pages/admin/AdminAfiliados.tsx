@@ -3,7 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Users, DollarSign, ArrowUpRight, CheckCircle2, Clock, XCircle, Gift, AlertTriangle, ShieldCheck } from "lucide-react";
+import { Users, DollarSign, ArrowUpRight, CheckCircle2, Clock, XCircle, Gift, AlertTriangle, ShieldCheck, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";

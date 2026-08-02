@@ -49,11 +49,11 @@ export default function AfiliadosGamificado() {
       return;
     }
 
-    let { data } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
+    let { data } = await (supabase as any).from("profiles").select("*").eq("id", session.user.id).single();
     
     if (data && !data.referral_code) {
       const newRefCode = generateRefCode();
-      const { data: updated } = await supabase.from("profiles").update({ referral_code: newRefCode }).eq("id", session.user.id).select().single();
+      const { data: updated } = await (supabase as any).from("profiles").update({ referral_code: newRefCode }).eq("id", session.user.id).select().single();
       if (updated) data = updated;
     }
 

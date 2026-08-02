@@ -78,7 +78,7 @@ const Login = () => {
           const isDoctor = userType === "doctor" || !!doctorData;
 
           if (isDoctor) {
-            navigate("/dashboard-medico");
+            navigate("/consultorio");
           } else {
             const { data: roleData } = await supabase
               .from("user_roles")

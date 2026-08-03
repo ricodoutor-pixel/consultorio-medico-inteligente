@@ -104,5 +104,8 @@ export function HealthSubscriptionPlans() {
         </div>
       ))}
     </div>
+    <p className="text-xs text-center text-muted-foreground">{SIGNATURE_NOTICE}</p>
+    </div>
   );
+
 }

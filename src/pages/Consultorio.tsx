@@ -58,19 +58,28 @@ const Consultorio = () => {
     try {
       setUpdatingStatus(true);
       const newStatus = !isOnline;
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('doctors')
-        .update({ is_online: newStatus })
-        .eq('id', doctor.id);
-      
+        .update({ is_online: newStatus, is_available: newStatus })
+        .eq('id', doctor.id)
+        .select('id, is_online, is_available');
+
       if (error) throw error;
-      setIsOnline(newStatus);
-    } catch (error) {
+      if (!data || data.length === 0) {
+        toast.error("Não foi possível alterar o status (permissão negada).");
+        return;
+      }
+      setIsOnline(Boolean(data[0].is_online));
+      setDoctor((prev: any) => prev ? { ...prev, ...data[0] } : prev);
+      toast.success(newStatus ? "Você está ONLINE — visível na página Profissionais." : "Você está OFFLINE no card de Profissionais.");
+    } catch (error: any) {
       console.error("Error toggling status:", error);
+      toast.error(error?.message || "Erro ao atualizar status.");
     } finally {
       setUpdatingStatus(false);
     }
   };
+
 
   if (loading) {
     return (

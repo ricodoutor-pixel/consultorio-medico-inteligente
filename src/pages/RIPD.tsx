@@ -120,7 +120,7 @@ const RIPD = () => {
               <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">CFM 2.314/2022</Badge>
               <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">RDC ANVISA 660/2022</Badge>
               <Badge variant="outline" className="text-[10px]">RIPD v1.0 — Publicado em {new Date().toLocaleDateString("pt-BR")}</Badge>
-              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">DPO Interina: Dra. Suelen Naves Rodrigues (CRM-PR 49354)</Badge>
+              <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">DPO Interina: Dr. Edilson Bezerra ON</Badge>
 
             </div>
 

@@ -1,4 +1,4 @@
-// 🩺 Dra. Suelen Naves Rodrigues (CRM-PR 49354) — Agente de Apoio Clínico (chat flutuante no Dashboard Médico)
+// 🩺 Dr. Edilson Bezerra ON — Agente de Apoio Clínico (chat flutuante no Dashboard Médico)
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -138,7 +138,7 @@ export function DrEdilsonClinicalAgent({ patientContext }: { patientContext?: st
           bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg shadow-primary/30
           border border-primary/40 backdrop-blur-md hover:shadow-primary/50 transition-all
           ${open ? "hidden" : ""}`}
-        aria-label="Pergunte ao Dra. Suelen Naves Rodrigues (CRM-PR 49354)"
+        aria-label="Pergunte ao Dr. Edilson Bezerra ON"
       >
         <div className="relative">
           <Stethoscope className="h-5 w-5" />
@@ -171,7 +171,7 @@ export function DrEdilsonClinicalAgent({ patientContext }: { patientContext?: st
                     <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-card animate-pulse" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-bold leading-tight">Dra. Suelen Naves Rodrigues (CRM-PR 49354)</h3>
+                    <h3 className="text-sm font-bold leading-tight">Dr. Edilson Bezerra ON</h3>
                     <p className="text-[11px] text-muted-foreground leading-tight flex items-center gap-1">
                       <Sparkles className="h-2.5 w-2.5" />
                       Apoio clínico • 40k+ estudos

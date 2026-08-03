@@ -126,7 +126,7 @@ export const professionals: Professional[] = [
     hospital: "Beneficência Portuguesa (SP) / Hospital Menino Jesus",
     hospitalUrl: "https://www.beneficencia.org.br",
     services: [
-      { name: "Orientação Técnica Inicial", price: "R$ 30,00", desc: "Avaliação completa + plano terapêutico canábico" },
+      { name: "Orientação Técnica", price: "R$ 30,00", desc: "Apenas chat via whatsapp (recurso autônomo em nuvem com IA)" },
       { name: "Retorno", price: "R$ 35,00", desc: "Acompanhamento e ajuste de dosagem" },
       { name: "Laudo ANVISA", price: "R$ 50,00", desc: "Documentação para importação ou uso compassivo" },
     ],
@@ -264,7 +264,8 @@ export const professionals: Professional[] = [
     flags: ["🇧🇷"],
     online: false,
     services: [
-      { name: "Orientação Inicial via Chat", price: "R$ 100,00", desc: "Avaliação inicial via chat seguro" },
+      { name: "Orientação Técnica Agendada", price: "R$ 50,00", desc: "Agendado no Brasil (Mercado Pago)" },
+      { name: "Consultas Internacionais (Bolívia)", price: "US$ 50,00", desc: "Agendado na Bolívia (Stripe)" },
       { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150,00", desc: "Avaliação completa com teleconsulta" },
       { name: "Retorno", price: "R$ 90,00", desc: "Acompanhamento" },
     ],

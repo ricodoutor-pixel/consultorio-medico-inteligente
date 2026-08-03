@@ -194,8 +194,8 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         paymentLink: "https://mpago.la/12KAwmH",
         services: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") 
           ? [
-              { name: "Orientação Inicial via Chat", price: "R$ 100,00", desc: "Avaliação inicial via chat seguro" },
-              { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150,00", desc: "Avaliação completa com teleconsulta" },
+              { name: "Consulta via Chat", price: "R$ 100,00", desc: "Avalia\u00e7\u00e3o inicial via chat seguro" },
+              { name: "Consulta (Chat + V\u00eddeo)", price: "R$ 150,00", desc: "Avalia\u00e7\u00e3o completa com teleconsulta" },
               { name: "Retorno", price: "R$ 90,00", desc: "Acompanhamento" },
             ]
           : [

@@ -247,7 +247,7 @@ ${patientContext}\
                     <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-yellow-400 border-2 border-card animate-pulse" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-bold leading-tight">Dra. Suelen Naves Rodrigues (CRM-PR 49354)</h3>
+                    <h3 className="text-sm font-bold leading-tight">Dr. Edilson Bezerra ON</h3>
                     <p className="text-[11px] text-muted-foreground leading-tight flex items-center gap-1">
                       <Stethoscope className="h-2.5 w-2.5" />
                       Suporte Exclusivo • Paciente: {patientName || "Não selecionado"}

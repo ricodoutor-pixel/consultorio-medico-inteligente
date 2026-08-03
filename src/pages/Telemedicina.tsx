@@ -43,6 +43,37 @@ const interviewQuestions = [
 const BrisaAvatar = () => {
   const [mood, setMood] = useState<"neutral" | "happy" | "thinking">("neutral");
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
+  const [chat, setChat] = useState<{ role: "user" | "assistant"; content: string }[]>([
+    { role: "assistant", content: "Olá! Sou a Enfª Brisa 🌿. Como posso te ajudar com sua triagem ou dúvidas sobre o tratamento?" },
+  ]);
+
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text || sending) return;
+    setInput("");
+    const next = [...chat, { role: "user" as const, content: text }];
+    setChat(next);
+    setSending(true);
+    setMood("thinking");
+    try {
+      const { data, error } = await supabase.functions.invoke("brisa-web-chat", {
+        body: { messages: next, leadInfo: { category: "Telemedicina" } },
+      });
+      if (error) throw error;
+      setChat([...next, { role: "assistant", content: data?.text || "Estou aqui com você. Pode me contar um pouco mais?" }]);
+    } catch {
+      setChat([...next, {
+        role: "assistant",
+        content: "Minhas conexões oscilaram, mas continuo aqui. Você pode iniciar a Triagem abaixo ou falar comigo pelo WhatsApp.",
+      }]);
+    } finally {
+      setSending(false);
+      setMood("happy");
+    }
+  };
+
 
   return (
     <div className="relative flex flex-col items-center mb-6">
@@ -50,7 +81,7 @@ const BrisaAvatar = () => {
         className="relative cursor-pointer group"
         onMouseEnter={() => setMood("happy")}
         onMouseLeave={() => setMood("neutral")}
-        onDoubleClick={() => setIsChatOpen(true)}
+        onClick={() => setIsChatOpen(true)}
         whileHover={{ scale: 1.05 }}
       >
         <div className="absolute -inset-4 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -105,14 +136,34 @@ const BrisaAvatar = () => {
                 <X size={18} />
               </Button>
             </div>
-            <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-muted/30">
-              <div className="bg-primary/10 p-3 rounded-2xl rounded-tl-none text-xs text-foreground font-medium border border-primary/20">
-                Olá! Sou a Brisa. Como posso te ajudar com sua triagem ou dúvidas sobre o tratamento?
-              </div>
+            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-muted/30">
+              {chat.map((m, i) => (
+                <div
+                  key={i}
+                  className={
+                    m.role === "assistant"
+                      ? "bg-primary/10 p-3 rounded-2xl rounded-tl-none text-xs text-foreground font-medium border border-primary/20"
+                      : "bg-card p-3 rounded-2xl rounded-br-none text-xs text-foreground border border-border ml-6"
+                  }
+                >
+                  {m.content}
+                </div>
+              ))}
+              {sending && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Loader2 className="animate-spin" size={14} /> Brisa está digitando...
+                </div>
+              )}
             </div>
             <div className="p-3 border-t border-border bg-background flex gap-2">
-              <Input placeholder="Digite sua dúvida..." className="text-xs h-9 rounded-xl" />
-              <Button size="icon" className="h-9 w-9 rounded-xl bg-primary text-white">
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); sendMessage(); } }}
+                placeholder="Digite sua dúvida..."
+                className="text-xs h-9 rounded-xl"
+              />
+              <Button size="icon" disabled={sending} onClick={sendMessage} className="h-9 w-9 rounded-xl bg-primary text-white">
                 <ArrowRight size={16} />
               </Button>
             </div>

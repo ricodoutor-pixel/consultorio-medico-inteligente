@@ -62,7 +62,9 @@ export function HealthSubscriptionPlans() {
   }
 
   return (
+    <div className="space-y-4">
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
       {PLANS.map((plan, i) => (
         <div key={plan.id}>
           <Card className={`relative border-border/50 bg-card/80 backdrop-blur-sm h-full flex flex-col ${

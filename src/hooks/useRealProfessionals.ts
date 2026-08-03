@@ -102,13 +102,16 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
   }, []);
 
   useEffect(() => {
+    let active = true;
+
     const fetchReal = async () => {
       try {
         const { data: doctors } = await supabase
           .from("doctors_public" as any)
           .select("*") as { data: (RealDoctor & { full_name?: string | null; avatar_url?: string | null })[] | null };
 
-        if (doctors && doctors.length > 0) {
+        if (!active) return;
+        if (doctors) {
           setRealDoctors(doctors.map((d: any) => ({
             ...d,
             profile: {
@@ -122,30 +125,46 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       } catch (err) {
         console.error("[useRealProfessionals] Error:", err);
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
     fetchReal();
 
+    // Fallback: revalida a cada 20s caso o realtime falhe
+    const poll = setInterval(fetchReal, 20_000);
+
     const channel = supabase
-      .channel("doctors_public_changes")
+      .channel("public:doctors-status")
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "doctors" },
-        (payload) => {
-          setRealDoctors((prev) => 
-            prev.map((d) => 
-              d.id === payload.new.id ? { ...d, is_online: payload.new.is_online, is_available: payload.new.is_available } : d
-            )
-          );
+        { event: "*", schema: "public", table: "doctors" },
+        (payload: any) => {
+          const row = payload.new ?? payload.old;
+          if (!row?.id) return;
+          setRealDoctors((prev) => {
+            const exists = prev.some((d) => d.id === row.id);
+            if (!exists) {
+              // médico novo/recém-verificado → recarrega a view completa
+              fetchReal();
+              return prev;
+            }
+            return prev.map((d) =>
+              d.id === row.id
+                ? { ...d, is_online: payload.new?.is_online ?? d.is_online, is_available: payload.new?.is_available ?? d.is_available }
+                : d
+            );
+          });
         }
       )
       .subscribe();
 
     return () => {
+      active = false;
+      clearInterval(poll);
       supabase.removeChannel(channel);
     };
   }, []);
+
 
   const merged = useMemo(() => {
     // Build real professionals list directly from DB

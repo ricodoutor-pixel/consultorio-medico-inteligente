@@ -184,21 +184,21 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         bio: d.bio || `Profissional verificado na Planta & Raiz. Especialidade: ${d.specialty}. ${documentLabel}.`,
         experience: "Verificado",
         tags: [d.specialty, documentLabel, cityLabel],
-        price: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") ? "R$ 100,00" : (testMatch?.price || price),
-        priceValue: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") ? 100 : (testMatch?.priceValue || Number(d.consultation_price) || 30),
+        price: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") ? "R$ 100,00" : (mockMatch?.price || price),
+        priceValue: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") ? 100 : (mockMatch?.priceValue || Number(d.consultation_price) || 30),
         whatsapp: "5511991363154",
         rating: d.rating || 5.0,
         consults: d.total_consultations || 0,
         avatar: fullName.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "PR",
         imageUrl: finalImage,
-        paymentLink: testMatch?.paymentLink || "https://mpago.la/12KAwmH",
+        paymentLink: mockMatch?.paymentLink || "https://mpago.la/12KAwmH",
         services: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") 
           ? [
               { name: "Consulta via Chat", price: "R$ 100,00", desc: "Avalia\u00e7\u00e3o inicial via chat seguro" },
               { name: "Consulta (Chat + V\u00eddeo)", price: "R$ 150,00", desc: "Avalia\u00e7\u00e3o completa com teleconsulta" },
               { name: "Retorno", price: "R$ 90,00", desc: "Acompanhamento" },
             ]
-          : (testMatch?.services || [
+          : (mockMatch?.services || [
           { name: "Orienta\u00e7\u00e3o T\u00e9cnica Inicial", price, desc: "Avalia\u00e7\u00e3o completa + plano terap\u00eautico" },
           { name: "Retorno", price: formatConsultationPrice((Number(d.consultation_price) || 30) * 0.6, d.country), desc: "Acompanhamento e ajuste" },
         ]),

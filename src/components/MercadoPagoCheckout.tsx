@@ -33,8 +33,9 @@ export function MercadoPagoCheckout({
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("mp-checkout", {
-        body: { sku, cartToken, appointmentId, returnUrl },
+        body: { sku, cartToken, appointmentId, returnUrl, refCode: getReferralCode() },
       });
+
       if (error || !data?.init_point) {
         throw new Error(data?.error || error?.message || "Falha ao iniciar pagamento");
       }

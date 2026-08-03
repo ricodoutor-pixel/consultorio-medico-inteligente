@@ -13,6 +13,7 @@ import { Star, ArrowLeft, CheckCircle2, Stethoscope, CreditCard, MessageSquare, 
 import { useToast } from "@/hooks/use-toast";
 import { professionals } from "@/data/professionals";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -39,18 +40,88 @@ const FalarComEspecialista = () => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.nomePaciente || !form.telefoneWhatsapp || !form.objetivo || !form.resumoCaso) {
       toast({ title: "Preencha todos os campos obrigatórios", variant: "destructive" });
       return;
     }
     setLoading(true);
-    setTimeout(() => {
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: "Erro", description: "Você precisa fazer login para continuar.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
+      // real-id is used for real professionals in useRealProfessionals hook
+      const doctorId = pro?.id.startsWith("real-") ? pro.id.replace("real-", "") : pro?.id;
+
+      // Check for return visit within 90 days
+      const { data: pastVisits } = await supabase
+        .from("appointments")
+        .select("id")
+        .eq("patient_id", session.user.id)
+        .eq("doctor_id", doctorId)
+        .eq("payment_status", "paid")
+        .gte("created_at", new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString())
+        .limit(1);
+
+      const isReturn = pastVisits && pastVisits.length > 0;
+      const price = isReturn ? 0 : (form.preferencia === "video" ? 150 : 100);
+      
+      const { data: appt, error: apptErr } = await supabase
+        .from("appointments")
+        .insert({
+          patient_id: session.user.id,
+          doctor_id: doctorId,
+          type: form.preferencia,
+          amount: price,
+          notes: form.resumoCaso,
+          status: isReturn ? "confirmed" : "scheduled",
+          payment_status: isReturn ? "paid" : "pending",
+          scheduled_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+        
+      if (apptErr) throw apptErr;
+
+      if (isReturn) {
+        // Create medical record directly since it's a paid return
+        await supabase.from("medical_records").insert({
+          patient_id: session.user.id,
+          doctor_id: doctorId,
+          appointment_id: appt.id,
+        });
+        toast({ title: "Retorno Confirmado!", description: "Isento de taxa (Retorno 90 dias). Iniciando atendimento..." });
+        
+        // Redirect to consultation room
+        setTimeout(() => {
+          window.location.href = form.preferencia === "video" ? `/video-call?room=${appt.id}` : `/chat-medico?appt=${appt.id}`;
+        }, 1500);
+      } else {
+        // Call Mercado Pago webhook
+        const { data: payData, error: payErr } = await supabase.functions.invoke("create-payment", {
+          body: {
+            appointmentId: appt.id,
+            doctorName: pro?.name,
+            patientEmail: form.email || session.user.email,
+            description: `Orientação Técnica ${form.preferencia === "video" ? "Vídeo" : "Chat"} - ${pro?.name}`
+          }
+        });
+
+        if (payErr || !payData?.init_point) throw new Error("Erro ao gerar link de pagamento.");
+        
+        toast({ title: "Redirecionando...", description: "Você será levado ao Mercado Pago." });
+        window.location.href = payData.init_point;
+      }
+    } catch (err: any) {
+      toast({ title: "Erro na solicitação", description: err.message || "Erro desconhecido.", variant: "destructive" });
       setLoading(false);
-      setStep("payment");
-      toast({ title: "Pré-entrevista registrada!", description: "Agora finalize o pagamento via Pix." });
-    }, 1200);
+    }
   };
 
   if (!pro) {

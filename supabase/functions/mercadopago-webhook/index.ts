@@ -495,6 +495,14 @@ Deno.serve(async (req) => {
           .single();
 
         if (appt) {
+          // 2b. Auto-create medical record for the appointment
+          const { error: mrErr } = await supabase.from("medical_records").insert({
+            patient_id: appt.patient_id,
+            doctor_id: appt.doctor_id,
+            appointment_id: appointmentId,
+          });
+          if (mrErr) console.error("Medical record insert error:", mrErr);
+
           // 3. Record escrow transaction for revenue tracking
           const { error: escrowErr } = await supabase.from("escrow_transactions").insert({
             patient_id: appt.patient_id,

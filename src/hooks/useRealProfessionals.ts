@@ -238,10 +238,9 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       finalPros.push({ ...oliviaMock, online: getMockOnlineStatus("mock-olivia", false) });
     }
 
-    // Dra. Suelen fallback (offline by default, togglable)
     const suelenMock = testProfessionals.find(p => p.id === "mock-suelen");
     if (suelenMock && !isMockReplaced(suelenMock)) {
-      finalPros.push({ ...suelenMock, online: getMockOnlineStatus("mock-suelen", false) });
+      finalPros.push({ ...suelenMock, online: false });
     }
 
     // How many test slots remain after real doctors fill spots

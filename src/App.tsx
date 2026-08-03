@@ -62,6 +62,7 @@ const Pay = lazyWithRecovery(() => import("./pages/Pay"), { sourceRef: "/pay" })
 const Carteira = lazyWithRecovery(() => import("./pages/Carteira"), { sourceRef: "/carteira" });
 const Admin = lazyWithRecovery(() => import("./pages/Admin"), { sourceRef: "/admin" });
 const AdminClinicas = lazyWithRecovery(() => import("./pages/AdminClinicas"), { sourceRef: "/admin/clinicas" });
+const AdminIndicacoes = lazyWithRecovery(() => import("./pages/AdminIndicacoes"), { sourceRef: "/admin/indicacoes" });
 const AdminLogin = lazyWithRecovery(() => import("./pages/AdminLogin"), { sourceRef: "/admin-login" });
 const BibliotecaCientifica = lazyWithRecovery(() => import("./pages/BibliotecaCientifica"), { sourceRef: "/biblioteca" });
 const CadastroProfissional = lazyWithRecovery(() => import("./pages/CadastroProfissional"), { sourceRef: "/cadastro-profissional" });

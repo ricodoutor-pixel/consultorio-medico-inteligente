@@ -17,32 +17,33 @@ const OPTIONS = [
   {
     key: "A" as const,
     icon: Repeat,
-    title: "Assinatura Mensal",
-    price: "R$ 79",
+    title: "Plano Universal",
+    price: "R$ 99",
     suffix: "/mês",
-    tagline: "Tratamento contínuo + Brisa Care",
-    perks: ["Consultas ilimitadas", "Receita renovada auto", "Diário inteligente", "10% off no shopping"],
+    tagline: "Paciente, Médico ou Lojista — mesmo valor",
+    perks: ["Acompanhamento contínuo", "Receita sempre assinada digitalmente", "Descontos no Shopping", "Programa de indicações"],
     highlight: true,
   },
   {
     key: "B" as const,
     icon: Calendar,
-    title: "Consulta Agendada",
-    price: "R$ 49",
+    title: "Consulta por Chat",
+    price: "R$ 100",
     suffix: "única",
-    tagline: "Horário escolhido com médico",
-    perks: ["Telemedicina HD", "Receita digital ICP", "Laudo IA gratuito"],
+    tagline: "Atendimento por chat com o profissional",
+    perks: ["Receita com assinatura digital", "Histórico no prontuário", "Retorno por R$ 90"],
   },
   {
     key: "C" as const,
     icon: Zap,
-    title: "Atendimento Imediato",
-    price: "R$ 80",
-    suffix: "agora",
-    tagline: "Fila prioritária — < 5 min",
-    perks: ["Médico online já", "PIX → Sala em 1 toque", "Sem espera"],
+    title: "Consulta por Vídeo",
+    price: "R$ 150",
+    suffix: "completa",
+    tagline: "Telemedicina HD com receita digital",
+    perks: ["Vídeo em alta definição", "Receita Gov.br / ICP / ClickSign", "Retorno por R$ 90"],
   },
 ];
+
 
 export function TripleCheckout({ onSelect, defaultSelected }: TripleCheckoutProps) {
   const [selected, setSelected] = useState<CheckoutOptionKey | null>(defaultSelected ?? null);

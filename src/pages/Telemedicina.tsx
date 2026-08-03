@@ -81,7 +81,7 @@ const BrisaAvatar = () => {
         className="relative cursor-pointer group"
         onMouseEnter={() => setMood("happy")}
         onMouseLeave={() => setMood("neutral")}
-        onDoubleClick={() => setIsChatOpen(true)}
+        onClick={() => setIsChatOpen(true)}
         whileHover={{ scale: 1.05 }}
       >
         <div className="absolute -inset-4 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />

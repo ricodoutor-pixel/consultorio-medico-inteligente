@@ -805,7 +805,7 @@ const DashboardMedico = () => {
                   
                   <Button 
                     className="w-full mt-4 bg-primary text-primary-foreground font-black h-12 rounded-xl" 
-                    onClick={() => navigate(`/orientacao-video?appointment=${selectedPatientTriage.appointment.id}`)}
+                    onClick={() => navigate(`/workspace-medico?patient=${selectedPatientTriage.appointment.patient_id}&appt=${selectedPatientTriage.appointment.id}&type=${selectedPatientTriage.appointment.type}`)}
                   >
                     <Video size={18} className="mr-2" /> Iniciar Atendimento
                   </Button>

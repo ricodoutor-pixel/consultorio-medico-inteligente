@@ -21,6 +21,7 @@ import { DoctorBICockpit } from "@/components/doctor/DoctorBICockpit";
 import { DominationMonitor } from "@/components/doctor/DominationMonitor";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { VIPExpirationAlert } from "@/components/doctor/VIPExpirationAlert";
+import { DoctorSchedule } from "@/components/doctor/DoctorSchedule";
 
 import { DoctorAuxDiagnosticTools } from "@/components/doctor/DoctorAuxDiagnosticTools";
 import { IoTBiometricTracker } from "@/components/IoTBiometricTracker";
@@ -563,6 +564,10 @@ const DashboardMedico = () => {
             )}
 
             {/* Ferramentas Auxiliares de Monitoramento e Diagnóstico */}
+            <div className="mb-8">
+              <DoctorSchedule />
+            </div>
+            
             <DoctorAuxDiagnosticTools />
 
             {/* Quick Access — Cannabis & Clinical Tools */}

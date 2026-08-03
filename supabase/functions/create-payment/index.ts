@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
     }
     const userId = authData.user.id;
 
-    const { appointmentId, doctorName, patientEmail, description } = await req.json();
+    const { appointmentId, doctorName, patientEmail, description, amount: passedAmount } = await req.json();
 
     const MP_ACCESS_TOKEN = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
     if (!MP_ACCESS_TOKEN) {
@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     );
 
     // --- Server-side amount lookup ---
-    let amount = 49.90; // default for non-appointment payments
+    let amount = passedAmount ? Number(passedAmount) : 49.90; // default for non-appointment payments
     if (appointmentId) {
       const { data: appt, error: apptError } = await supabase
         .from("appointments")

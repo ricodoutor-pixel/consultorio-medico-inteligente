@@ -240,7 +240,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     const suelenMock = testProfessionals.find(p => p.id === "mock-suelen");
     if (suelenMock && !isMockReplaced(suelenMock)) {
-      finalPros.push({ ...suelenMock, online: false });
+      finalPros.push({ ...suelenMock, online: getMockOnlineStatus("mock-suelen", false) });
     }
 
     // How many test slots remain after real doctors fill spots

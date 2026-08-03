@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DoctorQuickActions } from "@/components/doctor/DoctorQuickActions";
 import { PrescriptionTemplates } from "@/components/doctor/PrescriptionTemplates";
 import { TriageSummaryCard } from "@/components/doctor/TriageSummaryCard";
+import { Switch } from "@/components/ui/switch";
 
 const WorkspaceMedico = () => {
   const [searchParams] = useSearchParams();
@@ -25,6 +26,8 @@ const WorkspaceMedico = () => {
   const [patient, setPatient] = useState<any>(null);
   const [appointment, setAppointment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isOnline, setIsOnline] = useState(false);
+  const [doctorId, setDoctorId] = useState<string>("mock-suelen");
 
   // EMR state
   const [notes, setNotes] = useState("");
@@ -44,6 +47,17 @@ const WorkspaceMedico = () => {
 
   const fetchData = async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+         const email = session.user.email?.toLowerCase() || '';
+         let docId = "mock-edilson";
+         if (email.includes('olivia')) docId = 'mock-olivia';
+         else if (email.includes('suelen')) docId = 'mock-suelen';
+         setDoctorId(docId);
+         setIsOnline(localStorage.getItem(`mock_online_${docId}`) === "true");
+      }
+
       const [patientRes, apptRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", patientId).single(),
         supabase.from("appointments").select("*").eq("id", appointmentId).single()
@@ -55,6 +69,13 @@ const WorkspaceMedico = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleOnline = (val: boolean) => {
+    setIsOnline(val);
+    localStorage.setItem(`mock_online_${doctorId}`, String(val));
+    window.dispatchEvent(new Event("mock_online_changed"));
+    toast({ title: val ? "Você está Online ✅" : "Você está Offline" });
   };
 
   const handleSaveEMR = async () => {
@@ -98,11 +119,19 @@ const WorkspaceMedico = () => {
           </div>
         </div>
         
-        <DoctorQuickActions 
-          patientId={patientId || ""} 
-          appointmentId={appointmentId || ""} 
-          patientName={patient?.full_name || ""}
-        />
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-background border border-border">
+            <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-muted-foreground"}`} />
+            <span className="text-xs font-bold mr-2">{isOnline ? "Online" : "Offline"}</span>
+            <Switch checked={isOnline} onCheckedChange={toggleOnline} className="scale-75 data-[state=checked]:bg-primary" />
+          </div>
+          
+          <DoctorQuickActions 
+            patientId={patientId || ""} 
+            appointmentId={appointmentId || ""} 
+            patientName={patient?.full_name || ""}
+          />
+        </div>
       </div>
 
       {/* Split Pane Area */}

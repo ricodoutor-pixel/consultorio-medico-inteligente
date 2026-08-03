@@ -48,12 +48,9 @@ function useRotatingOnline(base: Professional[]): Professional[] {
 
 
 const SERVICE_TIERS = [
-  { name: "Mentoria", price: "R$ 30", value: 30, icon: Zap, desc: "Orientação rápida de 15 min", highlight: false },
-  { name: "Orientação Técnica Chat", price: "R$ 50", value: 50, icon: MessageSquare, desc: "Orientação Técnica por chat completa", highlight: false },
-  { name: "Orientação Técnica Vídeo", price: "R$ 80", value: 80, icon: Video, desc: "Teleconsulta por vídeo 30 min", highlight: false },
-  { name: "Orientação Técnica + Receita", price: "R$ 100", value: 100, icon: FileText, desc: "Orientação Técnica com prescrição canábica", highlight: true },
-  { name: "Combo ANVISA Chat", price: "R$ 120", value: 120, icon: ShieldCheck, desc: "Orientação Técnica + laudo + receita ANVISA", highlight: false },
-  { name: "Combo Full Vídeo", price: "R$ 150", value: 150, icon: Star, desc: "Vídeo + receita + laudo completo", highlight: false },
+  { name: "Orientação Inicial via Chat", price: "R$ 100", value: 100, icon: MessageSquare, desc: "Avaliação inicial via chat seguro", highlight: false },
+  { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150", value: 150, icon: Video, desc: "Avaliação completa com teleconsulta", highlight: true },
+  { name: "Retorno", price: "R$ 90", value: 90, icon: Zap, desc: "Acompanhamento e ajuste de dose", highlight: false },
 ];
 
 type ServiceTier = typeof SERVICE_TIERS[number];
@@ -109,7 +106,8 @@ const ServicePricingGrid = ({ doctorName, services }: { doctorName: string; serv
         body: {
           doctorName,
           patientEmail: session.user.email || "",
-          description: `${service.name} com ${doctorName} - R$ ${service.value},00`,
+          description: `${service.name} com ${doctorName}`,
+          amount: service.value,
         },
       });
 

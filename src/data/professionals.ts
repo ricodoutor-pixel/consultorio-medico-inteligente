@@ -264,9 +264,9 @@ export const professionals: Professional[] = [
     flags: ["🇧🇷"],
     online: false,
     services: [
-      { name: "Orientação Técnica", price: "R$ 85,00", desc: "Avaliação + plano terapêutico canábico" },
-      { name: "Acompanhamento", price: "R$ 60", desc: "Follow-up quinzenal" },
-      { name: "Relatório Médico", price: "R$ 55", desc: "Para importação ou uso compassivo" },
+      { name: "Orientação Inicial via Chat", price: "R$ 100,00", desc: "Avaliação inicial via chat seguro" },
+      { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150,00", desc: "Avaliação completa com teleconsulta" },
+      { name: "Retorno", price: "R$ 90,00", desc: "Acompanhamento" },
     ],
     slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
     reviews: [
@@ -1921,9 +1921,9 @@ export const professionals: Professional[] = [
     flags: ["🇧🇷"],
     online: false,
     services: [
-      { name: "Orientação Técnica Inicial", price: "R$ 100,00", desc: "Avaliação completa + plano terapêutico canábico" },
-      { name: "Retorno", price: "R$ 75,00", desc: "Acompanhamento e ajuste de dosagem" },
-      { name: "Laudo ANVISA", price: "R$ 60,00", desc: "Documentação para importação ou uso compassivo" },
+      { name: "Orientação Inicial via Chat", price: "R$ 100,00", desc: "Avaliação inicial via chat seguro" },
+      { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150,00", desc: "Avaliação completa com teleconsulta" },
+      { name: "Retorno", price: "R$ 90,00", desc: "Acompanhamento" },
     ],
     slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
     reviews: [

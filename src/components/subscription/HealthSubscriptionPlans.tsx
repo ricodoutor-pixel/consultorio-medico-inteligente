@@ -6,8 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 // framer-motion removido — animações na montagem desperdiçavam recursos em mobile.
-import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
-import { getStripeEnvironment } from "@/lib/stripe";
+import { MercadoPagoCheckout } from "@/components/MercadoPagoCheckout";
 
 const PLANS = [
   {
@@ -83,11 +82,9 @@ export function HealthSubscriptionPlans() {
         </Button>
         <h3 className="text-xl font-bold mb-4 text-center">Assinatura {plan.name}</h3>
         <div className="rounded-xl overflow-hidden border border-border">
-          <StripeEmbeddedCheckout
-            priceId={plan.priceId}
-            customerEmail={user?.email}
-            userId={user?.id}
-            returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
+          <MercadoPagoCheckout
+            sku={plan.priceId}
+            label={`Assinar ${plan.name} — R$ ${plan.price.toFixed(2)}/mês`}
           />
         </div>
       </div>

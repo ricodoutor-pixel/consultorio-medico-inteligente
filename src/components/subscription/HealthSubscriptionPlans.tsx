@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Check, Crown, Leaf, Sparkles, Zap } from "lucide-react";
+import { Check, Crown, Stethoscope, Store, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,54 +7,24 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 // framer-motion removido — animações na montagem desperdiçavam recursos em mobile.
 import { MercadoPagoCheckout } from "@/components/MercadoPagoCheckout";
+import { UNIVERSAL_PLANS, PLAN_FEATURES, SIGNATURE_NOTICE, type PlanSku } from "@/lib/pricing";
 
-const PLANS = [
-  {
-    id: "basic",
-    name: "Essencial",
-    price: 49.9,
-    priceId: "essencial_mensal",
-    icon: Leaf,
-    badge: null,
-    features: [
-      "Acesso 24h à Brisa IA",
-      "5% desconto no Marketplace",
-      "Suporte prioritário via WhatsApp",
-      "Prontuário digital completo",
-    ],
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: 99.9,
-    priceId: "premium_mensal",
-    icon: Crown,
-    badge: "Mais Popular",
-    features: [
-      "Tudo do Essencial",
-      "15% desconto no Marketplace",
-      "1 Orientação Técnica trimestral inclusa",
-      "Acesso ao Club Planta y Raiz",
-      "Receita com renovação automática",
-    ],
-  },
-  {
-    id: "vip",
-    name: "VIP",
-    price: 199.9,
-    priceId: "vip_mensal",
-    icon: Sparkles,
-    badge: "Exclusivo",
-    features: [
-      "Tudo do Premium",
-      "25% desconto no Marketplace",
-      "1 Orientação Técnica mensal inclusa",
-      "Médico dedicado",
-      "Fila prioritária 24/7",
-      "Acesso antecipado a novos produtos",
-    ],
-  },
-];
+const PLAN_ICONS: Record<PlanSku, typeof Crown> = {
+  plano_paciente: Crown,
+  plano_medico: Stethoscope,
+  plano_lojista: Store,
+};
+
+const PLANS = UNIVERSAL_PLANS.map((p) => ({
+  id: p.sku,
+  name: p.name,
+  price: p.price,
+  priceId: p.sku,
+  icon: PLAN_ICONS[p.sku as PlanSku],
+  badge: p.sku === "plano_paciente" ? "Mais Popular" : null,
+  features: PLAN_FEATURES[p.sku as PlanSku],
+}));
+
 
 export function HealthSubscriptionPlans() {
   const [activePlan, setActivePlan] = useState<string | null>(null);

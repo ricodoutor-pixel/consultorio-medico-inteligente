@@ -5,6 +5,7 @@ import brisaImg from "@/assets/brisa-enfermeira.png";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
+import { DoctorsStatusBoard } from "@/components/doctors/DoctorsStatusBoard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";

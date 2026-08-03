@@ -62,7 +62,20 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { sku, cartToken, appointmentId, returnUrl } = await req.json();
+    const { sku: rawSku, cartToken, appointmentId, returnUrl, refCode } = await req.json();
+    const sku = typeof rawSku === "string" ? (LEGACY_SKU_MAP[rawSku] ?? rawSku) : rawSku;
+
+    // Programa de indicações (médicos, pacientes e lojistas) — resolvido no servidor.
+    let referrerId: string | null = null;
+    if (typeof refCode === "string" && refCode.length > 3 && refCode.length < 40) {
+      const { data: refRow } = await supabase
+        .from("referral_links")
+        .select("user_id")
+        .eq("code", refCode)
+        .maybeSingle();
+      if (refRow?.user_id && refRow.user_id !== userId) referrerId = refRow.user_id;
+    }
+
 
     let title: string;
     let amount: number;

@@ -264,8 +264,13 @@ const Telemedicina = () => {
               </Button>
             </div>
           </motion.div>
+
+          <div className="max-w-2xl mx-auto mt-8">
+            <DoctorsStatusBoard title="Médicos disponíveis agora" />
+          </div>
         </div>
       </section>
+
 
       <AnimatePresence>
         {showFlowInfo && (

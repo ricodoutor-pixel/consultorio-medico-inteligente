@@ -6,7 +6,7 @@ import { CheckCircle2, Loader2, Heart, Sparkles, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { WELLNESS_PLANS, type WellnessPlan } from "@/lib/domination-services";
-import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
+import { MercadoPagoCheckout } from "@/components/MercadoPagoCheckout";
 
 const PLAN_ICONS: Record<string, typeof Heart> = {
   basic: Heart,
@@ -20,7 +20,7 @@ const PLAN_COLORS: Record<string, string> = {
   premium: "text-amber-400",
 };
 
-// Map wellness plan IDs to Stripe price lookup_keys
+// Map wellness plan IDs to Mercado Pago SKUs (catálogo server-side)
 const STRIPE_PRICE_MAP: Record<string, string> = {
   basic: "essencial_mensal",
   pro: "premium_mensal",
@@ -58,12 +58,7 @@ export function WellnessSubscriptionCards() {
         </Button>
         <h3 className="text-xl font-bold text-center">Assinatura {plan.name}</h3>
         <div className="rounded-xl overflow-hidden border border-border">
-          <StripeEmbeddedCheckout
-            priceId={stripePriceId}
-            customerEmail={user?.email}
-            userId={user?.id}
-            returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
-          />
+          <MercadoPagoCheckout sku={stripePriceId} label={`Assinar ${plan.name}`} />
         </div>
       </div>
     );

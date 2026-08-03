@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
-import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
+import { MercadoPagoCheckout } from "@/components/MercadoPagoCheckout";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShoppingCart, Clock, Shield, Leaf } from "lucide-react";
@@ -183,12 +183,9 @@ export default function PrescriptionCheckout() {
           </button>
         ) : (
           <div className="rounded-xl overflow-hidden border border-border">
-            <StripeEmbeddedCheckout
-              dynamicAmount={Math.max(100, Math.round((cart.total_amount || 1) * 100))}
-              customerEmail={user?.email}
-              userId={user?.id}
+            <MercadoPagoCheckout
               cartToken={token}
-              returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
+              label={`Pagar R$ ${(cart.total_amount || 0).toFixed(2)} com Mercado Pago`}
             />
           </div>
         )}

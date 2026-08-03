@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 
-export type PaymentGateway = 'mercadopago' | 'stripe';
+export type PaymentGateway = 'mercadopago';
 
 /**
- * Hook usado APENAS para Orientação Técnica do Dr. Edilson.
- * Decisão de produto (2026-05-14): orientações técnicas processam SEMPRE via Stripe
- * (BR R$30 e Internacional US$10) para reduzir taxas de transação e centralizar
- * a auditoria financeira na carteira Stripe da Lovable.
- *
- * Demais fluxos (consultas, marketplace, club) seguem usando Mercado Pago.
+ * Hook usado para Orientação Técnica e demais cobranças diretas.
+ * Decisão de produto (2026-08-03): Stripe DESATIVADO na plataforma.
+ * 100% dos pagamentos (orientações, consultas, marketplace e assinaturas)
+ * são processados via Mercado Pago (PIX, cartão e boleto).
  */
 export const usePaymentGateway = () => {
   const [currency, setCurrency] = useState<'BRL' | 'USD'>('BRL');
@@ -47,17 +45,15 @@ export const usePaymentGateway = () => {
 
   const createPayment = async (params: {
     appointmentId?: string;
-    doctorName: string;
-    patientEmail: string;
-    description: string;
+    doctorName?: string;
+    patientEmail?: string;
+    description?: string;
   }) => {
-    // Stripe para 100% das orientações técnicas (BR + Internacional)
-    const { data, error } = await supabase.functions.invoke('create-stripe-payment', {
+    // Mercado Pago para 100% dos pagamentos da plataforma.
+    const { data, error } = await supabase.functions.invoke('mp-checkout', {
       body: {
-        ...params,
-        amount: price,
-        currency,
-        countryCode,
+        appointmentId: params.appointmentId,
+        sku: params.appointmentId ? undefined : 'orientacao_tecnica',
       },
     });
 
@@ -66,7 +62,7 @@ export const usePaymentGateway = () => {
   };
 
   return {
-    gateway: 'stripe' as const,
+    gateway: 'mercadopago' as const,
     currency,
     price,
     loading,

@@ -17,30 +17,46 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: "Gemini API Key missing" }), { status: 500, headers: cors });
     }
 
-    const systemPrompt = `Você é a Enfª Brisa 🌿, assistente virtual autônoma da Planta y Raiz.
-Você está no canal Web de Emergência (Fallback de Atendimento).
-Aja de forma empática, profissional e acolhedora.
-Contexto do paciente atual:
+    const audience = String(leadInfo?.audience ?? "paciente").toLowerCase();
+    const isDoctor = audience.includes("medic") || audience.includes("doutor") || audience.includes("prescritor");
+
+    const systemPrompt = `Você é a Enfª Brisa 🌿, assistente interna oficial da plataforma Planta y Raiz (atendimento DENTRO da plataforma, canal web).
+Aja de forma empática, profissional, elegante e objetiva. Português do Brasil.
+
+Contexto do usuário atual:
 - Nome: ${leadInfo?.name || 'Não informado'}
-- WhatsApp: ${leadInfo?.phone || 'Não informado'}
+- Contato: ${leadInfo?.phone || 'Não informado'}
+- Perfil: ${isDoctor ? 'MÉDICO PRESCRITOR' : 'PACIENTE'}
 - Categoria de Suporte: ${leadInfo?.category || 'Geral'}
 
-Lembre-se: não dê diagnósticos nem prescreva medicamentos. O objetivo é triar a solicitação e informar que a equipe de saúde, sob a supervisão da Dra. Suelen Naves Rodrigues, entrará em contato.`;
+${isDoctor ? `ORIENTAÇÃO A MÉDICOS:
+- Explique o Consultório Virtual: chave de plantão ON/OFF (reflete em tempo real no card em Profissionais/Telemedicina), agenda, prontuário e assinatura digital de receitas.
+- Oriente sobre videochamada (Jitsi) e chat com o paciente, repasses/split, saques via Pix e planos profissionais.
+- Nunca discuta conduta clínica de um paciente específico sem que o médico acesse o prontuário.` : `ORIENTAÇÃO A PACIENTES:
+- Acolha, faça triagem breve dos sintomas e explique as modalidades: Orientação Técnica R$ 30, Consulta por Chat R$ 150, Consulta por Vídeo R$ 250, Emergência R$ 350.
+- Todos os pagamentos da plataforma são processados pelo Mercado Pago (PIX, cartão ou boleto).
+- Médicos disponíveis: Dr. Edilson Bezerra, Dra. Olivia Zimeri e Dra. Suelen Naves Rodrigues.
+- Em sinais de emergência real, oriente procurar pronto-socorro imediatamente.`}
 
-    const geminiMessages = [
-      { role: "system", parts: [{ text: systemPrompt }] },
-      ...messages.map((m: any) => ({
-        role: m.role === "assistant" ? "model" : "user",
-        parts: [{ text: m.content }]
-      }))
-    ];
+COMPLIANCE OBRIGATÓRIO:
+- A Planta y Raiz (Bezerra Med Soluções Integradas Ltda, CNPJ 30.740.319/0001-14) é apenas plataforma de intermediação tecnológica; não é clínica, não vende medicamentos e não presta atos médicos.
+- Você NÃO dá diagnósticos, NÃO prescreve e NÃO indica doses. Encaminhe sempre ao profissional habilitado.
+- Supervisão técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR).`;
+
+    // IMPORTANTE: a API v1beta NÃO aceita role "system" dentro de contents.
+    // O prompt mestre precisa ir em systemInstruction, senão retorna HTTP 400.
+    const geminiMessages = (messages ?? []).map((m: any) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: String(m.content ?? "") }],
+    }));
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-    
+
     const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
         contents: geminiMessages,
         generationConfig: {
           maxOutputTokens: 450,

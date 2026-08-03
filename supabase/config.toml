@@ -1,6 +1,10 @@
 project_id = "shmbwdjuddvquszwkvuq"
 
 [functions]
+  [functions.mp-checkout]
+    verify_jwt = true
+  [functions.brisa-web-chat]
+    verify_jwt = false
   [functions.ai-pharmacokinetic-profile]
     verify_jwt = false
   [functions.auth-email-hook]

@@ -96,12 +96,13 @@ const Consultorio = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       
-      {doctor && doctor.is_approved && (
+      {doctor && (
         <div className="px-4 py-3 bg-card border-b flex justify-between items-center flex-wrap gap-3">
           <div className="flex items-center">
             <button 
               onClick={() => {
-                const refCode = doctor.crm ? `DR_${doctor.full_name?.split(' ')[1] || 'MEDICO'}_CRM${doctor.crm}`.toUpperCase() : doctor.id;
+                const lastName = (profile?.full_name || '').split(' ').slice(-1)[0] || 'MEDICO';
+                const refCode = doctor.crm ? `DR_${lastName}_CRM${doctor.crm}`.toUpperCase() : doctor.id;
                 navigator.clipboard.writeText(`https://plantayraiz.com.br/cadastro-profissional?ref=${refCode}`);
                 toast.success("Link copiado! Envie para seus convidados.");
               }}
@@ -134,7 +135,7 @@ const Consultorio = () => {
         </div>
       )}
 
-      {doctor && doctor.is_approved === false && (
+      {doctor && !doctor.is_verified && (
         <div className="px-4 py-3 bg-amber-500/10 border-b border-amber-500/20">
           <div className="container mx-auto flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />

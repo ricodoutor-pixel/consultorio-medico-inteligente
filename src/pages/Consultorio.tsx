@@ -135,7 +135,7 @@ const Consultorio = () => {
         </div>
       )}
 
-      {doctor && doctor.is_approved === false && (
+      {doctor && !doctor.is_verified && (
         <div className="px-4 py-3 bg-amber-500/10 border-b border-amber-500/20">
           <div className="container mx-auto flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />

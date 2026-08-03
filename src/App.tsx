@@ -397,6 +397,7 @@ const App = () => (
                 <Route path="/admin/cadastros" element={<AdminRoute><CadastrosRealtime /></AdminRoute>} />
                 <Route path="/admin/cadastros-tempo-real" element={<AdminRoute><CadastrosRealtime /></AdminRoute>} />
                 <Route path="/admin/afiliados" element={<AdminRoute><AdminAfiliados /></AdminRoute>} />
+                <Route path="/admin/indicacoes" element={<AdminRoute><AdminIndicacoes /></AdminRoute>} />
                 <Route path="/admin/global-ops" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
                 <Route path="/admin/mapa-global" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
                 <Route path="/admin/aprovacoes-medicas" element={<AdminRoute><AdminAprovacoes /></AdminRoute>} />

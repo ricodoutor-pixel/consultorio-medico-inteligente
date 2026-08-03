@@ -164,7 +164,7 @@ const Consultorio = () => {
           </TabsContent>
 
           <TabsContent value="fila-assincrona" className="mt-0 border-0 p-0">
-            <FilaAssincrona />
+            <FilaAssincrona currentTier={doctor?.plan_tier} />
           </TabsContent>
           
           <TabsContent value="perfil" className="mt-0">

@@ -213,6 +213,16 @@ const DashboardMedico = () => {
 
   const handleApproveRenewal = async () => {
     if (!selectedRequest || !doctorData) return;
+
+    if (doctorData.plan_tier !== "vip") {
+      toast({
+        title: "Emissão Bloqueada",
+        description: "É necessário possuir assinatura Gov.br/ICP-Brasil/ClickSign validada ou assinar o Plano Médico (R$99).",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setProcessing(true);
     try {
       // 1. Update request status

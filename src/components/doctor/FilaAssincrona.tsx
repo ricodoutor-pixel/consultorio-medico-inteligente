@@ -31,7 +31,7 @@ const mockRequests = [
   }
 ];
 
-export const FilaAssincrona = () => {
+export const FilaAssincrona = ({ currentTier }: { currentTier?: string }) => {
   const { toast } = useToast();
   const [requests, setRequests] = useState(mockRequests);
   const [playingId, setPlayingId] = useState<string | null>(null);
@@ -63,6 +63,15 @@ export const FilaAssincrona = () => {
   };
 
   const handleApprove = (id: string) => {
+    if (currentTier !== "vip") {
+      toast({
+        title: "Emissão Bloqueada",
+        description: "É necessário possuir assinatura Gov.br/ICP-Brasil/ClickSign validada ou assinar o Plano Médico (R$99).",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status: "approved" } : r));
     toast({
       title: "Receita Emitida com Sucesso",

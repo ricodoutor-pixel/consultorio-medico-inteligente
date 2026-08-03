@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Star, ArrowLeft, CheckCircle2, Stethoscope, CreditCard, MessageSquare, Video, ArrowRight, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { professionals } from "@/data/professionals";
+import { professionals as staticProfessionals } from "@/data/professionals";
+import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -22,6 +23,7 @@ const objectives = ["Sono", "Dor crônica", "Ansiedade", "Epilepsia", "Bem-estar
 const FalarComEspecialista = () => {
   const [searchParams] = useSearchParams();
   const proId = searchParams.get("pro");
+  const { professionals } = useRealProfessionals();
   const pro = proId ? professionals.find((p) => p.id === proId) : null;
   const { toast } = useToast();
 
@@ -70,7 +72,7 @@ const FalarComEspecialista = () => {
         .limit(1);
 
       const isReturn = pastVisits && pastVisits.length > 0;
-      const price = isReturn ? 0 : (form.preferencia === "video" ? 150 : 100);
+      const price = isReturn ? 90 : (form.preferencia === "video" ? 150 : 100);
       
       const { data: appt, error: apptErr } = await supabase
         .from("appointments")
@@ -80,8 +82,8 @@ const FalarComEspecialista = () => {
           type: form.preferencia,
           amount: price,
           notes: form.resumoCaso,
-          status: isReturn ? "confirmed" : "scheduled",
-          payment_status: isReturn ? "paid" : "pending",
+          status: "scheduled",
+          payment_status: "pending",
           scheduled_at: new Date().toISOString()
         })
         .select()
@@ -89,35 +91,20 @@ const FalarComEspecialista = () => {
         
       if (apptErr) throw apptErr;
 
-      if (isReturn) {
-        // Create medical record directly since it's a paid return
-        await supabase.from("medical_records").insert({
-          patient_id: session.user.id,
-          doctor_id: doctorId,
-          appointment_id: appt.id,
-        });
-        toast({ title: "Retorno Confirmado!", description: "Isento de taxa (Retorno 90 dias). Iniciando atendimento..." });
-        
-        // Redirect to consultation room
-        setTimeout(() => {
-          window.location.href = form.preferencia === "video" ? `/video-call?room=${appt.id}` : `/chat-medico?appt=${appt.id}`;
-        }, 1500);
-      } else {
-        // Call Mercado Pago webhook
-        const { data: payData, error: payErr } = await supabase.functions.invoke("create-payment", {
-          body: {
-            appointmentId: appt.id,
-            doctorName: pro?.name,
-            patientEmail: form.email || session.user.email,
-            description: `Orientação Técnica ${form.preferencia === "video" ? "Vídeo" : "Chat"} - ${pro?.name}`
-          }
-        });
+      // Call Mercado Pago webhook
+      const { data: payData, error: payErr } = await supabase.functions.invoke("create-payment", {
+        body: {
+          appointmentId: appt.id,
+          doctorName: pro?.name,
+          patientEmail: form.email || session.user.email,
+          description: isReturn ? `Retorno 90 dias - ${pro?.name}` : `Orientação Técnica ${form.preferencia === "video" ? "Vídeo" : "Chat"} - ${pro?.name}`
+        }
+      });
 
-        if (payErr || !payData?.init_point) throw new Error("Erro ao gerar link de pagamento.");
-        
-        toast({ title: "Redirecionando...", description: "Você será levado ao Mercado Pago." });
-        window.location.href = payData.init_point;
-      }
+      if (payErr || !payData?.init_point) throw new Error("Erro ao gerar link de pagamento.");
+      
+      toast({ title: "Redirecionando...", description: "Você será levado ao Mercado Pago." });
+      window.location.href = payData.init_point;
     } catch (err: any) {
       toast({ title: "Erro na solicitação", description: err.message || "Erro desconhecido.", variant: "destructive" });
       setLoading(false);

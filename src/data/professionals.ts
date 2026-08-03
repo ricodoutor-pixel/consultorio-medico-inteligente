@@ -126,9 +126,10 @@ export const professionals: Professional[] = [
     hospital: "Beneficência Portuguesa (SP) / Hospital Menino Jesus",
     hospitalUrl: "https://www.beneficencia.org.br",
     services: [
-      { name: "Orientação Técnica", price: "R$ 30,00", desc: "Apenas chat via whatsapp (recurso autônomo em nuvem com IA)" },
-      { name: "Retorno", price: "R$ 35,00", desc: "Acompanhamento e ajuste de dosagem" },
-      { name: "Laudo ANVISA", price: "R$ 50,00", desc: "Documentação para importação ou uso compassivo" },
+      { name: "Orienta\u00e7\u00e3o T\u00e9cnica (Apenas Chat 30 min)", price: "R$ 30,00", desc: "Pagamento Mercado Pago (Brasil)" },
+      { name: "Consulta (Chat + V\u00eddeo)", price: "R$ 100,00", desc: "Avalia\u00e7\u00e3o completa com teleconsulta" },
+      { name: "Consulta Internacional (Bol\u00edvia)", price: "US$ 50,00", desc: "Com receita e assinatura digital (Stripe)" },
+      { name: "Retorno", price: "R$ 30,00", desc: "Acompanhamento" },
     ],
     slots: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
     reviews: [

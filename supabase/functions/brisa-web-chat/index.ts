@@ -27,20 +27,20 @@ Contexto do paciente atual:
 
 Lembre-se: não dê diagnósticos nem prescreva medicamentos. O objetivo é triar a solicitação e informar que a equipe de saúde, sob a supervisão da Dra. Suelen Naves Rodrigues, entrará em contato.`;
 
-    const geminiMessages = [
-      { role: "system", parts: [{ text: systemPrompt }] },
-      ...messages.map((m: any) => ({
-        role: m.role === "assistant" ? "model" : "user",
-        parts: [{ text: m.content }]
-      }))
-    ];
+    // IMPORTANTE: a API v1beta NÃO aceita role "system" dentro de contents.
+    // O prompt mestre precisa ir em systemInstruction, senão retorna HTTP 400.
+    const geminiMessages = (messages ?? []).map((m: any) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: String(m.content ?? "") }],
+    }));
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-    
+
     const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
         contents: geminiMessages,
         generationConfig: {
           maxOutputTokens: 450,

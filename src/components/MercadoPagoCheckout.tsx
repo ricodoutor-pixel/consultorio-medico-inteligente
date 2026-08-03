@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getReferralCode } from "@/hooks/useReferralTracking";
 import { toast } from "sonner";
+
 
 interface MercadoPagoCheckoutProps {
   /** SKU do catálogo server-side (ex.: essencial_mensal, orientacao_tecnica) */

@@ -14,17 +14,28 @@ const json = (body: unknown, status = 200) =>
 
 /**
  * Catálogo autoritativo (server-side). O cliente NUNCA envia preço.
- * Substitui integralmente o checkout Stripe — toda a plataforma usa Mercado Pago.
+ * Tabela oficial 2026-08-03:
+ *  serviços → Orientação R$30 · Retorno R$90 · Chat R$100 · Vídeo R$150
+ *  planos   → 3 planos universais (paciente/médico/lojista) a R$99/mês
  */
 const CATALOG: Record<string, { title: string; amount: number; recurring?: boolean }> = {
   orientacao_tecnica: { title: "Orientação Técnica (Planta y Raiz)", amount: 30 },
-  consulta_chat: { title: "Consulta por Chat", amount: 150 },
-  consulta_video: { title: "Consulta por Vídeo", amount: 250 },
-  consulta_emergencia: { title: "Consulta de Emergência", amount: 350 },
-  essencial_mensal: { title: "Assinatura Essencial (mensal)", amount: 49.9, recurring: true },
-  premium_mensal: { title: "Assinatura Premium (mensal)", amount: 99.9, recurring: true },
-  vip_mensal: { title: "Assinatura VIP (mensal)", amount: 199.9, recurring: true },
+  retorno_consulta: { title: "Retorno com o Profissional", amount: 90 },
+  consulta_chat: { title: "Consulta por Chat (com receita assinada)", amount: 100 },
+  consulta_video: { title: "Consulta por Vídeo (com receita assinada)", amount: 150 },
+  plano_paciente: { title: "Plano Paciente (mensal)", amount: 99, recurring: true },
+  plano_medico: { title: "Plano Médico (mensal)", amount: 99, recurring: true },
+  plano_lojista: { title: "Plano Lojista (mensal)", amount: 99, recurring: true },
 };
+
+/** SKUs legados → novos (mantém links antigos funcionando com o preço correto). */
+const LEGACY_SKU_MAP: Record<string, string> = {
+  consulta_emergencia: "consulta_video",
+  essencial_mensal: "plano_paciente",
+  premium_mensal: "plano_paciente",
+  vip_mensal: "plano_medico",
+};
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -51,7 +62,20 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { sku, cartToken, appointmentId, returnUrl } = await req.json();
+    const { sku: rawSku, cartToken, appointmentId, returnUrl, refCode } = await req.json();
+    const sku = typeof rawSku === "string" ? (LEGACY_SKU_MAP[rawSku] ?? rawSku) : rawSku;
+
+    // Programa de indicações (médicos, pacientes e lojistas) — resolvido no servidor.
+    let referrerId: string | null = null;
+    if (typeof refCode === "string" && refCode.length > 3 && refCode.length < 40) {
+      const { data: refRow } = await supabase
+        .from("referral_links")
+        .select("user_id")
+        .eq("code", refCode)
+        .maybeSingle();
+      if (refRow?.user_id && refRow.user_id !== userId) referrerId = refRow.user_id;
+    }
+
 
     let title: string;
     let amount: number;
@@ -110,7 +134,15 @@ Deno.serve(async (req) => {
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
       external_reference: externalReference,
       statement_descriptor: "PLANTA Y RAIZ",
-      metadata: { type, user_id: userId, sku: sku ?? null, cart_token: cartToken ?? null },
+      metadata: {
+        type,
+        user_id: userId,
+        sku: sku ?? null,
+        cart_token: cartToken ?? null,
+        ref_code: typeof refCode === "string" ? refCode : null,
+        referrer_id: referrerId,
+      },
+
     };
 
     const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {

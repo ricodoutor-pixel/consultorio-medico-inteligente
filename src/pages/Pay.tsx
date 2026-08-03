@@ -13,10 +13,11 @@ import { supabase } from "@/integrations/supabase/client";
 const BRISA_WHATSAPP = "5511991363154";
 
 const plans: Record<string, { name: string; price: number }> = {
-  essencial: { name: "Essencial", price: 19.9 },
-  acesso: { name: "Acesso", price: 29.9 },
-  familia: { name: "Família", price: 49.9 },
+  plano_paciente: { name: "Plano Paciente", price: 99 },
+  plano_medico: { name: "Plano Médico", price: 99 },
+  plano_lojista: { name: "Plano Lojista", price: 99 },
 };
+
 
 const Pay = () => {
   const [searchParams] = useSearchParams();

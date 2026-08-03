@@ -31,28 +31,25 @@ export default function PlanosTratamento() {
       nextCharge.setMonth(nextCharge.getMonth() + 1);
       const { error } = await supabase.from("treatment_subscriptions" as any).insert({
         patient_id: session.user.id,
-        plan_code: "tratamento_mensal_79",
-        monthly_amount: 79,
+        plan_code: "plano_paciente",
+        monthly_amount: 99,
         status: "pending",
         next_charge_at: nextCharge.toISOString(),
       });
       if (error) { toast.error(error.message); return; }
-      navigate("/pay?type=subscription&amount=79");
+      navigate("/pay?type=subscription&amount=99&sku=plano_paciente");
       return;
     }
 
     if (opt === "B") {
-      navigate("/agendamento?type=scheduled&amount=49");
+      navigate("/agendamento?type=chat&amount=100");
       return;
     }
 
-    // C — Atendimento Imediato
-    if (!doctor) {
-      toast.warning("Nenhum médico disponível agora. Tentando novamente em segundos…");
-      return;
-    }
-    navigate(`/pay?type=immediate&amount=80&doctor=${doctor.doctor_id}`);
+    // C — Consulta por vídeo
+    navigate(`/agendamento?type=video&amount=150${doctor ? `&doctor=${doctor.doctor_id}` : ""}`);
   };
+
 
   return (
     <div className="min-h-dvh bg-background">

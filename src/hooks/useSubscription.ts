@@ -17,10 +17,16 @@ export interface SubscriptionInfo {
 }
 
 const TIER_MAP: Record<string, { tier: SubscriptionInfo["tier"]; discount: number }> = {
+  // Planos universais (R$ 99/mês) — paciente, médico e lojista
+  plano_paciente: { tier: "premium", discount: 15 },
+  plano_medico: { tier: "vip", discount: 15 },
+  plano_lojista: { tier: "vip", discount: 15 },
+  // Legados
   essencial_mensal: { tier: "essencial", discount: 5 },
   premium_mensal: { tier: "premium", discount: 15 },
   vip_mensal: { tier: "vip", discount: 25 },
 };
+
 
 export function useSubscription(): SubscriptionInfo {
   const [info, setInfo] = useState<SubscriptionInfo>({

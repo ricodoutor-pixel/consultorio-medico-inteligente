@@ -125,6 +125,7 @@ export function MedicalDashboard() {
   const [productSearch, setProductSearch] = useState("");
   const [isVideoActive, setIsVideoActive] = useState(false);
   const [doctorId, setDoctorId] = useState<string | null>(null);
+  const [activeDoctor, setActiveDoctor] = useState<any>(null);
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
@@ -133,10 +134,13 @@ export function MedicalDashboard() {
       if (!uid) return;
       const { data: doc } = await supabase
         .from("doctors")
-        .select("id")
+        .select("*")
         .eq("user_id", uid)
         .maybeSingle();
-      if (doc?.id) setDoctorId(doc.id);
+      if (doc?.id) {
+        setDoctorId(doc.id);
+        setActiveDoctor(doc);
+      }
     });
   }, []);
 
@@ -203,14 +207,17 @@ export function MedicalDashboard() {
     if (!activePatient || prescriptionItems.length === 0) return;
 
     try {
-      // Gerar PDF client-side
+      const doctorNameStr = activeDoctor?.full_name || "Suelen Naves Rodrigues";
+      const doctorCRMStr = activeDoctor?.crm || "123456";
+      const doctorStateStr = activeDoctor?.crm_state || "SP";
+      const doctorSignatureUrl = activeDoctor?.signature_url;
+
       const prescriptionData: PrescriptionData = {
         clinicName: APP_CONFIG.COMPANY.NAME,
         clinicPhone: APP_CONFIG.COMPANY.PHONE,
-        doctorName: "Dra. Suelen Naves Rodrigues (CRM-PR 49354)",
-        doctorCRM: "123456",
-        doctorCRMState: "SP",
-        doctorRQE: "78901",
+        doctorName: doctorNameStr,
+        doctorCRM: doctorCRMStr,
+        doctorCRMState: doctorStateStr,
         patientName: activePatient.name,
         patientCPF: activePatient.cpf,
         patientAge: activePatient.age,
@@ -221,10 +228,11 @@ export function MedicalDashboard() {
         })),
         notes: notes || undefined,
         signatureHash: crypto.randomUUID().replace(/-/g, "").toUpperCase().slice(0, 32),
+        signatureUrl: doctorSignatureUrl,
         date: new Date(),
       };
 
-      const doc = generatePrescriptionPDF(prescriptionData);
+      const doc = await generatePrescriptionPDF(prescriptionData);
       const pdfBlob = doc.output("blob");
       const fileName = `receita_${activePatient.name.replace(/\s/g, "_")}_${Date.now()}.pdf`;
 
@@ -260,7 +268,7 @@ export function MedicalDashboard() {
             patientId: activePatient.id,
             patientPhone: "11999999999",
             patientName: activePatient.name,
-            doctorName: "Dra. Suelen Naves Rodrigues (CRM-PR 49354)",
+            doctorName: `Dra. ${doctorNameStr} (CRM-${doctorStateStr} ${doctorCRMStr})`,
             items: cartItems,
           },
         });

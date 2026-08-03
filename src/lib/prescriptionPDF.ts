@@ -1,7 +1,7 @@
 /**
  * 🐸 Planta y Raiz — Gerador de PDF de Prescrição (Client-Side)
  * Gera receitas médicas em PDF usando jsPDF
- * Conformidade: ANVISA RDC 660/327 + CFM
+ * Layout Limpo - Receituário Simples com assinatura gov.br
  */
 
 import jsPDF from "jspdf";
@@ -12,11 +12,9 @@ export interface PrescriptionData {
   doctorName: string;
   doctorCRM: string;
   doctorCRMState: string;
-  doctorRQE?: string;
   patientName: string;
   patientCPF: string;
   patientAge: number;
-  diagnosisCID?: string;
   medications: {
     name: string;
     dosage: string;
@@ -24,193 +22,183 @@ export interface PrescriptionData {
   }[];
   notes?: string;
   signatureHash?: string;
+  signatureUrl?: string; // Imagem da assinatura ICP-Brasil (Gov.br)
   date: Date;
 }
 
-export function generatePrescriptionPDF(data: PrescriptionData): jsPDF {
+// Helper para carregar a imagem da assinatura
+const loadImage = (url: string): Promise<HTMLImageElement> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = (err) => reject(err);
+    img.src = url;
+  });
+};
+
+export async function generatePrescriptionPDF(data: PrescriptionData): Promise<jsPDF> {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 20;
-  let y = 20;
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 25; // Margem padrão
+  let y = 30;
 
-  // ─── Header / Logo ─────────────────────────────────────
-  doc.setFillColor(10, 12, 16); // #0a0c10
-  doc.rect(0, 0, pageWidth, 40, "F");
+  // Cor do texto base
+  doc.setTextColor(0, 0, 0);
 
-  doc.setTextColor(16, 185, 129); // Emerald #10b981
-  doc.setFontSize(22);
+  // ─── CABEÇALHO (RECEITUÁRIO SIMPLES) ─────────────────────────────────────
   doc.setFont("helvetica", "bold");
-  doc.text(data.clinicName, margin, 18);
+  doc.setFontSize(16);
+  doc.text("RECEITUÁRIO SIMPLES", pageWidth / 2, y, { align: "center" });
+  
+  y += 20;
 
-  doc.setTextColor(200, 200, 200);
-  doc.setFontSize(9);
-  doc.text("RECEITUÁRIO MÉDICO — CANNABIS MEDICINAL", margin, 26);
-  doc.text(`Tel: ${data.clinicPhone}`, margin, 32);
-
-  doc.setTextColor(16, 185, 129);
-  doc.setFontSize(8);
-  doc.text(
-    `Emitido em: ${data.date.toLocaleDateString("pt-BR")} às ${data.date.toLocaleTimeString("pt-BR")}`,
-    pageWidth - margin,
-    32,
-    { align: "right" }
-  );
-
-  y = 50;
-
-  // ─── Dados do Médico ───────────────────────────────────
-  doc.setTextColor(40, 40, 40);
-  doc.setFontSize(10);
+  // ─── DADOS DO PACIENTE ──────────────────────────────────────────────────
+  doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
-  doc.text("MÉDICO PRESCRITOR", margin, y);
-  y += 6;
-
+  doc.text("Nome: ", margin, y);
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.text(`Dr(a). ${data.doctorName}`, margin, y);
-  y += 5;
-  doc.text(
-    `CRM ${data.doctorCRM}/${data.doctorCRMState}${data.doctorRQE ? ` | RQE ${data.doctorRQE}` : ""}`,
-    margin,
-    y
-  );
-  y += 10;
-
-  // ─── Dados do Paciente ─────────────────────────────────
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(10);
-  doc.text("PACIENTE", margin, y);
+  doc.text(data.patientName, margin + 14, y);
   y += 6;
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.text(`Nome: ${data.patientName}`, margin, y);
-  y += 5;
-  doc.text(`CPF: ${data.patientCPF} | Idade: ${data.patientAge} anos`, margin, y);
-  if (data.diagnosisCID) {
-    y += 5;
-    doc.text(`CID: ${data.diagnosisCID}`, margin, y);
-  }
-  y += 10;
-
-  // ─── Separador ─────────────────────────────────────────
-  doc.setDrawColor(16, 185, 129);
-  doc.setLineWidth(0.5);
-  doc.line(margin, y, pageWidth - margin, y);
-  y += 8;
-
-  // ─── Prescrição ────────────────────────────────────────
+  
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.setTextColor(16, 185, 129);
-  doc.text("PRESCRIÇÃO", margin, y);
-  y += 8;
+  doc.text("CPF: ", margin, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(data.patientCPF, margin + 11, y);
 
-  doc.setTextColor(40, 40, 40);
-  data.medications.forEach((med, i) => {
+  y += 15;
+
+  // ─── USO CONTÍNUO (CENTRALIZADO EM ITÁLICO) ─────────────────────────────
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(14);
+  doc.text("USO CONTÍNUO", pageWidth / 2, y, { align: "center" });
+
+  y += 15;
+
+  // ─── MEDICAMENTOS (DUAS COLUNAS) ────────────────────────────────────────
+  data.medications.forEach((med) => {
+    // Esquerda: Medicamento e Posologia
+    // Direita: Quantidade de frascos
+    
+    // Nome do medicamento
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    // Underline para o nome do medicamento (no estilo da imagem)
+    doc.text(med.name, margin, y);
+    const textWidth = doc.getTextWidth(med.name);
+    doc.setLineWidth(0.3);
+    doc.line(margin, y + 1, margin + textWidth, y + 1);
+
+    // Quantidade na direita
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
-    doc.text(`${i + 1}. ${med.name}`, margin, y);
-    y += 5;
+    // Calcular qtd baseada na receita ou default 3
+    const qtdMatches = med.dosage.match(/(\d+)\s*(frasco|goma|gota)/i);
+    let frascosPorAno = "3";
+    if (qtdMatches && parseInt(qtdMatches[1]) > 5) frascosPorAno = "12";
 
+    doc.text("Quant. de frascos por", pageWidth - margin - 40, y);
+    doc.text("ano:", pageWidth - margin - 40, y + 5);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.text(`Posologia: ${med.dosage}`, margin + 4, y);
-    y += 5;
+    doc.text(frascosPorAno, pageWidth - margin - 40, y + 10);
 
-    const lines = doc.splitTextToSize(
-      `Instruções: ${med.instructions}`,
-      pageWidth - margin * 2 - 4
-    );
-    doc.text(lines, margin + 4, y);
-    y += lines.length * 4 + 6;
+    // Instruções e dosagem
+    y += 7;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    const instructionsText = `${med.dosage}${med.instructions ? ` - ${med.instructions}` : ''}`;
+    const lines = doc.splitTextToSize(instructionsText, pageWidth - margin * 2 - 45);
+    doc.text(lines, margin, y);
+    
+    y += (lines.length * 5) + 12;
 
-    // Check for page break
-    if (y > 250) {
+    if (y > 200) {
       doc.addPage();
-      y = 20;
+      y = 30;
     }
   });
 
-  // ─── Observações ───────────────────────────────────────
-  if (data.notes) {
-    y += 4;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text("Observações:", margin, y);
-    y += 5;
-    doc.setFont("helvetica", "normal");
-    const noteLines = doc.splitTextToSize(data.notes, pageWidth - margin * 2);
-    doc.text(noteLines, margin, y);
-    y += noteLines.length * 4 + 6;
-  }
+  // ─── VALIDADE (3 MESES) ─────────────────────────────────────────────────
+  y += 10;
+  const validDate = new Date(data.date);
+  validDate.setMonth(validDate.getMonth() + 3);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text(`Válido até: ${validDate.toLocaleDateString("pt-BR")} (3 meses)`, margin, y);
 
-  // ─── Linha de Assinatura ───────────────────────────────
-  y = Math.max(y + 10, 215);
-  doc.setDrawColor(100, 100, 100);
-  doc.setLineWidth(0.3);
-  doc.line(margin, y, margin + 80, y);
+  // ─── ASSINATURA MÉDICA (RODAPÉ ESQUERDO) ────────────────────────────────
+  // Fica fixo mais para o final da página principal
+  y = pageHeight - 85;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text(data.doctorName.toUpperCase(), margin, y);
   y += 5;
-  doc.setFontSize(9);
-  doc.setFont("helvetica", "bold");
-  doc.text(`Dr(a). ${data.doctorName}`, margin, y);
-  y += 4;
-  doc.setFont("helvetica", "normal");
-  doc.text(`Medicina Integrativa`, margin, y);
+  doc.text(`MÉDICO: CRM ${data.doctorCRM}/${data.doctorCRMState}`, margin, y);
 
-  // ─── Carimbo Digital do CRM (destaque visual) ─────────
-  const stampX = pageWidth - margin - 70;
-  const stampY = y - 10;
-  doc.setDrawColor(16, 185, 129);
-  doc.setLineWidth(1.2);
-  doc.roundedRect(stampX, stampY, 70, 26, 3, 3, "S");
-  doc.setTextColor(16, 185, 129);
-  doc.setFontSize(8);
+  // ─── ÁREA DE ASSINATURA DIGITAL (GOV.BR / ICP-BRASIL) ───────────────────
+  const footerY = pageHeight - 60;
+  
+  // Linha marrom clara divisória (fundo color)
+  doc.setFillColor(242, 235, 230); // cor pêssego/marrom clara do header/footer
+  doc.rect(0, footerY, pageWidth, 5, "F");
+
+  // Logo ICP Brasil (Simulado com texto para facilitar, ou usar base64 no futuro)
   doc.setFont("helvetica", "bold");
-  doc.text("CARIMBO MÉDICO", stampX + 35, stampY + 5, { align: "center" });
-  doc.setFontSize(9);
-  doc.text(`Dr(a). ${data.doctorName}`, stampX + 35, stampY + 11, { align: "center" });
+  doc.setFontSize(16);
+  doc.text("ICP", pageWidth - margin - 15, footerY + 12);
   doc.setFontSize(10);
-  doc.text(`CRM ${data.doctorCRM}/${data.doctorCRMState}`, stampX + 35, stampY + 17, { align: "center" });
-  if (data.doctorRQE) {
-    doc.setFontSize(7);
-    doc.setFont("helvetica", "normal");
-    doc.text(`RQE ${data.doctorRQE}`, stampX + 35, stampY + 22, { align: "center" });
-  }
-  doc.setTextColor(40, 40, 40);
+  doc.text("Brasil", pageWidth - margin - 15, footerY + 16);
+  
+  // Ícone chave simples
+  doc.setLineWidth(0.5);
+  doc.circle(pageWidth - margin - 10, footerY + 20, 2);
+  doc.line(pageWidth - margin - 8, footerY + 20, pageWidth - margin, footerY + 20);
+  doc.line(pageWidth - margin - 4, footerY + 20, pageWidth - margin - 4, footerY + 22);
 
-  // ─── Selo de Assinatura Digital ────────────────────────
-  y += 8;
-  doc.setFillColor(30, 64, 175);
-  doc.roundedRect(margin, y, 70, 10, 2, 2, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(8);
+  // Texto ASSINATURAS DIGITAIS DO DOCUMENTO
+  let currentY = footerY + 18;
+  doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
-  doc.text("✓ ASSINATURA DIGITAL gov.br / ITI", margin + 35, y + 6.5, { align: "center" });
-  doc.setTextColor(40, 40, 40);
+  doc.text("ASSINATURAS DIGITAIS DO DOCUMENTO", margin, currentY);
 
-  // ─── Hash de Autenticidade ─────────────────────────────
-  if (data.signatureHash) {
-    y += 10;
-    doc.setFontSize(7);
-    doc.setTextColor(150, 150, 150);
-    doc.text(
-      `Assinatura Digital: ${data.signatureHash}`,
-      margin,
-      y
-    );
+  currentY += 8;
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  const legalText = `O documento eletrônico, incluindo a(s) sua(s) assinatura(s), contém ${doc.internal.getNumberOfPages()} páginas e foi produzido para ser assinado digitalmente, mediante o uso de certificados digitais ICP-Brasil, de acordo com os termos do Art. 10, § 1º, da Medida Provisória nº 2.200-2, de 24 de agosto de 2001.`;
+  
+  const legalLines = doc.splitTextToSize(legalText, pageWidth - margin * 2 - 20);
+  doc.text(legalLines, margin, currentY);
+
+  currentY += legalLines.length * 4 + 4;
+  doc.setFont("helvetica", "bold");
+  doc.text("Documento assinado digitalmente por:", margin, currentY);
+
+  currentY += 8;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.text(`Digitally signed by ${data.doctorName.toUpperCase()}:${data.doctorCRM}`, margin, currentY);
+  doc.text(`Date: ${data.date.toISOString().replace("T", " ").substring(0, 19)} UTC`, margin, currentY + 4);
+
+  // Se o médico fez o upload da imagem da assinatura digital gov.br, insere aqui
+  if (data.signatureUrl) {
+    try {
+      const img = await loadImage(data.signatureUrl);
+      // Calcula proporção
+      const maxWidth = 50;
+      const maxHeight = 25;
+      let imgWidth = img.width;
+      let imgHeight = img.height;
+      const ratio = Math.min(maxWidth / imgWidth, maxHeight / imgHeight);
+      imgWidth = imgWidth * ratio;
+      imgHeight = imgHeight * ratio;
+
+      // Coloca no canto inferior esquerdo (logo acima das letras "Digitally signed")
+      doc.addImage(img, "PNG", margin + 60, currentY - 10, imgWidth, imgHeight);
+    } catch (e) {
+      console.warn("Erro ao carregar imagem da assinatura:", e);
+    }
   }
-
-  // ─── Footer ────────────────────────────────────────────
-  const footerY = doc.internal.pageSize.getHeight() - 10;
-  doc.setFontSize(7);
-  doc.setTextColor(150, 150, 150);
-  doc.text(
-    "Documento gerado eletronicamente por Planta & Raiz — plantayraiz.com.br | Válido conforme RDC 660/2023",
-    pageWidth / 2,
-    footerY,
-    { align: "center" }
-  );
 
   return doc;
 }

@@ -19,6 +19,7 @@ export const DoctorProfileSettings: React.FC<DoctorProfileSettingsProps> = ({ do
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingFront, setIsUploadingFront] = useState(false);
   const [isUploadingBack, setIsUploadingBack] = useState(false);
+  const [isUploadingSignature, setIsUploadingSignature] = useState(false);
   
   const { toast } = useToast();
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -31,13 +32,14 @@ export const DoctorProfileSettings: React.FC<DoctorProfileSettingsProps> = ({ do
     }
   });
 
-  const uploadDocument = async (event: React.ChangeEvent<HTMLInputElement>, field: 'crm_front' | 'crm_back') => {
+  const uploadDocument = async (event: React.ChangeEvent<HTMLInputElement>, field: 'crm_front' | 'crm_back' | 'signature') => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
       if (field === 'crm_front') setIsUploadingFront(true);
-      else setIsUploadingBack(true);
+      else if (field === 'crm_back') setIsUploadingBack(true);
+      else setIsUploadingSignature(true);
 
       const fileExt = file.name.split('.').pop();
       const filePath = `documents/${doctor.user_id}/${field}_${crypto.randomUUID()}.${fileExt}`;
@@ -52,7 +54,7 @@ export const DoctorProfileSettings: React.FC<DoctorProfileSettingsProps> = ({ do
         .from('avatars')
         .getPublicUrl(filePath);
 
-      const updateField = field === 'crm_front' ? { crm_front_url: publicUrl } : { crm_back_url: publicUrl };
+      const updateField = field === 'crm_front' ? { crm_front_url: publicUrl } : field === 'crm_back' ? { crm_back_url: publicUrl } : { signature_url: publicUrl };
       
       const { error: updateError } = await supabase
         .from('doctors')
@@ -68,7 +70,8 @@ export const DoctorProfileSettings: React.FC<DoctorProfileSettingsProps> = ({ do
       toast({ title: "Erro ao enviar documento", variant: "destructive" });
     } finally {
       if (field === 'crm_front') setIsUploadingFront(false);
-      else setIsUploadingBack(false);
+      else if (field === 'crm_back') setIsUploadingBack(false);
+      else setIsUploadingSignature(false);
     }
   };
 
@@ -144,6 +147,25 @@ export const DoctorProfileSettings: React.FC<DoctorProfileSettingsProps> = ({ do
             </div>
             {doctor.crm_back_url && <p className="text-xs text-green-600 font-medium">✓ Enviado</p>}
           </div>
+        </div>
+
+        <div className="mt-6 space-y-2 max-w-md">
+          <Label>Assinatura Digital (Gov.br / ICP-Brasil)</Label>
+          <div className="flex items-center gap-4">
+            <Button variant="outline" className="relative w-full" disabled={isUploadingSignature}>
+              {isUploadingSignature ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Upload className="mr-2 h-4 w-4" />}
+              {doctor.signature_url ? 'Atualizar Assinatura' : 'Enviar Imagem da Assinatura'}
+              <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*" onChange={(e) => uploadDocument(e, 'signature')} />
+            </Button>
+          </div>
+          {doctor.signature_url && (
+            <div className="mt-4 border rounded-lg p-4 bg-white/50">
+              <p className="text-xs text-green-600 font-medium mb-2">✓ Assinatura enviada e ativa para receitas</p>
+              <div className="bg-white p-2 border inline-block rounded">
+                <img src={doctor.signature_url} alt="Assinatura" className="h-20 object-contain" />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

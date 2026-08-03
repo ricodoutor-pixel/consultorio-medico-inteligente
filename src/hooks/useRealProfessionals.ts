@@ -184,23 +184,29 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         bio: d.bio || `Profissional verificado na Planta & Raiz. Especialidade: ${d.specialty}. ${documentLabel}.`,
         experience: "Verificado",
         tags: [d.specialty, documentLabel, cityLabel],
-        price,
-        priceValue: Number(d.consultation_price) || 30,
+        price: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") ? "R$ 100,00" : price,
+        priceValue: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") ? 100 : (Number(d.consultation_price) || 30),
         whatsapp: "5511991363154",
         rating: d.rating || 5.0,
         consults: d.total_consultations || 0,
         avatar: fullName.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "PR",
         imageUrl: finalImage,
         paymentLink: "https://mpago.la/12KAwmH",
-        online: Boolean(d.is_online && (d.is_available ?? true)),
-        crm: d.document_type === "ci" ? `${d.crm} - BO` : `${d.crm} - ${d.crm_state}`,
-        hospital: cityLabel,
-        services: [
+        services: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") 
+          ? [
+              { name: "Orientação Inicial via Chat", price: "R$ 100,00", desc: "Avaliação inicial via chat seguro" },
+              { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150,00", desc: "Avaliação completa com teleconsulta" },
+              { name: "Retorno", price: "R$ 90,00", desc: "Acompanhamento" },
+            ]
+          : [
           { name: "Orientação Técnica Inicial", price, desc: "Avaliação completa + plano terapêutico" },
           { name: "Retorno", price: formatConsultationPrice((Number(d.consultation_price) || 30) * 0.6, d.country), desc: "Acompanhamento e ajuste" },
         ],
         slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
         reviews: [],
+        online: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") ? false : Boolean(d.is_online && (d.is_available ?? true)),
+        crm: d.document_type === "ci" ? `${d.crm} - BO` : `${d.crm} - ${d.crm_state}`,
+        hospital: cityLabel,
         flags: flagForCountry(d.country),
       };
     });

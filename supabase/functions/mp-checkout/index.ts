@@ -134,7 +134,15 @@ Deno.serve(async (req) => {
       notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
       external_reference: externalReference,
       statement_descriptor: "PLANTA Y RAIZ",
-      metadata: { type, user_id: userId, sku: sku ?? null, cart_token: cartToken ?? null },
+      metadata: {
+        type,
+        user_id: userId,
+        sku: sku ?? null,
+        cart_token: cartToken ?? null,
+        ref_code: typeof refCode === "string" ? refCode : null,
+        referrer_id: referrerId,
+      },
+
     };
 
     const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {

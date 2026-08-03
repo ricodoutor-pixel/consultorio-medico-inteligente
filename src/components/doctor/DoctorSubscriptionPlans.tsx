@@ -21,7 +21,7 @@ const PLANS = [
     tagline: null,
     features: [
       "Taxa de 7% sobre cada consulta",
-      "Exige Assinatura Digital ICP-Brasil (Gov.br)",
+      "Exige assinatura digital própria (Gov.br / ICP-Brasil / ClickSign)",
       "Prontuário eletrônico básico",
       "Perfil verificado na plataforma",
       "Sem IA para diagnóstico",
@@ -30,9 +30,9 @@ const PLANS = [
   },
   {
     id: "vip",
-    name: "Plano VIP",
+    name: "Plano Médico",
     price: 99,
-    priceUSD: 15,
+    priceUSD: 19,
     icon: Crown,
     color: "border-primary/40",
     highlight: true,
@@ -41,16 +41,17 @@ const PLANS = [
     tagline: "TAXA ZERO",
     features: [
       "✨ Taxa de intermediação 0% — retenha 100%",
-      "Assinatura Digital ICP-Brasil inclusa",
+      "Assinatura digital da plataforma inclusa (para quem não tem Gov.br)",
+      "Consulta por vídeo (R$ 150) e por chat (R$ 100) + retorno (R$ 90)",
       "Assistente IA para diagnóstico (CBD/THC)",
       "Prontuário eletrônico completo",
-      "Central de comando completa",
       "Prioridade na triagem Brisa IA",
-      "Selo VIP dourado no perfil",
+      "Programa de indicações ativo",
       "Suporte prioritário 24/7",
     ],
   },
 ];
+
 
 
 interface Props {

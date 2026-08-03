@@ -320,7 +320,6 @@ const App = () => (
                 <Route path="/lojistas" element={<PrivateRoute><LojistaDashboard /></PrivateRoute>} />
                 <Route path="/agendamento" element={<Agendamento />} />
                 <Route path="/prontuario" element={<Prontuario />} />
-                <Route path="/dashboard-medico" element={<DashboardMedico />} />
                 <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />
                 <Route path="/notificacoes" element={<Notificacoes />} />
                 <Route path="/sala-espera" element={<SalaEspera />} />

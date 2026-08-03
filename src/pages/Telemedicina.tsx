@@ -43,6 +43,37 @@ const interviewQuestions = [
 const BrisaAvatar = () => {
   const [mood, setMood] = useState<"neutral" | "happy" | "thinking">("neutral");
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
+  const [chat, setChat] = useState<{ role: "user" | "assistant"; content: string }[]>([
+    { role: "assistant", content: "Olá! Sou a Enfª Brisa 🌿. Como posso te ajudar com sua triagem ou dúvidas sobre o tratamento?" },
+  ]);
+
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text || sending) return;
+    setInput("");
+    const next = [...chat, { role: "user" as const, content: text }];
+    setChat(next);
+    setSending(true);
+    setMood("thinking");
+    try {
+      const { data, error } = await supabase.functions.invoke("brisa-web-chat", {
+        body: { messages: next, leadInfo: { category: "Telemedicina" } },
+      });
+      if (error) throw error;
+      setChat([...next, { role: "assistant", content: data?.text || "Estou aqui com você. Pode me contar um pouco mais?" }]);
+    } catch {
+      setChat([...next, {
+        role: "assistant",
+        content: "Minhas conexões oscilaram, mas continuo aqui. Você pode iniciar a Triagem abaixo ou falar comigo pelo WhatsApp.",
+      }]);
+    } finally {
+      setSending(false);
+      setMood("happy");
+    }
+  };
+
 
   return (
     <div className="relative flex flex-col items-center mb-6">

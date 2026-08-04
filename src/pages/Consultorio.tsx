@@ -41,7 +41,7 @@ const Consultorio = () => {
       setProfile(profileData);
       setDoctor(doctorData);
       if (doctorData) {
-        setIsOnline(doctorData.is_online || false);
+        setIsOnline(Boolean(doctorData.is_online && (doctorData.is_available ?? true)));
         
         // Fetch next appointment for dynamic video link
         const { data: nextAppt } = await supabase

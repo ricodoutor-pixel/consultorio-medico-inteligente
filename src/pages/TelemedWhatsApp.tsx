@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { JitsiRoom } from "@/components/consultation/JitsiRoom";
 import { invokeBrisaEngine, analyzeUserIntent } from "@/lib/brisaMasterEngine";
+import { DiagnosticSidebar } from "@/components/diagnostics/DiagnosticSidebar";
 
 type ChatState = 'ANAMNESE' | 'ESCOLHA_MEDICO' | 'PAYMENT' | 'UPLOAD_RECEIPT' | 'DOCTOR_UNLOCKED' | 'VIDEO_CALL';
 
@@ -41,6 +42,7 @@ export default function TelemedWhatsApp() {
   const [isMobileList, setIsMobileList] = useState(true); // Control for mobile view
   const [doctorLocked, setDoctorLocked] = useState(true);
   const [selectedModality, setSelectedModality] = useState<string>('Nenhuma');
+  const [isDiagnosticSidebarOpen, setDiagnosticSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const contacts = [
@@ -354,9 +356,11 @@ export default function TelemedWhatsApp() {
             <span className="font-semibold text-[#41525d]">Telemed - Planta y Raiz</span>
           </div>
           <div className="flex gap-4 text-[#54656f]">
-            <MoreVertical size={20} className="cursor-pointer" />
+            <MoreVertical size={20} className="cursor-pointer hover:text-[#00a884] transition-colors" onClick={() => setDiagnosticSidebarOpen(true)} title="Ferramentas de Diagnóstico" />
           </div>
         </div>
+
+        <DiagnosticSidebar open={isDiagnosticSidebarOpen} onOpenChange={setDiagnosticSidebarOpen} />
 
         {/* Search */}
         <div className="p-2 border-b bg-white">

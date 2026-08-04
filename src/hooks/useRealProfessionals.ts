@@ -204,7 +204,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         ]),
         slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
         reviews: [],
-        online: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") ? false : Boolean(d.is_online && (d.is_available ?? true)),
+        online: Boolean(d.is_online && (d.is_available ?? true)),
         crm: d.document_type === "ci" ? `${d.crm} - BO` : `${d.crm} - ${d.crm_state}`,
         hospital: cityLabel,
         flags: flagForCountry(d.country),

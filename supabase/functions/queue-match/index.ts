@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
       if (!uid) return jsonRes({ error: "Unauthorized" }, 401);
 
       const { specialty, amount } = body;
-      const jitsiRoom = `plr-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const consultationId = crypto.randomUUID();
 
       // SECURITY: payment_confirmed MUST be set only by mercadopago-webhook after
       // HMAC-verified payment. Client-supplied payment_id is ignored here to
@@ -81,18 +81,19 @@ Deno.serve(async (req) => {
       const { data: entry, error } = await supabase
         .from("consultation_queue")
         .insert({
+          id: consultationId,
           patient_id: uid, // forced to authenticated user
           specialty: specialty || "Cannabis Medicinal",
           amount: amount || 30,
           payment_id: null,
           payment_confirmed: false,
-          jitsi_room: jitsiRoom,
+          jitsi_room: null, // Room is generated at accept phase
         })
-        .select("id, jitsi_room")
+        .select("id")
         .single();
 
       if (error) throw error;
-      return jsonRes({ status: "ok", queue_id: entry.id, jitsi_room: entry.jitsi_room });
+      return jsonRes({ status: "ok", queue_id: entry.id });
     }
 
     // ── action: accept ────────────────────────────────────────
@@ -114,12 +115,29 @@ Deno.serve(async (req) => {
         return jsonRes({ error: "Forbidden: caller is not a verified doctor" }, 403);
       }
 
+      // Chamar create-video-room para gerar o token JWT e a sala oficial
+      const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", uid).maybeSingle();
+      
+      const createRoomResp = await supabase.functions.invoke("create-video-room", {
+        body: {
+          consultation_id: queue_id,
+          patient_name: "Paciente",
+          doctor_name: profile?.full_name || "Médico Plantão",
+          is_doctor: true
+        }
+      });
+      
+      if (createRoomResp.error) throw createRoomResp.error;
+      const roomUrl = createRoomResp.data?.room_url;
+      const jitsiRoomName = createRoomResp.data?.room_name;
+
       const { data: entry, error } = await supabase
         .from("consultation_queue")
         .update({
           matched_doctor_id: doctor.id,
           status: "matched",
           matched_at: new Date().toISOString(),
+          jitsi_room: jitsiRoomName
         })
         .eq("id", queue_id)
         .eq("status", "waiting")
@@ -129,16 +147,17 @@ Deno.serve(async (req) => {
       if (error) throw error;
 
       if (entry) {
+        // Enviar notificação pro paciente. No frontend, useConsultationQueue vai reagir a "matched" e usar o token.
         await supabase.from("notifications").insert({
           user_id: entry.patient_id,
           title: "Médico encontrado!",
           message: "Um médico aceitou sua consulta. Clique para entrar na sala.",
           type: "consultation",
-          action_url: `/sala-espera?room=${entry.jitsi_room}`,
+          action_url: `/orientacao-video?consultation=${queue_id}`,
         });
       }
 
-      return jsonRes({ status: "ok", entry });
+      return jsonRes({ status: "ok", entry, createRoomData: createRoomResp.data });
     }
 
     // ── default action: match (service-role only) ─────────────

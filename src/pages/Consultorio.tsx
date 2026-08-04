@@ -18,6 +18,7 @@ const Consultorio = () => {
   const [loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [nextAppointment, setNextAppointment] = useState<any>(null);
 
   const fetchData = async () => {
     try {
@@ -41,6 +42,18 @@ const Consultorio = () => {
       setDoctor(doctorData);
       if (doctorData) {
         setIsOnline(doctorData.is_online || false);
+        
+        // Fetch next appointment for dynamic video link
+        const { data: nextAppt } = await supabase
+          .from('appointments')
+          .select('*')
+          .eq('doctor_id', doctorData.id)
+          .gte('scheduled_at', new Date().toISOString())
+          .order('scheduled_at', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        
+        setNextAppointment(nextAppt);
       }
     } catch (err) {
       console.error(err);
@@ -112,9 +125,19 @@ const Consultorio = () => {
             </button>
           </div>
           <div className="flex items-center gap-3">
-            <Link to="/orientacao-video" className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-blue-600 text-white hover:bg-blue-700">
-              <Video size={16} /> Iniciar Vídeo
-            </Link>
+            {nextAppointment ? (
+              <Link to={`/orientacao-video?appointment=${nextAppointment.id}`} className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-blue-600 text-white hover:bg-blue-700">
+                <Video size={16} /> Iniciar Vídeo
+              </Link>
+            ) : (
+              <button 
+                disabled 
+                title="Não há consultas futuras agendadas no momento"
+                className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-gray-400 text-white cursor-not-allowed"
+              >
+                <Video size={16} /> Iniciar Vídeo
+              </button>
+            )}
             <Link to="/telemed-whatsapp" className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-[#00a884] text-white hover:bg-[#008f6f]">
               <MessageCircle size={16} /> Telemed WhatsApp
             </Link>

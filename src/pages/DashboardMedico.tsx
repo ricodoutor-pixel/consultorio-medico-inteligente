@@ -675,14 +675,24 @@ const DashboardMedico = () => {
                               <p className="text-xs text-muted-foreground">{a.notes?.slice(0, 40) || "Clique para ver triagem Brisa"}</p>
                             </div>
                           </div>
-                          <div className="text-right">
+                          <div className="text-right flex flex-col items-end">
                             <p className="font-display font-black text-sm text-foreground">{format(new Date(a.scheduled_at), "HH:mm")}</p>
-                            <div className="flex items-center gap-1">
-                              <FileBarChart size={10} className="text-primary" />
+                            <div className="flex items-center gap-1 mt-1">
                               <Badge className={`text-[10px] ${a.status === "confirmed" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
                                 {a.status === "confirmed" ? "Confirmada" : a.status === "scheduled" ? "Agendada" : a.status}
                               </Badge>
                             </div>
+                            <Button 
+                                size="sm" 
+                                className="h-6 text-[10px] px-3 rounded-full mt-2 bg-blue-600 text-white hover:bg-blue-700"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.location.href = `/orientacao-video?appointment=${a.id}`;
+                                }}
+                              >
+                                <Video size={12} className="mr-1" />
+                                Iniciar Vídeo
+                            </Button>
                           </div>
                         </div>
                       ))}

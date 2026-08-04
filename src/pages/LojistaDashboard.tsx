@@ -44,7 +44,7 @@ export default function LojistaDashboard() {
 
   const fetchOrders = async () => {
     try {
-      const { data } = await supabase.from("b2b_orders").select("*").order("created_at", { ascending: false });
+      const { data } = await (supabase as any).from("b2b_orders").select("*").order("created_at", { ascending: false });
       if (data) setOrders(data);
     } catch (e) {
       console.error("Error fetching b2b_orders:", e);
@@ -53,7 +53,7 @@ export default function LojistaDashboard() {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await supabase.from("products").select("*").eq("is_active", true);
+      const { data } = await (supabase as any).from("products").select("*").eq("is_active", true);
       if (data) {
         setProducts(data);
       }

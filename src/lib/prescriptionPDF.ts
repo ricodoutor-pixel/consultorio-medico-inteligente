@@ -165,7 +165,7 @@ export async function generatePrescriptionPDF(data: PrescriptionData): Promise<j
   currentY += 8;
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  const legalText = `O documento eletrônico, incluindo a(s) sua(s) assinatura(s), contém ${doc.internal.getNumberOfPages()} páginas e foi produzido para ser assinado digitalmente, mediante o uso de certificados digitais ICP-Brasil, de acordo com os termos do Art. 10, § 1º, da Medida Provisória nº 2.200-2, de 24 de agosto de 2001.`;
+  const legalText = `O documento eletrônico, incluindo a(s) sua(s) assinatura(s), contém ${doc.getNumberOfPages()} páginas e foi produzido para ser assinado digitalmente, mediante o uso de certificados digitais ICP-Brasil, de acordo com os termos do Art. 10, § 1º, da Medida Provisória nº 2.200-2, de 24 de agosto de 2001.`;
   
   const legalLines = doc.splitTextToSize(legalText, pageWidth - margin * 2 - 20);
   doc.text(legalLines, margin, currentY);

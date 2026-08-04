@@ -47,7 +47,8 @@ export function resolveSignatureProvider(doctorCRM: string): SignatureProvider {
   return doctorCRM.replace(/\D/g, "") === DR_EDILSON_CRM ? "gov.br" : "clicksign";
 }
 
-function pdfToBase64(doc: ReturnType<typeof generatePrescriptionPDF>): string {
+async function pdfToBase64(docPromise: ReturnType<typeof generatePrescriptionPDF>): Promise<string> {
+  const doc = await docPromise;
   // jsPDF datauristring → strip "data:application/pdf;filename=...;base64,"
   const dataUri = doc.output("datauristring");
   return dataUri.split(",")[1] ?? "";
@@ -65,7 +66,7 @@ export async function signAndDispatchPrescription(
 ): Promise<SignAndDispatchResult> {
   const provider = resolveSignatureProvider(input.doctor.crm);
   const pdfDoc = generatePrescriptionPDF(input.prescription);
-  const contentBase64 = pdfToBase64(pdfDoc);
+  const contentBase64 = await pdfToBase64(pdfDoc);
   const filename = `receita_${input.patient.name.replace(/\s+/g, "_")}_${Date.now()}.pdf`;
 
   let documentKey: string | undefined;

@@ -152,22 +152,23 @@ export const Navbar = () => {
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
             {/* Logo + Verdinho */}
-            <div className="flex items-center gap-4 md:gap-6 lg:gap-8 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
+            <div className="flex items-center gap-3 md:gap-5 lg:gap-6 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
               <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3">
                 <img
                   src="/logo-planta-raiz.webp"
                   alt="Planta y Raíz - Mega Clínica Digital"
-                  width={900}
-                  height={330}
+                  width={520}
+                  height={190}
                   fetchPriority="high"
-                  decoding="async"
+                  loading="eager"
+                  decoding="sync"
                   className="h-[62px] md:h-[74px] w-auto max-w-[210px] md:max-w-[260px] object-contain object-left drop-shadow-[0_0_14px_rgba(34,197,94,0.25)]"
                 />
               </NavLink>
 
 
-              {/* Verdinho com respiro de ~30% — sem sobreposição com o logo */}
-              <div className={`ml-2 lg:ml-4 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>
+              {/* Verdinho ~20% mais próximo do logotipo */}
+              <div className={`ml-1 lg:ml-3 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>
                 <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
               </div>
 

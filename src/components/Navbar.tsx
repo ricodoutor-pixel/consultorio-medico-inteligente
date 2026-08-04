@@ -152,30 +152,34 @@ export const Navbar = () => {
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
             {/* Logo + Verdinho */}
-            <div className="flex items-center gap-4 md:gap-6 lg:gap-8 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
+            <div className="flex items-center gap-1.5 md:gap-3.5 lg:gap-4 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
               <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3">
                 <img
                   src="/logo-planta-raiz.webp"
                   alt="Planta y Raíz - Mega Clínica Digital"
-                  width={900}
-                  height={330}
+                  width={520}
+                  height={190}
                   fetchPriority="high"
-                  decoding="async"
+                  loading="eager"
+                  decoding="sync"
                   className="h-[62px] md:h-[74px] w-auto max-w-[210px] md:max-w-[260px] object-contain object-left drop-shadow-[0_0_14px_rgba(34,197,94,0.25)]"
                 />
               </NavLink>
 
 
-              {/* Verdinho com respiro de ~30% — sem sobreposição com o logo */}
-              <div className={`ml-2 lg:ml-4 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>
-                <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
-              </div>
+
 
             </div>
 
+            {/* Desktop: Verdinho exatamente no meio entre o logo e o menu */}
+            <div className={`hidden ${showNavbarMascot ? "lg:flex" : ""} flex-1 items-center justify-center`}>
+              <div className="flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">
+                <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
+              </div>
+            </div>
 
             {/* Desktop: Menu Centralizado (aparece a partir de lg = 1024px) */}
-            <div className="hidden lg:flex items-center gap-2 xl:gap-3 flex-1 justify-end">
+            <div className="hidden lg:flex items-center gap-2 xl:gap-3 justify-end">
               <div className="flex items-center gap-1 xl:gap-2" role="menubar">
                 {primaryLinks.map((link) => (
                   <NavLink

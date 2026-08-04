@@ -58,7 +58,8 @@ export function resolveSignatureRoute(doctor: SignatureContext["doctor"]): Signa
   return "iti_free";
 }
 
-function pdfToBase64(doc: ReturnType<typeof generatePrescriptionPDF>): string {
+async function pdfToBase64(docPromise: ReturnType<typeof generatePrescriptionPDF>): Promise<string> {
+  const doc = await docPromise;
   const dataUri = doc.output("datauristring");
   return dataUri.split(",")[1] ?? "";
 }
@@ -92,7 +93,7 @@ export async function orchestrateSignature(
 ): Promise<SignatureResult> {
   const route = resolveSignatureRoute(ctx.doctor);
   const pdfDoc = generatePrescriptionPDF(ctx.prescription);
-  const contentBase64 = pdfToBase64(pdfDoc);
+  const contentBase64 = await pdfToBase64(pdfDoc);
   const filename = `receita_${ctx.patient.name.replace(/\s+/g, "_")}_${Date.now()}.pdf`;
 
   try {

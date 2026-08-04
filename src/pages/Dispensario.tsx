@@ -73,7 +73,7 @@ const Dispensario = () => {
     }
 
     try {
-      const { data: dbProducts, error } = await supabase.from("products").select("*").eq("is_active", true);
+      const { data: dbProducts, error } = await (supabase as any).from("products").select("*").eq("is_active", true);
       if (dbProducts && dbProducts.length > 0) {
         setProducts(dbProducts.map(p => ({
           id: p.id,

@@ -166,10 +166,8 @@ export const Navbar = () => {
                 />
               </NavLink>
 
-              {/* Verdinho (mobile/tablet fica junto ao logo) */}
-              <div className={`ml-0 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "block lg:hidden" : "hidden"}`}>
-                <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
-              </div>
+
+
 
             </div>
 

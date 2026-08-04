@@ -13,6 +13,7 @@ import { DoctorQuickActions } from "@/components/doctor/DoctorQuickActions";
 import { PrescriptionTemplates } from "@/components/doctor/PrescriptionTemplates";
 import { TriageSummaryCard } from "@/components/doctor/TriageSummaryCard";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 
 const WorkspaceMedico = () => {
   const [searchParams] = useSearchParams();
@@ -58,12 +59,18 @@ const WorkspaceMedico = () => {
          setIsOnline(localStorage.getItem(`mock_online_${docId}`) === "true");
       }
 
-      const [patientRes, apptRes] = await Promise.all([
+      const [patientRes, apptRes, recordRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", patientId).single(),
-        supabase.from("appointments").select("*").eq("id", appointmentId).single()
+        supabase.from("appointments").select("*").eq("id", appointmentId).single(),
+        supabase.from("medical_records").select("*").eq("appointment_id", appointmentId).maybeSingle()
       ]);
       if (patientRes.data) setPatient(patientRes.data);
       if (apptRes.data) setAppointment(apptRes.data);
+      if (recordRes.data) {
+        if (recordRes.data.notes) setNotes(recordRes.data.notes);
+        if (recordRes.data.diagnosis) setDiagnosis(recordRes.data.diagnosis);
+        if (recordRes.data.treatment_plan) setTreatmentPlan(recordRes.data.treatment_plan);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -110,7 +117,12 @@ const WorkspaceMedico = () => {
             <ChevronLeft size={20} />
           </Button>
           <div>
-            <h2 className="font-semibold text-lg">{patient?.full_name || "Paciente Remoto"}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-semibold text-lg">{patient?.full_name || "Paciente Remoto"}</h2>
+              <Badge variant={type === 'video' ? "default" : "secondary"} className="text-[10px]">
+                {type === 'video' ? "Consulta Completa - Resolução CFM 2.314/22" : "Orientação Técnica Rápida"}
+              </Badge>
+            </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="flex items-center gap-1"><Clock size={12}/> {appointment?.scheduled_at ? new Date(appointment.scheduled_at).toLocaleDateString() : "Hoje"}</span>
               <span>•</span>
@@ -158,7 +170,7 @@ const WorkspaceMedico = () => {
         <div className="w-1/2 flex flex-col bg-card/10 overflow-hidden">
           
           <div className="p-4 border-b border-border shrink-0 bg-background/50">
-             <TriageSummaryCard notes={appointment?.notes} />
+             <TriageSummaryCard notes={notes} />
           </div>
 
           <div className="flex-1 overflow-auto p-4">

@@ -152,7 +152,7 @@ export const Navbar = () => {
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
             {/* Logo + Verdinho */}
-            <div className="flex items-center gap-3 md:gap-5 lg:gap-6 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
+            <div className="flex items-center gap-2 md:gap-4 lg:gap-5 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
               <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3">
                 <img
                   src="/logo-planta-raiz.webp"
@@ -167,8 +167,8 @@ export const Navbar = () => {
               </NavLink>
 
 
-              {/* Verdinho ~20% mais próximo do logotipo */}
-              <div className={`ml-1 lg:ml-3 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>
+              {/* Verdinho ~30% mais próximo do logotipo */}
+              <div className={`ml-0 lg:ml-2 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>
                 <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
               </div>
 

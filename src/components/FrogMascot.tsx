@@ -1,6 +1,8 @@
 import { memo, useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import verdinhoImg from "@/assets/verdinho-mascot-256.webp";
+// Servido de /public + <link rel="preload"> no index.html → carrega junto com o logo,
+// sem depender do chunk JS do mascote.
+const verdinhoImg = "/verdinho-mascot-256.webp";
 import { useFrogAnimations, FrogExpression } from "./frog/useFrogAnimations";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { FrogEyes } from "./frog/FrogEyes";

@@ -14,6 +14,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { JitsiRoom } from "@/components/consultation/JitsiRoom";
 import { invokeBrisaEngine, analyzeUserIntent } from "@/lib/brisaMasterEngine";
 import { DiagnosticSidebar } from "@/components/diagnostics/DiagnosticSidebar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 
 type ChatState = 'ANAMNESE' | 'ESCOLHA_MEDICO' | 'PAYMENT' | 'UPLOAD_RECEIPT' | 'DOCTOR_UNLOCKED' | 'VIDEO_CALL';
 
@@ -43,9 +45,65 @@ export default function TelemedWhatsApp() {
   const [doctorLocked, setDoctorLocked] = useState(true);
   const [selectedModality, setSelectedModality] = useState<string>('Nenhuma');
   const [isDiagnosticSidebarOpen, setDiagnosticSidebarOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'PATIENT' | 'DOCTOR'>('PATIENT');
+  const [prontuarioOpen, setProntuarioOpen] = useState(false);
+  const [receitaOpen, setReceitaOpen] = useState(false);
+  const [prontuarioText, setProntuarioText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const contacts = [
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const email = session.user.email?.toLowerCase() || '';
+        if (email.includes('medico') || email.includes('olivia') || email.includes('suelen') || email.includes('edilson')) {
+          setViewMode('DOCTOR');
+        }
+      }
+    };
+    fetchSession();
+  }, []);
+
+  const handleFinishConsultation = () => {
+    setDoctorLocked(true);
+    setChatState('ANAMNESE');
+    toast.success('Atendimento finalizado. O contato com o paciente foi bloqueado novamente.');
+  };
+
+  const handleSendReceita = () => {
+    setReceitaOpen(false);
+    toast.success('Receita gerada e assinada com sucesso!');
+    setMessages(prev => [...prev, {
+      id: Date.now().toString(),
+      senderId: 'doctor',
+      text: 'Receituário Digital Anexado',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      attachment: '📄 Receita_Canabidiol_PlantaYRaiz.pdf'
+    }]);
+  };
+
+  const mockPatients = [
+    {
+      id: 'patient-1',
+      name: 'João Silva (Paciente)',
+      role: doctorLocked ? 'Sala de Espera - Aguardando Pagamento' : 'Pronto para Atendimento',
+      avatar: 'https://i.pravatar.cc/150?u=joao',
+      isOnline: true,
+      isLocked: doctorLocked,
+      lastMsg: doctorLocked ? 'Aguardando liberação do sistema.' : 'Pronto para atendimento.'
+    },
+    {
+      id: 'patient-2',
+      name: 'Maria Oliveira (Paciente)',
+      role: 'Triagem em andamento',
+      avatar: 'https://i.pravatar.cc/150?u=maria',
+      isOnline: false,
+      isLocked: true,
+      lastMsg: 'Conversando com Enfª Brisa...'
+    }
+  ];
+
+  const baseContacts = [
     {
       id: 'brisa',
       name: 'Enfª Brisa - Triagem 24h',
@@ -63,7 +121,10 @@ export default function TelemedWhatsApp() {
       isOnline: true,
       isLocked: false,
       lastMsg: 'Olá, sou o Dr. Verdinho!'
-    },
+    }
+  ];
+
+  const doctorContacts = [
     {
       id: 'doctor',
       name: 'Dr. Edilson Bezerra On',
@@ -92,6 +153,12 @@ export default function TelemedWhatsApp() {
       lastMsg: doctorLocked ? 'Bloqueado aguardando triagem.' : 'Pronto para atendimento.'
     }
   ];
+
+  const contacts = viewMode === 'DOCTOR' 
+    ? [...baseContacts, ...mockPatients]
+    : [...baseContacts, ...doctorContacts];
+
+  const currentContact = contacts.find(c => c.id === activeContact);
 
   // Initial greeting
   useEffect(() => {
@@ -335,8 +402,6 @@ export default function TelemedWhatsApp() {
   const handleEndVideoCall = () => {
     setChatState('DOCTOR_UNLOCKED');
   };
-
-  const currentContact = contacts.find(c => c.id === activeContact);
 
   return (
     <div className="flex h-screen bg-[#f0f2f5] overflow-hidden font-sans">
@@ -636,6 +701,52 @@ export default function TelemedWhatsApp() {
           </div>
         )}
       </div>
+
+      {/* Prontuário Dialog */}
+      <Dialog open={prontuarioOpen} onOpenChange={setProntuarioOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Prontuário Digital</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Textarea 
+              placeholder="Digite a evolução clínica do paciente..." 
+              value={prontuarioText}
+              onChange={(e) => setProntuarioText(e.target.value)}
+              className="min-h-[200px]"
+            />
+          </div>
+          <Button onClick={() => { setProntuarioOpen(false); toast.success('Prontuário salvo!'); }} className="w-full">
+            Salvar no Histórico
+          </Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* Receita Dialog */}
+      <Dialog open={receitaOpen} onOpenChange={setReceitaOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Prescrever Receita</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div>
+              <p className="text-sm font-medium mb-1">Medicamento</p>
+              <Input placeholder="Ex: Óleo de CBD Full Spectrum 10%" />
+            </div>
+            <div>
+              <p className="text-sm font-medium mb-1">Posologia</p>
+              <Textarea placeholder="Ex: 5 gotas sublinguais 2x ao dia" />
+            </div>
+            <div className="p-3 bg-slate-100 rounded-lg flex items-center gap-2">
+              <Check size={16} className="text-emerald-500" />
+              <span className="text-sm text-slate-700">Assinatura Digital Anvisa ativada</span>
+            </div>
+          </div>
+          <Button onClick={handleSendReceita} className="w-full bg-emerald-600 hover:bg-emerald-700">
+            Assinar e Enviar ao Paciente
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

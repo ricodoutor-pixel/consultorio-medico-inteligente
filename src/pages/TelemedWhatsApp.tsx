@@ -421,7 +421,7 @@ export default function TelemedWhatsApp() {
             <span className="font-semibold text-[#41525d]">Telemed - Planta y Raiz</span>
           </div>
           <div className="flex gap-4 text-[#54656f]">
-            <MoreVertical size={20} className="cursor-pointer hover:text-[#00a884] transition-colors" onClick={() => setDiagnosticSidebarOpen(true)} title="Ferramentas de Diagnóstico" />
+            <button type="button" onClick={() => setDiagnosticSidebarOpen(true)} title="Ferramentas de Diagnóstico" aria-label="Ferramentas de Diagnóstico"><MoreVertical size={20} className="cursor-pointer hover:text-[#00a884] transition-colors" /></button>
           </div>
         </div>
 

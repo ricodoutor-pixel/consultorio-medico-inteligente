@@ -42,6 +42,7 @@ const Dispensario = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<DispensaryProduct[]>([]);
 
   useEffect(() => {
     checkAccess();
@@ -69,12 +70,36 @@ const Dispensario = () => {
       }
     } catch (e) {
       console.error(e);
+    }
+
+    try {
+      const { data: dbProducts, error } = await supabase.from("products").select("*").eq("is_active", true);
+      if (dbProducts && dbProducts.length > 0) {
+        setProducts(dbProducts.map(p => ({
+          id: p.id,
+          name: p.name,
+          brand: p.brand || "Marca Parceira",
+          type: p.category || "Óleo",
+          cbdMg: p.cbd_mg || 0,
+          thcPct: p.thc_pct || 0,
+          volume: p.volume || "30mL",
+          price: p.price || 0,
+          requiresReceitaA: p.requires_receita_a || false,
+          anvisaReg: p.anvisa_reg || "Isento",
+          inStock: p.in_stock !== false
+        })));
+      } else {
+        setProducts(PRODUCTS); // Fallback if no real products
+      }
+    } catch (e) {
+      console.error(e);
+      setProducts(PRODUCTS);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredProducts = PRODUCTS.filter(p =>
+  const filteredProducts = products.filter(p =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.brand.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -165,55 +190,65 @@ const Dispensario = () => {
           />
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredProducts.map(product => (
-            <Card key={product.id} className={`bg-card border-border ${!product.inStock ? "opacity-50" : ""}`}>
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-sm">{product.name}</CardTitle>
-                    <p className="text-xs text-muted-foreground">{product.brand}</p>
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-12 bg-muted/20 border border-dashed border-border rounded-xl">
+            <ShoppingCart size={48} className="mx-auto mb-4 text-muted-foreground/50" />
+            <h3 className="text-lg font-bold text-foreground">Nenhum produto encontrado</h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              Não encontramos produtos para esta busca ou a loja está vazia.
+            </p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredProducts.map(product => (
+              <Card key={product.id} className={`bg-card border-border ${!product.inStock ? "opacity-50" : ""}`}>
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-sm">{product.name}</CardTitle>
+                      <p className="text-xs text-muted-foreground">{product.brand}</p>
+                    </div>
+                    {product.requiresReceitaA && (
+                      <Badge variant="destructive" className="text-[9px]">
+                        <AlertTriangle size={8} className="mr-1" /> Receita A
+                      </Badge>
+                    )}
                   </div>
-                  {product.requiresReceitaA && (
-                    <Badge variant="destructive" className="text-[9px]">
-                      <AlertTriangle size={8} className="mr-1" /> Receita A
-                    </Badge>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex flex-wrap gap-1.5">
-                  <Badge variant="outline" className="text-[10px]">{product.type}</Badge>
-                  <Badge variant="outline" className="text-[10px]">CBD {product.cbdMg}mg</Badge>
-                  {product.thcPct > 0 && (
-                    <Badge variant="outline" className="text-[10px] border-yellow-500/50 text-yellow-500">
-                      THC {product.thcPct}%
-                    </Badge>
-                  )}
-                  <Badge variant="outline" className="text-[10px]">{product.volume}</Badge>
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <AnvisaBadge registration={product.anvisaReg} compact />
-                  <span className="text-[9px] text-muted-foreground/70 font-mono">{product.anvisaReg}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-primary">
-                    R$ {product.price.toFixed(2)}
-                  </span>
-                  <Button
-                    size="sm"
-                    disabled={!product.inStock}
-                    className="bg-primary text-primary-foreground text-xs"
-                  >
-                    {product.inStock ? (
-                      <><ShoppingCart size={12} className="mr-1" /> Comprar</>
-                    ) : "Indisponível"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex flex-wrap gap-1.5">
+                    <Badge variant="outline" className="text-[10px]">{product.type}</Badge>
+                    <Badge variant="outline" className="text-[10px]">CBD {product.cbdMg}mg</Badge>
+                    {product.thcPct > 0 && (
+                      <Badge variant="outline" className="text-[10px] border-yellow-500/50 text-yellow-500">
+                        THC {product.thcPct}%
+                      </Badge>
+                    )}
+                    <Badge variant="outline" className="text-[10px]">{product.volume}</Badge>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <AnvisaBadge registration={product.anvisaReg} compact />
+                    <span className="text-[9px] text-muted-foreground/70 font-mono">{product.anvisaReg}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-primary">
+                      R$ {product.price.toFixed(2)}
+                    </span>
+                    <Button
+                      size="sm"
+                      disabled={!product.inStock}
+                      className="bg-primary text-primary-foreground text-xs"
+                    >
+                      {product.inStock ? (
+                        <><ShoppingCart size={12} className="mr-1" /> Comprar</>
+                      ) : "Indisponível"}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         <Card className="mt-8 bg-muted/30 border-border">
           <CardContent className="p-4">

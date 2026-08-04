@@ -66,6 +66,49 @@ const Consultorio = () => {
     fetchData();
   }, []);
 
+  // Sincronismo total com o ponto verde do card médico:
+  // realtime na própria linha + revalidação ao voltar para a aba.
+  useEffect(() => {
+    if (!doctor?.id) return;
+
+    const syncFromDb = async () => {
+      const { data } = await supabase
+        .from('doctors')
+        .select('is_online, is_available')
+        .eq('id', doctor.id)
+        .maybeSingle();
+      if (data) {
+        setIsOnline(Boolean(data.is_online && (data.is_available ?? true)));
+      }
+    };
+
+    syncFromDb();
+    const poll = setInterval(syncFromDb, 20_000);
+    const onVisible = () => { if (document.visibilityState === 'visible') syncFromDb(); };
+    document.addEventListener('visibilitychange', onVisible);
+
+    const channel = supabase
+      .channel(`doctor:${doctor.user_id}:online-status`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'doctors', filter: `id=eq.${doctor.id}` },
+        (payload: any) => {
+          const row = payload.new;
+          if (!row) return;
+          setIsOnline(Boolean(row.is_online && (row.is_available ?? true)));
+          setDoctor((prev: any) => (prev ? { ...prev, ...row } : prev));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      clearInterval(poll);
+      document.removeEventListener('visibilitychange', onVisible);
+      supabase.removeChannel(channel);
+    };
+  }, [doctor?.id, doctor?.user_id]);
+
+
   const toggleOnlineStatus = async () => {
     if (!doctor) return;
     try {

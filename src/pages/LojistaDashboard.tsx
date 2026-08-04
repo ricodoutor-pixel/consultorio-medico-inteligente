@@ -28,9 +28,38 @@ const terpenesData = [
   { name: 'Cariofileno', prescricoes: 180 },
 ];
 
+import { supabase } from "@/integrations/supabase/client";
+
 export default function LojistaDashboard() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    fetchProducts();
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const { data } = await supabase.from("b2b_orders").select("*").order("created_at", { ascending: false });
+      if (data) setOrders(data);
+    } catch (e) {
+      console.error("Error fetching b2b_orders:", e);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const { data } = await supabase.from("products").select("*").eq("is_active", true);
+      if (data) {
+        setProducts(data);
+      }
+    } catch (e) {
+      console.error("Error fetching products:", e);
+    }
+  };
 
   const handleProductSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,9 +98,10 @@ export default function LojistaDashboard() {
         </div>
 
         <Tabs defaultValue="demanda" className="w-full">
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 grid grid-cols-3">
             <TabsTrigger value="demanda">Demanda Preditiva</TabsTrigger>
             <TabsTrigger value="catalogo">Meu Catálogo (Shopping)</TabsTrigger>
+            <TabsTrigger value="pedidos">Pedidos B2B</TabsTrigger>
           </TabsList>
 
           <TabsContent value="demanda" className="space-y-6">
@@ -206,16 +236,68 @@ export default function LojistaDashboard() {
                     <CardDescription>Produtos visíveis para os pacientes e médicos no IA Matchmaker.</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground border-2 border-dashed border-border rounded-xl bg-muted/10">
-                      <Package size={48} className="text-muted-foreground/50 mb-4" />
-                      <h4 className="font-bold text-foreground mb-1">Nenhum produto listado ainda</h4>
-                      <p className="text-sm">Os produtos aprovados pela nossa diretoria técnica aparecerão aqui com métricas de conversão ao vivo.</p>
-                    </div>
+                    {products.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground border-2 border-dashed border-border rounded-xl bg-muted/10">
+                        <Package size={48} className="text-muted-foreground/50 mb-4" />
+                        <h4 className="font-bold text-foreground mb-1">Nenhum produto listado ainda</h4>
+                        <p className="text-sm">Os produtos aprovados pela nossa diretoria técnica aparecerão aqui com métricas de conversão ao vivo.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {products.map(product => (
+                          <div key={product.id} className="flex justify-between items-center p-3 border rounded-lg">
+                            <div>
+                              <p className="font-bold">{product.name}</p>
+                              <p className="text-sm text-muted-foreground">{product.brand} - {product.category}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold">R$ {product.price?.toFixed(2) || "0.00"}</p>
+                              <Badge variant={product.in_stock ? "outline" : "destructive"}>
+                                {product.in_stock ? "Em Estoque" : "Esgotado"}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
 
             </div>
+          </TabsContent>
+
+          <TabsContent value="pedidos">
+            <Card className="border-border">
+              <CardHeader>
+                <CardTitle>Pedidos B2B</CardTitle>
+                <CardDescription>Acompanhe os pedidos de clínicas e médicos parceiros.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {orders.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground border-2 border-dashed border-border rounded-xl bg-muted/10">
+                    <Package size={48} className="text-muted-foreground/50 mb-4" />
+                    <h4 className="font-bold text-foreground mb-1">Nenhum pedido ainda</h4>
+                    <p className="text-sm">Os pedidos recebidos aparecerão aqui.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.map(order => (
+                      <div key={order.id} className="flex justify-between items-center p-4 border rounded-lg bg-card">
+                        <div>
+                          <p className="font-bold">Pedido #{order.id.slice(0, 8)}</p>
+                          <p className="text-sm text-muted-foreground">Em: {new Date(order.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-primary">R$ {order.total_amount?.toFixed(2) || "0.00"}</p>
+                          <Badge variant="outline" className="mt-1">{order.status}</Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Clock, FilePlus, ChevronLeft, Calendar, Stethoscope, Video, MessageSquare } from "lucide-react";
+import { FileText, Clock, FilePlus, ChevronLeft, Calendar, Stethoscope, Video, MessageSquare, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DoctorQuickActions } from "@/components/doctor/DoctorQuickActions";
 import { PrescriptionTemplates } from "@/components/doctor/PrescriptionTemplates";
@@ -132,6 +132,13 @@ const WorkspaceMedico = () => {
         </div>
         
         <div className="flex items-center gap-6">
+          <Button 
+            variant="outline" 
+            className="gap-2 bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"
+            onClick={() => window.open("/manual?tab=medico", "_blank")}
+          >
+            <BookOpen size={16} /> Passo a Passo
+          </Button>
           <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-background border border-border">
             <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-muted-foreground"}`} />
             <span className="text-xs font-bold mr-2">{isOnline ? "Online" : "Offline"}</span>

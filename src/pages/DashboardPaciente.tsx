@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, BellRing, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, FileText, ClipboardList, RefreshCw, MessageCircle, ArrowUpRight } from "lucide-react";
+import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, BellRing, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, FileText, ClipboardList, RefreshCw, MessageCircle, ArrowUpRight, BookOpen } from "lucide-react";
 import { PlanUpgradeCard } from "@/components/patient/PlanUpgradeCard";
 import { ProfileAvatarCard } from "@/components/patient/ProfileAvatarCard";
 import { motion } from "framer-motion";
@@ -209,6 +209,9 @@ const DashboardPaciente = () => {
               </Button>
               <Button variant="outline" size="sm" className="rounded-xl text-xs" onClick={handleLogout}>
                 <LogOut size={14} className="mr-1" /> Sair
+              </Button>
+              <Button size="sm" className="rounded-xl text-xs bg-background text-primary border border-primary/20 hover:bg-primary/10" asChild>
+                <Link to="/manual?tab=paciente"><BookOpen size={14} className="mr-1" /> Passo a Passo</Link>
               </Button>
               <Button size="sm" className="rounded-xl text-xs bg-[#00a884] text-white hover:bg-[#008f6f]" asChild>
                 <Link to="/telemed-whatsapp"><MessageCircle size={14} className="mr-1" /> Telemed WhatsApp</Link>

@@ -11,7 +11,7 @@ import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, FileBarChart, Brain, Flame, RefreshCw, ClipboardCheck, Loader2, Camera, UserCircle2, MessageCircle, Network, Settings } from "lucide-react";
+import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, FileBarChart, Brain, Flame, RefreshCw, ClipboardCheck, Loader2, Camera, UserCircle2, MessageCircle, Network, Settings, BookOpen } from "lucide-react";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { motion } from "framer-motion";
 import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
@@ -423,6 +423,14 @@ const DashboardMedico = () => {
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Acessar Telemed
                 </Button>
+                <Link to="/manual?tab=medico">
+                  <span 
+                    className="inline-flex items-center justify-center gap-1.5 bg-background border-2 border-primary/20 text-primary rounded-full px-4 py-2 text-sm font-black hover:bg-primary/10 transition-all transform hover:scale-105 cursor-pointer shadow-[0_0_15px_rgba(255,255,255,0.05)]"
+                  >
+                    <BookOpen size={16} />
+                    PASSO A PASSO
+                  </span>
+                </Link>
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-muted-foreground"}`} />
                   <span className="text-sm font-bold text-foreground">{isOnline ? "Online" : "Offline"}</span>

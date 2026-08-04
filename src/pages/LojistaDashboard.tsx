@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { TrendingUp, Package, AlertTriangle, Building2, UploadCloud, Plus } from "lucide-react";
+import { TrendingUp, Package, AlertTriangle, Building2, UploadCloud, Plus, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const demandData = [
@@ -91,10 +92,14 @@ export default function LojistaDashboard() {
             </h1>
             <p className="text-muted-foreground mt-2">Monitore a demanda preditiva e posicione seus produtos no ecossistema.</p>
           </div>
-          
-          <Button size="lg" className="font-bold rounded-xl shadow-lg shadow-primary/20">
-            <TrendingUp size={18} className="mr-2" /> Upgrade para Relatórios Avançados
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button size="lg" variant="outline" className="font-bold rounded-xl border-primary/20 text-primary hover:bg-primary/10" asChild>
+              <Link to="/manual?tab=lojista"><BookOpen size={18} className="mr-2" /> Passo a Passo</Link>
+            </Button>
+            <Button size="lg" className="font-bold rounded-xl shadow-lg shadow-primary/20">
+              <TrendingUp size={18} className="mr-2" /> Upgrade para Relatórios Avançados
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="demanda" className="w-full">

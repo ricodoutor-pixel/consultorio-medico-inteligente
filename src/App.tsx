@@ -98,6 +98,7 @@ const WorkspaceMedico = lazyWithRecovery(() => import("./pages/WorkspaceMedico")
 const DashboardExecutivo = lazyWithRecovery(() => import("./pages/DashboardExecutivo"), { sourceRef: "/dashboard-executivo" });
 const Notificacoes = lazyWithRecovery(() => import("./pages/Notificacoes"), { sourceRef: "/notificacoes" });
 const SalaEspera = lazyWithRecovery(() => import("./pages/SalaEspera"), { sourceRef: "/sala-espera" });
+const ManualPlataforma = lazyWithRecovery(() => import("./pages/ManualPlataforma"), { sourceRef: "/manual" });
 const OrientacaoVideo = lazyWithRecovery(() => import("./pages/OrientacaoVideo"), { sourceRef: "/orientacao-video" });
 const Appointments = lazyWithRecovery(() => import("./pages/Appointments"), { sourceRef: "/consultas" });
 const RIPD = lazyWithRecovery(() => import("./pages/RIPD"), { sourceRef: "/ripd" });
@@ -264,6 +265,7 @@ const App = () => (
                 <Route path="/precos" element={<Precos />} />
                 <Route path="/saude-digital" element={<SaudeDigital />} />
                 <Route path="/faq" element={<FAQ />} />
+                <Route path="/manual" element={<ManualPlataforma />} />
                 <Route path="/contato" element={<Contato />} />
                 <Route path="/pay" element={<Pay />} />
                 <Route path="/carteira" element={<Carteira />} />

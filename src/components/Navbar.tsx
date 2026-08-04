@@ -152,7 +152,7 @@ export const Navbar = () => {
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
             {/* Logo + Verdinho */}
-            <div className="flex items-center gap-2 md:gap-4 lg:gap-5 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
+            <div className="flex items-center gap-1.5 md:gap-3.5 lg:gap-4 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
               <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3">
                 <img
                   src="/logo-planta-raiz.webp"
@@ -166,17 +166,22 @@ export const Navbar = () => {
                 />
               </NavLink>
 
-
-              {/* Verdinho ~30% mais próximo do logotipo */}
-              <div className={`ml-0 lg:ml-2 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "hidden lg:block" : "hidden"}`}>
+              {/* Verdinho (mobile/tablet fica junto ao logo) */}
+              <div className={`ml-0 flex-shrink-0 hover:scale-110 transition-transform cursor-pointer ${showNavbarMascot ? "block lg:hidden" : "hidden"}`}>
                 <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
               </div>
 
             </div>
 
+            {/* Desktop: Verdinho exatamente no meio entre o logo e o menu */}
+            <div className={`hidden ${showNavbarMascot ? "lg:flex" : ""} flex-1 items-center justify-center`}>
+              <div className="flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">
+                <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
+              </div>
+            </div>
 
             {/* Desktop: Menu Centralizado (aparece a partir de lg = 1024px) */}
-            <div className="hidden lg:flex items-center gap-2 xl:gap-3 flex-1 justify-end">
+            <div className="hidden lg:flex items-center gap-2 xl:gap-3 justify-end">
               <div className="flex items-center gap-1 xl:gap-2" role="menubar">
                 {primaryLinks.map((link) => (
                   <NavLink

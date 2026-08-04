@@ -159,6 +159,17 @@ const OrientacaoVideo = () => {
     }
   };
 
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (!isDoctor && roomError?.code === "not_found") {
+      timeout = setTimeout(() => {
+        roomFetchStarted.current = false;
+        fetchOrCreateRoom();
+      }, 5000);
+    }
+    return () => clearTimeout(timeout);
+  }, [roomError, isDoctor]);
+
   const handleTCLEAccept = () => {
     setTcleAccepted(true);
     setShowTCLE(false);

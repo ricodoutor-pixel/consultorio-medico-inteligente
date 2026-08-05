@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { doctorChannel, userChannel } from "@/lib/realtime-channels";
-import { Users, Clock, Video, MessageSquare, CheckCircle2, Wifi, Shield, Bell, ArrowRight, Loader2, Zap } from "lucide-react";
+import { Users, Clock, Video, MessageSquare, CheckCircle2, Wifi, Shield, Bell, ArrowRight, Loader2, Zap, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -120,18 +120,26 @@ const SalaEspera = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             {/* Header */}
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
-                <Users size={24} className="text-primary" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
+                  <Users size={24} className="text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-2xl md:text-4xl font-display font-black text-foreground">
+                    Sala de Espera <span className="text-gradient-green">Virtual</span>
+                  </h1>
+                  <p className="text-xs text-muted-foreground font-semibold">
+                    {userType === "doctor" ? "Gerencie sua fila de pacientes" : "Acompanhe sua posição na fila"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl md:text-4xl font-display font-black text-foreground">
-                  Sala de Espera <span className="text-gradient-green">Virtual</span>
-                </h1>
-                <p className="text-xs text-muted-foreground font-semibold">
-                  {userType === "doctor" ? "Gerencie sua fila de pacientes" : "Acompanhe sua posição na fila"}
-                </p>
-              </div>
+              <Button variant="outline" className="border-border text-foreground hover:bg-muted font-bold rounded-xl" asChild>
+                <Link to="/consultorio">
+                  <ArrowLeft size={16} className="mr-2" />
+                  Voltar ao Consultório
+                </Link>
+              </Button>
             </div>
 
             {/* Status bar */}

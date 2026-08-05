@@ -1,4 +1,4 @@
-import Dra. SuelenImg from "@/assets/dr-edilson-bezerra.jpg";
+import DraSuelenImg from "@/assets/dr-edilson-bezerra.jpg";
 import draJulianaImg from "@/assets/dra-juliana-ferreira.jpg";
 import drMarcosImg from "@/assets/dr-marcos-oliveira.jpg";
 import draIsabellaImg from "@/assets/dra-isabella-moreno.jpg";
@@ -120,7 +120,7 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 850,
     avatar: "EB",
-    imageUrl: Dra. SuelenImg,
+    imageUrl: DraSuelenImg,
     online: true,
     crm: "10963 - Sta Cruz Bo",
     hospital: "Beneficência Portuguesa (SP) / Hospital Menino Jesus",

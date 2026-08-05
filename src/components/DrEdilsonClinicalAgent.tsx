@@ -22,7 +22,7 @@ const SUGGESTIONS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dr-edilson-clinical-support`;
 
-export function Dra. SuelenClinicalAgent({ patientContext }: { patientContext?: string }) {
+export function DraSuelenClinicalAgent({ patientContext }: { patientContext?: string }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -281,4 +281,4 @@ export function Dra. SuelenClinicalAgent({ patientContext }: { patientContext?: 
   );
 }
 
-export default Dra. SuelenClinicalAgent;
+export default DraSuelenClinicalAgent;

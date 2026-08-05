@@ -17,7 +17,7 @@ import { doctorChannel } from "@/lib/realtime-channels";
 import { toast } from "sonner";
 import { generatePrescriptionPDF, type PrescriptionData } from "@/lib/prescriptionPDF";
 import { APP_CONFIG } from "@/lib/app-config";
-import { DraSuelenClinicalAgent } from "@/components/DraSuelenClinicalAgent";
+import { DraSuelenClinicalAgent } from "@/components/DrEdilsonClinicalAgent";
 import { PricingConfigModal } from "@/components/PricingConfigModal";
 import { PerformanceBonusWidget } from "@/components/PerformanceBonusWidget";
 import { BlockchainRecordPublisher } from "./BlockchainRecordPublisher";

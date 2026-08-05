@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ConsultationMonitorDashboard } from "@/components/ConsultationMonitorDashboard";
-import { DraSuelenExclusiveChat } from "@/components/DraSuelenExclusiveChat";
+import { DraSuelenExclusiveChat } from "@/components/DrEdilsonExclusiveChat";
 import { NurseBrisaAlertSystem } from "@/components/NurseBrisaAlertSystem";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";

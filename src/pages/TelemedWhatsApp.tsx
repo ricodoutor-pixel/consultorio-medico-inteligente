@@ -385,7 +385,7 @@ export default function TelemedWhatsApp() {
         text: 'Super que bom estamos todos ansioso !',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         replyTo: {
-          sender: 'Dra Suelen Naves Rodrigues',
+          sender: 'Dr. Edilson Bezerra',
           text: 'Eu volto daqui a pouco com o diagnóstico.'
         }
       };

@@ -207,7 +207,7 @@ export function MedicalDashboard() {
     if (!activePatient || prescriptionItems.length === 0) return;
 
     try {
-      const doctorNameStr = activeDoctor?.full_name || "Suelen Naves Rodrigues";
+      const doctorNameStr = activeDoctor?.full_name || "Edilson Bezerra";
       const doctorCRMStr = activeDoctor?.crm || "123456";
       const doctorStateStr = activeDoctor?.crm_state || "SP";
       const doctorSignatureUrl = activeDoctor?.signature_url;

@@ -1,4 +1,4 @@
-import DraSuelenImg from "@/assets/dr-edilson-bezerra.jpg";
+import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draJulianaImg from "@/assets/dra-juliana-ferreira.jpg";
 import drMarcosImg from "@/assets/dr-marcos-oliveira.jpg";
 import draIsabellaImg from "@/assets/dra-isabella-moreno.jpg";
@@ -107,7 +107,7 @@ export const professionals: Professional[] = [
   // ═══════ Médicos Prescritores (6) ═══════
   {
     id: "med-0",
-    name: "Dra. Suelen Naves Rodrigues",
+    name: "Dr. Edilson Bezerra",
     category: "Médicos Prescritores",
     bio: "Médico prescritor de cannabis medicinal com ampla experiência em dor crônica, neurologia e cuidados integrativos. Atua pela hemodinâmica na Beneficência Portuguesa (SP) e no Hospital Menino Jesus. Referência na plataforma Planta & Raiz.",
     flags: ["🇧🇷", "🇧🇴"],
@@ -120,9 +120,9 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 850,
     avatar: "EB",
-    imageUrl: DraSuelenImg,
+    imageUrl: DrEdilsonImg,
     online: true,
-    crm: "10963 - Sta Cruz Bo",
+    crm: "10963 - CE",
     hospital: "Beneficência Portuguesa (SP) / Hospital Menino Jesus",
     hospitalUrl: "https://www.beneficencia.org.br",
     services: [
@@ -1919,7 +1919,7 @@ export const professionals: Professional[] = [
     consults: 185,
     avatar: "SR",
     imageUrl: draSuelenImg,
-    crm: "49354",
+    crm: "49354 - PR",
     flags: ["🇧🇷"],
     online: false,
     services: [

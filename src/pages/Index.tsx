@@ -246,7 +246,7 @@ const Index = () => {
                   <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/40 shrink-0">
                     <img
                       src={DrEdilsonPhoto}
-                      alt="Dr. Edilson Bezerra — CRM-PR 49354 Sta Cruz Bo"
+                      alt="Dr. Edilson Bezerra — CRM-CE 10963"
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"
@@ -254,7 +254,7 @@ const Index = () => {
                   </div>
                   <div>
                     <p className="font-display font-black text-xl">Dr. Edilson Bezerra</p>
-                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Médicos Prescritores · CRM-PR 49354 Sta Cruz Bo</p>
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Médicos Prescritores · CRM-CE 10963</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3 pt-2">
@@ -295,7 +295,7 @@ const Index = () => {
           >
             <div className="space-y-5">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/15 border border-primary/30 text-xs font-black uppercase tracking-wider text-primary">
-                ⚕️ CRM-PR 49354 Sta Cruz Bo
+                ⚕️ CRM-CE 10963
               </span>
             <h2 className="font-display font-black text-3xl md:text-5xl leading-tight">
                 Orientação e Avaliação Técnica com{" "}
@@ -339,9 +339,9 @@ const Index = () => {
                   {/* Pulse verde leve atrás do CTA da Brisa (Triagem) */}
                   <span aria-hidden className="pointer-events-none absolute -inset-3 rounded-3xl bg-primary/40 blur-2xl opacity-70 animate-brisa-pulse" />
                   <BrisaCTAGate
-                    href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20a%20triagem%20para%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20a%20Dra.%20Suelen%20Naves%20Rodrigues"
+                    href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20a%20triagem%20para%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20a%20Dr.%20Edilson%20Bezerra"
                     className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-14 sm:h-16 px-8 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all"
-                    source="CTA_DraSuelen_Triagem"
+                    source="CTA_DrEdilson_Triagem"
                     modalMessage="Antes da triagem com a Enf. Brisa, deixe seu contato — garantimos sua Orientação Técnica de R$30 com o Dr. Edilson Bezerra."
                   >
                     💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={20} className="ml-2" />

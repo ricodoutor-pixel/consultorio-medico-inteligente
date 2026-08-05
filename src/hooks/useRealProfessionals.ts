@@ -1,7 +1,7 @@
 /**
  * Hook: useRealProfessionals
  * Fetches real registered doctors from the database.
- * Limits test professionals to 6 + Dra. Suelen (med-0) = 7 total.
+ * Limits test professionals to 6 + Dr. Edilson (med-0) = 7 total.
  * Rotates online status hourly among test doctors. Edilson is ALWAYS online.
  * Real doctors replace test placeholders.
  */
@@ -232,7 +232,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       return stored !== null ? stored === "true" : defaultStatus;
     };
 
-    // Dra. Suelen fallback (always online)
+    // Dr. Edilson fallback (always online)
     const edilsonMock = testProfessionals.find(p => p.id === "med-0");
     if (edilsonMock && !isMockReplaced(edilsonMock)) {
       finalPros.unshift({ ...edilsonMock, online: true });

@@ -37,7 +37,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
                   Responsável Técnico
                 </p>
                 <p className="text-sm md:text-base font-bold text-gray-900 leading-tight" itemProp="name">
-                  Dr. Edilson Bezerra ON da Silva
+                  Dra. Suelen Naves Rodrigues da Silva
                 </p>
                 <p className="text-xs md:text-sm text-gray-700 flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
                   <span className="inline-flex items-center gap-1 font-semibold text-green-700">

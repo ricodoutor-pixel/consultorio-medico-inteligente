@@ -1,4 +1,4 @@
-// Brisa Daily Summary — envia ao Dr. Edilson um resumo às 19:00 BRT (22:00 UTC)
+// Brisa Daily Summary — envia ao Dra. Suelen um resumo às 19:00 BRT (22:00 UTC)
 // Conteúdo: cadastros por tipo, orientações técnicas aprovadas, visitas (sessões únicas) e status do fluxo.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";

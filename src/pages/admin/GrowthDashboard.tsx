@@ -264,7 +264,7 @@ export default function GrowthDashboard() {
         </Card>
 
         <p className="text-xs text-muted-foreground text-center">
-          ⏰ Execução automática diária às 06h BRT · 🔒 Guardrails: CRM 10963 + RDC 660 obrigatórios · 📦 Código versionado no GitHub
+          ⏰ Execução automática diária às 06h BRT · 🔒 Guardrails: CRM-PR 49354 + RDC 660 obrigatórios · 📦 Código versionado no GitHub
         </p>
       </div>
     </div>

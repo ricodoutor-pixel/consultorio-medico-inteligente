@@ -125,7 +125,7 @@ const EbookMedicinaCanabinoide = () => (
                     </h3>
                     <p className="text-xs text-muted-foreground mb-3">Curso Completo 2026</p>
                     <div className="w-12 h-0.5 mx-auto bg-primary/40 rounded-full mb-3" />
-                    <p className="text-[10px] text-muted-foreground">Dr. Edilson Bezerra ON</p>
+                    <p className="text-[10px] text-muted-foreground">Dra. Suelen Naves Rodrigues</p>
                     <p className="text-[10px] text-primary font-bold mt-1">Edição Atualizada</p>
                   </div>
                 </div>

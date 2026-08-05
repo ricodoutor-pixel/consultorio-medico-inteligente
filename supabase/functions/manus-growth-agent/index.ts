@@ -137,7 +137,7 @@ async function optimize(supa: any, runId: string, targets: GscRow[]) {
         body: JSON.stringify({
           model: "gemini-2.5-pro",
           messages: [
-            { role: "system", content: `Você é o SEO Architect da Planta y Raiz (telemedicina canábica BR). Gere JSON com {meta_title (max 60), meta_description (max 155), h1, h2_list (array 3 strings), schema_org_snippet (objeto MedicalBusiness/Physician com priceCurrency:'BRL')}. OBRIGATÓRIO incluir no body: "Dr. Edilson", "CRM 10963", "RDC 660". Foco na palavra-chave: "${query}". Moeda sempre BRL.` },
+            { role: "system", content: `Você é o SEO Architect da Planta y Raiz (telemedicina canábica BR). Gere JSON com {meta_title (max 60), meta_description (max 155), h1, h2_list (array 3 strings), schema_org_snippet (objeto MedicalBusiness/Physician com priceCurrency:'BRL')}. OBRIGATÓRIO incluir no body: "Dra. Suelen", "CRM-PR 49354", "RDC 660". Foco na palavra-chave: "${query}". Moeda sempre BRL.` },
             { role: "user", content: `Rota: ${route}\nKeyword alvo: ${query}\nPosição atual: ${t.position}\nCTR: ${(t.ctr * 100).toFixed(2)}%\nImpressões: ${t.impressions}\nOtimize.` },
           ],
           response_format: { type: "json_object" },
@@ -192,7 +192,7 @@ async function distribute(supa: any, runId: string, targets: GscRow[]) {
     body: JSON.stringify({
       model: "gemini-2.5-flash",
       messages: [
-        { role: "system", content: `Gere JSON {posts: [{platform: 'instagram'|'facebook'|'tiktok'|'youtube', topic, script, caption, hashtags: string[]}]} — 1 post por plataforma. Tom acolhedor, citar Dr. Edilson CRM 10963 e RDC 660. Mencionar Planta y Raiz.` },
+        { role: "system", content: `Gere JSON {posts: [{platform: 'instagram'|'facebook'|'tiktok'|'youtube', topic, script, caption, hashtags: string[]}]} — 1 post por plataforma. Tom acolhedor, citar Dra. Suelen CRM-PR 49354 e RDC 660. Mencionar Planta y Raiz.` },
         { role: "user", content: `Dores top-pesquisadas hoje: ${topQueries}. Gere posts para captar esse tráfego.` },
       ],
       response_format: { type: "json_object" },

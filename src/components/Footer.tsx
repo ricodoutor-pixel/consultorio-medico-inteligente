@@ -62,7 +62,7 @@ export const Footer = () => {
           <div className="space-y-3">
             <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Compliance Médico</h4>
             <div className="text-[10px] text-muted-foreground/70 leading-relaxed space-y-1">
-              <p className="text-xs text-muted-foreground">Supervisora Técnica: Dr. Edilson Bezerra ON</p>
+              <p className="text-xs text-muted-foreground">Supervisora Técnica: Dra. Suelen Naves Rodrigues</p>
             </div>
             <p className="text-[10px] text-muted-foreground/60 leading-relaxed pt-1 max-w-[260px]">
               O conteúdo deste site é informativo. A prescrição de terapias canabinoides depende de avaliação médica individual do profissional prescritor cadastrado.
@@ -108,7 +108,7 @@ export const Footer = () => {
               fabricação, comercialização, distribuição ou entrega de produtos farmacêuticos ou
               fitoterápicos. Não realizamos vendas diretas nem detemos posse ou propriedade dos
               produtos. Toda a responsabilidade técnica pelo ato médico é do profissional
-              prescritor cadastrado (supervisão técnica: Dr. Edilson Bezerra ON),
+              prescritor cadastrado (supervisão técnica: Dra. Suelen Naves Rodrigues),
               e a responsabilidade pela qualidade, entrega, eficácia e efeitos dos produtos é
               exclusiva das farmácias e importadoras parceiras devidamente licenciadas pela ANVISA.
             </p>

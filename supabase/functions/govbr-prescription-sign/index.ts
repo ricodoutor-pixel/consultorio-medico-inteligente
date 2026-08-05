@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
     }
 
     // Server-side ownership check: the authenticated user MUST be a doctor
-    // with CRM 10963 (Dr. Edilson) and own the target prescription.
+    // with CRM-PR 49354 (Dra. Suelen) and own the target prescription.
     const { data: doctor } = await admin
       .from("doctors")
       .select("id, crm")

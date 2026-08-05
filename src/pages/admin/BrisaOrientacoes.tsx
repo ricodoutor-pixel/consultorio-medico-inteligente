@@ -117,7 +117,7 @@ export default function BrisaOrientacoes() {
     }
     toast({
       title: emergency ? "Repasse forçado liberado" : "Consulta finalizada",
-      description: "Pagamento marcado para repasse ao Dr. Edilson.",
+      description: "Pagamento marcado para repasse ao Dra. Suelen.",
     });
     setDialogRow(null);
     setNotes("");
@@ -130,7 +130,7 @@ export default function BrisaOrientacoes() {
       <div className="max-w-6xl mx-auto space-y-6">
         <header className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Orientações Brisa · Dr. Edilson</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">Orientações Brisa · Dra. Suelen</h1>
             <p className="text-sm text-muted-foreground">
               Auditoria de pagamentos R$30 · auto-libera em 48h
             </p>

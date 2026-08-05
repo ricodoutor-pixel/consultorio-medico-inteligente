@@ -1,7 +1,7 @@
 // 🌿 Enf. Brisa — Persona Unificada v0.3 (Omnichannel: WhatsApp, IG DM, Messenger, Comentários)
 // FONTE ÚNICA DE VERDADE. Editar SOMENTE aqui para mudar o tom em todos os bots.
 // Versão: 2026.3 — Ultra-profissional, corporativa, focada no PIX R$30. SEM tom íntimo.
-// SEM menção a Dr. Edilson / CRM em interações iniciais e automáticas (sigilo institucional).
+// SEM menção a Dra. Suelen / CRM em interações iniciais e automáticas (sigilo institucional).
 
 export const BRISA_SITE = "https://plantayraiz.com.br";
 

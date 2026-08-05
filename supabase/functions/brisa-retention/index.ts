@@ -17,7 +17,7 @@ const FOLLOWUP_RULES = [
     id: "d7_acolhimento",
     daysAfter: 7,
     message: (name: string) =>
-      `Olá ${name}! Aqui é a Brisa 🌿 Passando para saber como foi sua primeira semana com o protocolo do Dr. Edilson. Alguma dúvida sobre a administração das gotas? Estou aqui para te ajudar! 💚`,
+      `Olá ${name}! Aqui é a Brisa 🌿 Passando para saber como foi sua primeira semana com o protocolo do Dra. Suelen. Alguma dúvida sobre a administração das gotas? Estou aqui para te ajudar! 💚`,
   },
   {
     id: "d30_estoque",
@@ -266,7 +266,7 @@ Deno.serve(async (req) => {
       const isCrisis = negativeRate > 50;
 
       if (isCrisis) {
-        // Send crisis alert to admin (Dr. Edilson)
+        // Send crisis alert to admin (Dra. Suelen)
         const adminPhone = "5511991363154"; // Admin phone
         const crisisMsg = `🚨 ALERTA DE CRISE — Brisa COO\n\nSentimento negativo acima de 50% esta semana:\n• Positivo: ${positive}\n• Neutro: ${neutral}\n• Negativo: ${negative}\n• Taxa negativa: ${negativeRate.toFixed(1)}%\n\nRecomendo revisão dos pontos de atrito.\nRelatório completo: https://plantayraiz.com.br/admin`;
 

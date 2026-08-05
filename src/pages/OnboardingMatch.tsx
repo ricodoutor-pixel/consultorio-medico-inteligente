@@ -113,9 +113,9 @@ export default function OnboardingMatch() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-10 -mt-10"></div>
               <CardContent className="p-6 text-center relative z-10">
                 <div className="w-24 h-24 mx-auto bg-muted rounded-full overflow-hidden border-4 border-background shadow-lg mb-4">
-                  <img src="https://i.pravatar.cc/150?u=dr_edilson" alt="Dr. Edilson Bezerra" className="w-full h-full object-cover" />
+                  <img src="https://i.pravatar.cc/150?u=dr_edilson" alt="Dra. Suelen Naves Rodrigues" className="w-full h-full object-cover" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground">Dr. Edilson Bezerra</h3>
+                <h3 className="text-xl font-bold text-foreground">Dra. Suelen Naves Rodrigues</h3>
                 <p className="text-sm text-primary font-medium">CRM-SP 123456</p>
                 <div className="flex items-center justify-center gap-2 mt-3 text-xs text-muted-foreground">
                   <span className="bg-muted px-2 py-1 rounded-md">Especialista em Dor Crônica</span>

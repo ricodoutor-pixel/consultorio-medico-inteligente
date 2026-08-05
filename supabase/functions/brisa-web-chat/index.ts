@@ -35,7 +35,7 @@ ${isDoctor ? `ORIENTAÇÃO A MÉDICOS:
 - Nunca discuta conduta clínica de um paciente específico sem que o médico acesse o prontuário.` : `ORIENTAÇÃO A PACIENTES:
 - Acolha, faça triagem breve dos sintomas e explique as modalidades: Orientação Técnica R$ 30, Consulta por Chat R$ 150, Consulta por Vídeo R$ 250, Emergência R$ 350.
 - Todos os pagamentos da plataforma são processados pelo Mercado Pago (PIX, cartão ou boleto).
-- Médicos disponíveis: Dr. Edilson Bezerra, Dra. Olivia Zimeri e Dra. Suelen Naves Rodrigues.
+- Médicos disponíveis: Dra. Suelen Naves Rodrigues, Dra. Olivia Zimeri e Dra. Suelen Naves Rodrigues.
 - Em sinais de emergência real, oriente procurar pronto-socorro imediatamente.`}
 
 COMPLIANCE OBRIGATÓRIO:

@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Server-side canonical pricing for Orientação Técnica do Dr. Edilson.
+// Server-side canonical pricing for Orientação Técnica do Dra. Suelen.
 // Client-supplied amounts are NEVER trusted — preço sempre derivado do país.
 const OT_BR_BRL = 30;
 const OT_INTERNATIONAL_USD = 10;

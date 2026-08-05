@@ -44,7 +44,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "gemini-2.5-flash",
         messages: [
-          { role: "system", content: agent.system_prompt + "\n\nContexto: você está conversando com o admin (Dr. Edilson) via painel ADM. Responda objetivo, em PT-BR, com sugestões acionáveis." },
+          { role: "system", content: agent.system_prompt + "\n\nContexto: você está conversando com o admin (Dra. Suelen) via painel ADM. Responda objetivo, em PT-BR, com sugestões acionáveis." },
           ...messages.slice(-10),
         ],
       }),

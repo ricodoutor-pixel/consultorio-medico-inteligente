@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
 
     const prescription_url = rx.signed_pdf_url;
     const appointment_id = rx.appointment_id;
-    const doctor_name = "Dr. Edilson";
+    const doctor_name = "Dra. Suelen";
 
     if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
       await logHttp(500, "Evolution API not configured");
@@ -104,7 +104,7 @@ Deno.serve(async (req) => {
     }
 
     const patientFirst = (patient_name || "paciente").split(" ")[0];
-    const doctorDisplay = doctor_name || "Dr. Edilson";
+    const doctorDisplay = doctor_name || "Dra. Suelen";
     const phoneClean = patient_phone.replace(/\D/g, "");
 
     const message = `Olá ${patientFirst}! Aqui é a Brisa 🌿

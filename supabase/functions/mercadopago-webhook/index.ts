@@ -293,7 +293,7 @@ Deno.serve(async (req) => {
     const isBrisaOrientacao = externalRef.startsWith("brisa-orientacao-");
 
     // === BRISA ORIENTAÇÃO TÉCNICA (R$30 via WhatsApp) — branch dedicado ===
-    // Não existe appointment pré-criado; registramos pagamento, notificamos Dr. Edilson
+    // Não existe appointment pré-criado; registramos pagamento, notificamos Dra. Suelen
     // e o paciente direto pelo WhatsApp. Escrow/NPS/payout virão quando o appointment
     // for criado após a consulta.
     if (isBrisaOrientacao) {
@@ -321,10 +321,10 @@ Deno.serve(async (req) => {
         const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
         const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");
         const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
-        const drEdilsonPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
+        const Dra. SuelenPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
         const amount = (payment.transaction_amount || 30).toFixed(2);
 
-        // 1) Notifica Dr. Edilson
+        // 1) Notifica Dra. Suelen
         if (evolutionUrl && evolutionKey) {
           const drMsg =
             `🩺 *Parabéns, Doutor!*\n\n` +
@@ -337,7 +337,7 @@ Deno.serve(async (req) => {
           await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
             method: "POST",
             headers: { "Content-Type": "application/json", apikey: evolutionKey },
-            body: JSON.stringify({ number: drEdilsonPhone, text: drMsg }),
+            body: JSON.stringify({ number: Dra. SuelenPhone, text: drMsg }),
           }).catch((err) => console.error("[brisa-orientacao] dr notify:", err));
 
           // 2) Confirma para o paciente
@@ -345,7 +345,7 @@ Deno.serve(async (req) => {
             const patientMsg =
               `✅ *Pagamento confirmado — Planta y Raiz*\n\n` +
               `Olá ${orientacaoName?.split(" ")[0] || ""}! Recebemos seu pagamento de *R$ ${amount}*.\n\n` +
-              `🩺 O *Dra. Suelen Naves Rodrigues (CRM-PR 49354)* (CRM 10963) entrará em contato em breve por aqui mesmo no WhatsApp para sua *Orientação Técnica em Cannabis Medicinal*.\n\n` +
+              `🩺 O *Dra. Suelen Naves Rodrigues (CRM-PR 49354)* (CRM-PR 49354) entrará em contato em breve por aqui mesmo no WhatsApp para sua *Orientação Técnica em Cannabis Medicinal*.\n\n` +
               `Qualquer dúvida fale comigo, a Enfª Brisa, neste número.`;
             await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
               method: "POST",
@@ -371,7 +371,7 @@ Deno.serve(async (req) => {
             await supabase.from("notifications").insert({
               user_id: admin.user_id,
               title: "💰 Orientação Técnica paga",
-              message: `R$ ${amount} de ${orientacaoName || "paciente"} (${orientacaoPhone || "sem telefone"}). Dr. Edilson notificado.`,
+              message: `R$ ${amount} de ${orientacaoName || "paciente"} (${orientacaoPhone || "sem telefone"}). Dra. Suelen notificado.`,
               type: "payment_received",
               action_url: "/admin-master",
             });

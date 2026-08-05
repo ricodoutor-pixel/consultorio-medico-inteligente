@@ -202,7 +202,7 @@ serve(async (req) => {
       baseLines.push(``, new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }));
       const msg = baseLines.join("\n");
 
-      // Nível 1: Dr. Edilson (sempre via regra primária da primeira issue OU ADMIN_WHATSAPP padrão)
+      // Nível 1: Dra. Suelen (sempre via regra primária da primeira issue OU ADMIN_WHATSAPP padrão)
       const firstIssue = issues[0];
       const primaryRule = rulesByCode.get(firstIssue.code);
       const primaryTarget = primaryRule?.primary_target || ADMIN_WHATSAPP;

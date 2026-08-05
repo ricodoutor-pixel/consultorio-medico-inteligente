@@ -1,7 +1,7 @@
 /**
  * 🔏 Roteador de Assinatura Digital — Planta y Raiz
  *
- * Regra de Negócio (Dr. Edilson — Comando Supremo):
+ * Regra de Negócio (Dra. Suelen — Comando Supremo):
  *  • Dra. Suelen Naves Rodrigues (CRM-PR 49354) → assinatura GOV.BR (ICP-Brasil nativo).
  *  • Demais médicos com CRM válido    → ClickSign (e-mail + token).
  *
@@ -58,7 +58,7 @@ async function pdfToBase64(docPromise: ReturnType<typeof generatePrescriptionPDF
  * Assina e despacha a receita.
  * Fluxo:
  *  1. Gera PDF timbrado (selo gov.br + hash)
- *  2. Roteia para gov.br (Dr. Edilson) ou ClickSign (demais)
+ *  2. Roteia para gov.br (Dra. Suelen) ou ClickSign (demais)
  *  3. Dispara Enfª Brisa → WhatsApp paciente com link da receita
  */
 export async function signAndDispatchPrescription(
@@ -75,7 +75,7 @@ export async function signAndDispatchPrescription(
 
   try {
     if (provider === "gov.br") {
-      // Dr. Edilson: assinatura ICP-Brasil via gov.br (selo já embutido no PDF)
+      // Dra. Suelen: assinatura ICP-Brasil via gov.br (selo já embutido no PDF)
       const { data, error } = await supabase.functions.invoke("govbr-prescription-sign", {
         body: {
           prescriptionId: input.prescriptionId,

@@ -142,7 +142,7 @@ Deno.serve(async (req) => {
       await supabase.from("leads_contatos").update({ tags: newTags }).eq("id", leadRow.id);
     }
 
-    // Notifica Dr. Edilson sobre o novo lead (ver brisa-signup-alert).
+    // Notifica Dra. Suelen sobre o novo lead (ver brisa-signup-alert).
     supabase.functions
       .invoke("brisa-signup-alert", {
         body: { nome, telefone: phoneDigits, email, categoria, origem, source: "lead_invite" },

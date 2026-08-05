@@ -1,7 +1,7 @@
 import { BadgeCheck } from "lucide-react";
 
 /**
- * Selo "Supervisão Técnica Dr. Edilson Bezerra ON — Made In Brazil" exibido em produtos
+ * Selo "Supervisão Técnica Dra. Suelen Naves Rodrigues — Made In Brazil" exibido em produtos
  * cuja flag `endorsed_by_doctor` está marcada como true pelo admin.
  * Emitido sob a supervisão técnica da plataforma (Bezerra Med Soluções Integradas Ltda. — CNPJ 30.740.319/0001-14).
  */
@@ -16,7 +16,7 @@ export const DoctorEndorsedBadge = ({ compact = false }: { compact?: boolean }) 
   return (
     <span className="inline-flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold w-fit">
       <BadgeCheck size={13} className="shrink-0" />
-      Supervisão Técnica — Dr. Edilson Bezerra ON (CRM 49354/PR) — Made In Brazil
+      Supervisão Técnica — Dra. Suelen Naves Rodrigues (CRM 49354/PR) — Made In Brazil
     </span>
   );
 };

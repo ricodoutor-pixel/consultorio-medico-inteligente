@@ -9,7 +9,7 @@ const FAQS = [
   },
   {
     q: "Como funciona a Orientação Técnica de R$ 30?",
-    a: "Você inicia uma triagem rápida com a Enfª Brisa pelo WhatsApp, paga R$ 30 via Pix seguro (Mercado Pago) e recebe a Orientação Técnica do Dr. Edilson Bezerra ON em PDF assinado digitalmente com ICP-Brasil e selo gov.br. Pacientes internacionais pagam US$ 10. Não é consulta nem prescrição — é orientação educativa sobre o sistema endocanabinoide.",
+    a: "Você inicia uma triagem rápida com a Enfª Brisa pelo WhatsApp, paga R$ 30 via Pix seguro (Mercado Pago) e recebe a Orientação Técnica do Dra. Suelen Naves Rodrigues em PDF assinado digitalmente com ICP-Brasil e selo gov.br. Pacientes internacionais pagam US$ 10. Não é consulta nem prescrição — é orientação educativa sobre o sistema endocanabinoide.",
   },
   {
     q: "Como recebo minha receita médica?",

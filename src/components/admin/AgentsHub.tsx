@@ -57,7 +57,7 @@ export function AgentsHub() {
     setChatAgent(agent);
     setMessages([{
       role: "assistant",
-      content: `Olá Dr. Edilson, sou ${agent.name} — ${agent.role}. Como posso melhorar a Planta y Raiz hoje? Sugiro pedir: "quais 3 melhorias urgentes na sua área?"`,
+      content: `Olá Dra. Suelen, sou ${agent.name} — ${agent.role}. Como posso melhorar a Planta y Raiz hoje? Sugiro pedir: "quais 3 melhorias urgentes na sua área?"`,
     }]);
   };
 

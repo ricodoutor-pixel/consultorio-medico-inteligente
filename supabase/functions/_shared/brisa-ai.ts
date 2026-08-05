@@ -83,7 +83,7 @@ function isQuotaOrBillingFailure(status: number, detail: string): boolean {
 
 async function alertEdilson(errorId: string, context: string, detail: string) {
   if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) return;
-  // Guard signup-only (política Dr. Edilson)
+  // Guard signup-only (política Dra. Suelen)
   const { shouldSilenceAdminAlert } = await import("./admin-alert-guard.ts");
   if (shouldSilenceAdminAlert("brisa-ai-heartbeat")) return;
   const text = `[ALERTA BRISA] Falha de IA. Log: ${errorId}\nCtx: ${context}\n${detail.slice(0, 400)}`;
@@ -277,7 +277,7 @@ export async function processar_triagem_brisa(
   const reply = BRISA_BREAKER_FALLBACK_MESSAGE;
   const sameAsAdmin = normalizePhone(usuario_id) && normalizePhone(usuario_id) === normalizePhone(ADMIN_WHATSAPP);
   const quotaLikeFailure = isQuotaOrBillingFailure(lastStatus, lastErr);
-  // Dispara alerta INTERNO ao Dr. Edilson apenas quando fizer sentido e sem poluir o próprio chat de teste.
+  // Dispara alerta INTERNO ao Dra. Suelen apenas quando fizer sentido e sem poluir o próprio chat de teste.
   if (!sameAsAdmin && !quotaLikeFailure) {
     alertEdilson(errorId, `canal=${canal} usuario=${usuario_id}`, `${lastStatus} ${lastErr}`).catch(() => {});
   }

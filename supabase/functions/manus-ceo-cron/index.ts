@@ -1,6 +1,6 @@
 // Manus CEO — Auditor Noturno Autônomo
 // Roda diariamente às 03:00 BRT, varre as últimas 24h, gera relatório
-// e envia via WhatsApp para o admin (Dr. Edilson).
+// e envia via WhatsApp para o admin (Dra. Suelen).
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { requireServiceAuth } from "../_shared/service-auth.ts";

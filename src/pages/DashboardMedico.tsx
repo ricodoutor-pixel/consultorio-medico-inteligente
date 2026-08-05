@@ -85,9 +85,9 @@ const DashboardMedico = () => {
              doctor = { id: 'mock-suelen', user_id: session.user.id, crm: '49354', crm_state: 'SP', specialty: 'Médicos Prescritores', is_online: false } as any;
              profile = { full_name: 'Dra. Suelen Naves Rodrigues', avatar_url: '/dra-suelen-avatar.jpg' };
          } else {
-             // Fallback default (Dr. Edilson)
+             // Fallback default (Dra. Suelen)
              doctor = { id: 'mock-edilson', user_id: session.user.id, crm: '10963', crm_state: 'Sta-Cruz Bo', specialty: 'Médicos Prescritores', is_online: false } as any;
-             profile = { full_name: 'Dr. Edilson Bezerra', avatar_url: '/dr-edilson-avatar.jpg' };
+             profile = { full_name: 'Dra. Suelen Naves Rodrigues', avatar_url: '/dr-edilson-avatar.jpg' };
          }
       }
 

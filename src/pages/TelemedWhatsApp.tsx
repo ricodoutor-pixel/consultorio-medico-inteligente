@@ -127,8 +127,8 @@ export default function TelemedWhatsApp() {
   const doctorContacts = [
     {
       id: 'doctor',
-      name: 'Dr. Edilson Bezerra On',
-      role: 'Medicina Canábica - CRM 10963',
+      name: 'Dra. Suelen Naves Rodrigues',
+      role: 'Medicina Canábica - CRM-PR 49354',
       avatar: '/dr-edilson-avatar.jpg',
       isOnline: true,
       isLocked: doctorLocked,
@@ -226,7 +226,7 @@ export default function TelemedWhatsApp() {
                 setMessages(prev => [...prev, {
                   id: (Date.now() + 1).toString(),
                   senderId: 'brisa',
-                  text: 'Para prosseguirmos: qual médico você prefere? (Dr. Edilson Bezerra, Dra. Olivia Zimeri, Dra. Suelen Naves ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
+                  text: 'Para prosseguirmos: qual médico você prefere? (Dra. Suelen Naves Rodrigues, Dra. Olivia Zimeri, Dra. Suelen Naves ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
                   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                   isBrisa: true
                 }]);
@@ -247,7 +247,7 @@ export default function TelemedWhatsApp() {
               setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 senderId: 'brisa',
-                text: 'Para prosseguirmos: qual médico você prefere? (Dr. Edilson Bezerra, Dra. Olivia Zimeri, Dra. Suelen Naves ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
+                text: 'Para prosseguirmos: qual médico você prefere? (Dra. Suelen Naves Rodrigues, Dra. Olivia Zimeri, Dra. Suelen Naves ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 isBrisa: true
               }]);

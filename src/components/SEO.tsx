@@ -11,7 +11,7 @@ interface SEOProps {
 
 export const SEO = ({
   title = "Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda",
-  description = "Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dr. Edilson Bezerra ON) Cadastro e Ebook Gratuito!",
+  description = "Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues) Cadastro e Ebook Gratuito!",
   keywords = "cannabis medicinal, telemedicina, CBD, THC, saúde digital, triagem IA, supervisão IA 24x7",
   image = "/src/assets/verdinho-doctor.png",
   url = "https://plantayraiz.com.br",

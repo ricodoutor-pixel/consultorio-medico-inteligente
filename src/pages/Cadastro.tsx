@@ -169,7 +169,7 @@ const Cadastro = () => {
         // 5. Link referral (3-level MLM tree)
         await linkReferralOnSignup(authData.user.id);
 
-        // 5. Alerta WhatsApp ao Dr. Edilson — Modo Cadastro Ativado (signup)
+        // 5. Alerta WhatsApp ao Dra. Suelen — Modo Cadastro Ativado (signup)
         supabase.functions
           .invoke("brisa-signup-alert", { body: { user_id: authData.user.id, event: "signup" } })
           .catch((e) => console.warn("[brisa-signup-alert] signup", e));

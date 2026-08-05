@@ -1,4 +1,4 @@
-// 🩺 Dr. Edilson Bezerra ON — Agente de Apoio Clínico (chat flutuante no Dashboard Médico)
+// 🩺 Dra. Suelen Naves Rodrigues — Agente de Apoio Clínico (chat flutuante no Dashboard Médico)
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -22,7 +22,7 @@ const SUGGESTIONS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dr-edilson-clinical-support`;
 
-export function DrEdilsonClinicalAgent({ patientContext }: { patientContext?: string }) {
+export function Dra. SuelenClinicalAgent({ patientContext }: { patientContext?: string }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -114,7 +114,7 @@ export function DrEdilsonClinicalAgent({ patientContext }: { patientContext?: st
         setMessages((prev) => {
           const copy = [...prev];
           if (copy[copy.length - 1]?.role === "assistant" && !copy[copy.length - 1].content) {
-            copy[copy.length - 1] = { role: "assistant", content: "⚠️ Erro ao consultar Dr. Edilson. Tente novamente." };
+            copy[copy.length - 1] = { role: "assistant", content: "⚠️ Erro ao consultar Dra. Suelen. Tente novamente." };
           }
           return copy;
         });
@@ -138,7 +138,7 @@ export function DrEdilsonClinicalAgent({ patientContext }: { patientContext?: st
           bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg shadow-primary/30
           border border-primary/40 backdrop-blur-md hover:shadow-primary/50 transition-all
           ${open ? "hidden" : ""}`}
-        aria-label="Pergunte ao Dr. Edilson Bezerra ON"
+        aria-label="Pergunte ao Dra. Suelen Naves Rodrigues"
       >
         <div className="relative">
           <Stethoscope className="h-5 w-5" />
@@ -146,7 +146,7 @@ export function DrEdilsonClinicalAgent({ patientContext }: { patientContext?: st
         </div>
         <div className="hidden sm:flex flex-col items-start leading-tight">
           <span className="text-[10px] uppercase tracking-wider opacity-80">Apoio clínico IA</span>
-          <span className="text-sm font-semibold">Pergunte ao Dr. Edilson</span>
+          <span className="text-sm font-semibold">Pergunte ao Dra. Suelen</span>
         </div>
       </motion.button>
 
@@ -171,7 +171,7 @@ export function DrEdilsonClinicalAgent({ patientContext }: { patientContext?: st
                     <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-card animate-pulse" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-bold leading-tight">Dr. Edilson Bezerra ON</h3>
+                    <h3 className="text-sm font-bold leading-tight">Dra. Suelen Naves Rodrigues</h3>
                     <p className="text-[11px] text-muted-foreground leading-tight flex items-center gap-1">
                       <Sparkles className="h-2.5 w-2.5" />
                       Apoio clínico • 40k+ estudos
@@ -228,7 +228,7 @@ export function DrEdilsonClinicalAgent({ patientContext }: { patientContext?: st
                             {m.content || (loading && i === messages.length - 1 ? (
                               <div className="flex items-center gap-2 text-muted-foreground">
                                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                <span className="text-xs">Dr. Edilson está raciocinando...</span>
+                                <span className="text-xs">Dra. Suelen está raciocinando...</span>
                               </div>
                             ) : null)}
                             {m.content && <ReactMarkdown>{m.content}</ReactMarkdown>}
@@ -281,4 +281,4 @@ export function DrEdilsonClinicalAgent({ patientContext }: { patientContext?: st
   );
 }
 
-export default DrEdilsonClinicalAgent;
+export default Dra. SuelenClinicalAgent;

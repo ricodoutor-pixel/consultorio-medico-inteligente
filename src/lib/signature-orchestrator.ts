@@ -2,7 +2,7 @@
  * 🔏 Orquestrador de Assinatura Híbrido — Planta y Raiz
  *
  * Árvore de Decisão:
- *  • CRM 10963 (Dr. Edilson)        → gov.br (selo oficial ICP-Brasil)
+ *  • CRM-PR 49354 (Dra. Suelen)        → gov.br (selo oficial ICP-Brasil)
  *  • plan_tier === 'VIP' (ou superior: 'premium' / 'enterprise')
  *                                   → ClickSign (assinatura direta na plataforma)
  *  • Demais (Free / Basic / Pro)    → Modal "Assinatura Grátis via ITI"

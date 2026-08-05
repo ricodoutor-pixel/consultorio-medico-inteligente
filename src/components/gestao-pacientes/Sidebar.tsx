@@ -69,7 +69,7 @@ export function GestaoPacientesSidebar({ open, onClose }: SidebarProps) {
               DE
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium truncate">Dr. Edilson</p>
+              <p className="text-sm font-medium truncate">Dra. Suelen</p>
               <p className="text-xs text-white/60 truncate">CRM 12345-SP</p>
             </div>
           </div>

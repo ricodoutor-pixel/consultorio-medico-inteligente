@@ -56,7 +56,7 @@ export function PostConsultationViralLoop({ coinsEarned = 15, bonusPerReferral =
 
   const shareUrl = refCode ? `https://plantayraiz.com.br/?ref=${refCode}` : "";
   const waMessage = encodeURIComponent(
-    `Oi! Acabei de fazer minha Orientação Técnica de Cannabis Medicinal com o Dr. Edilson na Planta y Raiz 💚\n\nValeu muito a pena. Se quiser usar meu link de indicação (a partir de R$30): ${shareUrl}`
+    `Oi! Acabei de fazer minha Orientação Técnica de Cannabis Medicinal com o Dra. Suelen na Planta y Raiz 💚\n\nValeu muito a pena. Se quiser usar meu link de indicação (a partir de R$30): ${shareUrl}`
   );
   const waLink = `https://wa.me/?text=${waMessage}`;
 

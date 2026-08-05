@@ -11,7 +11,7 @@ const EMERGENCY_WA = `https://wa.me/5511987131241?text=${encodeURIComponent(
 
 /**
  * Botão EMERGÊNCIA pulsátil com giroflex de ambulância.
- * Só pacientes logados conseguem abrir o WhatsApp do Dr. Edilson.
+ * Só pacientes logados conseguem abrir o WhatsApp do Dra. Suelen.
  */
 export function EmergencyCTA() {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ export function EmergencyCTA() {
     if (!isAuthed) {
       toast({
         title: "Acesso exclusivo a pacientes cadastrados",
-        description: "Faça login (ou cadastre-se gratuitamente) para falar AGORA com o Dr. Edilson em caso de urgência.",
+        description: "Faça login (ou cadastre-se gratuitamente) para falar AGORA com o Dra. Suelen em caso de urgência.",
       });
       navigate("/login?redirect=/&emergency=1");
       return;
@@ -88,7 +88,7 @@ export function EmergencyCTA() {
       {/* Botão pulsátil */}
       <button
         onClick={handleClick}
-        aria-label="Botão de Emergência — falar com o Dr. Edilson Bezerra ON agora"
+        aria-label="Botão de Emergência — falar com o Dra. Suelen Naves Rodrigues agora"
         className="relative group inline-flex items-center justify-center gap-3 px-8 py-5 sm:px-12 sm:py-6 rounded-2xl font-display font-black text-xl sm:text-3xl tracking-wider text-white shadow-[0_0_40px_rgba(239,68,68,0.6)] overflow-hidden"
         style={{ background: "linear-gradient(135deg,#dc2626 0%,#ef4444 50%,#b91c1c 100%)" }}
       >

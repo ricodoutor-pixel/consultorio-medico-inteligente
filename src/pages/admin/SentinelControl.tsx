@@ -204,7 +204,7 @@ export default function SentinelControl() {
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label>Canal primário (Dra. Suelen)</Label>
+                    <Label>Canal primário (Dr. Edilson)</Label>
                     <div className="flex gap-2">
                       <select className="bg-background border rounded px-2"
                         value={rule.primary_channel}

@@ -33,7 +33,7 @@ const OrientacaoConfirmadaEmail = ({ name, whatsappUrl, protocolo }: Props) => (
         <Text style={text}>
           Pagamento recebido com sucesso. Em até <strong>24 horas</strong> a enfermeira
           Brisa entrará em contato pelo WhatsApp para agendar sua consulta com o
-          Dra. Suelen Naves Rodrigues (CRM-PR 49354).
+          Dr. Edilson Bezerra (CRM-CE 10963).
         </Text>
         {protocolo ? (
           <Text style={text}>

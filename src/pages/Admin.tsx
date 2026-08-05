@@ -94,7 +94,7 @@ const Admin = () => {
   const [drill, setDrill] = useState<{ open: boolean; source: DrillSource | null; title: string }>({ open: false, source: null, title: "" });
   const [liveAlerts, setLiveAlerts] = useState<{ kind: string; title: string; message: string; created_at: string }[]>([]);
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Comandante Dra. Suelen, Command Center 360 online. Dados reais sincronizando em tempo real." },
+    { role: "assistant", content: "Comandante Dr. Edilson, Command Center 360 online. Dados reais sincronizando em tempo real." },
   ]);
 
   // Auth gate

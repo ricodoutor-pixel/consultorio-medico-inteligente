@@ -22,7 +22,7 @@ const BRISA_WHATSAPP = "5511991363154";
 
 /**
  * Always keep exactly 3 professionals "online".
- * Dra. Suelen (med-0) is ALWAYS online.
+ * Dr. Edilson (med-0) is ALWAYS online.
  * The other 2 rotate every 60 minutes based on the current hour.
  */
 function useRotatingOnline(base: Professional[]): Professional[] {

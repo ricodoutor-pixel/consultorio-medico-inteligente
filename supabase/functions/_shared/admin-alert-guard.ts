@@ -1,7 +1,7 @@
 /**
- * Guard global de alertas ao Dra. Suelen.
+ * Guard global de alertas ao Dr. Edilson.
  *
- * Política vigente (até segunda ordem, definida pelo Dra. Suelen):
+ * Política vigente (até segunda ordem, definida pelo Dr. Edilson):
  *   APENAS alertas de novos cadastros são enviados ao WhatsApp pessoal dele.
  *   Todos os outros (sentinel, growth, weekly-audit, fuzzy-triage, crisis,
  *   channels-status, retention, meta-messenger, mp-health, pool-sanitizer,
@@ -9,7 +9,7 @@
  *   heartbeat, etc.) ficam SILENCIADOS no canal pessoal.
  *
  * Para reativar: definir secret `ADMIN_ALERTS_SIGNUP_ONLY=false` (ou remover).
- * Default = silenciado (signup-only) para evitar spam ao Dra. Suelen.
+ * Default = silenciado (signup-only) para evitar spam ao Dr. Edilson.
  */
 export function adminAlertsSignupOnly(): boolean {
   const v = (Deno.env.get("ADMIN_ALERTS_SIGNUP_ONLY") ?? "true").toLowerCase();

@@ -29,7 +29,7 @@ const BoasVindasEmail = ({ name, ctaUrl }: Props) => (
           {name ? `Bem-vindo(a), ${name}!` : 'Bem-vindo(a) à Planta y Raiz!'}
         </Heading>
         <Text style={text}>
-          Sua conta foi criada com sucesso. Agora você tem acesso ao Dra. Suelen Naves Rodrigues (CRM-PR 49354), à enfermeira Brisa e ao shopping de produtos
+          Sua conta foi criada com sucesso. Agora você tem acesso ao Dr. Edilson Bezerra (CRM-CE 10963), à enfermeira Brisa e ao shopping de produtos
           canábicos aprovados pela ANVISA (RDC 660/2022).
         </Text>
         <Text style={text}>

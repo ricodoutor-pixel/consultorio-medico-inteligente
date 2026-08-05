@@ -46,7 +46,7 @@ const CONSULT_ACTIONS: ActionItem[] = [
   {
     emoji: "🌿",
     label: "Orientação Técnica R$ 30",
-    desc: "Atendimento c/ Dra. Suelen",
+    desc: "Atendimento c/ Dr. Edilson",
     icon: Stethoscope,
     href: "https://wa.me/5511991363154?text=Ol%C3%A1%20Brisa%2C%20quero%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20R%24%2030",
     gradient: "from-emerald-500/15 to-emerald-500/5",

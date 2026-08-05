@@ -100,22 +100,33 @@ export function setupAntiDevTools(): void {
 export function setupAntiCopy(): void {
   if (import.meta.env.DEV) return;
 
+  // Resolve um Element a partir do target do evento (pode ser Text/Document)
+  const asElement = (t: EventTarget | null): Element | null => {
+    if (!t) return null;
+    if (t instanceof Element) return t;
+    const node = t as Node;
+    return (node?.parentElement as Element) ?? null;
+  };
+
+  const isProtected = (t: EventTarget | null): boolean => {
+    const el = asElement(t);
+    if (!el || typeof el.closest !== 'function') return false;
+    return Boolean(el.closest('[data-protected]') || el.closest('.protected-content'));
+  };
+
   // Bloqueia seleção de texto em áreas sensíveis
   document.addEventListener('selectstart', (e) => {
-    const target = e.target as HTMLElement;
-    if (target.closest('[data-protected]') || target.closest('.protected-content')) {
-      e.preventDefault();
-    }
+    if (isProtected(e.target)) e.preventDefault();
   });
 
   // Bloqueia cópia de conteúdo protegido
   document.addEventListener('copy', (e) => {
-    const target = e.target as HTMLElement;
-    if (target.closest('[data-protected]') || target.closest('.protected-content')) {
+    if (isProtected(e.target)) {
       e.preventDefault();
-      e.clipboardData?.setData('text/plain', '© Planta & Raiz — Conteúdo Protegido');
+      (e as ClipboardEvent).clipboardData?.setData('text/plain', '© Planta & Raiz — Conteúdo Protegido');
     }
   });
+
 
   // Sobrescreve Ctrl+U (view source)
   document.addEventListener('keydown', (e) => {

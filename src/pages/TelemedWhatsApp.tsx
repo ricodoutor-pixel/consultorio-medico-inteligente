@@ -127,7 +127,7 @@ export default function TelemedWhatsApp() {
   const doctorContacts = [
     {
       id: 'doctor',
-      name: 'Dra. Suelen Naves Rodrigues',
+      name: 'Dr. Edilson Bezerra',
       role: 'Medicina Canábica - CRM-PR 49354',
       avatar: '/dr-edilson-avatar.jpg',
       isOnline: true,
@@ -145,7 +145,7 @@ export default function TelemedWhatsApp() {
     },
     {
       id: 'suelen',
-      name: 'Dra. Suelen Naves Rodrigues',
+      name: 'Dr. Edilson Bezerra',
       role: 'Médica Prescritora',
       avatar: '/dra-suelen-avatar.jpg',
       isOnline: true,
@@ -226,7 +226,7 @@ export default function TelemedWhatsApp() {
                 setMessages(prev => [...prev, {
                   id: (Date.now() + 1).toString(),
                   senderId: 'brisa',
-                  text: 'Para prosseguirmos: qual médico você prefere? (Dra. Suelen Naves Rodrigues, Dra. Olivia Zimeri, Dra. Suelen Naves ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
+                  text: 'Para prosseguirmos: qual médico você prefere? (Dr. Edilson Bezerra, Dra. Olivia Zimeri, Dr. Edilson Bezerra ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
                   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                   isBrisa: true
                 }]);
@@ -247,7 +247,7 @@ export default function TelemedWhatsApp() {
               setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 senderId: 'brisa',
-                text: 'Para prosseguirmos: qual médico você prefere? (Dra. Suelen Naves Rodrigues, Dra. Olivia Zimeri, Dra. Suelen Naves ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
+                text: 'Para prosseguirmos: qual médico você prefere? (Dr. Edilson Bezerra, Dra. Olivia Zimeri, Dr. Edilson Bezerra ou o próximo disponível?) E qual a modalidade da consulta? (Atendimento Ao Vivo, Agendamento, Emergência, Orientação Técnica)',
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 isBrisa: true
               }]);
@@ -385,7 +385,7 @@ export default function TelemedWhatsApp() {
         text: 'Super que bom estamos todos ansioso !',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         replyTo: {
-          sender: 'Dra Suelen Naves Rodrigues',
+          sender: 'Dr. Edilson Bezerra',
           text: 'Eu volto daqui a pouco com o diagnóstico.'
         }
       };

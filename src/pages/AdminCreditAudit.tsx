@@ -74,7 +74,7 @@ export default function AdminCreditAudit() {
     <div className="container mx-auto p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Auditoria de Créditos Médicos</h1>
-        <p className="text-muted-foreground">Revisão Brisa — avaliações &lt;5★ ficam retidas para o Dra. Suelen (1241)</p>
+        <p className="text-muted-foreground">Revisão Brisa — avaliações &lt;5★ ficam retidas para o Dr. Edilson (1241)</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

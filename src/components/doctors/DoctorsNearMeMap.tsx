@@ -106,7 +106,7 @@ export default function DoctorsNearMeMap() {
               lat = -23.5629; // Posição ilustrativa para Dra Olivia
               lng = -46.6544;
             } else if (nameLower.includes("suelen")) {
-              lat = -23.5732; // Posição ilustrativa para Dra Suelen
+              lat = -23.5732; // Posição ilustrativa para Dr. Edilson
               lng = -46.6417;
             } else {
               // Posicionamento genérico

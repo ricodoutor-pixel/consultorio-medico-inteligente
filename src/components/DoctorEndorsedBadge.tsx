@@ -1,7 +1,7 @@
 import { BadgeCheck } from "lucide-react";
 
 /**
- * Selo "Supervisão Técnica Dra. Suelen Naves Rodrigues — Made In Brazil" exibido em produtos
+ * Selo "Supervisão Técnica Dra. Suelen Naves Rodrigues (CRM 49354/PR) — Made In Brazil" exibido em produtos
  * cuja flag `endorsed_by_doctor` está marcada como true pelo admin.
  * Emitido sob a supervisão técnica da plataforma (Bezerra Med Soluções Integradas Ltda. — CNPJ 30.740.319/0001-14).
  */

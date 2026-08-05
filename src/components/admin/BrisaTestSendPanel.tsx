@@ -17,7 +17,7 @@ type Result = {
 };
 
 const DEFAULT_TEXT =
-  "✅ Teste Brisa 2.0 — Dra. Suelen, sistema Planta y Raiz online. Canal WhatsApp autônomo confirmado. Se receber, responda OK. 🌿";
+  "✅ Teste Brisa 2.0 — Dr. Edilson, sistema Planta y Raiz online. Canal WhatsApp autônomo confirmado. Se receber, responda OK. 🌿";
 
 export default function BrisaTestSendPanel() {
   const [number, setNumber] = useState("5511987131241");
@@ -99,7 +99,7 @@ export default function BrisaTestSendPanel() {
         className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
       >
         {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-        {sending ? "Enviando..." : "Enviar teste para Dra. Suelen"}
+        {sending ? "Enviando..." : "Enviar teste para Dr. Edilson"}
       </button>
 
       {result && (

@@ -346,7 +346,7 @@
           console.error('[boot]', source, err);
 
           var msg = String(err && err.message || err);
-          var isChunkErr = /Failed to fetch|dynamically imported module|Importing a module script failed|Loading chunk|is not a function/i.test(msg);
+          var isChunkErr = /Failed to fetch dynamically imported module|dynamically imported module|Importing a module script failed|Loading chunk|ChunkLoadError|Failed to load module script/i.test(msg);
           if (!isChunkErr) return;
 
           var tried = false;

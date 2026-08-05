@@ -98,7 +98,7 @@ export default function NossaHistoria() {
 
             <motion.p variants={fadeUp}>
               Impactado por esta perda irreparável de colegas queridos, o{" "}
-              <strong className="text-white">Dra. Suelen Naves Rodrigues</strong>, nossa atual Supervisora
+              <strong className="text-white">Dra. Suelen Naves Rodrigues (CRM 49354/PR)</strong>, nossa atual Supervisora
               Técnica, concebeu uma ideia visionária para resolver, de uma vez por todas, o desafio
               da medicina à distância. Se aplicada com excelência no início da pandemia, esta
               tecnologia teria evitado a morte de milhares de profissionais e pacientes em todo o

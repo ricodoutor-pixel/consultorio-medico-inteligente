@@ -85,7 +85,7 @@ const mockData: Affiliate[] = [
   },
   {
     id: "2",
-    name: "Dra. Suelen Rodrigues",
+    name: "Dr. Edilson Rodrigues",
     type: "doctor",
     crm: "67890 RJ",
     level: 1,

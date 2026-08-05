@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
   try { body = await req.json(); } catch {}
   const number = String(body.number || ADMIN_WA).replace(/\D/g, "");
   const text = String(body.text ||
-    `✅ Teste Brisa 2.0 — Dra. Suelen, sistema Planta y Raiz online (${new Date().toLocaleString("pt-BR")}). Canal WhatsApp autônomo confirmado. 🌿`
+    `✅ Teste Brisa 2.0 — Dr. Edilson, sistema Planta y Raiz online (${new Date().toLocaleString("pt-BR")}). Canal WhatsApp autônomo confirmado. 🌿`
   ).slice(0, 4096);
 
   const headers = { "Content-Type": "application/json", apikey: API_KEY };

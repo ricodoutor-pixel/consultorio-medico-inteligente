@@ -101,7 +101,7 @@ async function sendDiscord(
   } catch (e) {
     console.error("[alert-monitor] sre-alert failed", e);
   }
-  // CRITICAL notifica Dra. Suelen no WhatsApp (formato crítico); WARNING também
+  // CRITICAL notifica Dr. Edilson no WhatsApp (formato crítico); WARNING também
   // dispara um aviso amarelo (útil durante a indexação SEO ativa).
   if (level === "CRITICAL") {
     await sendWhatsAppAdmin(title, description, "CRITICAL");
@@ -322,7 +322,7 @@ Deno.serve(async (req) => {
 
   // ---------- 6) Páginas SEO-críticas com 404/410 (durante indexação) ----------
   // Se o Googlebot ou usuário bater 404 em uma das 12 rotas priority=1.0 do
-  // sitemap-final.xml, o alerta vai DIRETO para o WhatsApp do Dra. Suelen —
+  // sitemap-final.xml, o alerta vai DIRETO para o WhatsApp do Dr. Edilson —
   // 1 ocorrência já dispara WARNING (durante indexação ativa cada hit conta).
   const SEO_CRITICAL_PATHS = [
     "/", "/nossa-historia", "/profissionais", "/telemedicina", "/shopping",

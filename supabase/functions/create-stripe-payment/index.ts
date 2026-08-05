@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Server-side canonical pricing for Orientação Técnica do Dra. Suelen.
+// Server-side canonical pricing for Orientação Técnica do Dr. Edilson.
 // Client-supplied amounts are NEVER trusted — preço sempre derivado do país.
 const OT_BR_BRL = 30;
 const OT_INTERNATIONAL_USD = 10;
@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const {
       appointmentId,
-      doctorName = "Dra. Suelen Naves Rodrigues (CRM-PR 49354)",
+      doctorName = "Dr. Edilson Bezerra (CRM-CE 10963)",
       description,
       environment,
       countryCode,

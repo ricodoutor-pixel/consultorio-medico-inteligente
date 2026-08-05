@@ -23,7 +23,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import { ScientificBadge } from "@/components/ScientificBadge";
 import { ProtocolCalculator } from "@/components/ProtocolCalculator";
 import { EbookGate } from "@/components/EbookGate";
-import Dra. SuelenPhoto from "@/assets/dr-edilson-bezerra.jpg";
+import DraSuelenPhoto from "@/assets/dr-edilson-bezerra.jpg";
 import { RecoverableRender } from "@/lib/runtime-recovery";
 import { DoctorsOnlineWidget } from "@/components/DoctorsOnlineWidget";
 import { HomeFAQ } from "@/components/HomeFAQ";
@@ -245,7 +245,7 @@ const Index = () => {
                 <div className="flex items-center gap-4">
                   <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/40 shrink-0">
                     <img
-                      src={Dra. SuelenPhoto}
+                      src={DraSuelenPhoto}
                       alt="Dra. Suelen Naves Rodrigues — CRM-PR 49354 Sta Cruz Bo"
                       className="w-full h-full object-cover"
                       loading="lazy"
@@ -341,7 +341,7 @@ const Index = () => {
                   <BrisaCTAGate
                     href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20a%20triagem%20para%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20a%20Dra.%20Suelen%20Naves%20Rodrigues"
                     className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-14 sm:h-16 px-8 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all"
-                    source="CTA_Dra. Suelen_Triagem"
+                    source="CTA_DraSuelen_Triagem"
                     modalMessage="Antes da triagem com a Enf. Brisa, deixe seu contato — garantimos sua Orientação Técnica de R$30 com o Dra. Suelen Naves Rodrigues."
                   >
                     💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={20} className="ml-2" />

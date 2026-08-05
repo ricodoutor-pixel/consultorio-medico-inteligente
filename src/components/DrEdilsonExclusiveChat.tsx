@@ -13,7 +13,7 @@ const supabase: any = _supabase;
 
 type Message = { id: string; role: "doctor" | "assistant"; content: string; timestamp: Date };
 
-interface Dra. SuelenExclusiveChatProps {
+interface DraSuelenExclusiveChatProps {
   appointmentId?: string;
   patientName?: string;
   patientContext?: string;
@@ -28,11 +28,11 @@ const QUICK_QUESTIONS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dr-edilson-clinical-support`;
 
-export function Dra. SuelenExclusiveChat({
+export function DraSuelenExclusiveChat({
   appointmentId,
   patientName,
   patientContext,
-}: Dra. SuelenExclusiveChatProps) {
+}: DraSuelenExclusiveChatProps) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -372,4 +372,4 @@ ${patientContext}\
   );
 }
 
-export default Dra. SuelenExclusiveChat;
+export default DraSuelenExclusiveChat;

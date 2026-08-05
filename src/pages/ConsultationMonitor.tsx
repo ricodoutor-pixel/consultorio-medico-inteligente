@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ConsultationMonitorDashboard } from "@/components/ConsultationMonitorDashboard";
-import { Dra. SuelenExclusiveChat } from "@/components/Dra. SuelenExclusiveChat";
+import { DraSuelenExclusiveChat } from "@/components/DrEdilsonExclusiveChat";
 import { NurseBrisaAlertSystem } from "@/components/NurseBrisaAlertSystem";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -58,7 +58,7 @@ export function ConsultationMonitorPage() {
 
       {/* Chat exclusivo com Dra. Suelen */}
       {appointmentId && (
-        <Dra. SuelenExclusiveChat
+        <DraSuelenExclusiveChat
           appointmentId={appointmentId}
           patientName="Paciente"
           patientContext="Paciente em atendimento com sintomas de dor crônica"

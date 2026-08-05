@@ -321,7 +321,7 @@ Deno.serve(async (req) => {
         const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
         const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");
         const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
-        const Dra. SuelenPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
+        const DraSuelenPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
         const amount = (payment.transaction_amount || 30).toFixed(2);
 
         // 1) Notifica Dra. Suelen
@@ -337,7 +337,7 @@ Deno.serve(async (req) => {
           await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
             method: "POST",
             headers: { "Content-Type": "application/json", apikey: evolutionKey },
-            body: JSON.stringify({ number: Dra. SuelenPhone, text: drMsg }),
+            body: JSON.stringify({ number: DraSuelenPhone, text: drMsg }),
           }).catch((err) => console.error("[brisa-orientacao] dr notify:", err));
 
           // 2) Confirma para o paciente

@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import { Stethoscope, Activity, Eye, FileSearch, ArrowLeft } from 'lucide-react';
+import { Stethoscope, Activity, Eye, HeartPulse, ScanSearch, Accessibility, ArrowLeft } from 'lucide-react';
 import MonitorCardiaco from '@/components/MonitorCardiaco';
 import { ExameFundoOlho } from './ExameFundoOlho';
+import { OximetriaOptica } from './OximetriaOptica';
+import { DermatoscopiaDigital } from './DermatoscopiaDigital';
+import { AvaliacaoMobilidade } from './AvaliacaoMobilidade';
 import { Button } from '@/components/ui/button';
 
-type DiagnosticTool = 'menu' | 'cardiaco' | 'fundo_olho';
+type DiagnosticTool = 'menu' | 'cardiaco' | 'fundo_olho' | 'oximetria' | 'dermatoscopia' | 'mobilidade';
 
 interface DiagnosticSidebarProps {
   open: boolean;
@@ -34,8 +37,26 @@ export function DiagnosticSidebar({ open, onOpenChange, onCompleteDiagnostic }: 
     {
       id: 'fundo_olho',
       title: 'Fundo de Olho (Fundoscopia)',
-      description: 'Análise de retina guiada por IA',
+      description: 'Análise de retina guiada por IA — 31 patologias',
       icon: <Eye className="w-6 h-6 text-emerald-500" />
+    },
+    {
+      id: 'oximetria',
+      title: 'Oximetria Óptica (SpO2)',
+      description: 'Saturação de oxigênio via câmera',
+      icon: <HeartPulse className="w-6 h-6 text-blue-500" />
+    },
+    {
+      id: 'dermatoscopia',
+      title: 'Dermatoscopia Digital',
+      description: 'Análise de lesões de pele com IA',
+      icon: <ScanSearch className="w-6 h-6 text-amber-500" />
+    },
+    {
+      id: 'mobilidade',
+      title: 'Mobilidade Articular',
+      description: 'Avaliação de amplitude de movimento',
+      icon: <Accessibility className="w-6 h-6 text-violet-500" />
     }
   ];
 
@@ -64,7 +85,7 @@ export function DiagnosticSidebar({ open, onOpenChange, onCompleteDiagnostic }: 
 
         <div className="flex-1 overflow-y-auto p-4">
           {activeTool === 'menu' && (
-            <div className="space-y-4 mt-2">
+            <div className="space-y-3 mt-2">
               {menuItems.map(item => (
                 <div 
                   key={item.id}
@@ -80,18 +101,6 @@ export function DiagnosticSidebar({ open, onOpenChange, onCompleteDiagnostic }: 
                   </div>
                 </div>
               ))}
-
-              <div className="mt-8 p-4 bg-blue-50/50 rounded-2xl border border-blue-100">
-                <div className="flex items-center gap-2 mb-2 text-blue-800">
-                  <FileSearch className="w-4 h-4" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Em breve</span>
-                </div>
-                <ul className="text-xs text-blue-900/70 space-y-2">
-                  <li>• Oximetria Óptica (SpO2)</li>
-                  <li>• Dermatoscopia Digital com IA</li>
-                  <li>• Avaliação de Mobilidade Articular</li>
-                </ul>
-              </div>
             </div>
           )}
 
@@ -104,6 +113,24 @@ export function DiagnosticSidebar({ open, onOpenChange, onCompleteDiagnostic }: 
           {activeTool === 'fundo_olho' && (
             <div className="h-full min-h-[500px]">
               <ExameFundoOlho onComplete={() => handleOpenChange(false)} />
+            </div>
+          )}
+
+          {activeTool === 'oximetria' && (
+            <div className="h-full min-h-[500px]">
+              <OximetriaOptica onComplete={() => handleOpenChange(false)} />
+            </div>
+          )}
+
+          {activeTool === 'dermatoscopia' && (
+            <div className="h-full min-h-[500px]">
+              <DermatoscopiaDigital onComplete={() => handleOpenChange(false)} />
+            </div>
+          )}
+
+          {activeTool === 'mobilidade' && (
+            <div className="h-full min-h-[500px]">
+              <AvaliacaoMobilidade onComplete={() => handleOpenChange(false)} />
             </div>
           )}
         </div>

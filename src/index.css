@@ -391,6 +391,101 @@ p, li { font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1.125rem); }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* --- COMIC BOOK STYLES --- */
+  .comic-panel {
+    @apply relative border-4 border-foreground bg-card rounded-xl overflow-hidden;
+    box-shadow: 6px 6px 0px hsl(var(--foreground));
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .comic-panel:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0px hsl(var(--foreground));
+  }
+  .comic-panel-primary {
+    @apply border-primary;
+    box-shadow: 6px 6px 0px hsl(var(--primary));
+  }
+  .comic-panel-primary:hover {
+    box-shadow: 8px 8px 0px hsl(var(--primary));
+  }
+  .comic-panel-purple {
+    @apply border-purple-600;
+    box-shadow: 6px 6px 0px hsl(270 60% 60%);
+  }
+  .comic-panel-purple:hover {
+    box-shadow: 8px 8px 0px hsl(270 60% 60%);
+  }
+  
+  .speech-bubble {
+    @apply relative border-2 border-foreground bg-background rounded-2xl p-4 font-medium;
+    box-shadow: 4px 4px 0px hsl(var(--foreground));
+  }
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 20px;
+    border-width: 10px 10px 0;
+    border-style: solid;
+    border-color: hsl(var(--background)) transparent;
+    display: block;
+    width: 0;
+    z-index: 1;
+  }
+  .speech-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: -13px;
+    left: 18px;
+    border-width: 12px 12px 0;
+    border-style: solid;
+    border-color: hsl(var(--foreground)) transparent;
+    display: block;
+    width: 0;
+    z-index: 0;
+  }
+  .speech-bubble-right::after {
+    left: auto;
+    right: 20px;
+  }
+  .speech-bubble-right::before {
+    left: auto;
+    right: 18px;
+  }
+  .speech-bubble-top::after {
+    bottom: auto;
+    top: -10px;
+    border-width: 0 10px 10px;
+    border-color: transparent transparent hsl(var(--background));
+  }
+  .speech-bubble-top::before {
+    bottom: auto;
+    top: -13px;
+    border-width: 0 12px 12px;
+    border-color: transparent transparent hsl(var(--foreground));
+  }
+  
+  .narration-box {
+    @apply border-b-4 border-foreground p-3 text-sm font-bold uppercase tracking-wider mb-4;
+  }
+  
+  .halftone-bg {
+    background-image: radial-gradient(hsl(var(--foreground)/0.08) 20%, transparent 22%), radial-gradient(hsl(var(--foreground)/0.08) 20%, transparent 22%);
+    background-size: 10px 10px;
+    background-position: 0 0, 5px 5px;
+  }
+  
+  .comic-font {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+  
+  .comic-pop {
+    text-shadow: 2px 2px 0px hsl(var(--background)), 4px 4px 0px hsl(var(--foreground));
+  }
 }
 
 /* Anti-anomaly guard: prevent recharts ResponsiveContainer from collapsing to -1

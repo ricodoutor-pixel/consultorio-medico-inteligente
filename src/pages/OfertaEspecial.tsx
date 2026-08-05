@@ -92,7 +92,7 @@ const OfertaEspecial = () => {
             {nome}, garantimos seu desconto <span className="text-primary">por tempo limitado</span>
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base">
-            Dra. Suelen preparou sua orientação técnica personalizada. Não deixe seu tratamento parar.
+            Dr. Edilson preparou sua orientação técnica personalizada. Não deixe seu tratamento parar.
           </p>
         </div>
 
@@ -134,7 +134,7 @@ const OfertaEspecial = () => {
         {/* PRIMARY CTA — Pay Now */}
         <Card className="mb-4 bg-gradient-to-br from-primary/15 to-primary/5 border-2 border-primary">
           <CardContent className="p-4 sm:p-6 text-center">
-            <p className="text-xs sm:text-sm text-muted-foreground mb-1">Orientação Técnica com Dra. Suelen</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-1">Orientação Técnica com Dr. Edilson</p>
             <p className="text-3xl sm:text-4xl font-black text-foreground mb-1">R$ 30,00</p>
             <p className="text-xs text-muted-foreground mb-4">PIX ou Cartão · Aprovação instantânea</p>
             <Button
@@ -163,7 +163,7 @@ const OfertaEspecial = () => {
             </h3>
             <div className="space-y-2.5">
               {[
-                "Teleconsulta com Dra. Suelen (Especialista em Cannabis Medicinal)",
+                "Teleconsulta com Dr. Edilson (Especialista em Cannabis Medicinal)",
                 "Prescrição digital válida em todo Brasil",
                 "Acompanhamento contínuo pelo app",
                 "Acesso ao Club Planta & Raiz",
@@ -229,7 +229,7 @@ const OfertaEspecial = () => {
         {/* Social Proof */}
         <div className="mt-4 p-4 rounded-lg bg-muted text-center">
           <p className="text-xs sm:text-sm text-muted-foreground italic">
-            "O tratamento com cannabis mudou minha vida. O Dra. Suelen é incrível!"
+            "O tratamento com cannabis mudou minha vida. O Dr. Edilson é incrível!"
           </p>
           <p className="text-[11px] sm:text-xs text-muted-foreground mt-1">— Maria S., São Paulo ⭐⭐⭐⭐⭐</p>
         </div>

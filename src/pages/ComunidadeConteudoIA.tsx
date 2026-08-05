@@ -15,7 +15,7 @@ export default function ComunidadeConteudoIA() {
   const handleGeneratePdf = () => {
     generateEducationalPDF({
       patientName: "João Silva",
-      doctorName: "Dra. Suelen",
+      doctorName: "Dr. Edilson",
       date: new Date().toLocaleDateString("pt-BR"),
       products: ["Óleo CBD Full Spectrum 3000mg", "Gummies de THC 5mg"],
       posology: "Semana 1: 2 gotas à noite antes de dormir.\nSemana 2: 3 gotas à noite, 1 gota pela manhã se necessário.",

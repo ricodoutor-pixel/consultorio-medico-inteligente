@@ -83,11 +83,11 @@ const DashboardMedico = () => {
              profile = { full_name: 'Dra. Olivia Zimeri', avatar_url: '/dra-olivia-avatar.jpg' };
          } else if (email.includes('suelen')) {
              doctor = { id: 'mock-suelen', user_id: session.user.id, crm: '49354', crm_state: 'SP', specialty: 'Médicos Prescritores', is_online: false } as any;
-             profile = { full_name: 'Dra. Suelen Naves Rodrigues', avatar_url: '/dra-suelen-avatar.jpg' };
+             profile = { full_name: 'Dr. Edilson Bezerra', avatar_url: '/dra-suelen-avatar.jpg' };
          } else {
-             // Fallback default (Dra. Suelen)
+             // Fallback default (Dr. Edilson)
              doctor = { id: 'mock-edilson', user_id: session.user.id, crm: '10963', crm_state: 'Sta-Cruz Bo', specialty: 'Médicos Prescritores', is_online: false } as any;
-             profile = { full_name: 'Dra. Suelen Naves Rodrigues', avatar_url: '/dr-edilson-avatar.jpg' };
+             profile = { full_name: 'Dr. Edilson Bezerra', avatar_url: '/dr-edilson-avatar.jpg' };
          }
       }
 

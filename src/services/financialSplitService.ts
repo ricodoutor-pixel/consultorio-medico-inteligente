@@ -71,7 +71,7 @@ export const financialSplitService = {
 
   /**
    * Libera os 93% ao médico apenas se a avaliação for 5★.
-   * Caso contrário, marca o crédito como `under_review` (auditoria do Dra. Suelen).
+   * Caso contrário, marca o crédito como `under_review` (auditoria do Dr. Edilson).
    *
    * @param ratingId  ID da linha em consultation_ratings (gerada após o paciente avaliar)
    */
@@ -91,7 +91,7 @@ export const financialSplitService = {
       const payoutStatus = isFiveStar ? "released" : "under_review";
       const reason = isFiveStar
         ? "Avaliação 5★ — repasse de 93% liberado para saque pelo médico."
-        : `Avaliação ${rating.stars}★ < 5★ — repasse retido para auditoria do Dra. Suelen.`;
+        : `Avaliação ${rating.stars}★ < 5★ — repasse retido para auditoria do Dr. Edilson.`;
 
       // Atualiza o registro de auditoria criado pelo trigger handle_consultation_rating
       const { error: uErr } = await (supabase as any)

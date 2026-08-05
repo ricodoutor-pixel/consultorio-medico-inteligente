@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
     const msg =
       `Oi ${firstName}! 🌿 Aqui é a Brisa novamente.\n\n` +
       `Espero que o *Guia de Cannabis Medicinal* esteja sendo útil. 📘\n\n` +
-      `🎁 *Cupom exclusivo para você:* a *Orientação Técnica* do Dra. Suelen Naves Rodrigues (CRM-PR 49354) ` +
+      `🎁 *Cupom exclusivo para você:* a *Orientação Técnica* do Dr. Edilson Bezerra (CRM-CE 10963) ` +
       `(CRM-PR 49354) sai por apenas *R$30* — análise personalizada do seu caso, ` +
       `indicação de óleo e protocolo ANVISA RDC 660/2022 incluso.\n\n` +
       `👉 Garanta agora: https://plantayraiz.com.br/orientacao-tecnica\n\n` +

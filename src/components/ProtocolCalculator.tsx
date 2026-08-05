@@ -104,7 +104,7 @@ function suggestProfile(answers: Record<string, string>): Profile {
     ratio: "CBD dominante 10:1 (avaliação personalizada)",
     spectrum: "Full-Spectrum",
     rationale:
-      "Sua condição requer avaliação individual. A Orientação Técnica do Dra. Suelen cruza seus dados com 40k+ estudos para definir o protocolo exato.",
+      "Sua condição requer avaliação individual. A Orientação Técnica do Dr. Edilson cruza seus dados com 40k+ estudos para definir o protocolo exato.",
     cta: "Quero a Orientação Técnica completa",
   };
 }
@@ -124,7 +124,7 @@ const buildWhatsappUrl = (
       `• Medicações contínuas: ${answers.meds}\n` +
       `• Intensidade dos sintomas: ${answers.intensity}\n` +
       `• Já experimentou cannabis: ${answers.tried}\n\n` +
-      `Quero iniciar a Orientação Técnica com Dra. Suelen Naves Rodrigues (R$30).`,
+      `Quero iniciar a Orientação Técnica com Dr. Edilson Bezerra (R$30).`,
   )}`;
 
 export function ProtocolCalculator() {
@@ -332,7 +332,7 @@ export function ProtocolCalculator() {
                   </div>
                   <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-[11px] leading-relaxed text-amber-100/90">
                     ⚖️ <strong>Aviso:</strong> Esta é uma <strong>prévia educativa</strong>. O
-                    protocolo definitivo exige <strong>Orientação Técnica</strong> com o Dra. Suelen Naves Rodrigues (CRM-PR 49354), que cruza seus dados com 40k+ estudos PubMed e
+                    protocolo definitivo exige <strong>Orientação Técnica</strong> com o Dr. Edilson Bezerra (CRM-CE 10963), que cruza seus dados com 40k+ estudos PubMed e
                     entrega relatório PDF assinado digitalmente (ICP-Brasil / gov.br).
                   </div>
 

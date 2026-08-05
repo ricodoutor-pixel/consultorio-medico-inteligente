@@ -348,7 +348,7 @@ const Telemedicina = () => {
               </div>
               <div className="p-6 space-y-5 text-sm text-foreground">
                 <p className="text-muted-foreground">
-                  Todo paciente passa primeiro pela <strong>Triagem da Enf. Brisa</strong>. Os dados são enviados para o médico escolhido — ou para o <strong>Dra. Suelen Naves Rodrigues</strong> em caso de Orientação Técnica.
+                  Todo paciente passa primeiro pela <strong>Triagem da Enf. Brisa</strong>. Os dados são enviados para o médico escolhido — ou para o <strong>Dr. Edilson Bezerra</strong> em caso de Orientação Técnica.
                 </p>
 
                 <div className="space-y-3">
@@ -361,12 +361,12 @@ const Telemedicina = () => {
 
                   <div className="rounded-2xl border border-border p-4 bg-muted/30">
                     <p className="font-black text-foreground mb-1">2 · Triagem + Orientação Técnica + Consulta</p>
-                    <p className="text-xs text-muted-foreground">Brisa triagem → Orientação com Dra. Suelen Naves Rodrigues → consulta com médico prescritor → receita.</p>
+                    <p className="text-xs text-muted-foreground">Brisa triagem → Orientação com Dr. Edilson Bezerra → consulta com médico prescritor → receita.</p>
                   </div>
 
                   <div className="rounded-2xl border border-border p-4 bg-muted/30">
                     <p className="font-black text-foreground mb-1">3 · Triagem + Orientação Técnica (sem consulta)</p>
-                    <p className="text-xs text-muted-foreground">Enf. Brisa triagem → Orientação Técnica personalizada com <strong>Dra. Suelen Naves Rodrigues</strong> → relatório em PDF e encaminhamento emitido diretamente com assinatura digital.</p>
+                    <p className="text-xs text-muted-foreground">Enf. Brisa triagem → Orientação Técnica personalizada com <strong>Dr. Edilson Bezerra</strong> → relatório em PDF e encaminhamento emitido diretamente com assinatura digital.</p>
                   </div>
                 </div>
 
@@ -555,7 +555,7 @@ const Telemedicina = () => {
                     
                     <p className="text-sm text-muted-foreground font-medium mb-6 max-w-lg mx-auto">
                       Após a triagem com a Brisa, você receberá um link para o pagamento da taxa de <span className="text-primary font-black">{dynamicSymbol} {dynamicPrice}</span>. 
-                      Após confirmação do pagamento, você será atendido pelo <span className="text-primary font-black">Dra. Suelen Naves Rodrigues</span> para sua Orientação Técnica via Chat autônomo no WhatsApp.
+                      Após confirmação do pagamento, você será atendido pelo <span className="text-primary font-black">Dr. Edilson Bezerra</span> para sua Orientação Técnica via Chat autônomo no WhatsApp.
                     </p>
 
                     {/* Fluxo Visual */}
@@ -603,7 +603,7 @@ const Telemedicina = () => {
                               (window as any).fbq("track", "InitiateCheckout", { 
                                 value: isInternational ? 10 : 30, 
                                 currency: isInternational ? "USD" : "BRL", 
-                                content_name: "Orientação Técnica — Dra. Suelen Naves Rodrigues" 
+                                content_name: "Orientação Técnica — Dr. Edilson Bezerra" 
                               });
                             }
                             window.open(data.payment_url, "_blank", "noopener,noreferrer");
@@ -631,17 +631,17 @@ const Telemedicina = () => {
                         Pagar {dynamicSymbol} {dynamicPrice} — Orientação Técnica
                       </Button>
 
-                      {/* Botão Secundário — WhatsApp Dra. Suelen */}
+                      {/* Botão Secundário — WhatsApp Dr. Edilson */}
                       <Button 
                         variant="outline"
                         className="w-full h-12 sm:h-14 border-green-500/30 text-green-500 font-black rounded-2xl text-sm sm:text-base hover:bg-green-500/10 transition-all"
                         onClick={() => {
-                          const message = `Olá Dra. Suelen, finalizei minha triagem com a Brisa! Meu nome é ${patientData.nome || "paciente"} e gostaria de agendar minha Orientação Técnica. Triagem concluída: ${selectedPathology || "Cannabis Medicinal"}.`;
+                          const message = `Olá Dr. Edilson, finalizei minha triagem com a Brisa! Meu nome é ${patientData.nome || "paciente"} e gostaria de agendar minha Orientação Técnica. Triagem concluída: ${selectedPathology || "Cannabis Medicinal"}.`;
                           window.open(`https://wa.me/5511987131241?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
                         }}
                       >
                         <MessageCircle className="mr-2" size={18} />
-                        Já pagou? Fale com Dra. Suelen no WhatsApp
+                        Já pagou? Fale com Dr. Edilson no WhatsApp
                       </Button>
                     </div>
 

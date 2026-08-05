@@ -15,7 +15,7 @@ const corsHeaders = {
 
 const SITE_BASE = "https://plantayraiz.com.br";
 const WA_LINK = `https://wa.me/5511991363154?text=${encodeURIComponent(
-  "Olá Enfª Brisa, quero garantir minha Orientação Técnica de R$30 com o Dra. Suelen Naves Rodrigues (CRM-PR 49354) On!"
+  "Olá Enfª Brisa, quero garantir minha Orientação Técnica de R$30 com o Dr. Edilson Bezerra (CRM-CE 10963) On!"
 )}`;
 
 function inviteMessage(nome: string, categoria: string | null) {
@@ -37,7 +37,7 @@ function inviteMessage(nome: string, categoria: string | null) {
   // default: paciente / ebook
   return (
     `Olá ${first}! 🌿💚\n\nAqui é a Enf. Brisa da Planta y Raiz.\n\n` +
-    `🎯 *Garanta agora sua Orientação Técnica em Cannabis Medicinal com o Dra. Suelen Naves Rodrigues (CRM-PR 49354) On por apenas R$30* — relatório em PDF com assinatura digital ICP-Brasil e selo gov.br.\n\n` +
+    `🎯 *Garanta agora sua Orientação Técnica em Cannabis Medicinal com o Dr. Edilson Bezerra (CRM-CE 10963) On por apenas R$30* — relatório em PDF com assinatura digital ICP-Brasil e selo gov.br.\n\n` +
     `Acesse rapidinho aqui: ${WA_LINK}\n\n` +
     `Qualquer dúvida, é só responder esta mensagem. Estou aqui para te ajudar! 🐸`
   );
@@ -142,7 +142,7 @@ Deno.serve(async (req) => {
       await supabase.from("leads_contatos").update({ tags: newTags }).eq("id", leadRow.id);
     }
 
-    // Notifica Dra. Suelen sobre o novo lead (ver brisa-signup-alert).
+    // Notifica Dr. Edilson sobre o novo lead (ver brisa-signup-alert).
     supabase.functions
       .invoke("brisa-signup-alert", {
         body: { nome, telefone: phoneDigits, email, categoria, origem, source: "lead_invite" },

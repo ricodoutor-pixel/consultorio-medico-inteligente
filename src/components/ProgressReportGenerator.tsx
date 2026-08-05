@@ -81,7 +81,7 @@ export function ProgressReportGenerator({ userId, patientName }: ProgressReportG
       const today = new Date().toLocaleDateString("pt-BR");
       doc.text(sanitize(`Emissao: ${today}`), W - margin - 50, 16);
       doc.text("CRM: 12345/SP", W - margin - 50, 22);
-      doc.text("Dra. Suelen Naves Rodrigues da Silva", W - margin - 50, 28);
+      doc.text("Dr. Edilson Bezerra da Silva", W - margin - 50, 28);
 
       y = 48;
 

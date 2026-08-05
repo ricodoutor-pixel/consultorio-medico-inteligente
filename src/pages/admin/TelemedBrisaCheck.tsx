@@ -15,7 +15,7 @@
  *  status, a latencia e o erro (se houver).
  *
  * Este arquivo NAO altera a producao — e uma pagina isolada, protegida por
- * AdminRoute, apenas para o Dra. Suelen validar os dois fluxos antes de
+ * AdminRoute, apenas para o Dr. Edilson validar os dois fluxos antes de
  * liberar o funil ao vivo.
  */
 import { useState } from "react";
@@ -133,7 +133,7 @@ export default function TelemedBrisaCheck() {
                   </Button>
                 </div>
                 <Input
-                  placeholder={role === "doctor" ? "Dra. Suelen (teste)" : "Paciente (teste)"}
+                  placeholder={role === "doctor" ? "Dr. Edilson (teste)" : "Paciente (teste)"}
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                 />

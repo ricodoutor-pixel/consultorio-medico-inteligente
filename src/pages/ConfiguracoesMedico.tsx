@@ -235,7 +235,7 @@ export default function ConfiguracoesMedico() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="bg-slate-900 border-slate-700 text-white focus:border-primary"
-                    placeholder="Ex: Dra. Suelen Naves Rodrigues"
+                    placeholder="Ex: Dr. Edilson Bezerra"
                   />
                 </div>
 

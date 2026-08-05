@@ -13,7 +13,7 @@ const supabase: any = _supabase;
 
 type Message = { id: string; role: "doctor" | "assistant"; content: string; timestamp: Date };
 
-interface DraSuelenExclusiveChatProps {
+interface DrEdilsonExclusiveChatProps {
   appointmentId?: string;
   patientName?: string;
   patientContext?: string;
@@ -28,11 +28,11 @@ const QUICK_QUESTIONS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dr-edilson-clinical-support`;
 
-export function DraSuelenExclusiveChat({
+export function DrEdilsonExclusiveChat({
   appointmentId,
   patientName,
   patientContext,
-}: DraSuelenExclusiveChatProps) {
+}: DrEdilsonExclusiveChatProps) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -189,7 +189,7 @@ ${patientContext}\
           if (copy[copy.length - 1]?.role === "assistant" && !copy[copy.length - 1].content) {
             copy[copy.length - 1] = {
               ...copy[copy.length - 1],
-              content: "⚠️ Erro ao consultar Dra. Suelen. Tente novamente.",
+              content: "⚠️ Erro ao consultar Dr. Edilson. Tente novamente.",
             };
           }
           return copy;
@@ -214,7 +214,7 @@ ${patientContext}\
           bg-gradient-to-br from-emerald-600 to-emerald-700 text-white shadow-lg shadow-emerald-600/30
           border border-emerald-500/40 backdrop-blur-md hover:shadow-emerald-600/50 transition-all
           ${open ? "hidden" : ""}`}
-        aria-label="Suporte Exclusivo - Dra. Suelen"
+        aria-label="Suporte Exclusivo - Dr. Edilson"
       >
         <div className="relative">
           <Lock className="h-5 w-5" />
@@ -222,7 +222,7 @@ ${patientContext}\
         </div>
         <div className="hidden sm:flex flex-col items-start leading-tight">
           <span className="text-[10px] uppercase tracking-wider opacity-90">Suporte Exclusivo</span>
-          <span className="text-sm font-semibold">Dra. Suelen On</span>
+          <span className="text-sm font-semibold">Dr. Edilson On</span>
         </div>
       </motion.button>
 
@@ -247,7 +247,7 @@ ${patientContext}\
                     <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-yellow-400 border-2 border-card animate-pulse" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-bold leading-tight">Dra. Suelen Naves Rodrigues</h3>
+                    <h3 className="text-sm font-bold leading-tight">Dr. Edilson Bezerra</h3>
                     <p className="text-[11px] text-muted-foreground leading-tight flex items-center gap-1">
                       <Stethoscope className="h-2.5 w-2.5" />
                       Suporte Exclusivo • Paciente: {patientName || "Não selecionado"}
@@ -312,7 +312,7 @@ ${patientContext}\
                             {m.content || (loading && i === messages.length - 1 ? (
                               <div className="flex items-center gap-2 text-muted-foreground">
                                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                <span className="text-xs">Dra. Suelen está analisando...</span>
+                                <span className="text-xs">Dr. Edilson está analisando...</span>
                               </div>
                             ) : null)}
                             {m.content && <ReactMarkdown>{m.content}</ReactMarkdown>}
@@ -372,4 +372,4 @@ ${patientContext}\
   );
 }
 
-export default DraSuelenExclusiveChat;
+export default DrEdilsonExclusiveChat;

@@ -1,5 +1,5 @@
 // Tópicos e prompt unificados para posts automáticos (IG / FB / Threads).
-// REGRA: Nunca mencionar Dra. Suelen, CRM, ou qualquer médico específico.
+// REGRA: Nunca mencionar Dr. Edilson, CRM, ou qualquer médico específico.
 // Foco: vantagens da plataforma Planta y Raiz para pacientes, médicos, lojistas e parceiros.
 
 export const AUTO_POST_TOPICS = [

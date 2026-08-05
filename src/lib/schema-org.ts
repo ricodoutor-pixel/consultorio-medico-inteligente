@@ -194,7 +194,7 @@ export const articleSchema: SchemaOrgConfig = {
 };
 
 /**
- * Schema.org Physician — Dra. Suelen Naves Rodrigues (CRM-PR 49354) (CRM 49354/PR)
+ * Schema.org Physician — Dr. Edilson Bezerra (CRM-CE 10963) (CRM 49354/PR)
  * Supervisora Técnica da plataforma Planta y Raiz (Bezerra Med Soluções Integradas Ltda.).
  */
 export const physicianSchema: SchemaOrgConfig = {
@@ -203,7 +203,7 @@ export const physicianSchema: SchemaOrgConfig = {
     '@context': 'https://schema.org',
     '@type': 'Physician',
     '@id': 'https://plantayraiz.com.br/#supervisora-tecnica',
-    name: 'Dra. Suelen Naves Rodrigues (CRM-PR 49354)',
+    name: 'Dr. Edilson Bezerra (CRM-CE 10963)',
     jobTitle: 'Supervisora Técnica da Plataforma Planta y Raiz',
     identifier: 'CRM 49354/PR',
     medicalSpecialty: ['GeneralPractice', 'Pharmacology'],

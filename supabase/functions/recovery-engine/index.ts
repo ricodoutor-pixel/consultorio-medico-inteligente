@@ -22,7 +22,7 @@ const TRIGGERS: RecoveryTrigger[] = [
     hoursThreshold: 24,
     couponCode: null,
     discountAmount: 0,
-    message: "⚠️ Não ignore sua saúde: Dra. Suelen preparou sua prescrição, mas ela expira em breve. Vai adiar sua saúde até quando?",
+    message: "⚠️ Não ignore sua saúde: Dr. Edilson preparou sua prescrição, mas ela expira em breve. Vai adiar sua saúde até quando?",
     affiliateMessage: "🔔 Seu lead {NOME} esfriou! Mande este áudio/texto para ele agora para garantir sua comissão!",
   },
   {

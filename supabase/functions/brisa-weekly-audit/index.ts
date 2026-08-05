@@ -1,4 +1,4 @@
-// Brisa Weekly Audit — relatório semanal de performance enviado ao Dra. Suelen via WhatsApp
+// Brisa Weekly Audit — relatório semanal de performance enviado ao Dr. Edilson via WhatsApp
 // Cron sugerido: domingo 09:00 BRT = 12:00 UTC
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
@@ -65,7 +65,7 @@ serve(async (req) => {
     const prompt = `Analise estas mensagens de pacientes da última semana e gere:
 1) Top 5 dúvidas/temas mais frequentes (1 linha cada)
 2) Nível de satisfação geral (1-10) baseado em tom
-3) 3 recomendações práticas para o Dra. Suelen
+3) 3 recomendações práticas para o Dr. Edilson
 
 Mensagens:
 - ${sampleMessages}`;

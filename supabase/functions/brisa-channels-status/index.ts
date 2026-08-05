@@ -94,7 +94,7 @@ Deno.serve(async (req) => {
     ? await check(`https://graph.facebook.com/v19.0/me?fields=id,username&access_token=${IG_PAGE_TOKEN}`)
     : { ok: false, status: 0, latency_ms: 0, detail: "no_ig_creds" };
 
-  // Alerta o Dra. Suelen quando qualquer canal cai (1x a cada 10min por canal)
+  // Alerta o Dr. Edilson quando qualquer canal cai (1x a cada 10min por canal)
   const channels = { whatsapp: wa, facebook: fb, instagram: ig };
   for (const [name, st] of Object.entries(channels)) {
     if (st.ok) continue;

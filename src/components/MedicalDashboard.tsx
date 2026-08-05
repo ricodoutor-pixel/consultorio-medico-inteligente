@@ -17,7 +17,7 @@ import { doctorChannel } from "@/lib/realtime-channels";
 import { toast } from "sonner";
 import { generatePrescriptionPDF, type PrescriptionData } from "@/lib/prescriptionPDF";
 import { APP_CONFIG } from "@/lib/app-config";
-import { DraSuelenClinicalAgent } from "@/components/DrEdilsonClinicalAgent";
+import { DrEdilsonClinicalAgent } from "@/components/DrEdilsonClinicalAgent";
 import { PricingConfigModal } from "@/components/PricingConfigModal";
 import { PerformanceBonusWidget } from "@/components/PerformanceBonusWidget";
 import { BlockchainRecordPublisher } from "./BlockchainRecordPublisher";
@@ -710,7 +710,7 @@ export function MedicalDashboard() {
         )}
       </aside>
 
-      <DraSuelenClinicalAgent
+      <DrEdilsonClinicalAgent
         patientContext={activePatient
           ? `${activePatient.name}, ${activePatient.age} anos. Tags: ${activePatient.tags.join(", ")}. Sintomas: ${activePatient.symptoms}`
           : undefined}

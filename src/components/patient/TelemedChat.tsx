@@ -115,7 +115,7 @@ export const TelemedChat = ({ patientId }: TelemedChatProps) => {
             const match = professionals.find(p => p.id === a.doctor_id);
             if (match) unlockedIds.add(match.id);
           }
-          // Always unlock med-0 (Dra. Suelen) for OT R$30
+          // Always unlock med-0 (Dr. Edilson) for OT R$30
           unlockedIds.add("med-0");
         }
       }

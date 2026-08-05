@@ -102,6 +102,24 @@ export default function LojistaDashboard() {
           </div>
         </div>
 
+        {/* Comic Book Manual Banner */}
+        <Link to="/manual?tab=lojista" className="block w-full focus:outline-none mb-4">
+          <div className="w-full comic-panel-purple bg-purple-600 hover:bg-purple-700 p-6 flex flex-col md:flex-row items-center justify-between gap-6 cursor-pointer transform hover:-rotate-1 transition-all">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-background flex items-center justify-center text-purple-600 shrink-0 border-2 border-foreground shadow-[2px_2px_0px_#000]">
+                <BookOpen size={32} />
+              </div>
+              <div>
+                <h3 className="font-black comic-font text-2xl text-white mb-1">COMO AUMENTAR SUAS VENDAS?</h3>
+                <p className="font-bold text-white/90">Leia o Guia HQ de Conversão para Lojistas!</p>
+              </div>
+            </div>
+            <Button asChild className="bg-background text-foreground font-black border-2 border-transparent hover:border-foreground hover:bg-background/90 text-lg px-8 h-14 rounded-xl shadow-[4px_4px_0px_#000] pointer-events-none">
+              <span>LER AGORA <ArrowRight className="ml-2" /></span>
+            </Button>
+          </div>
+        </Link>
+
         <Tabs defaultValue="demanda" className="w-full">
           <TabsList className="mb-6 grid grid-cols-3">
             <TabsTrigger value="demanda">Demanda Preditiva</TabsTrigger>

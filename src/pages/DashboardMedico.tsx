@@ -762,7 +762,7 @@ const DashboardMedico = () => {
             </div>
 
             {/* PIX Balance */}
-            <Card className="border-border mt-6">
+            <Card className="border-border mt-6 mb-8">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div>
@@ -780,6 +780,25 @@ const DashboardMedico = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Comic Book Manual Banner */}
+            <Link to="/manual?tab=medico" className="block w-full focus:outline-none mb-8">
+              <div className="w-full comic-panel-primary bg-primary hover:bg-primary/90 p-6 flex flex-col md:flex-row items-center justify-between gap-6 cursor-pointer transform hover:-rotate-1 transition-all">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-background flex items-center justify-center text-primary shrink-0 border-2 border-foreground shadow-[2px_2px_0px_#000]">
+                    <BookOpen size={32} />
+                  </div>
+                  <div>
+                    <h3 className="font-black comic-font text-2xl text-primary-foreground mb-1">DÚVIDAS NA PLATAFORMA?</h3>
+                    <p className="font-bold text-primary-foreground/90">Leia o Guia Definitivo em HQ para Médicos!</p>
+                  </div>
+                </div>
+                <Button asChild className="bg-background text-foreground font-black border-2 border-transparent hover:border-foreground hover:bg-background/90 text-lg px-8 h-14 rounded-xl shadow-[4px_4px_0px_#000] pointer-events-none">
+                  <span>LER AGORA <ArrowRight className="ml-2" /></span>
+                </Button>
+              </div>
+            </Link>
+
           </motion.div>
         </div>
       </section>

@@ -625,6 +625,28 @@ const DashboardPaciente = () => {
         </div>
       </section>
 
+      {/* Comic Book Manual Banner */}
+      <section className="pb-8">
+        <div className="container mx-auto px-4">
+          <Link to="/manual?tab=paciente" className="block w-full focus:outline-none">
+            <div className="w-full comic-panel bg-yellow-300 hover:bg-yellow-400 p-6 flex flex-col md:flex-row items-center justify-between gap-6 cursor-pointer transform hover:-rotate-1 transition-all">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center text-yellow-300 shrink-0 border-2 border-foreground shadow-[2px_2px_0px_#000]">
+                  <BookOpen size={32} />
+                </div>
+                <div>
+                  <h3 className="font-black comic-font text-2xl text-foreground mb-1">COMO USAR A PLATAFORMA?</h3>
+                  <p className="font-bold text-foreground/80">Leia nosso Guia Definitivo em Quadrinhos!</p>
+                </div>
+              </div>
+              <Button asChild className="bg-foreground text-background font-black border-2 border-transparent hover:border-foreground hover:bg-transparent hover:text-foreground text-lg px-8 h-14 rounded-xl shadow-[4px_4px_0px_#000] pointer-events-none">
+                <span>LER AGORA <ArrowRight className="ml-2" /></span>
+              </Button>
+            </div>
+          </Link>
+        </div>
+      </section>
+
       {/* Wellness Subscription Plans */}
       <section className="pb-16">
         <div className="container mx-auto px-4">

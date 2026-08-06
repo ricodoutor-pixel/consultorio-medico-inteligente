@@ -17,6 +17,7 @@ export const EstetoscopioDigital = () => {
     brisaSpeech: string;
   } | null>(null);
   const [timer, setTimer] = useState(0);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -25,14 +26,40 @@ export const EstetoscopioDigital = () => {
   
   // Clean up on unmount
   useEffect(() => {
+    checkPermissionsAndAutoStart();
     return () => {
-      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-        mediaRecorderRef.current.stop();
-      }
+      stopRecording();
       speechSynthesis.cancel();
+      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
     };
   }, []);
+
+  const checkPermissionsAndAutoStart = async () => {
+    try {
+      const permission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      if (permission.state === 'granted') {
+        startCountdown();
+      }
+    } catch (e) {
+      console.log('Permissions API not supported or mic not queryable', e);
+    }
+  };
+
+  const startCountdown = () => {
+    setCountdown(3);
+    speakBrisa("Microfone já autorizado. Posicione o celular no peito, iniciando em 3 segundos.");
+    
+    let currentCount = 3;
+    const interval = setInterval(() => {
+      currentCount -= 1;
+      setCountdown(currentCount);
+      if (currentCount <= 0) {
+        clearInterval(interval);
+        setCountdown(null);
+        startRecording(true);
+      }
+    }, 1000);
+  };
 
   const speakBrisa = (text: string) => {
     speechSynthesis.cancel();
@@ -43,7 +70,7 @@ export const EstetoscopioDigital = () => {
     speechSynthesis.speak(utterance);
   };
 
-  const startRecording = async () => {
+  const startRecording = async (isAuto = false) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
@@ -79,8 +106,11 @@ export const EstetoscopioDigital = () => {
       setResult(null);
       setTimer(0);
       
-      // Encorajamento inicial
-      speakBrisa("Agora sim consigo escutar seu coração. Por favor, deixe o celular encostado no peito, fique em silêncio absoluto e aguarde alguns segundos.");
+      if (!isAuto) {
+        speakBrisa("Permissão concedida. Fique em silêncio absoluto e coloque a base do celular no peito esquerdo.");
+      } else {
+        speakBrisa("Iniciando gravação.");
+      }
       
       timerIntervalRef.current = setInterval(() => {
         setTimer(prev => {
@@ -248,11 +278,21 @@ export const EstetoscopioDigital = () => {
         {/* Área de Gravação */}
         <div className="flex flex-col items-center justify-center p-8 border-4 border-dashed border-muted rounded-3xl bg-muted/30">
           
-          {!isRecording && !isProcessing && !result && (
+          {countdown !== null && (
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center">
+              <div className="w-32 h-32 flex items-center justify-center rounded-full bg-red-500 text-white text-6xl font-black shadow-[0_0_40px_rgba(239,68,68,0.6)] animate-pulse">
+                {countdown}
+              </div>
+              <h3 className="mt-6 text-2xl font-black text-red-600 text-center">Iniciando Automaticamente...</h3>
+              <p className="text-muted-foreground font-medium text-center mt-2">Posicione o celular no peito esquerdo agora.</p>
+            </motion.div>
+          )}
+
+          {!isRecording && !isProcessing && !result && countdown === null && (
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center">
               <Button 
                 size="lg" 
-                onClick={startRecording}
+                onClick={() => startRecording(false)}
                 className="w-32 h-32 rounded-full shadow-[0_0_40px_rgba(16,185,129,0.3)] bg-gradient-to-br from-emerald-500 to-emerald-700 hover:scale-105 transition-all text-white border-4 border-emerald-300"
               >
                 <Mic className="w-12 h-12" />
@@ -339,7 +379,7 @@ export const EstetoscopioDigital = () => {
 
         {/* Janela da Enf. Brisa (Assistente de Voz) */}
         <AnimatePresence>
-          {(isRecording || isProcessing || result) && (
+          {(countdown !== null || isRecording || isProcessing || result) && (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -353,8 +393,9 @@ export const EstetoscopioDigital = () => {
                 </div>
                 <div className="flex-1 flex flex-col justify-center">
                   <p className="font-black text-lg md:text-xl text-black leading-tight italic">
-                    {isRecording && "Agora sim consigo escutar seu coração! Fique na mesma posição, em silêncio..."}
-                    {isProcessing && "Quase lá! Cruzando os dados vitais..."}
+                    {countdown !== null && "Tudo liberado! Vamos iniciar o teste cardíaco em instantes."}
+                    {isRecording && "Shhh... Permaneça em total silêncio. Estou captando os batimentos."}
+                    {isProcessing && "Calculando os padrões de frequência e buscando sopros..."}
                     {result && result.brisaSpeech}
                   </p>
                   {result && (

@@ -15,8 +15,11 @@ const DermatoscopiaDigital = lazy(() => import('@/components/diagnostics/Dermato
 const AvaliacaoMobilidade = lazy(() => import('@/components/diagnostics/AvaliacaoMobilidade').then(m => ({ default: m.AvaliacaoMobilidade })));
 const EstetoscopioDigital = lazy(() => import('@/components/diagnostics/EstetoscopioDigital').then(m => ({ default: m.EstetoscopioDigital })));
 const AuscultaPulmonar = lazy(() => import('@/components/diagnostics/AuscultaPulmonar').then(m => ({ default: m.AuscultaPulmonar })));
+const TremorometriaDigital = lazy(() => import('@/components/diagnostics/TremorometriaDigital').then(m => ({ default: m.TremorometriaDigital })));
+const ColorimetriaUrinaria = lazy(() => import('@/components/diagnostics/ColorimetriaUrinaria').then(m => ({ default: m.ColorimetriaUrinaria })));
+const AcuidadeVisual = lazy(() => import('@/components/diagnostics/AcuidadeVisual').then(m => ({ default: m.AcuidadeVisual })));
 
-type ActiveTool = null | 'cardiaco' | 'fundoscopia' | 'oximetria' | 'dermatoscopia' | 'mobilidade' | 'estetoscopio' | 'pulmonar';
+type ActiveTool = null | 'cardiaco' | 'fundoscopia' | 'oximetria' | 'dermatoscopia' | 'mobilidade' | 'estetoscopio' | 'pulmonar' | 'tremor' | 'urine' | 'acuity';
 
 const tools = [
   {
@@ -89,6 +92,36 @@ const tools = [
     borderHover: 'hover:border-cyan-300',
     tag: '🌬️ Respiração + Gemini IA',
   },
+  {
+    id: 'tremor' as ActiveTool,
+    title: 'Tremorometria IA',
+    description: 'Análise de tremores neuromotores via acelerômetro',
+    icon: Activity,
+    iconColor: 'text-orange-500',
+    bgGlow: 'from-orange-500/10 to-orange-500/5',
+    borderHover: 'hover:border-orange-300',
+    tag: 'Acelerômetro',
+  },
+  {
+    id: 'urine' as ActiveTool,
+    title: 'Urinálise IA',
+    description: 'Leitura colorimétrica de tiras reagentes de urina',
+    icon: ScanSearch,
+    iconColor: 'text-yellow-500',
+    bgGlow: 'from-yellow-500/10 to-yellow-500/5',
+    borderHover: 'hover:border-yellow-300',
+    tag: 'Colorimetria',
+  },
+  {
+    id: 'acuity' as ActiveTool,
+    title: 'Acuidade Visual',
+    description: 'Teste gamificado de acuidade visual com Optotipos',
+    icon: Eye,
+    iconColor: 'text-teal-500',
+    bgGlow: 'from-teal-500/10 to-teal-500/5',
+    borderHover: 'hover:border-teal-300',
+    tag: 'Optotipos',
+  },
 ];
 
 export default function MonitoramentoSaude() {
@@ -110,6 +143,12 @@ export default function MonitoramentoSaude() {
         return <EstetoscopioDigital />;
       case 'pulmonar':
         return <AuscultaPulmonar />;
+      case 'tremor':
+        return <TremorometriaDigital />;
+      case 'urine':
+        return <ColorimetriaUrinaria />;
+      case 'acuity':
+        return <AcuidadeVisual />;
       default:
         return null;
     }

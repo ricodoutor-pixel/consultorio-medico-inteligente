@@ -21,6 +21,7 @@ import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { PrescriptionVerificationModal } from "@/components/PrescriptionVerificationModal";
 import { DoctorEndorsedBadge } from "@/components/DoctorEndorsedBadge";
 import { AnvisaBadge } from "@/components/AnvisaBadge";
+import { buildProductSchema } from "@/lib/schema-org";
 
 // Import product images
 import oleoCbd1 from "@/assets/products/oleo-cbd-1.jpg";
@@ -223,6 +224,25 @@ const ProductDetail = ({ id }: { id: string }) => {
       setLoading(false);
     })();
   }, [id]);
+
+  // Product JSON-LD for rich results
+  useEffect(() => {
+    if (!product) return;
+    const schema = buildProductSchema({
+      id: String(product.id),
+      name: product.name,
+      description: (product as any).description || undefined,
+      image: (product as any).image_url || undefined,
+      price: fmtPrice(product.price),
+      brand: (product as any).brand || undefined,
+    });
+    const el = document.createElement("script");
+    el.type = "application/ld+json";
+    el.setAttribute("data-product-schema", "true");
+    el.textContent = JSON.stringify(schema.data);
+    document.head.appendChild(el);
+    return () => { el.remove(); };
+  }, [product]);
 
   if (loading) return <div className="flex items-center justify-center min-h-[60vh]"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>;
   if (!product) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Produto não encontrado.</div>;

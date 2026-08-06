@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, ScanSearch, Zap, RefreshCcw, Activity, ShieldCheck, Database, FileText, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, ScanLine } from 'lucide-react';
+import { ComicManual } from './ComicManual';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -100,6 +101,18 @@ export function DermatoscopiaDigital({ onComplete }: { onComplete?: () => void }
 
   return (
     <div className="flex flex-col w-full h-full bg-slate-50 relative overflow-hidden rounded-xl border border-border shadow-sm">
+      <ComicManual 
+        title="Como Fazer a Dermatoscopia"
+        icon={ScanSearch}
+        brisaMessage="Vou analisar essa manchinha na sua pele usando inteligência artificial avançada!"
+        steps={[
+          { title: 'Boa Luz', description: 'Fique em um ambiente claro. A luz natural do dia é a melhor.', icon: '☀️', colorClass: 'bg-yellow-50' },
+          { title: 'Enquadre a Lesão', description: 'Coloque a pinta bem no centro da tela, de perto.', icon: '🔍', colorClass: 'bg-green-50' },
+          { title: 'Foco Fixo', description: 'Toque na tela para focar e evite tremer a mão.', icon: '🎯', colorClass: 'bg-blue-50' },
+          { title: 'Capture', description: 'Tire a foto! A IA vai analisar a Regra ABCDE na hora.', icon: '📸', colorClass: 'bg-purple-50' }
+        ]}
+      />
+
       <AnimatePresence mode="wait">
         {phase === 'intro' && (
           <motion.div 

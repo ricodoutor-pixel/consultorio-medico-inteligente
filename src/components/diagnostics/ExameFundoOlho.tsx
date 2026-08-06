@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Eye, Zap, RefreshCcw, Activity, ShieldCheck, Database, ScanLine, FileText, CheckCircle2, AlertTriangle, ArrowRight, Brain, Pill, ChevronDown, ChevronUp, BookOpen, Heart, Share2 } from 'lucide-react';
+import { ComicManual } from './ComicManual';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -317,6 +318,18 @@ export function ExameFundoOlho({ onComplete }: { onComplete?: () => void }) {
 
   return (
     <div className="flex flex-col w-full h-full bg-slate-50 relative overflow-hidden rounded-xl border border-border shadow-sm">
+      <ComicManual 
+        title="Como Fazer o Exame de Fundo de Olho"
+        icon={Eye}
+        brisaMessage="Vou analisar seus olhos com muito cuidado. Mantenha os olhos bem abertos!"
+        steps={[
+          { title: 'Iluminação', description: 'Vá para um local bem iluminado.', icon: '💡', colorClass: 'bg-yellow-50' },
+          { title: 'Posição', description: 'Segure o celular na altura dos olhos.', icon: '📱', colorClass: 'bg-blue-50' },
+          { title: 'Foque na Câmera', description: 'Olhe fixamente para a lente da câmera sem piscar muito.', icon: '👁️', colorClass: 'bg-green-50' },
+          { title: 'Aguarde a IA', description: 'Fique imóvel enquanto o scan da retina é feito.', icon: '🤖', colorClass: 'bg-purple-50' }
+        ]}
+      />
+      
       <AnimatePresence mode="wait">
         {/* ===== INTRO PHASE ===== */}
         {phase === 'intro' && (

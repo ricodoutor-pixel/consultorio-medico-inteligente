@@ -13,8 +13,9 @@ const ExameFundoOlho = lazy(() => import('@/components/diagnostics/ExameFundoOlh
 const OximetriaOptica = lazy(() => import('@/components/diagnostics/OximetriaOptica').then(m => ({ default: m.OximetriaOptica })));
 const DermatoscopiaDigital = lazy(() => import('@/components/diagnostics/DermatoscopiaDigital').then(m => ({ default: m.DermatoscopiaDigital })));
 const AvaliacaoMobilidade = lazy(() => import('@/components/diagnostics/AvaliacaoMobilidade').then(m => ({ default: m.AvaliacaoMobilidade })));
+const EstetoscopioDigital = lazy(() => import('@/components/diagnostics/EstetoscopioDigital').then(m => ({ default: m.EstetoscopioDigital })));
 
-type ActiveTool = null | 'cardiaco' | 'fundoscopia' | 'oximetria' | 'dermatoscopia' | 'mobilidade';
+type ActiveTool = null | 'cardiaco' | 'fundoscopia' | 'oximetria' | 'dermatoscopia' | 'mobilidade' | 'estetoscopio';
 
 const tools = [
   {
@@ -67,6 +68,16 @@ const tools = [
     borderHover: 'hover:border-violet-300',
     tag: 'Pose Estimation',
   },
+  {
+    id: 'estetoscopio' as ActiveTool,
+    title: 'Estetoscópio Digital IA',
+    description: 'Ausculta cardíaca e pulmonar via microfone',
+    icon: Stethoscope,
+    iconColor: 'text-emerald-500',
+    bgGlow: 'from-emerald-500/10 to-emerald-500/5',
+    borderHover: 'hover:border-emerald-300',
+    tag: '🎙️ Áudio + Gemini IA',
+  },
 ];
 
 export default function MonitoramentoSaude() {
@@ -84,6 +95,8 @@ export default function MonitoramentoSaude() {
         return <DermatoscopiaDigital onComplete={() => setActiveTool(null)} />;
       case 'mobilidade':
         return <AvaliacaoMobilidade onComplete={() => setActiveTool(null)} />;
+      case 'estetoscopio':
+        return <EstetoscopioDigital />;
       default:
         return null;
     }

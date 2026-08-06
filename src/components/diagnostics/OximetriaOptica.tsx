@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, HeartPulse, Zap, RefreshCcw, Activity, ShieldCheck, Database, FileText, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
+import { ComicManual } from './ComicManual';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -94,6 +95,18 @@ export function OximetriaOptica({ onComplete }: { onComplete?: () => void }) {
 
   return (
     <div className="flex flex-col w-full h-full bg-slate-50 relative overflow-hidden rounded-xl border border-border shadow-sm">
+      <ComicManual 
+        title="Como Fazer a Oximetria"
+        icon={HeartPulse}
+        brisaMessage="Vou medir o nível de oxigênio no seu sangue! Deixe o dedo bem quieto na lente."
+        steps={[
+          { title: 'Lave as Mãos', description: 'Certifique-se de que seus dedos estão limpos e secos.', icon: '🧼', colorClass: 'bg-blue-50' },
+          { title: 'Apoie o Dedo', description: 'Coloque o dedo indicador tampando a CÂMERA e o FLASH do celular.', icon: '👆', colorClass: 'bg-red-50' },
+          { title: 'Pressão Leve', description: 'Não aperte muito forte, apenas encoste o dedo cobrindo tudo.', icon: '🎈', colorClass: 'bg-yellow-50' },
+          { title: 'Aguarde 30s', description: 'Fique imóvel até a contagem terminar. Respire fundo!', icon: '⏱️', colorClass: 'bg-green-50' }
+        ]}
+      />
+      
       <AnimatePresence mode="wait">
         {phase === 'intro' && (
           <motion.div 

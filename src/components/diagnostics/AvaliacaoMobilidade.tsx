@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Accessibility, RefreshCcw, Activity, ShieldCheck, Database, FileText, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, Bone, Minimize2 } from 'lucide-react';
+import { ComicManual } from './ComicManual';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -119,6 +120,18 @@ export function AvaliacaoMobilidade({ onComplete }: { onComplete?: () => void })
 
   return (
     <div className="flex flex-col w-full h-full bg-slate-50 relative overflow-hidden rounded-xl border border-border shadow-sm">
+      <ComicManual 
+        title="Como Fazer a Avaliação de Mobilidade"
+        icon={Accessibility}
+        brisaMessage="Vou observar seus movimentos para calcular a amplitude das suas articulações!"
+        steps={[
+          { title: 'Apoie o Celular', description: 'Deixe o celular em uma mesa ou estante onde ele possa te ver inteiro.', icon: '📱', colorClass: 'bg-blue-50' },
+          { title: 'Espaço Livre', description: 'Afaste-se uns 2 metros para aparecer de corpo inteiro na câmera.', icon: '🧍', colorClass: 'bg-green-50' },
+          { title: 'Boa Luz', description: 'Evite ficar contra a janela, acenda as luzes do ambiente.', icon: '💡', colorClass: 'bg-yellow-50' },
+          { title: 'Faça o Movimento', description: 'Mexa a articulação escolhida conforme o limite da sua dor.', icon: '🦾', colorClass: 'bg-purple-50' }
+        ]}
+      />
+
       <AnimatePresence mode="wait">
         {phase === 'intro' && (
           <motion.div 

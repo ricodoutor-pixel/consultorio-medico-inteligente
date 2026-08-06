@@ -4,6 +4,7 @@
  */
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Heart, Camera, AlertTriangle, Share2, MessageCircle, RotateCw, Save, Brain, Activity, Gauge, Wind, Flame } from "lucide-react";
+import { ComicManual } from "./diagnostics/ComicManual";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -347,7 +348,19 @@ export default function MonitorCardiaco() {
     : "text-red-400";
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="flex flex-col w-full h-full bg-slate-50 relative overflow-hidden rounded-xl border border-border shadow-sm">
+      <ComicManual 
+        title="Como Fazer o Monitor Cardíaco"
+        icon={Heart}
+        brisaMessage="Vou medir seus batimentos e nível de estresse! Coloque o dedo na câmera de trás."
+        steps={[
+          { title: 'Dedo na Lente', description: 'Coloque a ponta do dedo indicador cobrindo a CÂMERA e o FLASH do celular.', icon: '👆', colorClass: 'bg-blue-50' },
+          { title: 'Não Aperte', description: 'Apoie suavemente, se apertar muito o sangue não circula.', icon: '🎈', colorClass: 'bg-green-50' },
+          { title: 'Fique Imóvel', description: 'Não mexa o dedo e fique em silêncio durante a contagem.', icon: '🤫', colorClass: 'bg-yellow-50' },
+          { title: 'Aguarde 30s', description: 'A luz vai piscar, é normal! A IA está captando suas ondas de pulso.', icon: '⏱️', colorClass: 'bg-red-50' }
+        ]}
+      />
+
       <video ref={videoRef} className="hidden" muted playsInline />
       <canvas ref={canvasRef} className="hidden" />
 

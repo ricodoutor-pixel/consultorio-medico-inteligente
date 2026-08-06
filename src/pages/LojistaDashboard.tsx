@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { TrendingUp, Package, AlertTriangle, Building2, UploadCloud, Plus, BookOpen } from "lucide-react";
+import { TrendingUp, Package, AlertTriangle, Building2, UploadCloud, Plus, BookOpen, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const demandData = [

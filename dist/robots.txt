@@ -30,6 +30,9 @@ Disallow: /admin-login
 Disallow: /dashboard-executivo
 Disallow: /prontuario
 Disallow: /ripd
+Disallow: /pagamento
+Disallow: /dashboard-especialista
+Disallow: /influenciadores
 Disallow: /health
 Disallow: /api
 Disallow: /private
@@ -58,6 +61,9 @@ Disallow: /admin
 Disallow: /admin-ceo
 Disallow: /admin-master
 Disallow: /admin-login
+Disallow: /pagamento
+Disallow: /dashboard-especialista
+Disallow: /influenciadores
 Disallow: /api
 Disallow: /private
 Crawl-delay: 1
@@ -119,6 +125,9 @@ Disallow: /admin-master
 Disallow: /admin-login
 Disallow: /dashboard-executivo
 Disallow: /prontuario
+Disallow: /pagamento
+Disallow: /dashboard-especialista
+Disallow: /influenciadores
 Disallow: /api
 Disallow: /private
 Disallow: /temp

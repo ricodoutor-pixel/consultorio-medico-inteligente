@@ -448,26 +448,26 @@ const Telemedicina = () => {
 
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label className="text-xs font-bold uppercase">Nome Completo</Label>
-                        <Input placeholder="Seu nome" value={patientData.nome} onChange={(e) => setPatientData({...patientData, nome: e.target.value})} className="h-12 rounded-xl" />
+                        <Label htmlFor="tele-nome" className="text-xs font-bold uppercase">Nome Completo</Label>
+                        <Input id="tele-nome" name="nome" placeholder="Seu nome" value={patientData.nome} onChange={(e) => setPatientData({...patientData, nome: e.target.value})} className="h-12 rounded-xl" />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div className="space-y-2">
-                          <Label className="text-xs font-bold uppercase">CPF</Label>
-                          <Input placeholder="000.000.000-00" value={patientData.cpf} onChange={(e) => setPatientData({...patientData, cpf: e.target.value})} className="h-12 rounded-xl" />
+                          <Label htmlFor="tele-cpf" className="text-xs font-bold uppercase">CPF</Label>
+                          <Input id="tele-cpf" name="cpf" placeholder="000.000.000-00" value={patientData.cpf} onChange={(e) => setPatientData({...patientData, cpf: e.target.value})} className="h-12 rounded-xl" />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-xs font-bold uppercase">Nascimento</Label>
-                          <Input type="date" value={patientData.dataNascimento} onChange={(e) => setPatientData({...patientData, dataNascimento: e.target.value})} className="h-12 rounded-xl" />
+                          <Label htmlFor="tele-nascimento" className="text-xs font-bold uppercase">Nascimento</Label>
+                          <Input id="tele-nascimento" name="nascimento" type="date" value={patientData.dataNascimento} onChange={(e) => setPatientData({...patientData, dataNascimento: e.target.value})} className="h-12 rounded-xl" />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-xs font-bold uppercase">WhatsApp</Label>
-                        <Input placeholder="(11) 99999-9999" value={patientData.telefone} onChange={(e) => setPatientData({...patientData, telefone: e.target.value})} className="h-12 rounded-xl" />
+                        <Label htmlFor="tele-whatsapp" className="text-xs font-bold uppercase">WhatsApp</Label>
+                        <Input id="tele-whatsapp" name="whatsapp" placeholder="(11) 99999-9999" value={patientData.telefone} onChange={(e) => setPatientData({...patientData, telefone: e.target.value})} className="h-12 rounded-xl" />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-xs font-bold uppercase">E-mail</Label>
-                        <Input placeholder="seu@email.com" value={patientData.email} onChange={(e) => setPatientData({...patientData, email: e.target.value})} className="h-12 rounded-xl" />
+                        <Label htmlFor="tele-email" className="text-xs font-bold uppercase">E-mail</Label>
+                        <Input id="tele-email" name="email" placeholder="seu@email.com" value={patientData.email} onChange={(e) => setPatientData({...patientData, email: e.target.value})} className="h-12 rounded-xl" />
                       </div>
                     </div>
                      <Button 

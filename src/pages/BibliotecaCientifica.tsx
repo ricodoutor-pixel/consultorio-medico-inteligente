@@ -186,7 +186,7 @@ const BibliotecaCientifica = () => {
             </div>
 
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-black text-foreground leading-tight mb-2">
-              Vamos crescer juntos 🌱
+              Biblioteca Científica de Cannabis Medicinal 🌱
             </h1>
 
             <h2 className="text-lg md:text-2xl font-display font-bold text-primary leading-tight mb-4">
@@ -343,6 +343,7 @@ const BibliotecaCientifica = () => {
             </p>
             <div className="flex items-center gap-2">
               <select
+                aria-label="Ordenar resultados da biblioteca"
                 value={sortMode}
                 onChange={(e) => setSortMode(e.target.value as SortMode)}
                 className="text-xs bg-card border border-border rounded-lg px-2 py-1.5 text-muted-foreground font-bold focus:outline-none focus:border-primary/30"
@@ -354,12 +355,14 @@ const BibliotecaCientifica = () => {
               </select>
               <div className="flex gap-1 border border-border rounded-lg p-0.5">
                 <button
+                  aria-label="Visualizar em grade"
                   onClick={() => setViewMode("grid")}
                   className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "bg-primary/20 text-primary" : "text-muted-foreground"}`}
                 >
                   <Grid3X3 size={14} />
                 </button>
                 <button
+                  aria-label="Visualizar em lista"
                   onClick={() => setViewMode("list")}
                   className={`p-1.5 rounded-md transition-colors ${viewMode === "list" ? "bg-primary/20 text-primary" : "text-muted-foreground"}`}
                 >

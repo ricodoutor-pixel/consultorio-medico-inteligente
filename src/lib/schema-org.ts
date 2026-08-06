@@ -353,6 +353,87 @@ export function buildBreadcrumbSchema(pathname: string): SchemaOrgConfig {
   };
 }
 
+
+/**
+ * Product JSON-LD — usado nas páginas de produto do Shopping
+ */
+export function buildProductSchema(product: {
+  id: string;
+  name: string;
+  description?: string;
+  image?: string;
+  price?: string;
+  brand?: string;
+}): SchemaOrgConfig {
+  const priceNumber = (product.price || '').replace(/[^\d,]/g, '').replace(',', '.');
+  return {
+    type: 'Article',
+    data: {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: product.name,
+      description: product.description || `${product.name} — produto canabinoide disponível via farmácias parceiras autorizadas pela ANVISA.`,
+      image: product.image?.startsWith('http')
+        ? product.image
+        : `https://plantayraiz.com.br${product.image || '/dr-verdinho-512.png'}`,
+      brand: { '@type': 'Brand', name: product.brand || 'Planta y Raiz' },
+      url: `https://plantayraiz.com.br/shopping/${product.id}`,
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'BRL',
+        price: priceNumber || undefined,
+        availability: 'https://schema.org/InStock',
+        url: `https://plantayraiz.com.br/shopping/${product.id}`,
+      },
+    },
+  };
+}
+
+/**
+ * CollectionPage JSON-LD — listagens (Shopping, Profissionais, Biblioteca)
+ */
+export function buildCollectionPageSchema(opts: {
+  name: string;
+  description: string;
+  path: string;
+}): SchemaOrgConfig {
+  return {
+    type: 'Article',
+    data: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: opts.name,
+      description: opts.description,
+      url: `https://plantayraiz.com.br${opts.path}`,
+      isPartOf: { '@id': 'https://plantayraiz.com.br/#org' },
+    },
+  };
+}
+
+/**
+ * BlogPosting / Article JSON-LD por rota editorial
+ */
+export function buildBlogPostingSchema(opts: {
+  headline: string;
+  description: string;
+  path: string;
+}): SchemaOrgConfig {
+  return {
+    type: 'Article',
+    data: {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: opts.headline,
+      description: opts.description,
+      mainEntityOfPage: `https://plantayraiz.com.br${opts.path}`,
+      image: 'https://plantayraiz.com.br/dr-verdinho-512.png',
+      author: { '@type': 'Organization', name: 'Planta y Raiz', url: 'https://plantayraiz.com.br' },
+      publisher: { '@id': 'https://plantayraiz.com.br/#org' },
+      inLanguage: 'pt-BR',
+    },
+  };
+}
+
 /**
  * Gera tags Schema.org JSON-LD para HTML head
  */
@@ -382,7 +463,56 @@ export function getSchemaOrgByRoute(pathname: string): SchemaOrgConfig[] {
     return [...baseSchemas, articleSchema];
   }
   if (pathname.includes('/biblioteca')) {
-    return [...baseSchemas, articleSchema];
+    return [
+      ...baseSchemas,
+      articleSchema,
+      buildCollectionPageSchema({
+        name: 'Biblioteca Científica de Cannabis Medicinal',
+        description: 'Estudos, artigos e evidências científicas sobre cannabis medicinal, CBD e THC.',
+        path: '/biblioteca',
+      }),
+    ];
+  }
+  if (pathname === '/shopping') {
+    return [
+      ...baseSchemas,
+      buildCollectionPageSchema({
+        name: 'Shopping de Produtos Canabinoides',
+        description: 'Produtos de cannabis medicinal disponíveis via farmácias parceiras autorizadas pela ANVISA.',
+        path: '/shopping',
+      }),
+    ];
+  }
+  if (pathname === '/profissionais') {
+    return [
+      ...baseSchemas,
+      buildCollectionPageSchema({
+        name: 'Médicos Prescritores de Cannabis Medicinal',
+        description: 'Profissionais verificados por CRM que prescrevem cannabis medicinal por telemedicina.',
+        path: '/profissionais',
+      }),
+    ];
+  }
+  if (pathname === '/blog' || pathname.startsWith('/blog/')) {
+    return [
+      ...baseSchemas,
+      buildBlogPostingSchema({
+        headline: 'Blog de Cannabis Medicinal — Planta y Raiz',
+        description: 'Artigos, notícias regulatórias e conteúdo clínico sobre cannabis medicinal, CBD e THC.',
+        path: pathname,
+      }),
+    ];
+  }
+  if (pathname.startsWith('/tratamento')) {
+    const label = pathname.replace(/^\//, '').replace(/-/g, ' ');
+    return [
+      ...baseSchemas,
+      buildBlogPostingSchema({
+        headline: `Cannabis medicinal — ${label}`,
+        description: `Indicações, evidências e como iniciar o tratamento com cannabis medicinal (${label}).`,
+        path: pathname,
+      }),
+    ];
   }
 
   return baseSchemas;

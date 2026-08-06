@@ -18,8 +18,9 @@ const AuscultaPulmonar = lazy(() => import('@/components/diagnostics/AuscultaPul
 const TremorometriaDigital = lazy(() => import('@/components/diagnostics/TremorometriaDigital').then(m => ({ default: m.TremorometriaDigital })));
 const ColorimetriaUrinaria = lazy(() => import('@/components/diagnostics/ColorimetriaUrinaria').then(m => ({ default: m.ColorimetriaUrinaria })));
 const AcuidadeVisual = lazy(() => import('@/components/diagnostics/AcuidadeVisual').then(m => ({ default: m.AcuidadeVisual })));
+const AtividadeFisicaGPS = lazy(() => import('@/components/diagnostics/AtividadeFisicaGPS').then(m => ({ default: m.AtividadeFisicaGPS })));
 
-type ActiveTool = null | 'cardiaco' | 'fundoscopia' | 'oximetria' | 'dermatoscopia' | 'mobilidade' | 'estetoscopio' | 'pulmonar' | 'tremor' | 'urine' | 'acuity';
+type ActiveTool = null | 'cardiaco' | 'fundoscopia' | 'oximetria' | 'dermatoscopia' | 'mobilidade' | 'estetoscopio' | 'pulmonar' | 'tremor' | 'urine' | 'acuity' | 'gps';
 
 const tools = [
   {
@@ -122,6 +123,16 @@ const tools = [
     borderHover: 'hover:border-teal-300',
     tag: 'Optotipos',
   },
+  {
+    id: 'gps' as ActiveTool,
+    title: 'Rastreador GPS Cardíaco',
+    description: 'Monitoramento ao ar livre com satélite e calorias',
+    icon: Activity,
+    iconColor: 'text-indigo-500',
+    bgGlow: 'from-indigo-500/10 to-indigo-500/5',
+    borderHover: 'hover:border-indigo-300',
+    tag: 'Satélite & Haversine',
+  },
 ];
 
 export default function MonitoramentoSaude() {
@@ -149,6 +160,8 @@ export default function MonitoramentoSaude() {
         return <ColorimetriaUrinaria />;
       case 'acuity':
         return <AcuidadeVisual />;
+      case 'gps':
+        return <AtividadeFisicaGPS />;
       default:
         return null;
     }

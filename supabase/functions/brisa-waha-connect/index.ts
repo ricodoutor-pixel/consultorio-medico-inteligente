@@ -115,6 +115,11 @@ const webhookPayload = (sessionName: string) => ({
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
 
+  // 🔐 Painel de controle do bot: só service-role / cron secret
+  const unauth = requireServiceAuth(req, cors);
+  if (unauth) return unauth;
+
+
   const url    = new URL(req.url);
   const action = url.searchParams.get('action') || 'status';
 

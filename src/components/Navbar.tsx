@@ -88,12 +88,11 @@ export const Navbar = () => {
     return name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
   };
 
-  // Links primários sempre visíveis no desktop (enxuto p/ caber confortável)
   const primaryLinks = [
     { to: "/", label: "Início" },
     { to: "/profissionais", label: "Profissionais" },
     { to: "/telemedicina", label: "Telemedicina" },
-    { to: "/monitor-cardiaco", label: "Monitoramento" },
+    { to: "/monitoramento-saude", label: "Monitoramento" },
     { to: "/shopping", label: "Shopping" },
     { to: "/planos", label: "Planos" },
   ];

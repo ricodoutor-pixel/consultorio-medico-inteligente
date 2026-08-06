@@ -83,6 +83,15 @@ const TOOLS_ACTIONS: ActionItem[] = [
     iconColor: "text-rose-400",
   },
   {
+    emoji: "🤖",
+    label: "Monitoramento IA",
+    desc: "Exames com IA (Olho, Pele, SpO2)",
+    icon: Zap,
+    to: "/monitoramento-saude",
+    gradient: "from-emerald-500/15 to-emerald-500/5",
+    iconColor: "text-emerald-400",
+  },
+  {
     emoji: "📚",
     label: "E-book Gratuito",
     desc: "Baixe em 1 clique",

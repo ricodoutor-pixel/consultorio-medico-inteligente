@@ -186,12 +186,14 @@ const ImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
       {validImgs.length > 1 && (
         <>
           <button
+            aria-label="Imagem anterior do produto"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIdx((idx - 1 + validImgs.length) % validImgs.length); }}
             className="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:bg-background"
           >
             <ChevronLeft size={14} />
           </button>
           <button
+            aria-label="Próxima imagem do produto"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIdx((idx + 1) % validImgs.length); }}
             className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:bg-background"
           >
@@ -666,7 +668,7 @@ const Shopping = () => {
                                 </p>
 
                                 <Link to={`/shopping/${p.id}`}>
-                                  <h3 className="font-bold text-foreground hover:text-primary transition-colors text-[11px] sm:text-xs line-clamp-2 min-h-[2.2em] leading-tight mb-1">
+                                  <h2 className="font-bold text-foreground hover:text-primary transition-colors text-[11px] sm:text-xs line-clamp-2 min-h-[2.2em] leading-tight mb-1">
                                     {p.name}
                                   </h3>
                                 </Link>
@@ -712,7 +714,7 @@ const Shopping = () => {
                                     <div className="min-w-0 flex-1">
                                       <p className="text-[8px] sm:text-[9px] text-muted-foreground mb-0.5 flex items-center gap-1"><Store size={9} className="text-primary" /> {vendorName}</p>
                                       <Link to={`/shopping/${p.id}`}>
-                                        <h3 className="font-bold text-foreground hover:text-primary transition-colors text-xs sm:text-sm mb-0.5 line-clamp-1">{p.name}</h3>
+                                        <h2 className="font-bold text-foreground hover:text-primary transition-colors text-xs sm:text-sm mb-0.5 line-clamp-1">{p.name}</h2>
                                       </Link>
                                       {p.endorsed_by_doctor && <div className="mt-1"><DoctorEndorsedBadge compact /></div>}
                                       {p.as_anvisa && <div className="mt-1"><AnvisaBadge compact registration={p.as_anvisa} /></div>}

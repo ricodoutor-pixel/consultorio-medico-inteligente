@@ -670,7 +670,7 @@ const Shopping = () => {
                                 <Link to={`/shopping/${p.id}`}>
                                   <h2 className="font-bold text-foreground hover:text-primary transition-colors text-[11px] sm:text-xs line-clamp-2 min-h-[2.2em] leading-tight mb-1">
                                     {p.name}
-                                  </h3>
+                                  </h2>
                                 </Link>
 
                                 <div className="flex items-center gap-0.5 mb-1">

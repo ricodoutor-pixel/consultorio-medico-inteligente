@@ -1,7 +1,7 @@
 import React, { useState, Suspense, lazy } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Stethoscope, ArrowLeft, X, Brain, Shield, Pill, Sparkles } from 'lucide-react';
+import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Stethoscope, ArrowLeft, X, Brain, Shield, Pill, Sparkles, Wind } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Navbar } from '@/components/Navbar';
@@ -14,8 +14,9 @@ const OximetriaOptica = lazy(() => import('@/components/diagnostics/OximetriaOpt
 const DermatoscopiaDigital = lazy(() => import('@/components/diagnostics/DermatoscopiaDigital').then(m => ({ default: m.DermatoscopiaDigital })));
 const AvaliacaoMobilidade = lazy(() => import('@/components/diagnostics/AvaliacaoMobilidade').then(m => ({ default: m.AvaliacaoMobilidade })));
 const EstetoscopioDigital = lazy(() => import('@/components/diagnostics/EstetoscopioDigital').then(m => ({ default: m.EstetoscopioDigital })));
+const AuscultaPulmonar = lazy(() => import('@/components/diagnostics/AuscultaPulmonar').then(m => ({ default: m.AuscultaPulmonar })));
 
-type ActiveTool = null | 'cardiaco' | 'fundoscopia' | 'oximetria' | 'dermatoscopia' | 'mobilidade' | 'estetoscopio';
+type ActiveTool = null | 'cardiaco' | 'fundoscopia' | 'oximetria' | 'dermatoscopia' | 'mobilidade' | 'estetoscopio' | 'pulmonar';
 
 const tools = [
   {
@@ -78,6 +79,16 @@ const tools = [
     borderHover: 'hover:border-emerald-300',
     tag: '🎙️ Áudio + Gemini IA',
   },
+  {
+    id: 'pulmonar' as ActiveTool,
+    title: 'Ausculta Pulmonar IA',
+    description: 'Análise de sons respiratórios via microfone',
+    icon: Wind,
+    iconColor: 'text-cyan-500',
+    bgGlow: 'from-cyan-500/10 to-cyan-500/5',
+    borderHover: 'hover:border-cyan-300',
+    tag: '🌬️ Respiração + Gemini IA',
+  },
 ];
 
 export default function MonitoramentoSaude() {
@@ -97,6 +108,8 @@ export default function MonitoramentoSaude() {
         return <AvaliacaoMobilidade onComplete={() => setActiveTool(null)} />;
       case 'estetoscopio':
         return <EstetoscopioDigital />;
+      case 'pulmonar':
+        return <AuscultaPulmonar />;
       default:
         return null;
     }

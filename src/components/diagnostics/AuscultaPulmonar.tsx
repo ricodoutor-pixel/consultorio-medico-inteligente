@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mic, Square, Volume2, AlertTriangle, Info, BookOpen, Stethoscope, Loader2, Activity } from "lucide-react";
+import { Mic, Square, Volume2, AlertTriangle, Info, BookOpen, Wind, Loader2, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-export const EstetoscopioDigital = () => {
+export const AuscultaPulmonar = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -79,12 +79,12 @@ export const EstetoscopioDigital = () => {
       setResult(null);
       setTimer(0);
       
-      // Encorajamento inicial
-      speakBrisa("Agora sim consigo escutar seu coração. Por favor, deixe o celular encostado no peito, fique em silêncio absoluto e aguarde alguns segundos.");
+      // Encorajamento inicial (Ausculta Pulmonar)
+      speakBrisa("Vamos escutar seus pulmões. Por favor, encoste o celular nas costas, respire fundo pela boca e depois repita a palavra trinta e três.");
       
       timerIntervalRef.current = setInterval(() => {
         setTimer(prev => {
-          if (prev >= 15) {
+          if (prev >= 20) { // Aumentado para 20 segundos
             stopRecording();
             return prev;
           }
@@ -123,11 +123,11 @@ export const EstetoscopioDigital = () => {
 
   const processAudio = async (blob: Blob) => {
     setIsProcessing(true);
-    speakBrisa("Muito bem, estou cruzando os dados do seu áudio com nosso banco de dados cardiológico. Um momento por favor.");
+    speakBrisa("Muito bem, estou analisando o fluxo de ar nos seus pulmões. Aguarde um instante.");
     
     try {
       const base64 = await blobToBase64(blob);
-      const { data, error } = await supabase.functions.invoke('analyze-heart-sound', {
+      const { data, error } = await supabase.functions.invoke('analyze-lung-sound', {
         body: { 
           audioBase64: base64,
           mimeType: blob.type
@@ -146,7 +146,7 @@ export const EstetoscopioDigital = () => {
       if (session?.session?.user) {
         await supabase.from('diagnostic_exams').insert({
           user_id: session.session.user.id,
-          exam_type: 'cardiac',
+          exam_type: 'pulmonary',
           ai_diagnosis: data,
           risk_level: data.isDangerous ? 'alto' : 'baixo'
         });
@@ -165,8 +165,8 @@ export const EstetoscopioDigital = () => {
         {/* Panel 1 */}
         <div className="border-4 border-black rounded-lg p-4 bg-yellow-50 relative shadow-[4px_4px_0px_rgba(0,0,0,1)]">
           <div className="absolute -top-3 -left-3 bg-red-500 text-white font-black px-3 py-1 rounded-full border-2 border-black rotate-[-5deg]">PASSO 1</div>
-          <h3 className="font-black text-xl mb-2 mt-2 uppercase tracking-tight">Prepare o Ambiente!</h3>
-          <p className="font-bold leading-tight">Vá para um quarto totalmente silencioso. Desligue a TV, ventilador e rádio.</p>
+          <h3 className="font-black text-xl mb-2 mt-2 uppercase tracking-tight">Silêncio Total!</h3>
+          <p className="font-bold leading-tight">Vá para um ambiente totalmente silencioso. A respiração é um som muito sutil.</p>
           <div className="mt-4 flex justify-center">
             <span className="text-6xl">🤫</span>
           </div>
@@ -175,8 +175,8 @@ export const EstetoscopioDigital = () => {
         {/* Panel 2 */}
         <div className="border-4 border-black rounded-lg p-4 bg-blue-50 relative shadow-[4px_4px_0px_rgba(0,0,0,1)]">
           <div className="absolute -top-3 -left-3 bg-red-500 text-white font-black px-3 py-1 rounded-full border-2 border-black rotate-[-5deg]">PASSO 2</div>
-          <h3 className="font-black text-xl mb-2 mt-2 uppercase tracking-tight">Tire a Capinha!</h3>
-          <p className="font-bold leading-tight">Remova a capa de proteção do celular. Ela abafa o som fraco do coração.</p>
+          <h3 className="font-black text-xl mb-2 mt-2 uppercase tracking-tight">Capa de Celular? Não!</h3>
+          <p className="font-bold leading-tight">Tire a capinha para o microfone ficar livre. Encoste-o diretamente nas suas costas ou peito.</p>
           <div className="mt-4 flex justify-center">
             <span className="text-6xl">📱</span>
           </div>
@@ -185,24 +185,24 @@ export const EstetoscopioDigital = () => {
         {/* Panel 3 */}
         <div className="border-4 border-black rounded-lg p-4 bg-green-50 relative shadow-[4px_4px_0px_rgba(0,0,0,1)]">
           <div className="absolute -top-3 -left-3 bg-red-500 text-white font-black px-3 py-1 rounded-full border-2 border-black rotate-[-5deg]">PASSO 3</div>
-          <h3 className="font-black text-xl mb-2 mt-2 uppercase tracking-tight">Posicione no Peito!</h3>
-          <p className="font-bold leading-tight">Encoste o microfone do celular (parte de baixo) DIRETAMENTE na pele do peito esquerdo.</p>
+          <h3 className="font-black text-xl mb-2 mt-2 uppercase tracking-tight">Respire Fundo (Boca Aberta)</h3>
+          <p className="font-bold leading-tight">Ao gravar, inspire e expire com a BOCA ABERTA de forma constante.</p>
           <div className="mt-4 flex justify-center">
-            <span className="text-6xl">🫀</span>
+            <span className="text-6xl">😮‍💨</span>
           </div>
         </div>
 
         {/* Panel 4 */}
         <div className="border-4 border-black rounded-lg p-4 bg-purple-50 relative shadow-[4px_4px_0px_rgba(0,0,0,1)]">
           <div className="absolute -top-3 -left-3 bg-red-500 text-white font-black px-3 py-1 rounded-full border-2 border-black rotate-[-5deg]">PASSO 4</div>
-          <h3 className="font-black text-xl mb-2 mt-2 uppercase tracking-tight">Grave sem Falar!</h3>
-          <p className="font-bold leading-tight">Aperte gravar, respire calmamente e NÃO FALE por 15 segundos.</p>
+          <h3 className="font-black text-xl mb-2 mt-2 uppercase tracking-tight">Teste da Voz</h3>
+          <p className="font-bold leading-tight">Diga "Trinta e Três" enquanto grava, para a IA analisar a ressonância do som no pulmão.</p>
           <div className="mt-4 flex justify-center">
-            <span className="text-6xl">⏳</span>
+            <span className="text-6xl">🗣️</span>
           </div>
         </div>
         {/* Panel 5 */}
-        <div className="border-4 border-black rounded-lg p-4 bg-emerald-50 relative shadow-[4px_4px_0px_rgba(0,0,0,1)] md:col-span-2">
+        <div className="border-4 border-black rounded-lg p-4 bg-cyan-50 relative shadow-[4px_4px_0px_rgba(0,0,0,1)] md:col-span-2">
           <div className="absolute -top-3 -left-3 bg-red-500 text-white font-black px-3 py-1 rounded-full border-2 border-black rotate-[-5deg]">DICA DE OURO</div>
           <h3 className="font-black text-xl mb-2 mt-2 uppercase tracking-tight text-center">Microfone Externo</h3>
           <p className="font-bold leading-tight text-center">Para obter o melhor resultado e a avaliação mais precisa possível, conecte um fone de ouvido com microfone ou um microfone de lapela ao seu celular!</p>
@@ -214,19 +214,19 @@ export const EstetoscopioDigital = () => {
       </div>
       
       <div className="bg-primary text-primary-foreground p-4 rounded-xl border-4 border-black font-black flex items-center gap-3">
-        <Stethoscope className="w-12 h-12" />
-        <p className="leading-tight text-lg">A Enfermeira Brisa vai te orientar por voz. Deixe o volume do celular alto!</p>
+        <Wind className="w-12 h-12" />
+        <p className="leading-tight text-lg">A Enfermeira Brisa vai te dar as instruções. O áudio será captado por 20 segundos!</p>
       </div>
     </div>
   );
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-xl border-primary/20 overflow-hidden relative">
-      <CardHeader className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-border">
+      <CardHeader className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-b border-border">
         <div className="flex justify-between items-center">
-          <CardTitle className="flex items-center gap-2 text-2xl font-black text-emerald-700 dark:text-emerald-400">
-            <Stethoscope className="w-8 h-8 text-emerald-500" />
-            Estetoscópio Digital IA
+          <CardTitle className="flex items-center gap-2 text-2xl font-black text-cyan-700 dark:text-cyan-400">
+            <Wind className="w-8 h-8 text-cyan-500" />
+            Ausculta Pulmonar IA
           </CardTitle>
           <Dialog open={showHowItWorks} onOpenChange={setShowHowItWorks}>
             <DialogTrigger asChild>
@@ -236,7 +236,7 @@ export const EstetoscopioDigital = () => {
             </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto border-4 border-black rounded-2xl">
               <DialogHeader>
-                <DialogTitle className="text-3xl font-black uppercase text-center mb-4 text-emerald-600 font-comic">Manual do Estetoscópio Digital</DialogTitle>
+                <DialogTitle className="text-3xl font-black uppercase text-center mb-4 text-cyan-600 font-comic">Manual de Ausculta Pulmonar</DialogTitle>
               </DialogHeader>
               {renderComicManual()}
             </DialogContent>
@@ -253,16 +253,16 @@ export const EstetoscopioDigital = () => {
               <Button 
                 size="lg" 
                 onClick={startRecording}
-                className="w-32 h-32 rounded-full shadow-[0_0_40px_rgba(16,185,129,0.3)] bg-gradient-to-br from-emerald-500 to-emerald-700 hover:scale-105 transition-all text-white border-4 border-emerald-300"
+                className="w-32 h-32 rounded-full shadow-[0_0_40px_rgba(6,182,212,0.3)] bg-gradient-to-br from-cyan-500 to-blue-600 hover:scale-105 transition-all text-white border-4 border-cyan-300"
               >
                 <Mic className="w-12 h-12" />
               </Button>
-              <h3 className="mt-6 text-xl font-black text-center text-foreground">Aperte para Iniciar a Avaliação</h3>
-              <p className="text-muted-foreground text-center mt-2 max-w-xs font-medium">Você precisa estar em um ambiente silencioso e colocar o celular colado ao peito.</p>
+              <h3 className="mt-6 text-xl font-black text-center text-foreground">Aperte para Iniciar Ausculta</h3>
+              <p className="text-muted-foreground text-center mt-2 max-w-xs font-medium">Você precisa estar em silêncio. Respire fundo e fale 'Trinta e Três'.</p>
               
-              <div className="mt-6 bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex items-start gap-3 max-w-sm">
-                <Info className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm font-semibold text-emerald-800 leading-tight">
+              <div className="mt-6 bg-cyan-50 border border-cyan-200 p-3 rounded-xl flex items-start gap-3 max-w-sm">
+                <Info className="w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm font-semibold text-cyan-800 leading-tight">
                   Dica da Brisa: Para um resultado muito mais preciso, conecte um microfone externo (de lapela ou fone de ouvido) ao seu celular!
                 </p>
               </div>
@@ -281,41 +281,41 @@ export const EstetoscopioDigital = () => {
                   <Square className="w-12 h-12" />
                 </Button>
               </div>
-              <h3 className="mt-6 text-2xl font-black text-red-500 animate-pulse">Gravando e Analisando...</h3>
+              <h3 className="mt-6 text-2xl font-black text-red-500 animate-pulse">Ouvindo os Pulmões...</h3>
               
               {/* Cronômetro */}
               <div className="mt-4 text-4xl font-black font-mono bg-background px-6 py-2 rounded-xl border-2 border-red-500/30 text-foreground">
-                00:{timer.toString().padStart(2, '0')}
+                00:{timer.toString().padStart(2, '0')} / 20
               </div>
               
               <div className="mt-4 flex items-center gap-2 text-muted-foreground font-bold bg-muted px-4 py-2 rounded-full">
-                <Volume2 className="w-5 h-5 animate-pulse" /> Captando frequências (20Hz-200Hz)...
+                <Volume2 className="w-5 h-5 animate-pulse" /> Captando ruídos adventícios...
               </div>
             </motion.div>
           )}
 
           {isProcessing && (
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center">
-              <div className="w-32 h-32 flex items-center justify-center rounded-full bg-blue-500/10 border-4 border-blue-500 border-t-transparent animate-spin">
-                <Activity className="w-12 h-12 text-blue-500 animate-bounce" />
+              <div className="w-32 h-32 flex items-center justify-center rounded-full bg-cyan-500/10 border-4 border-cyan-500 border-t-transparent animate-spin">
+                <Wind className="w-12 h-12 text-cyan-500 animate-bounce" />
               </div>
-              <h3 className="mt-6 text-xl font-black text-blue-600 text-center">Processando Sinais...</h3>
-              <p className="text-muted-foreground font-medium text-center mt-2">Brisa está cruzando seu áudio com bancos de dados globais de cardiologia.</p>
+              <h3 className="mt-6 text-xl font-black text-cyan-600 text-center">Processando Sinais...</h3>
+              <p className="text-muted-foreground font-medium text-center mt-2">Brisa está cruzando seu áudio com bancos de pneumologia.</p>
             </motion.div>
           )}
 
           {result && !isProcessing && (
              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full">
                <div className="flex justify-between items-center mb-4">
-                 <h3 className="text-2xl font-black text-emerald-700">Resultado da Avaliação</h3>
+                 <h3 className="text-2xl font-black text-cyan-700">Resultado da Avaliação</h3>
                  <Button variant="outline" size="sm" onClick={() => setResult(null)} className="font-bold border-2 rounded-xl">Novo Exame</Button>
                </div>
                
-               <div className={`p-5 rounded-2xl border-l-8 shadow-sm ${result.isDangerous ? 'bg-red-50 border-red-500' : 'bg-emerald-50 border-emerald-500'}`}>
+               <div className={`p-5 rounded-2xl border-l-8 shadow-sm ${result.isDangerous ? 'bg-red-50 border-red-500' : 'bg-cyan-50 border-cyan-500'}`}>
                  <div className="flex items-start gap-3">
-                   {result.isDangerous ? <AlertTriangle className="w-8 h-8 text-red-500 flex-shrink-0 mt-1" /> : <Activity className="w-8 h-8 text-emerald-500 flex-shrink-0 mt-1" />}
+                   {result.isDangerous ? <AlertTriangle className="w-8 h-8 text-red-500 flex-shrink-0 mt-1" /> : <Activity className="w-8 h-8 text-cyan-500 flex-shrink-0 mt-1" />}
                    <div>
-                     <h4 className={`font-black text-lg ${result.isDangerous ? 'text-red-700' : 'text-emerald-700'}`}>
+                     <h4 className={`font-black text-lg ${result.isDangerous ? 'text-red-700' : 'text-cyan-700'}`}>
                        {result.isDangerous ? 'Atenção Necessária' : 'Achados Clínicos'}
                      </h4>
                      <p className="text-gray-700 font-medium mt-1 leading-relaxed">{result.diagnosis}</p>
@@ -353,8 +353,8 @@ export const EstetoscopioDigital = () => {
                 </div>
                 <div className="flex-1 flex flex-col justify-center">
                   <p className="font-black text-lg md:text-xl text-black leading-tight italic">
-                    {isRecording && "Agora sim consigo escutar seu coração! Fique na mesma posição, em silêncio..."}
-                    {isProcessing && "Quase lá! Cruzando os dados vitais..."}
+                    {isRecording && "Lembre-se: respire fundo pela boca e fale trinta e três..."}
+                    {isProcessing && "Quase lá! Analisando o fluxo de ar..."}
                     {result && result.brisaSpeech}
                   </p>
                   {result && (

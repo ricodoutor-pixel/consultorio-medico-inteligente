@@ -94,6 +94,7 @@ const SaudeDigital = lazyWithRecovery(() => import("./pages/SaudeDigital"), { so
 const DashboardPaciente = lazyWithRecovery(() => import("./pages/DashboardPaciente"), { sourceRef: "/dashboard" });
 const Prontuario = lazyWithRecovery(() => import("./pages/Prontuario"), { sourceRef: "/prontuario" });
 const DashboardMedico = lazyWithRecovery(() => import("./pages/DashboardMedico"), { sourceRef: "/dashboard-medico" });
+const ProntuarioInteligente = lazyWithRecovery(() => import("./pages/medico/ProntuarioInteligente").then(m => ({ default: m.ProntuarioInteligente })), { sourceRef: "/medico/prontuario" });
 const WorkspaceMedico = lazyWithRecovery(() => import("./pages/WorkspaceMedico"), { sourceRef: "/workspace-medico" });
 const DashboardExecutivo = lazyWithRecovery(() => import("./pages/DashboardExecutivo"), { sourceRef: "/dashboard-executivo" });
 const Notificacoes = lazyWithRecovery(() => import("./pages/Notificacoes"), { sourceRef: "/notificacoes" });
@@ -317,7 +318,8 @@ const App = () => (
                 <Route path="/comunidade" element={<ComunidadeConteudoIA />} />
                 <Route path="/dashboard" element={<DashboardPaciente />} />
                 <Route path="/telemedicina-assincrona" element={<PrivateRoute><TelemedicinaAssincrona /></PrivateRoute>} />
-                <Route path="/dashboard-medico" element={<PrivateRoute><DashboardMedico /></PrivateRoute>} />
+                <Route path="/medico/prontuario" element={<PrivateRoute><ProntuarioInteligente /></PrivateRoute>} />
+              <Route path="/dashboard-medico" element={<PrivateRoute><DashboardMedico /></PrivateRoute>} />
                 <Route path="/workspace-medico" element={<PrivateRoute><WorkspaceMedico /></PrivateRoute>} />
                 <Route path="/dashboard-afiliado" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
                 <Route path="/afiliados" element={<PrivateRoute><AfiliadosGamificado /></PrivateRoute>} />

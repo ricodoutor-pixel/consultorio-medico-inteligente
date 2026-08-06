@@ -17,6 +17,7 @@ export const AuscultaPulmonar = () => {
     brisaSpeech: string;
   } | null>(null);
   const [timer, setTimer] = useState(0);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -25,14 +26,39 @@ export const AuscultaPulmonar = () => {
   
   // Clean up on unmount
   useEffect(() => {
+    checkPermissionsAndAutoStart();
     return () => {
-      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-        mediaRecorderRef.current.stop();
-      }
+      stopRecording();
       speechSynthesis.cancel();
     };
   }, []);
+
+  const checkPermissionsAndAutoStart = async () => {
+    try {
+      const permission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      if (permission.state === 'granted') {
+        startCountdown();
+      }
+    } catch (e) {
+      console.log('Permissions API not supported or mic not queryable', e);
+    }
+  };
+
+  const startCountdown = () => {
+    setCountdown(3);
+    speakBrisa("Permissão reconhecida. O exame iniciará em 3 segundos. Posicione-se.");
+    
+    let currentCount = 3;
+    const interval = setInterval(() => {
+      currentCount -= 1;
+      setCountdown(currentCount);
+      if (currentCount <= 0) {
+        clearInterval(interval);
+        setCountdown(null);
+        startRecording(true); // pass true to avoid speaking the prompt again
+      }
+    }, 1000);
+  };
 
   const speakBrisa = (text: string) => {
     speechSynthesis.cancel();
@@ -43,7 +69,7 @@ export const AuscultaPulmonar = () => {
     speechSynthesis.speak(utterance);
   };
 
-  const startRecording = async () => {
+  const startRecording = async (isAuto = false) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
@@ -80,7 +106,11 @@ export const AuscultaPulmonar = () => {
       setTimer(0);
       
       // Encorajamento inicial (Ausculta Pulmonar)
-      speakBrisa("Vamos escutar seus pulmões. Por favor, encoste o celular nas costas, respire fundo pela boca e depois repita a palavra trinta e três.");
+      if (!isAuto) {
+        speakBrisa("Vamos escutar seus pulmões. Por favor, encoste o celular nas costas, respire fundo pela boca e depois repita a palavra trinta e três.");
+      } else {
+        speakBrisa("Iniciando gravação. Fale trinta e três.");
+      }
       
       timerIntervalRef.current = setInterval(() => {
         setTimer(prev => {
@@ -248,7 +278,17 @@ export const AuscultaPulmonar = () => {
         {/* Área de Gravação */}
         <div className="flex flex-col items-center justify-center p-8 border-4 border-dashed border-muted rounded-3xl bg-muted/30">
           
-          {!isRecording && !isProcessing && !result && (
+          {countdown !== null && (
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center">
+              <div className="w-32 h-32 flex items-center justify-center rounded-full bg-cyan-500 text-white text-6xl font-black shadow-[0_0_40px_rgba(6,182,212,0.6)] animate-pulse">
+                {countdown}
+              </div>
+              <h3 className="mt-6 text-2xl font-black text-cyan-600 text-center">Iniciando Automaticamente...</h3>
+              <p className="text-muted-foreground font-medium text-center mt-2">Posicione-se, o microfone já está liberado.</p>
+            </motion.div>
+          )}
+
+          {!isRecording && !isProcessing && !result && countdown === null && (
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center">
               <Button 
                 size="lg" 
@@ -353,6 +393,7 @@ export const AuscultaPulmonar = () => {
                 </div>
                 <div className="flex-1 flex flex-col justify-center">
                   <p className="font-black text-lg md:text-xl text-black leading-tight italic">
+                    {countdown !== null && "Permissão reconhecida, vamos iniciar!"}
                     {isRecording && "Lembre-se: respire fundo pela boca e fale trinta e três..."}
                     {isProcessing && "Quase lá! Analisando o fluxo de ar..."}
                     {result && result.brisaSpeech}

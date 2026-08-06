@@ -1,7 +1,7 @@
 import React, { useState, Suspense, lazy } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Stethoscope, ArrowLeft, X, Brain, Shield, Pill, Sparkles, Wind } from 'lucide-react';
+import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Stethoscope, ArrowLeft, X, Brain, Shield, Pill, Sparkles, Wind, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Navbar } from '@/components/Navbar';
@@ -254,6 +254,16 @@ export default function MonitoramentoSaude() {
                         <p className="text-[11px] text-muted-foreground">Receba um parecer técnico com patologias detectadas, recomendações e conexão com cannabis medicinal.</p>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="flex justify-center mt-8">
+                    <Button 
+                      size="lg" 
+                      className="bg-primary text-primary-foreground font-black border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_rgba(0,0,0,1)] transition-all gap-2"
+                      onClick={() => navigate('/relatorio-paciente')}
+                    >
+                      <FileText className="w-5 h-5" /> Baixar Meu Relatório Clínico (PDF)
+                    </Button>
                   </div>
                 </div>
 

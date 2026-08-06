@@ -247,6 +247,16 @@ async function sendTwilioWhatsApp(phone: string, text: string): Promise<{ ok: bo
   };
 }
 
+
+// 🔐 Verificação do segredo compartilhado do webhook (anti-spoof)
+const WAHA_WEBHOOK_SECRET = Deno.env.get("WAHA_WEBHOOK_SECRET") || "";
+function webhookSecretOk(req: Request): boolean {
+  if (!WAHA_WEBHOOK_SECRET) return false;
+  const hdr = req.headers.get("x-webhook-secret") || req.headers.get("x-api-key") || "";
+  const auth = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+  return hdr === WAHA_WEBHOOK_SECRET || auth === WAHA_WEBHOOK_SECRET;
+}
+
 serve(async (req: Request): Promise<Response> => {
 
   // Preflight CORS
@@ -274,6 +284,12 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(JSON.stringify({ error: "method_not_allowed" }), {
       status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+  }
+
+  // 🔐 POSTs só são aceitos com o segredo do webhook OU credencial de serviço/admin
+  if (!webhookSecretOk(req)) {
+    const unauth = requireServiceAuth(req, corsHeaders);
+    if (unauth && !(await isAdminRequest(req))) return unauth;
   }
 
   let body: Record<string,unknown> = {};

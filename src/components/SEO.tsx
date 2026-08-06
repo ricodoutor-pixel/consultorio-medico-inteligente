@@ -50,7 +50,7 @@ export const SEO = ({
       "name": "Planta y Raiz",
       "alternateName": "Mega Clínica Digital",
       "url": "https://plantayraiz.com.br",
-      "logo": "https://plantayraiz.com.br/src/assets/verdinho-doctor.png",
+      "logo": "https://plantayraiz.com.br/dr-verdinho-512.png",
       "description": description,
       "medicalSpecialty": ["Cannabis Medicinal", "Telemedicina", "Clínica Geral"],
       "availableService": [

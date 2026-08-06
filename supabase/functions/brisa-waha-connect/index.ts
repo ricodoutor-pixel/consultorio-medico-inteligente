@@ -89,6 +89,8 @@ const ok = (d: unknown, s = 200) =>
   });
 
 // ── Payload de webhook (doc oficial) ─────────────────────────────────────
+const WAHA_WEBHOOK_SECRET = Deno.env.get('WAHA_WEBHOOK_SECRET') || '';
+
 const webhookPayload = (sessionName: string) => ({
   name: sessionName,
   config: {
@@ -96,6 +98,9 @@ const webhookPayload = (sessionName: string) => ({
       {
         url: WEBHOOK_TARGET,
         events: ['message', 'session.status'],
+        customHeaders: WAHA_WEBHOOK_SECRET
+          ? [{ name: 'x-webhook-secret', value: WAHA_WEBHOOK_SECRET }]
+          : [],
         retries: {
           policy:       'constant',
           delaySeconds: 3,

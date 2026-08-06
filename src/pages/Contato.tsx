@@ -77,21 +77,21 @@ const Contato = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-muted-foreground mb-2">Nome</label>
-                      <Input required placeholder="Seu nome" className="bg-muted border-border" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                      <label htmlFor="contato-nome" className="block text-xs font-bold text-muted-foreground mb-2">Nome</label>
+                      <Input id="contato-nome" name="nome" required placeholder="Seu nome" className="bg-muted border-border" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-muted-foreground mb-2">Telefone</label>
-                      <Input required type="tel" placeholder="(11) 99999-9999" className="bg-muted border-border" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                      <label htmlFor="contato-telefone" className="block text-xs font-bold text-muted-foreground mb-2">Telefone</label>
+                      <Input id="contato-telefone" name="telefone" required type="tel" placeholder="(11) 99999-9999" className="bg-muted border-border" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-muted-foreground mb-2">Email</label>
-                    <Input required type="email" placeholder="seu@email.com" className="bg-muted border-border" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                    <label htmlFor="contato-email" className="block text-xs font-bold text-muted-foreground mb-2">Email</label>
+                    <Input id="contato-email" name="email" required type="email" placeholder="seu@email.com" className="bg-muted border-border" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-muted-foreground mb-2">Mensagem</label>
-                    <Textarea required placeholder="Como podemos ajudar?" rows={4} className="bg-muted border-border" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} />
+                    <label htmlFor="contato-mensagem" className="block text-xs font-bold text-muted-foreground mb-2">Mensagem</label>
+                    <Textarea id="contato-mensagem" name="mensagem" required placeholder="Como podemos ajudar?" rows={4} className="bg-muted border-border" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} />
                   </div>
                   <Button type="submit" className="w-full font-bold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
                     Enviar via WhatsApp <ArrowRight size={18} className="ml-2" />

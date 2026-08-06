@@ -6,17 +6,18 @@ interface SEOProps {
   keywords?: string;
   image?: string;
   url?: string;
-  type?: "website" | "article" | "medical_clinic";
+  type?: "website" | "article" | "profile";
 }
 
 export const SEO = ({
   title = "Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda",
   description = "Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR)) Cadastro e Ebook Gratuito!",
   keywords = "cannabis medicinal, telemedicina, CBD, THC, saúde digital, triagem IA, supervisão IA 24x7",
-  image = "/src/assets/verdinho-doctor.png",
+  image = "https://plantayraiz.com.br/dr-verdinho-512.png",
   url = "https://plantayraiz.com.br",
-  type = "medical_clinic"
+  type = "website"
 }: SEOProps) => {
+
   useEffect(() => {
     document.title = title;
     
@@ -49,7 +50,7 @@ export const SEO = ({
       "name": "Planta y Raiz",
       "alternateName": "Mega Clínica Digital",
       "url": "https://plantayraiz.com.br",
-      "logo": "https://plantayraiz.com.br/src/assets/verdinho-doctor.png",
+      "logo": "https://plantayraiz.com.br/dr-verdinho-512.png",
       "description": description,
       "medicalSpecialty": ["Cannabis Medicinal", "Telemedicina", "Clínica Geral"],
       "availableService": [

@@ -19,6 +19,7 @@ const TremorometriaDigital = lazy(() => import('@/components/diagnostics/Tremoro
 const ColorimetriaUrinaria = lazy(() => import('@/components/diagnostics/ColorimetriaUrinaria').then(m => ({ default: m.ColorimetriaUrinaria })));
 const AcuidadeVisual = lazy(() => import('@/components/diagnostics/AcuidadeVisual').then(m => ({ default: m.AcuidadeVisual })));
 const AtividadeFisicaGPS = lazy(() => import('@/components/diagnostics/AtividadeFisicaGPS').then(m => ({ default: m.AtividadeFisicaGPS })));
+import { BrisaVoiceAssistant } from '@/components/diagnostics/BrisaVoiceAssistant';
 
 type ActiveTool = null | 'cardiaco' | 'fundoscopia' | 'oximetria' | 'dermatoscopia' | 'mobilidade' | 'estetoscopio' | 'pulmonar' | 'tremor' | 'urine' | 'acuity' | 'gps';
 
@@ -353,6 +354,7 @@ export default function MonitoramentoSaude() {
         </section>
       </main>
 
+      <BrisaVoiceAssistant />
       <Footer />
     </>
   );

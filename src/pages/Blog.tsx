@@ -144,7 +144,10 @@ const Blog = () => {
               Receba semanalmente os últimos avanços da medicina canabinoide direto no seu e-mail.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
+              <label htmlFor="newsletter-email" className="sr-only">E-mail para a newsletter</label>
               <input 
+                id="newsletter-email"
+                name="newsletter-email"
                 type="email" 
                 placeholder="Seu melhor e-mail" 
                 className="flex-1 bg-background border border-border rounded-2xl px-6 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"

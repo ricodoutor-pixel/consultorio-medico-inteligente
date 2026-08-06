@@ -227,7 +227,7 @@ const Comunidade = () => {
           <AnimatePresence mode="wait">
             {activeTopic ? (
               <motion.div key="thread" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <button onClick={() => setOpenTopic(null)} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
+                <button aria-label="Voltar para a lista de tópicos" onClick={() => setOpenTopic(null)} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
                   <ArrowLeft size={16} /> Voltar aos tópicos
                 </button>
 
@@ -250,10 +250,10 @@ const Comunidade = () => {
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{activeTopic.content}</p>
                     <div className="flex items-center gap-3 mt-4 pt-4 border-t border-border">
-                      <button onClick={() => handleVote(activeTopic.id, "up")} className="flex items-center gap-1 text-xs text-primary hover:bg-primary/10 px-2 py-1 rounded-lg transition-colors">
+                      <button aria-label="Votar a favor deste tópico" onClick={() => handleVote(activeTopic.id, "up")} className="flex items-center gap-1 text-xs text-primary hover:bg-primary/10 px-2 py-1 rounded-lg transition-colors">
                         <ThumbsUp size={14} /> {activeTopic.upvotes}
                       </button>
-                      <button onClick={() => handleVote(activeTopic.id, "down")} className="flex items-center gap-1 text-xs text-muted-foreground hover:bg-destructive/10 px-2 py-1 rounded-lg transition-colors">
+                      <button aria-label="Votar contra este tópico" onClick={() => handleVote(activeTopic.id, "down")} className="flex items-center gap-1 text-xs text-muted-foreground hover:bg-destructive/10 px-2 py-1 rounded-lg transition-colors">
                         <ThumbsDown size={14} /> {activeTopic.downvotes}
                       </button>
                       <span className="text-xs text-muted-foreground flex items-center gap-1"><MessageSquare size={12} /> {activeTopic.replyCount} respostas</span>
@@ -283,10 +283,10 @@ const Comunidade = () => {
                               </div>
                               <p className="text-sm text-muted-foreground leading-relaxed">{reply.content}</p>
                               <div className="flex items-center gap-3 mt-2">
-                                <button onClick={() => handleReplyVote(activeTopic.id, reply.id, "up")} className="flex items-center gap-1 text-[10px] text-primary hover:bg-primary/10 px-1.5 py-0.5 rounded transition-colors">
+                                <button aria-label="Votar a favor desta resposta" onClick={() => handleReplyVote(activeTopic.id, reply.id, "up")} className="flex items-center gap-1 text-[10px] text-primary hover:bg-primary/10 px-1.5 py-0.5 rounded transition-colors">
                                   <ThumbsUp size={10} /> {reply.upvotes}
                                 </button>
-                                <button onClick={() => handleReplyVote(activeTopic.id, reply.id, "down")} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:bg-destructive/10 px-1.5 py-0.5 rounded transition-colors">
+                                <button aria-label="Votar contra esta resposta" onClick={() => handleReplyVote(activeTopic.id, reply.id, "down")} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:bg-destructive/10 px-1.5 py-0.5 rounded transition-colors">
                                   <ThumbsDown size={10} /> {reply.downvotes}
                                 </button>
                                 <button onClick={() => setReplyingTo(replyingTo === reply.id ? null : reply.id)} className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors">
@@ -412,9 +412,9 @@ const Comunidade = () => {
                                 </div>
                               </div>
                               <div className="flex flex-col items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
-                                <button onClick={() => handleVote(topic.id, "up")} className="p-1.5 rounded-lg hover:bg-primary/10 transition-colors"><ThumbsUp size={14} className="text-primary" /></button>
+                                <button aria-label="Votar a favor do tópico" onClick={() => handleVote(topic.id, "up")} className="p-1.5 rounded-lg hover:bg-primary/10 transition-colors"><ThumbsUp size={14} className="text-primary" /></button>
                                 <span className="text-xs font-bold text-foreground">{topic.upvotes - topic.downvotes}</span>
-                                <button onClick={() => handleVote(topic.id, "down")} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors"><ThumbsDown size={14} className="text-muted-foreground" /></button>
+                                <button aria-label="Votar contra o tópico" onClick={() => handleVote(topic.id, "down")} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors"><ThumbsDown size={14} className="text-muted-foreground" /></button>
                               </div>
                             </div>
                           </CardContent>

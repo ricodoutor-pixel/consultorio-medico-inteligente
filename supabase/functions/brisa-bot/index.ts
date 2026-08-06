@@ -14,6 +14,7 @@
 // ╚══════════════════════════════════════════════════════════════════╝
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -355,6 +356,16 @@ async function sendEvolution(
 }
 
 // ── Handler principal ─────────────────────────────────────────────────────
+
+// 🔐 Verificação do segredo compartilhado do webhook (anti-spoof)
+const WAHA_WEBHOOK_SECRET = Deno.env.get("WAHA_WEBHOOK_SECRET") || "";
+function webhookSecretOk(req: Request): boolean {
+  if (!WAHA_WEBHOOK_SECRET) return false;
+  const hdr = req.headers.get("x-webhook-secret") || req.headers.get("x-api-key") || "";
+  const auth = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+  return hdr === WAHA_WEBHOOK_SECRET || auth === WAHA_WEBHOOK_SECRET;
+}
+
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
 
@@ -374,6 +385,11 @@ serve(async (req: Request): Promise<Response> => {
     }, null, 2), {
       headers: { ...cors, 'Content-Type': 'application/json' },
     });
+  }
+
+  if (req.method === 'POST' && !webhookSecretOk(req)) {
+    const unauth = requireServiceAuth(req, cors);
+    if (unauth) return unauth;
   }
 
   if (req.method !== 'POST') {

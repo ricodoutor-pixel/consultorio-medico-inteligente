@@ -14,10 +14,11 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { requireServiceAuth } from '../_shared/service-auth.ts';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-cron-secret',
 };
 
 // ── Variáveis de ambiente ────────────────────────────────────────────────
@@ -89,6 +90,8 @@ const ok = (d: unknown, s = 200) =>
   });
 
 // ── Payload de webhook (doc oficial) ─────────────────────────────────────
+const WAHA_WEBHOOK_SECRET = Deno.env.get('WAHA_WEBHOOK_SECRET') || '';
+
 const webhookPayload = (sessionName: string) => ({
   name: sessionName,
   config: {
@@ -96,6 +99,9 @@ const webhookPayload = (sessionName: string) => ({
       {
         url: WEBHOOK_TARGET,
         events: ['message', 'session.status'],
+        customHeaders: WAHA_WEBHOOK_SECRET
+          ? [{ name: 'x-webhook-secret', value: WAHA_WEBHOOK_SECRET }]
+          : [],
         retries: {
           policy:       'constant',
           delaySeconds: 3,
@@ -109,6 +115,11 @@ const webhookPayload = (sessionName: string) => ({
 // ════════════════════════════════════════════════════════════════════════
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+
+  // 🔐 Painel de controle do bot: só service-role / cron secret
+  const unauth = requireServiceAuth(req, cors);
+  if (unauth) return unauth;
+
 
   const url    = new URL(req.url);
   const action = url.searchParams.get('action') || 'status';

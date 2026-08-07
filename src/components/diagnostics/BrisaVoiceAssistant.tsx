@@ -2,12 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Square, Loader2, Volume2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-<<<<<<< HEAD
 
 const brisaImg = '/lovable-uploads/ebfc53d1-432d-48bd-bb55-a0833a695dd8.png';
-=======
-import brisaImg from '@/assets/brisa-enfermeira.png';
->>>>>>> 50afb0eb2c82347f74b76a0101b3a3036b13fd36
 
 export const BrisaVoiceAssistant = () => {
   const [isListening, setIsListening] = useState(false);
@@ -132,7 +128,6 @@ export const BrisaVoiceAssistant = () => {
   };
 
   return (
-<<<<<<< HEAD
     <div className="w-full max-w-4xl mx-auto">
       {/* Header label */}
       <div className="flex items-center gap-2 mb-4">
@@ -187,76 +182,6 @@ export const BrisaVoiceAssistant = () => {
                 />
                 <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wide">
                   {isListening ? 'Ouvindo' : mood === 'speaking' ? 'Falando' : 'Online'}
-=======
-    <div className="w-full bg-card/60 backdrop-blur-md border border-cyan-500/30 rounded-3xl shadow-xl overflow-hidden mt-8 max-w-4xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-3">
-        {/* Left column: Bust and Mic */}
-        <div className="bg-gradient-to-b from-emerald-500/10 to-emerald-900/10 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-emerald-500/20">
-          <motion.div 
-            className="w-32 h-32 rounded-full border-4 border-emerald-400 overflow-hidden bg-muted shadow-[0_0_30px_rgba(16,185,129,0.4)] relative mb-4"
-            animate={mood === 'speaking' ? { scale: [1, 1.05, 1] } : {}}
-            transition={{ repeat: Infinity, duration: 2 }}
-          >
-            <img 
-              src={brisaImg} 
-              alt="Enfermeira Brisa - Assistente de saúde" 
-              loading="lazy"
-              className="w-full h-full object-cover object-center"
-            />
-          </motion.div>
-          <div className="text-center mb-6">
-            <h3 className="text-foreground font-black text-xl leading-tight">Enfª Brisa</h3>
-          </div>
-
-          <div className="relative flex items-center justify-center">
-            {/* Luz de fundo pulsante */}
-            <span className="absolute w-32 h-32 rounded-full bg-emerald-500/20 blur-2xl animate-pulse" />
-            <span className="absolute w-24 h-24 rounded-full border border-emerald-400/40 animate-ping" />
-            <button
-              onClick={toggleListening}
-              aria-label={isListening ? 'Parar de ouvir' : 'Falar com a Enfª Brisa'}
-              className={`relative w-20 h-20 rounded-full flex items-center justify-center text-white transition-all ${
-                isListening
-                  ? 'bg-red-500 shadow-[0_0_40px_rgba(239,68,68,0.7)] hover:scale-105'
-                  : 'bg-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.7)] hover:bg-emerald-400 hover:scale-105'
-              }`}
-            >
-              {isListening ? <Square size={32} fill="currentColor" /> : <Mic size={36} />}
-            </button>
-          </div>
-          
-          <p className="text-[10px] text-muted-foreground mt-4 uppercase font-bold tracking-wider text-center">
-            {isListening ? 'Ouvindo...' : 'Toque para falar com a Brisa'}
-          </p>
-        </div>
-
-
-        {/* Right column: Chat interaction */}
-        <div className="md:col-span-2 p-6 flex flex-col min-h-[300px] justify-center relative bg-gradient-to-br from-background to-cyan-950/10">
-          
-          {/* User Transcript */}
-          {transcript && (
-            <div className="w-full max-w-[85%] bg-white/5 p-4 rounded-2xl rounded-tr-none border border-cyan-100/20 text-sm text-foreground font-medium mb-4 self-end shadow-sm">
-              <span className="text-[10px] text-cyan-400 font-bold uppercase block mb-1">Você</span>
-              "{transcript}"
-            </div>
-          )}
-
-          {/* Brisa Response */}
-          <AnimatePresence>
-            {isProcessing && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full gap-3">
-                <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
-                <span className="text-xs font-bold text-cyan-600 uppercase tracking-widest">Brisa está processando...</span>
-              </motion.div>
-            )}
-
-            {brisaResponse && !isProcessing && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-[90%] bg-cyan-950/30 p-5 rounded-2xl rounded-tl-none border border-cyan-500/30 text-sm md:text-base text-cyan-50 font-medium self-start shadow-lg relative backdrop-blur-sm">
-                <span className="text-[10px] text-cyan-400 font-black uppercase block mb-2 flex items-center gap-1.5">
-                  <Volume2 size={14} className={mood === 'speaking' ? 'animate-pulse text-cyan-300' : ''} />
-                  Brisa responde
->>>>>>> 50afb0eb2c82347f74b76a0101b3a3036b13fd36
                 </span>
               </div>
             </motion.div>

@@ -40,13 +40,13 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: (id) => {
           if (!id.includes('node_modules')) return;
-          // CRÍTICO: manter React + React-DOM + Scheduler + React-Router no MESMO chunk.
-          // Separar react/react-dom causa "Cannot set properties of undefined (setting 'Children')"
-          // em produção pois react-dom executa antes do react ser definido.
+          // CRÍTICO: manter React + React-DOM + Scheduler + React-Router no MESMO chunk "vendor".
+          // Separar react/react-dom em chunk separado causa circular reference com rolldown/vite7
+          // e "Cannot set properties of undefined" em produção.
           if (
             /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler|react-is|use-sync-external-store)[\\/]/.test(id)
           ) {
-            return 'react-vendor';
+            return 'vendor'; // tudo junto no vendor, sem react-vendor separado
           }
           // Recharts/D3 NÃO devem ficar em chunk separado — caem junto do vendor
           // para evitar ordem de execução cross-chunk que estava quebrando produção.

@@ -1,9 +1,9 @@
 import React, { useState, Suspense, lazy } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Stethoscope, ArrowLeft, X, Brain, Shield, Pill, Sparkles, Wind, FileText } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Stethoscope, ArrowLeft, Brain, Shield, Pill, Sparkles, Wind, FileText, Mic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 
@@ -138,6 +138,7 @@ const tools = [
 
 export default function MonitoramentoSaude() {
   const [activeTool, setActiveTool] = useState<ActiveTool>(null);
+  const navigate = useNavigate();
 
   const renderTool = () => {
     switch (activeTool) {
@@ -348,13 +349,25 @@ export default function MonitoramentoSaude() {
                     </span>
                   </p>
                 </div>
+                {/* Brisa Voice Assistant Section */}
+                <div className="mt-8 mb-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                      <Mic className="w-5 h-5 text-cyan-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-foreground">Tire suas dúvidas com a Enfermeira Brisa</h2>
+                      <p className="text-xs text-muted-foreground">Assistente de voz com IA — pergunte sobre seus exames ou saúde</p>
+                    </div>
+                  </div>
+                  <BrisaVoiceAssistant />
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </section>
       </main>
 
-      <BrisaVoiceAssistant />
       <Footer />
     </>
   );

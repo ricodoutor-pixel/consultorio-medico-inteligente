@@ -205,12 +205,12 @@ export function DiagnosticSidebar({
                 {activeTool === 'oximetria' && <OximetriaOptica onComplete={handleComplete('oximetria')} />}
                 {activeTool === 'dermatoscopia' && <DermatoscopiaDigital onComplete={handleComplete('dermatoscopia')} />}
                 {activeTool === 'mobilidade' && <AvaliacaoMobilidade onComplete={handleComplete('mobilidade')} />}
-                {activeTool === 'estetoscopio' && <EstetoscopioDigital onComplete={handleComplete('estetoscopio')} />}
-                {activeTool === 'pulmonar' && <AuscultaPulmonar onComplete={handleComplete('pulmonar')} />}
-                {activeTool === 'tremor' && <TremorometriaDigital onComplete={handleComplete('tremor')} />}
-                {activeTool === 'urine' && <ColorimetriaUrinaria onComplete={handleComplete('urine')} />}
-                {activeTool === 'acuity' && <AcuidadeVisual onComplete={handleComplete('acuity')} />}
-                {activeTool === 'gps' && <AtividadeFisicaGPS onComplete={handleComplete('gps')} />}
+                {activeTool === 'estetoscopio' && <EstetoscopioDigital />}
+                {activeTool === 'pulmonar' && <AuscultaPulmonar />}
+                {activeTool === 'tremor' && <TremorometriaDigital />}
+                {activeTool === 'urine' && <ColorimetriaUrinaria />}
+                {activeTool === 'acuity' && <AcuidadeVisual />}
+                {activeTool === 'gps' && <AtividadeFisicaGPS />}
               </Suspense>
             </div>
           )}

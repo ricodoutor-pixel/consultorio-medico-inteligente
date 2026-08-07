@@ -169,7 +169,7 @@ export const BrisaVoiceAssistant = () => {
             <button
               onClick={toggleListening}
               aria-label={isListening ? 'Parar de ouvir' : 'Falar com a Enfª Brisa'}
-              className={`relative w-20 h-20 rounded-full flex items-center justify-center text-white transition-all animate-pulse-slow ${
+              className={`relative w-20 h-20 rounded-full flex items-center justify-center text-white transition-all ${
                 isListening
                   ? 'bg-red-500 shadow-[0_0_40px_rgba(239,68,68,0.7)] hover:scale-105'
                   : 'bg-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.7)] hover:bg-emerald-400 hover:scale-105'

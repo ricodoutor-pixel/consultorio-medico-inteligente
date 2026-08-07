@@ -1,5 +1,6 @@
 import React, { useState, Suspense, lazy } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Stethoscope, ArrowLeft, Brain, Shield, Pill, Sparkles, Wind, FileText, Mic } from 'lucide-react';
@@ -137,6 +138,7 @@ const tools = [
 ];
 
 export default function MonitoramentoSaude() {
+  const navigate = useNavigate();
   const [activeTool, setActiveTool] = useState<ActiveTool>(null);
   const navigate = useNavigate();
 
@@ -209,8 +211,14 @@ export default function MonitoramentoSaude() {
                 Realize exames pelo seu smartphone com segurança e precisão.
               </p>
             </motion.div>
+
+            {/* Enfª Brisa — assistente de voz, logo abaixo do texto */}
+            <div className="mt-8 text-left">
+              <BrisaVoiceAssistant />
+            </div>
           </div>
         </section>
+
 
         {/* Tool Grid or Active Tool */}
         <section className="px-4 pb-16 max-w-4xl mx-auto">

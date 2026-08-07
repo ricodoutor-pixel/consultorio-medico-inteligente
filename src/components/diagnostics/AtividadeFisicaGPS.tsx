@@ -61,17 +61,14 @@ export const AtividadeFisicaGPS = () => {
   useEffect(() => {
     fetchProfile();
     return () => {
-      stopTracking();
+      stopHardwareTracking();
       speechSynthesis.cancel();
     };
   }, []);
 
   const fetchProfile = async () => {
-    const { data: session } = await supabase.auth.getSession();
-    if (session?.session?.user) {
-      const { data } = await supabase.from('profiles').select('weight').eq('id', session.session.user.id).single();
-      if (data?.weight) setUserWeight(data.weight);
-    }
+    // Peso padrão (70kg) — o perfil não armazena peso.
+    setUserWeight(70);
   };
 
   const speakBrisa = (text: string) => {

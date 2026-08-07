@@ -2078,6 +2078,36 @@ export type Database = {
           },
         ]
       }
+      diagnostic_exams: {
+        Row: {
+          ai_diagnosis: Json | null
+          created_at: string
+          exam_type: string
+          id: string
+          results: Json | null
+          risk_level: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_diagnosis?: Json | null
+          created_at?: string
+          exam_type: string
+          id?: string
+          results?: Json | null
+          risk_level?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_diagnosis?: Json | null
+          created_at?: string
+          exam_type?: string
+          id?: string
+          results?: Json | null
+          risk_level?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       doctor_availability: {
         Row: {
           appointment_id: string | null

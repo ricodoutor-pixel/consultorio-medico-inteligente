@@ -140,7 +140,6 @@ const tools = [
 export default function MonitoramentoSaude() {
   const navigate = useNavigate();
   const [activeTool, setActiveTool] = useState<ActiveTool>(null);
-  const navigate = useNavigate();
 
   const renderTool = () => {
     switch (activeTool) {

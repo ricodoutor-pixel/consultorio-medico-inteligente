@@ -425,7 +425,35 @@ export default function TelemedWhatsApp() {
           </div>
         </div>
 
-        <DiagnosticSidebar open={isDiagnosticSidebarOpen} onOpenChange={setDiagnosticSidebarOpen} />
+        <DiagnosticSidebar
+          open={isDiagnosticSidebarOpen}
+          onOpenChange={setDiagnosticSidebarOpen}
+          isDoctor={viewMode === 'DOCTOR'}
+          patientId={
+            currentContact && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(currentContact.id)
+              ? currentContact.id
+              : undefined
+          }
+          patientName={currentContact?.name}
+          onCompleteDiagnostic={(result) => {
+            setMessages(prev => [...prev, {
+              id: Date.now().toString(),
+              senderId: viewMode === 'DOCTOR' ? 'doctor' : 'user',
+              text: `Exame digital realizado: ${result?.tool ?? 'exame'} — resultado disponível no prontuário.`,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            }]);
+          }}
+          onSendReport={(report) => {
+            setMessages(prev => [...prev, {
+              id: Date.now().toString(),
+              senderId: 'doctor',
+              text: report,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              isSummary: true,
+            }]);
+            toast.success('Relatório clínico anexado ao atendimento');
+          }}
+        />
 
         {/* Search */}
         <div className="p-2 border-b bg-white">

@@ -1,5 +1,6 @@
 import React, { useState, Suspense, lazy } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Stethoscope, ArrowLeft, X, Brain, Shield, Pill, Sparkles, Wind, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -137,6 +138,7 @@ const tools = [
 ];
 
 export default function MonitoramentoSaude() {
+  const navigate = useNavigate();
   const [activeTool, setActiveTool] = useState<ActiveTool>(null);
 
   const renderTool = () => {

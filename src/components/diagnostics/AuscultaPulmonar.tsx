@@ -292,7 +292,7 @@ export const AuscultaPulmonar = () => {
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center">
               <Button 
                 size="lg" 
-                onClick={startRecording}
+                onClick={() => startRecording()}
                 className="w-32 h-32 rounded-full shadow-[0_0_40px_rgba(6,182,212,0.3)] bg-gradient-to-br from-cyan-500 to-blue-600 hover:scale-105 transition-all text-white border-4 border-cyan-300"
               >
                 <Mic className="w-12 h-12" />

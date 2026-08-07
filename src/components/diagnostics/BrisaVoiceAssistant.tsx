@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Square, Loader2, Volume2, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-const brisaImg = '/lovable-uploads/ebfc53d1-432d-48bd-bb55-a0833a695dd8.png';
+import brisaImg from '@/assets/brisa-enfermeira.png';
 
 export const BrisaVoiceAssistant = () => {
   const [isListening, setIsListening] = useState(false);

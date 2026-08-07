@@ -208,8 +208,14 @@ export default function MonitoramentoSaude() {
                 Realize exames pelo seu smartphone com segurança e precisão.
               </p>
             </motion.div>
+
+            {/* Enfª Brisa — assistente de voz, logo abaixo do texto */}
+            <div className="mt-8 text-left">
+              <BrisaVoiceAssistant />
+            </div>
           </div>
         </section>
+
 
         {/* Tool Grid or Active Tool */}
         <section className="px-4 pb-16 max-w-4xl mx-auto">

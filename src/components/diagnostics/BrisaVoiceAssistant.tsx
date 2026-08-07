@@ -145,41 +145,45 @@ export const BrisaVoiceAssistant = () => {
     <div className="w-full bg-card/60 backdrop-blur-md border border-cyan-500/30 rounded-3xl shadow-xl overflow-hidden mt-8 max-w-4xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-3">
         {/* Left column: Bust and Mic */}
-        <div className="bg-gradient-to-b from-cyan-500/10 to-cyan-900/10 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-cyan-500/20">
+        <div className="bg-gradient-to-b from-emerald-500/10 to-emerald-900/10 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-emerald-500/20">
           <motion.div 
-            className="w-32 h-32 rounded-full border-4 border-cyan-400 overflow-hidden bg-muted shadow-2xl relative mb-4"
+            className="w-32 h-32 rounded-full border-4 border-emerald-400 overflow-hidden bg-muted shadow-[0_0_30px_rgba(16,185,129,0.4)] relative mb-4"
             animate={mood === 'speaking' ? { scale: [1, 1.05, 1] } : {}}
             transition={{ repeat: Infinity, duration: 2 }}
           >
             <img 
               src={brisaImg} 
-              alt="Brisa - IA" 
+              alt="Enfermeira Brisa - Assistente de saúde" 
+              loading="lazy"
               className="w-full h-full object-cover object-center"
             />
           </motion.div>
           <div className="text-center mb-6">
             <h3 className="text-foreground font-black text-xl leading-tight">Enfª Brisa</h3>
-            <p className="text-cyan-500 text-xs font-bold uppercase tracking-wider">Assistente de Voz IA</p>
           </div>
 
-          <button
-            onClick={toggleListening}
-            className={`relative w-20 h-20 rounded-full flex items-center justify-center transition-all ${
-              isListening 
-                ? 'bg-red-500 text-white shadow-[0_0_30px_rgba(239,68,68,0.6)] hover:scale-105' 
-                : 'bg-cyan-500 text-white shadow-[0_10px_20px_rgba(6,182,212,0.4)] hover:bg-cyan-600 hover:scale-105'
-            }`}
-          >
-            {isListening && (
-              <span className="absolute inset-0 rounded-full border-4 border-red-400 animate-ping" />
-            )}
-            {isListening ? <Square size={32} fill="currentColor" /> : <Mic size={36} />}
-          </button>
+          <div className="relative flex items-center justify-center">
+            {/* Luz de fundo pulsante */}
+            <span className="absolute w-32 h-32 rounded-full bg-emerald-500/20 blur-2xl animate-pulse" />
+            <span className="absolute w-24 h-24 rounded-full border border-emerald-400/40 animate-ping" />
+            <button
+              onClick={toggleListening}
+              aria-label={isListening ? 'Parar de ouvir' : 'Falar com a Enfª Brisa'}
+              className={`relative w-20 h-20 rounded-full flex items-center justify-center text-white transition-all animate-pulse-slow ${
+                isListening
+                  ? 'bg-red-500 shadow-[0_0_40px_rgba(239,68,68,0.7)] hover:scale-105'
+                  : 'bg-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.7)] hover:bg-emerald-400 hover:scale-105'
+              }`}
+            >
+              {isListening ? <Square size={32} fill="currentColor" /> : <Mic size={36} />}
+            </button>
+          </div>
           
           <p className="text-[10px] text-muted-foreground mt-4 uppercase font-bold tracking-wider text-center">
-            {isListening ? 'Ouvindo...' : 'Toque para falar'}
+            {isListening ? 'Ouvindo...' : 'Toque para falar com a Brisa'}
           </p>
         </div>
+
 
         {/* Right column: Chat interaction */}
         <div className="md:col-span-2 p-6 flex flex-col min-h-[300px] justify-center relative bg-gradient-to-br from-background to-cyan-950/10">

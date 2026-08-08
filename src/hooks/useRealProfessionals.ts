@@ -179,23 +179,30 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
       const isEdilson = (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011" || fullName.toLowerCase().includes("edilson")) && !fullName.toLowerCase().includes("suelen");
       const isSuelen = fullName.toLowerCase().includes("suelen") || d.crm?.includes("49354");
+      const isOlivia = fullName.toLowerCase().includes("olivia") || d.crm?.includes("Z-494444");
 
       const finalCrm = isEdilson 
         ? "10963 - Sta Cruz (BO)" 
         : isSuelen
         ? "49354 - PR"
+        : isOlivia
+        ? "Z-494444 - BO"
         : (d.document_type === "ci" ? `${d.crm} - BO` : `${d.crm} - ${d.crm_state}`);
 
       const finalBio = isEdilson
         ? "CEO da Planta y Raíz Ltda e Médico Prescritor em Santa Cruz de la Sierra (Bolívia, Registro 10963). No Brasil, atua prestando Orientação Técnica exclusiva com Relatório de Encaminhamento Completo assinado digitalmente, para que o paciente dê continuidade ao seu atendimento com prescritor referendado."
         : isSuelen
         ? "Diretora Técnica da Planta y Raíz Ltda. Médica Prescritora com atendimento humanizado e individualizado de cannabis medicinal baseado em evidências científicas, com foco na qualidade de vida e cuidado integral."
+        : isOlivia
+        ? "Diretora Técnica da Planta y Raíz para a Bolívia (Cochabamba) e Médica Prescritora em Cochabamba (Bolívia, Registro Z-494444). No Brasil, atua prestando Orientação Técnica exclusiva, Mentoria Terapêutica e Relatório de Encaminhamento Completo assinado digitalmente, para que o paciente dê continuidade ao seu atendimento com prescritor referendado."
         : (d.bio || `Profissional verificado na Planta & Raiz. Especialidade: ${d.specialty}. ${documentLabel}.`);
 
       const finalTags = isEdilson
         ? ["CEO Planta y Raíz", "Orientação Técnica (BR)", "Prescritor Sta Cruz (BO)"]
         : isSuelen
         ? ["Diretora Técnica", "CRM 49354 - PR", "Cannabis Medicinal"]
+        : isOlivia
+        ? ["Diretora Técnica (BO)", "Orientação Técnica (BR)", "Prescritor Cochabamba (BO)"]
         : [d.specialty, documentLabel, cityLabel];
 
       return {
@@ -205,11 +212,11 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         bio: finalBio,
         experience: "Verificado",
         tags: finalTags,
-        price: isEdilson ? "R$ 30,00" : isSuelen ? "R$ 100,00" : (mockMatch?.price || price),
-        priceValue: isEdilson ? 30 : isSuelen ? 100 : (mockMatch?.priceValue || Number(d.consultation_price) || 30),
+        price: isEdilson ? "R$ 30,00" : isSuelen ? "R$ 100,00" : isOlivia ? "R$ 50,00" : (mockMatch?.price || price),
+        priceValue: isEdilson ? 30 : isSuelen ? 100 : isOlivia ? 50 : (mockMatch?.priceValue || Number(d.consultation_price) || 30),
         whatsapp: "5511991363154",
         rating: d.rating || 5.0,
-        consults: d.total_consultations || (isEdilson ? 850 : 185),
+        consults: d.total_consultations || (isEdilson ? 850 : isOlivia ? 520 : 185),
         avatar: fullName.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "PR",
         imageUrl: finalImage,
         paymentLink: mockMatch?.paymentLink || "https://mpago.la/12KAwmH",
@@ -226,6 +233,13 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
               { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150,00", desc: "Avaliação completa com teleconsulta" },
               { name: "Retorno", price: "R$ 90,00", desc: "Acompanhamento" },
             ]
+          : isOlivia
+          ? [
+              { name: "Orientação Técnica + Mentoria Terapêutica (Chat 30 min)", price: "R$ 50,00", desc: "Com relatório completo assinado digitalmente (Brasil)" },
+              { name: "Orientação Técnica Completa (Chat + Vídeo)", price: "R$ 100,00", desc: "Avaliação por vídeo e mentoria terapêutica" },
+              { name: "Consulta Prescritiva Internacional (Bolívia)", price: "US$ 50,00", desc: "Com receita e assinatura digital (Cochabamba - BO)" },
+              { name: "Retorno", price: "R$ 30,00", desc: "Acompanhamento" },
+            ]
           : (mockMatch?.services || [
           { name: "Orientação Técnica Inicial", price, desc: "Avaliação completa + plano terapêutico" },
           { name: "Retorno", price: formatConsultationPrice((Number(d.consultation_price) || 30) * 0.6, d.country), desc: "Acompanhamento e ajuste" },
@@ -234,8 +248,8 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         reviews: [],
         online: true,
         crm: finalCrm,
-        hospital: isEdilson ? "Planta y Raíz Ltda / Santa Cruz de la Sierra (BO)" : isSuelen ? "Planta y Raíz Ltda / Paraná (BR)" : cityLabel,
-        flags: isEdilson ? ["🇧🇷", "🇧🇴"] : ["🇧🇷"],
+        hospital: isEdilson ? "Planta y Raíz Ltda / Santa Cruz de la Sierra (BO)" : isSuelen ? "Planta y Raíz Ltda / Paraná (BR)" : isOlivia ? "Planta y Raíz Ltda / Cochabamba (BO)" : cityLabel,
+        flags: isEdilson || isOlivia ? ["🇧🇷", "🇧🇴"] : ["🇧🇷"],
       };
     });
 

@@ -40,11 +40,21 @@ nav img, [role="navigation"] img {
   max-height: 100%;
 }
 
-input, button, textarea, select {
+input:not([type="checkbox"]):not([type="radio"]), button, textarea, select {
   font: inherit;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+}
+
+button, a, [role="button"] {
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+/* iOS Safari Smooth Scrolling */
+.scrollable-ios {
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Safe area insets for iOS notch */

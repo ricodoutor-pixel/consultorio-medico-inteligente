@@ -246,7 +246,7 @@ const Index = () => {
                   <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-primary/40 shrink-0">
                     <img
                       src={DrEdilsonPhoto}
-                      alt="Dr. Edilson Bezerra — CRM-CE 10963"
+                      alt="Dr. Edilson Bezerra — CRM 10963 - Sta Cruz (BO)"
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"
@@ -254,7 +254,7 @@ const Index = () => {
                   </div>
                   <div>
                     <p className="font-display font-black text-xl">Dr. Edilson Bezerra</p>
-                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Médicos Prescritores · CRM-CE 10963</p>
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">CEO Planta y Raíz · CRM 10963 - Sta Cruz (BO)</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3 pt-2">
@@ -295,7 +295,7 @@ const Index = () => {
           >
             <div className="space-y-5">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/15 border border-primary/30 text-xs font-black uppercase tracking-wider text-primary">
-                ⚕️ CRM-CE 10963
+                ⚕️ CRM 10963 - Sta Cruz (BO)
               </span>
             <h2 className="font-display font-black text-3xl md:text-5xl leading-tight">
                 Orientação e Avaliação Técnica com{" "}

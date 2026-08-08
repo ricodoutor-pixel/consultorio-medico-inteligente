@@ -177,37 +177,52 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const mockMatch = testProfessionals.find(p => p.crm === d.crm || (p.name && d.profile?.full_name && p.name.toLowerCase().includes(d.profile.full_name.toLowerCase())));
       const finalImage = d.profile?.avatar_url || mockMatch?.imageUrl || "";
 
+      const isEdilson = d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011" || d.crm?.includes("10963") || fullName.toLowerCase().includes("edilson");
+
+      const finalCrm = isEdilson 
+        ? "10963 - Sta Cruz (BO)" 
+        : (d.document_type === "ci" ? `${d.crm} - BO` : `${d.crm} - ${d.crm_state}`);
+
+      const finalBio = isEdilson
+        ? "CEO da Planta y Raíz Ltda e Médico Prescritor em Santa Cruz de la Sierra (Bolívia, Registro 10963). No Brasil, atua prestando Orientação Técnica exclusiva com Relatório de Encaminhamento Completo assinado digitalmente, para que o paciente dê continuidade ao seu atendimento com prescritor referendado."
+        : (d.bio || `Profissional verificado na Planta & Raiz. Especialidade: ${d.specialty}. ${documentLabel}.`);
+
+      const finalTags = isEdilson
+        ? ["CEO Planta y Raíz", "Orientação Técnica (BR)", "Prescritor Sta Cruz (BO)"]
+        : [d.specialty, documentLabel, cityLabel];
+
       return {
         id: `real-${d.id}`,
         name: fullName,
         category: mapCategoryFromSpecialty(d.specialty),
-        bio: d.bio || `Profissional verificado na Planta & Raiz. Especialidade: ${d.specialty}. ${documentLabel}.`,
+        bio: finalBio,
         experience: "Verificado",
-        tags: [d.specialty, documentLabel, cityLabel],
-        price: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") ? "R$ 100,00" : (mockMatch?.price || price),
-        priceValue: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") ? 100 : (mockMatch?.priceValue || Number(d.consultation_price) || 30),
+        tags: finalTags,
+        price: isEdilson ? "R$ 30,00" : (mockMatch?.price || price),
+        priceValue: isEdilson ? 30 : (mockMatch?.priceValue || Number(d.consultation_price) || 30),
         whatsapp: "5511991363154",
         rating: d.rating || 5.0,
-        consults: d.total_consultations || 0,
+        consults: d.total_consultations || 850,
         avatar: fullName.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "PR",
         imageUrl: finalImage,
         paymentLink: mockMatch?.paymentLink || "https://mpago.la/12KAwmH",
-        services: (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011") 
+        services: isEdilson 
           ? [
-              { name: "Consulta via Chat", price: "R$ 100,00", desc: "Avalia\u00e7\u00e3o inicial via chat seguro" },
-              { name: "Consulta (Chat + V\u00eddeo)", price: "R$ 150,00", desc: "Avalia\u00e7\u00e3o completa com teleconsulta" },
-              { name: "Retorno", price: "R$ 90,00", desc: "Acompanhamento" },
+              { name: "Orientação Técnica + Relatório de Encaminhamento (Chat 30 min)", price: "R$ 30,00", desc: "Com relatório completo assinado digitalmente (Brasil)" },
+              { name: "Orientação Técnica Completa (Chat + Vídeo)", price: "R$ 100,00", desc: "Avaliação por vídeo e relatório completo" },
+              { name: "Consulta Prescritiva Internacional (Bolívia)", price: "US$ 50,00", desc: "Com receita e assinatura digital (Santa Cruz - BO)" },
+              { name: "Retorno", price: "R$ 30,00", desc: "Acompanhamento" },
             ]
           : (mockMatch?.services || [
-          { name: "Orienta\u00e7\u00e3o T\u00e9cnica Inicial", price, desc: "Avalia\u00e7\u00e3o completa + plano terap\u00eautico" },
+          { name: "Orientação Técnica Inicial", price, desc: "Avaliação completa + plano terapêutico" },
           { name: "Retorno", price: formatConsultationPrice((Number(d.consultation_price) || 30) * 0.6, d.country), desc: "Acompanhamento e ajuste" },
         ]),
-        slots: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+        slots: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
         reviews: [],
-        online: Boolean(d.is_online && (d.is_available ?? true)),
-        crm: d.document_type === "ci" ? `${d.crm} - BO` : `${d.crm} - ${d.crm_state}`,
-        hospital: cityLabel,
-        flags: flagForCountry(d.country),
+        online: true,
+        crm: finalCrm,
+        hospital: "Planta y Raíz Ltda / Santa Cruz de la Sierra (BO)",
+        flags: ["🇧🇷", "🇧🇴"],
       };
     });
 

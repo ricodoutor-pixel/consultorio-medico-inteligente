@@ -203,9 +203,9 @@ export const physicianSchema: SchemaOrgConfig = {
     '@context': 'https://schema.org',
     '@type': 'Physician',
     '@id': 'https://plantayraiz.com.br/#supervisora-tecnica',
-    name: 'Dr. Edilson Bezerra (CRM-CE 10963)',
-    jobTitle: 'Supervisora Técnica da Plataforma Planta y Raiz',
-    identifier: 'CRM 49354/PR',
+    name: 'Dr. Edilson Bezerra — CRM 10963 - Sta Cruz (BO)',
+    jobTitle: 'CEO da Planta y Raíz Ltda e Orientador Técnico',
+    identifier: 'Registro 10963 (Santa Cruz - BO)',
     medicalSpecialty: ['GeneralPractice', 'Pharmacology'],
     memberOf: {
       '@type': 'MedicalOrganization',

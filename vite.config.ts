@@ -48,8 +48,9 @@ export default defineConfig(({ mode }) => ({
           ) {
             return 'vendor'; // tudo junto no vendor, sem react-vendor separado
           }
-          // Recharts/D3 NÃO devem ficar em chunk separado — caem junto do vendor
-          // para evitar ordem de execução cross-chunk que estava quebrando produção.
+          if (id.includes('recharts') || id.includes('d3-')) return 'charts';
+          if (id.includes('leaflet') || id.includes('react-simple-maps') || id.includes('topojson')) return 'maps';
+          if (id.includes('lottie-react') || id.includes('lottie-web')) return 'lottie';
           if (id.includes('framer-motion')) return 'animation';
           if (id.includes('@radix-ui') || id.includes('cmdk')) return 'ui-primitives';
           if (id.includes('@supabase')) return 'supabase';

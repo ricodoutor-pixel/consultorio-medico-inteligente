@@ -75,13 +75,7 @@ const uniqueContacts = [...new Set(masterList)];
 const finalContacts = ["5511987131241", ...uniqueContacts.filter(c => c !== "5511987131241")];
 
 const delay = (ms) => new Promise(res => setTimeout(res, ms));
-const randomDelay = () => {
-    // 60 to 75 seconds wait
-    const min = 60000;
-    const max = 75000;
-    const rnd = Math.floor(Math.random() * (max - min + 1)) + min;
-    return delay(rnd);
-};
+const randomDelay = () => delay(30000);
 
 const MAX_RETRIES = 3;
 

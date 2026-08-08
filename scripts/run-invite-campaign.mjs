@@ -14,12 +14,17 @@ const INVITATION_MESSAGE = `Olá!\n\nSou a Brisa 🌿, assistente virtual da cl�
 async function sendWAHA(chatId, text) {
   try {
     const base = WAHA_API_URL.startsWith('http') ? WAHA_API_URL : `https://${WAHA_API_URL}`;
+    const controller = new AbortController();
+    const tId = setTimeout(() => controller.abort(), 60000);
+
     const response = await fetch(`${base}/api/sendText`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Api-Key': WAHA_API_KEY },
       body: JSON.stringify({ session: WAHA_SESSION, chatId, text }),
-      signal: AbortSignal.timeout(30000),
+      signal: controller.signal,
     });
+    clearTimeout(tId);
+
     if (!response.ok) {
       const body = await response.text();
       return { ok: false, status: response.status, error: body };
@@ -39,40 +44,50 @@ async function runCampaign() {
 
   const supabase = createClient(SB_URL, SB_KEY);
   
-  console.log("🔍 Buscando contatos no banco de dados (Profiles)...");
-  const { data: profilesData, error } = await supabase
-    .from('profiles')
-    .select('id, full_name, phone')
-    .not('phone', 'is', null);
-
-  if (error) {
-    console.error("❌ Erro ao buscar no DB:", error.message);
-  }
-
-  let profilesList = profilesData || [];
+  console.log("🔍 Buscando lista de contatos nos bancos (Profiles e Doctors)...");
   
-  // Garantir que 5511987131241 esteja no topo da lista se informado pelo usuário
+  const [profilesRes, doctorsRes] = await Promise.allSettled([
+    supabase.from('profiles').select('id, full_name, phone').not('phone', 'is', null),
+    supabase.from('doctors').select('id, full_name, phone').not('phone', 'is', null),
+  ]);
+
+  let profilesList = profilesRes.status === 'fulfilled' && profilesRes.value.data ? profilesRes.value.data : [];
+  let doctorsList = doctorsRes.status === 'fulfilled' && doctorsRes.value.data ? doctorsRes.value.data : [];
+  
   const targetFirstPhone = '5511987131241';
   let formattedList = [];
 
-  // Inserir primeiro o número prioritário pedido pelo usuário
+  // Primeiro da lista: Celular de teste do usuário
   formattedList.push({
-    full_name: 'Contato Prioritário',
+    full_name: 'Seu Telefone Pessoal (Teste)',
     phone: targetFirstPhone
   });
 
+  // Adicionar contatos da tabela Profiles
   for (const p of profilesList) {
     if (!p || !p.phone) continue;
     const clean = p.phone.replace(/\D/g, '');
     if (clean.length < 10) continue;
-    if (clean === targetFirstPhone) continue; // Evitar duplicar o primeiro
+    if (clean === targetFirstPhone) continue;
     formattedList.push({
-      full_name: p.full_name || 'Usuário',
+      full_name: p.full_name || 'Paciente/Usuário',
       phone: clean
     });
   }
 
-  // Remover duplicados por telefone
+  // Adicionar contatos da tabela Doctors
+  for (const d of doctorsList) {
+    if (!d || !d.phone) continue;
+    const clean = d.phone.replace(/\D/g, '');
+    if (clean.length < 10) continue;
+    if (clean === targetFirstPhone) continue;
+    formattedList.push({
+      full_name: d.full_name || 'Dr.(a)',
+      phone: clean
+    });
+  }
+
+  // Deduplicar por número de telefone
   const uniqueList = [];
   const seen = new Set();
   for (const item of formattedList) {
@@ -82,8 +97,9 @@ async function runCampaign() {
     }
   }
 
-  console.log(`✅ Total de ${uniqueList.length} contatos prontos para envio (primeiro: ${targetFirstPhone}).`);
-  console.log(`⏱️ Intervalo entre envios: 30 segundos.`);
+  console.log(`✅ Total de ${uniqueList.length} contatos prontos para a campanha.`);
+  console.log(`🚀 Primeiro envio configurado para: ${targetFirstPhone}`);
+  console.log(`⏱️ Intervalo estrito: 30 segundos entre mensagens.\n`);
 
   let sentCount = 0;
   let errorCount = 0;
@@ -94,7 +110,7 @@ async function runCampaign() {
     const chatId = `${phone}@c.us`;
     const nowStr = new Date().toLocaleTimeString('pt-BR');
 
-    console.log(`\n[${nowStr}] [${i + 1}/${uniqueList.length}] 🚀 Enviando convite para ${profile.full_name} (${phone})...`);
+    console.log(`[${nowStr}] [${i + 1}/${uniqueList.length}] 🚀 Enviando convite para ${profile.full_name} (${phone})...`);
     
     const result = await sendWAHA(chatId, INVITATION_MESSAGE);
     
@@ -112,7 +128,7 @@ async function runCampaign() {
     }
   }
 
-  console.log("\n🎉 Campanha finalizada com sucesso!");
+  console.log("\n🎉 Campanha de Convites finalizada com sucesso!");
   console.log(`Total enviados com sucesso: ${sentCount}`);
   console.log(`Total falhas: ${errorCount}`);
 }

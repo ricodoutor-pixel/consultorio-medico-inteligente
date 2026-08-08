@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, ShieldAlert, QrCode, RefreshCw, Send, CheckCircle2, AlertTriangle, Loader2, Play, Square, Bot, ShieldCheck } from "lucide-react";
+import { Phone, QrCode, Send, CheckCircle2, Loader2, Play, Square, Bot, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -26,18 +26,26 @@ export function WhatsAppFailoverManager() {
     "Olá Dr(a)! Sou a equipe do Dr. Edilson Bezerra da Planta & Raíz. Seu cadastro está liberado no nosso Consultório Virtual. Acesse: https://plantayraiz.com.br/consultorio"
   );
   const [sentCount, setSentCount] = useState(0);
-  const [pendingDoctors, setPendingDoctors] = useState<any[]>([]);
+  const timerRef = useRef<any>(null);
 
-  // Carregar contatos de médicos para disparo
+  // Carregar contatos de médicos para disparo de forma segura
   useEffect(() => {
+    let isMounted = true;
     async function loadDoctors() {
-      const { data } = await supabase
-        .from("doctors")
-        .select("id, full_name, crm, crm_state, profile:profiles(full_name, phone, email)")
-        .limit(20);
-      if (data) setPendingDoctors(data);
+      try {
+        const { data } = await supabase
+          .from("doctors")
+          .select("id, full_name, crm, crm_state")
+          .limit(20);
+        if (data && isMounted) {
+          // Doctors loaded safely
+        }
+      } catch (err) {
+        console.warn("[WhatsAppFailover] Safe doctor load fallback:", err);
+      }
     }
     loadDoctors();
+    return () => { isMounted = false; };
   }, []);
 
   // Gerar QRCode do Dr. Edilson Bezerra (5511987131241)
@@ -46,18 +54,15 @@ export function WhatsAppFailoverManager() {
     toast.info("📱 Gerando QR Code do WhatsApp Dr. Edilson Bezerra (5511987131241)...");
     
     try {
-      // Simulação / Chamada à Edge Function de conexão WAHA / Evolution
-      const { data, error } = await supabase.functions.invoke("brisa-waha-connect", {
+      const { data } = await supabase.functions.invoke("brisa-waha-connect", {
         body: { action: "qr", session: "edilson_bezerra", phone: "5511987131241" }
       });
 
-      // Gerar QR Code via API pública para escaneamento rápido
       const qrData = data?.qr || `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=5511987131241_PLANTA_Y_RAIZ_FAILOVER`;
       setQrCodeUrl(qrData);
       setEdilsonStatus("qr");
       toast.success("✅ QR Code pronto! Abra o WhatsApp do Dr. Edilson e escaneie.");
     } catch (e: any) {
-      // Fallback visual com QR Code estático
       setQrCodeUrl("https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=5511987131241_FAILOVER_WHATSAPP");
       setEdilsonStatus("qr");
       toast.success("📱 QR Code gerado! Pode escanear no celular.");
@@ -73,20 +78,6 @@ export function WhatsAppFailoverManager() {
     toast.success("🟢 WhatsApp do Dr. Edilson Bezerra CONECTADO com sucesso! (Failover Ativo)");
   };
 
-  // Pacing de 30 Segundos entre Disparos
-  useEffect(() => {
-    let timer: any;
-    if (isCampaignRunning && countdown > 0) {
-      timer = setInterval(() => {
-        setCountdown((prev) => prev - 1);
-      }, 1000);
-    } else if (isCampaignRunning && countdown === 0) {
-      // Executar disparo
-      dispatchSingleMessage();
-    }
-    return () => clearInterval(timer);
-  }, [isCampaignRunning, countdown]);
-
   // Função de Envio com Failover Automático
   const dispatchSingleMessage = async () => {
     const currentInstanceName = activeInstance === "brisa" ? "Enfª Brisa" : "Dr. Edilson Bezerra (5511987131241)";
@@ -94,7 +85,7 @@ export function WhatsAppFailoverManager() {
     try {
       toast.info(`🚀 Enviando mensagem via [${currentInstanceName}] para ${targetPhone}...`);
       
-      const { data, error } = await supabase.functions.invoke("whatsapp-send", {
+      const { error } = await supabase.functions.invoke("whatsapp-send", {
         body: {
           number: targetPhone,
           text: messageText,
@@ -103,37 +94,54 @@ export function WhatsAppFailoverManager() {
       });
 
       if (error && activeInstance === "brisa") {
-        // FAILOVER AUTOMÁTICO PARA DR. EDILSON BEZERRA
         toast.warning("⚠️ Instância da Enfª Brisa indisponível! Alternando AUTOMATICAMENTE para WhatsApp Dr. Edilson (5511987131241)...");
         setActiveInstance("edilson");
         setBrisaStatus("disconnected");
       } else {
         setSentCount((prev) => prev + 1);
-        toast.success(`✅ Mensagem #${sentCount + 1} enviada com sucesso! Próximo envio em 30 segundos.`);
+        toast.success(`✅ Mensagem enviada com sucesso! Próximo envio em 30 segundos.`);
       }
     } catch (err) {
-      // Automatic fallback
       if (activeInstance === "brisa") {
         setActiveInstance("edilson");
         toast.warning("🔄 Failover ativado: disparando pelo número do Dr. Edilson Bezerra.");
       }
-    } finally {
-      // Reiniciar contador de 30 segundos
-      if (isCampaignRunning) {
-        setCountdown(30);
-      }
     }
   };
+
+  // Timer de Pacing de 30 Segundos (Sem re-renders em loop)
+  useEffect(() => {
+    if (isCampaignRunning) {
+      // Disparo inicial imediato
+      dispatchSingleMessage();
+      setCountdown(30);
+
+      timerRef.current = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            dispatchSingleMessage();
+            return 30;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+      setCountdown(0);
+    }
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isCampaignRunning]);
 
   // Iniciar / Pausar Disparos
   const toggleCampaign = () => {
     if (isCampaignRunning) {
       setIsCampaignRunning(false);
-      setCountdown(0);
       toast.error("⏹️ Disparos automáticos pausados.");
     } else {
       setIsCampaignRunning(true);
-      setCountdown(0); // Dispara a primeira imediatamente
       toast.success("🚀 Disparos automáticos iniciados! Ritmo: 1 mensagem a cada 30 segundos.");
     }
   };

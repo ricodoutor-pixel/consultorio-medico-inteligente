@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { Download, FileDown, Crown } from "lucide-react";
 import { exportCSV, exportAdminPDF } from "@/lib/admin-export";
 import { KpiDrillDown, type DrillSource } from "@/components/admin/KpiDrillDown";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AgentsHub } from "@/components/admin/AgentsHub";
 import { WhatsAppFailoverManager } from "@/components/admin/WhatsAppFailoverManager";
 
@@ -704,7 +705,9 @@ const Admin = () => {
 
           {/* WHATSAPP FAILOVER & DISPARADOR AUTÔNOMO DR. EDILSON BEZERRA (5511987131241) */}
           <div className="mb-6">
-            <WhatsAppFailoverManager />
+            <ErrorBoundary>
+              <WhatsAppFailoverManager />
+            </ErrorBoundary>
           </div>
         </div>
       </section>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Square, Loader2, Volume2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-const brisaImg = '/lovable-uploads/ebfc53d1-432d-48bd-bb55-a0833a695dd8.png';
+import brisaImg from '@/assets/brisa-enfermeira.webp';
 
 export const BrisaVoiceAssistant = () => {
   const [isListening, setIsListening] = useState(false);
@@ -166,6 +166,9 @@ export const BrisaVoiceAssistant = () => {
                 <img
                   src={brisaImg}
                   alt="Enfermeira Brisa"
+                  loading="eager"
+                  // @ts-ignore
+                  fetchPriority="high"
                   className="w-full h-full object-cover object-top"
                 />
               </div>

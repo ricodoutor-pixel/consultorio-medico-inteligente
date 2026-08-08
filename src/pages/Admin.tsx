@@ -25,8 +25,8 @@ import { toast } from "sonner";
 import { Download, FileDown, Crown } from "lucide-react";
 import { exportCSV, exportAdminPDF } from "@/lib/admin-export";
 import { KpiDrillDown, type DrillSource } from "@/components/admin/KpiDrillDown";
-import { useAdminRealtime } from "@/hooks/useAdminRealtime";
 import { AgentsHub } from "@/components/admin/AgentsHub";
+import { WhatsAppFailoverManager } from "@/components/admin/WhatsAppFailoverManager";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -701,6 +701,11 @@ const Admin = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* WHATSAPP FAILOVER & DISPARADOR AUTÔNOMO DR. EDILSON BEZERRA (5511987131241) */}
+          <div className="mb-6">
+            <WhatsAppFailoverManager />
+          </div>
         </div>
       </section>
 

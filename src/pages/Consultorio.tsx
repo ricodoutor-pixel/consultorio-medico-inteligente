@@ -6,9 +6,10 @@ import { DoctorProfileSettings } from "@/components/doctor/DoctorProfileSettings
 import { DoctorTeamDashboard } from "@/components/doctor/DoctorTeamDashboard";
 import { DoctorEducationDashboard } from "@/components/doctor/DoctorEducationDashboard";
 import { FilaAssincrona } from "@/components/doctor/FilaAssincrona";
-import { AlertTriangle, Loader2, MessageCircle, Gift, Video } from "lucide-react";
+import { PacienteTesteSimulacao360 } from "@/components/doctor/PacienteTesteSimulacao360";
+import { DoctorRankingPlantaCoin } from "@/components/doctor/DoctorRankingPlantaCoin";
+import { AlertTriangle, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -19,6 +20,7 @@ const Consultorio = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [nextAppointment, setNextAppointment] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("atendimentos");
 
   const fetchData = async () => {
     try {
@@ -43,7 +45,6 @@ const Consultorio = () => {
       if (doctorData) {
         setIsOnline(Boolean(doctorData.is_online && (doctorData.is_available ?? true)));
         
-        // Fetch next appointment for dynamic video link
         const { data: nextAppt } = await supabase
           .from('appointments')
           .select('*')
@@ -66,8 +67,6 @@ const Consultorio = () => {
     fetchData();
   }, []);
 
-  // Sincronismo total com o ponto verde do card médico:
-  // realtime na própria linha + revalidação ao voltar para a aba.
   useEffect(() => {
     if (!doctor?.id) return;
 
@@ -108,7 +107,6 @@ const Consultorio = () => {
     };
   }, [doctor?.id, doctor?.user_id]);
 
-
   const toggleOnlineStatus = async () => {
     if (!doctor) return;
     try {
@@ -136,7 +134,6 @@ const Consultorio = () => {
     }
   };
 
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
@@ -154,7 +151,14 @@ const Consultorio = () => {
       
       {doctor && (
         <div className="px-4 py-3 bg-card border-b flex justify-between items-center flex-wrap gap-3">
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setActiveTab("paciente-teste")}
+              className="px-4 py-1.5 rounded-full text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-emerald-500 to-teal-600 text-black hover:scale-105"
+            >
+              <Sparkles size={16} /> 🎭 Ativar Paciente Teste
+            </button>
+
             <button 
               onClick={() => {
                 const lastName = (profile?.full_name || '').split(' ').slice(-1)[0] || 'MEDICO';
@@ -162,11 +166,12 @@ const Consultorio = () => {
                 navigator.clipboard.writeText(`https://plantayraiz.com.br/cadastro-profissional?ref=${refCode}`);
                 toast.success("Link copiado! Envie para seus convidados.");
               }}
-              className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:opacity-90"
+              className="px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 transition-colors shadow-sm bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:opacity-90"
             >
-              <Gift size={16} /> Seu Link de Médico Sócio
+              <Gift size={15} /> Link Médico Sócio
             </button>
           </div>
+
           <div className="flex items-center gap-3">
             {nextAppointment ? (
               <Link to={`/orientacao-video?appointment=${nextAppointment.id}`} className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-blue-600 text-white hover:bg-blue-700">
@@ -185,18 +190,18 @@ const Consultorio = () => {
               <MessageCircle size={16} /> Telemed WhatsApp
             </Link>
             <span className="text-sm font-medium">Status do Plantão:</span>
-          <button
-            onClick={toggleOnlineStatus}
-            disabled={updatingStatus}
-            className={`px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm ${
-              isOnline 
-                ? "bg-green-500 text-white hover:bg-green-600" 
-                : "bg-red-500 text-white hover:bg-red-600"
-            }`}
-          >
-            <span className={`w-2.5 h-2.5 rounded-full ${isOnline ? "bg-white animate-pulse" : "bg-white/70"}`} />
-            {isOnline ? "ONLINE (Atendendo)" : "OFFLINE (Ausente)"}
-          </button>
+            <button
+              onClick={toggleOnlineStatus}
+              disabled={updatingStatus}
+              className={`px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm ${
+                isOnline 
+                  ? "bg-green-500 text-white hover:bg-green-600" 
+                  : "bg-red-500 text-white hover:bg-red-600"
+              }`}
+            >
+              <span className={`w-2.5 h-2.5 rounded-full ${isOnline ? "bg-white animate-pulse" : "bg-white/70"}`} />
+              {isOnline ? "ONLINE (Atendendo)" : "OFFLINE (Ausente)"}
+            </button>
           </div>
         </div>
       )}
@@ -208,7 +213,7 @@ const Consultorio = () => {
             <div>
               <h4 className="text-sm font-semibold text-amber-500">Cadastro em Análise</h4>
               <p className="text-sm text-amber-500/80 mt-1">
-                ⚡ Seu cadastro está em análise pela nossa Diretoria Técnica. O prazo de aprovação e publicação do seu Card na plataforma é de até 12 horas. Enquanto isso, aproveite para explorar seu Consultório Virtual e preencher seus dados de perfil!
+                ⚡ Seu cadastro está em análise pela nossa Diretoria Técnica. O prazo de aprovação e publicação do seu Card na plataforma é de até 12 horas. Enquanto isso, aproveite para explorar seu Consultório Virtual e praticar atendimentos com o Paciente Teste IA!
               </p>
             </div>
           </div>
@@ -216,9 +221,15 @@ const Consultorio = () => {
       )}
 
       <div className="flex-1 container mx-auto py-6">
-        <Tabs defaultValue="atendimentos" className="w-full">
-          <TabsList className="mb-6 w-full justify-start overflow-x-auto">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-6 w-full justify-start overflow-x-auto gap-1.5 p-1 bg-card border">
             <TabsTrigger value="atendimentos">Atendimentos</TabsTrigger>
+            <TabsTrigger value="paciente-teste" className="bg-emerald-500/10 text-emerald-400 font-bold data-[state=active]:bg-emerald-500 data-[state=active]:text-black">
+              🎭 Paciente Teste (Simulação 360°)
+            </TabsTrigger>
+            <TabsTrigger value="ranking-plantacoin" className="bg-amber-500/10 text-amber-400 font-bold data-[state=active]:bg-amber-500 data-[state=active]:text-black">
+              🏆 Ranking & PlantaCoins
+            </TabsTrigger>
             <TabsTrigger value="fila-assincrona">Fila Assíncrona</TabsTrigger>
             <TabsTrigger value="perfil">Perfil e KYC</TabsTrigger>
             <TabsTrigger value="time">Meu Time</TabsTrigger>
@@ -227,6 +238,14 @@ const Consultorio = () => {
           
           <TabsContent value="atendimentos" className="mt-0 border-0 p-0">
             <MedicalDashboard />
+          </TabsContent>
+
+          <TabsContent value="paciente-teste" className="mt-0 border-0 p-0">
+            <PacienteTesteSimulacao360 />
+          </TabsContent>
+
+          <TabsContent value="ranking-plantacoin" className="mt-0 border-0 p-0">
+            <DoctorRankingPlantaCoin />
           </TabsContent>
 
           <TabsContent value="fila-assincrona" className="mt-0 border-0 p-0">

@@ -46,11 +46,11 @@ interface PrescriptionItem {
 
 // ─── Mock data (will be replaced by real queries) ───────────
 const MOCK_WAITING: WaitingPatient[] = [
+  { id: "paciente-teste-id", appointmentId: "appt-sim-01", name: "Paciente Teste (Simulação IA - PAGO)", cpf: "***.***.000-00", age: 38, waitMinutes: 0, tags: ["🤖 Paciente Teste", "Simulação 360", "Insônia"], urgency: "high", symptoms: "Não dorme há 3 dias (<2h por noite), exaustão, ansiedade noturna. Deseja orientação médica canábica." },
   { id: "1", appointmentId: "a1", name: "Maria Silva", cpf: "***.***.789-01", age: 45, waitMinutes: 3, tags: ["Dor Crônica", "Retorno"], urgency: "medium", symptoms: "Lombalgia persistente, insônia leve" },
   { id: "2", appointmentId: "a2", name: "João Santos", cpf: "***.***.456-78", age: 32, waitMinutes: 18, tags: ["Ansiedade", "Retorno"], urgency: "low", symptoms: "Ansiedade generalizada, pânico noturno" },
   { id: "3", appointmentId: "a3", name: "Ana Costa", cpf: "***.***.123-45", age: 58, waitMinutes: 1, tags: ["Epilepsia", "Urgente"], urgency: "high", symptoms: "Crises refratárias, 3x/semana" },
   { id: "4", appointmentId: "a4", name: "Carlos Oliveira", cpf: "***.***.321-00", age: 67, waitMinutes: 22, tags: ["Parkinson", "Retorno"], urgency: "medium", symptoms: "Tremores, rigidez muscular progressiva" },
-  { id: "5", appointmentId: "a5", name: "Fernanda Lima", cpf: "***.***.654-32", age: 29, waitMinutes: 5, tags: ["Insônia", "Fibromialgia"], urgency: "low", symptoms: "Dificuldade para dormir, dor difusa" },
 ];
 
 const AI_PROTOCOLS: Record<string, { product: string; dosage: string; notes: string }> = {

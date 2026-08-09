@@ -1,7 +1,6 @@
 import { Component, lazy, Suspense, type ComponentType, type LazyExoticComponent, type ReactNode } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 
 type LazyModule<T extends ComponentType<any>> = Promise<{ default: T }>;
 

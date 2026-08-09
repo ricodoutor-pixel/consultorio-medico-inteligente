@@ -291,7 +291,7 @@
   <meta name="twitter:title" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda">
   <meta property="og:description" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!">
   <meta name="twitter:description" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!">
-  <script type="module" crossorigin src="/assets/index-DJ1EAViV.js"></script>
+  <script type="module" crossorigin src="/assets/index-5Y5a_uAz.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/date-fns-kcmPcxah.js">
   <link rel="modulepreload" crossorigin href="/assets/vendor-DUWJGh7Z.js">
   <link rel="modulepreload" crossorigin href="/assets/i18n-COVkCh4V.js">
@@ -300,7 +300,7 @@
   <link rel="modulepreload" crossorigin href="/assets/ui-primitives-B26ldWuL.js">
   <link rel="modulepreload" crossorigin href="/assets/animation-XUogTf8p.js">
   <link rel="stylesheet" crossorigin href="/assets/vendor-DpsRipQV.css">
-  <link rel="stylesheet" crossorigin href="/assets/index-BUOgWWKf.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-B6ae67PB.css">
 </head>
   <body>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GT-MRLXCRGK"
@@ -352,12 +352,28 @@
           } catch(_){}
         }
 
+        // Ruído de extensões do navegador (MetaMask, carteiras, tradutores) e
+        // erros de Service Worker dentro de iframe não são falhas da plataforma.
+        function isExternalNoise(err){
+          try {
+            var msg = String((err && err.message) || err || '');
+            var stack = String((err && err.stack) || '');
+            if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack)) return true;
+            if (/MetaMask|ethereum|web3|Failed to connect to MetaMask/i.test(msg)) return true;
+            if (/ServiceWorkerRegistration|document is in an invalid state/i.test(msg)) return true;
+            if (/ResizeObserver loop/i.test(msg)) return true;
+          } catch(_){}
+          return false;
+        }
+
         function reportEarlyError(err, source){
+          if (isExternalNoise(err)) return;
           crumb('error', { src: source, msg: String(err && err.message || err).slice(0,200) });
           // Tentar mandar para Sentry depois que ele subir
           window.__pyr_earlyErrors = window.__pyr_earlyErrors || [];
           window.__pyr_earlyErrors.push({ source: source, message: String(err && err.message || err), stack: err && err.stack });
           console.error('[boot]', source, err);
+
 
           var msg = String(err && err.message || err);
           var isChunkErr = /Failed to fetch dynamically imported module|dynamically imported module|Importing a module script failed|Loading chunk|ChunkLoadError|Failed to load module script/i.test(msg);

@@ -511,16 +511,24 @@ const CadastroProfissional = () => {
                   <li>⏳ {isBO ? "Liberación del Dashboard Médico (≤ 24h)" : "Liberação do Dashboard Médico (≤ 24h)"}</li>
                 </ul>
               </div>
-              <div className="flex gap-3 justify-center flex-wrap mb-3">
-                <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
-                  <a href="/login">{isBO ? "Iniciar Sesión Ahora" : "Fazer Login Agora"} <ArrowRight size={16} className="ml-2" /></a>
+
+              {/* Botão Principal — Entrar direto no Consultório Virtual */}
+              <div className="flex flex-col gap-3 justify-center items-center mb-6 w-full">
+                <Button className="w-full text-lg py-6 font-black bg-gradient-to-r from-emerald-500 to-teal-500 text-black hover:scale-[1.02] shadow-xl rounded-2xl glow-green" asChild>
+                  <a href="/consultorio">
+                    🚀 {isBO ? "Ir al Consultorio Virtual Ahora" : "Entrar Direto no Consultório Virtual"} <ArrowRight size={20} className="ml-2" />
+                  </a>
                 </Button>
               </div>
+
               <div className="flex gap-3 justify-center flex-wrap">
-                <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
-                  <a href="/profissionais">{isBO ? "Ver Profesionales" : "Ver Profissionais"} <ArrowRight size={16} className="ml-2" /></a>
+                <Button variant="outline" className="font-bold border-border rounded-2xl" asChild>
+                  <a href="/login">{isBO ? "Iniciar Sesión" : "Fazer Login"}</a>
                 </Button>
-                <Button variant="outline" className="font-black border-border rounded-2xl" asChild>
+                <Button variant="outline" className="font-bold border-border rounded-2xl" asChild>
+                  <a href="/profissionais">{isBO ? "Ver Profesionales" : "Ver Profissionais"}</a>
+                </Button>
+                <Button variant="outline" className="font-bold border-border rounded-2xl" asChild>
                   <a href="https://wa.me/5511991363154?text=Olá!%20Enviei%20meu%20cadastro%20de%20profissional" target="_blank" rel="noopener noreferrer">
                     {isBO ? "Hablar con Soporte" : "Falar com Suporte"}
                   </a>

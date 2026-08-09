@@ -150,8 +150,26 @@ export const Navbar = () => {
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
-            {/* Logo + Verdinho */}
-            <div className="flex items-center gap-1.5 md:gap-3.5 lg:gap-4 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
+            {/* Logo + Seta de Voltar + Verdinho */}
+            <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
+              {location.pathname !== "/" && (
+                <button
+                  onClick={() => {
+                    if (window.history.length > 1) {
+                      navigate(-1);
+                    } else {
+                      navigate("/");
+                    }
+                  }}
+                  aria-label="Voltar para a página anterior"
+                  title="Voltar à página anterior"
+                  className="p-1.5 md:p-2 rounded-xl bg-muted/50 hover:bg-muted text-foreground border border-border/50 transition-all flex items-center gap-1 font-bold text-xs md:text-sm active:scale-95 shadow-sm"
+                >
+                  <ArrowLeft size={18} className="text-primary" />
+                  <span className="hidden sm:inline">Voltar</span>
+                </button>
+              )}
+
               <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3">
                 <img
                   src="/logo-planta-raiz.webp"
@@ -161,13 +179,9 @@ export const Navbar = () => {
                   {...({ fetchpriority: "high" } as Record<string, string>)}
                   loading="eager"
                   decoding="sync"
-                  className="h-[62px] md:h-[74px] w-auto max-w-[210px] md:max-w-[260px] object-contain object-left drop-shadow-[0_0_14px_rgba(34,197,94,0.25)]"
+                  className="h-[56px] sm:h-[62px] md:h-[74px] w-auto max-w-[180px] sm:max-w-[210px] md:max-w-[260px] object-contain object-left drop-shadow-[0_0_14px_rgba(34,197,94,0.25)]"
                 />
               </NavLink>
-
-
-
-
             </div>
 
             {/* Desktop: Verdinho exatamente no meio entre o logo e o menu */}

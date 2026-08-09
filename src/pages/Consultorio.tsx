@@ -154,8 +154,16 @@ const Consultorio = () => {
         <div className="px-4 py-3 bg-card border-b flex justify-between items-center flex-wrap gap-3">
           <div className="flex items-center gap-2">
             <button 
+              onClick={() => window.history.back()}
+              className="px-3 py-1.5 rounded-xl bg-muted/60 hover:bg-muted text-foreground font-bold text-xs flex items-center gap-1 transition-colors"
+              title="Voltar à página anterior"
+            >
+              <ArrowLeft size={16} /> <span className="hidden sm:inline">Voltar</span>
+            </button>
+
+            <button 
               onClick={() => setActiveTab("paciente-teste")}
-              className="px-4 py-1.5 rounded-full text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-emerald-500 to-teal-600 text-black hover:scale-105"
+              className="px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-2 transition-all shadow-md bg-gradient-to-r from-emerald-500 to-teal-600 text-black hover:scale-105"
             >
               <Sparkles size={16} /> 🎭 Ativar Paciente Teste
             </button>
@@ -223,21 +231,21 @@ const Consultorio = () => {
 
       <div className="flex-1 container mx-auto py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6 w-full justify-start overflow-x-auto gap-1.5 p-1 bg-card border">
-            <TabsTrigger value="atendimentos">Atendimentos</TabsTrigger>
-            <TabsTrigger value="copiloto-vip" className="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 font-extrabold data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-black border border-emerald-500/30">
+          <TabsList className="mb-6 w-full flex flex-nowrap overflow-x-auto h-auto p-1.5 bg-card/90 backdrop-blur-md border border-border/60 rounded-xl gap-2 whitespace-nowrap scrollbar-none">
+            <TabsTrigger value="atendimentos" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Atendimentos</TabsTrigger>
+            <TabsTrigger value="copiloto-vip" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-extrabold rounded-lg transition-all bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-black border border-emerald-500/30">
               🧠 Copiloto IA (Decisão Clínica)
             </TabsTrigger>
-            <TabsTrigger value="paciente-teste" className="bg-emerald-500/10 text-emerald-400 font-bold data-[state=active]:bg-emerald-500 data-[state=active]:text-black">
+            <TabsTrigger value="paciente-teste" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all bg-emerald-500/10 text-emerald-400 data-[state=active]:bg-emerald-500 data-[state=active]:text-black">
               🎭 Paciente Teste (Simulação 360°)
             </TabsTrigger>
-            <TabsTrigger value="ranking-plantacoin" className="bg-amber-500/10 text-amber-400 font-bold data-[state=active]:bg-amber-500 data-[state=active]:text-black">
+            <TabsTrigger value="ranking-plantacoin" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all bg-amber-500/10 text-amber-400 data-[state=active]:bg-amber-500 data-[state=active]:text-black">
               🏆 Ranking & PlantaCoins
             </TabsTrigger>
-            <TabsTrigger value="fila-assincrona">Fila Assíncrona</TabsTrigger>
-            <TabsTrigger value="perfil">Perfil e KYC</TabsTrigger>
-            <TabsTrigger value="time">Meu Time</TabsTrigger>
-            <TabsTrigger value="educacao">Educação Continuada</TabsTrigger>
+            <TabsTrigger value="fila-assincrona" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Fila Assíncrona</TabsTrigger>
+            <TabsTrigger value="perfil" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Perfil e KYC</TabsTrigger>
+            <TabsTrigger value="time" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Meu Time</TabsTrigger>
+            <TabsTrigger value="educacao" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Educação Continuada</TabsTrigger>
           </TabsList>
           
           <TabsContent value="atendimentos" className="mt-0 border-0 p-0">

@@ -213,6 +213,8 @@ async function sendMsg(chatId: string, phone: string, text: string): Promise<boo
   return sendEvo(phone, text);
 }
 
+import { GEMINI_PRIMARY_MODEL, GEMINI_FALLBACK_MODEL, GEMINI_MODELS_FALLBACK_CHAIN } from '../_shared/gemini.ts';
+
 // ── GEMINI (Estágio 2 — background) ──────────────────────────────────────
 async function tryGemini(text: string, name: string | null, phone: string): Promise<string | null> {
   const ctx  = name ? `[${name}|+${phone}]` : `[+${phone}]`;
@@ -224,7 +226,7 @@ async function tryGemini(text: string, name: string | null, phone: string): Prom
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${LOVABLE_KEY}` },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash', max_tokens: 450, temperature: 0.75,
+          model: `google/${GEMINI_PRIMARY_MODEL}`, max_tokens: 450, temperature: 0.75,
           messages: [{ role: 'system', content: PERSONA }, { role: 'user', content: user }],
         }),
         signal: AbortSignal.timeout(12_000),
@@ -239,7 +241,7 @@ async function tryGemini(text: string, name: string | null, phone: string): Prom
 
   if (!GEMINI_KEY) return null;
 
-  for (const model of ['gemini-2.5-flash', 'gemini-2.5-pro']) {
+  for (const model of GEMINI_MODELS_FALLBACK_CHAIN) {
     try {
       const r = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`,

@@ -11,6 +11,8 @@ const IMG_STYLE =
   "square 1:1 composition, no text overlay, no watermark, no logos, no medical symbols, " +
   "no people faces visible (or out of focus), high resolution, instagram-ready.";
 
+import { GEMINI_PRIMARY_MODEL } from "./gemini.ts";
+
 export async function generateGeminiImageForTopic(
   topic: string,
 ): Promise<{ url: string | null; error?: string }> {
@@ -31,7 +33,7 @@ export async function generateGeminiImageForTopic(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image",
+        model: `google/${GEMINI_PRIMARY_MODEL}`,
         messages: [{ role: "user", content: prompt }],
         modalities: ["image", "text"],
       }),

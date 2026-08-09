@@ -95,6 +95,8 @@ Gere um RESUMO CLÍNICO estruturado a partir da triagem do paciente, seguindo es
 
 Responda APENAS com o resumo clínico, sem comentários adicionais. Máximo 400 palavras.`;
 
+import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
+
     const aiResponse = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",
       headers: {
@@ -102,7 +104,7 @@ Responda APENAS com o resumo clínico, sem comentários adicionais. Máximo 400 
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gemini-2.5-flash",
+        model: GEMINI_PRIMARY_MODEL,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: triageText },

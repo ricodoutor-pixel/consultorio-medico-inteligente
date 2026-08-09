@@ -125,30 +125,23 @@ async function generateReply(userText: string, phone: string, name: string | nul
     return { text: "Ola! Sou a Enfa Brisa da Planta y Raiz. Estou com instabilidade tecnica agora. Em instantes retorno. Ou acesse: https://plantayraiz.com.br", source: "fallback:no_key" };
   }
 
+import { callGeminiApiWithFallback, GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
+
   try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 25000);
-    const r = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST", signal: ctrl.signal,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: BRISA_PERSONA }] },
-          contents: [{ role: "user", parts: [{ text: userContent }] }],
-          generationConfig: { maxOutputTokens: 400, temperature: 0.7 },
-        }),
-      }
-    );
-    clearTimeout(t);
-    if (r.ok) {
-      const j = await r.json() as {candidates?:Array<{content?:{parts?:Array<{text?:string}>}}>};
-      const reply = j?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      if (reply) return { text: reply, source: "gemini-1.5-pro" };
+    const payload = {
+      system_instruction: { parts: [{ text: BRISA_PERSONA }] },
+      contents: [{ role: "user", parts: [{ text: userContent }] }],
+      generationConfig: { maxOutputTokens: 400, temperature: 0.7 },
+    };
+
+    const res = await callGeminiApiWithFallback(GEMINI_API_KEY, payload, GEMINI_PRIMARY_MODEL);
+    if (res.ok) {
+      const reply = res.data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (reply) return { text: reply, source: res.usedModel };
       return { text: "Ola! Sou a Enfa Brisa da Planta y Raiz. Estou com instabilidade tecnica agora. Em instantes retorno.", source: "fallback:empty_candidate" };
     } else {
-      const errBody = await r.text();
-      return { text: "Ola! Sou a Enfa Brisa da Planta y Raiz. Estou com instabilidade tecnica agora. Em instantes retorno.", source: `fallback:gemini_http_${r.status}:${errBody.slice(0,180)}` };
+      console.error(`Gemini API HTTP ${res.status}:`, res.data);
+      return { text: "Ola! Sou a Enfa Brisa da Planta y Raiz. Estou com instabilidade tecnica agora. Em instantes retorno.", source: `fallback:http_${res.status}` };
     }
   } catch(e) {
     return { text: "Ola! Sou a Enfa Brisa da Planta y Raiz. Estou com instabilidade tecnica agora. Em instantes retorno.", source: `fallback:exception:${String(e).slice(0,180)}` };

@@ -95,11 +95,13 @@ ${pathologyContext || "(indisponível)"}
 
 Gere o relatório clínico no formato definido.`;
 
+import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
+
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Lovable-API-Key": LOVABLE_API_KEY },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: `google/${GEMINI_PRIMARY_MODEL}`,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userPrompt },
@@ -125,7 +127,7 @@ Gere o relatório clínico no formato definido.`;
       message_in: `exames=${exams.length} paciente=${targetUserId}`,
       message_out: report.slice(0, 2000),
       provider: "lovable",
-      model: "google/gemini-2.5-flash",
+      model: `google/${GEMINI_PRIMARY_MODEL}`,
       status: "ok",
       http_status: 200,
       latency_ms: 0,

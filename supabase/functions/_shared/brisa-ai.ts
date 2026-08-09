@@ -4,6 +4,8 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { BRISA_PERSONA } from "./brisa-persona.ts";
 
+import { GEMINI_PRIMARY_MODEL, GEMINI_FALLBACK_MODEL } from "./gemini.ts";
+
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") || "";
@@ -14,7 +16,8 @@ const GEMINI_API_KEY =
   "";
 
 const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = GEMINI_PRIMARY_MODEL;
+const FALLBACK_MODEL = GEMINI_FALLBACK_MODEL;
 const stripPrefix = (m: string) => m.replace(/^google\//, "");
 
 const sb = createClient(SUPABASE_URL, SERVICE_ROLE);

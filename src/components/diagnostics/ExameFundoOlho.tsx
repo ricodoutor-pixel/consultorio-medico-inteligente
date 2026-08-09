@@ -128,7 +128,7 @@ export function ExameFundoOlho({ onComplete }: { onComplete?: () => void }) {
     const aiLogs = [
       'Conectando ao banco de 31 patologias oftalmológicas...',
       'Cruzando achados com +40.000 estudos publicados...',
-      'Aplicando modelo de IA (Gemini 2.5 Flash)...',
+      'Aplicando modelo de IA (Gemini 3.5 Flash)...',
       'Analisando correlações com doenças sistêmicas...',
       'Avaliando conexões com cannabis medicinal...',
       'Gerando parecer técnico baseado em evidências...'
@@ -360,7 +360,7 @@ export function ExameFundoOlho({ onComplete }: { onComplete?: () => void }) {
               </div>
               <div className="bg-white p-3 rounded-xl border shadow-sm">
                 <Brain className="w-5 h-5 text-violet-500 mb-1" />
-                <p className="text-[11px] text-slate-600 leading-tight">Diagnóstico IA com Gemini 2.5</p>
+                <p className="text-[11px] text-slate-600 leading-tight">Diagnóstico IA com Gemini 3.5</p>
               </div>
               <div className="bg-white p-3 rounded-xl border shadow-sm">
                 <Pill className="w-5 h-5 text-green-500 mb-1" />

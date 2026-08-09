@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from "../_shared/cors.ts"
+import { callGeminiApiWithFallback, GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts"
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY') || ''
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -65,25 +66,15 @@ Retorne EXATAMENTE UM JSON VÁLIDO com a seguinte estrutura e nada mais (sem blo
 
     console.log("Sending audio to Gemini API...");
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      }
-    )
+    const res = await callGeminiApiWithFallback(GEMINI_API_KEY, requestBody, GEMINI_PRIMARY_MODEL);
 
-    const result = await response.json()
-    console.log("Gemini API Response Status:", response.status);
-
-    if (!response.ok) {
-      console.error("Gemini API Error details:", JSON.stringify(result));
-      throw new Error(result.error?.message || "Failed to process audio with Gemini")
+    if (!res.ok) {
+      console.error("Gemini API Error details:", JSON.stringify(res.data));
+      throw new Error(res.data?.error?.message || "Failed to process audio with Gemini")
     }
 
-    const aiResponseText = result.candidates[0].content.parts[0].text;
-    console.log("Gemini Response Text:", aiResponseText);
+    const aiResponseText = res.data.candidates[0].content.parts[0].text;
+    console.log("Gemini Response Text (Model:", res.usedModel, "):", aiResponseText);
     
     let parsedResponse;
     try {

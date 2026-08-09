@@ -64,7 +64,9 @@ serve(async (req) => {
       url: a.url, doi: a.doi, abstract: (a.abstract || "").slice(0, 500),
     }));
 
-    // 2) (Opcional) sintetizar resumo clínico via Lovable AI Gateway
+import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
+
+// 2) (Opcional) sintetizar resumo clínico via Lovable AI Gateway
     let summary: string | null = null;
     if (summarize && GEMINI_API_KEY && cleaned.length > 0) {
       try {
@@ -74,7 +76,7 @@ serve(async (req) => {
           method: "POST",
           headers: { Authorization: `Bearer ${GEMINI_API_KEY}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "gemini-2.5-flash",
+            model: GEMINI_PRIMARY_MODEL,
             messages: [
               { role: "system", content: "Você é um assistente clínico. Resuma evidências em 3 frases curtas, em PT-BR, citando [n]." },
               { role: "user", content: `Condição: ${condition}\n\nEvidências:\n${ctx}` },

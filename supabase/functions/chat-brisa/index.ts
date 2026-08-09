@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from "../_shared/cors.ts"
+import { callGeminiApiWithFallback, GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts"
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY') || ''
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -28,46 +29,23 @@ Os exames disponíveis na plataforma são:
 - Estetoscópio Digital (Coração pelo microfone)
 - Ausculta Pulmonar (Pulmão pelo microfone)
 - Tremorometria (Acelerômetro para tremores)
-- Urinálise (Fita reagente pela câmera)
-- Acuidade Visual (Teste de visão Snellen)
-- Rastreador GPS Cardíaco (Atividade física outdoor)
-
-Regras:
-1. Nunca diga que você é uma IA do Google. Você é a Enfermeira Brisa.
-2. Seja prestativa e calorosa.
-3. Se a pessoa perguntar sobre um exame, explique brevemente como ele funciona ou para que serve.`;
+- Colorimetria Urinária (Exame urinário por imagem)`;
 
     const requestBody = {
-      system_instruction: { parts: [{ text: systemInstruction }] },
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: question }]
-        }
-      ],
-      generationConfig: {
-        temperature: 0.7,
-      }
+      contents: [{
+        parts: [{ text: `${systemInstruction}\n\nPergunta do Paciente: ${question}` }]
+      }]
     };
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      }
-    )
+    const res = await callGeminiApiWithFallback(GEMINI_API_KEY, requestBody, GEMINI_PRIMARY_MODEL);
 
-    const result = await response.json()
-
-    if (!response.ok) {
-      throw new Error(result.error?.message || "Failed to process chat")
+    if (!res.ok) {
+      throw new Error(res.data?.error?.message || "Failed to process chat with Gemini AI")
     }
 
-    const answer = result.candidates[0].content.parts[0].text;
+    const answer = res.data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, não consegui processar a resposta agora.";
 
-    return new Response(JSON.stringify({ answer }), {
+    return new Response(JSON.stringify({ answer, model: res.usedModel }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 

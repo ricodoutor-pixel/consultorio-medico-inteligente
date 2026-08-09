@@ -211,6 +211,8 @@ Analise os dados do exame acima, cruze com o banco de patologias e forneça o di
       }
     }
 
+import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
+
     // 5. Log to audit
     await sb.from("brisa_interaction_logs").insert({
       channel: "diagnostic-ai",
@@ -218,7 +220,7 @@ Analise os dados do exame acima, cruze com o banco de patologias e forneça o di
       message_in: JSON.stringify(exam_data).slice(0, 1000),
       message_out: JSON.stringify(diagnosis).slice(0, 2000),
       provider: "gemini",
-      model: "gemini-2.5-flash",
+      model: GEMINI_PRIMARY_MODEL,
       status: "ok",
       http_status: 200,
       latency_ms: 0,

@@ -80,20 +80,18 @@ Deno.serve(async (req) => {
       let postContent = "";
       let aiError = "";
 
+import { callGeminiApiWithFallback, GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
+
       if (GEMINI_API_KEY) {
         try {
-          const aiResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ role: "user", parts: [{ text: `${theme.prompt}\n\nSempre inclua o link ${siteLink}. CNAE 6209-1/00. Nunca prometa cura. UTM: ?utm_source=brisa_ia&utm_medium=social&utm_campaign=${theme.theme}` }] }],
-            }),
-          });
+          const reqPayload = {
+            contents: [{ role: "user", parts: [{ text: `${theme.prompt}\n\nSempre inclua o link ${siteLink}. CNAE 6209-1/00. Nunca prometa cura. UTM: ?utm_source=brisa_ia&utm_medium=social&utm_campaign=${theme.theme}` }] }]
+          };
+          const aiResp = await callGeminiApiWithFallback(GEMINI_API_KEY, reqPayload, GEMINI_PRIMARY_MODEL);
           if (aiResp.ok) {
-            const aiData = await aiResp.json();
-            postContent = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+            postContent = aiResp.data.candidates?.[0]?.content?.parts?.[0]?.text || "";
           } else {
-            aiError = `google_gemini ${aiResp.status}: ${(await aiResp.text()).slice(0,200)}`;
+            aiError = `google_gemini ${aiResp.status}: ${JSON.stringify(aiResp.data).slice(0,200)}`;
           }
         } catch (e) { aiError = `google_gemini exception: ${e}`; }
       } else {

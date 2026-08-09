@@ -11,8 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 export function WhatsAppFailoverManager() {
   // Instâncias
   const [brisaStatus, setBrisaStatus] = useState<"connected" | "disconnected" | "qr">("connected");
-  const [edilsonStatus, setEdilsonStatus] = useState<"connected" | "disconnected" | "qr">("qr");
-  const [activeInstance, setActiveInstance] = useState<"brisa" | "edilson">("edilson");
+  const [edilsonStatus, setEdilsonStatus] = useState<"connected" | "disconnected" | "qr">("connected");
+  const [activeInstance, setActiveInstance] = useState<"brisa" | "edilson">("brisa");
   
   // QRCode State
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);

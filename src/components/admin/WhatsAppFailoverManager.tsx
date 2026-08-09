@@ -23,7 +23,21 @@ export function WhatsAppFailoverManager() {
   const [countdown, setCountdown] = useState<number>(0);
   const [targetPhone, setTargetPhone] = useState("5511987131241");
   const [messageText, setMessageText] = useState(
-    "Olá Dr(a)! Sou a equipe do Dr. Edilson Bezerra da Planta & Raíz. Seu cadastro está liberado no nosso Consultório Virtual. Acesse: https://plantayraiz.com.br/consultorio"
+    `📲 PASSO A PASSO DO SEU ATENDIMENTO:
+1️⃣ Acesse o Perfil do Profissional: 👉 https://plantayraiz.com.br/profissionais
+
+(O Dr. Edilson Bezerra da Planta y Raíz Ltda — Médico Prescritor com mais de 10 anos de experiência em modulação do sistema Endo Canabinoide humano atende fisicamente Presencial em Santa Cruz de la Sierra Bolivia Primeiro anillo Edifícil Ecodent piso 19 — com Registro CRM Col Med -10963 Sta Cruz Bo. No Brasil, atua apenas Prestando Mentoria Orientação Técnica Especializada).
+
+2️⃣ Escolha a Modalidade Desejada:
+💬 Orientação Técnica via Chat (30 min): R$ 30,00
+📹 Orientação Técnica Completa (Chat + Vídeo): R$ 100,00
+
+3️⃣ Pagamento Rápido e Seguro (PIX ou Cartão) com confirmação instantânea.
+4️⃣ Atendimento ao Vivo na sala virtual.
+5️⃣ Relatório Técnico Digital assinado.
+
+💬 Dúvidas no WhatsApp: https://wa.me/5511991363154
+Seja bem-vindo(a) à medicina do futuro! 🌿💚`
   );
   const [sentCount, setSentCount] = useState(0);
   const timerRef = useRef<any>(null);

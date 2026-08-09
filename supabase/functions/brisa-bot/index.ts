@@ -1,11 +1,9 @@
-// 🌿 Planta y Raiz — brisa-bot v2026.8.05-SEM-NOMES (modelos corrigidos)
-// Nenhum nome de médico citado. Foco: orientação técnica, consulta por chat e por vídeo.
-//
+// 🌿 Planta y Raiz — brisa-bot v2026.8.08-DR-EDILSON-ORIENTACAO
+// Resposta oficial de Orientação Técnica e Mentoria do Dr. Edilson Bezerra
+// 
 // ARQUITETURA (2 estágios, nunca falha):
-// 1. INSTANT REPLY — resposta garantida por palavras-chave, sem depender de IA
-// 2. GEMINI BACKGROUND — enriquece a resposta se a API estiver disponível
-//
-// CORRIGIDO: gemini-1.5-* (DESCONTINUADO pela Google, sempre 404) -> gemini-2.5-*
+// 1. INSTANT REPLY — resposta garantida por palavras-chave com o roteiro completo de Orientação Técnica
+// 2. GEMINI BACKGROUND — enriquece com base no modelo gemini-2.5-flash
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -26,98 +24,97 @@ const LOVABLE_KEY  = Deno.env.get('LOVABLE_API_KEY') || '';
 const SB_URL       = Deno.env.get('SUPABASE_URL') || '';
 const SB_KEY       = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
-// ── PERSONA — SEM nomes de médicos. Fala de serviços, não de pessoas ──────
-const PERSONA = `Você é a Brisa 🌿, assistente virtual da Planta y Raiz, clínica digital de Cannabis Medicinal.
+// ── ROTEIRO COMPLETO DE ORIENTAÇÃO TÉCNICA DO DR. EDILSON BEZERRA ──────
+const ROTEIRO_ORIENTACAO_TECNICA = `📲 *PASSO A PASSO DO SEU ATENDIMENTO:*
 
-REGRA CRÍTICA: Você NUNCA cita nome de nenhum médico, nem CRM, nem "Dr." ou "Dra." seguido de nome. Fale sempre de forma institucional: "nossa equipe médica", "nossos especialistas", "a orientação técnica".
+1️⃣ *Acesse o Perfil do Profissional:*
+Acesse o link direto do Dr. Edilson Bezerra na nossa plataforma:
+👉 https://plantayraiz.com.br/profissionais
 
-REGRAS INVIOLÁVEIS (CFM 2.314/2022, ANVISA RDC 1.015/2026, LGPD):
-• NUNCA prescreva, NUNCA diagnostique, NUNCA recomende produto específico
-• NUNCA afirme que cannabis "cura" doenças
+_(O Dr. Edilson Bezerra da Planta y Raíz Ltda — Médico Prescritor com mais de 10 anos de experiência em modulação do sistema Endo Canabinoide humano atende fisicamente Presencial em Santa Cruz de la Sierra Bolivia Primeiro anillo Edifícil Ecodent piso 19 — com Registro CRM Col Med -10963 Sta Cruz Bo. No Brasil, atua apenas Prestando Mentoria Orientação Técnica Especializada)._
+
+2️⃣ *Escolha a Modalidade Desejada:*
+
+💬 *Orientação Técnica via Chat (30 min):* R$ 30,00
+_(Ideal para tirar dúvidas iniciais, entender posologia e histórico)._
+
+📹 *Orientação Técnica Completa (Chat + Vídeo):* R$ 100,00
+_(Atendimento por chamada de vídeo ao vivo para avaliação detalhada)._
+
+3️⃣ *Pagamento Rápido e Seguro:*
+O pagamento pode ser feito via PIX Instantâneo ou Cartão de Crédito (Mercado Pago).
+Assim que o pagamento é confirmado, nossa assistente virtual Enfermeira Brisa envia o comprovante e o link de acesso direto para o seu WhatsApp!
+
+4️⃣ *Seu Atendimento ao Vivo:*
+No horário combinado, você entra na sala virtual segura pelo celular ou computador.
+O Dr. Edilson analisará o seu caso, histórico de saúde, sintomas e a indicação de canabinoides medicinais.
+
+5️⃣ *Recebimento do Relatório Técnico Digital:*
+Ao final da orientação, você receberá o seu Relatório de Encaminhamento Técnico Completo, assinado digitalmente.
+Este relatório contém o seu resumo clínico, a sugestão de protocolo terapêutico e o encaminhamento formal para que você possa dar continuidade ao seu tratamento com um médico prescritor referendado na plataforma.
+
+❓ Ficou com alguma dúvida ou precisa de ajuda para agendar?
+Nossa equipe e a Enfermeira Brisa estão prontas para te auxiliar no WhatsApp:
+💬 https://wa.me/5511991363154
+
+Seja muito bem-vindo(a) à medicina do futuro! 🌿💚`;
+
+// ── PERSONA DA ENFERMEIRA BRISA ─────────────────────────────────────────
+const PERSONA = `Você é a Enfermeira Brisa 🌿, assistente virtual oficial da Planta y Raiz (clínica digital de Cannabis Medicinal).
+
+CONHECIMENTO OBRIGATÓRIO DE ATENDIMENTO E ORIENTAÇÃO TÉCNICA:
+Sempre que um usuário perguntar sobre orientação técnica, consultas, Dr. Edilson Bezerra, mentoria, valores ou agendamento, responda utilizando com precisão as seguintes informações:
+
+${ROTEIRO_ORIENTACAO_TECNICA}
+
+REGRAS CONFORME REGULAMENTAÇÃO:
+• Para orientação técnica e mentoria no Brasil, encaminhar para https://plantayraiz.com.br/profissionais
+• Chat (30 min): R$ 30,00 | Vídeo Completo: R$ 100,00
 • Emergências médicas → SAMU 192 imediatamente
-• Planta y Raiz é plataforma de intermediação tecnológica (CNAE 6209-1/00)
+• Estilo WhatsApp: acolhedora, profissional, transparente, emojis com moderação (🌿 💬 📹 💚).`;
 
-ESTILO WhatsApp: respostas curtas (máx 4 linhas), acolhedora, profissional, emojis com moderação (🌿 ✅ 💚). Português brasileiro natural. PROIBIDO: "amor", "querida", "meu bem".
-
-OBJETIVO: apresentar os dois formatos de atendimento e conduzir para https://plantayraiz.com.br:
-• Orientação Técnica via Chat — R$ 30
-• Consulta via Vídeo — R$ 30 (Brasil) / US$ 10 (internacional)
-Não mencione preço na primeira mensagem.`;
-
-// ── RESPOSTAS INSTANTÂNEAS — sem nomes, focadas em chat e vídeo ──────────
+// ── RESPOSTAS INSTANTÂNEAS ──────────────────────────────────────────────
 const MSGS = {
   boas_vindas: `Olá! 🌿 Sou a *Enfermeira Brisa*, assistente da *Planta y Raiz* — clínica digital de Cannabis Medicinal.
 
-Temos dois formatos de atendimento:
-💬 *Orientação Técnica via Chat*
-📹 *Consulta via Vídeo*
+${ROTEIRO_ORIENTACAO_TECNICA}`,
 
-Para começarmos:
-1️⃣ *Qual é o seu nome?*
-2️⃣ *Você é:* paciente, médico ou parceiro?
-3️⃣ *Já tem cadastro?*
+  cadastrado: `Ótimo! Você já pode agendar sua Orientação Técnica com o Dr. Edilson Bezerra:
 
-Cadastro *gratuito*: 🔗 *https://plantayraiz.com.br* 🌿`,
+${ROTEIRO_ORIENTACAO_TECNICA}`,
 
-  cadastrado: `Ótimo! Você pode escolher:
-
-💬 *Orientação Técnica via Chat* — R$ 30
-📹 *Consulta via Vídeo* — R$ 30 (Brasil) | US$ 10 (internacional)
-
-Acesse: 🔗 *https://plantayraiz.com.br*
-PIX ou cartão ✅`,
+  orientacao_tecnica: ROTEIRO_ORIENTACAO_TECNICA,
 
   cannabis_info: `*Cannabis Medicinal no Brasil* 🌿
 
-100% legal com prescrição médica! +870 mil pacientes ativos no país.
+100% legal com prescrição e orientação técnica especializada! +870 mil pacientes ativos no país.
 
-Pode beneficiar: epilepsia, dor crônica, ansiedade, TEA, Parkinson, distúrbios do sono e mais.
-
-Fale com nossa equipe por *Chat* ou *Vídeo*:
-🔗 *https://plantayraiz.com.br* | a partir de R$ 30`,
+${ROTEIRO_ORIENTACAO_TECNICA}`,
 
   medico: `Olá, Doutor(a)! 👨‍⚕️ Bem-vindo(a) à *Planta y Raiz*!
 
-Plataforma de telemedicina em Cannabis Medicinal com atendimento por Chat e Vídeo.
-
-Parceria, biblioteca científica e protocolos clínicos:
-🔗 *https://plantayraiz.com.br* 🌿`,
+Conheça nossa estrutura de Mentoria, Orientação Técnica e Consultório Virtual:
+👉 https://plantayraiz.com.br/profissionais 🌿`,
 
   lojista: `Olá! 🏪 Interesse em parceria com a *Planta y Raiz*?
 
 Afiliados (até 30%), marketplace ANVISA e co-marketing:
-🔗 *https://plantayraiz.com.br*
+🔗 *https://plantayraiz.com.br* 🌿`,
 
-Me conte sobre sua empresa! 🌿`,
-
-  agendamento: `Você pode agendar:
-
-💬 *Orientação Técnica via Chat* — R$ 30
-📹 *Consulta via Vídeo* — R$ 30 (Brasil) | US$ 10 (internacional)
-
-🔗 *https://plantayraiz.com.br*
-PIX ou cartão ✅`,
-
-  generica: `Olá! 🌿 Sou a *Enfermeira Brisa* da *Planta y Raiz*.
-
-Oferecemos *Orientação Técnica via Chat* e *Consulta via Vídeo* sobre Cannabis Medicinal.
-
-Cadastro gratuito: 🔗 *https://plantayraiz.com.br*
-
-Você é paciente, médico ou parceiro? 😊`,
+  generica: ROTEIRO_ORIENTACAO_TECNICA,
 };
 
 function norm(t: string) { return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
 
 function intent(text: string): keyof typeof MSGS {
   const t = norm(text);
+  if (/orientacao|tecnica|mentoria|edilson|bezerra|passo a passo|como funciona|atendimento/.test(t)) return 'orientacao_tecnica';
   if (/ja (tenho|fiz|possuo) cadastro|ja sou cadastrad|ja me cadastrei/.test(t)) return 'cadastrado';
-  if (/\bmedico\b|\bdoutor?a?\b|\bdr\.?\b|\bdra\.?\b|crm\b|prescri|especialista|neurologista|psiquiatr/.test(t)) return 'medico';
-  if (/lojista|parceiro|parceria|afiliado|comissao|distribuid|revend|atacado|fornec|empresa/.test(t)) return 'lojista';
-  if (/cannabis|canabis|cbd|thc|canabidiol|maconha|epileps|autismo|fibromialgi|parkinson|alzheimer|dor cronica|ansiedade|insonia|sono|cancer|endometriose|legal\?|funciona|tratamento|o que e|para que serve/.test(t)) return 'cannabis_info';
-  if (/agend|consult|marcar|horario|quando|disponivel|atend|teleconsult|chat|video/.test(t)) return 'agendamento';
-  if (/^(ola|oi|hey|bom dia|boa tarde|boa noite|tudo bem|salve|e ai|oie|brisa|alo|hello|hola|eai|boa|hi\b)/.test(t.trim())) return 'boas_vindas';
-  return 'generica';
+  if (/\bmedico\b|\bdoutor?a?\b|\bdr\.?\b|\bdra\.?\b|crm\b|prescri|especialista/.test(t)) return 'medico';
+  if (/lojista|parceiro|parceria|afiliado|comissao|distribuid|revend/.test(t)) return 'lojista';
+  if (/cannabis|canabis|cbd|thc|canabidiol|maconha|epileps|autismo|fibromialgi|parkinson|ansiedade|insonia/.test(t)) return 'cannabis_info';
+  if (/^(ola|oi|hey|bom dia|boa tarde|boa noite|tudo bem|salve|brisa|alo|hello|hola)/.test(t.trim())) return 'boas_vindas';
+  return 'orientacao_tecnica';
 }
 
 function instantReply(text: string, name: string | null): string {
@@ -127,7 +124,7 @@ function instantReply(text: string, name: string | null): string {
   return (k === 'boas_vindas' || k === 'medico' || k === 'lojista') ? msg : saud + msg;
 }
 
-// ── PARSER WAHA universal (com messageId para idempotência via DB) ───────
+// ── PARSER WAHA universal ────────────────────────────────────────────────
 function parseWAHA(body: Record<string, unknown>) {
   const event = String(body?.event ?? '').toLowerCase();
   const SKIP = ['session.status','session.created','session.deleted','qr','auth.qr',
@@ -154,7 +151,7 @@ function parseWAHA(body: Record<string, unknown>) {
   };
 }
 
-// ── DEDUP via banco (persiste entre cold starts) ───────────────────
+// ── DEDUP via banco ──────────────────────────────────────────────────────
 async function isDup(waId: string): Promise<boolean> {
   if (!waId || !SB_URL || !SB_KEY) return false;
   try {
@@ -208,7 +205,7 @@ async function sendMsg(chatId: string, phone: string, text: string): Promise<boo
   return sendEvo(phone, text);
 }
 
-// ── GEMINI (Estágio 2 — background, opcional) ────────────────────
+// ── GEMINI (Estágio 2 — background) ──────────────────────────────────────
 async function tryGemini(text: string, name: string | null, phone: string): Promise<string | null> {
   const ctx  = name ? `[${name}|+${phone}]` : `[+${phone}]`;
   const user = `${ctx}\n${text}`;
@@ -219,7 +216,7 @@ async function tryGemini(text: string, name: string | null, phone: string): Prom
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${LOVABLE_KEY}` },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash', max_tokens: 350, temperature: 0.75,
+          model: 'google/gemini-2.5-flash', max_tokens: 450, temperature: 0.75,
           messages: [{ role: 'system', content: PERSONA }, { role: 'user', content: user }],
         }),
         signal: AbortSignal.timeout(12_000),
@@ -228,13 +225,11 @@ async function tryGemini(text: string, name: string | null, phone: string): Prom
         const j = await r.json() as { choices?: Array<{ message?: { content?: string } }> };
         const rep = j?.choices?.[0]?.message?.content?.trim();
         if (rep) { console.log('[brisa] ✅ Lovable/Gemini'); return rep; }
-      } else {
-        console.warn(`[brisa][LOVABLE] HTTP ${r.status}: ${(await r.text()).slice(0,200)}`);
       }
-    } catch (e: unknown) { console.warn(`[brisa][LOVABLE] timeout: ${(e as Error)?.message}`); }
+    } catch {}
   }
 
-  if (!GEMINI_KEY) { console.warn('[brisa][GEMINI] GEMINI_API_KEY ausente — só instant reply'); return null; }
+  if (!GEMINI_KEY) return null;
 
   for (const model of ['gemini-2.5-flash', 'gemini-2.5-pro']) {
     try {
@@ -246,37 +241,22 @@ async function tryGemini(text: string, name: string | null, phone: string): Prom
           body: JSON.stringify({
             system_instruction: { parts: [{ text: PERSONA }] },
             contents: [{ role: 'user', parts: [{ text: user }] }],
-            generationConfig: { maxOutputTokens: 350, temperature: 0.75 },
-            safetySettings: [
-              { category: 'HARM_CATEGORY_HARASSMENT',        threshold: 'BLOCK_ONLY_HIGH' },
-              { category: 'HARM_CATEGORY_HATE_SPEECH',       threshold: 'BLOCK_ONLY_HIGH' },
-              { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
-              { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' },
-            ],
+            generationConfig: { maxOutputTokens: 450, temperature: 0.75 },
           }),
           signal: AbortSignal.timeout(25_000),
         }
       );
       if (r.ok) {
-        const j = await r.json() as {
-          candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-          promptFeedback?: { blockReason?: string };
-        };
-        if (j?.promptFeedback?.blockReason) { console.error(`[brisa][${model}] bloqueado: ${j.promptFeedback.blockReason}`); continue; }
+        const j = await r.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
         const rep = j?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-        if (rep) { console.log(`[brisa] ✅ Gemini ${model}`); return rep; }
-      } else {
-        const errBody = await r.text();
-        console.error(`[brisa][GEMINI/${model}] HTTP ${r.status}: ${errBody.slice(0,300)}`);
+        if (rep) return rep;
       }
-    } catch (e: unknown) {
-      console.error(`[brisa][GEMINI/${model}] ${(e as Error)?.message}`);
-    }
+    } catch {}
   }
   return null;
 }
 
-// ── LOG ────────────────────────────────────────────────────────────────────
+// ── LOG ──────────────────────────────────────────────────────────────────
 async function log(phone: string, inText: string, outText: string, via: string) {
   if (!SB_URL || !SB_KEY) return;
   try {
@@ -300,13 +280,10 @@ serve(async (req: Request): Promise<Response> => {
 
   if (req.method === 'GET') {
     return new Response(JSON.stringify({
-      ok: true, version: '2026.8.05-SEM-NOMES-gemini2.5',
-      responsavel: 'institucional — sem nome de médico citado',
-      gemini: GEMINI_KEY ? `configurada (${GEMINI_KEY.slice(0,8)}...)` : 'ausente — instant reply garante funcionamento',
-      waha: `${WAHA_URL} | session: ${WAHA_SESSION}`,
-      instant_reply: '✅ SEMPRE ATIVO (não depende de IA)',
-      dedup: '✅ via banco (brisa_processed_messages)',
-      verify_jwt: false,
+      ok: true, version: '2026.8.08-DR-EDILSON-ORIENTACAO',
+      responsavel: 'Enfermeira Brisa (Orientação Técnica Dr. Edilson Bezerra)',
+      roteiro_ativo: true,
+      instant_reply: '✅ ATIVO (com o roteiro completo 5 passos)',
     }, null, 2), { headers: { ...cors, 'Content-Type': 'application/json' } });
   }
 
@@ -316,56 +293,40 @@ serve(async (req: Request): Promise<Response> => {
   try { raw = await req.json(); }
   catch { return new Response(JSON.stringify({ ok: false, error: 'invalid_json' }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } }); }
 
-  const ev = String(raw?.event ?? 'unknown');
-  console.log(`[brisa][IN] event=${ev}`);
-
   const p = parseWAHA(raw);
-  if (p.skip) {
-    console.log(`[brisa][SKIP] ${p.reason}`);
-    return new Response(JSON.stringify({ ok: true, skipped: true, reason: p.reason }), { headers: { ...cors, 'Content-Type': 'application/json' } });
-  }
+  if (p.skip) return new Response(JSON.stringify({ ok: true, skipped: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
 
   const { chatId, phone, fromMe, text, name, isGroup, isStatus, messageId } = p;
-  console.log(`[brisa][MSG] chatId=${chatId} fromMe=${fromMe} group=${isGroup} len=${text.length} id=${messageId.slice(0,16)}`);
 
-  if (fromMe)   return new Response(JSON.stringify({ ok: true, ignored: 'fromMe' }),  { headers: { ...cors, 'Content-Type': 'application/json' } });
-  if (isGroup)  return new Response(JSON.stringify({ ok: true, ignored: 'group' }),   { headers: { ...cors, 'Content-Type': 'application/json' } });
-  if (isStatus) return new Response(JSON.stringify({ ok: true, ignored: 'status' }),  { headers: { ...cors, 'Content-Type': 'application/json' } });
-  if (!chatId || !text) {
-    return new Response(JSON.stringify({ ok: true, ignored: 'no_text', chatId, textLen: text.length }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+  if (fromMe || isGroup || isStatus || !chatId || !text) {
+    return new Response(JSON.stringify({ ok: true, ignored: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
   }
 
   if (messageId) {
-    if (await isDup(messageId)) {
-      console.log(`[brisa][DEDUP] já processado: ${messageId.slice(0,16)}`);
-      return new Response(JSON.stringify({ ok: true, ignored: 'duplicate' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
-    }
+    if (await isDup(messageId)) return new Response(JSON.stringify({ ok: true, ignored: 'duplicate' }), { headers: { ...cors, 'Content-Type': 'application/json' } });
     await markDone(messageId, chatId);
   }
 
-  // ── ESTÁGIO 1: resposta instantânea garantida (sem nomes) ──
+  // ── ESTÁGIO 1: resposta instantânea com o roteiro completo ──
   const instant = instantReply(text, name);
-  console.log(`[brisa][INSTANT] intent=${intent(text)}`);
   const sent = await sendMsg(chatId, phone, instant);
   await log(phone, text, instant, sent ? 'waha_instant' : 'evo_instant');
 
-  // ── ESTÁGIO 2: Gemini em background (sem nomes) ──
+  // ── ESTÁGIO 2: Gemini em background ──
   if (GEMINI_KEY || LOVABLE_KEY) {
     const bg = async () => {
       const gemRep = await tryGemini(text, name, phone);
       if (!gemRep || gemRep.length < 30) return;
-      const similar = gemRep.includes('plantayraiz.com.br') && instant.includes('plantayraiz.com.br') && gemRep.length < instant.length * 1.5;
-      if (similar) { console.log('[brisa][GEMINI] similar ao instant — skip'); return; }
-      console.log('[brisa][GEMINI] enviando enriquecimento...');
+      if (gemRep.includes('https://plantayraiz.com.br/profissionais')) return; // evita duplicar roteiro
       await sendMsg(chatId, phone, gemRep);
       await log(phone, text, gemRep, 'gemini_enriched');
     };
     const rt = (globalThis as unknown as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime;
-    if (rt?.waitUntil) rt.waitUntil(bg()); else bg().catch(e => console.warn('[brisa][GEMINI bg]', e));
+    if (rt?.waitUntil) rt.waitUntil(bg()); else bg().catch(() => {});
   }
 
   return new Response(
-    JSON.stringify({ ok: true, sent, phone, chatId, via: sent ? 'waha' : 'evolution' }),
+    JSON.stringify({ ok: true, sent, phone, chatId }),
     { headers: { ...cors, 'Content-Type': 'application/json' } }
   );
 });

@@ -1,1 +1,0 @@
-var t=Object.defineProperty;var u=(n,r)=>t(n,"name",{value:r,configurable:!0});import"./index-D5ZQ4m75.js";function c(n){return`public:${n}`}u(c,"publicChannel");function a(n,r){return`user:${n}:${r}`}u(a,"userChannel");function i(n,r){return`doctor:${n}:${r}`}u(i,"doctorChannel");export{i as d,c as p,a as u};

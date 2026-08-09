@@ -14,7 +14,7 @@ const GestaoPacientes = () => {
   const [statusFilter, setStatusFilter] = useState("Todos");
 
   return (
-    <div className="flex min-h-screen bg-[#F1F5F9]">
+    <div className="flex min-h-dvh bg-[#F1F5F9]">
       {/* Sidebar */}
       <GestaoPacientesSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 

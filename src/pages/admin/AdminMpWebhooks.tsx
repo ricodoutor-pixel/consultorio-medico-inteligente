@@ -78,7 +78,7 @@ export default function AdminMpWebhooks() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-8">
+    <div className="min-h-dvh bg-background text-foreground py-8">
       <Helmet><title>Webhooks Mercado Pago | Admin</title></Helmet>
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex items-center justify-between mb-6">

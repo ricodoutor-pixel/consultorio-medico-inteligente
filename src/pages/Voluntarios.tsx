@@ -27,7 +27,7 @@ export default function Voluntarios() {
     <>
       <SEO title="Médicos Voluntários | Planta & Raiz" description="Programa de médicos voluntários para pacientes que não podem pagar. Junte-se a nós e faça a diferença." />
       <Navbar />
-      <main className="min-h-screen bg-background pt-20 pb-16">
+      <main className="min-h-dvh bg-background pt-20 pb-16">
         <div className="container mx-auto px-4">
           {/* Hero */}
           <div className="text-center mb-12">

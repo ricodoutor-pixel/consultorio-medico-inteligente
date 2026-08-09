@@ -458,7 +458,7 @@ const CadastroProfissional = () => {
   if (submitted) {
     const isBO = country === "BO";
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <section className="pt-24 pb-16 md:pt-32">
           <div className="container mx-auto px-4 max-w-2xl text-center">
@@ -538,7 +538,7 @@ const CadastroProfissional = () => {
   const regionOptions = isBO ? BO_DEPTS.map((d) => ({ v: d.code, l: `${d.code} — ${d.name}` })) : UF_OPTIONS.map((u) => ({ v: u, l: u }));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
 
       <section className="pt-24 pb-16 md:pt-32">

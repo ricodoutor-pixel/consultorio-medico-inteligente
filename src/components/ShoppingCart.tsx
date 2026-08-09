@@ -39,7 +39,7 @@ export function ShoppingCart() {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center md:justify-end">
-      <Card className="w-full md:w-96 h-screen md:h-auto md:rounded-lg rounded-t-2xl bg-card shadow-2xl flex flex-col">
+      <Card className="w-full md:w-96 h-dvh md:h-auto md:rounded-lg rounded-t-2xl bg-card shadow-2xl flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-2xl font-bold text-card-foreground">Carrinho de Compras</h2>
           <button onClick={() => setShowCart(false)} className="text-muted-foreground hover:text-foreground">✕</button>

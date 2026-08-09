@@ -92,7 +92,7 @@ const Badges: React.FC = () => {
   const progressPct = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Badges & Conquistas | Planta & Raiz"
         description="Desbloqueie badges e conquistas no sistema de gamificação da Planta & Raiz. Profissionais com melhor NPS ganham recompensas exclusivas."

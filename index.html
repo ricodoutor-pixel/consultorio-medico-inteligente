@@ -342,12 +342,28 @@
           } catch(_){}
         }
 
+        // Ruído de extensões do navegador (MetaMask, carteiras, tradutores) e
+        // erros de Service Worker dentro de iframe não são falhas da plataforma.
+        function isExternalNoise(err){
+          try {
+            var msg = String((err && err.message) || err || '');
+            var stack = String((err && err.stack) || '');
+            if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack)) return true;
+            if (/MetaMask|ethereum|web3|Failed to connect to MetaMask/i.test(msg)) return true;
+            if (/ServiceWorkerRegistration|document is in an invalid state/i.test(msg)) return true;
+            if (/ResizeObserver loop/i.test(msg)) return true;
+          } catch(_){}
+          return false;
+        }
+
         function reportEarlyError(err, source){
+          if (isExternalNoise(err)) return;
           crumb('error', { src: source, msg: String(err && err.message || err).slice(0,200) });
           // Tentar mandar para Sentry depois que ele subir
           window.__pyr_earlyErrors = window.__pyr_earlyErrors || [];
           window.__pyr_earlyErrors.push({ source: source, message: String(err && err.message || err), stack: err && err.stack });
           console.error('[boot]', source, err);
+
 
           var msg = String(err && err.message || err);
           var isChunkErr = /Failed to fetch dynamically imported module|dynamically imported module|Importing a module script failed|Loading chunk|ChunkLoadError|Failed to load module script/i.test(msg);

@@ -66,7 +66,7 @@ export default function AdminConversoesUptime() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <div className="container mx-auto px-4 pt-24 pb-16 max-w-7xl">
         <div className="flex items-center justify-between mb-6">

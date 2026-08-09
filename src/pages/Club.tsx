@@ -397,7 +397,7 @@ const Club = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background w-full overflow-x-hidden">
+    <div className="min-h-dvh bg-background w-full overflow-x-hidden">
       <Navbar />
 
       {/* Notification Bell */}
@@ -671,7 +671,7 @@ const Club = () => {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/60 z-50 flex items-end md:items-center md:justify-end" onClick={() => setShowCart(false)}>
             <motion.div initial={{ x: 400 }} animate={{ x: 0 }} exit={{ x: 400 }}
-              className="w-full md:w-96 h-full md:h-auto bg-card border-l border-border shadow-2xl flex flex-col max-h-screen md:max-h-[90vh] md:rounded-l-2xl"
+              className="w-full md:w-96 h-full md:h-auto bg-card border-l border-border shadow-2xl flex flex-col max-h-dvh md:max-h-[90vh] md:rounded-l-2xl"
               onClick={(e) => e.stopPropagation()}>
 
               <div className="flex items-center justify-between p-5 border-b border-border">

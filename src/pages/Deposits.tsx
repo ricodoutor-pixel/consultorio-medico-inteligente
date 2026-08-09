@@ -16,7 +16,7 @@ const Deposits = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <section className="pt-28 pb-16">
         <div className="container mx-auto px-4 max-w-lg">

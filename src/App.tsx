@@ -33,7 +33,7 @@ import { ConsentManager } from "@/components/ConsentManager";
 import { lazyWithRecovery, reportFrontendRuntimeError } from "@/lib/runtime-recovery";
 
 const Loading = () => (
-  <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+  <div className="min-h-dvh bg-background flex flex-col items-center justify-center">
     <div className="relative flex items-center justify-center">
       <div className="absolute inset-[-15px] rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
       <div className="animate-bounce" style={{ animationDuration: '2s' }}>

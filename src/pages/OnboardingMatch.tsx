@@ -92,7 +92,7 @@ export default function OnboardingMatch() {
 
   if (showMatch) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-dvh bg-background flex flex-col">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center p-4">
           <motion.div 
@@ -140,7 +140,7 @@ export default function OnboardingMatch() {
 
   if (isMatching) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      <div className="min-h-dvh bg-background flex flex-col items-center justify-center p-4">
         <motion.div 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
@@ -162,7 +162,7 @@ export default function OnboardingMatch() {
   const currentQ = questions[currentStep];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-dvh bg-background flex flex-col">
       <Navbar />
       <div className="flex-1 flex flex-col max-w-md mx-auto w-full pt-24 px-4 pb-12">
         <div className="mb-8">

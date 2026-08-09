@@ -111,7 +111,7 @@ export default function TelemedicinaAssincrona() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-dvh bg-background flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center p-4 pt-24">
           <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="max-w-md w-full">
@@ -132,7 +132,7 @@ export default function TelemedicinaAssincrona() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-dvh bg-background flex flex-col">
       <Navbar />
       <div className="flex-1 container max-w-2xl mx-auto p-4 pt-24 space-y-6">
         <div>

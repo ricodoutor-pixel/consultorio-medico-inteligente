@@ -104,10 +104,10 @@ const WorkspaceMedico = () => {
     }
   };
 
-  if (loading) return <div className="flex h-screen items-center justify-center">Carregando Workspace...</div>;
+  if (loading) return <div className="flex h-dvh items-center justify-center">Carregando Workspace...</div>;
 
   return (
-    <div className="flex flex-col h-screen bg-background overflow-hidden">
+    <div className="flex flex-col h-dvh bg-background overflow-hidden">
       <Navbar />
       
       {/* Top Header */}

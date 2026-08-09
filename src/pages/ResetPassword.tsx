@@ -60,7 +60,7 @@ const ResetPassword = () => {
 
   if (!validSession) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <section className="pt-32 pb-20 flex justify-center">
           <div className="text-center">
@@ -75,7 +75,7 @@ const ResetPassword = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <section className="pt-32 pb-20 flex justify-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} className="text-center">
@@ -90,7 +90,7 @@ const ResetPassword = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <section className="pt-28 pb-20 hero-glow">
         <div className="container mx-auto px-4 flex justify-center">

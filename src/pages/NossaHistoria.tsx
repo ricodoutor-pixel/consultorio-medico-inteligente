@@ -58,7 +58,7 @@ const stagger = {
 
 export default function NossaHistoria() {
   return (
-    <div className="min-h-screen bg-[#04080F] text-foreground">
+    <div className="min-h-dvh bg-[#04080F] text-foreground">
       <Navbar />
 
       <main className="pt-24 sm:pt-28 pb-20">

@@ -59,18 +59,30 @@ window.addEventListener("load", () => {
 const isInIframe = (() => {
   try { return window.self !== window.top; } catch { return true; }
 })();
+const host = window.location.hostname;
 const isPreviewHost =
-  window.location.hostname.includes("id-preview--") ||
-  window.location.hostname.includes("lovableproject.com");
+  host.startsWith("id-preview--") ||
+  host.startsWith("preview--") ||
+  host === "lovableproject.com" || host.endsWith(".lovableproject.com") ||
+  host === "lovableproject-dev.com" || host.endsWith(".lovableproject-dev.com") ||
+  host === "beta.lovable.dev" || host.endsWith(".beta.lovable.dev") ||
+  new URLSearchParams(window.location.search).get("sw") === "off";
 
-if (isPreviewHost || isInIframe) {
-  navigator.serviceWorker?.getRegistrations().then((regs) => {
-    regs.forEach((r) => r.unregister());
-  });
+if (isPreviewHost || isInIframe || !import.meta.env.PROD) {
+  // Nunca registra SW em preview/iframe/dev — e limpa registros antigos.
+  void (async () => {
+    try {
+      const regs = (await navigator.serviceWorker?.getRegistrations?.()) ?? [];
+      await Promise.all(regs.map((r) => r.unregister().catch(() => {})));
+    } catch {
+      /* documento em estado inválido dentro do iframe — ignorar */
+    }
+  })();
 } else {
   // Registrar Service Worker apenas em produção
-  registerServiceWorker();
+  void Promise.resolve(registerServiceWorker()).catch(() => {});
 }
+
 
 // Inicializa Sentry (não-bloqueante) — DSN vem do edge function sentry-config
 import("./lib/sentry").then(({ initSentry }) => initSentry()).catch(() => {});

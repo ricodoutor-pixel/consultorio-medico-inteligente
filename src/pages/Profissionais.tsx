@@ -301,7 +301,7 @@ const Profissionais = () => {
 
   if (id) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <ProfessionalDetail id={id} professionals={professionals} />
         <Footer />
@@ -312,7 +312,7 @@ const Profissionais = () => {
   const filtered = professionals.filter((p) => p.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
 
       <section className="pt-20 pb-12 md:pt-32 md:pb-16 hero-glow">

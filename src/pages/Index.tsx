@@ -108,7 +108,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background w-full overflow-x-hidden">
+    <div className="min-h-dvh bg-background w-full overflow-x-hidden">
       <Navbar />
 
 

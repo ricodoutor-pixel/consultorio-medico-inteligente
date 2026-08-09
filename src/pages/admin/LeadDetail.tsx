@@ -219,14 +219,14 @@ export default function AdminLeadDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">
+      <div className="min-h-dvh bg-background flex items-center justify-center text-muted-foreground">
         Carregando...
       </div>
     );
   }
   if (!lead) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">
+      <div className="min-h-dvh bg-background flex items-center justify-center text-muted-foreground">
         Lead não encontrado.
       </div>
     );
@@ -235,7 +235,7 @@ export default function AdminLeadDetail() {
   const formFields = Object.entries(lead.metadata ?? {}).filter(([k]) => k !== "session_id");
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-6 max-w-5xl">
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="outline" size="sm" asChild className="rounded-xl">

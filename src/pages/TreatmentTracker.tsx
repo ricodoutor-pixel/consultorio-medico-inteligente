@@ -94,7 +94,7 @@ const TreatmentTracker = () => {
   const avgMood = logs.length ? (logs.reduce((s, l) => s + l.moodLevel, 0) / logs.length).toFixed(1) : "—";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="flex items-center gap-3 mb-8">

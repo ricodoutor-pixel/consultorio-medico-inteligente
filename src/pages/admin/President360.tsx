@@ -174,7 +174,7 @@ const President360 = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-amber-950/10">
+    <div className="min-h-dvh bg-gradient-to-br from-background via-background to-amber-950/10">
       <section className="pt-8 pb-16 px-4">
         <div className="container mx-auto max-w-7xl">
           {/* HEADER */}

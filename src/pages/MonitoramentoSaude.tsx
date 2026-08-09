@@ -2,7 +2,7 @@ import React, { useState, Suspense, lazy } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+
 import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Stethoscope, ArrowLeft, Brain, Shield, Pill, Sparkles, Wind, FileText, Mic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/Navbar';
@@ -186,7 +186,7 @@ export default function MonitoramentoSaude() {
 
       <Navbar />
 
-      <main className="min-h-screen bg-gradient-to-b from-background to-slate-950">
+      <main className="min-h-dvh bg-gradient-to-b from-background to-slate-950">
         {/* Hero */}
         <section className="pt-24 pb-12 px-4">
           <div className="max-w-4xl mx-auto text-center">

@@ -49,7 +49,7 @@ export default function CartCheckout() {
 
   if (items.length === 0 && !success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-dvh flex items-center justify-center bg-background">
         <div className="text-center">
           <p className="text-muted-foreground mb-4">Carrinho vazio</p>
           <Button onClick={() => navigate('/')}>Voltar para Home</Button>
@@ -64,7 +64,7 @@ export default function CartCheckout() {
   const total = getFinalTotal() + upsellExtra;
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4">
+    <div className="min-h-dvh bg-background py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-foreground">Checkout</h1>
         <div className="grid md:grid-cols-3 gap-8">

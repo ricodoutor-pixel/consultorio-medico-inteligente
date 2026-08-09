@@ -61,7 +61,7 @@ export const ProntuarioInteligente = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
+    <div className="min-h-dvh bg-gray-50 dark:bg-gray-900 pb-20">
       <Navbar />
       <div className="container max-w-6xl mx-auto pt-24 px-4">
         

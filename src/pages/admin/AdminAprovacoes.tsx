@@ -173,7 +173,7 @@ const AdminAprovacoes = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-dvh bg-background flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="animate-spin text-primary h-8 w-8" />
@@ -338,7 +338,7 @@ const AdminAprovacoes = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-dvh bg-background flex flex-col">
       <Navbar />
       <div className="flex-1 container mx-auto py-8 mt-16 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

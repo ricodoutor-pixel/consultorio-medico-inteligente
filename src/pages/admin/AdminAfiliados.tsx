@@ -70,11 +70,11 @@ export default function AdminAfiliados() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>;
+    return <div className="min-h-dvh flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>;
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-dvh bg-muted/30">
       <Navbar />
       <div className="container mx-auto py-8 px-4 pt-24 space-y-6">
         <div className="flex items-center justify-between">

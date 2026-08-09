@@ -90,8 +90,9 @@ export default function DoctorsNearMeMap() {
       try {
         const { data } = await supabase
           .from("doctors_public" as any)
-          .select("id,full_name,specialty,latitude,longitude,city,state,is_online,crm,user_id,profile:profiles(avatar_url)")
+          .select("id,full_name,specialty,city,state:crm_state,is_online,crm,user_id,avatar_url")
           .limit(200);
+
 
         const list = ((data ?? []) as any[]).map(d => {
           const mockMatch = testProfessionals.find(p => p.crm === d.crm || (p.name && d.full_name && p.name.toLowerCase().includes(d.full_name.toLowerCase())));

@@ -207,7 +207,7 @@ const ShoppingDashboard = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-[#12141f] flex items-center justify-center">
+    <div className="min-h-dvh bg-[#12141f] flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="w-10 h-10 rounded-full border-3 border-[#3483fa] border-t-transparent animate-spin" />
         <p className="text-sm text-[#8b8fa3]">Carregando dashboard...</p>
@@ -216,7 +216,7 @@ const ShoppingDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#12141f]">
+    <div className="min-h-dvh bg-[#12141f]">
       <Navbar />
 
       {/* ─── Top Blue Bar (ML signature) ─── */}

@@ -44,7 +44,7 @@ export default function SaudeVerdeRede() {
   }, [city, category]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-dvh bg-background text-foreground">
       <Helmet>
         <title>Rede credenciada — Cartão Saúde Verde | Planta y Raiz</title>
         <meta name="description" content="Encontre clínicas, laboratórios e farmácias parceiras do Cartão Saúde Verde com até 80% de desconto." />

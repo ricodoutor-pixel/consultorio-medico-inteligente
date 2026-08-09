@@ -44,7 +44,7 @@ export default function MobileNav({ className = "" }: MobileNavProps) {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-0 left-0 w-full h-screen bg-white z-40 md:hidden transform transition-transform duration-300 overflow-y-auto ${
+        className={`fixed top-0 left-0 w-full h-dvh bg-white z-40 md:hidden transform transition-transform duration-300 overflow-y-auto ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{

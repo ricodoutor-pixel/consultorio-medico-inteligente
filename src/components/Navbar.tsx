@@ -158,7 +158,7 @@ export const Navbar = () => {
                   alt="Planta y Raíz - Mega Clínica Digital"
                   width={520}
                   height={190}
-                  fetchPriority="high"
+                  fetchpriority="high"
                   loading="eager"
                   decoding="sync"
                   className="h-[62px] md:h-[74px] w-auto max-w-[210px] md:max-w-[260px] object-contain object-left drop-shadow-[0_0_14px_rgba(34,197,94,0.25)]"

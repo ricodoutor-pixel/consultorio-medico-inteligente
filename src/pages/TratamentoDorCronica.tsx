@@ -106,7 +106,7 @@ const TratamentoDorCronica = () => {
               </div>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }}>
-              <img src={heroImg} alt="Sistema endocanabinoide e tratamento de dor crônica com cannabis medicinal" width={1280} height={720} fetchpriority="high" className="rounded-2xl shadow-xl border border-primary/10 w-full" />
+              <img src={heroImg} alt="Sistema endocanabinoide e tratamento de dor crônica com cannabis medicinal" width={1280} height={720} {...({ fetchpriority: "high" } as Record<string, string>)} className="rounded-2xl shadow-xl border border-primary/10 w-full" />
             </motion.div>
           </div>
         </div>

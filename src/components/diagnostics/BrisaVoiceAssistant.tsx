@@ -168,7 +168,7 @@ export const BrisaVoiceAssistant = () => {
                   alt="Enfermeira Brisa"
                   loading="eager"
                   // @ts-ignore
-                  fetchpriority="high"
+                  {...({ fetchpriority: "high" } as Record<string, string>)}
                   className="w-full h-full object-cover object-top"
                 />
               </div>

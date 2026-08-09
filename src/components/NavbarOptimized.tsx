@@ -60,7 +60,7 @@ export function NavbarOptimized() {
               Login
             </Link>
             <Link
-              to="/adm"
+              to="/admin"
               className="px-4 lg:px-6 py-2 lg:py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors text-sm lg:text-base"
             >
               ADM
@@ -98,7 +98,7 @@ export function NavbarOptimized() {
                 Login
               </Link>
               <Link
-                to="/adm"
+                to="/admin"
                 className="flex-1 px-4 py-3 text-center text-base bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors"
                 onClick={() => setMenuOpen(false)}
               >

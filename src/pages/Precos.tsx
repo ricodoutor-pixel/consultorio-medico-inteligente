@@ -339,7 +339,7 @@ const Precos = () => {
               <strong className="text-foreground">LGPD (Lei 13.709/2018):</strong> dados criptografados em repouso (AES-256).
               Veja <Link to="/politica-de-privacidade" className="text-primary underline">Privacidade</Link>,
               {" "}<Link to="/termos-de-uso" className="text-primary underline">Termos</Link> e
-              {" "}<Link to="/lgpd-direitos" className="text-primary underline">Direitos LGPD</Link>.
+              {" "}<Link to="/lgpd" className="text-primary underline">Direitos LGPD</Link>.
             </p>
             <p>
               <strong className="text-foreground">Direito de Arrependimento:</strong> CDC Art. 49 — 7 dias para cancelar

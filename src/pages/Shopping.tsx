@@ -803,7 +803,7 @@ const Shopping = () => {
               <Link to="/cadastro">Cadastrar Loja <ArrowRight size={16} className="ml-2" /></Link>
             </Button>
             <Button variant="outline" className="font-bold border-primary/30 text-primary rounded-xl h-11 sm:h-12" asChild>
-              <Link to="/shopping-dashboard">Dashboard Lojista <Store size={16} className="ml-2" /></Link>
+              <Link to="/dashboard-loja">Dashboard Lojista <Store size={16} className="ml-2" /></Link>
             </Button>
           </div>
         </div>

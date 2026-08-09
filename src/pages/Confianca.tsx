@@ -180,7 +180,7 @@ const Confianca = () => {
                   <strong className="block text-foreground">Termos de Uso</strong>
                   <span className="text-muted-foreground text-xs">Regras da plataforma</span>
                 </Link>
-                <Link to="/lgpd-direitos" className="p-3 rounded-xl bg-muted/30 border border-border hover:border-primary/40 transition-colors">
+                <Link to="/lgpd" className="p-3 rounded-xl bg-muted/30 border border-border hover:border-primary/40 transition-colors">
                   <strong className="block text-foreground">Direitos LGPD</strong>
                   <span className="text-muted-foreground text-xs">Acesso, correção, exclusão</span>
                 </Link>

@@ -42,7 +42,7 @@ export default function CheckoutReturn() {
                       <p className="text-sm font-medium text-foreground">Veja suas Prescrições</p>
                       <p className="text-xs text-muted-foreground">Acompanhe receitas e tratamentos.</p>
                       <Button size="sm" variant="outline" asChild className="w-full">
-                        <Link to="/minhas-prescricoes">Ver Receitas</Link>
+                        <Link to="/dashboard">Ver Receitas</Link>
                       </Button>
                     </CardContent>
                   </Card>

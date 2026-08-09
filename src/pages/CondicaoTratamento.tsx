@@ -87,7 +87,7 @@ const CondicaoTratamento = () => {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="container py-20 text-center">
           <h1 className="text-2xl font-bold mb-4">Condição não encontrada</h1>
@@ -112,7 +112,7 @@ const CondicaoTratamento = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Helmet>
         <title>{data.title}</title>
         <meta name="description" content={data.metaDesc} />

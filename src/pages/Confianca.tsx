@@ -86,7 +86,7 @@ const controls = [
 
 const Confianca = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Helmet>
         <title>Central de Confiança — Planta y Raiz</title>
         <meta

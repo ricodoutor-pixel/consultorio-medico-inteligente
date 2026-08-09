@@ -156,14 +156,14 @@ export default function ConfiguracoesMedico() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-dvh bg-slate-900 flex items-center justify-center">
         <Loader2 className="animate-spin text-primary w-12 h-12" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0F1C] flex flex-col font-sans selection:bg-primary/30">
+    <div className="min-h-dvh bg-[#0A0F1C] flex flex-col font-sans selection:bg-primary/30">
       <Navbar />
 
       <main className="flex-grow pt-24 pb-12 px-4 sm:px-6">

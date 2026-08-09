@@ -98,7 +98,7 @@ export default function SaudeVerdeAgendar() {
 
   if (hasSub === false) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <div className="min-h-dvh bg-background flex items-center justify-center p-6">
         <Card className="p-8 max-w-md text-center">
           <CalendarCheck className="w-12 h-12 text-primary mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Cartão necessário</h2>
@@ -110,7 +110,7 @@ export default function SaudeVerdeAgendar() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-12">
+    <div className="min-h-dvh bg-background text-foreground py-12">
       <Helmet><title>Agendar serviço — Cartão Saúde Verde</title></Helmet>
       <div className="container mx-auto px-4 max-w-3xl">
         <Link to="/saude-verde/cartao" className="text-sm text-muted-foreground hover:text-primary mb-6 inline-block">← Voltar</Link>

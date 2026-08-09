@@ -67,7 +67,7 @@ const termos = [
 
 const Legal = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
 
       <section className="pt-24 pb-12 md:pt-32 hero-glow">

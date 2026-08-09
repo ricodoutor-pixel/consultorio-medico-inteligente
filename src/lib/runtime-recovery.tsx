@@ -142,7 +142,7 @@ class SafeRenderBoundary extends Component<
 
 function RouteRecoveryFallback() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-dvh bg-background flex items-center justify-center p-4">
       <div className="max-w-md text-center space-y-4">
         <AlertTriangle className="mx-auto text-destructive" size={40} />
         <div className="space-y-2">

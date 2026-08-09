@@ -228,7 +228,7 @@ const AutomationsDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0E27] text-white">
+    <div className="min-h-dvh bg-[#0A0E27] text-white">
       {/* ── Header ── */}
       <div className="bg-gradient-to-r from-[#0A0E27] via-[#111638] to-[#0A0E27] border-b border-[#39FF14]/20 px-6 py-4">
         <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-4">

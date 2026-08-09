@@ -4,7 +4,7 @@ import { Activity } from "lucide-react";
 
 const MedicosOnline = () => {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-dvh bg-background flex flex-col">
       <Navbar />
       <div className="flex-1 container mx-auto px-4 py-8 mt-16">
         <div className="flex items-center gap-3 mb-8">

@@ -90,7 +90,7 @@ export default function TelemedBrisaCheck() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <main className="container mx-auto px-4 pt-28 pb-20 max-w-5xl">
         <header className="mb-8">

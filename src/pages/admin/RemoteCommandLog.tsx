@@ -58,7 +58,7 @@ export default function RemoteCommandLog() {
   }), [rows]);
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-dvh bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
           <Terminal className="w-8 h-8 text-primary" />

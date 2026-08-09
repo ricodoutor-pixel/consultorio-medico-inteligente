@@ -31,7 +31,7 @@ export default function SaudeVerdeParceiros() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-dvh bg-background text-foreground">
       <Helmet>
         <title>Seja parceiro Cartão Saúde Verde | Planta y Raiz</title>
         <meta name="description" content="Credencie sua clínica ou laboratório no Cartão Saúde Verde. Sem mensalidade nos primeiros 3 meses." />

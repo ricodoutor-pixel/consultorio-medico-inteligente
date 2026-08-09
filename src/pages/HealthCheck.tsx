@@ -71,7 +71,7 @@ export default function HealthCheck() {
   const getStatusBg = (ok: boolean) => ok ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30";
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-dvh bg-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

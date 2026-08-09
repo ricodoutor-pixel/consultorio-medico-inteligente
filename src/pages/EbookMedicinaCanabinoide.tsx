@@ -19,7 +19,7 @@ const bulletPoints = [
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
 
 const EbookMedicinaCanabinoide = () => (
-  <div className="min-h-screen bg-background">
+  <div className="min-h-dvh bg-background">
     <SEO
       title="E-book Grátis Medicina Canabinoide para Médicos - Planta y Raiz"
       description="Curso completo gratuito de Medicina Canabinoide. Domine as evidências científicas, prescrição e manejo clínico da Cannabis Medicinal."

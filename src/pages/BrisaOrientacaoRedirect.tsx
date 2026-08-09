@@ -11,7 +11,7 @@ export const BrisaOrientacaoRedirect = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 p-6 text-center">
+    <div className="min-h-dvh bg-background flex flex-col items-center justify-center gap-4 p-6 text-center">
       <Loader2 size={40} className="animate-spin text-primary" />
       <h1 className="text-xl font-display font-black text-foreground">
         Conectando você à Enfª Brisa no WhatsApp...

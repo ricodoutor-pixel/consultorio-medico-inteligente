@@ -106,7 +106,7 @@ const Dispensario = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-dvh bg-background flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
       </div>
     );
@@ -115,7 +115,7 @@ const Dispensario = () => {
   // Gate: Not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="container mx-auto px-4 py-20 text-center max-w-lg">
           <Lock size={48} className="mx-auto mb-4 text-muted-foreground" />
@@ -135,7 +135,7 @@ const Dispensario = () => {
   // Gate: No valid prescription
   if (!hasValidPrescription) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="container mx-auto px-4 py-20 text-center max-w-lg">
           <FileCheck size={48} className="mx-auto mb-4 text-yellow-500" />
@@ -164,7 +164,7 @@ const Dispensario = () => {
 
   // Unlocked: Show marketplace
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex items-center gap-3 mb-2">

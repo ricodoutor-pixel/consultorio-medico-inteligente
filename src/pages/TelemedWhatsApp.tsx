@@ -404,7 +404,7 @@ export default function TelemedWhatsApp() {
   };
 
   return (
-    <div className="flex h-screen bg-[#f0f2f5] overflow-hidden font-sans">
+    <div className="flex h-dvh bg-[#f0f2f5] overflow-hidden font-sans">
       
       {/* Left Panel - Contacts List */}
       <div className={`w-full md:w-[30%] lg:w-[350px] bg-white border-r flex flex-col transition-all duration-300 ${isMobileList ? 'block' : 'hidden md:flex'}`}>

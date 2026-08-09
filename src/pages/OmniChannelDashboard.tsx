@@ -46,7 +46,7 @@ const OmniChannelDashboard = () => {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-dvh bg-slate-950 flex items-center justify-center">
         <div className="w-6 h-6 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
       </div>
     );
@@ -54,7 +54,7 @@ const OmniChannelDashboard = () => {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+      <div className="min-h-dvh bg-slate-950 flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
           <div className="text-center mb-6">
             <div className="w-12 h-12 rounded-xl bg-blue-600/20 flex items-center justify-center mx-auto mb-3">
@@ -82,7 +82,7 @@ const OmniChannelDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200">
+    <div className="min-h-dvh bg-slate-950 text-slate-200">
       {/* Header */}
       <header className="border-b border-slate-800/50 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-[1600px] mx-auto px-4 py-3 flex items-center justify-between">

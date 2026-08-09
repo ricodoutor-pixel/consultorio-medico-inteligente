@@ -101,11 +101,11 @@ export default function AfiliadosGamificado() {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-background pt-24 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>;
+    return <div className="min-h-dvh bg-background pt-24 flex justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>;
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-dvh bg-background flex flex-col">
       <Navbar />
       
       <div className="flex-1 container mx-auto py-8 px-4 space-y-8 pt-24">

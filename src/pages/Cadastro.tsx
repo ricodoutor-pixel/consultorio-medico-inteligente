@@ -208,7 +208,7 @@ const Cadastro = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <section className="pt-32 pb-20 hero-glow">
           <div className="container mx-auto px-4 relative z-10 flex justify-center">
@@ -258,7 +258,7 @@ const Cadastro = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
 
       <section className="pt-24 pb-12 md:pt-32 hero-glow">

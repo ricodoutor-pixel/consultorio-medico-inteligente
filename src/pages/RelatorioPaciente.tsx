@@ -58,7 +58,7 @@ export const RelatorioPaciente = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white p-8 max-w-4xl mx-auto font-sans print:p-0 print:m-0">
+    <div className="min-h-dvh bg-white p-8 max-w-4xl mx-auto font-sans print:p-0 print:m-0">
       <div className="print:hidden mb-8 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Visualização de Impressão</h1>
         <Button onClick={() => window.print()} className="bg-primary">Imprimir / Salvar PDF</Button>

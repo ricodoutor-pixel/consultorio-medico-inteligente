@@ -59,7 +59,7 @@ export default function SaudeVerdeLanding() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-dvh bg-background text-foreground">
       <Helmet>
         <title>Cartão Saúde Verde — Até 80% OFF em consultas e exames | Planta y Raiz</title>
         <meta name="description" content="Cartão de desconto em saúde com até 80% OFF em consultas, exames, vacinas e terapias. A partir de R$35/mês, sem carência, cancele quando quiser." />

@@ -3,7 +3,7 @@ import GlobalOperationsMap from "@/components/admin/GlobalOperationsMap";
 
 export default function AdminGlobalOps() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <section className="pt-24 pb-12">
         <div className="container mx-auto px-4">

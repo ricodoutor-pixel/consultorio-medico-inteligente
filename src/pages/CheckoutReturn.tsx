@@ -10,7 +10,7 @@ export default function CheckoutReturn() {
   const sessionId = searchParams.get("session_id");
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <section className="pt-28 pb-16 flex items-center justify-center min-h-[70vh]">
         <div className="text-center space-y-8 px-4 max-w-2xl mx-auto">

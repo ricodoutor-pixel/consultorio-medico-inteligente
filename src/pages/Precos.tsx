@@ -133,7 +133,7 @@ const Precos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-6 sm:pb-0">
+    <div className="min-h-dvh bg-background pb-6 sm:pb-0">
       <Navbar />
 
       <section className="pt-20 pb-24 md:pt-32 md:pb-16 hero-glow">

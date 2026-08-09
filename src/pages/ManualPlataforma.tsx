@@ -47,7 +47,7 @@ const ManualPlataforma = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background halftone-bg">
+    <div className="min-h-dvh bg-background halftone-bg">
       <Navbar />
       
       <div className="container max-w-6xl mx-auto pt-28 pb-20 px-4">

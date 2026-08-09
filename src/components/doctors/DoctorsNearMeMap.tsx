@@ -90,7 +90,7 @@ export default function DoctorsNearMeMap() {
       try {
         const { data } = await supabase
           .from("doctors_public" as any)
-          .select("id,full_name,specialty,city,state,is_online,crm,user_id,avatar_url")
+          .select("id,full_name,specialty,city,state:crm_state,is_online,crm,user_id,avatar_url")
           .limit(200);
 
 

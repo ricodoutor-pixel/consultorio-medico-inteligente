@@ -53,12 +53,21 @@
     <link rel="preload" as="image" href="/logo-planta-raiz.webp" type="image/webp" fetchpriority="high" />
     <link rel="preload" as="image" href="/verdinho-mascot-256.webp" type="image/webp" fetchpriority="high" />
 
-    <!-- Preconnect para acelerar handshake TLS (mobile LCP) -->
-
-    <link rel="preconnect" href="https://shmbwdjuddvquszwkvuq.supabase.co" crossorigin />
-    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <!-- Preconnect & DNS-Prefetch para acelerar handshake TLS (Mobile LCP & WAHA) -->
+    <link rel="preconnect" href="https://tkxxoghzhvhjztdoomgss.supabase.co" crossorigin />
+    <link rel="preconnect" href="https://waha-production-4e9c.up.railway.app" crossorigin />
+    <link rel="dns-prefetch" href="https://waha-production-4e9c.up.railway.app" />
     <link rel="dns-prefetch" href="https://www.google-analytics.com" />
     <link rel="dns-prefetch" href="https://analytics.plantayraiz.com.br" />
+
+    <!-- Telemetria de Navegação (Microsoft Clarity - Padrão mHealth Whitebook) -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "pyr_clarity_2026");
+    </script>
 
     <!-- Analytics carregados DEPOIS do consentimento LGPD (cookie banner).
          Escutamos o evento `plr:cookie-consent` disparado pelo CookieConsentBanner.

@@ -8,7 +8,8 @@ import { DoctorEducationDashboard } from "@/components/doctor/DoctorEducationDas
 import { FilaAssincrona } from "@/components/doctor/FilaAssincrona";
 import { PacienteTesteSimulacao360 } from "@/components/doctor/PacienteTesteSimulacao360";
 import { DoctorRankingPlantaCoin } from "@/components/doctor/DoctorRankingPlantaCoin";
-import { AlertTriangle, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck } from "lucide-react";
+import { CopilotoClinicoVIP } from "@/components/doctor/CopilotoClinicoVIP";
+import { AlertTriangle, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -224,6 +225,9 @@ const Consultorio = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 w-full justify-start overflow-x-auto gap-1.5 p-1 bg-card border">
             <TabsTrigger value="atendimentos">Atendimentos</TabsTrigger>
+            <TabsTrigger value="copiloto-vip" className="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 font-extrabold data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-black border border-emerald-500/30">
+              🧠 Copiloto IA (Decisão Clínica)
+            </TabsTrigger>
             <TabsTrigger value="paciente-teste" className="bg-emerald-500/10 text-emerald-400 font-bold data-[state=active]:bg-emerald-500 data-[state=active]:text-black">
               🎭 Paciente Teste (Simulação 360°)
             </TabsTrigger>
@@ -238,6 +242,10 @@ const Consultorio = () => {
           
           <TabsContent value="atendimentos" className="mt-0 border-0 p-0">
             <MedicalDashboard />
+          </TabsContent>
+
+          <TabsContent value="copiloto-vip" className="mt-0 border-0 p-0">
+            <CopilotoClinicoVIP />
           </TabsContent>
 
           <TabsContent value="paciente-teste" className="mt-0 border-0 p-0">

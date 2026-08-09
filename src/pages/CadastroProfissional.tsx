@@ -260,10 +260,17 @@ const CadastroProfissional = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.nomeCompleto || !form.email || !form.telefone || !form.categoria || !form.priceVideoChat || !form.priceChatOnly || !form.priceReturn || !form.pixKey || !form.resumoAtuacao) {
-      toast({ title: country === "BO" ? "Complete todos los campos obligatorios" : "Preencha todos os campos obrigatórios", variant: "destructive" });
+    if (!form.nomeCompleto || !form.email || !form.telefone || !form.categoria) {
+      toast({ title: country === "BO" ? "Complete todos los campos obligatorios" : "Preencha todos os campos obrigatórios (Nome, E-mail, Telefone, Categoria)", variant: "destructive" });
       return;
     }
+    // Auto-fill sensible defaults if optional price/pix fields were left blank
+    if (!form.priceVideoChat) form.priceVideoChat = "120";
+    if (!form.priceChatOnly) form.priceChatOnly = "80";
+    if (!form.priceReturn) form.priceReturn = "0";
+    if (!form.pixKey) form.pixKey = form.telefone;
+    if (!form.resumoAtuacao) form.resumoAtuacao = "Médico Prescritor atuante em Medicina Canabinoide e Saúde Integral.";
+
     if (form.password.length < 8) {
       toast({ title: country === "BO" ? "Contraseña muy corta (mín. 8)" : "Senha muito curta (mín. 8 caracteres)", variant: "destructive" });
       return;
@@ -283,13 +290,13 @@ const CadastroProfissional = () => {
     if (!phoneIsValid(form.telefone)) {
       toast({
         title: country === "BO" ? "Teléfono inválido" : "Telefone inválido",
-        description: country === "BO" ? "Use formato +591 7 1234567" : "Insira um telefone válido.",
+        description: country === "BO" ? "Use formato +591 7 1234567" : "Insira um telefone válido com DDD (ex: 54 99364-6065).",
         variant: "destructive",
       });
       return;
     }
     if (form.resumoAtuacao.length > 500) {
-      toast({ title: "Resumo muito longo", description: "Máximo 500.", variant: "destructive" });
+      toast({ title: "Resumo muito longo", description: "Máximo 500 caracteres.", variant: "destructive" });
       return;
     }
     if (!documentNumber) {
@@ -313,7 +320,7 @@ const CadastroProfissional = () => {
       trackKYCValidationFailed("CRM_MISSING", "Registro profissional não informado");
       toast({
         title: country === "BO" ? "Matrícula obligatoria" : "Registro profissional obrigatório",
-        description: country === "BO" ? "Informe su matrícula del Colegio Médico." : "Informe seu registro de conselho.",
+        description: country === "BO" ? "Informe su matrícula del Colegio Médico." : "Informe seu registro de conselho (ex: CRM).",
         variant: "destructive",
       });
       return;
@@ -323,17 +330,14 @@ const CadastroProfissional = () => {
       return;
     }
 
-    // 🔐 Documentos KYC obrigatórios
-    const requiredKyc: KycKind[] = isCuidador
-      ? ["id_front", "id_back"]
-      : ["crm_front", "crm_back", "id_front", "id_back"];
-    const missing = requiredKyc.filter((k) => !kycFiles[k]);
-    if (missing.length > 0) {
+    // 🔐 Flexibilização do KYC: permite envio se ao menos 1 documento foi anexado ou se prosseguir para verificação posterior
+    const uploadedCount = Object.values(kycFiles).filter(Boolean).length;
+    if (uploadedCount === 0) {
       toast({
-        title: country === "BO" ? "Documentos obligatorios" : "Documentos obrigatórios",
+        title: country === "BO" ? "Anexe al menos 1 documento" : "Anexe ao menos 1 documento (CRM ou RG/CPF)",
         description: country === "BO"
-          ? "Suba frente y dorso de la matrícula y del documento de identidad."
-          : "Envie frente e verso do registro profissional e do documento de identidade.",
+          ? "Por favor suba la foto de su documento o matrícula para verificación."
+          : "Anexe ao menos uma foto do seu documento profissional para a verificação KYC.",
         variant: "destructive",
       });
       return;

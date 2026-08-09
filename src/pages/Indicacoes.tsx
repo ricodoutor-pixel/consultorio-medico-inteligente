@@ -132,7 +132,7 @@ const Indicacoes = () => {
 
     if (refLink) {
       setReferralCode(refLink.code);
-      setReferralLink(`https://plantaeraiz.com.br/cadastro?ref=${refLink.code}`);
+      setReferralLink(`${window.location.origin}/cadastro?ref=${refLink.code}`);
       setTotalReferrals(refLink.total_referrals || 0);
       setTotalEarnings(refLink.total_earnings || 0);
     } else {

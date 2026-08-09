@@ -28,6 +28,7 @@ import { KpiDrillDown, type DrillSource } from "@/components/admin/KpiDrillDown"
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AgentsHub } from "@/components/admin/AgentsHub";
 import { WhatsAppFailoverManager } from "@/components/admin/WhatsAppFailoverManager";
+import { useAdminRealtime } from "@/hooks/useAdminRealtime";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };

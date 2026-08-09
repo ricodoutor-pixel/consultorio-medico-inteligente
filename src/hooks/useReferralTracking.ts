@@ -37,16 +37,37 @@ export async function linkReferralOnSignup(newUserId: string) {
   const refCode = getReferralCode();
   if (!refCode) return;
 
+  const cleanRef = refCode.trim();
+
   try {
-    // Find the referrer by code
-    const { data: referrer } = await supabase
+    // 1. Case-insensitive search by exact code or ilike
+    let { data: referrer } = await supabase
       .from("referral_links")
       .select("user_id, referred_by")
-      .eq("code", refCode)
-      .single();
+      .ilike("code", cleanRef)
+      .maybeSingle();
+
+    // 2. Fallback: If not found, try matching by code suffix (e.g. 5WQ65M)
+    if (!referrer) {
+      const codeSuffix = cleanRef.replace(/^(PLANTA-|PLR-)/i, "");
+      if (codeSuffix.length >= 4) {
+        const { data: fallbackRef } = await supabase
+          .from("referral_links")
+          .select("user_id, referred_by")
+          .ilike("code", `%${codeSuffix}`)
+          .maybeSingle();
+        referrer = fallbackRef;
+      }
+    }
 
     if (!referrer) {
-      console.log("[Referral] Invalid ref code:", refCode);
+      console.log("[Referral] Code captured but no DB referrer row found:", cleanRef);
+      // Still create a referral_link for new user so they get their own code
+      const newCode = generateCode(newUserId);
+      await supabase.from("referral_links").insert({
+        user_id: newUserId,
+        code: newCode,
+      });
       return;
     }
 
@@ -63,7 +84,7 @@ export async function linkReferralOnSignup(newUserId: string) {
         .from("referral_links")
         .select("referred_by")
         .eq("user_id", referrer.referred_by)
-        .single();
+        .maybeSingle();
 
       if (l2Ref?.referred_by) {
         level3 = l2Ref.referred_by;

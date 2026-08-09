@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
-import { linkReferralOnSignup } from "@/hooks/useReferralTracking";
+import { linkReferralOnSignup, getReferralCode } from "@/hooks/useReferralTracking";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { validateCPF, validateCNPJ, formatCPF, formatCNPJ } from "@/lib/validators";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { UserPlus, Stethoscope, Building2, Leaf, Users, CheckCircle2, ArrowRight, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
+import { UserPlus, Stethoscope, Building2, Leaf, Users, CheckCircle2, ArrowRight, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck, Gift } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +41,7 @@ const Cadastro = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirect");
+  const activeRefCode = searchParams.get("ref") || searchParams.get("ref_id") || getReferralCode();
 
   const handleChange = (key: string, value: string) => setFormData({ ...formData, [key]: value });
 
@@ -284,6 +286,27 @@ const Cadastro = () => {
           {/* Type Selection */}
           {!type && (
             <div className="max-w-3xl mx-auto">
+              {activeRefCode && (
+                <div className="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3 text-sm text-emerald-300 flex-wrap">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
+                      <Gift className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-foreground">
+                        🎁 Link de Indicação Ativo de Parceiro / Afiliado!
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Código Vinculado: <span className="font-mono font-bold text-primary">{activeRefCode}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <Badge className="bg-emerald-600/30 text-emerald-300 border-emerald-500/40">
+                    Indicação Ativa ✅
+                  </Badge>
+                </div>
+              )}
+
               <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 mb-6 text-center">
                 <p className="text-sm text-emerald-300 font-bold">
                   🎯 Selecione seu perfil. Cada categoria tem login Google dedicado e leva ao painel correto.

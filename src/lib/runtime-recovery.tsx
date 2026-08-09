@@ -62,23 +62,10 @@ export function reportFrontendRuntimeError(
   };
 
   try {
-    void supabase.from("error_logs").insert({
-      source: "frontend",
-      error_type: normalized.name,
-      message: normalized.message.slice(0, 500),
-      metadata: {
-        source_ref: meta.sourceRef ?? window.location.pathname,
-        phase: meta.phase ?? "runtime",
-        chunk_load_error: isChunkLoadError(normalized),
-        stack: normalized.stack?.slice(0, 4000) ?? null,
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        ...meta.context,
-      },
-    }).then(() => {
-      // Nota: manus-sentinel exige service-auth e não pode ser invocado do browser.
-      // O alerta server-side é disparado pelo cron/edge, não daqui.
-    }, () => {});
+    // Nota: o insert direto em `error_logs` é bloqueado por RLS para visitantes
+    // (401). O registro server-side é feito exclusivamente pela edge function
+    // `ai-error-gateway`, que usa service role + deduplicação.
+
 
 
     fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-error-gateway`, {

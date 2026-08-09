@@ -104,31 +104,57 @@ Seja bem-vindo(a) à medicina do futuro! 🌿💚`
   // Função de Envio com Failover Automático
   const dispatchSingleMessage = async () => {
     const currentInstanceName = activeInstance === "brisa" ? "Enfª Brisa" : "Dr. Edilson Bezerra (5511987131241)";
+    const cleanPhone = targetPhone.replace(/\D/g, "");
     
     try {
-      toast.info(`🚀 Enviando mensagem via [${currentInstanceName}] para ${targetPhone}...`);
+      toast.info(`🚀 Enviando mensagem via [${currentInstanceName}] para ${cleanPhone}...`);
       
-      const { error } = await supabase.functions.invoke("whatsapp-send", {
-        body: {
-          number: targetPhone,
-          text: messageText,
-          instance: activeInstance
-        }
-      });
+      let isSuccess = false;
 
-      if (error && activeInstance === "brisa") {
-        toast.warning("⚠️ Instância da Enfª Brisa indisponível! Alternando AUTOMATICAMENTE para WhatsApp Dr. Edilson (5511987131241)...");
-        setActiveInstance("edilson");
-        setBrisaStatus("disconnected");
-      } else {
+      // 1. Tentar envio direto via WAHA API (Instância Enfª Brisa)
+      if (activeInstance === "brisa") {
+        try {
+          const wahaRes = await fetch("https://waha-production-4e9c.up.railway.app/api/sendText", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Api-Key": "planta123"
+            },
+            body: JSON.stringify({
+              session: "default",
+              chatId: `${cleanPhone}@c.us`,
+              text: messageText
+            })
+          });
+
+          if (wahaRes.ok) {
+            isSuccess = true;
+          }
+        } catch (wahaErr) {
+          console.warn("Falha no envio direto WAHA, tentando edge function...", wahaErr);
+        }
+      }
+
+      // 2. Fallback via Supabase Edge Function whatsapp-send
+      if (!isSuccess) {
+        const { error } = await supabase.functions.invoke("whatsapp-send", {
+          body: {
+            number: cleanPhone,
+            text: messageText,
+            instance: activeInstance
+          }
+        });
+        if (!error) isSuccess = true;
+      }
+
+      if (isSuccess) {
         setSentCount((prev) => prev + 1);
-        toast.success(`✅ Mensagem enviada com sucesso! Próximo envio em 30 segundos.`);
+        toast.success(`✅ Convite enviado com sucesso via ${currentInstanceName}! Próximo envio em 30 segundos.`);
+      } else {
+        toast.error(`❌ Falha ao enviar mensagem para ${cleanPhone}. Verifique se o WhatsApp está ativo no aplicativo.`);
       }
     } catch (err) {
-      if (activeInstance === "brisa") {
-        setActiveInstance("edilson");
-        toast.warning("🔄 Failover ativado: disparando pelo número do Dr. Edilson Bezerra.");
-      }
+      toast.error("❌ Erro inesperado ao processar o disparo.");
     }
   };
 

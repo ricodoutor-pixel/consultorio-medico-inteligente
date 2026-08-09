@@ -78,7 +78,7 @@ export default function PrescriptionCheckout() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="pt-28 pb-16 max-w-2xl mx-auto px-4 space-y-4">
           <Skeleton className="h-10 w-3/4" />
@@ -91,7 +91,7 @@ export default function PrescriptionCheckout() {
 
   if (error || !cart) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="pt-28 pb-16 flex items-center justify-center min-h-[70vh]">
           <div className="text-center space-y-4 px-4">
@@ -108,7 +108,7 @@ export default function PrescriptionCheckout() {
   const items = (cart.items as any as CartItem[]) || [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <PaymentTestModeBanner />
       <Navbar />
       <section className="pt-28 pb-16 max-w-2xl mx-auto px-4">

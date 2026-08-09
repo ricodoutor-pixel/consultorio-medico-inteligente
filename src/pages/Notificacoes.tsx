@@ -63,7 +63,7 @@ const Notificacoes = () => {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <section className="pt-24 pb-16 md:pt-32">
         <div className="container mx-auto px-4 max-w-3xl">

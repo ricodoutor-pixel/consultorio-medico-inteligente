@@ -186,7 +186,7 @@ export default function MonitoramentoSaude() {
 
       <Navbar />
 
-      <main className="min-h-screen bg-gradient-to-b from-background to-slate-950">
+      <main className="min-h-dvh bg-gradient-to-b from-background to-slate-950">
         {/* Hero */}
         <section className="pt-24 pb-12 px-4">
           <div className="max-w-4xl mx-auto text-center">

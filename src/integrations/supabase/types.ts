@@ -2269,6 +2269,39 @@ export type Database = {
         }
         Relationships: []
       }
+      doctor_simulations: {
+        Row: {
+          created_at: string
+          difficulty: string | null
+          doctor_id: string
+          id: string
+          plantacoins_earned: number
+          scenario_id: string
+          scenario_title: string | null
+          score: number
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: string | null
+          doctor_id: string
+          id?: string
+          plantacoins_earned?: number
+          scenario_id: string
+          scenario_title?: string | null
+          score?: number
+        }
+        Update: {
+          created_at?: string
+          difficulty?: string | null
+          doctor_id?: string
+          id?: string
+          plantacoins_earned?: number
+          scenario_id?: string
+          scenario_title?: string | null
+          score?: number
+        }
+        Relationships: []
+      }
       doctors: {
         Row: {
           approval_status: string

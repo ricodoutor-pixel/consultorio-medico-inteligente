@@ -45,7 +45,7 @@ export default function ImpactoSocial() {
     <>
       <SEO title="Impacto Social | Planta & Raiz" description="Relatório transparente de impacto social da Planta & Raiz. Veja como estamos democratizando o acesso à cannabis medicinal." />
       <Navbar />
-      <main className="min-h-screen bg-background pt-20 pb-16">
+      <main className="min-h-dvh bg-background pt-20 pb-16">
         <div className="container mx-auto px-4">
           {/* Hero */}
           <div className="text-center mb-12">

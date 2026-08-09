@@ -141,7 +141,7 @@ export default function Cursos() {
         description="10 cursos gratuitos sobre cannabis medicinal. Aprenda farmacologia, indicações clínicas, dosagem e legislação com certificado."
       />
       <Navbar />
-      <main className="min-h-screen bg-background pt-20 pb-16">
+      <main className="min-h-dvh bg-background pt-20 pb-16">
         <div className="container mx-auto px-4">
           {/* Hero */}
           <div className="text-center mb-12">

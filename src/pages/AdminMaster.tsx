@@ -1038,7 +1038,7 @@ const AdminMaster = () => {
 
   /* ═══ MAIN RENDER ═══ */
   return (
-    <div className="min-h-screen" style={{ background: "#0A0E27" }}>
+    <div className="min-h-dvh" style={{ background: "#0A0E27" }}>
       {/* Header */}
       <header className="sticky top-0 z-50 border-b backdrop-blur-xl" style={{ borderColor: "#39FF1420", background: "#0A0E27EE" }}>
         <div className="flex items-center justify-between px-4 md:px-6 h-14">

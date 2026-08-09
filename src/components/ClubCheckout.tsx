@@ -158,7 +158,7 @@ export const ClubCheckout: React.FC<CheckoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 p-4 md:p-8">
+    <div className="min-h-dvh bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">

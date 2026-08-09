@@ -5,7 +5,7 @@ import { Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const PaymentPending = () => (
-  <div className="min-h-screen bg-background">
+  <div className="min-h-dvh bg-background">
     <Navbar />
     <section className="pt-28 pb-16 flex items-center justify-center min-h-[70vh]">
       <div className="text-center space-y-6 px-4">

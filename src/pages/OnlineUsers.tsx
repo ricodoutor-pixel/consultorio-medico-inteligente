@@ -43,7 +43,7 @@ const OnlineUsers = () => {
   const totalOnline = countries.reduce((s, c) => s + c.users, 0);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
 
       <section className="pt-24 pb-16 md:pt-32">

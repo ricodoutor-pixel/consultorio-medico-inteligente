@@ -64,7 +64,7 @@ const GlobalCompliance = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <div className="max-w-6xl mx-auto px-4 py-12">
         <motion.div initial="hidden" animate="visible" variants={fadeUp} className="text-center mb-12">

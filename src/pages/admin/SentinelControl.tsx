@@ -115,7 +115,7 @@ export default function SentinelControl() {
   if (loading) return <div className="p-8 text-muted-foreground">Carregando Sentinela...</div>;
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-dvh bg-background p-4 md:p-8">
       <Helmet><title>Sentinela 24x7 — Controle | Planta y Raiz</title></Helmet>
 
       <div className="max-w-7xl mx-auto space-y-6">

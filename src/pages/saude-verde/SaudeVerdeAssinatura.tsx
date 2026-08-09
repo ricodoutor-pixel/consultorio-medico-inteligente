@@ -51,14 +51,14 @@ export default function SaudeVerdeAssinatura() {
   useEffect(() => { load(); }, [load]);
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background">
+    return <div className="min-h-dvh flex items-center justify-center bg-background">
       <Loader2 className="w-8 h-8 text-primary animate-spin" />
     </div>;
   }
 
   if (!userId) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="min-h-dvh flex items-center justify-center bg-background px-4">
         <Card className="p-6 max-w-md text-center">
           <p className="mb-4">Faça login para ver sua assinatura.</p>
           <Button asChild><Link to="/login">Entrar</Link></Button>
@@ -69,7 +69,7 @@ export default function SaudeVerdeAssinatura() {
 
   if (!sub) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="min-h-dvh flex items-center justify-center bg-background px-4">
         <Card className="p-8 max-w-md text-center">
           <CreditCard className="w-10 h-10 text-primary mx-auto mb-3" />
           <h1 className="text-xl font-bold mb-2">Você ainda não tem o Cartão Saúde Verde</h1>
@@ -87,7 +87,7 @@ export default function SaudeVerdeAssinatura() {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(qrPayload)}`;
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-10">
+    <div className="min-h-dvh bg-background text-foreground py-10">
       <Helmet><title>Minha Assinatura Saúde Verde | Planta y Raiz</title></Helmet>
       <div className="container mx-auto px-4 max-w-4xl">
         <Link to="/saude-verde/cartao" className="text-sm text-muted-foreground hover:text-primary mb-6 inline-block">← Voltar ao cartão</Link>

@@ -78,7 +78,7 @@ const LGPDDireitos = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <div className="pt-24 pb-16 px-4 max-w-4xl mx-auto">
         <motion.div variants={fadeUp} initial="hidden" animate="visible" className="text-center mb-10">

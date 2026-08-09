@@ -7,7 +7,7 @@ import { HealthSubscriptionPlans } from "@/components/subscription/HealthSubscri
 
 export default function SaudeDigital() {
   return (
-    <div className="min-h-screen bg-background pb-6 sm:pb-0">
+    <div className="min-h-dvh bg-background pb-6 sm:pb-0">
       <Helmet>
         <title>Planos de Saúde Digital | Planta y Raiz</title>
         <meta

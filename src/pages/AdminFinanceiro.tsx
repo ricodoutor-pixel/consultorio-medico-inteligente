@@ -87,7 +87,7 @@ export default function AdminFinanceiro() {
   const isLoading = loadingEscrows || loadingWebhooks;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="flex items-center justify-between mb-6">

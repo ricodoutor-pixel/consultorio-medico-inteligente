@@ -53,7 +53,7 @@ export const ClubPlantaRaiz: React.FC<ClubPlantaRaizProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
+    <div className="min-h-dvh bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
       {/* Header com CTA */}
       <div className="bg-gradient-to-r from-emerald-500 via-cyan-500 to-purple-500 p-8 text-white">
         <div className="max-w-7xl mx-auto">

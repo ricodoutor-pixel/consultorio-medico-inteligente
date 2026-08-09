@@ -77,7 +77,7 @@ const AppointmentsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-dvh bg-background flex flex-col">
       <Navbar />
       <main className="flex-grow container mx-auto px-4 pt-32 pb-20">
         <header className="mb-8">

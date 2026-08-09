@@ -54,7 +54,7 @@ export const MedSocio = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f0a] text-slate-200">
+    <div className="min-h-dvh bg-[#0a0f0a] text-slate-200">
       <Navbar />
       
       <main className="container mx-auto px-4 pt-32 pb-24">

@@ -31,7 +31,7 @@ export default function SaudeVerdeEmpresas() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-dvh bg-background text-foreground">
       <Helmet>
         <title>Cartão Saúde Verde para empresas | Planta y Raiz</title>
         <meta name="description" content="Ofereça Cartão Saúde Verde para sua equipe a partir de R$29/funcionário/mês. Painel de RH, cobrança unificada, relatórios." />

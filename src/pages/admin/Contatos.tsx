@@ -70,7 +70,7 @@ export default function Contatos() {
   }, [selected]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-dvh bg-slate-950 text-white">
       <header className="border-b border-slate-800 px-4 sm:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold">Contatos — Chat Brisa Interno</h1>

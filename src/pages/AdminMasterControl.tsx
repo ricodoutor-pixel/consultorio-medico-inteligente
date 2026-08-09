@@ -301,14 +301,14 @@ const AdminMasterControl = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0c10] flex items-center justify-center">
+      <div className="min-h-dvh bg-[#0a0c10] flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0c10] text-white p-4 md:p-6 pb-24">
+    <div className="min-h-dvh bg-[#0a0c10] text-white p-4 md:p-6 pb-24">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">

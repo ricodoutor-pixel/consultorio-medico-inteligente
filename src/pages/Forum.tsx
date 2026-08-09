@@ -112,7 +112,7 @@ export default function Forum() {
     <>
       <SEO title="Fórum | Comunidade Cannabis Medicinal | Planta & Raiz" description="Participe das discussões sobre cannabis medicinal. Tire dúvidas, compartilhe experiências e aprenda com especialistas." />
       <Navbar />
-      <main className="min-h-screen bg-background pt-20 pb-16">
+      <main className="min-h-dvh bg-background pt-20 pb-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground mb-3">

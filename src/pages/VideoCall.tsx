@@ -18,7 +18,7 @@ export default function VideoCall() {
   const isDoctor = params.get("role") === "doctor";
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-dvh bg-background flex flex-col">
       <Navbar />
       <main className="flex-1 pt-20">
         <div className="h-[calc(100vh-5rem)]">

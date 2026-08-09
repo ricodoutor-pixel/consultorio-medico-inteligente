@@ -105,7 +105,7 @@ export default function GrowthDashboard() {
   const totalPosts = runs.reduce((s, r) => s + (r.posts_generated || 0), 0);
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-dvh bg-background p-4 md:p-8">
       <Helmet><title>Manus Growth CEO — Painel</title></Helmet>
 
       <div className="mx-auto max-w-7xl space-y-6">

@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { PostConsultationViralLoop } from "@/components/PostConsultationViralLoop";
 
 const PaymentSuccess = () => (
-  <div className="min-h-screen bg-background">
+  <div className="min-h-dvh bg-background">
     <Navbar />
     <section className="pt-28 pb-16 px-4">
       <div className="max-w-2xl mx-auto space-y-8">

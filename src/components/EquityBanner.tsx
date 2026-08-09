@@ -223,7 +223,7 @@ export default function EquityBanner({ className = "" }: EquityBannerProps) {
                 Entendi
               </button>
               <a
-                href="/privacy-policy"
+                href="/politica-de-privacidade"
                 className="flex-1 px-4 py-2 border-2 border-green-600 text-green-600 font-bold rounded-lg hover:bg-green-50 transition text-center"
               >
                 Política de Privacidade

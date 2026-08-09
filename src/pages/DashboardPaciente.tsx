@@ -154,7 +154,7 @@ const DashboardPaciente = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <section className="pt-24 pb-8 md:pt-32">
           <div className="container mx-auto px-4 space-y-6">
@@ -186,7 +186,7 @@ const DashboardPaciente = () => {
   const userName = profile?.full_name || "Paciente";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <div className="pt-20 md:pt-24">
         <FrogMoodBanner />

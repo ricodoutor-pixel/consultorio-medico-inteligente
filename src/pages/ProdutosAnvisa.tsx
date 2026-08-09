@@ -7,7 +7,7 @@ import { ShieldCheck, FileText, ExternalLink, AlertTriangle, Leaf } from "lucide
 
 const ProdutosAnvisa = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Helmet>
         <title>Produtos ANVISA — Conformidade Sanitária | Planta y Raiz</title>
         <meta

@@ -129,7 +129,7 @@ const AdminDashboard = () => {
   const formatCurrency = (v: number) => `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <main className="container mx-auto px-4 pt-32 pb-20">
         <div className="flex flex-col gap-8">

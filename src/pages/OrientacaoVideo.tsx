@@ -307,7 +307,7 @@ const OrientacaoVideo = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <TCLEConsentModal open={showTCLE && !tcleAccepted} onAccept={handleTCLEAccept} onDecline={handleTCLEDecline} appointmentId={appointmentId || undefined} />
 
       {/* Mandatory NPS Modal (patient only, after consultation ends) */}
@@ -336,7 +336,7 @@ const OrientacaoVideo = () => {
       )}
       {!isFullscreen && <Navbar />}
 
-      <div className={`${isFullscreen ? "" : "pt-16"} flex flex-col h-screen`}>
+      <div className={`${isFullscreen ? "" : "pt-16"} flex flex-col h-dvh`}>
         {/* Top bar */}
         <div className="bg-card border-b border-border px-4 py-2 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">

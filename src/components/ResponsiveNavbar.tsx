@@ -71,7 +71,7 @@ export const ResponsiveNavbar = () => {
           <a href="/consultas" className="text-gray-700 hover:text-green-600 font-medium transition">
             Orientações Técnicas
           </a>
-          <a href="/medicos" className="text-gray-700 hover:text-green-600 font-medium transition">
+          <a href="/profissionais" className="text-gray-700 hover:text-green-600 font-medium transition">
             Médicos
           </a>
         </div>
@@ -145,7 +145,7 @@ export const ResponsiveNavbar = () => {
             <a href="/consultas" className="block text-gray-700 hover:text-green-600 font-medium py-2">
               Orientações Técnicas
             </a>
-            <a href="/medicos" className="block text-gray-700 hover:text-green-600 font-medium py-2">
+            <a href="/profissionais" className="block text-gray-700 hover:text-green-600 font-medium py-2">
               Médicos
             </a>
 

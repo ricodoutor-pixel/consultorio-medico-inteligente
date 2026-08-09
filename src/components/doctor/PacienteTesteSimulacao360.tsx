@@ -210,7 +210,7 @@ export function PacienteTesteSimulacao360({ onFinish }: { onFinish?: () => void 
       if (user?.id) {
         await supabase.from("doctor_simulations").insert({
           doctor_id: user.id,
-          scenario_id: currentScenario.id,
+          scenario_id: String(currentScenario.id),
           scenario_title: currentScenario.title,
           difficulty: currentScenario.difficulty,
           score: 85,

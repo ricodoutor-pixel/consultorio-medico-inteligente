@@ -207,7 +207,7 @@ const SEOCondicoes = () => {
   if (!data) {
     // Index page - list all conditions
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <SEO title="Tratamentos com Cannabis Medicinal | Planta & Raiz" description="Conheça os tratamentos com cannabis medicinal para diversas condições. Evidências científicas e prescritores especializados." />
         
@@ -248,7 +248,7 @@ const SEOCondicoes = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <SEO title={data.title} description={data.description} />
 

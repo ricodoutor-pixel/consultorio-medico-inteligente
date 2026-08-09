@@ -40,18 +40,45 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: (id) => {
           if (!id.includes('node_modules')) return;
-          // CRÍTICO: manter React + React-DOM + Scheduler + React-Router no MESMO chunk "vendor".
-          // Separar react/react-dom em chunk separado causa circular reference com rolldown/vite7
-          // e "Cannot set properties of undefined" em produção.
+
+          // 1. React Core + Router (deve ficar junto no vendor)
           if (
             /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler|react-is|use-sync-external-store)[\\/]/.test(id)
           ) {
-            return 'vendor'; // tudo junto no vendor, sem react-vendor separado
+            return 'vendor';
           }
-          if (id.includes('recharts') || id.includes('d3-')) return 'charts';
+
+          // 2. Gráficos & Visualização
+          if (id.includes('recharts') || id.includes('d3-') || id.includes('victory-vendor')) return 'charts';
+
+          // 3. PDFs, Excel & Documentos pesados
+          if (id.includes('jspdf') || id.includes('html2canvas') || id.includes('xlsx') || id.includes('pdfmake') || id.includes('canvg')) {
+            return 'pdf-excel';
+          }
+
+          // 4. Pagamentos & Gateways
+          if (id.includes('stripe') || id.includes('mercadopago') || id.includes('@stripe')) {
+            return 'payment-gateways';
+          }
+
+          // 5. Analytics, Telemetria & Sentry
+          if (id.includes('@sentry') || id.includes('posthog') || id.includes('mixpanel')) {
+            return 'sentry-analytics';
+          }
+
+          // 6. Câmera, Scanners & Mídia
+          if (id.includes('@zxing') || id.includes('qrcode') || id.includes('jsqr') || id.includes('webrtc')) {
+            return 'scanner-media';
+          }
+
+          // 7. Mapas & Geolocalização
           if (id.includes('leaflet') || id.includes('react-simple-maps') || id.includes('topojson')) return 'maps';
+
+          // 8. Animações Lottie & Framer
           if (id.includes('lottie-react') || id.includes('lottie-web')) return 'lottie';
           if (id.includes('framer-motion')) return 'animation';
+
+          // 9. Componentes UI Primitives & Ícones
           if (id.includes('@radix-ui') || id.includes('cmdk')) return 'ui-primitives';
           if (id.includes('@supabase')) return 'supabase';
           if (id.includes('i18next')) return 'i18n';
@@ -59,6 +86,7 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('date-fns')) return 'date-fns';
           if (id.includes('@hookform') || id.includes('react-hook-form') || id.includes('zod')) return 'forms';
           if (id.includes('embla-carousel')) return 'carousel';
+
           return 'vendor';
         },
       },

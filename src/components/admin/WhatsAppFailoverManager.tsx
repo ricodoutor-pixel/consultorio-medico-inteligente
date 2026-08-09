@@ -65,21 +65,30 @@ Seja bem-vindo(a) à medicina do futuro! 🌿💚`
   // Gerar QRCode do Dr. Edilson Bezerra (5511987131241)
   const handleGenerateEdilsonQr = async () => {
     setLoadingQr(true);
-    toast.info("📱 Gerando QR Code do WhatsApp Dr. Edilson Bezerra (5511987131241)...");
+    toast.info("📱 Gerando QR Code em tempo real para o Dr. Edilson Bezerra (5511987131241)...");
     
     try {
       const { data } = await supabase.functions.invoke("brisa-waha-connect", {
-        body: { action: "qr", session: "edilson_bezerra", phone: "5511987131241" }
+        body: { action: "qr", session: "default", phone: "5511987131241" }
       });
 
-      const qrData = data?.qr || `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=5511987131241_PLANTA_Y_RAIZ_FAILOVER`;
-      setQrCodeUrl(qrData);
+      let rawQr = data?.qr;
+      if (typeof rawQr === 'object' && rawQr?.value) rawQr = rawQr.value;
+
+      if (typeof rawQr === 'string' && (rawQr.startsWith("data:image") || rawQr.startsWith("http"))) {
+        setQrCodeUrl(rawQr);
+      } else if (typeof rawQr === 'string' && rawQr.length > 15) {
+        setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(rawQr)}`);
+      } else {
+        // Live image stream endpoint from WAHA session
+        setQrCodeUrl(`https://waha-production-4e9c.up.railway.app/api/default/auth/qr?format=image&t=${Date.now()}`);
+      }
       setEdilsonStatus("qr");
       toast.success("✅ QR Code pronto! Abra o WhatsApp do Dr. Edilson e escaneie.");
     } catch (e: any) {
-      setQrCodeUrl("https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=5511987131241_FAILOVER_WHATSAPP");
+      setQrCodeUrl(`https://waha-production-4e9c.up.railway.app/api/default/auth/qr?format=image&t=${Date.now()}`);
       setEdilsonStatus("qr");
-      toast.success("📱 QR Code gerado! Pode escanear no celular.");
+      toast.success("📱 QR Code gerado! Pode escanear ou abrir o painel WAHA.");
     } finally {
       setLoadingQr(false);
     }
@@ -245,19 +254,34 @@ Seja bem-vindo(a) à medicina do futuro! 🌿💚`
         {qrCodeUrl && (
           <div className="p-6 rounded-2xl border border-emerald-500/40 bg-slate-900/90 flex flex-col items-center justify-center gap-4 text-center animate-in fade-in zoom-in duration-300">
             <div className="bg-white p-4 rounded-2xl shadow-2xl border-4 border-emerald-400">
-              <img src={qrCodeUrl} alt="QR Code WhatsApp Dr. Edilson" className="w-52 h-52 object-contain" />
+              <img
+                src={qrCodeUrl}
+                alt="QR Code WhatsApp Dr. Edilson"
+                className="w-56 h-56 object-contain"
+                onError={() => {
+                  setQrCodeUrl(`https://waha-production-4e9c.up.railway.app/api/default/auth/qr?format=image&t=${Date.now()}`);
+                }}
+              />
             </div>
             <div>
               <h4 className="text-base font-black text-white flex items-center justify-center gap-2">
                 <QrCode className="text-emerald-400" size={20} /> Escanear WhatsApp do Dr. Edilson Bezerra
               </h4>
-              <p className="text-xs text-slate-300 mt-1 max-w-sm">
-                Abra o WhatsApp no celular <strong>(11 98713-1241)</strong> &gt; Menu &gt; Aparelhos Conectados &gt; Conectar um aparelho.
+              <p className="text-xs text-slate-300 mt-1 max-w-md">
+                Abra o WhatsApp no celular <strong>(11 98713-1241)</strong> &gt; Configurações/Menu &gt; Aparelhos Conectados &gt; Conectar um aparelho.
               </p>
             </div>
-            <Button size="sm" className="bg-emerald-500 text-black font-extrabold hover:bg-emerald-400 text-xs" onClick={handleSimulateConnection}>
-              <CheckCircle2 className="w-4 h-4 mr-1.5" /> Confirmar Leitura do QR Code
-            </Button>
+
+            <div className="flex gap-2 flex-wrap justify-center">
+              <Button size="sm" className="bg-emerald-500 text-black font-extrabold hover:bg-emerald-400 text-xs" onClick={handleSimulateConnection}>
+                <CheckCircle2 className="w-4 h-4 mr-1.5" /> Confirmar Leitura do QR Code
+              </Button>
+              <a href="https://waha-production-4e9c.up.railway.app/dashboard" target="_blank" rel="noreferrer">
+                <Button size="sm" variant="outline" className="border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10 text-xs">
+                  🔗 Abrir Painel WAHA Ao Vivo
+                </Button>
+              </a>
+            </div>
           </div>
         )}
 

@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="pt-BR" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Planta & Raiz" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="theme-color" content="#0A0E27" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Favicon (CRÍTICO Google SERP — Googlebot busca /favicon.ico PRIMEIRO) -->
+    <link rel="icon" type="image/png" href="/dr-verdinho.png?v=9">
+    <link rel="icon" type="image/png" sizes="192x192" href="/dr-verdinho.png?v=9" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/dr-verdinho.png?v=9" />
+    <link rel="shortcut icon" href="/dr-verdinho.png?v=9" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/dr-verdinho.png?v=9" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="mask-icon" href="/dr-verdinho.png?v=9" color="#15803d" />
+
+    <style>
+      html, body { background-color: #0A0E27; margin: 0; padding: 0; }
+      #root { min-height: 100dvh; }
+    </style>
+
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      
+      // Estado padrão: Negado (cumpre a lei rigorosamente)
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'wait_for_update': 500
+      });
+
+      // Função global para o seu componente CookieBanner ativar os rastreios
+      window.updateConsent = function(consent) {
+        gtag('consent', 'update', {
+          'analytics_storage': consent.analytics_storage,
+          'ad_storage': consent.ad_storage,
+          'ad_user_data': consent.ad_user_data,
+          'ad_personalization': consent.ad_personalization
+        });
+        console.log('Consentimento atualizado para GTM');
+      };
+    </script>
+
+    <!-- Preload do logotipo (LCP da navbar) -->
+    <link rel="preload" as="image" href="/logo-planta-raiz.webp" type="image/webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/verdinho-mascot-256.webp" type="image/webp" fetchpriority="high" />
+
+    <!-- Preconnect & DNS-Prefetch para acelerar handshake TLS (Mobile LCP & WAHA) -->
+    <link rel="preconnect" href="https://tkxxoghzhvhjztdoomgss.supabase.co" crossorigin />
+    <link rel="preconnect" href="https://waha-production-4e9c.up.railway.app" crossorigin />
+    <link rel="dns-prefetch" href="https://waha-production-4e9c.up.railway.app" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+    <link rel="dns-prefetch" href="https://analytics.plantayraiz.com.br" />
+
+    <!-- Telemetria de Navegação (Microsoft Clarity - Padrão mHealth Whitebook) -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "pyr_clarity_2026");
+    </script>
+
+    <!-- Analytics carregados DEPOIS do consentimento LGPD (cookie banner).
+         Escutamos o evento `plr:cookie-consent` disparado pelo CookieConsentBanner.
+         Fallback: se o usuário já consentiu em sessão anterior (localStorage),
+         carrega em idle. Nunca carrega antes do consentimento. -->
+    <script>
+      (function(){
+        var loaded = false;
+        function loadAnalytics(){
+          if (loaded) return;
+          loaded = true;
+
+          // GTM
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GT-MRLXCRGK');
+
+          // GA4 direto (fallback se GTM falhar)
+          var ga = document.createElement('script');
+          ga.async = true;
+          ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-QY3HFCG64L';
+          document.head.appendChild(ga);
+          ga.onload = function(){
+            gtag('js', new Date());
+            gtag('config', 'G-QY3HFCG64L', {
+              anonymize_ip: true, send_page_view: true,
+              cookie_flags: 'SameSite=None;Secure'
+            });
+          };
+
+          // Plausible self-hosted
+          var pl = document.createElement('script');
+          pl.defer = true;
+          pl.setAttribute('data-domain','plantayraiz.com.br');
+          pl.setAttribute('data-api','https://analytics.plantayraiz.com.br/api/event');
+          pl.src = 'https://analytics.plantayraiz.com.br/js/script.js';
+          document.head.appendChild(pl);
+        }
+
+        // Aguarda consentimento LGPD explícito
+        window.addEventListener('plr:cookie-consent', function(){
+          if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 2000 });
+          else setTimeout(loadAnalytics, 500);
+        });
+
+        // Se já consentiu em visita anterior, carrega em idle
+        try {
+          var stored = localStorage.getItem('plr_cookie_consent');
+          if (stored) {
+            var parsed = JSON.parse(stored);
+            if (parsed && parsed.version === '1.0') {
+              if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 3500 });
+              else window.addEventListener('load', function(){ setTimeout(loadAnalytics, 1500); });
+            }
+          }
+        } catch(_){}
+      })();
+    </script>
+
+    <title>Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda</title>
+    <meta name="description" content="Inicie Tratamento Cannabis Medicinal por R$30 - Planta y Raiz! (Sup. Téc: Dra. Suelen Naves Rodrigues - CRM-PR 49354) Assistência Jurídica e Cadastro Gratuito!" />
+    <meta name="author" content="Bezerra Med Soluções Integradas Ltda. (Planta y Raiz) — Supervisão Técnica Dra. Suelen Naves Rodrigues (CRM-PR 49354)" />
+    <link rel="canonical" href="https://www.plantayraiz.com.br/" />
+
+    <meta name="geo.region" content="BR-SP" />
+    <meta name="geo.placename" content="São Paulo, SP, Brasil" />
+    <meta name="geo.position" content="-23.5632;-46.6542" />
+
+    <!-- Open Graph estático (fallback p/ crawlers sem JS); rotas sobrescrevem via OpenGraphHead -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Planta y Raiz" />
+    
+    
+    <meta property="og:url" content="https://www.plantayraiz.com.br/" />
+    <meta property="og:image" content="https://www.plantayraiz.com.br/og-image.png">
+    <meta property="og:image:secure_url" content="https://www.plantayraiz.com.br/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    
+    <meta name="twitter:image" content="https://www.plantayraiz.com.br/og-image.png">
+    <meta name="twitter:image:alt" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "MedicalBusiness",
+          "@id": "https://plantayraiz.com.br/#business",
+          "name": "Planta y Raiz",
+          "legalName": "Bezerra Med Soluções Integradas Ltda.",
+          "alternateName": ["Planta y Raiz Telemedicina", "Planta & Raiz", "Mega Clínica Digital", "Bezerra Med"],
+          "taxID": "30.740.319/0001-14",
+          "vatID": "30.740.319/0001-14",
+          "url": "https://plantayraiz.com.br",
+          "logo": "https://plantayraiz.com.br/favicon.png",
+          "image": "https://plantayraiz.com.br/og-image.png",
+          "description": "Plataforma de Telemedicina - Planta y Raiz | Orientação técnica e atendimento seguro via plataforma. Supervisão Técnica: Dra. Suelen N. Rodrigues (CRM-PR 49354). 100% ANVISA.",
+          "telephone": "+55-11-99136-3154",
+          "email": "contato@plantayraiz.com.br",
+          "priceRange": "R$30 - R$1500",
+          "currenciesAccepted": "BRL",
+          "paymentAccepted": "PIX, Cartão de Crédito, Bitcoin",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Av. Paulista, 1000",
+            "addressLocality": "São Paulo",
+            "addressRegion": "SP",
+            "postalCode": "01310-100",
+            "addressCountry": "BR"
+          },
+          "geo": { "@type": "GeoCoordinates", "latitude": -23.5632, "longitude": -46.6542 },
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+            "opens": "00:00", "closes": "23:59"
+          },
+          "medicalSpecialty": ["GeneralPractice", "Pharmacology"],
+          "employee": { "@id": "https://plantayraiz.com.br/#supervisora-tecnica" },
+          "sameAs": [
+            "https://www.instagram.com/plantayraizltda",
+            "https://wa.me/5511991363154"
+          ]
+        },
+        {
+          "@type": "Physician",
+          "@id": "https://plantayraiz.com.br/#supervisora-tecnica",
+          "name": "Dra. Suelen Naves Rodrigues",
+          "jobTitle": "Supervisora Técnica da Plataforma Planta y Raiz",
+          "identifier": "CRM-PR 49354",
+          "medicalSpecialty": ["GeneralPractice", "Pharmacology"],
+          "memberOf": {
+            "@type": "MedicalOrganization",
+            "name": "Conselho Regional de Medicina do Paraná (CRM-PR)"
+          },
+          "worksFor": { "@id": "https://plantayraiz.com.br/#business" },
+          "url": "https://plantayraiz.com.br",
+          "knowsAbout": [
+            "Cannabis Medicinal", "Canabidiol (CBD)", "Tetrahidrocanabinol (THC)",
+            "RDC 660/2022 ANVISA", "RDC 327/2019 ANVISA", "Telemedicina", "Prescrição Digital ICP-Brasil"
+          ]
+        },
+        {
+          "@type": "MedicalProcedure",
+          "name": "Orientação Técnica em Cannabis Medicinal — Plataforma de Telemedicina Cannabis",
+          "procedureType": "https://schema.org/TherapeuticProcedure",
+          "description": "Mentoria personalizada e orientação técnica 100% remota via Plataforma de Telemedicina Cannabis para o PRIMEIRO ACESSO do paciente ao tratamento canabinoide. Disponível em São Paulo capital e em todo o Brasil. Inclui avaliação digital com médico habilitado e emissão de relatório técnico em PDF válido para importação ANVISA via RDC 660/2022.",
+          "performer": { "@id": "https://plantayraiz.com.br/#supervisora-tecnica" },
+          "areaServed": [
+            { "@type": "City", "name": "São Paulo" },
+            { "@type": "Country", "name": "Brasil" }
+          ],
+          "offers": {
+            "@type": "Offer",
+            "price": "30.00",
+            "priceCurrency": "BRL",
+            "availability": "https://schema.org/InStock",
+            "url": "https://plantayraiz.com.br"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://plantayraiz.com.br/#website",
+          "url": "https://plantayraiz.com.br",
+          "name": "Planta y Raiz",
+          "publisher": { "@id": "https://plantayraiz.com.br/#business" },
+          "inLanguage": "pt-BR",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://plantayraiz.com.br/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Cannabis Medicinal é legal no Brasil?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Sim. A ANVISA regulamenta o acesso via RDC 660/2022 (importação por pessoa física) e RDC 327/2019 (produtos nacionais), mediante prescrição médica." }
+            },
+            {
+              "@type": "Question",
+              "name": "Quanto custa a orientação técnica?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A orientação técnica inicial custa R$30 (BRL) ou US$10. Inclui avaliação digital e relatório em PDF com selo gov.br." }
+            },
+            {
+              "@type": "Question",
+              "name": "Quem é o médico responsável técnico da plataforma?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Dra. Suelen Naves Rodrigues — CRM-PR 49354, supervisora técnica da plataforma Planta y Raiz (operada pela Bezerra Med Soluções Integradas Ltda., CNPJ 30.740.319/0001-14). A plataforma conta com uma rede de médicos prescritores habilitados que atendem pacientes em todo o Brasil." }
+            },
+            {
+              "@type": "Question",
+              "name": "A Planta y Raiz é uma plataforma de um único médico?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Não. A Planta y Raiz é uma plataforma UNIVERSAL de intermediação digital em saúde canabinoide (CNAE 6209-1/00), operada pela Bezerra Med Soluções Integradas Ltda., aberta a qualquer paciente do Brasil e supervisionada tecnicamente pela Dra. Suelen Naves Rodrigues (CRM-PR 49354)." }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <script>
+      // ANTI-CLONE DOMAIN GUARD — redireciona qualquer clone não-autorizado para o oficial
+      (function(){
+        try {
+          var h = location.hostname.toLowerCase();
+          var allowed = [
+            'plantayraiz.com.br', 'www.plantayraiz.com.br',
+            'localhost', '127.0.0.1', '0.0.0.0'
+          ];
+          var allowedSuffix = ['.lovable.app', '.lovableproject.com', '.lovable.dev'];
+          var ok = allowed.indexOf(h) !== -1 || allowedSuffix.some(function(s){ return h.endsWith(s); });
+          if (!ok) {
+            console.warn('[Anti-Clone] Domínio não autorizado:', h, '— redirecionando');
+            try { sessionStorage.clear(); localStorage.clear(); } catch(_){}
+            location.replace('https://plantayraiz.com.br' + location.pathname + location.search);
+          }
+        } catch(e) { /* fail-open: nunca quebrar a página por erro de guard */ }
+      })();
+    </script>
+    <meta property="og:title" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda">
+  <meta name="twitter:title" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda">
+  <meta property="og:description" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!">
+  <meta name="twitter:description" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!">
+  <script type="module" crossorigin src="/assets/index-CjmZrdVa.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/date-fns-u34-iOv_.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-CwWG2DsU.js">
+  <link rel="modulepreload" crossorigin href="/assets/pdf-excel-CVkfPfHA.js">
+  <link rel="modulepreload" crossorigin href="/assets/i18n-BUP1JwQ6.js">
+  <link rel="modulepreload" crossorigin href="/assets/supabase-CgO4_n1X.js">
+  <link rel="modulepreload" crossorigin href="/assets/lucide-DB91BVKT.js">
+  <link rel="modulepreload" crossorigin href="/assets/ui-primitives-ChqdtZcu.js">
+  <link rel="modulepreload" crossorigin href="/assets/animation-DWmyuYPV.js">
+  <link rel="stylesheet" crossorigin href="/assets/vendor-DpsRipQV.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-Di8WilW9.css">
+</head>
+  <body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GT-MRLXCRGK"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <div id="root"></div>
+
+    <!-- Favicon rotation REMOVIDO: Google exige URL estável.
+         A rotação diária fazia o Googlebot cair no globo padrão da SERP. -->
+
+
+    <!-- ESCUDO ANTI-TELA-PRETA (Salvaguarda #1)
+         Captura erros antes do React montar (chunk load, "_ is not a function", etc).
+         Se em 8s o #root continuar vazio, faz UM reload cache-busted (rollback-lite do browser).
+         Se já tentou recarregar, mostra fallback humano com botão e WhatsApp da Brisa. -->
+    <script>
+      (function(){
+        var RELOAD_KEY = '__pyr_boot_reload_v1';
+        var BREAD = window.__pyr_breadcrumbs = [];
+        function crumb(type, data){
+          try {
+            BREAD.push({ t: Date.now(), type: type, data: data });
+            if (BREAD.length > 50) BREAD.shift();
+          } catch(_){}
+        }
+        crumb('boot', { ua: navigator.userAgent.slice(0,80), url: location.href });
+
+        function showFallback(reason){
+          try {
+            var root = document.getElementById('root');
+            if (!root) return;
+            // Só mostra fallback se o React não conseguiu desenhar nada
+            if (root.childElementCount > 0) return;
+            root.innerHTML = ''
+              + '<div style="min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0A0E27;color:#fff;text-align:center">'
+              + '<div style="max-width:420px">'
+              +   '<div style="font-size:48px;margin-bottom:8px">🌱</div>'
+              +   '<h1 style="font-size:22px;margin:0 0 8px;font-weight:600">Estamos atualizando a plataforma</h1>'
+              +   '<p style="font-size:14px;opacity:.85;line-height:1.5;margin:0 0 20px">Recarregue a página para pegar a versão nova. Se persistir, fale com a Brisa pelo WhatsApp.</p>'
+              +   '<button id="__pyr_reload" style="background:#15803d;color:#fff;border:0;border-radius:10px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer;margin-right:8px">Recarregar</button>'
+              +   '<a href="https://wa.me/5511991363154" style="display:inline-block;background:transparent;color:#5cbdb9;border:1px solid #5cbdb9;border-radius:10px;padding:12px 18px;font-size:15px;font-weight:600;text-decoration:none">WhatsApp Brisa</a>'
+              +   '<p style="font-size:11px;opacity:.5;margin-top:18px">Código: ' + (reason || 'init') + '</p>'
+              + '</div></div>';
+            var btn = document.getElementById('__pyr_reload');
+            if (btn) btn.onclick = function(){
+              try { sessionStorage.removeItem(RELOAD_KEY); } catch(_){}
+              location.reload();
+            };
+          } catch(_){}
+        }
+
+        // Ruído de extensões do navegador (MetaMask, carteiras, tradutores) e
+        // erros de Service Worker dentro de iframe não são falhas da plataforma.
+        function isExternalNoise(err){
+          try {
+            var msg = String((err && err.message) || err || '');
+            var stack = String((err && err.stack) || '');
+            if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack)) return true;
+            if (/MetaMask|ethereum|web3|Failed to connect to MetaMask/i.test(msg)) return true;
+            if (/ServiceWorkerRegistration|document is in an invalid state/i.test(msg)) return true;
+            if (/ResizeObserver loop/i.test(msg)) return true;
+          } catch(_){}
+          return false;
+        }
+
+        function reportEarlyError(err, source){
+          if (isExternalNoise(err)) return;
+          crumb('error', { src: source, msg: String(err && err.message || err).slice(0,200) });
+          // Tentar mandar para Sentry depois que ele subir
+          window.__pyr_earlyErrors = window.__pyr_earlyErrors || [];
+          window.__pyr_earlyErrors.push({ source: source, message: String(err && err.message || err), stack: err && err.stack });
+          console.error('[boot]', source, err);
+
+
+          var msg = String(err && err.message || err);
+          var isChunkErr = /Failed to fetch dynamically imported module|dynamically imported module|Importing a module script failed|Loading chunk|ChunkLoadError|Failed to load module script/i.test(msg);
+          if (!isChunkErr) return;
+
+          var tried = false;
+          try { tried = sessionStorage.getItem(RELOAD_KEY) === '1'; } catch(_){}
+          if (tried) {
+            showFallback('chunk');
+            return;
+          }
+          try { sessionStorage.setItem(RELOAD_KEY, '1'); } catch(_){}
+          crumb('auto-reload', { msg: msg.slice(0,120) });
+          // cache-bust para forçar HTML novo
+          var url = location.pathname + (location.search ? location.search + '&' : '?') + '_v=' + Date.now() + location.hash;
+          location.replace(url);
+        }
+
+        window.addEventListener('error', function(e){
+          if (e && (e.message || e.error)) reportEarlyError(e.error || e.message, 'window.error');
+        }, true);
+        window.addEventListener('unhandledrejection', function(e){
+          reportEarlyError(e.reason, 'unhandledrejection');
+        });
+
+        // Watchdog: se em 8s o root ainda está vazio, é tela preta
+        setTimeout(function(){
+          var root = document.getElementById('root');
+          if (root && root.childElementCount === 0) {
+            crumb('watchdog-empty-root', {});
+            reportEarlyError(new Error('Root vazio após 8s'), 'watchdog');
+          } else {
+            // App montou — limpa flag de reload
+            try { sessionStorage.removeItem(RELOAD_KEY); } catch(_){}
+          }
+        }, 8000);
+      })();
+    </script>
+
+
+    <script>
+      // Bridge global de eventos para o GTM/GA4
+      window.trackEvent = function(eventName, params) {
+        if (window.gtag) gtag('event', eventName, params);
+        if (window.dataLayer) window.dataLayer.push({ event: eventName, ...(params || {}) });
+      };
+
+      // Captura cliques em qualquer link wa.me / WhatsApp Brisa sem alterar comportamento
+      document.addEventListener('click', function(e) {
+        var t = e.target;
+        if (!t || !t.closest) return;
+        var a = t.closest('a[href*="wa.me"], a[href*="api.whatsapp.com"], [data-brisa-cta]');
+        if (a) window.trackEvent('click_brisa_whatsapp', { href: a.getAttribute('href') || '' });
+      }, { passive: true });
+    </script>
+  </body>
+</html>

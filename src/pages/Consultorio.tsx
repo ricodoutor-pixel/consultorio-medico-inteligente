@@ -9,7 +9,7 @@ import { FilaAssincrona } from "@/components/doctor/FilaAssincrona";
 import { PacienteTesteSimulacao360 } from "@/components/doctor/PacienteTesteSimulacao360";
 import { DoctorRankingPlantaCoin } from "@/components/doctor/DoctorRankingPlantaCoin";
 import { CopilotoClinicoVIP } from "@/components/doctor/CopilotoClinicoVIP";
-import { AlertTriangle, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -123,11 +123,11 @@ const Consultorio = () => {
 
       // Attempt Supabase update
       if (doctor?.id) {
-        await supabase
+        const { error: dbError } = await supabase
           .from('doctors')
           .update({ is_online: newStatus, is_available: newStatus })
-          .eq('id', doctor.id)
-          .catch((e) => console.warn("[online status db update]", e));
+          .eq('id', doctor.id);
+        if (dbError) console.warn("[online status db update]", dbError);
       }
 
       toast.success(newStatus ? "🟢 Você está ONLINE — Card Ativo na página Profissionais." : "🔴 Você está OFFLINE no card de Profissionais.");

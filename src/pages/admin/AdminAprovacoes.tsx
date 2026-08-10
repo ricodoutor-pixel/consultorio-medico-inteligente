@@ -34,65 +34,30 @@ export const AdminAprovacoes = () => {
   const fetchDoctors = async () => {
     try {
       setLoading(true);
-      let supabaseDocs: any[] = [];
-      try {
-        const { data, error } = await supabase
-          .from('doctors')
-          .select(`
-            *,
-            profile:profiles(full_name, avatar_url, email, phone, cpf, country, city, pix_key, pix_type)
-          `)
-          .order('created_at', { ascending: false });
-        if (!error && data) {
-          supabaseDocs = data;
-        }
-      } catch (e) {
-        console.warn("Error fetching Supabase doctors:", e);
-      }
 
-      // Format static professionals into doctor format to ensure full display
-      const formattedStatic = staticProfessionals.map((p) => ({
-        id: p.id,
-        user_id: `static-${p.id}`,
-        full_name: p.name,
-        crm: p.crm || "10963",
-        crm_state: p.crm?.includes("-") ? p.crm.split("-")[1].trim() : "SP",
-        specialty: p.category,
-        bio: p.bio,
-        consultation_price: p.priceValue || 120,
-        price_video_chat: p.priceValue || 120,
-        price_chat_only: 80,
-        price_return: 50,
-        is_approved_by_admin: true,
-        is_approved: true,
-        approval_status: 'approved',
-        is_verified: true,
-        is_online: Boolean(p.online),
-        is_available: true,
-        kyc_status: 'approved',
-        document_type: 'cpf',
-        document_number: '***.***.***-**',
-        country: p.flags?.includes('🇧🇴') ? 'BO' : 'BR',
-        profile: {
-          full_name: p.name,
-          avatar_url: p.imageUrl,
-          email: `${p.id}@plantayraiz.com.br`,
-          phone: p.whatsapp,
-          cpf: '123.456.789-00',
-          pix_key: p.whatsapp,
-          pix_type: 'telefone'
-        }
-      }));
+      const { data, error } = await supabase
+        .from('doctors')
+        .select(`
+          *,
+          profile:profiles(full_name, avatar_url, phone, cpf, date_of_birth, country, city, pix_key, pix_type)
+        `)
+        .order('created_at', { ascending: false });
 
-      // Combine database + static, avoiding duplicates by id or crm
-      const combined = [...supabaseDocs];
-      formattedStatic.forEach((st) => {
-        if (!combined.some((d) => d.id === st.id || (d.crm && d.crm === st.crm))) {
-          combined.push(st);
-        }
+      if (error) throw error;
+
+      const realDoctors = data || [];
+
+      // KYC documents (CRM frente/verso, RG/CNH) por médico
+      const { data: kycDocs } = await supabase
+        .from('doctor_kyc_documents')
+        .select('doctor_user_id, document_kind, storage_path, verification_status');
+
+      const byUser: Record<string, any[]> = {};
+      (kycDocs || []).forEach((k: any) => {
+        byUser[k.doctor_user_id] = [...(byUser[k.doctor_user_id] || []), k];
       });
 
-      setDoctors(combined);
+      setDoctors(realDoctors.map((d: any) => ({ ...d, kyc_docs: byUser[d.user_id] || [] })));
     } catch (err: any) {
       console.error(err);
       toast.error("Erro ao buscar médicos: " + err.message);
@@ -105,10 +70,42 @@ export const AdminAprovacoes = () => {
     fetchDoctors();
   }, []);
 
-  // 🟢 / 🔴 Toggle Switch for Card Médico ON / OFF
+  // ✅ Checklist KYC fiel — só libera card com dossiê completo
+  const kycChecklist = (doc: any) => {
+    const p = doc.profile || {};
+    const kinds = new Set((doc.kyc_docs || []).map((k: any) => k.document_kind));
+    return [
+      { label: "CRM frente", ok: kinds.has("crm_front") },
+      { label: "CRM verso", ok: kinds.has("crm_back") },
+      { label: "RG / CNH", ok: kinds.has("id_front") },
+      { label: "Nº do CRM", ok: Boolean(doc.crm && String(doc.crm).length >= 3) },
+      { label: "CPF", ok: Boolean(p.cpf && String(p.cpf).replace(/\D/g, "").length === 11) },
+      { label: "Data de nascimento", ok: Boolean(p.date_of_birth) },
+      { label: "Foto de perfil", ok: Boolean(p.avatar_url) },
+      { label: "PIX para recebimento", ok: Boolean(p.pix_key) },
+      { label: "WhatsApp", ok: Boolean((p.phone || "").replace(/\D/g, "").length >= 10) },
+    ];
+  };
+
+  const kycMissing = (doc: any) => kycChecklist(doc).filter((i) => !i.ok).map((i) => i.label);
+
+  const CFM_URL = "https://portal.cfm.org.br/busca-medicos";
+  const RECEITA_CPF_URL = "https://servicos.receita.fazenda.gov.br/servicos/cpf/consultasituacao/consultapublica.asp";
+
+
+  // 🟢 / 🔴 Toggle Switch for Card Médico ON / OFF (bloqueado sem KYC completo)
   const handleToggleCardStatus = async (doc: any, newApprovedState: boolean) => {
     try {
       const docId = doc.id;
+
+      if (newApprovedState) {
+        const missing = kycMissing(doc);
+        if (missing.length) {
+          toast.error(`KYC incompleto — não é possível publicar o card. Falta: ${missing.join(", ")}`);
+          return;
+        }
+      }
+
       
       // Update local state immediately for instant feedback
       setDoctors((prev) =>
@@ -174,35 +171,47 @@ export const AdminAprovacoes = () => {
     }
   };
 
-  // 🤖 Executar Varredura Automática Enfª Brisa IA
+  // 🤖 Varredura Enfª Brisa IA — confere CRM no CFM + CPF antes de liberar o card
   const handleBrisaAutoAudit = async () => {
     setIsAuditing(true);
-    toast.info("🤖 Enfª Brisa IA iniciando varredura de autenticidade dos cadastros médicos...");
-    
+    toast.info("🤖 Enfª Brisa IA consultando CFM e Receita Federal para validar os cadastros...");
+
     try {
       let approvedCount = 0;
-      let pendingDocsCount = 0;
+      let incompleteCount = 0;
+      let rejectedCount = 0;
 
       for (const doc of doctors) {
-        const docUser = doc.profile || {};
-        const fullName = docUser.full_name || doc.full_name || "";
-        const crm = doc.crm || "";
-        const hasPhone = Boolean(docUser.phone || doc.personal_phone || doc.whatsapp);
+        const p = doc.profile || {};
+        if (kycMissing(doc).length) { incompleteCount++; continue; }
+        if (doc.is_approved_by_admin) continue;
 
-        const isComplete = Boolean(fullName.length > 3 && crm.length >= 3 && hasPhone);
+        const { data: result } = await supabase.functions.invoke("validate-doctor-kyc", {
+          body: {
+            doctor_id: doc.id,
+            crm: doc.crm,
+            crm_state: doc.crm_state,
+            document_type: doc.document_type || "cpf",
+            document_number: p.cpf,
+            full_name: p.full_name,
+          },
+        });
 
-        if (isComplete && !doc.is_approved_by_admin) {
+        if (result?.approved || result?.valid || result?.status === "approved") {
           await handleToggleCardStatus(doc, true);
           approvedCount++;
-        } else if (!isComplete) {
-          pendingDocsCount++;
+        } else {
+          rejectedCount++;
         }
       }
 
+      await fetchDoctors();
+
       toast.success(
-        `✅ Varredura concluída pela Enfª Brisa IA!\n` +
-        `• ${approvedCount} novos cadastros validados e com Card publicado!\n` +
-        `• Todos os médicos com dados completos estão com Consultório Virtual e Card Ativo.`
+        `✅ Varredura Enfª Brisa IA concluída!\n` +
+        `• ${approvedCount} cadastros confirmados no CFM/Receita e publicados\n` +
+        `• ${incompleteCount} com dossiê KYC incompleto\n` +
+        `• ${rejectedCount} aguardando revisão manual do administrador`
       );
     } catch (err: any) {
       toast.error("Erro na varredura da Enfª Brisa IA: " + err.message);
@@ -210,6 +219,7 @@ export const AdminAprovacoes = () => {
       setIsAuditing(false);
     }
   };
+
 
   // ✉️ Reenviar E-mail de Boas-Vindas SMTP Individual
   const handleSendWelcomeEmail = async (doc: any) => {
@@ -295,6 +305,22 @@ export const AdminAprovacoes = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <a
+              href={CFM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-500/20"
+            >
+              <ExternalLink size={14} /> Consultar CRM no CFM
+            </a>
+            <a
+              href={RECEITA_CPF_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-2 rounded-xl border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 text-xs font-bold flex items-center gap-1.5 hover:bg-cyan-500/20"
+            >
+              <ExternalLink size={14} /> Consultar CPF na Receita
+            </a>
             <Button
               onClick={handleBrisaAutoAudit}
               disabled={isAuditing}
@@ -305,6 +331,7 @@ export const AdminAprovacoes = () => {
             </Button>
           </div>
         </div>
+
 
         {/* Info Rules Banner */}
         <div className="p-4 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 flex items-start gap-3">
@@ -379,7 +406,7 @@ export const AdminAprovacoes = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Médico Prescritor</TableHead>
-                  <TableHead>Contato & PIX</TableHead>
+                  <TableHead>CPF · Nasc. · WhatsApp · PIX</TableHead>
                   <TableHead>Documentos KYC</TableHead>
                   <TableHead>Card Público ON / OFF</TableHead>
                   <TableHead className="text-right">Averiguação Completa</TableHead>
@@ -425,15 +452,14 @@ export const AdminAprovacoes = () => {
                         </TableCell>
 
                         <TableCell>
-                          <p className="text-xs font-medium">{docUser.email || doc.email || 'E-mail cadastrado'}</p>
+                          <p className="text-xs font-medium">CPF: <span className="font-mono">{docUser.cpf || '— não informado'}</span></p>
+                          <p className="text-[11px] text-muted-foreground">Nasc.: {docUser.date_of_birth || '— não informado'}</p>
                           <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
                             <Phone size={12} className="text-emerald-400" /> {phone}
                           </p>
-                          {docUser.pix_key && (
-                            <p className="text-[10px] text-cyan-400 font-mono mt-0.5">
-                              PIX: {docUser.pix_key} ({docUser.pix_type || 'PIX'})
-                            </p>
-                          )}
+                          <p className="text-[10px] text-cyan-400 font-mono mt-0.5">
+                            PIX: {docUser.pix_key ? `${docUser.pix_key} (${docUser.pix_type || 'PIX'})` : '— não informado'}
+                          </p>
                         </TableCell>
 
                         <TableCell>
@@ -463,7 +489,22 @@ export const AdminAprovacoes = () => {
                               <ShieldCheck className="w-3 h-3 mr-1 text-indigo-400" /> RG / CNH
                             </Button>
                           </div>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {kycChecklist(doc).map((item) => (
+                              <span
+                                key={item.label}
+                                className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border ${item.ok ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' : 'border-rose-500/40 bg-rose-500/10 text-rose-300'}`}
+                              >
+                                {item.ok ? '✓' : '✕'} {item.label}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="flex gap-2 mt-2">
+                            <a href={CFM_URL} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-emerald-400 underline">CFM</a>
+                            <a href={RECEITA_CPF_URL} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-cyan-400 underline">Receita CPF</a>
+                          </div>
                         </TableCell>
+
 
                         <TableCell>
                           {/* 🔴 / 🟢 Switch ON / OFF Card Público */}

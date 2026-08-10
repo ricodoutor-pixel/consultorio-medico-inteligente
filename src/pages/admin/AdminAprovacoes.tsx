@@ -71,7 +71,7 @@ const FALLBACK_REAL_DOCTORS = [
     profile: {
       full_name: "Dra. Olivia Zimeri",
       email: "olivia@plantayraiz.com.br",
-      phone: "5511991363154",
+      phone: "59178494444",
       cpf: "E-8472910-BO",
       date_of_birth: "1985-08-20",
       avatar_url: "https://images.unsplash.com/photo-1594824813566-8185b3a137b0?w=150&auto=format&fit=crop&q=80",
@@ -97,7 +97,7 @@ const FALLBACK_REAL_DOCTORS = [
     profile: {
       full_name: "Dra. Suelen Naves Rodrigues",
       email: "suelen@plantayraiz.com.br",
-      phone: "5511991363154",
+      phone: "5541998549354",
       cpf: "987.654.321-11",
       date_of_birth: "1988-11-12",
       avatar_url: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80",
@@ -149,7 +149,7 @@ const FALLBACK_REAL_DOCTORS = [
     profile: {
       full_name: "Dra. Ingrid C. Miranda Pimentel",
       email: "ingrid.pimentel@plantayraiz.com.br",
-      phone: "5511991363154",
+      phone: "",
       cpf: "",
       date_of_birth: "",
       avatar_url: "",
@@ -174,7 +174,7 @@ const FALLBACK_REAL_DOCTORS = [
     profile: {
       full_name: "Dr. Alexandre Corrêa",
       email: "alexandre.correa@plantayraiz.com.br",
-      phone: "5511991363154",
+      phone: "",
       cpf: "",
       date_of_birth: "",
       avatar_url: "",
@@ -198,7 +198,7 @@ const FALLBACK_REAL_DOCTORS = [
     profile: {
       full_name: "Dr. Adeonis Oliveira Lima",
       email: "adonis.lima@plantayraiz.com.br",
-      phone: "5511991363154",
+      phone: "",
       cpf: "",
       date_of_birth: "",
       avatar_url: "",
@@ -222,7 +222,7 @@ const FALLBACK_REAL_DOCTORS = [
     profile: {
       full_name: "Dr. Guilherme Campos Silva",
       email: "guilherme.campos@plantayraiz.com.br",
-      phone: "5511991363154",
+      phone: "",
       cpf: "",
       date_of_birth: "",
       avatar_url: "",
@@ -246,7 +246,7 @@ const FALLBACK_REAL_DOCTORS = [
     profile: {
       full_name: "Dr. Albert Machado Tenório",
       email: "albert.tenorio@plantayraiz.com.br",
-      phone: "5511991363154",
+      phone: "",
       cpf: "",
       date_of_birth: "",
       avatar_url: "",
@@ -270,7 +270,7 @@ const FALLBACK_REAL_DOCTORS = [
     profile: {
       full_name: "Dr. Gustavo Simões Llivi Ibañez",
       email: "gustavo.ibanez@plantayraiz.com.br",
-      phone: "5511991363154",
+      phone: "",
       cpf: "",
       date_of_birth: "",
       avatar_url: "",
@@ -294,7 +294,7 @@ const FALLBACK_REAL_DOCTORS = [
     profile: {
       full_name: "Dr. Eduardo Migueis Correa",
       email: "eduardo.migueis@plantayraiz.com.br",
-      phone: "5511991363154",
+      phone: "",
       cpf: "",
       date_of_birth: "",
       avatar_url: "",

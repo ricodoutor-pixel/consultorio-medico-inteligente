@@ -31,18 +31,35 @@ function useRotatingOnline(base: Professional[]): Professional[] {
   useEffect(() => {
     const interval = setInterval(() => {
       setTick(Math.floor(Date.now() / 3600000));
-    }, 60000); // check every minute
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
 
   return useMemo(() => {
-    const others = base.filter(p => p.id !== "med-0" && !p.id.startsWith("real-"));
-    // deterministic rotation based on hour tick
-    const idx1 = tick % others.length;
-    const idx2 = (tick + Math.floor(others.length / 2)) % others.length;
-    const onlineIds = new Set(["med-0", others[idx1]?.id, others[idx2]?.id]);
+    // Read card overrides set by Admin
+    let cardOverrides: Record<string, boolean> = {};
+    try {
+      cardOverrides = JSON.parse(localStorage.getItem('doctor_card_overrides') || '{}');
+    } catch (e) {}
 
-    return base.map(p => p.id.startsWith("real-") ? p : ({ ...p, online: onlineIds.has(p.id) }));
+    // Filter out doctors blocked/turned OFF by admin
+    const visibleDocs = base.filter((p) => cardOverrides[p.id] !== false);
+
+    return visibleDocs.map((p) => {
+      // Check direct online status set by doctor in /consultorio or admin in /admin/aprovacoes-medicas
+      const directStatus = localStorage.getItem(`doctor_online_status_${p.id}`);
+      if (directStatus !== null) {
+        return { ...p, online: directStatus === 'true' };
+      }
+      if (p.id === 'med-3' || p.id === 'med-joao-pedro') {
+        const joaoStatus = localStorage.getItem('doctor_online_status_med-3');
+        if (joaoStatus !== null) {
+          return { ...p, online: joaoStatus === 'true' };
+        }
+        return { ...p, online: true };
+      }
+      return p;
+    });
   }, [base, tick]);
 }
 

@@ -93,10 +93,19 @@ export const AdminAprovacoes = () => {
   const RECEITA_CPF_URL = "https://servicos.receita.fazenda.gov.br/servicos/cpf/consultasituacao/consultapublica.asp";
 
 
-  // 🟢 / 🔴 Toggle Switch for Card Médico ON / OFF
+  // 🟢 / 🔴 Toggle Switch for Card Médico ON / OFF (bloqueado sem KYC completo)
   const handleToggleCardStatus = async (doc: any, newApprovedState: boolean) => {
     try {
       const docId = doc.id;
+
+      if (newApprovedState) {
+        const missing = kycMissing(doc);
+        if (missing.length) {
+          toast.error(`KYC incompleto — não é possível publicar o card. Falta: ${missing.join(", ")}`);
+          return;
+        }
+      }
+
       
       // Update local state immediately for instant feedback
       setDoctors((prev) =>

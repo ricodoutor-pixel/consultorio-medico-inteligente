@@ -171,35 +171,47 @@ export const AdminAprovacoes = () => {
     }
   };
 
-  // 🤖 Executar Varredura Automática Enfª Brisa IA
+  // 🤖 Varredura Enfª Brisa IA — confere CRM no CFM + CPF antes de liberar o card
   const handleBrisaAutoAudit = async () => {
     setIsAuditing(true);
-    toast.info("🤖 Enfª Brisa IA iniciando varredura de autenticidade dos cadastros médicos...");
-    
+    toast.info("🤖 Enfª Brisa IA consultando CFM e Receita Federal para validar os cadastros...");
+
     try {
       let approvedCount = 0;
-      let pendingDocsCount = 0;
+      let incompleteCount = 0;
+      let rejectedCount = 0;
 
       for (const doc of doctors) {
-        const docUser = doc.profile || {};
-        const fullName = docUser.full_name || doc.full_name || "";
-        const crm = doc.crm || "";
-        const hasPhone = Boolean(docUser.phone || doc.personal_phone || doc.whatsapp);
+        const p = doc.profile || {};
+        if (kycMissing(doc).length) { incompleteCount++; continue; }
+        if (doc.is_approved_by_admin) continue;
 
-        const isComplete = Boolean(fullName.length > 3 && crm.length >= 3 && hasPhone);
+        const { data: result } = await supabase.functions.invoke("validate-doctor-kyc", {
+          body: {
+            doctor_id: doc.id,
+            crm: doc.crm,
+            crm_state: doc.crm_state,
+            document_type: doc.document_type || "cpf",
+            document_number: p.cpf,
+            full_name: p.full_name,
+          },
+        });
 
-        if (isComplete && !doc.is_approved_by_admin) {
+        if (result?.approved || result?.valid || result?.status === "approved") {
           await handleToggleCardStatus(doc, true);
           approvedCount++;
-        } else if (!isComplete) {
-          pendingDocsCount++;
+        } else {
+          rejectedCount++;
         }
       }
 
+      await fetchDoctors();
+
       toast.success(
-        `✅ Varredura concluída pela Enfª Brisa IA!\n` +
-        `• ${approvedCount} novos cadastros validados e com Card publicado!\n` +
-        `• Todos os médicos com dados completos estão com Consultório Virtual e Card Ativo.`
+        `✅ Varredura Enfª Brisa IA concluída!\n` +
+        `• ${approvedCount} cadastros confirmados no CFM/Receita e publicados\n` +
+        `• ${incompleteCount} com dossiê KYC incompleto\n` +
+        `• ${rejectedCount} aguardando revisão manual do administrador`
       );
     } catch (err: any) {
       toast.error("Erro na varredura da Enfª Brisa IA: " + err.message);
@@ -207,6 +219,7 @@ export const AdminAprovacoes = () => {
       setIsAuditing(false);
     }
   };
+
 
   // ✉️ Reenviar E-mail de Boas-Vindas SMTP Individual
   const handleSendWelcomeEmail = async (doc: any) => {

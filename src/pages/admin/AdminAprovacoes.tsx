@@ -406,7 +406,7 @@ export const AdminAprovacoes = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Médico Prescritor</TableHead>
-                  <TableHead>Contato & PIX</TableHead>
+                  <TableHead>CPF · Nasc. · WhatsApp · PIX</TableHead>
                   <TableHead>Documentos KYC</TableHead>
                   <TableHead>Card Público ON / OFF</TableHead>
                   <TableHead className="text-right">Averiguação Completa</TableHead>

@@ -34,65 +34,30 @@ export const AdminAprovacoes = () => {
   const fetchDoctors = async () => {
     try {
       setLoading(true);
-      let supabaseDocs: any[] = [];
-      try {
-        const { data, error } = await supabase
-          .from('doctors')
-          .select(`
-            *,
-            profile:profiles(full_name, avatar_url, email, phone, cpf, country, city, pix_key, pix_type)
-          `)
-          .order('created_at', { ascending: false });
-        if (!error && data) {
-          supabaseDocs = data;
-        }
-      } catch (e) {
-        console.warn("Error fetching Supabase doctors:", e);
-      }
 
-      // Format static professionals into doctor format to ensure full display
-      const formattedStatic = staticProfessionals.map((p) => ({
-        id: p.id,
-        user_id: `static-${p.id}`,
-        full_name: p.name,
-        crm: p.crm || "10963",
-        crm_state: p.crm?.includes("-") ? p.crm.split("-")[1].trim() : "SP",
-        specialty: p.category,
-        bio: p.bio,
-        consultation_price: p.priceValue || 120,
-        price_video_chat: p.priceValue || 120,
-        price_chat_only: 80,
-        price_return: 50,
-        is_approved_by_admin: true,
-        is_approved: true,
-        approval_status: 'approved',
-        is_verified: true,
-        is_online: Boolean(p.online),
-        is_available: true,
-        kyc_status: 'approved',
-        document_type: 'cpf',
-        document_number: '***.***.***-**',
-        country: p.flags?.includes('🇧🇴') ? 'BO' : 'BR',
-        profile: {
-          full_name: p.name,
-          avatar_url: p.imageUrl,
-          email: `${p.id}@plantayraiz.com.br`,
-          phone: p.whatsapp,
-          cpf: '123.456.789-00',
-          pix_key: p.whatsapp,
-          pix_type: 'telefone'
-        }
-      }));
+      const { data, error } = await supabase
+        .from('doctors')
+        .select(`
+          *,
+          profile:profiles(full_name, avatar_url, phone, cpf, date_of_birth, country, city, pix_key, pix_type)
+        `)
+        .order('created_at', { ascending: false });
 
-      // Combine database + static, avoiding duplicates by id or crm
-      const combined = [...supabaseDocs];
-      formattedStatic.forEach((st) => {
-        if (!combined.some((d) => d.id === st.id || (d.crm && d.crm === st.crm))) {
-          combined.push(st);
-        }
+      if (error) throw error;
+
+      const realDoctors = data || [];
+
+      // KYC documents (CRM frente/verso, RG/CNH) por médico
+      const { data: kycDocs } = await supabase
+        .from('doctor_kyc_documents')
+        .select('doctor_user_id, document_kind, storage_path, verification_status');
+
+      const byUser: Record<string, any[]> = {};
+      (kycDocs || []).forEach((k: any) => {
+        byUser[k.doctor_user_id] = [...(byUser[k.doctor_user_id] || []), k];
       });
 
-      setDoctors(combined);
+      setDoctors(realDoctors.map((d: any) => ({ ...d, kyc_docs: byUser[d.user_id] || [] })));
     } catch (err: any) {
       console.error(err);
       toast.error("Erro ao buscar médicos: " + err.message);
@@ -104,6 +69,29 @@ export const AdminAprovacoes = () => {
   useEffect(() => {
     fetchDoctors();
   }, []);
+
+  // ✅ Checklist KYC fiel — só libera card com dossiê completo
+  const kycChecklist = (doc: any) => {
+    const p = doc.profile || {};
+    const kinds = new Set((doc.kyc_docs || []).map((k: any) => k.document_kind));
+    return [
+      { label: "CRM frente", ok: kinds.has("crm_front") },
+      { label: "CRM verso", ok: kinds.has("crm_back") },
+      { label: "RG / CNH", ok: kinds.has("id_front") },
+      { label: "Nº do CRM", ok: Boolean(doc.crm && String(doc.crm).length >= 3) },
+      { label: "CPF", ok: Boolean(p.cpf && String(p.cpf).replace(/\D/g, "").length === 11) },
+      { label: "Data de nascimento", ok: Boolean(p.date_of_birth) },
+      { label: "Foto de perfil", ok: Boolean(p.avatar_url) },
+      { label: "PIX para recebimento", ok: Boolean(p.pix_key) },
+      { label: "WhatsApp", ok: Boolean((p.phone || "").replace(/\D/g, "").length >= 10) },
+    ];
+  };
+
+  const kycMissing = (doc: any) => kycChecklist(doc).filter((i) => !i.ok).map((i) => i.label);
+
+  const CFM_URL = "https://portal.cfm.org.br/busca-medicos";
+  const RECEITA_CPF_URL = "https://servicos.receita.fazenda.gov.br/servicos/cpf/consultasituacao/consultapublica.asp";
+
 
   // 🟢 / 🔴 Toggle Switch for Card Médico ON / OFF
   const handleToggleCardStatus = async (doc: any, newApprovedState: boolean) => {

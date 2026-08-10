@@ -305,6 +305,22 @@ export const AdminAprovacoes = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <a
+              href={CFM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-500/20"
+            >
+              <ExternalLink size={14} /> Consultar CRM no CFM
+            </a>
+            <a
+              href={RECEITA_CPF_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-2 rounded-xl border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 text-xs font-bold flex items-center gap-1.5 hover:bg-cyan-500/20"
+            >
+              <ExternalLink size={14} /> Consultar CPF na Receita
+            </a>
             <Button
               onClick={handleBrisaAutoAudit}
               disabled={isAuditing}
@@ -315,6 +331,7 @@ export const AdminAprovacoes = () => {
             </Button>
           </div>
         </div>
+
 
         {/* Info Rules Banner */}
         <div className="p-4 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 flex items-start gap-3">

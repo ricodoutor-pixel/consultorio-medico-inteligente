@@ -123,11 +123,11 @@ const Consultorio = () => {
 
       // Attempt Supabase update
       if (doctor?.id) {
-        await supabase
+        const { error: dbError } = await supabase
           .from('doctors')
           .update({ is_online: newStatus, is_available: newStatus })
-          .eq('id', doctor.id)
-          .catch((e) => console.warn("[online status db update]", e));
+          .eq('id', doctor.id);
+        if (dbError) console.warn("[online status db update]", dbError);
       }
 
       toast.success(newStatus ? "🟢 Você está ONLINE — Card Ativo na página Profissionais." : "🔴 Você está OFFLINE no card de Profissionais.");

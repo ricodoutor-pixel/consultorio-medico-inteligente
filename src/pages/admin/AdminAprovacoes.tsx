@@ -1019,6 +1019,50 @@ const FALLBACK_REAL_DOCTORS = [
                 </div>
               </div>
 
+              {/* 📑 Comprovantes de Revisão Pessoal do Admin (CPF Receita / CFM CRM) */}
+              <div className="p-4 rounded-2xl bg-muted/20 border border-emerald-500/30">
+                <h4 className="text-xs font-bold uppercase tracking-wider mb-3 text-emerald-400 flex items-center gap-1.5">
+                  <ShieldCheck size={14} className="text-emerald-400" /> Comprovantes Oficiais de Verificação do Admin
+                </h4>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="p-3 rounded-xl bg-background border border-border flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileImage size={18} className="text-cyan-400" />
+                      <span className="text-xs font-bold">Comprovante CPF Receita</span>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-xs font-bold border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10"
+                      onClick={() => {
+                        const url = selectedDoctor.cpf_proof_url || (selectedDoctor.crm === "10963" || selectedDoctor.crm === "42912" ? "/proof_cpf_edilson.png" : "/proof_cpf_edilson.png");
+                        window.open(url, '_blank');
+                      }}
+                    >
+                      <ExternalLink size={12} className="mr-1" /> Ver CPF Receita
+                    </Button>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-background border border-border flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileImage size={18} className="text-emerald-400" />
+                      <span className="text-xs font-bold">Certidão CRM CFM</span>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-xs font-bold border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
+                      onClick={() => {
+                        const url = selectedDoctor.crm_proof_url || (selectedDoctor.crm === "42912" || selectedDoctor.crm === "10963" ? "/proof_crm_joao_pedro.jpg" : "/proof_crm_joao_pedro.jpg");
+                        window.open(url, '_blank');
+                      }}
+                    >
+                      <ExternalLink size={12} className="mr-1" /> Ver CRM CFM
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
               {/* Botão de Controle ON/OFF & Ações Úteis de Administrador */}
               <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
@@ -1046,6 +1090,36 @@ const FALLBACK_REAL_DOCTORS = [
 
               {/* Ferramentas Proativas do Admin */}
               <div className="flex flex-wrap gap-2 justify-end pt-2 border-t">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs font-bold rounded-xl bg-amber-500/10 text-amber-400 border-amber-500/40 hover:bg-amber-500/20"
+                  onClick={() => {
+                    const msg = prompt(`Digite a notificação/recado direto para ${selectedDoctor.profile?.full_name || selectedDoctor.full_name}:`, "Atenção: Por favor, complete o envio do seu comprovante de PIX para aprovação do Card Público.");
+                    if (msg) {
+                      try {
+                        const notifications = JSON.parse(localStorage.getItem('admin_doctor_notifications') || '[]');
+                        notifications.unshift({
+                          id: Date.now().toString(),
+                          doctor_id: selectedDoctor.id,
+                          doctor_name: selectedDoctor.profile?.full_name || selectedDoctor.full_name,
+                          title: "Recado da Administração Planta y Raíz",
+                          message: msg,
+                          type: "urgent",
+                          date: new Date().toLocaleString("pt-BR"),
+                          read: false,
+                        });
+                        localStorage.setItem('admin_doctor_notifications', JSON.stringify(notifications));
+                        toast.success(`🔔 Recado enviado com sucesso! O médico verá a notificação no sino do Consultório Virtual.`);
+                      } catch (e) {
+                        toast.error("Erro ao enviar recado");
+                      }
+                    }
+                  }}
+                >
+                  🔔 Enviar Recado Direct Admin
+                </Button>
+
                 <Button 
                   variant="outline" 
                   size="sm" 

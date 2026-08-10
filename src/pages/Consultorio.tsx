@@ -9,10 +9,15 @@ import { FilaAssincrona } from "@/components/doctor/FilaAssincrona";
 import { PacienteTesteSimulacao360 } from "@/components/doctor/PacienteTesteSimulacao360";
 import { DoctorRankingPlantaCoin } from "@/components/doctor/DoctorRankingPlantaCoin";
 import { CopilotoClinicoVIP } from "@/components/doctor/CopilotoClinicoVIP";
-import { AlertTriangle, ArrowLeft, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot, Bell, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const Consultorio = () => {
   const [doctor, setDoctor] = useState<any>(null);
@@ -22,6 +27,8 @@ const Consultorio = () => {
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [nextAppointment, setNextAppointment] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("atendimentos");
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -64,9 +71,29 @@ const Consultorio = () => {
     }
   };
 
+  // Load Admin notifications for this doctor
+  const loadNotifications = () => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('admin_doctor_notifications') || '[]');
+      setNotifications(stored);
+    } catch (e) {}
+  };
+
   useEffect(() => {
     fetchData();
+    loadNotifications();
+    const interval = setInterval(loadNotifications, 5000);
+    return () => clearInterval(interval);
   }, []);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const markAllAsRead = () => {
+    const updated = notifications.map(n => ({ ...n, read: true }));
+    setNotifications(updated);
+    localStorage.setItem('admin_doctor_notifications', JSON.stringify(updated));
+    toast.success("Notificações marcadas como lidas.");
+  };
 
   useEffect(() => {
     if (!doctor?.id) return;
@@ -203,6 +230,24 @@ const Consultorio = () => {
             <Link to="/telemed-whatsapp" className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-[#00a884] text-white hover:bg-[#008f6f]">
               <MessageCircle size={16} /> Telemed WhatsApp
             </Link>
+            {/* 🔔 Sino de Notificações do Admin */}
+            <button
+              onClick={() => setShowNotificationsModal(true)}
+              className={`p-2 rounded-full relative transition-all shadow-sm ${
+                unreadCount > 0 
+                  ? "bg-rose-500 text-white animate-bounce ring-2 ring-rose-400" 
+                  : "bg-muted/70 hover:bg-muted text-foreground"
+              }`}
+              title="Notificações & Recados da Administração"
+            >
+              <Bell size={18} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-rose-600 text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-rose-500">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
             <span className="text-sm font-medium">Status do Plantão:</span>
             <button
               onClick={toggleOnlineStatus}
@@ -219,6 +264,56 @@ const Consultorio = () => {
           </div>
         </div>
       )}
+
+      {/* 🔔 MODAL DE RECADOS DA ADMINISTRAÇÃO */}
+      <Dialog open={showNotificationsModal} onOpenChange={setShowNotificationsModal}>
+        <DialogContent className="max-w-md bg-card border-border">
+          <DialogHeader className="border-b pb-3">
+            <DialogTitle className="text-lg font-black flex items-center gap-2 text-foreground">
+              <Bell className="text-rose-400" size={20} /> Recados & Notificações da Administração
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Mensagens diretas enviadas pela equipe de auditoria da Planta y Raíz.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-3 max-h-[60vh] overflow-y-auto">
+            {notifications.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground text-xs">
+                Nenhum recado ou pendência no momento. Seu cadastro está regular!
+              </div>
+            ) : (
+              notifications.map((n) => (
+                <div 
+                  key={n.id}
+                  className={`p-3 rounded-xl border transition-all ${
+                    n.type === 'urgent' 
+                      ? 'bg-rose-950/20 border-rose-500/40 text-foreground' 
+                      : 'bg-muted/30 border-border text-foreground'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <Badge variant={n.type === 'urgent' ? 'destructive' : 'secondary'} className="text-[10px] font-bold">
+                      {n.type === 'urgent' ? '🔴 ATENÇÃO - URGENTE' : '🟢 INFORMATIVO'}
+                    </Badge>
+                    <span className="text-[10px] text-muted-foreground">{n.date}</span>
+                  </div>
+                  <p className="text-xs font-bold text-foreground mt-1">{n.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{n.message}</p>
+                </div>
+              ))
+            )}
+          </div>
+
+          {notifications.length > 0 && (
+            <div className="pt-2 border-t flex justify-end">
+              <Button size="sm" onClick={markAllAsRead} className="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
+                <CheckCircle2 size={14} className="mr-1.5" /> Marcar como Lido
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {doctor && !doctor.is_verified && (
         <div className="px-4 py-3 bg-amber-500/10 border-b border-amber-500/20">

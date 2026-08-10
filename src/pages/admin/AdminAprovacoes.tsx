@@ -15,7 +15,7 @@ import {
 import { 
   Loader2, CheckCircle, XCircle, FileImage, UserCheck, Play, Sparkles, ShieldCheck, 
   Bot, Mail, Lock, Unlock, AlertTriangle, Search, Phone, ExternalLink, Printer, 
-  Eye, FileText, CreditCard, Stethoscope, Video, MessageCircle, DollarSign, Download
+  Eye, FileText, CreditCard, Stethoscope, Video, MessageCircle, DollarSign, Download, UserX
 } from "lucide-react";
 import { toast } from "sonner";
 import { professionals as staticProfessionals } from "@/data/professionals";
@@ -737,11 +737,18 @@ const FALLBACK_REAL_DOCTORS = [
                       <TableRow key={doc.id} className="hover:bg-muted/30 transition-colors">
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <img 
-                              src={docUser.avatar_url || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80"} 
-                              className="w-12 h-12 rounded-full object-cover border-2 border-emerald-500/40 shrink-0" 
-                              alt="Avatar" 
-                            />
+                            {docUser.avatar_url ? (
+                              <img 
+                                src={docUser.avatar_url} 
+                                className="w-12 h-12 rounded-full object-cover border-2 border-emerald-500/40 shrink-0" 
+                                alt="Avatar" 
+                              />
+                            ) : (
+                              <div className="w-12 h-12 rounded-full bg-neutral-900 border-2 border-dashed border-rose-500/50 flex flex-col items-center justify-center shrink-0 shadow-inner">
+                                <UserX className="w-5 h-5 text-rose-400" />
+                                <span className="text-[8px] font-bold text-rose-400 leading-none mt-0.5">Sem Foto</span>
+                              </div>
+                            )}
                             <div>
                               <p className="font-bold text-sm text-foreground flex items-center gap-1.5">
                                 {name}

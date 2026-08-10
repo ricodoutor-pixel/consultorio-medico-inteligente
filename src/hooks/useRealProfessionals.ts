@@ -11,9 +11,9 @@ import { professionals as testProfessionals, Professional, categories } from "@/
 
 // IDs of the 6 test doctors to keep (diverse specialties)
 // med-5 (Dra. Valentina Reyes) removido — substituído pela Dra. Olivia Zimeri (real, BO)
-// med-4 (Dra. Juliana Ferreira) removida — card de teste descartado.
-const KEPT_TEST_IDS = ["med-1", "med-2", "med-3", "psi-1"];
-const MAX_TEST_SLOTS = 6;
+// IDs of test doctors to keep — med-3 (Dr. João Pedro) is prioritized first
+const KEPT_TEST_IDS = ["med-3", "med-1", "med-2", "psi-1"];
+const MAX_TEST_SLOTS = 10;
 
 interface RealDoctor {
   id: string;
@@ -305,12 +305,18 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     // Only keep enough to fill remaining slots
     const finalTests = keptTests.slice(0, testSlotsRemaining);
 
-    // Apply hourly online rotation
+    // Apply online status: med-3 (Dr. João Pedro) reads from localStorage or defaults to true
     const shiftIndex = getOnlineShiftIndex();
-    const rotatedTests = finalTests.map((p, i) => ({
-      ...p,
-      online: i === (shiftIndex % Math.max(1, finalTests.length)),
-    }));
+    const rotatedTests = finalTests.map((p, i) => {
+      if (p.id === "med-3") {
+        const joaoStatus = localStorage.getItem("doctor_online_status_med-3");
+        return { ...p, online: joaoStatus !== null ? joaoStatus === "true" : true };
+      }
+      return {
+        ...p,
+        online: i === (shiftIndex % Math.max(1, finalTests.length)),
+      };
+    });
 
     return [...finalPros, ...rotatedTests];
   }, [realDoctors, currentHour, mockTrigger]);

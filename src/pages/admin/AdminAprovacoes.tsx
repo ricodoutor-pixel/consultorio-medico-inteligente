@@ -452,15 +452,14 @@ export const AdminAprovacoes = () => {
                         </TableCell>
 
                         <TableCell>
-                          <p className="text-xs font-medium">{docUser.email || doc.email || 'E-mail cadastrado'}</p>
+                          <p className="text-xs font-medium">CPF: <span className="font-mono">{docUser.cpf || '— não informado'}</span></p>
+                          <p className="text-[11px] text-muted-foreground">Nasc.: {docUser.date_of_birth || '— não informado'}</p>
                           <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
                             <Phone size={12} className="text-emerald-400" /> {phone}
                           </p>
-                          {docUser.pix_key && (
-                            <p className="text-[10px] text-cyan-400 font-mono mt-0.5">
-                              PIX: {docUser.pix_key} ({docUser.pix_type || 'PIX'})
-                            </p>
-                          )}
+                          <p className="text-[10px] text-cyan-400 font-mono mt-0.5">
+                            PIX: {docUser.pix_key ? `${docUser.pix_key} (${docUser.pix_type || 'PIX'})` : '— não informado'}
+                          </p>
                         </TableCell>
 
                         <TableCell>
@@ -490,7 +489,22 @@ export const AdminAprovacoes = () => {
                               <ShieldCheck className="w-3 h-3 mr-1 text-indigo-400" /> RG / CNH
                             </Button>
                           </div>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {kycChecklist(doc).map((item) => (
+                              <span
+                                key={item.label}
+                                className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border ${item.ok ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' : 'border-rose-500/40 bg-rose-500/10 text-rose-300'}`}
+                              >
+                                {item.ok ? '✓' : '✕'} {item.label}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="flex gap-2 mt-2">
+                            <a href={CFM_URL} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-emerald-400 underline">CFM</a>
+                            <a href={RECEITA_CPF_URL} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-cyan-400 underline">Receita CPF</a>
+                          </div>
                         </TableCell>
+
 
                         <TableCell>
                           {/* 🔴 / 🟢 Switch ON / OFF Card Público */}

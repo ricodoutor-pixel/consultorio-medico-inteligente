@@ -269,6 +269,11 @@
       "success": false,
       "last_attempt_at": "2026-08-11T06:04:56.317Z",
       "error": "delivery_failed"
+    },
+    "557799811447": {
+      "success": false,
+      "last_attempt_at": "2026-08-11T06:05:47.735Z",
+      "error": "delivery_failed"
     }
   },
   "total_sent": 53,

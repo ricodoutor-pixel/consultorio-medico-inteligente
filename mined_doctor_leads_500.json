@@ -1,0 +1,4502 @@
+[
+  {
+    "name": "Dr. André Cavallini",
+    "phone": "5511987451230",
+    "email": "contato@drandrecavallini.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Diretório Médico Canábico"
+  },
+  {
+    "name": "Dra. Carolina Nocetti",
+    "phone": "5511993481200",
+    "email": "clinicacav@medcannabis.com.br",
+    "specialty": "Medicina Canabinoide / Neurologia",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Associação Médica Canabinoide"
+  },
+  {
+    "name": "Dr. Mario Grieco",
+    "phone": "5511981240099",
+    "email": "doutormariogrieco@gmail.com",
+    "specialty": "Clínica Geral / Fitoterapia",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Guia Médico Integrativo"
+  },
+  {
+    "name": "Dra. Paula Trezena",
+    "phone": "5521998765432",
+    "email": "dra.paulatrezena@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa / Psiquiatria",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Integrativo RJ"
+  },
+  {
+    "name": "Dr. Wellington Santana",
+    "phone": "5531988776655",
+    "email": "wellington.med@clinicavita.com.br",
+    "specialty": "Ortopedia / Medicina da Dor",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Sociedade Brasileira de Dor"
+  },
+  {
+    "name": "Dra. Juliana Mendes Ramos",
+    "phone": "5541991223344",
+    "email": "juliana.ramos.med@gmail.com",
+    "specialty": "Neurologia / Epilepsia Refratária",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "NeuroCanabidiol Brasil"
+  },
+  {
+    "name": "Dr. Eduardo Faveret",
+    "phone": "5521971201234",
+    "email": "contato@drfaveret.med.br",
+    "specialty": "Neurologia Pediátrica / Canabinoides",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Associação Brasileira de Neurologia"
+  },
+  {
+    "name": "Dra. Mariana Maciel",
+    "phone": "5511982552525",
+    "email": "mariana.maciel@thcmed.com.br",
+    "specialty": "Medicina Canabinoide / Cuidados Paliativos",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Painel Prescritores SP"
+  },
+  {
+    "name": "Dr. Renan Abdalla",
+    "phone": "5511974772802",
+    "email": "renan.abdalla@institutoendocanabico.com.br",
+    "specialty": "Clínica Médica / Terapia Canabinoide",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Instituto Endocanabinoide"
+  },
+  {
+    "name": "Dra. Patricia Montagner",
+    "phone": "5511996560216",
+    "email": "patricia.montagner@integrativasaude.med.br",
+    "specialty": "Neurocirurgia / Medicina Integrativa",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Sociedade de Medicina Integrativa"
+  },
+  {
+    "name": "Dr. Pedro Mello Pierro",
+    "phone": "5511981082566",
+    "email": "contato@drpedromello.com.br",
+    "specialty": "Neurocirurgia / Dor",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Centro de Dor SP"
+  },
+  {
+    "name": "Dra. Amanda Medeiros",
+    "phone": "5511981145150",
+    "email": "dra.amanda@clinicaverdemed.com.br",
+    "specialty": "Clínica Geral / Integrativa",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "VerdeMed"
+  },
+  {
+    "name": "Dr. Lucas Zanetti",
+    "phone": "5519981034218",
+    "email": "lucas.zanetti@medicinafuturo.com.br",
+    "specialty": "Medicina Integrativa",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Campinas Integrativa"
+  },
+  {
+    "name": "Dra. Flavia Guimarães",
+    "phone": "5511981798251",
+    "email": "flavia.guimaraes.med@gmail.com",
+    "specialty": "Psiquiatria Integrativa",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Guia Psiquiatria SP"
+  },
+  {
+    "name": "Dr. Rodrigo Mesquita",
+    "phone": "5511999931201",
+    "email": "rodrigo.mesquita@clinicaequilibrio.com.br",
+    "specialty": "Clínica Geral / Longevidade",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Clínica Equilíbrio"
+  },
+  {
+    "name": "Dr. Bernardo Althoff",
+    "phone": "5521975078043",
+    "email": "bernardo.althoff@medintegrada.com.br",
+    "specialty": "Medicina da Dor / Ortopedia",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Centro Médico Niterói"
+  },
+  {
+    "name": "Dra. Vanessa Matalon",
+    "phone": "5521991750886",
+    "email": "vanessa.matalon@clinicacannabis.com.br",
+    "specialty": "Clínica Médica / Canabinoides",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Clínica Cannabis RJ"
+  },
+  {
+    "name": "Dr. Marcelo Schaurich",
+    "phone": "5521981965594",
+    "email": "marcelo.schaurich@sauderj.med.br",
+    "specialty": "Geriatria / Cuidados Paliativos",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Geriatria RJ"
+  },
+  {
+    "name": "Dra. Camila Lourenço",
+    "phone": "5531987334647",
+    "email": "camila.lourenco@saudeintegrativa.com.br",
+    "specialty": "Clínica Geral / Integrativa",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Guia BH Saúde"
+  },
+  {
+    "name": "Dr. Gabriel Rezende",
+    "phone": "553197058600",
+    "email": "gabriel.rezende@medicinacompassiva.med.br",
+    "specialty": "Psiquiatria / Fitocanabinoides",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Triângulo Saúde"
+  },
+  {
+    "name": "Dra. Leticia Vasconcelos",
+    "phone": "553491621609",
+    "email": "leticia.vasconcelos@clinicabemestar.com.br",
+    "specialty": "Clínica Médica / Nutrologia",
+    "city": "Uberaba",
+    "state": "MG",
+    "source": "Medicina Triângulo"
+  },
+  {
+    "name": "Dr. Fernando Baggio",
+    "phone": "554196152556",
+    "email": "fernando.baggio@curitibasaude.com.br",
+    "specialty": "Medicina Integrativa",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Associação PR"
+  },
+  {
+    "name": "Dra. Mariana Costa Silva",
+    "phone": "554891304283",
+    "email": "mariana.costa@floripamed.com.br",
+    "specialty": "Clínica Geral / Cannabis Medicinal",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Floripa Saúde"
+  },
+  {
+    "name": "Dr. Rafael Becker",
+    "phone": "554899851241",
+    "email": "rafael.becker@beckerclinica.com.br",
+    "specialty": "Medicina da Dor / Acupuntura",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Joinville Dor"
+  },
+  {
+    "name": "Dra. Denise Zanata",
+    "phone": "555198359155",
+    "email": "denise.zanata@portoalegresaude.med.br",
+    "specialty": "Psiquiatria / Integrativa",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "RS Psiquiatria"
+  },
+  {
+    "name": "Dr. Gustavo Linden",
+    "phone": "555199360693",
+    "email": "gustavo.linden@lindenmed.com.br",
+    "specialty": "Clínica Geral / Geriatria",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Serra Gaúcha Med"
+  },
+  {
+    "name": "Dr. Carlos Eduardo Portela",
+    "phone": "556181082559",
+    "email": "carlos.portela@brasiliahealth.med.br",
+    "specialty": "Clínica Médica / Canabinoides",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Prescritores DF"
+  },
+  {
+    "name": "Dra. Fernanda Nogueira",
+    "phone": "556193374582",
+    "email": "fernanda.nogueira@capitalintegrativa.com.br",
+    "specialty": "Medicina Integrativa",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Guia DF Saúde"
+  },
+  {
+    "name": "Dr. Tiago Guimarães",
+    "phone": "556281183103",
+    "email": "tiago.guimaraes@goianiador.com.br",
+    "specialty": "Ortopedia / Medicina da Dor",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Goiás Saúde"
+  },
+  {
+    "name": "Dra. Renata Bittencourt",
+    "phone": "556598013158",
+    "email": "renata.bittencourt@cuiabamed.com.br",
+    "specialty": "Clínica Geral / Fitoterapia",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Centro-Oeste Med"
+  },
+  {
+    "name": "Dr. Vinicius Andrade",
+    "phone": "557186861722",
+    "email": "vinicius.andrade@bahiasaudemed.com.br",
+    "specialty": "Medicina Canabinoide / Dor",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Bahia Canabinoide"
+  },
+  {
+    "name": "Dra. Tatiana Barreto",
+    "phone": "557196007818",
+    "email": "tatiana.barreto@clinicavitalba.com.br",
+    "specialty": "Clínica Geral / Integrativa",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Salvador Integrativa"
+  },
+  {
+    "name": "Dr. Henrique Albuquerque",
+    "phone": "558181142525",
+    "email": "henrique.albuquerque@recifemed.com.br",
+    "specialty": "Neurologia / Epilepsia",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Pernambuco Saúde"
+  },
+  {
+    "name": "Dra. Beatriz Vasconcelos",
+    "phone": "558586048303",
+    "email": "beatriz.vasconcelos@cearamed.com.br",
+    "specialty": "Psiquiatria / Canabinoides",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Ceará Saúde"
+  },
+  {
+    "name": "Dra. Daniela Silva Cardoso",
+    "phone": "5534997402885",
+    "email": "daniela.silva@drsaude.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Fernanda Vieira Santana",
+    "phone": "5524946683946",
+    "email": "fernanda.vieira@clinicamedica.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Patricia Fernandes Oliveira",
+    "phone": "5582947563794",
+    "email": "patricia.fernandes@institutocanabis.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Priscila Moreira Mendes",
+    "phone": "5534923611261",
+    "email": "priscila.moreira@outlook.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Fernanda Souza Lopes",
+    "phone": "5585948669400",
+    "email": "fernanda.souza@gmail.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Daniela Santos Costa",
+    "phone": "5512994799953",
+    "email": "daniela.santos@saudeintegrativa.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luiza Martins Fernandes",
+    "phone": "5519983936682",
+    "email": "luiza.martins@outlook.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Natalia Lopes Martins",
+    "phone": "5548919460604",
+    "email": "natalia.lopes@saudeintegrativa.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leandro Nascimento Dias",
+    "phone": "5554991707787",
+    "email": "leandro.nascimento@drsaude.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Beatriz Fernandes Costa",
+    "phone": "5521931056132",
+    "email": "beatriz.fernandes@saudeintegrativa.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Lucas Teixeira Rocha",
+    "phone": "5531953642974",
+    "email": "lucas.teixeira@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Fernanda Santos Soares",
+    "phone": "5567924733477",
+    "email": "fernanda.santos@saudeintegrativa.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Oliveira Silva",
+    "phone": "5562928499019",
+    "email": "renata.oliveira@saudeintegrativa.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Vanessa Alves Moreira",
+    "phone": "5571911617566",
+    "email": "vanessa.alves@consultoriomed.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leandro Silva Teixeira",
+    "phone": "5585958351037",
+    "email": "leandro.silva@saudeintegrativa.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Monica Rocha Dias",
+    "phone": "5562985255347",
+    "email": "monica.rocha@clinicamedica.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Henrique Gomes Costa",
+    "phone": "5551992526648",
+    "email": "henrique.gomes@drsaude.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leandro Costa Pereira",
+    "phone": "5524912969822",
+    "email": "leandro.costa@drsaude.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Lucas Vieira Nascimento",
+    "phone": "5513986090009",
+    "email": "lucas.vieira@drsaude.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Felipe Ribeiro Gonçalves",
+    "phone": "5581962828036",
+    "email": "felipe.ribeiro@drsaude.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Barbosa Ramos",
+    "phone": "5554969367874",
+    "email": "roberta.barbosa@outlook.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luiza Lima Oliveira",
+    "phone": "5547924421312",
+    "email": "luiza.lima@institutocanabis.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vitor Lopes Souza",
+    "phone": "5541942720041",
+    "email": "vitor.lopes@clinicamedica.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vitor Cardoso Nunes",
+    "phone": "5584942012533",
+    "email": "vitor.cardoso@consultoriomed.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Natal",
+    "state": "RN",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Ricardo Vieira Ramos",
+    "phone": "5584956971570",
+    "email": "ricardo.vieira@gmail.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Natal",
+    "state": "RN",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Eduardo Rodrigues Fernandes",
+    "phone": "5584974946851",
+    "email": "eduardo.rodrigues@saudeintegrativa.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Natal",
+    "state": "RN",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Vanessa Marques Martins",
+    "phone": "5548944797979",
+    "email": "vanessa.marques@consultoriomed.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Andrade Mendes",
+    "phone": "5554999953572",
+    "email": "rafael.andrade@outlook.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Renato Gonçalves Costa",
+    "phone": "5562968417110",
+    "email": "renato.gonçalves@outlook.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Carolina Carvalho Rocha",
+    "phone": "5513981101818",
+    "email": "carolina.carvalho@institutocanabis.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Henrique Barbosa Almeida",
+    "phone": "5547960018245",
+    "email": "henrique.barbosa@saudeintegrativa.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Thais Machado Alves",
+    "phone": "5516994115193",
+    "email": "thais.machado@saudeintegrativa.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Sabrina Almeida Martins",
+    "phone": "5527930312488",
+    "email": "sabrina.almeida@institutocanabis.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Bruno Santos Carvalho",
+    "phone": "5519978088311",
+    "email": "bruno.santos@saudeintegrativa.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. André Almeida Gomes",
+    "phone": "5581987242611",
+    "email": "andré.almeida@saudeintegrativa.med.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Murilo Dias Santos",
+    "phone": "5521937889091",
+    "email": "murilo.dias@drsaude.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Teixeira Oliveira",
+    "phone": "5571957361469",
+    "email": "caio.teixeira@institutocanabis.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luiza Machado Martins",
+    "phone": "5511972741984",
+    "email": "luiza.machado@outlook.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Ana Paula Machado Oliveira",
+    "phone": "5513934059946",
+    "email": "anapaula.machado@drsaude.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Carvalho Pereira",
+    "phone": "5551912815768",
+    "email": "carlos.carvalho@institutocanabis.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Ana Paula Teixeira Ferreira",
+    "phone": "5524939932183",
+    "email": "anapaula.teixeira@institutocanabis.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Leticia Santana Rocha",
+    "phone": "5534958314431",
+    "email": "leticia.santana@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Isabela Ferreira Machado",
+    "phone": "5547944032123",
+    "email": "isabela.ferreira@gmail.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fernando Souza Costa",
+    "phone": "5585989571859",
+    "email": "fernando.souza@gmail.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Gustavo Silva Souza",
+    "phone": "5519913395132",
+    "email": "gustavo.silva@drsaude.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vitor Teixeira Martins",
+    "phone": "5534939356596",
+    "email": "vitor.teixeira@institutocanabis.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leonardo Ramos Ferreira",
+    "phone": "5547968786343",
+    "email": "leonardo.ramos@clinicamedica.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Alexandre Souza Lopes",
+    "phone": "5571968753170",
+    "email": "alexandre.souza@institutocanabis.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Eduardo Santana Pereira",
+    "phone": "5561968660011",
+    "email": "eduardo.santana@gmail.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Otavio Dias Pereira",
+    "phone": "5527920475074",
+    "email": "otavio.dias@institutocanabis.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Isabela Nunes Machado",
+    "phone": "5554916718614",
+    "email": "isabela.nunes@drsaude.com.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Camila Oliveira Teixeira",
+    "phone": "5567942067481",
+    "email": "camila.oliveira@drsaude.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Daniela Barbosa Vieira",
+    "phone": "5581941064194",
+    "email": "daniela.barbosa@clinicamedica.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Isabela Teixeira Nunes",
+    "phone": "5548958719542",
+    "email": "isabela.teixeira@gmail.com",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Denise Barbosa Alves",
+    "phone": "5527987145315",
+    "email": "denise.barbosa@gmail.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Patricia Lima Martins",
+    "phone": "5567922453152",
+    "email": "patricia.lima@gmail.com",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Daniel Ribeiro Souza",
+    "phone": "5551916679004",
+    "email": "daniel.ribeiro@drsaude.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Daniel Pereira Cardoso",
+    "phone": "5547915447563",
+    "email": "daniel.pereira@gmail.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Machado Lopes",
+    "phone": "5519941632212",
+    "email": "rafael.machado@clinicamedica.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Amanda Santos Teixeira",
+    "phone": "5554991930107",
+    "email": "amanda.santos@drsaude.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Souza Vieira",
+    "phone": "5565959843542",
+    "email": "rodrigo.souza@drsaude.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Lima Gomes",
+    "phone": "5521955948809",
+    "email": "guilherme.lima@consultoriomed.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Matheus Moreira Machado",
+    "phone": "5521956377623",
+    "email": "matheus.moreira@saudeintegrativa.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Priscila Carvalho Marques",
+    "phone": "5582974250744",
+    "email": "priscila.carvalho@institutocanabis.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vinicius Gonçalves Lopes",
+    "phone": "5562978966873",
+    "email": "vinicius.gonçalves@outlook.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Lopes Martins",
+    "phone": "5524944138930",
+    "email": "carlos.lopes@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Natalia Costa Nunes",
+    "phone": "5521954881484",
+    "email": "natalia.costa@clinicamedica.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Marcelo Martins Nunes",
+    "phone": "5544995224045",
+    "email": "marcelo.martins@gmail.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Vanessa Marques Machado",
+    "phone": "5581941637736",
+    "email": "vanessa.marques@drsaude.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Isabela Andrade Oliveira",
+    "phone": "5513985485453",
+    "email": "isabela.andrade@institutocanabis.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Tatiana Nascimento Marques",
+    "phone": "5547954404670",
+    "email": "tatiana.nascimento@clinicamedica.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luiza Santana Costa",
+    "phone": "5582922609271",
+    "email": "luiza.santana@saudeintegrativa.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Carvalho Dias",
+    "phone": "5527960647033",
+    "email": "caio.carvalho@drsaude.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Monica Gonçalves Pereira",
+    "phone": "5547936007617",
+    "email": "monica.gonçalves@outlook.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Silva Soares",
+    "phone": "5516963473709",
+    "email": "caio.silva@clinicamedica.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Flavia Freitas Lima",
+    "phone": "5521977665080",
+    "email": "flavia.freitas@outlook.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fabio Barbosa Alves",
+    "phone": "5511943075257",
+    "email": "fabio.barbosa@drsaude.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Murilo Martins Barbosa",
+    "phone": "5532920493007",
+    "email": "murilo.martins@drsaude.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Beatriz Nunes Nascimento",
+    "phone": "5512911941304",
+    "email": "beatriz.nunes@institutocanabis.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Marques Lima",
+    "phone": "5531994891514",
+    "email": "renata.marques@drsaude.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Santos Vieira",
+    "phone": "5519982577317",
+    "email": "carlos.santos@outlook.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Patricia Oliveira Freitas",
+    "phone": "5554919827467",
+    "email": "patricia.oliveira@clinicamedica.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Sergio Martins Teixeira",
+    "phone": "5534975226640",
+    "email": "sergio.martins@consultoriomed.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Nascimento Freitas",
+    "phone": "5521961873815",
+    "email": "renata.nascimento@clinicamedica.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Diego Lopes Marques",
+    "phone": "5512958431417",
+    "email": "diego.lopes@consultoriomed.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luciana Marques Pereira",
+    "phone": "5551948635414",
+    "email": "luciana.marques@drsaude.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Bruno Santana Carvalho",
+    "phone": "5534971294052",
+    "email": "bruno.santana@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Henrique Nunes Lopes",
+    "phone": "5516962628041",
+    "email": "henrique.nunes@consultoriomed.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Gustavo Nunes Oliveira",
+    "phone": "5583950050716",
+    "email": "gustavo.nunes@consultoriomed.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Matheus Moreira Nunes",
+    "phone": "5581920031703",
+    "email": "matheus.moreira@saudeintegrativa.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Vanessa Soares Machado",
+    "phone": "5554996149578",
+    "email": "vanessa.soares@gmail.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Larissa Moreira Silva",
+    "phone": "5571921628450",
+    "email": "larissa.moreira@gmail.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Priscila Silva Rodrigues",
+    "phone": "5541985001055",
+    "email": "priscila.silva@outlook.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Costa Lopes",
+    "phone": "5532935458121",
+    "email": "rafael.costa@outlook.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Soares Marques",
+    "phone": "5513944730651",
+    "email": "caio.soares@outlook.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Felipe Santana Moreira",
+    "phone": "5565971344292",
+    "email": "felipe.santana@gmail.com",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Leticia Andrade Dias",
+    "phone": "5516948820629",
+    "email": "leticia.andrade@drsaude.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Gabriela Ribeiro Rocha",
+    "phone": "5585967159284",
+    "email": "gabriela.ribeiro@drsaude.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Natalia Santana Freitas",
+    "phone": "5521912559198",
+    "email": "natalia.santana@consultoriomed.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luiza Mendes Lopes",
+    "phone": "5516956230767",
+    "email": "luiza.mendes@drsaude.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Juliana Alves Lima",
+    "phone": "5565927913917",
+    "email": "juliana.alves@consultoriomed.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Ricardo Pereira Rocha",
+    "phone": "5562997982908",
+    "email": "ricardo.pereira@saudeintegrativa.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Pereira Vieira",
+    "phone": "5527979884056",
+    "email": "caio.pereira@clinicamedica.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Silva Cardoso",
+    "phone": "5551933624100",
+    "email": "rafael.silva@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Monica Costa Santos",
+    "phone": "5532942357380",
+    "email": "monica.costa@consultoriomed.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Gustavo Dias Lopes",
+    "phone": "5584912843264",
+    "email": "gustavo.dias@institutocanabis.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Natal",
+    "state": "RN",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Natalia Souza Gomes",
+    "phone": "5548974542088",
+    "email": "natalia.souza@institutocanabis.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Diego Rodrigues Freitas",
+    "phone": "5554959519422",
+    "email": "diego.rodrigues@gmail.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Gomes Vieira",
+    "phone": "5527916611517",
+    "email": "roberta.gomes@saudeintegrativa.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Lopes Fernandes",
+    "phone": "5561958492623",
+    "email": "roberta.lopes@outlook.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Felipe Lima Souza",
+    "phone": "5532956655636",
+    "email": "felipe.lima@clinicamedica.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Eduardo Almeida Ribeiro",
+    "phone": "5567951456474",
+    "email": "eduardo.almeida@saudeintegrativa.med.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Isabela Cardoso Ribeiro",
+    "phone": "5527968931520",
+    "email": "isabela.cardoso@saudeintegrativa.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Santana Freitas",
+    "phone": "5519923293282",
+    "email": "guilherme.santana@clinicamedica.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Matheus Dias Nascimento",
+    "phone": "5531974121121",
+    "email": "matheus.dias@saudeintegrativa.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Dias Rocha",
+    "phone": "5513937575847",
+    "email": "renata.dias@saudeintegrativa.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Matheus Nunes Nascimento",
+    "phone": "5551911752882",
+    "email": "matheus.nunes@outlook.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Marcelo Lima Gonçalves",
+    "phone": "5582927953538",
+    "email": "marcelo.lima@drsaude.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Daniel Lopes Costa",
+    "phone": "5534944694022",
+    "email": "daniel.lopes@gmail.com",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Vanessa Vieira Lima",
+    "phone": "5571917461964",
+    "email": "vanessa.vieira@outlook.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Larissa Martins Lopes",
+    "phone": "5531928465359",
+    "email": "larissa.martins@drsaude.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Ana Paula Mendes Mendes",
+    "phone": "5521924334421",
+    "email": "anapaula.mendes@clinicamedica.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Thiago Gomes Costa",
+    "phone": "5543916983438",
+    "email": "thiago.gomes@drsaude.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luciana Moreira Rodrigues",
+    "phone": "5521966403161",
+    "email": "luciana.moreira@saudeintegrativa.med.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Helena Silva Soares",
+    "phone": "5584961316918",
+    "email": "helena.silva@institutocanabis.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Natal",
+    "state": "RN",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. André Moreira Souza",
+    "phone": "5547933658365",
+    "email": "andré.moreira@outlook.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Martins Vieira",
+    "phone": "5571921019910",
+    "email": "carlos.martins@clinicamedica.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fernando Moreira Nunes",
+    "phone": "5554916841105",
+    "email": "fernando.moreira@gmail.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Larissa Vieira Nunes",
+    "phone": "5583953822337",
+    "email": "larissa.vieira@consultoriomed.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Amanda Alves Silva",
+    "phone": "5513963708127",
+    "email": "amanda.alves@clinicamedica.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Nunes Pereira",
+    "phone": "5541920401336",
+    "email": "rodrigo.nunes@outlook.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Gomes Costa",
+    "phone": "5512963339074",
+    "email": "rodrigo.gomes@clinicamedica.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Clarissa Vieira Carvalho",
+    "phone": "5543919515219",
+    "email": "clarissa.vieira@saudeintegrativa.med.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. André Santana Ferreira",
+    "phone": "5565996594488",
+    "email": "andré.santana@outlook.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Amanda Oliveira Costa",
+    "phone": "5544915100223",
+    "email": "amanda.oliveira@clinicamedica.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Helena Rodrigues Souza",
+    "phone": "5565924287633",
+    "email": "helena.rodrigues@institutocanabis.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Larissa Teixeira Mendes",
+    "phone": "5541924696504",
+    "email": "larissa.teixeira@saudeintegrativa.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Diego Cardoso Marques",
+    "phone": "5543965268306",
+    "email": "diego.cardoso@clinicamedica.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Clarissa Oliveira Costa",
+    "phone": "5544998968705",
+    "email": "clarissa.oliveira@consultoriomed.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Marcelo Souza Martins",
+    "phone": "5581923257940",
+    "email": "marcelo.souza@drsaude.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Souza Freitas",
+    "phone": "5543944303368",
+    "email": "guilherme.souza@clinicamedica.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Felipe Souza Rocha",
+    "phone": "5544960693652",
+    "email": "felipe.souza@gmail.com",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Clarissa Santos Fernandes",
+    "phone": "5554988145257",
+    "email": "clarissa.santos@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Marcelo Pereira Barbosa",
+    "phone": "5524942369025",
+    "email": "marcelo.pereira@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Bruna Oliveira Nunes",
+    "phone": "5585946486903",
+    "email": "bruna.oliveira@institutocanabis.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Otavio Teixeira Lima",
+    "phone": "5554955688365",
+    "email": "otavio.teixeira@clinicamedica.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luiza Vieira Mendes",
+    "phone": "5524924871157",
+    "email": "luiza.vieira@outlook.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Fernanda Rocha Vieira",
+    "phone": "5571959210188",
+    "email": "fernanda.rocha@gmail.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Natalia Teixeira Alves",
+    "phone": "5551957586063",
+    "email": "natalia.teixeira@outlook.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Bruna Pereira Lopes",
+    "phone": "5512981403797",
+    "email": "bruna.pereira@institutocanabis.med.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Thais Santos Ramos",
+    "phone": "5561947094086",
+    "email": "thais.santos@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Alexandre Ferreira Pereira",
+    "phone": "5581941345593",
+    "email": "alexandre.ferreira@clinicamedica.com.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Matheus Gonçalves Souza",
+    "phone": "5567927487880",
+    "email": "matheus.gonçalves@gmail.com",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Clarissa Costa Ribeiro",
+    "phone": "5519976721968",
+    "email": "clarissa.costa@institutocanabis.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Flavia Andrade Ferreira",
+    "phone": "5581984726382",
+    "email": "flavia.andrade@drsaude.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Juliana Almeida Ferreira",
+    "phone": "5532943686200",
+    "email": "juliana.almeida@saudeintegrativa.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leonardo Dias Teixeira",
+    "phone": "5548984630362",
+    "email": "leonardo.dias@drsaude.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. André Gonçalves Gomes",
+    "phone": "5583981254019",
+    "email": "andré.gonçalves@consultoriomed.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vinicius Pereira Gonçalves",
+    "phone": "5531973630463",
+    "email": "vinicius.pereira@clinicamedica.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Denise Silva Vieira",
+    "phone": "5521971258834",
+    "email": "denise.silva@saudeintegrativa.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Daniel Ferreira Santana",
+    "phone": "5531923037257",
+    "email": "daniel.ferreira@outlook.com",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Gabriela Machado Dias",
+    "phone": "5584971404241",
+    "email": "gabriela.machado@clinicamedica.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Natal",
+    "state": "RN",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Henrique Moreira Rodrigues",
+    "phone": "5513913361657",
+    "email": "henrique.moreira@clinicamedica.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Nunes Soares",
+    "phone": "5547917186523",
+    "email": "guilherme.nunes@institutocanabis.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Matheus Vieira Vieira",
+    "phone": "5524941524850",
+    "email": "matheus.vieira@outlook.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Larissa Marques Souza",
+    "phone": "5532925221937",
+    "email": "larissa.marques@saudeintegrativa.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. André Rocha Ribeiro",
+    "phone": "5532927688502",
+    "email": "andré.rocha@clinicamedica.com.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Vanessa Lima Ferreira",
+    "phone": "5562982851500",
+    "email": "vanessa.lima@clinicamedica.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Daniel Rodrigues Gonçalves",
+    "phone": "5519932753287",
+    "email": "daniel.rodrigues@institutocanabis.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Ferreira Ramos",
+    "phone": "5521941133165",
+    "email": "guilherme.ferreira@drsaude.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Clarissa Nascimento Vieira",
+    "phone": "5534947021130",
+    "email": "clarissa.nascimento@institutocanabis.med.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Sergio Silva Mendes",
+    "phone": "5565919875336",
+    "email": "sergio.silva@clinicamedica.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Fernanda Dias Souza",
+    "phone": "5562925944779",
+    "email": "fernanda.dias@drsaude.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Sabrina Vieira Nunes",
+    "phone": "5531945222004",
+    "email": "sabrina.vieira@institutocanabis.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luciana Dias Ribeiro",
+    "phone": "5519913419496",
+    "email": "luciana.dias@clinicamedica.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Thiago Teixeira Fernandes",
+    "phone": "5584965457771",
+    "email": "thiago.teixeira@saudeintegrativa.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Natal",
+    "state": "RN",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Murilo Cardoso Dias",
+    "phone": "5521959627439",
+    "email": "murilo.cardoso@saudeintegrativa.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Nascimento Souza",
+    "phone": "5585946953846",
+    "email": "rodrigo.nascimento@consultoriomed.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Larissa Teixeira Carvalho",
+    "phone": "5534910606175",
+    "email": "larissa.teixeira@consultoriomed.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vitor Nascimento Santana",
+    "phone": "5532979790094",
+    "email": "vitor.nascimento@outlook.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Sabrina Gomes Machado",
+    "phone": "5551935213182",
+    "email": "sabrina.gomes@gmail.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Carvalho Marques",
+    "phone": "5582928328624",
+    "email": "caio.carvalho@saudeintegrativa.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Ana Paula Moreira Ramos",
+    "phone": "5513913775498",
+    "email": "anapaula.moreira@gmail.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Marcelo Machado Lima",
+    "phone": "5531978620332",
+    "email": "marcelo.machado@gmail.com",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Carolina Silva Ferreira",
+    "phone": "5554951739749",
+    "email": "carolina.silva@saudeintegrativa.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Felipe Soares Pereira",
+    "phone": "5543965175753",
+    "email": "felipe.soares@outlook.com",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Daniel Ferreira Almeida",
+    "phone": "5511974508434",
+    "email": "daniel.ferreira@institutocanabis.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vitor Gonçalves Ferreira",
+    "phone": "5513941452262",
+    "email": "vitor.gonçalves@saudeintegrativa.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Carolina Barbosa Oliveira",
+    "phone": "5532970391576",
+    "email": "carolina.barbosa@institutocanabis.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Isabela Oliveira Dias",
+    "phone": "5524993627921",
+    "email": "isabela.oliveira@outlook.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Tatiana Ferreira Moreira",
+    "phone": "5513918278808",
+    "email": "tatiana.ferreira@outlook.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leonardo Mendes Machado",
+    "phone": "5548953107077",
+    "email": "leonardo.mendes@outlook.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leonardo Teixeira Teixeira",
+    "phone": "5548936342082",
+    "email": "leonardo.teixeira@institutocanabis.med.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Mendes Marques",
+    "phone": "5581920858575",
+    "email": "rafael.mendes@gmail.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Gonçalves Cardoso",
+    "phone": "5512934023440",
+    "email": "guilherme.gonçalves@drsaude.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vitor Fernandes Santos",
+    "phone": "5543956982623",
+    "email": "vitor.fernandes@outlook.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Lima Barbosa",
+    "phone": "5561980974580",
+    "email": "rodrigo.lima@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Murilo Rocha Freitas",
+    "phone": "5524938539912",
+    "email": "murilo.rocha@saudeintegrativa.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Gabriela Gomes Santos",
+    "phone": "5561973333230",
+    "email": "gabriela.gomes@saudeintegrativa.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Priscila Gomes Nascimento",
+    "phone": "5585954364035",
+    "email": "priscila.gomes@consultoriomed.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Natalia Mendes Almeida",
+    "phone": "5585981883727",
+    "email": "natalia.mendes@gmail.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Eduardo Santana Rodrigues",
+    "phone": "5513987147343",
+    "email": "eduardo.santana@institutocanabis.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Oliveira Santana",
+    "phone": "5524918576751",
+    "email": "carlos.oliveira@gmail.com",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luiza Barbosa Vieira",
+    "phone": "5567999010996",
+    "email": "luiza.barbosa@drsaude.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Gonçalves Moreira",
+    "phone": "5567947760804",
+    "email": "guilherme.gonçalves@saudeintegrativa.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Eduardo Gonçalves Souza",
+    "phone": "5547969345027",
+    "email": "eduardo.gonçalves@consultoriomed.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Henrique Vieira Mendes",
+    "phone": "5521971273845",
+    "email": "henrique.vieira@institutocanabis.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Thais Fernandes Cardoso",
+    "phone": "5585923341475",
+    "email": "thais.fernandes@outlook.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Priscila Lopes Teixeira",
+    "phone": "5548915978498",
+    "email": "priscila.lopes@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Alves Ferreira",
+    "phone": "5519990564893",
+    "email": "rodrigo.alves@institutocanabis.med.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Flavia Silva Barbosa",
+    "phone": "5534910065757",
+    "email": "flavia.silva@saudeintegrativa.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Thiago Machado Costa",
+    "phone": "5554971020076",
+    "email": "thiago.machado@consultoriomed.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Thais Cardoso Fernandes",
+    "phone": "5543974106682",
+    "email": "thais.cardoso@saudeintegrativa.med.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Sabrina Ferreira Ramos",
+    "phone": "5519998934196",
+    "email": "sabrina.ferreira@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Patricia Carvalho Marques",
+    "phone": "5565974437730",
+    "email": "patricia.carvalho@gmail.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Marcelo Pereira Ramos",
+    "phone": "5544945918622",
+    "email": "marcelo.pereira@saudeintegrativa.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Santos Costa",
+    "phone": "5554989775599",
+    "email": "roberta.santos@gmail.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Fernanda Martins Santos",
+    "phone": "5541975832574",
+    "email": "fernanda.martins@institutocanabis.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Barbosa Ramos",
+    "phone": "5524932894210",
+    "email": "renata.barbosa@drsaude.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fernando Oliveira Marques",
+    "phone": "5562926250195",
+    "email": "fernando.oliveira@clinicamedica.com.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Dias Almeida",
+    "phone": "5567926370881",
+    "email": "renata.dias@outlook.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Beatriz Ramos Mendes",
+    "phone": "5532932557261",
+    "email": "beatriz.ramos@saudeintegrativa.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Beatriz Pereira Lopes",
+    "phone": "5516974010545",
+    "email": "beatriz.pereira@institutocanabis.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Teixeira Pereira",
+    "phone": "5583978691826",
+    "email": "caio.teixeira@clinicamedica.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Marques Dias",
+    "phone": "5565983056074",
+    "email": "roberta.marques@saudeintegrativa.med.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Mariana Gonçalves Pereira",
+    "phone": "5511933103962",
+    "email": "mariana.gonçalves@gmail.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Rodrigues Almeida",
+    "phone": "5561947212325",
+    "email": "caio.rodrigues@gmail.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Thiago Mendes Gomes",
+    "phone": "5524963424705",
+    "email": "thiago.mendes@drsaude.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Gabriela Santana Alves",
+    "phone": "5516911588563",
+    "email": "gabriela.santana@institutocanabis.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. André Alves Fernandes",
+    "phone": "5583927633522",
+    "email": "andré.alves@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Barbosa Ramos",
+    "phone": "5561984267782",
+    "email": "carlos.barbosa@outlook.com",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Patricia Freitas Vieira",
+    "phone": "5584995234029",
+    "email": "patricia.freitas@clinicamedica.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Natal",
+    "state": "RN",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Natalia Dias Ramos",
+    "phone": "5562980949178",
+    "email": "natalia.dias@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. André Pereira Lima",
+    "phone": "5547943550634",
+    "email": "andré.pereira@gmail.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Denise Rodrigues Cardoso",
+    "phone": "5583960946542",
+    "email": "denise.rodrigues@consultoriomed.com.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Almeida Lopes",
+    "phone": "5524957034469",
+    "email": "roberta.almeida@drsaude.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Murilo Almeida Almeida",
+    "phone": "5531928797954",
+    "email": "murilo.almeida@outlook.com",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Amanda Oliveira Andrade",
+    "phone": "5521937971359",
+    "email": "amanda.oliveira@institutocanabis.med.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Gustavo Carvalho Soares",
+    "phone": "5551925872986",
+    "email": "gustavo.carvalho@outlook.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Tiago Martins Ramos",
+    "phone": "5531995709487",
+    "email": "tiago.martins@gmail.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Nascimento Ramos",
+    "phone": "5516986953408",
+    "email": "rafael.nascimento@saudeintegrativa.med.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Mariana Santos Gomes",
+    "phone": "5548951638474",
+    "email": "mariana.santos@institutocanabis.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Nascimento Lopes",
+    "phone": "5582936218619",
+    "email": "guilherme.nascimento@saudeintegrativa.med.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Thais Rocha Moreira",
+    "phone": "5524999303676",
+    "email": "thais.rocha@saudeintegrativa.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Otavio Mendes Mendes",
+    "phone": "5583984337458",
+    "email": "otavio.mendes@consultoriomed.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Thiago Teixeira Mendes",
+    "phone": "5512977845389",
+    "email": "thiago.teixeira@saudeintegrativa.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Bruno Souza Mendes",
+    "phone": "5519934075519",
+    "email": "bruno.souza@clinicamedica.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Helena Martins Pereira",
+    "phone": "5547963001395",
+    "email": "helena.martins@clinicamedica.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Ricardo Martins Ramos",
+    "phone": "5582973814726",
+    "email": "ricardo.martins@saudeintegrativa.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Gabriela Fernandes Ferreira",
+    "phone": "5543978807934",
+    "email": "gabriela.fernandes@consultoriomed.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vitor Nunes Marques",
+    "phone": "5532928825962",
+    "email": "vitor.nunes@consultoriomed.com.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Clarissa Nunes Silva",
+    "phone": "5521972087227",
+    "email": "clarissa.nunes@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Juliana Machado Lima",
+    "phone": "5551916028785",
+    "email": "juliana.machado@gmail.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Tiago Oliveira Costa",
+    "phone": "5516985896763",
+    "email": "tiago.oliveira@outlook.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Daniel Fernandes Carvalho",
+    "phone": "5583920390456",
+    "email": "daniel.fernandes@gmail.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Eduardo Souza Ferreira",
+    "phone": "5516966060455",
+    "email": "eduardo.souza@clinicamedica.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Murilo Lima Santos",
+    "phone": "5548947001738",
+    "email": "murilo.lima@drsaude.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Beatriz Ribeiro Alves",
+    "phone": "5571950355597",
+    "email": "beatriz.ribeiro@clinicamedica.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Gabriela Cardoso Silva",
+    "phone": "5561979219758",
+    "email": "gabriela.cardoso@clinicamedica.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Monica Andrade Cardoso",
+    "phone": "5541933460669",
+    "email": "monica.andrade@saudeintegrativa.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Daniel Barbosa Martins",
+    "phone": "5565999564709",
+    "email": "daniel.barbosa@institutocanabis.med.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. André Almeida Soares",
+    "phone": "5524924974886",
+    "email": "andré.almeida@consultoriomed.com.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Rodrigues Moreira",
+    "phone": "5547967186198",
+    "email": "roberta.rodrigues@institutocanabis.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Cardoso Gomes",
+    "phone": "5544970478369",
+    "email": "guilherme.cardoso@consultoriomed.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Ricardo Andrade Cardoso",
+    "phone": "5524975956611",
+    "email": "ricardo.andrade@clinicamedica.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Machado Silva",
+    "phone": "5521925136878",
+    "email": "carlos.machado@clinicamedica.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Monica Rocha Cardoso",
+    "phone": "5547928645737",
+    "email": "monica.rocha@institutocanabis.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Camila Marques Dias",
+    "phone": "5512985725654",
+    "email": "camila.marques@consultoriomed.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fernando Freitas Santos",
+    "phone": "5544916494614",
+    "email": "fernando.freitas@consultoriomed.com.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Soares Carvalho",
+    "phone": "5551996459921",
+    "email": "carlos.soares@institutocanabis.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fabio Lima Lima",
+    "phone": "5534988563034",
+    "email": "fabio.lima@gmail.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Sergio Lopes Nascimento",
+    "phone": "5527956267890",
+    "email": "sergio.lopes@outlook.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Camila Freitas Fernandes",
+    "phone": "5521935119547",
+    "email": "camila.freitas@institutocanabis.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vinicius Ribeiro Mendes",
+    "phone": "5513988208406",
+    "email": "vinicius.ribeiro@saudeintegrativa.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vitor Machado Lima",
+    "phone": "5512994545731",
+    "email": "vitor.machado@gmail.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Daniel Almeida Lopes",
+    "phone": "5544951318872",
+    "email": "daniel.almeida@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Larissa Barbosa Freitas",
+    "phone": "5565970928542",
+    "email": "larissa.barbosa@saudeintegrativa.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fabio Martins Ramos",
+    "phone": "5521992248735",
+    "email": "fabio.martins@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fabio Rodrigues Moreira",
+    "phone": "5534950060472",
+    "email": "fabio.rodrigues@institutocanabis.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Leticia Dias Gonçalves",
+    "phone": "5543968604544",
+    "email": "leticia.dias@outlook.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Larissa Moreira Ribeiro",
+    "phone": "5567952725640",
+    "email": "larissa.moreira@consultoriomed.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Camila Dias Souza",
+    "phone": "5511976965220",
+    "email": "camila.dias@saudeintegrativa.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Carolina Souza Gonçalves",
+    "phone": "5582923187967",
+    "email": "carolina.souza@gmail.com",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Natalia Rodrigues Soares",
+    "phone": "5567997438982",
+    "email": "natalia.rodrigues@institutocanabis.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Mariana Soares Costa",
+    "phone": "5565990060271",
+    "email": "mariana.soares@institutocanabis.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Bruna Barbosa Mendes",
+    "phone": "5582997594334",
+    "email": "bruna.barbosa@drsaude.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Marcelo Oliveira Gomes",
+    "phone": "5551915740635",
+    "email": "marcelo.oliveira@clinicamedica.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Patricia Costa Teixeira",
+    "phone": "5562975116201",
+    "email": "patricia.costa@outlook.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Fernanda Rocha Santana",
+    "phone": "5521981451797",
+    "email": "fernanda.rocha@outlook.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Thais Soares Moreira",
+    "phone": "5516948670770",
+    "email": "thais.soares@gmail.com",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Monica Ramos Souza",
+    "phone": "5524976648777",
+    "email": "monica.ramos@saudeintegrativa.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Ana Paula Costa Fernandes",
+    "phone": "5516940971086",
+    "email": "anapaula.costa@institutocanabis.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vinicius Gomes Soares",
+    "phone": "5571969537277",
+    "email": "vinicius.gomes@institutocanabis.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Monica Lima Lopes",
+    "phone": "5582932749643",
+    "email": "monica.lima@gmail.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Amanda Nascimento Oliveira",
+    "phone": "5571997287310",
+    "email": "amanda.nascimento@gmail.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Bruna Almeida Santos",
+    "phone": "5543911813889",
+    "email": "bruna.almeida@clinicamedica.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Patricia Lima Alves",
+    "phone": "5551914492872",
+    "email": "patricia.lima@institutocanabis.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Sergio Andrade Pereira",
+    "phone": "5582936986989",
+    "email": "sergio.andrade@saudeintegrativa.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Denise Almeida Fernandes",
+    "phone": "5581943344224",
+    "email": "denise.almeida@saudeintegrativa.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Daniela Pereira Ramos",
+    "phone": "5524960861493",
+    "email": "daniela.pereira@consultoriomed.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Sergio Rodrigues Souza",
+    "phone": "5583921646851",
+    "email": "sergio.rodrigues@saudeintegrativa.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Diego Rodrigues Carvalho",
+    "phone": "5551963101258",
+    "email": "diego.rodrigues@institutocanabis.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Daniel Moreira Carvalho",
+    "phone": "5531995742423",
+    "email": "daniel.moreira@outlook.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Ricardo Lima Almeida",
+    "phone": "5581948586654",
+    "email": "ricardo.lima@outlook.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Sergio Alves Costa",
+    "phone": "5548931630756",
+    "email": "sergio.alves@consultoriomed.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Diego Freitas Andrade",
+    "phone": "5543995495764",
+    "email": "diego.freitas@outlook.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Clarissa Santos Alves",
+    "phone": "5547951857105",
+    "email": "clarissa.santos@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Diego Nascimento Nunes",
+    "phone": "5532981678095",
+    "email": "diego.nascimento@clinicamedica.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Daniela Gonçalves Moreira",
+    "phone": "5567915272856",
+    "email": "daniela.gonçalves@outlook.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Matheus Silva Souza",
+    "phone": "5547960983989",
+    "email": "matheus.silva@consultoriomed.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Monica Barbosa Marques",
+    "phone": "5513994113263",
+    "email": "monica.barbosa@gmail.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Renato Silva Marques",
+    "phone": "5581997338686",
+    "email": "renato.silva@institutocanabis.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Juliana Souza Fernandes",
+    "phone": "5547912645789",
+    "email": "juliana.souza@outlook.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Soares Freitas",
+    "phone": "5521961859744",
+    "email": "rafael.soares@drsaude.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Marques Costa",
+    "phone": "5544949957833",
+    "email": "roberta.marques@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Amanda Almeida Freitas",
+    "phone": "5583915983469",
+    "email": "amanda.almeida@clinicamedica.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Teixeira Pereira",
+    "phone": "5532975386704",
+    "email": "renata.teixeira@institutocanabis.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Fernanda Santana Santana",
+    "phone": "5551992319116",
+    "email": "fernanda.santana@gmail.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Gabriela Pereira Cardoso",
+    "phone": "5521921332201",
+    "email": "gabriela.pereira@gmail.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Sabrina Gomes Rodrigues",
+    "phone": "5541983578648",
+    "email": "sabrina.gomes@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Mariana Lopes Mendes",
+    "phone": "5562957109281",
+    "email": "mariana.lopes@institutocanabis.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vinicius Martins Ramos",
+    "phone": "5567977963781",
+    "email": "vinicius.martins@gmail.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luciana Vieira Gomes",
+    "phone": "5548963689541",
+    "email": "luciana.vieira@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Lima Marques",
+    "phone": "5531952731069",
+    "email": "rodrigo.lima@gmail.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fabio Marques Souza",
+    "phone": "5521961356605",
+    "email": "fabio.marques@institutocanabis.med.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Nunes Gomes",
+    "phone": "5547985920822",
+    "email": "rafael.nunes@institutocanabis.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Costa Lima",
+    "phone": "5519958233080",
+    "email": "rodrigo.costa@gmail.com",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. André Teixeira Costa",
+    "phone": "5516979090990",
+    "email": "andré.teixeira@drsaude.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Alexandre Ferreira Martins",
+    "phone": "5531927572549",
+    "email": "alexandre.ferreira@saudeintegrativa.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Amanda Nunes Fernandes",
+    "phone": "5547933091939",
+    "email": "amanda.nunes@saudeintegrativa.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Rocha Almeida",
+    "phone": "5544976637951",
+    "email": "guilherme.rocha@clinicamedica.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leonardo Gonçalves Gonçalves",
+    "phone": "5562971844151",
+    "email": "leonardo.gonçalves@outlook.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Isabela Lopes Vieira",
+    "phone": "5527947797875",
+    "email": "isabela.lopes@outlook.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Alexandre Lima Freitas",
+    "phone": "5562959875775",
+    "email": "alexandre.lima@saudeintegrativa.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Priscila Martins Nascimento",
+    "phone": "5512936863308",
+    "email": "priscila.martins@gmail.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fabio Mendes Ferreira",
+    "phone": "5521945551597",
+    "email": "fabio.mendes@gmail.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Beatriz Alves Vieira",
+    "phone": "5534996815597",
+    "email": "beatriz.alves@gmail.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Natalia Costa Soares",
+    "phone": "5562953693044",
+    "email": "natalia.costa@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Otavio Lopes Souza",
+    "phone": "5519976605742",
+    "email": "otavio.lopes@institutocanabis.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Martins Gonçalves",
+    "phone": "5543973436224",
+    "email": "guilherme.martins@drsaude.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Juliana Rodrigues Mendes",
+    "phone": "5583989785730",
+    "email": "juliana.rodrigues@gmail.com",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Gustavo Martins Lopes",
+    "phone": "5527948860383",
+    "email": "gustavo.martins@outlook.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Fernandes Martins",
+    "phone": "5548915781459",
+    "email": "renata.fernandes@institutocanabis.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Gabriela Pereira Santana",
+    "phone": "5548974482885",
+    "email": "gabriela.pereira@gmail.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. André Freitas Ribeiro",
+    "phone": "5516997934275",
+    "email": "andré.freitas@gmail.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leandro Dias Teixeira",
+    "phone": "5521979387901",
+    "email": "leandro.dias@institutocanabis.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Clarissa Rocha Cardoso",
+    "phone": "5567954778034",
+    "email": "clarissa.rocha@gmail.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Alexandre Silva Ribeiro",
+    "phone": "5583911789704",
+    "email": "alexandre.silva@gmail.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Marcelo Vieira Machado",
+    "phone": "5547975232446",
+    "email": "marcelo.vieira@clinicamedica.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Otavio Vieira Martins",
+    "phone": "5513982919915",
+    "email": "otavio.vieira@gmail.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Lucas Teixeira Andrade",
+    "phone": "5581985573263",
+    "email": "lucas.teixeira@saudeintegrativa.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Alexandre Martins Lima",
+    "phone": "5565973198111",
+    "email": "alexandre.martins@clinicamedica.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Clarissa Pereira Marques",
+    "phone": "5524984835238",
+    "email": "clarissa.pereira@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Lopes Martins",
+    "phone": "5512935479436",
+    "email": "rafael.lopes@clinicamedica.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Camila Ferreira Alves",
+    "phone": "5565933155145",
+    "email": "camila.ferreira@institutocanabis.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Gabriela Almeida Nunes",
+    "phone": "5581966855523",
+    "email": "gabriela.almeida@gmail.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Beatriz Gonçalves Santana",
+    "phone": "5561950629288",
+    "email": "beatriz.gonçalves@consultoriomed.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Gomes Santana",
+    "phone": "5547979846874",
+    "email": "renata.gomes@consultoriomed.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Martins Andrade",
+    "phone": "5544999906894",
+    "email": "guilherme.martins@saudeintegrativa.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Ricardo Rodrigues Ferreira",
+    "phone": "5521983125171",
+    "email": "ricardo.rodrigues@saudeintegrativa.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Murilo Almeida Barbosa",
+    "phone": "5565959392536",
+    "email": "murilo.almeida@clinicamedica.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Larissa Santos Machado",
+    "phone": "5547975816355",
+    "email": "larissa.santos@drsaude.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Rocha Ramos",
+    "phone": "5519986165420",
+    "email": "carlos.rocha@consultoriomed.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Lucas Nunes Soares",
+    "phone": "5513980741857",
+    "email": "lucas.nunes@institutocanabis.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Bruna Gonçalves Rodrigues",
+    "phone": "5531992149797",
+    "email": "bruna.gonçalves@outlook.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leandro Barbosa Alves",
+    "phone": "5532929547456",
+    "email": "leandro.barbosa@consultoriomed.com.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Natalia Costa Pereira",
+    "phone": "5512942053288",
+    "email": "natalia.costa@institutocanabis.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Alexandre Freitas Pereira",
+    "phone": "5548920667872",
+    "email": "alexandre.freitas@consultoriomed.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Renato Carvalho Freitas",
+    "phone": "5567949988015",
+    "email": "renato.carvalho@drsaude.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Thiago Moreira Barbosa",
+    "phone": "5531931562925",
+    "email": "thiago.moreira@gmail.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fernando Santana Oliveira",
+    "phone": "5571965696686",
+    "email": "fernando.santana@outlook.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fabio Ramos Ferreira",
+    "phone": "5521924279752",
+    "email": "fabio.ramos@outlook.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Lima Machado",
+    "phone": "5547937160324",
+    "email": "carlos.lima@drsaude.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Ramos Ribeiro",
+    "phone": "5554985175293",
+    "email": "roberta.ramos@drsaude.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Juliana Lima Costa",
+    "phone": "5565996671166",
+    "email": "juliana.lima@saudeintegrativa.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Renato Gonçalves Rocha",
+    "phone": "5524967489228",
+    "email": "renato.gonçalves@gmail.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Petrópolis",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Renato Cardoso Gomes",
+    "phone": "5548987060851",
+    "email": "renato.cardoso@outlook.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luciana Cardoso Cardoso",
+    "phone": "5567943329373",
+    "email": "luciana.cardoso@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leonardo Barbosa Pereira",
+    "phone": "5541963329694",
+    "email": "leonardo.barbosa@saudeintegrativa.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Juliana Costa Ribeiro",
+    "phone": "5516994509829",
+    "email": "juliana.costa@saudeintegrativa.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Eduardo Mendes Martins",
+    "phone": "5582933032185",
+    "email": "eduardo.mendes@gmail.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vitor Gonçalves Carvalho",
+    "phone": "5561950856493",
+    "email": "vitor.gonçalves@drsaude.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Thiago Fernandes Martins",
+    "phone": "5582914737647",
+    "email": "thiago.fernandes@gmail.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Amanda Rocha Dias",
+    "phone": "5516963935327",
+    "email": "amanda.rocha@gmail.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luciana Dias Vieira",
+    "phone": "5571965222676",
+    "email": "luciana.dias@outlook.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Salvador",
+    "state": "BA",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Henrique Soares Cardoso",
+    "phone": "5513945367663",
+    "email": "henrique.soares@drsaude.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leandro Freitas Rodrigues",
+    "phone": "5554936929434",
+    "email": "leandro.freitas@drsaude.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Marques Oliveira",
+    "phone": "5547955627634",
+    "email": "roberta.marques@clinicamedica.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Isabela Silva Rodrigues",
+    "phone": "5531920025707",
+    "email": "isabela.silva@outlook.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Natalia Rodrigues Vieira",
+    "phone": "5519922088719",
+    "email": "natalia.rodrigues@outlook.com",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Helena Marques Cardoso",
+    "phone": "5565946192520",
+    "email": "helena.marques@saudeintegrativa.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Gabriela Ferreira Mendes",
+    "phone": "5583961946897",
+    "email": "gabriela.ferreira@consultoriomed.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Isabela Pereira Freitas",
+    "phone": "5541966835178",
+    "email": "isabela.pereira@outlook.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Mariana Gonçalves Pereira",
+    "phone": "5521912869482",
+    "email": "mariana.gonçalves@institutocanabis.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Larissa Martins Gonçalves",
+    "phone": "5581946787611",
+    "email": "larissa.martins@clinicamedica.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Thiago Dias Pereira",
+    "phone": "5532994871910",
+    "email": "thiago.dias@outlook.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Tiago Cardoso Rodrigues",
+    "phone": "5583926037102",
+    "email": "tiago.cardoso@saudeintegrativa.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Patricia Ribeiro Santana",
+    "phone": "5544949955617",
+    "email": "patricia.ribeiro@saudeintegrativa.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Ana Paula Dias Nascimento",
+    "phone": "5581996025262",
+    "email": "anapaula.dias@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Rodrigues Nunes",
+    "phone": "5565954374401",
+    "email": "caio.rodrigues@drsaude.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Mariana Gomes Barbosa",
+    "phone": "5516989862057",
+    "email": "mariana.gomes@saudeintegrativa.med.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Eduardo Ferreira Marques",
+    "phone": "5585986746594",
+    "email": "eduardo.ferreira@saudeintegrativa.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Henrique Moreira Santos",
+    "phone": "5532965994386",
+    "email": "henrique.moreira@outlook.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leonardo Alves Costa",
+    "phone": "5513915933117",
+    "email": "leonardo.alves@saudeintegrativa.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Santos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Flavia Marques Pereira",
+    "phone": "5512987385035",
+    "email": "flavia.marques@consultoriomed.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leandro Nunes Ramos",
+    "phone": "5554954507410",
+    "email": "leandro.nunes@institutocanabis.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Ribeiro Silva",
+    "phone": "5581923953812",
+    "email": "roberta.ribeiro@institutocanabis.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Teixeira Marques",
+    "phone": "5551926301064",
+    "email": "carlos.teixeira@gmail.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Matheus Ferreira Rodrigues",
+    "phone": "5565926032811",
+    "email": "matheus.ferreira@gmail.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Marques Moreira",
+    "phone": "5512932766851",
+    "email": "roberta.marques@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Ramos Rocha",
+    "phone": "5519912694930",
+    "email": "caio.ramos@drsaude.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Campinas",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Henrique Barbosa Rodrigues",
+    "phone": "5547967006549",
+    "email": "henrique.barbosa@outlook.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Blumenau",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leonardo Andrade Almeida",
+    "phone": "5543997368771",
+    "email": "leonardo.andrade@outlook.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Clarissa Almeida Ribeiro",
+    "phone": "5548913296154",
+    "email": "clarissa.almeida@gmail.com",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Gonçalves Almeida",
+    "phone": "5547982354324",
+    "email": "renata.gonçalves@saudeintegrativa.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Daniela Santos Moreira",
+    "phone": "5541914931559",
+    "email": "daniela.santos@clinicamedica.com.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Helena Ribeiro Barbosa",
+    "phone": "5512977628666",
+    "email": "helena.ribeiro@gmail.com",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Sergio Gomes Costa",
+    "phone": "5561931653376",
+    "email": "sergio.gomes@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Diego Freitas Ribeiro",
+    "phone": "5511956143098",
+    "email": "diego.freitas@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Felipe Fernandes Soares",
+    "phone": "5554992034982",
+    "email": "felipe.fernandes@institutocanabis.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Clarissa Lima Silva",
+    "phone": "5532997892797",
+    "email": "clarissa.lima@gmail.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Priscila Fernandes Rocha",
+    "phone": "5565984586247",
+    "email": "priscila.fernandes@institutocanabis.med.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Cuiabá",
+    "state": "MT",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Renato Alves Silva",
+    "phone": "5541955486160",
+    "email": "renato.alves@consultoriomed.com.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Bruno Soares Dias",
+    "phone": "5541961658005",
+    "email": "bruno.soares@institutocanabis.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Curitiba",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Sabrina Moreira Nascimento",
+    "phone": "5561957983751",
+    "email": "sabrina.moreira@institutocanabis.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Carolina Oliveira Rodrigues",
+    "phone": "5567985255410",
+    "email": "carolina.oliveira@institutocanabis.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Larissa Fernandes Costa",
+    "phone": "5521950993651",
+    "email": "larissa.fernandes@gmail.com",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Marcelo Machado Machado",
+    "phone": "5581999904373",
+    "email": "marcelo.machado@saudeintegrativa.med.br",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Patricia Silva Carvalho",
+    "phone": "5554989235914",
+    "email": "patricia.silva@drsaude.com.br",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Denise Andrade Nascimento",
+    "phone": "5544920407388",
+    "email": "denise.andrade@institutocanabis.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Leticia Oliveira Vieira",
+    "phone": "5531984532268",
+    "email": "leticia.oliveira@saudeintegrativa.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Ricardo Gomes Carvalho",
+    "phone": "5567912209995",
+    "email": "ricardo.gomes@outlook.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Campo Grande",
+    "state": "MS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Thais Freitas Silva",
+    "phone": "5511982358014",
+    "email": "thais.freitas@drsaude.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "São Paulo",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Fernanda Lopes Gomes",
+    "phone": "5512959398337",
+    "email": "fernanda.lopes@institutocanabis.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Mariana Andrade Santana",
+    "phone": "5562958933865",
+    "email": "mariana.andrade@outlook.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Goiânia",
+    "state": "GO",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Gustavo Silva Ferreira",
+    "phone": "5527985055905",
+    "email": "gustavo.silva@institutocanabis.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Marques Lima",
+    "phone": "5531954274415",
+    "email": "guilherme.marques@saudeintegrativa.med.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Moreira Fernandes",
+    "phone": "5581984206837",
+    "email": "renata.moreira@drsaude.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Recife",
+    "state": "PE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Moreira Rocha",
+    "phone": "5521935268500",
+    "email": "rafael.moreira@institutocanabis.med.br",
+    "specialty": "Ortopedia & Traumatologia / Tratamento da Dor",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Lucas Carvalho Gonçalves",
+    "phone": "5521966027751",
+    "email": "lucas.carvalho@outlook.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Niterói",
+    "state": "RJ",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Carolina Ribeiro Lopes",
+    "phone": "5543993681742",
+    "email": "carolina.ribeiro@gmail.com",
+    "specialty": "Clínica Médica / Terapia Endocanabinoide",
+    "city": "Londrina",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Fernando Costa Soares",
+    "phone": "5516987113919",
+    "email": "fernando.costa@saudeintegrativa.med.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leonardo Souza Moreira",
+    "phone": "5534964957014",
+    "email": "leonardo.souza@outlook.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Sergio Fernandes Vieira",
+    "phone": "5534954726940",
+    "email": "sergio.fernandes@institutocanabis.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Luiza Nunes Cardoso",
+    "phone": "5527944217984",
+    "email": "luiza.nunes@clinicamedica.com.br",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Machado Vieira",
+    "phone": "5512980091786",
+    "email": "caio.machado@saudeintegrativa.med.br",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Alexandre Gonçalves Martins",
+    "phone": "5554995274742",
+    "email": "alexandre.gonçalves@drsaude.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Vitor Mendes Teixeira",
+    "phone": "5531994202627",
+    "email": "vitor.mendes@gmail.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Roberta Andrade Nascimento",
+    "phone": "5516923287224",
+    "email": "roberta.andrade@outlook.com",
+    "specialty": "Medicina Integrativa & Funcional",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Ricardo Lopes Gonçalves",
+    "phone": "5582963348862",
+    "email": "ricardo.lopes@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Maceió",
+    "state": "AL",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Thiago Machado Machado",
+    "phone": "5548973193146",
+    "email": "thiago.machado@outlook.com",
+    "specialty": "Medicina de Família e Comunidade",
+    "city": "Florianópolis",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Caio Lopes Dias",
+    "phone": "5547931088833",
+    "email": "caio.lopes@institutocanabis.med.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Isabela Marques Carvalho",
+    "phone": "5544931335232",
+    "email": "isabela.marques@clinicamedica.com.br",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Maringá",
+    "state": "PR",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Leandro Freitas Gonçalves",
+    "phone": "5532932433681",
+    "email": "leandro.freitas@clinicamedica.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Juiz de Fora",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Helena Nunes Nunes",
+    "phone": "5512934416969",
+    "email": "helena.nunes@gmail.com",
+    "specialty": "Endocrinologia / Modulação Hormonal e Canabinoide",
+    "city": "São José dos Campos",
+    "state": "SP",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Fernanda Nunes Fernandes",
+    "phone": "5584946396709",
+    "email": "fernanda.nunes@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Natal",
+    "state": "RN",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Juliana Martins Rocha",
+    "phone": "5554971801373",
+    "email": "juliana.martins@saudeintegrativa.med.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Caxias do Sul",
+    "state": "RS",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Eduardo Cardoso Ribeiro",
+    "phone": "5527948879291",
+    "email": "eduardo.cardoso@institutocanabis.med.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Vitória",
+    "state": "ES",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Guilherme Almeida Fernandes",
+    "phone": "5534925561601",
+    "email": "guilherme.almeida@clinicamedica.com.br",
+    "specialty": "Medicina Canabinoide / Dor Crônica",
+    "city": "Uberlândia",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Matheus Marques Lima",
+    "phone": "5547937191425",
+    "email": "matheus.marques@gmail.com",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Mariana Pereira Cardoso",
+    "phone": "5547980875068",
+    "email": "mariana.pereira@drsaude.com.br",
+    "specialty": "Neurologia / Epilepsia e Transtornos Neurodegenerativos",
+    "city": "Joinville",
+    "state": "SC",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Isabela Gonçalves Vieira",
+    "phone": "5583957759072",
+    "email": "isabela.gonçalves@drsaude.com.br",
+    "specialty": "Psiquiatria Integrativa / Ansiedade e TDAH",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Bruna Machado Costa",
+    "phone": "5583974616910",
+    "email": "bruna.machado@clinicamedica.com.br",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "João Pessoa",
+    "state": "PB",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Juliana Rocha Barbosa",
+    "phone": "5531962606309",
+    "email": "juliana.rocha@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dra. Renata Martins Barbosa",
+    "phone": "5585938998255",
+    "email": "renata.martins@outlook.com",
+    "specialty": "Fitoterapia Médica / Cannabis Terapêutica",
+    "city": "Fortaleza",
+    "state": "CE",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Pereira Moreira",
+    "phone": "5561967514239",
+    "email": "rodrigo.pereira@gmail.com",
+    "specialty": "Geriatria & Cuidados Paliativos",
+    "city": "Brasília",
+    "state": "DF",
+    "source": "Diretório Nacional de Especialistas & Prescritores"
+  }
+]

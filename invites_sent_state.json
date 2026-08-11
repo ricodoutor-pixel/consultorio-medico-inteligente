@@ -309,9 +309,34 @@
       "success": false,
       "last_attempt_at": "2026-08-11T06:27:26.078Z",
       "error": "delivery_failed"
+    },
+    "558198870849": {
+      "success": false,
+      "last_attempt_at": "2026-08-11T06:28:31.579Z",
+      "error": "delivery_failed"
+    },
+    "558296742383": {
+      "success": false,
+      "last_attempt_at": "2026-08-11T06:29:42.046Z",
+      "error": "delivery_failed"
+    },
+    "558387006122": {
+      "success": false,
+      "last_attempt_at": "2026-08-11T06:30:47.836Z",
+      "error": "delivery_failed"
+    },
+    "558388285178": {
+      "success": false,
+      "last_attempt_at": "2026-08-11T06:31:58.321Z",
+      "error": "delivery_failed"
+    },
+    "558399129973": {
+      "success": true,
+      "sent_at": "2026-08-11T06:32:59.551Z",
+      "via": "waha_direct"
     }
   },
-  "total_sent": 54,
+  "total_sent": 55,
   "test_sent": true,
   "started_at": "2026-08-11T05:35:03.373Z"
 }

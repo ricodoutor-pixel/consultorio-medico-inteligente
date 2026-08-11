@@ -266,22 +266,52 @@
       "via": "waha_direct"
     },
     "557799104363": {
-      "success": false,
-      "last_attempt_at": "2026-08-11T06:04:56.317Z",
-      "error": "delivery_failed"
+      "success": true,
+      "sent_at": "2026-08-11T06:18:06.856Z",
+      "via": "waha_direct"
     },
     "557799811447": {
       "success": false,
-      "last_attempt_at": "2026-08-11T06:05:47.735Z",
+      "last_attempt_at": "2026-08-11T06:19:17.391Z",
       "error": "delivery_failed"
     },
     "557991704000": {
       "success": false,
-      "last_attempt_at": "2026-08-11T06:06:39.472Z",
+      "last_attempt_at": "2026-08-11T06:20:27.915Z",
+      "error": "delivery_failed"
+    },
+    "557999571459": {
+      "success": false,
+      "last_attempt_at": "2026-08-11T06:21:38.390Z",
+      "error": "delivery_failed"
+    },
+    "558181142525": {
+      "success": false,
+      "last_attempt_at": "2026-08-11T06:22:48.865Z",
+      "error": "delivery_failed"
+    },
+    "558182102430": {
+      "success": false,
+      "last_attempt_at": "2026-08-11T06:23:59.501Z",
+      "error": "delivery_failed"
+    },
+    "558192718268": {
+      "success": false,
+      "last_attempt_at": "2026-08-11T06:25:09.978Z",
+      "error": "delivery_failed"
+    },
+    "558194678255": {
+      "success": false,
+      "last_attempt_at": "2026-08-11T06:26:20.462Z",
+      "error": "delivery_failed"
+    },
+    "558197268083": {
+      "success": false,
+      "last_attempt_at": "2026-08-11T06:27:26.078Z",
       "error": "delivery_failed"
     }
   },
-  "total_sent": 53,
+  "total_sent": 54,
   "test_sent": true,
   "started_at": "2026-08-11T05:35:03.373Z"
 }

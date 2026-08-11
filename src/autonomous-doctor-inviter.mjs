@@ -60,8 +60,8 @@ https://plantayraiz.com.br
 Seja muito bem-vindo(a) ao futuro da medicina canabinoide.
 
 Atenciosamente, 
-Diretoria Médica & Conselho Executivo
-Planta y Raíz — A Plataforma nº 1 de Telemedicina Canabinoide melhor e mais completa do planeta cadastro gratuito!`;
+Dr. Edilson Bezerra & Diretoria Executiva
+Planta y Raíz — A Plataforma nº 1 de Telemedicina Canabinoide`;
 
 // Carrega a lista original de contatos
 const rawBatches = [
@@ -103,7 +103,7 @@ function loadState() {
   } catch (e) {
     console.error('[State] Erro ao carregar state:', e.message);
   }
-  return { sent: {}, total_sent: 0, test_sent: false, started_at: new Date().toISOString() };
+  return { sent: {}, total_sent: 0, started_at: new Date().toISOString() };
 }
 
 function saveState(state) {
@@ -114,42 +114,37 @@ function saveState(state) {
   }
 }
 
+async function ensureWebhookDisabled() {
+  try {
+    await axios.put(
+      `${WAHA_BASE}/api/sessions/${WAHA_SESSION}`,
+      { config: { webhooks: [] } },
+      { headers: { 'Content-Type': 'application/json', 'X-Api-Key': WAHA_KEY } }
+    );
+    console.log('✅ [Webhook] Webhook desativado para respostas 100% manuais.');
+  } catch (e) {
+    console.warn('[Webhook] Aviso ao desativar webhook:', e.message);
+  }
+}
+
 async function sendWhatsAppMessage(phone, text) {
   const cleanPhone = phone.replace(/\D/g, '');
   const chatId = `${cleanPhone}@c.us`;
 
-  // 1ª Tentativa: Envio direto via WAHA API (mais rápido e nativo)
   try {
     const res = await axios.post(
       `${WAHA_BASE}/api/sendText`,
       { session: WAHA_SESSION, chatId, text },
       {
         headers: { 'Content-Type': 'application/json', 'X-Api-Key': WAHA_KEY },
-        timeout: 40000
+        timeout: 45000
       }
     );
     if (res.status === 200 || res.status === 201) {
       return { ok: true, via: 'waha_direct', status: res.status };
     }
   } catch (err) {
-    console.warn(`[WAHA Direct] Falhou para ${cleanPhone} (${err.message}). Tentando fallback Edge Function...`);
-  }
-
-  // 2ª Tentativa: Fallback via Supabase Edge Function brisa-waha-connect
-  try {
-    const res = await axios.get(SB_FUNCTION_URL, {
-      params: {
-        action: 'test',
-        phone: cleanPhone,
-        msg: text
-      },
-      timeout: 45000
-    });
-    if (res.data && (res.data.ok || res.data.status === 201 || res.data.status === 200)) {
-      return { ok: true, via: 'supabase_edge', status: res.status };
-    }
-  } catch (err) {
-    console.error(`[Fallback Edge] Erro para ${cleanPhone}:`, err.message);
+    console.error(`[WAHA Direct] Erro para +${cleanPhone}:`, err.response?.data || err.message);
   }
 
   return { ok: false };
@@ -157,41 +152,36 @@ async function sendWhatsAppMessage(phone, text) {
 
 async function runAutonomousInviter() {
   console.log('================================================================');
-  console.log('🌿 [Planta y Raiz] INICIANDO MOTOR AUTÔNOMO DE CONVITES MÉDICOS');
+  console.log('🌿 [Planta y Raiz] MOTOR AUTÔNOMO — DR. EDILSON BEZERRA');
+  console.log('⏱️ CADÊNCIA DE SEGURANÇA: 1 MENSAGEM A CADA 60 SEGUNDOS (1 MIN)');
   console.log('================================================================');
   
+  await ensureWebhookDisabled();
+
   const state = loadState();
 
-  // 1. Mensagem de Teste Prioritária para o número do usuário
-  const ADMIN_TEST_PHONE = '5511987131241';
-  console.log(`[TESTE] Enviando mensagem de teste prioritária para ${ADMIN_TEST_PHONE}...`);
-  const testMsg = `🌿 *Planta y Raíz* — Sistema de Recrutamento Ativo & Conectado 100%!\n\nOlá Dr. Edilson / Gestão! O Motor Autônomo de Growth iniciou agora os disparos com intervalo de segurança de 30s.\n\nEnfermeira Brisa pronta para atender todos os médicos que responderem! 🚀`;
-  
-  const testResult = await sendWhatsAppMessage(ADMIN_TEST_PHONE, testMsg);
-  if (testResult.ok) {
-    console.log(`✅ [TESTE] Mensagem de teste enviada com sucesso para ${ADMIN_TEST_PHONE}! (Via: ${testResult.via})`);
-    state.test_sent = true;
-    saveState(state);
-  } else {
-    console.warn(`⚠️ [TESTE] Falha ao enviar mensagem de teste. Continuando com a lista principal...`);
-  }
+  const alreadySentCount = Object.values(state.sent).filter(s => s.success).length;
+  console.log(`[Queue] Total de médicos na base: ${uniqueContacts.length}`);
+  console.log(`[Queue] Já entregues anteriormente: ${alreadySentCount}`);
+  console.log(`[Queue] Restantes para envio: ${uniqueContacts.length - alreadySentCount}`);
 
-  console.log(`[Queue] Total de médicos na lista: ${uniqueContacts.length}`);
-  console.log(`[Queue] Já enviados anteriormente: ${Object.keys(state.sent).length}`);
-  console.log(`[Queue] Intervalo configurado: 30 segundos exatos`);
-
-  // 2. Itera sobre toda a lista de médicos
+  // Itera sobre toda a lista de médicos
   for (let i = 0; i < uniqueContacts.length; i++) {
     const phone = uniqueContacts[i];
 
-    // Se já foi enviado com sucesso, pula
+    // Ignora se for o próprio número do Dr. Edilson
+    if (phone.includes('5511987131241')) {
+      continue;
+    }
+
+    // Se já foi enviado com sucesso anteriormente, pula estritamente
     if (state.sent[phone] && state.sent[phone].success) {
       continue;
     }
 
-    const currentNum = Object.keys(state.sent).length + 1;
+    const currentSuccessCount = Object.values(state.sent).filter(s => s.success).length + 1;
     console.log(`\n------------------------------------------------------------`);
-    console.log(`[Disparo ${currentNum}/${uniqueContacts.length}] Enviando convite para: +${phone}`);
+    console.log(`[Disparo ${currentSuccessCount}/${uniqueContacts.length}] Enviando convite para: +${phone}`);
     console.log(`Timestamp: ${new Date().toLocaleTimeString('pt-BR')}`);
 
     const result = await sendWhatsAppMessage(phone, INVITE_MESSAGE);
@@ -205,7 +195,7 @@ async function runAutonomousInviter() {
       };
       state.total_sent = (state.total_sent || 0) + 1;
     } else {
-      console.error(`❌ [Falha] Não foi possível entregar para +${phone}. Registrando tentativa.`);
+      console.error(`❌ [Falha] Não foi possível entregar para +${phone}. Registrando status.`);
       state.sent[phone] = {
         success: false,
         last_attempt_at: new Date().toISOString(),
@@ -215,9 +205,9 @@ async function runAutonomousInviter() {
 
     saveState(state);
 
-    // Aguarda 30 segundos antes do próximo para não forçar o WhatsApp
-    console.log(`⏳ [Segurança] Aguardando 30 segundos antes do próximo médico...`);
-    await sleep(30000);
+    // Aguarda exatamente 60 segundos (1 minuto) antes do próximo para máxima segurança
+    console.log(`⏳ [Segurança 60s] Aguardando 1 minuto antes do próximo médico...`);
+    await sleep(60000);
   }
 
   console.log('================================================================');

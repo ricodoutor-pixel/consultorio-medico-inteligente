@@ -113,7 +113,7 @@ const FALLBACK_REAL_DOCTORS = [
   {
     id: "real-joao-pedro",
     user_id: "u-joao-pedro",
-    full_name: "Dr. João Pedro Detoni",
+    full_name: "Dr. João Pedro Girardello",
     crm: "42912",
     crm_state: "RS",
     specialty: "Médico Prescritor / Clínica Geral",
@@ -121,8 +121,8 @@ const FALLBACK_REAL_DOCTORS = [
     is_online: true,
     approval_status: "approved",
     profile: {
-      full_name: "Dr. João Pedro Detoni",
-      email: "joao.pedro@plantayraiz.com.br",
+      full_name: "Dr. João Pedro Girardello",
+      email: "joao.girardello@plantayraiz.com.br",
       phone: "555493646065",
       cpf: "012.345.678-99",
       date_of_birth: "1990-03-25",

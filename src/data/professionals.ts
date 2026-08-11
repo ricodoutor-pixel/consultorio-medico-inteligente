@@ -140,7 +140,7 @@ export const professionals: Professional[] = [
   },
   {
     id: "med-joao-pedro",
-    name: "Dr. João Pedro",
+    name: "Dr. João Pedro Girardello",
     category: "Médicos Prescritores",
     bio: "Médico Prescritor de Medicina Canabinoide e Clínica Geral. Especialista em saúde integral, manejo de dor crônica, ansiedade e qualidade de vida com Fitocanabinoides e acompanhamento personalizado.",
     flags: ["🇧🇷"],
@@ -226,7 +226,7 @@ export const professionals: Professional[] = [
   },
   {
     id: "med-3",
-    name: "Dr. João Pedro",
+    name: "Dr. João Pedro Girardello",
     category: "Médicos Prescritores",
     bio: "Médico Prescritor de Medicina Canabinoide e Clínica Geral. Atendimento presencial e telemedicina para dor crônica, ansiedade, insônia e saúde integral com Fitocanabinoides e relatório completo.",
     experience: "10 anos",

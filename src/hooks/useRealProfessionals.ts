@@ -11,7 +11,7 @@ import { professionals as testProfessionals, Professional, categories } from "@/
 
 // IDs of the 6 test doctors to keep (diverse specialties)
 // med-5 (Dra. Valentina Reyes) removido — substituído pela Dra. Olivia Zimeri (real, BO)
-// IDs of test doctors to keep — med-3 (Dr. João Pedro) is prioritized first
+// IDs of test doctors to keep — med-3 (Dr. João Pedro Girardello) is prioritized first
 const KEPT_TEST_IDS = ["med-3", "med-1", "med-2", "psi-1"];
 const MAX_TEST_SLOTS = 10;
 

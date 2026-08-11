@@ -107,6 +107,14 @@ export const categories = [
   "Medicina Integrativa",
 ];
 
+export const STANDARD_DOCTOR_SERVICES = [
+  { name: "Orientação Técnica (Mentoria Especializada)", price: "R$ 30,00", desc: "Chat até 30 min para mentoria e tira-dúvidas (sem receita médica)" },
+  { name: "Consulta por Chat", price: "R$ 100,00", desc: "Avaliação clínica completa por chat com receita médica assinada digitalmente" },
+  { name: "Consulta por Vídeo", price: "R$ 150,00", desc: "Teleconsulta humanizada por vídeo com receita assinada digitalmente" },
+  { name: "Retorno de Renovação", price: "R$ 90,00", desc: "Exclusivo via chat para pacientes antigos renovarem receita a cada 3 meses" },
+  { name: "Consulta Premium (Vídeo + Chat Integrado)", price: "R$ 180,00", desc: "Experiência completa com vídeo HD, chat e envio de exames em tempo real" },
+];
+
 export const professionals: Professional[] = [
   // ═══════ Médicos Prescritores (6) ═══════
   {
@@ -162,11 +170,7 @@ export const professionals: Professional[] = [
     crm: "CRM-RS (Ativo)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
-    services: [
-      { name: "Consulta Prescritiva & Avaliação de Telemedicina", price: "R$ 120,00", desc: "Atendimento completo com prescrição e plano terapêutico personalizado" },
-      { name: "Orientação Técnica (Chat + Vídeo)", price: "R$ 80,00", desc: "Avaliação de dosagem e plano terapêutico canabinoide" },
-      { name: "Retorno", price: "R$ 50,00", desc: "Acompanhamento e ajuste de titulação" },
-    ],
+    services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "11:00", "13:30", "15:00", "16:30", "18:00"],
     reviews: [
       { name: "Fernanda R.", rating: 5, text: "Dr. João Pedro é extremamente humano e esclarecedor. Excelente atendimento!" },
@@ -248,11 +252,7 @@ export const professionals: Professional[] = [
     crm: "10963 - RS",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
-    services: [
-      { name: "Orientação Técnica Completa (Chat + Vídeo)", price: "R$ 120,00", desc: "Avaliação em vídeo com relatório e laudo para acompanhamento" },
-      { name: "Orientação Técnica (Chat 30 min)", price: "R$ 80,00", desc: "Esclarecimento de dúvidas e plano terapêutico canabinoide" },
-      { name: "Retorno", price: "R$ 50,00", desc: "Acompanhamento de dosagem e titulação" },
-    ],
+    services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "11:00", "14:00", "15:30", "17:00"],
     reviews: [
       { name: "Lúcia F.", rating: 5, text: "Médico muito humano, atencioso e competente." },

@@ -142,6 +142,163 @@ const ComoFunciona = () => {
             ))}
           </motion.div>
 
+          {/* ═══════════════════════════════════════════════════════════════
+              🌿 JANELA OFICIAL: ORIENTAÇÃO DE VALORES PARA MÉDICOS & PACIENTES
+              ═══════════════════════════════════════════════════════════════ */}
+          <motion.div
+            className="max-w-4xl mx-auto mt-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+          >
+            <Card className="border-2 border-primary/40 bg-gradient-to-br from-card via-card/95 to-primary/5 shadow-2xl rounded-3xl overflow-hidden relative">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-emerald-400 to-secondary" />
+              
+              <CardContent className="p-6 md:p-10 space-y-8">
+                <div className="text-center space-y-3">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-black tracking-wide uppercase">
+                    <Stethoscope size={14} /> Tabela Oficial da Plataforma
+                  </div>
+                  <h2 className="text-2xl md:text-4xl font-display font-black text-foreground">
+                    Orientação de <span className="text-gradient-green">Valores e Serviços</span>
+                  </h2>
+                  <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                    Conheça a esteira padronizada de 5 produtos clínicos da Planta y Raíz. Transparência total para pacientes e rentabilidade de 93% para o médico.
+                  </p>
+                </div>
+
+                {/* Grid dos 5 Produtos */}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* 1. Orientação Técnica */}
+                  <div className="p-4 rounded-2xl border border-primary/30 bg-primary/5 space-y-2 relative flex flex-col justify-between hover:border-primary transition-all">
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-xs font-black text-primary uppercase tracking-wider">1. Mentoria</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground">Dr. Edilson ON</span>
+                      </div>
+                      <h3 className="font-bold text-foreground text-sm">Orientação Técnica</h3>
+                      <p className="text-xs text-muted-foreground mt-1">Chat de até 30 min para tirar dúvidas e mentoria clínica. Não emite receita.</p>
+                    </div>
+                    <div className="pt-3 border-t border-border/50 flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground font-medium">Fixo Plataforma</span>
+                      <span className="text-lg font-black text-primary">R$ 30,00</span>
+                    </div>
+                  </div>
+
+                  {/* 2. Consulta por Chat */}
+                  <div className="p-4 rounded-2xl border border-border bg-card/60 space-y-2 flex flex-col justify-between hover:border-primary/50 transition-all">
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-xs font-black text-muted-foreground uppercase tracking-wider">2. Chat Clínico</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-secondary/10 border border-secondary/30 text-secondary">Com Receita</span>
+                      </div>
+                      <h3 className="font-bold text-foreground text-sm">Consulta por Chat</h3>
+                      <p className="text-xs text-muted-foreground mt-1">Avaliação clínica completa em tempo real com emissão de receita digital assinada.</p>
+                    </div>
+                    <div className="pt-3 border-t border-border/50 flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground font-medium">Tabelado</span>
+                      <span className="text-lg font-black text-foreground">R$ 100,00</span>
+                    </div>
+                  </div>
+
+                  {/* 3. Consulta por Vídeo */}
+                  <div className="p-4 rounded-2xl border border-border bg-card/60 space-y-2 flex flex-col justify-between hover:border-primary/50 transition-all">
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-xs font-black text-muted-foreground uppercase tracking-wider">3. Vídeo HD</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-secondary/10 border border-secondary/30 text-secondary">Com Receita</span>
+                      </div>
+                      <h3 className="font-bold text-foreground text-sm">Consulta por Vídeo</h3>
+                      <p className="text-xs text-muted-foreground mt-1">Teleconsulta ao vivo humanizada por vídeo com prescrição digital válida nacionalmente.</p>
+                    </div>
+                    <div className="pt-3 border-t border-border/50 flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground font-medium">Tabelado</span>
+                      <span className="text-lg font-black text-foreground">R$ 150,00</span>
+                    </div>
+                  </div>
+
+                  {/* 4. Retorno de Renovação */}
+                  <div className="p-4 rounded-2xl border border-border bg-card/60 space-y-2 flex flex-col justify-between hover:border-primary/50 transition-all">
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-xs font-black text-muted-foreground uppercase tracking-wider">4. Recorrência</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">Pacientes Antigos</span>
+                      </div>
+                      <h3 className="font-bold text-foreground text-sm">Retorno de Renovação</h3>
+                      <p className="text-xs text-muted-foreground mt-1">Exclusivo via chat para pacientes que já consultaram renovarem a receita a cada 3 meses.</p>
+                    </div>
+                    <div className="pt-3 border-t border-border/50 flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground font-medium">Tabelado</span>
+                      <span className="text-lg font-black text-foreground">R$ 90,00</span>
+                    </div>
+                  </div>
+
+                  {/* 5. Consulta Premium */}
+                  <div className="sm:col-span-2 lg:col-span-2 p-4 rounded-2xl border-2 border-emerald-500/50 bg-emerald-500/10 space-y-2 flex flex-col justify-between relative">
+                    <span className="absolute -top-2.5 right-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow">
+                      VALOR LIVRE PARA O MÉDICO
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-black text-emerald-400 uppercase tracking-wider">5. Experiência Completa</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">Vídeo + Chat + Anexos</span>
+                      </div>
+                      <h3 className="font-bold text-foreground text-base">Consulta Premium (Vídeo + Chat Integrado)</h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Videoconferência em alta definição com chat lateral simultâneo para envio de exames, laudos e documentos em tempo real + receita assinada digitalmente.
+                      </p>
+                    </div>
+                    <div className="pt-3 border-t border-emerald-500/30 flex items-center justify-between mt-2">
+                      <span className="text-xs text-emerald-400 font-medium">Sugerido R$ 180,00 (Médico define)</span>
+                      <span className="text-xl font-black text-emerald-400">R$ 180,00*</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Box de Orientação para Médicos e Solicitação com Admin Verdinho */}
+                <div className="rounded-2xl border border-primary/30 bg-primary/10 p-5 md:p-6 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-lg">
+                      <Shield size={20} />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-foreground text-base">
+                        👨‍⚕️ Informação Importante para Médicos Sócios
+                      </h4>
+                      <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+                        Os valores dos serviços <strong>1 a 4 são previamente tabelados</strong> para garantir alta conversão de pacientes e velocidade de agendamento. Você retém <strong>93% líquido</strong> de cada atendimento com repasse via PIX imediato.
+                      </p>
+                      <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pt-1">
+                        Caso deseje solicitar uma <strong>alteração de valor</strong>, pacote personalizado ou condição diferenciada para o seu consultório, você pode solicitar a qualquer momento via chat direto com a Diretoria através do <strong>Admin Verdinho</strong> na página de Telemedicina.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
+                    <Button
+                      variant="outline"
+                      className="w-full sm:w-auto text-xs font-bold border-primary/40 text-primary hover:bg-primary/10"
+                      asChild
+                    >
+                      <Link to="/cadastro-profissional">
+                        <UserPlus size={14} className="mr-1.5" /> Quero me Cadastrar como Médico
+                      </Link>
+                    </Button>
+                    <Button
+                      className="w-full sm:w-auto text-xs font-black bg-gradient-to-r from-primary to-emerald-600 text-primary-foreground shadow-lg hover:opacity-95"
+                      asChild
+                    >
+                      <Link to="/telemedicina">
+                        <MessageSquare size={14} className="mr-1.5" /> Falar com Admin Verdinho (Telemed)
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
           {/* E-book Download Section */}
           <motion.div
             className="max-w-3xl mx-auto mt-16"

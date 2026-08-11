@@ -23,6 +23,7 @@ const CATALOG: Record<string, { title: string; amount: number; recurring?: boole
   retorno_consulta: { title: "Retorno com o Profissional", amount: 90 },
   consulta_chat: { title: "Consulta por Chat (com receita assinada)", amount: 100 },
   consulta_video: { title: "Consulta por Vídeo (com receita assinada)", amount: 150 },
+  consulta_premium: { title: "Consulta Premium (Vídeo + Chat)", amount: 180 },
   plano_paciente: { title: "Plano Paciente (mensal)", amount: 99, recurring: true },
   plano_medico: { title: "Plano Médico (mensal)", amount: 99, recurring: true },
   plano_lojista: { title: "Plano Lojista (mensal)", amount: 99, recurring: true },
@@ -62,7 +63,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { sku: rawSku, cartToken, appointmentId, returnUrl, refCode } = await req.json();
+    const { sku: rawSku, cartToken, appointmentId, returnUrl, refCode, doctorId } = await req.json();
     const sku = typeof rawSku === "string" ? (LEGACY_SKU_MAP[rawSku] ?? rawSku) : rawSku;
 
     // Programa de indicações (médicos, pacientes e lojistas) — resolvido no servidor.
@@ -112,6 +113,16 @@ Deno.serve(async (req) => {
       if (!item) return json({ error: "SKU inválido" }, 400);
       title = item.title;
       amount = item.amount;
+      // Consulta Premium é o único serviço com valor definido pelo profissional.
+      if (sku === "consulta_premium" && typeof doctorId === "string") {
+        const { data: doc } = await supabase
+          .from("doctors")
+          .select("price_video_chat")
+          .eq("id", doctorId)
+          .maybeSingle();
+        const custom = Number(doc?.price_video_chat || 0);
+        if (custom >= 100 && custom <= 2000) amount = custom;
+      }
       externalReference = `${sku}:${userId}:${Date.now()}`;
       type = item.recurring ? "subscription" : "sku";
     }

@@ -10,6 +10,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, BellRing, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, FileText, ClipboardList, RefreshCw, MessageCircle, ArrowUpRight, BookOpen } from "lucide-react";
 import { PlanUpgradeCard } from "@/components/patient/PlanUpgradeCard";
 import { ProfileAvatarCard } from "@/components/patient/ProfileAvatarCard";
+import { VipUpgradePopup } from "@/components/VipUpgradePopup";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -195,14 +196,17 @@ const DashboardPaciente = () => {
       <section className="pb-8">
         <div className="container mx-auto px-4">
           <motion.div className="flex items-center justify-between flex-wrap gap-4 mb-6" initial="hidden" animate="visible" variants={fadeUp}>
-            <ProfileAvatarCard
-              userId={profile?.id}
-              fullName={userName}
-              phone={profile?.phone}
-              avatarUrl={profile?.avatar_url}
-              completedCount={completedAppts.length}
-              onUpdated={(url) => setProfile((p: any) => ({ ...p, avatar_url: url }))}
-            />
+            <div className="relative">
+              <VipUpgradePopup role="paciente" className="-top-8 left-1/2 -translate-x-1/2" />
+              <ProfileAvatarCard
+                userId={profile?.id}
+                fullName={userName}
+                phone={profile?.phone}
+                avatarUrl={profile?.avatar_url}
+                completedCount={completedAppts.length}
+                onUpdated={(url) => setProfile((p: any) => ({ ...p, avatar_url: url }))}
+              />
+            </div>
             <div className="flex gap-2 flex-wrap items-center">
               <Button size="sm" className="rounded-xl text-xs bg-purple-600 text-white hover:bg-purple-700 font-bold" asChild>
                 <Link to="/afiliados"><Gift size={14} className="mr-1" /> Indique e Ganhe</Link>

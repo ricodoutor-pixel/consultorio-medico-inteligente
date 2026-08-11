@@ -31,6 +31,8 @@ const terpenesData = [
 
 import { supabase } from "@/integrations/supabase/client";
 
+import { VipUpgradePopup } from "@/components/VipUpgradePopup";
+
 export default function LojistaDashboard() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,9 +82,10 @@ export default function LojistaDashboard() {
       
       <div className="flex-1 container mx-auto py-8 px-4 space-y-8 pt-24">
         
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-6 relative">
+          <div className="relative">
+            <VipUpgradePopup role="lojista" className="-top-8 left-0 md:left-24" />
+            <div className="flex items-center gap-2 mb-2 mt-4 md:mt-0">
               <Badge className="bg-primary/20 text-primary border-primary/30">Lojista VIP</Badge>
               <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">Conta Ativa</Badge>
             </div>

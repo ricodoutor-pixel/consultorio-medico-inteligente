@@ -48,8 +48,7 @@ https://plantayraiz.com.br
 
 Seja muito bem-vindo(a) ao futuro da medicina canabinoide.
 Atenciosamente,
-Diretoria Médica & Conselho Executivo
-Planta y Raíz`;
+Enf Brisa Planta y Raiz`;
 
 /**
  * Envia mensagens para os leads captados

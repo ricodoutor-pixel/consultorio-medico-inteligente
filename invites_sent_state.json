@@ -1,0 +1,272 @@
+{
+  "sent": {
+    "554999229053": {
+      "success": true,
+      "sent_at": "2026-08-11T05:35:09.702Z",
+      "via": "waha_direct"
+    },
+    "555182676767": {
+      "success": true,
+      "sent_at": "2026-08-11T05:35:40.234Z",
+      "via": "waha_direct"
+    },
+    "555191080654": {
+      "success": true,
+      "sent_at": "2026-08-11T05:36:10.732Z",
+      "via": "waha_direct"
+    },
+    "555198359155": {
+      "success": true,
+      "sent_at": "2026-08-11T05:36:41.260Z",
+      "via": "waha_direct"
+    },
+    "555198919819": {
+      "success": true,
+      "sent_at": "2026-08-11T05:37:11.751Z",
+      "via": "waha_direct"
+    },
+    "555199360693": {
+      "success": true,
+      "sent_at": "2026-08-11T05:37:42.259Z",
+      "via": "waha_direct"
+    },
+    "555384472897": {
+      "success": true,
+      "sent_at": "2026-08-11T05:38:12.744Z",
+      "via": "waha_direct"
+    },
+    "555484327276": {
+      "success": true,
+      "sent_at": "2026-08-11T05:38:43.277Z",
+      "via": "waha_direct"
+    },
+    "555591667600": {
+      "success": true,
+      "sent_at": "2026-08-11T05:39:13.807Z",
+      "via": "waha_direct"
+    },
+    "555599612555": {
+      "success": true,
+      "sent_at": "2026-08-11T05:39:44.460Z",
+      "via": "waha_direct"
+    },
+    "556181082559": {
+      "success": true,
+      "sent_at": "2026-08-11T05:40:15.241Z",
+      "via": "waha_direct"
+    },
+    "556181145150": {
+      "success": true,
+      "sent_at": "2026-08-11T05:40:45.749Z",
+      "via": "waha_direct"
+    },
+    "556181173173": {
+      "success": true,
+      "sent_at": "2026-08-11T05:41:16.346Z",
+      "via": "waha_direct"
+    },
+    "556182993535": {
+      "success": true,
+      "sent_at": "2026-08-11T05:41:47.131Z",
+      "via": "waha_direct"
+    },
+    "556183840122": {
+      "success": true,
+      "sent_at": "2026-08-11T05:42:17.774Z",
+      "via": "waha_direct"
+    },
+    "556193374582": {
+      "success": true,
+      "sent_at": "2026-08-11T05:42:48.253Z",
+      "via": "waha_direct"
+    },
+    "556199789266": {
+      "success": true,
+      "sent_at": "2026-08-11T05:43:18.766Z",
+      "via": "waha_direct"
+    },
+    "556281183103": {
+      "success": true,
+      "sent_at": "2026-08-11T05:43:49.291Z",
+      "via": "waha_direct"
+    },
+    "556282581227": {
+      "success": true,
+      "sent_at": "2026-08-11T05:44:19.809Z",
+      "via": "waha_direct"
+    },
+    "556284727946": {
+      "success": true,
+      "sent_at": "2026-08-11T05:44:50.336Z",
+      "via": "waha_direct"
+    },
+    "556285861206": {
+      "success": true,
+      "sent_at": "2026-08-11T05:45:21.036Z",
+      "via": "waha_direct"
+    },
+    "556291560213": {
+      "success": true,
+      "sent_at": "2026-08-11T05:45:51.546Z",
+      "via": "waha_direct"
+    },
+    "556294701315": {
+      "success": true,
+      "sent_at": "2026-08-11T05:46:22.127Z",
+      "via": "waha_direct"
+    },
+    "556299100216": {
+      "success": true,
+      "sent_at": "2026-08-11T05:46:52.604Z",
+      "via": "waha_direct"
+    },
+    "556392388997": {
+      "success": true,
+      "sent_at": "2026-08-11T05:47:23.132Z",
+      "via": "waha_direct"
+    },
+    "556399700917": {
+      "success": true,
+      "sent_at": "2026-08-11T05:47:53.655Z",
+      "via": "waha_direct"
+    },
+    "556484479808": {
+      "success": true,
+      "sent_at": "2026-08-11T05:48:24.222Z",
+      "via": "waha_direct"
+    },
+    "556492080796": {
+      "success": true,
+      "sent_at": "2026-08-11T05:48:54.708Z",
+      "via": "waha_direct"
+    },
+    "556492899898": {
+      "success": true,
+      "sent_at": "2026-08-11T05:49:25.334Z",
+      "via": "waha_direct"
+    },
+    "556499814666": {
+      "success": true,
+      "sent_at": "2026-08-11T05:50:00.442Z",
+      "via": "waha_direct"
+    },
+    "556598013158": {
+      "success": true,
+      "sent_at": "2026-08-11T05:50:31.067Z",
+      "via": "waha_direct"
+    },
+    "556599019309": {
+      "success": true,
+      "sent_at": "2026-08-11T05:51:01.566Z",
+      "via": "waha_direct"
+    },
+    "556692237744": {
+      "success": true,
+      "sent_at": "2026-08-11T05:51:32.086Z",
+      "via": "waha_direct"
+    },
+    "556699234234": {
+      "success": true,
+      "sent_at": "2026-08-11T05:52:02.578Z",
+      "via": "waha_direct"
+    },
+    "556899503717": {
+      "success": true,
+      "sent_at": "2026-08-11T05:52:33.145Z",
+      "via": "waha_direct"
+    },
+    "556899998040": {
+      "success": true,
+      "sent_at": "2026-08-11T05:53:03.639Z",
+      "via": "waha_direct"
+    },
+    "556899999901": {
+      "success": true,
+      "sent_at": "2026-08-11T05:53:34.143Z",
+      "via": "waha_direct"
+    },
+    "556984244805": {
+      "success": true,
+      "sent_at": "2026-08-11T05:54:04.669Z",
+      "via": "waha_direct"
+    },
+    "556999046940": {
+      "success": true,
+      "sent_at": "2026-08-11T05:54:49.607Z",
+      "via": "waha_direct"
+    },
+    "556999736077": {
+      "success": true,
+      "sent_at": "2026-08-11T05:55:20.111Z",
+      "via": "waha_direct"
+    },
+    "557186861722": {
+      "success": true,
+      "sent_at": "2026-08-11T05:55:50.727Z",
+      "via": "waha_direct"
+    },
+    "557188023782": {
+      "success": true,
+      "sent_at": "2026-08-11T05:56:21.266Z",
+      "via": "waha_direct"
+    },
+    "557192565504": {
+      "success": true,
+      "sent_at": "2026-08-11T05:56:51.760Z",
+      "via": "waha_direct"
+    },
+    "557196007818": {
+      "success": true,
+      "sent_at": "2026-08-11T05:57:22.244Z",
+      "via": "waha_direct"
+    },
+    "557196657452": {
+      "success": true,
+      "sent_at": "2026-08-11T05:59:59.670Z",
+      "via": "waha_direct"
+    },
+    "557199381700": {
+      "success": true,
+      "sent_at": "2026-08-11T06:00:30.191Z",
+      "via": "waha_direct"
+    },
+    "557381389179": {
+      "success": true,
+      "sent_at": "2026-08-11T06:01:00.955Z",
+      "via": "waha_direct"
+    },
+    "557399100190": {
+      "success": true,
+      "sent_at": "2026-08-11T06:01:31.769Z",
+      "via": "waha_direct"
+    },
+    "557488189984": {
+      "success": true,
+      "sent_at": "2026-08-11T06:02:02.261Z",
+      "via": "waha_direct"
+    },
+    "557498031315": {
+      "success": true,
+      "sent_at": "2026-08-11T06:02:32.773Z",
+      "via": "waha_direct"
+    },
+    "557499619689": {
+      "success": true,
+      "sent_at": "2026-08-11T06:03:03.288Z",
+      "via": "waha_direct"
+    },
+    "557599681836": {
+      "success": true,
+      "sent_at": "2026-08-11T06:03:33.847Z",
+      "via": "waha_direct"
+    },
+    "557791231349": {
+      "success": true,
+      "sent_at": "2026-08-11T06:04:04.439Z",
+      "via": "waha_direct"
+    }
+  },
+  "total_sent": 53,
+  "test_sent": true,
+  "started_at": "2026-08-11T05:35:03.373Z"
+}

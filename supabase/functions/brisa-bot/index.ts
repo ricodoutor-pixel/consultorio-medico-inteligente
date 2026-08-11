@@ -140,15 +140,25 @@ function parseWAHA(body: Record<string, unknown>) {
   if (SKIP.some(e => event.includes(e))) return { skip: true, reason: `system_event:${event}` } as const;
 
   const payload = (body?.payload ?? body) as Record<string, unknown>;
-  const chatId  = String(payload?.from ?? payload?.chatId ?? payload?.id ?? '');
-  const fromMe  = Boolean(payload?.fromMe ?? payload?.from_me ?? false);
-  const text    = String(payload?.body ?? payload?.text ?? payload?.caption ?? '').trim();
-  const name    = String(payload?.senderName ?? payload?.notifyName ?? (payload?._data as Record<string,unknown>)?.notifyName ?? '') || null;
+  const payloadData = (payload?._data ?? {}) as Record<string, unknown>;
+  const payloadId = (payload?.id && typeof payload.id === 'object' ? payload.id : payloadData?.id) as Record<string, unknown> | undefined;
+
+  const fromMe = Boolean(
+    payload?.fromMe ??
+    payload?.from_me ??
+    payloadData?.fromMe ??
+    payloadId?.fromMe ??
+    false
+  );
+
+  const chatId = String(payload?.from ?? payload?.chatId ?? payload?.id ?? '');
+  const text   = String(payload?.body ?? payload?.text ?? payload?.caption ?? '').trim();
+  const name   = String(payload?.senderName ?? payload?.notifyName ?? payloadData?.notifyName ?? '') || null;
 
   let messageId = '';
   if (typeof payload?.id === 'string') messageId = payload.id;
-  else if (payload?.id && typeof payload.id === 'object') {
-    messageId = String((payload.id as Record<string,unknown>).id || (payload.id as Record<string,unknown>)._serialized || '');
+  else if (payloadId?.id || payloadId?._serialized) {
+    messageId = String(payloadId.id || payloadId._serialized || '');
   }
 
   return {

@@ -83,3 +83,30 @@ Se você for conectar um número de WhatsApp Business e o bot parar de receber m
    `WHATSAPP_DEFAULT_ENGINE=NOWEB`
 3. Reinicie o contêiner do WAHA.
 O motor `WEBJS` (padrão) possui limitações com contas comerciais. O `NOWEB` utiliza uma arquitetura baseada em WebSocket que é totalmente compatível.
+
+## 🚀 Motor Autônomo de Growth & CRM (Deploy)
+
+Para rodar o motor autônomo (scraper + WhatsApp CRM) em segundo plano utilizando o **PM2**, siga as instruções:
+
+1. Instale o PM2 globalmente (se não possuir):
+   ```bash
+   npm install -g pm2
+   ```
+
+2. Certifique-se de configurar seu arquivo `.env` com as chaves corretas do Supabase, WAHA_API_URL, e GEMINI_API_KEY.
+
+3. Importe a carga inicial de leads:
+   ```bash
+   node src/seed-initial-leads.mjs
+   ```
+
+4. Inicie o Motor Autônomo com o PM2:
+   ```bash
+   pm2 start src/autonomous-growth-engine.mjs --name "planta-growth-engine"
+   ```
+
+5. Comandos úteis do PM2:
+   - Visualizar logs: `pm2 logs planta-growth-engine`
+   - Parar o motor: `pm2 stop planta-growth-engine`
+   - Reiniciar: `pm2 restart planta-growth-engine`
+   - Salvar processos para reiniciar no boot: `pm2 save`

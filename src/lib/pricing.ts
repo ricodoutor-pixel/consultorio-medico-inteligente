@@ -107,3 +107,85 @@ export const SIGNATURE_NOTICE =
 
 export const formatBRL = (v: number) =>
   `R$ ${v.toFixed(2).replace(".", ",").replace(/,00$/, "")}`;
+
+/**
+ * Vitrine padronizada de serviços (2026) — exibida no card do profissional
+ * e no cadastro médico. Itens 1–4 têm preço FIXO de plataforma (o médico
+ * não edita). Apenas a Consulta Premium é editável pelo profissional.
+ */
+export type ServiceMenuKey =
+  | "orientacao_tecnica"
+  | "consulta_chat"
+  | "consulta_video"
+  | "retorno_consulta"
+  | "consulta_premium";
+
+export interface ServiceMenuItem {
+  sku: ServiceMenuKey;
+  name: string;
+  price: number;
+  /** Preço travado pela plataforma (médico não edita). */
+  fixed: boolean;
+  duration: string;
+  desc: string;
+  /** Emite receita com assinatura digital? */
+  prescription: boolean;
+  /** Redireciona para a Orientação Técnica com o Dr. Edilson Bezerra ON. */
+  redirectToEdilson?: boolean;
+  highlight?: boolean;
+}
+
+export const PREMIUM_SUGGESTED_PRICE = 180;
+
+export const SERVICE_MENU: ServiceMenuItem[] = [
+  {
+    sku: "orientacao_tecnica",
+    name: "Orientação Técnica",
+    price: 30,
+    fixed: true,
+    duration: "Chat 30 min",
+    desc: "Orientação técnica por chat, sem emissão de receita.",
+    prescription: false,
+    redirectToEdilson: true,
+  },
+  {
+    sku: "consulta_chat",
+    name: "Consulta por Chat",
+    price: 100,
+    fixed: true,
+    duration: "Chat",
+    desc: "Consulta por chat com receita assinada digitalmente.",
+    prescription: true,
+  },
+  {
+    sku: "consulta_video",
+    name: "Consulta por Vídeo",
+    price: 150,
+    fixed: true,
+    duration: "Teleconsulta",
+    desc: "Teleconsulta por vídeo com receita assinada digitalmente.",
+    prescription: true,
+    highlight: true,
+  },
+  {
+    sku: "retorno_consulta",
+    name: "Retorno de Renovação",
+    price: 90,
+    fixed: true,
+    duration: "Chat",
+    desc: "Exclusivo para pacientes já atendidos — renovação de receita.",
+    prescription: true,
+  },
+  {
+    sku: "consulta_premium",
+    name: "Consulta Premium",
+    price: PREMIUM_SUGGESTED_PRICE,
+    fixed: false,
+    duration: "Vídeo + Chat",
+    desc: "Vídeo e chat com acompanhamento estendido. Valor definido pelo profissional.",
+    prescription: true,
+  },
+];
+
+export const FIXED_SERVICE_NOTICE =
+  "Valores dos serviços 1 a 4 são padronizados pela plataforma. Apenas a Consulta Premium é definida pelo profissional.";

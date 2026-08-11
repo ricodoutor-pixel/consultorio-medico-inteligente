@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
+import { SERVICE_MENU, SERVICES, PREMIUM_SUGGESTED_PRICE, FIXED_SERVICE_NOTICE, formatBRL } from "@/lib/pricing";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -150,9 +151,7 @@ const CadastroProfissional = () => {
     passwordConfirm: "",
     telefone: "",
     categoria: "",
-    priceVideoChat: "",
-    priceChatOnly: "",
-    priceReturn: "",
+    pricePremium: String(PREMIUM_SUGGESTED_PRICE),
     pixKey: "",
     pixType: "cpf",
     resumoAtuacao: "",
@@ -265,9 +264,7 @@ const CadastroProfissional = () => {
       return;
     }
     // Auto-fill sensible defaults if optional price/pix fields were left blank
-    if (!form.priceVideoChat) form.priceVideoChat = "120";
-    if (!form.priceChatOnly) form.priceChatOnly = "80";
-    if (!form.priceReturn) form.priceReturn = "0";
+    if (!form.pricePremium) form.pricePremium = String(PREMIUM_SUGGESTED_PRICE);
     if (!form.pixKey) form.pixKey = form.telefone;
     if (!form.resumoAtuacao) form.resumoAtuacao = "Médico Prescritor atuante em Medicina Canabinoide e Saúde Integral.";
 
@@ -388,10 +385,11 @@ const CadastroProfissional = () => {
         crm_state: form.crmUF,
         specialty: form.categoria,
         bio: form.resumoAtuacao,
-        consultation_price: Number(form.priceVideoChat) || 0,
-        price_video_chat: Number(form.priceVideoChat) || 0,
-        price_chat_only: Number(form.priceChatOnly) || 0,
-        price_return: Number(form.priceReturn) || 0,
+        // Valores 1–4 padronizados pela plataforma; Premium definido pelo profissional.
+        consultation_price: SERVICES.consulta_chat.price,
+        price_video_chat: Math.min(2000, Math.max(100, Number(form.pricePremium) || PREMIUM_SUGGESTED_PRICE)),
+        price_chat_only: SERVICES.consulta_chat.price,
+        price_return: SERVICES.retorno_consulta.price,
         is_approved_by_admin: false,
         approval_status: 'pending',
         document_type: documentType,
@@ -753,10 +751,25 @@ const CadastroProfissional = () => {
                   </div>
 
 
+                  <div className="rounded-2xl border border-border bg-card/50 p-4 space-y-2">
+                    <p className="text-xs font-black text-foreground">Tabela oficial de serviços da plataforma</p>
+                    {SERVICE_MENU.filter((sv) => sv.fixed).map((sv, i) => (
+                      <div key={sv.sku} className="flex items-center justify-between gap-3 text-xs border-b border-border/50 last:border-0 py-1.5">
+                        <span className="text-muted-foreground">
+                          {i + 1}. <span className="text-foreground font-bold">{sv.name}</span> · {sv.duration} ·{" "}
+                          {sv.prescription ? "com receita digital" : "sem receita"}
+                        </span>
+                        <span className="font-black text-primary whitespace-nowrap">{formatBRL(sv.price)}</span>
+                      </div>
+                    ))}
+                    <p className="text-[10px] text-muted-foreground">{FIXED_SERVICE_NOTICE}</p>
+                  </div>
+
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="priceVideoChat">{t.value}</Label>
-                      <Input id="priceVideoChat" type="number" min="0" step="0.01" placeholder={isBO ? "70.00" : "120.00"} value={form.priceVideoChat} onChange={(e) => handleChange("priceVideoChat", e.target.value)} required />
+                      <Label htmlFor="pricePremium">Consulta Premium (Vídeo + Chat) — R$ *</Label>
+                      <Input id="pricePremium" type="number" min="100" max="2000" step="1" placeholder="180" value={form.pricePremium} onChange={(e) => handleChange("pricePremium", e.target.value)} required />
+                      <p className="text-[10px] text-muted-foreground">Único serviço com valor livre (sugerido R$ 180). Mínimo R$ 100.</p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="cidadeUF">{t.cityUF}</Label>

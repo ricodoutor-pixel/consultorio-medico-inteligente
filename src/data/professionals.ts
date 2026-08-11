@@ -83,6 +83,10 @@ export type Professional = {
   slots: string[];
   reviews: { name: string; rating: number; text: string }[];
   online?: boolean;
+  /** ID real na tabela doctors (quando o profissional vem do banco). */
+  dbId?: string;
+  /** Valor da Consulta Premium definido pelo profissional. */
+  premiumPrice?: number;
   crm?: string;
   hospital?: string;
   hospitalUrl?: string;

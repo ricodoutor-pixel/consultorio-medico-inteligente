@@ -14,6 +14,8 @@ import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import DoctorsNearMeMap from "@/components/doctors/DoctorsNearMeMap";
+import { DoctorServiceMenu } from "@/components/doctor/DoctorServiceMenu";
+import { SERVICE_MENU, PREMIUM_SUGGESTED_PRICE, formatBRL } from "@/lib/pricing";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -64,19 +66,6 @@ function useRotatingOnline(base: Professional[]): Professional[] {
 }
 
 
-const SERVICE_TIERS = [
-  { name: "Orientação Inicial via Chat", price: "R$ 100", value: 100, icon: MessageSquare, desc: "Avaliação inicial via chat seguro", highlight: false },
-  { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150", value: 150, icon: Video, desc: "Avaliação completa com teleconsulta", highlight: true },
-  { name: "Retorno", price: "R$ 90", value: 90, icon: Zap, desc: "Acompanhamento e ajuste de dose", highlight: false },
-];
-
-type ServiceTier = typeof SERVICE_TIERS[number];
-
-const parseServiceValue = (price: string) => {
-  const parsed = Number(price.replace(/[^\d,.-]/g, "").replace(".", "").replace(",", "."));
-  return Number.isFinite(parsed) ? parsed : 30;
-};
-
 const WhatsAppContactButton = ({ name, className = "" }: { name: string; className?: string }) => {
   const message = encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de iniciar Orientação Técnica com ${name}`);
   return (
@@ -93,99 +82,20 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
   );
 };
 
-const ServicePricingGrid = ({ doctorName, services }: { doctorName: string; services?: Professional["services"] }) => {
-  const [loadingTier, setLoadingTier] = useState<string | null>(null);
+/** Tags elegantes da vitrine padronizada exibidas no card do profissional. */
+const ServiceTagsRow = () => (
+  <div className="flex flex-wrap gap-1 mb-3">
+    {SERVICE_MENU.map((s) => (
+      <span
+        key={s.sku}
+        className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-primary/20 bg-primary/5 text-primary"
+      >
+        {s.name} · {formatBRL(s.sku === "consulta_premium" ? PREMIUM_SUGGESTED_PRICE : s.price)}
+      </span>
+    ))}
+  </div>
+);
 
-  const tiers: ServiceTier[] = services?.length
-    ? services.map((service, index) => ({
-        name: service.name,
-        price: service.price,
-        value: parseServiceValue(service.price),
-        icon: index === 0 ? Zap : MessageSquare,
-        desc: service.desc,
-        highlight: index === 0,
-      }))
-    : SERVICE_TIERS;
-
-  const handleSelectService = async (service: ServiceTier) => {
-    setLoadingTier(service.name);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-          toast.error("Faça seu cadastro para contratar um serviço.", {
-          action: { label: "Cadastro", onClick: () => window.location.href = "/cadastro" },
-        });
-        setLoadingTier(null);
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke("create-payment", {
-        body: {
-          doctorName,
-          patientEmail: session.user.email || "",
-          description: `${service.name} com ${doctorName}`,
-          amount: service.value,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data?.init_point) {
-        toast.success("Redirecionando para o Mercado Pago...");
-        window.open(data.init_point, "_blank");
-        // After payment, redirect to WhatsApp Brisa
-        setTimeout(() => {
-          const message = encodeURIComponent(
-            `Olá Enfermeira Brisa, acabei de pagar o serviço ${service.name} (${service.price}) e quero seguir com ${doctorName}.`
-          );
-          window.open(`https://wa.me/${BRISA_WHATSAPP}?text=${message}`, "_blank");
-        }, 2000);
-      } else {
-        toast.error(data?.error || "Erro ao gerar link de pagamento");
-      }
-    } catch (err) {
-      console.error("Payment error:", err);
-      toast.error("Erro ao processar pagamento. Tente novamente.");
-    } finally {
-      setLoadingTier(null);
-    }
-  };
-
-  return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {tiers.map((tier) => {
-        const Icon = tier.icon;
-        const isLoading = loadingTier === tier.name;
-        return (
-          <Card
-            key={tier.name}
-            className={`border-border hover:border-primary/50 transition-all cursor-pointer hover:-translate-y-1 ${
-              tier.highlight ? "ring-2 ring-primary border-primary relative" : ""
-            }`}
-            onClick={() => !isLoading && handleSelectService(tier)}
-          >
-            {tier.highlight && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-black px-3 py-1 rounded-full">
-                Mais Popular
-              </span>
-            )}
-            <CardContent className="p-5 text-center">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                <Icon size={22} className="text-primary" />
-              </div>
-              <h4 className="font-black text-foreground text-sm mb-1">{tier.name}</h4>
-              <p className="text-xs text-muted-foreground mb-3">{tier.desc}</p>
-              <p className="text-2xl font-display font-black text-gradient-green mb-3">{tier.price}</p>
-              <Button size="sm" className="w-full font-black bg-primary text-primary-foreground rounded-xl text-xs" disabled={isLoading}>
-                {isLoading ? <><Loader2 size={14} className="mr-1 animate-spin" /> Gerando...</> : "Contratar Agora"}
-              </Button>
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
-  );
-};
 
 const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: string; professionals?: Professional[] }) => {
   const pro = professionals.find((p) => p.id === id);
@@ -227,7 +137,7 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mb-1">Experiência: {pro.experience}</p>
-              <p className="text-2xl font-display font-black text-gradient-green mb-4">a partir de {pro.price} <span className="text-sm text-muted-foreground font-normal">/ serviço</span></p>
+              <p className="text-2xl font-display font-black text-gradient-green mb-4">a partir de {formatBRL(SERVICE_MENU[0].price)} <span className="text-sm text-muted-foreground font-normal">/ serviço</span></p>
               <div className="space-y-2">
                 <WhatsAppContactButton name={pro.name} />
               </div>
@@ -240,7 +150,7 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
           <Card className="border-border">
             <CardContent className="p-6">
               <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2">💳 Serviços & Valores</h2>
-              <ServicePricingGrid doctorName={pro.name} services={pro.services} />
+              <DoctorServiceMenu doctorName={pro.name} doctorId={pro.dbId ?? undefined} premiumPrice={pro.premiumPrice} />
             </CardContent>
           </Card>
 
@@ -436,15 +346,16 @@ const Profissionais = () => {
                       {/* Body */}
                       <div className="px-4 py-3">
                         <p className="text-xs md:text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">{p.bio}</p>
-                        <div className="flex flex-wrap gap-1 mb-3">
+                        <div className="flex flex-wrap gap-1 mb-2">
                           {p.tags.slice(0, 3).map((t) => (
-                            <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-primary/20 bg-primary/5 text-primary">{t}</span>
+                            <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-border bg-card text-muted-foreground">{t}</span>
                           ))}
                         </div>
+                        <ServiceTagsRow />
 
                         {/* Footer do card */}
                         <div className="flex items-center justify-between pt-2 border-t border-border/50">
-                          <span className="text-lg font-display font-black text-gradient-green">{p.price}</span>
+                          <span className="text-lg font-display font-black text-gradient-green">a partir de {formatBRL(SERVICE_MENU[0].price)}</span>
                           <span className="text-[10px] text-primary font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
                             Ver perfil <ArrowRight size={12} />
                           </span>

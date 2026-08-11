@@ -23,6 +23,7 @@ interface RealDoctor {
   specialty: string;
   bio: string | null;
   consultation_price: number;
+  price_video_chat?: number | null;
   rating: number | null;
   total_consultations: number | null;
   is_online: boolean;
@@ -207,6 +208,8 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
       return {
         id: `real-${d.id}`,
+        dbId: d.id,
+        premiumPrice: Number(d.price_video_chat) || undefined,
         name: fullName,
         category: mapCategoryFromSpecialty(d.specialty),
         bio: finalBio,

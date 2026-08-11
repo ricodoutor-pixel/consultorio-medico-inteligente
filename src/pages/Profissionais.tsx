@@ -137,7 +137,7 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mb-1">Experiência: {pro.experience}</p>
-              <p className="text-2xl font-display font-black text-gradient-green mb-4">a partir de {pro.price} <span className="text-sm text-muted-foreground font-normal">/ serviço</span></p>
+              <p className="text-2xl font-display font-black text-gradient-green mb-4">a partir de {formatBRL(SERVICE_MENU[0].price)} <span className="text-sm text-muted-foreground font-normal">/ serviço</span></p>
               <div className="space-y-2">
                 <WhatsAppContactButton name={pro.name} />
               </div>
@@ -355,7 +355,7 @@ const Profissionais = () => {
 
                         {/* Footer do card */}
                         <div className="flex items-center justify-between pt-2 border-t border-border/50">
-                          <span className="text-lg font-display font-black text-gradient-green">{p.price}</span>
+                          <span className="text-lg font-display font-black text-gradient-green">a partir de {formatBRL(SERVICE_MENU[0].price)}</span>
                           <span className="text-[10px] text-primary font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
                             Ver perfil <ArrowRight size={12} />
                           </span>

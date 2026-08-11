@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, Percent, TrendingUp } from "lucide-react";
+import { DollarSign, Percent, TrendingUp, Lock } from "lucide-react";
+import { SERVICE_MENU, PREMIUM_SUGGESTED_PRICE, FIXED_SERVICE_NOTICE, formatBRL } from "@/lib/pricing";
 import { supabase as _supabase } from "@/integrations/supabase/client";
 const supabase: any = _supabase;
 import { toast } from "sonner";
@@ -17,18 +18,20 @@ interface PricingConfigModalProps {
 }
 
 export function PricingConfigModal({ open, onOpenChange, doctorId }: PricingConfigModalProps) {
-  const [videoPriceInput, setVideoPriceInput] = useState("150.00");
-  const [chatPriceInput, setChatPriceInput] = useState("100.00");
+  const [premiumPriceInput, setPremiumPriceInput] = useState(String(PREMIUM_SUGGESTED_PRICE));
   const [platformCommission, setPlatformCommission] = useState(20);
   const [loading, setLoading] = useState(false);
 
-  // Calcular valores
-  const videoPrice = parseFloat(videoPriceInput) || 0;
-  const chatPrice = parseFloat(chatPriceInput) || 0;
+  // Valores dos serviços 1–4 são fixos (plataforma). Apenas o Premium é editável.
+  const videoPrice = 150;
+  const chatPrice = 100;
+  const premiumPrice = parseFloat(premiumPriceInput) || 0;
   const videoFee = videoPrice * (platformCommission / 100);
   const videoEarnings = videoPrice - videoFee;
   const chatFee = chatPrice * (platformCommission / 100);
   const chatEarnings = chatPrice - chatFee;
+  const premiumFee = premiumPrice * (platformCommission / 100);
+  const premiumEarnings = premiumPrice - premiumFee;
 
   useEffect(() => {
     if (open && doctorId) {
@@ -40,15 +43,14 @@ export function PricingConfigModal({ open, onOpenChange, doctorId }: PricingConf
     try {
       const { data, error } = await supabase
         .from("doctors")
-        .select("consultation_price_video, consultation_price_chat, platform_commission_percentage")
+        .select("price_video_chat, platform_commission_percentage")
         .eq("id", doctorId)
         .single();
 
       if (error) throw error;
 
       if (data) {
-        setVideoPriceInput(data.consultation_price_video?.toString() || "150.00");
-        setChatPriceInput(data.consultation_price_chat?.toString() || "100.00");
+        setPremiumPriceInput(data.price_video_chat?.toString() || String(PREMIUM_SUGGESTED_PRICE));
         setPlatformCommission(data.platform_commission_percentage || 20);
       }
     } catch (err) {
@@ -62,8 +64,12 @@ export function PricingConfigModal({ open, onOpenChange, doctorId }: PricingConf
       const { error } = await supabase
         .from("doctors")
         .update({
-          consultation_price_video: parseFloat(videoPriceInput),
-          consultation_price_chat: parseFloat(chatPriceInput),
+          // Serviços padronizados pela plataforma (não editáveis pelo médico)
+          consultation_price: 100,
+          price_chat_only: 100,
+          price_return: 90,
+          // Consulta Premium — único valor definido pelo profissional
+          price_video_chat: Math.min(2000, Math.max(100, premiumPrice || PREMIUM_SUGGESTED_PRICE)),
           platform_commission_percentage: platformCommission,
         })
         .eq("id", doctorId);
@@ -89,41 +95,42 @@ export function PricingConfigModal({ open, onOpenChange, doctorId }: PricingConf
             Configurar Preços de Consulta
           </DialogTitle>
           <DialogDescription>
-            Defina o valor final da consulta (vídeo/chat). O sistema calcula automaticamente o split entre você e a plataforma.
+            Os valores dos serviços 1 a 4 são padronizados pela plataforma. Você define apenas a Consulta Premium (Vídeo + Chat).
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Configuração de Preços */}
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="video-price">Preço da Consulta por Vídeo (R$)</Label>
-              <Input
-                id="video-price"
-                type="number"
-                step="0.01"
-                min="0"
-                value={videoPriceInput}
-                onChange={(e) => setVideoPriceInput(e.target.value)}
-                className="text-lg font-semibold"
-                placeholder="150.00"
-              />
-              <p className="text-xs text-muted-foreground">Valor mínimo recomendado: R$ 100</p>
+            <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+              <p className="text-xs font-black text-foreground flex items-center gap-1.5">
+                <Lock className="h-3.5 w-3.5" /> Tabela oficial (valores fixos)
+              </p>
+              {SERVICE_MENU.filter((sv) => sv.fixed).map((sv, i) => (
+                <div key={sv.sku} className="flex items-center justify-between gap-3 text-xs py-1 border-b border-border/50 last:border-0">
+                  <span className="text-muted-foreground">
+                    {i + 1}. <span className="text-foreground font-semibold">{sv.name}</span> · {sv.duration}
+                  </span>
+                  <span className="font-bold text-primary">{formatBRL(sv.price)}</span>
+                </div>
+              ))}
+              <p className="text-[10px] text-muted-foreground">{FIXED_SERVICE_NOTICE}</p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="chat-price">Preço da Consulta por Chat (R$)</Label>
+              <Label htmlFor="premium-price">Consulta Premium (Vídeo + Chat) — R$</Label>
               <Input
-                id="chat-price"
+                id="premium-price"
                 type="number"
-                step="0.01"
-                min="0"
-                value={chatPriceInput}
-                onChange={(e) => setChatPriceInput(e.target.value)}
+                step="1"
+                min="100"
+                max="2000"
+                value={premiumPriceInput}
+                onChange={(e) => setPremiumPriceInput(e.target.value)}
                 className="text-lg font-semibold"
-                placeholder="100.00"
+                placeholder="180"
               />
-              <p className="text-xs text-muted-foreground">Valor mínimo recomendado: R$ 70</p>
+              <p className="text-xs text-muted-foreground">Sugerido R$ 180 · mínimo R$ 100 · máximo R$ 2.000</p>
             </div>
 
             <div className="space-y-2">
@@ -197,6 +204,27 @@ export function PricingConfigModal({ open, onOpenChange, doctorId }: PricingConf
               </div>
             </Card>
           </div>
+
+          <Card className="p-4 bg-amber-50/50 border-amber-200/50 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-amber-900">Consulta Premium (Vídeo + Chat)</span>
+              <Badge variant="outline" className="bg-amber-100 text-amber-900 border-amber-300">Premium</Badge>
+            </div>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Valor Final:</span>
+                <span className="font-semibold">R$ {premiumPrice.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-amber-700">
+                <span className="text-muted-foreground">Taxa Plataforma ({platformCommission}%):</span>
+                <span className="font-semibold">-R$ {premiumFee.toFixed(2)}</span>
+              </div>
+              <div className="border-t border-amber-200 pt-2 flex justify-between text-green-700">
+                <span className="font-semibold">Você Recebe:</span>
+                <span className="font-bold text-lg">R$ {premiumEarnings.toFixed(2)}</span>
+              </div>
+            </div>
+          </Card>
 
           {/* Info sobre Participação nos Lucros */}
           <Card className="p-4 bg-green-50/50 border-green-200/50 rounded-lg">

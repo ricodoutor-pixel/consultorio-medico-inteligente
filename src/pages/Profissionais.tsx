@@ -14,6 +14,8 @@ import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import DoctorsNearMeMap from "@/components/doctors/DoctorsNearMeMap";
+import { DoctorServiceMenu } from "@/components/doctor/DoctorServiceMenu";
+import { SERVICE_MENU, PREMIUM_SUGGESTED_PRICE, formatBRL } from "@/lib/pricing";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -148,7 +150,7 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
           <Card className="border-border">
             <CardContent className="p-6">
               <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2">💳 Serviços & Valores</h2>
-              <ServicePricingGrid doctorName={pro.name} services={pro.services} />
+              <DoctorServiceMenu doctorName={pro.name} doctorId={pro.dbId ?? undefined} premiumPrice={pro.premiumPrice} />
             </CardContent>
           </Card>
 
@@ -344,11 +346,12 @@ const Profissionais = () => {
                       {/* Body */}
                       <div className="px-4 py-3">
                         <p className="text-xs md:text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">{p.bio}</p>
-                        <div className="flex flex-wrap gap-1 mb-3">
+                        <div className="flex flex-wrap gap-1 mb-2">
                           {p.tags.slice(0, 3).map((t) => (
-                            <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-primary/20 bg-primary/5 text-primary">{t}</span>
+                            <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-border bg-card text-muted-foreground">{t}</span>
                           ))}
                         </div>
+                        <ServiceTagsRow />
 
                         {/* Footer do card */}
                         <div className="flex items-center justify-between pt-2 border-t border-border/50">

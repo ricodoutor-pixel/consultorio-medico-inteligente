@@ -263,7 +263,7 @@ const ProductDetail = ({ id }: { id: string }) => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) { toast({ title: "Faça login para comprar", variant: "destructive" }); return; }
         const { data, error } = await supabase.functions.invoke("create-cart-payment", {
-          body: { items: [{ title: product.name, quantity: 1, price: product.price }], total: product.price, description: `Planta y Raiz Ltda - ${product.name}` },
+          body: { items: [{ product_id: product.id, quantity: 1 }], description: `Planta y Raiz Ltda - ${product.name}` },
         });
         if (error) { toast({ title: "Erro ao gerar pagamento", variant: "destructive" }); return; }
         if (data?.init_point) { window.open(data.init_point, "_blank"); toast({ title: "Redirecionando para pagamento... 💳" }); }
@@ -434,7 +434,7 @@ const Shopping = () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) { toast({ title: "Faça login para comprar", variant: "destructive" }); setTimeout(() => window.location.href = "/login", 1500); return; }
         const { data, error } = await supabase.functions.invoke("create-cart-payment", {
-          body: { items: [{ title: p.name, quantity: 1, price: p.price }], total: p.price, description: `Planta y Raiz Ltda - ${p.name}` },
+          body: { items: [{ product_id: p.id, quantity: 1 }], description: `Planta y Raiz Ltda - ${p.name}` },
         });
         if (error) { toast({ title: "Erro ao gerar pagamento", variant: "destructive" }); return; }
         if (data?.init_point) { window.open(data.init_point, "_blank"); toast({ title: "Redirecionando... 💳" }); }

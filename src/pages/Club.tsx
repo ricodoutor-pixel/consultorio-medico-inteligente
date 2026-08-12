@@ -333,13 +333,12 @@ const Club = () => {
       }
 
       const cartItems = cart.map(i => ({
-        title: i.product.name,
+        product_id: `club_${i.product.id}`,
         quantity: i.qty,
-        price: i.product.price,
       }));
 
       const { data, error } = await supabase.functions.invoke("create-cart-payment", {
-        body: { items: cartItems, total: cartTotal, description: `Club Planta y Raiz - ${cart.length} itens` },
+        body: { items: cartItems, description: `Club Planta y Raiz - ${cart.length} itens` },
       });
 
       if (error) throw error;
@@ -370,8 +369,7 @@ const Club = () => {
           }
           const { data, error } = await supabase.functions.invoke("create-cart-payment", {
             body: {
-              items: [{ title: product.name, quantity: 1, price: product.price }],
-              total: product.price,
+              items: [{ product_id: `club_${product.id}`, quantity: 1 }],
               description: `Planta y Raiz Ltda - ${product.name}`,
             },
           });

@@ -327,8 +327,8 @@ const DashboardMedico = () => {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
               <div className="flex items-center gap-4">
                 {/* Avatar do médico com upload */}
-                <div className="relative shrink-0 mt-4 md:mt-0">
-                  <VipUpgradePopup role="medico" className="-top-8 left-1/2 -translate-x-1/2 md:-left-4 md:translate-x-0" />
+                <div className="relative shrink-0 mt-8 md:mt-6">
+                  <VipUpgradePopup role="medico" className="-top-14 left-1/2 -translate-x-1/2 w-max" />
                   <label
                     htmlFor="doctor-avatar-upload"
                     className="group relative block w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-primary/40 bg-muted cursor-pointer shadow-glow"

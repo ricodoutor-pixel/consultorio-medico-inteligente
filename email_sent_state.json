@@ -30,10 +30,8 @@
     },
     "wellington.med@clinicavita.com.br": {
       "name": "Dr. Wellington Santana",
-      "phone": "5531988776655",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:41:30.471Z",
-      "error": "Can't send mail - all recipients were rejected: 451 4.3.0 <wellington.med@clinicavita.com.br>: Temporary lookup failure"
+      "success": true,
+      "sent_at": "2026-08-12T11:22:44.537Z"
     },
     "juliana.ramos.med@gmail.com": {
       "name": "Dra. Juliana Mendes Ramos",
@@ -226,10 +224,8 @@
     },
     "henrique.albuquerque@recifemed.com.br": {
       "name": "Dr. Henrique Albuquerque",
-      "phone": "558181142525",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:45:41.333Z",
-      "error": "Can't send mail - all recipients were rejected: 451 4.3.0 <henrique.albuquerque@recifemed.com.br>: Temporary lookup failure"
+      "success": true,
+      "sent_at": "2026-08-12T11:23:15.230Z"
     },
     "beatriz.vasconcelos@cearamed.com.br": {
       "name": "Dra. Beatriz Vasconcelos",
@@ -422,3029 +418,2181 @@
     },
     "vanessa.marques@consultoriomed.com.br": {
       "name": "Dra. Vanessa Marques Martins",
-      "phone": "5548944797979",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:49:28.679Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:23:45.844Z"
     },
     "rafael.andrade@outlook.com": {
       "name": "Dr. Rafael Andrade Mendes",
-      "phone": "5554999953572",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:49:36.176Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:24:16.413Z"
     },
     "renato.gonçalves@outlook.com": {
       "name": "Dr. Renato Gonçalves Costa",
-      "phone": "5562968417110",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:49:43.285Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T11:24:46.991Z"
     },
     "carolina.carvalho@institutocanabis.med.br": {
       "name": "Dra. Carolina Carvalho Rocha",
-      "phone": "5513981101818",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:49:50.754Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:25:17.607Z"
     },
     "henrique.barbosa@saudeintegrativa.med.br": {
       "name": "Dr. Henrique Barbosa Almeida",
-      "phone": "5547960018245",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:49:58.297Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:25:48.308Z"
     },
     "thais.machado@saudeintegrativa.med.br": {
       "name": "Dra. Thais Machado Alves",
-      "phone": "5516994115193",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:50:05.790Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:26:19.140Z"
     },
     "sabrina.almeida@institutocanabis.med.br": {
       "name": "Dra. Sabrina Almeida Martins",
-      "phone": "5527930312488",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:50:13.567Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:26:49.740Z"
     },
     "bruno.santos@saudeintegrativa.med.br": {
       "name": "Dr. Bruno Santos Carvalho",
-      "phone": "5519978088311",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:50:21.159Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:27:20.306Z"
     },
     "andré.almeida@saudeintegrativa.med.br": {
       "name": "Dr. André Almeida Gomes",
-      "phone": "5581987242611",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:50:28.276Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T11:27:50.890Z"
     },
     "murilo.dias@drsaude.com.br": {
       "name": "Dr. Murilo Dias Santos",
-      "phone": "5521937889091",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:50:35.747Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:28:21.453Z"
     },
     "caio.teixeira@institutocanabis.med.br": {
       "name": "Dr. Caio Teixeira Oliveira",
-      "phone": "5571957361469",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:50:43.260Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:28:52.118Z"
     },
     "luiza.machado@outlook.com": {
       "name": "Dra. Luiza Machado Martins",
-      "phone": "5511972741984",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:50:50.789Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:29:22.693Z"
     },
     "anapaula.machado@drsaude.com.br": {
       "name": "Dra. Ana Paula Machado Oliveira",
-      "phone": "5513934059946",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:50:58.392Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:29:53.259Z"
     },
     "carlos.carvalho@institutocanabis.med.br": {
       "name": "Dr. Carlos Carvalho Pereira",
-      "phone": "5551912815768",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:51:05.825Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:30:23.824Z"
     },
     "anapaula.teixeira@institutocanabis.med.br": {
       "name": "Dra. Ana Paula Teixeira Ferreira",
-      "phone": "5524939932183",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:51:14.140Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:30:54.442Z"
     },
     "leticia.santana@gmail.com": {
       "name": "Dra. Leticia Santana Rocha",
-      "phone": "5534958314431",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:51:21.668Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:31:25.040Z"
     },
     "isabela.ferreira@gmail.com": {
       "name": "Dra. Isabela Ferreira Machado",
-      "phone": "5547944032123",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:51:29.253Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:31:55.616Z"
     },
     "fernando.souza@gmail.com": {
       "name": "Dr. Fernando Souza Costa",
-      "phone": "5585989571859",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:51:36.742Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:32:26.188Z"
     },
     "gustavo.silva@drsaude.com.br": {
       "name": "Dr. Gustavo Silva Souza",
-      "phone": "5519913395132",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:51:44.295Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:32:56.757Z"
     },
     "vitor.teixeira@institutocanabis.med.br": {
       "name": "Dr. Vitor Teixeira Martins",
-      "phone": "5534939356596",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:51:52.202Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:33:27.330Z"
     },
     "leonardo.ramos@clinicamedica.com.br": {
       "name": "Dr. Leonardo Ramos Ferreira",
-      "phone": "5547968786343",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:52:00.905Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:33:57.911Z"
     },
     "alexandre.souza@institutocanabis.med.br": {
       "name": "Dr. Alexandre Souza Lopes",
-      "phone": "5571968753170",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:52:08.897Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:34:28.485Z"
     },
     "eduardo.santana@gmail.com": {
       "name": "Dr. Eduardo Santana Pereira",
-      "phone": "5561968660011",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:52:16.416Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:34:59.057Z"
     },
     "otavio.dias@institutocanabis.med.br": {
       "name": "Dr. Otavio Dias Pereira",
-      "phone": "5527920475074",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:52:23.956Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:35:29.654Z"
     },
     "isabela.nunes@drsaude.com.br": {
       "name": "Dra. Isabela Nunes Machado",
-      "phone": "5554916718614",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:52:31.856Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:36:00.289Z"
     },
     "camila.oliveira@drsaude.com.br": {
       "name": "Dra. Camila Oliveira Teixeira",
-      "phone": "5567942067481",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:52:39.468Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:36:30.993Z"
     },
     "daniela.barbosa@clinicamedica.com.br": {
       "name": "Dra. Daniela Barbosa Vieira",
-      "phone": "5581941064194",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:52:47.026Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:37:01.554Z"
     },
     "isabela.teixeira@gmail.com": {
       "name": "Dra. Isabela Teixeira Nunes",
-      "phone": "5548958719542",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:52:54.497Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:37:32.118Z"
     },
     "denise.barbosa@gmail.com": {
       "name": "Dra. Denise Barbosa Alves",
-      "phone": "5527987145315",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:53:01.990Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:38:02.574Z"
     },
     "patricia.lima@gmail.com": {
       "name": "Dra. Patricia Lima Martins",
-      "phone": "5567922453152",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:53:09.457Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:38:33.185Z"
     },
     "daniel.ribeiro@drsaude.com.br": {
       "name": "Dr. Daniel Ribeiro Souza",
-      "phone": "5551916679004",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:53:17.402Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:39:03.735Z"
     },
     "daniel.pereira@gmail.com": {
       "name": "Dr. Daniel Pereira Cardoso",
-      "phone": "5547915447563",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:53:24.931Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:39:34.320Z"
     },
     "rafael.machado@clinicamedica.com.br": {
       "name": "Dr. Rafael Machado Lopes",
-      "phone": "5519941632212",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:53:32.517Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:40:04.896Z"
     },
     "amanda.santos@drsaude.com.br": {
       "name": "Dra. Amanda Santos Teixeira",
-      "phone": "5554991930107",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:53:40.050Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:40:35.487Z"
     },
     "rodrigo.souza@drsaude.com.br": {
       "name": "Dr. Rodrigo Souza Vieira",
-      "phone": "5565959843542",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:53:47.818Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:41:06.016Z"
     },
     "guilherme.lima@consultoriomed.com.br": {
       "name": "Dr. Guilherme Lima Gomes",
-      "phone": "5521955948809",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:53:55.525Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:41:36.697Z"
     },
     "matheus.moreira@saudeintegrativa.med.br": {
-      "name": "Dr. Matheus Moreira Nunes",
-      "phone": "5581920031703",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:57:41.558Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "name": "Dr. Matheus Moreira Machado",
+      "success": true,
+      "sent_at": "2026-08-12T11:42:07.155Z"
     },
     "priscila.carvalho@institutocanabis.med.br": {
       "name": "Dra. Priscila Carvalho Marques",
-      "phone": "5582974250744",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:54:10.736Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:42:37.751Z"
     },
     "vinicius.gonçalves@outlook.com": {
       "name": "Dr. Vinicius Gonçalves Lopes",
-      "phone": "5562978966873",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:54:17.778Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T11:43:08.357Z"
     },
     "carlos.lopes@gmail.com": {
       "name": "Dr. Carlos Lopes Martins",
-      "phone": "5524944138930",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:54:25.279Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:43:38.930Z"
     },
     "natalia.costa@clinicamedica.com.br": {
       "name": "Dra. Natalia Costa Nunes",
-      "phone": "5521954881484",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:54:32.936Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:44:09.490Z"
     },
     "marcelo.martins@gmail.com": {
       "name": "Dr. Marcelo Martins Nunes",
-      "phone": "5544995224045",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:54:40.514Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:44:40.073Z"
     },
     "vanessa.marques@drsaude.com.br": {
       "name": "Dra. Vanessa Marques Machado",
-      "phone": "5581941637736",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:54:48.487Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:45:10.533Z"
     },
     "isabela.andrade@institutocanabis.med.br": {
       "name": "Dra. Isabela Andrade Oliveira",
-      "phone": "5513985485453",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:54:56.046Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:45:41.094Z"
     },
     "tatiana.nascimento@clinicamedica.com.br": {
       "name": "Dra. Tatiana Nascimento Marques",
-      "phone": "5547954404670",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:55:03.579Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:46:11.723Z"
     },
     "luiza.santana@saudeintegrativa.med.br": {
       "name": "Dra. Luiza Santana Costa",
-      "phone": "5582922609271",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:55:11.161Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:46:42.335Z"
     },
     "caio.carvalho@drsaude.com.br": {
       "name": "Dr. Caio Carvalho Dias",
-      "phone": "5527960647033",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:55:18.709Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:47:12.898Z"
     },
     "monica.gonçalves@outlook.com": {
       "name": "Dra. Monica Gonçalves Pereira",
-      "phone": "5547936007617",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:55:25.952Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T11:47:43.466Z"
     },
     "caio.silva@clinicamedica.com.br": {
       "name": "Dr. Caio Silva Soares",
-      "phone": "5516963473709",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:55:36.886Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:48:14.057Z"
     },
     "flavia.freitas@outlook.com": {
       "name": "Dra. Flavia Freitas Lima",
-      "phone": "5521977665080",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:55:44.431Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:48:44.668Z"
     },
     "fabio.barbosa@drsaude.com.br": {
       "name": "Dr. Fabio Barbosa Alves",
-      "phone": "5511943075257",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:55:52.124Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:49:15.158Z"
     },
     "murilo.martins@drsaude.com.br": {
       "name": "Dr. Murilo Martins Barbosa",
-      "phone": "5532920493007",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:55:59.626Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:49:45.746Z"
     },
     "beatriz.nunes@institutocanabis.med.br": {
       "name": "Dra. Beatriz Nunes Nascimento",
-      "phone": "5512911941304",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:56:07.153Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:50:16.532Z"
     },
     "renata.marques@drsaude.com.br": {
       "name": "Dra. Renata Marques Lima",
-      "phone": "5531994891514",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:56:14.648Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:50:47.119Z"
     },
     "carlos.santos@outlook.com": {
       "name": "Dr. Carlos Santos Vieira",
-      "phone": "5519982577317",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:56:22.164Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:51:17.766Z"
     },
     "patricia.oliveira@clinicamedica.com.br": {
       "name": "Dra. Patricia Oliveira Freitas",
-      "phone": "5554919827467",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:56:29.655Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:51:48.347Z"
     },
     "sergio.martins@consultoriomed.com.br": {
       "name": "Dr. Sergio Martins Teixeira",
-      "phone": "5534975226640",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:56:48.047Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:52:18.929Z"
     },
     "renata.nascimento@clinicamedica.com.br": {
       "name": "Dra. Renata Nascimento Freitas",
-      "phone": "5521961873815",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:56:55.505Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:52:49.637Z"
     },
     "diego.lopes@consultoriomed.com.br": {
       "name": "Dr. Diego Lopes Marques",
-      "phone": "5512958431417",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:57:03.330Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:53:20.196Z"
     },
     "luciana.marques@drsaude.com.br": {
       "name": "Dra. Luciana Marques Pereira",
-      "phone": "5551948635414",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:57:10.844Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:53:50.809Z"
     },
     "bruno.santana@consultoriomed.com.br": {
       "name": "Dr. Bruno Santana Carvalho",
-      "phone": "5534971294052",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:57:18.323Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:54:21.411Z"
     },
     "henrique.nunes@consultoriomed.com.br": {
       "name": "Dr. Henrique Nunes Lopes",
-      "phone": "5516962628041",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:57:26.044Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:54:52.010Z"
     },
     "gustavo.nunes@consultoriomed.com.br": {
       "name": "Dr. Gustavo Nunes Oliveira",
-      "phone": "5583950050716",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:57:33.826Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:55:22.580Z"
     },
     "vanessa.soares@gmail.com": {
       "name": "Dra. Vanessa Soares Machado",
-      "phone": "5554996149578",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:57:49.302Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:55:53.151Z"
     },
     "larissa.moreira@gmail.com": {
       "name": "Dra. Larissa Moreira Silva",
-      "phone": "5571921628450",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:57:56.766Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:56:23.700Z"
     },
     "priscila.silva@outlook.com": {
       "name": "Dra. Priscila Silva Rodrigues",
-      "phone": "5541985001055",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:58:04.310Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:56:54.341Z"
     },
     "rafael.costa@outlook.com": {
       "name": "Dr. Rafael Costa Lopes",
-      "phone": "5532935458121",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:58:11.834Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:57:24.915Z"
     },
     "caio.soares@outlook.com": {
       "name": "Dr. Caio Soares Marques",
-      "phone": "5513944730651",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:58:19.707Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:57:55.475Z"
     },
     "felipe.santana@gmail.com": {
       "name": "Dr. Felipe Santana Moreira",
-      "phone": "5565971344292",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:58:27.561Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:58:26.057Z"
     },
     "leticia.andrade@drsaude.com.br": {
       "name": "Dra. Leticia Andrade Dias",
-      "phone": "5516948820629",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:58:35.927Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:58:56.644Z"
     },
     "gabriela.ribeiro@drsaude.com.br": {
       "name": "Dra. Gabriela Ribeiro Rocha",
-      "phone": "5585967159284",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:58:43.481Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:59:27.235Z"
     },
     "natalia.santana@consultoriomed.com.br": {
       "name": "Dra. Natalia Santana Freitas",
-      "phone": "5521912559198",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:58:51.119Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T11:59:57.814Z"
     },
     "luiza.mendes@drsaude.com.br": {
       "name": "Dra. Luiza Mendes Lopes",
-      "phone": "5516956230767",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:58:58.600Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:00:28.398Z"
     },
     "juliana.alves@consultoriomed.com.br": {
       "name": "Dra. Juliana Alves Lima",
-      "phone": "5565927913917",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:59:08.534Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:00:58.967Z"
     },
     "ricardo.pereira@saudeintegrativa.med.br": {
       "name": "Dr. Ricardo Pereira Rocha",
-      "phone": "5562997982908",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:59:16.226Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:01:29.634Z"
     },
     "caio.pereira@clinicamedica.com.br": {
       "name": "Dr. Caio Pereira Vieira",
-      "phone": "5527979884056",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:59:24.154Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:02:00.109Z"
     },
     "rafael.silva@consultoriomed.com.br": {
       "name": "Dr. Rafael Silva Cardoso",
-      "phone": "5551933624100",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:59:31.844Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:02:30.709Z"
     },
     "monica.costa@consultoriomed.com.br": {
       "name": "Dra. Monica Costa Santos",
-      "phone": "5532942357380",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:59:39.411Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:03:01.306Z"
     },
     "gustavo.dias@institutocanabis.med.br": {
       "name": "Dr. Gustavo Dias Lopes",
-      "phone": "5584912843264",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:59:47.111Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:03:31.890Z"
     },
     "natalia.souza@institutocanabis.med.br": {
       "name": "Dra. Natalia Souza Gomes",
-      "phone": "5548974542088",
-      "success": false,
-      "last_attempt_at": "2026-08-11T14:59:54.733Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:04:02.470Z"
     },
     "diego.rodrigues@gmail.com": {
       "name": "Dr. Diego Rodrigues Freitas",
-      "phone": "5554959519422",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:00:02.366Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:04:36.436Z"
     },
     "roberta.gomes@saudeintegrativa.med.br": {
       "name": "Dra. Roberta Gomes Vieira",
-      "phone": "5527916611517",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:00:09.922Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:05:07.020Z"
     },
     "roberta.lopes@outlook.com": {
       "name": "Dra. Roberta Lopes Fernandes",
-      "phone": "5561958492623",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:00:17.884Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:05:37.596Z"
     },
     "felipe.lima@clinicamedica.com.br": {
       "name": "Dr. Felipe Lima Souza",
-      "phone": "5532956655636",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:00:25.546Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:06:08.154Z"
     },
     "eduardo.almeida@saudeintegrativa.med.br": {
       "name": "Dr. Eduardo Almeida Ribeiro",
-      "phone": "5567951456474",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:00:33.153Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:06:38.836Z"
     },
     "isabela.cardoso@saudeintegrativa.med.br": {
       "name": "Dra. Isabela Cardoso Ribeiro",
-      "phone": "5527968931520",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:00:56.916Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:07:09.438Z"
     },
     "guilherme.santana@clinicamedica.com.br": {
       "name": "Dr. Guilherme Santana Freitas",
-      "phone": "5519923293282",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:01:05.345Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:07:40.002Z"
     },
     "matheus.dias@saudeintegrativa.med.br": {
       "name": "Dr. Matheus Dias Nascimento",
-      "phone": "5531974121121",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:01:12.846Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:08:10.566Z"
     },
     "renata.dias@saudeintegrativa.med.br": {
       "name": "Dra. Renata Dias Rocha",
-      "phone": "5513937575847",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:01:20.377Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:08:41.147Z"
     },
     "matheus.nunes@outlook.com": {
       "name": "Dr. Matheus Nunes Nascimento",
-      "phone": "5551911752882",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:01:27.928Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:09:11.718Z"
     },
     "marcelo.lima@drsaude.com.br": {
       "name": "Dr. Marcelo Lima Gonçalves",
-      "phone": "5582927953538",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:01:35.499Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:09:42.249Z"
     },
     "daniel.lopes@gmail.com": {
       "name": "Dr. Daniel Lopes Costa",
-      "phone": "5534944694022",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:01:42.994Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:10:12.828Z"
     },
     "vanessa.vieira@outlook.com": {
       "name": "Dra. Vanessa Vieira Lima",
-      "phone": "5571917461964",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:01:50.891Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:10:44.867Z"
     },
     "larissa.martins@drsaude.com.br": {
       "name": "Dra. Larissa Martins Lopes",
-      "phone": "5531928465359",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:02:13.735Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:11:15.441Z"
     },
     "anapaula.mendes@clinicamedica.com.br": {
       "name": "Dra. Ana Paula Mendes Mendes",
-      "phone": "5521924334421",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:02:22.422Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:11:46.105Z"
     },
     "thiago.gomes@drsaude.com.br": {
       "name": "Dr. Thiago Gomes Costa",
-      "phone": "5543916983438",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:02:30.162Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:12:16.708Z"
     },
     "luciana.moreira@saudeintegrativa.med.br": {
       "name": "Dra. Luciana Moreira Rodrigues",
-      "phone": "5521966403161",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:02:37.699Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:12:47.273Z"
     },
     "helena.silva@institutocanabis.med.br": {
       "name": "Dra. Helena Silva Soares",
-      "phone": "5584961316918",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:02:45.693Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:13:17.935Z"
     },
     "andré.moreira@outlook.com": {
       "name": "Dr. André Moreira Souza",
-      "phone": "5547933658365",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:02:53.040Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T12:13:48.590Z"
     },
     "carlos.martins@clinicamedica.com.br": {
       "name": "Dr. Carlos Martins Vieira",
-      "phone": "5571921019910",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:03:00.936Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:14:19.200Z"
     },
     "fernando.moreira@gmail.com": {
       "name": "Dr. Fernando Moreira Nunes",
-      "phone": "5554916841105",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:03:08.443Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:14:51.379Z"
     },
     "larissa.vieira@consultoriomed.com.br": {
       "name": "Dra. Larissa Vieira Nunes",
-      "phone": "5583953822337",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:03:15.959Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:15:22.041Z"
     },
     "amanda.alves@clinicamedica.com.br": {
       "name": "Dra. Amanda Alves Silva",
-      "phone": "5513963708127",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:03:23.689Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:15:52.683Z"
     },
     "rodrigo.nunes@outlook.com": {
       "name": "Dr. Rodrigo Nunes Pereira",
-      "phone": "5541920401336",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:03:31.376Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:16:39.691Z"
     },
     "rodrigo.gomes@clinicamedica.com.br": {
       "name": "Dr. Rodrigo Gomes Costa",
-      "phone": "5512963339074",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:03:39.318Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:17:10.381Z"
     },
     "clarissa.vieira@saudeintegrativa.med.br": {
       "name": "Dra. Clarissa Vieira Carvalho",
-      "phone": "5543919515219",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:03:47.043Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:17:41.155Z"
     },
     "andré.santana@outlook.com": {
       "name": "Dr. André Santana Ferreira",
-      "phone": "5565996594488",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:03:54.131Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T12:18:11.771Z"
     },
     "amanda.oliveira@clinicamedica.com.br": {
       "name": "Dra. Amanda Oliveira Costa",
-      "phone": "5544915100223",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:04:01.980Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:18:42.364Z"
     },
     "helena.rodrigues@institutocanabis.med.br": {
       "name": "Dra. Helena Rodrigues Souza",
-      "phone": "5565924287633",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:04:10.039Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:19:12.990Z"
     },
     "larissa.teixeira@saudeintegrativa.med.br": {
       "name": "Dra. Larissa Teixeira Mendes",
-      "phone": "5541924696504",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:04:17.668Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:19:43.597Z"
     },
     "diego.cardoso@clinicamedica.com.br": {
       "name": "Dr. Diego Cardoso Marques",
-      "phone": "5543965268306",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:04:25.252Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:20:14.159Z"
     },
     "clarissa.oliveira@consultoriomed.com.br": {
       "name": "Dra. Clarissa Oliveira Costa",
-      "phone": "5544998968705",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:04:32.745Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:20:44.741Z"
     },
     "marcelo.souza@drsaude.com.br": {
       "name": "Dr. Marcelo Souza Martins",
-      "phone": "5581923257940",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:04:40.575Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:21:15.380Z"
     },
     "guilherme.souza@clinicamedica.com.br": {
       "name": "Dr. Guilherme Souza Freitas",
-      "phone": "5543944303368",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:04:48.256Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:21:45.875Z"
     },
     "felipe.souza@gmail.com": {
       "name": "Dr. Felipe Souza Rocha",
-      "phone": "5544960693652",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:04:56.003Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:22:16.527Z"
     },
     "clarissa.santos@gmail.com": {
       "name": "Dra. Clarissa Santos Fernandes",
-      "phone": "5554988145257",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:05:03.787Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:22:47.118Z"
     },
     "marcelo.pereira@gmail.com": {
       "name": "Dr. Marcelo Pereira Barbosa",
-      "phone": "5524942369025",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:05:11.338Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:23:17.686Z"
     },
     "bruna.oliveira@institutocanabis.med.br": {
       "name": "Dra. Bruna Oliveira Nunes",
-      "phone": "5585946486903",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:05:18.909Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:23:48.294Z"
     },
     "otavio.teixeira@clinicamedica.com.br": {
       "name": "Dr. Otavio Teixeira Lima",
-      "phone": "5554955688365",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:05:26.464Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:24:18.879Z"
     },
     "luiza.vieira@outlook.com": {
       "name": "Dra. Luiza Vieira Mendes",
-      "phone": "5524924871157",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:05:34.057Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:24:49.393Z"
     },
     "fernanda.rocha@gmail.com": {
       "name": "Dra. Fernanda Rocha Vieira",
-      "phone": "5571959210188",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:05:41.645Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:25:19.980Z"
     },
     "natalia.teixeira@outlook.com": {
       "name": "Dra. Natalia Teixeira Alves",
-      "phone": "5551957586063",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:05:49.224Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:25:50.557Z"
     },
     "bruna.pereira@institutocanabis.med.br": {
       "name": "Dra. Bruna Pereira Lopes",
-      "phone": "5512981403797",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:06:00.200Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:26:21.120Z"
     },
     "thais.santos@gmail.com": {
       "name": "Dra. Thais Santos Ramos",
-      "phone": "5561947094086",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:06:28.503Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:26:51.842Z"
     },
     "alexandre.ferreira@clinicamedica.com.br": {
       "name": "Dr. Alexandre Ferreira Pereira",
-      "phone": "5581941345593",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:06:36.330Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:27:22.432Z"
     },
     "matheus.gonçalves@gmail.com": {
       "name": "Dr. Matheus Gonçalves Souza",
-      "phone": "5567927487880",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:06:43.432Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T12:27:53.031Z"
     },
     "clarissa.costa@institutocanabis.med.br": {
       "name": "Dra. Clarissa Costa Ribeiro",
-      "phone": "5519976721968",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:06:51.015Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:28:23.597Z"
     },
     "flavia.andrade@drsaude.com.br": {
       "name": "Dra. Flavia Andrade Ferreira",
-      "phone": "5581984726382",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:06:58.532Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:28:54.184Z"
     },
     "juliana.almeida@saudeintegrativa.med.br": {
       "name": "Dra. Juliana Almeida Ferreira",
-      "phone": "5532943686200",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:07:05.983Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:29:24.755Z"
     },
     "leonardo.dias@drsaude.com.br": {
       "name": "Dr. Leonardo Dias Teixeira",
-      "phone": "5548984630362",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:07:13.416Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:29:55.308Z"
     },
     "andré.gonçalves@consultoriomed.com.br": {
       "name": "Dr. André Gonçalves Gomes",
-      "phone": "5583981254019",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:07:20.417Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T12:30:25.922Z"
     },
     "vinicius.pereira@clinicamedica.com.br": {
       "name": "Dr. Vinicius Pereira Gonçalves",
-      "phone": "5531973630463",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:07:28.010Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:30:56.521Z"
     },
     "denise.silva@saudeintegrativa.med.br": {
       "name": "Dra. Denise Silva Vieira",
-      "phone": "5521971258834",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:07:35.480Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:31:27.084Z"
     },
     "daniel.ferreira@outlook.com": {
       "name": "Dr. Daniel Ferreira Santana",
-      "phone": "5531923037257",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:07:43.021Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:31:57.651Z"
     },
     "gabriela.machado@clinicamedica.com.br": {
       "name": "Dra. Gabriela Machado Dias",
-      "phone": "5584971404241",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:07:50.469Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:32:28.336Z"
     },
     "henrique.moreira@clinicamedica.com.br": {
       "name": "Dr. Henrique Moreira Rodrigues",
-      "phone": "5513913361657",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:07:58.004Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:32:58.933Z"
     },
     "guilherme.nunes@institutocanabis.med.br": {
       "name": "Dr. Guilherme Nunes Soares",
-      "phone": "5547917186523",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:08:05.600Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:33:29.480Z"
     },
     "matheus.vieira@outlook.com": {
       "name": "Dr. Matheus Vieira Vieira",
-      "phone": "5524941524850",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:08:13.243Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:34:00.048Z"
     },
     "larissa.marques@saudeintegrativa.med.br": {
       "name": "Dra. Larissa Marques Souza",
-      "phone": "5532925221937",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:08:20.705Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:34:30.652Z"
     },
     "andré.rocha@clinicamedica.com.br": {
       "name": "Dr. André Rocha Ribeiro",
-      "phone": "5532927688502",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:08:27.962Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T12:35:01.265Z"
     },
     "vanessa.lima@clinicamedica.com.br": {
       "name": "Dra. Vanessa Lima Ferreira",
-      "phone": "5562982851500",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:08:35.499Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:35:31.861Z"
     },
     "daniel.rodrigues@institutocanabis.med.br": {
       "name": "Dr. Daniel Rodrigues Gonçalves",
-      "phone": "5519932753287",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:08:43.079Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:36:02.452Z"
     },
     "guilherme.ferreira@drsaude.com.br": {
       "name": "Dr. Guilherme Ferreira Ramos",
-      "phone": "5521941133165",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:08:50.704Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:36:33.053Z"
     },
     "clarissa.nascimento@institutocanabis.med.br": {
       "name": "Dra. Clarissa Nascimento Vieira",
-      "phone": "5534947021130",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:08:58.267Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:37:03.608Z"
     },
     "sergio.silva@clinicamedica.com.br": {
       "name": "Dr. Sergio Silva Mendes",
-      "phone": "5565919875336",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:09:06.072Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:37:34.178Z"
     },
     "fernanda.dias@drsaude.com.br": {
       "name": "Dra. Fernanda Dias Souza",
-      "phone": "5562925944779",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:09:13.538Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:38:04.743Z"
     },
     "sabrina.vieira@institutocanabis.med.br": {
       "name": "Dra. Sabrina Vieira Nunes",
-      "phone": "5531945222004",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:09:21.093Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:38:35.427Z"
     },
     "luciana.dias@clinicamedica.com.br": {
       "name": "Dra. Luciana Dias Ribeiro",
-      "phone": "5519913419496",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:09:28.786Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:39:06.012Z"
     },
     "thiago.teixeira@saudeintegrativa.med.br": {
-      "name": "Dr. Thiago Teixeira Mendes",
-      "phone": "5512977845389",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:18:35.360Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "name": "Dr. Thiago Teixeira Fernandes",
+      "success": true,
+      "sent_at": "2026-08-12T12:39:40.409Z"
     },
     "murilo.cardoso@saudeintegrativa.med.br": {
       "name": "Dr. Murilo Cardoso Dias",
-      "phone": "5521959627439",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:09:44.276Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:40:11.000Z"
     },
     "rodrigo.nascimento@consultoriomed.com.br": {
       "name": "Dr. Rodrigo Nascimento Souza",
-      "phone": "5585946953846",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:09:51.995Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:40:41.566Z"
     },
     "larissa.teixeira@consultoriomed.com.br": {
       "name": "Dra. Larissa Teixeira Carvalho",
-      "phone": "5534910606175",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:09:59.777Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:41:13.455Z"
     },
     "vitor.nascimento@outlook.com": {
       "name": "Dr. Vitor Nascimento Santana",
-      "phone": "5532979790094",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:10:07.653Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:41:44.007Z"
     },
     "sabrina.gomes@gmail.com": {
-      "name": "Dra. Sabrina Gomes Rodrigues",
-      "phone": "5541983578648",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:28:44.044Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "name": "Dra. Sabrina Gomes Machado",
+      "success": true,
+      "sent_at": "2026-08-12T12:42:14.587Z"
     },
     "caio.carvalho@saudeintegrativa.med.br": {
       "name": "Dr. Caio Carvalho Marques",
-      "phone": "5582928328624",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:10:22.968Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:42:45.251Z"
     },
     "anapaula.moreira@gmail.com": {
       "name": "Dra. Ana Paula Moreira Ramos",
-      "phone": "5513913775498",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:10:30.412Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:43:15.821Z"
     },
     "marcelo.machado@gmail.com": {
       "name": "Dr. Marcelo Machado Lima",
-      "phone": "5531978620332",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:10:37.955Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:43:46.384Z"
     },
     "carolina.silva@saudeintegrativa.med.br": {
       "name": "Dra. Carolina Silva Ferreira",
-      "phone": "5554951739749",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:10:45.600Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:44:16.969Z"
     },
     "felipe.soares@outlook.com": {
       "name": "Dr. Felipe Soares Pereira",
-      "phone": "5543965175753",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:10:53.091Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:44:47.552Z"
     },
     "daniel.ferreira@institutocanabis.med.br": {
       "name": "Dr. Daniel Ferreira Almeida",
-      "phone": "5511974508434",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:11:02.516Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:45:18.143Z"
     },
     "vitor.gonçalves@saudeintegrativa.med.br": {
       "name": "Dr. Vitor Gonçalves Ferreira",
-      "phone": "5513941452262",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:11:09.782Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T12:45:48.704Z"
     },
     "carolina.barbosa@institutocanabis.med.br": {
       "name": "Dra. Carolina Barbosa Oliveira",
-      "phone": "5532970391576",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:11:17.337Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:46:19.263Z"
     },
     "isabela.oliveira@outlook.com": {
       "name": "Dra. Isabela Oliveira Dias",
-      "phone": "5524993627921",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:11:24.833Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:46:49.830Z"
     },
     "tatiana.ferreira@outlook.com": {
       "name": "Dra. Tatiana Ferreira Moreira",
-      "phone": "5513918278808",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:11:33.632Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:47:20.383Z"
     },
     "leonardo.mendes@outlook.com": {
       "name": "Dr. Leonardo Mendes Machado",
-      "phone": "5548953107077",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:11:41.207Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:47:50.979Z"
     },
     "leonardo.teixeira@institutocanabis.med.br": {
       "name": "Dr. Leonardo Teixeira Teixeira",
-      "phone": "5548936342082",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:11:51.039Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:48:21.551Z"
     },
     "rafael.mendes@gmail.com": {
       "name": "Dr. Rafael Mendes Marques",
-      "phone": "5581920858575",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:11:58.567Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:48:52.130Z"
     },
     "guilherme.gonçalves@drsaude.com.br": {
       "name": "Dr. Guilherme Gonçalves Cardoso",
-      "phone": "5512934023440",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:12:05.985Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T12:49:22.737Z"
     },
     "vitor.fernandes@outlook.com": {
       "name": "Dr. Vitor Fernandes Santos",
-      "phone": "5543956982623",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:12:13.616Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:49:53.343Z"
     },
     "rodrigo.lima@consultoriomed.com.br": {
       "name": "Dr. Rodrigo Lima Barbosa",
-      "phone": "5561980974580",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:12:21.068Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:50:23.947Z"
     },
     "murilo.rocha@saudeintegrativa.med.br": {
       "name": "Dr. Murilo Rocha Freitas",
-      "phone": "5524938539912",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:12:30.265Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:50:54.546Z"
     },
     "gabriela.gomes@saudeintegrativa.med.br": {
       "name": "Dra. Gabriela Gomes Santos",
-      "phone": "5561973333230",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:12:37.722Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:51:25.148Z"
     },
     "priscila.gomes@consultoriomed.com.br": {
       "name": "Dra. Priscila Gomes Nascimento",
-      "phone": "5585954364035",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:12:45.157Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:51:55.718Z"
     },
     "natalia.mendes@gmail.com": {
       "name": "Dra. Natalia Mendes Almeida",
-      "phone": "5585981883727",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:12:52.712Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:52:26.319Z"
     },
     "eduardo.santana@institutocanabis.med.br": {
       "name": "Dr. Eduardo Santana Rodrigues",
-      "phone": "5513987147343",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:13:00.215Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:52:56.974Z"
     },
     "carlos.oliveira@gmail.com": {
       "name": "Dr. Carlos Oliveira Santana",
-      "phone": "5524918576751",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:13:07.666Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:53:27.543Z"
     },
     "luiza.barbosa@drsaude.com.br": {
       "name": "Dra. Luiza Barbosa Vieira",
-      "phone": "5567999010996",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:13:15.537Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:53:58.136Z"
     },
     "guilherme.gonçalves@saudeintegrativa.med.br": {
       "name": "Dr. Guilherme Gonçalves Moreira",
-      "phone": "5567947760804",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:13:22.624Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T12:54:28.893Z"
     },
     "eduardo.gonçalves@consultoriomed.com.br": {
       "name": "Dr. Eduardo Gonçalves Souza",
-      "phone": "5547969345027",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:13:29.714Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T12:54:59.482Z"
     },
     "henrique.vieira@institutocanabis.med.br": {
       "name": "Dr. Henrique Vieira Mendes",
-      "phone": "5521971273845",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:13:37.207Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:55:30.060Z"
     },
     "thais.fernandes@outlook.com": {
       "name": "Dra. Thais Fernandes Cardoso",
-      "phone": "5585923341475",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:13:44.689Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:56:00.643Z"
     },
     "priscila.lopes@consultoriomed.com.br": {
       "name": "Dra. Priscila Lopes Teixeira",
-      "phone": "5548915978498",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:13:52.227Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:56:31.206Z"
     },
     "rodrigo.alves@institutocanabis.med.br": {
       "name": "Dr. Rodrigo Alves Ferreira",
-      "phone": "5519990564893",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:13:59.791Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:57:01.785Z"
     },
     "flavia.silva@saudeintegrativa.med.br": {
       "name": "Dra. Flavia Silva Barbosa",
-      "phone": "5534910065757",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:14:07.329Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:57:32.444Z"
     },
     "thiago.machado@consultoriomed.com.br": {
       "name": "Dr. Thiago Machado Costa",
-      "phone": "5554971020076",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:14:14.841Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:58:03.124Z"
     },
     "thais.cardoso@saudeintegrativa.med.br": {
       "name": "Dra. Thais Cardoso Fernandes",
-      "phone": "5543974106682",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:14:22.376Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:58:33.750Z"
     },
     "sabrina.ferreira@consultoriomed.com.br": {
       "name": "Dra. Sabrina Ferreira Ramos",
-      "phone": "5519998934196",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:14:29.851Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:59:04.412Z"
     },
     "patricia.carvalho@gmail.com": {
       "name": "Dra. Patricia Carvalho Marques",
-      "phone": "5565974437730",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:14:37.380Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T12:59:34.978Z"
     },
     "marcelo.pereira@saudeintegrativa.med.br": {
       "name": "Dr. Marcelo Pereira Ramos",
-      "phone": "5544945918622",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:14:45.268Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:00:05.557Z"
     },
     "roberta.santos@gmail.com": {
       "name": "Dra. Roberta Santos Costa",
-      "phone": "5554989775599",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:14:52.960Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:00:36.132Z"
     },
     "fernanda.martins@institutocanabis.med.br": {
       "name": "Dra. Fernanda Martins Santos",
-      "phone": "5541975832574",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:15:00.867Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:01:06.716Z"
     },
     "renata.barbosa@drsaude.com.br": {
       "name": "Dra. Renata Barbosa Ramos",
-      "phone": "5524932894210",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:15:08.421Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:01:37.281Z"
     },
     "fernando.oliveira@clinicamedica.com.br": {
       "name": "Dr. Fernando Oliveira Marques",
-      "phone": "5562926250195",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:15:16.247Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:02:07.869Z"
     },
     "renata.dias@outlook.com": {
       "name": "Dra. Renata Dias Almeida",
-      "phone": "5567926370881",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:15:23.864Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:02:38.464Z"
     },
     "beatriz.ramos@saudeintegrativa.med.br": {
       "name": "Dra. Beatriz Ramos Mendes",
-      "phone": "5532932557261",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:15:31.377Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:03:09.164Z"
     },
     "beatriz.pereira@institutocanabis.med.br": {
       "name": "Dra. Beatriz Pereira Lopes",
-      "phone": "5516974010545",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:15:38.910Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:03:39.738Z"
     },
     "caio.teixeira@clinicamedica.com.br": {
       "name": "Dr. Caio Teixeira Pereira",
-      "phone": "5583978691826",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:15:46.402Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:04:10.201Z"
     },
     "roberta.marques@saudeintegrativa.med.br": {
       "name": "Dra. Roberta Marques Dias",
-      "phone": "5565983056074",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:15:55.320Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:04:40.767Z"
     },
     "mariana.gonçalves@gmail.com": {
       "name": "Dra. Mariana Gonçalves Pereira",
-      "phone": "5511933103962",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:16:02.455Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T13:05:11.361Z"
     },
     "caio.rodrigues@gmail.com": {
       "name": "Dr. Caio Rodrigues Almeida",
-      "phone": "5561947212325",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:16:10.318Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:05:41.928Z"
     },
     "thiago.mendes@drsaude.com.br": {
       "name": "Dr. Thiago Mendes Gomes",
-      "phone": "5524963424705",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:16:18.019Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:06:12.407Z"
     },
     "gabriela.santana@institutocanabis.med.br": {
       "name": "Dra. Gabriela Santana Alves",
-      "phone": "5516911588563",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:16:25.517Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:33:46.352Z"
     },
     "andré.alves@gmail.com": {
       "name": "Dr. André Alves Fernandes",
-      "phone": "5583927633522",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:16:32.584Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T13:34:17.178Z"
     },
     "carlos.barbosa@outlook.com": {
       "name": "Dr. Carlos Barbosa Ramos",
-      "phone": "5561984267782",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:16:40.027Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:34:47.802Z"
     },
     "patricia.freitas@clinicamedica.com.br": {
       "name": "Dra. Patricia Freitas Vieira",
-      "phone": "5584995234029",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:16:47.553Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:35:18.423Z"
     },
     "natalia.dias@gmail.com": {
       "name": "Dra. Natalia Dias Ramos",
-      "phone": "5562980949178",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:16:56.861Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:35:48.999Z"
     },
     "andré.pereira@gmail.com": {
       "name": "Dr. André Pereira Lima",
-      "phone": "5547943550634",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:17:04.122Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T13:36:19.580Z"
     },
     "denise.rodrigues@consultoriomed.com.br": {
       "name": "Dra. Denise Rodrigues Cardoso",
-      "phone": "5583960946542",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:17:11.653Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:36:50.159Z"
     },
     "roberta.almeida@drsaude.com.br": {
       "name": "Dra. Roberta Almeida Lopes",
-      "phone": "5524957034469",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:17:19.178Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:37:20.727Z"
     },
     "murilo.almeida@outlook.com": {
       "name": "Dr. Murilo Almeida Almeida",
-      "phone": "5531928797954",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:17:26.653Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:37:51.297Z"
     },
     "amanda.oliveira@institutocanabis.med.br": {
       "name": "Dra. Amanda Oliveira Andrade",
-      "phone": "5521937971359",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:17:34.421Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:38:21.875Z"
     },
     "gustavo.carvalho@outlook.com": {
       "name": "Dr. Gustavo Carvalho Soares",
-      "phone": "5551925872986",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:17:42.044Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:38:52.458Z"
     },
     "tiago.martins@gmail.com": {
       "name": "Dr. Tiago Martins Ramos",
-      "phone": "5531995709487",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:17:49.453Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:39:23.054Z"
     },
     "rafael.nascimento@saudeintegrativa.med.br": {
       "name": "Dr. Rafael Nascimento Ramos",
-      "phone": "5516986953408",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:17:57.401Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:39:53.641Z"
     },
     "mariana.santos@institutocanabis.med.br": {
       "name": "Dra. Mariana Santos Gomes",
-      "phone": "5548951638474",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:18:04.921Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:40:24.494Z"
     },
     "guilherme.nascimento@saudeintegrativa.med.br": {
       "name": "Dr. Guilherme Nascimento Lopes",
-      "phone": "5582936218619",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:18:12.427Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:40:55.065Z"
     },
     "thais.rocha@saudeintegrativa.med.br": {
       "name": "Dra. Thais Rocha Moreira",
-      "phone": "5524999303676",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:18:20.146Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:41:25.665Z"
     },
     "otavio.mendes@consultoriomed.com.br": {
       "name": "Dr. Otavio Mendes Mendes",
-      "phone": "5583984337458",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:18:27.718Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:41:56.221Z"
     },
     "bruno.souza@clinicamedica.com.br": {
       "name": "Dr. Bruno Souza Mendes",
-      "phone": "5519934075519",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:18:43.469Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:42:26.797Z"
     },
     "helena.martins@clinicamedica.com.br": {
       "name": "Dra. Helena Martins Pereira",
-      "phone": "5547963001395",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:18:55.530Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:42:57.365Z"
     },
     "ricardo.martins@saudeintegrativa.med.br": {
       "name": "Dr. Ricardo Martins Ramos",
-      "phone": "5582973814726",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:19:03.094Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:43:27.962Z"
     },
     "gabriela.fernandes@consultoriomed.com.br": {
       "name": "Dra. Gabriela Fernandes Ferreira",
-      "phone": "5543978807934",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:19:10.747Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:43:58.563Z"
     },
     "vitor.nunes@consultoriomed.com.br": {
       "name": "Dr. Vitor Nunes Marques",
-      "phone": "5532928825962",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:19:20.104Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:44:29.150Z"
     },
     "clarissa.nunes@gmail.com": {
       "name": "Dra. Clarissa Nunes Silva",
-      "phone": "5521972087227",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:19:27.795Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:44:59.628Z"
     },
     "juliana.machado@gmail.com": {
       "name": "Dra. Juliana Machado Lima",
-      "phone": "5551916028785",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:19:35.285Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:45:30.177Z"
     },
     "tiago.oliveira@outlook.com": {
       "name": "Dr. Tiago Oliveira Costa",
-      "phone": "5516985896763",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:19:42.738Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:46:00.749Z"
     },
     "daniel.fernandes@gmail.com": {
       "name": "Dr. Daniel Fernandes Carvalho",
-      "phone": "5583920390456",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:19:50.271Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:46:31.334Z"
     },
     "eduardo.souza@clinicamedica.com.br": {
       "name": "Dr. Eduardo Souza Ferreira",
-      "phone": "5516966060455",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:19:58.066Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:47:01.910Z"
     },
     "murilo.lima@drsaude.com.br": {
       "name": "Dr. Murilo Lima Santos",
-      "phone": "5548947001738",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:20:05.956Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:47:32.508Z"
     },
     "beatriz.ribeiro@clinicamedica.com.br": {
       "name": "Dra. Beatriz Ribeiro Alves",
-      "phone": "5571950355597",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:20:13.661Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:48:03.085Z"
     },
     "gabriela.cardoso@clinicamedica.com.br": {
       "name": "Dra. Gabriela Cardoso Silva",
-      "phone": "5561979219758",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:20:21.080Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:48:33.674Z"
     },
     "monica.andrade@saudeintegrativa.med.br": {
       "name": "Dra. Monica Andrade Cardoso",
-      "phone": "5541933460669",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:20:28.564Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:49:04.303Z"
     },
     "daniel.barbosa@institutocanabis.med.br": {
       "name": "Dr. Daniel Barbosa Martins",
-      "phone": "5565999564709",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:20:36.123Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:49:34.875Z"
     },
     "andré.almeida@consultoriomed.com.br": {
       "name": "Dr. André Almeida Soares",
-      "phone": "5524924974886",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:20:43.194Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T13:50:05.457Z"
     },
     "roberta.rodrigues@institutocanabis.med.br": {
       "name": "Dra. Roberta Rodrigues Moreira",
-      "phone": "5547967186198",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:20:50.726Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:50:36.018Z"
     },
     "guilherme.cardoso@consultoriomed.com.br": {
       "name": "Dr. Guilherme Cardoso Gomes",
-      "phone": "5544970478369",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:20:58.594Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:51:06.598Z"
     },
     "ricardo.andrade@clinicamedica.com.br": {
       "name": "Dr. Ricardo Andrade Cardoso",
-      "phone": "5524975956611",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:21:06.901Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:51:37.151Z"
     },
     "carlos.machado@clinicamedica.com.br": {
       "name": "Dr. Carlos Machado Silva",
-      "phone": "5521925136878",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:21:14.611Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:52:07.943Z"
     },
     "monica.rocha@institutocanabis.med.br": {
       "name": "Dra. Monica Rocha Cardoso",
-      "phone": "5547928645737",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:21:22.257Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:52:38.555Z"
     },
     "camila.marques@consultoriomed.com.br": {
       "name": "Dra. Camila Marques Dias",
-      "phone": "5512985725654",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:21:29.825Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:53:09.144Z"
     },
     "fernando.freitas@consultoriomed.com.br": {
       "name": "Dr. Fernando Freitas Santos",
-      "phone": "5544916494614",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:21:37.391Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:53:39.747Z"
     },
     "carlos.soares@institutocanabis.med.br": {
       "name": "Dr. Carlos Soares Carvalho",
-      "phone": "5551996459921",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:21:48.229Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:54:10.373Z"
     },
     "fabio.lima@gmail.com": {
       "name": "Dr. Fabio Lima Lima",
-      "phone": "5534988563034",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:21:55.856Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:54:41.129Z"
     },
     "sergio.lopes@outlook.com": {
       "name": "Dr. Sergio Lopes Nascimento",
-      "phone": "5527956267890",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:22:03.368Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:55:11.732Z"
     },
     "camila.freitas@institutocanabis.med.br": {
       "name": "Dra. Camila Freitas Fernandes",
-      "phone": "5521935119547",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:22:10.917Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:55:42.337Z"
     },
     "vinicius.ribeiro@saudeintegrativa.med.br": {
       "name": "Dr. Vinicius Ribeiro Mendes",
-      "phone": "5513988208406",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:22:18.657Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:56:12.864Z"
     },
     "vitor.machado@gmail.com": {
       "name": "Dr. Vitor Machado Lima",
-      "phone": "5512994545731",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:22:26.139Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:56:43.568Z"
     },
     "daniel.almeida@consultoriomed.com.br": {
       "name": "Dr. Daniel Almeida Lopes",
-      "phone": "5544951318872",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:22:33.676Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:57:14.197Z"
     },
     "larissa.barbosa@saudeintegrativa.med.br": {
       "name": "Dra. Larissa Barbosa Freitas",
-      "phone": "5565970928542",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:22:53.816Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:57:44.826Z"
     },
     "fabio.martins@consultoriomed.com.br": {
       "name": "Dr. Fabio Martins Ramos",
-      "phone": "5521992248735",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:23:01.314Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:58:15.450Z"
     },
     "fabio.rodrigues@institutocanabis.med.br": {
       "name": "Dr. Fabio Rodrigues Moreira",
-      "phone": "5534950060472",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:23:08.882Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:58:46.114Z"
     },
     "leticia.dias@outlook.com": {
       "name": "Dra. Leticia Dias Gonçalves",
-      "phone": "5543968604544",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:23:16.621Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:59:16.734Z"
     },
     "larissa.moreira@consultoriomed.com.br": {
       "name": "Dra. Larissa Moreira Ribeiro",
-      "phone": "5567952725640",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:23:24.121Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T13:59:47.350Z"
     },
     "camila.dias@saudeintegrativa.med.br": {
       "name": "Dra. Camila Dias Souza",
-      "phone": "5511976965220",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:23:31.818Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:00:17.900Z"
     },
     "carolina.souza@gmail.com": {
       "name": "Dra. Carolina Souza Gonçalves",
-      "phone": "5582923187967",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:23:39.344Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:00:48.457Z"
     },
     "natalia.rodrigues@institutocanabis.med.br": {
       "name": "Dra. Natalia Rodrigues Soares",
-      "phone": "5567997438982",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:23:47.240Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:01:19.022Z"
     },
     "mariana.soares@institutocanabis.med.br": {
       "name": "Dra. Mariana Soares Costa",
-      "phone": "5565990060271",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:23:54.893Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:01:49.781Z"
     },
     "bruna.barbosa@drsaude.com.br": {
       "name": "Dra. Bruna Barbosa Mendes",
-      "phone": "5582997594334",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:24:02.498Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:02:20.374Z"
     },
     "marcelo.oliveira@clinicamedica.com.br": {
       "name": "Dr. Marcelo Oliveira Gomes",
-      "phone": "5551915740635",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:24:10.442Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:02:50.974Z"
     },
     "patricia.costa@outlook.com": {
       "name": "Dra. Patricia Costa Teixeira",
-      "phone": "5562975116201",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:24:18.419Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:03:21.621Z"
     },
     "fernanda.rocha@outlook.com": {
       "name": "Dra. Fernanda Rocha Santana",
-      "phone": "5521981451797",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:24:25.923Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:03:52.236Z"
     },
     "thais.soares@gmail.com": {
       "name": "Dra. Thais Soares Moreira",
-      "phone": "5516948670770",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:24:33.432Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:04:22.841Z"
     },
     "monica.ramos@saudeintegrativa.med.br": {
       "name": "Dra. Monica Ramos Souza",
-      "phone": "5524976648777",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:24:49.340Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:04:53.395Z"
     },
     "anapaula.costa@institutocanabis.med.br": {
       "name": "Dra. Ana Paula Costa Fernandes",
-      "phone": "5516940971086",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:24:57.186Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:05:24.101Z"
     },
     "vinicius.gomes@institutocanabis.med.br": {
       "name": "Dr. Vinicius Gomes Soares",
-      "phone": "5571969537277",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:25:04.711Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:05:54.790Z"
     },
     "monica.lima@gmail.com": {
       "name": "Dra. Monica Lima Lopes",
-      "phone": "5582932749643",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:25:12.942Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:06:25.372Z"
     },
     "amanda.nascimento@gmail.com": {
       "name": "Dra. Amanda Nascimento Oliveira",
-      "phone": "5571997287310",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:25:20.424Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:06:55.961Z"
     },
     "bruna.almeida@clinicamedica.com.br": {
       "name": "Dra. Bruna Almeida Santos",
-      "phone": "5543911813889",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:25:27.964Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:07:26.542Z"
     },
     "patricia.lima@institutocanabis.med.br": {
       "name": "Dra. Patricia Lima Alves",
-      "phone": "5551914492872",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:25:35.523Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:07:57.161Z"
     },
     "sergio.andrade@saudeintegrativa.med.br": {
       "name": "Dr. Sergio Andrade Pereira",
-      "phone": "5582936986989",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:25:43.315Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:08:27.786Z"
     },
     "denise.almeida@saudeintegrativa.med.br": {
       "name": "Dra. Denise Almeida Fernandes",
-      "phone": "5581943344224",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:25:51.000Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:08:58.272Z"
     },
     "daniela.pereira@consultoriomed.com.br": {
       "name": "Dra. Daniela Pereira Ramos",
-      "phone": "5524960861493",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:25:58.564Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:09:28.775Z"
     },
     "sergio.rodrigues@saudeintegrativa.med.br": {
       "name": "Dr. Sergio Rodrigues Souza",
-      "phone": "5583921646851",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:26:06.275Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:09:59.366Z"
     },
     "diego.rodrigues@institutocanabis.med.br": {
       "name": "Dr. Diego Rodrigues Carvalho",
-      "phone": "5551963101258",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:26:13.820Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:10:29.979Z"
     },
     "daniel.moreira@outlook.com": {
       "name": "Dr. Daniel Moreira Carvalho",
-      "phone": "5531995742423",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:26:21.491Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:11:00.610Z"
     },
     "ricardo.lima@outlook.com": {
       "name": "Dr. Ricardo Lima Almeida",
-      "phone": "5581948586654",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:26:29.497Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:11:31.197Z"
     },
     "sergio.alves@consultoriomed.com.br": {
       "name": "Dr. Sergio Alves Costa",
-      "phone": "5548931630756",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:26:37.048Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:12:01.815Z"
     },
     "diego.freitas@outlook.com": {
       "name": "Dr. Diego Freitas Andrade",
-      "phone": "5543995495764",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:26:44.607Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:12:32.412Z"
     },
     "clarissa.santos@consultoriomed.com.br": {
       "name": "Dra. Clarissa Santos Alves",
-      "phone": "5547951857105",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:26:52.031Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:13:03.054Z"
     },
     "diego.nascimento@clinicamedica.com.br": {
       "name": "Dr. Diego Nascimento Nunes",
-      "phone": "5532981678095",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:26:59.711Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:13:33.657Z"
     },
     "daniela.gonçalves@outlook.com": {
       "name": "Dra. Daniela Gonçalves Moreira",
-      "phone": "5567915272856",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:27:06.790Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T14:14:04.220Z"
     },
     "matheus.silva@consultoriomed.com.br": {
       "name": "Dr. Matheus Silva Souza",
-      "phone": "5547960983989",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:27:14.386Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:14:34.827Z"
     },
     "monica.barbosa@gmail.com": {
       "name": "Dra. Monica Barbosa Marques",
-      "phone": "5513994113263",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:27:21.982Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:15:05.298Z"
     },
     "renato.silva@institutocanabis.med.br": {
       "name": "Dr. Renato Silva Marques",
-      "phone": "5581997338686",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:27:29.459Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:15:35.951Z"
     },
     "juliana.souza@outlook.com": {
       "name": "Dra. Juliana Souza Fernandes",
-      "phone": "5547912645789",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:27:36.986Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:16:06.435Z"
     },
     "rafael.soares@drsaude.com.br": {
       "name": "Dr. Rafael Soares Freitas",
-      "phone": "5521961859744",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:27:44.762Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:16:37.031Z"
     },
     "roberta.marques@consultoriomed.com.br": {
-      "name": "Dra. Roberta Marques Moreira",
-      "phone": "5512932766851",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:40:35.961Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "name": "Dra. Roberta Marques Costa",
+      "success": true,
+      "sent_at": "2026-08-12T14:17:07.636Z"
     },
     "amanda.almeida@clinicamedica.com.br": {
       "name": "Dra. Amanda Almeida Freitas",
-      "phone": "5583915983469",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:27:59.806Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:17:38.215Z"
     },
     "renata.teixeira@institutocanabis.med.br": {
       "name": "Dra. Renata Teixeira Pereira",
-      "phone": "5532975386704",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:28:07.581Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:18:08.953Z"
     },
     "fernanda.santana@gmail.com": {
       "name": "Dra. Fernanda Santana Santana",
-      "phone": "5551992319116",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:28:28.534Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:18:39.418Z"
     },
     "gabriela.pereira@gmail.com": {
-      "name": "Dra. Gabriela Pereira Santana",
-      "phone": "5548974482885",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:31:47.663Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "name": "Dra. Gabriela Pereira Cardoso",
+      "success": true,
+      "sent_at": "2026-08-12T14:19:09.996Z"
     },
     "mariana.lopes@institutocanabis.med.br": {
       "name": "Dra. Mariana Lopes Mendes",
-      "phone": "5562957109281",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:28:51.634Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:19:40.572Z"
     },
     "vinicius.martins@gmail.com": {
       "name": "Dr. Vinicius Martins Ramos",
-      "phone": "5567977963781",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:28:59.629Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:20:11.176Z"
     },
     "luciana.vieira@consultoriomed.com.br": {
       "name": "Dra. Luciana Vieira Gomes",
-      "phone": "5548963689541",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:29:07.276Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:20:41.742Z"
     },
     "rodrigo.lima@gmail.com": {
       "name": "Dr. Rodrigo Lima Marques",
-      "phone": "5531952731069",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:29:14.830Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:21:12.303Z"
     },
     "fabio.marques@institutocanabis.med.br": {
       "name": "Dr. Fabio Marques Souza",
-      "phone": "5521961356605",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:29:22.416Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:21:43.077Z"
     },
     "rafael.nunes@institutocanabis.med.br": {
       "name": "Dr. Rafael Nunes Gomes",
-      "phone": "5547985920822",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:29:29.903Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:22:13.698Z"
     },
     "rodrigo.costa@gmail.com": {
       "name": "Dr. Rodrigo Costa Lima",
-      "phone": "5519958233080",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:29:37.392Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:22:44.265Z"
     },
     "andré.teixeira@drsaude.com.br": {
       "name": "Dr. André Teixeira Costa",
-      "phone": "5516979090990",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:29:44.410Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T14:23:14.897Z"
     },
     "alexandre.ferreira@saudeintegrativa.med.br": {
       "name": "Dr. Alexandre Ferreira Martins",
-      "phone": "5531927572549",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:29:52.997Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:23:45.471Z"
     },
     "amanda.nunes@saudeintegrativa.med.br": {
       "name": "Dra. Amanda Nunes Fernandes",
-      "phone": "5547933091939",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:30:00.561Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:24:16.038Z"
     },
     "guilherme.rocha@clinicamedica.com.br": {
       "name": "Dr. Guilherme Rocha Almeida",
-      "phone": "5544976637951",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:30:08.803Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:24:46.624Z"
     },
     "leonardo.gonçalves@outlook.com": {
       "name": "Dr. Leonardo Gonçalves Gonçalves",
-      "phone": "5562971844151",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:30:16.114Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T14:25:17.183Z"
     },
     "isabela.lopes@outlook.com": {
       "name": "Dra. Isabela Lopes Vieira",
-      "phone": "5527947797875",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:30:23.642Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:25:47.781Z"
     },
     "alexandre.lima@saudeintegrativa.med.br": {
       "name": "Dr. Alexandre Lima Freitas",
-      "phone": "5562959875775",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:30:31.410Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:26:18.232Z"
     },
     "priscila.martins@gmail.com": {
       "name": "Dra. Priscila Martins Nascimento",
-      "phone": "5512936863308",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:30:39.080Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:26:48.795Z"
     },
     "fabio.mendes@gmail.com": {
       "name": "Dr. Fabio Mendes Ferreira",
-      "phone": "5521945551597",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:30:46.602Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:27:19.385Z"
     },
     "beatriz.alves@gmail.com": {
       "name": "Dra. Beatriz Alves Vieira",
-      "phone": "5534996815597",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:30:54.366Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:27:49.999Z"
     },
     "natalia.costa@consultoriomed.com.br": {
       "name": "Dra. Natalia Costa Soares",
-      "phone": "5562953693044",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:31:01.922Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:28:20.616Z"
     },
     "otavio.lopes@institutocanabis.med.br": {
       "name": "Dr. Otavio Lopes Souza",
-      "phone": "5519976605742",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:31:09.488Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:28:51.168Z"
     },
     "guilherme.martins@drsaude.com.br": {
       "name": "Dr. Guilherme Martins Gonçalves",
-      "phone": "5543973436224",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:31:16.994Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:29:21.754Z"
     },
     "juliana.rodrigues@gmail.com": {
       "name": "Dra. Juliana Rodrigues Mendes",
-      "phone": "5583989785730",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:31:24.531Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:29:52.355Z"
     },
     "gustavo.martins@outlook.com": {
       "name": "Dr. Gustavo Martins Lopes",
-      "phone": "5527948860383",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:31:32.408Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:30:22.951Z"
     },
     "renata.fernandes@institutocanabis.med.br": {
       "name": "Dra. Renata Fernandes Martins",
-      "phone": "5548915781459",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:31:40.097Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:30:53.537Z"
     },
     "andré.freitas@gmail.com": {
       "name": "Dr. André Freitas Ribeiro",
-      "phone": "5516997934275",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:31:54.797Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T14:31:24.116Z"
     },
     "leandro.dias@institutocanabis.med.br": {
       "name": "Dr. Leandro Dias Teixeira",
-      "phone": "5521979387901",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:32:02.279Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:31:54.712Z"
     },
     "clarissa.rocha@gmail.com": {
       "name": "Dra. Clarissa Rocha Cardoso",
-      "phone": "5567954778034",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:32:10.457Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:32:25.175Z"
     },
     "alexandre.silva@gmail.com": {
       "name": "Dr. Alexandre Silva Ribeiro",
-      "phone": "5583911789704",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:32:18.043Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:32:55.655Z"
     },
     "marcelo.vieira@clinicamedica.com.br": {
       "name": "Dr. Marcelo Vieira Machado",
-      "phone": "5547975232446",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:32:25.967Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:33:26.239Z"
     },
     "otavio.vieira@gmail.com": {
       "name": "Dr. Otavio Vieira Martins",
-      "phone": "5513982919915",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:32:33.663Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:33:56.875Z"
     },
     "lucas.teixeira@saudeintegrativa.med.br": {
       "name": "Dr. Lucas Teixeira Andrade",
-      "phone": "5581985573263",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:32:41.638Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:34:27.343Z"
     },
     "alexandre.martins@clinicamedica.com.br": {
       "name": "Dr. Alexandre Martins Lima",
-      "phone": "5565973198111",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:32:49.235Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:34:57.951Z"
     },
     "clarissa.pereira@consultoriomed.com.br": {
       "name": "Dra. Clarissa Pereira Marques",
-      "phone": "5524984835238",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:32:56.857Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:35:28.558Z"
     },
     "rafael.lopes@clinicamedica.com.br": {
       "name": "Dr. Rafael Lopes Martins",
-      "phone": "5512935479436",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:33:04.403Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:35:59.113Z"
     },
     "camila.ferreira@institutocanabis.med.br": {
       "name": "Dra. Camila Ferreira Alves",
-      "phone": "5565933155145",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:33:11.964Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:36:29.721Z"
     },
     "gabriela.almeida@gmail.com": {
       "name": "Dra. Gabriela Almeida Nunes",
-      "phone": "5581966855523",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:33:19.424Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:37:00.291Z"
     },
     "beatriz.gonçalves@consultoriomed.com.br": {
       "name": "Dra. Beatriz Gonçalves Santana",
-      "phone": "5561950629288",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:33:26.824Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T14:37:30.882Z"
     },
     "renata.gomes@consultoriomed.com.br": {
       "name": "Dra. Renata Gomes Santana",
-      "phone": "5547979846874",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:33:34.637Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:38:01.515Z"
     },
     "guilherme.martins@saudeintegrativa.med.br": {
       "name": "Dr. Guilherme Martins Andrade",
-      "phone": "5544999906894",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:33:42.130Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:38:32.221Z"
     },
     "ricardo.rodrigues@saudeintegrativa.med.br": {
       "name": "Dr. Ricardo Rodrigues Ferreira",
-      "phone": "5521983125171",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:33:49.626Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:39:02.820Z"
     },
     "murilo.almeida@clinicamedica.com.br": {
       "name": "Dr. Murilo Almeida Barbosa",
-      "phone": "5565959392536",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:33:57.415Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:39:33.385Z"
     },
     "larissa.santos@drsaude.com.br": {
       "name": "Dra. Larissa Santos Machado",
-      "phone": "5547975816355",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:34:05.466Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:40:05.377Z"
     },
     "carlos.rocha@consultoriomed.com.br": {
       "name": "Dr. Carlos Rocha Ramos",
-      "phone": "5519986165420",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:34:13.140Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:40:36.671Z"
     },
     "lucas.nunes@institutocanabis.med.br": {
       "name": "Dr. Lucas Nunes Soares",
-      "phone": "5513980741857",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:34:20.612Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:41:08.418Z"
     },
     "bruna.gonçalves@outlook.com": {
       "name": "Dra. Bruna Gonçalves Rodrigues",
-      "phone": "5531992149797",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:34:27.863Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T14:41:39.455Z"
     },
     "leandro.barbosa@consultoriomed.com.br": {
       "name": "Dr. Leandro Barbosa Alves",
-      "phone": "5532929547456",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:34:35.349Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:42:14.387Z"
     },
     "natalia.costa@institutocanabis.med.br": {
       "name": "Dra. Natalia Costa Pereira",
-      "phone": "5512942053288",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:34:42.850Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:42:45.066Z"
     },
     "alexandre.freitas@consultoriomed.com.br": {
       "name": "Dr. Alexandre Freitas Pereira",
-      "phone": "5548920667872",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:34:50.571Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:43:15.744Z"
     },
     "renato.carvalho@drsaude.com.br": {
       "name": "Dr. Renato Carvalho Freitas",
-      "phone": "5567949988015",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:34:58.175Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:43:46.533Z"
     },
     "thiago.moreira@gmail.com": {
       "name": "Dr. Thiago Moreira Barbosa",
-      "phone": "5531931562925",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:35:05.741Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:44:17.202Z"
     },
     "fernando.santana@outlook.com": {
       "name": "Dr. Fernando Santana Oliveira",
-      "phone": "5571965696686",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:35:18.459Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:44:47.804Z"
     },
     "fabio.ramos@outlook.com": {
       "name": "Dr. Fabio Ramos Ferreira",
-      "phone": "5521924279752",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:35:26.193Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:45:18.552Z"
     },
     "carlos.lima@drsaude.com.br": {
       "name": "Dr. Carlos Lima Machado",
-      "phone": "5547937160324",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:35:33.630Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:45:49.185Z"
     },
     "roberta.ramos@drsaude.com.br": {
       "name": "Dra. Roberta Ramos Ribeiro",
-      "phone": "5554985175293",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:35:41.114Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:46:19.878Z"
     },
     "juliana.lima@saudeintegrativa.med.br": {
       "name": "Dra. Juliana Lima Costa",
-      "phone": "5565996671166",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:35:48.752Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:46:50.655Z"
     },
     "renato.gonçalves@gmail.com": {
       "name": "Dr. Renato Gonçalves Rocha",
-      "phone": "5524967489228",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:35:55.858Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T14:47:21.318Z"
     },
     "renato.cardoso@outlook.com": {
       "name": "Dr. Renato Cardoso Gomes",
-      "phone": "5548987060851",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:36:03.426Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:47:53.137Z"
     },
     "luciana.cardoso@consultoriomed.com.br": {
       "name": "Dra. Luciana Cardoso Cardoso",
-      "phone": "5567943329373",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:36:11.282Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:48:23.996Z"
     },
     "leonardo.barbosa@saudeintegrativa.med.br": {
       "name": "Dr. Leonardo Barbosa Pereira",
-      "phone": "5541963329694",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:36:18.950Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:48:54.682Z"
     },
     "juliana.costa@saudeintegrativa.med.br": {
       "name": "Dra. Juliana Costa Ribeiro",
-      "phone": "5516994509829",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:36:26.439Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:49:25.352Z"
     },
     "eduardo.mendes@gmail.com": {
       "name": "Dr. Eduardo Mendes Martins",
-      "phone": "5582933032185",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:36:34.105Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:49:56.066Z"
     },
     "vitor.gonçalves@drsaude.com.br": {
       "name": "Dr. Vitor Gonçalves Carvalho",
-      "phone": "5561950856493",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:36:41.347Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T14:50:26.826Z"
     },
     "thiago.fernandes@gmail.com": {
       "name": "Dr. Thiago Fernandes Martins",
-      "phone": "5582914737647",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:36:49.142Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:50:57.600Z"
     },
     "amanda.rocha@gmail.com": {
       "name": "Dra. Amanda Rocha Dias",
-      "phone": "5516963935327",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:36:56.806Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:51:28.585Z"
     },
     "luciana.dias@outlook.com": {
       "name": "Dra. Luciana Dias Vieira",
-      "phone": "5571965222676",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:37:20.378Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:51:59.381Z"
     },
     "henrique.soares@drsaude.com.br": {
       "name": "Dr. Henrique Soares Cardoso",
-      "phone": "5513945367663",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:37:28.002Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:52:30.069Z"
     },
     "leandro.freitas@drsaude.com.br": {
       "name": "Dr. Leandro Freitas Rodrigues",
-      "phone": "5554936929434",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:37:35.534Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:53:00.865Z"
     },
     "roberta.marques@clinicamedica.com.br": {
       "name": "Dra. Roberta Marques Oliveira",
-      "phone": "5547955627634",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:37:43.106Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:53:31.971Z"
     },
     "isabela.silva@outlook.com": {
       "name": "Dra. Isabela Silva Rodrigues",
-      "phone": "5531920025707",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:37:50.520Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:54:03.104Z"
     },
     "natalia.rodrigues@outlook.com": {
       "name": "Dra. Natalia Rodrigues Vieira",
-      "phone": "5519922088719",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:37:58.013Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:54:33.818Z"
     },
     "helena.marques@saudeintegrativa.med.br": {
       "name": "Dra. Helena Marques Cardoso",
-      "phone": "5565946192520",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:38:05.973Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:55:04.500Z"
     },
     "gabriela.ferreira@consultoriomed.com.br": {
       "name": "Dra. Gabriela Ferreira Mendes",
-      "phone": "5583961946897",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:38:13.406Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:55:35.231Z"
     },
     "isabela.pereira@outlook.com": {
       "name": "Dra. Isabela Pereira Freitas",
-      "phone": "5541966835178",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:38:21.067Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:56:05.762Z"
     },
     "mariana.gonçalves@institutocanabis.med.br": {
       "name": "Dra. Mariana Gonçalves Pereira",
-      "phone": "5521912869482",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:38:31.401Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T14:56:36.452Z"
     },
     "larissa.martins@clinicamedica.com.br": {
       "name": "Dra. Larissa Martins Gonçalves",
-      "phone": "5581946787611",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:38:39.228Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:57:07.360Z"
     },
     "thiago.dias@outlook.com": {
       "name": "Dr. Thiago Dias Pereira",
-      "phone": "5532994871910",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:38:46.735Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:57:37.961Z"
     },
     "tiago.cardoso@saudeintegrativa.med.br": {
       "name": "Dr. Tiago Cardoso Rodrigues",
-      "phone": "5583926037102",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:38:54.546Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:58:08.627Z"
     },
     "patricia.ribeiro@saudeintegrativa.med.br": {
       "name": "Dra. Patricia Ribeiro Santana",
-      "phone": "5544949955617",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:39:02.460Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:58:39.199Z"
     },
     "anapaula.dias@gmail.com": {
       "name": "Dra. Ana Paula Dias Nascimento",
-      "phone": "5581996025262",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:39:09.933Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:59:09.957Z"
     },
     "caio.rodrigues@drsaude.com.br": {
       "name": "Dr. Caio Rodrigues Nunes",
-      "phone": "5565954374401",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:39:18.196Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T14:59:40.666Z"
     },
     "mariana.gomes@saudeintegrativa.med.br": {
       "name": "Dra. Mariana Gomes Barbosa",
-      "phone": "5516989862057",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:39:26.545Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:00:11.395Z"
     },
     "eduardo.ferreira@saudeintegrativa.med.br": {
       "name": "Dr. Eduardo Ferreira Marques",
-      "phone": "5585986746594",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:39:33.987Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:00:42.343Z"
     },
     "henrique.moreira@outlook.com": {
       "name": "Dr. Henrique Moreira Santos",
-      "phone": "5532965994386",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:39:42.591Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:01:12.924Z"
     },
     "leonardo.alves@saudeintegrativa.med.br": {
       "name": "Dr. Leonardo Alves Costa",
-      "phone": "5513915933117",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:39:50.277Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:01:43.505Z"
     },
     "flavia.marques@consultoriomed.com.br": {
       "name": "Dra. Flavia Marques Pereira",
-      "phone": "5512987385035",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:39:57.766Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:02:14.139Z"
     },
     "leandro.nunes@institutocanabis.med.br": {
       "name": "Dr. Leandro Nunes Ramos",
-      "phone": "5554954507410",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:40:05.295Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:02:44.944Z"
     },
     "roberta.ribeiro@institutocanabis.med.br": {
       "name": "Dra. Roberta Ribeiro Silva",
-      "phone": "5581923953812",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:40:12.943Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:03:15.551Z"
     },
     "carlos.teixeira@gmail.com": {
       "name": "Dr. Carlos Teixeira Marques",
-      "phone": "5551926301064",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:40:20.680Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:03:46.131Z"
     },
     "matheus.ferreira@gmail.com": {
       "name": "Dr. Matheus Ferreira Rodrigues",
-      "phone": "5565926032811",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:40:28.149Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:04:16.828Z"
     },
     "caio.ramos@drsaude.com.br": {
       "name": "Dr. Caio Ramos Rocha",
-      "phone": "5519912694930",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:40:43.446Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:04:47.507Z"
     },
     "henrique.barbosa@outlook.com": {
       "name": "Dr. Henrique Barbosa Rodrigues",
-      "phone": "5547967006549",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:40:50.858Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:05:19.506Z"
     },
     "leonardo.andrade@outlook.com": {
       "name": "Dr. Leonardo Andrade Almeida",
-      "phone": "5543997368771",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:40:58.490Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:05:50.299Z"
     },
     "clarissa.almeida@gmail.com": {
       "name": "Dra. Clarissa Almeida Ribeiro",
-      "phone": "5548913296154",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:41:05.995Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:06:20.877Z"
     },
     "renata.gonçalves@saudeintegrativa.med.br": {
       "name": "Dra. Renata Gonçalves Almeida",
-      "phone": "5547982354324",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:41:13.315Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T15:06:51.752Z"
     },
     "daniela.santos@clinicamedica.com.br": {
       "name": "Dra. Daniela Santos Moreira",
-      "phone": "5541914931559",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:41:21.813Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:07:22.475Z"
     },
     "helena.ribeiro@gmail.com": {
       "name": "Dra. Helena Ribeiro Barbosa",
-      "phone": "5512977628666",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:41:40.395Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:07:53.061Z"
     },
     "sergio.gomes@gmail.com": {
       "name": "Dr. Sergio Gomes Costa",
-      "phone": "5561931653376",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:41:47.921Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:08:28.927Z"
     },
     "diego.freitas@consultoriomed.com.br": {
       "name": "Dr. Diego Freitas Ribeiro",
-      "phone": "5511956143098",
       "success": false,
-      "last_attempt_at": "2026-08-11T15:41:56.022Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "error": "fetch failed",
+      "last_attempt_at": "2026-08-12T15:09:23.921Z"
     },
     "felipe.fernandes@institutocanabis.med.br": {
       "name": "Dr. Felipe Fernandes Soares",
-      "phone": "5554992034982",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:42:04.350Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:09:54.524Z"
     },
     "clarissa.lima@gmail.com": {
       "name": "Dra. Clarissa Lima Silva",
-      "phone": "5532997892797",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:42:11.819Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:10:31.991Z"
     },
     "priscila.fernandes@institutocanabis.med.br": {
       "name": "Dra. Priscila Fernandes Rocha",
-      "phone": "5565984586247",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:42:19.445Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:11:07.598Z"
     },
     "renato.alves@consultoriomed.com.br": {
       "name": "Dr. Renato Alves Silva",
-      "phone": "5541955486160",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:42:31.259Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:11:38.330Z"
     },
     "bruno.soares@institutocanabis.med.br": {
       "name": "Dr. Bruno Soares Dias",
-      "phone": "5541961658005",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:42:38.794Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:12:13.204Z"
     },
     "sabrina.moreira@institutocanabis.med.br": {
       "name": "Dra. Sabrina Moreira Nascimento",
-      "phone": "5561957983751",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:42:51.251Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:12:43.808Z"
     },
     "carolina.oliveira@institutocanabis.med.br": {
       "name": "Dra. Carolina Oliveira Rodrigues",
-      "phone": "5567985255410",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:42:58.717Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:13:14.378Z"
     },
     "larissa.fernandes@gmail.com": {
       "name": "Dra. Larissa Fernandes Costa",
-      "phone": "5521950993651",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:43:06.287Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:13:47.173Z"
     },
     "marcelo.machado@saudeintegrativa.med.br": {
       "name": "Dr. Marcelo Machado Machado",
-      "phone": "5581999904373",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:43:19.220Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:14:17.643Z"
     },
     "patricia.silva@drsaude.com.br": {
       "name": "Dra. Patricia Silva Carvalho",
-      "phone": "5554989235914",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:43:26.789Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:14:48.215Z"
     },
     "denise.andrade@institutocanabis.med.br": {
       "name": "Dra. Denise Andrade Nascimento",
-      "phone": "5544920407388",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:43:34.943Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:15:18.794Z"
     },
     "leticia.oliveira@saudeintegrativa.med.br": {
       "name": "Dra. Leticia Oliveira Vieira",
-      "phone": "5531984532268",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:43:47.270Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:15:49.402Z"
     },
     "ricardo.gomes@outlook.com": {
       "name": "Dr. Ricardo Gomes Carvalho",
-      "phone": "5567912209995",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:43:55.592Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:16:20.007Z"
     },
     "thais.freitas@drsaude.com.br": {
       "name": "Dra. Thais Freitas Silva",
-      "phone": "5511982358014",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:44:03.832Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:16:50.615Z"
     },
     "fernanda.lopes@institutocanabis.med.br": {
       "name": "Dra. Fernanda Lopes Gomes",
-      "phone": "5512959398337",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:44:11.985Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:17:21.219Z"
     },
     "mariana.andrade@outlook.com": {
       "name": "Dra. Mariana Andrade Santana",
-      "phone": "5562958933865",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:44:35.675Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:17:51.784Z"
     },
     "gustavo.silva@institutocanabis.med.br": {
       "name": "Dr. Gustavo Silva Ferreira",
-      "phone": "5527985055905",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:44:43.278Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:18:22.484Z"
     },
     "guilherme.marques@saudeintegrativa.med.br": {
       "name": "Dr. Guilherme Marques Lima",
-      "phone": "5531954274415",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:44:51.557Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:18:53.081Z"
     },
     "renata.moreira@drsaude.com.br": {
       "name": "Dra. Renata Moreira Fernandes",
-      "phone": "5581984206837",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:45:18.590Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:19:23.679Z"
     },
     "rafael.moreira@institutocanabis.med.br": {
       "name": "Dr. Rafael Moreira Rocha",
-      "phone": "5521935268500",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:45:30.273Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:19:54.252Z"
     },
     "lucas.carvalho@outlook.com": {
       "name": "Dr. Lucas Carvalho Gonçalves",
-      "phone": "5521966027751",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:45:38.583Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:20:24.923Z"
     },
     "carolina.ribeiro@gmail.com": {
       "name": "Dra. Carolina Ribeiro Lopes",
-      "phone": "5543993681742",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:45:47.076Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:20:55.783Z"
     },
     "fernando.costa@saudeintegrativa.med.br": {
       "name": "Dr. Fernando Costa Soares",
-      "phone": "5516987113919",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:45:55.609Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:21:26.381Z"
     },
     "leonardo.souza@outlook.com": {
       "name": "Dr. Leonardo Souza Moreira",
-      "phone": "5534964957014",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:46:08.500Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:21:58.040Z"
     },
     "sergio.fernandes@institutocanabis.med.br": {
       "name": "Dr. Sergio Fernandes Vieira",
-      "phone": "5534954726940",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:46:17.086Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:22:29.478Z"
     },
     "luiza.nunes@clinicamedica.com.br": {
       "name": "Dra. Luiza Nunes Cardoso",
-      "phone": "5527944217984",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:46:26.399Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:23:00.154Z"
     },
     "caio.machado@saudeintegrativa.med.br": {
       "name": "Dr. Caio Machado Vieira",
-      "phone": "5512980091786",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:46:55.824Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:23:30.858Z"
     },
     "alexandre.gonçalves@drsaude.com.br": {
       "name": "Dr. Alexandre Gonçalves Martins",
-      "phone": "5554995274742",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:47:05.527Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T15:24:01.440Z"
     },
     "vitor.mendes@gmail.com": {
       "name": "Dr. Vitor Mendes Teixeira",
-      "phone": "5531994202627",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:47:13.099Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:24:32.014Z"
     },
     "roberta.andrade@outlook.com": {
       "name": "Dra. Roberta Andrade Nascimento",
-      "phone": "5516923287224",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:47:20.695Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:25:02.570Z"
     },
     "ricardo.lopes@consultoriomed.com.br": {
       "name": "Dr. Ricardo Lopes Gonçalves",
-      "phone": "5582963348862",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:47:28.809Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:25:33.173Z"
     },
     "thiago.machado@outlook.com": {
       "name": "Dr. Thiago Machado Machado",
-      "phone": "5548973193146",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:47:36.429Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:26:03.789Z"
     },
     "caio.lopes@institutocanabis.med.br": {
       "name": "Dr. Caio Lopes Dias",
-      "phone": "5547931088833",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:47:43.986Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:26:34.414Z"
     },
     "isabela.marques@clinicamedica.com.br": {
       "name": "Dra. Isabela Marques Carvalho",
-      "phone": "5544931335232",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:47:52.192Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:27:04.984Z"
     },
     "leandro.freitas@clinicamedica.com.br": {
       "name": "Dr. Leandro Freitas Gonçalves",
-      "phone": "5532932433681",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:48:00.283Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:27:35.580Z"
     },
     "helena.nunes@gmail.com": {
       "name": "Dra. Helena Nunes Nunes",
-      "phone": "5512934416969",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:48:08.236Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:28:06.167Z"
     },
     "fernanda.nunes@gmail.com": {
       "name": "Dra. Fernanda Nunes Fernandes",
-      "phone": "5584946396709",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:48:16.745Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:28:36.760Z"
     },
     "juliana.martins@saudeintegrativa.med.br": {
       "name": "Dra. Juliana Martins Rocha",
-      "phone": "5554971801373",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:48:24.366Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:29:07.332Z"
     },
     "eduardo.cardoso@institutocanabis.med.br": {
       "name": "Dr. Eduardo Cardoso Ribeiro",
-      "phone": "5527948879291",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:48:31.968Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:29:37.893Z"
     },
     "guilherme.almeida@clinicamedica.com.br": {
       "name": "Dr. Guilherme Almeida Fernandes",
-      "phone": "5534925561601",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:48:39.784Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:30:08.478Z"
     },
     "matheus.marques@gmail.com": {
       "name": "Dr. Matheus Marques Lima",
-      "phone": "5547937191425",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:48:47.462Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:30:39.092Z"
     },
     "mariana.pereira@drsaude.com.br": {
       "name": "Dra. Mariana Pereira Cardoso",
-      "phone": "5547980875068",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:48:55.247Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:31:09.784Z"
     },
     "isabela.gonçalves@drsaude.com.br": {
       "name": "Dra. Isabela Gonçalves Vieira",
-      "phone": "5583957759072",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:49:02.299Z",
-      "error": "Can't send mail - all recipients were rejected: 553 5.6.7 Must declare SMTPUTF8 to send unicode address"
+      "success": true,
+      "sent_at": "2026-08-12T15:31:40.393Z"
     },
     "bruna.machado@clinicamedica.com.br": {
       "name": "Dra. Bruna Machado Costa",
-      "phone": "5583974616910",
-      "success": false,
-      "last_attempt_at": "2026-08-11T15:49:10.188Z",
-      "error": "Message failed: 554 5.7.1 Disabled by user from hPanel"
+      "success": true,
+      "sent_at": "2026-08-12T15:32:10.988Z"
+    },
+    "juliana.rocha@gmail.com": {
+      "name": "Dra. Juliana Rocha Barbosa",
+      "success": true,
+      "sent_at": "2026-08-12T15:32:41.566Z"
+    },
+    "renata.martins@outlook.com": {
+      "name": "Dra. Renata Martins Barbosa",
+      "success": true,
+      "sent_at": "2026-08-12T15:33:12.128Z"
+    },
+    "rodrigo.pereira@gmail.com": {
+      "name": "Dr. Rodrigo Pereira Moreira",
+      "success": true,
+      "sent_at": "2026-08-12T15:33:43.102Z"
     }
   },
-  "total_sent": 58,
+  "total_sent": 494,
   "started_at": "2026-08-11T14:40:42.025Z"
 }

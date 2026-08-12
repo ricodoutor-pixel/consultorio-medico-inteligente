@@ -10,7 +10,7 @@ if (!API_KEY) {
   process.exit(1);
 }
 
-const FILE_PATH = path.join(process.cwd(), 'mined_doctor_leads_500.json');
+const FILE_PATH = path.join(process.cwd(), 'mined_doctor_leads_part2.json');
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 

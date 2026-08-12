@@ -215,16 +215,26 @@ const Cadastro = () => {
             <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-md text-center">
               <CheckCircle2 size={64} className="text-primary mx-auto mb-6" />
               <h1 className="text-3xl font-display font-black text-foreground mb-4">Cadastro Realizado!</h1>
-              <p className="text-muted-foreground mb-4">
-                Enviamos um e-mail de confirmação para <span className="text-primary font-bold">{formData.email}</span>.
-              </p>
-              <p className="text-sm text-muted-foreground mb-8">
-                Clique no link do e-mail para ativar sua conta. Depois, faça login para acessar a plataforma.
-              </p>
-                      <div className="flex flex-col gap-2 p-4 rounded-xl bg-gradient-green border border-green mb-6">
+              
+              <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl mb-6 text-emerald-700 dark:text-emerald-400 text-left">
+                <p className="font-bold mb-2 flex items-center gap-2">
+                  <Lock size={16} />
+                  Verificação em Duas Etapas
+                </p>
+                <p className="text-sm">
+                  Enviamos uma carta de boas-vindas com um link de acesso para o e-mail: <strong className="break-all">{formData.email}</strong>.
+                </p>
+                <p className="text-sm mt-2">
+                  Por favor, confirme o recebimento para ativar completamente sua conta e garantir a segurança dos seus dados.
+                  <br/>
+                  <span className="text-xs opacity-80 mt-1 block">(Caso feche esta janela, você continuará tendo acesso inicial à plataforma, mas o e-mail servirá como lembrete).</span>
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2 p-4 rounded-xl bg-primary/5 border border-primary/20 mb-6">
                 <div className="flex items-center justify-center gap-2">
                   <Mail size={16} className="text-primary" />
-                  <span className="text-sm font-bold text-foreground">Verifique sua caixa de entrada</span>
+                  <span className="text-sm font-bold text-foreground">Verifique sua caixa de entrada (ou Spam)</span>
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-1">
                   Dúvidas? Entre em contato: contato@plantayraiz.com.br ou (11) 99136-3154
@@ -319,7 +329,13 @@ const Cadastro = () => {
                   <Card
                     key={ut.id}
                     className="border-border hover:border-primary/30 cursor-pointer transition-all hover:-translate-y-1"
-                    onClick={() => setType(ut.id)}
+                    onClick={() => {
+                      if (ut.id === "medico") {
+                        navigate(activeRefCode ? `/cadastro-profissional?ref=${activeRefCode}` : "/cadastro-profissional");
+                      } else {
+                        setType(ut.id);
+                      }
+                    }}
                   >
                     <CardContent className="p-6 text-center">
                       <div className={`w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center ${

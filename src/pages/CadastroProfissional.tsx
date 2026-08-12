@@ -327,17 +327,29 @@ const CadastroProfissional = () => {
       return;
     }
 
-    // 🔐 Flexibilização do KYC: permite envio se ao menos 1 documento foi anexado ou se prosseguir para verificação posterior
-    const uploadedCount = Object.values(kycFiles).filter(Boolean).length;
-    if (uploadedCount === 0) {
-      toast({
-        title: country === "BO" ? "Anexe al menos 1 documento" : "Anexe ao menos 1 documento (CRM ou RG/CPF)",
-        description: country === "BO"
-          ? "Por favor suba la foto de su documento o matrícula para verificación."
-          : "Anexe ao menos uma foto do seu documento profissional para a verificação KYC.",
-        variant: "destructive",
-      });
-      return;
+    // 🔐 KYC Rigoroso: Documentos obrigatórios (frente e verso)
+    if (!isCuidador) {
+      if (!kycFiles["crm_front"] || !kycFiles["crm_back"]) {
+        toast({
+          title: country === "BO" ? "Documentos Incompletos" : "Documentos Incompletos",
+          description: country === "BO"
+            ? "Obligatorio enviar el FRENTE y DORSO de su Matrícula Médica."
+            : "Obrigatório enviar a FRENTE e o VERSO do seu registro (CRM/etc).",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      if (!kycFiles["id_front"] || !kycFiles["id_back"]) {
+        toast({
+          title: country === "BO" ? "Documentos Incompletos" : "Documentos Incompletos",
+          description: country === "BO"
+            ? "Obligatorio enviar el FRENTE y DORSO de su CI."
+            : "Obrigatório enviar a FRENTE e o VERSO do seu RG/CNH.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     trackKYCSubmissionAttempt(documentType);
@@ -403,7 +415,7 @@ const CadastroProfissional = () => {
       });
       if (docErr) console.error("[doctor insert]", docErr);
 
-      // 4) Upload KYC (frente/verso) — não-bloqueante
+      // 4) Upload KYC (frente/verso) — bloqueante
       const uploads: Promise<unknown>[] = [];
       for (const kind of Object.keys(kycFiles) as KycKind[]) {
         const file = kycFiles[kind];
@@ -416,12 +428,18 @@ const CadastroProfissional = () => {
             .upload(path, file, { upsert: true, contentType: file.type || undefined })
             .catch((err) => {
               console.error("[kyc upload]", kind, err);
-              // Não bloqueia o fluxo se o upload falhar
+              throw new Error(`Falha ao fazer upload de ${kind}`);
             })
         );
       }
-      // Não aguarda os uploads — permite que o cadastro complete mesmo se houver atraso
-      Promise.all(uploads).catch(() => {});
+      
+      try {
+        await Promise.all(uploads);
+      } catch (err: any) {
+        toast({ title: "Erro no Upload", description: "Ocorreu um erro ao salvar os documentos. Tente novamente.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
 
       // 5) Disparo WhatsApp (Enf. Brisa) — não bloqueante
       try {
@@ -473,6 +491,19 @@ const CadastroProfissional = () => {
                 {isBO ? "Su registro fue recibido con estado " : "Seu cadastro foi recebido com status "}
                 <strong className="text-primary">{isBO ? "PENDIENTE DE VERIFICACIÓN KYC" : "PENDENTE DE VERIFICAÇÃO KYC"}</strong>.
               </p>
+              
+              <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl mb-4 text-emerald-700 dark:text-emerald-400">
+                <p className="font-bold mb-1 flex items-center justify-center gap-2">
+                  <Lock size={16} />
+                  Verificação em Duas Etapas
+                </p>
+                <p className="text-sm">
+                  Enviamos um e-mail de boas-vindas com um link de acesso. Por favor, confirme o recebimento para ativar completamente as comunicações da sua conta.
+                  <br/>
+                  <span className="text-xs opacity-80">(Caso feche esta janela, você continuará tendo acesso ao painel, mas o e-mail servirá como lembrete).</span>
+                </p>
+              </div>
+
               <p className="text-muted-foreground mb-4">
                 {isBO
                   ? "El sistema está validando automáticamente su matrícula con el Colegio Médico de Bolivia."

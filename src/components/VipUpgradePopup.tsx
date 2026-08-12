@@ -9,9 +9,11 @@ import { PlanSku } from "@/lib/pricing";
 interface VipUpgradePopupProps {
   role: "medico" | "paciente" | "lojista";
   className?: string;
+  /** Renderiza em fluxo normal (sem absolute) para evitar sobreposição */
+  inline?: boolean;
 }
 
-export function VipUpgradePopup({ role, className = "" }: VipUpgradePopupProps) {
+export function VipUpgradePopup({ role, className = "", inline = false }: VipUpgradePopupProps) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 

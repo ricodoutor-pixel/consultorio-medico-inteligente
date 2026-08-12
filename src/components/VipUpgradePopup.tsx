@@ -9,9 +9,11 @@ import { PlanSku } from "@/lib/pricing";
 interface VipUpgradePopupProps {
   role: "medico" | "paciente" | "lojista";
   className?: string;
+  /** Renderiza em fluxo normal (sem absolute) para evitar sobreposição */
+  inline?: boolean;
 }
 
-export function VipUpgradePopup({ role, className = "" }: VipUpgradePopupProps) {
+export function VipUpgradePopup({ role, className = "", inline = false }: VipUpgradePopupProps) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -57,9 +59,9 @@ export function VipUpgradePopup({ role, className = "" }: VipUpgradePopupProps) 
   };
 
   const textMap = {
-    medico: "Atenda mais, seja médico VIP agora!",
-    paciente: "Acesse Benefícios, seja VIP agora!",
-    lojista: "Venda mais, seja Loja VIP agora!",
+    medico: "Atenda mais, seja médico VIP agora! R$ 99/mês",
+    paciente: "Acesse Benefícios, seja VIP agora! R$ 99/mês",
+    lojista: "Venda mais, seja Loja VIP agora! R$ 99/mês",
   };
 
   return (
@@ -69,8 +71,10 @@ export function VipUpgradePopup({ role, className = "" }: VipUpgradePopupProps) 
         animate={{ opacity: 1, y: 0, scale: 1 }}
         whileHover={{ scale: 1.05 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className={`absolute z-[60] cursor-pointer ${className}`}
+        className={`${inline ? "relative inline-flex" : "absolute"} z-[60] cursor-pointer ${className}`}
         onClick={handleCheckout}
+        role="button"
+        aria-label={textMap[role]}
       >
         <div className="relative flex items-center justify-center group">
           {/* Luz de fundo (Backlight) pulsante bem forte (green glow) */}
@@ -96,7 +100,9 @@ export function VipUpgradePopup({ role, className = "" }: VipUpgradePopupProps) 
           </div>
           
           {/* Seta indicativa para baixo (Balão apontando para o avatar) */}
-          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-emerald-600 rotate-45 transform origin-center border-b border-r border-emerald-400/50 shadow-md" />
+          {!inline && (
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-emerald-600 rotate-45 transform origin-center border-b border-r border-emerald-400/50 shadow-md" />
+          )}
         </div>
       </motion.div>
     </AnimatePresence>

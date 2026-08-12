@@ -325,10 +325,11 @@ const DashboardMedico = () => {
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             {/* Header */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col items-start gap-2">
+                <VipUpgradePopup role="medico" inline className="ml-1" />
+                <div className="flex items-center gap-4">
                 {/* Avatar do médico com upload */}
-                <div className="relative shrink-0 mt-12 md:mt-10">
-                  <VipUpgradePopup role="medico" className="-top-[70px] left-1/2 -translate-x-1/2 w-max" />
+                <div className="relative shrink-0">
                   <label
                     htmlFor="doctor-avatar-upload"
                     className="group relative block w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-primary/40 bg-muted cursor-pointer shadow-glow"
@@ -391,7 +392,9 @@ const DashboardMedico = () => {
                     </p>
                   )}
                 </div>
+                </div>
               </div>
+
               <div className="flex flex-col sm:flex-row items-center gap-3">
                 <Link to="/medsocio">
                   <span 

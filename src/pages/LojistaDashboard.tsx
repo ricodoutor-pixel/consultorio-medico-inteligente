@@ -83,8 +83,8 @@ export default function LojistaDashboard() {
       <div className="flex-1 container mx-auto py-8 px-4 space-y-8 pt-24">
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-6 relative">
-          <div className="relative mt-12 md:mt-8">
-            <VipUpgradePopup role="lojista" className="-top-[70px] left-0 md:left-24 w-max" />
+          <div className="flex flex-col items-start gap-2">
+            <VipUpgradePopup role="lojista" inline className="ml-1" />
             <div className="flex items-center gap-2 mb-2 mt-4 md:mt-0">
               <Badge className="bg-primary/20 text-primary border-primary/30">Lojista VIP</Badge>
               <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">Conta Ativa</Badge>

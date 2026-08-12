@@ -2354,8 +2354,8 @@
     "diego.freitas@consultoriomed.com.br": {
       "name": "Dr. Diego Freitas Ribeiro",
       "success": false,
-      "error": "fetch failed",
-      "last_attempt_at": "2026-08-12T15:09:23.921Z"
+      "error": "Falha ao enviar: 401 - {\"message\":\"authentication not found in headers\",\"code\":\"unauthorized\"}\n",
+      "last_attempt_at": "2026-08-12T17:40:16.413Z"
     },
     "felipe.fernandes@institutocanabis.med.br": {
       "name": "Dr. Felipe Fernandes Soares",

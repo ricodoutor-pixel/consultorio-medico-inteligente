@@ -117,8 +117,8 @@ Deno.serve(async (req) => {
 
     const finalTotal = validatedTotal - discountAmount;
 
-    // Calculate marketplace split: 10% platform fee
-    const platformFeeRate = 0.10;
+    // Split do Shopping: 5% de taxa da plataforma (lojista recebe 95%)
+    const platformFeeRate = 0.05;
     const platformFee = Math.round(finalTotal * platformFeeRate * 100) / 100;
 
     const externalRef = `cart-${user.id}-${Date.now()}`;

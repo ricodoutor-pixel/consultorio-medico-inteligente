@@ -18,42 +18,12 @@ export function VipUpgradePopup({ role, className = "", inline = false }: VipUpg
   const navigate = useNavigate();
 
   const handleCheckout = async () => {
-    setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Você precisa estar logado para assinar o plano.");
-        navigate("/login");
-        return;
-      }
-
-      const skuMap: Record<string, PlanSku> = {
-        medico: "plano_medico",
-        paciente: "plano_paciente",
-        lojista: "plano_lojista",
-      };
-
-      const sku = skuMap[role];
-
-      const { data, error } = await supabase.functions.invoke("mp-checkout", {
-        body: {
-          sku,
-          returnUrl: "https://www.plantayraiz.com.br/pagamento/sucesso",
-        },
-      });
-
-      if (error) {
-        console.error("FunctionsHttpError:", error);
-        // Supabase-js FunctionsHttpError costuma ter a resposta em error.context
-        throw new Error(error.message || "Erro na função mp-checkout");
-      }
-
-      if (data?.init_point) {
-        toast.success("Redirecionando para o Mercado Pago...");
-        window.location.href = data.init_point;
-      } else {
-        throw new Error(data?.error || "Erro ao gerar checkout: init_point ausente");
-      }
+      setLoading(true);
+      
+      // Link direto provisório conforme solicitado
+      window.location.href = "https://mpago.la/2sQktg3";
+      
     } catch (err: any) {
       console.error("[VipUpgradePopup]", err);
       toast.error(`Erro: ${err.message || "Falha ao iniciar assinatura"}`);

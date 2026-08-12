@@ -524,7 +524,10 @@ Deno.serve(async (req) => {
 
       if (isCartPayment) {
         // === CART / MARKETPLACE PAYMENT ===
-        const buyerId = metadata.buyer_id || externalRef.split("-")[1];
+        // `cart-<user_id>-<ts>` (create-cart-payment) ou `cart:<cart_id>` (mp-checkout)
+        const buyerId = metadata.buyer_id || metadata.user_id ||
+          (externalRef.startsWith("cart-") ? externalRef.split("-")[1] : null);
+
 
         // Record escrow transaction for marketplace
         const { error: escrowErr } = await supabase.from("escrow_transactions").insert({

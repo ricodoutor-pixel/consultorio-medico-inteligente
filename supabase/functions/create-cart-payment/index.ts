@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { CLUB_CATALOG } from "../_shared/club-catalog.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -35,13 +36,6 @@ Deno.serve(async (req) => {
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return new Response(JSON.stringify({ error: "Carrinho vazio" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (!total || typeof total !== "number" || total <= 0) {
-      return new Response(JSON.stringify({ error: "Valor inválido" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -151,6 +145,7 @@ Deno.serve(async (req) => {
       metadata: {
         type: "marketplace",
         buyer_id: user.id,
+        user_id: user.id,
         items_count: mpItems.length,
         coupon_code: coupon_code || null,
       },

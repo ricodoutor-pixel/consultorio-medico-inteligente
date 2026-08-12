@@ -391,19 +391,105 @@ Deno.serve(async (req) => {
     }
 
 
-    // Determine split rate
-    let platformFeeRate: number;
-    if (isMarketplace || isCartPayment) {
-      platformFeeRate = 0.10; // 10% marketplace fee
-    } else {
-      // Consultation — franchise tier split
-      const monthlyConsultations = metadata.monthly_consultations ?? 0;
-      let doctorShareRate = 0.80;
-      if (monthlyConsultations > 500) doctorShareRate = 0.92;
-      else if (monthlyConsultations > 200) doctorShareRate = 0.90;
-      else if (monthlyConsultations > 50) doctorShareRate = 0.85;
-      platformFeeRate = 1 - doctorShareRate;
+    // === PLANOS UNIVERSAIS R$99/mês (paciente · médico · lojista) ===
+    // external_reference: `plano_xxx:<user_id>:<ts>` (mp-checkout)
+    const PLAN_SKUS = ["plano_paciente", "plano_medico", "plano_lojista"];
+    const refSku = externalRef.split(":")[0];
+    const planSku = PLAN_SKUS.includes(String(metadata.sku))
+      ? String(metadata.sku)
+      : PLAN_SKUS.includes(refSku)
+        ? refSku
+        : null;
+
+    if (planSku) {
+      const planUserId = metadata.user_id || externalRef.split(":")[1] || null;
+      if (payment.status === "approved" && planUserId) {
+        const now = new Date();
+        const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const planName = planSku === "plano_medico"
+          ? "Plano Médico"
+          : planSku === "plano_lojista"
+            ? "Plano Lojista"
+            : "Plano Paciente";
+
+        // Fonte de verdade para gating no app (useSubscription)
+        const { error: subErr } = await supabase.from("subscriptions").upsert({
+          user_id: planUserId,
+          stripe_subscription_id: `mp_${payment.id}`,
+          stripe_customer_id: `mp_${planUserId}`,
+          product_id: planSku,
+          price_id: planSku,
+          status: "active",
+          current_period_start: now.toISOString(),
+          current_period_end: periodEnd.toISOString(),
+          cancel_at_period_end: false,
+          environment: "live",
+          updated_at: now.toISOString(),
+        }, { onConflict: "stripe_subscription_id" });
+        if (subErr) console.error("[plan] subscriptions upsert error:", subErr);
+
+        // Controle de cobrança recorrente automática (cron plan-renewal-engine)
+        const { data: existingHealth } = await supabase
+          .from("health_subscriptions")
+          .select("id")
+          .eq("user_id", planUserId)
+          .eq("plan_type", planSku)
+          .maybeSingle();
+
+        const healthPayload = {
+          user_id: planUserId,
+          plan_type: planSku,
+          plan_name: planName,
+          amount: totalAmount || 99,
+          billing_cycle: "monthly",
+          status: "active",
+          payment_method: "mercadopago",
+          external_subscription_id: String(payment.id),
+          started_at: now.toISOString(),
+          next_billing_at: periodEnd.toISOString(),
+          expires_at: periodEnd.toISOString(),
+          cancelled_at: null,
+          updated_at: now.toISOString(),
+        };
+        if (existingHealth?.id) {
+          await supabase.from("health_subscriptions").update(healthPayload).eq("id", existingHealth.id);
+        } else {
+          await supabase.from("health_subscriptions").insert(healthPayload);
+        }
+
+        // Comissão de indicação (afiliados) — 25% do 1º mês
+        if (metadata.referrer_id) {
+          try {
+            await supabase.rpc("credit_affiliate_wallet", {
+              _user_id: metadata.referrer_id,
+              _amount: Math.round((totalAmount || 99) * 0.25 * 100) / 100,
+            });
+          } catch (e) {
+            console.error("[plan] affiliate credit error:", e);
+          }
+        }
+
+        await supabase.from("notifications").insert({
+          user_id: planUserId,
+          title: `✅ ${planName} ativado`,
+          message: `Assinatura de R$ ${(totalAmount || 99).toFixed(2)}/mês confirmada. Renovação automática em ${periodEnd.toLocaleDateString("pt-BR")}.`,
+          type: "subscription_active",
+          action_url: "/dashboard",
+        });
+
+        console.log(`✅ [plan] ${planSku} ativado para ${planUserId} até ${periodEnd.toISOString()}`);
+      }
+
+      return new Response(
+        JSON.stringify({ status: "processed", module: "universal_plan", plan: planSku, payment_status: payment.status }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
+
+    // Determine split rate — tabela oficial 2026:
+    //   consultas/serviços médicos → 7% de taxa da plataforma (93% ao médico)
+    //   Shopping / lojistas        → 5% de taxa da plataforma (95% ao lojista)
+    const platformFeeRate = (isMarketplace || isCartPayment) ? 0.05 : 0.07;
 
     const platformFee = Math.round(totalAmount * platformFeeRate * 100) / 100;
     const doctorPayout = Math.round((totalAmount - platformFee) * 100) / 100;
@@ -425,11 +511,13 @@ Deno.serve(async (req) => {
       console.error("DB insert error:", insertError);
     }
 
-    // Handle payment status — only treat external_reference as appointmentId if it's a valid UUID
+    // Handle payment status — aceita `<uuid>` e `appointment:<uuid>` como referência da consulta
     const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const candidateRef = externalRef && uuidRe.test(externalRef) ? externalRef : null;
+    const refTail = externalRef.startsWith("appointment:") ? externalRef.slice("appointment:".length) : externalRef;
+    const candidateRef = refTail && uuidRe.test(refTail) ? refTail : null;
     const candidateMeta = metadata.appointment_id && uuidRe.test(metadata.appointment_id) ? metadata.appointment_id : null;
     const appointmentId = isCartPayment ? null : (candidateRef || candidateMeta);
+
 
     if (payment.status === "approved") {
       console.log(`✅ Payment ${paymentId} approved — R$ ${totalAmount} | Platform: R$ ${platformFee} | Payout: R$ ${doctorPayout}`);

@@ -392,7 +392,9 @@ const DashboardMedico = () => {
                     </p>
                   )}
                 </div>
+                </div>
               </div>
+
               <div className="flex flex-col sm:flex-row items-center gap-3">
                 <Link to="/medsocio">
                   <span 

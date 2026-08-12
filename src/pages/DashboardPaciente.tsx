@@ -196,8 +196,8 @@ const DashboardPaciente = () => {
       <section className="pb-8">
         <div className="container mx-auto px-4">
           <motion.div className="flex items-center justify-between flex-wrap gap-4 mb-6" initial="hidden" animate="visible" variants={fadeUp}>
-            <div className="relative mt-8">
-              <VipUpgradePopup role="paciente" className="-top-14 left-1/2 -translate-x-1/2 w-max" />
+            <div className="relative mt-12 md:mt-10">
+              <VipUpgradePopup role="paciente" className="-top-[70px] left-1/2 -translate-x-1/2 w-max" />
               <ProfileAvatarCard
                 userId={profile?.id}
                 fullName={userName}

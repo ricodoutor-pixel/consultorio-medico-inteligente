@@ -64,18 +64,18 @@ const Pay = () => {
 
       if (payType === "order" && items.length > 0) {
         const cartItems = items.map(item => ({
-          title: item.product.title,
+          product_id: item.product.id,
           quantity: item.qty,
-          price: item.product.priceValue,
         }));
         const { data, error } = await supabase.functions.invoke("create-cart-payment", {
-          body: { items: cartItems, total: total(), description: paymentLabel },
+          body: { items: cartItems, description: paymentLabel },
         });
         if (error) throw error;
         if (data?.init_point) { setCheckoutUrl(data.init_point); setStatus("pending"); }
       } else if (payType === "subscription" && planId) {
-        const { data, error } = await supabase.functions.invoke("create-subscription", {
-          body: { planId },
+        // Planos universais R$99 — catálogo server-side do mp-checkout
+        const { data, error } = await supabase.functions.invoke("mp-checkout", {
+          body: { sku: planId.startsWith("plano_") ? planId : `plano_${planId}` },
         });
         if (error) throw error;
         if (data?.init_point) { setCheckoutUrl(data.init_point); setStatus("pending"); }

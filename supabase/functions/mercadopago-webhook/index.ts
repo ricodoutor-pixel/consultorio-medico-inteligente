@@ -289,8 +289,11 @@ Deno.serve(async (req) => {
 
 
     const externalRef = payment.external_reference || "";
-    const isCartPayment = externalRef.startsWith("cart-");
+    // Aceita os dois formatos usados pelos checkouts: `cart-<id>` (create-cart-payment)
+    // e `cart:<id>` (mp-checkout / carrinho de prescrição).
+    const isCartPayment = externalRef.startsWith("cart-") || externalRef.startsWith("cart:");
     const isBrisaOrientacao = externalRef.startsWith("brisa-orientacao-");
+
 
     // === BRISA ORIENTAÇÃO TÉCNICA (R$30 via WhatsApp) — branch dedicado ===
     // Não existe appointment pré-criado; registramos pagamento, notificamos Dr. Edilson

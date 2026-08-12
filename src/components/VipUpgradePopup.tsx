@@ -42,17 +42,21 @@ export function VipUpgradePopup({ role, className = "", inline = false }: VipUpg
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("FunctionsHttpError:", error);
+        // Supabase-js FunctionsHttpError costuma ter a resposta em error.context
+        throw new Error(error.message || "Erro na função mp-checkout");
+      }
 
       if (data?.init_point) {
         toast.success("Redirecionando para o Mercado Pago...");
         window.location.href = data.init_point;
       } else {
-        toast.error(data?.error || "Erro ao gerar checkout");
+        throw new Error(data?.error || "Erro ao gerar checkout: init_point ausente");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("[VipUpgradePopup]", err);
-      toast.error("Erro ao iniciar assinatura. Tente novamente.");
+      toast.error(`Erro: ${err.message || "Falha ao iniciar assinatura"}`);
     } finally {
       setLoading(false);
     }

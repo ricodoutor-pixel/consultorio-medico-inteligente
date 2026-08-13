@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { requireAuthedUser, rateLimit, hasClinicalRole } from "../_shared/ai-guard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -100,6 +101,19 @@ export const CLINICAL_SCENARIOS = [
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // 🔐 Simulador de treinamento: exclusivo para médicos/admins autenticados
+  const authed = await requireAuthedUser(req, corsHeaders);
+  if (authed instanceof Response) return authed;
+  if (!(await hasClinicalRole(authed.userId))) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const limited = await rateLimit({
+    bucket: "paciente_teste_ai", key: authed.userId, maxHits: 30, windowSeconds: 60, cors: corsHeaders,
+  });
+  if (limited) return limited;
 
   try {
     const { action, scenarioId, messages, prescriptionData } = await req.json();

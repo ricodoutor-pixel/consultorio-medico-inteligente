@@ -10,8 +10,19 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-api-key',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-api-key, x-webhook-secret',
 };
+
+// 🔐 Segredo compartilhado do webhook (anti-spoof). POSTs sem o segredo são rejeitados.
+const WAHA_WEBHOOK_SECRET = Deno.env.get('WAHA_WEBHOOK_SECRET') || '';
+const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+function webhookSecretOk(req: Request): boolean {
+  const hdr = req.headers.get('x-webhook-secret') || req.headers.get('x-api-key') || '';
+  const auth = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
+  if (WAHA_WEBHOOK_SECRET && (hdr === WAHA_WEBHOOK_SECRET || auth === WAHA_WEBHOOK_SECRET)) return true;
+  if (SERVICE_ROLE_KEY && auth === SERVICE_ROLE_KEY) return true;
+  return false;
+}
 
 const GEMINI_KEY   = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY') || '';
 const WAHA_URL     = (Deno.env.get('WAHA_API_URL') || 'waha-production-4e9c.up.railway.app').replace(/\/+$/, '');
@@ -308,6 +319,13 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   if (req.method !== 'POST') return new Response('method_not_allowed', { status: 405, headers: cors });
+
+  // 🔐 Só aceita payloads assinados com o segredo do webhook (ou service-role)
+  if (!webhookSecretOk(req)) {
+    return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), {
+      status: 401, headers: { ...cors, 'Content-Type': 'application/json' },
+    });
+  }
 
   let raw: Record<string, unknown> = {};
   try { raw = await req.json(); }

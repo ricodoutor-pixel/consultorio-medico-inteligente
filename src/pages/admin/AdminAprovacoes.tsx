@@ -462,7 +462,7 @@ export const AdminAprovacoes = () => {
                                 key={item.label}
                                 className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border ${item.ok ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300' : 'border-rose-500/40 bg-rose-500/10 text-rose-300'}`}
                               >
-                                {item.ok ? '✅' : '✅'} {item.label}
+                                {item.ok ? '✅' : '❌'} {item.label}
                               </span>
                             ))}
                           </div>

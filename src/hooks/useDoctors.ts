@@ -19,6 +19,7 @@ export interface DoctorRow {
   total_consultations?: number | null;
   full_name?: string | null;
   avatar_url?: string | null;
+  [key: string]: any;
 }
 
 interface Counts {
@@ -40,7 +41,7 @@ export function useDoctors() {
       if (error) {
         console.error("[useDoctors] error fetching doctors:", error);
       } else if (data) {
-        setDoctors(data as DoctorRow[]);
+        setDoctors(data as unknown as DoctorRow[]);
       }
     } catch (e) {
       console.error("[useDoctors] unexpected error:", e);

@@ -1,27 +1,9 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { Loader2, Stethoscope } from "lucide-react";
-
-interface DoctorRow {
-  id: string;
-  user_id: string;
-  crm: string;
-  crm_state: string | null;
-  specialty: string | null;
-  document_type?: string | null;
-  country?: string | null;
-  city?: string | null;
-  is_online: boolean | null;
-  is_available?: boolean | null;
-  is_verified?: boolean | null;
-  rating?: number | null;
-  total_consultations?: number | null;
-  full_name?: string | null;
-  avatar_url?: string | null;
-}
+import { useDoctors } from "@/hooks/useDoctors";
 
 interface Props {
   /** Admin mode shows extra data (consultas, verificado) */
@@ -30,44 +12,17 @@ interface Props {
 }
 
 export function DoctorsStatusBoard({ variant = "public", title = "Médicos na plataforma" }: Props) {
-  const [doctors, setDoctors] = useState<DoctorRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { doctors: rawDoctors, loading } = useDoctors();
 
-  useEffect(() => {
-    let active = true;
-
-    const fetch = async () => {
-      const { data, error } = await (supabase as any)
-        .from("doctors_public")
-        .select("*");
-      if (!active) return;
-      if (error) console.error("[DoctorsStatusBoard]", error.message);
-      if (data) {
-        const list = (data as DoctorRow[]).slice().sort((a, b) => {
-          const ao = a.is_online && (a.is_available ?? true) ? 0 : 1;
-          const bo = b.is_online && (b.is_available ?? true) ? 0 : 1;
-          if (ao !== bo) return ao - bo;
-          return (a.full_name || a.crm || "").localeCompare(b.full_name || b.crm || "");
-        });
-        setDoctors(list);
-      }
-      setLoading(false);
-    };
-
-    fetch();
-    const poll = setInterval(fetch, 20_000);
-
-    const channel = supabase
-      .channel("public:doctors-status-board")
-      .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, () => fetch())
-      .subscribe();
-
-    return () => {
-      active = false;
-      clearInterval(poll);
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  // Sort: online first, then alphabetical
+  const doctors = useMemo(() => {
+    return [...rawDoctors].sort((a, b) => {
+      const ao = a.is_online && (a.is_available ?? true) ? 0 : 1;
+      const bo = b.is_online && (b.is_available ?? true) ? 0 : 1;
+      if (ao !== bo) return ao - bo;
+      return (a.full_name || a.crm || "").localeCompare(b.full_name || b.crm || "");
+    });
+  }, [rawDoctors]);
 
   const onlineCount = doctors.filter((d) => d.is_online && (d.is_available ?? true)).length;
 

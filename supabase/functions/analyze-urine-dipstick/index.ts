@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from "../_shared/cors.ts"
+import { requireAuthedUser, rateLimit, assertPayloadSize } from "../_shared/ai-guard.ts"
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
 
@@ -8,8 +9,17 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
+
+  // 🔐 Requer sessão autenticada + rate limit (protege a chave paga de IA)
+  const authed = await requireAuthedUser(req, corsHeaders)
+  if (authed instanceof Response) return authed
+  const limited = await rateLimit({ bucket: "urine_dipstick", key: authed.userId, maxHits: 12, windowSeconds: 60, cors: corsHeaders })
+  if (limited) return limited
+
   try {
     const { imageBase64, mimeType } = await req.json()
+    const tooBig = assertPayloadSize(imageBase64, 12000000, corsHeaders)
+    if (tooBig) return tooBig
 
     if (!imageBase64) {
       throw new Error("No image data provided")

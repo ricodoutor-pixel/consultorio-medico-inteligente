@@ -5,6 +5,7 @@
 // para o admin acompanhar em /admin/contatos.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { rateLimit, clientIp } from "../_shared/ai-guard.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -67,6 +68,13 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+
+  // 🔐 Rate limit por IP (endpoint público de captação — protege a chave paga de IA)
+  const limited = await rateLimit({
+    bucket: "category_chat", key: clientIp(req), maxHits: 20, windowSeconds: 60, cors: corsHeaders,
+    message: "Muitas mensagens em pouco tempo. Aguarde 1 minuto e tente novamente. 🌿",
+  });
+  if (limited) return limited;
 
   try {
     const supa = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });

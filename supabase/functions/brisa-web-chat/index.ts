@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { rateLimit, clientIp } from "../_shared/ai-guard.ts";
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -9,6 +10,13 @@ const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GE
 
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+
+  // 🔐 Rate limit por IP (endpoint público — protege a chave paga de IA)
+  const limited = await rateLimit({
+    bucket: 'brisa_web_chat', key: clientIp(req), maxHits: 20, windowSeconds: 60, cors,
+    message: 'Muitas mensagens em pouco tempo. Aguarde 1 minuto e tente novamente. 🌿',
+  });
+  if (limited) return limited;
 
   try {
     const { messages, leadInfo } = await req.json();

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from "../_shared/cors.ts"
+import { requireAuthedUser, rateLimit, assertPayloadSize } from "../_shared/ai-guard.ts"
 import { callGeminiApiWithFallback, GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts"
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY') || ''
@@ -9,8 +10,17 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
+
+  // 🔐 Requer sessão autenticada + rate limit (protege a chave paga de IA)
+  const authed = await requireAuthedUser(req, corsHeaders)
+  if (authed instanceof Response) return authed
+  const limited = await rateLimit({ bucket: "lung_sound", key: authed.userId, maxHits: 12, windowSeconds: 60, cors: corsHeaders })
+  if (limited) return limited
+
   try {
     const { audioBase64, mimeType } = await req.json()
+    const tooBig = assertPayloadSize(audioBase64, 15000000, corsHeaders)
+    if (tooBig) return tooBig
 
     if (!audioBase64) {
       throw new Error("No audio data provided")

@@ -2,6 +2,8 @@
 // Cruza dados do exame do paciente com banco de 30+ patologias
 // Usa Gemini 2.5 Flash para diagnóstico baseado em evidências
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
+import { requireAuthedUser, rateLimit, hasClinicalRole } from "../_shared/ai-guard.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -125,13 +127,38 @@ async function callGemini(messages: Array<{ role: string; content: string }>): P
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
 
+  // 🔐 Exige sessão válida + rate limit (protege chave paga de IA)
+  const authed = await requireAuthedUser(req, CORS);
+  if (authed instanceof Response) return authed;
+  const limited = await rateLimit({
+    bucket: "fundoscopy_ai",
+    key: authed.userId,
+    maxHits: 12,
+    windowSeconds: 60,
+    cors: CORS,
+  });
+  if (limited) return limited;
+
   try {
     const body = await req.json();
     const {
       exam_data,
-      user_id,
       exam_type = "fundoscopy",
     } = body;
+
+    // 🔐 O paciente do exame é sempre o próprio usuário autenticado.
+    // Apenas médicos/admins podem registrar exame em nome de outro paciente.
+    let user_id: string = authed.userId;
+    const requestedUserId = typeof body?.user_id === "string" ? body.user_id : null;
+    if (requestedUserId && requestedUserId !== authed.userId) {
+      if (!(await hasClinicalRole(authed.userId))) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { ...CORS, "Content-Type": "application/json" },
+        });
+      }
+      user_id = requestedUserId;
+    }
 
     // 1. Load pathology database
     const { data: pathologies, error: pathErr } = await sb
@@ -210,8 +237,6 @@ Analise os dados do exame acima, cruze com o banco de patologias e forneça o di
         });
       }
     }
-
-import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 
     // 5. Log to audit
     await sb.from("brisa_interaction_logs").insert({

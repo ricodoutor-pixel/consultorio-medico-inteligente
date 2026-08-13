@@ -1,0 +1,700 @@
+[
+  {
+    "status": "sent",
+    "email": "guilherme.kelles@gmail.com",
+    "name": "Guilherme Kelles Juste",
+    "messageId": "<202608131426.23036232064@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:43.515Z"
+  },
+  {
+    "status": "sent",
+    "email": "gkovac43@gmail.com",
+    "name": "Guilherme Kovac Gomes",
+    "messageId": "<202608131426.18272755619@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:44.629Z"
+  },
+  {
+    "status": "sent",
+    "email": "guilherme.paschoalini@gmail.com",
+    "name": "Guilherme Lima Paschoalini",
+    "messageId": "<202608131426.24457958844@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:45.816Z"
+  },
+  {
+    "status": "sent",
+    "email": "guilherme_jp@hotmail.com",
+    "name": "Guilherme Lucas Ferreira da Silva",
+    "messageId": "<202608131426.57927318442@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:46.971Z"
+  },
+  {
+    "status": "sent",
+    "email": "guilhermemarchetti@msn.com",
+    "name": "Guilherme Marchetti",
+    "messageId": "<202608131426.20485633250@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:48.105Z"
+  },
+  {
+    "status": "sent",
+    "email": "guilhermepsiquiatra@gmail.com",
+    "name": "Guilherme Nogueira Mendes de Oliveira",
+    "messageId": "<202608131426.24118074366@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:49.153Z"
+  },
+  {
+    "status": "sent",
+    "email": "gvrhis@gmail.com",
+    "name": "Guilherme Rhis",
+    "messageId": "<202608131426.15206713515@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:50.420Z"
+  },
+  {
+    "status": "sent",
+    "email": "drguilhermeruivo@gmail.com",
+    "name": "Guilherme Ruivo Ribeiro",
+    "messageId": "<202608131426.15915738170@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:51.662Z"
+  },
+  {
+    "status": "sent",
+    "email": "guilhermet.verly@hotmail.com",
+    "name": "Guilherme Thomaz Verly da Silva",
+    "messageId": "<202608131426.15733183717@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:52.823Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavoburlamaqui72@gmail.com",
+    "name": "Gustavo Adolfo Burlamaqui da Silva Ferreira",
+    "messageId": "<202608131426.83966801718@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:53.999Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavo.hadaya@gmail.com",
+    "name": "Gustavo Ahmad Hadaya",
+    "messageId": "<202608131426.21443981221@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:55.112Z"
+  },
+  {
+    "status": "sent",
+    "email": "gugaaopb13@gmail.com",
+    "name": "Gustavo Ávila de Oliveira Paula",
+    "messageId": "<202608131426.13212036743@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:56.188Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavocastroguimaraes@gmail.com",
+    "name": "Gustavo Castro Guimarães",
+    "messageId": "<202608131426.14195845150@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:57.227Z"
+  },
+  {
+    "status": "sent",
+    "email": "drgustavonavarro@hotmail.com",
+    "name": "Gustavo Coelho Navarro",
+    "messageId": "<202608131426.84534229662@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:58.306Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavocolombo.vet@gmail.com",
+    "name": "Gustavo Colombo",
+    "messageId": "<202608131426.61595837130@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:26:59.370Z"
+  },
+  {
+    "status": "sent",
+    "email": "drgustavomedeiros@nutrohealth.com.br",
+    "name": "Gustavo Coutinho Medeiros de Andrade",
+    "messageId": "<202608131426.16338821487@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:27:00.437Z"
+  },
+  {
+    "status": "sent",
+    "email": "drgustavodamiani@gmail.com",
+    "name": "Gustavo Damiani",
+    "messageId": "<202608131426.47469200087@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:27:01.529Z"
+  },
+  {
+    "status": "failed",
+    "email": "gustavo@amadera.com.br",
+    "name": "Gustavo Daud Amadera",
+    "error": "upstream connect error or disconnect/reset before headers. reset reason: connection timeout"
+  },
+  {
+    "status": "sent",
+    "email": "gustavoamorimfoz@gmail.com",
+    "name": "Gustavo de Andrade Amorim",
+    "messageId": "<202608131428.24434117039@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:03.963Z"
+  },
+  {
+    "status": "sent",
+    "email": "gfrosendo@hotmail.com",
+    "name": "Gustavo de Figueiredo Rosendo",
+    "messageId": "<202608131428.93256247350@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:05.027Z"
+  },
+  {
+    "status": "sent",
+    "email": "gpensina@gmail.com",
+    "name": "Gustavo de Paula Ensina",
+    "messageId": "<202608131428.44738499122@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:06.084Z"
+  },
+  {
+    "status": "sent",
+    "email": "guf_alencar@hotmail.com",
+    "name": "Gustavo Fernandes de Alencar",
+    "messageId": "<202608131428.94564284665@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:07.162Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavohrm@icloud.com",
+    "name": "Gustavo Henrique Ramalho de Mattos",
+    "messageId": "<202608131428.51658710766@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:08.225Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavopneumo@gmail.com",
+    "name": "Gustavo Magno Baptista",
+    "messageId": "<202608131428.74705973975@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:09.293Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavoataide23@gmail.com",
+    "name": "Gustavo Mendonça Ataíde Gomes",
+    "messageId": "<202608131428.52139281168@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:10.355Z"
+  },
+  {
+    "status": "sent",
+    "email": "drgustavometzdorf@gmail.com",
+    "name": "Gustavo Metzdorf Junges",
+    "messageId": "<202608131428.42146112128@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:11.424Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavo@periciamedicaeconsultoria.com.br",
+    "name": "Gustavo Monteiro Chaves",
+    "messageId": "<202608131428.95523398555@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:12.478Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavooli42@gmail.com",
+    "name": "Gustavo Oliveira Barbosa",
+    "messageId": "<202608131428.73563682494@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:13.527Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavofreitaspe@hotmail.com",
+    "name": "Gustavo Pereira Freitas",
+    "messageId": "<202608131428.58818180517@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:14.608Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavoo_s@hotmail.com",
+    "name": "Gustavo Santos da Silveira",
+    "messageId": "<202608131428.29306488778@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:15.638Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavo.ibanez@hotmail.com",
+    "name": "Gustavo Simoes Llivi Ibanez",
+    "messageId": "<202608131428.57396986228@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:16.698Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavo.treistmanmedico@gmail.com",
+    "name": "Gustavo Treistman",
+    "messageId": "<202608131428.29376140717@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:17.885Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavotuulio@gmail.com",
+    "name": "Gustavo Túlio Silveira Sousa",
+    "messageId": "<202608131428.13163288020@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:18.950Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavomatutanaki@gmail.com",
+    "name": "Gustavo Vieira Dias",
+    "messageId": "<202608131428.47130418585@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:20.017Z"
+  },
+  {
+    "status": "sent",
+    "email": "gustavoyurits@hotmail.com",
+    "name": "Gustavo Yuri Torres Soares",
+    "messageId": "<202608131428.75149377919@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:21.091Z"
+  },
+  {
+    "status": "sent",
+    "email": "gutembergsl17@gmail.com",
+    "name": "Gutemberg da Silva Lima",
+    "messageId": "<202608131428.40216945503@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:22.163Z"
+  },
+  {
+    "status": "sent",
+    "email": "guttosoares15@gmail.com",
+    "name": "Guttenberg Matheus Soares Golin",
+    "messageId": "<202608131428.14343066865@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:23.231Z"
+  },
+  {
+    "status": "sent",
+    "email": "hacheemz@gmail.com",
+    "name": "Hachim Hayel Ali",
+    "messageId": "<202608131428.36163918619@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:24.300Z"
+  },
+  {
+    "status": "sent",
+    "email": "claudiastar6@hotmail.com",
+    "name": "Hamilton Ferreira",
+    "messageId": "<202608131428.25341756698@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:25.381Z"
+  },
+  {
+    "status": "sent",
+    "email": "drahaylalf@gmail.com",
+    "name": "Hayla Lima Fernandes",
+    "messageId": "<202608131428.33712307299@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:26.453Z"
+  },
+  {
+    "status": "sent",
+    "email": "hectorcastrovr@gmail.com",
+    "name": "Hector Ernane de Sousa Castro",
+    "messageId": "<202608131428.23584654476@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:27.515Z"
+  },
+  {
+    "status": "sent",
+    "email": "hectorbelloc@hotmail.com",
+    "name": "Hector Frank Bello Cerna",
+    "messageId": "<202608131428.47439423906@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:28.668Z"
+  },
+  {
+    "status": "sent",
+    "email": "heitor.lv@hotmail.com",
+    "name": "Heitor Marinheiro de Morais Dias",
+    "messageId": "<202608131428.29045958582@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:29.746Z"
+  },
+  {
+    "status": "sent",
+    "email": "helcianevida@yahoo.com.br",
+    "name": "Helciane Carvalho Bispo",
+    "messageId": "<202608131428.30382296223@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:30.813Z"
+  },
+  {
+    "status": "sent",
+    "email": "psicologohelder@gmail.com",
+    "name": "Helder Camilo da Silva Pereira",
+    "messageId": "<202608131428.26220770076@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:31.880Z"
+  },
+  {
+    "status": "sent",
+    "email": "htorres@cardiol.br",
+    "name": "Helder Torres Alves",
+    "messageId": "<202608131428.81992599297@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:32.946Z"
+  },
+  {
+    "status": "sent",
+    "email": "helenahsasaki@gmail.com",
+    "name": "Helena Harumi Sasaki",
+    "messageId": "<202608131428.55102286618@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:34.012Z"
+  },
+  {
+    "status": "sent",
+    "email": "dhr.odonto@gmail.com",
+    "name": "Helena Ribeiro de Araujo",
+    "messageId": "<202608131428.46704599740@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:35.090Z"
+  },
+  {
+    "status": "sent",
+    "email": "le.sottomaior@gmail.com",
+    "name": "Helena Sottomaior Arzua Pereira dos Santos",
+    "messageId": "<202608131428.56744795294@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:36.140Z"
+  },
+  {
+    "status": "sent",
+    "email": "helgasantiago@yahoo.com.br",
+    "name": "Helga Maria Santiago Silva",
+    "messageId": "<202608131428.55832616691@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:37.198Z"
+  },
+  {
+    "status": "sent",
+    "email": "dr.heliopires@gmail.com",
+    "name": "Hélio Henrique Medeiros Pires",
+    "messageId": "<202608131428.29678472754@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:38.261Z"
+  },
+  {
+    "status": "sent",
+    "email": "leopoti@hotmail.com",
+    "name": "Helio Leonardus Wagner Poti Sales",
+    "messageId": "<202608131428.39592167661@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:39.323Z"
+  },
+  {
+    "status": "sent",
+    "email": "ortogyn@hotmail.com",
+    "name": "Helio Marcio Temponi",
+    "messageId": "<202608131428.56397324558@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:40.384Z"
+  },
+  {
+    "status": "sent",
+    "email": "heloserradela@hotmail.com",
+    "name": "Heloisa Isidoro Uehara",
+    "messageId": "<202608131428.38673420747@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:41.445Z"
+  },
+  {
+    "status": "sent",
+    "email": "heloisaestrela86@gmail.com",
+    "name": "Heloisa Moreira Estrela Diniz Ramos",
+    "messageId": "<202608131428.59940131196@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:42.510Z"
+  },
+  {
+    "status": "sent",
+    "email": "henrienesruy@hotmail.com",
+    "name": "HENRIENE SCHNEIDER RUY GALAES",
+    "messageId": "<202608131428.10695034294@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:43.574Z"
+  },
+  {
+    "status": "sent",
+    "email": "hcampos.cunha@gmail.com",
+    "name": "Henrique Campos Cunha",
+    "messageId": "<202608131428.51042901303@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:44.651Z"
+  },
+  {
+    "status": "sent",
+    "email": "dr.henriquelorena33@gmail.com",
+    "name": "Henrique Carvalho Lorena",
+    "messageId": "<202608131428.40096661032@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:45.713Z"
+  },
+  {
+    "status": "sent",
+    "email": "henriquecoelhofernandes@hotmail.com",
+    "name": "Henrique Cotta Coelho Rodrigues Fernandes",
+    "messageId": "<202608131428.48140939438@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:46.789Z"
+  },
+  {
+    "status": "sent",
+    "email": "henrique.pernambuco@gmail.com",
+    "name": "Henrique de Almeida Pernambuco Sachs",
+    "messageId": "<202608131428.93243715217@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:47.859Z"
+  },
+  {
+    "status": "sent",
+    "email": "henri.med@hotmail.com",
+    "name": "Henrique de Souza Rodrigues",
+    "messageId": "<202608131428.45837097702@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:48.921Z"
+  },
+  {
+    "status": "sent",
+    "email": "henriquesilva.med@gmail.com",
+    "name": "Henrique Rodrigues Lemos Silva",
+    "messageId": "<202608131428.96598306488@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:49.981Z"
+  },
+  {
+    "status": "sent",
+    "email": "zanonhenrique@icloud.com",
+    "name": "Henrique Zanon Alves da Mata",
+    "messageId": "<202608131428.11395091875@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:51.064Z"
+  },
+  {
+    "status": "sent",
+    "email": "heryca.med@gmail.com",
+    "name": "Heryca Selvático de Toledo",
+    "messageId": "<202608131428.93594667586@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:52.126Z"
+  },
+  {
+    "status": "sent",
+    "email": "silva.heuler@gmail.com",
+    "name": "Heuler Alves da Silva",
+    "messageId": "<202608131428.86046347001@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:53.205Z"
+  },
+  {
+    "status": "sent",
+    "email": "hevertonbf@gmail.com",
+    "name": "Heverton Barbosa de Freitas",
+    "messageId": "<202608131428.16461352790@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:54.289Z"
+  },
+  {
+    "status": "sent",
+    "email": "drhigorafonso@gmail.com",
+    "name": "Higor Afonso Pereira da Silva",
+    "messageId": "<202608131428.94858809917@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:55.346Z"
+  },
+  {
+    "status": "sent",
+    "email": "higorbhenriques@gmail.com",
+    "name": "Higor Yuri Bezerra Henriques",
+    "messageId": "<202608131428.22989260711@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:56.417Z"
+  },
+  {
+    "status": "sent",
+    "email": "hilda_roberta@hotmail.com",
+    "name": "Hilda Roberta Lima Bezerra",
+    "messageId": "<202608131428.42032193766@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:57.600Z"
+  },
+  {
+    "status": "sent",
+    "email": "hudsondoctor1@hotmail.com",
+    "name": "Hudson de Oliveira Virgini",
+    "messageId": "<202608131428.78291380126@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:28:58.806Z"
+  },
+  {
+    "status": "sent",
+    "email": "hudsonmesquita@hotmail.com",
+    "name": "Hudson Mourão Mesquita",
+    "messageId": "<202608131428.95549124526@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:00.050Z"
+  },
+  {
+    "status": "sent",
+    "email": "huguinholuz@yahoo.com.br",
+    "name": "Hugo Dutra Luz",
+    "messageId": "<202608131428.58008147104@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:01.233Z"
+  },
+  {
+    "status": "sent",
+    "email": "motamachadohugo@gmail.com",
+    "name": "Hugo Mota Machado",
+    "messageId": "<202608131429.90327934424@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:02.499Z"
+  },
+  {
+    "status": "sent",
+    "email": "carvalhoiago107@gmail.com",
+    "name": "Iago Carvalho Barbosa",
+    "messageId": "<202608131429.38843948646@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:03.743Z"
+  },
+  {
+    "status": "sent",
+    "email": "iago.psiq@gmail.com",
+    "name": "Iago Davanço Nogueira",
+    "messageId": "<202608131429.76644981520@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:04.829Z"
+  },
+  {
+    "status": "sent",
+    "email": "iagopalbuquerque@gmail.com",
+    "name": "Iago Ricardo Lima Peon Albuquerque",
+    "messageId": "<202608131429.40596752031@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:05.957Z"
+  },
+  {
+    "status": "sent",
+    "email": "iannifarias@hotmail.com",
+    "name": "Ianni Farias de Abreu Miranda",
+    "messageId": "<202608131429.45411742417@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:07.110Z"
+  },
+  {
+    "status": "sent",
+    "email": "neurologiaibsen@gmail.com",
+    "name": "Ibsen Thadeo Damiani",
+    "messageId": "<202608131429.60186642658@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:08.174Z"
+  },
+  {
+    "status": "sent",
+    "email": "dricaropessoa@gmail.com",
+    "name": "Icaro Matteo Vital Pessoa",
+    "messageId": "<202608131429.14523127314@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:09.225Z"
+  },
+  {
+    "status": "sent",
+    "email": "consultasidelfonso@gmail.com",
+    "name": "Idelfonso Oliveira Chaves de Carvalho",
+    "messageId": "<202608131429.93341476665@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:10.308Z"
+  },
+  {
+    "status": "failed",
+    "email": "igorcepa@hotmail.com/ igorcepa@baloopet.com.br",
+    "name": "Igor Alberto Azevedo Cepa",
+    "error": "{\"code\":\"invalid_parameter\",\"message\":\"email is not valid in to\"}\n"
+  },
+  {
+    "status": "sent",
+    "email": "iarh3@hotmail.com",
+    "name": "Igor Andrade Reis Haddad",
+    "messageId": "<202608131429.83112442543@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:12.448Z"
+  },
+  {
+    "status": "sent",
+    "email": "igmedodonto@gmail.com",
+    "name": "Igor Cesar Martins de Oliveira",
+    "messageId": "<202608131429.72914282230@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:13.522Z"
+  },
+  {
+    "status": "sent",
+    "email": "igor_daniel_mf@hotmail.com",
+    "name": "Igor Daniel Moreira Ferreira",
+    "messageId": "<202608131429.80021475833@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:14.669Z"
+  },
+  {
+    "status": "sent",
+    "email": "dr.igorroversi@gmail.com",
+    "name": "Igor de Oliveira Roversi",
+    "messageId": "<202608131429.44291916675@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:15.721Z"
+  },
+  {
+    "status": "sent",
+    "email": "igorferreiradejesus0@gmail.com",
+    "name": "Igor Ferreira de Jesus",
+    "messageId": "<202608131429.43816312438@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:16.806Z"
+  },
+  {
+    "status": "sent",
+    "email": "igor.hypolito@gmail.com",
+    "name": "Igor Hypolito",
+    "messageId": "<202608131429.68340688873@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:17.878Z"
+  },
+  {
+    "status": "sent",
+    "email": "irfreitas.mfc@gmail.com",
+    "name": "Igor Ribeiro de Freitas",
+    "messageId": "<202608131429.76576517019@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:18.956Z"
+  },
+  {
+    "status": "sent",
+    "email": "ileanasimonemoura@gmail.com",
+    "name": "Ileana Simone de Oliveira Moura",
+    "messageId": "<202608131429.28924559022@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:20.029Z"
+  },
+  {
+    "status": "sent",
+    "email": "imatamara2016@gmail.com",
+    "name": "Ima Tamara de Oliveira Lino Lima",
+    "messageId": "<202608131429.97537064140@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:21.093Z"
+  },
+  {
+    "status": "sent",
+    "email": "incalo-junio@hotmail.com",
+    "name": "Incalo Junio de Jesus Santos",
+    "messageId": "<202608131429.19194996323@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:22.147Z"
+  },
+  {
+    "status": "sent",
+    "email": "ingrid__araujo@hotmail.com",
+    "name": "Ingrid Araújo Rebouças",
+    "messageId": "<202608131429.97950893186@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:23.202Z"
+  },
+  {
+    "status": "sent",
+    "email": "ingrid.azvd5@gmail.com",
+    "name": "Ingrid Carol Moura Chagas Azevedo",
+    "messageId": "<202608131429.64912148079@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:24.249Z"
+  },
+  {
+    "status": "sent",
+    "email": "icmpmed2@gmail.com",
+    "name": "Ingrid Chiullo Miranda Pimentel",
+    "messageId": "<202608131429.14585094813@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:25.318Z"
+  },
+  {
+    "status": "sent",
+    "email": "ingrydschaefer1992@gmail.com",
+    "name": "Ingryd Pereira de Oliveira",
+    "messageId": "<202608131429.66064454424@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:26.386Z"
+  },
+  {
+    "status": "sent",
+    "email": "inoaviana@gmail.com",
+    "name": "Inoã Mota Gonçalves Viana",
+    "messageId": "<202608131429.35421059180@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:27.443Z"
+  },
+  {
+    "status": "sent",
+    "email": "iolandadesalles@gmail.com",
+    "name": "Iolanda de Salles Fonseca Carvalho",
+    "messageId": "<202608131429.20403687686@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:28.550Z"
+  },
+  {
+    "status": "sent",
+    "email": "isaaclinhares@gmail.com",
+    "name": "Isaac Linhares de Oliveira",
+    "messageId": "<202608131429.62465208364@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:29.705Z"
+  },
+  {
+    "status": "sent",
+    "email": "isabelrondasn@gmail.com",
+    "name": "Isabel Rondas Nazareth",
+    "messageId": "<202608131429.98456096164@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:30.761Z"
+  },
+  {
+    "status": "sent",
+    "email": "isabelabagostini@gmail.com",
+    "name": "Isabela Barreiro Agostini",
+    "messageId": "<202608131429.31596460461@smtp-relay.mailin.fr>",
+    "ts": "2026-08-13T14:29:31.815Z"
+  }
+]

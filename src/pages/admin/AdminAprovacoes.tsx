@@ -593,7 +593,22 @@ export const AdminAprovacoes = () => {
                     <span className="text-[10px] text-muted-foreground ml-1">({selectedDoctor.profile?.pix_type || 'PIX'})</span>
                   </p>
                 </div>
+
+                <div>
+                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-1">Data de Nascimento</p>
+                  <p className="text-sm font-bold text-foreground font-mono">{selectedDoctor.profile?.date_of_birth || '— não informado'}</p>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-1">Endereço (CEP automático)</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {selectedDoctor.profile?.cep
+                      ? `CEP ${selectedDoctor.profile.cep} — ${selectedDoctor.profile.address_street || ''}${selectedDoctor.profile.address_number ? `, ${selectedDoctor.profile.address_number}` : ''}${selectedDoctor.profile.address_complement ? ` (${selectedDoctor.profile.address_complement})` : ''}${selectedDoctor.profile.neighborhood ? ` — ${selectedDoctor.profile.neighborhood}` : ''}${selectedDoctor.profile.city ? ` — ${selectedDoctor.profile.city}/${selectedDoctor.profile.region || ''}` : ''}`
+                      : '— não informado no cadastro'}
+                  </p>
+                </div>
               </div>
+
 
               {/* Tabela de Preços de Orientação / Consulta */}
               <div className="p-4 rounded-2xl bg-muted/20 border border-border">

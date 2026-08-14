@@ -5781,9 +5781,13 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address_complement: string | null
+          address_number: string | null
+          address_street: string | null
           anvisa_protocol: string | null
           avatar_url: string | null
           cannabis_experience: string | null
+          cep: string | null
           city: string | null
           country: string | null
           cpf: string | null
@@ -5796,6 +5800,7 @@ export type Database = {
           is_subscriber: boolean | null
           latitude: number | null
           longitude: number | null
+          neighborhood: string | null
           onboarding_completed: boolean
           phone: string | null
           pix_key: string | null
@@ -5808,9 +5813,13 @@ export type Database = {
           user_type: string
         }
         Insert: {
+          address_complement?: string | null
+          address_number?: string | null
+          address_street?: string | null
           anvisa_protocol?: string | null
           avatar_url?: string | null
           cannabis_experience?: string | null
+          cep?: string | null
           city?: string | null
           country?: string | null
           cpf?: string | null
@@ -5823,6 +5832,7 @@ export type Database = {
           is_subscriber?: boolean | null
           latitude?: number | null
           longitude?: number | null
+          neighborhood?: string | null
           onboarding_completed?: boolean
           phone?: string | null
           pix_key?: string | null
@@ -5835,9 +5845,13 @@ export type Database = {
           user_type?: string
         }
         Update: {
+          address_complement?: string | null
+          address_number?: string | null
+          address_street?: string | null
           anvisa_protocol?: string | null
           avatar_url?: string | null
           cannabis_experience?: string | null
+          cep?: string | null
           city?: string | null
           country?: string | null
           cpf?: string | null
@@ -5850,6 +5864,7 @@ export type Database = {
           is_subscriber?: boolean | null
           latitude?: number | null
           longitude?: number | null
+          neighborhood?: string | null
           onboarding_completed?: boolean
           phone?: string | null
           pix_key?: string | null

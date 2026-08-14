@@ -632,66 +632,27 @@ export const AdminAprovacoes = () => {
                   <FileText size={14} className="text-indigo-400" /> Documentos Anexados & Auditoria KYC (PDF / Imagem)
                 </h4>
                 <div className="grid sm:grid-cols-2 gap-3">
-                  <div className="p-3 rounded-xl bg-background border border-border flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FileImage size={18} className="text-emerald-400" />
-                      <span className="text-xs font-bold">CRM Frente</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="text-xs font-bold border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
-                      onClick={() => window.open(selectedDoctor.crm_front_url || getKycDocUrl(selectedDoctor.user_id, "crm_front"), '_blank')}
-                    >
-                      <ExternalLink size={12} className="mr-1" /> Abrir PDF / Imagem
-                    </Button>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-background border border-border flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FileImage size={18} className="text-teal-400" />
-                      <span className="text-xs font-bold">CRM Verso</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="text-xs font-bold border-teal-500/40 text-teal-400 hover:bg-teal-500/10"
-                      onClick={() => window.open(selectedDoctor.crm_back_url || getKycDocUrl(selectedDoctor.user_id, "crm_back"), '_blank')}
-                    >
-                      <ExternalLink size={12} className="mr-1" /> Abrir PDF / Imagem
-                    </Button>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-background border border-border flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck size={18} className="text-indigo-400" />
-                      <span className="text-xs font-bold">RG / CNH / Passaporte</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="text-xs font-bold border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10"
-                      onClick={() => window.open(selectedDoctor.id_front_url || getKycDocUrl(selectedDoctor.user_id, "id_front"), '_blank')}
-                    >
-                      <ExternalLink size={12} className="mr-1" /> Abrir PDF / Imagem
-                    </Button>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-background border border-border flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FileText size={18} className="text-cyan-400" />
-                      <span className="text-xs font-bold">Comprovante de Residência</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="text-xs font-bold border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10"
-                      onClick={() => window.open(getKycDocUrl(selectedDoctor.user_id, "proof"), '_blank')}
-                    >
-                      <ExternalLink size={12} className="mr-1" /> Abrir PDF / Imagem
-                    </Button>
-                  </div>
+                  {(Object.keys(KYC_LABELS) as KycKind[]).map((kind) => {
+                    const attached = docOf(selectedDoctor, kind);
+                    return (
+                      <div key={kind} className="p-3 rounded-xl bg-background border border-border flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileImage size={18} className={attached ? "text-emerald-400" : "text-rose-400"} />
+                          <span className="text-xs font-bold truncate">{KYC_LABELS[kind]}</span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className={`text-xs font-bold shrink-0 ${attached ? 'border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10' : 'border-rose-500/40 text-rose-400 hover:bg-rose-500/10'}`}
+                          onClick={() => openDoc(selectedDoctor, kind)}
+                        >
+                          <Eye size={12} className="mr-1" /> {attached ? 'Ver documento' : 'Não anexado'}
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
+
               </div>
 
               {/* 📎 Comprovantes de Revisão Pessoal do Admin (CPF Receita / CFM CRM) */}

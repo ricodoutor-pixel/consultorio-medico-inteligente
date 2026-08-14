@@ -399,9 +399,8 @@ export const AdminAprovacoes = () => {
                     const name = docUser.full_name || doc.full_name || 'Dr(a). Prescritor(a)';
                     const phone = docUser.phone || doc.personal_phone || doc.whatsapp || 'Não informado';
                     const crm = doc.crm ? `CRM-${doc.crm_state || 'BR'} ${doc.crm}` : 'CRM em Análise';
-                    const crmFrontUrl = doc.crm_front_url || getKycDocUrl(doc.user_id, "crm_front");
-                    const crmBackUrl = doc.crm_back_url || getKycDocUrl(doc.user_id, "crm_back");
-                    const idFrontUrl = doc.id_front_url || getKycDocUrl(doc.user_id, "id_front");
+                    const cep = docUser.cep || null;
+
 
                     const isCardActive = Boolean(doc.is_approved_by_admin);
 

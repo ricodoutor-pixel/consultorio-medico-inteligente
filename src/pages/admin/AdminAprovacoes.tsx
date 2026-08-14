@@ -812,6 +812,17 @@ export const AdminAprovacoes = () => {
           </DialogContent>
         </Dialog>
       )}
+
+      {docView && (
+        <KycDocViewer
+          open={Boolean(docView)}
+          onClose={() => setDocView(null)}
+          userId={docView.userId}
+          kind={docView.kind}
+          storagePath={docView.path}
+          doctorName={docView.name}
+        />
+      )}
     </div>
   );
 };

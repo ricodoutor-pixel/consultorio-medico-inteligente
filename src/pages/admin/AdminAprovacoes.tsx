@@ -31,18 +31,31 @@ export const AdminAprovacoes = () => {
   
   // Selected doctor for detailed inspection modal
   const [selectedDoctor, setSelectedDoctor] = useState<any | null>(null);
+  // Documento aberto para conferência visual (imagem/PDF real do cadastro)
+  const [docView, setDocView] = useState<{ userId: string; kind: KycKind; path?: string | null; name?: string } | null>(null);
 
-  // — Checklist KYC fiel — só libera card com dossiê completo
+  // Localiza o registro real do documento anexado pelo médico
+  const docOf = (doc: any, kind: KycKind) =>
+    (doc.kyc_docs || []).find((k: any) => k.document_kind === kind) || null;
+
+  const openDoc = (doc: any, kind: KycKind) =>
+    setDocView({
+      userId: doc.user_id,
+      kind,
+      path: docOf(doc, kind)?.storage_path,
+      name: doc.profile?.full_name || doc.full_name,
+    });
+
+  // — Checklist KYC fiel — só libera card com dossiê completo
   const kycChecklist = (doc: any) => {
     const p = doc.profile || {};
     const kinds = new Set((doc.kyc_docs || []).map((k: any) => k.document_kind));
     return [
-      { label: "CRM frente", ok: kinds.has("crm_front") },
-      { label: "CRM verso", ok: kinds.has("crm_back") },
-      { label: "RG / CNH", ok: kinds.has("id_front") },
+      ...KYC_REQUIRED.map((kind) => ({ label: KYC_LABELS[kind], ok: kinds.has(kind) })),
       { label: "Nº do CRM", ok: Boolean(doc.crm && String(doc.crm).length >= 3) },
       { label: "CPF", ok: Boolean(p.cpf && String(p.cpf).replace(/\D/g, "").length === 11) },
       { label: "Data de nascimento", ok: Boolean(p.date_of_birth) },
+      { label: "CEP / endereço", ok: Boolean(p.cep && String(p.cep).replace(/\D/g, "").length === 8) },
       { label: "Foto de perfil", ok: Boolean(p.avatar_url) },
       { label: "PIX para recebimento", ok: Boolean(p.pix_key) },
       { label: "WhatsApp", ok: Boolean((p.phone || "").replace(/\D/g, "").length >= 10) },
@@ -50,6 +63,7 @@ export const AdminAprovacoes = () => {
   };
 
   const kycMissing = (doc: any) => kycChecklist(doc).filter((i) => !i.ok).map((i) => i.label);
+
 
   const CFM_URL = "https://portal.cfm.org.br/busca-medicos";
   const RECEITA_CPF_URL = "https://servicos.receita.fazenda.gov.br/servicos/cpf/consultasituacao/consultapublica.asp";

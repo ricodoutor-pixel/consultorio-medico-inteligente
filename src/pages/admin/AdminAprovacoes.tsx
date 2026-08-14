@@ -213,10 +213,8 @@ export const AdminAprovacoes = () => {
     }
   };
 
-  const getKycDocUrl = (userId: string, kind: string) => {
-    const { data } = supabase.storage.from("kyc_documents").getPublicUrl(`${userId}/${kind}.png`);
-    return data.publicUrl;
-  };
+
+
 
   // Filtered doctors based on search & status filter
   const filteredDoctors = useMemo(() => {

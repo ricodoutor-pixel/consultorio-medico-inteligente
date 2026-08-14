@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDoctors } from "@/hooks/useDoctors";
+import KycDocViewer from "@/components/admin/KycDocViewer";
+import { KYC_LABELS, KYC_REQUIRED, type KycKind } from "@/lib/kyc-docs";
 
 export const AdminAprovacoes = () => {
   const { doctors, setDoctors, loading, fetchDoctors, counts } = useDoctors();
@@ -29,18 +31,31 @@ export const AdminAprovacoes = () => {
   
   // Selected doctor for detailed inspection modal
   const [selectedDoctor, setSelectedDoctor] = useState<any | null>(null);
+  // Documento aberto para conferência visual (imagem/PDF real do cadastro)
+  const [docView, setDocView] = useState<{ userId: string; kind: KycKind; path?: string | null; name?: string } | null>(null);
 
-  // — Checklist KYC fiel — só libera card com dossiê completo
+  // Localiza o registro real do documento anexado pelo médico
+  const docOf = (doc: any, kind: KycKind) =>
+    (doc.kyc_docs || []).find((k: any) => k.document_kind === kind) || null;
+
+  const openDoc = (doc: any, kind: KycKind) =>
+    setDocView({
+      userId: doc.user_id,
+      kind,
+      path: docOf(doc, kind)?.storage_path,
+      name: doc.profile?.full_name || doc.full_name,
+    });
+
+  // — Checklist KYC fiel — só libera card com dossiê completo
   const kycChecklist = (doc: any) => {
     const p = doc.profile || {};
     const kinds = new Set((doc.kyc_docs || []).map((k: any) => k.document_kind));
     return [
-      { label: "CRM frente", ok: kinds.has("crm_front") },
-      { label: "CRM verso", ok: kinds.has("crm_back") },
-      { label: "RG / CNH", ok: kinds.has("id_front") },
+      ...KYC_REQUIRED.map((kind) => ({ label: KYC_LABELS[kind], ok: kinds.has(kind) })),
       { label: "Nº do CRM", ok: Boolean(doc.crm && String(doc.crm).length >= 3) },
       { label: "CPF", ok: Boolean(p.cpf && String(p.cpf).replace(/\D/g, "").length === 11) },
       { label: "Data de nascimento", ok: Boolean(p.date_of_birth) },
+      { label: "CEP / endereço", ok: Boolean(p.cep && String(p.cep).replace(/\D/g, "").length === 8) },
       { label: "Foto de perfil", ok: Boolean(p.avatar_url) },
       { label: "PIX para recebimento", ok: Boolean(p.pix_key) },
       { label: "WhatsApp", ok: Boolean((p.phone || "").replace(/\D/g, "").length >= 10) },
@@ -48,6 +63,7 @@ export const AdminAprovacoes = () => {
   };
 
   const kycMissing = (doc: any) => kycChecklist(doc).filter((i) => !i.ok).map((i) => i.label);
+
 
   const CFM_URL = "https://portal.cfm.org.br/busca-medicos";
   const RECEITA_CPF_URL = "https://servicos.receita.fazenda.gov.br/servicos/cpf/consultasituacao/consultapublica.asp";
@@ -197,10 +213,8 @@ export const AdminAprovacoes = () => {
     }
   };
 
-  const getKycDocUrl = (userId: string, kind: string) => {
-    const { data } = supabase.storage.from("kyc_documents").getPublicUrl(`${userId}/${kind}.png`);
-    return data.publicUrl;
-  };
+
+
 
   // Filtered doctors based on search & status filter
   const filteredDoctors = useMemo(() => {
@@ -385,9 +399,8 @@ export const AdminAprovacoes = () => {
                     const name = docUser.full_name || doc.full_name || 'Dr(a). Prescritor(a)';
                     const phone = docUser.phone || doc.personal_phone || doc.whatsapp || 'Não informado';
                     const crm = doc.crm ? `CRM-${doc.crm_state || 'BR'} ${doc.crm}` : 'CRM em Análise';
-                    const crmFrontUrl = doc.crm_front_url || getKycDocUrl(doc.user_id, "crm_front");
-                    const crmBackUrl = doc.crm_back_url || getKycDocUrl(doc.user_id, "crm_back");
-                    const idFrontUrl = doc.id_front_url || getKycDocUrl(doc.user_id, "id_front");
+                    const cep = docUser.cep || null;
+
 
                     const isCardActive = Boolean(doc.is_approved_by_admin);
 
@@ -427,35 +440,32 @@ export const AdminAprovacoes = () => {
                           <p className="text-[10px] text-cyan-400 font-mono mt-0.5">
                             PIX: {docUser.pix_key ? `${docUser.pix_key} (${docUser.pix_type || 'PIX'})` : '— não informado'}
                           </p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">
+                            CEP: {cep || '— não informado'}
+                            {docUser.address_street ? ` · ${docUser.address_street}, ${docUser.address_number || 's/n'}` : ''}
+                            {docUser.neighborhood ? ` · ${docUser.neighborhood}` : ''}
+                            {docUser.city ? ` · ${docUser.city}/${docUser.region || ''}` : ''}
+                          </p>
                         </TableCell>
 
                         <TableCell>
                           <div className="flex flex-wrap gap-1.5">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-7 px-2 text-[11px] bg-muted/40 hover:bg-muted"
-                              onClick={() => window.open(crmFrontUrl, '_blank')}
-                            >
-                              <FileImage className="w-3 h-3 mr-1 text-emerald-400" /> CRM Frente
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-7 px-2 text-[11px] bg-muted/40 hover:bg-muted"
-                              onClick={() => window.open(crmBackUrl, '_blank')}
-                            >
-                              <FileImage className="w-3 h-3 mr-1 text-teal-400" /> CRM Verso
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-7 px-2 text-[11px] bg-muted/40 hover:bg-muted"
-                              onClick={() => window.open(idFrontUrl, '_blank')}
-                            >
-                              <ShieldCheck className="w-3 h-3 mr-1 text-indigo-400" /> RG / CNH
-                            </Button>
+                            {KYC_REQUIRED.map((kind) => {
+                              const attached = Boolean(docOf(doc, kind));
+                              return (
+                                <Button
+                                  key={kind}
+                                  variant="outline"
+                                  size="sm"
+                                  className={`h-7 px-2 text-[11px] ${attached ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300' : 'bg-rose-500/10 border-rose-500/40 text-rose-300'}`}
+                                  onClick={() => openDoc(doc, kind)}
+                                >
+                                  <FileImage className="w-3 h-3 mr-1" /> {KYC_LABELS[kind]}
+                                </Button>
+                              );
+                            })}
                           </div>
+
                           <div className="flex flex-wrap gap-1 mt-2">
                             {kycChecklist(doc).map((item) => (
                               <span
@@ -583,7 +593,22 @@ export const AdminAprovacoes = () => {
                     <span className="text-[10px] text-muted-foreground ml-1">({selectedDoctor.profile?.pix_type || 'PIX'})</span>
                   </p>
                 </div>
+
+                <div>
+                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-1">Data de Nascimento</p>
+                  <p className="text-sm font-bold text-foreground font-mono">{selectedDoctor.profile?.date_of_birth || '— não informado'}</p>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-1">Endereço (CEP automático)</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {selectedDoctor.profile?.cep
+                      ? `CEP ${selectedDoctor.profile.cep} — ${selectedDoctor.profile.address_street || ''}${selectedDoctor.profile.address_number ? `, ${selectedDoctor.profile.address_number}` : ''}${selectedDoctor.profile.address_complement ? ` (${selectedDoctor.profile.address_complement})` : ''}${selectedDoctor.profile.neighborhood ? ` — ${selectedDoctor.profile.neighborhood}` : ''}${selectedDoctor.profile.city ? ` — ${selectedDoctor.profile.city}/${selectedDoctor.profile.region || ''}` : ''}`
+                      : '— não informado no cadastro'}
+                  </p>
+                </div>
               </div>
+
 
               {/* Tabela de Preços de Orientação / Consulta */}
               <div className="p-4 rounded-2xl bg-muted/20 border border-border">
@@ -622,66 +647,27 @@ export const AdminAprovacoes = () => {
                   <FileText size={14} className="text-indigo-400" /> Documentos Anexados & Auditoria KYC (PDF / Imagem)
                 </h4>
                 <div className="grid sm:grid-cols-2 gap-3">
-                  <div className="p-3 rounded-xl bg-background border border-border flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FileImage size={18} className="text-emerald-400" />
-                      <span className="text-xs font-bold">CRM Frente</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="text-xs font-bold border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
-                      onClick={() => window.open(selectedDoctor.crm_front_url || getKycDocUrl(selectedDoctor.user_id, "crm_front"), '_blank')}
-                    >
-                      <ExternalLink size={12} className="mr-1" /> Abrir PDF / Imagem
-                    </Button>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-background border border-border flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FileImage size={18} className="text-teal-400" />
-                      <span className="text-xs font-bold">CRM Verso</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="text-xs font-bold border-teal-500/40 text-teal-400 hover:bg-teal-500/10"
-                      onClick={() => window.open(selectedDoctor.crm_back_url || getKycDocUrl(selectedDoctor.user_id, "crm_back"), '_blank')}
-                    >
-                      <ExternalLink size={12} className="mr-1" /> Abrir PDF / Imagem
-                    </Button>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-background border border-border flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck size={18} className="text-indigo-400" />
-                      <span className="text-xs font-bold">RG / CNH / Passaporte</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="text-xs font-bold border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10"
-                      onClick={() => window.open(selectedDoctor.id_front_url || getKycDocUrl(selectedDoctor.user_id, "id_front"), '_blank')}
-                    >
-                      <ExternalLink size={12} className="mr-1" /> Abrir PDF / Imagem
-                    </Button>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-background border border-border flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FileText size={18} className="text-cyan-400" />
-                      <span className="text-xs font-bold">Comprovante de Residência</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="text-xs font-bold border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10"
-                      onClick={() => window.open(getKycDocUrl(selectedDoctor.user_id, "proof"), '_blank')}
-                    >
-                      <ExternalLink size={12} className="mr-1" /> Abrir PDF / Imagem
-                    </Button>
-                  </div>
+                  {(Object.keys(KYC_LABELS) as KycKind[]).map((kind) => {
+                    const attached = docOf(selectedDoctor, kind);
+                    return (
+                      <div key={kind} className="p-3 rounded-xl bg-background border border-border flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileImage size={18} className={attached ? "text-emerald-400" : "text-rose-400"} />
+                          <span className="text-xs font-bold truncate">{KYC_LABELS[kind]}</span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className={`text-xs font-bold shrink-0 ${attached ? 'border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10' : 'border-rose-500/40 text-rose-400 hover:bg-rose-500/10'}`}
+                          onClick={() => openDoc(selectedDoctor, kind)}
+                        >
+                          <Eye size={12} className="mr-1" /> {attached ? 'Ver documento' : 'Não anexado'}
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
+
               </div>
 
               {/* 📎 Comprovantes de Revisão Pessoal do Admin (CPF Receita / CFM CRM) */}
@@ -825,6 +811,17 @@ export const AdminAprovacoes = () => {
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {docView && (
+        <KycDocViewer
+          open={Boolean(docView)}
+          onClose={() => setDocView(null)}
+          userId={docView.userId}
+          kind={docView.kind}
+          storagePath={docView.path}
+          doctorName={docView.name}
+        />
       )}
     </div>
   );

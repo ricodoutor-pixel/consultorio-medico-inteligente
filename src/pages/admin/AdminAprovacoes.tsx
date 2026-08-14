@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDoctors } from "@/hooks/useDoctors";
+import KycDocViewer from "@/components/admin/KycDocViewer";
+import { KYC_LABELS, KYC_REQUIRED, type KycKind } from "@/lib/kyc-docs";
 
 export const AdminAprovacoes = () => {
   const { doctors, setDoctors, loading, fetchDoctors, counts } = useDoctors();

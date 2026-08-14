@@ -440,35 +440,32 @@ export const AdminAprovacoes = () => {
                           <p className="text-[10px] text-cyan-400 font-mono mt-0.5">
                             PIX: {docUser.pix_key ? `${docUser.pix_key} (${docUser.pix_type || 'PIX'})` : '— não informado'}
                           </p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">
+                            CEP: {cep || '— não informado'}
+                            {docUser.address_street ? ` · ${docUser.address_street}, ${docUser.address_number || 's/n'}` : ''}
+                            {docUser.neighborhood ? ` · ${docUser.neighborhood}` : ''}
+                            {docUser.city ? ` · ${docUser.city}/${docUser.region || ''}` : ''}
+                          </p>
                         </TableCell>
 
                         <TableCell>
                           <div className="flex flex-wrap gap-1.5">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-7 px-2 text-[11px] bg-muted/40 hover:bg-muted"
-                              onClick={() => window.open(crmFrontUrl, '_blank')}
-                            >
-                              <FileImage className="w-3 h-3 mr-1 text-emerald-400" /> CRM Frente
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-7 px-2 text-[11px] bg-muted/40 hover:bg-muted"
-                              onClick={() => window.open(crmBackUrl, '_blank')}
-                            >
-                              <FileImage className="w-3 h-3 mr-1 text-teal-400" /> CRM Verso
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-7 px-2 text-[11px] bg-muted/40 hover:bg-muted"
-                              onClick={() => window.open(idFrontUrl, '_blank')}
-                            >
-                              <ShieldCheck className="w-3 h-3 mr-1 text-indigo-400" /> RG / CNH
-                            </Button>
+                            {KYC_REQUIRED.map((kind) => {
+                              const attached = Boolean(docOf(doc, kind));
+                              return (
+                                <Button
+                                  key={kind}
+                                  variant="outline"
+                                  size="sm"
+                                  className={`h-7 px-2 text-[11px] ${attached ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300' : 'bg-rose-500/10 border-rose-500/40 text-rose-300'}`}
+                                  onClick={() => openDoc(doc, kind)}
+                                >
+                                  <FileImage className="w-3 h-3 mr-1" /> {KYC_LABELS[kind]}
+                                </Button>
+                              );
+                            })}
                           </div>
+
                           <div className="flex flex-wrap gap-1 mt-2">
                             {kycChecklist(doc).map((item) => (
                               <span

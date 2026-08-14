@@ -13,6 +13,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CheckCircle2, Upload, UserPlus, ArrowRight, ShieldCheck, AlertTriangle, Lock, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { KYC_BUCKET, KYC_LABELS, type KycKind } from "@/lib/kyc-docs";
+
 import { categories } from "@/data/professionals";
 import { motion } from "framer-motion";
 import {

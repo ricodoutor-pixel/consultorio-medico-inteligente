@@ -38,7 +38,8 @@ export function useDoctors() {
       const { data, error } = await supabase
         .from("doctors" as any)
         .select("*")
-        .order("created_at", { ascending: false });
+        // Ordem de chegada real (primeiro cadastro primeiro): Dr. Edilson → Dra. Olivia → Dra. Suelen → …
+        .order("created_at", { ascending: true });
 
       if (error) {
         console.error("[useDoctors] error fetching doctors:", error);
@@ -48,21 +49,24 @@ export function useDoctors() {
       const rows = (data ?? []) as unknown as DoctorRow[];
       const userIds = Array.from(new Set(rows.map((d) => d.user_id).filter(Boolean)));
 
-      // Dados reais de cadastro (nome, CPF, nascimento, WhatsApp, PIX, foto) — visíveis ao admin via RLS
+      // Dados reais de cadastro (nome, CPF, nascimento, WhatsApp, PIX, endereço, foto) — visíveis ao admin via RLS
       const [{ data: profiles }, { data: kycDocs }] = await Promise.all([
         userIds.length
           ? supabase
               .from("profiles")
-              .select("id, full_name, phone, cpf, date_of_birth, pix_key, pix_type, avatar_url, city, region, country, created_at")
+              .select(
+                "id, full_name, phone, cpf, date_of_birth, pix_key, pix_type, avatar_url, city, region, country, cep, address_street, address_number, address_complement, neighborhood, created_at",
+              )
               .in("id", userIds)
           : Promise.resolve({ data: [] as any[] } as any),
         userIds.length
           ? supabase
               .from("doctor_kyc_documents" as any)
-              .select("doctor_user_id, document_kind, storage_path, verification_status, created_at")
+              .select("doctor_user_id, document_kind, storage_path, mime_type, verification_status, created_at")
               .in("doctor_user_id", userIds)
           : Promise.resolve({ data: [] as any[] } as any),
       ]);
+
 
       const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
       const docsMap = new Map<string, any[]>();

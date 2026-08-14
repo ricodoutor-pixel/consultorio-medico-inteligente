@@ -13,6 +13,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CheckCircle2, Upload, UserPlus, ArrowRight, ShieldCheck, AlertTriangle, Lock, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { KYC_BUCKET, KYC_LABELS, type KycKind } from "@/lib/kyc-docs";
+
 import { categories } from "@/data/professionals";
 import { motion } from "framer-motion";
 import {
@@ -161,17 +163,56 @@ const CadastroProfissional = () => {
     atendimento: "chat",
     disponibilidade: "",
     plano: "basic",
+    dateOfBirth: "",
+    cep: "",
+    logradouro: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    uf: "",
   });
+
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [savedCredentials, setSavedCredentials] = useState<{ email: string; password: string } | null>(null);
 
-  // KYC uploads (frente/verso obrigatórios)
-  type KycKind = "crm_front" | "crm_back" | "id_front" | "id_back";
+  // KYC uploads (frente/verso obrigatórios + CPF, endereço, selfie)
   const [kycFiles, setKycFiles] = useState<Record<KycKind, File | null>>({
     crm_front: null, crm_back: null, id_front: null, id_back: null,
+    cpf_doc: null, address_proof: null, selfie: null,
   });
   const MAX_KYC_BYTES = 5 * 1024 * 1024; // 5MB
   const isCuidadorSel = form.categoria === "Cuidadores de Idosos";
+  const [cepLoading, setCepLoading] = useState(false);
+
+  /** ViaCEP — preenche logradouro, bairro, cidade e UF automaticamente */
+  const handleCep = async (raw: string) => {
+    const masked = raw.replace(/\D/g, "").slice(0, 8).replace(/^(\d{5})(\d)/, "$1-$2");
+    handleChange("cep", masked);
+    const digits = masked.replace(/\D/g, "");
+    if (digits.length !== 8) return;
+    setCepLoading(true);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+      const data = await res.json();
+      if (data?.erro) {
+        toast({ title: "CEP não encontrado", variant: "destructive" });
+        return;
+      }
+      setForm((p) => ({
+        ...p,
+        logradouro: data.logradouro || p.logradouro,
+        bairro: data.bairro || p.bairro,
+        cidadeUF: data.localidade ? `${data.localidade}` : p.cidadeUF,
+        crmUF: data.uf || p.crmUF,
+        uf: data.uf || "",
+      }));
+      toast({ title: "Endereço preenchido automaticamente", description: `${data.logradouro || ""} — ${data.localidade}/${data.uf}` });
+    } catch {
+      toast({ title: "Não foi possível consultar o CEP", variant: "destructive" });
+    } finally {
+      setCepLoading(false);
+    }
+  };
 
   const handleKycFile = (kind: KycKind) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] || null;
@@ -182,6 +223,7 @@ const CadastroProfissional = () => {
     }
     setKycFiles((p) => ({ ...p, [kind]: f }));
   };
+
 
   // Cuando cambia el país, ajustar tipos de documento y departamento por defecto
   useEffect(() => {

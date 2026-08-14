@@ -161,7 +161,15 @@ const CadastroProfissional = () => {
     atendimento: "chat",
     disponibilidade: "",
     plano: "basic",
+    dateOfBirth: "",
+    cep: "",
+    logradouro: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    uf: "",
   });
+
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [savedCredentials, setSavedCredentials] = useState<{ email: string; password: string } | null>(null);
 

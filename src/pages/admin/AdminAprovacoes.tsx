@@ -46,6 +46,46 @@ export const AdminAprovacoes = () => {
       name: doc.profile?.full_name || doc.full_name,
     });
 
+  // — CONF CRM: anexa o print da consulta pública do CFM ao dossiê do médico
+  const [uploadingConf, setUploadingConf] = useState<string | null>(null);
+
+  const uploadConfCrm = async (doc: any, file: File) => {
+    setUploadingConf(doc.user_id);
+    try {
+      const ext = (file.name.split(".").pop() || "png").toLowerCase();
+      const path = `${doc.user_id}/cfm_print.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("doctor-kyc-documents")
+        .upload(path, file, { upsert: true, contentType: file.type || "image/png" });
+      if (upErr) throw upErr;
+
+      const existing = docOf(doc, "cfm_print");
+      if (existing) {
+        const { error } = await supabase
+          .from("doctor_kyc_documents" as any)
+          .update({ storage_path: path, mime_type: file.type, size_bytes: file.size, verification_status: "verified" })
+          .eq("id", existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("doctor_kyc_documents" as any).insert({
+          doctor_user_id: doc.user_id,
+          document_kind: "cfm_print",
+          storage_path: path,
+          mime_type: file.type,
+          size_bytes: file.size,
+          verification_status: "verified",
+        } as any);
+        if (error) throw error;
+      }
+      toast.success("CONF CRM anexada ao cadastro do médico");
+      fetchDoctors();
+    } catch (e: any) {
+      toast.error(e?.message || "Falha ao anexar CONF CRM");
+    } finally {
+      setUploadingConf(null);
+    }
+  };
+
   // — Checklist KYC fiel — só libera card com dossiê completo
   const kycChecklist = (doc: any) => {
     const p = doc.profile || {};

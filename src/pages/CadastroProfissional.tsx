@@ -465,31 +465,48 @@ const CadastroProfissional = () => {
       });
       if (docErr) console.error("[doctor insert]", docErr);
 
-      // 4) Upload KYC (frente/verso) — bloqueante
+      // 4) Upload KYC (bucket privado real) + registro em doctor_kyc_documents
       const uploads: Promise<unknown>[] = [];
+      const kycRows: any[] = [];
       for (const kind of Object.keys(kycFiles) as KycKind[]) {
         const file = kycFiles[kind];
         if (!file) continue;
         const ext = (file.name.split(".").pop() || "bin").toLowerCase().slice(0, 5);
         const path = `${userId}/${kind}.${ext}`;
+        kycRows.push({
+          doctor_user_id: userId,
+          document_kind: kind,
+          storage_path: path,
+          verification_status: "pending",
+        });
         uploads.push(
           supabase.storage
-            .from("kyc_documents")
+            .from(KYC_BUCKET)
             .upload(path, file, { upsert: true, contentType: file.type || undefined })
+            .then(({ error }) => {
+              if (error) throw error;
+            })
             .catch((err) => {
               console.error("[kyc upload]", kind, err);
-              throw new Error(`Falha ao fazer upload de ${kind}`);
+              throw new Error(`Falha ao fazer upload de ${KYC_LABELS[kind]}`);
             })
         );
       }
-      
+
       try {
         await Promise.all(uploads);
+        if (kycRows.length) {
+          const { error: kycErr } = await supabase
+            .from("doctor_kyc_documents" as any)
+            .upsert(kycRows, { onConflict: "doctor_user_id,document_kind" });
+          if (kycErr) console.error("[kyc rows]", kycErr);
+        }
       } catch (err: any) {
-        toast({ title: "Erro no Upload", description: "Ocorreu um erro ao salvar os documentos. Tente novamente.", variant: "destructive" });
+        toast({ title: "Erro no Upload", description: err?.message || "Ocorreu um erro ao salvar os documentos. Tente novamente.", variant: "destructive" });
         setLoading(false);
         return;
       }
+
 
       // 5) Disparo WhatsApp (Enf. Brisa) — não bloqueante
       try {

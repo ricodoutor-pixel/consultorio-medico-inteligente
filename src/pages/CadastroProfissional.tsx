@@ -176,7 +176,7 @@ const CadastroProfissional = () => {
   const [savedCredentials, setSavedCredentials] = useState<{ email: string; password: string } | null>(null);
 
   // KYC uploads (frente/verso obrigatórios + CPF, endereço, selfie)
-  const [kycFiles, setKycFiles] = useState<Record<KycKind, File | null>>({
+  const [kycFiles, setKycFiles] = useState<Partial<Record<KycKind, File | null>>>({
     crm_front: null, crm_back: null, id_front: null, id_back: null,
     cpf_doc: null, address_proof: null, selfie: null,
   });

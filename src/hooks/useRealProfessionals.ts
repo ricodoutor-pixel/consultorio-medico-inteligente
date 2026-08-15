@@ -296,7 +296,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     // Médicos reais recém-cadastrados (KYC pendente): card exposto, mas OFF-LINE
     // até liberação no painel KYC ou ativação pelo próprio médico.
-    const PENDING_REAL_IDS = ["med-joao-pedro", "med-marianna", "med-ana-paula"];
+    const PENDING_REAL_IDS = ["med-joao-pedro", "med-marianna", "med-ana-paula", "med-jose-roberto"];
     for (const pendingId of PENDING_REAL_IDS) {
       const mock = testProfessionals.find((p) => p.id === pendingId);
       if (!mock) continue;

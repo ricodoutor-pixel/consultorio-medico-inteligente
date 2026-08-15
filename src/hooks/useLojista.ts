@@ -40,23 +40,24 @@ export function useLojista() {
 
       // Validação de Role na tabela profiles
       const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
+        .from('profiles' as any)
         .select('id, role, company_name, is_verified')
         .eq('id', user.id)
         .single();
 
-      if (profileError || !profileData || (profileData.role !== 'lojista' && profileData.role !== 'dispensario')) {
+      const prof = profileData as any;
+      if (profileError || !prof || (prof.role !== 'lojista' && prof.role !== 'dispensario')) {
         setAuthError("Acesso Negado: Seu perfil não é de lojista.");
         setLoading(false);
         return;
       }
       
-      setProfile(profileData);
+      setProfile(prof);
 
       // Busca dados reais em paralelo usando Promisses
       const [productsRes, ordersRes] = await Promise.all([
-        supabase.from('products').select('*').eq('dispensary_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('b2b_orders').select('*').eq('lojista_id', user.id).order('created_at', { ascending: false })
+        (supabase as any).from('products').select('*').eq('dispensary_id', user.id).order('created_at', { ascending: false }),
+        (supabase as any).from('b2b_orders').select('*').eq('lojista_id', user.id).order('created_at', { ascending: false })
       ]);
 
       setMetrics({
@@ -79,7 +80,7 @@ export function useLojista() {
     if (!session?.user?.id) throw new Error("Usuário não logado");
 
     const { data, error } = await supabase
-      .from('products')
+      .from('products' as any)
       .insert([{
         ...productData,
         dispensary_id: session.user.id, // Vínculo rígido de RLS

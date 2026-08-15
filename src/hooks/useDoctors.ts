@@ -1,6 +1,7 @@
 // src/hooks/useDoctors.ts
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchInlineAvatar } from "@/lib/kyc-docs";
 
 export interface DoctorRow {
   id: string;
@@ -88,11 +89,11 @@ export function useDoctors() {
         .map((p: any) => p.id as string);
       if (inlineIds.length) {
         const resolved = await Promise.all(
-          inlineIds.map(async (id) => [id, await fetchInlineAvatar(id)] as const),
+          inlineIds.map(async (id) => [id, await fetchInlineAvatar(id)] as [string, string | null]),
         );
         const inlineMap = new Map(resolved);
         setDoctors((prev) =>
-          prev.map((d) => {
+          prev.map((d): DoctorRow => {
             const inline = inlineMap.get(d.user_id);
             if (!inline) return d;
             return {

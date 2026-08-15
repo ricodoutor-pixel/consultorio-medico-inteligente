@@ -368,6 +368,22 @@ const CadastroProfissional = () => {
       toast({ title: country === "BO" ? "Acepte los términos para continuar" : "Aceite os termos para continuar", variant: "destructive" });
       return;
     }
+    if (!form.dateOfBirth) {
+      toast({ title: "Informe a data de nascimento", variant: "destructive" });
+      return;
+    }
+    if (country !== "BO" && form.cep.replace(/\D/g, "").length !== 8) {
+      toast({ title: "CEP inválido", description: "Informe o CEP completo para preenchimento automático do endereço.", variant: "destructive" });
+      return;
+    }
+    if (!kycFiles["cpf_doc"] || !kycFiles["address_proof"]) {
+      toast({
+        title: "Documentos Incompletos",
+        description: "Anexe o documento do CPF e o comprovante de endereço (CEP).",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // 🔐 KYC Rigoroso: Documentos obrigatórios (frente e verso)
     if (!isCuidador) {

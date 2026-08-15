@@ -7,7 +7,6 @@ import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
 import draRenataImg from "@/assets/dra-renata-costa.jpg";
 import drLucasImg from "@/assets/dr-lucas-ferreira.jpg";
-import draSofiaImg from "@/assets/dra-sofia-santos.jpg";
 import drCarlosImg from "@/assets/dr-carlos-herrera.jpg";
 import draValentinaImg from "@/assets/dra-valentina-reyes.jpg";
 import drMateoImg from "@/assets/dr-mateo-lopez.jpg";

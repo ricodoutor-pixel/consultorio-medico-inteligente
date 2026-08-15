@@ -82,8 +82,15 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
   );
 };
 
+/** Médicos com Plano Med VIP ativo (selo exibido no card). */
+const VIP_DOCTOR_MATCHERS = ["edilson", "suelen", "olivia"];
+const isVipDoctor = (p: Professional) =>
+  p.id === "med-0" ||
+  VIP_DOCTOR_MATCHERS.some((n) => (p.name || "").toLowerCase().includes(n));
+
 /** Tags elegantes da vitrine padronizada exibidas no card do profissional. */
 const ServiceTagsRow = () => (
+
   <div className="flex flex-wrap gap-1 mb-3">
     {SERVICE_MENU.map((s) => (
       <span

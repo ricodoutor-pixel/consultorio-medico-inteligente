@@ -220,6 +220,8 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 0,
     avatar: "AP",
+    imageUrl: "/placeholder.svg",
+
     online: false,
     crm: "36942/PR (Regular)",
     hospital: "Planta y Raíz Ltda",

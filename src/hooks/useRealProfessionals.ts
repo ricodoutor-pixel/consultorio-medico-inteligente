@@ -294,6 +294,16 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       finalPros.push({ ...suelenMock, online: getMockOnlineStatus("mock-suelen", false) });
     }
 
+    // Médicos reais recém-cadastrados (KYC pendente): card exposto, mas OFF-LINE
+    // até liberação no painel KYC ou ativação pelo próprio médico.
+    const PENDING_REAL_IDS = ["med-joao-pedro", "med-marianna", "med-ana-paula"];
+    for (const pendingId of PENDING_REAL_IDS) {
+      const mock = testProfessionals.find((p) => p.id === pendingId);
+      if (!mock) continue;
+      if (finalPros.some((p) => p.id === mock.id) || isMockReplaced(mock)) continue;
+      finalPros.push({ ...mock, online: getMockOnlineStatus(mock.id, false) });
+    }
+
     // How many test slots remain after real doctors fill spots
     const testSlotsRemaining = Math.max(0, MAX_TEST_SLOTS - finalPros.length);
 

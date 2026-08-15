@@ -94,7 +94,7 @@ export function useDoctors() {
         const inlineMap = new Map(resolved);
         setDoctors((prev) =>
           prev.map((d): DoctorRow => {
-            const inline = inlineMap.get(d.user_id);
+            const inline = inlineMap.get(d.user_id) as string | null | undefined;
             if (!inline) return d;
             return {
               ...d,

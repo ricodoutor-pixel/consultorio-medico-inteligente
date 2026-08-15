@@ -9,6 +9,8 @@ import { FilaAssincrona } from "@/components/doctor/FilaAssincrona";
 import { PacienteTesteSimulacao360 } from "@/components/doctor/PacienteTesteSimulacao360";
 import { DoctorRankingPlantaCoin } from "@/components/doctor/DoctorRankingPlantaCoin";
 import { CopilotoClinicoVIP } from "@/components/doctor/CopilotoClinicoVIP";
+import { PendingDocsNotice } from "@/components/doctor/PendingDocsNotice";
+
 import { AlertTriangle, ArrowLeft, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot, Bell, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -330,7 +332,13 @@ const Consultorio = () => {
       )}
 
       <div className="flex-1 container mx-auto py-6">
+        {doctor && profile && (
+          <div className="mb-5">
+            <PendingDocsNotice userId={doctor.user_id} profile={profile} doctorName={profile.full_name} />
+          </div>
+        )}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+
           <TabsList className="mb-6 w-full flex flex-nowrap overflow-x-auto h-auto p-1.5 bg-card/90 backdrop-blur-md border border-border/60 rounded-xl gap-2 whitespace-nowrap scrollbar-none">
             <TabsTrigger value="atendimentos" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all">Atendimentos</TabsTrigger>
             <TabsTrigger value="copiloto-vip" className="shrink-0 whitespace-nowrap px-4 py-2 text-xs md:text-sm font-extrabold rounded-lg transition-all bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-black border border-emerald-500/30">

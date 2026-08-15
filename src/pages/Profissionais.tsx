@@ -82,8 +82,15 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
   );
 };
 
+/** Médicos com Plano Med VIP ativo (selo exibido no card). */
+const VIP_DOCTOR_MATCHERS = ["edilson", "suelen", "olivia"];
+const isVipDoctor = (p: Professional) =>
+  p.id === "med-0" ||
+  VIP_DOCTOR_MATCHERS.some((n) => (p.name || "").toLowerCase().includes(n));
+
 /** Tags elegantes da vitrine padronizada exibidas no card do profissional. */
 const ServiceTagsRow = () => (
+
   <div className="flex flex-wrap gap-1 mb-3">
     {SERVICE_MENU.map((s) => (
       <span
@@ -122,8 +129,12 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
                 <OnlineStatusIndicator online={pro.online} size="lg" className="absolute -bottom-1 -right-1" />
               </div>
               <h1 className="text-xl font-display font-black text-foreground">{pro.name}</h1>
-              <p className="text-sm text-muted-foreground mb-2">{pro.category}</p>
-              {pro.crm && <p className="text-xs text-muted-foreground mb-1">CRM: {pro.crm}</p>}
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <p className="text-sm text-muted-foreground">{pro.category}</p>
+                {isVipDoctor(pro) && <DoctorVIPSeal tier="basic" />}
+              </div>
+              {pro.crm && <p className="text-xs font-bold text-muted-foreground mb-1">CRM {pro.crm}</p>}
+
               {pro.hospital && <p className="text-xs text-muted-foreground mb-1">{pro.hospital}</p>}
               <div className="flex items-center gap-2 mb-4">
                 <Star size={14} className="text-primary fill-primary" />
@@ -318,7 +329,7 @@ const Profissionais = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <h2 className="font-black text-foreground text-sm md:text-base truncate">{p.name}</h2>
-                              {p.id === "med-0" && <DoctorVIPSeal tier="basic" />}
+                              {isVipDoctor(p) && <DoctorVIPSeal tier="basic" />}
                               {p.flags && p.flags.map((flag, i) => (
                                 <CountryFlag key={i} code={flag} />
                               ))}
@@ -334,6 +345,10 @@ const Profissionais = () => {
                                 {p.online ? 'Online' : 'Offline'}
                               </span>
                             </div>
+                            {p.crm && (
+                              <p className="text-[11px] font-bold text-muted-foreground mt-0.5">CRM {p.crm}</p>
+                            )}
+
                             <div className="flex items-center gap-1 mt-1">
                               <Star size={12} className="text-primary fill-primary" />
                               <span className="text-xs font-black text-foreground">{p.rating}</span>

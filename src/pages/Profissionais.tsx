@@ -129,8 +129,12 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
                 <OnlineStatusIndicator online={pro.online} size="lg" className="absolute -bottom-1 -right-1" />
               </div>
               <h1 className="text-xl font-display font-black text-foreground">{pro.name}</h1>
-              <p className="text-sm text-muted-foreground mb-2">{pro.category}</p>
-              {pro.crm && <p className="text-xs text-muted-foreground mb-1">CRM: {pro.crm}</p>}
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <p className="text-sm text-muted-foreground">{pro.category}</p>
+                {isVipDoctor(pro) && <DoctorVIPSeal tier="basic" />}
+              </div>
+              {pro.crm && <p className="text-xs font-bold text-muted-foreground mb-1">CRM {pro.crm}</p>}
+
               {pro.hospital && <p className="text-xs text-muted-foreground mb-1">{pro.hospital}</p>}
               <div className="flex items-center gap-2 mb-4">
                 <Star size={14} className="text-primary fill-primary" />

@@ -8320,6 +8320,30 @@ export type Database = {
       }
     }
     Functions: {
+      admin_doctor_inline_avatar: { Args: { _id: string }; Returns: string }
+      admin_doctor_profiles: {
+        Args: { _ids: string[] }
+        Returns: {
+          address_complement: string
+          address_number: string
+          address_street: string
+          avatar_url: string
+          cep: string
+          city: string
+          country: string
+          cpf: string
+          created_at: string
+          date_of_birth: string
+          full_name: string
+          has_inline_avatar: boolean
+          id: string
+          neighborhood: string
+          phone: string
+          pix_key: string
+          pix_type: string
+          region: string
+        }[]
+      }
       anonymize_old_ot_orders: { Args: never; Returns: undefined }
       auto_release_brisa_orientacao: { Args: never; Returns: Json }
       calculate_doctor_performance: {

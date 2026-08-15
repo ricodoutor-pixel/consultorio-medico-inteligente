@@ -368,6 +368,22 @@ const CadastroProfissional = () => {
       toast({ title: country === "BO" ? "Acepte los términos para continuar" : "Aceite os termos para continuar", variant: "destructive" });
       return;
     }
+    if (!form.dateOfBirth) {
+      toast({ title: "Informe a data de nascimento", variant: "destructive" });
+      return;
+    }
+    if (country !== "BO" && form.cep.replace(/\D/g, "").length !== 8) {
+      toast({ title: "CEP inválido", description: "Informe o CEP completo para preenchimento automático do endereço.", variant: "destructive" });
+      return;
+    }
+    if (!kycFiles["cpf_doc"] || !kycFiles["address_proof"]) {
+      toast({
+        title: "Documentos Incompletos",
+        description: "Anexe o documento do CPF e o comprovante de endereço (CEP).",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // 🔐 KYC Rigoroso: Documentos obrigatórios (frente e verso)
     if (!isCuidador) {
@@ -422,15 +438,23 @@ const CadastroProfissional = () => {
         full_name: form.nomeCompleto,
         phone: form.telefone,
         cpf: documentType === "cpf" ? documentNumber : null,
+        date_of_birth: form.dateOfBirth || null,
         country,
         city: form.cidadeUF || null,
+        region: form.uf || form.crmUF || null,
+        cep: form.cep || null,
+        address_street: form.logradouro || null,
+        address_number: form.numero || null,
+        address_complement: form.complemento || null,
+        neighborhood: form.bairro || null,
         user_type: "doctor",
         signup_role: "doctor",
         avatar_url: fotoPreview,
         pix_key: form.pixKey,
         pix_type: form.pixType,
-      });
+      } as any);
       if (profErr) console.error("[profile upsert]", profErr);
+
 
       // 3) Insert doctor record (status: pending verification)
       const { error: docErr } = await supabase.from("doctors").insert({
@@ -457,31 +481,48 @@ const CadastroProfissional = () => {
       });
       if (docErr) console.error("[doctor insert]", docErr);
 
-      // 4) Upload KYC (frente/verso) — bloqueante
+      // 4) Upload KYC (bucket privado real) + registro em doctor_kyc_documents
       const uploads: Promise<unknown>[] = [];
+      const kycRows: any[] = [];
       for (const kind of Object.keys(kycFiles) as KycKind[]) {
         const file = kycFiles[kind];
         if (!file) continue;
         const ext = (file.name.split(".").pop() || "bin").toLowerCase().slice(0, 5);
         const path = `${userId}/${kind}.${ext}`;
+        kycRows.push({
+          doctor_user_id: userId,
+          document_kind: kind,
+          storage_path: path,
+          verification_status: "pending",
+        });
         uploads.push(
           supabase.storage
-            .from("kyc_documents")
+            .from(KYC_BUCKET)
             .upload(path, file, { upsert: true, contentType: file.type || undefined })
+            .then(({ error }) => {
+              if (error) throw error;
+            })
             .catch((err) => {
               console.error("[kyc upload]", kind, err);
-              throw new Error(`Falha ao fazer upload de ${kind}`);
+              throw new Error(`Falha ao fazer upload de ${KYC_LABELS[kind]}`);
             })
         );
       }
-      
+
       try {
         await Promise.all(uploads);
+        if (kycRows.length) {
+          const { error: kycErr } = await supabase
+            .from("doctor_kyc_documents" as any)
+            .upsert(kycRows, { onConflict: "doctor_user_id,document_kind" });
+          if (kycErr) console.error("[kyc rows]", kycErr);
+        }
       } catch (err: any) {
-        toast({ title: "Erro no Upload", description: "Ocorreu um erro ao salvar os documentos. Tente novamente.", variant: "destructive" });
+        toast({ title: "Erro no Upload", description: err?.message || "Ocorreu um erro ao salvar os documentos. Tente novamente.", variant: "destructive" });
         setLoading(false);
         return;
       }
+
 
       // 5) Disparo WhatsApp (Enf. Brisa) — não bloqueante
       try {
@@ -680,6 +721,38 @@ const CadastroProfissional = () => {
                     </div>
                   </div>
 
+                  {/* 🗓️ Nascimento + 📍 Endereço com CEP automático */}
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="dateOfBirth">Data de nascimento *</Label>
+                      <Input id="dateOfBirth" type="date" value={form.dateOfBirth} onChange={(e) => handleChange("dateOfBirth", e.target.value)} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="cep">CEP * {cepLoading && <span className="text-[10px] text-muted-foreground">buscando…</span>}</Label>
+                      <Input id="cep" inputMode="numeric" placeholder="00000-000" value={form.cep} onChange={(e) => handleCep(e.target.value)} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="numero">Número *</Label>
+                      <Input id="numero" placeholder="123" value={form.numero} onChange={(e) => handleChange("numero", e.target.value)} required />
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="logradouro">Logradouro</Label>
+                      <Input id="logradouro" value={form.logradouro} onChange={(e) => handleChange("logradouro", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bairro">Bairro</Label>
+                      <Input id="bairro" value={form.bairro} onChange={(e) => handleChange("bairro", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="complemento">Complemento</Label>
+                      <Input id="complemento" placeholder="Sala / Apto" value={form.complemento} onChange={(e) => handleChange("complemento", e.target.value)} />
+                    </div>
+                  </div>
+
+
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="telefone">{t.phone}</Label>
@@ -816,6 +889,15 @@ const CadastroProfissional = () => {
                           <Label className="text-xs">{isBO ? "CI — dorso" : "RG/CNH — verso"}</Label>
                           <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("id_back")} required />
                         </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">{KYC_LABELS.cpf_doc} *</Label>
+                          <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("cpf_doc")} required />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">{KYC_LABELS.address_proof} *</Label>
+                          <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} required />
+                        </div>
+
                       </div>
                       <p className="text-[10px] text-muted-foreground">
                         JPG/PNG/PDF · máx 5MB por arquivo · legível e sem cortes.

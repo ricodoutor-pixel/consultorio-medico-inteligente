@@ -1,6 +1,7 @@
 // src/hooks/useDoctors.ts
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchInlineAvatar } from "@/lib/kyc-docs";
 
 export interface DoctorRow {
   id: string;
@@ -52,12 +53,8 @@ export function useDoctors() {
       // Dados reais de cadastro (nome, CPF, nascimento, WhatsApp, PIX, endereço, foto) — visíveis ao admin via RLS
       const [{ data: profiles }, { data: kycDocs }] = await Promise.all([
         userIds.length
-          ? supabase
-              .from("profiles")
-              .select(
-                "id, full_name, phone, cpf, date_of_birth, pix_key, pix_type, avatar_url, city, region, country, cep, address_street, address_number, address_complement, neighborhood, created_at",
-              )
-              .in("id", userIds)
+          ? // RPC admin: retorna dados fiéis de cadastro sem trazer fotos base64 gigantes (2MB+)
+            (supabase.rpc as any)("admin_doctor_profiles", { _ids: userIds })
           : Promise.resolve({ data: [] as any[] } as any),
         userIds.length
           ? supabase
@@ -85,6 +82,29 @@ export function useDoctors() {
           avatar_url: (profileMap.get(d.user_id) as any)?.avatar_url ?? d.avatar_url ?? null,
         }))
       );
+
+      // Fotos legadas gravadas como base64 no banco: carregadas sob demanda
+      const inlineIds = (profiles ?? [])
+        .filter((p: any) => p?.has_inline_avatar)
+        .map((p: any) => p.id as string);
+      if (inlineIds.length) {
+        const resolved = await Promise.all(
+          inlineIds.map(async (id) => [id, await fetchInlineAvatar(id)] as [string, string | null]),
+        );
+        const inlineMap = new Map(resolved);
+        setDoctors((prev) =>
+          prev.map((d): DoctorRow => {
+            const inline = inlineMap.get(d.user_id);
+            if (!inline) return d;
+            return {
+              ...d,
+              avatar_url: inline,
+              profile: d.profile ? { ...d.profile, avatar_url: inline } : d.profile,
+            };
+          }),
+        );
+      }
+
     } catch (e) {
       console.error("[useDoctors] unexpected error:", e);
     } finally {

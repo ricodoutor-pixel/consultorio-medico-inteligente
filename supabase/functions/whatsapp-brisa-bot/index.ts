@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { sendWhatsApp } from "../_shared/evolution.ts";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import { callGeminiApiWithFallback, GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -125,7 +126,6 @@ async function generateReply(userText: string, phone: string, name: string | nul
     return { text: "Ola! Sou a Enfa Brisa da Planta y Raiz. Estou com instabilidade tecnica agora. Em instantes retorno. Ou acesse: https://plantayraiz.com.br", source: "fallback:no_key" };
   }
 
-import { callGeminiApiWithFallback, GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 
   try {
     const payload = {

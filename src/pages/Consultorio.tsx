@@ -215,7 +215,7 @@ const Consultorio = () => {
 
           <div className="flex items-center gap-3">
             {nextAppointment ? (
-              <Link to={`/orientacao-video?appointment=${nextAppointment.id}`} className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-blue-600 text-white hover:bg-blue-700">
+              <Link to={`/workspace-medico?patient=${nextAppointment.patient_id}&appt=${nextAppointment.id}`} className="px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-2 transition-colors shadow-sm bg-blue-600 text-white hover:bg-blue-700">
                 <Video size={16} /> Iniciar Vídeo
               </Link>
             ) : (

@@ -68,7 +68,11 @@ const AppointmentsPage = () => {
         body: { consultation_id: appt.id },
       });
       if (error) throw error;
-      navigate(`/orientacao-video?appointment=${appt.id}`);
+      if (role === "doctor") {
+        navigate(`/workspace-medico?patient=${appt.patient_id}&appt=${appt.id}`);
+      } else {
+        navigate(`/orientacao-video?appointment=${appt.id}`);
+      }
     } catch (e: any) {
       toast.error(e?.message ?? "Não foi possível abrir a sala");
     } finally {

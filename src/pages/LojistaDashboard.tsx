@@ -112,10 +112,9 @@ export default function LojistaDashboard() {
         </div>
 
         <Tabs defaultValue="catalogo" className="w-full">
-          <TabsList className="mb-6 grid grid-cols-3">
+          <TabsList className="mb-6 grid grid-cols-2">
             <TabsTrigger value="catalogo">Meu Catálogo</TabsTrigger>
             <TabsTrigger value="pedidos">Pedidos B2B</TabsTrigger>
-            <TabsTrigger value="demanda">Inteligência de Demanda</TabsTrigger>
           </TabsList>
 
           <TabsContent value="catalogo">
@@ -223,9 +222,7 @@ export default function LojistaDashboard() {
               </CardContent>
             </Card>
           </TabsContent>
-          <TabsContent value="demanda">
-            <div className="text-center p-12">Gráficos de demanda em breve...</div>
-          </TabsContent>
+
         </Tabs>
       </div>
     </div>

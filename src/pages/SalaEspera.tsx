@@ -238,7 +238,7 @@ const SalaEspera = () => {
                               )}
                               {isInProgress && (
                                 <Button className="w-full sm:w-auto bg-primary text-primary-foreground font-bold rounded-xl h-12 text-base animate-pulse shadow-lg shadow-primary/30" asChild>
-                                  <Link to={`/orientacao-video?appointment=${appt.id}`}>
+                                  <Link to={userType === "doctor" ? `/workspace-medico?patient=${appt.patient_id}&appt=${appt.id}` : `/orientacao-video?appointment=${appt.id}`}>
                                     <Video size={16} className="mr-2" /> Entrar na Sala
                                   </Link>
                                 </Button>

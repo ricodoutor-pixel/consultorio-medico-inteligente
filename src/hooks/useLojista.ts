@@ -29,20 +29,20 @@ export function useLojista() {
   const loadLojistaData = async () => {
     try {
       setLoading(true);
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
       
-      if (sessionError || !session) {
+      if (userError || !user) {
         setAuthError("Não autenticado");
         setLoading(false);
         return;
       }
-      setSession(session);
+      setSession({ user });
 
       // Validação de Role na tabela profiles
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('id, role, company_name, is_verified')
-        .eq('id', session.user.id)
+        .eq('id', user.id)
         .single();
 
       if (profileError || !profileData || (profileData.role !== 'lojista' && profileData.role !== 'dispensario')) {
@@ -54,18 +54,16 @@ export function useLojista() {
       setProfile(profileData);
 
       // Busca dados reais em paralelo usando Promisses
-      const [productsRes, ordersRes, demandRes, terpenesRes] = await Promise.all([
-        supabase.from('products').select('*').eq('dispensary_id', session.user.id).order('created_at', { ascending: false }),
-        supabase.from('b2b_orders').select('*').eq('lojista_id', session.user.id).order('created_at', { ascending: false }),
-        supabase.from('market_demand').select('*').order('date', { ascending: true }).limit(7), // Tabela fictícia para o gráfico
-        supabase.from('terpenes_analytics').select('*').order('prescricoes', { ascending: false }).limit(5) // Tabela fictícia
+      const [productsRes, ordersRes] = await Promise.all([
+        supabase.from('products').select('*').eq('dispensary_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('b2b_orders').select('*').eq('lojista_id', user.id).order('created_at', { ascending: false })
       ]);
 
       setMetrics({
         products: productsRes.data || [],
         orders: ordersRes.data || [],
-        demand: demandRes.data || [],
-        terpenes: terpenesRes.data || []
+        demand: [],
+        terpenes: []
       });
 
     } catch (e: any) {

@@ -27,14 +27,6 @@ interface DispensaryProduct {
   inStock: boolean;
 }
 
-const PRODUCTS: DispensaryProduct[] = [
-  { id: "1", name: "CBD Full Spectrum 3000mg", brand: "Ease Labs", type: "Óleo", cbdMg: 3000, thcPct: 0.1, volume: "30mL", price: 389.90, requiresReceitaA: false, anvisaReg: "RDC-660/22-001", inStock: true },
-  { id: "2", name: "CBD Isolado 1500mg", brand: "HempMeds", type: "Óleo", cbdMg: 1500, thcPct: 0, volume: "30mL", price: 249.90, requiresReceitaA: false, anvisaReg: "RDC-660/22-002", inStock: true },
-  { id: "3", name: "CBD + THC Balanced 1:1", brand: "Charlotte's Web", type: "Óleo", cbdMg: 500, thcPct: 2.5, volume: "15mL", price: 599.90, requiresReceitaA: true, anvisaReg: "RDC-660/22-003", inStock: true },
-  { id: "4", name: "CBD Broad Spectrum 5000mg", brand: "Abrace", type: "Óleo", cbdMg: 5000, thcPct: 0, volume: "60mL", price: 520.00, requiresReceitaA: false, anvisaReg: "RDC-660/22-004", inStock: false },
-  { id: "5", name: "THC Medicinal 10mg/mL", brand: "Verdemed", type: "Óleo", cbdMg: 0, thcPct: 5, volume: "30mL", price: 890.00, requiresReceitaA: true, anvisaReg: "RDC-660/22-005", inStock: true },
-  { id: "6", name: "CBD Cápsulas 25mg", brand: "Prati-Donaduzzi", type: "Cápsulas", cbdMg: 750, thcPct: 0, volume: "30 caps", price: 179.90, requiresReceitaA: false, anvisaReg: "RDC-660/22-006", inStock: true },
-];
 
 const Dispensario = () => {
   const { toast } = useToast();
@@ -50,8 +42,8 @@ const Dispensario = () => {
 
   const checkAccess = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
         setLoading(false);
         return;
       }
@@ -61,7 +53,7 @@ const Dispensario = () => {
       const { data: prescriptions } = await supabase
         .from("prescriptions")
         .select("id, status, valid_until")
-        .eq("patient_id", session.user.id)
+        .eq("patient_id", user.id)
         .eq("status", "signed")
         .gte("valid_until", new Date().toISOString().split("T")[0]);
 
@@ -89,11 +81,11 @@ const Dispensario = () => {
           inStock: p.in_stock !== false
         })));
       } else {
-        setProducts(PRODUCTS); // Fallback if no real products
+        setProducts([]); // Fallback
       }
     } catch (e) {
       console.error(e);
-      setProducts(PRODUCTS);
+      setProducts([]);
     } finally {
       setLoading(false);
     }

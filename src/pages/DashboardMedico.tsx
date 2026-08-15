@@ -700,7 +700,7 @@ const DashboardMedico = () => {
                                 className="h-6 text-[10px] px-3 rounded-full mt-2 bg-blue-600 text-white hover:bg-blue-700"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  window.location.href = `/orientacao-video?appointment=${a.id}`;
+                                  window.location.href = `/workspace-medico?patient=${a.patient_id}&appt=${a.id}`;
                                 }}
                               >
                                 <Video size={12} className="mr-1" />

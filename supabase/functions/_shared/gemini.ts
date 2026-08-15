@@ -1,13 +1,12 @@
 // 🌿 Planta y Raiz — Single Source of Truth para Modelos Gemini AI nas Edge Functions (2026)
 
-export const GEMINI_PRIMARY_MODEL = "gemini-3.5-flash";
-export const GEMINI_FALLBACK_MODEL = "gemini-3.1-flash-lite";
+export const GEMINI_PRIMARY_MODEL = "gemini-1.5-pro";
+export const GEMINI_FALLBACK_MODEL = "gemini-1.5-flash";
 
 export const GEMINI_MODELS_FALLBACK_CHAIN = [
   GEMINI_PRIMARY_MODEL,
   GEMINI_FALLBACK_MODEL,
-  "gemini-2.5-flash",
-  "gemini-1.5-flash"
+  "gemini-1.5-flash-8b"
 ] as const;
 
 export function getGeminiEndpoint(modelName = GEMINI_PRIMARY_MODEL): string {

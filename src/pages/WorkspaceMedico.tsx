@@ -14,6 +14,7 @@ import { PrescriptionTemplates } from "@/components/doctor/PrescriptionTemplates
 import { TriageSummaryCard } from "@/components/doctor/TriageSummaryCard";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { JitsiRoom } from "@/components/consultation/JitsiRoom";
 
 const WorkspaceMedico = () => {
   const [searchParams] = useSearchParams();
@@ -42,6 +43,10 @@ const WorkspaceMedico = () => {
   const [copilotLoading, setCopilotLoading] = useState(false);
   const [copilotSuggestion, setCopilotSuggestion] = useState("");
 
+  // Video Room State
+  const [roomInfo, setRoomInfo] = useState<{ roomName: string; domain: string; jwt?: string } | null>(null);
+  const [roomError, setRoomError] = useState<string | null>(null);
+
   useEffect(() => {
     if (!patientId || !appointmentId) {
       navigate("/dashboard-medico");
@@ -63,10 +68,11 @@ const WorkspaceMedico = () => {
          setIsOnline(localStorage.getItem(`mock_online_${docId}`) === "true");
       }
 
-      const [patientRes, apptRes, recordRes] = await Promise.all([
+      const [patientRes, apptRes, recordRes, roomRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", patientId).single(),
         supabase.from("appointments").select("*").eq("id", appointmentId).single(),
-        supabase.from("medical_records").select("*").eq("appointment_id", appointmentId).maybeSingle()
+        supabase.from("medical_records").select("*").eq("appointment_id", appointmentId).maybeSingle(),
+        type === 'video' ? supabase.functions.invoke("create-video-room", { body: { appointmentId } }) : Promise.resolve({ data: null, error: null })
       ]);
       if (patientRes.data) setPatient(patientRes.data);
       if (apptRes.data) setAppointment(apptRes.data);
@@ -74,6 +80,18 @@ const WorkspaceMedico = () => {
         if (recordRes.data.notes) setNotes(recordRes.data.notes);
         if (recordRes.data.diagnosis) setDiagnosis(recordRes.data.diagnosis);
         if (recordRes.data.treatment_plan) setTreatmentPlan(recordRes.data.treatment_plan);
+      }
+      
+      if (type === 'video') {
+        if (roomRes.error || !roomRes.data?.ok) {
+          setRoomError(roomRes.data?.error || roomRes.error?.message || "Erro ao criar sala de vídeo");
+        } else {
+          setRoomInfo({
+            roomName: roomRes.data.roomName,
+            domain: roomRes.data.domain,
+            jwt: roomRes.data.doctorJwt
+          });
+        }
       }
     } catch (e) {
       console.error(e);
@@ -192,11 +210,24 @@ const WorkspaceMedico = () => {
         {/* Left Side: Video/Chat iframe */}
         <div className="w-1/2 border-r border-border bg-black/5 flex flex-col relative">
            {type === 'video' ? (
-             <iframe 
-               src={`https://meet.jit.si/${appointmentId || 'default_room'}`} 
-               allow="camera; microphone; fullscreen; display-capture"
-               className="w-full h-full border-0"
-             />
+             roomError ? (
+               <div className="flex-1 flex items-center justify-center text-red-500 font-bold p-6 text-center">
+                 <p>{roomError}</p>
+               </div>
+             ) : roomInfo ? (
+               <JitsiRoom 
+                 roomName={roomInfo.roomName}
+                 domain={roomInfo.domain}
+                 jwt={roomInfo.jwt}
+                 isDoctor={true}
+                 onClose={() => navigate("/dashboard-medico")}
+               />
+             ) : (
+               <div className="flex-1 flex flex-col items-center justify-center">
+                 <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+                 <p className="text-muted-foreground font-bold">Iniciando sala criptografada...</p>
+               </div>
+             )
            ) : (
              <div className="flex items-center justify-center h-full flex-col text-muted-foreground">
                <MessageSquare size={48} className="mb-4 opacity-50" />

@@ -57,6 +57,7 @@ import draBeatrizIntImg from "@/assets/dra-beatriz-integrativa.jpg";
 import draSuelenImg from "@/assets/dra-suelen-naves.jpg";
 import draMariannaImg from "@/assets/dra-marianna-arzamendia.jpg";
 import draAnaPaulaImg from "@/assets/dra-ana-paula-ferreira.jpg";
+import drJoseRobertoImg from "@/assets/dr-jose-roberto.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -217,6 +218,30 @@ export const professionals: Professional[] = [
     hospitalUrl: "https://plantayraiz.com.br",
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["09:00", "10:30", "14:00", "15:30", "17:00"],
+    reviews: [],
+  },
+  {
+    id: "med-jose-roberto",
+    name: "Dr. José Roberto Silva Coutinho",
+    category: "Médicos Prescritores",
+    bio: "Psiquiatra com ampla experiência clínica. Formado pela Escola de Medicina Souza Marques (1998). CRM 5266864-8/RJ (Situação Regular). Especialista em Psiquiatria (RQE Nº 19693). Atendimento focado no acolhimento de transtornos mentais, ansiedade, depressão e manejo de qualidade de vida com terapias avançadas e fitocanabinoides.",
+    flags: ["🇧🇷"],
+    experience: "26 anos",
+    tags: ["Psiquiatria", "Cannabis Medicinal", "Saúde Mental", "Ansiedade"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "JR",
+    imageUrl: drJoseRobertoImg,
+    online: false,
+    crm: "5266864-8/RJ (Regular) RQE: 19693",
+    hospital: "Planta y Raíz Ltda",
+    hospitalUrl: "https://plantayraiz.com.br",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
   },
 

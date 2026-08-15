@@ -1,0 +1,62 @@
+[
+  {
+    "crm": "CRMV: 18803-SP",
+    "nome": "Aline Gonçalves Goulart",
+    "email": "lilavet78@gmail.com",
+    "especialidade": "Claudio Cunha dos Santos"
+  },
+  {
+    "crm": "CRM: 98987-SP",
+    "nome": "Claudio Cunha dos Santos",
+    "email": "saude.claudio@gmail.com",
+    "especialidade": "Cynthia Martinelli"
+  },
+  {
+    "crm": "CRMV: 6480-RJ",
+    "nome": "Cynthia Martinelli",
+    "email": "cynthia.vet@gmail.com",
+    "especialidade": "Eliane Bragança Veloso"
+  },
+  {
+    "crm": "CRM: 283734-RJ",
+    "nome": "Eliane Bragança Veloso",
+    "telefone": "2125390307",
+    "email": "eliconkava@gmail.com",
+    "especialidade": "Isabel Cristina Nilles Hilguera"
+  },
+  {
+    "crm": "CRMV: 19177-RJ",
+    "nome": "Isabel Cristina Nilles Hilguera",
+    "email": "isabelhilguera@ufrrj.br",
+    "especialidade": "João Victor Bohn de Albuquerque Alves"
+  },
+  {
+    "crm": "CRM: 10233-RJ",
+    "nome": "João Victor Bohn de Albuquerque Alves",
+    "email": "joao.corcovadomedicina@gmail.com",
+    "especialidade": "Julio Cesar Esteves Leite"
+  },
+  {
+    "crm": "CRM: 1124110-RJ",
+    "nome": "Julio Cesar Esteves Leite",
+    "email": "juliomilk@gmail.com",
+    "especialidade": "Luiz Sergio Duque Estrada de Castro"
+  },
+  {
+    "crm": "CRM: 164032-RJ",
+    "nome": "Luiz Sergio Duque Estrada de Castro",
+    "email": "luizsduque@hotmail.com",
+    "especialidade": "Marcos Adams Goldraich"
+  },
+  {
+    "crm": "CRM: 913294-RJ",
+    "nome": "Marcos Adams Goldraich",
+    "email": "marcos.goldraich@gmail.com",
+    "especialidade": "Maria Carolina Silva Tenório de Brito"
+  },
+  {
+    "crm": "CRM: 124642-SP",
+    "nome": "Maria Carolina Silva Tenório de Brito",
+    "email": "mariactbrito@yahoo.com.br"
+  }
+]

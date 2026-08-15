@@ -153,6 +153,7 @@ const TelemedicinaAssincrona = lazyWithRecovery(() => import("./pages/Telemedici
 const AfiliadosGamificado = lazyWithRecovery(() => import("./pages/AfiliadosGamificado"), { sourceRef: "/afiliados" });
 const AdminAfiliados = lazyWithRecovery(() => import("./pages/admin/AdminAfiliados"), { sourceRef: "/admin/afiliados" });
 const LojistaDashboard = lazyWithRecovery(() => import("./pages/LojistaDashboard"), { sourceRef: "/lojistas" });
+const ConviteMedico = lazyWithRecovery(() => import("./pages/ConviteMedico"), { sourceRef: "/convite-medico" });
 
 // ── Cartão Saúde Verde ──
 const SaudeVerdeLanding = lazyWithRecovery(() => import("./pages/saude-verde/SaudeVerdeLanding"), { sourceRef: "/saude-verde" });
@@ -267,6 +268,7 @@ const App = () => (
                 <Route path="/planos" element={<Precos />} />
                 <Route path="/precos" element={<Precos />} />
                 <Route path="/saude-digital" element={<SaudeDigital />} />
+          <Route path="/convite-medico" element={<ConviteMedico />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/manual" element={<ManualPlataforma />} />
                 <Route path="/contato" element={<Contato />} />

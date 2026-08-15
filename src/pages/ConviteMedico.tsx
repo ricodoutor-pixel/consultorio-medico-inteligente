@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowRight, ShieldCheck, TrendingUp, Clock, Stethoscope } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { LeadCaptureForm } from "@/components/LeadCaptureForm";
 
 export default function ConviteMedico() {
   return (
@@ -17,34 +18,40 @@ export default function ConviteMedico() {
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576091160550-2173ff9e5eb3?auto=format&fit=crop&q=80')] opacity-10 bg-cover bg-center mix-blend-overlay"></div>
         
         <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-100 text-sm font-semibold tracking-wide uppercase mb-8 backdrop-blur-sm">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-              </span>
-              Vagas Limitadas para Sócios Prescritores
-            </div>
-            
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
-              Recupere sua <span className="text-emerald-400">Autonomia</span> e Multiplique seu <span className="text-emerald-400">Faturamento</span>
-            </h1>
-            
-            <p className="text-lg md:text-xl text-emerald-100/90 mb-10 max-w-2xl mx-auto leading-relaxed">
-              Junte-se à Planta y Raíz como Médico Sócio Prescritor. A única plataforma de telemedicina canabinoide do Brasil com taxa de apenas 7% e repasse financeiro instantâneo.
-            </p>
+          <div className="max-w-6xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              
+              <div className="text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-100 text-sm font-semibold tracking-wide uppercase mb-8 backdrop-blur-sm">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  Vagas Limitadas para Sócios Prescritores
+                </div>
+                
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+                  Recupere sua <span className="text-emerald-400">Autonomia</span> e Multiplique seu <span className="text-emerald-400">Faturamento</span>
+                </h1>
+                
+                <p className="text-lg md:text-xl text-emerald-100/90 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                  Junte-se à Planta y Raíz como Médico Sócio Prescritor. A única plataforma de telemedicina canabinoide do Brasil com taxa de apenas 7% e repasse financeiro instantâneo.
+                </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button asChild size="lg" className="w-full sm:w-auto h-14 px-8 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-bold rounded-xl shadow-[0_0_40px_-10px_rgba(16,185,129,0.5)] transition-all hover:scale-105">
-                <Link to="/cadastro-profissional">
-                  Cadastre-se Agora <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <p className="text-sm text-emerald-200/70 sm:hidden">Leva menos de 2 minutos. 100% gratuito.</p>
+                <div className="hidden lg:flex items-center gap-4 text-emerald-100/80 text-sm font-medium">
+                  <div className="flex items-center gap-1"><CheckCircle className="h-4 w-4 text-emerald-400" /> Sem mensalidade</div>
+                  <div className="flex items-center gap-1"><CheckCircle className="h-4 w-4 text-emerald-400" /> PIX Instantâneo</div>
+                  <div className="flex items-center gap-1"><CheckCircle className="h-4 w-4 text-emerald-400" /> IA Integrada</div>
+                </div>
+              </div>
+
+              <div className="flex justify-center lg:justify-end">
+                <LeadCaptureForm />
+              </div>
+
             </div>
           </div>
         </div>
-        
         {/* Wave Divider */}
         <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
           <svg className="relative block w-[calc(100%+1.3px)] h-[60px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">

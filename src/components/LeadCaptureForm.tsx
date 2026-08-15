@@ -32,7 +32,7 @@ export function LeadCaptureForm() {
     setIsSubmitting(true);
     try {
       // 1. Inserir no CRM do Supabase
-      const { error } = await supabase.from('leads_crm').insert({
+      const { error } = await (supabase as any).from('leads_crm').insert({
         name: data.name,
         email: data.email,
         phone: data.phone,

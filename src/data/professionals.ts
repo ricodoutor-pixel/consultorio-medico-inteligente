@@ -59,6 +59,7 @@ import draMariannaImg from "@/assets/dra-marianna-arzamendia.jpg";
 import draAnaPaulaImg from "@/assets/dra-ana-paula-ferreira.jpg";
 import drJoseRobertoImg from "@/assets/dr-jose-roberto.jpg";
 import draAngelaBeatrizImg from "@/assets/dra-angela-beatriz.jpg";
+import drGustavoNobreImg from "@/assets/dr-gustavo-nobre.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -263,6 +264,30 @@ export const professionals: Professional[] = [
     imageUrl: draAngelaBeatrizImg,
     online: false,
     crm: "5258084-6/RJ (Regular) RQEs: 5874, 24753",
+    hospital: "Planta y Raíz Ltda",
+    hospitalUrl: "https://plantayraiz.com.br",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
+    reviews: [],
+  },
+  {
+    id: "med-gustavo-nobre",
+    name: "Dr. Gustavo Nobre Damiani Pereira",
+    category: "Médicos Prescritores",
+    bio: "Médico formado pelo Centro Universitário Serra dos Órgãos (2014). CRM 35632/PR (Situação Regular). Foco no cuidado integral, bem-estar e no acolhimento humanizado dos pacientes, prestando orientações terapêuticas com fitocanabinoides e acompanhamento clínico geral.",
+    flags: ["🇧🇷"],
+    experience: "12 anos",
+    tags: ["Clínica Geral", "Cannabis Medicinal", "Saúde e Bem-estar"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "GN",
+    imageUrl: drGustavoNobreImg,
+    online: false,
+    crm: "35632/PR (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
     services: STANDARD_DOCTOR_SERVICES,

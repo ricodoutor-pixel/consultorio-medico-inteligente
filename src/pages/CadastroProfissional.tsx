@@ -873,6 +873,15 @@ const CadastroProfissional = () => {
                           <Label className="text-xs">{isBO ? "CI — dorso" : "RG/CNH — verso"}</Label>
                           <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("id_back")} required />
                         </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">{KYC_LABELS.cpf_doc} *</Label>
+                          <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("cpf_doc")} required />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">{KYC_LABELS.address_proof} *</Label>
+                          <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} required />
+                        </div>
+
                       </div>
                       <p className="text-[10px] text-muted-foreground">
                         JPG/PNG/PDF · máx 5MB por arquivo · legível e sem cortes.

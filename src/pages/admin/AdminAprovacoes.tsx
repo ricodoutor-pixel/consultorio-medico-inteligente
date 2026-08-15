@@ -516,7 +516,39 @@ export const AdminAprovacoes = () => {
                               </span>
                             ))}
                           </div>
-                          <div className="flex gap-2 mt-2">
+                          <div className="flex items-center gap-2 mt-2 flex-wrap">
+                            {/* CONF CRM — anexa/exibe o print da consulta pública do CFM */}
+                            {docOf(doc, "cfm_print") ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 px-2 text-[11px] bg-emerald-500/10 border-emerald-500/40 text-emerald-300"
+                                onClick={() => openDoc(doc, "cfm_print")}
+                              >
+                                <ShieldCheck className="w-3 h-3 mr-1" /> CONF CRM
+                              </Button>
+                            ) : (
+                              <label className="inline-flex">
+                                <input
+                                  type="file"
+                                  accept="image/*,application/pdf"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const f = e.target.files?.[0];
+                                    if (f) uploadConfCrm(doc, f);
+                                    e.currentTarget.value = "";
+                                  }}
+                                />
+                                <span className="inline-flex items-center h-7 px-2 text-[11px] font-bold rounded-md border cursor-pointer bg-amber-500/10 border-amber-500/40 text-amber-300">
+                                  {uploadingConf === doc.user_id ? (
+                                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                  ) : (
+                                    <ShieldCheck className="w-3 h-3 mr-1" />
+                                  )}
+                                  CONF CRM
+                                </span>
+                              </label>
+                            )}
                             <a href={CFM_URL} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-emerald-400 underline">CFM</a>
                             <a href={RECEITA_CPF_URL} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-cyan-400 underline">Receita CPF</a>
                           </div>

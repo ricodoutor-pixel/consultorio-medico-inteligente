@@ -318,7 +318,7 @@ const Profissionais = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <h2 className="font-black text-foreground text-sm md:text-base truncate">{p.name}</h2>
-                              {p.id === "med-0" && <DoctorVIPSeal tier="basic" />}
+                              {isVipDoctor(p) && <DoctorVIPSeal tier="basic" />}
                               {p.flags && p.flags.map((flag, i) => (
                                 <CountryFlag key={i} code={flag} />
                               ))}
@@ -334,6 +334,10 @@ const Profissionais = () => {
                                 {p.online ? 'Online' : 'Offline'}
                               </span>
                             </div>
+                            {p.crm && (
+                              <p className="text-[11px] font-bold text-muted-foreground mt-0.5">CRM {p.crm}</p>
+                            )}
+
                             <div className="flex items-center gap-1 mt-1">
                               <Star size={12} className="text-primary fill-primary" />
                               <span className="text-xs font-black text-foreground">{p.rating}</span>

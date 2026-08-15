@@ -52,3 +52,18 @@ export async function getKycSignedUrl(
   }
   return null;
 }
+
+/**
+ * Fotos de perfil antigas foram salvas como data:URI (base64) dentro do banco.
+ * Elas não vêm na listagem admin (para não pesar a página) e são buscadas
+ * sob demanda, uma única vez por sessão, apenas para os médicos afetados.
+ */
+const inlineAvatarCache = new Map<string, string | null>();
+
+export async function fetchInlineAvatar(userId: string): Promise<string | null> {
+  if (inlineAvatarCache.has(userId)) return inlineAvatarCache.get(userId) ?? null;
+  const { data, error } = await (supabase.rpc as any)("admin_doctor_inline_avatar", { _id: userId });
+  const url = error ? null : ((data as string | null) ?? null);
+  inlineAvatarCache.set(userId, url);
+  return url;
+}

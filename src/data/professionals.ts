@@ -60,6 +60,7 @@ import draAnaPaulaImg from "@/assets/dra-ana-paula-ferreira.jpg";
 import drJoseRobertoImg from "@/assets/dr-jose-roberto.jpg";
 import draAngelaBeatrizImg from "@/assets/dra-angela-beatriz.jpg";
 import drGustavoNobreImg from "@/assets/dr-gustavo-nobre.jpg";
+import drGustavoSimoesImg from "@/assets/dr-gustavo-simoes.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -288,6 +289,30 @@ export const professionals: Professional[] = [
     imageUrl: drGustavoNobreImg,
     online: false,
     crm: "35632/PR (Regular)",
+    hospital: "Planta y Raíz Ltda",
+    hospitalUrl: "https://plantayraiz.com.br",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
+    reviews: [],
+  },
+  {
+    id: "med-gustavo-simoes",
+    name: "Dr. Gustavo Simoes Llivi Ibanez",
+    category: "Médicos Prescritores",
+    bio: "Médico formado pela Universidad Privada Abierta Latino Americana (UPAL) em 2019, com revalidação pelo Centro Universitário UNIRG. Atua com o CRM 7684/RO (Situação Regular). Presta atendimento humanizado e cuidado integral aos pacientes, incluindo orientações com terapias canabinoides.",
+    flags: ["🇧🇷"],
+    experience: "7 anos",
+    tags: ["Clínica Geral", "Cannabis Medicinal", "Saúde Integral"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "GS",
+    imageUrl: drGustavoSimoesImg,
+    online: false,
+    crm: "7684/RO (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
     services: STANDARD_DOCTOR_SERVICES,

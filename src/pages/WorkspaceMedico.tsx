@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Clock, FilePlus, ChevronLeft, Calendar, Stethoscope, Video, MessageSquare, BookOpen } from "lucide-react";
+import { FileText, Clock, FilePlus, ChevronLeft, Calendar, Stethoscope, Video, MessageSquare, BookOpen, Brain, Sparkles, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DoctorQuickActions } from "@/components/doctor/DoctorQuickActions";
 import { PrescriptionTemplates } from "@/components/doctor/PrescriptionTemplates";
@@ -37,6 +37,10 @@ const WorkspaceMedico = () => {
   
   // Prescription state
   const [prescriptionText, setPrescriptionText] = useState("");
+
+  // Copilot state
+  const [copilotLoading, setCopilotLoading] = useState(false);
+  const [copilotSuggestion, setCopilotSuggestion] = useState("");
 
   useEffect(() => {
     if (!patientId || !appointmentId) {
@@ -101,6 +105,35 @@ const WorkspaceMedico = () => {
       toast({ title: "Salvo com sucesso", description: "Evolução registrada no prontuário." });
     } catch (error) {
       toast({ title: "Erro", description: "Não foi possível salvar.", variant: "destructive" });
+    }
+  };
+
+  const handleCopilotAction = async (action: "suggest_treatment" | "format_soap") => {
+    setCopilotLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      
+      const { data, error } = await supabase.functions.invoke("clinical-copilot", {
+        body: {
+          action,
+          patientInfo: patient?.full_name,
+          notes: notes,
+          triageSummary: "Paciente relata dores crônicas. (Dado simulado da triagem)",
+        }
+      });
+      if (error) throw error;
+      
+      if (action === "suggest_treatment") {
+        setCopilotSuggestion(data.result);
+      } else if (action === "format_soap") {
+        setNotes(data.result);
+        toast({ title: "Transcrição Concluída", description: "Anotações convertidas para formato SOAP." });
+      }
+    } catch (err) {
+      toast({ title: "Erro no Copiloto", description: "Falha ao conectar com a IA.", variant: "destructive" });
+    } finally {
+      setCopilotLoading(false);
     }
   };
 
@@ -194,11 +227,31 @@ const WorkspaceMedico = () => {
                   <Input placeholder="Ex: CID R52.2 - Outra dor crônica" value={diagnosis} onChange={e => setDiagnosis(e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Evolução / Notas Clínicas (Subjetivo e Objetivo)</Label>
+                  <div className="flex justify-between items-end mb-1">
+                    <Label>Evolução / Notas Clínicas</Label>
+                    <Button variant="outline" size="sm" className="h-7 text-xs bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 hover:text-purple-800" onClick={() => handleCopilotAction("format_soap")} disabled={copilotLoading || !notes}>
+                      {copilotLoading ? <Loader2 size={12} className="mr-1 animate-spin" /> : <Sparkles size={12} className="mr-1" />}
+                      Formatar em SOAP
+                    </Button>
+                  </div>
                   <Textarea className="min-h-[150px]" placeholder="Paciente relata melhora no quadro álgico após início de CBD 20%..." value={notes} onChange={e => setNotes(e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Plano Terapêutico</Label>
+                  <div className="flex justify-between items-end mb-1">
+                    <Label>Plano Terapêutico</Label>
+                    <Button variant="outline" size="sm" className="h-7 text-xs bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-800" onClick={() => handleCopilotAction("suggest_treatment")} disabled={copilotLoading}>
+                      {copilotLoading ? <Loader2 size={12} className="mr-1 animate-spin" /> : <Brain size={12} className="mr-1" />}
+                      Copiloto: Sugerir Tratamento
+                    </Button>
+                  </div>
+                  {copilotSuggestion && (
+                    <div className="p-3 bg-emerald-50/50 border border-emerald-100 rounded-lg mb-2 relative group">
+                      <Button variant="ghost" size="icon" className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => setCopilotSuggestion("")}>&times;</Button>
+                      <p className="text-xs font-bold text-emerald-800 mb-1 flex items-center gap-1"><Brain size={12}/> Sugestão do Copiloto (Revisar):</p>
+                      <p className="text-xs text-emerald-700 whitespace-pre-wrap">{copilotSuggestion}</p>
+                      <Button variant="link" size="sm" className="p-0 h-auto text-xs text-emerald-600 mt-2" onClick={() => setTreatmentPlan(prev => prev ? prev + "\n" + copilotSuggestion : copilotSuggestion)}>Incorporar ao Plano</Button>
+                    </div>
+                  )}
                   <Textarea className="min-h-[100px]" placeholder="Ajuste de dose, solicitar novos exames..." value={treatmentPlan} onChange={e => setTreatmentPlan(e.target.value)} />
                 </div>
                 <Button className="w-full" onClick={handleSaveEMR}><FilePlus size={16} className="mr-2"/> Salvar Evolução</Button>

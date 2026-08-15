@@ -401,18 +401,31 @@ const OrientacaoVideo = () => {
                 </div>
               ) : roomError ? (
                 <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center space-y-3 max-w-sm px-6">
-                    <Shield className="w-10 h-10 text-red-400 mx-auto" />
-                    <p className="text-sm font-bold text-red-300">
-                      {roomError.code === "not_found" ? "Aguardando o médico" : "Não foi possível entrar na sala"}
-                    </p>
-                    <p className="text-xs text-white/60">{roomError.message}</p>
-                    {roomError.code === "not_found" && (
-                      <Button size="sm" variant="outline" onClick={() => { roomFetchStarted.current = false; fetchOrCreateRoom(); }}>
-                        Tentar novamente
-                      </Button>
-                    )}
-                  </div>
+                  {roomError.code === "not_found" && !isDoctor ? (
+                    <div className="text-center space-y-4 max-w-sm px-6">
+                      <div className="relative mx-auto w-20 h-20 mb-4">
+                        <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+                        <div className="relative w-20 h-20 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+                          <Stethoscope size={32} className="text-primary animate-pulse" />
+                        </div>
+                      </div>
+                      <h3 className="text-xl font-display font-black text-white">Sala de Espera</h3>
+                      <p className="text-sm text-white/70">
+                        O médico ainda não abriu a sala de telemedicina. Aguarde, não é necessário recarregar a página.
+                      </p>
+                      <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-bold px-4 py-2 rounded-full mt-4">
+                        <Loader2 size={14} className="animate-spin" /> Atualizando automaticamente...
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center space-y-3 max-w-sm px-6">
+                      <Shield className="w-10 h-10 text-red-400 mx-auto" />
+                      <p className="text-sm font-bold text-red-300">
+                        Não foi possível entrar na sala
+                      </p>
+                      <p className="text-xs text-white/60">{roomError.message}</p>
+                    </div>
+                  )}
                 </div>
               ) : roomInfo ? (
                 <JitsiRoom

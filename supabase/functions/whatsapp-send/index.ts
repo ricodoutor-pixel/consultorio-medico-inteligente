@@ -7,6 +7,8 @@ const EVOLUTION_API_URL = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$
 const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
 const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
 
+import { sendWhatsApp } from "../_shared/evolution.ts";
+
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -50,22 +52,8 @@ Deno.serve(async (req) => {
   if (!number || number.length < 10 || number.length > 15) return json({ error: "invalid_number" }, 400);
   if (!text || text.length > 4096) return json({ error: "invalid_text" }, 400);
 
-  if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) return json({ error: "evolution_not_configured" }, 500);
-
-  let sent = { ok: false, status: 0, body: "" };
-  try {
-    const r = await fetch(
-      `${EVOLUTION_API_URL}/message/sendText/${encodeURIComponent(EVOLUTION_INSTANCE)}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json", apikey: EVOLUTION_API_KEY },
-        body: JSON.stringify({ number, text }),
-      },
-    );
-    sent = { ok: r.ok, status: r.status, body: (await r.text()).slice(0, 400) };
-  } catch (e) {
-    return json({ error: "evolution_unreachable", detail: String(e) }, 502);
-  }
+  const res = await sendWhatsApp(number, text);
+  let sent = { ok: res.ok, status: res.status, body: res.error || "" };
 
   await admin.from("whatsapp_messages").insert({
     remote_jid: `${number}@s.whatsapp.net`,

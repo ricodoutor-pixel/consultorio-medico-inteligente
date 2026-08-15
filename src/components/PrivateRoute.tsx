@@ -12,8 +12,8 @@ export const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
       setAuthenticated(!!session);
       setLoading(false);
     });
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setAuthenticated(!!session);
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setAuthenticated(!!user);
       setLoading(false);
     });
     return () => subscription.unsubscribe();

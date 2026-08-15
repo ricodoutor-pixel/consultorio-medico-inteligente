@@ -11,6 +11,8 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+import { sendWhatsApp } from "../_shared/evolution.ts";
+
 interface AlertPayload {
   doctorId: string;
   appointmentId?: string;
@@ -52,24 +54,23 @@ async function notifyDoctorWhatsApp(doctorId: string, title: string, message: st
     const digits = String(phone).replace(/\D/g, "");
     const jid = digits.startsWith("55") ? digits : `55${digits}`;
 
-    if (!EVOLUTION_URL || !EVOLUTION_KEY) {
-      return { skipped: true, reason: "evolution_not_configured" };
-    }
-
     const text = `🔔 *${title}*\n\n${message}${
       actionUrl ? `\n\n👉 Abrir consulta:\n${actionUrl}` : ""
     }`;
 
-    const url = `${EVOLUTION_URL.replace(/\/+$/, "")}/message/sendText/${encodeURIComponent(EVOLUTION_INSTANCE)}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: EVOLUTION_KEY,
-      },
-      body: JSON.stringify({ number: jid, text }),
+    const res = await sendWhatsApp(jid, text);
+    
+    // Opcionalmente podemos injetar no log do whatsapp_messages aqui se quisermos centralizar
+    await supabase.from("whatsapp_messages").insert({
+      remote_jid: `${jid}@s.whatsapp.net`,
+      sender_name: "Brisa (Alerta Enfermeira)",
+      message_text: text,
+      message_type: "text",
+      direction: "out",
+      status: res.ok ? "sent" : "failed",
     });
-    return { sent: res.ok, status: res.status };
+
+    return { sent: res.ok, status: res.status, error: res.error };
   } catch (e) {
     console.error("[send-nurse-brisa-alert] whatsapp error", e);
     return { sent: false, error: String(e) };

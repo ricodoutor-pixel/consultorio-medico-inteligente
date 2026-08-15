@@ -46,57 +46,59 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(JSON.stringify({ ok: false, error: "Acesso não autorizado. Header ausente." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 })
+    }
+
     const body = await req.json();
-    // Accept either format to preserve compatibility
     const appointmentId = body.appointmentId || body.consultation_id || body.appointment_id;
 
     if (!appointmentId) {
-      throw new Error("O campo 'appointmentId' é obrigatório no corpo da requisição.")
-    }
-
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      throw new Error("Header de autorização ausente.")
+      return new Response(JSON.stringify({ ok: false, error: "O campo 'appointmentId' é obrigatório no corpo da requisição." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 })
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    const supabase = createClient(supabaseUrl, supabaseKey, {
+    // Cliente com o token do usuário para validação RLS básica
+    const supabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
       global: { headers: { Authorization: authHeader } }
     })
 
     const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
     if (authError || !user) {
-      throw new Error("Usuário não autenticado ou token inválido.")
+      return new Response(JSON.stringify({ ok: false, error: "Usuário não autenticado ou token inválido." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 })
     }
 
-    // Usaremos a master key para as validações estritas de banco (RLS bypass seguro no backend)
+    // Cliente Master (Service Role) para inserção em tabelas seguras/bypassar RLS
     const masterSupabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
 
     const { data: doctorData, error: doctorError } = await masterSupabase
       .from('doctors')
       .select('id, is_verified, full_name')
+      .eq('user_id', user.id) // doctors.user_id ou doctors.id? Dependendo do esquema, é comum ser id.
+      // Usaremos id se for 1:1, mas vamos tentar 'id' primeiro (fallback para 'user_id' se erro?)
+      // A versão anterior buscava eq('id', user.id). Vamos manter 'id'.
       .eq('id', user.id)
-      .single()
+      .maybeSingle();
 
     if (doctorError || !doctorData || doctorData.is_verified === false) {
-      throw new Error("Acesso negado: O usuário não é um médico ou não está verificado.")
+       return new Response(JSON.stringify({ ok: false, error: "Acesso negado: O usuário não é um médico ou não está verificado." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 })
     }
 
     const { data: appointment, error: appointmentError } = await masterSupabase
       .from('appointments')
-      .select('id, patient_id')
+      .select('id, patient_id, consultation_id') // tentando trazer consultation_id se houver
       .eq('id', appointmentId)
       .eq('doctor_id', user.id)
-      .single()
+      .maybeSingle()
 
     if (appointmentError || !appointment) {
-      throw new Error("Agendamento não encontrado ou não pertence a este médico.")
+      return new Response(JSON.stringify({ ok: false, error: "Acesso negado: Agendamento não encontrado ou não pertence a este médico." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 })
     }
 
     const doctorId = user.id;
     const patientId = appointment.patient_id;
+    const consultationId = appointment.consultation_id || appointment.id || crypto.randomUUID();
 
     // Idempotência
     const { data: existingRoom } = await masterSupabase
@@ -108,23 +110,27 @@ serve(async (req) => {
       .limit(1)
 
     let roomName: string;
-    let patientToken: string | null = null;
+    let patientToken: string = crypto.randomUUID();
+    let hashedToken = await hashToken(patientToken);
     let doctorJwt: string = "";
+    let reused = false;
+    let expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
 
     const JITSI_APP_ID = Deno.env.get('JITSI_APP_ID') ?? '';
     const JITSI_SECRET = Deno.env.get('JITSI_SECRET') ?? '';
+    const domain = Deno.env.get('JITSI_DOMAIN') ?? '8x8.vc'; 
 
     if (existingRoom && existingRoom.length > 0) {
       roomName = existingRoom[0].room_name;
-      if (JITSI_APP_ID && JITSI_SECRET) {
-        doctorJwt = await generateJitsiJwt(roomName, doctorData.full_name || 'Médico', true, JITSI_APP_ID, JITSI_SECRET);
-      }
-    } else {
-      roomName = `planta-y-raiz-${appointmentId}-${crypto.randomUUID().split('-')[0]}`;
+      reused = true;
+      // Atualizar o secure_token na sala existente para que o novo link funcione
+      await masterSupabase.from('video_rooms').update({
+         secure_token: hashedToken,
+         expires_at: expiresAt
+      }).eq('id', existingRoom[0].id);
       
-      patientToken = crypto.randomUUID();
-      const hashedToken = await hashToken(patientToken);
-      const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(); 
+    } else {
+      roomName = `planta-y-raiz-${consultationId}-${crypto.randomUUID().split('-')[0]}`;
       
       const { error: insertError } = await masterSupabase
         .from('video_rooms')
@@ -139,37 +145,40 @@ serve(async (req) => {
         })
 
       if (insertError) {
-        throw new Error(`Falha ao criar sala no banco de dados: ${insertError.message}`);
-      }
-
-      if (JITSI_APP_ID && JITSI_SECRET) {
-        doctorJwt = await generateJitsiJwt(roomName, doctorData.full_name || 'Médico', true, JITSI_APP_ID, JITSI_SECRET);
+        return new Response(JSON.stringify({ ok: false, error: `Falha ao criar sala no banco de dados: ${insertError.message}` }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 })
       }
     }
 
+    if (JITSI_APP_ID && JITSI_SECRET) {
+      // Jitsi App ID for 8x8 is usually formatted `vpaas-magic-cookie-xxx`
+      doctorJwt = await generateJitsiJwt(roomName, doctorData.full_name || 'Médico', true, JITSI_APP_ID, JITSI_SECRET);
+    }
+
     const FRONTEND_URL = Deno.env.get('FRONTEND_URL') ?? 'https://plantayraiz.com';
-    const patientAccessLink = patientToken 
-      ? `${FRONTEND_URL}/orientacao-video?room=${roomName}&token=${patientToken}` 
-      : `Link já gerado e salvo.`;
+    const patientAccessLink = `${FRONTEND_URL}/orientacao-video?consultation=${consultationId}&token=${patientToken}`;
 
     await masterSupabase.from('appointments').update({
        room_url: patientAccessLink
     }).eq('id', appointmentId);
 
-    // Compatibilidade estrita com OrientacaoVideo.tsx e join-video-room
     return new Response(
       JSON.stringify({
+        ok: true,
         roomName: roomName,
+        roomUrl: patientAccessLink,
+        domain: domain,
+        consultationId: consultationId,
+        expiresAt: expiresAt,
         doctorJwt: doctorJwt,
         patientAccessLink: patientAccessLink,
-        consultationId: appointmentId
+        reused: reused
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
 
   } catch (error: any) {
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ ok: false, error: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
     )
   }

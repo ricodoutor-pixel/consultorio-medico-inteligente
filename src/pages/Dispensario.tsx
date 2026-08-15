@@ -12,6 +12,7 @@ import {
   Pill, Leaf, ExternalLink, CheckCircle2
 } from "lucide-react";
 import { AnvisaBadge } from "@/components/AnvisaBadge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface DispensaryProduct {
   id: string;
@@ -158,7 +159,16 @@ const Dispensario = () => {
   return (
     <div className="min-h-dvh bg-background">
       <Navbar />
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-8 max-w-6xl pt-24">
+        
+        <Alert variant="destructive" className="bg-amber-50 text-amber-900 border-amber-200 mb-6">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Módulo em Desenvolvimento</AlertTitle>
+          <AlertDescription>
+            Os produtos e as opções de compra exibidos abaixo são apenas simulações. Nenhuma transação será processada.
+          </AlertDescription>
+        </Alert>
+
         <div className="flex items-center gap-3 mb-2">
           <Leaf className="text-primary" size={28} />
           <div>

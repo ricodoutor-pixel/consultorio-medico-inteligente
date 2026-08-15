@@ -12,6 +12,7 @@ import { TrendingUp, Package, AlertTriangle, Building2, BookOpen, ArrowRight, Lo
 import { useToast } from "@/hooks/use-toast";
 import { VipUpgradePopup } from "@/components/VipUpgradePopup";
 import { useLojista } from "@/hooks/useLojista";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function LojistaDashboard() {
   const { toast } = useToast();
@@ -52,34 +53,11 @@ export default function LojistaDashboard() {
 
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    
-    try {
-      await addProduct({
-        name: formData.name,
-        brand: profile.company_name || "Marca Lojista",
-        category: "Óleo", // Ajustável futuramente
-        in_stock: parseInt(formData.stock) > 0,
-        price: parseFloat(formData.price)
-      });
-
-      toast({
-        title: "Produto Cadastrado!",
-        description: "Seu produto foi salvo e passará pela curadoria técnica.",
-      });
-
-      // Limpa formulário
-      setFormData({ name: "", proportion: "", stock: "", price: "" });
-
-    } catch (error: any) {
-      toast({
-        title: "Erro ao cadastrar",
-        description: error.message || "Verifique sua conexão com o banco.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    toast({
+      title: "Módulo em Desenvolvimento",
+      description: "Esta funcionalidade não está conectada ao banco de dados.",
+      variant: "destructive",
+    });
   };
 
   return (
@@ -87,6 +65,14 @@ export default function LojistaDashboard() {
       <Navbar />
       
       <div className="flex-1 container mx-auto py-8 px-4 space-y-8 pt-24">
+        
+        <Alert variant="destructive" className="bg-amber-50 text-amber-900 border-amber-200">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Módulo em Desenvolvimento</AlertTitle>
+          <AlertDescription>
+            As funcionalidades de Lojista e métricas exibidas nesta tela são simulações. Nenhuma alteração real está sendo salva no banco de dados no momento.
+          </AlertDescription>
+        </Alert>
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-6">
           <div className="flex flex-col items-start gap-2">

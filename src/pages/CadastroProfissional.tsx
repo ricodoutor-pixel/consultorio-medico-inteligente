@@ -422,15 +422,23 @@ const CadastroProfissional = () => {
         full_name: form.nomeCompleto,
         phone: form.telefone,
         cpf: documentType === "cpf" ? documentNumber : null,
+        date_of_birth: form.dateOfBirth || null,
         country,
         city: form.cidadeUF || null,
+        region: form.uf || form.crmUF || null,
+        cep: form.cep || null,
+        address_street: form.logradouro || null,
+        address_number: form.numero || null,
+        address_complement: form.complemento || null,
+        neighborhood: form.bairro || null,
         user_type: "doctor",
         signup_role: "doctor",
         avatar_url: fotoPreview,
         pix_key: form.pixKey,
         pix_type: form.pixType,
-      });
+      } as any);
       if (profErr) console.error("[profile upsert]", profErr);
+
 
       // 3) Insert doctor record (status: pending verification)
       const { error: docErr } = await supabase.from("doctors").insert({

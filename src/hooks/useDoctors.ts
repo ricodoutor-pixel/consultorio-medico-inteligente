@@ -81,6 +81,29 @@ export function useDoctors() {
           avatar_url: (profileMap.get(d.user_id) as any)?.avatar_url ?? d.avatar_url ?? null,
         }))
       );
+
+      // Fotos legadas gravadas como base64 no banco: carregadas sob demanda
+      const inlineIds = (profiles ?? [])
+        .filter((p: any) => p?.has_inline_avatar)
+        .map((p: any) => p.id as string);
+      if (inlineIds.length) {
+        const resolved = await Promise.all(
+          inlineIds.map(async (id) => [id, await fetchInlineAvatar(id)] as const),
+        );
+        const inlineMap = new Map(resolved);
+        setDoctors((prev) =>
+          prev.map((d) => {
+            const inline = inlineMap.get(d.user_id);
+            if (!inline) return d;
+            return {
+              ...d,
+              avatar_url: inline,
+              profile: d.profile ? { ...d.profile, avatar_url: inline } : d.profile,
+            };
+          }),
+        );
+      }
+
     } catch (e) {
       console.error("[useDoctors] unexpected error:", e);
     } finally {

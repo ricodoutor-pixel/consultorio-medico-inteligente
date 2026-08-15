@@ -7,7 +7,6 @@ import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
 import draRenataImg from "@/assets/dra-renata-costa.jpg";
 import drLucasImg from "@/assets/dr-lucas-ferreira.jpg";
-import draSofiaImg from "@/assets/dra-sofia-santos.jpg";
 import drCarlosImg from "@/assets/dr-carlos-herrera.jpg";
 import draValentinaImg from "@/assets/dra-valentina-reyes.jpg";
 import drMateoImg from "@/assets/dr-mateo-lopez.jpg";
@@ -206,32 +205,31 @@ export const professionals: Professional[] = [
     ],
   },
   {
-    id: "med-2",
-    name: "Dra. Sofia Santos",
+    id: "med-ana-paula",
+    name: "Dra. Ana Paula Ferreira Lima",
     category: "Médicos Prescritores",
-    bio: "Psiquiatra portuguesa-brasileira focada em ansiedade, insônia e TEPT. Abordagem integrativa com cannabis medicinal há 8 anos. Membro da SBEC e palestrante internacional.",
-    experience: "8 anos",
-    tags: ["Psiquiatria", "Ansiedade", "Insônia"],
-    price: "R$ 90,00",
-    priceValue: 90,
+    bio: "Médica Clínica Geral e Prescritora de Cannabis Medicinal, especialista em modulação do Sistema Endocanabinoide Humano. Formada pela Universidade do Oeste Paulista (Campus Presidente Prudente, 2016). CRM 36942/PR — situação regular no CFM. Atendimento humanizado para dor crônica, ansiedade, insônia e qualidade de vida com fitocanabinoides.",
+    flags: ["🇧🇷"],
+    experience: "10 anos",
+    tags: ["Clínica Geral", "Cannabis Medicinal", "Sistema Endocanabinoide", "Dor Crônica"],
+    price: "R$ 100,00",
+    priceValue: 100,
     paymentLink: "https://mpago.la/12KAwmH",
     whatsapp: "5511991363154",
-    rating: 4.8,
-    consults: 275,
-    avatar: "SS",
-    imageUrl: draSofiaImg,
-    flags: ["🇵🇹", "🇧🇷"],
-    services: [
-      { name: "Orientação Técnica Inicial", price: "R$ 90,00", desc: "Avaliação psiquiátrica + orientação" },
-      { name: "Retorno", price: "R$ 75", desc: "Acompanhamento mensal" },
-      { name: "Receita Especial", price: "R$ 50", desc: "Prescrição controlada quando aplicável" },
-    ],
-    slots: ["08:00", "09:00", "10:00", "13:00", "14:00"],
-    reviews: [
-      { name: "Ana S.", rating: 5, text: "Mudou minha qualidade de vida completamente." },
-      { name: "Pedro M.", rating: 4, text: "Ótima consulta, muito acolhedora." },
-    ],
+    rating: 5.0,
+    consults: 0,
+    avatar: "AP",
+    imageUrl: "/placeholder.svg",
+
+    online: false,
+    crm: "36942/PR (Regular)",
+    hospital: "Planta y Raíz Ltda",
+    hospitalUrl: "https://plantayraiz.com.br",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["09:00", "10:30", "14:00", "15:30", "17:00"],
+    reviews: [],
   },
+
   {
     id: "med-3",
     name: "Dr. João Pedro Girardello",

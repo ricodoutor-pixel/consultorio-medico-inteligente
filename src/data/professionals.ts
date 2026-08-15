@@ -58,6 +58,7 @@ import draSuelenImg from "@/assets/dra-suelen-naves.jpg";
 import draMariannaImg from "@/assets/dra-marianna-arzamendia.jpg";
 import draAnaPaulaImg from "@/assets/dra-ana-paula-ferreira.jpg";
 import drJoseRobertoImg from "@/assets/dr-jose-roberto.jpg";
+import draAngelaBeatrizImg from "@/assets/dra-angela-beatriz.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -238,6 +239,30 @@ export const professionals: Professional[] = [
     imageUrl: drJoseRobertoImg,
     online: false,
     crm: "5266864-8/RJ (Regular) RQE: 19693",
+    hospital: "Planta y Raíz Ltda",
+    hospitalUrl: "https://plantayraiz.com.br",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
+    reviews: [],
+  },
+  {
+    id: "med-angela-beatriz",
+    name: "Dra. Angela Beatriz Mercado Acevedo",
+    category: "Médicos Prescritores",
+    bio: "Médica Psiquiatra e Médica de Família e Comunidade, com graduação pela Universidad Nacional de Assuncion e revalidação pela UFF. CRM 5258084-6/RJ (Situação Regular). Especialista com duplos RQEs (Psiquiatria Nº 5874 e Med. Família Nº 24753). Ampla vivência em psiquiatria e medicina integrativa familiar, proporcionando um acolhimento completo e tratamentos avançados com fitocanabinoides.",
+    flags: ["🇧🇷"],
+    experience: "36 anos",
+    tags: ["Psiquiatria", "Medicina de Família", "Cannabis Medicinal", "Saúde Integral"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "AB",
+    imageUrl: draAngelaBeatrizImg,
+    online: false,
+    crm: "5258084-6/RJ (Regular) RQEs: 5874, 24753",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
     services: STANDARD_DOCTOR_SERVICES,

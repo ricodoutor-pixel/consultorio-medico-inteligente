@@ -705,6 +705,38 @@ const CadastroProfissional = () => {
                     </div>
                   </div>
 
+                  {/* 🗓️ Nascimento + 📍 Endereço com CEP automático */}
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="dateOfBirth">Data de nascimento *</Label>
+                      <Input id="dateOfBirth" type="date" value={form.dateOfBirth} onChange={(e) => handleChange("dateOfBirth", e.target.value)} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="cep">CEP * {cepLoading && <span className="text-[10px] text-muted-foreground">buscando…</span>}</Label>
+                      <Input id="cep" inputMode="numeric" placeholder="00000-000" value={form.cep} onChange={(e) => handleCep(e.target.value)} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="numero">Número *</Label>
+                      <Input id="numero" placeholder="123" value={form.numero} onChange={(e) => handleChange("numero", e.target.value)} required />
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="logradouro">Logradouro</Label>
+                      <Input id="logradouro" value={form.logradouro} onChange={(e) => handleChange("logradouro", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bairro">Bairro</Label>
+                      <Input id="bairro" value={form.bairro} onChange={(e) => handleChange("bairro", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="complemento">Complemento</Label>
+                      <Input id="complemento" placeholder="Sala / Apto" value={form.complemento} onChange={(e) => handleChange("complemento", e.target.value)} />
+                    </div>
+                  </div>
+
+
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="telefone">{t.phone}</Label>

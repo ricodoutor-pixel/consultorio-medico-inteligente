@@ -20,6 +20,7 @@ import { BiometricShield } from "@/components/consultation/BiometricShield";
 import { AIScribeCoding } from "@/components/consultation/AIScribeCoding";
 import { SmartPrescriptionDTx } from "@/components/consultation/SmartPrescriptionDTx";
 import { BlockchainConsent } from "@/components/consultation/BlockchainConsent";
+import { DrugInteractionChecker } from "@/components/consultation/DrugInteractionChecker";
 import { MandatoryNPSModal } from "@/components/MandatoryNPSModal";
 import { PatientFlowGuide } from "@/components/patient/PatientFlowGuide";
 import type { FlowStep } from "@/components/patient/PatientFlowGuide";
@@ -551,7 +552,12 @@ const OrientacaoVideo = () => {
                   <CID10QuickSearch />
                 </div>
 
-                {/* CBD/THC AI Suggestion */}
+                {/* Drug Interaction Checker */}
+                <div className="border-t border-border pt-4">
+                  <DrugInteractionChecker />
+                </div>
+
+                {/* CBD/THC AI Suggestion & Titration */}
                 <div className="border-t border-border pt-4">
                   <CbdThcAISuggestionPanel />
                 </div>

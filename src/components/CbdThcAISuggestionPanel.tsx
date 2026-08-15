@@ -5,7 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Brain, Leaf, Pill, AlertTriangle, Sparkles, ExternalLink, FileText } from "lucide-react";
+import { Brain, Leaf, Pill, AlertTriangle, Sparkles, ExternalLink, FileText, Loader2, CalendarClock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import ReactMarkdown from "react-markdown";
 
 interface Suggestion {
   ratio: string;
@@ -98,6 +100,8 @@ export const CbdThcAISuggestionPanel = ({ onApplySuggestion }: Props) => {
   const [selectedCondition, setSelectedCondition] = useState("");
   const [patientWeight, setPatientWeight] = useState(70);
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
+  const [loadingTitration, setLoadingTitration] = useState(false);
+  const [titrationPlan, setTitrationPlan] = useState<string | null>(null);
 
   const generateSuggestion = () => {
     const s = CONDITION_SUGGESTIONS[selectedCondition];
@@ -109,6 +113,35 @@ export const CbdThcAISuggestionPanel = ({ onApplySuggestion }: Props) => {
       cbdMg: Math.round(s.cbdMg * weightFactor),
       thcMg: Math.round(s.thcMg * weightFactor * 10) / 10,
     });
+    setTitrationPlan(null); // reset old plan
+  };
+
+  const generateTitrationPlan = async () => {
+    if (!suggestion || !selectedCondition) return;
+    setLoadingTitration(true);
+    setTitrationPlan(null);
+    try {
+      const conditionName = CONDITIONS.find(c => c.code === selectedCondition)?.name || selectedCondition;
+      const { data, error } = await supabase.functions.invoke("clinical-copilot", {
+        body: {
+          action: "titration_schedule",
+          patientInfo: `${conditionName} (Alvo: ${suggestion.ratio})`,
+          notes: `${patientWeight}kg - Dose Base Recomendada: ${suggestion.cbdMg}mg CBD / ${suggestion.thcMg}mg THC`,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.success && data?.result) {
+        setTitrationPlan(data.result);
+      } else {
+        setTitrationPlan("Erro ao gerar plano via IA.");
+      }
+    } catch (err) {
+      console.error(err);
+      setTitrationPlan("Falha na comunicação com o Copiloto Clínico.");
+    } finally {
+      setLoadingTitration(false);
+    }
   };
 
   return (
@@ -200,23 +233,42 @@ export const CbdThcAISuggestionPanel = ({ onApplySuggestion }: Props) => {
               💡 {suggestion.note}
             </p>
 
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 mt-2">
               <Button
                 size="sm"
-                variant="outline"
-                className="flex-1 text-[10px] h-7"
-                onClick={() => onApplySuggestion?.(suggestion)}
+                variant="default"
+                className="w-full text-[11px] h-8 bg-indigo-600 hover:bg-indigo-700 text-white"
+                onClick={generateTitrationPlan}
+                disabled={loadingTitration}
               >
-                <Pill size={10} className="mr-1" /> Aplicar na Prescrição
+                {loadingTitration ? <Loader2 size={12} className="animate-spin mr-1" /> : <CalendarClock size={12} className="mr-1" />}
+                {loadingTitration ? "Gerando Tabela..." : "Gerar Plano de Titulação (IA)"}
               </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="text-[10px] h-7"
-                onClick={() => window.open("https://www.gov.br/anvisa/pt-br/assuntos/medicamentos/cannabis", "_blank")}
-              >
-                <ExternalLink size={10} className="mr-1" /> ANVISA
-              </Button>
+              
+              {titrationPlan && (
+                <div className="bg-background/80 p-2 rounded text-[10px] prose prose-sm prose-p:text-[10px] prose-headings:text-xs max-w-none border border-indigo-500/20">
+                  <ReactMarkdown>{titrationPlan}</ReactMarkdown>
+                </div>
+              )}
+
+              <div className="flex gap-2 mt-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1 text-[10px] h-7"
+                  onClick={() => onApplySuggestion?.(suggestion)}
+                >
+                  <Pill size={10} className="mr-1" /> Aplicar na Prescrição
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-[10px] h-7"
+                  onClick={() => window.open("https://www.gov.br/anvisa/pt-br/assuntos/medicamentos/cannabis", "_blank")}
+                >
+                  <ExternalLink size={10} className="mr-1" /> ANVISA
+                </Button>
+              </div>
             </div>
 
             <p className="text-[8px] text-muted-foreground bg-background/30 p-1.5 rounded">

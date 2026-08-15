@@ -53,6 +53,15 @@ A: Avaliação (impressão diagnóstica)
 P: Plano (conduta terapêutica)
 NÃO invente dados. Se uma letra faltar, deixe em branco ou extraia o máximo possível do rascunho.`;
        userContent = `Rascunho do médico:\n${notes}`;
+    } else if (action === "check_interactions") {
+       systemPrompt = `Você é um farmacologista clínico especialista em medicina canabinoide.
+O médico informará os medicamentos alopáticos atuais do paciente. Você deve informar se existe interação medicamentosa com CBD ou THC (focando no citocromo P450, ex: CYP3A4, CYP2C19, etc).
+Responda APENAS com o Nível de Risco (Nenhum, Leve, Moderado, Grave) e uma breve recomendação de ajuste de dose, de forma direta e concisa. Retorne o formato em Markdown.`;
+       userContent = `Medicamentos em uso contínuo: ${notes}`;
+    } else if (action === "titration_schedule") {
+       systemPrompt = `Você é um médico especialista em medicina canabinoide. Crie uma tabela de titulação rigorosa ("Start low, go slow") para a condição e peso informados.
+Retorne a resposta ESTRITAMENTE em formato Markdown, contendo apenas uma tabela de introdução passo a passo (ex: dia a dia ou semana a semana) exibindo a dosagem recomendada (em mg ou gotas se for óleo). Seja extremamente conciso.`;
+       userContent = `Condição/Sintoma: ${patientInfo}\nPeso/Detalhes: ${notes}\nForneça a tabela de titulação/introdução.`;
     } else {
        return new Response(JSON.stringify({ error: "Invalid Action" }), { status: 400, headers: corsHeaders });
     }

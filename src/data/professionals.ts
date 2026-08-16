@@ -64,6 +64,7 @@ import drGustavoSimoesImg from "@/assets/dr-gustavo-simoes.jpg";
 import drAlbertMachadoImg from "@/assets/dr-albert-machado.jpg";
 import drGuilhermeCamposImg from "@/assets/dr-guilherme-campos.jpg";
 import draIngridChiulloImg from "@/assets/dra-ingrid-chiullo.jpg";
+import drAlexandreStramandinoliImg from "@/assets/dr-alexandre-stramandinoli.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -388,6 +389,30 @@ export const professionals: Professional[] = [
     imageUrl: draIngridChiulloImg,
     online: false,
     crm: "216629/SP (Regular)",
+    hospital: "Planta y Raíz Ltda",
+    hospitalUrl: "https://plantayraiz.com.br",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
+    reviews: [],
+  },
+  {
+    id: "med-alexandre-stramandinoli",
+    name: "Dr. Alexandre Stramandinoli Correa da Silva",
+    category: "Médicos Prescritores",
+    bio: "Médico formado pela Universidad Nuestra Señora de La Paz em 2016, com revalidação pelo Centro Universitário UNIRG. Atua com o CRM 17266/PB (Situação Regular). Foco em atendimento clínico geral humanizado, buscando promover o bem-estar através da medicina integrativa e suporte no uso de terapias avançadas, como a medicina canabinoide.",
+    flags: ["🇧🇷"],
+    experience: "10 anos",
+    tags: ["Clínica Geral", "Cannabis Medicinal", "Saúde e Bem-estar"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "AS",
+    imageUrl: drAlexandreStramandinoliImg,
+    online: false,
+    crm: "17266/PB (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
     services: STANDARD_DOCTOR_SERVICES,

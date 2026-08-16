@@ -65,6 +65,7 @@ import drAlbertMachadoImg from "@/assets/dr-albert-machado.jpg";
 import drGuilhermeCamposImg from "@/assets/dr-guilherme-campos.jpg";
 import draIngridChiulloImg from "@/assets/dra-ingrid-chiullo.jpg";
 import drAlexandreStramandinoliImg from "@/assets/dr-alexandre-stramandinoli.jpg";
+import drAdeonisOliveiraImg from "@/assets/dr-adeonis-oliveira.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -413,6 +414,30 @@ export const professionals: Professional[] = [
     imageUrl: drAlexandreStramandinoliImg,
     online: false,
     crm: "17266/PB (Regular)",
+    hospital: "Planta y Raíz Ltda",
+    hospitalUrl: "https://plantayraiz.com.br",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
+    reviews: [],
+  },
+  {
+    id: "med-adeonis-oliveira",
+    name: "Dr. Adeonis Oliveira Lima",
+    category: "Médicos Prescritores",
+    bio: "Médico formado pela Universidad Privada Maria Serrana em 2019, com revalidação pela Universidade Estadual do Maranhão. Atua com o CRM 9060/SE (Situação Regular). Foco no cuidado integral e humanizado, buscando o bem-estar dos pacientes através de medicina avançada e abordagens terapêuticas como a medicina canabinoide.",
+    flags: ["🇧🇷"],
+    experience: "7 anos",
+    tags: ["Clínica Geral", "Cannabis Medicinal", "Saúde e Bem-estar"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "AO",
+    imageUrl: drAdeonisOliveiraImg,
+    online: false,
+    crm: "9060/SE (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
     services: STANDARD_DOCTOR_SERVICES,

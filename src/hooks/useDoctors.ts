@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchInlineAvatar } from "@/lib/kyc-docs";
+import { professionals as mockProfessionals } from "@/data/professionals";
 
 export interface DoctorRow {
   id: string;
@@ -64,7 +65,6 @@ export function useDoctors() {
           : Promise.resolve({ data: [] as any[] } as any),
       ]);
 
-
       const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
       const docsMap = new Map<string, any[]>();
       for (const doc of (kycDocs ?? []) as any[]) {
@@ -74,13 +74,27 @@ export function useDoctors() {
       }
 
       setDoctors(
-        rows.map((d) => ({
-          ...d,
-          profile: profileMap.get(d.user_id) ?? null,
-          kyc_docs: docsMap.get(d.user_id) ?? [],
-          full_name: (profileMap.get(d.user_id) as any)?.full_name ?? d.full_name ?? null,
-          avatar_url: (profileMap.get(d.user_id) as any)?.avatar_url ?? d.avatar_url ?? null,
-        }))
+        rows.map((d) => {
+          const profile = profileMap.get(d.user_id) as any;
+          const fullName = profile?.full_name ?? d.full_name ?? "";
+          
+          const isMockReplaced = mockProfessionals.find(mock => {
+            const mockCrmNum = mock.crm.replace(/\D/g, "");
+            const realCrmNum = d.crm?.replace(/\D/g, "") || "";
+            return (mockCrmNum && realCrmNum && mockCrmNum.includes(realCrmNum)) || 
+                   (fullName && mock.name.toLowerCase() === fullName.toLowerCase());
+          });
+          
+          const avatarUrl = isMockReplaced?.imageUrl ?? profile?.avatar_url ?? d.avatar_url ?? null;
+
+          return {
+            ...d,
+            profile: profile ?? null,
+            kyc_docs: docsMap.get(d.user_id) ?? [],
+            full_name: fullName || null,
+            avatar_url: avatarUrl,
+          };
+        })
       );
 
       // Fotos legadas gravadas como base64 no banco: carregadas sob demanda

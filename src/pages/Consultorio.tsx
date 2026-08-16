@@ -59,9 +59,7 @@ const Consultorio = () => {
           const matchName = p.name && profileData.full_name && p.name.toLowerCase().includes(profileData.full_name.toLowerCase());
           return matchCrm || matchName;
         });
-        if (mockMatch?.imageUrl && !profileData.avatar_url) {
-          profileData.avatar_url = mockMatch.imageUrl;
-        } else if (mockMatch?.imageUrl && profileData.avatar_url && !profileData.avatar_url.includes('supabase')) {
+        if (mockMatch?.imageUrl) {
           profileData.avatar_url = mockMatch.imageUrl;
         }
       }

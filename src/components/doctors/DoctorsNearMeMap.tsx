@@ -120,7 +120,7 @@ export default function DoctorsNearMeMap() {
             ...d,
             latitude: lat,
             longitude: lng,
-            avatar_url: d.profile?.avatar_url || mockMatch?.imageUrl || "https://ui-avatars.com/api/?name=" + encodeURIComponent(d.full_name || "M")
+            avatar_url: mockMatch?.imageUrl || d.profile?.avatar_url || d.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(d.full_name || "M")
           };
         }).filter(
           (d) => Number.isFinite(Number(d.latitude)) && Number.isFinite(Number(d.longitude)),

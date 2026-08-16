@@ -63,6 +63,7 @@ import drGustavoNobreImg from "@/assets/dr-gustavo-nobre.jpg";
 import drGustavoSimoesImg from "@/assets/dr-gustavo-simoes.jpg";
 import drAlbertMachadoImg from "@/assets/dr-albert-machado.jpg";
 import drGuilhermeCamposImg from "@/assets/dr-guilherme-campos.jpg";
+import draIngridChiulloImg from "@/assets/dra-ingrid-chiullo.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -363,6 +364,30 @@ export const professionals: Professional[] = [
     imageUrl: drGuilhermeCamposImg,
     online: false,
     crm: "49694/PR (Regular) RQE: 37782",
+    hospital: "Planta y Raíz Ltda",
+    hospitalUrl: "https://plantayraiz.com.br",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
+    reviews: [],
+  },
+  {
+    id: "med-ingrid-chiullo",
+    name: "Dra. Ingrid Chiullo Miranda",
+    category: "Médicos Prescritores",
+    bio: "Médica formada pela Universidad Tecnica Privada Cosmos (2018), com revalidação pela UFMG. Atua nos estados de São Paulo (CRM 216629/SP - Regular) e Minas Gerais (CRM 84187/MG). Presta atendimento focado na melhoria da qualidade de vida dos pacientes por meio do acolhimento humano e orientações voltadas à medicina canabinoide e clínica geral.",
+    flags: ["🇧🇷"],
+    experience: "8 anos",
+    tags: ["Clínica Geral", "Cannabis Medicinal", "Saúde e Bem-estar"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "IC",
+    imageUrl: draIngridChiulloImg,
+    online: false,
+    crm: "216629/SP (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
     services: STANDARD_DOCTOR_SERVICES,

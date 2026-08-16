@@ -173,8 +173,15 @@ const Consultorio = () => {
         if (dbError) console.warn("[online status db update]", dbError);
       }
 
+      // Ao ficar ONLINE, pedimos a localização do médico (1x) para cruzar pacientes próximos.
+      if (newStatus) {
+        const { captureUserGeolocation } = await import("@/lib/geolocation-capture");
+        captureUserGeolocation(true, "doctor_online").catch(() => {});
+      }
+
       toast.success(newStatus ? "🟢 Você está ONLINE — Card Ativo na página Profissionais." : "🔴 Você está OFFLINE no card de Profissionais.");
     } catch (error: any) {
+
       console.error("Error toggling status:", error);
       setIsOnline(!isOnline);
       toast.success("Status atualizado!");

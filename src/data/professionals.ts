@@ -61,6 +61,7 @@ import drJoseRobertoImg from "@/assets/dr-jose-roberto.jpg";
 import draAngelaBeatrizImg from "@/assets/dra-angela-beatriz.jpg";
 import drGustavoNobreImg from "@/assets/dr-gustavo-nobre.jpg";
 import drGustavoSimoesImg from "@/assets/dr-gustavo-simoes.jpg";
+import drAlbertMachadoImg from "@/assets/dr-albert-machado.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -313,6 +314,30 @@ export const professionals: Professional[] = [
     imageUrl: drGustavoSimoesImg,
     online: false,
     crm: "7684/RO (Regular)",
+    hospital: "Planta y Raíz Ltda",
+    hospitalUrl: "https://plantayraiz.com.br",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
+    reviews: [],
+  },
+  {
+    id: "med-albert-machado",
+    name: "Dr. Albert Machado Tenorio",
+    category: "Médicos Prescritores",
+    bio: "Especialista em Medicina de Família e Comunidade (RQE Nº 19896). Formado pelo Centro Universitário de João Pessoa em 2023. Atua com o CRM 34660/PE (Situação Regular) e CRM 16118/PB. Dedicado ao acompanhamento contínuo e acolhimento focado na saúde integrativa e no bem-estar do paciente, com expertise na adoção de terapias canabinoides.",
+    flags: ["🇧🇷"],
+    experience: "3 anos",
+    tags: ["Medicina de Família", "Cannabis Medicinal", "Saúde Integrativa"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "AM",
+    imageUrl: drAlbertMachadoImg,
+    online: false,
+    crm: "34660/PE (Regular) RQE: 19896",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
     services: STANDARD_DOCTOR_SERVICES,

@@ -1,14 +1,20 @@
 /**
- * Captura geolocalização do usuário (1x ao aceitar termos) + reverse geocoding via edge function.
- * LGPD: só executa após consentimento explícito.
+ * Captura geolocalização do usuário — SOMENTE sob demanda (nunca ao entrar na plataforma).
+ * Gatilhos autorizados:
+ *  - médico virando a chave ONLINE no Consultório Virtual (para cruzar pacientes próximos);
+ *  - paciente logado buscando médicos na vitrine de profissionais.
+ * LGPD: só executa com sessão ativa + consentimento de geolocalização.
  */
 import { supabase } from "@/integrations/supabase/client";
 
 const LS_KEY = "pr_geo_captured_v1";
 
-export async function captureUserGeolocation(force = false): Promise<void> {
+export type GeoTrigger = "doctor_online" | "patient_search";
+
+export async function captureUserGeolocation(force = false, _trigger?: GeoTrigger): Promise<void> {
   if (!force && localStorage.getItem(LS_KEY)) return;
   if (!("geolocation" in navigator)) return;
+
 
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return;

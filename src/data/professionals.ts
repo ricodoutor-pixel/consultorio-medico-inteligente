@@ -67,6 +67,7 @@ import draIngridChiulloImg from "@/assets/dra-ingrid-chiullo.jpg";
 import drAlexandreStramandinoliImg from "@/assets/dr-alexandre-stramandinoli.jpg";
 import drAdeonisOliveiraImg from "@/assets/dr-adeonis-oliveira.jpg";
 import drJoaoPedroDetoniImg from "@/assets/dr-joao-pedro-detoni.jpg";
+import drEduardoCorreaImg from "@/assets/dr-eduardo-correa.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -98,6 +99,7 @@ export type Professional = {
 
 export const categories = [
   "Médicos Prescritores",
+  "Médico Veterinário Prescritor",
   "Psicologia & Terapias",
   "Farmácia Clínica",
   "Saúde Ocupacional",
@@ -119,6 +121,30 @@ export const STANDARD_DOCTOR_SERVICES = [
 ];
 
 export const professionals: Professional[] = [
+  {
+    id: "med-eduardo-correa",
+    name: "Dr. Eduardo Migueis Correa",
+    category: "Médico Veterinário Prescritor",
+    bio: "Médico Veterinário formado e atuante. Inscrito no CRMV 19333/SP (Data de Inscrição: 15/06/2005). Especialista em cuidado, manejo e tratamento integrativo para animais com Fitocanabinoides.",
+    flags: ["🇧🇷"],
+    experience: "19 anos",
+    tags: ["Medicina Veterinária", "Canabinoides Veterinários", "Bem-estar Animal"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "",
+    whatsapp: "",
+    rating: 5.0,
+    consults: 20,
+    avatar: "EC",
+    imageUrl: drEduardoCorreaImg,
+    online: true,
+    crm: "19333 - SP",
+    hospital: "",
+    hospitalUrl: "",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
+    reviews: [],
+  },
   // ═══════ Médicos Prescritores (6) ═══════
   {
     id: "med-0",

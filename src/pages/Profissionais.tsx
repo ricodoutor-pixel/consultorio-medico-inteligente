@@ -357,9 +357,9 @@ const Profissionais = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-2 mt-4 bg-green-500/10 rounded-lg border border-green-500/20 p-3 shadow-sm w-full">
-                          <ShieldCheck size={20} className="text-green-500 mt-0.5 shrink-0" />
-                          <span className="text-[11px] sm:text-xs leading-snug text-green-600/90 font-bold tracking-tight">
+                        <div className="flex items-center gap-3 mt-4 bg-primary/10 rounded-xl border border-primary/20 p-4 sm:p-5 shadow-sm w-full">
+                          <ShieldCheck size={30} className="text-primary shrink-0" />
+                          <span className="text-[11px] sm:text-xs leading-snug text-primary font-bold tracking-tight">
                             Perfil 100% Verificado Por IA independente banco de dados do CFM proteção 360-24 x 7 contra fraudes e falsificação de identidade
                           </span>
                         </div>

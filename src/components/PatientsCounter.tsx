@@ -17,7 +17,7 @@ export const PatientsCounter = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-center mt-6 lg:mt-8 w-full">
+    <div className="flex items-center justify-center mt-10 lg:mt-12 w-full">
       <div className="flex items-center gap-3 md:gap-4 p-4 md:p-5 rounded-2xl bg-primary/10 border border-primary/20 max-w-sm w-full mx-auto backdrop-blur-sm shadow-[0_0_15px_rgba(57,255,20,0.1)]">
         <div className="p-3 bg-primary/20 rounded-xl">
           <Users className="text-primary w-6 h-6 md:w-8 md:h-8" />

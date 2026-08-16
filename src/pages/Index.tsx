@@ -30,6 +30,7 @@ import { HomeFAQ } from "@/components/HomeFAQ";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EmergencyCTA } from "@/components/EmergencyCTA";
 import { WelcomeMascotSplash } from "@/components/WelcomeMascotSplash";
+import { PatientsCounter } from "@/components/PatientsCounter";
 
 
 import { useEffect } from "react";
@@ -149,6 +150,9 @@ const Index = () => {
                   <span className="text-[hsl(45,90%,55%)] drop-shadow-[0_0_8px_hsl(45,90%,55%/0.3)]">por apenas R$30.</span>{' '}
                   <span className="text-[hsl(340,85%,60%)] drop-shadow-[0_0_10px_hsl(340,85%,60%/0.4)]">Venha Você Também Fazer Parte desta revolução!</span>
                 </p>
+                <div className="flex justify-start">
+                  <PatientsCounter />
+                </div>
               </motion.div>
             </motion.div>
 
@@ -189,6 +193,9 @@ const Index = () => {
                   <span className="text-[hsl(45,90%,55%)]">por apenas R$30.</span>{' '}
                   <span className="text-[hsl(340,85%,60%)]">Venha Você Também Fazer Parte desta revolução!</span>
                 </p>
+                <div className="lg:hidden w-full flex justify-center">
+                  <PatientsCounter />
+                </div>
               </div>
             </motion.div>
           </div>

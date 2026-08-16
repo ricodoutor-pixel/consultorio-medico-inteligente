@@ -52,8 +52,9 @@ export function ConsentManager() {
     if (!error) {
       setShow(false);
       toast({ title: "Consentimento registrado ✅", description: "Termos LGPD, geolocalização e saúde aceitos." });
-      // Dispara captura de geolocalização (1x) — usuário pode bloquear no navegador
-      captureUserGeolocation(true).catch(() => {});
+      // A localização NÃO é solicitada aqui. Só é pedida quando o médico fica ONLINE
+      // ou quando um paciente logado busca médicos (ver src/lib/geolocation-capture.ts).
+
     }
     setLoading(false);
   };

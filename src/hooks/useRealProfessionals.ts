@@ -176,7 +176,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const price = formatConsultationPrice(Number(d.consultation_price), d.country);
       const documentLabel = d.document_type === "ci" ? "CI Bolívia" : `CRM ${d.crm_state}`;
       const mockMatch = testProfessionals.find(p => p.crm === d.crm || (p.name && d.profile?.full_name && p.name.toLowerCase().includes(d.profile.full_name.toLowerCase())));
-      const finalImage = d.profile?.avatar_url || mockMatch?.imageUrl || "";
+      const finalImage = mockMatch?.imageUrl || d.profile?.avatar_url || "";
 
       const isEdilson = (d.id === "8b32a5f6-0fce-4c33-a245-2c655764c011" || fullName.toLowerCase().includes("edilson")) && !fullName.toLowerCase().includes("suelen");
       const isSuelen = fullName.toLowerCase().includes("suelen") || d.crm?.includes("49354");
@@ -210,20 +210,20 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         id: `real-${d.id}`,
         dbId: d.id,
         premiumPrice: Number(d.price_video_chat) || undefined,
-        name: fullName,
-        category: mapCategoryFromSpecialty(d.specialty),
-        bio: finalBio,
-        experience: "Verificado",
-        tags: finalTags,
+        name: mockMatch?.name || fullName,
+        category: mockMatch?.category || mapCategoryFromSpecialty(d.specialty),
+        bio: mockMatch?.bio || finalBio,
+        experience: mockMatch?.experience || "Verificado",
+        tags: mockMatch?.tags || finalTags,
         price: isEdilson ? "R$ 30,00" : isSuelen ? "R$ 100,00" : isOlivia ? "R$ 50,00" : (mockMatch?.price || price),
         priceValue: isEdilson ? 30 : isSuelen ? 100 : isOlivia ? 50 : (mockMatch?.priceValue || Number(d.consultation_price) || 30),
-        whatsapp: "5511991363154",
-        rating: d.rating || 5.0,
-        consults: d.total_consultations || (isEdilson ? 850 : isOlivia ? 520 : 185),
-        avatar: fullName.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "PR",
+        whatsapp: mockMatch?.whatsapp || "5511991363154",
+        rating: mockMatch?.rating || d.rating || 5.0,
+        consults: mockMatch?.consults || d.total_consultations || (isEdilson ? 850 : isOlivia ? 520 : 185),
+        avatar: mockMatch?.avatar || fullName.split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase() || "PR",
         imageUrl: finalImage,
         paymentLink: mockMatch?.paymentLink || "https://mpago.la/12KAwmH",
-        services: isEdilson 
+        services: mockMatch?.services || (isEdilson 
           ? [
               { name: "Orientação Técnica + Relatório de Encaminhamento (Chat 30 min)", price: "R$ 30,00", desc: "Com relatório completo assinado digitalmente (Brasil)" },
               { name: "Orientação Técnica Completa (Chat + Vídeo)", price: "R$ 100,00", desc: "Avaliação por vídeo e relatório completo" },
@@ -243,30 +243,26 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
               { name: "Consulta Prescritiva Internacional (Bolívia)", price: "US$ 50,00", desc: "Com receita e assinatura digital (Cochabamba - BO)" },
               { name: "Retorno", price: "R$ 30,00", desc: "Acompanhamento" },
             ]
-          : (mockMatch?.services || [
+          : [
           { name: "Orientação Técnica Inicial", price, desc: "Avaliação completa + plano terapêutico" },
           { name: "Retorno", price: formatConsultationPrice((Number(d.consultation_price) || 30) * 0.6, d.country), desc: "Acompanhamento e ajuste" },
         ]),
-        slots: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
-        reviews: [],
-        online: true,
-        crm: finalCrm,
-        hospital: isEdilson ? "Planta y Raíz Ltda / Santa Cruz de la Sierra (BO)" : isSuelen ? "Planta y Raíz Ltda / Paraná (BR)" : isOlivia ? "Planta y Raíz Ltda / Cochabamba (BO)" : cityLabel,
-        flags: isEdilson || isOlivia ? ["🇧🇷", "🇧🇴"] : ["🇧🇷"],
+        slots: mockMatch?.slots || ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
+        reviews: mockMatch?.reviews || [],
+        online: d.is_online,
+        crm: mockMatch?.crm || finalCrm,
+        hospital: mockMatch?.hospital || (isEdilson ? "Planta y Raíz Ltda / Santa Cruz de la Sierra (BO)" : isSuelen ? "Planta y Raíz Ltda / Paraná (BR)" : isOlivia ? "Planta y Raíz Ltda / Cochabamba (BO)" : cityLabel),
+        flags: mockMatch?.flags || (isEdilson || isOlivia ? ["🇧🇷", "🇧🇴"] : ["🇧🇷"]),
       };
     });
 
-    // Helper to check if a mock is replaced by a real DB entry
     const isMockReplaced = (mock: Professional) => {
-      return realPros.some(real => {
-        const realCrmNum = real.crm ? real.crm.replace(/\D/g, '') : '';
+      return realDoctors.some(d => {
+        const realCrmNum = d.crm ? d.crm.replace(/\D/g, '') : '';
         const mockCrmNum = mock.crm ? mock.crm.replace(/\D/g, '') : '';
-        if (realCrmNum && mockCrmNum && realCrmNum === mockCrmNum) return true;
-        // fallback to name matching (first and last name)
-        if (!mock.name || !real.name) return false;
-        const mockNameParts = mock.name.toLowerCase().split(' ');
-        const mockLastName = mockNameParts[mockNameParts.length - 1];
-        return real.name.toLowerCase().includes(mockLastName);
+        const matchCrm = !!(realCrmNum && mockCrmNum && mockCrmNum.includes(realCrmNum));
+        const matchName = mock.name && d.profile?.full_name && mock.name.toLowerCase().includes(d.profile.full_name.toLowerCase());
+        return matchCrm || matchName;
       });
     };
 

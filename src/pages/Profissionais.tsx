@@ -354,13 +354,14 @@ const Profissionais = () => {
                               <span className="text-xs font-black text-foreground">{p.rating}</span>
                               <span className="text-[10px] text-muted-foreground">• {p.consults} consultas</span>
                             </div>
-                            <div className="flex items-start gap-1.5 mt-2 bg-green-500/10 rounded-md border border-green-500/20 p-1.5 shadow-sm">
-                              <ShieldCheck size={12} className="text-green-500 mt-0.5 shrink-0" />
-                              <span className="text-[8px] sm:text-[9px] leading-tight text-green-600/90 font-bold tracking-tight">
-                                Perfil 100% Verificado Por IA independente banco de dados do CFM proteção 360-24 x 7 contra fraudes e falsificação de identidade
-                              </span>
-                            </div>
                           </div>
+                        </div>
+
+                        <div className="flex items-start gap-2 mt-4 bg-green-500/10 rounded-lg border border-green-500/20 p-3 shadow-sm w-full">
+                          <ShieldCheck size={20} className="text-green-500 mt-0.5 shrink-0" />
+                          <span className="text-[11px] sm:text-xs leading-snug text-green-600/90 font-bold tracking-tight">
+                            Perfil 100% Verificado Por IA independente banco de dados do CFM proteção 360-24 x 7 contra fraudes e falsificação de identidade
+                          </span>
                         </div>
                       </div>
 

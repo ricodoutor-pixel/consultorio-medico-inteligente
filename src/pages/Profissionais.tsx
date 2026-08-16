@@ -212,6 +212,26 @@ const Profissionais = () => {
   const { professionals: mergedPros, realCount } = useRealProfessionals();
   const professionals = useRotatingOnline(mergedPros);
 
+  // Geolocalização apenas para PACIENTE LOGADO que está buscando médicos (nunca ao entrar no site).
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session || cancelled) return;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("user_type")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      if (cancelled || profile?.user_type === "doctor") return;
+      const { captureUserGeolocation } = await import("@/lib/geolocation-capture");
+      captureUserGeolocation(false, "patient_search").catch(() => {});
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+
+
   const handleLoginRedirect = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();

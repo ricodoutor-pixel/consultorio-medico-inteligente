@@ -10,6 +10,7 @@ import { PacienteTesteSimulacao360 } from "@/components/doctor/PacienteTesteSimu
 import { DoctorRankingPlantaCoin } from "@/components/doctor/DoctorRankingPlantaCoin";
 import { CopilotoClinicoVIP } from "@/components/doctor/CopilotoClinicoVIP";
 import { PendingDocsNotice } from "@/components/doctor/PendingDocsNotice";
+import { testProfessionals } from "@/data/professionals";
 
 import { AlertTriangle, ArrowLeft, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot, Bell, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -49,6 +50,21 @@ const Consultorio = () => {
         .select('*')
         .eq('user_id', user.id)
         .single();
+
+      if (profileData && doctorData) {
+        const mockMatch = testProfessionals.find(p => {
+          const realCrmNum = doctorData.crm ? doctorData.crm.replace(/\D/g, '') : '';
+          const mockCrmNum = p.crm ? p.crm.replace(/\D/g, '') : '';
+          const matchCrm = !!(realCrmNum && mockCrmNum && mockCrmNum.includes(realCrmNum));
+          const matchName = p.name && profileData.full_name && p.name.toLowerCase().includes(profileData.full_name.toLowerCase());
+          return matchCrm || matchName;
+        });
+        if (mockMatch?.imageUrl && !profileData.avatar_url) {
+          profileData.avatar_url = mockMatch.imageUrl;
+        } else if (mockMatch?.imageUrl && profileData.avatar_url && !profileData.avatar_url.includes('supabase')) {
+          profileData.avatar_url = mockMatch.imageUrl;
+        }
+      }
 
       setProfile(profileData);
       setDoctor(doctorData);

@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Shield, FileText, Eye, MapPin, HeartPulse } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { captureUserGeolocation } from "@/lib/geolocation-capture";
+
 
 const CONSENT_VERSION = "2.1";
 const CONSENT_TYPES = [

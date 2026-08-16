@@ -13,7 +13,7 @@ import { professionals as testProfessionals, Professional, categories } from "@/
 // med-5 (Dra. Valentina Reyes) removido — substituído pela Dra. Olivia Zimeri (real, BO)
 // IDs of test doctors to keep — med-3 (Dr. João Pedro Girardello) is prioritized first
 const KEPT_TEST_IDS = ["med-eduardo-correa", "med-3", "med-1", "med-2", "psi-1"];
-const MAX_TEST_SLOTS = 10;
+const MAX_TEST_SLOTS = 50;
 
 interface RealDoctor {
   id: string;
@@ -260,8 +260,8 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       return realDoctors.some(d => {
         const realCrmNum = d.crm ? d.crm.replace(/\D/g, '') : '';
         const mockCrmNum = mock.crm ? mock.crm.replace(/\D/g, '') : '';
-        const matchCrm = !!(realCrmNum && mockCrmNum && mockCrmNum.includes(realCrmNum));
-        const matchName = mock.name && d.profile?.full_name && mock.name.toLowerCase().includes(d.profile.full_name.toLowerCase());
+        const matchCrm = !!(realCrmNum && mockCrmNum && mockCrmNum === realCrmNum);
+        const matchName = mock.name && d.profile?.full_name && d.profile.full_name.trim().length > 3 && mock.name.toLowerCase().includes(d.profile.full_name.toLowerCase().trim());
         return matchCrm || matchName;
       });
     };
@@ -292,7 +292,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     // Médicos reais recém-cadastrados (KYC pendente): card exposto, mas OFF-LINE
     // até liberação no painel KYC ou ativação pelo próprio médico.
-    const PENDING_REAL_IDS = ["med-joao-pedro", "med-marianna", "med-ana-paula", "med-jose-roberto", "med-angela-beatriz", "med-gustavo-nobre", "med-gustavo-simoes", "med-albert-machado", "med-guilherme-campos", "med-ingrid-chiullo", "med-alexandre-stramandinoli", "med-adeonis-oliveira"];
+    const PENDING_REAL_IDS = ["med-eduardo-correa", "med-joao-pedro", "med-marianna", "med-ana-paula", "med-jose-roberto", "med-angela-beatriz", "med-gustavo-nobre", "med-gustavo-simoes", "med-albert-machado", "med-guilherme-campos", "med-ingrid-chiullo", "med-alexandre-stramandinoli", "med-adeonis-oliveira"];
     for (const pendingId of PENDING_REAL_IDS) {
       const mock = testProfessionals.find((p) => p.id === pendingId);
       if (!mock) continue;

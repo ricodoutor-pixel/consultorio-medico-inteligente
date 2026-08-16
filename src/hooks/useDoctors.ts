@@ -81,8 +81,8 @@ export function useDoctors() {
           const isMockReplaced = mockProfessionals.find(mock => {
             const mockCrmNum = mock.crm ? mock.crm.replace(/\D/g, "") : "";
             const realCrmNum = d.crm ? d.crm.replace(/\D/g, "") : "";
-            return (mockCrmNum && realCrmNum && mockCrmNum.includes(realCrmNum)) || 
-                   (fullName && mock.name.toLowerCase() === fullName.toLowerCase());
+            return (mockCrmNum && realCrmNum && mockCrmNum === realCrmNum) || 
+                   (fullName && fullName.trim().length > 3 && mock.name.toLowerCase() === fullName.toLowerCase().trim());
           });
           
           const avatarUrl = isMockReplaced?.imageUrl ?? profile?.avatar_url ?? d.avatar_url ?? null;

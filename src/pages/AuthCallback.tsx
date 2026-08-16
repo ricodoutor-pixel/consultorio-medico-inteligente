@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { captureUserGeolocation } from "@/lib/geolocation-capture";
 
 const ROUTE_BY_ROLE: Record<string, string> = {
   paciente: "/dashboard",

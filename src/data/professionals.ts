@@ -62,6 +62,7 @@ import draAngelaBeatrizImg from "@/assets/dra-angela-beatriz.jpg";
 import drGustavoNobreImg from "@/assets/dr-gustavo-nobre.jpg";
 import drGustavoSimoesImg from "@/assets/dr-gustavo-simoes.jpg";
 import drAlbertMachadoImg from "@/assets/dr-albert-machado.jpg";
+import drGuilhermeCamposImg from "@/assets/dr-guilherme-campos.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -338,6 +339,30 @@ export const professionals: Professional[] = [
     imageUrl: drAlbertMachadoImg,
     online: false,
     crm: "34660/PE (Regular) RQE: 19896",
+    hospital: "Planta y Raíz Ltda",
+    hospitalUrl: "https://plantayraiz.com.br",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
+    reviews: [],
+  },
+  {
+    id: "med-guilherme-campos",
+    name: "Dr. Guilherme Campos Silva",
+    category: "Médicos Prescritores",
+    bio: "Especialista em Medicina de Família e Comunidade (RQE Nº 37782). Formado pela Universidade Maria Auxiliadora (2016), com revalidação pela UEL. Atua no Paraná (CRM 49694/PR - Regular) e em São Paulo (CRM 243856/SP). Proporciona atendimento qualificado com foco na medicina canabinoide, visando a melhoria da qualidade de vida e tratamento de dores crônicas.",
+    flags: ["🇧🇷"],
+    experience: "10 anos",
+    tags: ["Medicina de Família", "Cannabis Medicinal", "Dor Crônica"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    paymentLink: "https://mpago.la/12KAwmH",
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "GC",
+    imageUrl: drGuilhermeCamposImg,
+    online: false,
+    crm: "49694/PR (Regular) RQE: 37782",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
     services: STANDARD_DOCTOR_SERVICES,

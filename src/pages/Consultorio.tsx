@@ -10,7 +10,7 @@ import { PacienteTesteSimulacao360 } from "@/components/doctor/PacienteTesteSimu
 import { DoctorRankingPlantaCoin } from "@/components/doctor/DoctorRankingPlantaCoin";
 import { CopilotoClinicoVIP } from "@/components/doctor/CopilotoClinicoVIP";
 import { PendingDocsNotice } from "@/components/doctor/PendingDocsNotice";
-import { testProfessionals } from "@/data/professionals";
+import { professionals as testProfessionals } from "@/data/professionals";
 
 import { AlertTriangle, ArrowLeft, Loader2, MessageCircle, Gift, Video, Sparkles, Trophy, UserCheck, Bot, Bell, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";

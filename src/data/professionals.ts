@@ -66,6 +66,7 @@ import drGuilhermeCamposImg from "@/assets/dr-guilherme-campos.jpg";
 import draIngridChiulloImg from "@/assets/dra-ingrid-chiullo.jpg";
 import drAlexandreStramandinoliImg from "@/assets/dr-alexandre-stramandinoli.jpg";
 import drAdeonisOliveiraImg from "@/assets/dr-adeonis-oliveira.jpg";
+import drJoaoPedroDetoniImg from "@/assets/dr-joao-pedro-detoni.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -154,12 +155,12 @@ export const professionals: Professional[] = [
   },
   {
     id: "med-joao-pedro",
-    name: "Dr. João Pedro Girardello",
+    name: "Dr. João Pedro Girardello Detoni",
     category: "Médicos Prescritores",
-    bio: "Médico Prescritor de Medicina Canabinoide e Clínica Geral. Especialista em saúde integral, manejo de dor crônica, ansiedade e qualidade de vida com Fitocanabinoides e acompanhamento personalizado.",
+    bio: "Médico formado pela Universidade de Passo Fundo em 2016. Atua com o CRM 42912/RS (Situação Regular) com especialidade em Clínica Médica (RQE Nº 35641). Especialista em saúde integral, manejo de dor crônica, ansiedade e qualidade de vida com Fitocanabinoides e acompanhamento personalizado.",
     flags: ["🇧🇷"],
     experience: "10 anos",
-    tags: ["Médico Prescritor", "Medicina Canabinoide", "Clínica Geral", "Dor Crônica"],
+    tags: ["Clínica Médica", "Medicina Canabinoide", "Dor Crônica"],
     price: "R$ 120,00",
     priceValue: 120,
     paymentLink: "https://mpago.la/12KAwmH",
@@ -167,9 +168,9 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 142,
     avatar: "JP",
-    imageUrl: drLucasImg,
+    imageUrl: drJoaoPedroDetoniImg,
     online: true,
-    crm: "CRM-RS (Ativo)",
+    crm: "42912/RS (Regular) RQE: 35641",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
     services: STANDARD_DOCTOR_SERVICES,

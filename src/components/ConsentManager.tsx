@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Shield, FileText, Eye, MapPin, HeartPulse } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { captureUserGeolocation } from "@/lib/geolocation-capture";
+
 
 const CONSENT_VERSION = "2.1";
 const CONSENT_TYPES = [
@@ -52,8 +52,9 @@ export function ConsentManager() {
     if (!error) {
       setShow(false);
       toast({ title: "Consentimento registrado ✅", description: "Termos LGPD, geolocalização e saúde aceitos." });
-      // Dispara captura de geolocalização (1x) — usuário pode bloquear no navegador
-      captureUserGeolocation(true).catch(() => {});
+      // A localização NÃO é solicitada aqui. Só é pedida quando o médico fica ONLINE
+      // ou quando um paciente logado busca médicos (ver src/lib/geolocation-capture.ts).
+
     }
     setLoading(false);
   };

@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { captureUserGeolocation } from "@/lib/geolocation-capture";
 
 const ROUTE_BY_ROLE: Record<string, string> = {
   paciente: "/dashboard",
@@ -39,8 +38,9 @@ export default function AuthCallback() {
                    : "patient",
         }).eq("id", session.user.id);
 
-        // Captura geolocalização (se permitido pelo navegador)
-        captureUserGeolocation().catch(() => {});
+        // Geolocalização NÃO é solicitada no login. Apenas quando o médico fica ONLINE
+        // ou quando um paciente logado busca médicos.
+
       }
 
       localStorage.removeItem("pr_pending_signup_role");

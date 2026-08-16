@@ -398,17 +398,26 @@
           reportEarlyError(e.reason, 'unhandledrejection');
         });
 
-        // Watchdog: se em 8s o root ainda está vazio, é tela preta
-        setTimeout(function(){
+        // Watchdog: re-checa o root por até 20s. Se continuar vazio, mostra o
+        // fallback humano (com botão Recarregar) em vez de deixar tela preta.
+        var wdTries = 0;
+        var wdTimer = setInterval(function(){
           var root = document.getElementById('root');
-          if (root && root.childElementCount === 0) {
-            crumb('watchdog-empty-root', {});
-            reportEarlyError(new Error('Root vazio após 8s'), 'watchdog');
-          } else {
-            // App montou — limpa flag de reload
+          if (root && root.childElementCount > 0) {
+            clearInterval(wdTimer);
             try { sessionStorage.removeItem(RELOAD_KEY); } catch(_){}
+            return;
           }
-        }, 8000);
+          wdTries++;
+          if (wdTries === 2) crumb('watchdog-slow-boot', {});
+          if (wdTries >= 5) { // ~20s
+            clearInterval(wdTimer);
+            crumb('watchdog-empty-root', {});
+            console.warn('[boot] watchdog: root vazio após 20s');
+            showFallback('boot');
+          }
+        }, 4000);
+
       })();
     </script>
 

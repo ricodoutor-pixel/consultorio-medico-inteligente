@@ -22,8 +22,8 @@ async function generateJitsiJwt(roomName: string, userName: string, isModerator:
   const payload = {
     aud: "jitsi",
     iss: jitsiAppId,
-    sub: "*",
-    room: roomName,
+    sub: jitsiAppId,
+    room: "*",
     exp: Math.floor(Date.now() / 1000) + (2 * 3600),
     context: {
       user: {
@@ -33,7 +33,7 @@ async function generateJitsiJwt(roomName: string, userName: string, isModerator:
       features: {
         recording: isModerator,
         livestreaming: false,
-        screen_sharing: true
+        "screen-sharing": true
       }
     }
   };
@@ -74,29 +74,27 @@ serve(async (req) => {
 
     const { data: doctorData, error: doctorError } = await masterSupabase
       .from('doctors')
-      .select('id, is_verified, full_name')
-      .eq('user_id', user.id) // doctors.user_id ou doctors.id? Dependendo do esquema, é comum ser id.
-      // Usaremos id se for 1:1, mas vamos tentar 'id' primeiro (fallback para 'user_id' se erro?)
-      // A versão anterior buscava eq('id', user.id). Vamos manter 'id'.
-      .eq('id', user.id)
+      .select('id, is_verified, full_name, user_id')
+      .or(`user_id.eq.${user.id},id.eq.${user.id}`)
       .maybeSingle();
 
     if (doctorError || !doctorData || doctorData.is_verified === false) {
        return new Response(JSON.stringify({ ok: false, error: "Acesso negado: O usuário não é um médico ou não está verificado." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 })
     }
 
+    const doctorId = doctorData.id;
+
     const { data: appointment, error: appointmentError } = await masterSupabase
       .from('appointments')
-      .select('id, patient_id, consultation_id') // tentando trazer consultation_id se houver
+      .select('id, patient_id, consultation_id') 
       .eq('id', appointmentId)
-      .eq('doctor_id', user.id)
+      .eq('doctor_id', doctorId)
       .maybeSingle()
 
     if (appointmentError || !appointment) {
       return new Response(JSON.stringify({ ok: false, error: "Acesso negado: Agendamento não encontrado ou não pertence a este médico." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 })
     }
 
-    const doctorId = user.id;
     const patientId = appointment.patient_id;
     const consultationId = appointment.consultation_id || appointment.id || crypto.randomUUID();
 

@@ -87,5 +87,12 @@ if (isPreviewHost || isInIframe || !import.meta.env.PROD) {
 // Inicializa Sentry (não-bloqueante) — DSN vem do edge function sentry-config
 import("./lib/sentry").then(({ initSentry }) => initSentry()).catch(() => {});
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootElement = document.getElementById("root");
+
+if (!rootElement) {
+  throw new Error("Elemento raiz da aplicação não encontrado");
+}
+
+rootElement.dataset.reactMounted = "1";
+createRoot(rootElement).render(<App />);
 

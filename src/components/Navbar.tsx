@@ -171,22 +171,30 @@ export const Navbar = () => {
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
-            {/* Logo + Verdinho */}
-            <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
-              <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3">
-                <img
-                  src="/logo-planta-raiz.webp"
-                  alt="Planta y Raíz - Mega Clínica Digital"
-                  width={520}
-                  height={190}
-                  {...({ fetchpriority: "high" } as Record<string, string>)}
-                  loading="eager"
-                  decoding="sync"
-                  className="h-[56px] sm:h-[62px] md:h-[74px] w-auto max-w-[180px] sm:max-w-[210px] md:max-w-[260px] object-contain object-left drop-shadow-[0_0_14px_rgba(34,197,94,0.25)]"
-                />
-              </NavLink>
+            {/* Logo + Seta Consultorio */}
+            <div className="flex flex-col justify-center flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
+              <div className="flex items-center gap-1.5 md:gap-3">
+                <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3">
+                  <img
+                    src="/logo-planta-raiz.webp"
+                    alt="Planta y Raíz - Mega Clínica Digital"
+                    width={520}
+                    height={190}
+                    {...({ fetchpriority: "high" } as Record<string, string>)}
+                    loading="eager"
+                    decoding="sync"
+                    className="h-[56px] sm:h-[62px] md:h-[74px] w-auto max-w-[180px] sm:max-w-[210px] md:max-w-[260px] object-contain object-left drop-shadow-[0_0_14px_rgba(34,197,94,0.25)]"
+                  />
+                </NavLink>
+              </div>
+              <button
+                onClick={() => navigate("/consultorio")}
+                className="flex items-center gap-1 text-[11px] uppercase font-black text-primary hover:text-primary/80 transition-colors ml-4 md:ml-6 -mt-1 md:-mt-2"
+                title="Ir para o Consultório Virtual"
+              >
+                <ArrowLeft size={12} /> Consultório Virtual
+              </button>
             </div>
-
             {/* Desktop: Verdinho exatamente no meio entre o logo e o menu */}
             <div className={`hidden ${showNavbarMascot ? "lg:flex" : ""} flex-1 items-center justify-center`}>
               <div className="flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">

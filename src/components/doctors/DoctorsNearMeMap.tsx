@@ -219,11 +219,11 @@ export default function DoctorsNearMeMap() {
               attribution='&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EAP, and the GIS User Community'
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
             />
-            {/* Overlay borders/labels for reference (optional, makes it look more like hybrid maps) */}
+            {/* Overlay de fronteiras/rótulos (híbrido). Esri Reference — o antigo
+                endpoint Stamen foi descontinuado e retornava 404 em todos os tiles. */}
             <TileLayer
-              url="https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lines/{z}/{x}/{y}{r}.png"
-              subdomains="abcd"
-              opacity={0.3}
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+              opacity={0.85}
             />
             
             <MapUpdater center={me} />

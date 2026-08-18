@@ -300,23 +300,31 @@
   <meta name="twitter:title" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda">
   <meta property="og:description" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!">
   <meta name="twitter:description" content="Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM-PR 49354)) Cadastro e Ebook Gratuito!">
-  <script type="module" crossorigin src="/assets/index-DB3aqkNW.js"></script>
+  <script type="module" crossorigin src="/assets/index-BnfXUFbk.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/date-fns-u34-iOv_.js">
   <link rel="modulepreload" crossorigin href="/assets/vendor-BIT-_7gm.js">
   <link rel="modulepreload" crossorigin href="/assets/pdf-excel-CdRA0FG3.js">
   <link rel="modulepreload" crossorigin href="/assets/i18n-ClJ_6EQ3.js">
   <link rel="modulepreload" crossorigin href="/assets/supabase-mOUXcx32.js">
-  <link rel="modulepreload" crossorigin href="/assets/lucide-Bb0KMspu.js">
+  <link rel="modulepreload" crossorigin href="/assets/lucide-Pvo_ssvz.js">
   <link rel="modulepreload" crossorigin href="/assets/ui-primitives-CDRRtb50.js">
   <link rel="modulepreload" crossorigin href="/assets/animation-D8J8qpWc.js">
   <link rel="stylesheet" crossorigin href="/assets/vendor-DpsRipQV.css">
-  <link rel="stylesheet" crossorigin href="/assets/index-zY-3Q8px.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-tXj22gfN.css">
 </head>
   <body>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GT-MRLXCRGK"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-    <div id="root"></div>
+    <div id="root">
+      <div id="__pyr_boot_screen" role="status" aria-live="polite" style="min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0A0E27;color:#fff;text-align:center">
+        <div>
+          <img src="/verdinho-mascot-256.webp" alt="Planta y Raiz" width="96" height="96" style="width:96px;height:96px;object-fit:contain;margin:0 auto 16px" />
+          <div style="font-size:18px;font-weight:700">Planta y Raiz</div>
+          <div style="font-size:14px;opacity:.75;margin-top:6px">Carregando a plataforma...</div>
+        </div>
+      </div>
+    </div>
 
     <!-- Favicon rotation REMOVIDO: Google exige URL estável.
          A rotação diária fazia o Googlebot cair no globo padrão da SERP. -->
@@ -342,8 +350,8 @@
           try {
             var root = document.getElementById('root');
             if (!root) return;
-            // Só mostra fallback se o React não conseguiu desenhar nada
-            if (root.childElementCount > 0) return;
+            // Só mostra fallback se o React já conseguiu substituir a tela inicial.
+            if (root.dataset.reactMounted === '1') return;
             root.innerHTML = ''
               + '<div style="min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0A0E27;color:#fff;text-align:center">'
               + '<div style="max-width:420px">'
@@ -409,17 +417,30 @@
           reportEarlyError(e.reason, 'unhandledrejection');
         });
 
-        // Watchdog: se em 8s o root ainda está vazio, é tela preta
-        setTimeout(function(){
+        // Watchdog paciente: mantém a tela de carregamento enquanto o bundle
+        // compila/baixa. Só troca pelo fallback humano se houve erro fatal real
+        // ou se passaram 90s sem QUALQUER conteúdo React no #root.
+        var wdTries = 0;
+        var wdTimer = setInterval(function(){
           var root = document.getElementById('root');
-          if (root && root.childElementCount === 0) {
-            crumb('watchdog-empty-root', {});
-            reportEarlyError(new Error('Root vazio após 8s'), 'watchdog');
-          } else {
-            // App montou — limpa flag de reload
+          if (!root) return;
+          var boot = document.getElementById('__pyr_boot_screen');
+          var hasReact = root.dataset.reactMounted === '1' || (root.children.length > 0 && !boot);
+          if (hasReact) {
+            clearInterval(wdTimer);
             try { sessionStorage.removeItem(RELOAD_KEY); } catch(_){}
+            return;
           }
-        }, 8000);
+          wdTries++;
+          if (wdTries === 3) crumb('watchdog-slow-boot', {});
+          var hadFatal = (window.__pyr_earlyErrors || []).length > 0;
+          if (hadFatal || wdTries >= 18) { // ~90s
+            clearInterval(wdTimer);
+            crumb('watchdog-empty-root', { fatal: hadFatal, tries: wdTries });
+            showFallback(hadFatal ? 'init' : 'boot');
+          }
+        }, 5000);
+
       })();
     </script>
 

@@ -448,6 +448,7 @@ const App = () => (
                 <Route path="/consultas-com-desconto" element={<SaudeVerdeRede />} />
                 <Route path="/medsocio" element={<MedSocio />} />
                 <Route path="/monitoramento-saude" element={<MonitoramentoSaude />} />
+                <Route path="/meus-exames" element={<MeusExames />} />
                 <Route path="/telemed-whatsapp" element={<PrivateRoute><TelemedWhatsApp /></PrivateRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

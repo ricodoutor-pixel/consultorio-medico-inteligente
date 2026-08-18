@@ -11,6 +11,22 @@ import { toast } from "sonner";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
+import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Wind, Brain, Beaker, Glasses, Navigation } from "lucide-react";
+
+const diagnosticTools = [
+  { id: 'cardiaco', title: 'Monitor Cardíaco', description: 'Mede BPM e HRV via câmera do smartphone', icon: Activity },
+  { id: 'fundoscopia', title: 'Fundo de Olho (Fundoscopia)', description: 'Análise de retina com IA — 31 patologias', icon: Eye },
+  { id: 'oximetria', title: 'Oximetria Óptica (SpO2)', description: 'Saturação de oxigênio via câmera', icon: HeartPulse },
+  { id: 'dermatoscopia', title: 'Dermatoscopia Digital', description: 'Análise de lesões de pele com IA (ABCDE)', icon: ScanSearch },
+  { id: 'mobilidade', title: 'Mobilidade Articular', description: 'Avaliação de amplitude de movimento (ROM)', icon: Accessibility },
+  { id: 'estetoscopio', title: 'Estetoscópio Digital IA', description: 'Ausculta cardíaca e pulmonar via microfone', icon: Stethoscope },
+  { id: 'pulmonar', title: 'Ausculta Pulmonar IA', description: 'Análise de sons respiratórios via microfone', icon: Wind },
+  { id: 'tremor', title: 'Tremorometria IA', description: 'Análise de tremores neuromotores', icon: Brain },
+  { id: 'urine', title: 'Urinálise IA', description: 'Leitura colorimétrica de tiras reagentes', icon: Beaker },
+  { id: 'acuity', title: 'Acuidade Visual', description: 'Teste gamificado de acuidade visual', icon: Glasses },
+  { id: 'gps', title: 'Rastreador GPS Cardíaco', description: 'Monitoramento ao ar livre com satélite', icon: Navigation },
+];
+
 // HealthSubscriptionPlans removido para evitar duplicação de planos.
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
@@ -18,6 +34,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 const Precos = () => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [loadingTool, setLoadingTool] = useState<string | null>(null);
   const [btcModal, setBtcModal] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
 
@@ -130,6 +147,42 @@ const Precos = () => {
       { type: "assinatura", planName: plan.name, value: plan.priceValue / 100 },
       () => executeDynamicCheckout(planId)
     );
+  };
+
+  const handleBuyTool = async (toolId: string) => {
+    setLoadingTool(toolId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Faça login para adquirir ferramentas.", {
+          action: { label: "Login", onClick: () => window.location.href = "/login" },
+        });
+        setLoadingTool(null);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("create-tool-checkout", {
+        body: { toolId },
+      });
+
+      if (error) {
+        console.error("Tool checkout error:", error);
+        toast.error("Erro ao processar pagamento. Tente novamente.");
+        return;
+      }
+
+      if (data?.init_point) {
+        toast.success("Redirecionando para o Mercado Pago...");
+        window.location.href = data.init_point;
+      } else {
+        toast.error("Erro ao gerar link de pagamento");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      toast.error("Erro ao processar. Tente novamente.");
+    } finally {
+      setLoadingTool(null);
+    }
   };
 
   return (
@@ -259,6 +312,79 @@ const Precos = () => {
             >
               🌿 Invista Em Cannabis Medicinal <ArrowRight size={22} />
             </a>
+          </div>
+
+          {/* Diagnostic Tools Showcase Section */}
+          <div className="mt-20 pt-16 border-t border-border/40">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-5xl font-display font-black text-foreground mb-4">
+                🩺 Ferramentas Diagnósticas de Bolso & Exames com IA
+              </h2>
+              <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto font-medium leading-relaxed">
+                Adquira módulos avulsos para usar direto na câmera do seu smartphone. Sem mensalidades, pagamento único de <strong className="text-foreground">R$ 29,90</strong> por ferramenta.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-12">
+              {diagnosticTools.map(tool => (
+                <Card key={tool.id} className="border-border bg-card/40 hover:bg-card/80 transition-all flex flex-col group overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <CardContent className="p-6 flex-1 flex flex-col relative z-10">
+                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 text-primary group-hover:scale-110 transition-transform">
+                      <tool.icon size={28} />
+                    </div>
+                    <h3 className="font-display font-black text-lg text-foreground mb-2 leading-tight">{tool.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-6 flex-1 leading-relaxed">{tool.description}</p>
+                    <div className="flex flex-col gap-3 mt-auto pt-5 border-t border-border/50">
+                      <div className="flex items-center justify-between">
+                        <span className="font-display font-black text-gradient-green text-xl">R$ 29,90</span>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground/60 tracking-wider">Vitalício</span>
+                      </div>
+                      <Button 
+                        className="font-black w-full shadow-sm text-xs rounded-xl" 
+                        onClick={() => handleBuyTool(tool.id)} 
+                        disabled={loadingTool === tool.id}
+                      >
+                        {loadingTool === tool.id ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
+                        {loadingTool === tool.id ? "Gerando..." : "Baixar Módulo"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="max-w-4xl mx-auto relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-emerald-400 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity" />
+              <div className="relative bg-gradient-to-r from-background to-card rounded-3xl p-8 sm:p-10 border border-primary/20 shadow-2xl overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-8">
+                <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+                
+                <div className="flex-1 text-center sm:text-left z-10">
+                  <h3 className="text-2xl sm:text-3xl font-display font-black text-foreground mb-3 tracking-tight">
+                    🎁 Leve o Consultório Digital <span className="text-gradient-green">Completo</span>
+                  </h3>
+                  <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                    Desbloqueie todas as 11 ferramentas de diagnóstico com IA de uma só vez e transforme seu celular no mais avançado equipamento de bolso.
+                  </p>
+                </div>
+                
+                <div className="shrink-0 w-full sm:w-auto z-10">
+                  <div className="text-center sm:text-right mb-3">
+                    <span className="text-xs text-muted-foreground line-through mr-2">R$ 328,90</span>
+                    <span className="font-display font-black text-3xl text-gradient-green">R$ 97,00</span>
+                  </div>
+                  <Button 
+                    size="lg" 
+                    className="font-black w-full sm:w-auto px-8 h-14 rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm shadow-xl shadow-primary/20" 
+                    onClick={() => handleBuyTool("combo_tools")} 
+                    disabled={loadingTool === "combo_tools"}
+                  >
+                    {loadingTool === "combo_tools" ? <Loader2 size={20} className="animate-spin mr-2" /> : null}
+                    Comprar Combo Agora
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

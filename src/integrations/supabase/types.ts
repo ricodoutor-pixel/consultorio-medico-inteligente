@@ -5806,6 +5806,7 @@ export type Database = {
           pix_key: string | null
           pix_type: string | null
           planta_coins: number | null
+          purchased_tools: string[] | null
           referred_by: string | null
           region: string | null
           signup_role: string | null

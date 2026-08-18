@@ -1,3 +1,4 @@
+import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -95,7 +96,6 @@ Gere um RESUMO CLÍNICO estruturado a partir da triagem do paciente, seguindo es
 
 Responda APENAS com o resumo clínico, sem comentários adicionais. Máximo 400 palavras.`;
 
-import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 
     const aiResponse = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",

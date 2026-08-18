@@ -22,10 +22,6 @@ project_id = "shmbwdjuddvquszwkvuq"
 
   [functions.send-transactional-email]
     verify_jwt = true
-  [functions.meta-messenger-bot]
-    verify_jwt = false
-  [functions.meta-comment-to-dm]
-    verify_jwt = false
   [functions.preview-transactional-email]
     verify_jwt = false
   [functions.handle-email-unsubscribe]
@@ -36,10 +32,6 @@ project_id = "shmbwdjuddvquszwkvuq"
     verify_jwt = false
   [functions.ai-error-gateway]
     verify_jwt = false
-  [functions.whatsapp-brisa-bot]
-    verify_jwt = false
-  [functions.brisa-whatsapp]
-    verify_jwt = false
   [functions.brisa-evolution-reconnect]
     verify_jwt = false
   [functions.brisa-evolution-admin]
@@ -47,10 +39,6 @@ project_id = "shmbwdjuddvquszwkvuq"
   [functions.admin-bootstrap-doctor]
     verify_jwt = false
   [functions.brisa-send-now]
-    verify_jwt = false
-  [functions.provision-sole-admin]
-    verify_jwt = false
-  [functions.brisa-waha-bot]
     verify_jwt = false
   [functions.brisa-bot]
     verify_jwt = false

@@ -1,3 +1,4 @@
+import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 // Scientific RAG — refatorado para Lovable AI Gateway (Gemini).
 // Não usa mais OpenAI embeddings. Faz busca full-text via RPC search_scientific_articles
 // e opcionalmente sintetiza um resumo clínico com Lovable AI (Gemini Flash).
@@ -64,7 +65,6 @@ serve(async (req) => {
       url: a.url, doi: a.doi, abstract: (a.abstract || "").slice(0, 500),
     }));
 
-import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 
 // 2) (Opcional) sintetizar resumo clínico via Lovable AI Gateway
     let summary: string | null = null;

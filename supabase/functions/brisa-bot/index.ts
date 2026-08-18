@@ -35,14 +35,16 @@ const LOVABLE_KEY  = Deno.env.get('LOVABLE_API_KEY') || '';
 const SB_URL       = Deno.env.get('SUPABASE_URL') || '';
 const SB_KEY       = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
+import { DOCTOR_NAME, DOCTOR_CRM, DOCTOR_PHONE } from '../_shared/clinic-info.ts';
+
 // ── ROTEIRO COMPLETO DE ORIENTAÇÃO TÉCNICA DO DR. EDILSON BEZERRA ──────
 const ROTEIRO_ORIENTACAO_TECNICA = `📲 *PASSO A PASSO DO SEU ATENDIMENTO:*
 
 1️⃣ *Acesse o Perfil do Profissional:*
-Acesse o link direto do Dr. Edilson Bezerra na nossa plataforma:
+Acesse o link direto do ${DOCTOR_NAME} na nossa plataforma:
 👉 https://plantayraiz.com.br/profissionais
 
-_(O Dr. Edilson Bezerra da Planta y Raíz Ltda — Médico Prescritor com mais de 10 anos de experiência em modulação do sistema Endo Canabinoide humano atende fisicamente Presencial em Santa Cruz de la Sierra Bolivia Primeiro anillo Edifícil Ecodent piso 19 — com Registro CRM Col Med -10963 Sta Cruz Bo. No Brasil, atua apenas Prestando Mentoria Orientação Técnica Especializada)._
+_(O ${DOCTOR_NAME} da Planta y Raíz Ltda — Médico Prescritor com mais de 10 anos de experiência em modulação do sistema Endo Canabinoide humano atende fisicamente Presencial em Santa Cruz de la Sierra Bolivia Primeiro anillo Edifícil Ecodent piso 19 — com Registro ${DOCTOR_CRM} Sta Cruz Bo. No Brasil, atua apenas Prestando Mentoria Orientação Técnica Especializada)._
 
 2️⃣ *Escolha a Modalidade Desejada:*
 
@@ -58,7 +60,7 @@ Assim que o pagamento é confirmado, nossa assistente virtual Enfermeira Brisa e
 
 4️⃣ *Seu Atendimento ao Vivo:*
 No horário combinado, você entra na sala virtual segura pelo celular ou computador.
-O Dr. Edilson analisará o seu caso, histórico de saúde, sintomas e a indicação de canabinoides medicinais.
+O ${DOCTOR_NAME} analisará o seu caso, histórico de saúde, sintomas e a indicação de canabinoides medicinais.
 
 5️⃣ *Recebimento do Relatório Técnico Digital:*
 Ao final da orientação, você receberá o seu Relatório de Encaminhamento Técnico Completo, assinado digitalmente.
@@ -71,11 +73,11 @@ Nossa equipe e a Enfermeira Brisa estão prontas para te auxiliar no WhatsApp:
 Seja muito bem-vindo(a) à medicina do futuro! 🌿💚`;
 
 // ── PERSONA DA ENFERMEIRA BRISA / COPILOTO CLÍNICO VIP ──────────────────
-const PERSONA = `Você é a Enfermeira Brisa 🌿 & Dr. Edilson IA, assistente virtual oficial e Copiloto #1 de Decisão Clínica VIP em Medicina Canabinoide e Geral da Planta y Raiz.
+const PERSONA = `Você é a Enfermeira Brisa 🌿 & ${DOCTOR_NAME} IA, assistente virtual oficial e Copiloto #1 de Decisão Clínica VIP em Medicina Canabinoide e Geral da Planta y Raiz.
 
 SUA MISSÃO DUPLA:
 1. ATENDIMENTO AO PACIENTE / CLIENTE:
-   Orientar pacientemente sobre valores, cadastro, agendamento de mentoria e orientação técnica com o Dr. Edilson Bezerra (5511987131241 / CRM Col Med -10963).
+   Orientar pacientemente sobre valores, cadastro, agendamento de mentoria e orientação técnica com o ${DOCTOR_NAME} (${DOCTOR_PHONE} / ${DOCTOR_CRM}).
    Roteiro Obrigatório:
    ${ROTEIRO_ORIENTACAO_TECNICA}
 

@@ -1,3 +1,4 @@
+import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 // 🩺 telemed-exam-report — relatório clínico fiel a partir dos exames digitais
 // Cruza todos os exames do paciente (diagnostic_exams) com o banco de patologias
 // e devolve um relatório estruturado gerado pela IA (Gemini via Lovable AI Gateway).
@@ -95,7 +96,6 @@ ${pathologyContext || "(indisponível)"}
 
 Gere o relatório clínico no formato definido.`;
 
-import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

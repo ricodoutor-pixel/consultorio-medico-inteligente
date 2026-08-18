@@ -100,10 +100,26 @@ const WorkspaceMedico = () => {
     }
   };
 
-  const toggleOnline = (val: boolean) => {
+  const toggleOnline = async (val: boolean) => {
     setIsOnline(val);
     localStorage.setItem(`mock_online_${doctorId}`, String(val));
     window.dispatchEvent(new Event("mock_online_changed"));
+    
+    // Atualiza o status real no banco de dados para refletir na vitrine
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { error } = await supabase.from('doctors').update({
+        is_online: val,
+        is_available: val
+      }).eq('user_id', session.user.id);
+      
+      if (error) {
+        console.error("Erro ao atualizar status:", error);
+        toast({ title: "Erro", description: "Falha ao sincronizar status online.", variant: "destructive" });
+        return;
+      }
+    }
+    
     toast({ title: val ? "Você está Online ✅" : "Você está Offline" });
   };
 

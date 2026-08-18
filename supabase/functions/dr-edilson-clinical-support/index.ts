@@ -1,3 +1,4 @@
+import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 // 🩺 Dr. Edilson Bezerra (CRM 10963 - Sta Cruz BO / CEO Planta y Raíz) — Agente de Apoio Clínico (Médicos)
 // Streaming via Lovable AI Gateway (gemini-2.5-pro) — raciocínio clínico em tempo real
 // Foco: evidência, ANVISA/CFM/RDC 660, CYP450, interações, exames, monitoramento.
@@ -115,7 +116,6 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

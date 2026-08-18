@@ -1,3 +1,4 @@
+import { callGeminiApiWithFallback, GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
 
@@ -80,7 +81,6 @@ Deno.serve(async (req) => {
       let postContent = "";
       let aiError = "";
 
-import { callGeminiApiWithFallback, GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 
       if (GEMINI_API_KEY) {
         try {

@@ -228,7 +228,7 @@ export const Navbar = () => {
               </div>
 
               <div className="flex items-center gap-2 border-l border-border pl-3 ml-1">
-                <div className="hidden xl:block scale-90">
+                <div className="block scale-90">
                   <LanguageSwitcher />
                 </div>
 

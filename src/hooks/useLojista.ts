@@ -56,7 +56,7 @@ export function useLojista() {
 
       // Busca dados reais em paralelo usando Promisses
       const [productsRes, ordersRes] = await Promise.all([
-        (supabase as any).from('products').select('*').eq('dispensary_id', user.id).order('created_at', { ascending: false }),
+        (supabase as any).from('products').select('*').eq('vendor_id', user.id).order('created_at', { ascending: false }),
         (supabase as any).from('b2b_orders').select('*').eq('lojista_id', user.id).order('created_at', { ascending: false })
       ]);
 
@@ -79,11 +79,17 @@ export function useLojista() {
   const addProduct = async (productData: any) => {
     if (!session?.user?.id) throw new Error("Usuário não logado");
 
+    const descriptionWithProportion = `Proporção: ${productData.proportion || 'N/A'}`;
+
     const { data, error } = await supabase
       .from('products' as any)
       .insert([{
-        ...productData,
-        dispensary_id: session.user.id, // Vínculo rígido de RLS
+        vendor_id: session.user.id, // Vínculo rígido de RLS
+        name: productData.name,
+        description: descriptionWithProportion,
+        price: Number(productData.price) || 0,
+        stock: Number(productData.stock) || 0,
+        category: "Óleo",
         is_active: false, // Produto novo passa por curadoria
       }])
       .select()

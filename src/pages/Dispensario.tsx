@@ -71,15 +71,15 @@ const Dispensario = () => {
         setProducts(dbProducts.map(p => ({
           id: p.id,
           name: p.name,
-          brand: p.brand || "Marca Parceira",
+          brand: "Marca Parceira", // p.brand não existe na tabela products
           type: p.category || "Óleo",
-          cbdMg: p.cbd_mg || 0,
-          thcPct: p.thc_pct || 0,
-          volume: p.volume || "30mL",
+          cbdMg: 0, // p.cbd_mg não existe na tabela products
+          thcPct: 0, // p.thc_pct não existe na tabela products
+          volume: "30mL", // p.volume não existe na tabela products
           price: p.price || 0,
-          requiresReceitaA: p.requires_receita_a || false,
-          anvisaReg: p.anvisa_reg || "Isento",
-          inStock: p.in_stock !== false
+          requiresReceitaA: false, // p.requires_receita_a não existe na tabela products
+          anvisaReg: "Isento", // p.anvisa_reg não existe na tabela products
+          inStock: Number(p.stock) > 0 // p.in_stock não existe, mapear de p.stock numérico
         })));
       } else {
         setProducts([]); // Fallback

@@ -406,25 +406,29 @@
           reportEarlyError(e.reason, 'unhandledrejection');
         });
 
-        // Watchdog: re-checa o root por até 20s. Se continuar vazio, mostra o
-        // fallback humano (com botão Recarregar) em vez de deixar tela preta.
+        // Watchdog paciente: mantém a tela de carregamento enquanto o bundle
+        // compila/baixa. Só troca pelo fallback humano se houve erro fatal real
+        // ou se passaram 90s sem QUALQUER conteúdo React no #root.
         var wdTries = 0;
         var wdTimer = setInterval(function(){
           var root = document.getElementById('root');
-          if (root && root.dataset.reactMounted === '1') {
+          if (!root) return;
+          var boot = document.getElementById('__pyr_boot_screen');
+          var hasReact = root.dataset.reactMounted === '1' || (root.children.length > 0 && !boot);
+          if (hasReact) {
             clearInterval(wdTimer);
             try { sessionStorage.removeItem(RELOAD_KEY); } catch(_){}
             return;
           }
           wdTries++;
-          if (wdTries === 2) crumb('watchdog-slow-boot', {});
-          if (wdTries >= 5) { // ~20s
+          if (wdTries === 3) crumb('watchdog-slow-boot', {});
+          var hadFatal = (window.__pyr_earlyErrors || []).length > 0;
+          if (hadFatal || wdTries >= 18) { // ~90s
             clearInterval(wdTimer);
-            crumb('watchdog-empty-root', {});
-            console.warn('[boot] watchdog: root vazio após 20s');
-            showFallback('boot');
+            crumb('watchdog-empty-root', { fatal: hadFatal, tries: wdTries });
+            showFallback(hadFatal ? 'init' : 'boot');
           }
-        }, 4000);
+        }, 5000);
 
       })();
     </script>

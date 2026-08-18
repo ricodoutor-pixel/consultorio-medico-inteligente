@@ -1,183 +1,207 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1"
-import * as jwt from "https://deno.land/x/djwt@v2.8/mod.ts"
+// 🌿 Planta y Raiz — create-video-room (CORRIGIDO — restaura autenticação e compatibilidade)
+// Cria (ou reaproveita, de forma idempotente) a sala de telemedicina de uma consulta.
+// Exige autenticacao do medico responsavel e emite um JWT real (Jitsi).
+// Compatível com: src/pages/OrientacaoVideo.tsx e src/pages/WorkspaceMedico.tsx
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { create as createJWT, getNumericDate } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+const cors = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const JITSI_APP_ID = Deno.env.get("JITSI_APP_ID") || "";
+const JITSI_APP_SECRET = Deno.env.get("JITSI_APP_SECRET") || "";
+const JITSI_DOMAIN = Deno.env.get("JITSI_DOMAIN") ?? "meet.jit.si";
+const PUBLIC_SITE_URL = Deno.env.get("PUBLIC_SITE_URL") ?? "https://plantayraiz.com.br";
+
+const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+
+function randomHex(bytes: number): string {
+  return Array.from(crypto.getRandomValues(new Uint8Array(bytes)))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
-async function hashToken(token: string): Promise<string> {
-  const msgUint8 = new TextEncoder().encode(token);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+async function sha256Hex(input: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-async function generateJitsiJwt(roomName: string, userName: string, isModerator: boolean, jitsiAppId: string, jitsiSecret: string) {
-  const encoder = new TextEncoder();
-  const keyBuf = encoder.encode(jitsiSecret);
-  const key = await crypto.subtle.importKey("raw", keyBuf, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-  
-  const payload = {
-    aud: "jitsi",
-    iss: jitsiAppId,
-    sub: jitsiAppId,
-    room: "*",
-    exp: Math.floor(Date.now() / 1000) + (2 * 3600),
-    context: {
-      user: {
-        name: userName,
-        affiliation: isModerator ? "owner" : "member"
-      },
-      features: {
-        recording: isModerator,
-        livestreaming: false,
-        "screen-sharing": true
-      }
-    }
-  };
-  return await jwt.create({ alg: "HS256", typ: "JWT" }, payload, key);
-}
+Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+  if (req.method === "GET") {
+    return new Response(JSON.stringify({
+      ok: true, service: "create-video-room", version: "2026.08-fixed",
+      jwt_enabled: Boolean(JITSI_APP_ID && JITSI_APP_SECRET),
+      domain: JITSI_DOMAIN,
+      auth_required: true,
+    }), { headers: { ...cors, "Content-Type": "application/json" } });
   }
 
   try {
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(JSON.stringify({ ok: false, error: "Acesso não autorizado. Header ausente." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 })
-    }
-
-    const body = await req.json();
-    const appointmentId = body.appointmentId || body.consultation_id || body.appointment_id;
-
-    if (!appointmentId) {
-      return new Response(JSON.stringify({ ok: false, error: "O campo 'appointmentId' é obrigatório no corpo da requisição." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 })
-    }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-    // Cliente com o token do usuário para validação RLS básica
-    const supabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
-      global: { headers: { Authorization: authHeader } }
-    })
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // 1. Exige medico autenticado — NUNCA aceitar is_doctor vindo do corpo da requisicao
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const { data: { user }, error: authError } = await admin.auth.getUser(
+      authHeader.replace("Bearer ", ""),
+    );
     if (authError || !user) {
-      return new Response(JSON.stringify({ ok: false, error: "Usuário não autenticado ou token inválido." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 })
+      return new Response(JSON.stringify({ ok: false, error: "Nao autenticado" }), {
+        status: 401,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
     }
 
-    // Cliente Master (Service Role) para inserção em tabelas seguras/bypassar RLS
-    const masterSupabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
-
-    const { data: doctorData, error: doctorError } = await masterSupabase
-      .from('doctors')
-      .select('id, is_verified, full_name, user_id')
-      .or(`user_id.eq.${user.id},id.eq.${user.id}`)
+    // 2. Confirma que e um medico verificado
+    const { data: doctor, error: doctorError } = await admin
+      .from("doctors")
+      .select("user_id, is_verified")
+      .eq("user_id", user.id)
       .maybeSingle();
 
-    if (doctorError || !doctorData || doctorData.is_verified === false) {
-       return new Response(JSON.stringify({ ok: false, error: "Acesso negado: O usuário não é um médico ou não está verificado." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 })
+    if (doctorError || !doctor || !doctor.is_verified) {
+      return new Response(
+        JSON.stringify({ ok: false, error: "Apenas medicos verificados podem criar salas" }),
+        { status: 403, headers: { ...cors, "Content-Type": "application/json" } },
+      );
     }
 
-    const doctorId = doctorData.id;
-
-    const { data: appointment, error: appointmentError } = await masterSupabase
-      .from('appointments')
-      .select('id, patient_id, consultation_id') 
-      .eq('id', appointmentId)
-      .eq('doctor_id', doctorId)
-      .maybeSingle()
-
-    if (appointmentError || !appointment) {
-      return new Response(JSON.stringify({ ok: false, error: "Acesso negado: Agendamento não encontrado ou não pertence a este médico." }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 })
+    const body = await req.json().catch(() => ({}));
+    const appointmentId = String(body.appointmentId || body.appointment_id || "");
+    if (!appointmentId) {
+      return new Response(JSON.stringify({ ok: false, error: "appointmentId e obrigatorio" }), {
+        status: 400,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
     }
 
-    const patientId = appointment.patient_id;
-    const consultationId = appointment.consultation_id || appointment.id || crypto.randomUUID();
+    // 3. Confirma que a consulta pertence a este medico
+    const { data: appointment, error: apptError } = await admin
+      .from("appointments")
+      .select("id, doctor_id, patient_id, consultation_id, scheduled_at, status")
+      .eq("id", appointmentId)
+      .maybeSingle();
 
-    // Idempotência
-    const { data: existingRoom } = await masterSupabase
-      .from('video_rooms')
-      .select('*')
-      .eq('appointment_id', appointmentId)
-      .eq('status', 'active')
-      .order('created_at', { ascending: false })
-      .limit(1)
+    if (apptError || !appointment) {
+      return new Response(JSON.stringify({ ok: false, error: "Consulta nao encontrada" }), {
+        status: 404,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
+    }
+    if (appointment.doctor_id !== user.id) {
+      return new Response(
+        JSON.stringify({ ok: false, error: "Esta consulta nao pertence a este medico" }),
+        { status: 403, headers: { ...cors, "Content-Type": "application/json" } },
+      );
+    }
+
+    const consultationId = appointment.consultation_id ?? crypto.randomUUID();
+
+    // 3b. IDEMPOTENCIA: reaproveita sala existente e nao expirada
+    const { data: existingRoom } = await admin
+      .from("video_rooms")
+      .select("id, room_name, room_url, expires_at, secure_token, status")
+      .eq("consultation_id", consultationId)
+      .maybeSingle();
+
+    const now = new Date();
+    const existingIsValid = existingRoom
+      && existingRoom.status !== "ended"
+      && existingRoom.expires_at
+      && new Date(existingRoom.expires_at) > now;
 
     let roomName: string;
-    let patientToken: string = crypto.randomUUID();
-    let hashedToken = await hashToken(patientToken);
-    let doctorJwt: string = "";
-    let reused = false;
-    let expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
+    let roomUrl: string;
+    let patientAccessToken: string;
+    let expiresAt: string;
 
-    const JITSI_APP_ID = Deno.env.get('JITSI_APP_ID') ?? '';
-    const JITSI_SECRET = Deno.env.get('JITSI_SECRET') ?? '';
-    const domain = Deno.env.get('JITSI_DOMAIN') ?? '8x8.vc'; 
-
-    if (existingRoom && existingRoom.length > 0) {
-      roomName = existingRoom[0].room_name;
-      reused = true;
-      // Atualizar o secure_token na sala existente para que o novo link funcione
-      await masterSupabase.from('video_rooms').update({
-         secure_token: hashedToken,
-         expires_at: expiresAt
-      }).eq('id', existingRoom[0].id);
-      
+    if (existingIsValid) {
+      roomName = existingRoom.room_name;
+      roomUrl = existingRoom.room_url;
+      expiresAt = existingRoom.expires_at;
+      patientAccessToken = randomHex(24);
+      const secureTokenHash = await sha256Hex(patientAccessToken);
+      await admin.from("video_rooms").update({ secure_token: secureTokenHash }).eq("id", existingRoom.id);
     } else {
-      roomName = `planta-y-raiz-${consultationId}-${crypto.randomUUID().split('-')[0]}`;
-      
-      const { error: insertError } = await masterSupabase
-        .from('video_rooms')
-        .insert({
-          appointment_id: appointmentId,
-          doctor_id: doctorId,
-          patient_id: patientId,
-          room_name: roomName,
-          secure_token: hashedToken,
-          status: 'active',
-          expires_at: expiresAt
-        })
+      roomName = `pyr-${consultationId}-${randomHex(4)}`.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+      roomUrl = `https://${JITSI_DOMAIN}/${roomName}`;
 
-      if (insertError) {
-        return new Response(JSON.stringify({ ok: false, error: `Falha ao criar sala no banco de dados: ${insertError.message}` }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 })
+      const scheduledAt = appointment.scheduled_at ? new Date(appointment.scheduled_at) : new Date();
+      expiresAt = new Date(scheduledAt.getTime() + 4 * 60 * 60 * 1000).toISOString();
+
+      patientAccessToken = randomHex(24);
+      const secureTokenHash = await sha256Hex(patientAccessToken);
+
+      const { error: upsertError } = await admin
+        .from("video_rooms")
+        .upsert({
+          consultation_id: consultationId,
+          room_name: roomName,
+          room_url: roomUrl,
+          doctor_id: appointment.doctor_id,
+          patient_id: appointment.patient_id,
+          appointment_id: appointment.id,
+          status: "scheduled",
+          expires_at: expiresAt,
+          secure_token: secureTokenHash,
+        }, { onConflict: "consultation_id" });
+
+      if (upsertError) {
+        console.error("[create-video-room] DB error:", upsertError);
+        return new Response(JSON.stringify({ ok: false, error: "Erro ao salvar a sala" }), {
+          status: 500, headers: { ...cors, "Content-Type": "application/json" },
+        });
       }
     }
 
-    if (JITSI_APP_ID && JITSI_SECRET) {
-      // Jitsi App ID for 8x8 is usually formatted `vpaas-magic-cookie-xxx`
-      doctorJwt = await generateJitsiJwt(roomName, doctorData.full_name || 'Médico', true, JITSI_APP_ID, JITSI_SECRET);
+    await admin.from("appointments").update({
+      room_url: roomUrl,
+      consultation_id: consultationId,
+      status: "confirmed",
+      updated_at: new Date().toISOString(),
+    }).eq("id", appointment.id);
+
+    // 4. JWT real do medico (moderador)
+    let doctorJwt: string | null = null;
+    if (JITSI_APP_ID && JITSI_APP_SECRET) {
+      doctorJwt = await createJWT(
+        { alg: "HS256", typ: "JWT" },
+        {
+          iss: JITSI_APP_ID,
+          aud: "jitsi",
+          sub: JITSI_APP_ID,
+          room: roomName,
+          exp: getNumericDate(60 * 60 * 4),
+          context: {
+            user: { name: String(user.user_metadata?.full_name ?? "Medico(a)"), moderator: "true" },
+            features: { "lobby-bypass": true, "screen-sharing": true, recording: false },
+          },
+        },
+        JITSI_APP_SECRET,
+      );
     }
 
-    const FRONTEND_URL = Deno.env.get('FRONTEND_URL') ?? 'https://plantayraiz.com';
-    const patientAccessLink = `${FRONTEND_URL}/orientacao-video?consultation=${consultationId}&token=${patientToken}`;
+    console.log(`[create-video-room] Sala ${existingIsValid ? "reaproveitada" : "criada"}: ${roomName} (medico ${user.id})`);
 
-    await masterSupabase.from('appointments').update({
-       room_url: patientAccessLink
-    }).eq('id', appointmentId);
+    return new Response(JSON.stringify({
+      ok: true,
+      roomName,
+      roomUrl,
+      domain: JITSI_DOMAIN,
+      consultationId,
+      expiresAt,
+      doctorJwt,
+      reused: Boolean(existingIsValid),
+      patientAccessLink: `${PUBLIC_SITE_URL}/orientacao-video?consultation=${consultationId}&token=${patientAccessToken}`,
+    }), { headers: { ...cors, "Content-Type": "application/json" } });
 
-    return new Response(
-      JSON.stringify({
-        ok: true,
-        roomName: roomName,
-        roomUrl: patientAccessLink,
-        domain: domain,
-        consultationId: consultationId,
-        expiresAt: expiresAt,
-        doctorJwt: doctorJwt,
-        patientAccessLink: patientAccessLink,
-        reused: reused
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
-    )
-
-  } catch (error: any) {
-    return new Response(
-      JSON.stringify({ ok: false, error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-    )
+  } catch (err) {
+    console.error("[create-video-room] Error:", err);
+    return new Response(JSON.stringify({ ok: false, error: String(err) }), {
+      status: 500, headers: { ...cors, "Content-Type": "application/json" },
+    });
   }
-})
+});

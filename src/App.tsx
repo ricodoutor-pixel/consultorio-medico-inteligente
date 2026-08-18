@@ -76,6 +76,7 @@ const PoliticaDePrivacidade = lazyWithRecovery(() => import("./pages/PoliticaDeP
 const PoliticaDeReembolso = lazyWithRecovery(() => import("./pages/PoliticaDeReembolso"), { sourceRef: "/reembolso" });
 const Indicacoes = lazyWithRecovery(() => import("./pages/Indicacoes"), { sourceRef: "/indicacoes" });
 const Unsubscribe = lazyWithRecovery(() => import("./pages/Unsubscribe"), { sourceRef: "/unsubscribe" });
+const MeusExames = lazyWithRecovery(() => import("./pages/MeusExames"), { sourceRef: "/meus-exames" });
 const Telemedicina = lazyWithRecovery(() => import("./pages/Telemedicina"), { sourceRef: "/telemedicina" });
 const Cadastro = lazyWithRecovery(() => import("./pages/Cadastro"), { sourceRef: "/cadastro" });
 const ConfiguracoesMedico = lazyWithRecovery(() => import("./pages/ConfiguracoesMedico"), { sourceRef: "/configuracoes-medico" });

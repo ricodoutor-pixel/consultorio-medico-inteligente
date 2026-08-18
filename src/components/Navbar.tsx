@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+﻿import { useState, useEffect, useCallback } from "react";
 import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
@@ -342,3 +342,4 @@ export const Navbar = () => {
     </>
   );
 };
+

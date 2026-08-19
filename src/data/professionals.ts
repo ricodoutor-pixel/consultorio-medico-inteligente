@@ -69,6 +69,7 @@ import drAdeonisOliveiraImg from "@/assets/dr-adeonis-oliveira.jpg";
 import drJoaoPedroDetoniImg from "@/assets/dr-joao-pedro-detoni.jpg";
 import drEduardoCorreaImg from "@/assets/dr-eduardo-correa.jpg";
 import drDanielKobayashiImg from "@/assets/dr-daniel-kobayashi.jpg";
+import cfmDaniel from "@/assets/cfm_prints/dr-daniel.png";
 export type Professional = {
   id: string;
   name: string;
@@ -95,6 +96,7 @@ export type Professional = {
   crm?: string;
   hospital?: string;
   hospitalUrl?: string;
+  cfmPrintUrl?: string;
   flags?: string[];
 };
 
@@ -144,7 +146,8 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento." }
     ],
-    online: true,
+    online: false,
+    cfmPrintUrl: cfmDaniel,
   },
   {
     id: "med-eduardo-correa",
@@ -248,6 +251,7 @@ export const professionals: Professional[] = [
     avatar: "MA",
     imageUrl: draMariannaImg,
     online: false,
+    cfmPrintUrl: cfmDaniel,
     crm: "12110/MS (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -273,6 +277,7 @@ export const professionals: Professional[] = [
     imageUrl: draAnaPaulaImg,
 
     online: false,
+    cfmPrintUrl: cfmDaniel,
     crm: "36942/PR (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -297,6 +302,7 @@ export const professionals: Professional[] = [
     avatar: "JR",
     imageUrl: drJoseRobertoImg,
     online: false,
+    cfmPrintUrl: cfmDaniel,
     crm: "5266864-8/RJ (Regular) RQE: 19693",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -321,6 +327,7 @@ export const professionals: Professional[] = [
     avatar: "AB",
     imageUrl: draAngelaBeatrizImg,
     online: false,
+    cfmPrintUrl: cfmDaniel,
     crm: "5258084-6/RJ (Regular) RQEs: 5874, 24753",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -345,6 +352,7 @@ export const professionals: Professional[] = [
     avatar: "GN",
     imageUrl: drGustavoNobreImg,
     online: false,
+    cfmPrintUrl: cfmDaniel,
     crm: "35632/PR (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -369,6 +377,7 @@ export const professionals: Professional[] = [
     avatar: "GS",
     imageUrl: drGustavoSimoesImg,
     online: false,
+    cfmPrintUrl: cfmDaniel,
     crm: "7684/RO (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -393,6 +402,7 @@ export const professionals: Professional[] = [
     avatar: "AM",
     imageUrl: drAlbertMachadoImg,
     online: false,
+    cfmPrintUrl: cfmDaniel,
     crm: "34660/PE (Regular) RQE: 19896",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -417,6 +427,7 @@ export const professionals: Professional[] = [
     avatar: "GC",
     imageUrl: drGuilhermeCamposImg,
     online: false,
+    cfmPrintUrl: cfmDaniel,
     crm: "49694/PR (Regular) RQE: 37782",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -441,6 +452,7 @@ export const professionals: Professional[] = [
     avatar: "IC",
     imageUrl: draIngridChiulloImg,
     online: false,
+    cfmPrintUrl: cfmDaniel,
     crm: "216629/SP (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -465,6 +477,7 @@ export const professionals: Professional[] = [
     avatar: "AS",
     imageUrl: drAlexandreStramandinoliImg,
     online: false,
+    cfmPrintUrl: cfmDaniel,
     crm: "17266/PB (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -489,6 +502,7 @@ export const professionals: Professional[] = [
     avatar: "AO",
     imageUrl: drAdeonisOliveiraImg,
     online: false,
+    cfmPrintUrl: cfmDaniel,
     crm: "9060/SE (Regular)",
     hospital: "Planta y Raíz Ltda",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -1981,6 +1995,7 @@ export const professionals: Professional[] = [
     crm: "49354 - PR",
     flags: ["🇧🇷"],
     online: false,
+    cfmPrintUrl: cfmDaniel,
     services: [
       { name: "Orientação Inicial via Chat", price: "R$ 100,00", desc: "Avaliação inicial via chat seguro" },
       { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150,00", desc: "Avaliação completa com teleconsulta" },
@@ -1994,4 +2009,6 @@ export const professionals: Professional[] = [
     ],
   },
 ];
+
+
 

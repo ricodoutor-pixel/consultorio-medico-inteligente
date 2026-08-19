@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Hook: useRealProfessionals
  * Fetches real registered doctors from the database.
  * Limits test professionals to 6 + Dr. Edilson (med-0) = 7 total.
@@ -292,7 +292,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     // Médicos reais recém-cadastrados (KYC pendente): card exposto, mas OFF-LINE
     // até liberação no painel KYC ou ativação pelo próprio médico.
-    const PENDING_REAL_IDS = ["med-eduardo-correa", "med-joao-pedro", "med-marianna", "med-ana-paula", "med-jose-roberto", "med-angela-beatriz", "med-gustavo-nobre", "med-gustavo-simoes", "med-albert-machado", "med-guilherme-campos", "med-ingrid-chiullo", "med-alexandre-stramandinoli", "med-adeonis-oliveira"];
+    const PENDING_REAL_IDS = ["med-eduardo-correa", "med-joao-pedro", "med-marianna", "med-ana-paula", "med-jose-roberto", "med-angela-beatriz", "med-gustavo-nobre", "med-gustavo-simoes", "med-albert-machado", "med-guilherme-campos", "med-ingrid-chiullo", "med-alexandre-stramandinoli", "med-adeonis-oliveira", "med-daniel-kobayashi"];
     for (const pendingId of PENDING_REAL_IDS) {
       const mock = testProfessionals.find((p) => p.id === pendingId);
       if (!mock) continue;
@@ -332,3 +332,5 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
   return { professionals: merged, realCount: realDoctors.length, loading };
 }
+
+

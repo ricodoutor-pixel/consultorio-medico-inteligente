@@ -146,7 +146,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento." }
     ],
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
   },
   {
@@ -250,7 +250,7 @@ export const professionals: Professional[] = [
     consults: 0,
     avatar: "MA",
     imageUrl: draMariannaImg,
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     crm: "12110/MS (Regular)",
     hospital: "Planta y Raíz Ltda",
@@ -276,7 +276,7 @@ export const professionals: Professional[] = [
     avatar: "AP",
     imageUrl: draAnaPaulaImg,
 
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     crm: "36942/PR (Regular)",
     hospital: "Planta y Raíz Ltda",
@@ -301,7 +301,7 @@ export const professionals: Professional[] = [
     consults: 0,
     avatar: "JR",
     imageUrl: drJoseRobertoImg,
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     crm: "5266864-8/RJ (Regular) RQE: 19693",
     hospital: "Planta y Raíz Ltda",
@@ -326,7 +326,7 @@ export const professionals: Professional[] = [
     consults: 0,
     avatar: "AB",
     imageUrl: draAngelaBeatrizImg,
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     crm: "5258084-6/RJ (Regular) RQEs: 5874, 24753",
     hospital: "Planta y Raíz Ltda",
@@ -351,7 +351,7 @@ export const professionals: Professional[] = [
     consults: 0,
     avatar: "GN",
     imageUrl: drGustavoNobreImg,
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     crm: "35632/PR (Regular)",
     hospital: "Planta y Raíz Ltda",
@@ -376,7 +376,7 @@ export const professionals: Professional[] = [
     consults: 0,
     avatar: "GS",
     imageUrl: drGustavoSimoesImg,
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     crm: "7684/RO (Regular)",
     hospital: "Planta y Raíz Ltda",
@@ -401,7 +401,7 @@ export const professionals: Professional[] = [
     consults: 0,
     avatar: "AM",
     imageUrl: drAlbertMachadoImg,
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     crm: "34660/PE (Regular) RQE: 19896",
     hospital: "Planta y Raíz Ltda",
@@ -426,7 +426,7 @@ export const professionals: Professional[] = [
     consults: 0,
     avatar: "GC",
     imageUrl: drGuilhermeCamposImg,
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     crm: "49694/PR (Regular) RQE: 37782",
     hospital: "Planta y Raíz Ltda",
@@ -451,7 +451,7 @@ export const professionals: Professional[] = [
     consults: 0,
     avatar: "IC",
     imageUrl: draIngridChiulloImg,
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     crm: "216629/SP (Regular)",
     hospital: "Planta y Raíz Ltda",
@@ -476,7 +476,7 @@ export const professionals: Professional[] = [
     consults: 0,
     avatar: "AS",
     imageUrl: drAlexandreStramandinoliImg,
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     crm: "17266/PB (Regular)",
     hospital: "Planta y Raíz Ltda",
@@ -501,7 +501,7 @@ export const professionals: Professional[] = [
     consults: 0,
     avatar: "AO",
     imageUrl: drAdeonisOliveiraImg,
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     crm: "9060/SE (Regular)",
     hospital: "Planta y Raíz Ltda",
@@ -1994,7 +1994,7 @@ export const professionals: Professional[] = [
     imageUrl: draSuelenImg,
     crm: "49354 - PR",
     flags: ["🇧🇷"],
-    online: false,
+    online: true,
     cfmPrintUrl: cfmDaniel,
     services: [
       { name: "Orientação Inicial via Chat", price: "R$ 100,00", desc: "Avaliação inicial via chat seguro" },
@@ -2009,6 +2009,8 @@ export const professionals: Professional[] = [
     ],
   },
 ];
+
+
 
 
 

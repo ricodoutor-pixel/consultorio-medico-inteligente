@@ -1,1 +1,0 @@
-var t=Object.defineProperty;var u=(n,r)=>t(n,"name",{value:r,configurable:!0});import"./index-Burqexdg.js";function c(n){return"public:".concat(n)}u(c,"publicChannel");function a(n,r){return"user:".concat(n,":").concat(r)}u(a,"userChannel");function i(n,r){return"doctor:".concat(n,":").concat(r)}u(i,"doctorChannel");export{i as d,c as p,a as u};

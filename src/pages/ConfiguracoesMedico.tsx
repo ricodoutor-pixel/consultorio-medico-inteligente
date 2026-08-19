@@ -329,7 +329,14 @@ export default function ConfiguracoesMedico() {
                 />
               </div>
 
-              <div className="pt-4 flex justify-end">
+              <div className="pt-4 flex justify-end gap-3 flex-wrap">
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate('/atualizar-documentos-medico')}
+                  className="border-slate-700 text-slate-300 hover:text-white"
+                >
+                  <Upload className="mr-2 h-4 w-4" /> Atualizar dados de cadastro medico
+                </Button>
                 <Button 
                   onClick={handleSave} 
                   disabled={saving}
@@ -352,4 +359,5 @@ export default function ConfiguracoesMedico() {
     </div>
   );
 }
+
 

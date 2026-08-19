@@ -1,4 +1,4 @@
-import DashboardDiretoria from "./components/admin/DashboardDiretoria";
+﻿import DashboardDiretoria from "./components/admin/DashboardDiretoria";
 import { Suspense } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
@@ -424,6 +424,7 @@ const App = () => (
                 <Route path="/condicao/:condicao" element={<CondicaoTratamento />} />
                 <Route path="/consultorio" element={<PrivateRoute><Consultorio /></PrivateRoute>} />
                 <Route path="/configuracoes-medico" element={<PrivateRoute><ConfiguracoesMedico /></PrivateRoute>} />
+                <Route path="/atualizar-documentos-medico" element={<PrivateRoute><AtualizarDocumentosMedico /></PrivateRoute>} />
                 <Route path="/checkout/fast-track" element={<FastTrackCheckout />} />
                 <Route path="/checkout/:token" element={<PrescriptionCheckout />} />
                 <Route path="/checkout/return" element={<CheckoutReturn />} />
@@ -475,3 +476,4 @@ const App = () => (
 );
 
 export default App;
+

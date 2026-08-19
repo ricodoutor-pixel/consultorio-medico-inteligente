@@ -80,6 +80,7 @@ const MeusExames = lazyWithRecovery(() => import("./pages/MeusExames"), { source
 const Telemedicina = lazyWithRecovery(() => import("./pages/Telemedicina"), { sourceRef: "/telemedicina" });
 const Cadastro = lazyWithRecovery(() => import("./pages/Cadastro"), { sourceRef: "/cadastro" });
 const ConfiguracoesMedico = lazyWithRecovery(() => import("./pages/ConfiguracoesMedico"), { sourceRef: "/configuracoes-medico" });
+const AtualizarDocumentosMedico = lazyWithRecovery(() => import("./pages/AtualizarDocumentosMedico"), { sourceRef: "/atualizar-documentos-medico" });
 const Login = lazyWithRecovery(() => import("./pages/Login"), { sourceRef: "/login" });
 const ResetPassword = lazyWithRecovery(() => import("./pages/ResetPassword"), { sourceRef: "/reset-password" });
 const ConsultationPayment = lazyWithRecovery(() => import("./pages/ConsultationPayment"), { sourceRef: "/pagamento" });
@@ -476,4 +477,6 @@ const App = () => (
 );
 
 export default App;
+
+
 

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -61,7 +61,7 @@ export default function AtualizarDocumentosMedico() {
         if (!file) continue;
 
         const ext = (file.name.split(".").pop() || "bin").toLowerCase().slice(0, 5);
-        const path = ${user.id}/.;
+        const path = `${user.id}/${kind}.${ext}`;
 
         kycRows.push({
           doctor_user_id: user.id,

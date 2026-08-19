@@ -10,7 +10,8 @@ export type KycKind =
   | "cpf_doc"
   | "address_proof"
   | "selfie"
-  | "cfm_print";
+  | "cfm_print"
+  | "icp_brasil";
 
 export const KYC_LABELS: Record<KycKind, string> = {
   crm_front: "CRM — Frente",
@@ -21,6 +22,7 @@ export const KYC_LABELS: Record<KycKind, string> = {
   address_proof: "Comprovante de endereço (CEP)",
   selfie: "Selfie de conferência",
   cfm_print: "CONF CRM",
+  icp_brasil: "Assinatura Digital (ICP-Brasil)",
 };
 
 /** Documentos obrigatórios para liberar o card médico */

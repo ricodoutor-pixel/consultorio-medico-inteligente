@@ -186,9 +186,56 @@ export default function ConfiguracoesMedico() {
               <AlertTriangle className="text-red-400 mt-1 flex-shrink-0" />
               <div>
                 <h3 className="text-red-400 font-bold">Documentação Pendente ou em Análise</h3>
-                <p className="text-red-300/80 text-sm mt-1">
+                <p className="text-red-300/80 text-sm mt-1 mb-3">
                   Seu cadastro ainda não possui todos os documentos KYC validados. Para atender pacientes na plataforma, providencie os documentos no painel ou aguarde a aprovação.
                 </p>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="icp_upload" className="text-white bg-red-500/20 px-3 py-2 rounded-lg border border-red-500/30 cursor-pointer hover:bg-red-500/30 transition-colors w-fit flex items-center gap-2">
+                    <Upload size={16} />
+                    Anexar Assinatura Digital (ICP-Brasil)
+                    <input 
+                      type="file" 
+                      id="icp_upload" 
+                      accept="image/*,.pdf" 
+                      className="hidden" 
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file || !doctorData) return;
+                        toast.info("Enviando assinatura digital...");
+                        
+                        try {
+                          const { data: { user } } = await supabase.auth.getUser();
+                          if (!user) throw new Error("Não autenticado");
+                          
+                          const ext = (file.name.split(".").pop() || "bin").toLowerCase().slice(0, 5);
+                          const path = `${user.id}/icp_brasil.${ext}`;
+                          
+                          const { error: uploadError } = await supabase.storage
+                            .from("doctor-kyc-documents")
+                            .upload(path, file, { upsert: true, contentType: file.type || undefined });
+                          
+                          if (uploadError) throw uploadError;
+                          
+                          const { error: kycError } = await supabase
+                            .from("doctor_kyc_documents" as any)
+                            .upsert({
+                              doctor_user_id: user.id,
+                              document_kind: "icp_brasil",
+                              storage_path: path,
+                              verification_status: "pending",
+                            }, { onConflict: "doctor_user_id,document_kind" });
+                            
+                          if (kycError) throw kycError;
+                          
+                          toast.success("Assinatura anexada com sucesso!");
+                        } catch (err: any) {
+                          toast.error("Erro ao enviar: " + (err.message || "Tente novamente."));
+                        }
+                      }}
+                    />
+                  </Label>
+                  <span className="text-xs text-red-300/60 ml-1">Faltando: Assinatura Digital (ICP-Brasil) para receituários.</span>
+                </div>
               </div>
             </motion.div>
           )}
@@ -305,3 +352,4 @@ export default function ConfiguracoesMedico() {
     </div>
   );
 }
+

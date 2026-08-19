@@ -387,14 +387,14 @@ const CadastroProfissional = () => {
 
     // 🔐 KYC Rigoroso: Documentos obrigatórios (frente e verso)
     if (!isCuidador) {
-      if (!kycFiles["crm_front"] || !kycFiles["crm_back"]) {
-        toast({
-          title: country === "BO" ? "Documentos Incompletos" : "Documentos Incompletos",
-          description: country === "BO"
-            ? "Obligatorio enviar el FRENTE y DORSO de su Matrícula Médica."
-            : "Obrigatório enviar a FRENTE e o VERSO do seu registro (CRM/etc).",
-          variant: "destructive",
-        });
+      if (!kycFiles["crm_front"] || !kycFiles["crm_back"] || !kycFiles["icp_brasil"]) {
+          toast({
+            title: country === "BO" ? "Documentos Incompletos" : "Documentos Incompletos",
+            description: country === "BO"
+              ? "Obligatorio enviar el FRENTE y DORSO de su Matrícula Médica y Firma Digital."
+              : "Obrigatório enviar a FRENTE, o VERSO do seu registro, e a Assinatura ICP-Brasil.",
+            variant: "destructive",
+          });
         return;
       }
     } else {
@@ -1067,3 +1067,6 @@ const CadastroProfissional = () => {
 };
 
 export default CadastroProfissional;
+
+
+

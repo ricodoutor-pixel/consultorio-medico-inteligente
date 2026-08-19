@@ -416,15 +416,19 @@
         }
 
         window.addEventListener('error', function(e){
-          if (e && (e.message || e.error)) reportEarlyError(e.error || e.message, 'window.error');
+          if (!e || (!e.message && !e.error)) return;
+          // Preserve filename/source because browser extensions often expose only
+          // a generic message while their chrome-extension URL identifies the noise.
+          var error = e.error || { message: e.message, stack: String(e.filename || '') };
+          reportEarlyError(error, 'window.error');
         }, true);
         window.addEventListener('unhandledrejection', function(e){
           reportEarlyError(e.reason, 'unhandledrejection');
         });
 
         // Watchdog paciente: mantém a tela de carregamento enquanto o bundle
-        // compila/baixa. Só troca pelo fallback humano se houve erro fatal real
-        // ou se passaram 90s sem QUALQUER conteúdo React no #root.
+        // compila/baixa. Erros genéricos e de extensões jamais substituem o #root;
+        // a recuperação visual é reservada aos ChunkLoadError tratados acima.
         var wdTries = 0;
         var wdTimer = setInterval(function(){
           var root = document.getElementById('root');
@@ -438,11 +442,13 @@
           }
           wdTries++;
           if (wdTries === 3) crumb('watchdog-slow-boot', {});
-          var hadFatal = (window.__pyr_earlyErrors || []).length > 0;
-          if (hadFatal || wdTries >= 18) { // ~90s
+          if (wdTries >= 18) { // ~90s
             clearInterval(wdTimer);
-            crumb('watchdog-empty-root', { fatal: hadFatal, tries: wdTries });
-            showFallback(hadFatal ? 'init' : 'boot');
+            crumb('watchdog-empty-root', { tries: wdTries });
+            // Não destruir a raiz: um bundle lento ainda pode montar e substituir
+            // naturalmente a tela de inicialização. Mantém também o diagnóstico.
+            var bootMessage = document.querySelector('#__pyr_boot_screen p');
+            if (bootMessage) bootMessage.textContent = 'A conexão está lenta. Continuamos carregando…';
           }
         }, 5000);
 

@@ -178,7 +178,7 @@ const CadastroProfissional = () => {
   // KYC uploads (frente/verso obrigatórios + CPF, endereço, selfie)
   const [kycFiles, setKycFiles] = useState<Partial<Record<KycKind, File | null>>>({
     crm_front: null, crm_back: null, id_front: null, id_back: null,
-    cpf_doc: null, address_proof: null, selfie: null,
+    cpf_doc: null, address_proof: null, selfie: null, icp_brasil: null
   });
   const MAX_KYC_BYTES = 5 * 1024 * 1024; // 5MB
   const isCuidadorSel = form.categoria === "Cuidadores de Idosos";
@@ -878,6 +878,10 @@ const CadastroProfissional = () => {
                             <div className="space-y-1">
                               <Label className="text-xs">{isBO ? "Matrícula — dorso" : "CRM — verso"}</Label>
                               <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_back")} required />
+                            </div>
+                            <div className="space-y-1 sm:col-span-2">
+                              <Label className="text-xs">Assinatura Digital (ICP-Brasil) — Imagem</Label>
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("icp_brasil")} required />
                             </div>
                           </>
                         )}

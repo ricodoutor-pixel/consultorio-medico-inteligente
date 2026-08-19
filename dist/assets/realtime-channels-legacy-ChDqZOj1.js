@@ -1,0 +1,1 @@
+System.register(["./index-legacy-DffyjY9q.js"],function(t,e){"use strict";return{setters:[null],execute:function(){t({d:function(t,e){return`doctor:${t}:${e}`},p:function(t){return`public:${t}`},u:function(t,e){return`user:${t}:${e}`}})}}});

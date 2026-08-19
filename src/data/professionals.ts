@@ -1,4 +1,4 @@
-import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
+﻿import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
 import draRenataImg from "@/assets/dra-renata-costa.jpg";
@@ -68,6 +68,7 @@ import drAlexandreStramandinoliImg from "@/assets/dr-alexandre-stramandinoli.jpg
 import drAdeonisOliveiraImg from "@/assets/dr-adeonis-oliveira.jpg";
 import drJoaoPedroDetoniImg from "@/assets/dr-joao-pedro-detoni.jpg";
 import drEduardoCorreaImg from "@/assets/dr-eduardo-correa.jpg";
+import drDanielKobayashiImg from "@/assets/dr-daniel-kobayashi.jpg";
 export type Professional = {
   id: string;
   name: string;
@@ -121,6 +122,30 @@ export const STANDARD_DOCTOR_SERVICES = [
 ];
 
 export const professionals: Professional[] = [
+  {
+    id: "med-daniel-kobayashi",
+    name: "Dr. Daniel Kobayashi Colombo",
+    category: "Médicos Prescritores",
+    bio: "Médico formado pela FUNDAÇÃO UNIVERSIDADE FEDERAL DE RONDÔNIA em 2018. Inscrito no CRM 5460/RO.",
+    flags: ["🇧🇷"],
+    experience: "6 anos",
+    tags: ["Clínica Geral", "Medicina Canabinoide", "Medicina Integrativa", "Prescritor"],
+    price: "R$ 100,00",
+    priceValue: 100,
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "DK",
+    imageUrl: drDanielKobayashiImg,
+    paymentLink: "https://pay.asaas.com/00000",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 09:00", "Hoje 14:00", "Hoje 17:30"],
+    crm: "5460/RO",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento." }
+    ],
+    online: true,
+  },
   {
     id: "med-eduardo-correa",
     name: "Dr. Eduardo Migueis Correa",
@@ -1969,3 +1994,4 @@ export const professionals: Professional[] = [
     ],
   },
 ];
+

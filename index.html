@@ -335,13 +335,29 @@
         }
         crumb('boot', { ua: navigator.userAgent.slice(0,80), url: location.href });
 
+        function reactAlive(){
+          try {
+            var r = document.getElementById('root');
+            if (!r) return false;
+            if (r.dataset.reactMounted === '1') return true;
+            return r.children.length > 0 && !document.getElementById('__pyr_boot_screen');
+          } catch(_){ return false; }
+        }
+
         function showFallback(reason){
           try {
             var root = document.getElementById('root');
             if (!root) return;
-            // Só mostra fallback se o React já conseguiu substituir a tela inicial.
-            if (root.dataset.reactMounted === '1') return;
+            // Só mostra fallback se o React realmente não subiu.
+            if (reactAlive()) return;
+            root.setAttribute('data-pyr-fallback', '1');
+            // Se o React montar depois, ele substitui o #root e o fallback sai sozinho.
+            var heal = setInterval(function(){
+              if (root.dataset.reactMounted === '1') clearInterval(heal);
+            }, 2000);
+            setTimeout(function(){ clearInterval(heal); }, 60000);
             root.innerHTML = ''
+
               + '<div style="min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0A0E27;color:#fff;text-align:center">'
               + '<div style="max-width:420px">'
               +   '<div style="font-size:48px;margin-bottom:8px">🌱</div>'

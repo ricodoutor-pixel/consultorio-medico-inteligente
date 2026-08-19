@@ -32,19 +32,19 @@ const MeusExames = () => {
           return;
         }
         
-        const { data: profile } = await supabase
+        const { data } = await supabase
           .from("profiles")
-          .select("purchased_tools")
+          .select("*")
           .eq("id", session.user.id)
           .single();
-          
-        if (profile?.purchased_tools) {
-          // ensure it's an array
-          const pt = Array.isArray(profile.purchased_tools) 
-            ? profile.purchased_tools 
-            : JSON.parse(profile.purchased_tools as string || "[]");
+
+        const profile = data as Record<string, unknown> | null;
+        const raw = profile?.purchased_tools;
+        if (raw) {
+          const pt = Array.isArray(raw) ? raw : JSON.parse((raw as string) || "[]");
           setTools(pt);
         }
+
       } catch (e) {
         console.error("Error fetching tools", e);
       } finally {

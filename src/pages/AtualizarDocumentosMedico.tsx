@@ -16,6 +16,7 @@ export default function AtualizarDocumentosMedico() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [kycFiles, setKycFiles] = useState<Partial<Record<KycKind, File | null>>>({});
+  const [uploadedDocs, setUploadedDocs] = useState<KycKind[]>([]);
 
   useEffect(() => {
     fetchSession();
@@ -27,6 +28,16 @@ export default function AtualizarDocumentosMedico() {
       navigate("/login");
       return;
     }
+
+    const { data: docs } = await supabase
+      .from('doctor_kyc_documents')
+      .select('document_kind')
+      .eq('doctor_user_id', session.user.id);
+      
+    if (docs) {
+      setUploadedDocs(docs.map(d => d.document_kind as KycKind));
+    }
+
     setLoading(false);
   };
 
@@ -141,35 +152,56 @@ export default function AtualizarDocumentosMedico() {
                 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <Label className="text-xs text-slate-300">CRM — frente</Label>
+                    <Label className={`text-xs ${uploadedDocs.includes('crm_front') ? 'text-emerald-400' : 'text-red-400'}`}>
+                      CRM — frente {uploadedDocs.includes('crm_front') ? '(Anexado)' : '(Faltante)'}
+                    </Label>
                     <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} className="bg-slate-900 border-slate-700 text-slate-300" />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs text-slate-300">CRM — verso</Label>
+                    <Label className={`text-xs ${uploadedDocs.includes('crm_back') ? 'text-emerald-400' : 'text-red-400'}`}>
+                      CRM — verso {uploadedDocs.includes('crm_back') ? '(Anexado)' : '(Faltante)'}
+                    </Label>
                     <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_back")} className="bg-slate-900 border-slate-700 text-slate-300" />
                   </div>
                   
                   <div className="space-y-1 sm:col-span-2 mt-2">
-                    <Label className="text-xs text-emerald-400 font-bold">Assinatura Digital (ICP-Brasil) — Imagem</Label>
+                    <Label className={`text-xs font-bold ${uploadedDocs.includes('icp_brasil') ? 'text-emerald-400' : 'text-red-400'}`}>
+                      Assinatura Digital (ICP-Brasil) — Imagem {uploadedDocs.includes('icp_brasil') ? '(Anexado)' : '(Faltante)'}
+                    </Label>
                     <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("icp_brasil")} className="bg-slate-900 border-emerald-500/50 text-slate-300" />
                   </div>
 
                   <div className="space-y-1 mt-2">
-                    <Label className="text-xs text-slate-300">RG/CNH — frente</Label>
+                    <Label className={`text-xs ${uploadedDocs.includes('id_front') ? 'text-emerald-400' : 'text-red-400'}`}>
+                      RG/CNH — frente {uploadedDocs.includes('id_front') ? '(Anexado)' : '(Faltante)'}
+                    </Label>
                     <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("id_front")} className="bg-slate-900 border-slate-700 text-slate-300" />
                   </div>
                   <div className="space-y-1 mt-2">
-                    <Label className="text-xs text-slate-300">RG/CNH — verso</Label>
+                    <Label className={`text-xs ${uploadedDocs.includes('id_back') ? 'text-emerald-400' : 'text-red-400'}`}>
+                      RG/CNH — verso {uploadedDocs.includes('id_back') ? '(Anexado)' : '(Faltante)'}
+                    </Label>
                     <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("id_back")} className="bg-slate-900 border-slate-700 text-slate-300" />
                   </div>
 
                   <div className="space-y-1 mt-2">
-                    <Label className="text-xs text-slate-300">Documento do CPF</Label>
+                    <Label className={`text-xs ${uploadedDocs.includes('cpf_doc') ? 'text-emerald-400' : 'text-red-400'}`}>
+                      Documento do CPF {uploadedDocs.includes('cpf_doc') ? '(Anexado)' : '(Faltante)'}
+                    </Label>
                     <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("cpf_doc")} className="bg-slate-900 border-slate-700 text-slate-300" />
                   </div>
                   <div className="space-y-1 mt-2">
-                    <Label className="text-xs text-slate-300">Comprovante de endereço (CEP)</Label>
+                    <Label className={`text-xs ${uploadedDocs.includes('address_proof') ? 'text-emerald-400' : 'text-red-400'}`}>
+                      Comprovante de endereço (CEP) {uploadedDocs.includes('address_proof') ? '(Anexado)' : '(Faltante)'}
+                    </Label>
                     <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-slate-900 border-slate-700 text-slate-300" />
+                  </div>
+                  
+                  <div className="space-y-1 sm:col-span-2 mt-2">
+                    <Label className={`text-xs ${uploadedDocs.includes('selfie') ? 'text-emerald-400' : 'text-red-400'}`}>
+                      Selfie de Confirmação (com documento) {uploadedDocs.includes('selfie') ? '(Anexado)' : '(Faltante)'}
+                    </Label>
+                    <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("selfie")} className="bg-slate-900 border-slate-700 text-slate-300" />
                   </div>
                 </div>
               </div>

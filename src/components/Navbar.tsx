@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
@@ -197,14 +197,6 @@ export const Navbar = () => {
                   </button>
                 )}
               </div>
-              <button
-                onClick={() => navigate("/consultorio")}
-                className="flex items-center gap-1 text-[11px] uppercase font-black text-primary hover:text-primary/80 transition-colors ml-4 md:ml-6 -mt-1 md:-mt-2"
-                title="Ir para o Consultório Virtual"
-              >
-                <ArrowLeft size={12} /> Consultório Virtual
-              </button>
-            </div>
             {/* Desktop: Verdinho exatamente no meio entre o logo e o menu */}
             <div className={`hidden ${showNavbarMascot ? "lg:flex" : ""} flex-1 items-center justify-center`}>
               <div className="flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">
@@ -360,6 +352,7 @@ export const Navbar = () => {
     </>
   );
 };
+
 
 
 

@@ -187,11 +187,11 @@ export const Navbar = () => {
                     />
                   </NavLink>
                 </div>
-                {location.pathname === "/consultorio" && (
+                {(location.pathname === "/consultorio" || location.pathname === "/dashboard" || location.pathname === "/dashboard-medico") && (
                   <button
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() => navigate(location.pathname === "/consultorio" ? "/dashboard" : "/consultorio")}
                     className="flex items-center gap-1 text-[11px] uppercase font-black text-primary hover:text-primary/80 transition-colors ml-4 md:ml-6 -mt-1 md:-mt-2"
-                    title="Sair da Sala de Espera"
+                    title={location.pathname === "/consultorio" ? "Sair da Sala de Espera" : "Ir para Consultório Virtual"}
                   >
                     <ArrowLeft size={12} /> Consultório Virtual
                   </button>
@@ -352,6 +352,7 @@ export const Navbar = () => {
     </>
   );
 };
+
 
 
 

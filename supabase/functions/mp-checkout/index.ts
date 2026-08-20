@@ -128,6 +128,15 @@ Deno.serve(async (req) => {
       amount = Math.max(1, Number(appt.amount || 0));
       externalReference = `appointment:${appt.id}`;
       type = "consultation";
+    } else if (typeof sku === "string" && sku.startsWith("tool_") && TOOL_CATALOG[sku.slice(5)]) {
+      const toolId = sku.slice(5);
+      const tool = TOOL_CATALOG[toolId];
+      title = tool.title;
+      amount = tool.amount;
+      // Formato exigido pelo webhook para liberar o módulo: tool-<id>-<userId>-<ts>
+      externalReference = `tool-${toolId}-${userId}-${Date.now()}`;
+      type = "tool";
+      toolSku = toolId;
     } else {
       const item = typeof sku === "string" ? CATALOG[sku] : undefined;
       if (!item) return json({ error: "SKU inválido" }, 400);
@@ -145,7 +154,9 @@ Deno.serve(async (req) => {
       }
       externalReference = `${sku}:${userId}:${Date.now()}`;
       type = item.recurring ? "subscription" : "sku";
+      recurring = !!item.recurring;
     }
+
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const siteUrl = "https://www.plantayraiz.com.br";

@@ -14,7 +14,8 @@ import { PrescriptionTemplates } from "@/components/doctor/PrescriptionTemplates
 import { TriageSummaryCard } from "@/components/doctor/TriageSummaryCard";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { JitsiRoom } from "@/components/consultation/JitsiRoom";
+import { JitsiRoom } from '@/components/consultation/JitsiRoom';
+import { ManualMedicoModal } from '@/components/medico/ManualMedicoModal';
 
 const WorkspaceMedico = () => {
   const [searchParams] = useSearchParams();
@@ -199,13 +200,7 @@ const WorkspaceMedico = () => {
         </div>
         
         <div className="flex items-center gap-6">
-          <Button 
-            variant="outline" 
-            className="gap-2 bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"
-            onClick={() => window.open("/manual?tab=medico", "_blank")}
-          >
-            <BookOpen size={16} /> Passo a Passo
-          </Button>
+          <ManualMedicoModal />
           <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-background border border-border">
             <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-muted-foreground"}`} />
             <span className="text-xs font-bold mr-2">{isOnline ? "Online" : "Offline"}</span>

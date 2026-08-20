@@ -21,8 +21,11 @@ export function VipUpgradePopup({ role, className = "", inline = false }: VipUpg
     try {
       setLoading(true);
       
-      // Link direto provisório conforme solicitado
-      window.location.href = "https://mpago.la/2sQktg3";
+      const { data, error } = await supabase.functions.invoke("mp-checkout", {
+        body: { sku: role === "paciente" ? "plano_paciente" : role === "lojista" ? "plano_lojista" : "plano_medico" },
+      });
+      if (error) throw error;
+      if (data?.init_point) window.location.href = data.init_point;
       
     } catch (err: any) {
       console.error("[VipUpgradePopup]", err);

@@ -75,7 +75,7 @@ export const Footer = () => {
             <div className="space-y-2.5">
               <div className="flex items-center gap-2 text-muted-foreground/60">
                 <ShieldCheck size={14} className="text-primary/60 shrink-0" />
-                <span className="text-[10px]">Pagamento Seguro via Stripe</span>
+                <span className="text-[10px]">Pagamento Seguro via Mercado Pago</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground/60">
                 <Lock size={14} className="text-primary/60 shrink-0" />

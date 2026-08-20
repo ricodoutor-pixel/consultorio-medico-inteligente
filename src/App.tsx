@@ -1,4 +1,4 @@
-﻿import DashboardDiretoria from "./components/admin/DashboardDiretoria";
+import DashboardDiretoria from "./components/admin/DashboardDiretoria";
 import { Suspense } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
@@ -32,6 +32,7 @@ import { OnboardingModal } from "@/components/OnboardingModal";
 import { ConsentManager } from "@/components/ConsentManager";
 import { lazyWithRecovery, reportFrontendRuntimeError } from "@/lib/runtime-recovery";
 
+const MonitoramentoCSI = lazyWithRecovery(() => import("./pages/MonitoramentoCSI"), { sourceRef: "/monitoramento" });
 const Loading = () => (
   <div className="min-h-dvh bg-background flex flex-col items-center justify-center">
     <div className="relative flex items-center justify-center">
@@ -267,10 +268,12 @@ const App = () => (
                 <Route path="/profissionais/:id" element={<Profissionais />} />
                 <Route path="/shopping" element={<Shopping />} />
                 <Route path="/shopping/:id" element={<Shopping />} />
+                <Route path="/loja" element={<Shopping />} />
+                <Route path="/loja/:id" element={<Shopping />} />
                 <Route path="/planos" element={<Precos />} />
                 <Route path="/precos" element={<Precos />} />
                 <Route path="/saude-digital" element={<SaudeDigital />} />
-          <Route path="/convite-medico" element={<ConviteMedico />} />
+                <Route path="/convite-medico" element={<ConviteMedico />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/manual" element={<ManualPlataforma />} />
                 <Route path="/contato" element={<Contato />} />
@@ -450,7 +453,8 @@ const App = () => (
                 <Route path="/exames-com-desconto" element={<SaudeVerdeRede />} />
                 <Route path="/consultas-com-desconto" element={<SaudeVerdeRede />} />
                 <Route path="/medsocio" element={<MedSocio />} />
-                <Route path="/monitoramento-saude" element={<MonitoramentoSaude />} />
+                                <Route path="/monitoramento" element={<MonitoramentoCSI />} />
+<Route path="/monitoramento-saude" element={<MonitoramentoSaude />} />
                 <Route path="/meus-exames" element={<MeusExames />} />
                 <Route path="/telemed-whatsapp" element={<PrivateRoute><TelemedWhatsApp /></PrivateRoute>} />
                 <Route path="*" element={<NotFound />} />

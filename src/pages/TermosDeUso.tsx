@@ -111,7 +111,7 @@ const TermosDeUso = () => {
           {/* 8. Pagamentos */}
           <section className="space-y-3">
             <h2 className="text-lg font-display font-black text-foreground">⚖️ 8. Pagamentos</h2>
-            <p>Os pagamentos são processados exclusivamente via <strong className="text-foreground">Stripe</strong>, gateway certificado PCI-DSS Level 1. A Planta y Raiz <strong className="text-foreground">não armazena, processa ou transmite dados de cartão de crédito</strong>.</p>
+            <p>Os pagamentos são processados exclusivamente via <strong className="text-foreground">Mercado Pago</strong>, gateway certificado PCI-DSS Level 1. A Planta y Raiz <strong className="text-foreground">não armazena, processa ou transmite dados de cartão de crédito</strong>.</p>
             <p>Métodos aceitos: cartão de crédito, débito, PIX e boleto (quando disponível).</p>
           </section>
 

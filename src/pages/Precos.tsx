@@ -40,7 +40,7 @@ const Precos = () => {
 
   const plans = [
     {
-      id: "paciente-vip",
+      id: "plano_paciente",
       name: "Paciente VIP",
       price: "R$ 99",
       priceValue: 9900,
@@ -59,7 +59,7 @@ const Precos = () => {
       highlighted: false,
     },
     {
-      id: "lojista-vip",
+      id: "plano_lojista",
       name: "Lojista VIP",
       price: "R$ 99",
       priceValue: 9900,
@@ -79,7 +79,7 @@ const Precos = () => {
       highlighted: false,
     },
     {
-      id: "medico-vip",
+      id: "plano_medico",
       name: "Médico VIP",
       price: "R$ 99",
       priceValue: 9900,
@@ -113,8 +113,8 @@ const Precos = () => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke("create-subscription", {
-        body: { planId },
+      const { data, error } = await supabase.functions.invoke("mp-checkout", {
+        body: { sku: planId },
       });
 
       if (error) {
@@ -161,8 +161,8 @@ const Precos = () => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke("create-tool-checkout", {
-        body: { toolId },
+      const { data, error } = await supabase.functions.invoke("mp-checkout", {
+        body: { sku: `tool_${toolId}` },
       });
 
       if (error) {

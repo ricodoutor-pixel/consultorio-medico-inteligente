@@ -30,6 +30,7 @@ interface OnboardingState {
     cpf?: string;
     cnpj?: string;
     crm?: string;
+    councilType?: string;
     specialty?: string;
     company?: string;
     location?: string;
@@ -386,7 +387,25 @@ export const OnboardingFlow: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-2">CRM *</label>
+                  <label className="block text-sm font-semibold mb-2">Conselho Profissional *</label>
+                  <select
+                    value={state.personalData.councilType || 'CRM'}
+                    onChange={(e) =>
+                      setState((prev) => ({
+                        ...prev,
+                        personalData: { ...prev.personalData, councilType: e.target.value },
+                      }))
+                    }
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 bg-background"
+                  >
+                    <option value="CRM">CRM (Conselho Regional de Medicina)</option>
+                    <option value="CFO">CFO/CRO (Conselho Federal/Regional de Odontologia)</option>
+                    <option value="CRMV">CFMV/CRMV (Conselho de Medicina Veterinária)</option>
+                    <option value="COREN">COREN (Conselho Regional de Enfermagem)</option>
+                    <option value="OUTROS">Outros Profissionais de Saúde</option>
+                  </select>
+
+                  <label className="block text-sm font-semibold mb-2">Número do Registro *</label>
                   <input
                     type="text"
                     value={state.personalData.crm || ''}
@@ -396,7 +415,7 @@ export const OnboardingFlow: React.FC = () => {
                         personalData: { ...prev.personalData, crm: e.target.value },
                       }))
                     }
-                    placeholder="123456"
+                    placeholder="Ex: 123456-SP"
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />

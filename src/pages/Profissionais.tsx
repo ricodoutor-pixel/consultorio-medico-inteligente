@@ -9,7 +9,7 @@ import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { CountryFlag } from "@/components/CountryFlag";
 import { motion } from "framer-motion";
-import { professionals as allProfessionals, categories, Professional } from "@/data/professionals";
+import { professionals as allProfessionals, categories, Professional, COUNCIL_CONFIG } from "@/data/professionals";
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -133,7 +133,11 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
                 <p className="text-sm text-muted-foreground">{pro.category}</p>
                 {isVipDoctor(pro) && <DoctorVIPSeal tier="basic" />}
               </div>
-              {pro.crm && <p className="text-xs font-bold text-muted-foreground mb-1">CRM {pro.crm}</p>}
+              {pro.crm && (
+                <p className="text-xs font-bold text-muted-foreground mb-1">
+                  {(COUNCIL_CONFIG[pro.category]?.councilLabel || "CRM")} {pro.crm}
+                </p>
+              )}
 
               {pro.hospital && <p className="text-xs text-muted-foreground mb-1">{pro.hospital}</p>}
               <div className="flex items-center gap-2 mb-4">
@@ -366,7 +370,9 @@ const Profissionais = () => {
                               </span>
                             </div>
                             {p.crm && (
-                              <p className="text-[11px] font-bold text-muted-foreground mt-0.5">CRM {p.crm}</p>
+                              <p className="text-[11px] font-bold text-muted-foreground mt-0.5">
+                                {(COUNCIL_CONFIG[p.category]?.councilLabel || "CRM")} {p.crm}
+                              </p>
                             )}
 
                             <div className="flex items-center gap-1 mt-1">

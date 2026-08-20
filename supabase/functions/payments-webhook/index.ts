@@ -60,8 +60,70 @@ serve(async (req) => {
 async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   const userId = session.metadata?.userId;
   const cartToken = session.metadata?.cartToken;
+  const externalRef = session.client_reference_id || "";
 
-  console.log("Checkout completed:", session.id, "mode:", session.mode, "userId:", userId);
+  console.log("Checkout completed:", session.id, "mode:", session.mode, "userId:", userId, "ref:", externalRef);
+
+  // === BRISA ORIENTAÇÃO TÉCNICA (USD 10 via Stripe) ===
+  if (externalRef.startsWith("brisa-orientacao-") || session.metadata?.source === "brisa_whatsapp") {
+    const orientacaoPhone = session.metadata?.phone || externalRef.replace("brisa-orientacao-", "").split("-")[0] || null;
+    const orientacaoName = session.metadata?.name || session.customer_details?.name || null;
+    const orientacaoEmail = session.customer_details?.email || null;
+    const amount = (session.amount_total || 0) / 100;
+
+    await supabase.from("brisa_orientacao_payments").upsert({
+      payment_id: session.id,
+      external_reference: externalRef,
+      status: "approved",
+      amount: amount,
+      patient_phone: orientacaoPhone,
+      patient_name: orientacaoName,
+      patient_email: orientacaoEmail,
+      raw_payload: session,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "payment_id" });
+
+    // Notifica Dr. Edilson via WhatsApp (Evolution API)
+    const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
+    const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");
+    const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
+    const adminPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
+
+    if (evolutionUrl && evolutionKey) {
+      const drMsg =
+        `✅ *Parabéns, Doutor!*\n\n` +
+        `Mais uma *Orientação Técnica INTERNACIONAL* realizada com sucesso! 🌍\n\n` +
+        `💰 Valor: USD ${amount.toFixed(2)} (confirmado via Stripe)\n` +
+        `👤 Paciente: ${orientacaoName || "—"}\n` +
+        `📱 WhatsApp: ${orientacaoPhone ? `+${orientacaoPhone}` : "—"}\n` +
+        `🔖 Ref: ${externalRef}\n\n` +
+        `Inicie a consulta pelo WhatsApp do paciente.`;
+
+      await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", apikey: evolutionKey },
+        body: JSON.stringify({ number: adminPhone, text: drMsg }),
+      }).catch((err) => console.error("[brisa-stripe] dr notify:", err));
+
+      if (orientacaoPhone) {
+        const patientMsg =
+          `🌍 *Payment Confirmed — Planta y Raiz*\n\n` +
+          `Hello ${orientacaoName?.split(" ")[0] || ""}! We received your payment of *USD ${amount.toFixed(2)}*.\n\n` +
+          `👨‍⚕️ *Dr. Edilson Bezerra* will contact you shortly right here on WhatsApp for your *Medical Cannabis Technical Guidance*.\n\n` +
+          `Any questions, just talk to me, Nurse Brisa.`;
+        await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", apikey: evolutionKey },
+          body: JSON.stringify({ number: orientacaoPhone, text: patientMsg }),
+        }).catch((err) => console.error("[brisa-stripe] patient notify:", err));
+      }
+
+      await supabase.from("brisa_orientacao_payments").update({
+        doctor_notified_at: new Date().toISOString(),
+        patient_notified_at: orientacaoPhone ? new Date().toISOString() : null,
+      }).eq("payment_id", session.id);
+    }
+  }
 
   // One-time payment: credit Planta-Coins atomically
   if (session.mode === "payment" && userId) {

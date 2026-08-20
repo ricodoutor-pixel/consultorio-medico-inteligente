@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { KYC_BUCKET, KYC_LABELS, type KycKind } from "@/lib/kyc-docs";
 
-import { categories } from "@/data/professionals";
+import { categories, COUNCIL_CONFIG } from "@/data/professionals";
 import { motion } from "framer-motion";
 import {
   DocumentType,
@@ -832,10 +832,19 @@ const CadastroProfissional = () => {
                     ) : (
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="registroProfissional">{t.registry}</Label>
+                          <Label htmlFor="registroProfissional">
+                            {isBO ? t.registry : (COUNCIL_CONFIG[form.categoria]?.councilLabel
+                              ? `${COUNCIL_CONFIG[form.categoria].councilLabel} — Número do Registro *`
+                              : t.registry)}
+                          </Label>
+                          {COUNCIL_CONFIG[form.categoria]?.councilFull && !isBO && (
+                            <p className="text-[11px] text-muted-foreground -mt-1">
+                              {COUNCIL_CONFIG[form.categoria].councilFull}
+                            </p>
+                          )}
                           <Input
                             id="registroProfissional"
-                            placeholder={t.registryPh}
+                            placeholder={isBO ? t.registryPh : (COUNCIL_CONFIG[form.categoria]?.councilPlaceholder ?? t.registryPh)}
                             value={form.registroProfissional}
                             onChange={(e) => handleChange("registroProfissional", e.target.value)}
                             required
@@ -854,6 +863,32 @@ const CadastroProfissional = () => {
                             </SelectContent>
                           </Select>
                         </div>
+                        {/* Área de atuação / especialidade dinâmica */}
+                        {COUNCIL_CONFIG[form.categoria]?.specialtyLabel && (
+                          <div className="sm:col-span-2 space-y-2">
+                            <Label htmlFor="specialty">{COUNCIL_CONFIG[form.categoria].specialtyLabel}</Label>
+                            <Input
+                              id="specialty"
+                              placeholder={COUNCIL_CONFIG[form.categoria].specialtyPlaceholder}
+                              value={(form as any).specialty || ""}
+                              onChange={(e) => handleChange("specialty", e.target.value)}
+                            />
+                            {COUNCIL_CONFIG[form.categoria].areas.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5 mt-1">
+                                {COUNCIL_CONFIG[form.categoria].areas.map((area) => (
+                                  <button
+                                    key={area}
+                                    type="button"
+                                    onClick={() => handleChange("specialty", area)}
+                                    className="text-[10px] px-2 py-0.5 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
+                                  >
+                                    {area}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -872,11 +907,15 @@ const CadastroProfissional = () => {
                         {!isCuidadorSel && (
                           <>
                             <div className="space-y-1">
-                              <Label className="text-xs">{isBO ? "Matrícula — frente" : "CRM — frente"}</Label>
+                              <Label className="text-xs">
+                                {isBO ? "Matrícula — frente" : (COUNCIL_CONFIG[form.categoria]?.docFrentLabel ?? "CRM — frente")}
+                              </Label>
                               <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} required />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs">{isBO ? "Matrícula — dorso" : "CRM — verso"}</Label>
+                              <Label className="text-xs">
+                                {isBO ? "Matrícula — dorso" : (COUNCIL_CONFIG[form.categoria]?.docFrentLabel?.replace("frente","verso") ?? "CRM — verso")}
+                              </Label>
                               <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_back")} required />
                             </div>
                             <div className="space-y-1 sm:col-span-2">

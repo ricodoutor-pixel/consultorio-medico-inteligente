@@ -391,6 +391,45 @@ Deno.serve(async (req) => {
     }
 
 
+    // === FERRAMENTAS DIAGNÓSTICAS (R$ 29,90) E COMBOS ===
+    if (externalRef.startsWith("tool_") || externalRef.startsWith("tool-")) {
+      const toolUserId = metadata.user_id || externalRef.split(":")[1] || null;
+      if (payment.status === "approved" && toolUserId) {
+        let toolId = externalRef.split(":")[0];
+        if (toolId.startsWith("tool_")) toolId = toolId.replace("tool_", "");
+        if (toolId.startsWith("tool-")) toolId = toolId.replace("tool-", "");
+        
+        let toolsToCredit = [toolId];
+        if (toolId === "combo_tools") {
+          toolsToCredit = ["cardiaco", "fundoscopia", "oximetria", "dermatoscopia", "mobilidade", "estetoscopio", "pulmonar", "tremor", "urine", "acuity", "gps"];
+        }
+
+        for (const tid of toolsToCredit) {
+          const { error: pErr } = await supabase.from("purchased_tools").upsert({
+            user_id: toolUserId,
+            tool_id: tid,
+            payment_id: String(payment.id),
+          }, { onConflict: "user_id,tool_id" });
+          if (pErr) console.error("[tool-purchase] Error crediting tool:", pErr);
+        }
+
+        await supabase.from("notifications").insert({
+          user_id: toolUserId,
+          title: `🎁 ${toolId === 'combo_tools' ? 'Combo de' : 'Nova'} Ferramenta Ativada`,
+          message: `Pagamento aprovado. A ferramenta foi adicionada à sua conta!`,
+          type: "tool_purchased",
+          action_url: "/consultorio",
+        });
+
+        console.log(`✅ [tool-purchase] ${toolId} credited for ${toolUserId}`);
+      }
+
+      return new Response(
+        JSON.stringify({ status: "processed", module: "tools", payment_status: payment.status }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // === PLANOS UNIVERSAIS R$99/mês (paciente · médico · lojista) ===
     // external_reference: `plano_xxx:<user_id>:<ts>` (mp-checkout)
     const PLAN_SKUS = ["plano_paciente", "plano_medico", "plano_lojista"];

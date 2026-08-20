@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, AlertTriangle, ExternalLink } from "lucide-react";
+import { Loader2, AlertTriangle, ExternalLink, Download } from "lucide-react";
 import { getKycSignedUrl, KYC_LABELS, type KycKind } from "@/lib/kyc-docs";
 
 interface Props {
@@ -69,9 +69,9 @@ export default function KycDocViewer({ open, onClose, userId, kind, storagePath,
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-bold text-emerald-400 flex items-center gap-1 hover:underline"
+            className="flex w-full mt-4 items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg font-bold transition-colors text-sm shadow-md"
           >
-            <ExternalLink size={12} /> Abrir em nova aba / baixar original
+            <Download size={18} /> Baixar Arquivo Original (Alta Resolução)
           </a>
         )}
       </DialogContent>

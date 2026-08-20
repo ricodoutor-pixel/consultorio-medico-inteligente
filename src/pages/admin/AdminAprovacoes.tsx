@@ -92,7 +92,7 @@ export const AdminAprovacoes = () => {
     const p = doc.profile || {};
     const kinds = new Set((doc.kyc_docs || []).map((k: any) => k.document_kind));
     return [
-      ...KYC_REQUIRED.map((kind) => ({ label: KYC_LABELS[kind], ok: kinds.has(kind) })),
+      ...[...KYC_REQUIRED, 'icp_brasil'].map((kind) => ({ label: KYC_LABELS[kind], ok: kinds.has(kind) })),
       { label: "Nº do CRM", ok: Boolean(doc.crm && String(doc.crm).length >= 3) },
       { label: "CPF", ok: Boolean(p.cpf && String(p.cpf).replace(/\D/g, "").length === 11) },
       { label: "Data de nascimento", ok: Boolean(p.date_of_birth) },
@@ -500,7 +500,7 @@ export const AdminAprovacoes = () => {
 
                         <TableCell>
                           <div className="flex flex-wrap gap-1.5">
-                            {KYC_REQUIRED.map((kind) => {
+                            {[...KYC_REQUIRED, 'icp_brasil'].map((kind) => {
                               const attached = Boolean(docOf(doc, kind));
                               return (
                                 <Button

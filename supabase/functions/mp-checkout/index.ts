@@ -29,13 +29,33 @@ const CATALOG: Record<string, { title: string; amount: number; recurring?: boole
   plano_lojista: { title: "Plano Lojista (mensal)", amount: 99, recurring: true },
 };
 
+/** Ferramentas diagnósticas — compra única vitalícia (R$ 29,90 · combo R$ 97). */
+const TOOL_CATALOG: Record<string, { title: string; amount: number }> = {
+  cardiaco: { title: "Módulo Monitor Cardíaco", amount: 29.9 },
+  fundoscopia: { title: "Módulo Fundoscopia IA", amount: 29.9 },
+  oximetria: { title: "Módulo Oximetria", amount: 29.9 },
+  dermatoscopia: { title: "Módulo Dermatoscopia IA", amount: 29.9 },
+  mobilidade: { title: "Módulo Mobilidade Articular", amount: 29.9 },
+  estetoscopio: { title: "Módulo Estetoscópio Digital", amount: 29.9 },
+  pulmonar: { title: "Módulo Ausculta Pulmonar", amount: 29.9 },
+  tremor: { title: "Módulo Tremorometria", amount: 29.9 },
+  urine: { title: "Módulo Urinálise", amount: 29.9 },
+  acuity: { title: "Módulo Acuidade Visual", amount: 29.9 },
+  gps: { title: "Módulo Rastreador GPS", amount: 29.9 },
+  combo_tools: { title: "Combo 11 Ferramentas Diagnósticas", amount: 97 },
+};
+
 /** SKUs legados → novos (mantém links antigos funcionando com o preço correto). */
 const LEGACY_SKU_MAP: Record<string, string> = {
   consulta_emergencia: "consulta_video",
   essencial_mensal: "plano_paciente",
   premium_mensal: "plano_paciente",
   vip_mensal: "plano_medico",
+  "paciente-vip": "plano_paciente",
+  "medico-vip": "plano_medico",
+  "lojista-vip": "plano_lojista",
 };
+
 
 
 Deno.serve(async (req) => {
@@ -82,6 +102,9 @@ Deno.serve(async (req) => {
     let amount: number;
     let externalReference: string;
     let type = "sku";
+    let recurring = false;
+    let toolSku: string | null = null;
+
 
     if (cartToken && typeof cartToken === "string") {
       const { data: cart } = await supabase
@@ -108,6 +131,15 @@ Deno.serve(async (req) => {
       amount = Math.max(1, Number(appt.amount || 0));
       externalReference = `appointment:${appt.id}`;
       type = "consultation";
+    } else if (typeof sku === "string" && sku.startsWith("tool_") && TOOL_CATALOG[sku.slice(5)]) {
+      const toolId = sku.slice(5);
+      const tool = TOOL_CATALOG[toolId];
+      title = tool.title;
+      amount = tool.amount;
+      // Formato exigido pelo webhook para liberar o módulo: tool-<id>-<userId>-<ts>
+      externalReference = `tool-${toolId}-${userId}-${Date.now()}`;
+      type = "tool";
+      toolSku = toolId;
     } else {
       const item = typeof sku === "string" ? CATALOG[sku] : undefined;
       if (!item) return json({ error: "SKU inválido" }, 400);
@@ -125,7 +157,9 @@ Deno.serve(async (req) => {
       }
       externalReference = `${sku}:${userId}:${Date.now()}`;
       type = item.recurring ? "subscription" : "sku";
+      recurring = !!item.recurring;
     }
+
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const siteUrl = "https://www.plantayraiz.com.br";
@@ -149,12 +183,56 @@ Deno.serve(async (req) => {
         type,
         user_id: userId,
         sku: sku ?? null,
+        tool_id: toolSku,
         cart_token: cartToken ?? null,
         ref_code: typeof refCode === "string" ? refCode : null,
         referrer_id: referrerId,
       },
 
     };
+
+    // === MENSALIDADE REAL (assinatura recorrente Mercado Pago) ===
+    // Planos universais R$99/mês → preapproval com cobrança automática mensal.
+    if (recurring) {
+      const preapprovalRes = await fetch("https://api.mercadopago.com/preapproval", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${MP_ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reason: title,
+          external_reference: externalReference,
+          payer_email: authData.user.email ?? undefined,
+          back_url: success,
+          status: "pending",
+          auto_recurring: {
+            frequency: 1,
+            frequency_type: "months",
+            transaction_amount: Number(amount.toFixed(2)),
+            currency_id: "BRL",
+          },
+        }),
+      });
+
+      if (preapprovalRes.ok) {
+        const pre = await preapprovalRes.json();
+        if (pre?.init_point) {
+          await supabase.from("audit_log").insert({
+            user_id: userId,
+            action: "mp_preapproval_created",
+            table_name: "subscriptions",
+            record_id: String(pre.id),
+            new_data: { sku, amount, external_reference: externalReference },
+          });
+          return json({ init_point: pre.init_point, preapproval_id: pre.id, amount, recurring: true });
+        }
+      } else {
+        // Fallback: cobrança única (o cron plan-renewal-engine mantém a renovação).
+        console.error("[mp-checkout] preapproval falhou", preapprovalRes.status, await preapprovalRes.text());
+      }
+    }
+
 
     const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",

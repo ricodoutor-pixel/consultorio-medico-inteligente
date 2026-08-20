@@ -1,3 +1,4 @@
+import { DoctorIoMTDashboard } from '@/components/diagnostics/DoctorIoMTDashboard';
 import { useVitalSignsMonitoring } from '@/hooks/useVitalSignsMonitoring';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

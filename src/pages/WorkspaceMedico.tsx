@@ -1,3 +1,4 @@
+import { DoctorIoMTDashboard } from '@/components/diagnostics/DoctorIoMTDashboard';
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";

@@ -183,12 +183,56 @@ Deno.serve(async (req) => {
         type,
         user_id: userId,
         sku: sku ?? null,
+        tool_id: toolSku,
         cart_token: cartToken ?? null,
         ref_code: typeof refCode === "string" ? refCode : null,
         referrer_id: referrerId,
       },
 
     };
+
+    // === MENSALIDADE REAL (assinatura recorrente Mercado Pago) ===
+    // Planos universais R$99/mês → preapproval com cobrança automática mensal.
+    if (recurring) {
+      const preapprovalRes = await fetch("https://api.mercadopago.com/preapproval", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${MP_ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reason: title,
+          external_reference: externalReference,
+          payer_email: authData.user.email ?? undefined,
+          back_url: success,
+          status: "pending",
+          auto_recurring: {
+            frequency: 1,
+            frequency_type: "months",
+            transaction_amount: Number(amount.toFixed(2)),
+            currency_id: "BRL",
+          },
+        }),
+      });
+
+      if (preapprovalRes.ok) {
+        const pre = await preapprovalRes.json();
+        if (pre?.init_point) {
+          await supabase.from("audit_log").insert({
+            user_id: userId,
+            action: "mp_preapproval_created",
+            table_name: "subscriptions",
+            record_id: String(pre.id),
+            new_data: { sku, amount, external_reference: externalReference },
+          });
+          return json({ init_point: pre.init_point, preapproval_id: pre.id, amount, recurring: true });
+        }
+      } else {
+        // Fallback: cobrança única (o cron plan-renewal-engine mantém a renovação).
+        console.error("[mp-checkout] preapproval falhou", preapprovalRes.status, await preapprovalRes.text());
+      }
+    }
+
 
     const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",

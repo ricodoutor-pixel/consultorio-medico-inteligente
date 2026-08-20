@@ -1,0 +1,3 @@
+CREATE POLICY "admins_insert_kyc" ON public.doctor_kyc_documents FOR INSERT TO authenticated WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
+CREATE POLICY "kyc_bucket_admin_insert" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'doctor-kyc-documents' AND has_role(auth.uid(), 'admin'::app_role));
+CREATE POLICY "kyc_bucket_admin_update" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'doctor-kyc-documents' AND has_role(auth.uid(), 'admin'::app_role)) WITH CHECK (bucket_id = 'doctor-kyc-documents' AND has_role(auth.uid(), 'admin'::app_role));

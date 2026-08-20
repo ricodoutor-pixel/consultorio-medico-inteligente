@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.block_vendor_product_endorsement_tamper() FROM PUBLIC, anon, authenticated;

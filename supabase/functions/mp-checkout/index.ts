@@ -29,13 +29,33 @@ const CATALOG: Record<string, { title: string; amount: number; recurring?: boole
   plano_lojista: { title: "Plano Lojista (mensal)", amount: 99, recurring: true },
 };
 
+/** Ferramentas diagnósticas — compra única vitalícia (R$ 29,90 · combo R$ 97). */
+const TOOL_CATALOG: Record<string, { title: string; amount: number }> = {
+  cardiaco: { title: "Módulo Monitor Cardíaco", amount: 29.9 },
+  fundoscopia: { title: "Módulo Fundoscopia IA", amount: 29.9 },
+  oximetria: { title: "Módulo Oximetria", amount: 29.9 },
+  dermatoscopia: { title: "Módulo Dermatoscopia IA", amount: 29.9 },
+  mobilidade: { title: "Módulo Mobilidade Articular", amount: 29.9 },
+  estetoscopio: { title: "Módulo Estetoscópio Digital", amount: 29.9 },
+  pulmonar: { title: "Módulo Ausculta Pulmonar", amount: 29.9 },
+  tremor: { title: "Módulo Tremorometria", amount: 29.9 },
+  urine: { title: "Módulo Urinálise", amount: 29.9 },
+  acuity: { title: "Módulo Acuidade Visual", amount: 29.9 },
+  gps: { title: "Módulo Rastreador GPS", amount: 29.9 },
+  combo_tools: { title: "Combo 11 Ferramentas Diagnósticas", amount: 97 },
+};
+
 /** SKUs legados → novos (mantém links antigos funcionando com o preço correto). */
 const LEGACY_SKU_MAP: Record<string, string> = {
   consulta_emergencia: "consulta_video",
   essencial_mensal: "plano_paciente",
   premium_mensal: "plano_paciente",
   vip_mensal: "plano_medico",
+  "paciente-vip": "plano_paciente",
+  "medico-vip": "plano_medico",
+  "lojista-vip": "plano_lojista",
 };
+
 
 
 Deno.serve(async (req) => {

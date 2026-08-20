@@ -297,7 +297,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const mock = testProfessionals.find((p) => p.id === pendingId);
       if (!mock) continue;
       if (finalPros.some((p) => p.id === mock.id) || isMockReplaced(mock)) continue;
-      finalPros.push({ ...mock, online: (mock.id === 'med-daniel-kobayashi' || mock.id === 'med-jose-geraldo') ? getMockOnlineStatus(mock.id, true) : getMockOnlineStatus(mock.id, false) });
+      finalPros.push({ ...mock, online: mock.id === 'med-daniel-kobayashi' ? getMockOnlineStatus(mock.id, true) : getMockOnlineStatus(mock.id, false) });
     }
 
     // How many test slots remain after real doctors fill spots

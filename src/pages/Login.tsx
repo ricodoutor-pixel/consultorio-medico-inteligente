@@ -64,34 +64,32 @@ const Login = () => {
           const d = decodeURIComponent(redirectTo);
           return d.startsWith("/") && !d.startsWith("//") ? d : null;
         })();
-        if (safeRedirect) {
+        const userType = profile?.user_type || "patient";
+        
+        const { data: doctorData } = await supabase
+          .from("doctors")
+          .select("id")
+          .eq("user_id", data.user.id)
+          .maybeSingle();
+          
+        const isDoctor = userType === "doctor" || !!doctorData;
+
+        if (isDoctor) {
+          navigate("/consultorio");
+        } else if (safeRedirect) {
           navigate(safeRedirect);
         } else {
-          const userType = profile?.user_type || "patient";
-          
-          const { data: doctorData } = await supabase
-            .from("doctors")
-            .select("id")
+          const { data: roleData } = await supabase
+            .from("user_roles")
+            .select("role")
             .eq("user_id", data.user.id)
+            .eq("role", "admin")
             .maybeSingle();
-            
-          const isDoctor = userType === "doctor" || !!doctorData;
 
-          if (isDoctor) {
-            navigate("/consultorio");
+          if (roleData) {
+            navigate("/admin");
           } else {
-            const { data: roleData } = await supabase
-              .from("user_roles")
-              .select("role")
-              .eq("user_id", data.user.id)
-              .eq("role", "admin")
-              .maybeSingle();
-
-            if (roleData) {
-              navigate("/admin");
-            } else {
-              navigate("/dashboard");
-            }
+            navigate("/dashboard");
           }
         }
       }

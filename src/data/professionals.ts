@@ -96,36 +96,7 @@ export type Professional = {
   /** Valor da Consulta Premium definido pelo profissional. */
   premiumPrice?: number;
   crm?: string;
-import cfmJoseGeraldo from "@/assets/cfm_prints/dr-jose-geraldo.png";
-export type Professional = {
-  id: string;
-  name: string;
-  category: string;
-  bio: string;
-  experience: string;
-  tags: string[];
-  price: string;
-  priceValue: number;
-  whatsapp: string;
-  rating: number;
-  consults: number;
-  avatar: string;
-  imageUrl: string;
-  paymentLink: string;
-  services: { name: string; price: string; desc: string }[];
-  slots: string[];
-  reviews: { name: string; rating: number; text: string }[];
-  online?: boolean;
-  /** ID real na tabela doctors (quando o profissional vem do banco). */
-  dbId?: string;
-  /** Valor da Consulta Premium definido pelo profissional. */
-  premiumPrice?: number;
-  crm?: string;
-  hospital?: string;
-  hospitalUrl?: string;
-
-
-/** Configuração dinâmica de Conselho por categoria */
+}
 export const COUNCIL_CONFIG: Record<string, {
   councilLabel: string;
   councilFull: string;
@@ -283,7 +254,6 @@ export const professionals: Professional[] = [
     id: "med-jose-geraldo",
     name: "Dr. José Geraldo Barbugli Abbade Filho",
     category: "Médicos Prescritores",
-  "Dentista Prescritor",
     bio: "Médico formado pela ESCOLA SUPERIOR DE CIÊNCIAS DA SANTA CASA DE MISERICORDIA DE VITÓRIA em 1989. Inscrito no CRM 32584/MG. Especialista em Medicina do Trabalho (RQE Nº: 12598).",
     flags: ["🇧🇷"],
     experience: "37 anos",

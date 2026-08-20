@@ -1,4 +1,4 @@
-﻿import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
+import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
 import draRenataImg from "@/assets/dra-renata-costa.jpg";
@@ -70,6 +70,8 @@ import drJoaoPedroDetoniImg from "@/assets/dr-joao-pedro-detoni.jpg";
 import drEduardoCorreaImg from "@/assets/dr-eduardo-correa.jpg";
 import drDanielKobayashiImg from "@/assets/dr-daniel-kobayashi.jpg";
 import cfmDaniel from "@/assets/cfm_prints/dr-daniel.png";
+import drJoseGeraldoImg from "@/assets/dr-jose-geraldo.jpg";
+import cfmJoseGeraldo from "@/assets/cfm_prints/dr-jose-geraldo.png";
 export type Professional = {
   id: string;
   name: string;
@@ -125,6 +127,31 @@ export const STANDARD_DOCTOR_SERVICES = [
 
 export const professionals: Professional[] = [
   {
+    id: "med-jose-geraldo",
+    name: "Dr. José Geraldo Barbugli Abbade Filho",
+    category: "Médicos Prescritores",
+    bio: "Médico formado pela ESCOLA SUPERIOR DE CIÊNCIAS DA SANTA CASA DE MISERICORDIA DE VITÓRIA em 1989. Inscrito no CRM 32584/MG. Especialista em Medicina do Trabalho (RQE Nº: 12598).",
+    flags: ["🇧🇷"],
+    experience: "37 anos",
+    tags: ["Medicina do Trabalho", "Medicina Canabinoide", "Medicina Integrativa", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "JG",
+    imageUrl: drJoseGeraldoImg,
+    online: true,
+    cfmPrintUrl: cfmJoseGeraldo,
+    paymentLink: "https://pay.asaas.com/00000",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 08:30", "Hoje 10:00", "Hoje 14:00", "Hoje 16:30"],
+    crm: "32584/MG",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Profissional extremamente experiente e atencioso." }
+    ],
+  },
+  {
     id: "med-daniel-kobayashi",
     name: "Dr. Daniel Kobayashi Colombo",
     category: "Médicos Prescritores",
@@ -148,7 +175,6 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento." }
     ],
-    online: false,
   },
   {
     id: "med-eduardo-correa",

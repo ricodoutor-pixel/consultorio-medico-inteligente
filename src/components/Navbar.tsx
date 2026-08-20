@@ -198,14 +198,14 @@ export const Navbar = () => {
                 )}
               </div>
             {/* Desktop: Verdinho exatamente no meio entre o logo e o menu */}
-            <div className={`hidden ${showNavbarMascot ? "lg:flex" : ""} flex-1 items-center justify-center`}>
+            <div className={`hidden ${showNavbarMascot ? "lg:flex" : ""} flex-1 items-center justify-center min-w-[80px]`}>
               <div className="flex-shrink-0 hover:scale-110 transition-transform cursor-pointer">
-                <FrogMascot size={72} mood="happy" onClick={openChat} enableJumpToNav={true} />
+                <FrogMascot size={64} mood="happy" onClick={openChat} enableJumpToNav={true} compact={true} />
               </div>
             </div>
 
             {/* Desktop: Menu Centralizado (aparece a partir de lg = 1024px) */}
-            <div className="hidden lg:flex items-center gap-2 xl:gap-3 justify-end">
+            <div className="hidden lg:flex items-center gap-2 xl:gap-3 justify-end flex-shrink-0">
               <div className="flex items-center gap-1 xl:gap-2" role="menubar">
                 {primaryLinks.map((link) => (
                   <NavLink

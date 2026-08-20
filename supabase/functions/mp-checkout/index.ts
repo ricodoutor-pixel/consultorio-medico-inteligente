@@ -102,6 +102,9 @@ Deno.serve(async (req) => {
     let amount: number;
     let externalReference: string;
     let type = "sku";
+    let recurring = false;
+    let toolSku: string | null = null;
+
 
     if (cartToken && typeof cartToken === "string") {
       const { data: cart } = await supabase

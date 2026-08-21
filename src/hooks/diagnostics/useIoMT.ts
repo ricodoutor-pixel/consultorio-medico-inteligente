@@ -89,13 +89,13 @@ export const useIoMT = () => {
    * Exemplo de perfil GATT genérico (Heart Rate / Audio Stream).
    */
   const connectDigitalStethoscope = useCallback(async () => {
-    if (!navigator.bluetooth) {
+    if (!(navigator as any).bluetooth) {
       toast.error('Web Bluetooth não é suportado neste navegador.');
       return;
     }
     try {
       // Requerimento do dispositivo focado em saúde (BLE)
-      const device = await navigator.bluetooth.requestDevice({
+      const device = await (navigator as any).bluetooth.requestDevice({
         acceptAllDevices: true,
         optionalServices: ['heart_rate', 'battery_service'] // IDs padronizados GATT
       });
@@ -105,7 +105,7 @@ export const useIoMT = () => {
         isConnected: true, 
         deviceName: device.name || 'Estetoscópio BLE Genérico' 
       }));
-      toast.success(\`Estetoscópio \${device.name || ''} conectado com sucesso!\`);
+      toast.success(`Estetoscópio ${device.name || ''} conectado com sucesso!`);
 
       // Mock de streaming contínuo
       setInterval(() => {
@@ -132,7 +132,7 @@ export const useIoMT = () => {
    */
   const setStethoscopeFilter = useCallback((mode: 'bell' | 'diaphragm' | 'wide') => {
     setStethoscope(prev => ({ ...prev, filterMode: mode }));
-    toast.info(\`Filtro acústico alterado para: \${mode.toUpperCase()}\`);
+    toast.info(`Filtro acústico alterado para: ${mode.toUpperCase()}`);
   }, []);
 
   /**
@@ -191,11 +191,11 @@ export const useIoMT = () => {
 
     const baseObservation: FHIRObservation = {
       resourceType: 'Observation',
-      id: \`obs-\${Date.now()}\`,
+      id: `obs-${Date.now()}`,
       status: 'final',
       category: 'vital-signs',
       code: { system: 'http://loinc.org', code: '8716-3', display: 'Vital signs' },
-      subject: { reference: \`Patient/\${patientRef}\` },
+      subject: { reference: `Patient/${patientRef}` },
       effectiveDateTime: new Date().toISOString(),
       securitySignature: {
         algorithm: 'Ed25519',

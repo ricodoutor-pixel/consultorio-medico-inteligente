@@ -307,6 +307,19 @@ async function log(phone: string, inText: string, outText: string, via: string) 
   } catch {}
 }
 
+// ── PAUSA GLOBAL (atendimento manual) ────────────────────────────────────
+// Quando system_settings.brisa_whatsapp_paused = true, o bot NÃO responde:
+// o Dr. Edilson assume as conversas manualmente no WhatsApp.
+async function isBrisaPaused(): Promise<boolean> {
+  if (!SB_URL || !SB_KEY) return false;
+  try {
+    const sb = createClient(SB_URL, SB_KEY);
+    const { data } = await sb.from('system_settings').select('value').eq('key', 'brisa_whatsapp_paused').maybeSingle();
+    const v: unknown = data?.value;
+    return v === true || v === 'true';
+  } catch { return false; }
+}
+
 // ── HANDLER PRINCIPAL ─────────────────────────────────────────────────────
 serve(async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -335,6 +348,12 @@ serve(async (req: Request): Promise<Response> => {
 
   const p = parseWAHA(raw);
   if (p.skip) return new Response(JSON.stringify({ ok: true, skipped: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+
+  // ⏸️ PAUSA GLOBAL — Dr. Edilson respondendo manualmente no WhatsApp
+  if (await isBrisaPaused()) {
+    console.log('[brisa] ⏸️ Bot pausado via system_settings — atendimento manual ativo');
+    return new Response(JSON.stringify({ ok: true, paused: true }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
 
   const { chatId, phone, fromMe, text, name, isGroup, isStatus, messageId } = p;
 

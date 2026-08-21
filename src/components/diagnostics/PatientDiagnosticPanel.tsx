@@ -61,7 +61,7 @@ export const PatientDiagnosticPanel = () => {
               autoPlay 
               playsInline 
               muted 
-              className={\`absolute inset-0 w-full h-full object-cover \${activeModule === 'rppg' ? 'opacity-100' : 'opacity-0'}\`}
+              className={`absolute inset-0 w-full h-full object-cover ${activeModule === 'rppg' ? 'opacity-100' : 'opacity-0'}`}
             />
             {rppgData.isProcessing && (
               <div className="absolute inset-0 border-4 border-green-500/50 rounded-lg animate-pulse pointer-events-none" />
@@ -110,7 +110,7 @@ export const PatientDiagnosticPanel = () => {
                    <div 
                      key={i} 
                      className="w-2 bg-blue-500 rounded-t animate-pulse" 
-                     style={{ height: \`\${Math.random() * 100}%\`, animationDelay: \`\${i * 0.05}s\` }} 
+                     style={{ height: `${Math.random() * 100}%`, animationDelay: `${i * 0.05}s` }} 
                    />
                  ))}
                </div>

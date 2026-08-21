@@ -95,7 +95,7 @@ export const useIoMT = () => {
     }
     try {
       // Requerimento do dispositivo focado em saúde (BLE)
-      const device = await navigator.bluetooth.requestDevice({
+      const device = await (navigator as any).bluetooth.requestDevice({
         acceptAllDevices: true,
         optionalServices: ['heart_rate', 'battery_service'] // IDs padronizados GATT
       });

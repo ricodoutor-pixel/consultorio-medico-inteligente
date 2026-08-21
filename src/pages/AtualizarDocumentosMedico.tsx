@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Loader2, Upload, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { KYC_BUCKET, type KycKind } from "@/lib/kyc-docs";
@@ -17,6 +17,9 @@ export default function AtualizarDocumentosMedico() {
   const [uploading, setUploading] = useState(false);
   const [kycFiles, setKycFiles] = useState<Partial<Record<KycKind, File | null>>>({});
   const [uploadedDocs, setUploadedDocs] = useState<KycKind[]>([]);
+  const [signatureUrl, setSignatureUrl] = useState<string | null>(null);
+  const [isUploadingSignature, setIsUploadingSignature] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSession();
@@ -29,6 +32,8 @@ export default function AtualizarDocumentosMedico() {
       return;
     }
 
+    setUserId(session.user.id);
+
     const { data: docs } = await supabase
       .from('doctor_kyc_documents')
       .select('document_kind')
@@ -38,7 +43,60 @@ export default function AtualizarDocumentosMedico() {
       setUploadedDocs(docs.map(d => d.document_kind as KycKind));
     }
 
+    // Load existing signature from profiles (same as photo)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('signature_url')
+      .eq('id', session.user.id)
+      .single();
+    
+    if (profile?.signature_url) setSignatureUrl(profile.signature_url);
+
     setLoading(false);
+  };
+
+  // ✅ Same pattern as DoctorPhotoUpload — uses avatars bucket + profiles table
+  const handleSignatureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Arquivo muito grande. Máximo 5MB.");
+      return;
+    }
+
+    try {
+      setIsUploadingSignature(true);
+      toast.info("Enviando assinatura...");
+
+      const fileExt = file.name.split('.').pop();
+      const filePath = `documents/${userId}/signature_${crypto.randomUUID()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')  // mesmo bucket da foto de perfil — já funciona!
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Salva na tabela profiles — mesma lógica da foto de perfil
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ signature_url: publicUrl } as any)
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+
+      setSignatureUrl(publicUrl);
+      toast.success("✅ Assinatura digital enviada com sucesso!");
+    } catch (err: any) {
+      toast.error("Erro ao enviar assinatura: " + (err?.message || "Tente novamente."));
+    } finally {
+      setIsUploadingSignature(false);
+    }
   };
 
   const handleKycFile = (kind: KycKind) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +107,7 @@ export default function AtualizarDocumentosMedico() {
     }
     setKycFiles((prev) => ({ ...prev, [kind]: f }));
   };
+
 
   const handleUpload = async () => {
     const kindsToUpload = Object.keys(kycFiles).filter(kind => kycFiles[kind as KycKind]);
@@ -98,9 +157,9 @@ export default function AtualizarDocumentosMedico() {
         if (kycErr) throw kycErr;
       }
 
-      toast.success("Documentos enviados com sucesso! Aguarde a liberação do seu card médico pela Diretoria Técnica.");
+      toast.success("Documentos enviados com sucesso!");
       setKycFiles({});
-      setTimeout(() => navigate('/consultorio'), 2000);
+      setTimeout(() => navigate('/configuracoes-medico'), 1500);
     } catch (err: any) {
       toast.error("Erro no Upload: " + (err?.message || "Tente novamente."));
     } finally {
@@ -164,11 +223,39 @@ export default function AtualizarDocumentosMedico() {
                     <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_back")} className="bg-slate-900 border-slate-700 text-slate-300" />
                   </div>
                   
-                  <div className="space-y-1 sm:col-span-2 mt-2">
-                    <Label className={`text-xs font-bold ${uploadedDocs.includes('icp_brasil') ? 'text-emerald-400' : 'text-red-400'}`}>
-                      Assinatura Digital (ICP-Brasil) — Imagem {uploadedDocs.includes('icp_brasil') ? '(Anexado)' : '(Faltante)'}
+                  <div className="space-y-1 sm:col-span-2 mt-2 border border-emerald-500/30 rounded-lg p-3 bg-emerald-900/10">
+                    <Label className={`text-xs font-bold ${signatureUrl ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      ✍️ Assinatura Digital (ICP-Brasil) — Imagem {signatureUrl ? '(✅ Anexada)' : '(Faltante)'}
                     </Label>
-                    <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("icp_brasil")} className="bg-slate-900 border-emerald-500/50 text-slate-300" />
+                    {signatureUrl && (
+                      <div className="mt-2 p-2 bg-slate-800 rounded border border-emerald-500/30">
+                        <p className="text-xs text-emerald-400 mb-1">Prévia da assinatura atual:</p>
+                        <img src={signatureUrl} alt="Assinatura Digital" className="h-16 object-contain" />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 mt-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="relative w-full bg-emerald-900/20 border-emerald-500/50 text-emerald-300 hover:bg-emerald-800/40 hover:text-white font-semibold"
+                        disabled={isUploadingSignature}
+                      >
+                        {isUploadingSignature ? (
+                          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando...</>
+                        ) : (
+                          <><Upload className="mr-2 h-4 w-4" /> {signatureUrl ? 'Atualizar Assinatura Digital' : '📎 Enviar Imagem da Assinatura'}</>
+                        )}
+                        <input
+                          type="file"
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          accept="image/*"
+                          onChange={handleSignatureUpload}
+                          disabled={isUploadingSignature}
+                        />
+                      </Button>
+                      {signatureUrl && <CheckCircle2 className="h-6 w-6 text-emerald-500 shrink-0" />}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">Aceita JPG, PNG. Máximo 5MB. Sem constraint de banco de dados.</p>
                   </div>
 
                   <div className="space-y-1 mt-2">
@@ -195,6 +282,13 @@ export default function AtualizarDocumentosMedico() {
                       Comprovante de endereço (CEP) {uploadedDocs.includes('address_proof') ? '(Anexado)' : '(Faltante)'}
                     </Label>
                     <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-slate-900 border-slate-700 text-slate-300" />
+                  </div>
+                  
+                  <div className="space-y-1 sm:col-span-2 mt-2">
+                    <Label className={`text-xs ${uploadedDocs.includes('selfie') ? 'text-emerald-400' : 'text-red-400'}`}>
+                      Selfie de Confirmação (com documento) {uploadedDocs.includes('selfie') ? '(Anexado)' : '(Faltante)'}
+                    </Label>
+                    <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("selfie")} className="bg-slate-900 border-slate-700 text-slate-300" />
                   </div>
                 </div>
               </div>

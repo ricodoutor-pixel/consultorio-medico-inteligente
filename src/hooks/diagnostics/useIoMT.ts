@@ -89,7 +89,7 @@ export const useIoMT = () => {
    * Exemplo de perfil GATT genérico (Heart Rate / Audio Stream).
    */
   const connectDigitalStethoscope = useCallback(async () => {
-    if (!navigator.bluetooth) {
+    if (!(navigator as any).bluetooth) {
       toast.error('Web Bluetooth não é suportado neste navegador.');
       return;
     }

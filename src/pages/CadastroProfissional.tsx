@@ -175,10 +175,10 @@ const CadastroProfissional = () => {
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [savedCredentials, setSavedCredentials] = useState<{ email: string; password: string } | null>(null);
 
-  // KYC uploads (frente/verso obrigatórios + CPF, endereço, assinatura digital)
+  // KYC uploads (frente/verso obrigatórios + CPF, endereço, selfie)
   const [kycFiles, setKycFiles] = useState<Partial<Record<KycKind, File | null>>>({
     crm_front: null, crm_back: null, id_front: null, id_back: null,
-    cpf_doc: null, address_proof: null, icp_brasil: null
+    cpf_doc: null, address_proof: null, selfie: null, icp_brasil: null
   });
   const MAX_KYC_BYTES = 5 * 1024 * 1024; // 5MB
   const isCuidadorSel = form.categoria === "Cuidadores de Idosos";
@@ -488,6 +488,31 @@ const CadastroProfissional = () => {
         const file = kycFiles[kind];
         if (!file) continue;
         const ext = (file.name.split(".").pop() || "bin").toLowerCase().slice(0, 5);
+        
+        // INTERCEPTAR ICP_BRASIL PARA MANDAR PARA BUCKET 'AVATARS' (Evitar erro de constraint e unificar com Perfil)
+        if (kind === "icp_brasil") {
+          const path = `documents/${userId}/signature_${Date.now()}.${ext}`;
+          uploads.push(
+            supabase.storage
+              .from('avatars') // Bucket avatars
+              .upload(path, file, { upsert: true, contentType: file.type || undefined })
+              .then(async ({ error, data }) => {
+                if (error) throw error;
+                if (data?.path) {
+                  const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(data.path);
+                  if (publicUrlData?.publicUrl) {
+                    await supabase.from("doctors").update({ signature_url: publicUrlData.publicUrl }).eq("user_id", userId);
+                  }
+                }
+              })
+              .catch((err) => {
+                console.error("[signature upload]", err);
+              })
+          );
+          continue; // Não adiciona no kycRows (que quebra a constraint)
+        }
+
+        // DEMAIS DOCUMENTOS KYC VÃO NORMALMENTE
         const path = `${userId}/${kind}.${ext}`;
         kycRows.push({
           doctor_user_id: userId,

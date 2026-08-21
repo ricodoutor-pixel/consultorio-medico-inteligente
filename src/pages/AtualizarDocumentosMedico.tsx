@@ -78,20 +78,22 @@ export default function AtualizarDocumentosMedico() {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      const { data: publicUrlData } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
-      // Salva na tabela profiles — mesma lógica da foto de perfil
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ signature_url: publicUrl } as any)
-        .eq('id', userId);
-
-      if (updateError) throw updateError;
-
-      setSignatureUrl(publicUrl);
-      toast.success("✅ Assinatura digital enviada com sucesso!");
+      // Salva na tabela doctors
+      if (publicUrlData?.publicUrl) {
+        const { error: updateError } = await supabase
+          .from("doctors")
+          .update({ signature_url: publicUrlData.publicUrl })
+          .eq("user_id", userId);
+        
+        if (updateError) throw updateError;
+        
+        setSignatureUrl(publicUrlData.publicUrl);
+        toast.success("✅ Assinatura digital enviada com sucesso!");
+      }
     } catch (err: any) {
       toast.error("Erro ao enviar assinatura: " + (err?.message || "Tente novamente."));
     } finally {

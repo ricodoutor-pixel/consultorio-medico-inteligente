@@ -96,6 +96,10 @@ export type Professional = {
   /** Valor da Consulta Premium definido pelo profissional. */
   premiumPrice?: number;
   crm?: string;
+  /** Bandeiras de países de atuação (ex.: ["🇧🇷"]). */
+  flags?: string[];
+  /** Hospital / clínica de vínculo (quando aplicável). */
+  hospital?: string;
 }
 export const COUNCIL_CONFIG: Record<string, {
   councilLabel: string;

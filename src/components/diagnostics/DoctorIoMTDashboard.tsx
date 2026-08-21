@@ -67,7 +67,7 @@ export const DoctorIoMTDashboard = () => {
                 {/* Simulador visual de PCG / Osciloscópio */}
                 <svg viewBox="0 0 1000 100" className="w-full h-full stroke-green-400 fill-none" preserveAspectRatio="none">
                   <path 
-                    d={\`M 0 50 \${Array.from({length: 50}).map((_, i) => \`L \${i * 20} \${50 + Math.random() * 80 - 40}\`).join(' ')}\`} 
+                    d={`M 0 50 ${Array.from({length: 50}).map((_, i) => `L ${i * 20} ${50 + Math.random() * 80 - 40}`).join(' ')}`} 
                     strokeWidth="2" 
                     vectorEffect="non-scaling-stroke"
                   />

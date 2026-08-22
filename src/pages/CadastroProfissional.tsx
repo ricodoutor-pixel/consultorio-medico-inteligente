@@ -175,10 +175,10 @@ const CadastroProfissional = () => {
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [savedCredentials, setSavedCredentials] = useState<{ email: string; password: string } | null>(null);
 
-  // KYC uploads (frente/verso obrigatórios + CPF, endereço, selfie)
+  // KYC uploads (frente/verso obrigatórios + CPF, endereço, assinatura digital)
   const [kycFiles, setKycFiles] = useState<Partial<Record<KycKind, File | null>>>({
     crm_front: null, crm_back: null, id_front: null, id_back: null,
-    cpf_doc: null, address_proof: null, selfie: null, icp_brasil: null
+    cpf_doc: null, address_proof: null, icp_brasil: null
   });
   const MAX_KYC_BYTES = 5 * 1024 * 1024; // 5MB
   const isCuidadorSel = form.categoria === "Cuidadores de Idosos";

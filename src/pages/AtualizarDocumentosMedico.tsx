@@ -285,13 +285,7 @@ export default function AtualizarDocumentosMedico() {
                     </Label>
                     <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-slate-900 border-slate-700 text-slate-300" />
                   </div>
-                  
-                  <div className="space-y-1 sm:col-span-2 mt-2">
-                    <Label className={`text-xs ${uploadedDocs.includes('selfie') ? 'text-emerald-400' : 'text-red-400'}`}>
-                      Selfie de Confirmação (com documento) {uploadedDocs.includes('selfie') ? '(Anexado)' : '(Faltante)'}
-                    </Label>
-                    <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("selfie")} className="bg-slate-900 border-slate-700 text-slate-300" />
-                  </div>
+
                 </div>
               </div>
 

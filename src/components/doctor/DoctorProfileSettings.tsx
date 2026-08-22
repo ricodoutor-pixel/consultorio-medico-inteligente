@@ -55,8 +55,8 @@ export const DoctorProfileSettings: React.FC<DoctorProfileSettingsProps> = ({ do
         .getPublicUrl(filePath);
 
       const updateField = field === 'crm_front' ? { crm_front_url: publicUrl } : field === 'crm_back' ? { crm_back_url: publicUrl } : { signature_url: publicUrl };
-      
-      const { error: updateError } = await supabase
+
+      const { error: updateError } = await (supabase as any)
         .from('doctors')
         .update(updateField)
         .eq('id', doctor.id);

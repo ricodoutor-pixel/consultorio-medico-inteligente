@@ -371,18 +371,10 @@ serve(async (req: Request): Promise<Response> => {
   const sent = await sendMsg(chatId, phone, instant);
   await log(phone, text, instant, sent ? 'waha_instant' : 'evo_instant');
 
-  // ── ESTÁGIO 2: Gemini em background ──
-  if (GEMINI_KEY || LOVABLE_KEY) {
-    const bg = async () => {
-      const gemRep = await tryGemini(text, name, phone);
-      if (!gemRep || gemRep.length < 30) return;
-      if (gemRep.includes('https://plantayraiz.com.br/profissionais')) return; // evita duplicar roteiro
-      await sendMsg(chatId, phone, gemRep);
-      await log(phone, text, gemRep, 'gemini_enriched');
-    };
-    const rt = (globalThis as unknown as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime;
-    if (rt?.waitUntil) rt.waitUntil(bg()); else bg().catch(() => {});
-  }
+  // ── ESTÁGIO 2 (Gemini background) DESATIVADO — evitava resposta dupla ──
+  // Enquanto o atendimento for manual / resposta instantânea, não disparamos
+  // uma segunda mensagem de IA em background. Para reativar, descomente o bloco.
+  // if (GEMINI_KEY || LOVABLE_KEY) { ... }
 
   return new Response(
     JSON.stringify({ ok: true, sent, phone, chatId }),

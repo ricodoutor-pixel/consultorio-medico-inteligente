@@ -2333,6 +2333,7 @@ export type Database = {
           price_video_chat: number
           rating: number | null
           rqe: string | null
+          signature_url: string | null
           specialty: string
           suspended_at: string | null
           suspension_reason: string | null
@@ -2370,6 +2371,7 @@ export type Database = {
           price_video_chat?: number
           rating?: number | null
           rqe?: string | null
+          signature_url?: string | null
           specialty?: string
           suspended_at?: string | null
           suspension_reason?: string | null
@@ -2407,6 +2409,7 @@ export type Database = {
           price_video_chat?: number
           rating?: number | null
           rqe?: string | null
+          signature_url?: string | null
           specialty?: string
           suspended_at?: string | null
           suspension_reason?: string | null
@@ -5808,6 +5811,7 @@ export type Database = {
           planta_coins: number | null
           referred_by: string | null
           region: string | null
+          signature_url: string | null
           signup_role: string | null
           updated_at: string
           user_type: string
@@ -5840,6 +5844,7 @@ export type Database = {
           planta_coins?: number | null
           referred_by?: string | null
           region?: string | null
+          signature_url?: string | null
           signup_role?: string | null
           updated_at?: string
           user_type?: string
@@ -5872,6 +5877,7 @@ export type Database = {
           planta_coins?: number | null
           referred_by?: string | null
           region?: string | null
+          signature_url?: string | null
           signup_role?: string | null
           updated_at?: string
           user_type?: string

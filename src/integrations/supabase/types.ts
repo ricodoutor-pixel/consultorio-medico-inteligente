@@ -2312,6 +2312,8 @@ export type Database = {
           country: string | null
           created_at: string
           crm: string
+          crm_back_url: string | null
+          crm_front_url: string | null
           crm_state: string
           document_type: string
           fraud_score: number | null
@@ -2350,6 +2352,8 @@ export type Database = {
           country?: string | null
           created_at?: string
           crm: string
+          crm_back_url?: string | null
+          crm_front_url?: string | null
           crm_state?: string
           document_type?: string
           fraud_score?: number | null
@@ -2388,6 +2392,8 @@ export type Database = {
           country?: string | null
           created_at?: string
           crm?: string
+          crm_back_url?: string | null
+          crm_front_url?: string | null
           crm_state?: string
           document_type?: string
           fraud_score?: number | null

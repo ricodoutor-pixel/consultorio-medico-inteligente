@@ -52,6 +52,10 @@ export async function generatePrescriptionPDF(data: PrescriptionData): Promise<j
   doc.setFontSize(16);
   doc.text("RECEITUÁRIO SIMPLES", pageWidth / 2, y, { align: "center" });
   
+  y += 8;
+  doc.setFontSize(12);
+  doc.text("Planta y Raíz Mega Clínica Digital", pageWidth / 2, y, { align: "center" });
+  
   y += 20;
 
   // ─── DADOS DO PACIENTE ──────────────────────────────────────────────────

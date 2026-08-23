@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_financial_ledger: {
+        Row: {
+          amount: number
+          balance_after: number | null
+          created_at: string | null
+          description: string | null
+          entry_type: string
+          id: string
+          reference_id: string | null
+          reference_type: string | null
+        }
+        Insert: {
+          amount: number
+          balance_after?: number | null
+          created_at?: string | null
+          description?: string | null
+          entry_type: string
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Update: {
+          amount?: number
+          balance_after?: number | null
+          created_at?: string | null
+          description?: string | null
+          entry_type?: string
+          id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Relationships: []
+      }
       affiliate_commissions: {
         Row: {
           amount: number
@@ -1863,6 +1896,89 @@ export type Database = {
         }
         Relationships: []
       }
+      consultations: {
+        Row: {
+          appointment_id: string | null
+          copilot_summary: string | null
+          created_at: string | null
+          doctor_id: string | null
+          duration_minutes: number | null
+          ended_at: string | null
+          id: string
+          modality: string | null
+          notes: string | null
+          patient_feedback: string | null
+          patient_id: string | null
+          patient_rating: number | null
+          started_at: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          copilot_summary?: string | null
+          created_at?: string | null
+          doctor_id?: string | null
+          duration_minutes?: number | null
+          ended_at?: string | null
+          id?: string
+          modality?: string | null
+          notes?: string | null
+          patient_feedback?: string | null
+          patient_id?: string | null
+          patient_rating?: number | null
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          copilot_summary?: string | null
+          created_at?: string | null
+          doctor_id?: string | null
+          duration_minutes?: number | null
+          ended_at?: string | null
+          id?: string
+          modality?: string | null
+          notes?: string | null
+          patient_feedback?: string | null
+          patient_id?: string | null
+          patient_rating?: number | null
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultations_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultations_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "financial_reports"
+            referencedColumns: ["appointment_id"]
+          },
+          {
+            foreignKeyName: "consultations_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultations_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversion_events: {
         Row: {
           created_at: string
@@ -2302,6 +2418,60 @@ export type Database = {
         }
         Relationships: []
       }
+      doctor_wallets: {
+        Row: {
+          balance: number | null
+          created_at: string | null
+          doctor_id: string
+          id: string
+          pix_key: string | null
+          pix_type: string | null
+          total_earned: number | null
+          total_withdrawn: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          balance?: number | null
+          created_at?: string | null
+          doctor_id: string
+          id?: string
+          pix_key?: string | null
+          pix_type?: string | null
+          total_earned?: number | null
+          total_withdrawn?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          balance?: number | null
+          created_at?: string | null
+          doctor_id?: string
+          id?: string
+          pix_key?: string | null
+          pix_type?: string | null
+          total_earned?: number | null
+          total_withdrawn?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_wallets_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: true
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_wallets_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: true
+            referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doctors: {
         Row: {
           approval_status: string
@@ -2617,6 +2787,57 @@ export type Database = {
           created_at?: string
           id?: number
           key?: string
+        }
+        Relationships: []
+      }
+      email_queue: {
+        Row: {
+          attempts: number | null
+          body_html: string | null
+          body_text: string | null
+          created_at: string | null
+          id: string
+          last_error: string | null
+          max_attempts: number | null
+          scheduled_for: string | null
+          sent_at: string | null
+          status: string | null
+          subject: string
+          template: string | null
+          to_email: string
+          to_name: string | null
+        }
+        Insert: {
+          attempts?: number | null
+          body_html?: string | null
+          body_text?: string | null
+          created_at?: string | null
+          id?: string
+          last_error?: string | null
+          max_attempts?: number | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject: string
+          template?: string | null
+          to_email: string
+          to_name?: string | null
+        }
+        Update: {
+          attempts?: number | null
+          body_html?: string | null
+          body_text?: string | null
+          created_at?: string | null
+          id?: string
+          last_error?: string | null
+          max_attempts?: number | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string
+          template?: string | null
+          to_email?: string
+          to_name?: string | null
         }
         Relationships: []
       }
@@ -5288,6 +5509,85 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          consultation_id: string | null
+          created_at: string | null
+          doctor_id: string | null
+          doctor_net_amount: number | null
+          gross_amount: number
+          id: string
+          mp_payment_id: string | null
+          mp_preference_id: string | null
+          paid_at: string | null
+          patient_id: string | null
+          payment_method: string | null
+          pix_transaction_id: string | null
+          platform_fee_amount: number | null
+          platform_fee_pct: number | null
+          released_at: string | null
+          status: string | null
+        }
+        Insert: {
+          consultation_id?: string | null
+          created_at?: string | null
+          doctor_id?: string | null
+          doctor_net_amount?: number | null
+          gross_amount: number
+          id?: string
+          mp_payment_id?: string | null
+          mp_preference_id?: string | null
+          paid_at?: string | null
+          patient_id?: string | null
+          payment_method?: string | null
+          pix_transaction_id?: string | null
+          platform_fee_amount?: number | null
+          platform_fee_pct?: number | null
+          released_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          consultation_id?: string | null
+          created_at?: string | null
+          doctor_id?: string | null
+          doctor_net_amount?: number | null
+          gross_amount?: number
+          id?: string
+          mp_payment_id?: string | null
+          mp_preference_id?: string | null
+          paid_at?: string | null
+          patient_id?: string | null
+          payment_method?: string | null
+          pix_transaction_id?: string | null
+          platform_fee_amount?: number | null
+          platform_fee_pct?: number | null
+          released_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_consultation_id_fkey"
+            columns: ["consultation_id"]
+            isOneToOne: false
+            referencedRelation: "consultations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payout_history: {
         Row: {
           amount: number
@@ -6103,6 +6403,60 @@ export type Database = {
           user_id?: string | null
           user_role?: string | null
           was_allowed?: boolean
+        }
+        Relationships: []
+      }
+      saas_subscriptions: {
+        Row: {
+          alert_days_before: number | null
+          api_key_env_var: string | null
+          auto_pay: boolean | null
+          billing_day: number | null
+          created_at: string | null
+          dashboard_url: string | null
+          id: string
+          monthly_cost_brl: number | null
+          monthly_cost_usd: number | null
+          next_due_date: string | null
+          notes: string | null
+          payment_method: string | null
+          provider: string
+          service_name: string
+          status: string | null
+        }
+        Insert: {
+          alert_days_before?: number | null
+          api_key_env_var?: string | null
+          auto_pay?: boolean | null
+          billing_day?: number | null
+          created_at?: string | null
+          dashboard_url?: string | null
+          id?: string
+          monthly_cost_brl?: number | null
+          monthly_cost_usd?: number | null
+          next_due_date?: string | null
+          notes?: string | null
+          payment_method?: string | null
+          provider: string
+          service_name: string
+          status?: string | null
+        }
+        Update: {
+          alert_days_before?: number | null
+          api_key_env_var?: string | null
+          auto_pay?: boolean | null
+          billing_day?: number | null
+          created_at?: string | null
+          dashboard_url?: string | null
+          id?: string
+          monthly_cost_brl?: number | null
+          monthly_cost_usd?: number | null
+          next_due_date?: string | null
+          notes?: string | null
+          payment_method?: string | null
+          provider?: string
+          service_name?: string
+          status?: string | null
         }
         Relationships: []
       }

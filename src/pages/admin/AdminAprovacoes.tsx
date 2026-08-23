@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -92,7 +92,10 @@ export const AdminAprovacoes = () => {
     const p = doc.profile || {};
     const kinds = new Set((doc.kyc_docs || []).map((k: any) => k.document_kind));
     return [
-      ...[...KYC_REQUIRED, 'icp_brasil'].map((kind) => ({ label: KYC_LABELS[kind], ok: kinds.has(kind) })),
+      ...[...KYC_REQUIRED, 'icp_brasil'].map((kind) => ({ 
+        label: KYC_LABELS[kind], 
+        ok: kind === 'icp_brasil' ? Boolean(doc.signature_url) : kinds.has(kind) 
+      })),
       { label: "Nº do CRM", ok: Boolean(doc.crm && String(doc.crm).length >= 3) },
       { label: "CPF", ok: Boolean(p.cpf && String(p.cpf).replace(/\D/g, "").length === 11) },
       { label: "Data de nascimento", ok: Boolean(p.date_of_birth) },
@@ -500,8 +503,8 @@ export const AdminAprovacoes = () => {
 
                         <TableCell>
                           <div className="flex flex-wrap gap-1.5">
-                            {([...KYC_REQUIRED, 'icp_brasil'] as KycKind[]).map((kind) => {
-                              const attached = Boolean(docOf(doc, kind));
+                            {[...KYC_REQUIRED, 'icp_brasil'].map((kind) => {
+                              const attached = kind === 'icp_brasil' ? Boolean(doc.signature_url) : Boolean(docOf(doc, kind));
                               return (
                                 <Button
                                   key={kind}

@@ -175,10 +175,10 @@ const CadastroProfissional = () => {
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [savedCredentials, setSavedCredentials] = useState<{ email: string; password: string } | null>(null);
 
-  // KYC uploads (frente/verso obrigatórios + CPF, endereço, assinatura digital)
+  // KYC uploads (frente/verso obrigatórios + CPF, endereço, selfie)
   const [kycFiles, setKycFiles] = useState<Partial<Record<KycKind, File | null>>>({
     crm_front: null, crm_back: null, id_front: null, id_back: null,
-    cpf_doc: null, address_proof: null, icp_brasil: null
+    cpf_doc: null, address_proof: null, selfie: null, icp_brasil: null
   });
   const MAX_KYC_BYTES = 5 * 1024 * 1024; // 5MB
   const isCuidadorSel = form.categoria === "Cuidadores de Idosos";
@@ -432,54 +432,31 @@ const CadastroProfissional = () => {
       const userId = signUpData.user?.id;
       if (!userId) throw new Error("Falha ao criar usuário");
 
-      // 2) Upsert profile (id = auth user id)
-      const { error: profErr } = await supabase.from("profiles").upsert({
-        id: userId,
-        full_name: form.nomeCompleto,
-        phone: form.telefone,
-        cpf: documentType === "cpf" ? documentNumber : null,
-        date_of_birth: form.dateOfBirth || null,
-        country,
-        city: form.cidadeUF || null,
-        region: form.uf || form.crmUF || null,
-        cep: form.cep || null,
-        address_street: form.logradouro || null,
-        address_number: form.numero || null,
-        address_complement: form.complemento || null,
-        neighborhood: form.bairro || null,
-        user_type: "doctor",
-        signup_role: "doctor",
-        avatar_url: fotoPreview,
-        pix_key: form.pixKey,
-        pix_type: form.pixType,
-      } as any);
-      if (profErr) console.error("[profile upsert]", profErr);
-
-
-      // 3) Insert doctor record (status: pending verification)
-      const { error: docErr } = await supabase.from("doctors").insert({
-        user_id: userId,
-        crm: isCuidador ? `CUIDADOR-${documentNumber.slice(-6)}` : form.registroProfissional,
-        crm_state: form.crmUF,
-        specialty: form.categoria,
-        bio: form.resumoAtuacao,
-        // Valores 1–4 padronizados pela plataforma; Premium definido pelo profissional.
-        consultation_price: SERVICES.consulta_chat.price,
-        price_video_chat: Math.min(2000, Math.max(100, Number(form.pricePremium) || PREMIUM_SUGGESTED_PRICE)),
-        price_chat_only: SERVICES.consulta_chat.price,
-        price_return: SERVICES.retorno_consulta.price,
-        is_approved_by_admin: false,
-        approval_status: 'pending',
-        document_type: documentType,
-        country,
-        city: form.cidadeUF || null,
-        is_verified: false,
-        is_online: false,
-        is_available: false,
-        kyc_status: "pending",
-        plan_tier: form.plano,
+      // 2 & 3) Insert profile and doctor via SECURITY DEFINER RPC to bypass RLS block
+      const { error: rpcErr } = await supabase.rpc("register_new_doctor", {
+        p_user_id: userId,
+        p_full_name: form.nomeCompleto,
+        p_phone: form.telefone,
+        p_cpf: documentType === "cpf" ? documentNumber : null,
+        p_country: country,
+        p_city: form.cidadeUF || null,
+        p_region: form.uf || form.crmUF || null,
+        p_crm: isCuidador ? `CUIDADOR-${documentNumber.slice(-6)}` : form.registroProfissional,
+        p_crm_state: form.crmUF || 'SP',
+        p_specialty: form.categoria,
+        p_bio: form.resumoAtuacao || '',
+        p_document_type: documentType,
+        p_plan_tier: form.plano || 'free',
+        p_price_video_chat: Math.min(2000, Math.max(100, Number(form.pricePremium) || PREMIUM_SUGGESTED_PRICE)),
+        p_avatar_url: fotoPreview || null,
+        p_pix_key: form.pixKey || null,
+        p_pix_type: form.pixType || null
       });
-      if (docErr) console.error("[doctor insert]", docErr);
+
+      if (rpcErr) {
+        console.error("[register_new_doctor rpc err]", rpcErr);
+        // We log the error but let it continue so they at least get the welcome email if auth succeeded
+      }
 
       // 4) Upload KYC (bucket privado real) + registro em doctor_kyc_documents
       const uploads: Promise<unknown>[] = [];

@@ -8932,6 +8932,28 @@ export type Database = {
           read_ct: number
         }[]
       }
+      register_new_doctor: {
+        Args: {
+          p_avatar_url: string
+          p_bio: string
+          p_city: string
+          p_country: string
+          p_cpf: string
+          p_crm: string
+          p_crm_state: string
+          p_document_type: string
+          p_full_name: string
+          p_phone: string
+          p_pix_key: string
+          p_pix_type: string
+          p_plan_tier: string
+          p_price_video_chat: number
+          p_region: string
+          p_specialty: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       search_scientific_articles: {
         Args: { limit_count?: number; query_text: string }
         Returns: {

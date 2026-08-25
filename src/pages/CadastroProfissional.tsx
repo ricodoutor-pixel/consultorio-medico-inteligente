@@ -162,7 +162,7 @@ const CadastroProfissional = () => {
     cidadeUF: "",
     atendimento: "chat",
     disponibilidade: "",
-    plano: "basic",
+    plano: "free",
     dateOfBirth: "",
     cep: "",
     logradouro: "",
@@ -1017,12 +1017,15 @@ const CadastroProfissional = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="basic">
-                          <span className="flex items-center gap-2">VIP — {isBO ? "USD 19/mes" : "R$ 99/mês"} (Taxa Zero) <Badge className="bg-primary/15 text-primary text-[8px] px-1.5 py-0">{isBO ? "MÁS POPULAR" : "MAIS POPULAR"}</Badge></span>
+                        <SelectItem value="free">
+                          <span className="flex items-center gap-2">Free — Gratuito (Paga apenas taxa por consulta) <Badge className="bg-muted text-muted-foreground text-[8px] px-1.5 py-0">INICIANTE</Badge></span>
                         </SelectItem>
-                        <SelectItem value="professional">{isBO ? "Profesional — USD 59/mes" : "Profissional — R$ 299/mês"}</SelectItem>
-                        <SelectItem value="premium">Premium — {isBO ? "USD 119/mes" : "R$ 599/mês"}</SelectItem>
-                        <SelectItem value="enterprise">Enterprise — {isBO ? "USD 299/mes" : "R$ 1.500/mês"}</SelectItem>
+                        <SelectItem value="basic">
+                          <span className="flex items-center gap-2">VIP — {isBO ? "USD 19/mes" : "R$ 99/mês"} (Taxa Zero + Destaque) <Badge className="bg-primary/15 text-primary text-[8px] px-1.5 py-0">{isBO ? "MÁS POPULAR" : "MAIS POPULAR"}</Badge></span>
+                        </SelectItem>
+                        <SelectItem value="professional">{isBO ? "Profesional — USD 59/mes" : "Profissional — R$ 299/mês (Dashboard Completo)"}</SelectItem>
+                        <SelectItem value="premium">Premium — {isBO ? "USD 119/mes" : "R$ 599/mês (Selo Premium + Prioridade na Busca)"}</SelectItem>
+                        <SelectItem value="enterprise">Enterprise — {isBO ? "USD 299/mes" : "R$ 1.500/mês (Conta Corporate + Multiclínicas)"}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

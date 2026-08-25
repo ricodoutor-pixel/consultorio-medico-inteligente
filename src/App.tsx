@@ -212,8 +212,31 @@ const MonitoramentoSaude = lazyWithRecovery(() => import("./pages/MonitoramentoS
 
 const queryClient = new QueryClient();
 
+/**
+ * Ruído de extensões do navegador (MetaMask/carteiras cripto, tradutores).
+ * Não são falhas da plataforma e não devem ser reportadas nem acionar recovery.
+ */
+const isExtensionNoise = (err: unknown): boolean => {
+  try {
+    const seen = new Set<unknown>();
+    let cur: any = err;
+    while (cur && !seen.has(cur)) {
+      seen.add(cur);
+      const msg = String(cur?.message ?? cur ?? "");
+      const stack = String(cur?.stack ?? "");
+      if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack + msg)) return true;
+      if (/MetaMask|ethereum provider|web3|Failed to connect to MetaMask/i.test(msg)) return true;
+      cur = cur?.cause;
+    }
+  } catch {
+    /* noop */
+  }
+  return false;
+};
+
 if (typeof window !== "undefined") {
   window.addEventListener("error", (event) => {
+    if (isExtensionNoise(event.error ?? event.message) || /extension:\/\//.test(event.filename || "")) return;
     reportFrontendRuntimeError(event.error ?? event.message, {
       sourceRef: window.location.pathname,
       phase: "fatal-runtime",
@@ -226,12 +249,14 @@ if (typeof window !== "undefined") {
   });
 
   window.addEventListener("unhandledrejection", (event) => {
+    if (isExtensionNoise(event.reason)) return;
     reportFrontendRuntimeError(event.reason, {
       sourceRef: window.location.pathname,
       phase: "unhandled-rejection",
     });
   });
 }
+
 
 const App = () => (
   <ErrorBoundary>

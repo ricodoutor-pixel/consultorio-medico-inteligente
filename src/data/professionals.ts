@@ -103,6 +103,7 @@ export type Professional = {
   /** Link do print de validação no portal do CFM. */
   cfmPrintUrl?: string;
   flags?: string[];
+  plan_tier?: string;
 }
 
 export const COUNCIL_CONFIG: Record<string, {

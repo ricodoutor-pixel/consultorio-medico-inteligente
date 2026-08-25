@@ -35,6 +35,7 @@ interface RealDoctor {
   rqe: string | null;
   available_hours: any;
   created_at: string;
+  plan_tier: string;
 }
 
 interface RealProfile {
@@ -253,6 +254,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         crm: mockMatch?.crm || finalCrm,
         hospital: mockMatch?.hospital || (isEdilson ? "Planta y Raíz Ltda / Santa Cruz de la Sierra (BO)" : isSuelen ? "Planta y Raíz Ltda / Paraná (BR)" : isOlivia ? "Planta y Raíz Ltda / Cochabamba (BO)" : cityLabel),
         flags: mockMatch?.flags || (isEdilson || isOlivia ? ["🇧🇷", "🇧🇴"] : ["🇧🇷"]),
+        plan_tier: d.plan_tier || "free",
       };
     });
 

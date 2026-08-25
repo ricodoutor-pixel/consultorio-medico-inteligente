@@ -118,11 +118,40 @@ export const WhatsAppButton = () => {
   const handleOptionClick = async (option: (typeof VISITOR_OPTIONS)[number]) => {
     trackPixelEvent("Contact", { content_name: `brisa_${option.id}` });
 
-    window.dispatchEvent(
-      new CustomEvent("open-brisa-chat", {
-        detail: { id: option.id, label: option.label },
-      })
-    );
+    try {
+      const nome = localStorage.getItem("pr_lead_name") || "Visitante";
+      const telefone = localStorage.getItem("pr_lead_phone") || "";
+      if (telefone) {
+        await supabase.from("leads_contatos").insert({
+          nome,
+          telefone,
+          origem: "brisa_whatsapp_fab",
+          categoria: option.id,
+          tags: [option.keyword.replace("#", "").toLowerCase()],
+        });
+      }
+    } catch (e) {
+      console.warn("[Brisa] lead persist skipped:", e);
+    }
+
+    // Personaliza a saudação com nome do usuário se disponível (CRM/lead context)
+    const leadName = (typeof window !== "undefined" && localStorage.getItem("pr_lead_name")) || "";
+    const personalizedGreeting = leadName
+      ? option.greeting.replace("Olá, Enfª Brisa!", `Olá, Enfª Brisa! Sou ${leadName} e`)
+      : option.greeting;
+
+    const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(personalizedGreeting)}`;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      window.location.href = whatsappUrl;
+    } else {
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    }
+
+    // NOTA: redirecionamento para landing pages internas removido — alguns destinos
+    // (ex: /profissionais, /afiliados) podem ter guards de auth que enviavam o
+    // usuário para /admin-login. Mantemos apenas a abertura do WhatsApp.
 
     setIsOpen(false);
   };

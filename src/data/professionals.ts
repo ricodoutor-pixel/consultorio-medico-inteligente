@@ -98,6 +98,10 @@ export type Professional = {
   premiumPrice?: number;
   crm?: string;
   hospital?: string;
+  /** Link externo do hospital/instituição. */
+  hospitalUrl?: string;
+  /** Link do print de validação no portal do CFM. */
+  cfmPrintUrl?: string;
   flags?: string[];
   plan_tier?: string;
 }

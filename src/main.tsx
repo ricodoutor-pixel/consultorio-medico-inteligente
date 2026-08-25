@@ -23,6 +23,47 @@ if (import.meta.env.PROD) {
 }
 
 
+// 🧩 Silencia ruído de extensões do navegador (MetaMask/carteiras cripto).
+// Roda ANTES de qualquer outro listener: impede que a rejeição não tratada
+// chegue aos reporters/overlays e provoque "tela em branco" falsa.
+const isExtensionNoise = (value: unknown): boolean => {
+  try {
+    const seen = new Set<unknown>();
+    let cur: any = value;
+    while (cur && !seen.has(cur)) {
+      seen.add(cur);
+      const msg = String(cur?.message ?? cur ?? "");
+      const stack = String(cur?.stack ?? "");
+      if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack + msg)) return true;
+      if (/MetaMask|ethereum provider|web3/i.test(msg)) return true;
+      cur = cur?.cause;
+    }
+  } catch { /* noop */ }
+  return false;
+};
+
+window.addEventListener(
+  "unhandledrejection",
+  (event) => {
+    if (isExtensionNoise(event.reason)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  },
+  true,
+);
+
+window.addEventListener(
+  "error",
+  (event) => {
+    if (isExtensionNoise(event.error ?? event.message) || /extension:\/\//.test(event.filename || "")) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  },
+  true,
+);
+
 // Inicializa proteções anti-clonagem ANTES do React
 initAntiClone();
 

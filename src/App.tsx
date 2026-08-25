@@ -236,7 +236,11 @@ const isExtensionNoise = (err: unknown): boolean => {
 
 if (typeof window !== "undefined") {
   window.addEventListener("error", (event) => {
-    if (isExtensionNoise(event.error ?? event.message) || /extension:\/\//.test(event.filename || "")) return;
+    if (isExtensionNoise(event.error ?? event.message) || /extension:\/\//.test(event.filename || "")) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     reportFrontendRuntimeError(event.error ?? event.message, {
       sourceRef: window.location.pathname,
       phase: "fatal-runtime",
@@ -249,7 +253,11 @@ if (typeof window !== "undefined") {
   });
 
   window.addEventListener("unhandledrejection", (event) => {
-    if (isExtensionNoise(event.reason)) return;
+    if (isExtensionNoise(event.reason)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     reportFrontendRuntimeError(event.reason, {
       sourceRef: window.location.pathname,
       phase: "unhandled-rejection",

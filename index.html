@@ -25,6 +25,40 @@
     </style>
 
     <script>
+      // Instala o filtro antes de analytics, módulos e reporters. Extensões como
+      // MetaMask podem rejeitar uma Promise ainda durante a leitura do <head>.
+      (function(){
+        function isExtensionNoise(value){
+          try {
+            var seen = [];
+            var current = value;
+            while (current && seen.indexOf(current) === -1) {
+              seen.push(current);
+              var message = String((current && current.message) || current || '');
+              var stack = String((current && current.stack) || '');
+              if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//i.test(message + stack)) return true;
+              if (/MetaMask|ethereum provider|web3|Failed to connect to MetaMask/i.test(message)) return true;
+              current = current && current.cause;
+            }
+          } catch(_){}
+          return false;
+        }
+        window.__pyrIsExtensionNoise = isExtensionNoise;
+        window.addEventListener('unhandledrejection', function(event){
+          if (!isExtensionNoise(event.reason)) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }, true);
+        window.addEventListener('error', function(event){
+          var source = event.error || { message: event.message, stack: event.filename };
+          if (!isExtensionNoise(source)) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }, true);
+      })();
+    </script>
+
+    <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       
@@ -289,6 +323,7 @@
         // erros de Service Worker dentro de iframe não são falhas da plataforma.
         function isExternalNoise(err){
           try {
+            if (window.__pyrIsExtensionNoise && window.__pyrIsExtensionNoise(err)) return true;
             var msg = String((err && err.message) || err || '');
             var stack = String((err && err.stack) || '');
             if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack)) return true;
@@ -333,8 +368,13 @@
           reportEarlyError(error, 'window.error');
         }, true);
         window.addEventListener('unhandledrejection', function(e){
+          if (isExternalNoise(e.reason)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+          }
           reportEarlyError(e.reason, 'unhandledrejection');
-        });
+        }, true);
 
         // Watchdog paciente: mantém a tela de carregamento enquanto o bundle
         // compila/baixa. Erros genéricos e de extensões jamais substituem o #root;

@@ -1,5 +1,20 @@
 import DashboardDiretoria from "./components/admin/DashboardDiretoria";
 import { Suspense } from "react";
+import { HelmetProvider } from "react-helmet-async";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { FrogChatModal } from "./components/FrogChatModal";
+import { BrisaChatModal } from "./components/BrisaChatModal";
+import { ShoppingCart } from "./components/ShoppingCart";
+import { PrivateRoute } from "@/components/PrivateRoute";
+import { AdminRoute } from "@/components/AdminRoute";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { CurrencyProvider } from "@/contexts/CurrencyContext";
+import { TenantProvider } from "@/contexts/TenantContext";
 
 import { OfflineAlert } from "@/components/OfflineAlert";
 import { useCart } from "@/store/cart";
@@ -198,8 +213,35 @@ const MonitoramentoSaude = lazyWithRecovery(() => import("./pages/MonitoramentoS
 
 const queryClient = new QueryClient();
 
+/**
+ * Ruído de extensões do navegador (MetaMask/carteiras cripto, tradutores).
+ * Não são falhas da plataforma e não devem ser reportadas nem acionar recovery.
+ */
+const isExtensionNoise = (err: unknown): boolean => {
+  try {
+    const seen = new Set<unknown>();
+    let cur: any = err;
+    while (cur && !seen.has(cur)) {
+      seen.add(cur);
+      const msg = String(cur?.message ?? cur ?? "");
+      const stack = String(cur?.stack ?? "");
+      if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack + msg)) return true;
+      if (/MetaMask|ethereum provider|web3|Failed to connect to MetaMask/i.test(msg)) return true;
+      cur = cur?.cause;
+    }
+  } catch {
+    /* noop */
+  }
+  return false;
+};
+
 if (typeof window !== "undefined") {
   window.addEventListener("error", (event) => {
+    if (isExtensionNoise(event.error ?? event.message) || /extension:\/\//.test(event.filename || "")) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     reportFrontendRuntimeError(event.error ?? event.message, {
       sourceRef: window.location.pathname,
       phase: "fatal-runtime",
@@ -212,12 +254,18 @@ if (typeof window !== "undefined") {
   });
 
   window.addEventListener("unhandledrejection", (event) => {
+    if (isExtensionNoise(event.reason)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     reportFrontendRuntimeError(event.reason, {
       sourceRef: window.location.pathname,
       phase: "unhandled-rejection",
     });
   });
 }
+
 
 const App = () => (
   <ErrorBoundary>

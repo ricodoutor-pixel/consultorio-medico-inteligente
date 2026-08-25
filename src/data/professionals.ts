@@ -72,6 +72,7 @@ import drDanielKobayashiImg from "@/assets/dr-daniel-kobayashi.jpg";
 import cfmDaniel from "@/assets/cfm_prints/dr-daniel.png";
 import drJoseGeraldoImg from "@/assets/dr-jose-geraldo.jpg";
 import cfmJoseGeraldo from "@/assets/cfm_prints/dr-jose-geraldo.png";
+
 export type Professional = {
   id: string;
   name: string;
@@ -96,15 +97,11 @@ export type Professional = {
   /** Valor da Consulta Premium definido pelo profissional. */
   premiumPrice?: number;
   crm?: string;
-  /** Bandeiras de países de atuação (ex.: ["🇧🇷"]). */
-  flags?: string[];
-  /** Hospital / clínica de vínculo (quando aplicável). */
   hospital?: string;
-  /** URL pública do hospital/clínica de vínculo. */
-  hospitalUrl?: string;
-  /** URL do comprovante CFM (print da consulta pública). */
-  cfmPrintUrl?: string;
+  flags?: string[];
+  plan_tier?: string;
 }
+
 export const COUNCIL_CONFIG: Record<string, {
   councilLabel: string;
   councilFull: string;

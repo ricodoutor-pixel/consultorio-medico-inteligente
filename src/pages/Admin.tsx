@@ -344,6 +344,7 @@ const Admin = () => {
     { label: "Crédito", path: "/admin/credit-audit", icon: Wallet },
     { label: "Aprovações KYC", path: "/admin/aprovacoes-medicas", icon: UserCheck },
     { label: "KYC Lojas / Farmácias", path: "/admin/aprovacoes-farmacias", icon: Building2 },
+    { label: "KYC Pacientes", path: "/admin/aprovacoes-pacientes", icon: Users },
   ];
 
   return (

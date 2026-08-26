@@ -1,318 +1,390 @@
-import { useEffect, useRef, useState } from "react";
-import { X, Send, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { X, Send, Sparkles, Trash2, Minimize2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 import brisaAvatar from "@/assets/brisa-whatsapp-icon.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
-export type BrisaCategoria = "paciente" | "medico" | "lojista" | "ebook" | "suporte";
-
-interface BrisaChatModalProps {
-  /** Controlado externamente (opcional). Sem props, o modal escuta o evento global `open-brisa-chat`. */
-  open?: boolean;
-  categoria?: BrisaCategoria;
-  onClose?: () => void;
+interface Message {
+  id: string;
+  text: string;
+  sender: "user" | "ai";
+  timestamp: Date;
 }
 
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brisa-chat`;
 
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
+async function streamChat({
+  messages,
+  leadName,
+  category,
+  onDelta,
+  onDone,
+  onError,
+}: {
+  messages: { role: "user" | "assistant"; content: string }[];
+  leadName: string;
+  category: string;
+  onDelta: (text: string) => void;
+  onDone: () => void;
+  onError: (err: string) => void;
+}) {
+  try {
+    const resp = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ messages, leadName, category }),
+    });
+
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => ({ error: "Erro de conexão" }));
+      onError(data.error || `Erro ${resp.status}`);
+      return;
+    }
+
+    if (!resp.body) {
+      onError("Sem resposta do servidor");
+      return;
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      let newlineIdx: number;
+      while ((newlineIdx = buffer.indexOf("\n")) !== -1) {
+        const line = buffer.slice(0, newlineIdx).trim();
+        buffer = buffer.slice(newlineIdx + 1);
+
+        if (!line.startsWith("data: ")) continue;
+        const payload = line.slice(6);
+        if (payload === "[DONE]") { onDone(); return; }
+
+        try {
+          const parsed = JSON.parse(payload);
+          const delta = parsed.choices?.[0]?.delta?.content;
+          if (delta) onDelta(delta);
+        } catch { /* partial JSON, skip */ }
+      }
+    }
+    onDone();
+  
+      // Sync with Brevo
+      supabase.functions.invoke('brevo-sync', {
+        body: { nome: finalData.name, email: finalData.email, telefone: finalData.phone, categoria: category, origem: 'brisa_chat_onboarding' }
+      }).catch(e => console.error('Brevo sync failed:', e));
+    } catch (e) {
+    onError(e instanceof Error ? e.message : "Erro de conexão");
+  }
 }
 
-const SAUDACAO: Record<BrisaCategoria, string> = {
-  paciente:
-    "Oi! Sou a Enfª Brisa 🌿 Antes de começarmos, me diz seu nome, e-mail e WhatsApp — assim consigo te acompanhar direitinho.",
-  medico:
-    "Olá, doutor(a)! Sou a Enfª Brisa 🌿 Me passa seu nome, e-mail e WhatsApp que eu te explico como funciona a prescrição na plataforma.",
-  lojista:
-    "Oi! Sou a Enfª Brisa 🌿 Me diz seu nome, e-mail e WhatsApp que eu te mostro como levar seus produtos para o nosso Shopping.",
-  ebook:
-    "Oi! Sou a Enfª Brisa 🌿 Deixa seu nome, e-mail e WhatsApp que eu te envio o e-book e o acesso à biblioteca.",
-  suporte:
-    "Oi! Sou a Enfª Brisa 🌿 Me diz seu nome, e-mail e WhatsApp e já te ajudo com o que precisar.",
-};
+export const BrisaChatModal = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [category, setCategory] = useState("");
+  const [categoryLabel, setCategoryLabel] = useState("");
+  
+  // 0: Ask Name, 1: Ask Email, 2: Ask Phone, 3: Ask Registered, 4: Free Chat
+  const [onboardingStep, setOnboardingStep] = useState(0);
+  
+  const [leadData, setLeadData] = useState({ name: "", email: "", phone: "", registered: "" });
 
-const onlyDigits = (v: string) => v.replace(/\D/g, "");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputValue, setInputValue] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingText, setStreamingText] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-export function BrisaChatModal(props: BrisaChatModalProps = {}) {
-  const isControlled = props.open !== undefined;
-  const [selfOpen, setSelfOpen] = useState(false);
-  const [selfCategoria, setSelfCategoria] = useState<BrisaCategoria>("paciente");
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, streamingText, isOpen]);
 
-  const open = isControlled ? !!props.open : selfOpen;
-  const categoria = (isControlled ? props.categoria : selfCategoria) ?? "paciente";
-  const onClose = () => {
-    props.onClose?.();
-    if (!isControlled) setSelfOpen(false);
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      setCategory(detail.id);
+      setCategoryLabel(detail.label);
+      setIsOpen(true);
+      
+      // Reset state on open
+      setOnboardingStep(0);
+      setLeadData({ name: "", email: "", phone: "", registered: "" });
+      setMessages([
+        {
+          id: "1",
+          text: `Olá! Sou a **Enfª Brisa**, estou aqui para te ajudar! Primeiro eu preciso fazer umas perguntas para dar início ao seu atendimento como **${detail.label}**.\n\n1. Qual é o seu nome?`,
+          sender: "ai",
+          timestamp: new Date(),
+        }
+      ]);
+    };
+    window.addEventListener("open-brisa-chat", handler);
+    return () => window.removeEventListener("open-brisa-chat", handler);
+  }, []);
+
+  const saveLeadToCRM = async (finalData: typeof leadData) => {
+    try {
+      await supabase.from("leads_contatos").insert({
+        nome: finalData.name,
+        email: finalData.email,
+        telefone: finalData.phone,
+        origem: "brisa_chat_onboarding",
+        categoria: category,
+        tags: [finalData.registered.toLowerCase().includes("sim") ? "ja_cadastrado" : "novo_cadastro"],
+      });
+    } catch (e) {
+      console.warn("Failed to save lead:", e);
+    }
   };
 
-  useEffect(() => {
-    if (isControlled) return;
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent<{ id?: string }>).detail;
-      const valid: BrisaCategoria[] = ["paciente", "medico", "lojista", "ebook", "suporte"];
-      const id = detail?.id as BrisaCategoria | undefined;
-      setSelfCategoria(id && valid.includes(id) ? id : "paciente");
-      setSelfOpen(true);
+  const handleSendMessage = useCallback(() => {
+    if (!inputValue.trim() || isStreaming) return;
+    const text = inputValue.trim();
+    
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      text,
+      sender: "user",
+      timestamp: new Date(),
     };
-    window.addEventListener("open-brisa-chat", handler as EventListener);
-    return () => window.removeEventListener("open-brisa-chat", handler as EventListener);
-  }, [isControlled]);
 
+    setMessages((prev) => [...prev, userMsg]);
+    setInputValue("");
 
-  const [step, setStep] = useState<"onboarding" | "chat">("onboarding");
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [erro, setErro] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+    // Onboarding flow
+    if (onboardingStep === 0) {
+      setLeadData(prev => ({ ...prev, name: text }));
+      setOnboardingStep(1);
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: (Date.now() + 1).toString(),
+          text: `Ok ${text}, agora preciso do seu endereço de e-mail.`,
+          sender: "ai",
+          timestamp: new Date(),
+        }]);
+      }, 500);
+      return;
+    }
 
-  useEffect(() => {
-    if (!open) return;
-    setErro(null);
-    const savedName = localStorage.getItem("pr_lead_name") || "";
-    const savedPhone = localStorage.getItem("pr_lead_phone") || "";
-    const savedEmail = localStorage.getItem("pr_lead_email") || "";
-    setNome(savedName);
-    setTelefone(savedPhone);
-    setEmail(savedEmail);
-    const captured = savedName.length >= 2 && onlyDigits(savedPhone).length >= 10;
-    setStep(captured ? "chat" : "onboarding");
-    setMessages(captured ? [] : []);
-  }, [open, categoria]);
+    if (onboardingStep === 1) {
+      setLeadData(prev => ({ ...prev, email: text }));
+      setOnboardingStep(2);
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: (Date.now() + 1).toString(),
+          text: `Ok, agora por favor digite seu número de celular/WhatsApp (com DDD).`,
+          sender: "ai",
+          timestamp: new Date(),
+        }]);
+      }, 500);
+      return;
+    }
 
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, loading, step]);
+    if (onboardingStep === 2) {
+      setLeadData(prev => ({ ...prev, phone: text }));
+      setOnboardingStep(3);
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: (Date.now() + 1).toString(),
+          text: `Perfeito! Uma última pergunta: você já tem cadastro em nossa plataforma? (Responda Sim ou Não)`,
+          sender: "ai",
+          timestamp: new Date(),
+        }]);
+      }, 500);
+      return;
+    }
 
-  const callBrisa = async (payload: {
-    message?: string;
-    saveLead?: boolean;
-    history: ChatMessage[];
-  }) => {
-    const { data, error } = await supabase.functions.invoke("brisa-chat", {
-      body: {
-        categoria,
-        lead: { nome, email, telefone },
-        messages: payload.history,
-        message: payload.message ?? "",
-        saveLead: !!payload.saveLead,
+    if (onboardingStep === 3) {
+      const finalData = { ...leadData, registered: text };
+      setLeadData(finalData);
+      setOnboardingStep(4);
+      saveLeadToCRM(finalData); // Save to DB
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: (Date.now() + 1).toString(),
+          text: `Ok, muito obrigada por suas respostas! 🌿\n\nAgora eu fico à disposição para esclarecer suas dúvidas sobre nossa plataforma. Lembrando que toda nossa conversa será encaminhada para revisão de um agente humano da nossa equipe, para garantir o melhor atendimento.\n\nFique à vontade para perguntar!`,
+          sender: "ai",
+          timestamp: new Date(),
+        }]);
+      }, 500);
+      return;
+    }
+
+    // AI Free Chat phase
+    setIsStreaming(true);
+    setStreamingText("");
+
+    const history = messages
+      .filter((m) => m.id !== "1" && m.sender === "user") // Send only relevant history to save tokens
+      .map((m) => ({
+        role: "user" as "user" | "assistant",
+        content: m.text,
+      }));
+    
+    // Add current message
+    history.push({ role: "user", content: text });
+
+    let accumulated = "";
+
+    streamChat({
+      messages: history.slice(-6),
+      leadName: leadData.name,
+      category,
+      onDelta: (delta) => {
+        accumulated += delta;
+        setStreamingText(accumulated);
+      },
+      onDone: () => {
+        if (accumulated) {
+          setMessages((prev) => [
+            ...prev,
+            { id: (Date.now() + 1).toString(), text: accumulated, sender: "ai", timestamp: new Date() },
+          ]);
+        }
+        setStreamingText("");
+        setIsStreaming(false);
+      },
+      onError: (err) => {
+        setMessages((prev) => [
+          ...prev,
+          { id: (Date.now() + 1).toString(), text: "Tive um problema na conexão 🌿 Pode repetir?", sender: "ai", timestamp: new Date() },
+        ]);
+        setStreamingText("");
+        setIsStreaming(false);
       },
     });
-    if (error) throw error;
-    return data as { reply: string | null; leadSaved?: boolean };
-  };
+  }, [inputValue, isStreaming, onboardingStep, leadData, messages, category]);
 
-  const handleOnboarding = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (nome.trim().length < 2) return setErro("Me diz seu nome completo, por favor.");
-    if (onlyDigits(telefone).length < 10) return setErro("Informe um WhatsApp válido com DDD.");
-    if (email && !/^\S+@\S+\.\S+$/.test(email)) return setErro("Esse e-mail parece inválido.");
 
-    setErro(null);
-    setLoading(true);
-    try {
-      localStorage.setItem("pr_lead_name", nome.trim());
-      localStorage.setItem("pr_lead_phone", onlyDigits(telefone));
-      if (email) localStorage.setItem("pr_lead_email", email.trim());
-
-      const firstMessage = `Meu nome é ${nome.trim()}. Quero atendimento como ${categoria}.`;
-      const res = await callBrisa({ message: firstMessage, saveLead: true, history: [] });
-      setStep("chat");
-      setMessages([
-        { role: "user", content: firstMessage },
-        {
-          role: "assistant",
-          content: res.reply ?? "Prontinho! Me conta em que posso te ajudar 🌿",
-        },
-      ]);
-    } catch {
-      setStep("chat");
-      setMessages([
-        {
-          role: "assistant",
-          content:
-            "Registrei seus dados 🌿 Minha conexão oscilou um pouco, mas pode me contar o que você precisa.",
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const text = input.trim();
-    if (!text || loading) return;
-    const history = [...messages];
-    setMessages([...history, { role: "user", content: text }]);
-    setInput("");
-    setLoading(true);
-    try {
-      const res = await callBrisa({ message: text, history });
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: res.reply ?? "Deixa eu confirmar isso aqui e já te retorno 🌿",
-        },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "Minha conexão oscilou agora. Pode repetir? Se preferir, seguimos no WhatsApp 🌿",
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!open) return null;
+  if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-background/80 backdrop-blur-sm p-0 sm:p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Chat com a Enfermeira Brisa"
-    >
-      <div
-        className="w-full sm:max-w-md h-[100dvh] sm:h-[85vh] sm:rounded-2xl border border-border overflow-hidden flex flex-col shadow-2xl"
-        style={{ background: "hsl(var(--card))" }}
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.95 }}
+        role="dialog"
+        aria-label="Chat com Enfª Brisa"
+        aria-modal="true"
+        className="fixed right-0 sm:right-6 z-[60] w-full sm:w-[380px] sm:max-w-[calc(100vw-2rem)] h-[min(65dvh,520px)] sm:h-[560px] sm:max-h-[75vh] rounded-t-2xl sm:rounded-2xl border-t sm:border border-border bg-card shadow-2xl flex flex-col overflow-hidden bottom-[calc(72px+env(safe-area-inset-bottom,0px))] sm:bottom-6"
       >
-        <header
-          className="flex items-center gap-3 px-4 py-3 border-b border-border shrink-0"
-          style={{
-            background:
-              "linear-gradient(135deg, hsl(152 100% 74% / 0.15), hsl(152 100% 74% / 0.05))",
-          }}
-        >
-          <img
-            src={brisaAvatar}
-            alt="Enfermeira Brisa"
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-foreground">Enfª Brisa</p>
-            <p className="text-xs text-muted-foreground">
-              Atendimento humanizado 24h · {categoria}
-            </p>
+        {/* Header */}
+        <div className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-3 border-b border-border bg-gradient-to-r from-primary/20 via-emerald-500/10 to-transparent flex-shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20 flex-shrink-0">
+              <img src={brisaAvatar} alt="Brisa" className="w-full h-full object-cover" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-bold text-sm text-foreground flex items-center gap-1 truncate">
+                Enfª Brisa <Sparkles size={12} className="text-primary" />
+              </p>
+              <p className="text-[10px] text-muted-foreground font-semibold truncate">
+                {isStreaming ? "✍️ Digitando..." : `Atendimento: ${categoryLabel}`}
+              </p>
+            </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg hover:bg-accent/50 text-muted-foreground"
-            aria-label="Fechar chat"
-          >
-            <X size={18} />
-          </button>
-        </header>
-
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-          {step === "onboarding" ? (
-            <>
-              <div className="max-w-[85%] rounded-2xl px-3 py-2 bg-accent/40 text-sm text-foreground">
-                {SAUDACAO[categoria]}
-              </div>
-              <form onSubmit={handleOnboarding} className="space-y-2 pt-2">
-                <input
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  placeholder="Seu nome completo"
-                  autoComplete="name"
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground"
-                />
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Seu e-mail"
-                  type="email"
-                  autoComplete="email"
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground"
-                />
-                <input
-                  value={telefone}
-                  onChange={(e) => setTelefone(e.target.value)}
-                  placeholder="WhatsApp com DDD"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground"
-                />
-                {erro && <p className="text-xs text-destructive">{erro}</p>}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full rounded-xl py-2.5 text-sm font-semibold text-background disabled:opacity-60"
-                  style={{ background: "hsl(152 100% 74%)" }}
-                >
-                  {loading ? "Conectando com a Brisa..." : "Começar atendimento"}
-                </button>
-                <p className="text-[10px] text-muted-foreground text-center">
-                  Seus dados são usados apenas para o atendimento (LGPD).
-                </p>
-              </form>
-            </>
-          ) : (
-            <>
-              {messages.length === 0 && (
-                <div className="max-w-[85%] rounded-2xl px-3 py-2 bg-accent/40 text-sm text-foreground">
-                  Oi{nome ? `, ${nome.split(" ")[0]}` : ""}! Sou a Enfª Brisa 🌿 Como posso te
-                  ajudar hoje?
-                </div>
-              )}
-              {messages.map((m, i) => (
-                <div
-                  key={i}
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap ${
-                    m.role === "user"
-                      ? "ml-auto text-background"
-                      : "bg-accent/40 text-foreground"
-                  }`}
-                  style={m.role === "user" ? { background: "hsl(152 100% 74%)" } : undefined}
-                >
-                  {m.content}
-                </div>
-              ))}
-              {loading && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Loader2 size={14} className="animate-spin" /> Brisa está digitando...
-                </div>
-              )}
-            </>
-          )}
+          <div className="flex items-center gap-0.5 flex-shrink-0">
+            <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground" title="Minimizar chat">
+              <Minimize2 size={14} />
+            </button>
+            <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-destructive/20 transition-colors text-destructive font-bold" title="Fechar chat">
+              <X size={16} />
+            </button>
+          </div>
         </div>
 
-        {step === "chat" && (
-          <form
-            onSubmit={handleSend}
-            className="flex items-center gap-2 px-3 py-3 border-t border-border shrink-0"
-            style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))" }}
-          >
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Escreva sua mensagem..."
-              className="flex-1 rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground"
-            />
-            <button
-              type="submit"
-              disabled={loading || !input.trim()}
-              className="p-2.5 rounded-xl text-background disabled:opacity-50"
-              style={{ background: "hsl(152 100% 74%)" }}
-              aria-label="Enviar mensagem"
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {messages.map((message) => (
+            <motion.div
+              key={message.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
             >
-              <Send size={18} />
-            </button>
-          </form>
-        )}
-      </div>
-    </div>
-  );
-}
+              <div className="max-w-[85%]">
+                <div
+                  className={`px-3 py-2 rounded-2xl text-sm leading-relaxed ${
+                    message.sender === "user"
+                      ? "bg-primary text-primary-foreground rounded-br-md"
+                      : "bg-muted text-foreground rounded-bl-md"
+                  }`}
+                >
+                  {message.sender === "ai" ? (
+                    <div className="prose prose-sm prose-invert max-w-none [&>p]:my-1">
+                      <ReactMarkdown>{message.text}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p className="whitespace-pre-wrap">{message.text}</p>
+                  )}
+                  <p className={`text-[10px] mt-1 text-right ${message.sender === "user" ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+                    {message.timestamp.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
 
-export default BrisaChatModal;
+          {/* Streaming message */}
+          {streamingText && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+              <div className="max-w-[85%]">
+                <div className="bg-muted text-foreground rounded-2xl rounded-bl-md px-3 py-2 text-sm leading-relaxed">
+                  <div className="prose prose-sm prose-invert max-w-none [&>p]:my-1">
+                    <ReactMarkdown>{streamingText}</ReactMarkdown>
+                  </div>
+                  <span className="animate-pulse text-primary">▊</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Typing indicator */}
+          {isStreaming && !streamingText && (
+            <div className="flex justify-start">
+              <div className="bg-muted px-4 py-2 rounded-2xl rounded-bl-md">
+                <div className="flex gap-1">
+                  <span className="w-2 h-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="w-2 h-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <span className="w-2 h-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: "300ms" }} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input */}
+        <div className="p-3 border-t border-border flex gap-2 bg-card">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
+            placeholder={onboardingStep < 4 ? "Responda a pergunta..." : "Digite sua dúvida..."}
+            disabled={isStreaming}
+            className="flex-1 bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50"
+          />
+          <Button
+            size="icon"
+            onClick={handleSendMessage}
+            disabled={isStreaming || !inputValue.trim()}
+            className="rounded-xl bg-primary text-primary-foreground h-9 w-9 flex-shrink-0"
+          >
+            <Send size={16} />
+          </Button>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};

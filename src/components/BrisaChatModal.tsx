@@ -33,7 +33,32 @@ const SAUDACAO: Record<BrisaCategoria, string> = {
 
 const onlyDigits = (v: string) => v.replace(/\D/g, "");
 
-export function BrisaChatModal({ open, categoria, onClose }: BrisaChatModalProps) {
+export function BrisaChatModal(props: BrisaChatModalProps = {}) {
+  const isControlled = props.open !== undefined;
+  const [selfOpen, setSelfOpen] = useState(false);
+  const [selfCategoria, setSelfCategoria] = useState<BrisaCategoria>("paciente");
+
+  const open = isControlled ? !!props.open : selfOpen;
+  const categoria = (isControlled ? props.categoria : selfCategoria) ?? "paciente";
+  const onClose = () => {
+    props.onClose?.();
+    if (!isControlled) setSelfOpen(false);
+  };
+
+  useEffect(() => {
+    if (isControlled) return;
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ id?: string }>).detail;
+      const valid: BrisaCategoria[] = ["paciente", "medico", "lojista", "ebook", "suporte"];
+      const id = detail?.id as BrisaCategoria | undefined;
+      setSelfCategoria(id && valid.includes(id) ? id : "paciente");
+      setSelfOpen(true);
+    };
+    window.addEventListener("open-brisa-chat", handler as EventListener);
+    return () => window.removeEventListener("open-brisa-chat", handler as EventListener);
+  }, [isControlled]);
+
+
   const [step, setStep] = useState<"onboarding" | "chat">("onboarding");
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");

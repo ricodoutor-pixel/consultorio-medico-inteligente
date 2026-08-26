@@ -403,6 +403,8 @@ const Cadastro = () => {
                   Ao continuar, você aceita os Termos LGPD e autoriza captura de localização para emergências.
                 </p>
               </div>
+              </>
+              )}
 
               <Card className="border-border">
                 <CardContent className="p-6">

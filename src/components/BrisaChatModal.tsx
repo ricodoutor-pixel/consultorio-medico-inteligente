@@ -6,10 +6,12 @@ import brisaAvatar from "@/assets/brisa-whatsapp-icon.jpg";
 export type BrisaCategoria = "paciente" | "medico" | "lojista" | "ebook" | "suporte";
 
 interface BrisaChatModalProps {
-  open: boolean;
-  categoria: BrisaCategoria;
-  onClose: () => void;
+  /** Controlado externamente (opcional). Sem props, o modal escuta o evento global `open-brisa-chat`. */
+  open?: boolean;
+  categoria?: BrisaCategoria;
+  onClose?: () => void;
 }
+
 
 interface ChatMessage {
   role: "user" | "assistant";

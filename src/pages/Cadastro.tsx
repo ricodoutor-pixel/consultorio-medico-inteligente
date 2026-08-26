@@ -25,9 +25,9 @@ type UserType = "paciente" | "medico" | "profissional" | "farmacia" | "produtor"
 const userTypes = [
   { id: "paciente" as UserType, label: "Paciente / Usuário", icon: Users, desc: "Busco consulta ou tratamento", color: "green", dbType: "patient" },
   { id: "medico" as UserType, label: "Médico Prescritor", icon: Stethoscope, desc: "CRM ativo, prescrevo cannabis", color: "green", dbType: "doctor" },
-  { id: "profissional" as UserType, label: "Profissional de Saúde", icon: UserPlus, desc: "Psicólogo, farmacêutico, TO, etc.", color: "purple", dbType: "professional" },
+  
   { id: "farmacia" as UserType, label: "Farmácia / Loja", icon: Building2, desc: "CNPJ + autorização ANVISA", color: "purple", dbType: "pharmacy" },
-  { id: "produtor" as UserType, label: "Produtor / Cultivador", icon: Leaf, desc: "Autorização judicial ou ANVISA", color: "gold", dbType: "producer" },
+  
 ];
 
 const Cadastro = () => {
@@ -361,6 +361,8 @@ const Cadastro = () => {
                 ← Trocar perfil
               </button>
 
+              {type === 'paciente' && (
+              <>
               {/* Google login dedicado por categoria */}
               <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 mb-4">
                 <p className="text-[11px] uppercase tracking-wider text-emerald-300 font-bold mb-2 text-center">

@@ -118,6 +118,12 @@ export const LeadCaptureModal = ({
 
       if (dbError) throw new Error(dbError.message);
 
+      
+      // Sync with Brevo
+      supabase.functions.invoke('brevo-sync', {
+        body: { nome: nome.trim(), email: email.trim() || null, telefone: phoneDigits, categoria: categoria || null, tags: allTags, origem }
+      }).catch(e => console.error('Brevo sync failed:', e));
+
       // 🚀 Dispara convite automático WhatsApp + email com oferta R$30 (fire-and-forget)
       supabase.functions
         .invoke("lead-invite-orientacao", {

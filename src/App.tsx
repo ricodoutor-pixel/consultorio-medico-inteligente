@@ -205,6 +205,7 @@ const CadastrosRealtime = lazyWithRecovery(() => import("./pages/admin/Cadastros
 const AdminGlobalOps = lazyWithRecovery(() => import("./pages/AdminGlobalOps"), { sourceRef: "/admin/global-ops" });
 const WhatsAppInbox = lazyWithRecovery(() => import("./pages/admin/WhatsAppInbox"), { sourceRef: "/admin/whatsapp-inbox" });
 const AdminAprovacoes = lazyWithRecovery(() => import("./pages/admin/AdminAprovacoes"), { sourceRef: "/admin/aprovacoes-medicas" });
+const AdminAprovacoesFarmacias = lazyWithRecovery(() => import("./pages/admin/AdminAprovacoesFarmacias"), { sourceRef: "/admin/aprovacoes-farmacias" });
 const AdminMedicosOnline = lazyWithRecovery(() => import("./pages/admin/MedicosOnline"), { sourceRef: "/admin/medicos-online" });
 const AuthCallback = lazyWithRecovery(() => import("./pages/AuthCallback"), { sourceRef: "/auth/callback" });
 const MedSocio = lazyWithRecovery(() => import("./pages/MedSocio"), { sourceRef: "/medsocio" });
@@ -454,6 +455,8 @@ const App = () => (
                 <Route path="/admin/global-ops" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
                 <Route path="/admin/mapa-global" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
                 <Route path="/admin/aprovacoes-medicas" element={<AdminRoute><AdminAprovacoes /></AdminRoute>} />
+                <Route path="/admin/aprovacoes-farmacias" element={<AdminRoute><AdminAprovacoesFarmacias /></AdminRoute>} />
+                <Route path="/admin/kyc-lojas" element={<AdminRoute><AdminAprovacoesFarmacias /></AdminRoute>} />
                 <Route path="/admin/medicos-online" element={<AdminRoute><AdminMedicosOnline /></AdminRoute>} />
                 <Route path="/admin/medicos" element={<AdminRoute><AdminMedicosOnline /></AdminRoute>} />
                 <Route path="/admin/leads/:id" element={<AdminRoute><AdminLeadDetail /></AdminRoute>} />

@@ -345,6 +345,7 @@ const Admin = () => {
     { label: "Aprovações KYC", path: "/admin/aprovacoes-medicas", icon: UserCheck },
     { label: "KYC Lojas / Farmácias", path: "/admin/aprovacoes-farmacias", icon: Building2 },
     { label: "KYC Pacientes", path: "/admin/aprovacoes-pacientes", icon: Users },
+    { label: "KYC Agentes & IAs", path: "/admin/kyc-agentes", icon: Bot },
   ];
 
   return (

@@ -117,7 +117,7 @@ Brisa:`;
       GEMINI_API_KEY,
       {
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.85, maxOutputTokens: 400 },
+        generationConfig: { temperature: 0.85, maxOutputTokens: 1500 },
       },
       GEMINI_PRIMARY_MODEL,
     );

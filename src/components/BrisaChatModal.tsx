@@ -339,7 +339,7 @@ export const BrisaChatModal = () => {
                   }`}
                 >
                   {message.sender === "ai" ? (
-                    <div className="prose prose-sm prose-invert max-w-none [&>p]:my-1">
+                    <div className="prose prose-sm prose-invert max-w-none [&>p]:my-1 prose-a:text-green-500 prose-a:underline prose-a:font-bold hover:prose-a:text-green-400">
                       <ReactMarkdown>{message.text}</ReactMarkdown>
                     </div>
                   ) : (
@@ -358,7 +358,7 @@ export const BrisaChatModal = () => {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
               <div className="max-w-[85%]">
                 <div className="bg-muted text-foreground rounded-2xl rounded-bl-md px-3 py-2 text-sm leading-relaxed">
-                  <div className="prose prose-sm prose-invert max-w-none [&>p]:my-1">
+                  <div className="prose prose-sm prose-invert max-w-none [&>p]:my-1 prose-a:text-green-500 prose-a:underline prose-a:font-bold hover:prose-a:text-green-400">
                     <ReactMarkdown>{streamingText}</ReactMarkdown>
                   </div>
                   <span className="animate-pulse text-primary">▊</span>

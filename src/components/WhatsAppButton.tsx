@@ -59,6 +59,17 @@ const VISITOR_OPTIONS = [
     landing: null,
     color: "hsl(0 84% 65%)",
   },
+,
+  {
+    id: "humano",
+    keyword: "#HUMANO",
+    label: "Falar com Agente Humano",
+    icon: MessageCircle,
+    description: "Atendimento direto pelo WhatsApp",
+    greeting: "",
+    landing: null,
+    color: "hsl(142 71% 45%)",
+  }
 ] as const;
 
 export const WhatsAppButton = () => {

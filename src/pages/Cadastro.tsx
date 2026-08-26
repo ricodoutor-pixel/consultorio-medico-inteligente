@@ -772,24 +772,84 @@ const Cadastro = () => {
                       </div>
                     </div>
 
-                    {/* Pharmacy fields */}
+                    {/* Pharmacy fields & KYC Uploads */}
                     {type === "farmacia" && (
-                      <div className="grid sm:grid-cols-2 gap-4 pt-2 border-t border-border/50">
-                        <div>
-                          <Label className="text-xs font-bold text-muted-foreground">
-                            {country === "BR" ? "CNPJ *" : t.cnpjOrTax}
-                          </Label>
-                          <Input
-                            value={formData.cnpj || ""}
-                            onChange={(e) => handleChange("cnpj", country === "BR" ? formatCNPJ(e.target.value) : e.target.value)}
-                            placeholder={country === "BR" ? "00.000.000/0000-00" : "Tax ID / License"}
-                            className="bg-muted border-border font-mono"
-                            required
-                          />
+                      <div className="space-y-4 pt-2 border-t border-border/50">
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-xs font-bold text-muted-foreground">{t.pharmacyName}</Label>
+                            <Input
+                              value={formData.razaoSocial || ""}
+                              onChange={(e) => handleChange("razaoSocial", e.target.value)}
+                              placeholder="Razão Social / Nome Fantasia da Farmácia"
+                              className="bg-muted border-border"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs font-bold text-muted-foreground">
+                              {country === "BR" ? "CNPJ *" : t.cnpjOrTax}
+                            </Label>
+                            <Input
+                              value={formData.cnpj || ""}
+                              onChange={(e) => handleChange("cnpj", country === "BR" ? formatCNPJ(e.target.value) : e.target.value)}
+                              placeholder={country === "BR" ? "00.000.000/0000-00" : "Tax ID / License"}
+                              className="bg-muted border-border font-mono"
+                              required
+                            />
+                          </div>
                         </div>
-                        <div>
-                          <Label className="text-xs font-bold text-muted-foreground">{t.anvisaOrAuth}</Label>
-                          <Input value={formData.anvisaAuth || ""} onChange={(e) => handleChange("anvisaAuth", e.target.value)} placeholder="Nº da Autorização / Licença" className="bg-muted border-border" required />
+
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-xs font-bold text-muted-foreground">{t.anvisaOrAuth}</Label>
+                            <Input
+                              value={formData.anvisaAuth || ""}
+                              onChange={(e) => handleChange("anvisaAuth", e.target.value)}
+                              placeholder="Ex: AFE-ANVISA 7.82941.2"
+                              className="bg-muted border-border"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs font-bold text-muted-foreground">Farmacêutico(a) Responsável & CRF *</Label>
+                            <Input
+                              value={formData.crf || ""}
+                              onChange={(e) => handleChange("crf", e.target.value)}
+                              placeholder="Nome do Farmacêutico — CRF/UF 12345"
+                              className="bg-muted border-border"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* 🏢 Uploads de Documentos KYC Lojista */}
+                        <div className="p-4 rounded-2xl bg-muted/20 border border-primary/20 space-y-3">
+                          <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                            <Building2 size={15} className="text-primary" /> Anexo de Documentos & Compliance da Loja Física (KYC)
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">
+                            Estes documentos serão auditados antes da publicação dos seus produtos no Shopping.
+                          </p>
+
+                          <div className="grid sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs font-bold text-muted-foreground">Foto da Fachada / Loja Física *</Label>
+                              <Input type="file" accept="image/*" className="bg-muted border-border text-xs" />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs font-bold text-muted-foreground">Logomarca da Empresa (Shopping) *</Label>
+                              <Input type="file" accept="image/*" className="bg-muted border-border text-xs" />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs font-bold text-muted-foreground">Contrato Social / Razão Social (PDF) *</Label>
+                              <Input type="file" accept=".pdf,image/*" className="bg-muted border-border text-xs" />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs font-bold text-muted-foreground">Alvará Sanitário / ANVISA AFE *</Label>
+                              <Input type="file" accept=".pdf,image/*" className="bg-muted border-border text-xs" />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}

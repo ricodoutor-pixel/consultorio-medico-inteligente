@@ -50,7 +50,7 @@ async function tryModels(messages: any[], apiKey: string) {
       const response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: \`Bearer \${apiKey}\`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -65,10 +65,10 @@ async function tryModels(messages: any[], apiKey: string) {
       }
       
       const errText = await response.text();
-      console.warn(\`Model \${model} failed:\`, response.status, errText);
+      console.warn(`Model ${model} failed:`, response.status, errText);
       lastError = { status: response.status, text: errText };
     } catch (err) {
-      console.warn(\`Model \${model} fetch error:\`, err);
+      console.warn(`Model ${model} fetch error:`, err);
       lastError = err;
     }
   }
@@ -87,10 +87,10 @@ serve(async (req) => {
     let finalSystemPrompt = SYSTEM_PROMPT;
 
     if (category) {
-      finalSystemPrompt += \`\\n\\nCONTEXTO ATUAL: Você está falando com um \${category.toUpperCase()}. Adapte o tom!\`;
+      finalSystemPrompt += `\n\nCONTEXTO ATUAL: Você está falando com um ${category.toUpperCase()}. Adapte o tom!`;
     }
     if (leadName) {
-      finalSystemPrompt += \`\\n\\nO nome da pessoa é \${leadName}. Use o nome para maior conexão.\`;
+      finalSystemPrompt += `\n\nO nome da pessoa é ${leadName}. Use o nome para maior conexão.`;
     }
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
@@ -118,7 +118,7 @@ serve(async (req) => {
     // Em caso de falha catastrófica, retornamos uma resposta simulada para o usuário cair no humano
     const fallbackMessage = "data: " + JSON.stringify({
       choices: [{ delta: { content: "Desculpe, estou enfrentando uma instabilidade técnica no momento. Por favor, [clique aqui para falar com um Agente Humano](https://wa.me/5511991363154)." } }]
-    }) + "\\n\\ndata: [DONE]\\n\\n";
+    }) + "\n\ndata: [DONE]\n\n";
     
     return new Response(fallbackMessage, {
       status: 200, 

@@ -74,11 +74,13 @@ serve(async (req) => {
         nome,
         email: String(lead?.email ?? "").trim() || null,
         telefone,
-        origem: "brisa_chat_modal",
+        // origem é validada por trigger (allowed: chat, whatsapp, instagram, web, ...)
+        origem: "chat",
         categoria,
-        tags: ["novo_cadastro", categoria],
+        tags: ["novo_cadastro", categoria, "brisa_chat_modal"],
       });
       if (error) console.error("[brisa-chat] lead insert error:", error.message);
+
       else leadSaved = true;
     }
 

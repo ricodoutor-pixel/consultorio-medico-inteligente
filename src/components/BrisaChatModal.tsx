@@ -159,14 +159,30 @@ export const BrisaChatModal = () => {
     setMessages((prev) => [...prev, userMsg]);
     setInputValue("");
 
+    
+    const isHumanRequest = /humano|atendente|pessoa|falar com algu[eé]m/i.test(text);
+    if (isHumanRequest && onboardingStep < 4) {
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: (Date.now() + 1).toString(),
+          text: "Entendo. Se preferir falar diretamente com um agente humano da nossa equipe, basta clicar neste link: [Falar com Agente Humano](https://wa.me/5511991363154)",
+          sender: "ai",
+          timestamp: new Date(),
+        }]);
+      }, 500);
+      // Optional: keep them in the same step so they can still fill it out if they change their mind, or let them bypass. We'll just return.
+      return;
+    }
+
     // Onboarding flow
     if (onboardingStep === 0) {
+      const firstName = text.split(' ')[0];
       setLeadData(prev => ({ ...prev, name: text }));
       setOnboardingStep(1);
       setTimeout(() => {
         setMessages(prev => [...prev, {
           id: (Date.now() + 1).toString(),
-          text: `Ok ${text}, agora preciso do seu endereço de e-mail.`,
+          text: `Muito prazer, ${firstName}! 🌿 Agora, por favor, me informe o seu melhor endereço de e-mail:`,
           sender: "ai",
           timestamp: new Date(),
         }]);
@@ -180,7 +196,7 @@ export const BrisaChatModal = () => {
       setTimeout(() => {
         setMessages(prev => [...prev, {
           id: (Date.now() + 1).toString(),
-          text: `Ok, agora por favor digite seu número de celular/WhatsApp (com DDD).`,
+          text: `Ótimo! Agora digite seu número de celular/WhatsApp (com DDD):`,
           sender: "ai",
           timestamp: new Date(),
         }]);
@@ -194,7 +210,7 @@ export const BrisaChatModal = () => {
       setTimeout(() => {
         setMessages(prev => [...prev, {
           id: (Date.now() + 1).toString(),
-          text: `Perfeito! Uma última pergunta: você já tem cadastro em nossa plataforma? (Responda Sim ou Não)`,
+          text: `Perfeito! Uma última perguntinha: você já tem cadastro em nossa plataforma? (Sim ou Não)`,
           sender: "ai",
           timestamp: new Date(),
         }]);

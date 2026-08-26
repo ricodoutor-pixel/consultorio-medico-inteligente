@@ -112,8 +112,6 @@ const AdminLogin = () => {
                   <Button type="submit" className="w-full font-black h-12 bg-primary text-primary-foreground rounded-xl" disabled={loading}>
                     {loading ? "Verificando..." : "Entrar"}
                   </Button>
-
-
                 </form>
               </CardContent>
             </Card>

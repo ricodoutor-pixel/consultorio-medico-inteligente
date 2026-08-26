@@ -165,7 +165,7 @@ export const BrisaChatModal = () => {
       setTimeout(() => {
         setMessages(prev => [...prev, {
           id: (Date.now() + 1).toString(),
-          text: "Entendo. Se preferir falar diretamente com um agente humano da nossa equipe, basta clicar neste link: [Falar com Agente Humano](https://wa.me/5511991363154)",
+          text: "Entendo. Se preferir falar diretamente com um agente humano da nossa equipe, basta clicar neste link: [💬 Falar com Agente Humano (WhatsApp)](https://wa.me/5511991363154)",
           sender: "ai",
           timestamp: new Date(),
         }]);
@@ -339,7 +339,7 @@ export const BrisaChatModal = () => {
                   }`}
                 >
                   {message.sender === "ai" ? (
-                    <div className="prose prose-sm prose-invert max-w-none [&>p]:my-1 prose-a:text-green-500 prose-a:underline prose-a:font-bold hover:prose-a:text-green-400">
+                    <div className="text-sm max-w-none [&>p]:my-1 [&_a]:text-green-500 [&_a]:underline [&_a]:font-bold hover:[&_a]:text-green-400">
                       <ReactMarkdown>{message.text}</ReactMarkdown>
                     </div>
                   ) : (
@@ -358,7 +358,7 @@ export const BrisaChatModal = () => {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
               <div className="max-w-[85%]">
                 <div className="bg-muted text-foreground rounded-2xl rounded-bl-md px-3 py-2 text-sm leading-relaxed">
-                  <div className="prose prose-sm prose-invert max-w-none [&>p]:my-1 prose-a:text-green-500 prose-a:underline prose-a:font-bold hover:prose-a:text-green-400">
+                  <div className="text-sm max-w-none [&>p]:my-1 [&_a]:text-green-500 [&_a]:underline [&_a]:font-bold hover:[&_a]:text-green-400">
                     <ReactMarkdown>{streamingText}</ReactMarkdown>
                   </div>
                   <span className="animate-pulse text-primary">▊</span>

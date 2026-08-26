@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import PharmacyKycDocViewer from "@/components/admin/PharmacyKycDocViewer";
+import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import {
   PHARMACY_KYC_LABELS,
   PHARMACY_KYC_REQUIRED,
@@ -327,17 +328,22 @@ export const AdminAprovacoesFarmacias = () => {
                   {/* Top Bar da Loja */}
                   <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-5 border-b border-border/60">
                     <div className="flex items-start gap-4">
-                      {pharmacy.logo_url ? (
-                        <img
-                          src={pharmacy.logo_url}
-                          alt={pharmacy.nome_fantasia}
-                          className="w-16 h-16 rounded-2xl object-cover border-2 border-primary/30 shadow-md shrink-0 bg-slate-900"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black text-xl shrink-0">
-                          {pharmacy.nome_fantasia.slice(0, 2).toUpperCase()}
+                      <div className="relative shrink-0">
+                        {pharmacy.logo_url ? (
+                          <img
+                            src={pharmacy.logo_url}
+                            alt={pharmacy.nome_fantasia}
+                            className="w-16 h-16 rounded-2xl object-cover border-2 border-primary/30 shadow-md bg-slate-900"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-black text-xl">
+                            {pharmacy.nome_fantasia.slice(0, 2).toUpperCase()}
+                          </div>
+                        )}
+                        <div className="absolute -bottom-1 -right-1 bg-background p-0.5 rounded-full shadow-md">
+                          <OnlineStatusIndicator online={true} size="md" />
                         </div>
-                      )}
+                      </div>
 
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
@@ -349,6 +355,7 @@ export const AdminAprovacoesFarmacias = () => {
                               OFICIAL PLANTA Y RAÍZ 🌿
                             </Badge>
                           )}
+                          <OnlineStatusIndicator online={true} size="sm" showLabel />
                           {pharmacy.is_approved ? (
                             <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/40 text-[10px] font-bold">
                               PUBLICADA NO SHOPPING ✅

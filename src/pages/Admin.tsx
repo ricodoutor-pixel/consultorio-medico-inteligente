@@ -28,6 +28,7 @@ import { KpiDrillDown, type DrillSource } from "@/components/admin/KpiDrillDown"
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AgentsHub } from "@/components/admin/AgentsHub";
 import { WhatsAppFailoverManager } from "@/components/admin/WhatsAppFailoverManager";
+import { GoogleAnalyticsLiveMirror } from "@/components/admin/GoogleAnalyticsLiveMirror";
 import { useAdminRealtime } from "@/hooks/useAdminRealtime";
 
 // ---------- Helpers ----------
@@ -390,6 +391,11 @@ const Admin = () => {
                 <LogOut size={14} />
               </Button>
             </div>
+          </motion.div>
+
+          {/* GOOGLE ANALYTICS 4 LIVE MIRROR (TOP WIDGET) */}
+          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+            <GoogleAnalyticsLiveMirror />
           </motion.div>
 
           {/* KPI STRIP */}

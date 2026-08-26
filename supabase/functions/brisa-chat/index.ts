@@ -117,7 +117,13 @@ Brisa:`;
       GEMINI_API_KEY,
       {
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.85, maxOutputTokens: 1500 },
+        generationConfig: {
+          temperature: 0.85,
+          maxOutputTokens: 1500,
+          // sem "thinking": o orçamento de raciocínio consumia os tokens e truncava a resposta
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+
       },
       GEMINI_PRIMARY_MODEL,
     );

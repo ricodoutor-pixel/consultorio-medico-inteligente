@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import { useDoctors } from "@/hooks/useDoctors";
 import KycDocViewer from "@/components/admin/KycDocViewer";
+import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { KYC_LABELS, KYC_REQUIRED, type KycKind } from "@/lib/kyc-docs";
 import { professionals as testProfessionals } from "@/data/professionals";
 
@@ -474,10 +475,13 @@ export const AdminAprovacoes = () => {
                               </div>
                             )}
                             <div>
-                              <p className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                                {name}
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <p className="font-bold text-sm text-foreground">
+                                  {name}
+                                </p>
+                                <OnlineStatusIndicator online={Boolean(doc.is_online || isCardActive)} size="sm" showLabel />
                                 {isCardActive && <Badge className="bg-emerald-500 text-black text-[10px] font-black h-4 px-1">ON</Badge>}
-                              </p>
+                              </div>
                               <p className="text-xs text-muted-foreground font-mono">{crm}</p>
                               <p className="text-[11px] text-emerald-400 font-semibold">{mockMatch?.tags?.[0] || doc.specialty || 'Medicina Canabinoide'}</p>
                             </div>
@@ -503,7 +507,7 @@ export const AdminAprovacoes = () => {
 
                         <TableCell>
                           <div className="flex flex-wrap gap-1.5">
-                            {([...KYC_REQUIRED, 'icp_brasil'] as KycKind[]).map((kind) => {
+                            {[...KYC_REQUIRED, 'icp_brasil'].map((kind) => {
                               const attached = kind === 'icp_brasil' ? Boolean(doc.signature_url) : Boolean(docOf(doc, kind));
                               return (
                                 <Button

@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { KYC_BUCKET, KYC_LABELS, type KycKind } from "@/lib/kyc-docs";
 import { categories, COUNCIL_CONFIG } from "@/data/professionals";
 import { motion } from "framer-motion";
+import * as Flags from "country-flag-icons/react/3x2";
 import {
   DocumentType,
   formatCPFInput,
@@ -35,28 +36,40 @@ import "react-phone-number-input/style.css";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
+export const CountryFlag = ({
+  code,
+  className = "w-5 h-3.5 rounded-sm object-cover shadow-sm shrink-0 border border-slate-700/50 inline-block align-middle",
+}: {
+  code: string;
+  className?: string;
+}) => {
+  const FlagComponent = (Flags as Record<string, any>)[code?.toUpperCase()];
+  if (!FlagComponent) return <span className="text-xs">🌐</span>;
+  return <FlagComponent className={className} title={code} />;
+};
+
 export const COUNTRIES = [
   // América Latina
-  { code: "BR", name: "Brasil", flag: "🇧🇷", council: "CFM / CRM", lang: "PT", currency: "R$ (BRL)", regionLabel: "UF", defaultUF: "SP", defaultDoc: "cpf" as DocumentType },
-  { code: "BO", name: "Bolívia", flag: "🇧🇴", council: "Colegio Médico / SEDES", lang: "ES", currency: "Bs / USD", regionLabel: "Departamento", defaultUF: "LP", defaultDoc: "ci" as DocumentType },
-  { code: "AR", name: "Argentina", flag: "🇦🇷", council: "MSAL / Colegios Médicos", lang: "ES", currency: "ARS / USD", regionLabel: "Provincia", defaultUF: "BA", defaultDoc: "passport" as DocumentType },
-  { code: "CL", name: "Chile", flag: "🇨🇱", council: "Colegio Médico (Colmed)", lang: "ES", currency: "CLP / USD", regionLabel: "Región", defaultUF: "RM", defaultDoc: "passport" as DocumentType },
-  { code: "CO", name: "Colômbia", flag: "🇨🇴", council: "Colegio Médico Colombiano", lang: "ES", currency: "COP / USD", regionLabel: "Departamento", defaultUF: "DC", defaultDoc: "passport" as DocumentType },
-  { code: "PE", name: "Peru", flag: "🇵🇪", council: "Colegio Médico del Perú (CMP)", lang: "ES", currency: "PEN / USD", regionLabel: "Departamento", defaultUF: "LIM", defaultDoc: "passport" as DocumentType },
-  { code: "UY", name: "Uruguai", flag: "🇺🇾", council: "Colegio Médico del Uruguay (CMU)", lang: "ES", currency: "UYU / USD", regionLabel: "Departamento", defaultUF: "MO", defaultDoc: "passport" as DocumentType },
-  { code: "PY", name: "Paraguai", flag: "🇵🇾", council: "Círculo Paraguayo de Médicos", lang: "ES", currency: "PYG / USD", regionLabel: "Departamento", defaultUF: "ASU", defaultDoc: "passport" as DocumentType },
-  { code: "EC", name: "Equador", flag: "🇪🇨", council: "Federación Médica Ecuatoriana", lang: "ES", currency: "USD", regionLabel: "Provincia", defaultUF: "P", defaultDoc: "passport" as DocumentType },
-  { code: "MX", name: "México", flag: "🇲🇽", council: "CONACEM / SSA", lang: "ES", currency: "MXN / USD", regionLabel: "Estado", defaultUF: "CMX", defaultDoc: "passport" as DocumentType },
+  { code: "BR", name: "Brasil", flag: "BR", council: "CFM / CRM", lang: "PT", currency: "R$ (BRL)", regionLabel: "UF", defaultUF: "SP", defaultDoc: "cpf" as DocumentType },
+  { code: "BO", name: "Bolívia", flag: "BO", council: "Colegio Médico / SEDES", lang: "ES", currency: "Bs / USD", regionLabel: "Departamento", defaultUF: "LP", defaultDoc: "ci" as DocumentType },
+  { code: "AR", name: "Argentina", flag: "AR", council: "MSAL / Colegios Médicos", lang: "ES", currency: "ARS / USD", regionLabel: "Provincia", defaultUF: "BA", defaultDoc: "passport" as DocumentType },
+  { code: "CL", name: "Chile", flag: "CL", council: "Colegio Médico (Colmed)", lang: "ES", currency: "CLP / USD", regionLabel: "Región", defaultUF: "RM", defaultDoc: "passport" as DocumentType },
+  { code: "CO", name: "Colômbia", flag: "CO", council: "Colegio Médico Colombiano", lang: "ES", currency: "COP / USD", regionLabel: "Departamento", defaultUF: "DC", defaultDoc: "passport" as DocumentType },
+  { code: "PE", name: "Peru", flag: "PE", council: "Colegio Médico del Perú (CMP)", lang: "ES", currency: "PEN / USD", regionLabel: "Departamento", defaultUF: "LIM", defaultDoc: "passport" as DocumentType },
+  { code: "UY", name: "Uruguai", flag: "UY", council: "Colegio Médico del Uruguay (CMU)", lang: "ES", currency: "UYU / USD", regionLabel: "Departamento", defaultUF: "MO", defaultDoc: "passport" as DocumentType },
+  { code: "PY", name: "Paraguai", flag: "PY", council: "Círculo Paraguayo de Médicos", lang: "ES", currency: "PYG / USD", regionLabel: "Departamento", defaultUF: "ASU", defaultDoc: "passport" as DocumentType },
+  { code: "EC", name: "Equador", flag: "EC", council: "Federación Médica Ecuatoriana", lang: "ES", currency: "USD", regionLabel: "Provincia", defaultUF: "P", defaultDoc: "passport" as DocumentType },
+  { code: "MX", name: "México", flag: "MX", council: "CONACEM / SSA", lang: "ES", currency: "MXN / USD", regionLabel: "Estado", defaultUF: "CMX", defaultDoc: "passport" as DocumentType },
   // América do Norte
-  { code: "US", name: "Estados Unidos", flag: "🇺🇸", council: "State Medical Board / AMA", lang: "EN", currency: "USD ($)", regionLabel: "State", defaultUF: "FL", defaultDoc: "passport" as DocumentType },
-  { code: "CA", name: "Canadá", flag: "🇨🇦", council: "RCPSC / CMA", lang: "EN", currency: "CAD / USD", regionLabel: "Province", defaultUF: "ON", defaultDoc: "passport" as DocumentType },
+  { code: "US", name: "Estados Unidos", flag: "US", council: "State Medical Board / AMA", lang: "EN", currency: "USD ($)", regionLabel: "State", defaultUF: "FL", defaultDoc: "passport" as DocumentType },
+  { code: "CA", name: "Canadá", flag: "CA", council: "RCPSC / CMA", lang: "EN", currency: "CAD / USD", regionLabel: "Province", defaultUF: "ON", defaultDoc: "passport" as DocumentType },
   // Europa
-  { code: "PT", name: "Portugal", flag: "🇵🇹", council: "Ordem dos Médicos (OM)", lang: "PT", currency: "EUR (€)", regionLabel: "Distrito", defaultUF: "LIS", defaultDoc: "passport" as DocumentType },
-  { code: "ES", name: "Espanha", flag: "🇪🇸", council: "CGCOM / Colegios Oficiales", lang: "ES", currency: "EUR (€)", regionLabel: "Provincia", defaultUF: "MAD", defaultDoc: "passport" as DocumentType },
-  { code: "NL", name: "Holanda (Amsterdã)", flag: "🇳🇱", council: "BIG-register / KNMG", lang: "EN", currency: "EUR (€)", regionLabel: "Provincie", defaultUF: "NH", defaultDoc: "passport" as DocumentType },
+  { code: "PT", name: "Portugal", flag: "PT", council: "Ordem dos Médicos (OM)", lang: "PT", currency: "EUR (€)", regionLabel: "Distrito", defaultUF: "LIS", defaultDoc: "passport" as DocumentType },
+  { code: "ES", name: "Espanha", flag: "ES", council: "CGCOM / Colegios Oficiales", lang: "ES", currency: "EUR (€)", regionLabel: "Provincia", defaultUF: "MAD", defaultDoc: "passport" as DocumentType },
+  { code: "NL", name: "Holanda (Amsterdã)", flag: "NL", council: "BIG-register / KNMG", lang: "EN", currency: "EUR (€)", regionLabel: "Provincie", defaultUF: "NH", defaultDoc: "passport" as DocumentType },
   // Ásia
-  { code: "CN", name: "China", flag: "🇨🇳", council: "Chinese Medical Doctor Association (CMDA)", lang: "EN", currency: "CNY / USD", regionLabel: "Province", defaultUF: "BJ", defaultDoc: "passport" as DocumentType },
-  { code: "JP", name: "Japão", flag: "🇯🇵", council: "Japan Medical Association (JMA)", lang: "EN", currency: "JPY / USD", regionLabel: "Prefecture", defaultUF: "TOK", defaultDoc: "passport" as DocumentType },
+  { code: "CN", name: "China", flag: "CN", council: "Chinese Medical Doctor Association (CMDA)", lang: "EN", currency: "CNY / USD", regionLabel: "Province", defaultUF: "BJ", defaultDoc: "passport" as DocumentType },
+  { code: "JP", name: "Japão", flag: "JP", council: "Japan Medical Association (JMA)", lang: "EN", currency: "JPY / USD", regionLabel: "Prefecture", defaultUF: "TOK", defaultDoc: "passport" as DocumentType },
 ] as const;
 
 export type CountryCode = typeof COUNTRIES[number]["code"];
@@ -97,9 +110,9 @@ const STRINGS: Record<LangCode, Record<string, string>> = {
     passportSignLabel: "Foto do Passaporte (Página com Foto e Assinatura) *",
     stayStampLabel: "Carimbo de Permanência / Visto no Brasil ou Licença Internacional *",
     paymentsTitle: "Formas de Pagamento Integradas:",
-    paymentMP: "🇧🇷 Mercado Pago (Brasil)",
-    paymentStripe: "🌐 Stripe (Internacional)",
-    paymentBTC: "⚡ Bitcoin & Cripto (Universal)",
+    paymentMP: "Mercado Pago (Brasil)",
+    paymentStripe: "Stripe (Internacional)",
+    paymentBTC: "Bitcoin & Cripto (Universal)",
   },
   ES: {
     title: "Registro de",
@@ -135,9 +148,9 @@ const STRINGS: Record<LangCode, Record<string, string>> = {
     passportSignLabel: "Foto del Pasaporte (Página con Foto y Firma) *",
     stayStampLabel: "Sello de Permanencia / Visa o Licencia Médica Internacional *",
     paymentsTitle: "Métodos de Pago Integrados:",
-    paymentMP: "🇧🇷 Mercado Pago (Brasil)",
-    paymentStripe: "🌐 Stripe (Internacional)",
-    paymentBTC: "⚡ Bitcoin & Cripto (Universal)",
+    paymentMP: "Mercado Pago (Brasil)",
+    paymentStripe: "Stripe (Internacional)",
+    paymentBTC: "Bitcoin & Cripto (Universal)",
   },
   EN: {
     title: "Healthcare",
@@ -173,9 +186,9 @@ const STRINGS: Record<LangCode, Record<string, string>> = {
     passportSignLabel: "Passport Photo (Photo & Signature Page) *",
     stayStampLabel: "Stay Stamp / Visa in Brazil or International Medical License *",
     paymentsTitle: "Integrated Payment Gateways:",
-    paymentMP: "🇧🇷 Mercado Pago (Brazil)",
-    paymentStripe: "🌐 Stripe (International Credit Cards)",
-    paymentBTC: "⚡ Bitcoin & Crypto (Universal)",
+    paymentMP: "Mercado Pago (Brazil)",
+    paymentStripe: "Stripe (International Credit Cards)",
+    paymentBTC: "Bitcoin & Crypto (Universal)",
   },
 };
 
@@ -321,21 +334,21 @@ const CadastroProfissional = () => {
   const docOptions = useMemo(() => {
     if (country === "BR") {
       return [
-        { value: "cpf", label: "🇧🇷 CPF (Brasileiro)" },
-        { value: "passport", label: "🌎 Passaporte (Estrangeiro / Internacional)" },
-        { value: "rne", label: "🌎 RNE (Estrangeiro Residente)" },
+        { value: "cpf", label: "CPF (Brasileiro)", flag: "BR" },
+        { value: "passport", label: "Passaporte (Estrangeiro / Internacional)", flag: "US" },
+        { value: "rne", label: "RNE (Estrangeiro Residente)", flag: "BR" },
       ];
     }
     if (country === "BO") {
       return [
-        { value: "ci", label: "🇧🇴 Cédula de Identidad (CI)" },
-        { value: "passport", label: "🌎 Pasaporte Internacional" },
+        { value: "ci", label: "Cédula de Identidad (CI)", flag: "BO" },
+        { value: "passport", label: "Pasaporte Internacional", flag: "US" },
       ];
     }
     return [
-      { value: "passport", label: `🌎 ${t.passportSignLabel.split("(")[0].trim()}` },
-      { value: "ci", label: `🆔 ${currentCountryConfig.name} ID Nacional` },
-      { value: "rne", label: "🌎 RNE / Visa de Residencia" },
+      { value: "passport", label: `${t.passportSignLabel.split("(")[0].trim()}`, flag: currentCountryConfig.code },
+      { value: "ci", label: `${currentCountryConfig.name} ID Nacional`, flag: currentCountryConfig.code },
+      { value: "rne", label: "RNE / Visa de Residencia", flag: "BR" },
     ];
   }, [country, currentCountryConfig, t]);
 
@@ -720,11 +733,12 @@ const CadastroProfissional = () => {
                   key={l}
                   type="button"
                   onClick={() => setLang(l)}
-                  className={`text-xs px-2.5 py-1 rounded-lg font-bold transition-colors ${
+                  className={`text-xs px-2.5 py-1 rounded-lg font-bold transition-colors flex items-center gap-1.5 ${
                     lang === l ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {l === "PT" ? "🇧🇷 Português" : l === "ES" ? "🇪🇸 Español" : "🇺🇸 English"}
+                  <CountryFlag code={l === "PT" ? "BR" : l === "ES" ? "ES" : "US"} className="w-4 h-3 rounded-sm object-cover" />
+                  {l === "PT" ? "Português" : l === "ES" ? "Español" : "English"}
                 </button>
               ))}
             </div>
@@ -735,7 +749,7 @@ const CadastroProfissional = () => {
               <CardContent className="p-6 md:p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
 
-                  {/* 🌍 País de Atuação Expandido */}
+                  {/* 🌍 País de Atuação Expandido com Bandeiras SVG */}
                   <div className="space-y-3 p-4 rounded-2xl bg-primary/5 border border-primary/20">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="country" className="font-bold flex items-center gap-2 text-foreground">
@@ -749,34 +763,64 @@ const CadastroProfissional = () => {
 
                     <Select value={country} onValueChange={(v) => setCountry(v as CountryCode)}>
                       <SelectTrigger id="country" className="h-12 bg-muted border-border font-bold text-sm">
-                        <SelectValue />
+                        <div className="flex items-center gap-2.5">
+                          <CountryFlag code={currentCountryConfig.code} className="w-5 h-3.5 rounded-sm object-cover shadow-sm border border-slate-700/50" />
+                          <span className="font-bold text-primary">{currentCountryConfig.code}</span>
+                          <span className="text-muted-foreground">—</span>
+                          <span className="text-foreground">{currentCountryConfig.name}</span>
+                          <span className="text-muted-foreground text-xs font-normal">({currentCountryConfig.council})</span>
+                        </div>
                       </SelectTrigger>
                       <SelectContent className="max-h-80 bg-slate-900 text-slate-100 border-slate-700">
                         <div className="p-2 text-[10px] font-bold text-primary uppercase tracking-wider">América Latina</div>
                         {COUNTRIES.filter(c => ["BR","BO","AR","CL","CO","PE","UY","PY","EC","MX"].includes(c.code)).map((c) => (
-                          <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer">
-                            <span className="font-bold">{c.flag} {c.code}</span> — {c.name} <span className="text-muted-foreground text-xs">({c.council})</span>
+                          <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer py-2.5">
+                            <div className="flex items-center gap-2.5">
+                              <CountryFlag code={c.code} className="w-5 h-3.5 rounded-sm object-cover shadow-sm border border-slate-700/50" />
+                              <span className="font-bold text-primary">{c.code}</span>
+                              <span className="text-muted-foreground">—</span>
+                              <span className="font-medium">{c.name}</span>
+                              <span className="text-muted-foreground text-xs">({c.council})</span>
+                            </div>
                           </SelectItem>
                         ))}
 
                         <div className="p-2 text-[10px] font-bold text-primary uppercase tracking-wider border-t border-slate-800 mt-1">América do Norte</div>
                         {COUNTRIES.filter(c => ["US","CA"].includes(c.code)).map((c) => (
-                          <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer">
-                            <span className="font-bold">{c.flag} {c.code}</span> — {c.name} <span className="text-muted-foreground text-xs">({c.council})</span>
+                          <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer py-2.5">
+                            <div className="flex items-center gap-2.5">
+                              <CountryFlag code={c.code} className="w-5 h-3.5 rounded-sm object-cover shadow-sm border border-slate-700/50" />
+                              <span className="font-bold text-primary">{c.code}</span>
+                              <span className="text-muted-foreground">—</span>
+                              <span className="font-medium">{c.name}</span>
+                              <span className="text-muted-foreground text-xs">({c.council})</span>
+                            </div>
                           </SelectItem>
                         ))}
 
                         <div className="p-2 text-[10px] font-bold text-primary uppercase tracking-wider border-t border-slate-800 mt-1">Europa</div>
                         {COUNTRIES.filter(c => ["PT","ES","NL"].includes(c.code)).map((c) => (
-                          <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer">
-                            <span className="font-bold">{c.flag} {c.code}</span> — {c.name} <span className="text-muted-foreground text-xs">({c.council})</span>
+                          <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer py-2.5">
+                            <div className="flex items-center gap-2.5">
+                              <CountryFlag code={c.code} className="w-5 h-3.5 rounded-sm object-cover shadow-sm border border-slate-700/50" />
+                              <span className="font-bold text-primary">{c.code}</span>
+                              <span className="text-muted-foreground">—</span>
+                              <span className="font-medium">{c.name}</span>
+                              <span className="text-muted-foreground text-xs">({c.council})</span>
+                            </div>
                           </SelectItem>
                         ))}
 
                         <div className="p-2 text-[10px] font-bold text-primary uppercase tracking-wider border-t border-slate-800 mt-1">Ásia</div>
                         {COUNTRIES.filter(c => ["CN","JP"].includes(c.code)).map((c) => (
-                          <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer">
-                            <span className="font-bold">{c.flag} {c.code}</span> — {c.name} <span className="text-muted-foreground text-xs">({c.council})</span>
+                          <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer py-2.5">
+                            <div className="flex items-center gap-2.5">
+                              <CountryFlag code={c.code} className="w-5 h-3.5 rounded-sm object-cover shadow-sm border border-slate-700/50" />
+                              <span className="font-bold text-primary">{c.code}</span>
+                              <span className="text-muted-foreground">—</span>
+                              <span className="font-medium">{c.name}</span>
+                              <span className="text-muted-foreground text-xs">({c.council})</span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -791,9 +835,15 @@ const CadastroProfissional = () => {
                       <span className="font-bold text-foreground flex items-center gap-1">
                         <CreditCard size={13} className="text-primary" /> {t.paymentsTitle}
                       </span>
-                      <span className="bg-muted px-2 py-0.5 rounded text-emerald-400 font-medium">{t.paymentMP}</span>
-                      <span className="bg-muted px-2 py-0.5 rounded text-sky-400 font-medium">{t.paymentStripe}</span>
-                      <span className="bg-muted px-2 py-0.5 rounded text-amber-400 font-medium">{t.paymentBTC}</span>
+                      <span className="bg-muted px-2 py-0.5 rounded text-emerald-400 font-medium flex items-center gap-1">
+                        <CountryFlag code="BR" className="w-3.5 h-2.5 rounded-xs" /> {t.paymentMP}
+                      </span>
+                      <span className="bg-muted px-2 py-0.5 rounded text-sky-400 font-medium flex items-center gap-1">
+                        <CountryFlag code="US" className="w-3.5 h-2.5 rounded-xs" /> {t.paymentStripe}
+                      </span>
+                      <span className="bg-muted px-2 py-0.5 rounded text-amber-400 font-medium flex items-center gap-1">
+                        <Bitcoin size={12} /> {t.paymentBTC}
+                      </span>
                     </div>
                   </div>
 
@@ -904,7 +954,10 @@ const CadastroProfissional = () => {
                           <SelectContent className="bg-slate-900 text-slate-100 border-slate-700">
                             {docOptions.map((d) => (
                               <SelectItem key={d.value} value={d.value} className="hover:bg-slate-800">
-                                {d.label}
+                                <div className="flex items-center gap-2">
+                                  <CountryFlag code={d.flag} className="w-4 h-3 rounded-sm object-cover" />
+                                  <span>{d.label}</span>
+                                </div>
                               </SelectItem>
                             ))}
                           </SelectContent>

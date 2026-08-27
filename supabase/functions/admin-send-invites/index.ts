@@ -98,11 +98,10 @@ serve(async (req: Request): Promise<Response> => {
     });
   }
 
-  // Verifica admin
+  // Verifica admin (JWT com role admin) ou service-role key (cron)
   const isAdmin = await isAdminRequest(req);
   const authHeader = req.headers.get("Authorization");
-  if (!isAdmin && authHeader !== `Bearer ${SB_KEY}` && authHeader !== "Bearer DISPATCH_AGORA") {
-    // Permite uso com Service Role Key para acionamento via cron ou admin
+  if (!isAdmin && !(SB_KEY && authHeader === `Bearer ${SB_KEY}`)) {
     return new Response(JSON.stringify({ error: 'unauthorized' }), {
       status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });

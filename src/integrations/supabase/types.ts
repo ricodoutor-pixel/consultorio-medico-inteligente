@@ -603,13 +603,6 @@ export type Database = {
             referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "appointments_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       audit_log: {
@@ -1178,13 +1171,6 @@ export type Database = {
             columns: ["matched_doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "brisa_triages_matched_doctor_id_fkey"
-            columns: ["matched_doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1800,13 +1786,6 @@ export type Database = {
             referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "consultation_offers_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       consultation_queue: {
@@ -1968,13 +1947,6 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "consultations_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors_public"
             referencedColumns: ["id"]
           },
         ]
@@ -2283,13 +2255,6 @@ export type Database = {
             referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "doctor_availability_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       doctor_kyc_documents: {
@@ -2463,13 +2428,6 @@ export type Database = {
             referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "doctor_wallets_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: true
-            referencedRelation: "doctors_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       doctors: {
@@ -2637,11 +2595,93 @@ export type Database = {
             referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      doctors_public: {
+        Row: {
+          available_hours: Json | null
+          avatar_url: string | null
+          bio: string | null
+          city: string | null
+          consultation_price: number
+          country: string | null
+          created_at: string
+          crm: string
+          crm_state: string
+          document_type: string
+          full_name: string | null
+          id: string
+          is_available: boolean
+          is_online: boolean
+          is_verified: boolean
+          plan_tier: string
+          price_chat_only: number
+          price_return: number
+          price_video_chat: number
+          rating: number | null
+          rqe: string | null
+          specialty: string
+          total_consultations: number | null
+          user_id: string
+        }
+        Insert: {
+          available_hours?: Json | null
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          consultation_price: number
+          country?: string | null
+          created_at: string
+          crm: string
+          crm_state: string
+          document_type: string
+          full_name?: string | null
+          id: string
+          is_available: boolean
+          is_online: boolean
+          is_verified: boolean
+          plan_tier: string
+          price_chat_only: number
+          price_return: number
+          price_video_chat: number
+          rating?: number | null
+          rqe?: string | null
+          specialty: string
+          total_consultations?: number | null
+          user_id: string
+        }
+        Update: {
+          available_hours?: Json | null
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          consultation_price?: number
+          country?: string | null
+          created_at?: string
+          crm?: string
+          crm_state?: string
+          document_type?: string
+          full_name?: string | null
+          id?: string
+          is_available?: boolean
+          is_online?: boolean
+          is_verified?: boolean
+          plan_tier?: string
+          price_chat_only?: number
+          price_return?: number
+          price_video_chat?: number
+          rating?: number | null
+          rqe?: string | null
+          specialty?: string
+          total_consultations?: number | null
+          user_id?: string
+        }
+        Relationships: [
           {
-            foreignKeyName: "doctors_financial_doctor_id_fkey"
-            columns: ["doctor_id"]
+            foreignKeyName: "doctors_public_id_fkey"
+            columns: ["id"]
             isOneToOne: true
-            referencedRelation: "doctors_public"
+            referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
         ]
@@ -4493,13 +4533,6 @@ export type Database = {
             referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "medical_records_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       medical_subscriptions: {
@@ -5579,13 +5612,6 @@ export type Database = {
             referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "payments_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       payout_history: {
@@ -5643,13 +5669,6 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payout_history_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors_public"
             referencedColumns: ["id"]
           },
         ]
@@ -5732,13 +5751,6 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payouts_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors_public"
             referencedColumns: ["id"]
           },
           {
@@ -6037,13 +6049,6 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "prescriptions_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors_public"
             referencedColumns: ["id"]
           },
           {
@@ -8502,32 +8507,6 @@ export type Database = {
           },
         ]
       }
-      doctors_public: {
-        Row: {
-          available_hours: Json | null
-          avatar_url: string | null
-          bio: string | null
-          city: string | null
-          consultation_price: number | null
-          country: string | null
-          created_at: string | null
-          crm: string | null
-          crm_state: string | null
-          document_type: string | null
-          full_name: string | null
-          id: string | null
-          is_available: boolean | null
-          is_online: boolean | null
-          is_verified: boolean | null
-          plan_tier: string | null
-          rating: number | null
-          rqe: string | null
-          specialty: string | null
-          total_consultations: number | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
       financial_reports: {
         Row: {
           appointment_id: string | null
@@ -8547,13 +8526,6 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "appointments_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors_public"
             referencedColumns: ["id"]
           },
         ]

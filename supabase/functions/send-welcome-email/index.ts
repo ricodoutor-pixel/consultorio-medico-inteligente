@@ -1,15 +1,33 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-cron-secret, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 
 const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY") || "";
 
 serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
+
   try {
     const body = await req.json();
     
     // Webhook payload from auth.users or profiles
     const record = body.record;
     if (!record) {
-      return new Response(JSON.stringify({ error: "No record found" }), { status: 400 });
+      return new Response(JSON.stringify({ error: "No record found" }), { status: 400, headers: corsHeaders });
     }
 
     // Attempt to get email and name from auth.users payload (or profiles if extended)
@@ -18,7 +36,7 @@ serve(async (req) => {
     const role = record.raw_user_meta_data?.role || record.user_type || "paciente";
 
     if (!email) {
-      return new Response(JSON.stringify({ error: "No email to send to" }), { status: 400 });
+      return new Response(JSON.stringify({ error: "No email to send to" }), { status: 400, headers: corsHeaders });
     }
 
     // Decide which template to use based on role
@@ -91,16 +109,16 @@ serve(async (req) => {
     if (!response.ok) {
       const errText = await response.text();
       console.error("Brevo error:", errText);
-      return new Response(JSON.stringify({ error: errText }), { status: 500 });
+      return new Response(JSON.stringify({ error: "Email provider rejected the request" }), { status: 502, headers: corsHeaders });
     }
 
     const data = await response.json();
     return new Response(JSON.stringify({ success: true, messageId: data.messageId }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
     
   } catch (error) {
     console.error("Internal Error:", error);
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500, headers: corsHeaders });
   }
 });

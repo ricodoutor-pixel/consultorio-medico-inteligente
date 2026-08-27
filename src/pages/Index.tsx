@@ -31,6 +31,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { EmergencyCTA } from "@/components/EmergencyCTA";
 import { WelcomeMascotSplash } from "@/components/WelcomeMascotSplash";
 import { PatientsCounter } from "@/components/PatientsCounter";
+import { TrustBadges } from "@/components/TrustBadges";
 
 
 import { useEffect } from "react";
@@ -199,6 +200,15 @@ const Index = () => {
               </div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* SELOS DE CONFIANÇA & CONFORMIDADE JURÍDICA / INPI */}
+      <section className="py-6 bg-background/60">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <TrustBadges />
+          </motion.div>
         </div>
       </section>
 

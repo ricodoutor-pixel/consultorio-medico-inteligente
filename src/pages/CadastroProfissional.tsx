@@ -744,6 +744,54 @@ const CadastroProfissional = () => {
             </div>
           </motion.div>
 
+          {/* CARD DE SEGURANÇA JURÍDICA & RESPALDO AO PROFISSIONAL DE SAÚDE */}
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} className="mb-6">
+            <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 via-card to-background p-5 md:p-6 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 -mt-6 -mr-6 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+              
+              <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-border/60">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                    <ShieldCheck size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-black text-base text-foreground flex items-center gap-2">
+                      Segurança Jurídica & Respaldo Profissional
+                      <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[9px] font-mono">
+                        100% REGULAMENTADO
+                      </Badge>
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Conformidade estrita com CFM Res. 2.314/2022, ANVISA RDC 660/2022 e LGPD
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div className="p-3 rounded-xl bg-background/50 border border-border/60 space-y-1">
+                  <div className="flex items-center gap-2 text-foreground font-bold">
+                    <Lock size={14} className="text-emerald-400 shrink-0" />
+                    <span>Prontuário Eletrônico (PEP) Blindado</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Histórico clínico imutável com <strong>integridade criptográfica SHA-512</strong> e proteção absoluta de dados confidenciais do paciente.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-background/50 border border-border/60 space-y-1">
+                  <div className="flex items-center gap-2 text-foreground font-bold">
+                    <CheckCircle2 size={14} className="text-primary shrink-0" />
+                    <span>Software Registrado no INPI</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Tecnologia e algoritmos clínicos registrados sob o <strong>Processo INPI nº 512026007103-8</strong> (Lei nº 9.609/1998).
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <Card className="border-border">
               <CardContent className="p-6 md:p-8">

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { AlertCircle, CheckCircle, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UpsellOffer } from '@/components/checkout/UpsellOffer';
+import { TrustBadges } from '@/components/TrustBadges';
 
 export default function CartCheckout() {
   const navigate = useNavigate();
@@ -155,6 +156,10 @@ export default function CartCheckout() {
                 <div className="border-t border-border pt-3 flex justify-between font-bold"><span>Total:</span><span className="text-xl text-primary">R$ {total.toFixed(2)}</span></div>
               </div>
             </Card>
+
+            <div className="mt-4">
+              <TrustBadges variant="compact" />
+            </div>
           </div>
         </div>
       </div>

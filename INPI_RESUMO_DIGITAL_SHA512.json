@@ -1,0 +1,34 @@
+{
+  "titulo_software": "Planta y Raiz - Plataforma de Telemedicina Canabinoide, Marketplace Farmacêutico & Hub de Agentes Autônomos",
+  "titular_direitos": "Planta y Raiz Ltda",
+  "autor_responsavel": "Dr. Edilson Bezerra da Silva",
+  "versao": "2.6.0-PROD",
+  "linguagens_principais": [
+    "TypeScript",
+    "React",
+    "Node.js",
+    "Tailwind CSS",
+    "SQL (PostgreSQL)",
+    "Deno Edge Functions"
+  ],
+  "campo_aplicacao": "Telemedicina, Prescrição Digital Canabinoide, E-commerce Farmacêutico e Inteligência Artificial para Gestão Clínica",
+  "data_calculo_iso": "2026-08-27T07:21:34.406Z",
+  "algoritmo_resumo_digital": "SHA-512 (Secure Hash Algorithm 512-bit / 128 Caracteres Hexadecimais Maiúsculos)",
+  "resumo_digital_sha512_inpi": "E907311E257E0E81D9F9BA25F5D2F6EC877D196F56BAF5F4391EB939844415BCF45D0053F4F245A731F230C17008BB1E2CBE1ADD4C40AD00E3E8E452F5174FDF",
+  "total_arquivos_fontes": 1821,
+  "volume_total_bytes": 128662951,
+  "escopo_diretorios_incluidos": [
+    "src/",
+    "src/components/",
+    "src/components/admin/",
+    "src/pages/",
+    "src/pages/admin/",
+    "src/lib/",
+    "src/hooks/",
+    "src/integrations/",
+    "supabase/functions/",
+    "supabase/migrations/",
+    "scripts/",
+    "public/"
+  ]
+}

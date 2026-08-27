@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
+import { TrustBadges } from "@/components/TrustBadges";
 import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Wind, Brain, Beaker, Glasses, Navigation } from "lucide-react";
 
 const diagnosticTools = [
@@ -198,6 +199,11 @@ const Precos = () => {
             <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
               Escolha o plano ideal para seu perfil. Pagamento via Pix (Mercado Pago), PayPal (USD) ou BTC.
             </p>
+          </div>
+
+          {/* Selos de Confiança & Conformidade Legal */}
+          <div className="max-w-5xl mx-auto mb-10">
+            <TrustBadges />
           </div>
 
           <div

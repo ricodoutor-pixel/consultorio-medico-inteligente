@@ -19,7 +19,7 @@ import {
   Activity, AlertTriangle, BarChart3, Bell, Bot, CheckCircle2, Clock,
   CreditCard, DollarSign, FileText, Globe, HeartPulse, LogOut, MessageSquare,
   RefreshCw, Send, Server, Shield, ShoppingBag, Stethoscope, TrendingUp,
-  UserPlus, Users, Wallet, XCircle, Zap, UserCheck, Building2,
+  UserPlus, Users, Wallet, XCircle, Zap, UserCheck, Building2, Video,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -39,6 +39,7 @@ import { FinancialSplitPanel } from "@/components/admin/FinancialSplitPanel";
 import { SystemHealthGrid } from "@/components/admin/SystemHealthGrid";
 import { AgentOptimizerStatusCard } from "@/components/admin/AgentOptimizerStatusCard";
 import { OfficialPharmacyCard } from "@/components/admin/OfficialPharmacyCard";
+import { TikTokAnalyticsPanel } from "@/components/admin/TikTokAnalyticsPanel";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -356,6 +357,7 @@ const Admin = () => {
     { label: "KYC Lojas / Farmácias", path: "/admin/aprovacoes-farmacias", icon: Building2 },
     { label: "KYC Pacientes", path: "/admin/aprovacoes-pacientes", icon: Users },
     { label: "KYC Agentes & IAs", path: "/admin/kyc-agentes", icon: Bot },
+    { label: "TikTok Ads & Pixel", path: "/admin/conversoes", icon: Video },
   ];
 
   return (
@@ -504,6 +506,11 @@ const Admin = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
             <AgentOptimizerStatusCard />
             <OfficialPharmacyCard />
+          </div>
+
+          {/* CARD 9: TIKTOK ADS & VÍDEOS 1-MINUTO (PIXEL DA8R8N3C77UBCVGL01RG) */}
+          <div className="mb-6">
+            <TikTokAnalyticsPanel />
           </div>
 
           {/* ============================================== */}

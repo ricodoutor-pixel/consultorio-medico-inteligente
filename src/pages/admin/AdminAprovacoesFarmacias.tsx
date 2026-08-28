@@ -16,11 +16,12 @@ import {
 import { 
   Building2, CheckCircle2, XCircle, FileImage, ShieldCheck, 
   Search, Phone, ExternalLink, Eye, FileText, Download,
-  AlertTriangle, RefreshCw, ShoppingBag, Store, MapPin, Check
+  AlertTriangle, RefreshCw, ShoppingBag, Store, MapPin, Check, Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 import PharmacyKycDocViewer from "@/components/admin/PharmacyKycDocViewer";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
+import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
 import {
   PHARMACY_KYC_LABELS,
   PHARMACY_KYC_REQUIRED,
@@ -213,6 +214,14 @@ export const AdminAprovacoesFarmacias = () => {
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => openGlobalTour("farmacia")}
+              className="rounded-xl border-amber-500/40 text-amber-400 hover:bg-amber-500/10 font-bold"
+            >
+              <Sparkles size={14} className="mr-1.5" /> 🚀 Tour 3D Farmácia & Lojas
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -499,6 +508,7 @@ export const AdminAprovacoesFarmacias = () => {
         />
       )}
 
+      <InteractiveTour3DModal initialRole="farmacia" />
       <Footer />
     </div>
   );

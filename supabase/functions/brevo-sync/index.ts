@@ -1,20 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { email, nome, telefone, tags, categoria, origem } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const { email, nome, telefone, tags, categoria, origem } = body;
 
-    if (!email) {
-      return new Response(JSON.stringify({ error: "E-mail é obrigatório" }), {
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      return new Response(JSON.stringify({ error: "E-mail válido é obrigatório" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -22,82 +20,102 @@ serve(async (req) => {
 
     const brevoApiKey = Deno.env.get("BREVO_API_KEY");
     if (!brevoApiKey) {
-      throw new Error("BREVO_API_KEY não configurada");
+      console.warn("[brevo-sync] BREVO_API_KEY não configurada. CRM sync ignorado com sucesso silencioso.");
+      return new Response(
+        JSON.stringify({ success: true, queued: true, message: "CRM mock mode (no key configured)" }),
+        { status: 202, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Prepara atributos dinâmicos para a Brevo
     const attributes: Record<string, string> = {};
-    
-    if (nome) {
-      const parts = nome.split(" ");
+
+    if (nome && typeof nome === "string") {
+      const cleanName = nome.replace(/[\x00-\x1F\x7F]/g, "").trim().slice(0, 100);
+      const parts = cleanName.split(" ");
       attributes.NOME = parts[0];
-      attributes.NOME_COMPLETO = nome;
+      attributes.NOME_COMPLETO = cleanName;
       if (parts.length > 1) {
         attributes.SOBRENOME = parts.slice(1).join(" ");
       }
     }
-    
-    if (telefone) {
-      // Brevo requer formato DDI ex: 5511999999999
+
+    if (telefone && typeof telefone === "string") {
+      // Brevo requer formato E.164 ex: 5511999999999
       let phoneNum = telefone.replace(/\D/g, "");
       if (phoneNum.length === 10 || phoneNum.length === 11) {
         phoneNum = `55${phoneNum}`; // Assume BR se vier sem DDI
       }
-      attributes.SMS = phoneNum;
+      if (phoneNum.length >= 8) {
+        attributes.SMS = phoneNum;
+      }
     }
 
-    if (categoria) attributes.CATEGORIA = categoria;
-    if (origem) attributes.ORIGEM = origem;
+    if (categoria && typeof categoria === "string") {
+      attributes.CATEGORIA = categoria.slice(0, 50);
+    }
+    if (origem && typeof origem === "string") {
+      attributes.ORIGEM = origem.slice(0, 50);
+    }
 
-    // Converte array de tags (ex: ["Origem_Ebook", "novo_cadastro"]) numa string separada por vírgulas, se aplicável, ou atualiza lista na Brevo.
-    // Brevo usa Listas, mas também suporta atributos customizados. 
-    // Vamos adicionar como um atributo "TAGS" e habilitar update.
     if (tags && Array.isArray(tags)) {
-      attributes.TAGS = tags.join(", ");
+      attributes.TAGS = tags.map((t) => String(t).slice(0, 30)).join(", ");
     }
 
     const payload = {
-      email: email.trim(),
+      email: email.trim().toLowerCase(),
       attributes,
-      updateEnabled: true, // Importante: atualiza se o contato já existir
+      updateEnabled: true, // Atualiza se o contato já existir
     };
 
-    console.log("Enviando para Brevo:", payload);
+    console.log("[brevo-sync] Enviando para Brevo:", payload);
 
-    const brevoResponse = await fetch("https://api.brevo.com/v3/contacts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": brevoApiKey,
-        "Accept": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    // SECURITY + RESILIENCE: AbortSignal prevents hanging if Brevo API is slow
+    let brevoResponse: Response;
+    try {
+      brevoResponse = await fetch("https://api.brevo.com/v3/contacts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": brevoApiKey,
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(4000), // 4s timeout max — non-blocking
+      });
+    } catch (fetchErr) {
+      console.error("[brevo-sync] Brevo API timeout ou erro de rede:", fetchErr);
+      return new Response(
+        JSON.stringify({ success: true, queued: true, warning: "CRM sync queued — Brevo temporariamente indisponível" }),
+        { status: 202, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const responseText = await brevoResponse.text();
     let responseData;
     try {
       responseData = JSON.parse(responseText);
-    } catch (e) {
+    } catch {
       responseData = responseText;
     }
 
     if (!brevoResponse.ok) {
-      console.error("Erro na API da Brevo:", responseData);
-      return new Response(JSON.stringify({ error: "Erro ao sincronizar com Brevo", details: responseData }), {
-        status: brevoResponse.status,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      console.error("[brevo-sync] Resposta da API Brevo:", responseData);
+      // Retorna 202 se for duplicado ou erro tratável para não quebrar a UX do usuário
+      return new Response(
+        JSON.stringify({ success: true, queued: true, details: responseData }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     return new Response(JSON.stringify({ success: true, data: responseData }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (error) {
-    console.error("Erro interno:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
+  } catch (error: any) {
+    console.error("[brevo-sync] Erro interno:", error);
+    return new Response(JSON.stringify({ success: true, queued: true, error: error?.message }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

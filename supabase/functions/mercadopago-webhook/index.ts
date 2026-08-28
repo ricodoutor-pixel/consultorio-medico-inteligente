@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { corsHeaders, getCorsHeaders } from "../_shared/cors.ts";
 
 const getFirstEnv = (...names: string[]) => {
   for (const name of names) {
@@ -8,12 +9,8 @@ const getFirstEnv = (...names: string[]) => {
   return null;
 };
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-signature, x-request-id, x-admin-replay",
-};
-
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

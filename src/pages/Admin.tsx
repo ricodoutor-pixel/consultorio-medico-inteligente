@@ -41,6 +41,7 @@ import { AgentOptimizerStatusCard } from "@/components/admin/AgentOptimizerStatu
 import { OfficialPharmacyCard } from "@/components/admin/OfficialPharmacyCard";
 import { TikTokAnalyticsPanel } from "@/components/admin/TikTokAnalyticsPanel";
 import { LeadHunterTracker } from "@/components/admin/LeadHunterTracker";
+import { OpusSocialAutomation } from "@/components/admin/OpusSocialAutomation";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -518,6 +519,11 @@ const Admin = () => {
           {/* CARD 10: LEAD HUNTER AI & CRM PIPELINE (META DE 10.000 MÉDICOS) */}
           <div className="mb-6">
             <LeadHunterTracker />
+          </div>
+
+          {/* CARD 11: FILA DE 43 VÍDEOS OPUS CLIP COM LINK & WHATSAPP */}
+          <div className="mb-6">
+            <OpusSocialAutomation />
           </div>
 
           {/* ============================================== */}

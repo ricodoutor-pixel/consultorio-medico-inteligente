@@ -5,12 +5,13 @@ import { getCorsHeaders } from "../_shared/cors.ts";
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GENERATIVE_AI_API_KEY') || '';
 
 // SECURITY: Sanitize all user-supplied fields before interpolating into system prompt
+// Prevents prompt injection attacks that could override CFM/ANVISA directives
 function sanitizePromptInput(input: unknown, maxLength = 80): string {
   if (!input || typeof input !== "string") return "";
   return input
     .replace(/[\x00-\x1F\x7F]/g, "")
     .replace(/[`"'\\]/g, "")
-    .replace(/\b(ignore|instrução|instruction|system|prompt|override|forget|pretend|act as|você é|you are)\b/gi, "***")
+    .replace(/\b(ignore|instrução|instruction|system|prompt|override|forget|pretend|act as|você é|you are|new instruction|nova instrução)\b/gi, "***")
     .trim()
     .slice(0, maxLength);
 }

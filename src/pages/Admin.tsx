@@ -37,6 +37,8 @@ import { UserCensus360 } from "@/components/admin/UserCensus360";
 import { AgenticCommerceTracker } from "@/components/admin/AgenticCommerceTracker";
 import { FinancialSplitPanel } from "@/components/admin/FinancialSplitPanel";
 import { SystemHealthGrid } from "@/components/admin/SystemHealthGrid";
+import { AgentOptimizerStatusCard } from "@/components/admin/AgentOptimizerStatusCard";
+import { OfficialPharmacyCard } from "@/components/admin/OfficialPharmacyCard";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -496,6 +498,12 @@ const Admin = () => {
           {/* CARD 6: STATUS DE SAÚDE DA INFRAESTRUTURA */}
           <div className="mb-6">
             <SystemHealthGrid />
+          </div>
+
+          {/* CARD 7 & 8: BRAIN OPTIMIZER 04H + FARMÁCIA OFICIAL PLANTA Y RAÍZ LTDA */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <AgentOptimizerStatusCard />
+            <OfficialPharmacyCard />
           </div>
 
           {/* ============================================== */}

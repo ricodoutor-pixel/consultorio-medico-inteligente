@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
+import { verifyAndEnsureAdmin } from "@/lib/admin-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,8 +63,8 @@ const AdminClinicas = () => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate("/admin-login"); return; }
-      const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
-      if (!roleData) { navigate("/admin-login"); return; }
+      const isAdmin = await verifyAndEnsureAdmin(user);
+      if (!isAdmin) { navigate("/admin-login"); return; }
       await loadClinics();
     })();
   }, [navigate]);

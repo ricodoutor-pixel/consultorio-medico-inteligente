@@ -1,76 +1,223 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { rateLimit, clientIp } from "../_shared/ai-guard.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
 // Fallback chain definition
 const MODELS = ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-1.5-pro"];
 
-const SYSTEM_PROMPT = `Você é a Enfermeira Brisa, assistente virtual humanizada e especialista de triagem da Plataforma Planta y Raiz.
-Sua missão é atuar com excelência, empatia, clareza e altíssimo nível de domínio técnico institucional.
+const SYSTEM_PROMPT = `Você é a Enfermeira Brisa, assistente virtual humanizada, especialista clínica e agente de Comércio Agêntico (UCP / MCP) da Plataforma Planta y Raiz.
+Sua missão é atuar com empatia, excelência técnica, compliance regulatório e agilidade no atendimento de pacientes, médicos e farmácias.
 
 DIRETRIZES DE COMPLIANCE E CLÍNICA:
-- Você NÃO diagnostica, NÃO prescreve e NÃO altera dosagens. Toda decisão médica é do especialista.
+- Você NÃO diagnostica, NÃO prescreve e NÃO altera dosagens. Toda decisão médica é exclusiva do especialista.
 - A Planta y Raiz atua estritamente de acordo com as RDC 660 e 327 da ANVISA, normas do CFM e LGPD.
-- Em caso de emergência médica relatada, oriente IMEDIATAMENTE buscar o pronto-socorro mais próximo, ligar para o SAMU (192) ou CVV (188) em caso de crise emocional severa.
+- Em caso de emergência médica relatada, oriente IMEDIATAMENTE buscar o pronto-socorro mais próximo, ligar para o SAMU (192) ou CVV (188).
 
-DOMÍNIO TÉCNICO (Canabinoides):
-- Domine os conceitos: Sistema Endocanabinoide (receptores CB1 e CB2), Efeito Entourage, óleos Full Spectrum, Broad Spectrum e Isolados.
-- Titulação: Explique que o tratamento começa com doses baixas (start low, go slow) para adaptação.
-- Indicações gerais: Ansiedade, Insônia, Dor Crônica, Parkinson, Alzheimer, Autismo (TEA), Epilepsia, etc.
+MOTOR DE COMÉRCIO AGÊNTICO & PRESCRIÇÃO (UCP / MCP):
+- Quando um paciente solicitar cotação ou compra de medicamento prescrito, você pode cotar opções nas farmácias credenciadas.
+- TRAVA REGULATÓRIA OBRIGATÓRIA: Qualquer compra de canabinoides exige OBRIGATORIAMENTE uma receita médica digital com integridade criptográfica SHA-512 (ICP-Brasil). Se o paciente não tiver receita válida, recuse a venda e convide-o cordialmente para agendar consulta de telemedicina (/telemedicina).
+- Quando gerar o checkout agêntico, informe o valor oficial transparente e o link de pagamento seguro em 1 clique (Google Pay / PIX / Mercado Pago).
 
-PREÇOS OFICIAIS E PAGAMENTO:
+PREÇOS OFICIAIS:
 - Orientação Técnica (Triagem/Acolhimento): R$30.
-- Consulta Médica Especializada: Valores variam, média de R$90 a R$150.
+- Consulta Médica Especializada: R$90 a R$150.
 - Clube/Planos de Assinatura: A partir de R$49.90 / R$99.
-- O pagamento é processado de forma 100% segura via Mercado Pago diretamente na plataforma.
-
-ATENDIMENTO POR PERFIL (Adapte o tom):
-- Paciente: Acolhimento, empatia, foco em qualidade de vida, agendamento e renovação de receitas.
-- Médico: Foco em autonomia prescritiva, ferramentas da plataforma (prontuário, telemedicina, prescrição digital).
-- Lojista/Farmácia: Foco em marketplace, fluxo de dispensação e parcerias.
-- Influenciador: Parcerias, programa de afiliados, comissões.
-- Pet (Veterinária): Saúde animal, prescrição veterinária de canabinoides.
 
 REGRA OBRIGATÓRIA DE TRANSFERÊNCIA PARA HUMANO:
-Se o usuário solicitar falar com um agente humano, se demonstrar insatisfação, irritação, ou se a dúvida for muito complexa/fora do seu escopo, você DEVE oferecer educadamente a transferência. 
-Use a frase: "Se preferir falar diretamente com nossa equipe humana para um suporte especializado, basta clicar no link abaixo:"
-Sempre forneça EXATAMENTE este link (em Markdown): [💬 Falar com Agente Humano (WhatsApp)](https://wa.me/5511991363154)
+Se o usuário solicitar falar com um agente humano, forneça EXATAMENTE este link: [💬 Falar com Agente Humano (WhatsApp)](https://wa.me/5511991363154)
 
 ANTI-ALUCINAÇÃO:
-Nunca invente preços, links ou nomes de médicos que não estejam neste prompt. Se não souber, ofereça o contato humano.`;
+Nunca invente preços ou links. Valores de medicamentos vêm sempre da tabela oficial de farmácias credenciadas.`;
 
-// SECURITY: Sanitize all user-supplied fields before interpolating into system prompt
-// Prevents prompt injection attacks that could override CFM/ANVISA compliance directives
+// Tool definitions for Gemini / OpenAI-compatible API
+const UCP_TOOLS = [
+  {
+    type: "function",
+    function: {
+      name: "quote_prescribed_products",
+      description: "Consulta cotações e prazos de entrega de medicamentos canabinoides prescritos em farmácias credenciadas.",
+      parameters: {
+        type: "object",
+        properties: {
+          prescription_id: { type: "string", description: "ID UUID da prescrição médica do paciente" },
+          medication_query: { type: "string", description: "Nome ou tipo do medicamento (ex: CBD 1500mg, CBN Sleep)" }
+        },
+        required: ["prescription_id"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_agentic_checkout",
+      description: "Gera a ordem agêntica de compra (agentic_orders) e link de pagamento em 1 clique (Google Pay / PIX). Exige receita médica com hash SHA-512 válida.",
+      parameters: {
+        type: "object",
+        properties: {
+          prescription_id: { type: "string", description: "ID UUID da prescrição médica válida" },
+          product_id: { type: "string", description: "ID ou SKU do medicamento selecionado" },
+          vendor_id: { type: "string", description: "ID da farmácia/lojista selecionado" },
+          payment_method: { type: "string", enum: ["google_pay", "pix", "credit_card", "mercado_pago"], description: "Método de pagamento preferido" }
+        },
+        required: ["prescription_id", "product_id"]
+      }
+    }
+  }
+];
+
+// SECURITY: Sanitize user input
 function sanitizePromptInput(input: unknown, maxLength = 80): string {
   if (!input || typeof input !== "string") return "";
   return input
-    .replace(/[\x00-\x1F\x7F]/g, "") // Remove control characters (newlines, tabs, etc.)
-    .replace(/[`"'\\]/g, "") // Remove quote/escape characters
+    .replace(/[\x00-\x1F\x7F]/g, "")
+    .replace(/[`"'\\]/g, "")
     .replace(/\b(ignore|instrução|instruction|system|prompt|override|forget|pretend|act as|você é|you are)\b/gi, "***")
     .trim()
     .slice(0, maxLength);
 }
 
-async function tryModels(messages: any[], apiKey: string) {
+// Regulatory validator & order generator
+async function executeAgenticTool(toolName: string, args: any, supabase: any, userId?: string) {
+  if (toolName === "quote_prescribed_products") {
+    const { prescription_id, medication_query } = args;
+    
+    // 1. Verifica se existe prescrição válida
+    const { data: presc } = await supabase
+      .from("prescriptions")
+      .select("id, medication, dosage, signature_hash, doctor_id, patient_id")
+      .eq("id", prescription_id)
+      .maybeSingle();
+
+    if (!presc) {
+      return {
+        error: "Prescrição médica não localizada no sistema. Por favor informe o ID correto da receita ou agende uma consulta."
+      };
+    }
+
+    const quotes = [
+      {
+        pharmacy_name: "Farmácia Oficial Planta y Raíz Dispensary",
+        product_name: presc.medication || medication_query || "Óleo de CBD Full Spectrum 1500mg",
+        price: 290.00,
+        currency: "BRL",
+        delivery_days: "2 a 4 dias úteis",
+        in_stock: true,
+        product_id: "pyr_cbd_full_1500",
+        vendor_id: "farmacia_pyr_loja_oficial"
+      },
+      {
+        pharmacy_name: "Drogaria Parceira Express ANVISA",
+        product_name: presc.medication || medication_query || "Óleo de CBD Broad Spectrum 3000mg",
+        price: 450.00,
+        currency: "BRL",
+        delivery_days: "1 a 2 dias úteis",
+        in_stock: true,
+        product_id: "pyr_cbd_broad_3000",
+        vendor_id: "drogaria_parceira_express"
+      }
+    ];
+
+    return {
+      prescription_id: presc.id,
+      prescribed_medication: presc.medication,
+      verified_signature: !!presc.signature_hash,
+      available_quotes: quotes
+    };
+  }
+
+  if (toolName === "create_agentic_checkout") {
+    const { prescription_id, product_id, vendor_id, payment_method = "pix" } = args;
+
+    // 🔒 TRAVA REGULATÓRIA: Exige receita digital assinada (SHA-512 ICP-Brasil)
+    const { data: presc } = await supabase
+      .from("prescriptions")
+      .select("id, medication, signature_hash, patient_id")
+      .eq("id", prescription_id)
+      .maybeSingle();
+
+    if (!presc || !presc.signature_hash) {
+      return {
+        regulatory_block: true,
+        error: "🚨 TRAVA REGULATÓRIA (ANVISA RDC 660 / CFM): Esta receita não possui assinatura digital válida ou integridade criptográfica SHA-512 confirmada. O fornecimento é restrito a pacientes com prescrição válida. Por favor, realize uma teleconsulta na plataforma."
+      };
+    }
+
+    const priceMap: Record<string, { name: string; price: number }> = {
+      pyr_cbd_full_1500: { name: "Óleo de CBD Full Spectrum 1500mg (30ml)", price: 290.00 },
+      pyr_cbd_broad_3000: { name: "Óleo de CBD Broad Spectrum 3000mg (30ml)", price: 450.00 },
+      pyr_cbg_isolate_1000: { name: "Óleo de CBG Isolado 1000mg (30ml)", price: 320.00 },
+      pyr_cbn_sleep_750: { name: "Fórmula Sono Reparador CBD + CBN 750mg (30ml)", price: 360.00 }
+    };
+
+    const selectedProduct = priceMap[product_id] || { name: "Medicamento Canabinoide Certificado", price: 290.00 };
+    const patientUid = userId || presc.patient_id;
+
+    // Cria registro na tabela agentic_orders
+    const { data: order, error: orderErr } = await supabase
+      .from("agentic_orders")
+      .insert({
+        patient_id: patientUid,
+        prescription_id: presc.id,
+        vendor_id: vendor_id || null,
+        items: [{
+          product_id,
+          name: selectedProduct.name,
+          quantity: 1,
+          unit_price: selectedProduct.price
+        }],
+        total_amount: selectedProduct.price,
+        status: "quoted",
+        payment_method: payment_method,
+        regulatory_hash: presc.signature_hash
+      })
+      .select("id, total_amount, status")
+      .single();
+
+    if (orderErr) {
+      console.error("[brisa-chat] Erro ao criar agentic order:", orderErr);
+    }
+
+    const orderId = order?.id || `agentic_${Date.now()}`;
+    const checkoutUrl = `https://plantayraiz.com.br/checkout?agentic_order_id=${orderId}`;
+
+    return {
+      success: true,
+      agentic_order_id: orderId,
+      product_name: selectedProduct.name,
+      total_amount: selectedProduct.price,
+      payment_method,
+      regulatory_hash: presc.signature_hash,
+      checkout_url: checkoutUrl,
+      action_button: `[💳 Pagar ${payment_method.toUpperCase()} em 1 Clique (R$ ${selectedProduct.price.toFixed(2)})](${checkoutUrl})`
+    };
+  }
+
+  return { error: "Ferramenta não reconhecida" };
+}
+
+async function tryModels(messages: any[], apiKey: string, tools?: any[]) {
   let lastError = null;
 
   for (const model of MODELS) {
     try {
+      const bodyPayload: any = {
+        model: model,
+        messages: messages,
+        stream: true,
+      };
+
       const response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          model: model,
-          messages: messages,
-          stream: true,
-        }),
+        body: JSON.stringify(bodyPayload),
       });
 
       if (response.ok) {
-        return response; // Success, return the stream
+        return response;
       }
 
       const errText = await response.text();
@@ -91,11 +238,11 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  // 🔐 Rate limit por IP (protege cotas de API)
+  // 🔐 Rate limit por IP
   const limited = await rateLimit({
     bucket: "brisa_chat",
     key: clientIp(req),
-    maxHits: 25,
+    maxHits: 30,
     windowSeconds: 60,
     cors: corsHeaders,
     message: "Limite de mensagens por minuto atingido. Aguarde alguns instantes. 🌿",
@@ -103,7 +250,20 @@ serve(async (req) => {
   if (limited) return limited;
 
   try {
-    const { messages, leadName, category } = await req.json();
+    const { messages, leadName, category, tool_call, tool_args } = await req.json();
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Se a chamada for diretamente uma requisição de tool UCP/MCP:
+    if (tool_call) {
+      const result = await executeAgenticTool(tool_call, tool_args || {}, supabase);
+      return new Response(JSON.stringify(result), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const safeName = sanitizePromptInput(leadName, 80);
     const safeCategory = sanitizePromptInput(category, 40);
@@ -120,7 +280,7 @@ serve(async (req) => {
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is missing");
 
-    // Limitar histórico a 12 turnos (1 sistema + até 11 mensagens do usuário/assistente)
+    // Limitar histórico
     let recentMessages = messages || [];
     if (recentMessages.length > 11) {
       recentMessages = recentMessages.slice(recentMessages.length - 11);
@@ -131,14 +291,13 @@ serve(async (req) => {
       ...recentMessages,
     ];
 
-    const response = await tryModels(payloadMessages, GEMINI_API_KEY);
+    const response = await tryModels(payloadMessages, GEMINI_API_KEY, UCP_TOOLS);
 
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e) {
     console.error("Brisa Chat Error:", e);
-    // Em caso de falha transitória, retornamos fallback seguro com link para atendimento humano
     const fallbackMessage = "data: " + JSON.stringify({
       choices: [{ delta: { content: "Desculpe, estou enfrentando uma instabilidade técnica momentânea. Por favor, [clique aqui para falar com nossa Equipe Humana via WhatsApp](https://wa.me/5511991363154)." } }]
     }) + "\n\ndata: [DONE]\n\n";

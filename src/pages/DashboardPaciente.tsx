@@ -32,6 +32,7 @@ import { IoTBiometricTracker } from "@/components/IoTBiometricTracker";
 import { FarmacogenomicaCard } from "@/components/FarmacogenomicaCard";
 import { TitulacaoTrackerCard } from "@/components/TitulacaoTrackerCard";
 import { Anvisa1ClickButton } from "@/components/Anvisa1ClickButton";
+import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -709,6 +710,7 @@ const DashboardPaciente = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <InteractiveTour3DModal initialRole="paciente" autoOpen={true} />
     </div>
   );
 };

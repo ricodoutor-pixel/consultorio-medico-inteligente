@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getOpenGraphConfig, updateOpenGraphTags } from '@/lib/open-graph';
+import { getOpenGraphConfig, updateOpenGraphTags } from '@/lib/open-graph-complete';
 
 export function OpenGraphHead() {
   const { pathname } = useLocation();

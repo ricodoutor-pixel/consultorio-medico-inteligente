@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
 
 const Consultorio = () => {
   const [doctor, setDoctor] = useState<any>(null);
@@ -234,6 +235,13 @@ const Consultorio = () => {
             >
               <Gift size={15} /> Link Médico Sócio
             </button>
+
+            <button 
+              onClick={() => openGlobalTour("medico")}
+              className="px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 transition-all shadow-sm bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:scale-105"
+            >
+              <Sparkles size={15} /> 🚀 Tour 3D (93% PIX)
+            </button>
           </div>
 
           <div className="flex items-center gap-3">
@@ -426,6 +434,7 @@ const Consultorio = () => {
           </TabsContent>
         </Tabs>
       </div>
+      <InteractiveTour3DModal initialRole="medico" autoOpen={true} />
     </div>
   );
 };

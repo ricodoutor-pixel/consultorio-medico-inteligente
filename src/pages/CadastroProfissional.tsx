@@ -10,9 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle2, Upload, UserPlus, ArrowRight, ShieldCheck, AlertTriangle, Lock, Copy, Globe, CreditCard, DollarSign, Bitcoin, MapPin } from "lucide-react";
+import { CheckCircle2, Upload, UserPlus, ArrowRight, ShieldCheck, AlertTriangle, Lock, Copy, Globe, CreditCard, DollarSign, Bitcoin, MapPin, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
 import { KYC_BUCKET, KYC_LABELS, type KycKind } from "@/lib/kyc-docs";
 import { categories, COUNCIL_CONFIG } from "@/data/professionals";
 import { motion } from "framer-motion";
@@ -680,6 +681,12 @@ const CadastroProfissional = () => {
               </div>
 
               <div className="flex gap-3 justify-center flex-wrap">
+                <Button
+                  onClick={() => openGlobalTour("medico")}
+                  className="font-black bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-2xl shadow-lg shadow-sky-500/20 hover:scale-105 transition-all"
+                >
+                  <Sparkles size={16} className="mr-2 animate-pulse" /> 🚀 Tour 3D do Consultório (93% PIX)
+                </Button>
                 <Button variant="outline" className="font-bold border-border rounded-2xl" asChild>
                   <a href="/login">Fazer Login</a>
                 </Button>
@@ -695,6 +702,7 @@ const CadastroProfissional = () => {
             </motion.div>
           </div>
         </section>
+        <InteractiveTour3DModal initialRole="medico" />
         <Footer />
       </div>
     );

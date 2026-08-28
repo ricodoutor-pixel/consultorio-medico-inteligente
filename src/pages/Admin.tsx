@@ -40,6 +40,7 @@ import { SystemHealthGrid } from "@/components/admin/SystemHealthGrid";
 import { AgentOptimizerStatusCard } from "@/components/admin/AgentOptimizerStatusCard";
 import { OfficialPharmacyCard } from "@/components/admin/OfficialPharmacyCard";
 import { TikTokAnalyticsPanel } from "@/components/admin/TikTokAnalyticsPanel";
+import { LeadHunterTracker } from "@/components/admin/LeadHunterTracker";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -358,6 +359,7 @@ const Admin = () => {
     { label: "KYC Pacientes", path: "/admin/aprovacoes-pacientes", icon: Users },
     { label: "KYC Agentes & IAs", path: "/admin/kyc-agentes", icon: Bot },
     { label: "TikTok Ads & Pixel", path: "/admin/conversoes", icon: Video },
+    { label: "Lead Hunter (10k Médicos)", path: "/admin/leads", icon: Sparkles },
   ];
 
   return (
@@ -511,6 +513,11 @@ const Admin = () => {
           {/* CARD 9: TIKTOK ADS & VÍDEOS 1-MINUTO (PIXEL DA8R8N3C77UBCVGL01RG) */}
           <div className="mb-6">
             <TikTokAnalyticsPanel />
+          </div>
+
+          {/* CARD 10: LEAD HUNTER AI & CRM PIPELINE (META DE 10.000 MÉDICOS) */}
+          <div className="mb-6">
+            <LeadHunterTracker />
           </div>
 
           {/* ============================================== */}

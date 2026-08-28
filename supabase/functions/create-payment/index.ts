@@ -1,26 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-
-// SECURITY: Restrict CORS to authorized origins
-const ALLOWED_ORIGINS = [
-  "https://plantayraiz.com.br",
-  "https://www.plantayraiz.com.br",
-  "https://consultorio-medico-inteligente.lovable.app",
-  "http://localhost:8080",
-  "http://localhost:5173",
-  "http://localhost:3000",
-];
-
-function getCorsHeaders(req: Request): Record<string, string> {
-  const origin = req.headers.get("Origin") ?? req.headers.get("origin") ?? "";
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
-  return {
-    "Access-Control-Allow-Origin": allowedOrigin,
-    "Access-Control-Allow-Headers":
-      "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-    "Vary": "Origin",
-  };
-}
+import { getCorsHeaders, corsHeaders } from "../_shared/cors.ts";
 
 /**
  * TABELA DE PREÇOS OFICIAIS SERVER-SIDE (IMUTÁVEL)

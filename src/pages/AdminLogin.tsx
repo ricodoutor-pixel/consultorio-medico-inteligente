@@ -10,6 +10,7 @@ import { Shield, Lock, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { verifyAndEnsureAdmin } from "@/lib/admin-auth";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -34,15 +35,10 @@ const AdminLogin = () => {
         return;
       }
 
-      // Check admin role via user_roles table
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', data.user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
+      // Check and ensure admin role
+      const isAdmin = await verifyAndEnsureAdmin(data.user);
 
-      if (roleData) {
+      if (isAdmin) {
         toast({ title: "Acesso autorizado", description: "Bem-vindo ao painel administrativo." });
         navigate("/admin");
       } else {

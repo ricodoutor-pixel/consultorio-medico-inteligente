@@ -7,6 +7,7 @@
  */
 
 import crypto from 'crypto';
+import { devlog } from '@/lib/devlog';
 
 /**
  * 🔴 ANTI-CLONE: Script de Proteção de Domínio
@@ -77,7 +78,6 @@ export const ANTI_CLONE_SCRIPT = `
         if (!devtoolsOpen) {
           devtoolsOpen = true;
           console.warn('🔒 DevTools detectado. Aplicação protegida.');
-          // Opcional: desabilitar funcionalidades sensíveis
         }
       } else {
         devtoolsOpen = false;
@@ -128,7 +128,7 @@ export class E2EEncryption {
       const combined = iv.toString('hex') + authTag.toString('hex') + encrypted;
       return combined;
     } catch (error) {
-      console.error('Erro ao criptografar:', error);
+      devlog.error('Erro ao criptografar:', error);
       throw error;
     }
   }
@@ -153,7 +153,7 @@ export class E2EEncryption {
 
       return decrypted;
     } catch (error) {
-      console.error('Erro ao descriptografar:', error);
+      devlog.error('Erro ao descriptografar:', error);
       throw error;
     }
   }
@@ -177,7 +177,6 @@ export async function validateSupabaseEncryption(
   encryptedCount: number;
 }> {
   try {
-    // Verificar se tabela 'messages' tem criptografia em repouso
     const { data: messages, error } = await supabaseClient
       .from('messages')
       .select('id, content, is_encrypted')
@@ -195,7 +194,7 @@ export async function validateSupabaseEncryption(
       encryptedCount,
     };
   } catch (error) {
-    console.error('Erro ao validar criptografia:', error);
+    devlog.error('Erro ao validar criptografia:', error);
     return {
       isEncrypted: false,
       messagesCount: 0,
@@ -227,8 +226,7 @@ export async function deployWatcher(): Promise<{
     const buildTime = Date.now() - startTime;
 
     if (buildTime > 10000) {
-      // Build > 10s - Reiniciar PM2
-      console.warn(
+      devlog.warn(
         `⚠️ Build lento detectado: ${(buildTime / 1000).toFixed(2)}s`
       );
 
@@ -263,7 +261,7 @@ export async function deployWatcher(): Promise<{
       status: 'success',
     };
   } catch (error) {
-    console.error('Erro no deploy watcher:', error);
+    devlog.error('Erro no deploy watcher:', error);
     return {
       buildTime: 0,
       status: 'error',
@@ -309,7 +307,7 @@ ${routes
 
     return sitemapXml;
   } catch (error) {
-    console.error('Erro ao gerar sitemap:', error);
+    devlog.error('Erro ao gerar sitemap:', error);
     throw error;
   }
 }
@@ -346,7 +344,7 @@ export async function systemHealthCheck(): Promise<{
       timestamp: new Date(),
     };
   } catch (error) {
-    console.error('Erro no health check:', error);
+    devlog.error('Erro no health check:', error);
     return {
       status: 'down',
       checks: {

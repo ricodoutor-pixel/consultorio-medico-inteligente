@@ -28,10 +28,10 @@ const WebhookSchema = z.object({
   data: z.object({ id: z.string() }).passthrough(),
 });
 
-function json(data: unknown, status = 200) {
+function json(data: unknown, status = 200, req?: Request) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...(req ? getCorsHeaders(req) : corsHeaders), "Content-Type": "application/json" },
   });
 }
 
@@ -250,6 +250,7 @@ async function processPixOut(supabase: any, withdrawal: any, pixKey: string, adm
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const url = new URL(req.url);

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import brisaAvatar from "@/assets/brisa-whatsapp-icon.jpg";
 import { supabase } from "@/integrations/supabase/client";
+import { AgenticCommerceCard } from "@/components/checkout/AgenticCommerceCard";
 
 interface Message {
   id: string;
@@ -341,6 +342,17 @@ export const BrisaChatModal = () => {
                   {message.sender === "ai" ? (
                     <div className="text-sm max-w-none [&>p]:my-1 [&_a]:text-green-500 [&_a]:underline [&_a]:font-bold hover:[&_a]:text-green-400">
                       <ReactMarkdown>{message.text}</ReactMarkdown>
+                      {message.text.includes("agentic_order_id=") && (() => {
+                        const match = message.text.match(/agentic_order_id=([a-zA-Z0-9_\-]+)/);
+                        const orderId = match ? match[1] : "";
+                        return (
+                          <AgenticCommerceCard
+                            orderId={orderId}
+                            productName="Óleo de CBD Full Spectrum 1500mg"
+                            amount={290.00}
+                          />
+                        );
+                      })()}
                     </div>
                   ) : (
                     <p className="whitespace-pre-wrap">{message.text}</p>
@@ -360,6 +372,17 @@ export const BrisaChatModal = () => {
                 <div className="bg-muted text-foreground rounded-2xl rounded-bl-md px-3 py-2 text-sm leading-relaxed">
                   <div className="text-sm max-w-none [&>p]:my-1 [&_a]:text-green-500 [&_a]:underline [&_a]:font-bold hover:[&_a]:text-green-400">
                     <ReactMarkdown>{streamingText}</ReactMarkdown>
+                    {streamingText.includes("agentic_order_id=") && (() => {
+                      const match = streamingText.match(/agentic_order_id=([a-zA-Z0-9_\-]+)/);
+                      const orderId = match ? match[1] : "";
+                      return (
+                        <AgenticCommerceCard
+                          orderId={orderId}
+                          productName="Óleo de CBD Full Spectrum 1500mg"
+                          amount={290.00}
+                        />
+                      );
+                    })()}
                   </div>
                   <span className="animate-pulse text-primary">▊</span>
                 </div>

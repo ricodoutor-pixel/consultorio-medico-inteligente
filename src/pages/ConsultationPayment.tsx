@@ -19,6 +19,8 @@ const ConsultationPayment = () => {
   const [searchParams] = useSearchParams();
   const proId = searchParams.get("pro") || "med-1";
   const appointmentId = searchParams.get("appointment") || null;
+  const agenticOrderId = searchParams.get("agentic_order_id") || null;
+  const agenticMethod = searchParams.get("method") || null;
   const pro = professionals.find((p) => p.id === proId) || professionals[0];
   const [status, setStatus] = useState<"pending" | "loading" | "processing" | "confirmed" | "rejected">("pending");
   const [processingStep, setProcessingStep] = useState(0);
@@ -28,6 +30,25 @@ const ConsultationPayment = () => {
   const { price: dynamicPrice, gateway, createPayment: createGatewayPayment, loading: loadingGateway } = usePaymentGateway();
 
   const [isExempt, setIsExempt] = useState(false);
+  // Comércio Agêntico (UCP/MCP): valor sempre validado server-side
+  const [agenticOrder, setAgenticOrder] = useState<{ total_amount: number; status: string } | null>(null);
+
+  useEffect(() => {
+    if (!agenticOrderId) return;
+    (async () => {
+      const { data, error } = await (supabase as any)
+        .from("agentic_orders")
+        .select("total_amount, status")
+        .eq("id", agenticOrderId)
+        .maybeSingle();
+      if (error || !data) {
+        toast({ title: "Pedido agêntico não encontrado", description: "Seguindo com o checkout padrão." });
+        return;
+      }
+      setAgenticOrder({ total_amount: Number(data.total_amount), status: data.status });
+    })();
+  }, [agenticOrderId, toast]);
+
 
   // Check if the doctor has an active Consultório Virtual subscription (exempt from 7% fee)
   useEffect(() => {

@@ -4,12 +4,7 @@ import { GEMINI_PRIMARY_MODEL } from "../_shared/gemini.ts";
 // Foco: evidência, ANVISA/CFM/RDC 660, CYP450, interações, exames, monitoramento.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders, corsHeaders } from "../_shared/cors.ts";
 
 const SYSTEM_PROMPT = `Você é **Dr. Edilson Bezerra (CRM 10963 - Sta Cruz BO)**, CEO da Planta y Raíz Ltda e médico especialista em canabinologia medicinal. No Brasil, atua oferecendo Orientação Técnica com Relatório de Encaminhamento Completo assinado digitalmente, e na Bolívia como Médico Prescritor em Santa Cruz de la Sierra. Você age como AGENTE DE APOIO CLÍNICO SÊNIOR para os médicos da plataforma. Tom: colega sênior, direto, técnico, embasado e acolhedor.
 
@@ -57,15 +52,26 @@ O que você NÃO sabe, contra-indicações absolutas, populações sem dados (ge
 - Sinalize quando a prescrição exige notificação de receita amarela/azul.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚫 LIMITES INVIOLÁVEIS
+🚫 LIMITES INVIOLÁVEIS (CFM/ANVISA)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Você NÃO substitui o médico, apenas APOIA a decisão.
-- NUNCA prometa cura.
-- Se faltar dado essencial (peso, idade, função hepática, fármacos em uso) → PEÇA antes de responder.
-- Se a pergunta sair de cannabis/clínica → redirecione gentil ao escopo.
-- Mensagens curtas e densas. Sem enrolar.`;
+- Você é um AGENTE DE APOIO para médicos, não substitui o médico assistente.
+- NUNCA emite diagnóstico definitivo — apenas raciocínio clínico de suporte.
+- NUNCA prescreve diretamente para pacientes — apenas orienta o médico prescritor.
+- NUNCA altera ou sugere alterar dosagem sem o médico responsável estar ciente.
+- Se o médico relatar emergência ou risco imediato ao paciente: encaminhar para SAMU 192 ou UPA imediatamente.
+- A decisão clínica final é SEMPRE do médico assistente com CRM ativo.`;
+
+function sanitizePromptInput(input: unknown, maxLength = 500): string {
+  if (!input || typeof input !== "string") return "";
+  return input
+    .replace(/[\x00-\x1F\x7F]/g, "")
+    .replace(/[`"'\\]/g, "")
+    .trim()
+    .slice(0, maxLength);
+}
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
@@ -116,6 +122,10 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    const sanitizedMessages = messages.slice(-12).map((m: any) => ({
+      role: m.role === "user" ? "user" : "assistant",
+      content: sanitizePromptInput(m.content, 4000),
+    }));
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -127,7 +137,7 @@ serve(async (req) => {
         model: `google/${GEMINI_PRIMARY_MODEL}`,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          ...messages.slice(-12),
+          ...sanitizedMessages,
         ],
         stream: true,
       }),

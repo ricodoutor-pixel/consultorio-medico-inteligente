@@ -13,10 +13,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { UserPlus, Stethoscope, Building2, Leaf, Users, CheckCircle2, ArrowRight, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck, Gift, Globe } from "lucide-react";
+import { UserPlus, Stethoscope, Building2, Leaf, Users, CheckCircle2, ArrowRight, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck, Gift, Globe, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
 import * as Flags from "country-flag-icons/react/3x2";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -421,6 +422,12 @@ const Cadastro = () => {
               </div>
 
               <div className="flex flex-col gap-3 justify-center">
+                <Button
+                  onClick={() => openGlobalTour(type || "paciente")}
+                  className="font-black bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 rounded-2xl h-12 shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all"
+                >
+                  <Sparkles size={16} className="mr-2 animate-pulse" /> 🚀 Fazer Tour 3D da Plataforma
+                </Button>
                 <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-12" asChild>
                   <Link to="/login">Fazer Login <ArrowRight size={16} className="ml-2" /></Link>
                 </Button>
@@ -431,6 +438,7 @@ const Cadastro = () => {
             </motion.div>
           </div>
         </section>
+        <InteractiveTour3DModal initialRole={type || "paciente"} />
         <Footer />
       </div>
     );

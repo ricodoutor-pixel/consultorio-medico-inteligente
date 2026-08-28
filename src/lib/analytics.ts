@@ -6,6 +6,11 @@
 declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void;
+    ttq?: {
+      page: () => void;
+      track: (eventName: string, properties?: Record<string, unknown>) => void;
+      identify: (params: Record<string, unknown>) => void;
+    };
     clevertap?: { event: { push: (name: string, props?: Record<string, unknown>) => void } };
     dataLayer?: Record<string, unknown>[];
   }
@@ -14,7 +19,7 @@ declare global {
 type EventProperties = Record<string, string | number | boolean | null | undefined>;
 
 /**
- * Universal track function — fans out to Meta Pixel, CleverTap, and GTM dataLayer.
+ * Universal track function — fans out to Meta Pixel, TikTok Pixel, CleverTap, and GTM dataLayer.
  */
 export function trackEvent(eventName: string, properties?: EventProperties): void {
   try {
@@ -24,6 +29,19 @@ export function trackEvent(eventName: string, properties?: EventProperties): voi
     // Meta Pixel
     if (typeof window.fbq === "function") {
       window.fbq("trackCustom", eventName, properties);
+    }
+
+    // TikTok Pixel (ID: DA8R8N3C77UBCVGL01RG)
+    if (typeof window.ttq?.track === "function") {
+      const tikTokMap: Record<string, string> = {
+        PageView: "ViewContent",
+        Medical_Signup_Started: "CompleteRegistration",
+        KYC_Validation_Success: "CompleteRegistration",
+        Consultation_Booked: "PlaceAnOrder",
+        Checkout_Started: "InitiateCheckout",
+      };
+      const ttEvent = tikTokMap[eventName] || eventName;
+      window.ttq.track(ttEvent, properties as Record<string, unknown>);
     }
 
     // CleverTap

@@ -68,16 +68,16 @@ const ConsultationPayment = () => {
   }, []);
 
   const feeRate = isExempt ? 0 : 0.07;
-  const basePrice = dynamicPrice || pro.priceValue;
-  const commission = basePrice * feeRate;
+  const basePrice = agenticOrder ? agenticOrder.total_amount : (dynamicPrice || pro.priceValue);
+  const commission = agenticOrder ? 0 : basePrice * feeRate;
   const total = basePrice + commission;
 
   // Create payment preference on mount or when dynamic price is ready
   useEffect(() => {
-    if (!loadingGateway) {
+    if (!loadingGateway && (!agenticOrderId || agenticOrder)) {
       createPayment();
     }
-  }, [loadingGateway]);
+  }, [loadingGateway, agenticOrderId, agenticOrder]);
 
   const createPayment = async () => {
     setStatus("loading");
@@ -87,8 +87,11 @@ const ConsultationPayment = () => {
         appointmentId,
         doctorName: pro.name,
         patientEmail: session?.user?.email || "",
-        description: `Orientação Técnica com ${pro.name} - Planta & Raiz`,
+        description: agenticOrder
+          ? `Pedido validado (UCP) ${agenticOrderId?.slice(0, 8)} - Planta & Raiz${agenticMethod ? ` [${agenticMethod}]` : ""}`
+          : `Orientação Técnica com ${pro.name} - Planta & Raiz`,
       });
+
 
       if (data?.init_point || data?.url) {
         setCheckoutUrl(data.init_point || data.url);

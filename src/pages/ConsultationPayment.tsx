@@ -19,15 +19,31 @@ const ConsultationPayment = () => {
   const [searchParams] = useSearchParams();
   const proId = searchParams.get("pro") || "med-1";
   const appointmentId = searchParams.get("appointment") || null;
+  const agenticOrderId = searchParams.get("agentic_order_id") || null;
   const pro = professionals.find((p) => p.id === proId) || professionals[0];
   const [status, setStatus] = useState<"pending" | "loading" | "processing" | "confirmed" | "rejected">("pending");
   const [processingStep, setProcessingStep] = useState(0);
   const [countdown, setCountdown] = useState(900); // 15 min
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
+  const [agenticOrder, setAgenticOrder] = useState<any>(null);
   const { toast } = useToast();
   const { price: dynamicPrice, gateway, createPayment: createGatewayPayment, loading: loadingGateway } = usePaymentGateway();
 
   const [isExempt, setIsExempt] = useState(false);
+
+  // Busca detalhes do pedido agêntico se informado
+  useEffect(() => {
+    if (!agenticOrderId) return;
+    const fetchAgenticOrder = async () => {
+      const { data } = await supabase
+        .from("agentic_orders")
+        .select("*")
+        .eq("id", agenticOrderId)
+        .maybeSingle();
+      if (data) setAgenticOrder(data);
+    };
+    fetchAgenticOrder();
+  }, [agenticOrderId]);
 
   // Check if the doctor has an active Consultório Virtual subscription (exempt from 7% fee)
   useEffect(() => {
@@ -46,8 +62,8 @@ const ConsultationPayment = () => {
     checkExemption();
   }, []);
 
-  const feeRate = isExempt ? 0 : 0.07;
-  const basePrice = dynamicPrice || pro.priceValue;
+  const feeRate = isExempt || agenticOrder ? 0 : 0.07;
+  const basePrice = agenticOrder ? Number(agenticOrder.total_amount) : (dynamicPrice || pro.priceValue);
   const commission = basePrice * feeRate;
   const total = basePrice + commission;
 
@@ -62,11 +78,15 @@ const ConsultationPayment = () => {
     setStatus("loading");
     try {
       const { data: { session } } = await supabase.auth.getSession();
+      const paymentDescription = agenticOrder
+        ? `Pedido Agêntico UCP: ${agenticOrder.items?.[0]?.name || "Medicamento Prescrito"}`
+        : `Orientação Técnica com ${pro.name} - Planta & Raiz`;
+
       const data = await createGatewayPayment({
         appointmentId,
-        doctorName: pro.name,
+        doctorName: agenticOrder ? "Farmácia Dispensary Planta y Raíz" : pro.name,
         patientEmail: session?.user?.email || "",
-        description: `Orientação Técnica com ${pro.name} - Planta & Raiz`,
+        description: paymentDescription,
       });
 
       if (data?.init_point || data?.url) {

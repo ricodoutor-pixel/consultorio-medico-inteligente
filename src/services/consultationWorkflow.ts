@@ -1,6 +1,7 @@
 import { supabase as _supabase } from "@/integrations/supabase/client";
 const supabase: any = _supabase;
 import { toast } from "sonner";
+import { devlog } from "@/lib/devlog";
 
 interface ConsultationWorkflowPayload {
   doctorId: string;
@@ -35,7 +36,7 @@ export const consultationWorkflowService = {
       if (error) throw error;
       return { success: true };
     } catch (err) {
-      console.error("Erro ao enviar alerta da Enf. Brisa:", err);
+      devlog.error("Erro ao enviar alerta da Enf. Brisa:", err);
       throw err;
     }
   },
@@ -76,7 +77,7 @@ export const consultationWorkflowService = {
 
       return { success: true };
     } catch (err) {
-      console.error("Erro ao aceitar consulta:", err);
+      devlog.error("Erro ao aceitar consulta:", err);
       throw err;
     }
   },
@@ -98,7 +99,7 @@ export const consultationWorkflowService = {
       if (error) throw error;
       return { success: true };
     } catch (err) {
-      console.error("Erro ao rejeitar consulta:", err);
+      devlog.error("Erro ao rejeitar consulta:", err);
       throw err;
     }
   },
@@ -161,7 +162,7 @@ export const consultationWorkflowService = {
 
       return { success: true };
     } catch (err) {
-      console.error("Erro ao finalizar consulta:", err);
+      devlog.error("Erro ao finalizar consulta:", err);
       throw err;
     }
   },
@@ -190,7 +191,7 @@ export const consultationWorkflowService = {
       if (error) throw error;
       return { success: true };
     } catch (err) {
-      console.error("Erro ao salvar nota clínica:", err);
+      devlog.error("Erro ao salvar nota clínica:", err);
       throw err;
     }
   },
@@ -237,7 +238,7 @@ export const consultationWorkflowService = {
       if (error) throw error;
       return { success: true, prescription: data };
     } catch (err) {
-      console.error("Erro ao gerar prescrição:", err);
+      devlog.error("Erro ao gerar prescrição:", err);
       throw err;
     }
   },
@@ -256,7 +257,7 @@ export const consultationWorkflowService = {
       if (error) throw error;
       return { success: true, patient: data };
     } catch (err) {
-      console.error("Erro ao buscar paciente:", err);
+      devlog.error("Erro ao buscar paciente:", err);
       throw err;
     }
   },
@@ -285,7 +286,7 @@ export const consultationWorkflowService = {
       if (error) throw error;
       return { success: true, history: data };
     } catch (err) {
-      console.error("Erro ao buscar histórico:", err);
+      devlog.error("Erro ao buscar histórico:", err);
       throw err;
     }
   },

@@ -213,6 +213,7 @@ const AuthCallback = lazyWithRecovery(() => import("./pages/AuthCallback"), { so
 const MedSocio = lazyWithRecovery(() => import("./pages/MedSocio"), { sourceRef: "/medsocio" });
 const TelemedWhatsApp = lazyWithRecovery(() => import("./pages/TelemedWhatsApp"), { sourceRef: "/telemed-whatsapp" });
 const MonitoramentoSaude = lazyWithRecovery(() => import("./pages/MonitoramentoSaude"), { sourceRef: "/monitoramento-saude" });
+const FeedbackNPS = lazyWithRecovery(() => import("./pages/FeedbackNPS"), { sourceRef: "/feedback" });
 
 const queryClient = new QueryClient();
 
@@ -313,6 +314,7 @@ const App = () => (
                 <Route path="/saude-digital" element={<SaudeDigital />} />
                 <Route path="/convite-medico" element={<ConviteMedico />} />
                 <Route path="/faq" element={<FAQ />} />
+                <Route path="/feedback" element={<FeedbackNPS />} />
                 <Route path="/manual" element={<ManualPlataforma />} />
                 <Route path="/contato" element={<Contato />} />
                 <Route path="/pay" element={<Pay />} />

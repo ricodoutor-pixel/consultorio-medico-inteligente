@@ -65,7 +65,7 @@ serve(async (req) => {
       { name: "Pagamentos (Mercado Pago)", status: mpStatus },
       {
         name: "Enfª Brisa (WhatsApp)",
-        status: "operational" as Status,
+        status: ((brisaInbound ?? 0) > 0 ? "operational" : "degraded") as Status,
       },
       {
         name: "Auditoria & Crons",

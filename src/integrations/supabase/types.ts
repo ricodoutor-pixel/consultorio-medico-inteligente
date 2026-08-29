@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -213,6 +213,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      agentic_orders: {
+        Row: {
+          created_at: string
+          id: string
+          items: Json
+          patient_id: string
+          payment_method: string | null
+          prescription_id: string | null
+          regulatory_hash: string
+          status: string | null
+          total_amount: number
+          updated_at: string
+          vendor_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          items: Json
+          patient_id: string
+          payment_method?: string | null
+          prescription_id?: string | null
+          regulatory_hash: string
+          status?: string | null
+          total_amount: number
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          items?: Json
+          patient_id?: string
+          payment_method?: string | null
+          prescription_id?: string | null
+          regulatory_hash?: string
+          status?: string | null
+          total_amount?: number
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agentic_orders_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_events: {
         Row: {

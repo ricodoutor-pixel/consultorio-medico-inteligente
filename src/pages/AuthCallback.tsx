@@ -7,8 +7,9 @@ const ROUTE_BY_ROLE: Record<string, string> = {
   medico: "/dashboard-medico",
   profissional: "/dashboard-medico",
   cuidador: "/dashboard-medico",
-  farmacia: "/dashboard-loja",
-  lojista: "/dashboard-loja",
+  farmacia: "/lojistas",
+  lojista: "/lojistas",
+  vendor: "/lojistas",
   produtor: "/dashboard/professional",
 };
 

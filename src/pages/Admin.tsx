@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Download, FileDown, Crown, Sparkles } from "lucide-react";
+import { Download, FileDown, Crown } from "lucide-react";
 import { exportCSV, exportAdminPDF } from "@/lib/admin-export";
 import { KpiDrillDown, type DrillSource } from "@/components/admin/KpiDrillDown";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -223,7 +223,7 @@ const Admin = () => {
         kpi: {
           receita30d, receitaHoje,
           ordensTotal, ordensHoje, ticketMedio,
-          consultasHoje: appHoje.count ?? 0,
+          consultasHoje: (appHoje.count ?? 0) + (otHoje.data?.length ?? 0),
           filaAtiva: fila.count ?? 0,
           leadsTotal: leadsAll.count ?? 0,
           leads24h: leads24.data?.length ?? 0,
@@ -254,7 +254,7 @@ const Admin = () => {
 
   useEffect(() => {
     loadData();
-    const i = setInterval(loadData, 30_000);
+    const i = setInterval(loadData, 15_000); // 15s para dados mais frescos
     return () => clearInterval(i);
   }, [loadData]);
 

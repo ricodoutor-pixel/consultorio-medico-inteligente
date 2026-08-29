@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Download, FileDown, Crown } from "lucide-react";
+import { Download, FileDown, Crown, Sparkles } from "lucide-react";
 import { exportCSV, exportAdminPDF } from "@/lib/admin-export";
 import { KpiDrillDown, type DrillSource } from "@/components/admin/KpiDrillDown";
 import { ErrorBoundary } from "@/components/ErrorBoundary";

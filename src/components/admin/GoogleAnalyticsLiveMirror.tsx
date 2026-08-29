@@ -325,7 +325,7 @@ export function GoogleAnalyticsLiveMirror() {
                   className="flex items-center justify-between p-2 rounded-xl bg-slate-950/60 border border-slate-800/60 text-xs"
                 >
                   <div className="flex items-center gap-2">
-                    <CountryFlag code={c.country} size={15} />
+                    <CountryFlag code={c.country} />
                     <span className="font-medium text-foreground">{c.city}</span>
                   </div>
                   <span className="font-mono font-bold text-emerald-400 text-[11px]">

@@ -122,11 +122,12 @@ export function useDoctors() {
       if (userIds.length > 0) {
         const [profRes, kycRes] = await Promise.all([
           (supabase.rpc as any)("admin_doctor_profiles", { _ids: userIds }).catch(() => ({ data: [] })),
-          supabase
-            .from("doctor_kyc_documents" as any)
-            .select("doctor_user_id, document_kind, storage_path, mime_type, verification_status, created_at")
-            .in("doctor_user_id", userIds)
-            .catch(() => ({ data: [] })),
+          Promise.resolve(
+            supabase
+              .from("doctor_kyc_documents" as any)
+              .select("doctor_user_id, document_kind, storage_path, mime_type, verification_status, created_at")
+              .in("doctor_user_id", userIds)
+          ).catch(() => ({ data: [] as any[] })),
         ]);
         profiles = profRes.data || [];
         kycDocs = kycRes.data || [];

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const getFirstEnv = (...names: string[]) => {
@@ -10,17 +11,12 @@ const getFirstEnv = (...names: string[]) => {
   return null;
 };
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const authErr = requireServiceAuth(req, corsHeaders);
   if (authErr) return authErr;
-
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -38,32 +34,75 @@ serve(async (req) => {
       const { error: dbError } = await supabase.from("profiles").select("id").limit(1);
       checks.database = { ok: !dbError, responseTime: Date.now() - dbStart, error: dbError?.message };
 
-      // 2. ManyChat check
-      const mcStart = Date.now();
-      const MANYCHAT_API_KEY = Deno.env.get("MANYCHAT_API_KEY");
-      if (MANYCHAT_API_KEY) {
+      // 2. Evolution API check (WhatsApp Brisa — sistema principal)
+      const evStart = Date.now();
+      const EV_URL = (Deno.env.get("EVOLUTION_API_URL") || "").replace(/\/$/, "");
+      const EV_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
+      const EV_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
+
+      if (EV_URL && EV_KEY) {
         try {
-          const mcRes = await fetch("https://api.manychat.com/fb/page/getInfo", {
-            headers: { Authorization: `Bearer ${MANYCHAT_API_KEY}` },
-          });
-          const mcBody = await mcRes.text();
-          checks.manychat = { ok: mcRes.ok, responseTime: Date.now() - mcStart, status: mcRes.status };
+          const base = EV_URL.startsWith("http") ? EV_URL : `https://${EV_URL}`;
+          const evRes = await fetch(
+            `${base}/instance/connectionState/${encodeURIComponent(EV_INSTANCE)}`,
+            {
+              headers: { apikey: EV_KEY },
+              signal: AbortSignal.timeout(6_000),
+            }
+          );
+          const evData = evRes.ok ? await evRes.json() : null;
+          checks.evolution_api = {
+            ok: evRes.ok && evData?.instance?.state === "open",
+            responseTime: Date.now() - evStart,
+            status: evRes.status,
+            state: evData?.instance?.state || "unknown",
+            instance: EV_INSTANCE,
+          };
         } catch (e: any) {
-          checks.manychat = { ok: false, responseTime: Date.now() - mcStart, error: e.message };
+          checks.evolution_api = {
+            ok: false,
+            responseTime: Date.now() - evStart,
+            error: e.message,
+          };
         }
       } else {
-        checks.manychat = { ok: false, responseTime: 0, error: "API key not configured" };
+        checks.evolution_api = {
+          ok: false,
+          responseTime: 0,
+          error: "EVOLUTION_API_URL ou EVOLUTION_API_KEY não configurados",
+        };
       }
 
-      // 3. Mercado Pago check
+      // 3. Gemini API check
+      const gemStart = Date.now();
+      const GEMINI_KEY = getFirstEnv("GEMINI_API_KEY", "GOOGLE_GENERATIVE_AI_API_KEY");
+      if (GEMINI_KEY) {
+        try {
+          const gemRes = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models?key=${GEMINI_KEY}`,
+            { signal: AbortSignal.timeout(5_000) }
+          );
+          checks.gemini_api = {
+            ok: gemRes.ok,
+            responseTime: Date.now() - gemStart,
+            status: gemRes.status,
+          };
+        } catch (e: any) {
+          checks.gemini_api = { ok: false, responseTime: Date.now() - gemStart, error: e.message };
+        }
+      } else {
+        checks.gemini_api = { ok: false, responseTime: 0, error: "GEMINI_API_KEY não configurada" };
+      }
+
+      // 4. Mercado Pago check
       const mpStart = Date.now();
       const MP_TOKEN = getFirstEnv("MERCADO_PAGO_ACCESS_TOKEN", "MERCADOPAGO_ACCESS_TOKEN", "MERCADO_PAGO_API_KEY");
       if (MP_TOKEN) {
         try {
           const mpRes = await fetch("https://api.mercadopago.com/v1/payment_methods", {
             headers: { Authorization: `Bearer ${MP_TOKEN}` },
+            signal: AbortSignal.timeout(5_000),
           });
-          const mpBody = await mpRes.text();
           checks.mercadopago = { ok: mpRes.ok, responseTime: Date.now() - mpStart, status: mpRes.status };
         } catch (e: any) {
           checks.mercadopago = { ok: false, responseTime: Date.now() - mpStart, error: e.message };
@@ -72,10 +111,10 @@ serve(async (req) => {
         checks.mercadopago = { ok: false, responseTime: 0, error: "Access token not configured" };
       }
 
-      // 4. Edge Functions check (self-test)
+      // 5. Edge Functions check (self-test)
       checks.edge_functions = { ok: true, responseTime: 0, note: "Running from edge function" };
 
-      // 5. Automation stats
+      // 6. Automation stats
       const { data: pendingJobs } = await supabase
         .from("job_queue")
         .select("id", { count: "exact" })

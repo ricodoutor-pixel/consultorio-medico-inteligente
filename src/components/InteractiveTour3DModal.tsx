@@ -448,7 +448,7 @@ export const InteractiveTour3DModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-w-4xl p-0 overflow-hidden border-border bg-slate-950/95 backdrop-blur-2xl text-foreground shadow-2xl rounded-3xl z-[150]">
+      <DialogContent className="max-w-3xl scale-[0.85] origin-center p-0 overflow-hidden border-border bg-slate-950/95 backdrop-blur-2xl text-foreground shadow-2xl rounded-3xl z-[150]">
         {/* Top Gradient Banner */}
         <div className="relative p-6 pb-4 border-b border-border/60 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-purple-950/30">
           <div className="flex items-center justify-between flex-wrap gap-3">

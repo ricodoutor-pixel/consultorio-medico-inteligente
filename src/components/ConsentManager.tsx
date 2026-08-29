@@ -106,7 +106,7 @@ export function ConsentManager() {
           user_agent: navigator.userAgent || "WebClient",
         }));
 
-        await supabase.from("user_consents").upsert(inserts as any).catch(() => {});
+        await Promise.resolve(supabase.from("user_consents").upsert(inserts as any)).catch(() => {});
       }
     } catch (e) {
       console.warn("Background consent sync error:", e);

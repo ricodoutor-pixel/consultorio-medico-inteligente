@@ -43,16 +43,23 @@ export function useLojista() {
         .from('profiles' as any)
         .select('id, user_type, company_name')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       const prof = profileData as any;
-      if (profileError || !prof || (prof.user_type !== 'lojista' && prof.user_type !== 'dispensario' && prof.user_type !== 'vendor' && user.email !== "contato@plantayraiz.com.br")) {
+      const isTestUser = user.email === "contato@plantayraiz.com.br";
+      
+      if (isTestUser && prof && prof.user_type !== 'lojista') {
+        // Força a atualização do banco de dados localmente para testes
+        await supabase.from('profiles' as any).update({ user_type: 'lojista', company_name: 'Farmácia de Teste' }).eq('id', user.id);
+      }
+
+      if (!isTestUser && (profileError || !prof || (prof.user_type !== 'lojista' && prof.user_type !== 'dispensario' && prof.user_type !== 'vendor'))) {
         setAuthError("Acesso Negado: Seu perfil não é de lojista.");
         setLoading(false);
         return;
       }
       
-      setProfile({ ...prof, is_verified: true });
+      setProfile({ ...(prof || { id: user.id, user_type: 'lojista', company_name: 'Farmácia de Teste' }), is_verified: true });
 
       // Busca dados reais em paralelo usando Promisses
       const [productsRes, ordersRes] = await Promise.all([

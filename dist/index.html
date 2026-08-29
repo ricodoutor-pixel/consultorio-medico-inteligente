@@ -25,40 +25,6 @@
     </style>
 
     <script>
-      // Instala o filtro antes de analytics, módulos e reporters. Extensões como
-      // MetaMask podem rejeitar uma Promise ainda durante a leitura do <head>.
-      (function(){
-        function isExtensionNoise(value){
-          try {
-            var seen = [];
-            var current = value;
-            while (current && seen.indexOf(current) === -1) {
-              seen.push(current);
-              var message = String((current && current.message) || current || '');
-              var stack = String((current && current.stack) || '');
-              if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//i.test(message + stack)) return true;
-              if (/MetaMask|ethereum provider|web3|Failed to connect to MetaMask/i.test(message)) return true;
-              current = current && current.cause;
-            }
-          } catch(_){}
-          return false;
-        }
-        window.__pyrIsExtensionNoise = isExtensionNoise;
-        window.addEventListener('unhandledrejection', function(event){
-          if (!isExtensionNoise(event.reason)) return;
-          event.preventDefault();
-          event.stopImmediatePropagation();
-        }, true);
-        window.addEventListener('error', function(event){
-          var source = event.error || { message: event.message, stack: event.filename };
-          if (!isExtensionNoise(source)) return;
-          event.preventDefault();
-          event.stopImmediatePropagation();
-        }, true);
-      })();
-    </script>
-
-    <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       
@@ -251,18 +217,30 @@
       ]
     }
     </script>
+    <!-- TikTok Pixel Code Start -->
+    <script>
+      !function (w, d, t) {
+        w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+      var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+      ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
 
-    <script type="module" crossorigin src="/assets/index-0AnCd7XM.js"></script>
+        ttq.load('DA8R8N3C77UBCVGL01RG');
+        ttq.page();
+      }(window, document, 'ttq');
+    </script>
+    <!-- TikTok Pixel Code End -->
+
+    <script type="module" crossorigin src="/assets/index-B71MFXxb.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/date-fns-8SSMhL6z.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-BAlk3gvx.js">
     <link rel="modulepreload" crossorigin href="/assets/pdf-excel-4KVKXZDI.js">
     <link rel="modulepreload" crossorigin href="/assets/i18n-Cvw8CJX9.js">
     <link rel="modulepreload" crossorigin href="/assets/supabase-CZAdrELw.js">
-    <link rel="modulepreload" crossorigin href="/assets/lucide-dnCq25AD.js">
-    <link rel="modulepreload" crossorigin href="/assets/ui-primitives-Ybtt_RO8.js">
+    <link rel="modulepreload" crossorigin href="/assets/lucide-DbMPhmXb.js">
+    <link rel="modulepreload" crossorigin href="/assets/ui-primitives-CKCU8Jcu.js">
     <link rel="modulepreload" crossorigin href="/assets/animation-4SMoEF0Z.js">
     <link rel="stylesheet" crossorigin href="/assets/vendor-DpsRipQV.css">
-    <link rel="stylesheet" crossorigin href="/assets/index-CMv3thzb.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-DEGAHmQ3.css">
     <script type="module">import.meta.url;import("_").catch(()=>1);(async function*(){})().next();window.__vite_is_modern_browser=true</script>
     <script type="module">!function(){if(window.__vite_is_modern_browser)return;console.warn("vite: loading legacy chunks, syntax error above and the same error below should be ignored");var e=document.getElementById("vite-legacy-polyfill"),n=document.createElement("script");n.src=e.src,n.onload=function(){System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))},document.body.appendChild(n)}();</script>
   </head>
@@ -336,7 +314,6 @@
         // erros de Service Worker dentro de iframe não são falhas da plataforma.
         function isExternalNoise(err){
           try {
-            if (window.__pyrIsExtensionNoise && window.__pyrIsExtensionNoise(err)) return true;
             var msg = String((err && err.message) || err || '');
             var stack = String((err && err.stack) || '');
             if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack)) return true;
@@ -381,13 +358,8 @@
           reportEarlyError(error, 'window.error');
         }, true);
         window.addEventListener('unhandledrejection', function(e){
-          if (isExternalNoise(e.reason)) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            return;
-          }
           reportEarlyError(e.reason, 'unhandledrejection');
-        }, true);
+        });
 
         // Watchdog paciente: mantém a tela de carregamento enquanto o bundle
         // compila/baixa. Erros genéricos e de extensões jamais substituem o #root;
@@ -436,6 +408,6 @@
     </script>
     <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
     <script nomodule crossorigin id="vite-legacy-polyfill" src="/assets/polyfills-legacy-8XaHBhDD.js"></script>
-    <script nomodule crossorigin id="vite-legacy-entry" data-src="/assets/index-legacy-C5b5yIt5.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+    <script nomodule crossorigin id="vite-legacy-entry" data-src="/assets/index-legacy-Bnvzw5TN.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
   </body>
 </html>

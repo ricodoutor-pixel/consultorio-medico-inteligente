@@ -58,6 +58,7 @@ const DashboardMedico = () => {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [dosageNotes, setDosageNotes] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [hasAvailability, setHasAvailability] = useState<boolean | null>(null);
 
   useEffect(() => {
     fetchDoctorData();
@@ -126,6 +127,14 @@ const DashboardMedico = () => {
           .limit(1)
           .maybeSingle();
         if (sub?.plan_tier) setCurrentTier(sub.plan_tier);
+
+        const { count: availCount } = await supabase
+          .from("doctor_availability")
+          .select("id", { count: "exact", head: true })
+          .eq("doctor_id", doctor.id)
+          .gte("slot_date", new Date().toISOString().split('T')[0]);
+        
+        setHasAvailability(availCount !== null && availCount > 0);
       }
     } catch (e) {
       console.error(e);
@@ -465,6 +474,23 @@ const DashboardMedico = () => {
                     <p className="font-bold text-foreground">Cadastro em Análise</p>
                     <p className="text-sm text-muted-foreground">Seu cadastro e documentos estão em análise pela Administração. O seu Card Online será liberado em breve.</p>
                   </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {doctorData && doctorData.is_approved_by_admin && hasAvailability === false && (
+              <Card className="border-emerald-500/30 bg-emerald-500/10 mb-8 animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                <CardContent className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <Calendar size={28} className="text-emerald-500 shrink-0" />
+                    <div>
+                      <p className="font-bold text-foreground text-lg">Abertura de Horários Pendente!</p>
+                      <p className="text-sm text-muted-foreground">Configure suas grades de disponibilidade semanal no Consultório Virtual para que o paciente encontre horários livres em qualquer dia.</p>
+                    </div>
+                  </div>
+                  <Button asChild className="bg-emerald-600 hover:bg-emerald-500 font-bold whitespace-nowrap">
+                    <Link to="/configuracoes-medico">Configurar Grade <ArrowRight className="ml-2 w-4 h-4"/></Link>
+                  </Button>
                 </CardContent>
               </Card>
             )}

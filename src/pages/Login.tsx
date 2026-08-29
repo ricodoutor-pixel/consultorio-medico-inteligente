@@ -73,8 +73,11 @@ const Login = () => {
           .maybeSingle();
           
         const isDoctor = userType === "doctor" || !!doctorData;
+        const isVendor = userType === "vendor" || userType === "lojista" || data.user.email === "contato@plantayraiz.com.br";
 
-        if (isDoctor) {
+        if (isVendor) {
+          navigate("/lojistas");
+        } else if (isDoctor) {
           navigate("/consultorio");
         } else if (safeRedirect) {
           navigate(safeRedirect);

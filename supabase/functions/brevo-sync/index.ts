@@ -1,11 +1,44 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
+
+  // ── AUTH GATE: rejeitar chamadas sem JWT válido ou service_role ────────
+  const authHeader = req.headers.get("Authorization") || "";
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+  const jwt = authHeader.replace("Bearer ", "").trim();
+
+  // Aceitar service_role (chamadas internas de edge functions)
+  const isServiceCall = jwt === serviceRoleKey;
+
+  if (!isServiceCall) {
+    if (!jwt) {
+      return new Response(
+        JSON.stringify({ error: "Não autorizado — token JWT obrigatório" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authErr } = await supabaseAuth.auth.getUser();
+    if (authErr || !user) {
+      return new Response(
+        JSON.stringify({ error: "Token inválido ou expirado" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+  }
+  // ── FIM DO AUTH GATE ──────────────────────────────────────────────────
 
   try {
     const body = await req.json().catch(() => ({}));

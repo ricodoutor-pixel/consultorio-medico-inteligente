@@ -94,6 +94,11 @@ serve(async (req) => {
     if (tags && Array.isArray(tags)) {
       attributes.TAGS = tags.map((t) => String(t).slice(0, 30)).join(", ");
     }
+    
+    if (body.last_appointment_completed_at) {
+      // Brevo expects date format YYYY-MM-DD
+      attributes.LAST_APPOINTMENT_COMPLETED_AT = new Date(body.last_appointment_completed_at).toISOString().split('T')[0];
+    }
 
     const payload = {
       email: email.trim().toLowerCase(),

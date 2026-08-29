@@ -11,6 +11,7 @@ import { AlertTriangle, ArrowLeft, Save, Upload, User, Loader2 } from "lucide-re
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
+import { DoctorAvailabilityManager } from "@/components/doctor/DoctorAvailabilityManager";
 
 export default function ConfiguracoesMedico() {
   const navigate = useNavigate();
@@ -352,6 +353,9 @@ export default function ConfiguracoesMedico() {
 
             </CardContent>
           </Card>
+
+          {/* Gerenciador de Disponibilidade / Abertura de Horários */}
+          <DoctorAvailabilityManager />
         </div>
       </main>
       

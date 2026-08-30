@@ -394,21 +394,41 @@ const Shopping = () => {
   useEffect(() => {
     supabase
       .from('vendors')
-      .select(`
-        id, store_name, store_logo_url, store_banner_url, rating, total_sales, is_active,
-        profiles!vendors_user_id_fkey(city, state, is_verified),
-        vendor_products(id, name, price, image_url, category, is_active)
-      `)
+      .select('id, store_name, store_logo_url, store_banner_url, rating, total_sales, is_active')
       .eq('is_active', true)
       .limit(8)
-      .then(({ data }) => {
-        if (data) setVerifiedVendors(data.map((v: any) => ({
-          ...v,
-          city: v.profiles?.city || 'Brasil',
-          state: v.profiles?.state || '',
-          is_verified: v.profiles?.is_verified ?? true,
-          featured_product: v.vendor_products?.find((p: any) => p.is_active) || null,
-        })));
+      .then(async ({ data: vData }) => {
+        if (!vData || vData.length === 0) return;
+        
+        const { data: pData } = await supabase
+          .from('vendor_products')
+          .select('id, vendor_id, name, price, image_url, category, is_active')
+          .eq('is_active', true);
+
+        const mapped = vData.map((v: any) => {
+          const featured = pData?.find((p: any) => p.vendor_id === v.id) || null;
+          return {
+            id: v.id,
+            store_name: v.store_name || "Farmácia Parceira",
+            store_logo_url: v.store_logo_url || null,
+            store_banner_url: v.store_banner_url || null,
+            rating: Number(v.rating || 5.0),
+            total_sales: Number(v.total_sales || 0),
+            is_verified: true,
+            city: "São Paulo",
+            state: "SP",
+            featured_product: featured ? {
+              name: featured.name,
+              price: Number(featured.price || 0),
+              image_url: featured.image_url,
+              category: featured.category || "oleo"
+            } : null
+          };
+        });
+        setVerifiedVendors(mapped);
+      })
+      .catch((err) => {
+        console.warn("[Shopping] Falha ao carregar farmácias:", err);
       });
 
     if (prefetchedProducts) {

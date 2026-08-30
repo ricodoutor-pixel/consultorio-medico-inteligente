@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.enforce_vendor_showcase_limit() FROM anon, authenticated, PUBLIC;

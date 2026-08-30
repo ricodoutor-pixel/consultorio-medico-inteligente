@@ -120,7 +120,7 @@ export function useFarmaciaVirtual() {
       // 1. Buscar vendor associado
       let { data: vendor, error: vendorError } = await supabase
         .from('vendors')
-        .select('*, profiles!vendors_user_id_fkey(full_name, is_verified, city, state)')
+        .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -138,7 +138,7 @@ export function useFarmaciaVirtual() {
             rating: 5.0,
             is_active: true
           })
-          .select('*, profiles!vendors_user_id_fkey(full_name, is_verified, city, state)')
+          .select('*')
           .single();
         vendor = newVendor;
       }
@@ -147,7 +147,7 @@ export function useFarmaciaVirtual() {
         // Tenta pegar qualquer vendor ativo como fallback caso seja teste administrativo
         const { data: fallbackVendor } = await supabase
           .from('vendors')
-          .select('*, profiles!vendors_user_id_fkey(full_name, is_verified, city, state)')
+          .select('*')
           .eq('is_active', true)
           .limit(1)
           .maybeSingle();

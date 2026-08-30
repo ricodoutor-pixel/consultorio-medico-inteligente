@@ -5819,6 +5819,92 @@ export type Database = {
           },
         ]
       }
+      pharmacy_prescriptions_inbox: {
+        Row: {
+          created_at: string
+          delivery_address: Json | null
+          dispatch_mode: string
+          id: string
+          motivo_recusa: string | null
+          order_id: string | null
+          patient_id: string
+          patient_name: string
+          patient_whatsapp: string | null
+          prescription_id: string | null
+          prescription_pdf_url: string
+          regulatory_hash: string
+          status: string
+          tracking_code: string | null
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_address?: Json | null
+          dispatch_mode: string
+          id?: string
+          motivo_recusa?: string | null
+          order_id?: string | null
+          patient_id: string
+          patient_name: string
+          patient_whatsapp?: string | null
+          prescription_id?: string | null
+          prescription_pdf_url: string
+          regulatory_hash: string
+          status?: string
+          tracking_code?: string | null
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_address?: Json | null
+          dispatch_mode?: string
+          id?: string
+          motivo_recusa?: string | null
+          order_id?: string | null
+          patient_id?: string
+          patient_name?: string
+          patient_whatsapp?: string | null
+          prescription_id?: string | null
+          prescription_pdf_url?: string
+          regulatory_hash?: string
+          status?: string
+          tracking_code?: string | null
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pharmacy_prescriptions_inbox_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "agentic_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pharmacy_prescriptions_inbox_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pharmacy_prescriptions_inbox_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pharmacy_prescriptions_inbox_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_moderation_queue: {
         Row: {
           admin_decision_at: string | null
@@ -7875,6 +7961,7 @@ export type Database = {
         Row: {
           category: string
           compare_price: number | null
+          concentration: string | null
           created_at: string
           description: string | null
           endorsed_by_doctor: boolean
@@ -7883,18 +7970,23 @@ export type Database = {
           image_url_2: string | null
           image_url_3: string | null
           is_active: boolean
+          is_approved_by_admin: boolean
+          is_showcase: boolean
           name: string
           price: number
           rating: number | null
+          requires_prescription: boolean
           review_count: number
           sold_count: number
           stock: number
+          stock_quantity: number
           updated_at: string
           vendor_id: string
         }
         Insert: {
           category?: string
           compare_price?: number | null
+          concentration?: string | null
           created_at?: string
           description?: string | null
           endorsed_by_doctor?: boolean
@@ -7903,18 +7995,23 @@ export type Database = {
           image_url_2?: string | null
           image_url_3?: string | null
           is_active?: boolean
+          is_approved_by_admin?: boolean
+          is_showcase?: boolean
           name: string
           price: number
           rating?: number | null
+          requires_prescription?: boolean
           review_count?: number
           sold_count?: number
           stock?: number
+          stock_quantity?: number
           updated_at?: string
           vendor_id: string
         }
         Update: {
           category?: string
           compare_price?: number | null
+          concentration?: string | null
           created_at?: string
           description?: string | null
           endorsed_by_doctor?: boolean
@@ -7923,12 +8020,16 @@ export type Database = {
           image_url_2?: string | null
           image_url_3?: string | null
           is_active?: boolean
+          is_approved_by_admin?: boolean
+          is_showcase?: boolean
           name?: string
           price?: number
           rating?: number | null
+          requires_prescription?: boolean
           review_count?: number
           sold_count?: number
           stock?: number
+          stock_quantity?: number
           updated_at?: string
           vendor_id?: string
         }
@@ -7942,6 +8043,57 @@ export type Database = {
           },
           {
             foreignKeyName: "vendor_products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_sales_splits: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          paid_at: string | null
+          payout_status: string
+          platform_fee_5pct: number
+          total_item_amount: number
+          vendor_id: string
+          vendor_net_95pct: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          paid_at?: string | null
+          payout_status?: string
+          platform_fee_5pct: number
+          total_item_amount: number
+          vendor_id: string
+          vendor_net_95pct: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          paid_at?: string | null
+          payout_status?: string
+          platform_fee_5pct?: number
+          total_item_amount?: number
+          vendor_id?: string
+          vendor_net_95pct?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_sales_splits_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_sales_splits_vendor_id_fkey"
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors_public"
@@ -8021,45 +8173,111 @@ export type Database = {
       }
       vendors: {
         Row: {
+          afe_doc_url: string | null
+          anvisa_ae: string | null
+          anvisa_afe: string | null
           balance: number
+          cnpj: string | null
+          contrato_social_url: string | null
           created_at: string
+          crf_doc_url: string | null
+          crf_numero: string | null
+          crf_uf: string | null
+          endereco_completo: Json | null
+          fachada_foto_url: string | null
           id: string
           is_active: boolean
+          is_kyc_approved: boolean
+          kyc_approved_at: string | null
+          kyc_approved_by: string | null
+          kyc_rejection_reason: string | null
+          kyc_status: string
+          logo_url: string | null
+          max_showcase_products: number
+          nome_fantasia: string | null
+          pix_key: string | null
           rating: number | null
+          razao_social: string | null
+          responsavel_tecnico: string | null
           store_banner_url: string | null
           store_description: string | null
           store_logo_url: string | null
           store_name: string
+          telefone_whatsapp: string | null
           total_products: number
           total_sales: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          afe_doc_url?: string | null
+          anvisa_ae?: string | null
+          anvisa_afe?: string | null
           balance?: number
+          cnpj?: string | null
+          contrato_social_url?: string | null
           created_at?: string
+          crf_doc_url?: string | null
+          crf_numero?: string | null
+          crf_uf?: string | null
+          endereco_completo?: Json | null
+          fachada_foto_url?: string | null
           id?: string
           is_active?: boolean
+          is_kyc_approved?: boolean
+          kyc_approved_at?: string | null
+          kyc_approved_by?: string | null
+          kyc_rejection_reason?: string | null
+          kyc_status?: string
+          logo_url?: string | null
+          max_showcase_products?: number
+          nome_fantasia?: string | null
+          pix_key?: string | null
           rating?: number | null
+          razao_social?: string | null
+          responsavel_tecnico?: string | null
           store_banner_url?: string | null
           store_description?: string | null
           store_logo_url?: string | null
           store_name: string
+          telefone_whatsapp?: string | null
           total_products?: number
           total_sales?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          afe_doc_url?: string | null
+          anvisa_ae?: string | null
+          anvisa_afe?: string | null
           balance?: number
+          cnpj?: string | null
+          contrato_social_url?: string | null
           created_at?: string
+          crf_doc_url?: string | null
+          crf_numero?: string | null
+          crf_uf?: string | null
+          endereco_completo?: Json | null
+          fachada_foto_url?: string | null
           id?: string
           is_active?: boolean
+          is_kyc_approved?: boolean
+          kyc_approved_at?: string | null
+          kyc_approved_by?: string | null
+          kyc_rejection_reason?: string | null
+          kyc_status?: string
+          logo_url?: string | null
+          max_showcase_products?: number
+          nome_fantasia?: string | null
+          pix_key?: string | null
           rating?: number | null
+          razao_social?: string | null
+          responsavel_tecnico?: string | null
           store_banner_url?: string | null
           store_description?: string | null
           store_logo_url?: string | null
           store_name?: string
+          telefone_whatsapp?: string | null
           total_products?: number
           total_sales?: number
           updated_at?: string

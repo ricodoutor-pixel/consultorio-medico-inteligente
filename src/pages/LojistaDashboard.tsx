@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,44 +7,55 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { TrendingUp, Package, AlertTriangle, Building2, BookOpen, ArrowRight, Lock } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { DollarSign, Package, AlertTriangle, Building2, BookOpen, Clock, FileText, CheckCircle, Truck, FileSignature, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { VipUpgradePopup } from "@/components/VipUpgradePopup";
 import { useLojista } from "@/hooks/useLojista";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function LojistaDashboard() {
   const { toast } = useToast();
   const { profile, metrics, loading, authError, addProduct } = useLojista();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
-  // Estados do Formulário
+  // Mock data para Receitas Inbox
+  const [inbox] = useState([
+    { id: "1", patient: "João M.", hash: "a8f9c...12x", mode: "1click", status: "recebida", date: "Hoje, 10:30" },
+    { id: "2", patient: "Maria S.", hash: "b2x4...99z", mode: "manual", status: "em_analise_farmaceutica", date: "Ontem, 15:45" }
+  ]);
+
+  const [selectedPrescription, setSelectedPrescription] = useState<any>(null);
+
   const [formData, setFormData] = useState({
     name: "",
-    proportion: "",
+    concentration: "",
+    category: "oleo_cbd",
+    price: "",
     stock: "",
-    price: ""
+    image_url: ""
   });
 
   if (loading) {
     return (
       <div className="min-h-dvh bg-background flex flex-col items-center justify-center">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-4 text-muted-foreground font-medium">Carregando painel do lojista...</p>
+        <p className="mt-4 text-muted-foreground font-medium">Carregando painel...</p>
       </div>
     );
   }
 
-  // Barreira de Segurança
   if (authError || !profile) {
     return (
       <div className="min-h-dvh bg-background flex flex-col">
         <Navbar />
-        <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
-          <Lock size={48} className="text-red-500 mb-4" />
+        <div className="flex-1 flex flex-col items-center justify-center p-4 text-center pt-24">
+          <AlertTriangle size={48} className="text-red-500 mb-4" />
           <h1 className="text-2xl font-bold mb-2">Acesso Restrito</h1>
-          <p className="text-muted-foreground mb-6">{authError || "Você precisa estar logado como Lojista/Dispensário."}</p>
+          <p className="text-muted-foreground mb-6">{authError}</p>
           <Button asChild><Link to="/login">Ir para o Login</Link></Button>
         </div>
       </div>
@@ -55,18 +66,17 @@ export default function LojistaDashboard() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await addProduct(formData);
+      await addProduct({
+        ...formData,
+        proportion: formData.concentration
+      });
       toast({
         title: "Sucesso!",
-        description: "Produto adicionado e pendente de curadoria.",
+        description: "Produto cadastrado com sucesso. Pendente de aprovação (Compliance).",
       });
-      setFormData({ name: "", proportion: "", stock: "", price: "" });
+      setFormData({ name: "", concentration: "", category: "oleo_cbd", price: "", stock: "", image_url: "" });
     } catch (err: any) {
-      toast({
-        title: "Erro ao adicionar",
-        description: err.message || "Tente novamente mais tarde.",
-        variant: "destructive",
-      });
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -77,64 +87,155 @@ export default function LojistaDashboard() {
       <Navbar />
       
       <div className="flex-1 container mx-auto py-8 px-4 space-y-8 pt-24">
-
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-6">
           <div className="flex flex-col items-start gap-2">
             <VipUpgradePopup role="lojista" inline className="ml-1" />
             <div className="flex items-center gap-2 mb-2 mt-4 md:mt-0">
-              {profile.is_verified ? (
-                 <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">Lojista Verificado</Badge>
-              ) : (
-                 <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500 border-yellow-500/30">Em Análise</Badge>
-              )}
+              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
+                Lojista Verificado
+              </Badge>
+              <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/30">
+                Split 95% Ativo
+              </Badge>
             </div>
             <h1 className="text-3xl md:text-4xl font-display font-black text-foreground flex items-center gap-3">
               <Building2 className="text-primary h-8 w-8" /> 
-              Painel: {profile.company_name || 'Lojista'}
+              Painel: {profile.company_name || 'Lojista Partner'}
             </h1>
-            <p className="text-muted-foreground mt-2">Monitore a demanda preditiva e gerencie seu catálogo de produtos.</p>
           </div>
-          <div className="flex items-center gap-3">
-            <Button size="lg" variant="outline" className="font-bold rounded-xl border-primary/20 text-primary" asChild>
-              <Link to="/manual?tab=lojista"><BookOpen size={18} className="mr-2" /> Passo a Passo</Link>
-            </Button>
-          </div>
+          <Button size="lg" variant="outline" className="font-bold rounded-xl border-primary/20 text-primary" asChild>
+             <Link to="/cadastro-farmacia"><FileSignature size={18} className="mr-2" /> Atualizar KYC</Link>
+          </Button>
         </div>
 
-        <Tabs defaultValue="catalogo" className="w-full">
-          <TabsList className="mb-6 grid grid-cols-2">
-            <TabsTrigger value="catalogo">Meu Catálogo</TabsTrigger>
-            <TabsTrigger value="pedidos">Pedidos B2B</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-6 grid grid-cols-2 lg:grid-cols-4 gap-2 h-auto">
+            <TabsTrigger value="overview" className="py-3">Visão Geral</TabsTrigger>
+            <TabsTrigger value="inbox" className="py-3">Receitas & Dispensação</TabsTrigger>
+            <TabsTrigger value="catalog" className="py-3">Catálogo (Vitrine)</TabsTrigger>
+            <TabsTrigger value="financial" className="py-3">Financeiro & Repasse</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="catalogo">
+          {/* ABA 1: OVERVIEW */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="bg-emerald-950/20 border-emerald-500/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-emerald-500 flex justify-between">
+                    Receitas Aguardando <AlertTriangle size={16} className="animate-pulse" />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">12</div>
+                  <p className="text-xs text-muted-foreground mt-1">Requer análise farmacêutica</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Faturamento Bruto (Mês)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">R$ 14.500,00</div>
+                  <p className="text-xs text-green-500 mt-1">+15% em relação a julho</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Repasse Líquido (95%)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-primary">R$ 13.775,00</div>
+                  <p className="text-xs text-muted-foreground mt-1">Disponível para saque Pix</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Taxa da Plataforma (5%)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-red-400">R$ 725,00</div>
+                  <p className="text-xs text-muted-foreground mt-1">Retido na fonte</p>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* ABA 2: RECEITAS & DISPENSAÇÃO */}
+          <TabsContent value="inbox" className="space-y-6">
+            <Card className="border-border">
+              <CardHeader>
+                <CardTitle>Caixa de Entrada: Receitas ICP-Brasil</CardTitle>
+                <CardDescription>Auditoria e liberação de despachos.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-md border border-border overflow-hidden">
+                  <Table>
+                    <TableHeader className="bg-slate-900">
+                      <TableRow>
+                        <TableHead>Paciente</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Hash Digital</TableHead>
+                        <TableHead>Envio</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Ação</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {inbox.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{item.patient}</TableCell>
+                          <TableCell>{item.date}</TableCell>
+                          <TableCell><Badge variant="outline" className="font-mono text-[10px]">{item.hash}</Badge></TableCell>
+                          <TableCell>{item.mode === '1click' ? <Badge className="bg-primary/20 text-primary">Automático</Badge> : <Badge variant="secondary">Upload Manual</Badge>}</TableCell>
+                          <TableCell>
+                            {item.status === 'recebida' && <Badge className="bg-amber-500/20 text-amber-500"><Clock size={12} className="mr-1"/> Nova Receita</Badge>}
+                            {item.status === 'em_analise_farmaceutica' && <Badge className="bg-blue-500/20 text-blue-500">Em Análise</Badge>}
+                          </TableCell>
+                          <TableCell>
+                            <Button size="sm" onClick={() => setSelectedPrescription(item)}>Auditar</Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ABA 3: CATÁLOGO */}
+          <TabsContent value="catalog" className="space-y-6">
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1">
-                <Card className="border-primary/20 shadow-md">
+                <Card className="border-primary/20">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">Adicionar Produto</CardTitle>
-                    <CardDescription>Submeta um novo lote de produto.</CardDescription>
+                    <CardTitle>Novo Produto</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleProductSubmit} className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Nome do Produto</Label>
+                        <Label>Nome (ex: Óleo CBD Full Spectrum)</Label>
                         <Input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
                       </div>
                       <div className="space-y-2">
-                        <Label>Proporção (Ex: 10:1)</Label>
-                        <Input value={formData.proportion} onChange={e => setFormData({...formData, proportion: e.target.value})} required />
+                        <Label>Concentração (ex: 3000mg/30ml)</Label>
+                        <Input value={formData.concentration} onChange={e => setFormData({...formData, concentration: e.target.value})} required />
                       </div>
-                      <div className="space-y-2">
-                        <Label>Estoque Inicial</Label>
-                        <Input type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} required />
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-2">
+                          <Label>Preço (R$)</Label>
+                          <Input type="number" step="0.01" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Estoque</Label>
+                          <Input type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} required />
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label>Preço de Venda (R$)</Label>
-                        <Input type="number" step="0.01" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required />
-                      </div>
-                      <Button type="submit" className="w-full font-bold" disabled={isSubmitting}>
-                        {isSubmitting ? "Enviando pro banco..." : "Salvar no Banco"}
+                      <Button type="submit" className="w-full" disabled={isSubmitting}>
+                        {isSubmitting ? "Enviando..." : "Cadastrar Produto"}
                       </Button>
                     </form>
                   </CardContent>
@@ -142,79 +243,114 @@ export default function LojistaDashboard() {
               </div>
 
               <div className="lg:col-span-2">
-                <Card className="border-border">
+                <Card>
                   <CardHeader>
-                    <CardTitle>Meus Produtos Cadastrados</CardTitle>
-                    <CardDescription>Estes são os produtos lidos do banco de dados.</CardDescription>
+                    <CardTitle>Vitrine Principal (Máx 10)</CardTitle>
+                    <CardDescription>Controle o que aparece no Shopping para os pacientes.</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {metrics.products.length === 0 ? (
-                      <div className="text-center py-12 text-muted-foreground border-2 border-dashed border-border rounded-xl">
-                        <Package size={48} className="mx-auto mb-4 opacity-50" />
-                        <h4 className="font-bold">Nenhum produto listado</h4>
-                        <p className="text-sm">Seus produtos aparecerão aqui após adicionar no formulário ao lado.</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {metrics.products.map(product => (
-                          <div key={product.id} className="flex justify-between items-center p-3 border rounded-lg">
-                            <div>
-                              <p className="font-bold">{product.name}</p>
-                              <div className="flex gap-2 items-center mt-1">
-                                 <Badge variant={product.is_active ? "default" : "secondary"} className="text-[10px]">
-                                   {product.is_active ? "Ativo no Shopping" : "Em Curadoria"}
-                                 </Badge>
+                    <div className="space-y-4">
+                      {metrics.products.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground border border-dashed rounded-xl">
+                          <Package size={32} className="mx-auto mb-2 opacity-50" />
+                          <p>Nenhum produto cadastrado.</p>
+                        </div>
+                      ) : (
+                        metrics.products.map((p: any) => (
+                          <div key={p.id} className="flex items-center justify-between p-4 border rounded-xl bg-slate-900/50">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-slate-800 rounded flex items-center justify-center">
+                                <Package size={20} className="text-muted-foreground"/>
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-sm">{p.name}</h4>
+                                <p className="text-xs text-muted-foreground">{p.description} • R$ {p.price}</p>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <p className="font-bold">R$ {product.price?.toFixed(2) || "0.00"}</p>
-                              <p className="text-xs text-muted-foreground">{product.in_stock ? "Com Estoque" : "Esgotado"}</p>
+                            <div className="flex items-center gap-4">
+                              <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500 border-yellow-500/30">Em análise</Badge>
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs">Na Vitrine</Label>
+                                <Switch checked={false} disabled />
+                              </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
+                        ))
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </div>
             </div>
           </TabsContent>
           
-          <TabsContent value="pedidos">
-             <Card className="border-border">
-              <CardHeader>
-                <CardTitle>Pedidos B2B</CardTitle>
-                <CardDescription>Acompanhe os pedidos de clínicas e médicos parceiros.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {metrics.orders.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground border-2 border-dashed border-border rounded-xl bg-muted/10">
-                    <Package size={48} className="text-muted-foreground/50 mb-4" />
-                    <h4 className="font-bold text-foreground mb-1">Nenhum pedido ainda</h4>
-                    <p className="text-sm">Os pedidos recebidos aparecerão aqui.</p>
+          {/* ABA 4: FINANCEIRO */}
+          <TabsContent value="financial" className="space-y-6">
+             <Card>
+                <CardHeader>
+                  <CardTitle>Extrato Financeiro (Split Automático)</CardTitle>
+                  <CardDescription>Você recebe 95% direto na sua conta conectada.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-12 border rounded-xl border-dashed">
+                    <Wallet size={48} className="mx-auto mb-4 text-muted-foreground opacity-50" />
+                    <h3 className="font-bold text-lg">Histórico de Repasses</h3>
+                    <p className="text-muted-foreground mt-2">Nenhuma liquidação recente.</p>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {metrics.orders.map(order => (
-                      <div key={order.id} className="flex justify-between items-center p-4 border rounded-lg bg-card">
-                        <div>
-                          <p className="font-bold">Pedido #{order.id.slice(0, 8)}</p>
-                          <p className="text-sm text-muted-foreground">Em: {new Date(order.created_at).toLocaleDateString()}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-primary">R$ {order.total_amount?.toFixed(2) || "0.00"}</p>
-                          <Badge variant="outline" className="mt-1">{order.status}</Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+             </Card>
           </TabsContent>
-
         </Tabs>
       </div>
+
+      {/* Modal de Auditoria de Receita */}
+      <Dialog open={!!selectedPrescription} onOpenChange={() => setSelectedPrescription(null)}>
+        <DialogContent className="max-w-2xl bg-slate-950 border-border">
+          <DialogHeader>
+            <DialogTitle>Auditoria Farmacêutica de Receita</DialogTitle>
+            <DialogDescription>Validação do PDF e assinatura ICP-Brasil.</DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="p-4 bg-slate-900 rounded-xl flex justify-between items-center border border-slate-800">
+               <div>
+                 <p className="text-xs text-muted-foreground">Paciente</p>
+                 <p className="font-bold">{selectedPrescription?.patient}</p>
+               </div>
+               <div className="text-right">
+                 <p className="text-xs text-muted-foreground">Hash SHA-512</p>
+                 <p className="font-mono text-xs text-primary bg-primary/10 p-1 rounded mt-1">{selectedPrescription?.hash}</p>
+               </div>
+            </div>
+
+            <div className="h-48 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700">
+               <FileText size={48} className="text-slate-600 mb-2" />
+               <div className="ml-4">
+                 <p className="font-bold">ReceitaDigital.pdf</p>
+                 <Badge className="bg-green-500 mt-1">Assinatura Válida</Badge>
+               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Código de Rastreio (Se aprovado e enviado)</Label>
+              <Input placeholder="BR123456789BR" />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Motivo de Recusa (Opcional)</Label>
+              <Textarea placeholder="Descreva o motivo se a receita for irregular..." />
+            </div>
+          </div>
+          
+          <DialogFooter className="flex justify-between sm:justify-between w-full">
+            <Button variant="destructive">Recusar Receita</Button>
+            <div className="flex gap-2">
+              <Button variant="outline"><FileText className="mr-2" size={16}/> Ver PDF</Button>
+              <Button className="bg-primary text-primary-foreground"><CheckCircle className="mr-2" size={16}/> Aprovar & Despachar</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -127,9 +127,22 @@ const prefetchProducts = () => {
   if (prefetchedProducts) return Promise.resolve(prefetchedProducts);
   if (prefetchPromise) return prefetchPromise;
   prefetchPromise = (async () => {
-    const { data } = await supabase.from("vendor_products").select("*, vendors(id, store_name, rating)").eq("is_active", true);
-    prefetchedProducts = (data as any) || [];
-    return prefetchedProducts;
+    try {
+      const { data } = await supabase.from("vendor_products").select("*, vendors(id, store_name, rating)").eq("is_active", true);
+      prefetchedProducts = ((data as any) || []).map((p: any) => ({
+        ...p,
+        price: typeof p.price === 'number' ? p.price : parseFloat(String(p.price || '0').replace(',', '.')),
+        compare_price: p.compare_price ? (typeof p.compare_price === 'number' ? p.compare_price : parseFloat(String(p.compare_price).replace(',', '.'))) : null,
+        rating: Number(p.rating || 5),
+        sold_count: Number(p.sold_count || 0),
+        review_count: Number(p.review_count || 12),
+        stock: Number(p.stock || 0)
+      }));
+      return prefetchedProducts;
+    } catch {
+      prefetchedProducts = [];
+      return [];
+    }
   })();
   return prefetchPromise;
 };
@@ -149,7 +162,10 @@ const ProductSkeleton = () => (
   </div>
 );
 
-const fmtPrice = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
+const fmtPrice = (v: any) => {
+  const num = typeof v === 'number' ? v : parseFloat(String(v || '0').replace(',', '.'));
+  return isNaN(num) ? 'R$ 0,00' : `R$ ${num.toFixed(2).replace('.', ',')}`;
+};
 
 /* ─── FAVORITES HOOK (localStorage) ─── */
 const useFavorites = () => {
@@ -220,9 +236,26 @@ const ProductDetail = ({ id }: { id: string }) => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.from("vendor_products").select("*, vendors(id, store_name, rating)").eq("id", id).single();
-      if (data) { setProduct(data as any); setVendor((data as any).vendors); }
-      setLoading(false);
+      try {
+        const { data } = await supabase.from("vendor_products").select("*, vendors(id, store_name, rating)").eq("id", id).maybeSingle();
+        if (data) {
+          const norm = {
+            ...data,
+            price: typeof (data as any).price === 'number' ? (data as any).price : parseFloat(String((data as any).price || '0').replace(',', '.')),
+            compare_price: (data as any).compare_price ? (typeof (data as any).compare_price === 'number' ? (data as any).compare_price : parseFloat(String((data as any).compare_price).replace(',', '.'))) : null,
+            rating: Number((data as any).rating || 5),
+            sold_count: Number((data as any).sold_count || 0),
+            review_count: Number((data as any).review_count || 12),
+            stock: Number((data as any).stock || 0)
+          };
+          setProduct(norm as any);
+          setVendor((data as any).vendors);
+        }
+      } catch {
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [id]);
 
@@ -249,7 +282,9 @@ const ProductDetail = ({ id }: { id: string }) => {
   if (!product) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Produto não encontrado.</div>;
 
   const images = [product.image_url, product.image_url_2, product.image_url_3].filter(Boolean) as string[];
-  const discount = product.compare_price ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
+  const pPrice = Number(product.price || 0);
+  const pCompare = product.compare_price ? Number(product.compare_price) : 0;
+  const discount = pCompare > 0 ? Math.round(((pCompare - pPrice) / pCompare) * 100) : 0;
   const priceStr = fmtPrice(product.price);
 
   const handleBuy = () => {
@@ -704,7 +739,9 @@ const Shopping = () => {
                   key={activeCategory + searchQuery + sortBy}
                 >
                   {filtered.map(p => {
-                    const discount = p.compare_price ? Math.round(((p.compare_price - p.price) / p.compare_price) * 100) : 0;
+                    const pPrice = Number(p.price || 0);
+                    const pCompare = p.compare_price ? Number(p.compare_price) : 0;
+                    const discount = pCompare > 0 ? Math.round(((pCompare - pPrice) / pCompare) * 100) : 0;
                     const vendorName = (p as any).vendors?.store_name || "Loja Parceira";
                     const images = [p.image_url, p.image_url_2, p.image_url_3].filter(Boolean) as string[];
 

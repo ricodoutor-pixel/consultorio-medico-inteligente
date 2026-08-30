@@ -165,7 +165,7 @@ const Login = () => {
                         required
                       />
                     </div>
-                  </div>     </div>
+                  </div>
 
                   {!forgotMode && (
                     <div>

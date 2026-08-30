@@ -120,6 +120,7 @@ const Login = () => {
       setForgotMode(false);
     }
   };
+  const [loginType, setLoginType] = useState<"patient" | "partner">("patient");
 
   return (
     <div className="min-h-dvh bg-background">
@@ -138,6 +139,30 @@ const Login = () => {
 
             <Card className="border-border bg-card">
               <CardContent className="p-6">
+                
+                {!forgotMode && (
+                  <div className="flex rounded-lg bg-muted p-1 mb-6">
+                    <button
+                      type="button"
+                      onClick={() => setLoginType("patient")}
+                      className={`flex-1 text-xs font-bold py-2 rounded-md transition-all ${
+                        loginType === "patient" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Paciente
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLoginType("partner")}
+                      className={`flex-1 text-xs font-bold py-2 rounded-md transition-all ${
+                        loginType === "partner" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Farmácia / Profissional
+                    </button>
+                  </div>
+                )}
+
                 <form onSubmit={forgotMode ? handleForgotPassword : handleLogin} className="space-y-4">
                   <div>
                     <Label htmlFor="email" className="text-xs font-bold text-muted-foreground">E-mail</Label>
@@ -208,7 +233,7 @@ const Login = () => {
                   )}
                 </form>
 
-                {!forgotMode && (
+                {!forgotMode && loginType === "patient" && (
                   <>
                     <div className="relative my-5">
                       <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
@@ -242,16 +267,18 @@ const Login = () => {
                       </svg>
                       Continuar com Google
                     </Button>
-
-                    <div className="mt-6 text-center">
-                      <p className="text-xs text-muted-foreground">
-                        Não tem conta?{" "}
-                        <Link to={redirectTo ? `/cadastro?redirect=${redirectTo}` : "/cadastro"} className="text-primary font-bold hover:underline">
-                          Cadastre-se
-                        </Link>
-                      </p>
-                    </div>
                   </>
+                )}
+
+                {!forgotMode && (
+                  <div className="mt-6 text-center">
+                    <p className="text-xs text-muted-foreground">
+                      Não tem conta?{" "}
+                      <Link to={redirectTo ? `/cadastro?redirect=${redirectTo}` : "/cadastro"} className="text-primary font-bold hover:underline">
+                        Cadastre-se
+                      </Link>
+                    </p>
+                  </div>
                 )}
               </CardContent>
             </Card>

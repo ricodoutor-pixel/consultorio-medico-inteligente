@@ -469,7 +469,7 @@ const Cadastro = () => {
             </h1>
             <p className="text-muted-foreground max-w-2xl font-medium mx-auto md:mx-0">
               {t.heroSubtitle}{" "}
-              <Link to="/login" className="text-primary font-bold hover:underline">{t.alreadyHaveAccount}</Link>
+              <Link to={type === "farmacia" ? "/login-farmacia" : "/login"} className="text-primary font-bold hover:underline">{t.alreadyHaveAccount}</Link>
             </p>
 
             {/* 🌐 Language Switcher Bar with SVG Flags */}
@@ -883,7 +883,7 @@ const Cadastro = () => {
 
                     <p className="text-center text-xs text-muted-foreground">
                       {t.alreadyRegistered}{" "}
-                      <Link to="/login" className="text-primary font-bold hover:underline">{t.loginLink}</Link>
+                      <Link to={type === "farmacia" ? "/login-farmacia" : "/login"} className="text-primary font-bold hover:underline">{t.loginLink}</Link>
                     </p>
                   </form>
                 </CardContent>

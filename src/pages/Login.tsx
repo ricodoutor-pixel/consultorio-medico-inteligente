@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Leaf, Mail, Lock, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Leaf, Mail, Lock, ArrowRight, Eye, EyeOff, Loader2, Store } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +23,7 @@ const Login = () => {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const redirectTo = searchParams.get("redirect");
+  const isPharmacy = searchParams.get("type") === "farmacia" || searchParams.get("type") === "lojista" || redirectTo === "/lojistas";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +44,12 @@ const Login = () => {
       }
 
       if (data.user) {
+        if (isPharmacy) {
+          toast({ title: "Acesso autorizado ao Portal do Lojista! 🏪" });
+          navigate("/lojistas");
+          return;
+        }
+
         // Check user type to redirect
         const { data: profile } = await supabase
           .from("profiles")
@@ -127,20 +134,25 @@ const Login = () => {
         <div className="container mx-auto px-4 flex justify-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} className="w-full max-w-md">
             <div className="flex items-center gap-3 mb-6 justify-center">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
-                <Leaf size={24} className="text-primary" />
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                isPharmacy 
+                  ? "bg-gradient-to-br from-emerald-500/20 to-emerald-900/20 border border-emerald-500/30" 
+                  : "bg-gradient-green border border-green glow-green"
+              }`}>
+                {isPharmacy ? <Store size={24} className="text-emerald-500" /> : <Leaf size={24} className="text-primary" />}
               </div>
               <h1 className="text-2xl font-display font-black text-foreground">
-                {forgotMode ? "Recuperar Senha" : "Entrar"}
+                {forgotMode ? "Recuperar Senha" : isPharmacy ? "Portal do Lojista" : "Entrar"}
               </h1>
             </div>
 
             <Card className="border-border bg-card">
               <CardContent className="p-6">
-
                 <form onSubmit={forgotMode ? handleForgotPassword : handleLogin} className="space-y-4">
                   <div>
-                    <Label htmlFor="email" className="text-xs font-bold text-muted-foreground">E-mail</Label>
+                    <Label htmlFor="email" className="text-xs font-bold text-muted-foreground">
+                      {isPharmacy ? "E-mail Comercial" : "E-mail"}
+                    </Label>
                     <div className="relative mt-1">
                       <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                       <Input
@@ -148,12 +160,12 @@ const Login = () => {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="seu@email.com"
+                        placeholder={isPharmacy ? "contato@suafarmacia.com.br" : "seu@email.com"}
                         className="pl-10 bg-muted border-border"
                         required
                       />
                     </div>
-                  </div>
+                  </div>     </div>
 
                   {!forgotMode && (
                     <div>
@@ -208,7 +220,7 @@ const Login = () => {
                   )}
                 </form>
 
-                {!forgotMode && (
+                {!forgotMode && !isPharmacy && (
                   <>
                     <div className="relative my-5">
                       <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
@@ -248,9 +260,12 @@ const Login = () => {
                 {!forgotMode && (
                   <div className="mt-6 text-center">
                     <p className="text-xs text-muted-foreground">
-                      Não tem conta?{" "}
-                      <Link to={redirectTo ? `/cadastro?redirect=${redirectTo}` : "/cadastro"} className="text-primary font-bold hover:underline">
-                        Cadastre-se
+                      {isPharmacy ? "Ainda não é um parceiro? " : "Não tem conta? "}
+                      <Link 
+                        to={isPharmacy ? "/cadastro" : redirectTo ? `/cadastro?redirect=${redirectTo}` : "/cadastro"} 
+                        className="text-primary font-bold hover:underline"
+                      >
+                        {isPharmacy ? "Cadastrar Farmácia" : "Cadastre-se"}
                       </Link>
                     </p>
                   </div>

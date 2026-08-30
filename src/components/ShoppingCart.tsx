@@ -4,7 +4,7 @@ import { useCart } from '@/store/cart';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Trash2, Plus, Minus, ShoppingCart as CartIcon } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingCart as CartIcon, FileText } from 'lucide-react';
 
 export function ShoppingCart() {
   const { items, removeItem, updateQty, clearCart, getSubtotal, getTax, getShipping, getFinalTotal } = useCart();
@@ -80,6 +80,17 @@ export function ShoppingCart() {
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Imposto (10%):</span><span className="font-semibold">R$ {tax.toFixed(2)}</span></div>
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Frete:</span><span className="font-semibold">R$ {shipping.toFixed(2)}</span></div>
               <div className="border-t border-border pt-3 flex justify-between"><span className="font-bold">Total:</span><span className="text-xl font-bold text-primary">R$ {total.toFixed(2)}</span></div>
+            </div>
+            <div className="px-6 space-y-2">
+               <div className="bg-primary/10 border border-primary/20 p-3 rounded-lg flex items-center justify-between">
+                 <div className="flex flex-col">
+                   <span className="text-sm font-bold text-primary flex items-center gap-1">
+                      <FileText size={16} /> Receita Digital (PDF)
+                   </span>
+                   <span className="text-xs text-muted-foreground">Obrigatório para canabinoides</span>
+                 </div>
+                 <Button variant="outline" size="sm" className="text-xs" onClick={() => alert('Abrindo modal de receitas salvas do paciente...')}>Anexar</Button>
+               </div>
             </div>
             <div className="p-6 border-t border-border space-y-3">
               <Button className="w-full py-6" onClick={() => { window.location.href = '/cart-checkout'; }}>Ir para Checkout</Button>

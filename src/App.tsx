@@ -156,6 +156,8 @@ const OnboardingMatch = lazyWithRecovery(() => import("./pages/OnboardingMatch")
 const TelemedicinaAssincrona = lazyWithRecovery(() => import("./pages/TelemedicinaAssincrona"), { sourceRef: "/telemedicina-assincrona" });
 const AfiliadosGamificado = lazyWithRecovery(() => import("./pages/AfiliadosGamificado"), { sourceRef: "/afiliados" });
 const AdminAfiliados = lazyWithRecovery(() => import("./pages/admin/AdminAfiliados"), { sourceRef: "/admin/afiliados" });
+// Lojistas & Farmácias
+const CadastroFarmacia = lazyWithRecovery(() => import("./pages/CadastroFarmacia"), { sourceRef: "/cadastro-farmacia" });
 const LojistaDashboard = lazyWithRecovery(() => import("./pages/LojistaDashboard"), { sourceRef: "/lojistas" });
 const ConviteMedico = lazyWithRecovery(() => import("./pages/ConviteMedico"), { sourceRef: "/convite-medico" });
 
@@ -320,6 +322,7 @@ const App = () => (
                 <Route path="/pay" element={<Pay />} />
                 <Route path="/carteira" element={<Carteira />} />
                 <Route path="/cadastro-profissional" element={<CadastroProfissional />} />
+                <Route path="/cadastro-farmacia" element={<CadastroFarmacia />} />
                 <Route path="/cadastro" element={<Cadastro />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />

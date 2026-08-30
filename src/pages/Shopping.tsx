@@ -21,6 +21,7 @@ import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { PrescriptionVerificationModal } from "@/components/PrescriptionVerificationModal";
 import { DoctorEndorsedBadge } from "@/components/DoctorEndorsedBadge";
 import { AnvisaBadge } from "@/components/AnvisaBadge";
+import { FarmaciaCard } from "@/components/FarmaciaCard";
 import { buildProductSchema } from "@/lib/schema-org";
 
 // Import product images
@@ -388,9 +389,28 @@ const Shopping = () => {
   const [btcModal, setBtcModal] = useState({ open: false, planName: "", planId: "", amount: "" });
   const [rxModal, setRxModal] = useState<{ open: boolean; productName: string; pendingProduct: VendorProduct | null }>({ open: false, productName: "", pendingProduct: null });
 
-  const { toggle: toggleFav, isFav } = useFavorites();
+  const [verifiedVendors, setVerifiedVendors] = useState<any[]>([]);
 
   useEffect(() => {
+    supabase
+      .from('vendors')
+      .select(`
+        id, store_name, store_logo_url, store_banner_url, rating, total_sales, is_active,
+        profiles!vendors_user_id_fkey(city, state, is_verified),
+        vendor_products(id, name, price, image_url, category, is_active)
+      `)
+      .eq('is_active', true)
+      .limit(8)
+      .then(({ data }) => {
+        if (data) setVerifiedVendors(data.map((v: any) => ({
+          ...v,
+          city: v.profiles?.city || 'Brasil',
+          state: v.profiles?.state || '',
+          is_verified: v.profiles?.is_verified ?? true,
+          featured_product: v.vendor_products?.find((p: any) => p.is_active) || null,
+        })));
+      });
+
     if (prefetchedProducts) {
       setProducts(prefetchedProducts);
       setLoading(false);
@@ -620,6 +640,23 @@ const Shopping = () => {
 
             {/* Products Grid */}
             <div>
+              {/* Seção de Farmácias Parceiras Verificadas */}
+              {verifiedVendors.length > 0 && !searchQuery && activeCategory === "Todos" && (
+                <div className="mb-6 p-4 rounded-2xl bg-card/40 border border-border/40">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-xs sm:text-sm font-bold flex items-center gap-1.5 text-foreground">
+                      <Store size={15} className="text-primary" /> Farmácias Parceiras Verificadas
+                    </h2>
+                    <span className="text-[10px] text-muted-foreground font-mono">Dispensação Oficial</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                    {verifiedVendors.map((v) => (
+                      <FarmaciaCard key={v.id} vendor={v} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Toolbar */}
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">{filtered.length} produto{filtered.length !== 1 ? "s" : ""}</span>

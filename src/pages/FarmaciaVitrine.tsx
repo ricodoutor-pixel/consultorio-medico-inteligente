@@ -76,7 +76,7 @@ export default function FarmaciaVitrine() {
         // 1. Buscar vendor
         const { data: vData, error: vErr } = await supabase
           .from('vendors')
-          .select('*, profiles!vendors_user_id_fkey(city, state, is_verified)')
+          .select('*')
           .eq('id', vendorId)
           .maybeSingle();
 
@@ -86,7 +86,6 @@ export default function FarmaciaVitrine() {
           return;
         }
 
-        const profile = (vData as any).profiles;
         setVendor({
           id: vData.id,
           store_name: vData.store_name || "Farmácia Parceira",
@@ -95,9 +94,9 @@ export default function FarmaciaVitrine() {
           store_banner_url: vData.store_banner_url || null,
           rating: Number(vData.rating || 5.0),
           total_sales: Number(vData.total_sales || 0),
-          is_verified: profile?.is_verified ?? true,
-          city: profile?.city || "São Paulo",
-          state: profile?.state || "SP"
+          is_verified: true,
+          city: "São Paulo",
+          state: "SP"
         });
 
         // 2. Buscar produtos da farmácia

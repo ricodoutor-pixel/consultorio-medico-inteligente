@@ -85,6 +85,8 @@ const ConfiguracoesMedico = lazyWithRecovery(() => import("./pages/Configuracoes
 const AtualizarDocumentosMedico = lazyWithRecovery(() => import("./pages/AtualizarDocumentosMedico"), { sourceRef: "/atualizar-documentos-medico" });
 const Login = lazyWithRecovery(() => import("./pages/Login"), { sourceRef: "/login" });
 const LoginFarmacia = lazyWithRecovery(() => import("./pages/LoginFarmacia"), { sourceRef: "/login-farmacia" });
+const FarmaciaVirtual = lazyWithRecovery(() => import("./pages/FarmaciaVirtual"), { sourceRef: "/farmacia-virtual" });
+const FarmaciaVitrine = lazyWithRecovery(() => import("./pages/FarmaciaVitrine"), { sourceRef: "/shopping/farmacia/:vendorId" });
 const ResetPassword = lazyWithRecovery(() => import("./pages/ResetPassword"), { sourceRef: "/reset-password" });
 const ConsultationPayment = lazyWithRecovery(() => import("./pages/ConsultationPayment"), { sourceRef: "/pagamento" });
 const SpecialistDashboard = lazyWithRecovery(() => import("./pages/SpecialistDashboard"), { sourceRef: "/dashboard-especialista" });
@@ -378,6 +380,8 @@ const App = () => (
                 <Route path="/dashboard-afiliado" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
                 <Route path="/afiliados" element={<PrivateRoute><AfiliadosGamificado /></PrivateRoute>} />
                 <Route path="/lojistas" element={<PrivateRoute><LojistaDashboard /></PrivateRoute>} />
+                <Route path="/farmacia-virtual" element={<PrivateRoute><FarmaciaVirtual /></PrivateRoute>} />
+                <Route path="/shopping/farmacia/:vendorId" element={<FarmaciaVitrine />} />
                 <Route path="/agendamento" element={<Agendamento />} />
                 <Route path="/prontuario" element={<Prontuario />} />
                 <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />

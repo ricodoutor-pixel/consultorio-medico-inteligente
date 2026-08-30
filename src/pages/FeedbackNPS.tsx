@@ -51,7 +51,7 @@ export default function FeedbackNPS() {
       // Let's assume there is an RPC 'submit_nps' or we allow update for specific fields.
       // For now we will use a direct update, but typically we'd need an RPC.
       
-      const { error: rpcError } = await supabase.rpc('submit_appointment_nps', {
+      const { error: rpcError } = await (supabase as any).rpc('submit_appointment_nps', {
         p_appointment_id: id,
         p_score: value
       });
@@ -59,7 +59,7 @@ export default function FeedbackNPS() {
       if (rpcError) {
         // Fallback to direct update if RPC doesn't exist
         const { error: updateError } = await supabase
-          .from("appointments")
+          .from("appointments" as any)
           .update({ 
             nps_score: value,
             nps_submitted_at: new Date().toISOString()
@@ -83,15 +83,15 @@ export default function FeedbackNPS() {
     if (!apptId) return;
     setSaving(true);
     try {
-      const { error: rpcError } = await supabase.rpc('submit_appointment_nps_comment', {
+      const { error: rpcError } = await (supabase as any).rpc('submit_appointment_nps_comment', {
         p_appointment_id: apptId,
         p_comment: comment
       });
 
       if (rpcError) {
         await supabase
-          .from("appointments")
-          .update({ nps_comment: comment })
+          .from("appointments" as any)
+          .update({ nps_comment: comment } as any)
           .eq("id", apptId);
       }
       setSubmitted(true);

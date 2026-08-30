@@ -84,6 +84,7 @@ const Cadastro = lazyWithRecovery(() => import("./pages/Cadastro"), { sourceRef:
 const ConfiguracoesMedico = lazyWithRecovery(() => import("./pages/ConfiguracoesMedico"), { sourceRef: "/configuracoes-medico" });
 const AtualizarDocumentosMedico = lazyWithRecovery(() => import("./pages/AtualizarDocumentosMedico"), { sourceRef: "/atualizar-documentos-medico" });
 const Login = lazyWithRecovery(() => import("./pages/Login"), { sourceRef: "/login" });
+const LoginFarmacia = lazyWithRecovery(() => import("./pages/LoginFarmacia"), { sourceRef: "/login-farmacia" });
 const ResetPassword = lazyWithRecovery(() => import("./pages/ResetPassword"), { sourceRef: "/reset-password" });
 const ConsultationPayment = lazyWithRecovery(() => import("./pages/ConsultationPayment"), { sourceRef: "/pagamento" });
 const SpecialistDashboard = lazyWithRecovery(() => import("./pages/SpecialistDashboard"), { sourceRef: "/dashboard-especialista" });
@@ -325,6 +326,7 @@ const App = () => (
                 <Route path="/cadastro-farmacia" element={<CadastroFarmacia />} />
                 <Route path="/cadastro" element={<Cadastro />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/login-farmacia" element={<LoginFarmacia />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />

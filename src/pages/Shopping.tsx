@@ -614,8 +614,8 @@ const Shopping = () => {
           setVerifiedVendors([{
             id: official.id,
             store_name: "Planta y Raiz Ltda",
-            store_logo_url: official.store_logo_url || "/dr-verdinho.png",
-            store_banner_url: official.store_banner_url || "linear-gradient(135deg, #062b1e 0%, #0d4a34 50%, #10b981 100%)",
+            store_logo_url: "/logo-farmacia.jpg",
+            store_banner_url: "/farmacia-fachada.jpg",
             rating: Number(official.rating || 5.0),
             total_sales: Number(official.total_sales || 48),
             is_verified: true,
@@ -633,8 +633,8 @@ const Shopping = () => {
           setVerifiedVendors([{
             id: "vendor-pyr-oficial",
             store_name: "Planta y Raiz Ltda",
-            store_logo_url: "/dr-verdinho.png",
-            store_banner_url: "linear-gradient(135deg, #062b1e 0%, #0d4a34 50%, #10b981 100%)",
+            store_logo_url: "/logo-farmacia.jpg",
+            store_banner_url: "/farmacia-fachada.jpg",
             rating: 5.0,
             total_sales: 48,
             is_verified: true,
@@ -653,8 +653,8 @@ const Shopping = () => {
         setVerifiedVendors([{
           id: "vendor-pyr-oficial",
           store_name: "Planta y Raiz Ltda",
-          store_logo_url: "/dr-verdinho.png",
-          store_banner_url: "linear-gradient(135deg, #062b1e 0%, #0d4a34 50%, #10b981 100%)",
+          store_logo_url: "/logo-farmacia.jpg",
+          store_banner_url: "/farmacia-fachada.jpg",
           rating: 5.0,
           total_sales: 48,
           is_verified: true,

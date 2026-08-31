@@ -35,7 +35,8 @@ import {
   Sparkles,
   CreditCard,
   Truck,
-  Navigation
+  Navigation,
+  BookOpen
 } from "lucide-react";
 import { 
   BarChart, 
@@ -321,6 +322,14 @@ export default function FarmaciaVirtual() {
                 className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-950/30 border border-emerald-400/30 flex items-center gap-1.5 hover:scale-105 transition-all"
               >
                 <Truck size={15} className="text-white" /> 🚚 Rastreio de Pedido & Entregas
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-card/80 hover:bg-muted text-foreground font-bold rounded-xl border border-primary/30 text-xs h-9 px-3 flex items-center gap-1.5 hover:scale-105 transition-all shadow-md"
+                onClick={() => navigate("/manual?tab=farmacia")}
+              >
+                <BookOpen size={14} className="text-emerald-400" /> 📖 Como Funciona Passo a Passo
               </Button>
               <Button
                 variant="outline"

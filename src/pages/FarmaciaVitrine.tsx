@@ -19,7 +19,9 @@ import {
   CheckCircle, 
   Truck, 
   ArrowLeft,
-  Share2
+  Share2,
+  ZoomIn,
+  Maximize2
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/store/cart";
@@ -29,6 +31,7 @@ import { resolveProductImg } from "@/lib/productImages";
 import farmaciaFachadaImg from "@/assets/farmacia-fachada.jpg";
 import logoFarmaciaImg from "@/assets/logo-farmacia.jpg";
 import { OFFICIAL_MEDICINES } from "@/pages/Shopping";
+import { ImageLightboxModal } from "@/components/ImageLightboxModal";
 
 interface PublicVendor {
   id: string;
@@ -71,6 +74,23 @@ export default function FarmaciaVitrine() {
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<PublicProduct | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  // Lightbox State
+  const [lightbox, setLightbox] = useState<{ open: boolean; url: string; title: string; desc?: string }>({
+    open: false,
+    url: "",
+    title: "",
+    desc: ""
+  });
+
+  const openLightbox = (url: string, title: string, desc?: string) => {
+    setLightbox({
+      open: true,
+      url,
+      title,
+      desc
+    });
+  };
 
   useEffect(() => {
     async function loadPublicStore() {
@@ -231,19 +251,26 @@ export default function FarmaciaVitrine() {
           </Button>
         </div>
 
-        {/* Header da Farmácia Oficial com Fachada Real */}
-        <div className="rounded-3xl overflow-hidden border border-border/80 bg-card shadow-2xl mb-8">
-          {/* Banner Fachada */}
+        {/* Header da Farmácia Oficial com Fachada Real (Clicável para Ampliar) */}
+        <div className="rounded-3xl overflow-hidden border border-border/80 bg-card shadow-2xl mb-8 group/card">
+          {/* Banner Fachada com Clique para Ver Inteira */}
           <div
-            className="h-52 md:h-72 relative w-full overflow-hidden"
+            onClick={() => openLightbox(farmaciaFachadaImg, "Fachada da Farmácia Física Planta y Raíz", "Sua Saúde, Nossa Raiz • Farmácia de dispensação e atendimento presencial e digital.")}
+            className="h-56 md:h-80 relative w-full overflow-hidden cursor-pointer group"
             style={{
               backgroundImage: `url(${farmaciaFachadaImg})`,
-              backgroundPosition: "center 35%",
+              backgroundPosition: "center 30%",
               backgroundSize: "cover"
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-            <div className="absolute top-4 right-4 bg-emerald-600/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent transition-opacity group-hover:opacity-70" />
+            
+            {/* Dica de Clique para Ampliar */}
+            <div className="absolute top-4 left-4 bg-black/60 hover:bg-black/80 backdrop-blur-md text-emerald-300 border border-emerald-500/40 px-3 py-1.5 rounded-full text-xs font-bold shadow-xl flex items-center gap-1.5 transition-all group-hover:scale-105">
+              <Maximize2 size={13} className="text-emerald-400" /> Clique na foto para ver a fachada inteira
+            </div>
+
+            <div className="absolute top-4 right-4 bg-emerald-600/95 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
               Farmácia Oficial Credenciada ANVISA
             </div>
           </div>
@@ -251,8 +278,12 @@ export default function FarmaciaVitrine() {
           {/* Dados da Loja */}
           <div className="p-6 pt-0 relative flex flex-col md:flex-row md:items-end justify-between gap-4 -mt-14 md:-mt-16 z-10">
             <div className="flex items-end gap-4">
-              {/* Logo Oficial */}
-              <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl border-4 border-card bg-white p-2 overflow-hidden flex items-center justify-center shadow-2xl flex-shrink-0">
+              {/* Logo Oficial Clicável */}
+              <div 
+                onClick={() => openLightbox(logoFarmaciaImg, "Logotipo Oficial Planta y Raíz", "Identidade visual da rede Planta y Raíz.")}
+                className="w-24 h-24 md:w-28 md:h-28 rounded-2xl border-4 border-card bg-white p-2 overflow-hidden flex items-center justify-center shadow-2xl flex-shrink-0 cursor-pointer hover:scale-105 transition-transform"
+                title="Clique para ampliar o logotipo"
+              >
                 <img src={logoFarmaciaImg} alt={vendor.store_name} className="w-full h-full object-contain" />
               </div>
 
@@ -342,7 +373,7 @@ export default function FarmaciaVitrine() {
                       setActiveImageIndex(0);
                     }}
                   >
-                    {/* Imagem do Produto */}
+                    {/* Imagem do Produto com Dica de Zoom */}
                     <div className="h-56 bg-muted/20 relative p-4 flex items-center justify-center overflow-hidden">
                       <img
                         src={resolveProductImg(p.image_url)}
@@ -357,6 +388,11 @@ export default function FarmaciaVitrine() {
                       <Badge className="absolute top-2 right-2 bg-emerald-600 text-white text-[9px] uppercase font-bold">
                         <Shield size={10} className="mr-1" /> ANVISA
                       </Badge>
+                      
+                      {/* Ícone de Zoom Flutuante */}
+                      <div className="absolute bottom-2 right-2 bg-black/60 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ZoomIn size={14} className="text-emerald-400" />
+                      </div>
                     </div>
 
                     {/* Detalhes */}
@@ -383,12 +419,24 @@ export default function FarmaciaVitrine() {
                     </div>
                   </div>
 
-                  <div className="p-4 pt-0">
+                  <div className="p-4 pt-0 flex gap-2">
                     <Button
-                      className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl h-10 shadow-md shadow-emerald-950/20"
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl h-10 shadow-md shadow-emerald-950/20"
                       onClick={() => handleAddToCart(p)}
                     >
                       <ShoppingBag size={14} className="mr-1.5" /> Adicionar ao Carrinho
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-10 w-10 rounded-xl border-border/60"
+                      title="Ver detalhes e fotos"
+                      onClick={() => {
+                        setSelectedProduct(p);
+                        setActiveImageIndex(0);
+                      }}
+                    >
+                      <Maximize2 size={15} />
                     </Button>
                   </div>
                 </motion.div>
@@ -397,7 +445,7 @@ export default function FarmaciaVitrine() {
           </div>
         )}
 
-        {/* Modal de Detalhes do Produto */}
+        {/* Modal de Detalhes do Produto com Zoom na Foto */}
         <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>
           {selectedProduct && (
             <DialogContent className="max-w-xl bg-card border-border rounded-2xl">
@@ -419,16 +467,29 @@ export default function FarmaciaVitrine() {
               </DialogHeader>
 
               <div className="py-2 space-y-4">
-                {/* Carrossel de 3 Fotos */}
+                {/* Carrossel de 3 Fotos com Clique para Ver em Tela Cheia */}
                 {(() => {
                   const images = getProductImages(selectedProduct);
+                  const currentImgUrl = resolveProductImg(images[activeImageIndex] || selectedProduct.image_url);
+
                   return (
-                    <div className="relative rounded-2xl bg-muted/20 border border-border p-4 h-60 flex items-center justify-center overflow-hidden">
+                    <div className="relative rounded-2xl bg-muted/20 border border-border p-4 h-64 flex items-center justify-center overflow-hidden group">
                       <img
-                        src={resolveProductImg(images[activeImageIndex] || selectedProduct.image_url)}
+                        src={currentImgUrl}
                         alt={selectedProduct.name}
-                        className="h-full w-full object-contain"
+                        className="h-full w-full object-contain cursor-zoom-in hover:scale-105 transition-transform"
+                        onClick={() => openLightbox(currentImgUrl, selectedProduct.name, `Foto ${activeImageIndex + 1} de ${images.length}`)}
+                        title="Clique para ver a foto em tamanho grande"
                       />
+
+                      {/* Botão Flutuante de Ampliar */}
+                      <button
+                        onClick={() => openLightbox(currentImgUrl, selectedProduct.name, `Foto ${activeImageIndex + 1} de ${images.length}`)}
+                        className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 hover:bg-black/80 text-emerald-400 backdrop-blur-sm shadow-md transition-all"
+                        title="Ampliar Imagem"
+                      >
+                        <ZoomIn size={16} />
+                      </button>
 
                       {images.length > 1 && (
                         <>
@@ -522,6 +583,15 @@ export default function FarmaciaVitrine() {
             </DialogContent>
           )}
         </Dialog>
+
+        {/* Modal Lightbox de Imagem em Alta Resolução */}
+        <ImageLightboxModal
+          open={lightbox.open}
+          onClose={() => setLightbox((prev) => ({ ...prev, open: false }))}
+          imageUrl={lightbox.url}
+          title={lightbox.title}
+          description={lightbox.desc}
+        />
       </main>
 
       <Footer />

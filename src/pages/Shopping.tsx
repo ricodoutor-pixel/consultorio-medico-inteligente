@@ -24,6 +24,7 @@ import { AnvisaBadge } from "@/components/AnvisaBadge";
 import { FarmaciaCard } from "@/components/FarmaciaCard";
 import { buildProductSchema } from "@/lib/schema-org";
 import { resolveProductImg } from "@/lib/productImages";
+import { ImageLightboxModal } from "@/components/ImageLightboxModal";
 
 export interface VendorProduct {
   id: string;
@@ -378,6 +379,7 @@ const ProductDetail = ({ id }: { id: string }) => {
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
   const [btcModal, setBtcModal] = useState({ open: false, planName: "", planId: "", amount: "" });
   const [rxModal, setRxModal] = useState({ open: false, productName: "" });
+  const [lightbox, setLightbox] = useState<{ open: boolean; url: string; title: string }>({ open: false, url: "", title: "" });
 
   useEffect(() => {
     (async () => {
@@ -472,8 +474,15 @@ const ProductDetail = ({ id }: { id: string }) => {
       <div className="grid md:grid-cols-2 gap-6 lg:gap-10">
         {/* Gallery */}
         <div className="space-y-3">
-          <div className="aspect-square rounded-2xl overflow-hidden border border-border/30 bg-card/30 relative">
-            <img src={resolveProductImg(images[mainImg])} alt={product.name} className="w-full h-full object-cover" />
+          <div 
+            className="aspect-square rounded-2xl overflow-hidden border border-border/30 bg-card/30 relative cursor-zoom-in group"
+            onClick={() => setLightbox({ open: true, url: resolveProductImg(images[mainImg]), title: product.name })}
+            title="Clique para ver a foto em alta resolução"
+          >
+            <img src={resolveProductImg(images[mainImg])} alt={product.name} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-emerald-400 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-[10px] font-bold flex items-center gap-1">🔍 Ampliar Foto</span>
+            </div>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {images.map((img, i) => (
@@ -560,6 +569,13 @@ const ProductDetail = ({ id }: { id: string }) => {
         productName={rxModal.productName}
         onHasPrescription={proceedWithPurchase}
         onNeedsPrescription={() => { setRxModal({ open: false, productName: "" }); window.location.href = "/profissionais"; }}
+      />
+      <ImageLightboxModal
+        open={lightbox.open}
+        onClose={() => setLightbox(prev => ({ ...prev, open: false }))}
+        imageUrl={lightbox.url}
+        title={lightbox.title}
+        description="Medicamento Oficial • Planta y Raiz Ltda"
       />
     </div>
   );

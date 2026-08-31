@@ -51,6 +51,7 @@ import {
 import { useFarmaciaVirtual, PharmacyPrescription, VendorProduct } from "@/hooks/useFarmaciaVirtual";
 import { useToast } from "@/hooks/use-toast";
 import { MedicamentoSatelliteTracker } from "@/components/delivery/MedicamentoSatelliteTracker";
+import { RastreioPedidoModal } from "@/components/delivery/RastreioPedidoModal";
 
 export default function FarmaciaVirtual() {
   const navigate = useNavigate();
@@ -70,6 +71,7 @@ export default function FarmaciaVirtual() {
 
   // Estados locais da página
   const [activeTab, setActiveTab] = useState("visao-geral");
+  const [isRastreioOpen, setIsRastreioOpen] = useState(false);
   const [prescriptionFilter, setPrescriptionFilter] = useState<string>("todas");
   const [prescriptionSearch, setPrescriptionSearch] = useState<string>("");
   const [selectedPrescription, setSelectedPrescription] = useState<PharmacyPrescription | null>(null);
@@ -312,7 +314,14 @@ export default function FarmaciaVirtual() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <Button
+                size="sm"
+                onClick={() => setIsRastreioOpen(true)}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-950/30 border border-emerald-400/30 flex items-center gap-1.5 hover:scale-105 transition-all"
+              >
+                <Truck size={15} className="text-white" /> 🚚 Rastreio de Pedido & Entregas
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -323,7 +332,7 @@ export default function FarmaciaVirtual() {
               </Button>
               <Button
                 size="sm"
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold"
                 onClick={() => navigate("/cadastro")}
               >
                 Atualizar KYC →
@@ -1190,6 +1199,13 @@ export default function FarmaciaVirtual() {
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Modal de Rastreamento de Pedido & Entregador */}
+        <RastreioPedidoModal
+          open={isRastreioOpen}
+          onOpenChange={setIsRastreioOpen}
+          isPharmacy={true}
+        />
       </main>
 
       <Footer />

@@ -162,6 +162,7 @@ const AdminAfiliados = lazyWithRecovery(() => import("./pages/admin/AdminAfiliad
 // Lojistas & Farmácias
 const CadastroFarmacia = lazyWithRecovery(() => import("./pages/CadastroFarmacia"), { sourceRef: "/cadastro-farmacia" });
 const LojistaDashboard = lazyWithRecovery(() => import("./pages/LojistaDashboard"), { sourceRef: "/lojistas" });
+const EntregadorGPS = lazyWithRecovery(() => import("./pages/EntregadorGPS"), { sourceRef: "/entregador" });
 const ConviteMedico = lazyWithRecovery(() => import("./pages/ConviteMedico"), { sourceRef: "/convite-medico" });
 
 // ── Cartão Saúde Verde ──
@@ -381,6 +382,8 @@ const App = () => (
                 <Route path="/afiliados" element={<PrivateRoute><AfiliadosGamificado /></PrivateRoute>} />
                 <Route path="/lojistas" element={<PrivateRoute><LojistaDashboard /></PrivateRoute>} />
                 <Route path="/farmacia-virtual" element={<PrivateRoute><FarmaciaVirtual /></PrivateRoute>} />
+                <Route path="/entregador" element={<EntregadorGPS />} />
+                <Route path="/rastreio" element={<EntregadorGPS />} />
                 <Route path="/shopping/farmacia/:vendorId" element={<FarmaciaVitrine />} />
                 <Route path="/agendamento" element={<Agendamento />} />
                 <Route path="/prontuario" element={<Prontuario />} />

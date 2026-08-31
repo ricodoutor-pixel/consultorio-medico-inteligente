@@ -5,10 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Shield, Clock, Download, Search, Activity, Pill, AlertTriangle, Eye } from "lucide-react";
+import { FileText, Shield, Clock, Download, Search, Activity, Pill, AlertTriangle, Eye, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { RastreioPedidoModal } from "@/components/delivery/RastreioPedidoModal";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
@@ -18,6 +19,7 @@ const Prontuario = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"records" | "prescriptions" | "audit">("records");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isRastreioOpen, setIsRastreioOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -95,6 +97,12 @@ Dados protegidos pela LGPD (Lei 13.709/2018)
                   <Shield size={14} className="text-primary" /> Criptografia AES-256 • CFM 2.314/2022 • LGPD
                 </p>
               </div>
+              <Button
+                onClick={() => setIsRastreioOpen(true)}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs sm:text-sm h-10 px-4 flex items-center gap-2 shadow-lg shadow-emerald-950/30 border border-emerald-400/30 hover:scale-105 transition-all"
+              >
+                <Truck size={16} className="text-white" /> 🚚 Rastreio de Pedido via Satélite
+              </Button>
             </div>
 
             {/* Tabs */}
@@ -239,6 +247,14 @@ Dados protegidos pela LGPD (Lei 13.709/2018)
           </motion.div>
         </div>
       </section>
+
+      {/* Modal de Rastreamento de Pedido via Satélite */}
+      <RastreioPedidoModal
+        open={isRastreioOpen}
+        onOpenChange={setIsRastreioOpen}
+        isPharmacy={false}
+      />
+
       <Footer />
     </div>
   );

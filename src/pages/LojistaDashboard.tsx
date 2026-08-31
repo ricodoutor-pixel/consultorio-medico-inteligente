@@ -11,16 +11,19 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { DollarSign, Package, AlertTriangle, Building2, BookOpen, Clock, FileText, CheckCircle, Truck, FileSignature, Wallet } from "lucide-react";
+import { DollarSign, Package, AlertTriangle, Building2, BookOpen, Clock, FileText, CheckCircle, Truck, FileSignature, Wallet, Navigation, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { VipUpgradePopup } from "@/components/VipUpgradePopup";
 import { useLojista } from "@/hooks/useLojista";
+import { RastreioPedidoModal } from "@/components/delivery/RastreioPedidoModal";
+import { MedicamentoSatelliteTracker } from "@/components/delivery/MedicamentoSatelliteTracker";
 
 export default function LojistaDashboard() {
   const { toast } = useToast();
   const { profile, metrics, loading, authError, addProduct } = useLojista();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [isRastreioOpen, setIsRastreioOpen] = useState(false);
 
   // Mock data para Receitas Inbox
   const [inbox] = useState([
@@ -98,10 +101,18 @@ export default function LojistaDashboard() {
                 Split 95% Ativo
               </Badge>
             </div>
-            <h1 className="text-3xl md:text-4xl font-display font-black text-foreground flex items-center gap-3">
-              <Building2 className="text-primary h-8 w-8" /> 
-              Painel: {profile.company_name || 'Lojista Partner'}
-            </h1>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-black text-foreground flex items-center gap-3">
+                <Building2 className="text-primary h-8 w-8 shrink-0" /> 
+                Painel: {profile.company_name || 'Farmácia Planta y Raíz'}
+              </h1>
+              <Button 
+                onClick={() => setIsRastreioOpen(true)}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-950/30 text-xs sm:text-sm h-10 px-4 flex items-center gap-2 border border-emerald-400/30 hover:scale-105 transition-all"
+              >
+                <Truck size={17} className="text-white" /> 🚚 Rastreio de Pedido & Entregas
+              </Button>
+            </div>
           </div>
           <Button size="lg" variant="outline" className="font-bold rounded-xl border-primary/20 text-primary" asChild>
              <Link to="/cadastro-farmacia"><FileSignature size={18} className="mr-2" /> Atualizar KYC</Link>
@@ -109,11 +120,14 @@ export default function LojistaDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6 grid grid-cols-2 lg:grid-cols-4 gap-2 h-auto">
-            <TabsTrigger value="overview" className="py-3">Visão Geral</TabsTrigger>
-            <TabsTrigger value="inbox" className="py-3">Receitas & Dispensação</TabsTrigger>
-            <TabsTrigger value="catalog" className="py-3">Catálogo (Vitrine)</TabsTrigger>
-            <TabsTrigger value="financial" className="py-3">Financeiro & Repasse</TabsTrigger>
+          <TabsList className="mb-6 grid grid-cols-2 lg:grid-cols-5 gap-2 h-auto bg-muted/60 p-1.5 rounded-2xl border border-border">
+            <TabsTrigger value="overview" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Visão Geral</TabsTrigger>
+            <TabsTrigger value="rastreio" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-emerald-400">
+              <Truck size={14} className="mr-1 inline" /> Rastreamento Satélite
+            </TabsTrigger>
+            <TabsTrigger value="inbox" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Receitas & Dispensação</TabsTrigger>
+            <TabsTrigger value="catalog" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Catálogo (Vitrine)</TabsTrigger>
+            <TabsTrigger value="financial" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Financeiro & Repasse</TabsTrigger>
           </TabsList>
 
           {/* ABA 1: OVERVIEW */}
@@ -160,6 +174,30 @@ export default function LojistaDashboard() {
                   <p className="text-xs text-muted-foreground mt-1">Retido na fonte</p>
                 </CardContent>
               </Card>
+            </div>
+          </TabsContent>
+
+          {/* ABA RASTREAMENTO SATÉLITE ESTILO UBER */}
+          <TabsContent value="rastreio" className="space-y-6">
+            <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                    <Truck size={20} className="text-emerald-400" /> Central de Rastreamento Satélite & Entregas
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Acompanhe o trajeto dos seus entregadores com GPS em tempo real até a residência do paciente.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => setIsRastreioOpen(true)}
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs h-9"
+                >
+                  <Navigation size={14} className="mr-1.5" /> Abrir Painel Completo
+                </Button>
+              </div>
+
+              <MedicamentoSatelliteTracker isPharmacyView={true} />
             </div>
           </TabsContent>
 
@@ -351,6 +389,13 @@ export default function LojistaDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Modal de Rastreamento de Pedido & Entregas */}
+      <RastreioPedidoModal
+        open={isRastreioOpen}
+        onOpenChange={setIsRastreioOpen}
+        isPharmacy={true}
+      />
     </div>
   );
 }

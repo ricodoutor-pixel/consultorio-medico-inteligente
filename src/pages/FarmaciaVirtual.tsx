@@ -33,7 +33,9 @@ import {
   RefreshCw,
   Zap,
   Sparkles,
-  CreditCard
+  CreditCard,
+  Truck,
+  Navigation
 } from "lucide-react";
 import { 
   BarChart, 
@@ -48,6 +50,7 @@ import {
 } from "recharts";
 import { useFarmaciaVirtual, PharmacyPrescription, VendorProduct } from "@/hooks/useFarmaciaVirtual";
 import { useToast } from "@/hooks/use-toast";
+import { MedicamentoSatelliteTracker } from "@/components/delivery/MedicamentoSatelliteTracker";
 
 export default function FarmaciaVirtual() {
   const navigate = useNavigate();
@@ -381,20 +384,23 @@ export default function FarmaciaVirtual() {
           </Card>
         </div>
 
-        {/* Tabs Principais - 4 Abas */}
+        {/* Tabs Principais - 5 Abas */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 bg-muted/60 p-1 rounded-2xl border border-border">
+          <TabsList className="grid grid-cols-2 md:grid-cols-5 bg-muted/60 p-1 rounded-2xl border border-border">
             <TabsTrigger value="visao-geral" className="rounded-xl font-bold text-xs md:text-sm">
               Visão Geral
             </TabsTrigger>
+            <TabsTrigger value="logistica" className="rounded-xl font-bold text-xs md:text-sm text-emerald-400">
+              <Truck size={14} className="mr-1 inline" /> Logística & Satélite
+            </TabsTrigger>
             <TabsTrigger value="receitas" className="rounded-xl font-bold text-xs md:text-sm">
-              Receitas & Dispensação ({metrics.pending_prescriptions})
+              Receitas ({metrics.pending_prescriptions})
             </TabsTrigger>
             <TabsTrigger value="catalogo" className="rounded-xl font-bold text-xs md:text-sm">
-              Catálogo (Vitrine) ({metrics.active_products}/10)
+              Catálogo ({metrics.active_products}/10)
             </TabsTrigger>
             <TabsTrigger value="financeiro" className="rounded-xl font-bold text-xs md:text-sm">
-              Financeiro & Repasse
+              Financeiro
             </TabsTrigger>
           </TabsList>
 
@@ -497,6 +503,53 @@ export default function FarmaciaVirtual() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Rastreamento Satélite Ativo na Visão Geral */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+                  <Truck size={16} className="text-emerald-400" /> Logística de Entrega em Tempo Real (Cadeia de Frio Satélite)
+                </h3>
+                <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs font-bold">
+                  Telemetria Ativa
+                </Badge>
+              </div>
+              <MedicamentoSatelliteTracker
+                initialOriginCep="01310-100"
+                initialOriginAddress="Av. Paulista, 1000 - Bela Vista, São Paulo - SP (Farmácia Planta y Raíz)"
+                initialDestinationCep="04571-010"
+                initialDestinationAddress="Av. Eng. Luís Carlos Berrini, 1200 - Brooklin, São Paulo - SP"
+                medicineName="Epidiolex / Canabidiol 100 mg/mL (Frasco Lote #2026-B8)"
+                orderId="PYR-SAT-984210-BR"
+                isPharmacyView={true}
+              />
+            </div>
+          </TabsContent>
+
+          {/* ============================================================ */}
+          {/* ABA LOGÍSTICA & SATÉLITE DEDICADA */}
+          {/* ============================================================ */}
+          <TabsContent value="logistica" className="space-y-6">
+            <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
+              <div>
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <Truck size={20} className="text-emerald-400" /> Central de Rastreamento Satélite & Despacho Crio-Logístico
+                </h2>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Acompanhe a saída dos medicamentos da farmácia até a porta do paciente em qualquer lugar do Brasil e do mundo com geolocalização por CEP e monitoramento de temperatura.
+                </p>
+              </div>
+
+              <MedicamentoSatelliteTracker
+                initialOriginCep="01310-100"
+                initialOriginAddress="Av. Paulista, 1000 - Bela Vista, São Paulo - SP (Farmácia Planta y Raíz)"
+                initialDestinationCep="04571-010"
+                initialDestinationAddress="Av. Eng. Luís Carlos Berrini, 1200 - Brooklin, São Paulo - SP"
+                medicineName="Epidiolex / Canabidiol 100 mg/mL (Frasco Lote #2026-B8)"
+                orderId="PYR-SAT-984210-BR"
+                isPharmacyView={true}
+              />
+            </div>
           </TabsContent>
 
           {/* ============================================================ */}

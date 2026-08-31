@@ -25,6 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import { resolveProductImg } from "@/lib/productImages";
 
 interface PublicVendor {
   id: string;
@@ -305,7 +306,7 @@ export default function FarmaciaVitrine() {
                     {/* Imagem do Produto */}
                     <div className="h-48 bg-muted/20 relative p-4 flex items-center justify-center overflow-hidden">
                       <img
-                        src={p.image_url}
+                        src={resolveProductImg(p.image_url)}
                         alt={p.name}
                         className="h-full w-full object-contain group-hover:scale-105 transition-transform duration-300"
                       />
@@ -385,7 +386,7 @@ export default function FarmaciaVitrine() {
                   return (
                     <div className="relative rounded-2xl bg-muted/20 border border-border p-4 h-60 flex items-center justify-center overflow-hidden">
                       <img
-                        src={images[activeImageIndex] || selectedProduct.image_url}
+                        src={resolveProductImg(images[activeImageIndex] || selectedProduct.image_url)}
                         alt={selectedProduct.name}
                         className="h-full w-full object-contain"
                       />

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Shield, Clock, Download, Search, Activity, Pill, AlertTriangle, Eye, Truck } from "lucide-react";
+import { FileText, Shield, Clock, Download, Search, Activity, Pill, AlertTriangle, Eye, Truck, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -97,12 +98,23 @@ Dados protegidos pela LGPD (Lei 13.709/2018)
                   <Shield size={14} className="text-primary" /> Criptografia AES-256 • CFM 2.314/2022 • LGPD
                 </p>
               </div>
-              <Button
-                onClick={() => setIsRastreioOpen(true)}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs sm:text-sm h-10 px-4 flex items-center gap-2 shadow-lg shadow-emerald-950/30 border border-emerald-400/30 hover:scale-105 transition-all"
-              >
-                <Truck size={16} className="text-white" /> 🚚 Rastreio de Pedido via Satélite
-              </Button>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button
+                  onClick={() => setIsRastreioOpen(true)}
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs sm:text-sm h-10 px-4 flex items-center gap-2 shadow-lg shadow-emerald-950/30 border border-emerald-400/30 hover:scale-105 transition-all"
+                >
+                  <Truck size={16} className="text-white" /> 🚚 Rastreio de Pedido
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="bg-card/80 hover:bg-muted text-foreground font-bold rounded-xl border border-primary/30 text-xs sm:text-sm h-10 px-4 flex items-center gap-2 hover:scale-105 transition-all shadow-md"
+                  asChild
+                >
+                  <Link to="/manual?tab=paciente">
+                    <BookOpen size={16} className="text-emerald-400" /> 📖 Como Funciona Passo a Passo
+                  </Link>
+                </Button>
+              </div>
             </div>
 
             {/* Tabs */}

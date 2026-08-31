@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { isMasterAdminEmail } from "@/lib/admin-auth";
 
 export interface LojistaProfile {
   id: string;
@@ -46,20 +47,20 @@ export function useLojista() {
         .maybeSingle();
 
       const prof = profileData as any;
-      const isTestUser = user.email === "contato@plantayraiz.com.br";
-      
-      if (isTestUser && prof && prof.user_type !== 'lojista') {
-        // Força a atualização do banco de dados localmente para testes
-        await supabase.from('profiles' as any).update({ user_type: 'lojista', company_name: 'Farmácia de Teste' }).eq('id', user.id);
-      }
+      const isMaster = isMasterAdminEmail(user.email);
 
-      if (!isTestUser && (profileError || !prof || (prof.user_type !== 'lojista' && prof.user_type !== 'dispensario' && prof.user_type !== 'vendor'))) {
-        setAuthError("Acesso Negado: Seu perfil não é de lojista.");
+      if (!isMaster && (profileError || !prof || (prof.user_type !== 'lojista' && prof.user_type !== 'dispensario' && prof.user_type !== 'vendor'))) {
+        setAuthError("Acesso Negado: Seu perfil não possui permissão de farmácia/lojista.");
         setLoading(false);
         return;
       }
       
-      setProfile({ ...(prof || { id: user.id, user_type: 'lojista', company_name: 'Farmácia de Teste' }), is_verified: true });
+      setProfile({
+        id: user.id,
+        role: prof?.user_type || 'lojista',
+        company_name: prof?.company_name || 'Planta y Raiz Ltda',
+        is_verified: true
+      });
 
       // Busca dados reais em paralelo usando Promisses
       const [productsRes, ordersRes] = await Promise.all([

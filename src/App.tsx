@@ -31,6 +31,7 @@ import { DynamicSEOHead } from "@/components/DynamicSEOHead";
 import { LocalCTABanner } from "@/components/LocalCTABanner";
 import { OnboardingModal } from "@/components/OnboardingModal";
 import { ConsentManager } from "@/components/ConsentManager";
+import { MasterPortalSwitcher } from "@/components/MasterPortalSwitcher";
 import { lazyWithRecovery, reportFrontendRuntimeError } from "@/lib/runtime-recovery";
 
 const MonitoramentoCSI = lazyWithRecovery(() => import("./pages/MonitoramentoCSI"), { sourceRef: "/monitoramento" });
@@ -301,6 +302,7 @@ const App = () => (
             <ShoppingCart />
             <OnboardingModal />
             <ConsentManager />
+            <MasterPortalSwitcher />
             <Suspense fallback={<Loading />}>
               <main id="main-content" role="main">
               <Routes>

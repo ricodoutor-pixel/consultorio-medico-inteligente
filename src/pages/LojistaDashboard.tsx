@@ -112,6 +112,15 @@ export default function LojistaDashboard() {
               >
                 <Truck size={17} className="text-white" /> 🚚 Rastreio de Pedido & Entregas
               </Button>
+              <Button 
+                variant="outline"
+                className="bg-card/80 hover:bg-muted text-foreground font-bold rounded-xl border border-primary/30 text-xs sm:text-sm h-10 px-4 flex items-center gap-2 hover:scale-105 transition-all shadow-md"
+                asChild
+              >
+                <Link to="/manual?tab=farmacia">
+                  <BookOpen size={16} className="text-emerald-400" /> 📖 Como Funciona Passo a Passo
+                </Link>
+              </Button>
             </div>
           </div>
           <Button size="lg" variant="outline" className="font-bold rounded-xl border-primary/20 text-primary" asChild>

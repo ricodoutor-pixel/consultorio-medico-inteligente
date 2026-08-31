@@ -34,6 +34,7 @@ import { TitulacaoTrackerCard } from "@/components/TitulacaoTrackerCard";
 import { Anvisa1ClickButton } from "@/components/Anvisa1ClickButton";
 import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
 import { MedicamentoSatelliteTracker } from "@/components/delivery/MedicamentoSatelliteTracker";
+import { RastreioPedidoModal } from "@/components/delivery/RastreioPedidoModal";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -50,6 +51,7 @@ const allBadges = [
 
 const DashboardPaciente = () => {
   const [activeTab, setActiveTab] = useState<"overview" | "badges" | "prescriptions" | "triages" | "telemed" | "upgrade" | "rastreamento">("overview");
+  const [isRastreioOpen, setIsRastreioOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -210,6 +212,13 @@ const DashboardPaciente = () => {
               />
             </div>
             <div className="flex gap-2 flex-wrap items-center">
+              <Button 
+                size="sm" 
+                onClick={() => setIsRastreioOpen(true)}
+                className="rounded-xl text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-950/30 border border-emerald-400/30 flex items-center gap-1.5 hover:scale-105 transition-all"
+              >
+                <Truck size={15} className="text-white" /> 🚚 Rastreio de Pedido
+              </Button>
               <Button size="sm" className="rounded-xl text-xs bg-purple-600 text-white hover:bg-purple-700 font-bold" asChild>
                 <Link to="/afiliados"><Gift size={14} className="mr-1" /> Indique e Ganhe</Link>
               </Button>
@@ -733,6 +742,15 @@ const DashboardPaciente = () => {
         </DialogContent>
       </Dialog>
       <InteractiveTour3DModal initialRole="paciente" autoOpen={true} />
+
+      {/* Modal de Rastreamento de Pedido via Satélite (Visão do Paciente) */}
+      <RastreioPedidoModal
+        open={isRastreioOpen}
+        onOpenChange={setIsRastreioOpen}
+        isPharmacy={false}
+        patientName={userName}
+        patientAddress={profile?.address || "Av. Eng. Luís Carlos Berrini, 1200 - Brooklin, São Paulo - SP"}
+      />
     </div>
   );
 };

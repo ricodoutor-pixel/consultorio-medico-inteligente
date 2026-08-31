@@ -26,6 +26,9 @@ import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { resolveProductImg } from "@/lib/productImages";
+import farmaciaFachadaImg from "@/assets/farmacia-fachada.jpg";
+import logoFarmaciaImg from "@/assets/logo-farmacia.jpg";
+import { OFFICIAL_MEDICINES } from "@/pages/Shopping";
 
 interface PublicVendor {
   id: string;
@@ -71,45 +74,80 @@ export default function FarmaciaVitrine() {
 
   useEffect(() => {
     async function loadPublicStore() {
-      if (!vendorId) return;
       try {
         setLoading(true);
         // 1. Buscar vendor
-        const { data: vData, error: vErr } = await supabase
+        const { data: vData } = await supabase
           .from('vendors')
           .select('*')
-          .eq('id', vendorId)
+          .eq(vendorId && vendorId !== "vendor-pyr-oficial" ? 'id' : 'is_active', vendorId && vendorId !== "vendor-pyr-oficial" ? vendorId : true)
           .maybeSingle();
 
-        if (vErr || !vData) {
-          toast({ title: "Farmácia não encontrada", variant: "destructive" });
-          setLoading(false);
-          return;
-        }
-
         setVendor({
-          id: vData.id,
-          store_name: vData.store_name || "Farmácia Parceira",
-          store_description: vData.store_description || "Farmácia de manipulação e dispensação credenciada na rede Planta y Raíz.",
-          store_logo_url: vData.store_logo_url || null,
-          store_banner_url: vData.store_banner_url || null,
-          rating: Number(vData.rating || 5.0),
-          total_sales: Number(vData.total_sales || 0),
+          id: vData?.id || "vendor-pyr-oficial",
+          store_name: "Planta y Raiz Ltda",
+          store_description: vData?.store_description || "Farmácia de manipulação e dispensação de fitocanabinoides e medicamentos à base de cannabis regulados pela ANVISA (RDC 327/2019 e RDC 660/2022). Produtos 100% auditados com laudo COA e envio expresso para todo o Brasil.",
+          store_logo_url: logoFarmaciaImg,
+          store_banner_url: farmaciaFachadaImg,
+          rating: Number(vData?.rating || 5.0),
+          total_sales: Number(vData?.total_sales || 48),
           is_verified: true,
           city: "São Paulo",
           state: "SP"
         });
 
         // 2. Buscar produtos da farmácia
-        const { data: pData } = await supabase
-          .from('vendor_products')
-          .select('*')
-          .eq('vendor_id', vendorId)
-          .eq('is_active', true)
-          .order('created_at', { ascending: false })
-          .limit(10);
+        if (vData?.id) {
+          const { data: pData } = await supabase
+            .from('vendor_products')
+            .select('*')
+            .eq('vendor_id', vData.id)
+            .eq('is_active', true)
+            .order('created_at', { ascending: false })
+            .limit(10);
 
-        setProducts(pData || []);
+          if (pData && pData.length > 0) {
+            setProducts(pData.map((p: any) => ({
+              ...p,
+              price: Number(p.price || 0),
+              compare_price: p.compare_price ? Number(p.compare_price) : null
+            })));
+          } else {
+            setProducts(OFFICIAL_MEDICINES.map(m => ({
+              id: m.id,
+              vendor_id: m.vendor_id,
+              name: m.name,
+              description: m.description,
+              price: m.price,
+              compare_price: m.compare_price,
+              category: m.category,
+              image_url: m.image_url || "",
+              image_url_2: m.image_url_2,
+              image_url_3: m.image_url_3,
+              stock: m.stock,
+              sold_count: m.sold_count,
+              rating: m.rating || 5,
+              is_active: true
+            })));
+          }
+        } else {
+          setProducts(OFFICIAL_MEDICINES.map(m => ({
+            id: m.id,
+            vendor_id: m.vendor_id,
+            name: m.name,
+            description: m.description,
+            price: m.price,
+            compare_price: m.compare_price,
+            category: m.category,
+            image_url: m.image_url || "",
+            image_url_2: m.image_url_2,
+            image_url_3: m.image_url_3,
+            stock: m.stock,
+            sold_count: m.sold_count,
+            rating: m.rating || 5,
+            is_active: true
+          })));
+        }
       } catch (err: any) {
         console.error("[FarmaciaVitrine] erro:", err);
       } finally {
@@ -118,7 +156,7 @@ export default function FarmaciaVitrine() {
     }
 
     loadPublicStore();
-  }, [vendorId, toast]);
+  }, [vendorId]);
 
   const handleAddToCart = (product: PublicProduct) => {
     addItem({
@@ -129,15 +167,15 @@ export default function FarmaciaVitrine() {
       price: `R$ ${product.price.toFixed(2).replace('.', ',')}`,
       priceValue: product.price,
       category: product.category,
-      vendor: vendor?.store_name || "Farmácia Parceira",
+      vendor: vendor?.store_name || "Planta y Raiz Ltda",
       rating: product.rating || 5.0,
-      imageUrl: product.image_url,
-      tags: ["Canabidiol", "Farmácia", product.category],
+      imageUrl: resolveProductImg(product.image_url),
+      tags: ["Canabidiol", "Farmácia Oficial", product.category],
       freeShipping: true
     });
 
     toast({
-      title: "🛒 Produto adicionado ao carrinho!",
+      title: "🛒 Medicamento adicionado ao carrinho!",
       description: `${product.name} foi inserido no seu pedido.`
     });
     setSelectedProduct(null);
@@ -155,7 +193,7 @@ export default function FarmaciaVitrine() {
           <div className="absolute inset-[-15px] rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
           <Store size={48} className="text-primary animate-pulse" />
         </div>
-        <p className="mt-6 text-foreground font-bold">Carregando Vitrine da Farmácia...</p>
+        <p className="mt-6 text-foreground font-bold">Carregando Vitrine da Farmácia Oficial...</p>
       </div>
     );
   }
@@ -193,30 +231,29 @@ export default function FarmaciaVitrine() {
           </Button>
         </div>
 
-        {/* Header da Farmácia */}
-        <div className="rounded-3xl overflow-hidden border border-border bg-card shadow-2xl mb-8">
-          {/* Banner */}
+        {/* Header da Farmácia Oficial com Fachada Real */}
+        <div className="rounded-3xl overflow-hidden border border-border/80 bg-card shadow-2xl mb-8">
+          {/* Banner Fachada */}
           <div
-            className="h-44 md:h-56 relative w-full"
+            className="h-52 md:h-72 relative w-full overflow-hidden"
             style={{
-              background: vendor.store_banner_url
-                ? `url(${vendor.store_banner_url}) center/cover`
-                : "linear-gradient(135deg, #062b1e 0%, #0d4a34 50%, #10b981 100%)"
+              backgroundImage: `url(${farmaciaFachadaImg})`,
+              backgroundPosition: "center 35%",
+              backgroundSize: "cover"
             }}
           >
-            <div className="absolute inset-0 bg-black/30" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+            <div className="absolute top-4 right-4 bg-emerald-600/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+              Farmácia Oficial Credenciada ANVISA
+            </div>
           </div>
 
           {/* Dados da Loja */}
-          <div className="p-6 pt-0 relative flex flex-col md:flex-row md:items-end justify-between gap-4 -mt-12 md:-mt-14">
+          <div className="p-6 pt-0 relative flex flex-col md:flex-row md:items-end justify-between gap-4 -mt-14 md:-mt-16 z-10">
             <div className="flex items-end gap-4">
-              {/* Logo */}
-              <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl border-4 border-card bg-background overflow-hidden flex items-center justify-center shadow-xl flex-shrink-0">
-                {vendor.store_logo_url ? (
-                  <img src={vendor.store_logo_url} alt={vendor.store_name} className="w-full h-full object-cover" />
-                ) : (
-                  <Store className="text-primary" size={48} />
-                )}
+              {/* Logo Oficial */}
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl border-4 border-card bg-white p-2 overflow-hidden flex items-center justify-center shadow-2xl flex-shrink-0">
+                <img src={logoFarmaciaImg} alt={vendor.store_name} className="w-full h-full object-contain" />
               </div>
 
               <div className="mb-1">
@@ -224,22 +261,20 @@ export default function FarmaciaVitrine() {
                   <h1 className="text-2xl md:text-3xl font-display font-black text-foreground">
                     {vendor.store_name}
                   </h1>
-                  {vendor.is_verified && (
-                    <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs font-bold">
-                      <BadgeCheck size={12} className="mr-1" /> Farmácia Verificada
-                    </Badge>
-                  )}
+                  <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs font-bold">
+                    <BadgeCheck size={12} className="mr-1" /> Farmácia Verificada
+                  </Badge>
                 </div>
 
                 <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1.5 flex-wrap">
                   <span className="flex items-center gap-1">
-                    <MapPin size={12} className="text-primary" /> {vendor.city}, {vendor.state}
+                    <MapPin size={12} className="text-emerald-400" /> {vendor.city}, {vendor.state}
                   </span>
                   <span className="flex items-center gap-1 text-amber-400 font-bold">
                     <Star size={12} fill="currentColor" /> {vendor.rating.toFixed(1)} / 5.0
                   </span>
                   <span className="flex items-center gap-1 text-emerald-400 font-medium">
-                    <Truck size={12} /> Envio para todo o Brasil
+                    <Truck size={12} /> Envio Expresso & Refrigerado para todo o Brasil
                   </span>
                 </div>
               </div>
@@ -252,17 +287,17 @@ export default function FarmaciaVitrine() {
                 className="text-xs font-bold rounded-xl"
                 onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
-                  toast({ title: "Link copiado!", description: "Link da vitrine copiado para a área de transferência." });
+                  toast({ title: "Link copiado!", description: "Link da vitrine oficial copiado para a área de transferência." });
                 }}
               >
-                <Share2 size={14} className="mr-1.5" /> Compartilhar Loja
+                <Share2 size={14} className="mr-1.5" /> Compartilhar Vitrine
               </Button>
             </div>
           </div>
 
           {/* Descrição */}
           {vendor.store_description && (
-            <div className="px-6 pb-6 text-xs text-muted-foreground max-w-3xl leading-relaxed border-t border-border/40 pt-4">
+            <div className="px-6 pb-6 text-xs text-muted-foreground max-w-4xl leading-relaxed border-t border-border/40 pt-4">
               {vendor.store_description}
             </div>
           )}
@@ -271,9 +306,11 @@ export default function FarmaciaVitrine() {
         {/* Grid de Produtos */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <ShoppingBag size={18} className="text-primary" /> Catálogo da Farmácia ({products.length} produtos)
+            <ShoppingBag size={18} className="text-primary" /> Catálogo Farmacêutico Oficial ({products.length} medicamentos)
           </h2>
-          <span className="text-xs text-muted-foreground font-mono">Dispensação Autorizada ANVISA</span>
+          <span className="text-xs text-emerald-400 font-mono font-bold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+            Dispensação Sob Prescrição Médica
+          </span>
         </div>
 
         {products.length === 0 ? (
@@ -285,16 +322,18 @@ export default function FarmaciaVitrine() {
             </p>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
             {products.map((p) => {
-              const discount = p.compare_price ? Math.round(((p.compare_price - p.price) / p.compare_price) * 100) : 0;
+              const pPrice = Number(p.price || 0);
+              const pCompare = p.compare_price ? Number(p.compare_price) : 0;
+              const discount = pCompare > 0 ? Math.round(((pCompare - pPrice) / pCompare) * 100) : 0;
 
               return (
                 <motion.div
                   key={p.id}
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.2 }}
-                  className="bg-card border border-border rounded-2xl overflow-hidden hover:border-primary/40 transition-all flex flex-col justify-between shadow-lg"
+                  className="bg-card border border-border/60 rounded-2xl overflow-hidden hover:border-emerald-500/40 transition-all flex flex-col justify-between shadow-xl"
                 >
                   <div 
                     className="cursor-pointer group"
@@ -304,7 +343,7 @@ export default function FarmaciaVitrine() {
                     }}
                   >
                     {/* Imagem do Produto */}
-                    <div className="h-48 bg-muted/20 relative p-4 flex items-center justify-center overflow-hidden">
+                    <div className="h-56 bg-muted/20 relative p-4 flex items-center justify-center overflow-hidden">
                       <img
                         src={resolveProductImg(p.image_url)}
                         alt={p.name}
@@ -315,31 +354,31 @@ export default function FarmaciaVitrine() {
                           -{discount}% OFF
                         </Badge>
                       )}
-                      <Badge className="absolute top-2 right-2 bg-emerald-600/90 text-[9px] uppercase font-bold">
+                      <Badge className="absolute top-2 right-2 bg-emerald-600 text-white text-[9px] uppercase font-bold">
                         <Shield size={10} className="mr-1" /> ANVISA
                       </Badge>
                     </div>
 
                     {/* Detalhes */}
                     <div className="p-4">
-                      <p className="text-[10px] text-primary font-mono uppercase font-bold">{p.category}</p>
-                      <h3 className="font-bold text-sm text-foreground mt-1 line-clamp-2 min-h-[40px] group-hover:text-primary transition-colors">
+                      <p className="text-[10px] text-emerald-400 font-mono uppercase font-bold">{p.category}</p>
+                      <h3 className="font-bold text-sm text-foreground mt-1 line-clamp-2 min-h-[40px] group-hover:text-emerald-400 transition-colors">
                         {p.name}
                       </h3>
 
                       <div className="mt-3 flex items-baseline gap-2">
                         <span className="text-xl font-black text-foreground">
-                          R$ {p.price.toFixed(2).replace('.', ',')}
+                          R$ {pPrice.toFixed(2).replace('.', ',')}
                         </span>
-                        {p.compare_price && (
+                        {pCompare > 0 && (
                           <span className="text-xs text-muted-foreground line-through">
-                            R$ {p.compare_price.toFixed(2).replace('.', ',')}
+                            R$ {pCompare.toFixed(2).replace('.', ',')}
                           </span>
                         )}
                       </div>
 
                       <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
-                        <CheckCircle size={10} className="text-emerald-400" /> {p.stock > 0 ? `${p.stock} em estoque` : "Sob encomenda"}
+                        <CheckCircle size={10} className="text-emerald-400" /> {p.stock > 0 ? `${p.stock} unidades em estoque` : "Dispensação sob encomenda"}
                       </p>
                     </div>
                   </div>
@@ -364,7 +403,7 @@ export default function FarmaciaVitrine() {
             <DialogContent className="max-w-xl bg-card border-border rounded-2xl">
               <DialogHeader>
                 <div className="flex items-center gap-2 mb-1">
-                  <Badge className="bg-primary/20 text-primary uppercase text-[10px] font-bold">
+                  <Badge className="bg-emerald-500/20 text-emerald-400 uppercase text-[10px] font-bold">
                     {selectedProduct.category}
                   </Badge>
                   <Badge className="bg-emerald-600 text-white text-[10px] font-bold">
@@ -375,7 +414,7 @@ export default function FarmaciaVitrine() {
                   {selectedProduct.name}
                 </DialogTitle>
                 <DialogDescription className="text-xs text-muted-foreground">
-                  Vendido e entregue por <strong>{vendor.store_name}</strong>
+                  Dispensado e expedido por <strong>{vendor.store_name}</strong>
                 </DialogDescription>
               </DialogHeader>
 
@@ -415,7 +454,7 @@ export default function FarmaciaVitrine() {
                                 key={i}
                                 onClick={() => setActiveImageIndex(i)}
                                 className={`w-2 h-2 rounded-full transition-all ${
-                                  activeImageIndex === i ? "bg-primary w-5" : "bg-muted-foreground/40"
+                                  activeImageIndex === i ? "bg-emerald-500 w-5" : "bg-muted-foreground/40"
                                 }`}
                               />
                             ))}
@@ -431,11 +470,11 @@ export default function FarmaciaVitrine() {
                   <div>
                     <div className="flex items-baseline gap-2">
                       <span className="text-2xl font-black text-foreground">
-                        R$ {selectedProduct.price.toFixed(2).replace('.', ',')}
+                        R$ {Number(selectedProduct.price).toFixed(2).replace('.', ',')}
                       </span>
                       {selectedProduct.compare_price && (
                         <span className="text-sm text-muted-foreground line-through">
-                          R$ {selectedProduct.compare_price.toFixed(2).replace('.', ',')}
+                          R$ {Number(selectedProduct.compare_price).toFixed(2).replace('.', ',')}
                         </span>
                       )}
                     </div>
@@ -445,7 +484,7 @@ export default function FarmaciaVitrine() {
                   </div>
 
                   <div className="text-right">
-                    <Badge variant="outline" className="text-xs border-border">
+                    <Badge variant="outline" className="text-xs border-emerald-500/30 text-emerald-400">
                       📦 {selectedProduct.stock} unidades disponíveis
                     </Badge>
                   </div>
@@ -454,7 +493,7 @@ export default function FarmaciaVitrine() {
                 {/* Descrição */}
                 {selectedProduct.description && (
                   <div className="space-y-1">
-                    <h4 className="text-xs font-bold text-foreground">Descrição do Produto:</h4>
+                    <h4 className="text-xs font-bold text-foreground">Informações Clínicas & Posologia:</h4>
                     <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line bg-muted/20 p-3 rounded-xl border border-border">
                       {selectedProduct.description}
                     </p>

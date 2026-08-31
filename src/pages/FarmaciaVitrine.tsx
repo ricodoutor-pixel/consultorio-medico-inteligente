@@ -103,19 +103,19 @@ export default function FarmaciaVitrine() {
             .select('*')
             .eq('vendor_id', vData.id)
             .eq('is_active', true)
-            .order('created_at', { ascending: false })
-            .limit(10);
+            .order('created_at', { ascending: false });
 
-          if (pData && pData.length > 0) {
+          if (pData && pData.length >= 10) {
             setProducts(pData.map((p: any) => ({
               ...p,
               price: Number(p.price || 0),
               compare_price: p.compare_price ? Number(p.compare_price) : null
             })));
           } else {
+            // Garantir que todos os 10 medicamentos oficiais apareçam com suas 3 imagens cada
             setProducts(OFFICIAL_MEDICINES.map(m => ({
               id: m.id,
-              vendor_id: m.vendor_id,
+              vendor_id: vData.id,
               name: m.name,
               description: m.description,
               price: m.price,
@@ -133,7 +133,7 @@ export default function FarmaciaVitrine() {
         } else {
           setProducts(OFFICIAL_MEDICINES.map(m => ({
             id: m.id,
-            vendor_id: m.vendor_id,
+            vendor_id: "vendor-pyr-oficial",
             name: m.name,
             description: m.description,
             price: m.price,

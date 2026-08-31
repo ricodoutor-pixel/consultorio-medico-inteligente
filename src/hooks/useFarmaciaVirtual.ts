@@ -130,11 +130,11 @@ export function useFarmaciaVirtual() {
           .from('vendors')
           .insert({
             user_id: user.id,
-            store_name: "Farmácia Planta y Raíz (Oficial)",
+            store_name: "Planta y Raiz Ltda",
             store_description: "Farmácia de manipulação e dispensação de fitocanabinoides regulados ANVISA.",
             store_logo_url: "/dr-verdinho.png",
             balance: 14250.00,
-            total_sales: 38,
+            total_sales: 48,
             rating: 5.0,
             is_active: true
           })

@@ -33,6 +33,7 @@ import { FarmacogenomicaCard } from "@/components/FarmacogenomicaCard";
 import { TitulacaoTrackerCard } from "@/components/TitulacaoTrackerCard";
 import { Anvisa1ClickButton } from "@/components/Anvisa1ClickButton";
 import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
+import { MedicamentoSatelliteTracker } from "@/components/delivery/MedicamentoSatelliteTracker";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -48,7 +49,7 @@ const allBadges = [
 ];
 
 const DashboardPaciente = () => {
-  const [activeTab, setActiveTab] = useState<"overview" | "badges" | "prescriptions" | "triages" | "telemed" | "upgrade">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "badges" | "prescriptions" | "triages" | "telemed" | "upgrade" | "rastreamento">("overview");
   const [profile, setProfile] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -231,6 +232,7 @@ const DashboardPaciente = () => {
           <div className="flex gap-2 mb-6 flex-wrap">
             {([
               { key: "overview" as const, label: "Visão Geral", icon: Activity },
+              { key: "rastreamento" as const, label: "Rastreamento Satélite", icon: Truck },
               { key: "telemed" as const, label: "Telemed", icon: MessageCircle },
               { key: "prescriptions" as const, label: "Receitas", icon: FileText },
               { key: "triages" as const, label: "Triagens", icon: ClipboardList },
@@ -247,6 +249,18 @@ const DashboardPaciente = () => {
           <div className="mb-6">
             <AirQualityWidget />
           </div>
+
+          {/* RASTREAMENTO SATÉLITE ESTILO UBER (Dedicado) */}
+          {activeTab === "rastreamento" && (
+            <div className="space-y-4 mb-8">
+              <MedicamentoSatelliteTracker
+                patientName={profile?.full_name || "Paciente Planta y Raíz"}
+                initialDestinationAddress={profile?.address || "Av. Eng. Luís Carlos Berrini, 1200 - Brooklin, São Paulo - SP"}
+                medicineName="Epidiolex / Canabidiol 100 mg/mL"
+                orderId="PYR-SAT-984210-BR"
+              />
+            </div>
+          )}
 
           {/* Stats */}
 
@@ -308,6 +322,14 @@ const DashboardPaciente = () => {
                   </Card>
                 )}
                 
+                {/* Rastreamento Satélite Estilo Uber */}
+                <MedicamentoSatelliteTracker
+                  patientName={profile?.full_name || "Paciente Planta y Raíz"}
+                  initialDestinationAddress={profile?.address || "Av. Eng. Luís Carlos Berrini, 1200 - Brooklin, São Paulo - SP"}
+                  medicineName="Epidiolex / Canabidiol 100 mg/mL"
+                  orderId="PYR-SAT-984210-BR"
+                />
+
                 {/* Integração IoT & Biometria Clínica */}
                 <IoTBiometricTracker />
 

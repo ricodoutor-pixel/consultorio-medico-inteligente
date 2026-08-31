@@ -7,12 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, BellRing, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, FileText, ClipboardList, RefreshCw, MessageCircle, ArrowUpRight, BookOpen } from "lucide-react";
+import { Stethoscope, ShoppingBag, Star, Trophy, Gift, ArrowRight, Calendar, Clock, CheckCircle2, Bell, BellRing, User, Heart, Activity, TrendingUp, Flame, Target, Award, Zap, Crown, Shield, Sparkles, Timer, LogOut, Pill, Watch, Leaf, FileText, ClipboardList, RefreshCw, MessageCircle, ArrowUpRight, BookOpen, Truck, FileCheck } from "lucide-react";
 import { PlanUpgradeCard } from "@/components/patient/PlanUpgradeCard";
 import { ProfileAvatarCard } from "@/components/patient/ProfileAvatarCard";
 import { VipUpgradePopup } from "@/components/VipUpgradePopup";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WellnessSubscriptionCards } from "@/components/WellnessSubscriptionCards";
@@ -35,6 +35,7 @@ import { Anvisa1ClickButton } from "@/components/Anvisa1ClickButton";
 import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
 import { MedicamentoSatelliteTracker } from "@/components/delivery/MedicamentoSatelliteTracker";
 import { RastreioPedidoModal } from "@/components/delivery/RastreioPedidoModal";
+import { PatientInvoicesList } from "@/components/patient/PatientInvoicesList";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
@@ -50,7 +51,11 @@ const allBadges = [
 ];
 
 const DashboardPaciente = () => {
-  const [activeTab, setActiveTab] = useState<"overview" | "badges" | "prescriptions" | "triages" | "telemed" | "upgrade" | "rastreamento">("overview");
+  const [searchParams] = useSearchParams();
+  const initialTab = (searchParams.get("tab") || "overview") as any;
+  const [activeTab, setActiveTab] = useState<"overview" | "invoices" | "badges" | "prescriptions" | "triages" | "telemed" | "upgrade" | "rastreamento">(
+    ["overview", "invoices", "badges", "prescriptions", "triages", "telemed", "upgrade", "rastreamento"].includes(initialTab) ? initialTab : "overview"
+  );
   const [isRastreioOpen, setIsRastreioOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -66,6 +71,13 @@ const DashboardPaciente = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const recommendedPros = professionals.filter(p => p.category === "Médicos Prescritores").slice(0, 3);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && ["overview", "invoices", "badges", "prescriptions", "triages", "telemed", "upgrade", "rastreamento"].includes(tab)) {
+      setActiveTab(tab as any);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetchData();
@@ -241,6 +253,7 @@ const DashboardPaciente = () => {
           <div className="flex gap-2 mb-6 flex-wrap">
             {([
               { key: "overview" as const, label: "Visão Geral", icon: Activity },
+              { key: "invoices" as const, label: "Notas & Recibos IRPF", icon: FileCheck },
               { key: "rastreamento" as const, label: "Rastreamento Satélite", icon: Truck },
               { key: "telemed" as const, label: "Telemed", icon: MessageCircle },
               { key: "prescriptions" as const, label: "Receitas", icon: FileText },
@@ -258,6 +271,17 @@ const DashboardPaciente = () => {
           <div className="mb-6">
             <AirQualityWidget />
           </div>
+
+          {/* NOTAS FISCAIS & RECIBOS IRPF (Dedicado) */}
+          {activeTab === "invoices" && (
+            <div className="mb-8">
+              <PatientInvoicesList 
+                userId={profile?.id} 
+                patientName={profile?.full_name} 
+                patientCpf={profile?.cpf} 
+              />
+            </div>
+          )}
 
           {/* RASTREAMENTO SATÉLITE ESTILO UBER (Dedicado) */}
           {activeTab === "rastreamento" && (

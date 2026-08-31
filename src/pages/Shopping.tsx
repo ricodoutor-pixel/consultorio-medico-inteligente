@@ -424,6 +424,8 @@ const Shopping = () => {
   const [btcModal, setBtcModal] = useState({ open: false, planName: "", planId: "", amount: "" });
   const [rxModal, setRxModal] = useState<{ open: boolean; productName: string; pendingProduct: VendorProduct | null }>({ open: false, productName: "", pendingProduct: null });
 
+  const { toggle: toggleFav, isFav } = useFavorites();
+
   const [verifiedVendors, setVerifiedVendors] = useState<any[]>([]);
 
   useEffect(() => {

@@ -1,43 +1,88 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, User, Stethoscope, Store, CheckCircle, ArrowRight, ShieldCheck, Video, Settings, ClipboardList, Wallet, Sprout, ShoppingBag, Lock, Smartphone, Pill, HeartPulse } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { 
+  BookOpen, 
+  User, 
+  Stethoscope, 
+  Store, 
+  CheckCircle, 
+  ArrowRight, 
+  ShieldCheck, 
+  Video, 
+  Settings, 
+  ClipboardList, 
+  Wallet, 
+  Sprout, 
+  ShoppingBag, 
+  Lock, 
+  Smartphone, 
+  Pill, 
+  HeartPulse,
+  Truck,
+  Sparkles,
+  Navigation,
+  FileText
+} from "lucide-react";
 import { motion } from "framer-motion";
 
-const ComicPanel = ({ children, className = "", type = "default" }: { children: React.ReactNode, className?: string, type?: "default" | "primary" | "purple" }) => {
-  const borderClass = type === "primary" ? "comic-panel-primary" : type === "purple" ? "comic-panel-purple" : "comic-panel";
+const ComicPanel = ({ children, className = "", color = "emerald" }: { children: React.ReactNode, className?: string, color?: "emerald" | "sky" | "purple" | "amber" }) => {
+  const borderMap = {
+    emerald: "border-emerald-500/60 shadow-[0_0_20px_rgba(16,185,129,0.15)]",
+    sky: "border-sky-500/60 shadow-[0_0_20px_rgba(56,189,248,0.15)]",
+    purple: "border-purple-500/60 shadow-[0_0_20px_rgba(192,132,252,0.15)]",
+    amber: "border-amber-500/60 shadow-[0_0_20px_rgba(251,191,36,0.15)]"
+  };
+
   return (
-    <div className={`p-6 ${borderClass} bg-card ${className}`}>
+    <div className={`p-6 bg-slate-900/95 backdrop-blur-md border-2 ${borderMap[color]} rounded-3xl transition-all duration-300 hover:scale-[1.01] ${className}`}>
       {children}
     </div>
   );
 };
 
-const NarrationBox = ({ text, className = "" }: { text: string, className?: string }) => (
-  <div className={`narration-box text-foreground bg-yellow-300 ${className}`}>
-    {text}
-  </div>
-);
+const NarrationBox = ({ text, color = "amber" }: { text: string, color?: "amber" | "emerald" | "sky" | "purple" }) => {
+  const colorMap = {
+    amber: "bg-amber-400 text-slate-950 border-amber-300",
+    emerald: "bg-emerald-500 text-slate-950 border-emerald-300",
+    sky: "bg-sky-400 text-slate-950 border-sky-300",
+    purple: "bg-purple-500 text-white border-purple-300"
+  };
 
-const SpeechBubble = ({ children, direction = "left", className = "" }: { children: React.ReactNode, direction?: "left" | "right" | "top", className?: string }) => {
-  const dirClass = direction === "left" ? "" : direction === "right" ? "speech-bubble-right" : "speech-bubble-top";
   return (
-    <div className={`speech-bubble ${dirClass} ${className}`}>
+    <div className={`p-2.5 px-4 text-xs md:text-sm font-black uppercase tracking-wider mb-4 rounded-xl border-2 shadow-md inline-block ${colorMap[color]}`}>
+      {text}
+    </div>
+  );
+};
+
+const SpeechBubble = ({ children, color = "emerald" }: { children: React.ReactNode, color?: "emerald" | "sky" | "purple" | "amber" }) => {
+  const borderMap = {
+    emerald: "border-emerald-500/50 text-emerald-300",
+    sky: "border-sky-500/50 text-sky-300",
+    purple: "border-purple-500/50 text-purple-300",
+    amber: "border-amber-500/50 text-amber-300"
+  };
+
+  return (
+    <div className={`relative bg-slate-800/95 border-2 ${borderMap[color]} rounded-2xl p-4 font-bold text-sm shadow-xl`}>
       {children}
     </div>
   );
 };
 
-const ManualPlataforma = () => {
+export default function ManualPlataforma() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab = searchParams.get("tab") || "paciente";
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const initialTab = searchParams.get("tab") || "farmacia";
+  const [activeTab, setActiveTab] = useState(initialTab === "lojista" ? "farmacia" : initialTab);
 
   useEffect(() => {
-    if (searchParams.get("tab")) {
-      setActiveTab(searchParams.get("tab") as string);
+    const tabParam = searchParams.get("tab");
+    if (tabParam) {
+      setActiveTab(tabParam === "lojista" ? "farmacia" : tabParam);
     }
   }, [searchParams]);
 
@@ -47,291 +92,301 @@ const ManualPlataforma = () => {
   };
 
   return (
-    <div className="min-h-dvh bg-background halftone-bg">
+    <div className="min-h-dvh bg-background text-foreground flex flex-col">
       <Navbar />
       
-      <div className="container max-w-6xl mx-auto pt-28 pb-20 px-4">
+      <main className="flex-1 container max-w-6xl mx-auto pt-28 pb-20 px-4">
         
-        {/* CABEÇALHO ESTILO HQ */}
+        {/* CABEÇALHO VIBRANTE */}
         <div className="text-center mb-10">
           <div className="inline-block relative">
-            <h1 className="text-4xl md:text-6xl comic-font comic-pop text-foreground mb-4 relative z-10 transform -rotate-2">
-              GUIA DE SOBREVIVÊNCIA
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-display font-black text-white mb-2 tracking-tight">
+              GUIA PASSO A PASSO
             </h1>
-            <div className="absolute -bottom-4 right-0 transform rotate-6 bg-primary text-primary-foreground font-black px-4 py-1 border-2 border-foreground shadow-[4px_4px_0px_#000] z-20">
-              PLANTA Y RAÍZ
+            <div className="bg-emerald-600 text-white font-black px-4 py-1.5 rounded-xl border border-emerald-400/40 shadow-lg inline-block text-xs sm:text-sm uppercase tracking-widest">
+              🌿 Plataforma Oficial Planta y Raíz
             </div>
           </div>
-          <p className="mt-8 text-xl font-bold bg-background/80 inline-block px-4 py-2 border-2 border-foreground rounded-lg">
-            Como dominar a plataforma passo a passo!
+          <p className="mt-4 text-sm sm:text-base font-bold text-emerald-400 max-w-2xl mx-auto">
+            Aprenda como dominar todas as ferramentas da plataforma com alta nitidez e instruções detalhadas!
           </p>
         </div>
 
-        {/* TABS (SELEÇÃO DE PERSONAGEM) */}
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-8">
-          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-12 bg-background border-4 border-foreground rounded-xl shadow-[6px_6px_0px_#000] h-auto p-1">
-            <TabsTrigger value="paciente" className="font-bold py-3 data-[state=active]:bg-foreground data-[state=active]:text-background rounded-lg border-2 border-transparent data-[state=active]:border-foreground transition-all">
-              <User size={20} className="mr-2" /> PACIENTE
+        {/* TABS (SELEÇÃO DE PERFIL COM CORES VIVAS) */}
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-6">
+          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-10 bg-slate-900/90 border-2 border-emerald-500/40 rounded-2xl h-auto p-1.5 shadow-xl">
+            <TabsTrigger 
+              value="farmacia" 
+              className="font-bold py-3 text-xs sm:text-sm rounded-xl text-amber-300 data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 transition-all"
+            >
+              <Store size={18} className="mr-1.5 inline" /> FARMÁCIA
             </TabsTrigger>
-            <TabsTrigger value="medico" className="font-bold py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg border-2 border-transparent data-[state=active]:border-foreground transition-all">
-              <Stethoscope size={20} className="mr-2" /> MÉDICO
+            
+            <TabsTrigger 
+              value="paciente" 
+              className="font-bold py-3 text-xs sm:text-sm rounded-xl text-emerald-300 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all"
+            >
+              <User size={18} className="mr-1.5 inline" /> PACIENTE
             </TabsTrigger>
-            <TabsTrigger value="lojista" className="font-bold py-3 data-[state=active]:bg-purple-600 data-[state=active]:text-white rounded-lg border-2 border-transparent data-[state=active]:border-foreground transition-all">
-              <Store size={20} className="mr-2" /> LOJISTA
+            
+            <TabsTrigger 
+              value="medico" 
+              className="font-bold py-3 text-xs sm:text-sm rounded-xl text-sky-300 data-[state=active]:bg-sky-600 data-[state=active]:text-white transition-all"
+            >
+              <Stethoscope size={18} className="mr-1.5 inline" /> MÉDICO
             </TabsTrigger>
           </TabsList>
 
-          {/* TAB: PACIENTE */}
-          <TabsContent value="paciente" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* ============================================================ */}
+          {/* TAB: FARMÁCIA / LOJISTA */}
+          {/* ============================================================ */}
+          <TabsContent value="farmacia" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              <ComicPanel>
-                <NarrationBox text="EPISÓDIO 1: O INÍCIO DA JORNADA" className="bg-blue-300" />
-                <div className="flex gap-4">
-                  <div className="w-16 h-16 shrink-0 bg-blue-100 rounded-full border-2 border-foreground flex items-center justify-center">
-                    <User size={32} className="text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <SpeechBubble direction="left" className="bg-blue-50 text-foreground">
-                      "Estou com dores e ansiedade... como encontro o tratamento certo com Cannabis?"
-                    </SpeechBubble>
-                  </div>
-                </div>
-                <div className="mt-6 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-full bg-foreground text-background font-black flex items-center justify-center shrink-0">1</span>
-                    <p className="font-bold">Acesse a aba <strong>Profissionais</strong> no menu principal.</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-full bg-foreground text-background font-black flex items-center justify-center shrink-0">2</span>
-                    <p className="font-bold">Filtre médicos por especialidade (ex: Psiquiatria, Dor Crônica).</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-full bg-foreground text-background font-black flex items-center justify-center shrink-0">3</span>
-                    <p className="font-bold">Escolha entre "Orientação Rápida (Chat)" ou "Consulta (Vídeo)" e faça o pagamento seguro.</p>
-                  </div>
-                </div>
-              </ComicPanel>
-
-              <ComicPanel type="primary">
-                <NarrationBox text="EPISÓDIO 2: A SALA DE ESPERA" className="bg-primary text-primary-foreground" />
-                <div className="flex flex-col h-full">
-                  <div className="flex justify-end gap-4 mb-4">
-                    <div className="flex-1">
-                      <SpeechBubble direction="right" className="bg-green-50 text-foreground">
-                        "Encontrei um médico! O que eu faço agora?"
-                      </SpeechBubble>
-                    </div>
-                    <div className="w-16 h-16 shrink-0 bg-green-100 rounded-full border-2 border-foreground flex items-center justify-center">
-                      <User size={32} className="text-green-600" />
-                    </div>
-                  </div>
-                  <div className="mt-4 p-4 border-2 border-foreground rounded-xl bg-card border-dashed">
-                    <h4 className="font-black comic-font mb-2 flex items-center gap-2"><Lock className="text-primary"/> AMBIENTE SEGURO</h4>
-                    <p className="font-medium text-sm mb-2">
-                      Após o pagamento, o sistema te leva direto para o <strong>Consultório Virtual</strong>.
-                    </p>
-                    <ul className="space-y-2 text-sm font-bold">
-                      <li>• A IA (Enfermeira Brisa) fará uma triagem inicial.</li>
-                      <li>• Aguarde o médico ficar ONLINE e liberar o acesso.</li>
-                      <li>• Você receberá um aviso sonoro quando for sua vez!</li>
-                    </ul>
-                  </div>
-                </div>
-              </ComicPanel>
-
-              <ComicPanel className="md:col-span-2">
-                <NarrationBox text="EPISÓDIO FINAL: PRESCRIÇÃO E COMPRA" className="bg-yellow-300" />
-                <div className="flex flex-col md:flex-row gap-8 items-center">
-                  <div className="w-full md:w-1/3">
-                    <div className="relative">
-                      <img src="https://images.unsplash.com/photo-1576091160550-2173ff9e8eb4?auto=format&fit=crop&q=80&w=400&h=300" alt="Médico" className="rounded-xl border-4 border-foreground grayscale hover:grayscale-0 transition-all duration-300 object-cover" />
-                      <SpeechBubble direction="top" className="absolute -top-12 left-4 text-xs font-bold w-48 bg-white">
-                        "Aqui está sua prescrição médica validada, em PDF!"
-                      </SpeechBubble>
-                    </div>
-                  </div>
-                  <div className="w-full md:w-2/3 space-y-4">
-                    <h3 className="font-black text-2xl comic-font">A MÁGICA ACONTECE AQUI!</h3>
-                    <p className="text-lg font-bold">
-                      O médico encerrará a chamada e gerará sua receita digital. Imediatamente:
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="p-4 border-2 border-foreground rounded-lg bg-orange-50">
-                        <Wallet size={24} className="mb-2 text-orange-600" />
-                        <h4 className="font-black uppercase mb-1">Dispensário Liberado</h4>
-                        <p className="text-sm font-medium">As portas do shopping se abrem. Antes disso, tudo era bloqueado!</p>
-                      </div>
-                      <div className="p-4 border-2 border-foreground rounded-lg bg-purple-50">
-                        <ShoppingBag size={24} className="mb-2 text-purple-600" />
-                        <h4 className="font-black uppercase mb-1">Compra Direta</h4>
-                        <p className="text-sm font-medium">Você verá apenas os produtos liberados pela sua receita. Compre sem sair do app!</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </ComicPanel>
-
-            </div>
-          </TabsContent>
-
-          {/* TAB: MÉDICO */}
-          <TabsContent value="medico" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              
-              <ComicPanel type="primary">
-                <NarrationBox text="PARTE 1: O COMANDO CENTRAL" className="bg-primary text-primary-foreground" />
-                <div className="flex gap-4 mb-6">
-                  <div className="w-16 h-16 shrink-0 bg-primary/20 rounded-full border-2 border-foreground flex items-center justify-center">
-                    <Stethoscope size={32} className="text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <SpeechBubble direction="left" className="bg-green-50 text-foreground">
-                      "Doutor(a), sua fila de pacientes aguarda no Consultório Virtual!"
-                    </SpeechBubble>
-                  </div>
-                </div>
-                <div className="space-y-3 font-bold text-sm">
-                  <p>1. Vá ao seu <strong>Dashboard Médico</strong>.</p>
-                  <p>2. Clique em <strong>"Consultório Virtual"</strong>.</p>
-                  <p>3. Você não verá outros médicos. Apenas a sua <span className="bg-yellow-200 px-1 border border-black">FILA PRIVADA</span>.</p>
-                  <p>4. Pacientes "Aguardando Pagamento" ainda estão finalizando o checkout.</p>
-                  <p>5. Clique em "Pronto para Atendimento" para abrir a sala do paciente.</p>
-                </div>
-              </ComicPanel>
-
-              <ComicPanel>
-                <NarrationBox text="PARTE 2: SUPER PODERES CLÍNICOS" className="bg-blue-300" />
-                <h3 className="font-black comic-font text-xl mb-4 text-center">O CLIPE DE PAPEL MÁGICO 📎</h3>
-                <p className="font-bold mb-4">Dentro da sala de chat do paciente, o ícone de anexo (clipe) abre seu arsenal:</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="border-2 border-foreground p-2 rounded bg-card flex flex-col items-center text-center">
-                    <Video className="mb-1 text-red-500" />
-                    <span className="text-xs font-black uppercase">Vídeo Seguro</span>
-                  </div>
-                  <div className="border-2 border-foreground p-2 rounded bg-card flex flex-col items-center text-center">
-                    <HeartPulse className="mb-1 text-pink-500" />
-                    <span className="text-xs font-black uppercase">Exame Cardíaco</span>
-                  </div>
-                  <div className="border-2 border-foreground p-2 rounded bg-card flex flex-col items-center text-center">
-                    <ShieldCheck className="mb-1 text-blue-500" />
-                    <span className="text-xs font-black uppercase">Verificador CYP450</span>
-                  </div>
-                  <div className="border-2 border-foreground p-2 rounded bg-card flex flex-col items-center text-center">
-                    <ClipboardList className="mb-1 text-green-500" />
-                    <span className="text-xs font-black uppercase">Prontuário Rápido</span>
-                  </div>
-                </div>
-              </ComicPanel>
-
-              <ComicPanel className="md:col-span-2">
-                <NarrationBox text="PARTE 3: PRESCRIÇÃO E ENCERRAMENTO" className="bg-red-400 text-white" />
-                <div className="flex flex-col md:flex-row gap-6">
-                  <div className="flex-1 space-y-4">
-                    <h3 className="font-black comic-font text-2xl">O COPILOTO DE RECEITAS</h3>
-                    <p className="font-bold">
-                      Esquecer dosagens? Nunca mais! Nosso copiloto permite que você ajuste a <span className="bg-yellow-300 border border-black px-1">Calculadora de Rampa de Dose</span> (gotas, concentração, dias de aumento). 
-                      O sistema redige o texto legal automaticamente.
-                    </p>
-                    <p className="font-bold">
-                      Um PDF com assinatura digital (padrão CFM) é enviado ao paciente no chat.
-                    </p>
-                  </div>
-                  <div className="flex-1 border-4 border-foreground p-4 bg-muted rounded-xl transform rotate-1 hover:rotate-0 transition-all">
-                    <h3 className="font-black comic-font text-xl mb-2 text-destructive flex items-center gap-2">
-                      <Lock size={20} /> FINALIZAR & BLOQUEAR
-                    </h3>
-                    <p className="font-bold text-sm">
-                      Para evitar mensagens intermináveis fora de hora, clique na seta superior direita e escolha <strong>"Finalizar & Bloquear"</strong>. 
-                      Isso encerra a sessão clínica. O paciente precisará agendar um novo retorno para reabrir o chat!
-                    </p>
-                  </div>
-                </div>
-              </ComicPanel>
-
-            </div>
-          </TabsContent>
-
-          {/* TAB: LOJISTA */}
-          <TabsContent value="lojista" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              
-              <ComicPanel type="purple">
-                <NarrationBox text="CAPÍTULO 1: ENTRANDO NO DISPENSÁRIO" className="bg-purple-600 text-white" />
+              {/* Painel 1: Dispensário & RDC 660 */}
+              <ComicPanel color="amber">
+                <NarrationBox text="CAPÍTULO 1: DISPENSÁRIO & CATÁLOGO REGULAMENTADO" color="amber" />
                 <div className="flex gap-4 mb-4">
-                  <div className="w-16 h-16 shrink-0 bg-purple-100 rounded-full border-2 border-foreground flex items-center justify-center">
-                    <Store size={32} className="text-purple-600" />
+                  <div className="w-14 h-14 shrink-0 bg-amber-500/20 rounded-2xl border-2 border-amber-400/50 flex items-center justify-center">
+                    <Store size={28} className="text-amber-400" />
                   </div>
                   <div className="flex-1">
-                    <SpeechBubble direction="left" className="bg-purple-50 text-foreground">
-                      "Meus produtos estão cadastrados. Por que não consigo vê-los online livremente?"
+                    <SpeechBubble color="amber">
+                      "Como funciona a exibição dos medicamentos e preços na nossa farmácia?"
                     </SpeechBubble>
                   </div>
                 </div>
-                <div className="bg-yellow-100 border-2 border-foreground p-4 rounded-xl">
-                  <h4 className="font-black comic-font text-lg mb-2">A LEI DA RDC-660 (ANVISA)</h4>
-                  <p className="font-bold text-sm">
-                    A Planta y Raíz possui um "Gated Community" (Comunidade Fechada). Pessoas não autorizadas não veem preços nem estoques.
-                    Seu catálogo só é destravado e exibido quando um paciente obtém uma <strong>Prescrição Médica Ativa</strong> validada na plataforma.
+
+                <div className="bg-slate-950/90 border-2 border-amber-500/50 p-4 rounded-2xl space-y-2 mt-4">
+                  <h4 className="font-black text-amber-400 text-base flex items-center gap-1.5">
+                    <ShieldCheck size={18} className="text-amber-400" /> REGULAMENTAÇÃO ANVISA (RDC 660 / RDC 327)
+                  </h4>
+                  <p className="font-bold text-white text-xs sm:text-sm leading-relaxed">
+                    A Planta y Raíz opera em conformidade estrita com as normas da ANVISA. O catálogo de medicamentos fitoderivados é liberado de forma personalizada e segura assim que o paciente possui uma <strong className="text-amber-300">Prescrição Médica Válida</strong> emitida pelos médicos credenciados.
                   </p>
                 </div>
               </ComicPanel>
 
-              <ComicPanel>
-                <NarrationBox text="CAPÍTULO 2: INTELIGÊNCIA B2B" className="bg-blue-300" />
-                <h3 className="font-black comic-font text-xl text-center mb-4">A BOLA DE CRISTAL DAS VENDAS 🔮</h3>
-                <p className="font-bold mb-4">
-                  Seu Dashboard Lojista é uma máquina de previsões. Acesse a aba <strong>Demanda Preditiva</strong>.
-                </p>
-                <ul className="space-y-3 font-bold text-sm">
-                  <li className="flex items-start gap-2">
-                    <ArrowRight className="text-purple-600 shrink-0 mt-0.5" size={18} />
-                    O sistema escaneia quais cepas ou dosagens os médicos mais estão prescrevendo nesta semana.
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <ArrowRight className="text-purple-600 shrink-0 mt-0.5" size={18} />
-                    Ele gera gráficos que te avisam: <em>"A demanda por Óleo de CBD Isolate 1500mg vai disparar!"</em>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <ArrowRight className="text-purple-600 shrink-0 mt-0.5" size={18} />
-                    Você reabastece seu estoque <strong>antes</strong> do paciente tentar comprar.
-                  </li>
-                </ul>
-              </ComicPanel>
-
-              <ComicPanel className="md:col-span-2">
-                <NarrationBox text="CAPÍTULO FINAL: CONVERSÃO & LOGÍSTICA" className="bg-green-400" />
-                <div className="flex flex-col md:flex-row items-center gap-8">
-                  <div className="w-full md:w-1/2">
-                    <h3 className="font-black comic-font text-2xl uppercase mb-3">Do Consultório à sua Porta</h3>
-                    <p className="font-bold mb-4">
-                      Na aba <strong>Pedidos B2B</strong> do seu painel, caem as vendas garantidas. O processo flui organicamente:
-                    </p>
-                    <div className="flex items-center justify-between bg-card border-4 border-foreground p-3 rounded-full font-black text-xs md:text-sm shadow-[4px_4px_0px_#000]">
-                      <span>Receita</span>
-                      <ArrowRight size={16} />
-                      <span>Carrinho</span>
-                      <ArrowRight size={16} />
-                      <span className="text-primary">Faturamento</span>
-                    </div>
+              {/* Painel 2: Rastreamento Satélite & Entregadores */}
+              <ComicPanel color="emerald">
+                <NarrationBox text="CAPÍTULO 2: LOGÍSTICA & RASTREAMENTO SATÉLITE" color="emerald" />
+                <div className="flex gap-4 mb-4">
+                  <div className="w-14 h-14 shrink-0 bg-emerald-500/20 rounded-2xl border-2 border-emerald-400/50 flex items-center justify-center">
+                    <Truck size={28} className="text-emerald-400" />
                   </div>
-                  <div className="w-full md:w-1/2 p-6 bg-card border-4 border-dashed border-purple-600 rounded-xl text-center">
-                    <Store size={48} className="mx-auto text-purple-600 mb-3" />
-                    <h4 className="font-black text-lg uppercase mb-2">Suporte Integrado</h4>
-                    <p className="font-bold text-sm">
-                      Dúvidas sobre o pedido? O paciente tem um chat direto com você pós-compra, focado apenas em rastreio e logística.
-                    </p>
+                  <div className="flex-1">
+                    <SpeechBubble color="emerald">
+                      "Como acompanhar e despachar o medicamento com mapa estilo Uber?"
+                    </SpeechBubble>
                   </div>
                 </div>
+
+                <div className="bg-slate-950/90 border-2 border-emerald-500/50 p-4 rounded-2xl space-y-3">
+                  <h4 className="font-black text-emerald-400 text-base flex items-center gap-1.5">
+                    <Navigation size={18} className="text-emerald-400" /> CENTRAL DE ENTREGAS AO VIVO
+                  </h4>
+                  <ul className="space-y-2 text-xs sm:text-sm font-bold text-white">
+                    <li className="flex items-start gap-2">
+                      <ArrowRight className="text-emerald-400 shrink-0 mt-0.5" size={16} />
+                      Clique no botão <strong className="text-emerald-300">"🚚 Rastreio de Pedido & Entregas"</strong> ao lado do nome da sua farmácia.
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ArrowRight className="text-emerald-400 shrink-0 mt-0.5" size={16} />
+                      Cadastre seus entregadores (nome, WhatsApp, furgão/moto e placa).
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ArrowRight className="text-emerald-400 shrink-0 mt-0.5" size={16} />
+                      Gere a rota automática pelo CEP do paciente com telemetria térmica (<strong className="text-sky-300">4.2°C Cadeia de Frio</strong>).
+                    </li>
+                  </ul>
+                </div>
+              </ComicPanel>
+
+              {/* Painel 3: Faturamento & Repasse 95% */}
+              <ComicPanel color="purple" className="md:col-span-2">
+                <NarrationBox text="CAPÍTULO 3: FINANCEIRO, REPASSE LÍQUIDO & SAQUE PIX" color="purple" />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                  <div className="bg-slate-950/90 border-2 border-emerald-500/50 p-4 rounded-2xl text-center space-y-1">
+                    <span className="text-2xl font-black text-emerald-400">95%</span>
+                    <p className="text-xs font-black uppercase text-white">Repasse Líquido</p>
+                    <p className="text-[11px] text-emerald-200 font-bold">Faturamento direto da farmácia</p>
+                  </div>
+
+                  <div className="bg-slate-950/90 border-2 border-purple-500/50 p-4 rounded-2xl text-center space-y-1">
+                    <span className="text-2xl font-black text-purple-400">⚡ PIX</span>
+                    <p className="text-xs font-black uppercase text-white">Saque Instantâneo</p>
+                    <p className="text-[11px] text-purple-200 font-bold">Disponível em 1 clique no painel</p>
+                  </div>
+
+                  <div className="bg-slate-950/90 border-2 border-amber-500/50 p-4 rounded-2xl text-center space-y-1">
+                    <span className="text-2xl font-black text-amber-400">5%</span>
+                    <p className="text-xs font-black uppercase text-white">Taxa da Plataforma</p>
+                    <p className="text-[11px] text-amber-200 font-bold">Infraestrutura, IA & Compliance</p>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-center">
+                  <Button 
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl px-6 h-11 shadow-lg shadow-emerald-950/30 text-xs sm:text-sm"
+                    asChild
+                  >
+                    <Link to="/lojistas">
+                      <Store className="mr-2" size={16} /> Acessar Meu Painel da Farmácia Agora
+                    </Link>
+                  </Button>
+                </div>
+              </ComicPanel>
+
+            </div>
+          </TabsContent>
+
+          {/* ============================================================ */}
+          {/* TAB: PACIENTE */}
+          {/* ============================================================ */}
+          <TabsContent value="paciente" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <ComicPanel color="emerald">
+                <NarrationBox text="ETAPA 1: ESCOLHENDO SEU MÉDICO" color="emerald" />
+                <div className="flex gap-4 mb-4">
+                  <div className="w-14 h-14 shrink-0 bg-emerald-500/20 rounded-2xl border-2 border-emerald-400/50 flex items-center justify-center">
+                    <User size={28} className="text-emerald-400" />
+                  </div>
+                  <div className="flex-1">
+                    <SpeechBubble color="emerald">
+                      "Como encontro o médico especialista e agendo meu atendimento?"
+                    </SpeechBubble>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 text-xs sm:text-sm font-bold text-white bg-slate-950/90 p-4 rounded-2xl border border-border/60">
+                  <p className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">1</span>
+                    Acesse a aba <strong>Profissionais</strong> no menu principal.
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">2</span>
+                    Filtre os médicos por especialidade (ex: Neurologia, Dor Crônica, Psiquiatria).
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0">3</span>
+                    Escolha entre <strong>"Orientação Rápida (Chat)"</strong> ou <strong>"Teleconsulta (Vídeo)"</strong>.
+                  </p>
+                </div>
+              </ComicPanel>
+
+              <ComicPanel color="sky">
+                <NarrationBox text="ETAPA 2: CONSULTÓRIO VIRTUAL & RECEITA" color="sky" />
+                <div className="flex gap-4 mb-4">
+                  <div className="w-14 h-14 shrink-0 bg-sky-500/20 rounded-2xl border-2 border-sky-400/50 flex items-center justify-center">
+                    <Video size={28} className="text-sky-400" />
+                  </div>
+                  <div className="flex-1">
+                    <SpeechBubble color="sky">
+                      "Como funciona a teleconsulta e onde fica guardada minha receita?"
+                    </SpeechBubble>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 text-xs sm:text-sm font-bold text-white bg-slate-950/90 p-4 rounded-2xl border border-border/60">
+                  <p>• O atendimento ocorre em sala criptografada em conformidade com o CFM.</p>
+                  <p>• Sua receita digital com assinatura ICP-Brasil fica disponível no seu <strong className="text-sky-300">Prontuário Eletrônico</strong>.</p>
+                  <p>• O catálogo de medicamentos da Farmácia Planta y Raíz é destravado automaticamente para sua compra.</p>
+                </div>
+              </ComicPanel>
+
+              <ComicPanel color="amber" className="md:col-span-2">
+                <NarrationBox text="ETAPA 3: RASTREAMENTO DO MEDICAMENTO ATÉ SUA CASA" color="amber" />
+                <div className="flex flex-col md:flex-row gap-6 items-center">
+                  <div className="flex-1 space-y-3">
+                    <h3 className="text-lg font-black text-amber-400 flex items-center gap-2">
+                      <Truck size={20} className="text-amber-400" /> ACOMPANHE O ENTREGADOR AO VIVO (ESTILO UBER)
+                    </h3>
+                    <p className="text-xs sm:text-sm font-bold text-white leading-relaxed">
+                      Ao comprar seu medicamento, você pode clicar no botão <strong className="text-emerald-400">"🚚 Rastreio de Pedido"</strong> no seu Dashboard ou Prontuário para ver o carro em movimento contínuo no mapa, estimativa de tempo e temperatura da carga!
+                    </p>
+                  </div>
+                  <Button 
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl px-6 h-11 text-xs sm:text-sm shadow-lg shadow-emerald-950/30"
+                    asChild
+                  >
+                    <Link to="/dashboard-paciente">
+                      <User className="mr-2" size={16} /> Acessar Meu Dashboard de Paciente
+                    </Link>
+                  </Button>
+                </div>
+              </ComicPanel>
+
+            </div>
+          </TabsContent>
+
+          {/* ============================================================ */}
+          {/* TAB: MÉDICO */}
+          {/* ============================================================ */}
+          <TabsContent value="medico" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <ComicPanel color="sky">
+                <NarrationBox text="PARTE 1: O CONSULTÓRIO VIRTUAL" color="sky" />
+                <div className="flex gap-4 mb-4">
+                  <div className="w-14 h-14 shrink-0 bg-sky-500/20 rounded-2xl border-2 border-sky-400/50 flex items-center justify-center">
+                    <Stethoscope size={28} className="text-sky-400" />
+                  </div>
+                  <div className="flex-1">
+                    <SpeechBubble color="sky">
+                      "Doutor(a), sua fila de pacientes aguarda no Consultório Virtual!"
+                    </SpeechBubble>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 text-xs sm:text-sm font-bold text-white bg-slate-950/90 p-4 rounded-2xl border border-border/60">
+                  <p>1. Acesse seu <strong>Workspace Médico</strong>.</p>
+                  <p>2. A IA Enfermeira Brisa faz a triagem inicial dos pacientes.</p>
+                  <p>3. Clique em <strong>"Iniciar Consulta"</strong> para abrir a sala segura em alta definição.</p>
+                </div>
+              </ComicPanel>
+
+              <ComicPanel color="emerald">
+                <NarrationBox text="PARTE 2: PRESCRIÇÃO DIGITAL & COPILOTO" color="emerald" />
+                <div className="flex gap-4 mb-4">
+                  <div className="w-14 h-14 shrink-0 bg-emerald-500/20 rounded-2xl border-2 border-emerald-400/50 flex items-center justify-center">
+                    <FileText size={28} className="text-emerald-400" />
+                  </div>
+                  <div className="flex-1">
+                    <SpeechBubble color="emerald">
+                      "Como emitir receitas digitais com assinatura CFM e calculadora de rampa?"
+                    </SpeechBubble>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 text-xs sm:text-sm font-bold text-white bg-slate-950/90 p-4 rounded-2xl border border-border/60">
+                  <p>• O Copiloto sugere dosagens padronizadas e rampas de titulação.</p>
+                  <p>• O sistema gera o PDF com assinatura digital e QR Code para auditoria.</p>
+                  <p>• A receita é enviada instantaneamente para a Farmácia Planta y Raíz.</p>
+                </div>
+              </ComicPanel>
+
+              <ComicPanel color="purple" className="md:col-span-2 text-center">
+                <NarrationBox text="PARTE 3: HONORÁRIOS E REPASSE DIRETO" color="purple" />
+                <p className="text-xs sm:text-sm font-bold text-white max-w-2xl mx-auto mb-4">
+                  Seus honorários médicos são creditados diretamente na sua conta com split automático e total transparência financeira.
+                </p>
+                <Button 
+                  className="bg-sky-600 hover:bg-sky-500 text-white font-black rounded-xl px-6 h-11 text-xs sm:text-sm shadow-lg shadow-sky-950/30"
+                  asChild
+                >
+                  <Link to="/workspace-medico">
+                    <Stethoscope className="mr-2" size={16} /> Acessar Meu Consultório Médico
+                  </Link>
+                </Button>
               </ComicPanel>
 
             </div>
           </TabsContent>
         </Tabs>
-      </div>
+      </main>
+
       <Footer />
     </div>
   );
-};
-
-export default ManualPlataforma;
+}

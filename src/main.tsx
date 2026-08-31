@@ -46,9 +46,40 @@ const reloadOnce = () => {
     void clearRuntimeCaches().finally(() => window.location.reload());
   }
 };
+// 🛡️ Previne que rejeições de extensões do navegador (MetaMask, Phantom, etc.) crashem o app ou o preview da Lovable
+window.addEventListener("unhandledrejection", (e) => {
+  const reason = e.reason;
+  const message = typeof reason === "string" ? reason : reason?.message || reason?.stack || "";
+  const isExtensionError = 
+    message.includes("MetaMask") || 
+    message.includes("chrome-extension://") || 
+    message.includes("moz-extension://") ||
+    message.includes("Failed to connect to MetaMask") ||
+    message.includes("User rejected") ||
+    message.includes("inpage.js");
+
+  if (isExtensionError) {
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+});
+
 window.addEventListener("vite:preloadError", (e) => { e.preventDefault(); reloadOnce(); });
 window.addEventListener("error", (e) => {
   const m = e.message || "";
+  const isExtensionError = 
+    m.includes("MetaMask") || 
+    m.includes("chrome-extension://") || 
+    m.includes("moz-extension://") ||
+    m.includes("inpage.js");
+
+  if (isExtensionError) {
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+
   if (m.includes("Failed to fetch dynamically imported module") ||
       m.includes("Importing a module script failed")) reloadOnce();
 });

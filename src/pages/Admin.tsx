@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Download, FileDown, Crown, Sparkles } from "lucide-react";
+import { Download, FileDown, Crown } from "lucide-react";
 import { exportCSV, exportAdminPDF } from "@/lib/admin-export";
 import { KpiDrillDown, type DrillSource } from "@/components/admin/KpiDrillDown";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -42,6 +42,7 @@ import { OfficialPharmacyCard } from "@/components/admin/OfficialPharmacyCard";
 import { TikTokAnalyticsPanel } from "@/components/admin/TikTokAnalyticsPanel";
 import { LeadHunterTracker } from "@/components/admin/LeadHunterTracker";
 import { OpusSocialAutomation } from "@/components/admin/OpusSocialAutomation";
+import { AdminFiscalManagement } from "@/components/admin/AdminFiscalManagement";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -524,6 +525,11 @@ const Admin = () => {
           {/* CARD 11: FILA DE 43 VÍDEOS OPUS CLIP COM LINK & WHATSAPP */}
           <div className="mb-6">
             <OpusSocialAutomation />
+          </div>
+
+          {/* CARD 12: MOTOR AUTOMÁTICO DE FATURAMENTO, NOTAS FISCAIS & RECIBOS IRPF (DMED) */}
+          <div className="mb-6">
+            <AdminFiscalManagement />
           </div>
 
           {/* ============================================== */}

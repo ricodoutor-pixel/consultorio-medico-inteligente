@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MapPin, Star, BadgeCheck, Store, ArrowRight } from "lucide-react";
+import { MapPin, Star, BadgeCheck, Store, ArrowRight, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -46,40 +46,45 @@ export function FarmaciaCard({ vendor, onClick }: FarmaciaCardProps) {
 
   return (
     <motion.div
-      whileHover={{ y: -4, boxShadow: "0 14px 40px rgba(29,158,117,0.25)" }}
+      whileHover={{ y: -4, boxShadow: "0 16px 45px rgba(29,158,117,0.3)" }}
       transition={{ duration: 0.2 }}
-      className="bg-card border border-border/60 hover:border-emerald-500/50 rounded-2xl overflow-hidden cursor-pointer group flex flex-col justify-between shadow-lg max-w-sm"
+      className="bg-card border border-border/60 hover:border-emerald-500/60 rounded-3xl overflow-hidden cursor-pointer group flex flex-col justify-between shadow-xl max-w-sm"
       onClick={() => (onClick ? onClick() : navigate(`/shopping/farmacia/${vendor.id}`))}
     >
       {/* Banner da Fachada */}
       <div>
         <div
-          className="h-32 relative overflow-hidden"
+          className="h-36 relative overflow-hidden"
           style={{
             backgroundImage: `url(${bannerBackground})`,
-            backgroundPosition: "center 30%",
+            backgroundPosition: "center 28%",
             backgroundSize: "cover"
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
-          {/* Logo Oficial Sobreposto */}
-          <div className="absolute -bottom-5 left-4 z-10">
-            <div className="w-14 h-14 rounded-2xl border-2 border-emerald-500 bg-white p-1 overflow-hidden flex items-center justify-center shadow-xl">
-              <img src={logoSrc} alt={storeName} className="w-full h-full object-contain" />
+          {/* Logotipo Oficial Inteiro e Visível */}
+          <div className="absolute -bottom-6 left-4 z-10">
+            <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-2xl border-2 border-emerald-500 bg-white p-1.5 overflow-hidden flex items-center justify-center shadow-2xl ring-4 ring-black/40 group-hover:scale-105 transition-transform duration-300">
+              <img
+                src={logoSrc}
+                alt={storeName}
+                className="w-full h-full object-contain"
+                loading="eager"
+              />
             </div>
           </div>
 
-          <div className="absolute top-2 right-2 z-10">
-            <span className="text-[10px] bg-emerald-600/90 backdrop-blur-sm text-white px-2 py-0.5 rounded-full font-bold shadow-md">
+          <div className="absolute top-2.5 right-2.5 z-10">
+            <span className="text-[10px] bg-emerald-600/95 backdrop-blur-md text-white px-2.5 py-1 rounded-full font-bold shadow-lg border border-emerald-400/30">
               Farmácia Física & Digital
             </span>
           </div>
         </div>
 
         {/* Conteúdo */}
-        <div className="pt-7 px-4 pb-2">
-          <div className="flex items-center justify-between mb-1">
+        <div className="pt-8 px-4 pb-2">
+          <div className="flex items-center justify-between mb-1.5">
             {vendor?.is_verified !== false && (
               <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px] font-bold">
                 <BadgeCheck size={11} className="mr-1 text-emerald-400" /> Farmácia Oficial ANVISA
@@ -90,7 +95,7 @@ export function FarmaciaCard({ vendor, onClick }: FarmaciaCardProps) {
             </div>
           </div>
 
-          <h3 className="font-display font-bold text-foreground text-base mt-1.5 mb-1 leading-tight group-hover:text-emerald-400 transition-colors line-clamp-1">
+          <h3 className="font-display font-bold text-foreground text-base mt-1 mb-1 leading-tight group-hover:text-emerald-400 transition-colors line-clamp-1">
             {storeName}
           </h3>
 

@@ -63,9 +63,9 @@ export function FarmaciaCard({ vendor, onClick }: FarmaciaCardProps) {
         >
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
-          {/* Logotipo Oficial Inteiro e Visível */}
-          <div className="absolute -bottom-6 left-4 z-10">
-            <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-2xl border-2 border-emerald-500 bg-white p-1.5 overflow-hidden flex items-center justify-center shadow-2xl ring-4 ring-black/40 group-hover:scale-105 transition-transform duration-300">
+          {/* Logotipo Oficial — 100% visível, sem corte */}
+          <div className="absolute -bottom-4 left-4 z-10">
+            <div className="w-16 h-16 rounded-xl border-2 border-emerald-500 bg-white p-1 flex items-center justify-center shadow-2xl ring-2 ring-black/30 group-hover:scale-105 transition-transform duration-300">
               <img
                 src={logoSrc}
                 alt={storeName}
@@ -83,7 +83,7 @@ export function FarmaciaCard({ vendor, onClick }: FarmaciaCardProps) {
         </div>
 
         {/* Conteúdo */}
-        <div className="pt-8 px-4 pb-2">
+        <div className="pt-6 px-4 pb-2">
           <div className="flex items-center justify-between mb-1.5">
             {vendor?.is_verified !== false && (
               <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px] font-bold">

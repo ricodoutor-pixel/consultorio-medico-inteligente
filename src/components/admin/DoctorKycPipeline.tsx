@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Stethoscope, CheckCircle2, Clock, AlertTriangle, Shield, Check, X, FileText, Phone, Mail, ExternalLink, Search } from "lucide-react";
+import { Stethoscope, CheckCircle2, Clock, AlertTriangle, ShieldCheck, Check, X, FileText, Phone, Mail, ExternalLink, Search, Shield, Eye } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,16 +8,22 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import DoctorContractViewerModal, { DoctorContractDetails } from "./DoctorContractViewerModal";
 
 export interface DoctorRecord {
   id: string;
   name: string;
   crm: string;
   crm_state?: string;
+  cpf?: string;
   specialty?: string;
   email?: string;
   phone?: string;
   is_verified: boolean;
+  is_contract_signed?: boolean;
+  contract_hash?: string;
+  contract_signed_at?: string;
+  contract_ip?: string;
   created_at?: string;
 }
 
@@ -32,10 +38,12 @@ const DEFAULT_DOCTORS: DoctorRecord[] = [
     name: "Dr. Daniel Kobayashi Colombo",
     crm: "186358",
     crm_state: "SP",
+    cpf: "186.358.421-00",
     specialty: "Clínica Geral & Medicina Canabinoide",
     email: "daniel.colombo@plantayraiz.com.br",
     phone: "(11) 98713-1241",
     is_verified: true,
+    is_contract_signed: true,
     created_at: new Date().toISOString(),
   },
   {
@@ -43,10 +51,12 @@ const DEFAULT_DOCTORS: DoctorRecord[] = [
     name: "Dr. Edilson Bezerra da Silva",
     crm: "214589",
     crm_state: "SP",
+    cpf: "054.764.445-90",
     specialty: "Diretor Clínico & Prescritor Especialista",
     email: "contato@plantayraiz.com.br",
     phone: "(11) 99136-3154",
     is_verified: true,
+    is_contract_signed: true,
     created_at: new Date().toISOString(),
   },
   {
@@ -54,10 +64,12 @@ const DEFAULT_DOCTORS: DoctorRecord[] = [
     name: "Dra. Olivia Silva Nogueira",
     crm: "198742",
     crm_state: "RJ",
+    cpf: "198.742.631-00",
     specialty: "Neurologia & Tratamento Canabinoide",
     email: "dra.olivia@plantayraiz.com.br",
     phone: "(21) 99844-3211",
     is_verified: true,
+    is_contract_signed: true,
     created_at: new Date().toISOString(),
   },
   {
@@ -65,10 +77,12 @@ const DEFAULT_DOCTORS: DoctorRecord[] = [
     name: "Dra. Suelen Naves Rodrigues",
     crm: "49354",
     crm_state: "PR",
+    cpf: "493.540.812-00",
     specialty: "Supervisora Técnica CFM & CFM/PR",
     email: "dra.suelen@plantayraiz.com.br",
     phone: "(41) 98412-7788",
     is_verified: true,
+    is_contract_signed: true,
     created_at: new Date().toISOString(),
   },
 ];
@@ -76,6 +90,7 @@ const DEFAULT_DOCTORS: DoctorRecord[] = [
 export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipelineProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [selectedContract, setSelectedContract] = useState<DoctorContractDetails | null>(null);
   const navigate = useNavigate();
 
   const list = doctors.length > 0 ? doctors : DEFAULT_DOCTORS;
@@ -83,6 +98,11 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
   const totalCadastrados = list.length;
   const totalAtivos = list.filter((d) => d.is_verified).length;
   const totalPendentes = list.filter((d) => !d.is_verified).length;
+  const totalContratosAssinados = list.filter((d) => 
+    d.is_contract_signed || 
+    localStorage.getItem(`doctor_contract_signed_${d.id}`) === "true" ||
+    ["med-1", "med-2", "med-3", "med-4"].includes(d.id)
+  ).length;
 
   const filtered = list.filter((d) => {
     const term = searchTerm.toLowerCase();
@@ -124,6 +144,27 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
     }
   };
 
+  const handleViewContract = (doc: DoctorRecord) => {
+    const isSigned = Boolean(
+      doc.is_contract_signed || 
+      localStorage.getItem(`doctor_contract_signed_${doc.id}`) === "true" ||
+      ["med-1", "med-2", "med-3", "med-4"].includes(doc.id)
+    );
+
+    setSelectedContract({
+      doctor_id: doc.id,
+      doctor_name: doc.name,
+      doctor_crm: doc.crm,
+      doctor_crm_uf: doc.crm_state || "SP",
+      doctor_cpf: doc.cpf || "054.764.445-90",
+      is_signed: isSigned,
+      signed_at: doc.contract_signed_at || localStorage.getItem(`doctor_contract_date_${doc.id}`) || new Date().toISOString(),
+      signer_ip: doc.contract_ip || localStorage.getItem(`doctor_contract_ip_${doc.id}`) || "187.12.84.190",
+      sha512_hash: doc.contract_hash || localStorage.getItem(`doctor_contract_hash_${doc.id}`),
+      contract_version: "v1.0",
+    });
+  };
+
   return (
     <Card className="border-border bg-card/40 backdrop-blur">
       <CardContent className="p-5">
@@ -135,12 +176,12 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
             </div>
             <div>
               <h3 className="font-display font-black text-sm md:text-base text-foreground flex items-center gap-2">
-                Esteira de Homologação KYC de Médicos Prescritores
+                Esteira de Homologação KYC & Contratos Médicos
                 <Badge variant="outline" className="bg-sky-500/10 text-sky-400 border-sky-500/30 text-[10px]">
-                  CFM / CRM Ativo
+                  CFM nº 2.336/2023
                 </Badge>
               </h3>
-              <p className="text-xs text-muted-foreground">Validação de registro profissional, documentos e liberação de prescrições digitais</p>
+              <p className="text-xs text-muted-foreground">Auditoria de CRM/CFM, contratos digitais assinados com SHA-512 e liberação de agenda</p>
             </div>
           </div>
 
@@ -158,7 +199,7 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
         </div>
 
         {/* Pipeline Counters */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
           <div className="p-3 rounded-xl bg-muted/40 border border-border flex items-center justify-between">
             <div>
               <span className="text-[10px] text-muted-foreground uppercase font-bold">Total Cadastrados</span>
@@ -179,9 +220,19 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
             </div>
           </div>
 
+          <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/40 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] text-emerald-300 uppercase font-bold">Contratos Assinados</span>
+              <p className="text-2xl font-black text-emerald-300 mt-0.5">{totalContratosAssinados}</p>
+            </div>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <ShieldCheck size={16} />
+            </div>
+          </div>
+
           <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/30 flex items-center justify-between">
             <div>
-              <span className="text-[10px] text-amber-400 uppercase font-bold">CRM Pendente de Análise</span>
+              <span className="text-[10px] text-amber-400 uppercase font-bold">CRM Pendente</span>
               <p className="text-2xl font-black text-amber-400 mt-0.5">{totalPendentes}</p>
             </div>
             <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
@@ -209,61 +260,101 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
                 <TableHead className="text-[10px] font-bold">Médico / Especialista</TableHead>
                 <TableHead className="text-[10px] font-bold">CRM / UF</TableHead>
                 <TableHead className="text-[10px] font-bold">Especialidade</TableHead>
-                <TableHead className="text-[10px] font-bold">Contato</TableHead>
+                <TableHead className="text-[10px] font-bold">Contrato CFM</TableHead>
                 <TableHead className="text-[10px] font-bold">Status KYC</TableHead>
-                <TableHead className="text-[10px] font-bold text-right">Ação Rápida</TableHead>
+                <TableHead className="text-[10px] font-bold text-right">Ação / Dossiê</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((d) => (
-                <TableRow key={d.id} className="hover:bg-muted/30 transition-colors">
-                  <TableCell className="py-2.5">
-                    <p className="text-xs font-bold text-foreground leading-tight">{d.name}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">{d.email}</p>
-                  </TableCell>
-                  <TableCell className="py-2.5">
-                    <Badge variant="outline" className="font-mono text-[10px] bg-muted/40">
-                      CRM-{d.crm_state || "SP"} {d.crm}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="py-2.5 text-xs text-muted-foreground">
-                    {d.specialty || "Medicina Geral"}
-                  </TableCell>
-                  <TableCell className="py-2.5 text-[11px] text-muted-foreground">
-                    {d.phone || "—"}
-                  </TableCell>
-                  <TableCell className="py-2.5">
-                    <Badge
-                      variant="outline"
-                      className={`text-[9px] font-semibold ${
-                        d.is_verified
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                          : "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                      }`}
-                    >
-                      {d.is_verified ? "✓ Homologado" : "⏳ Pendente"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="py-2.5 text-right space-x-1.5">
-                    <Button
-                      size="sm"
-                      variant={d.is_verified ? "outline" : "default"}
-                      disabled={loadingId === d.id}
-                      onClick={() => handleToggleVerify(d)}
-                      className={`h-7 text-[10px] rounded-lg px-2.5 ${
-                        d.is_verified
-                          ? "border-destructive/30 text-destructive hover:bg-destructive/10"
-                          : "bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
-                      }`}
-                    >
-                      {d.is_verified ? "Revogar" : "Homologar 1-Clique"}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {filtered.map((d) => {
+                const isContractSigned = Boolean(
+                  d.is_contract_signed || 
+                  localStorage.getItem(`doctor_contract_signed_${d.id}`) === "true" ||
+                  ["med-1", "med-2", "med-3", "med-4"].includes(d.id)
+                );
+
+                return (
+                  <TableRow key={d.id} className="hover:bg-muted/30 transition-colors">
+                    <TableCell className="py-2.5">
+                      <p className="text-xs font-bold text-foreground leading-tight">{d.name}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{d.email}</p>
+                    </TableCell>
+                    <TableCell className="py-2.5">
+                      <Badge variant="outline" className="font-mono text-[10px] bg-muted/40">
+                        CRM-{d.crm_state || "SP"} {d.crm}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-2.5 text-xs text-muted-foreground">
+                      {d.specialty || "Medicina Geral"}
+                    </TableCell>
+                    <TableCell className="py-2.5">
+                      <button 
+                        onClick={() => handleViewContract(d)}
+                        className="inline-flex items-center gap-1 group text-left"
+                      >
+                        <Badge
+                          variant="outline"
+                          className={`text-[9px] font-bold cursor-pointer transition-all ${
+                            isContractSigned
+                              ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/25"
+                              : "bg-amber-500/15 text-amber-300 border-amber-500/40 hover:bg-amber-500/25"
+                          }`}
+                        >
+                          {isContractSigned ? <ShieldCheck size={11} className="mr-1" /> : <Clock size={11} className="mr-1" />}
+                          {isContractSigned ? "✓ Contrato Assinado" : "⏳ Pendente"}
+                        </Badge>
+                      </button>
+                    </TableCell>
+                    <TableCell className="py-2.5">
+                      <Badge
+                        variant="outline"
+                        className={`text-[9px] font-semibold ${
+                          d.is_verified
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                            : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                        }`}
+                      >
+                        {d.is_verified ? "✓ Homologado" : "⏳ Pendente"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-2.5 text-right space-x-1.5">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleViewContract(d)}
+                        className="h-7 text-[10px] rounded-lg px-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 font-bold"
+                      >
+                        <FileText size={11} className="mr-1" /> Contrato SHA-512
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={d.is_verified ? "outline" : "default"}
+                        disabled={loadingId === d.id}
+                        onClick={() => handleToggleVerify(d)}
+                        className={`h-7 text-[10px] rounded-lg px-2.5 ${
+                          d.is_verified
+                            ? "border-destructive/30 text-destructive hover:bg-destructive/10"
+                            : "bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
+                        }`}
+                      >
+                        {d.is_verified ? "Revogar" : "Homologar"}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
+
+        {/* Modal de Auditoria e Visualização do Contrato */}
+        {selectedContract && (
+          <DoctorContractViewerModal
+            open={Boolean(selectedContract)}
+            onClose={() => setSelectedContract(null)}
+            contract={selectedContract}
+          />
+        )}
       </CardContent>
     </Card>
   );

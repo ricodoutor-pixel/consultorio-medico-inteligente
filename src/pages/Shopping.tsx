@@ -602,11 +602,12 @@ const Shopping = () => {
 
   useEffect(() => {
     // 1. Buscar vendor oficial Planta y Raíz
-    supabase
+    Promise.resolve(supabase
       .from('vendors')
       .select('id, store_name, store_logo_url, store_banner_url, rating, total_sales, is_active')
       .eq('is_active', true)
-      .limit(10)
+      .limit(10))
+
       .then(async ({ data: vData }) => {
         const official = vData?.find(v => v.store_name.toLowerCase().includes("planta")) || vData?.[0];
         

@@ -86,7 +86,16 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
 const VIP_DOCTOR_MATCHERS = ["edilson", "suelen", "olivia"];
 const isVipDoctor = (p: Professional) => {
   if (p.plan_tier && p.plan_tier !== 'free') return true;
-  return p.id === "med-0" || VIP_DOCTOR_MATCHERS.some((n) => (p.name || "").toLowerCase().includes(n));
+  return p.id === "med-0" || p.id === "mock-suelen" || p.id === "mock-olivia" || VIP_DOCTOR_MATCHERS.some((n) => (p.name || "").toLowerCase().includes(n));
+};
+
+const getDoctorSealTier = (p: Professional) => {
+  const name = (p.name || "").toLowerCase();
+  if (p.id === "med-0" || p.id === "mock-suelen" || p.id === "mock-olivia" || name.includes("edilson") || name.includes("suelen") || name.includes("olivia") || p.plan_tier === "premium") {
+    return "premium";
+  }
+  if (p.plan_tier && p.plan_tier !== 'free') return p.plan_tier;
+  return "basic";
 };
 
 /** Tags elegantes da vitrine padronizada exibidas no card do profissional. */
@@ -132,7 +141,7 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
               <h1 className="text-xl font-display font-black text-foreground">{pro.name}</h1>
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <p className="text-sm text-muted-foreground">{pro.category}</p>
-                {isVipDoctor(pro) && <DoctorVIPSeal tier={pro.plan_tier || 'basic'} />}
+                {isVipDoctor(pro) && <DoctorVIPSeal tier={getDoctorSealTier(pro)} />}
               </div>
               {pro.crm && (
                 <p className="text-xs font-bold text-muted-foreground mb-1">
@@ -354,7 +363,7 @@ const Profissionais = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               <h2 className="font-black text-foreground text-sm md:text-base truncate">{p.name}</h2>
-                              {isVipDoctor(p) && <DoctorVIPSeal tier={p.plan_tier || 'basic'} />}
+                              {isVipDoctor(p) && <DoctorVIPSeal tier={getDoctorSealTier(p)} />}
                               {p.flags && p.flags.map((flag, i) => (
                                 <CountryFlag key={i} code={flag} />
                               ))}

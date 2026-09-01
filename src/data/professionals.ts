@@ -98,10 +98,6 @@ export type Professional = {
   premiumPrice?: number;
   crm?: string;
   hospital?: string;
-  /** Link externo do hospital/instituição. */
-  hospitalUrl?: string;
-  /** Link do print de validação no portal do CFM. */
-  cfmPrintUrl?: string;
   flags?: string[];
   plan_tier?: string;
 }
@@ -351,6 +347,7 @@ export const professionals: Professional[] = [
     avatar: "EB",
     imageUrl: DrEdilsonImg,
     online: true,
+    plan_tier: "premium",
     crm: "10963 - Sta Cruz (BO)",
     hospital: "Planta y Raíz Ltda / Santa Cruz de la Sierra (BO)",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -679,6 +676,7 @@ export const professionals: Professional[] = [
     hospital: "Planta y Raíz Ltda / Cochabamba (BO)",
     flags: ["🇧🇷", "🇧🇴"],
     online: true,
+    plan_tier: "premium",
     services: [
       { name: "Orientação Técnica + Mentoria Terapêutica (Chat 30 min)", price: "R$ 50,00", desc: "Com relatório completo assinado digitalmente (Brasil)" },
       { name: "Orientação Técnica Completa (Chat + Vídeo)", price: "R$ 100,00", desc: "Avaliação por vídeo e mentoria terapêutica" },
@@ -2130,9 +2128,9 @@ export const professionals: Professional[] = [
     id: "mock-suelen",
     name: "Dra. Suelen Naves Rodrigues",
     category: "Médicos Prescritores",
-    bio: "Médica com atendimento humanizado e individualizado. Prescrição de cannabis medicinal baseada em evidências científicas, com foco na qualidade de vida, bem-estar e cuidado integral do paciente.",
+    bio: "Supervisora Técnica da Planta y Raíz Ltda e Médica Prescritora com atendimento humanizado e individualizado. Prescrição de cannabis medicinal baseada em evidências científicas, com foco na qualidade de vida, bem-estar e cuidado integral do paciente.",
     experience: "8 anos",
-    tags: ["Cannabis Medicinal", "Qualidade de Vida", "Cuidado Integral"],
+    tags: ["Supervisora Técnica", "Cannabis Medicinal", "Qualidade de Vida", "Cuidado Integral"],
     price: "R$ 100,00",
     priceValue: 100,
     paymentLink: "https://mpago.la/12KAwmH",
@@ -2144,6 +2142,7 @@ export const professionals: Professional[] = [
     crm: "49354 - PR",
     flags: ["🇧🇷"],
     online: false,
+    plan_tier: "premium",
     services: [
       { name: "Orientação Inicial via Chat", price: "R$ 100,00", desc: "Avaliação inicial via chat seguro" },
       { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150,00", desc: "Avaliação completa com teleconsulta" },

@@ -602,11 +602,12 @@ const Shopping = () => {
 
   useEffect(() => {
     // 1. Buscar vendor oficial Planta y Raíz
-    supabase
+    Promise.resolve(supabase
       .from('vendors')
       .select('id, store_name, store_logo_url, store_banner_url, rating, total_sales, is_active')
       .eq('is_active', true)
-      .limit(10)
+      .limit(10))
+
       .then(async ({ data: vData }) => {
         const official = vData?.find(v => v.store_name.toLowerCase().includes("planta")) || vData?.[0];
         
@@ -1049,10 +1050,10 @@ const Shopping = () => {
       <BTCPaymentModal open={btcModal.open} onClose={() => setBtcModal({ ...btcModal, open: false })} planName={btcModal.planName} planId={btcModal.planId} amount={btcModal.amount} />
       <PrescriptionVerificationModal
         open={rxModal.open}
-        onClose={() => setRxModal({ open: false, productName: "" })}
+        onClose={() => setRxModal({ open: false, productName: "", pendingProduct: null })}
         productName={rxModal.productName}
         onHasPrescription={proceedWithPurchaseMain}
-        onNeedsPrescription={() => { setRxModal({ open: false, productName: "" }); window.location.href = "/profissionais"; }}
+        onNeedsPrescription={() => { setRxModal({ open: false, productName: "", pendingProduct: null }); window.location.href = "/profissionais"; }}
       />
       <Footer />
     </div>

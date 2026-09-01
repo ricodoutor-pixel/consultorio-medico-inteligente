@@ -98,9 +98,14 @@ export type Professional = {
   premiumPrice?: number;
   crm?: string;
   hospital?: string;
+  /** Link do hospital/instituição de referência. */
+  hospitalUrl?: string;
+  /** Print do registro no portal do CFM (comprovação pública). */
+  cfmPrintUrl?: string;
   flags?: string[];
   plan_tier?: string;
 }
+
 
 export const COUNCIL_CONFIG: Record<string, {
   councilLabel: string;

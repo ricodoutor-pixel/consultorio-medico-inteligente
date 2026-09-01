@@ -33,13 +33,103 @@ export default function LojistaDashboard() {
   const [uploadingKind, setUploadingKind] = useState<string | null>(null);
   const [docViewer, setDocViewer] = useState<{ kind: PharmacyKycKind; url?: string } | null>(null);
 
-  // Mock data para Receitas Inbox
-  const [inbox] = useState([
-    { id: "1", patient: "João M.", hash: "a8f9c...12x", mode: "1click", status: "recebida", date: "Hoje, 10:30" },
-    { id: "2", patient: "Maria S.", hash: "b2x4...99z", mode: "manual", status: "em_analise_farmaceutica", date: "Ontem, 15:45" }
-  ]);
+export interface PrescriptionInboxItem {
+  id: string;
+  patient: string;
+  patient_phone?: string;
+  patient_address?: string;
+  patient_cep?: string;
+  medicine: string;
+  concentration?: string;
+  value: number;
+  hash: string;
+  mode: "1click" | "manual";
+  status: "recebida" | "em_analise_farmaceutica" | "despachada" | "recusada";
+  date: string;
+  tracking_code?: string;
+  courier_name?: string;
+  refusal_reason?: string;
+  pdf_url?: string;
+}
 
-  const [selectedPrescription, setSelectedPrescription] = useState<any>(null);
+const DEFAULT_INBOX: PrescriptionInboxItem[] = [
+  { 
+    id: "rx-101", 
+    patient: "João Marcelo Silveira", 
+    patient_phone: "11991363154", 
+    patient_address: "Av. Eng. Luís Carlos Berrini, 1200 - Brooklin, São Paulo - SP", 
+    patient_cep: "04571-010",
+    medicine: "Óleo CBD Full Spectrum 3000mg/30ml", 
+    concentration: "100mg/mL", 
+    value: 480.00,
+    hash: "a8f9c2d1e0...78a2f", 
+    mode: "1click", 
+    status: "recebida", 
+    date: "Hoje, 10:30" 
+  },
+  { 
+    id: "rx-102", 
+    patient: "Maria Souza Fontes", 
+    patient_phone: "11988776655", 
+    patient_address: "Rua Augusta, 1500 - Consolação, São Paulo - SP", 
+    patient_cep: "01305-100",
+    medicine: "Extrato Canabidiol Broad Spectrum 1500mg", 
+    concentration: "50mg/mL", 
+    value: 320.00,
+    hash: "b2x489a7f1...99c01", 
+    mode: "manual", 
+    status: "em_analise_farmaceutica", 
+    date: "Ontem, 15:45" 
+  },
+  { 
+    id: "rx-103", 
+    patient: "Carlos Eduardo Mendes", 
+    patient_phone: "11977665544", 
+    patient_address: "Alameda Santos, 1800 - Cerqueira César, São Paulo - SP", 
+    patient_cep: "01418-102",
+    medicine: "Gummies Fitocanabinoides Sleep & Relax (30 un)", 
+    concentration: "25mg/gummy", 
+    value: 260.00,
+    hash: "f4e198b3c2...33d88", 
+    mode: "1click", 
+    status: "despachada", 
+    date: "28/08/2026, 14:10",
+    tracking_code: "PYR-SAT-781923-BR",
+    courier_name: "Carlos Eduardo Silva (Furgão Refrigerado)"
+  }
+];
+
+export default function LojistaDashboard() {
+  const { toast } = useToast();
+  const { profile, metrics, loading, authError, kycDocs, uploadKycDoc, addProduct, refreshData } = useLojista();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isRastreioOpen, setIsRastreioOpen] = useState(false);
+  const [uploadingKind, setUploadingKind] = useState<string | null>(null);
+  const [docViewer, setDocViewer] = useState<{ kind: PharmacyKycKind; url?: string } | null>(null);
+
+  // Inbox & Prescriptions State
+  const [inbox, setInbox] = useState<PrescriptionInboxItem[]>(() => {
+    const saved = localStorage.getItem("pharmacy_prescriptions_inbox");
+    return saved ? JSON.parse(saved) : DEFAULT_INBOX;
+  });
+
+  const [selectedPrescription, setSelectedPrescription] = useState<PrescriptionInboxItem | null>(null);
+  const [dispatchTrackingCode, setDispatchTrackingCode] = useState("");
+  const [dispatchCourier, setDispatchCourier] = useState("Carlos Eduardo Silva (Furgão Refrigerado)");
+  const [refusalReason, setRefusalReason] = useState("");
+
+  // Modal para Simulação/Upload de Nova Receita pelo Paciente
+  const [isNewRxModalOpen, setIsNewRxModalOpen] = useState(false);
+  const [newRxForm, setNewRxForm] = useState({
+    patient: "",
+    phone: "",
+    address: "",
+    cep: "",
+    medicine: "Óleo CBD Full Spectrum 3000mg/30ml",
+    value: "450.00",
+    file: null as File | null,
+  });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -91,6 +181,145 @@ export default function LojistaDashboard() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Dynamic KPIs derived from live inbox & dispatches
+  const pendingRxCount = inbox.filter((i) => i.status === "recebida" || i.status === "em_analise_farmaceutica").length;
+  const dispatchedRxList = inbox.filter((i) => i.status === "despachada");
+  const dispatchedCount = dispatchedRxList.length;
+
+  const baseGross = 14500.0;
+  const dispatchedRevenue = dispatchedRxList.reduce((acc, curr) => acc + (Number(curr.value) || 0), 0);
+  const totalGross = baseGross + dispatchedRevenue;
+  const netRevenue = totalGross * 0.95;
+  const platformFee = totalGross * 0.05;
+
+  const handleCreateNewPrescription = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRxForm.patient.trim()) {
+      toast({ title: "Erro", description: "Informe o nome do paciente.", variant: "destructive" });
+      return;
+    }
+
+    const newRx: PrescriptionInboxItem = {
+      id: `rx-${Date.now().toString().slice(-4)}`,
+      patient: newRxForm.patient,
+      patient_phone: newRxForm.phone || "11991363154",
+      patient_address: newRxForm.address || "Av. Paulista, 1500 - Bela Vista, São Paulo - SP",
+      patient_cep: newRxForm.cep || "01310-200",
+      medicine: newRxForm.medicine,
+      concentration: "Fitocanabinoide Grau Farmacêutico",
+      value: parseFloat(newRxForm.value) || 450.0,
+      hash: `${Math.random().toString(36).substring(2, 10)}...${Math.random().toString(36).substring(2, 7)}`,
+      mode: "manual",
+      status: "recebida",
+      date: "Hoje, " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    const updated = [newRx, ...inbox];
+    setInbox(updated);
+    localStorage.setItem("pharmacy_prescriptions_inbox", JSON.stringify(updated));
+    setIsNewRxModalOpen(false);
+    setNewRxForm({
+      patient: "",
+      phone: "",
+      address: "",
+      cep: "",
+      medicine: "Óleo CBD Full Spectrum 3000mg/30ml",
+      value: "450.00",
+      file: null,
+    });
+
+    toast({
+      title: "📥 Receita Recebida com Sucesso!",
+      description: `Prescrição de ${newRx.patient} adicionada à Caixa de Entrada para auditoria farmacêutica.`,
+    });
+  };
+
+  const handleApproveAndDispatch = () => {
+    if (!selectedPrescription) return;
+    const tracking = dispatchTrackingCode.trim() || `PYR-SAT-${Math.floor(100000 + Math.random() * 900000)}-BR`;
+
+    const updated = inbox.map((item) => {
+      if (item.id === selectedPrescription.id) {
+        return {
+          ...item,
+          status: "despachada" as const,
+          tracking_code: tracking,
+          courier_name: dispatchCourier,
+        };
+      }
+      return item;
+    });
+
+    setInbox(updated);
+    localStorage.setItem("pharmacy_prescriptions_inbox", JSON.stringify(updated));
+
+    // Adiciona / Atualiza a ordem de entrega para o rastreador satélite
+    const newDeliveryOrder = {
+      id: `deliv-${selectedPrescription.id}`,
+      tracking_code: tracking,
+      patient_name: selectedPrescription.patient,
+      patient_phone: selectedPrescription.patient_phone || "11991363154",
+      patient_cep: selectedPrescription.patient_cep || "04571-010",
+      patient_address: selectedPrescription.patient_address || "Av. Paulista, 1000, São Paulo - SP",
+      patient_coords: [-23.5654, -46.6515] as [number, number],
+      pharmacy_name: profile.company_name || "Farmácia Planta y Raíz Ltda",
+      pharmacy_cep: "01310-100",
+      pharmacy_address: "Av. Paulista, 1000 - Bela Vista, São Paulo - SP",
+      pharmacy_coords: [-23.5654, -46.6515] as [number, number],
+      medicine_name: selectedPrescription.medicine,
+      medicine_batch: `LT-2026-${Math.floor(100 + Math.random() * 900)}`,
+      temperature_celsius: 4.5,
+      courier_id: "courier-1",
+      courier_name: dispatchCourier,
+      courier_phone: "11998765432",
+      courier_vehicle: "Mercedes Sprinter Crio-Pharma",
+      courier_plate: "PYR-4Z26",
+      status: "em_rota" as const,
+      progress_pct: 0.20,
+      distance_km: 5.2,
+      eta_minutes: 22,
+      speed_kmh: 42,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    const existingDeliveries = JSON.parse(localStorage.getItem("delivery_orders") || "[]");
+    localStorage.setItem("delivery_orders", JSON.stringify([newDeliveryOrder, ...existingDeliveries]));
+
+    setSelectedPrescription(null);
+    setDispatchTrackingCode("");
+
+    toast({
+      title: "🚀 Pedido Aprovado e Despachado!",
+      description: `Código ${tracking} emitido. Rastreamento satélite e repasse de R$ ${(selectedPrescription.value * 0.95).toFixed(2)} atualizados nos KPIs!`,
+    });
+  };
+
+  const handleRejectPrescription = () => {
+    if (!selectedPrescription) return;
+    const updated = inbox.map((item) => {
+      if (item.id === selectedPrescription.id) {
+        return {
+          ...item,
+          status: "recusada" as const,
+          refusal_reason: refusalReason || "Irregularidade no receituário ou assinatura não conforme.",
+        };
+      }
+      return item;
+    });
+
+    setInbox(updated);
+    localStorage.setItem("pharmacy_prescriptions_inbox", JSON.stringify(updated));
+    setSelectedPrescription(null);
+    setRefusalReason("");
+
+    toast({
+      title: "Receita Recusada",
+      description: "O paciente foi notificado para regularizar o documento.",
+      variant: "destructive",
+    });
   };
 
   return (
@@ -193,7 +422,9 @@ export default function LojistaDashboard() {
             <TabsTrigger value="rastreio" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-emerald-400">
               <Truck size={14} className="mr-1 inline" /> Rastreamento
             </TabsTrigger>
-            <TabsTrigger value="inbox" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Receitas</TabsTrigger>
+            <TabsTrigger value="inbox" className="py-3 font-bold text-xs sm:text-sm rounded-xl">
+              Receitas ({pendingRxCount})
+            </TabsTrigger>
             <TabsTrigger value="catalog" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Catálogo</TabsTrigger>
             <TabsTrigger value="financial" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Financeiro</TabsTrigger>
             <TabsTrigger value="kyc" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-amber-400">
@@ -201,18 +432,20 @@ export default function LojistaDashboard() {
             </TabsTrigger>
           </TabsList>
 
-          {/* ABA 1: OVERVIEW */}
+          {/* ABA 1: OVERVIEW COM KPIS REAIS DINÂMICOS */}
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card className="bg-emerald-950/20 border-emerald-500/20">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-emerald-500 flex justify-between">
-                    Receitas Aguardando <AlertTriangle size={16} className="animate-pulse" />
+                    Receitas Aguardando <AlertTriangle size={16} className={pendingRxCount > 0 ? "animate-pulse text-amber-400" : ""} />
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">12</div>
-                  <p className="text-xs text-muted-foreground mt-1">Requer análise farmacêutica</p>
+                  <div className="text-3xl font-bold">{pendingRxCount}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {pendingRxCount > 0 ? "Requer auditoria farmacêutica" : "Todas as receitas auditadas"}
+                  </p>
                 </CardContent>
               </Card>
 
@@ -221,8 +454,10 @@ export default function LojistaDashboard() {
                   <CardTitle className="text-sm font-medium text-muted-foreground">Faturamento Bruto (Mês)</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">R$ 14.500,00</div>
-                  <p className="text-xs text-green-500 mt-1">+15% em relação a julho</p>
+                  <div className="text-3xl font-bold">
+                    {totalGross.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </div>
+                  <p className="text-xs text-green-500 mt-1">+{dispatchedCount} pedidos despachados</p>
                 </CardContent>
               </Card>
 
@@ -231,7 +466,9 @@ export default function LojistaDashboard() {
                   <CardTitle className="text-sm font-medium text-muted-foreground">Repasse Líquido (95%)</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-primary">R$ 13.775,00</div>
+                  <div className="text-3xl font-bold text-primary">
+                    {netRevenue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </div>
                   <p className="text-xs text-muted-foreground mt-1">Disponível para saque Pix</p>
                 </CardContent>
               </Card>
@@ -241,7 +478,9 @@ export default function LojistaDashboard() {
                   <CardTitle className="text-sm font-medium text-muted-foreground">Taxa da Plataforma (5%)</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-red-400">R$ 725,00</div>
+                  <div className="text-3xl font-bold text-red-400">
+                    {platformFee.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </div>
                   <p className="text-xs text-muted-foreground mt-1">Retido na fonte</p>
                 </CardContent>
               </Card>
@@ -272,42 +511,118 @@ export default function LojistaDashboard() {
             </div>
           </TabsContent>
 
-          {/* ABA 2: RECEITAS & DISPENSAÇÃO */}
+          {/* ABA 2: RECEITAS & DISPENSAÇÃO INTERATIVA */}
           <TabsContent value="inbox" className="space-y-6">
             <Card className="border-border">
-              <CardHeader>
-                <CardTitle>Caixa de Entrada: Receitas ICP-Brasil</CardTitle>
-                <CardDescription>Auditoria e liberação de despachos.</CardDescription>
+              <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                  <CardTitle className="text-lg font-bold flex items-center gap-2">
+                    <FileText className="text-primary w-5 h-5" /> Caixa de Entrada: Receitas Médicas ICP-Brasil
+                  </CardTitle>
+                  <CardDescription className="text-xs mt-0.5">
+                    Auditoria farmacêutica, verificação de assinatura digital e despacho com código de rastreio.
+                  </CardDescription>
+                </div>
+
+                <Button
+                  onClick={() => setIsNewRxModalOpen(true)}
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-9 rounded-xl shadow-md gap-1.5"
+                >
+                  <Upload size={14} /> 📥 Simular Upload de Receita (Paciente)
+                </Button>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border border-border overflow-hidden">
+                <div className="rounded-2xl border border-border overflow-hidden">
                   <Table>
                     <TableHeader className="bg-slate-900">
                       <TableRow>
-                        <TableHead>Paciente</TableHead>
-                        <TableHead>Data</TableHead>
-                        <TableHead>Hash Digital</TableHead>
-                        <TableHead>Envio</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Ação</TableHead>
+                        <TableHead className="text-xs">Paciente / Contato</TableHead>
+                        <TableHead className="text-xs">Medicamento Prescrito</TableHead>
+                        <TableHead className="text-xs">Valor</TableHead>
+                        <TableHead className="text-xs">Data</TableHead>
+                        <TableHead className="text-xs">Hash SHA-512</TableHead>
+                        <TableHead className="text-xs">Status</TableHead>
+                        <TableHead className="text-xs text-right">Ação</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {inbox.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell className="font-medium">{item.patient}</TableCell>
-                          <TableCell>{item.date}</TableCell>
-                          <TableCell><Badge variant="outline" className="font-mono text-[10px]">{item.hash}</Badge></TableCell>
-                          <TableCell>{item.mode === '1click' ? <Badge className="bg-primary/20 text-primary">Automático</Badge> : <Badge variant="secondary">Upload Manual</Badge>}</TableCell>
-                          <TableCell>
-                            {item.status === 'recebida' && <Badge className="bg-amber-500/20 text-amber-500"><Clock size={12} className="mr-1"/> Nova Receita</Badge>}
-                            {item.status === 'em_analise_farmaceutica' && <Badge className="bg-blue-500/20 text-blue-500">Em Análise</Badge>}
-                          </TableCell>
-                          <TableCell>
-                            <Button size="sm" onClick={() => setSelectedPrescription(item)}>Auditar</Button>
+                      {inbox.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center py-8 text-muted-foreground text-xs">
+                            Nenhuma receita médica na caixa de entrada.
                           </TableCell>
                         </TableRow>
-                      ))}
+                      ) : (
+                        inbox.map((item) => (
+                          <TableRow key={item.id} className="hover:bg-muted/30 transition-colors">
+                            <TableCell className="font-bold text-xs">
+                              <div>{item.patient}</div>
+                              {item.patient_phone && (
+                                <span className="text-[10px] text-muted-foreground font-normal">
+                                  📞 {item.patient_phone}
+                                </span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-xs text-foreground font-medium">
+                              {item.medicine}
+                            </TableCell>
+                            <TableCell className="text-xs font-bold text-emerald-400">
+                              {Number(item.value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground">{item.date}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="font-mono text-[10px] bg-muted/40">
+                                {item.hash.slice(0, 10)}...
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {item.status === "recebida" && (
+                                <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-[10px] font-bold">
+                                  <Clock size={11} className="mr-1" /> Aguardando Análise
+                                </Badge>
+                              )}
+                              {item.status === "em_analise_farmaceutica" && (
+                                <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-[10px] font-bold">
+                                  Em Análise
+                                </Badge>
+                              )}
+                              {item.status === "despachada" && (
+                                <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] font-bold">
+                                  <CheckCircle2 size={11} className="mr-1" /> Despachado
+                                </Badge>
+                              )}
+                              {item.status === "recusada" && (
+                                <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-[10px] font-bold">
+                                  <XCircle size={11} className="mr-1" /> Recusada
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {item.status === "despachada" ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setIsRastreioOpen(true)}
+                                  className="text-[11px] h-8 rounded-xl border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 font-bold"
+                                >
+                                  <Truck size={13} className="mr-1" /> Rastreio
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedPrescription(item);
+                                    setDispatchTrackingCode(`PYR-SAT-${Math.floor(100000 + Math.random() * 900000)}-BR`);
+                                  }}
+                                  className="text-[11px] h-8 rounded-xl bg-primary text-black hover:bg-primary/90 font-bold"
+                                >
+                                  Auditar & Despachar
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </div>
@@ -522,52 +837,209 @@ export default function LojistaDashboard() {
         </Tabs>
       </div>
 
-      {/* Modal de Auditoria de Receita */}
-      <Dialog open={!!selectedPrescription} onOpenChange={() => setSelectedPrescription(null)}>
-        <DialogContent className="max-w-2xl bg-slate-950 border-border">
+      {/* Modal de Auditoria e Despacho Farmacêutico da Receita */}
+      <Dialog open={Boolean(selectedPrescription)} onOpenChange={() => setSelectedPrescription(null)}>
+        <DialogContent className="max-w-2xl bg-card border-border shadow-2xl">
           <DialogHeader>
-            <DialogTitle>Auditoria Farmacêutica de Receita</DialogTitle>
-            <DialogDescription>Validação do PDF e assinatura ICP-Brasil.</DialogDescription>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <ShieldCheck className="text-emerald-400 w-6 h-6" /> Auditoria Farmacêutica & Despacho de Receita
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Conformidade com a ICP-Brasil e dispensação canabinoide regulamentada ANVISA.
+            </DialogDescription>
           </DialogHeader>
           
-          <div className="grid gap-4 py-4">
-            <div className="p-4 bg-slate-900 rounded-xl flex justify-between items-center border border-slate-800">
-               <div>
-                 <p className="text-xs text-muted-foreground">Paciente</p>
-                 <p className="font-bold">{selectedPrescription?.patient}</p>
+          <div className="grid gap-4 py-2">
+            {/* Informações do Paciente e Prescrição */}
+            <div className="p-4 bg-muted/40 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border border-border">
+               <div className="space-y-1">
+                 <p className="text-[10px] text-muted-foreground uppercase font-bold">Paciente & Endereço de Entrega</p>
+                 <p className="font-bold text-sm text-foreground">{selectedPrescription?.patient}</p>
+                 <p className="text-xs text-muted-foreground">{selectedPrescription?.patient_address}</p>
+                 <p className="text-xs text-emerald-400 font-bold">
+                   📞 {selectedPrescription?.patient_phone} · Valor: {Number(selectedPrescription?.value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                 </p>
                </div>
-               <div className="text-right">
-                 <p className="text-xs text-muted-foreground">Hash SHA-512</p>
-                 <p className="font-mono text-xs text-primary bg-primary/10 p-1 rounded mt-1">{selectedPrescription?.hash}</p>
+               <div className="text-left sm:text-right">
+                 <p className="text-[10px] text-muted-foreground uppercase font-bold">Hash SHA-512 ICP-Brasil</p>
+                 <p className="font-mono text-[11px] text-primary bg-primary/10 px-2 py-1 rounded-lg border border-primary/20 mt-1">
+                   {selectedPrescription?.hash}
+                 </p>
+                 <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/40 text-[10px] mt-1.5 font-bold">
+                   <CheckCircle2 size={11} className="mr-1" /> Assinatura Médica Válida
+                 </Badge>
                </div>
             </div>
 
-            <div className="h-48 bg-slate-800 rounded-xl flex items-center justify-center border border-slate-700">
-               <FileText size={48} className="text-slate-600 mb-2" />
-               <div className="ml-4">
-                 <p className="font-bold">ReceitaDigital.pdf</p>
-                 <Badge className="bg-green-500 mt-1">Assinatura Válida</Badge>
-               </div>
+            {/* Medicamento Prescrito */}
+            <div className="p-3 bg-muted/20 rounded-xl border border-border text-xs space-y-1">
+              <span className="text-[10px] text-muted-foreground uppercase font-bold">Medicamento Selecionado:</span>
+              <p className="font-bold text-foreground text-sm">{selectedPrescription?.medicine}</p>
             </div>
 
-            <div className="space-y-2">
-              <Label>Código de Rastreio (Se aprovado e enviado)</Label>
-              <Input placeholder="BR123456789BR" />
+            {/* Seleção de Entregador / Courier */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold">Entregador Responsável (Logística Crio-Pharma)</Label>
+              <select
+                value={dispatchCourier}
+                onChange={(e) => setDispatchCourier(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl bg-muted/30 border border-border text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="Carlos Eduardo Silva (Furgão Refrigerado PYR-4Z26)">
+                  🚚 Carlos Eduardo Silva — Furgão Refrigerado (Placa PYR-4Z26) · ⭐ 4.98
+                </option>
+                <option value="Marcos Vinícius Santos (Moto Baú Isotérmico PLT-8X19)">
+                  🛵 Marcos Vinícius Santos — Moto Baú Isotérmico (Placa PLT-8X19) · ⭐ 4.95
+                </option>
+                <option value="Juliana Mendes Costa (Renault Kangoo Maxi MED-3K44)">
+                  🚐 Juliana Mendes Costa — Renault Kangoo Crio (Placa MED-3K44) · ⭐ 5.0
+                </option>
+              </select>
+            </div>
+
+            {/* Código de Rastreio */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold">Código de Rastreio Satélite (Gerado Automaticamente)</Label>
+              <Input
+                value={dispatchTrackingCode}
+                onChange={(e) => setDispatchTrackingCode(e.target.value)}
+                placeholder="PYR-SAT-984210-BR"
+                className="rounded-xl font-mono text-sm bg-muted/30 border-border"
+              />
             </div>
             
-            <div className="space-y-2">
-              <Label>Motivo de Recusa (Opcional)</Label>
-              <Textarea placeholder="Descreva o motivo se a receita for irregular..." />
+            {/* Motivo de Recusa (Opcional) */}
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Motivo de Recusa (Apenas se houver irregularidade no receituário)</Label>
+              <Textarea
+                value={refusalReason}
+                onChange={(e) => setRefusalReason(e.target.value)}
+                placeholder="Ex: Assinatura médica ilegível ou dosagem incompatível..."
+                className="rounded-xl text-xs bg-muted/20 border-border min-h-[60px]"
+              />
             </div>
           </div>
           
-          <DialogFooter className="flex justify-between sm:justify-between w-full">
-            <Button variant="destructive">Recusar Receita</Button>
+          <DialogFooter className="flex flex-col sm:flex-row justify-between sm:justify-between w-full gap-2 pt-3 border-t border-border">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleRejectPrescription}
+              className="rounded-xl text-xs font-bold"
+            >
+              <XCircle size={14} className="mr-1.5" /> Recusar Receita
+            </Button>
             <div className="flex gap-2">
-              <Button variant="outline"><FileText className="mr-2" size={16}/> Ver PDF</Button>
-              <Button className="bg-primary text-primary-foreground"><CheckCircle className="mr-2" size={16}/> Aprovar & Despachar</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => toast({ title: "Visualizando Receita", description: "PDF autêntico verificado com chave pública ICP-Brasil." })}
+                className="rounded-xl text-xs font-bold border-border"
+              >
+                <FileText className="mr-1.5" size={14}/> Ver PDF ICP-Brasil
+              </Button>
+              <Button
+                onClick={handleApproveAndDispatch}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-lg gap-1.5"
+              >
+                <CheckCircle2 size={15} /> Aprovar & Despachar Pedido
+              </Button>
             </div>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Simulação de Upload de Receita pelo Paciente */}
+      <Dialog open={isNewRxModalOpen} onOpenChange={setIsNewRxModalOpen}>
+        <DialogContent className="max-w-lg bg-card border-border shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold flex items-center gap-2">
+              <Upload className="text-emerald-400 w-5 h-5" /> Enviar Nova Receita Médica (Paciente)
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Simule o envio de uma prescrição canabinoide para cair instantaneamente na Caixa de Entrada da farmácia.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateNewPrescription} className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold">Nome do Paciente *</Label>
+              <Input
+                required
+                placeholder="Ex: Gabriela Medeiros Lima"
+                value={newRxForm.patient}
+                onChange={(e) => setNewRxForm({ ...newRxForm, patient: e.target.value })}
+                className="rounded-xl text-xs bg-muted/30 border-border"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold">WhatsApp / Telefone</Label>
+                <Input
+                  placeholder="(11) 98765-4321"
+                  value={newRxForm.phone}
+                  onChange={(e) => setNewRxForm({ ...newRxForm, phone: e.target.value })}
+                  className="rounded-xl text-xs bg-muted/30 border-border"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold">CEP</Label>
+                <Input
+                  placeholder="01310-200"
+                  value={newRxForm.cep}
+                  onChange={(e) => setNewRxForm({ ...newRxForm, cep: e.target.value })}
+                  className="rounded-xl text-xs bg-muted/30 border-border"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-bold">Endereço de Entrega</Label>
+              <Input
+                placeholder="Av. Paulista, 1500 - São Paulo, SP"
+                value={newRxForm.address}
+                onChange={(e) => setNewRxForm({ ...newRxForm, address: e.target.value })}
+                className="rounded-xl text-xs bg-muted/30 border-border"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold">Medicamento</Label>
+                <Input
+                  value={newRxForm.medicine}
+                  onChange={(e) => setNewRxForm({ ...newRxForm, medicine: e.target.value })}
+                  className="rounded-xl text-xs bg-muted/30 border-border"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold">Valor (R$)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={newRxForm.value}
+                  onChange={(e) => setNewRxForm({ ...newRxForm, value: e.target.value })}
+                  className="rounded-xl text-xs bg-muted/30 border-border"
+                />
+              </div>
+            </div>
+
+            <div className="p-3 border-2 border-dashed border-border rounded-xl text-center bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors">
+              <UploadCloud className="mx-auto mb-1 text-muted-foreground w-6 h-6" />
+              <p className="text-xs font-bold text-foreground">Anexar Receita (PDF ou Imagem)</p>
+              <p className="text-[10px] text-muted-foreground">Assinatura ICP-Brasil reconhecida automaticamente</p>
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button
+                type="submit"
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs h-10"
+              >
+                📥 Enviar Receita para a Farmácia
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

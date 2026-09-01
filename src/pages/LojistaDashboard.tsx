@@ -24,15 +24,6 @@ import { MedicamentoSatelliteTracker } from "@/components/delivery/MedicamentoSa
 import PharmacyKycDocViewer from "@/components/admin/PharmacyKycDocViewer";
 import { PHARMACY_KYC_LABELS, type PharmacyKycKind, TEST_PHARMACY_DATA } from "@/lib/pharmacy-kyc-docs";
 
-export default function LojistaDashboard() {
-  const { toast } = useToast();
-  const { profile, metrics, loading, authError, kycDocs, uploadKycDoc, addProduct, refreshData } = useLojista();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [isRastreioOpen, setIsRastreioOpen] = useState(false);
-  const [uploadingKind, setUploadingKind] = useState<string | null>(null);
-  const [docViewer, setDocViewer] = useState<{ kind: PharmacyKycKind; url?: string } | null>(null);
-
 export interface PrescriptionInboxItem {
   id: string;
   patient: string;

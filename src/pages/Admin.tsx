@@ -19,7 +19,7 @@ import {
   Activity, AlertTriangle, BarChart3, Bell, Bot, CheckCircle2, Clock,
   CreditCard, DollarSign, FileText, Globe, HeartPulse, LogOut, MessageSquare,
   RefreshCw, Send, Server, Shield, ShoppingBag, Stethoscope, TrendingUp,
-  UserPlus, Users, Wallet, XCircle, Zap, UserCheck, Building2, Video, Sparkles,
+  UserPlus, Users, Wallet, XCircle, Zap, UserCheck, Building2, Video,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";

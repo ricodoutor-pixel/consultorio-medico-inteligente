@@ -456,26 +456,38 @@ export const AdminAprovacoesFarmacias = () => {
                     </div>
                   </div>
 
-                  {/* AÇÕES EXTERNAS / CONSULTAS PÚBLICAS */}
-                  <div className="pt-4 mt-4 border-t border-border/40 flex items-center justify-between flex-wrap gap-2">
+                  {/* AÇÕES EXTERNAS / CONSULTAS PÚBLICAS & CONEXÃO COM O DASHBOARD DO LOJISTA */}
+                  <div className="pt-4 mt-4 border-t border-border/40 flex items-center justify-between flex-wrap gap-3">
                     <div className="flex items-center gap-2 flex-wrap text-xs">
-                      <Button variant="outline" size="sm" className="h-8 text-xs rounded-lg border-border" asChild>
-                        <a href={RECEITA_CNPJ_URL} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink size={12} className="mr-1 text-primary" /> Consulta CNPJ (Receita)
+                      <Button variant="outline" size="sm" className="h-8 text-xs rounded-xl border-primary/30 text-primary hover:bg-primary/10 font-bold" asChild>
+                        <a href="/lojistas" target="_blank" rel="noopener noreferrer">
+                          <Store size={13} className="mr-1" /> Acessar Painel Lojista (/lojistas)
                         </a>
                       </Button>
 
-                      <Button variant="outline" size="sm" className="h-8 text-xs rounded-lg border-border" asChild>
+                      <Button variant="outline" size="sm" className="h-8 text-xs rounded-xl border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 font-bold" asChild>
+                        <a href="/farmacia-virtual" target="_blank" rel="noopener noreferrer">
+                          <ShoppingBag size={13} className="mr-1" /> Farmácia Virtual & Balcão
+                        </a>
+                      </Button>
+
+                      <Button variant="outline" size="sm" className="h-8 text-xs rounded-xl border-border" asChild>
+                        <a href={RECEITA_CNPJ_URL} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink size={12} className="mr-1 text-primary" /> Consulta CNPJ
+                        </a>
+                      </Button>
+
+                      <Button variant="outline" size="sm" className="h-8 text-xs rounded-xl border-border" asChild>
                         <a href={ANVISA_CONSULTA_URL} target="_blank" rel="noopener noreferrer">
                           <ExternalLink size={12} className="mr-1 text-emerald-400" /> Consulta AFE (ANVISA)
                         </a>
                       </Button>
 
-                      <Button variant="outline" size="sm" className="h-8 text-xs rounded-lg border-border text-emerald-400" asChild>
+                      <Button variant="outline" size="sm" className="h-8 text-xs rounded-xl border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10" asChild>
                         <a
                           href={`https://wa.me/${pharmacy.phone.replace(/\D/g, "")}?text=Olá%20${encodeURIComponent(
                             pharmacy.nome_fantasia
-                          )},%20sua%20loja%20está%20sendo%20analisada%20na%20Planta%20y%20Raíz.`}
+                          )},%20sua%20loja%20está%20sendo%20homologada%20na%20Planta%20y%20Raíz.`}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -484,8 +496,10 @@ export const AdminAprovacoesFarmacias = () => {
                       </Button>
                     </div>
 
-                    <div className="text-[11px] text-muted-foreground">
-                      E-mail: <strong className="text-foreground">{pharmacy.email}</strong>
+                    <div className="text-[11px] text-muted-foreground flex items-center gap-2">
+                      <span>E-mail: <strong className="text-foreground">{pharmacy.email}</strong></span>
+                      <span>·</span>
+                      <span>ID: <strong className="text-foreground font-mono">{pharmacy.id.slice(0, 8)}</strong></span>
                     </div>
                   </div>
                 </CardContent>

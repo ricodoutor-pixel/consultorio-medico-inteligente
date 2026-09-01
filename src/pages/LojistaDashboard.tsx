@@ -11,19 +11,27 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { DollarSign, Package, AlertTriangle, Building2, BookOpen, Clock, FileText, CheckCircle, Truck, FileSignature, Wallet, Navigation, Sparkles } from "lucide-react";
+import { 
+  DollarSign, Package, AlertTriangle, Building2, BookOpen, Clock, FileText, 
+  CheckCircle, Truck, FileSignature, Wallet, Navigation, Sparkles, ShieldCheck, 
+  Upload, Eye, CheckCircle2, XCircle, ExternalLink, RefreshCw 
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { VipUpgradePopup } from "@/components/VipUpgradePopup";
 import { useLojista } from "@/hooks/useLojista";
 import { RastreioPedidoModal } from "@/components/delivery/RastreioPedidoModal";
 import { MedicamentoSatelliteTracker } from "@/components/delivery/MedicamentoSatelliteTracker";
+import PharmacyKycDocViewer from "@/components/admin/PharmacyKycDocViewer";
+import { PHARMACY_KYC_LABELS, type PharmacyKycKind, TEST_PHARMACY_DATA } from "@/lib/pharmacy-kyc-docs";
 
 export default function LojistaDashboard() {
   const { toast } = useToast();
-  const { profile, metrics, loading, authError, addProduct } = useLojista();
+  const { profile, metrics, loading, authError, kycDocs, uploadKycDoc, addProduct, refreshData } = useLojista();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [isRastreioOpen, setIsRastreioOpen] = useState(false);
+  const [uploadingKind, setUploadingKind] = useState<string | null>(null);
+  const [docViewer, setDocViewer] = useState<{ kind: PharmacyKycKind; url?: string } | null>(null);
 
   // Mock data para Receitas Inbox
   const [inbox] = useState([
@@ -128,15 +136,69 @@ export default function LojistaDashboard() {
           </Button>
         </div>
 
+        {/* BANNER DE COMPLIANCE & STATUS KYC */}
+        <div className={`p-4 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${
+          profile.is_approved
+            ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+            : "bg-amber-500/10 border-amber-500/30 text-amber-300"
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+              profile.is_approved ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"
+            }`}>
+              <ShieldCheck size={22} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-bold text-sm text-foreground">
+                  Status Regulatório da Loja:
+                </span>
+                <Badge className={profile.is_approved ? "bg-emerald-500 text-black font-bold text-xs" : "bg-amber-500 text-black font-bold text-xs"}>
+                  {profile.is_approved ? "✓ LOJA HOMOLOGADA NO SHOPPING" : "⏳ EM ANÁLISE KYC"}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {profile.is_approved 
+                  ? "Sua loja está ativa para receber pedidos, dispensar receitas e sincronizar catálogo com o Shopping Planta y Raíz."
+                  : "Complete o envio dos 7 documentos de conformidade ANVISA e CRF para liberar a publicação dos seus produtos."}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setActiveTab("kyc")}
+              className="text-xs font-bold rounded-xl border-primary/30 text-primary hover:bg-primary/10 flex-1 md:flex-none"
+            >
+              <FileSignature size={14} className="mr-1.5" /> Dossiê Regulatório ANVISA
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              asChild
+              className="text-xs font-bold rounded-xl border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 flex-1 md:flex-none"
+            >
+              <Link to="/admin/kyc-lojas">
+                <ExternalLink size={14} className="mr-1.5" /> Painel Admin KYC
+              </Link>
+            </Button>
+          </div>
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6 grid grid-cols-2 lg:grid-cols-5 gap-2 h-auto bg-muted/60 p-1.5 rounded-2xl border border-border">
+          <TabsList className="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 h-auto bg-muted/60 p-1.5 rounded-2xl border border-border">
             <TabsTrigger value="overview" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Visão Geral</TabsTrigger>
             <TabsTrigger value="rastreio" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-emerald-400">
-              <Truck size={14} className="mr-1 inline" /> Rastreamento Satélite
+              <Truck size={14} className="mr-1 inline" /> Rastreamento
             </TabsTrigger>
-            <TabsTrigger value="inbox" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Receitas & Dispensação</TabsTrigger>
-            <TabsTrigger value="catalog" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Catálogo (Vitrine)</TabsTrigger>
-            <TabsTrigger value="financial" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Financeiro & Repasse</TabsTrigger>
+            <TabsTrigger value="inbox" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Receitas</TabsTrigger>
+            <TabsTrigger value="catalog" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Catálogo</TabsTrigger>
+            <TabsTrigger value="financial" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Financeiro</TabsTrigger>
+            <TabsTrigger value="kyc" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-amber-400">
+              <ShieldCheck size={14} className="mr-1 inline" /> KYC & Documentos
+            </TabsTrigger>
           </TabsList>
 
           {/* ABA 1: OVERVIEW */}
@@ -331,21 +393,131 @@ export default function LojistaDashboard() {
             </div>
           </TabsContent>
           
-          {/* ABA 4: FINANCEIRO */}
-          <TabsContent value="financial" className="space-y-6">
-             <Card>
-                <CardHeader>
-                  <CardTitle>Extrato Financeiro (Split Automático)</CardTitle>
-                  <CardDescription>Você recebe 95% direto na sua conta conectada.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-12 border rounded-xl border-dashed">
-                    <Wallet size={48} className="mx-auto mb-4 text-muted-foreground opacity-50" />
-                    <h3 className="font-bold text-lg">Histórico de Repasses</h3>
-                    <p className="text-muted-foreground mt-2">Nenhuma liquidação recente.</p>
+          {/* ABA 6: KYC & DOCUMENTAÇÃO REGULATÓRIA ANVISA / CRF */}
+          <TabsContent value="kyc" className="space-y-6">
+            <Card className="border-border bg-card/60">
+              <CardHeader>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                  <div>
+                    <CardTitle className="text-lg md:text-xl font-display font-black flex items-center gap-2">
+                      <ShieldCheck className="text-emerald-400 w-5 h-5" />
+                      Dossiê Regulatório & Upload de Documentos KYC
+                    </CardTitle>
+                    <CardDescription className="text-xs mt-1">
+                      Conformidade com a ANVISA RDC 327/2019, RDC 660/2022 e Conselho Regional de Farmácia (CRF).
+                    </CardDescription>
                   </div>
-                </CardContent>
-             </Card>
+                  <Badge className={profile.is_approved ? "bg-emerald-500 text-black font-bold text-xs" : "bg-amber-500 text-black font-bold text-xs"}>
+                    {profile.is_approved ? "✓ LOJA HOMOLOGADA" : "⏳ AGUARDANDO ANÁLISE"}
+                  </Badge>
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+                {/* Grid dos 7 Documentos Regulatórios */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {(Object.keys(PHARMACY_KYC_LABELS) as PharmacyKycKind[]).map((kind) => {
+                    const localUrl = kycDocs[kind];
+                    const testDoc = TEST_PHARMACY_DATA.kyc_docs?.find(d => d.document_kind === kind);
+                    const hasDoc = Boolean(localUrl || testDoc?.file_url);
+                    const isUploading = uploadingKind === kind;
+
+                    return (
+                      <div
+                        key={kind}
+                        className={`p-4 rounded-2xl border transition-all flex flex-col justify-between gap-3 ${
+                          hasDoc
+                            ? "bg-emerald-500/5 border-emerald-500/30"
+                            : "bg-muted/30 border-border hover:border-amber-500/40"
+                        }`}
+                      >
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-foreground">
+                              {PHARMACY_KYC_LABELS[kind]}
+                            </span>
+                            {hasDoc ? (
+                              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[10px] font-bold">
+                                <CheckCircle2 size={11} className="mr-1" /> Enviado
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="bg-amber-500/10 text-amber-400 border-amber-500/30 text-[10px] font-bold">
+                                <Clock size={11} className="mr-1" /> Pendente
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-muted-foreground leading-tight">
+                            {kind === "foto_fachada" && "Foto nítida da fachada externa com identificação visual da loja."}
+                            {kind === "logo_empresa" && "Logo de alta resolução para exibição no Marketplace e vitrine."}
+                            {kind === "contrato_social_pdf" && "Última alteração consolidada ou Certificado de MEI/EIRELI."}
+                            {kind === "cartao_cnpj" && "Comprovante de Inscrição e Situação Cadastral na Receita Federal."}
+                            {kind === "alvara_sanitario" && "Alvará Sanitário da Vigilância Sanitária Municipal/Estadual."}
+                            {kind === "crf_responsavel" && "Certidão de Regularidade Técnica emitida pelo CRF do farmacêutico RT."}
+                            {kind === "comprovante_endereco" && "Conta de água, luz ou contrato de locação do imóvel."}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-2 border-t border-border/40">
+                          {hasDoc && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setDocViewer({ kind, url: localUrl || testDoc?.file_url })}
+                              className="text-[11px] h-8 rounded-xl border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 flex-1 font-bold"
+                            >
+                              <Eye size={13} className="mr-1" /> Ver Arquivo
+                            </Button>
+                          )}
+
+                          <label className="flex-1 cursor-pointer">
+                            <input
+                              type="file"
+                              accept="image/*,application/pdf"
+                              className="hidden"
+                              disabled={isUploading}
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setUploadingKind(kind);
+                                try {
+                                  await uploadKycDoc(kind, file);
+                                  toast({
+                                    title: "✓ Documento Anexado com Sucesso!",
+                                    description: `${PHARMACY_KYC_LABELS[kind]} enviado para análise de compliance.`,
+                                  });
+                                } catch (err: any) {
+                                  toast({
+                                    title: "Erro no envio",
+                                    description: err.message || "Tente novamente.",
+                                    variant: "destructive",
+                                  });
+                                } finally {
+                                  setUploadingKind(null);
+                                  e.target.value = "";
+                                }
+                              }}
+                            />
+                            <Button
+                              size="sm"
+                              variant={hasDoc ? "ghost" : "default"}
+                              disabled={isUploading}
+                              className={`w-full text-[11px] h-8 rounded-xl font-bold pointer-events-none ${
+                                hasDoc
+                                  ? "text-muted-foreground hover:text-foreground"
+                                  : "bg-primary text-black hover:bg-primary/90"
+                              }`}
+                            >
+                              <Upload size={13} className="mr-1" />
+                              {isUploading ? "Enviando..." : hasDoc ? "Substituir" : "Enviar Arquivo"}
+                            </Button>
+                          </label>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
@@ -405,6 +577,18 @@ export default function LojistaDashboard() {
         onOpenChange={setIsRastreioOpen}
         isPharmacy={true}
       />
+
+      {/* Visualizador de Documentos KYC */}
+      {docViewer && (
+        <PharmacyKycDocViewer
+          open={Boolean(docViewer)}
+          onClose={() => setDocViewer(null)}
+          userId={profile.id}
+          kind={docViewer.kind}
+          fileUrl={docViewer.url}
+          pharmacyName={profile.company_name}
+        />
+      )}
     </div>
   );
 }

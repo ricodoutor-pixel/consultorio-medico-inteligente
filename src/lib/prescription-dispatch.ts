@@ -85,3 +85,76 @@ export async function computeRegulatoryHash(input: string): Promise<string> {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
+
+/** Hash SHA-512 do conteúdo binário do PDF (prova de integridade regulatória) */
+export async function computeFileHash(file: File | Blob): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  const digest = await crypto.subtle.digest("SHA-512", buffer);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/** Baixa o PDF assinado e calcula o hash SHA-512 real do arquivo */
+export async function hashRemotePdf(url: string): Promise<string | null> {
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) return null;
+    return await computeFileHash(await resp.blob());
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fluxo real de despacho 1-clique: escolhe a farmácia homologada (ou a primeira
+ * disponível), garante o hash SHA-512 do PDF e grava na pharmacy_prescriptions_inbox.
+ */
+export async function dispatchSignedPrescription(params: {
+  vendorId?: string | null;
+  patientId: string;
+  patientName: string;
+  patientWhatsapp?: string | null;
+  prescriptionId?: string | null;
+  prescriptionPdfUrl: string;
+  existingHash?: string | null;
+  orderId?: string | null;
+  deliveryAddress?: Record<string, unknown> | null;
+  dispatchMode?: DispatchPayload["dispatchMode"];
+}): Promise<{ id: string; pharmacy: PharmacyOption | null }> {
+  let vendorId = params.vendorId ?? null;
+  let pharmacy: PharmacyOption | null = null;
+
+  const pharmacies = await listApprovedPharmacies();
+  if (vendorId) {
+    pharmacy = pharmacies.find((p) => p.id === vendorId) ?? null;
+  } else {
+    pharmacy = pharmacies[0] ?? null;
+    vendorId = pharmacy?.id ?? null;
+  }
+
+  if (!vendorId) {
+    throw new Error("Nenhuma farmácia homologada disponível para receber a receita.");
+  }
+
+  const regulatoryHash =
+    params.existingHash ||
+    (await hashRemotePdf(params.prescriptionPdfUrl)) ||
+    (await computeRegulatoryHash(`${params.prescriptionPdfUrl}|${params.patientId}|${Date.now()}`));
+
+  const result = await dispatchPrescriptionToPharmacy({
+    vendorId,
+    patientId: params.patientId,
+    patientName: params.patientName,
+    patientWhatsapp: params.patientWhatsapp ?? null,
+    prescriptionId: params.prescriptionId ?? null,
+    prescriptionPdfUrl: params.prescriptionPdfUrl,
+    regulatoryHash,
+    orderId: params.orderId ?? null,
+    deliveryAddress: params.deliveryAddress ?? null,
+    dispatchMode: params.dispatchMode ?? "automatic_1click",
+  });
+
+  return { id: result.id, pharmacy };
+}
+

@@ -83,11 +83,11 @@ export default function Login() {
         // Fetch user profile
         const { data: profile } = await supabase
           .from("profiles")
-          .select("user_type, full_name")
+          .select("user_type, full_name, company_name")
           .eq("id", data.user.id)
           .maybeSingle();
 
-        const name = profile?.full_name || userEmail.split("@")[0];
+        const name = profile?.full_name || profile?.company_name || userEmail.split("@")[0];
 
         // Safe redirect handling
         const safeRedirect = (() => {

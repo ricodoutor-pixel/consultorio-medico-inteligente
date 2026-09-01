@@ -532,7 +532,7 @@ export const AdminAprovacoes = () => {
 
                         <TableCell>
                           <div className="flex flex-wrap gap-1.5">
-                            {[...KYC_REQUIRED, 'icp_brasil'].map((kind) => {
+                            {([...KYC_REQUIRED, 'icp_brasil'] as KycKind[]).map((kind) => {
                               const attached = kind === 'icp_brasil' ? Boolean(doc.signature_url) : Boolean(docOf(doc, kind));
                               return (
                                 <Button

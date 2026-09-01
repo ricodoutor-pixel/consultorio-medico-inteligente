@@ -172,7 +172,7 @@ export function useFarmaciaVirtual() {
           .order('created_at', { ascending: false })
           .limit(10),
 
-        supabase
+        (supabase as any)
           .from('prescriptions')
           .select(`
             *,
@@ -372,7 +372,7 @@ export function useFarmaciaVirtual() {
   const dispensePrescription = async (prescriptionId: string) => {
     if (!data?.vendor?.id) return;
     const now = new Date().toISOString();
-    const { error: updateErr } = await supabase
+    const { error: updateErr } = await (supabase as any)
       .from('prescriptions')
       .update({
         status: 'dispensed',

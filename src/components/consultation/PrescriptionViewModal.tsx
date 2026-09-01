@@ -1,33 +1,96 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { FileText, Send, Download, Store } from "lucide-react";
+import { FileText, Send, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  dispatchSignedPrescription,
+  listApprovedPharmacies,
+  type PharmacyOption,
+} from "@/lib/prescription-dispatch";
 
-export function PrescriptionViewModal({ isOpen, onClose, prescription }: any) {
+interface PrescriptionViewModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  prescription: any;
+  /** Farmácia preferida (opcional). Sem valor, usa a primeira homologada. */
+  vendorId?: string | null;
+}
+
+export function PrescriptionViewModal({ isOpen, onClose, prescription, vendorId }: PrescriptionViewModalProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSending, setIsSending] = useState(false);
+  const [pharmacies, setPharmacies] = useState<PharmacyOption[]>([]);
 
-  const handleSendToPharmacy = () => {
-    setIsSending(true);
-    setTimeout(() => {
-      setIsSending(false);
+  useEffect(() => {
+    if (!isOpen) return;
+    listApprovedPharmacies()
+      .then(setPharmacies)
+      .catch(() => setPharmacies([]));
+  }, [isOpen]);
+
+  const pdfUrl: string | undefined =
+    prescription?.signed_pdf_url || prescription?.pdf_url || prescription?.prescription_pdf_url;
+
+  const handleSendToPharmacy = async () => {
+    if (!pdfUrl) {
       toast({
-        title: "Receita Despachada!",
-        description: "Enviada automaticamente para a farmácia com melhor cotação.",
+        title: "Receita sem PDF assinado",
+        description: "Aguarde a assinatura digital do médico para despachar à farmácia.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      const patientId = prescription?.patient_id || auth.user?.id;
+      if (!patientId) throw new Error("Faça login para despachar a receita.");
+
+      const patientName =
+        prescription?.patient_name ||
+        (auth.user?.user_metadata as any)?.full_name ||
+        auth.user?.email ||
+        "Paciente";
+
+      const { pharmacy } = await dispatchSignedPrescription({
+        vendorId: vendorId ?? prescription?.vendor_id ?? null,
+        patientId,
+        patientName,
+        patientWhatsapp: prescription?.patient_whatsapp ?? null,
+        prescriptionId: prescription?.id ?? null,
+        prescriptionPdfUrl: pdfUrl,
+        existingHash: prescription?.signature_hash ?? prescription?.regulatory_hash ?? null,
+        dispatchMode: "automatic_1click",
+      });
+
+      toast({
+        title: "Receita despachada!",
+        description: `Enviada com hash SHA-512 para ${pharmacy?.nome_fantasia || "a farmácia homologada"}.`,
       });
       onClose();
-    }, 1500);
+    } catch (err) {
+      toast({
+        title: "Falha no despacho",
+        description: err instanceof Error ? err.message : "Não foi possível enviar a receita.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleDownload = () => {
-    toast({ title: "Download Iniciado", description: "O PDF assinado está sendo baixado." });
+    if (pdfUrl) window.open(pdfUrl, "_blank", "noopener,noreferrer");
+    else toast({ title: "PDF indisponível", description: "A receita ainda não possui arquivo assinado." });
     setTimeout(() => {
       navigate("/shopping");
       onClose();
-    }, 1000);
+    }, 800);
   };
 
   if (!prescription) return null;
@@ -51,10 +114,14 @@ export function PrescriptionViewModal({ isOpen, onClose, prescription }: any) {
             disabled={isSending}
           >
             <div className="flex items-center gap-2 font-bold text-lg">
-              <Send size={20} />
-              Enviar Direto para Farmácia (Recomendada)
+              {isSending ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
+              {isSending ? "Despachando..." : "Enviar Direto para Farmácia (Recomendada)"}
             </div>
-            <span className="text-xs text-emerald-100 font-normal">Cotação automática com melhor preço e frete grátis</span>
+            <span className="text-xs text-emerald-100 font-normal">
+              {pharmacies.length > 0
+                ? `Despacho auditado para ${pharmacies[0].nome_fantasia}`
+                : "Cotação automática com melhor preço e frete grátis"}
+            </span>
           </Button>
 
           <div className="relative flex py-2 items-center">

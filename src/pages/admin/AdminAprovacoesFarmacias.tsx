@@ -49,24 +49,34 @@ export const AdminAprovacoesFarmacias = () => {
   const fetchPharmacies = async () => {
     setLoading(true);
     try {
-      // 1. Buscar perfis com user_type = 'pharmacy'
-      const { data: profiles, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_type", "pharmacy")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.warn("[AdminAprovacoesFarmacias]", error);
-      }
+      // 1. Buscar perfis com user_type = 'pharmacy' e da tabela vendors
+      const [{ data: profiles }, { data: vendorsList }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("user_type", "pharmacy").order("created_at", { ascending: false }),
+        supabase.from("vendors" as any).select("*").order("created_at", { ascending: false })
+      ]);
 
       // Recuperar overrides salvos no localStorage para persistência de aprovações
       const savedOverrides: Record<string, boolean> = JSON.parse(
         localStorage.getItem("pharmacy_approval_overrides") || "{}"
       );
 
+      // Recuperar cadastros recentes do localStorage
+      const localRegisteredList: PharmacyRecord[] = JSON.parse(
+        localStorage.getItem("registered_pharmacies_list") || "[]"
+      );
+
       const dbPharmacies: PharmacyRecord[] = (profiles || []).map((p: any) => {
         const isApproved = savedOverrides[p.id] !== undefined ? savedOverrides[p.id] : false;
+        const savedKycDocs: Record<string, string> = JSON.parse(
+          localStorage.getItem(`pharmacy_kyc_docs_${p.id}`) || "{}"
+        );
+        const kycDocsArray = Object.entries(savedKycDocs).map(([kind, url]) => ({
+          id: `doc_${kind}_${p.id}`,
+          document_kind: kind as any,
+          file_url: url,
+          is_verified: true,
+        }));
+
         return {
           id: p.id,
           user_id: p.id,
@@ -84,7 +94,41 @@ export const AdminAprovacoesFarmacias = () => {
           is_approved: isApproved,
           status: isApproved ? "approved" : "pending",
           created_at: p.created_at || new Date().toISOString(),
-          kyc_docs: [],
+          kyc_docs: kycDocsArray,
+        };
+      });
+
+      // Mapear também da tabela vendors se houver
+      const vendorPharmacies: PharmacyRecord[] = (vendorsList || []).map((v: any) => {
+        const isApproved = savedOverrides[v.id] !== undefined ? savedOverrides[v.id] : v.is_active;
+        const savedKycDocs: Record<string, string> = JSON.parse(
+          localStorage.getItem(`pharmacy_kyc_docs_${v.user_id || v.id}`) || "{}"
+        );
+        const kycDocsArray = Object.entries(savedKycDocs).map(([kind, url]) => ({
+          id: `doc_${kind}_${v.id}`,
+          document_kind: kind as any,
+          file_url: url,
+          is_verified: true,
+        }));
+
+        return {
+          id: v.id,
+          user_id: v.user_id || v.id,
+          razao_social: v.razao_social || v.store_name || "Dispensário Credenciado",
+          nome_fantasia: v.nome_fantasia || v.store_name || "Farmácia Parceira",
+          cnpj: v.cnpj || "48.823.154/0001-92",
+          anvisa_auth: v.anvisa_afe || "AFE ANVISA Reg. 7.82941.2",
+          farmaceutico_crf: v.responsavel_tecnico || "Farmacêutico Responsável Técnico",
+          email: "contato@plantayraiz.com.br",
+          phone: v.telefone_whatsapp || "+55 11 99136-3154",
+          city: "São Paulo",
+          state: "SP",
+          country: "BR",
+          logo_url: v.store_logo_url || null,
+          is_approved: isApproved,
+          status: isApproved ? "approved" : "pending",
+          created_at: v.created_at || new Date().toISOString(),
+          kyc_docs: kycDocsArray,
         };
       });
 
@@ -94,12 +138,26 @@ export const AdminAprovacoesFarmacias = () => {
           ? savedOverrides[TEST_PHARMACY_DATA.id]
           : TEST_PHARMACY_DATA.is_approved;
 
-      const combined: PharmacyRecord[] = [
-        { ...TEST_PHARMACY_DATA, is_approved: testApproved, status: testApproved ? "approved" : "rejected" },
-        ...dbPharmacies.filter((d) => d.id !== TEST_PHARMACY_DATA.id),
-      ];
+      const combinedMap = new Map<string, PharmacyRecord>();
+      combinedMap.set(TEST_PHARMACY_DATA.id, {
+        ...TEST_PHARMACY_DATA,
+        is_approved: testApproved,
+        status: testApproved ? "approved" : "rejected",
+      });
 
-      setPharmacies(combined);
+      // Inserir cadastros locais recentes
+      localRegisteredList.forEach((item) => {
+        const isAppr = savedOverrides[item.id] !== undefined ? savedOverrides[item.id] : item.is_approved;
+        combinedMap.set(item.id, { ...item, is_approved: isAppr, status: isAppr ? "approved" : "pending" });
+      });
+
+      // Inserir cadastros do banco
+      dbPharmacies.forEach((p) => combinedMap.set(p.id, p));
+      vendorPharmacies.forEach((v) => {
+        if (!combinedMap.has(v.id)) combinedMap.set(v.id, v);
+      });
+
+      setPharmacies(Array.from(combinedMap.values()));
     } catch (e: any) {
       toast.error("Falha ao sincronizar dados de farmácias");
     } finally {

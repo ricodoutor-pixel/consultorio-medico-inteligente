@@ -288,7 +288,52 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GT-MRLXCRGK"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-    <div id="root"></div>
+    <div id="root">
+      <!-- Tela de boot estática: no iPhone o bundle pode levar segundos e o
+           usuário via apenas fundo escuro (parecia "site não carrega").
+           O React substitui todo o #root ao montar. -->
+      <div id="__pyr_boot_screen">
+        <img class="pyr-mark" src="/logo-planta-raiz.webp" alt="Planta y Raiz" width="84" height="84" fetchpriority="high" />
+        <p>Carregando sua Clínica Digital…</p>
+      </div>
+    </div>
+
+    <script>
+      // 🍏 Recuperação específica de iOS Safari:
+      // 1) bfcache (voltar/avançar) às vezes restaura a página com o #root vazio;
+      // 2) abas suspensas pelo iOS por memória voltam sem o React montado.
+      (function(){
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (!isIOS) return;
+        var KEY = '__pyr_ios_recover_v1';
+        function rootDead(){
+          var r = document.getElementById('root');
+          if (!r) return true;
+          if (r.dataset.reactMounted === '1') return false;
+          return r.children.length === 0 || !!document.getElementById('__pyr_boot_screen');
+        }
+        function recoverOnce(){
+          var tried;
+          try { tried = sessionStorage.getItem(KEY) === '1'; } catch(_){ tried = false; }
+          if (tried) return;
+          try { sessionStorage.setItem(KEY, '1'); } catch(_){}
+          location.reload();
+        }
+        window.addEventListener('pageshow', function(e){
+          if (!e.persisted) return;
+          if (rootDead()) recoverOnce();
+        });
+        document.addEventListener('visibilitychange', function(){
+          if (document.visibilityState !== 'visible') return;
+          setTimeout(function(){ if (rootDead()) recoverOnce(); }, 1500);
+        });
+        window.addEventListener('load', function(){
+          setTimeout(function(){ try { sessionStorage.removeItem(KEY); } catch(_){} }, 8000);
+        });
+      })();
+    </script>
+
 
     <!-- Favicon rotation REMOVIDO: Google exige URL estável.
          A rotação diária fazia o Googlebot cair no globo padrão da SERP. -->

@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
   DollarSign, Package, AlertTriangle, Building2, BookOpen, Clock, FileText, 
   CheckCircle, Truck, FileSignature, Wallet, Navigation, Sparkles, ShieldCheck, 
-  Upload, Eye, CheckCircle2, XCircle, ExternalLink, RefreshCw 
+  Upload, UploadCloud, Eye, CheckCircle2, XCircle, ExternalLink, RefreshCw 
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { VipUpgradePopup } from "@/components/VipUpgradePopup";

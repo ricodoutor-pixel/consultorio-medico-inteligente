@@ -11,7 +11,7 @@ import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, FileBarChart, Brain, Flame, RefreshCw, ClipboardCheck, Loader2, Camera, UserCircle2, MessageCircle, Network, Settings, BookOpen, ArrowRight } from "lucide-react";
+import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, FileBarChart, Brain, Flame, RefreshCw, ClipboardCheck, Loader2, Camera, UserCircle2, MessageCircle, Network, Settings, BookOpen, ArrowRight, ShieldCheck } from "lucide-react";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { motion } from "framer-motion";
 import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
@@ -102,7 +102,7 @@ const DashboardMedico = () => {
         setIsOnline(doctor.is_online);
 
         const isSigned = Boolean(
-          doctor.is_contract_signed ||
+          (doctor as any).is_contract_signed ||
           localStorage.getItem(`doctor_contract_signed_${doctor.id}`) === "true"
         );
         if (!isSigned) {

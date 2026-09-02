@@ -118,7 +118,7 @@ export const AdminAprovacoes = () => {
     const p = doc.profile || {};
     const kinds = new Set((doc.kyc_docs || []).map((k: any) => k.document_kind));
     return [
-      ...[...KYC_REQUIRED, 'icp_brasil'].map((kind) => ({ 
+      ...([...KYC_REQUIRED, 'icp_brasil'] as KycKind[]).map((kind) => ({ 
         label: KYC_LABELS[kind], 
         ok: kind === 'icp_brasil' ? Boolean(doc.signature_url) : kinds.has(kind) 
       })),
@@ -532,7 +532,7 @@ export const AdminAprovacoes = () => {
 
                         <TableCell>
                           <div className="flex flex-wrap gap-1.5">
-                            {[...KYC_REQUIRED, 'icp_brasil'].map((kind) => {
+                            {([...KYC_REQUIRED, 'icp_brasil'] as KycKind[]).map((kind) => {
                               const attached = kind === 'icp_brasil' ? Boolean(doc.signature_url) : Boolean(docOf(doc, kind));
                               return (
                                 <Button

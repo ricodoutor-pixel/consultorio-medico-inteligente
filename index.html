@@ -21,8 +21,61 @@
 
     <style>
       html, body { background-color: #0A0E27; margin: 0; padding: 0; }
-      #root { min-height: 100dvh; }
+      /* iOS Safari antigo (< 15.4) não entende dvh: fallback progressivo */
+      #root { min-height: 100vh; min-height: -webkit-fill-available; }
+      @supports (min-height: 100dvh) { #root { min-height: 100dvh; } }
+      /* Evita "rubber band" branco no iPhone e travas de scroll no boot */
+      html { -webkit-text-size-adjust: 100%; }
+      #__pyr_boot_screen {
+        position: fixed; inset: 0; z-index: 2147483000;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 14px; background: #0A0E27; color: #fff;
+        font-family: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+        padding: env(safe-area-inset-top) 24px env(safe-area-inset-bottom);
+        text-align: center;
+      }
+      #__pyr_boot_screen .pyr-mark {
+        width: 84px; height: 84px; object-fit: contain;
+        -webkit-transform: translateZ(0); transform: translateZ(0);
+        -webkit-animation: pyrPulse 1.8s ease-in-out infinite; animation: pyrPulse 1.8s ease-in-out infinite;
+      }
+      #__pyr_boot_screen p { margin: 0; font-size: 13px; opacity: .75; }
+      @-webkit-keyframes pyrPulse { 0%,100% { opacity:.65 } 50% { opacity:1 } }
+      @keyframes pyrPulse { 0%,100% { opacity:.65 } 50% { opacity:1 } }
     </style>
+
+    <script>
+      // 📱 Shims mínimos para iOS Safari < 15.4 (iPhone 6s/7/8/X com iOS 14).
+      // Sem isso, crypto.randomUUID lança TypeError e derruba páginas inteiras.
+      (function(){
+        try {
+          if (!window.crypto) window.crypto = {};
+          if (typeof window.crypto.randomUUID !== 'function') {
+            window.crypto.randomUUID = function(){
+              var buf = new Uint8Array(16);
+              if (window.crypto.getRandomValues) window.crypto.getRandomValues(buf);
+              else for (var i=0;i<16;i++) buf[i] = Math.floor(Math.random()*256);
+              buf[6] = (buf[6] & 0x0f) | 0x40; buf[8] = (buf[8] & 0x3f) | 0x80;
+              var hex = []; for (var j=0;j<16;j++) hex.push(('0'+buf[j].toString(16)).slice(-2));
+              return hex.slice(0,4).join('')+'-'+hex.slice(4,6).join('')+'-'+hex.slice(6,8).join('')+'-'+hex.slice(8,10).join('')+'-'+hex.slice(10,16).join('');
+            };
+          }
+          if (typeof Object.hasOwn !== 'function') {
+            Object.hasOwn = function(o, k){ return Object.prototype.hasOwnProperty.call(o, k); };
+          }
+          if (!Array.prototype.at) {
+            Array.prototype.at = function(n){ n = Math.trunc(n) || 0; if (n < 0) n += this.length; return (n < 0 || n >= this.length) ? undefined : this[n]; };
+          }
+          if (!String.prototype.at) {
+            String.prototype.at = function(n){ n = Math.trunc(n) || 0; if (n < 0) n += this.length; return (n < 0 || n >= this.length) ? undefined : this[n]; };
+          }
+          if (typeof window.structuredClone !== 'function') {
+            window.structuredClone = function(v){ return JSON.parse(JSON.stringify(v)); };
+          }
+        } catch(_){}
+      })();
+    </script>
+
 
     <script>
       window.dataLayer = window.dataLayer || [];

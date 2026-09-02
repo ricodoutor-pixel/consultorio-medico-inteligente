@@ -98,6 +98,8 @@ export type Professional = {
   premiumPrice?: number;
   crm?: string;
   hospital?: string;
+  hospitalUrl?: string;
+  cfmPrintUrl?: string;
   flags?: string[];
   plan_tier?: string;
 }

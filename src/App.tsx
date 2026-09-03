@@ -475,6 +475,7 @@ const App = () => (
                 <Route path="/admin/mapa-global" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
                 <Route path="/admin/aprovacoes-medicas" element={<AdminRoute><AdminAprovacoes /></AdminRoute>} />
                 <Route path="/admin/aprovacoes-farmacias" element={<AdminRoute><AdminAprovacoesFarmacias /></AdminRoute>} />
+                <Route path="/admin/importacoes-anvisa" element={<AdminRoute><AdminImportacoesAnvisa /></AdminRoute>} />
                 <Route path="/admin/kyc-lojas" element={<AdminRoute><AdminAprovacoesFarmacias /></AdminRoute>} />
                 <Route path="/admin/aprovacoes-pacientes" element={<AdminRoute><AdminAprovacoesPacientes /></AdminRoute>} />
                 <Route path="/admin/kyc-pacientes" element={<AdminRoute><AdminAprovacoesPacientes /></AdminRoute>} />

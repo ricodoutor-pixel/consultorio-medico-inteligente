@@ -110,7 +110,65 @@ Deno.serve(async (req) => {
     let externalReference: string;
     let type = "sku";
 
-    if (cartToken && typeof cartToken === "string") {
+    // ── Split nativo na adquirente ────────────────────────────────────────────
+    // Telemedicina: 93% médico · 7% plataforma · Shopping/Farmácia: 95% vendor · 5% plataforma
+    const FEE_TELEMEDICINE = 0.07;
+    const FEE_MARKETPLACE = 0.05;
+    let marketplaceFee: number | null = null;
+    let collectorId: string | null = null;
+    let splitDetails: Record<string, unknown> | null = null;
+    const round2 = (n: number) => Math.round(n * 100) / 100;
+
+    if (orderId && typeof orderId === "string") {
+      // Pedido do Shopping/Farmácia — frete integral para o vendor.
+      const { data: order } = await supabase
+        .from("orders")
+        .select("id, user_id, total, subtotal, shipping_cost, vendor_id, status")
+        .eq("id", orderId)
+        .maybeSingle();
+      if (!order) return json({ error: "Pedido não encontrado" }, 404);
+      if (order.user_id !== userId) return json({ error: "Forbidden" }, 403);
+
+      const productsTotal = Number(order.subtotal || 0);
+      const shipping = Number(order.shipping_cost || 0);
+      amount = Math.max(1, round2(Number(order.total || productsTotal + shipping)));
+      // A taxa de 5% incide apenas sobre produtos; o frete é repassado 100% ao vendor.
+      marketplaceFee = round2(productsTotal * FEE_MARKETPLACE);
+      const vendorNet = round2(amount - marketplaceFee);
+
+      if (order.vendor_id) {
+        const { data: vendor } = await supabase
+          .from("vendors")
+          .select("mp_collector_id")
+          .eq("id", order.vendor_id)
+          .maybeSingle();
+        collectorId = (vendor as any)?.mp_collector_id ?? null;
+      }
+
+      splitDetails = {
+        model: "marketplace_95_5",
+        gross_amount: amount,
+        products_amount: productsTotal,
+        shipping_amount: shipping,
+        platform_fee: marketplaceFee,
+        vendor_net_amount: vendorNet,
+        vendor_id: order.vendor_id ?? null,
+        collector_id: collectorId,
+      };
+
+      await supabase
+        .from("orders")
+        .update({
+          platform_fee: marketplaceFee,
+          vendor_net_amount: vendorNet,
+          split_details: splitDetails,
+        })
+        .eq("id", order.id);
+
+      title = "Pedido Shopping Planta y Raiz";
+      externalReference = `order:${order.id}`;
+      type = "marketplace_order";
+    } else if (cartToken && typeof cartToken === "string") {
       const { data: cart } = await supabase
         .from("prescription_carts")
         .select("id, patient_id, total_amount, status, cart_token")

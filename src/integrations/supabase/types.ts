@@ -503,6 +503,90 @@ export type Database = {
         }
         Relationships: []
       }
+      anvisa_import_processes: {
+        Row: {
+          address_proof_url: string | null
+          approved_at: string | null
+          authorization_pdf_url: string | null
+          created_at: string
+          delivered_at: string | null
+          dispatched_at: string | null
+          doctor_crm: string | null
+          doctor_id: string | null
+          doctor_name: string | null
+          id: string
+          id_document_url: string | null
+          in_transit_at: string | null
+          international_tracking_code: string | null
+          notes: string | null
+          patient_cpf: string | null
+          patient_id: string
+          patient_name: string | null
+          power_of_attorney_url: string | null
+          prescription_id: string | null
+          product_name: string | null
+          protocol_number: string | null
+          status: string
+          submitted_at: string | null
+          under_review_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          address_proof_url?: string | null
+          approved_at?: string | null
+          authorization_pdf_url?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          dispatched_at?: string | null
+          doctor_crm?: string | null
+          doctor_id?: string | null
+          doctor_name?: string | null
+          id?: string
+          id_document_url?: string | null
+          in_transit_at?: string | null
+          international_tracking_code?: string | null
+          notes?: string | null
+          patient_cpf?: string | null
+          patient_id: string
+          patient_name?: string | null
+          power_of_attorney_url?: string | null
+          prescription_id?: string | null
+          product_name?: string | null
+          protocol_number?: string | null
+          status?: string
+          submitted_at?: string | null
+          under_review_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address_proof_url?: string | null
+          approved_at?: string | null
+          authorization_pdf_url?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          dispatched_at?: string | null
+          doctor_crm?: string | null
+          doctor_id?: string | null
+          doctor_name?: string | null
+          id?: string
+          id_document_url?: string | null
+          in_transit_at?: string | null
+          international_tracking_code?: string | null
+          notes?: string | null
+          patient_cpf?: string | null
+          patient_id?: string
+          patient_name?: string | null
+          power_of_attorney_url?: string | null
+          prescription_id?: string | null
+          product_name?: string | null
+          protocol_number?: string | null
+          status?: string
+          submitted_at?: string | null
+          under_review_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       app_downloads: {
         Row: {
           created_at: string
@@ -5091,15 +5175,22 @@ export type Database = {
           items: Json
           organization_id: string | null
           payment_id: string | null
+          platform_fee: number | null
+          settlement_receipt: Json | null
+          shipping_carrier: string | null
           shipping_cep: string | null
           shipping_cost: number | null
+          shipping_deadline_days: number | null
           shipping_method: string | null
+          split_details: Json | null
           status: string
           subtotal: number
           total: number
           tracking_code: string | null
           updated_at: string | null
           user_id: string
+          vendor_id: string | null
+          vendor_net_amount: number | null
         }
         Insert: {
           created_at?: string | null
@@ -5107,15 +5198,22 @@ export type Database = {
           items?: Json
           organization_id?: string | null
           payment_id?: string | null
+          platform_fee?: number | null
+          settlement_receipt?: Json | null
+          shipping_carrier?: string | null
           shipping_cep?: string | null
           shipping_cost?: number | null
+          shipping_deadline_days?: number | null
           shipping_method?: string | null
+          split_details?: Json | null
           status?: string
           subtotal?: number
           total?: number
           tracking_code?: string | null
           updated_at?: string | null
           user_id: string
+          vendor_id?: string | null
+          vendor_net_amount?: number | null
         }
         Update: {
           created_at?: string | null
@@ -5123,15 +5221,22 @@ export type Database = {
           items?: Json
           organization_id?: string | null
           payment_id?: string | null
+          platform_fee?: number | null
+          settlement_receipt?: Json | null
+          shipping_carrier?: string | null
           shipping_cep?: string | null
           shipping_cost?: number | null
+          shipping_deadline_days?: number | null
           shipping_method?: string | null
+          split_details?: Json | null
           status?: string
           subtotal?: number
           total?: number
           tracking_code?: string | null
           updated_at?: string | null
           user_id?: string
+          vendor_id?: string | null
+          vendor_net_amount?: number | null
         }
         Relationships: []
       }
@@ -5684,6 +5789,8 @@ export type Database = {
           platform_fee_amount: number | null
           platform_fee_pct: number | null
           released_at: string | null
+          settlement_receipt: Json | null
+          split_details: Json | null
           status: string | null
         }
         Insert: {
@@ -5702,6 +5809,8 @@ export type Database = {
           platform_fee_amount?: number | null
           platform_fee_pct?: number | null
           released_at?: string | null
+          settlement_receipt?: Json | null
+          split_details?: Json | null
           status?: string | null
         }
         Update: {
@@ -5720,6 +5829,8 @@ export type Database = {
           platform_fee_amount?: number | null
           platform_fee_pct?: number | null
           released_at?: string | null
+          settlement_receipt?: Json | null
+          split_details?: Json | null
           status?: string | null
         }
         Relationships: [
@@ -6177,10 +6288,12 @@ export type Database = {
         Row: {
           anvisa_code: string | null
           appointment_id: string | null
+          copies: number
           created_at: string
           diagnosis_cid: string | null
           digital_signature: string | null
           doctor_id: string
+          icp_provider: string | null
           id: string
           instructions: string | null
           medical_record_id: string | null
@@ -6188,21 +6301,26 @@ export type Database = {
           patient_id: string
           pharmacy_id: string | null
           pharmacy_name: string | null
+          prescription_type: string
           signature_date: string | null
           signature_hash: string | null
           signature_provider: string | null
           signed_pdf_url: string | null
           status: string
+          thc_percentage: number | null
           updated_at: string
           valid_until: string | null
+          verification_code: string | null
         }
         Insert: {
           anvisa_code?: string | null
           appointment_id?: string | null
+          copies?: number
           created_at?: string
           diagnosis_cid?: string | null
           digital_signature?: string | null
           doctor_id: string
+          icp_provider?: string | null
           id?: string
           instructions?: string | null
           medical_record_id?: string | null
@@ -6210,21 +6328,26 @@ export type Database = {
           patient_id: string
           pharmacy_id?: string | null
           pharmacy_name?: string | null
+          prescription_type?: string
           signature_date?: string | null
           signature_hash?: string | null
           signature_provider?: string | null
           signed_pdf_url?: string | null
           status?: string
+          thc_percentage?: number | null
           updated_at?: string
           valid_until?: string | null
+          verification_code?: string | null
         }
         Update: {
           anvisa_code?: string | null
           appointment_id?: string | null
+          copies?: number
           created_at?: string
           diagnosis_cid?: string | null
           digital_signature?: string | null
           doctor_id?: string
+          icp_provider?: string | null
           id?: string
           instructions?: string | null
           medical_record_id?: string | null
@@ -6232,13 +6355,16 @@ export type Database = {
           patient_id?: string
           pharmacy_id?: string | null
           pharmacy_name?: string | null
+          prescription_type?: string
           signature_date?: string | null
           signature_hash?: string | null
           signature_provider?: string | null
           signed_pdf_url?: string | null
           status?: string
+          thc_percentage?: number | null
           updated_at?: string
           valid_until?: string | null
+          verification_code?: string | null
         }
         Relationships: [
           {
@@ -8269,11 +8395,13 @@ export type Database = {
           kyc_status: string
           logo_url: string | null
           max_showcase_products: number
+          mp_collector_id: string | null
           nome_fantasia: string | null
           pix_key: string | null
           rating: number | null
           razao_social: string | null
           responsavel_tecnico: string | null
+          shipping_origin_cep: string | null
           store_banner_url: string | null
           store_description: string | null
           store_logo_url: string | null
@@ -8306,11 +8434,13 @@ export type Database = {
           kyc_status?: string
           logo_url?: string | null
           max_showcase_products?: number
+          mp_collector_id?: string | null
           nome_fantasia?: string | null
           pix_key?: string | null
           rating?: number | null
           razao_social?: string | null
           responsavel_tecnico?: string | null
+          shipping_origin_cep?: string | null
           store_banner_url?: string | null
           store_description?: string | null
           store_logo_url?: string | null
@@ -8343,11 +8473,13 @@ export type Database = {
           kyc_status?: string
           logo_url?: string | null
           max_showcase_products?: number
+          mp_collector_id?: string | null
           nome_fantasia?: string | null
           pix_key?: string | null
           rating?: number | null
           razao_social?: string | null
           responsavel_tecnico?: string | null
+          shipping_origin_cep?: string | null
           store_banner_url?: string | null
           store_description?: string | null
           store_logo_url?: string | null

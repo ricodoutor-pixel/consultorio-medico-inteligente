@@ -288,8 +288,12 @@ Deno.serve(async (req) => {
         cart_token: cartToken ?? null,
         ref_code: typeof refCode === "string" ? refCode : null,
         referrer_id: referrerId,
+        order_id: typeof orderId === "string" ? orderId : null,
+        split: splitDetails,
       },
-
+      // Split nativo na adquirente (Mercado Pago marketplace)
+      ...(marketplaceFee !== null ? { marketplace_fee: marketplaceFee } : {}),
+      ...(collectorId ? { collector_id: Number(collectorId) || collectorId } : {}),
     };
 
     let endpoint = "https://api.mercadopago.com/checkout/preferences";

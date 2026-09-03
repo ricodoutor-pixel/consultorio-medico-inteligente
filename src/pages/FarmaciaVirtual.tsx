@@ -681,7 +681,7 @@ export default function FarmaciaVirtual() {
                             <Button
                               size="sm"
                               className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-950/20"
-                              onClick={() => dispensePrescription(rx.id)}
+                              onClick={() => { setTrackingCode(""); setDispensingRxId(rx.id); }}
                             >
                               <CheckCircle size={14} className="mr-1.5" /> Marcar como Dispensada
                             </Button>

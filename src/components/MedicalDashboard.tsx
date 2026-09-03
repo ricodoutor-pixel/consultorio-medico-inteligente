@@ -219,6 +219,8 @@ export function MedicalDashboard() {
       const doctorCRMStr = activeDoctor?.crm || "123456";
       const doctorStateStr = activeDoctor?.crm_state || "SP";
       const doctorSignatureUrl = activeDoctor?.signature_url;
+      const typeMeta = getPrescriptionTypeMeta(prescriptionType);
+      const verificationCode = generateVerificationCode();
 
       const prescriptionData: PrescriptionData = {
         clinicName: APP_CONFIG.COMPANY.NAME,

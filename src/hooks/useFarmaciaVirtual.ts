@@ -368,9 +368,19 @@ export function useFarmaciaVirtual() {
     await loadVendorData();
   };
 
-  // Dispensar Receita
-  const dispensePrescription = async (prescriptionId: string) => {
+  // Dispensar Receita (exige código de rastreamento da encomenda)
+  const dispensePrescription = async (prescriptionId: string, trackingCode?: string) => {
     if (!data?.vendor?.id) return;
+    const code = (trackingCode || '').trim().toUpperCase();
+    if (code.length < 8) {
+      toast({
+        title: "Código de rastreamento obrigatório",
+        description: "Informe o código de rastreio (mínimo 8 caracteres) para concluir a dispensação.",
+        variant: "destructive",
+      });
+      return;
+    }
+    const trackingUrl = `https://rastreamento.correios.com.br/app/index.php?objeto=${encodeURIComponent(code)}`;
     const now = new Date().toISOString();
     const { error: updateErr } = await (supabase as any)
       .from('prescriptions')
@@ -386,9 +396,22 @@ export function useFarmaciaVirtual() {
       return;
     }
 
+    // Registra rastreio na inbox da farmácia (fonte do painel do paciente)
+    await (supabase as any)
+      .from('pharmacy_prescriptions_inbox')
+      .update({ status: 'dispensed', tracking_code: code, dispensed_at: now })
+      .eq('prescription_id', prescriptionId)
+      .eq('vendor_id', data.vendor.id);
+
+    // Propaga o rastreio para o pedido correspondente, quando existir
+    await (supabase as any)
+      .from('orders')
+      .update({ status: 'shipped', tracking_code: code, tracking_url: trackingUrl })
+      .eq('prescription_id', prescriptionId);
+
     toast({
       title: "✅ Receita Dispensada com Sucesso!",
-      description: "O status foi registrado e o paciente notificado."
+      description: `Rastreio ${code} registrado e paciente notificado.`
     });
     await loadVendorData();
   };

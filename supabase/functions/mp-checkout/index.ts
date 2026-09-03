@@ -238,6 +238,29 @@ Deno.serve(async (req) => {
       }
       externalReference = `${sku}:${userId}:${Date.now()}`;
       type = item.recurring ? "subscription" : "sku";
+
+      // Serviços de telemedicina avulsos também seguem o split 93/7
+      const isTelemedSku = typeof sku === "string" &&
+        (sku.startsWith("consulta") || sku.startsWith("orientacao") || sku.startsWith("retorno"));
+      if (isTelemedSku && !item.recurring) {
+        marketplaceFee = round2(amount * FEE_TELEMEDICINE);
+        if (typeof doctorId === "string") {
+          const { data: doc } = await supabase
+            .from("doctors")
+            .select("mp_collector_id")
+            .eq("id", doctorId)
+            .maybeSingle();
+          collectorId = (doc as any)?.mp_collector_id ?? null;
+        }
+        splitDetails = {
+          model: "telemedicine_93_7",
+          gross_amount: amount,
+          platform_fee: marketplaceFee,
+          doctor_net_amount: round2(amount - marketplaceFee),
+          doctor_id: typeof doctorId === "string" ? doctorId : null,
+          collector_id: collectorId,
+        };
+      }
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;

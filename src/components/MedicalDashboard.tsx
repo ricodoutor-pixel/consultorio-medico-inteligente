@@ -132,6 +132,8 @@ export function MedicalDashboard() {
   const [isVideoActive, setIsVideoActive] = useState(false);
   const [doctorId, setDoctorId] = useState<string | null>(null);
   const [activeDoctor, setActiveDoctor] = useState<any>(null);
+  const [prescriptionType, setPrescriptionType] = useState<PrescriptionType>("controle_especial_c1");
+  const [thcPercentage, setThcPercentage] = useState<number>(0.2);
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {

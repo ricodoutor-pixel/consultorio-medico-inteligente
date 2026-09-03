@@ -23,6 +23,7 @@ import { EvolutionChart } from "@/components/EvolutionChart";
 import { ProgressReportGenerator } from "@/components/ProgressReportGenerator";
 import PassportQRCard from "@/components/passport/PassportQRCard";
 import { SymptomTracker } from "@/components/diary/SymptomTracker";
+import { ConciergeAnvisaTab } from "@/components/anvisa/ConciergeAnvisaTab";
 import { Skeleton } from "@/components/ui/skeleton";
 import { professionals } from "@/data/professionals";
 import AirQualityWidget from "@/components/health/AirQualityWidget";

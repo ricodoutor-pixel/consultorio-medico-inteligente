@@ -331,7 +331,7 @@ export function MedicalDashboard() {
       console.error("[PDF] Erro ao gerar receita:", err);
       toast.error("Erro ao gerar receita. Tente novamente.");
     }
-  }, [activePatient, patients, prescriptionItems, notes]);
+  }, [activePatient, patients, prescriptionItems, notes, activeDoctor, doctorId, prescriptionType, thcPercentage]);
 
   const addMockProduct = useCallback(() => {
     if (!activePatient) return;

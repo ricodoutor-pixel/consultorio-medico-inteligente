@@ -676,7 +676,7 @@ export const professionals: Professional[] = [
     imageUrl: "/dra-olivia-avatar.jpg",
     crm: "Z-494444 - BO",
     hospital: "Planta y Raíz Ltda / Cochabamba (BO)",
-    flags: ["🇧🇷", "🇧🇴"],
+    flags: ["🇧🇴"],
     online: true,
     plan_tier: "premium",
     services: [

@@ -250,10 +250,10 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         ]),
         slots: mockMatch?.slots || ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
         reviews: mockMatch?.reviews || [],
-        online: d.is_online,
+        online: isOlivia ? true : d.is_online,
         crm: mockMatch?.crm || finalCrm,
         hospital: mockMatch?.hospital || (isEdilson ? "Planta y Raíz Ltda / Santa Cruz de la Sierra (BO)" : isSuelen ? "Planta y Raíz Ltda / Paraná (BR)" : isOlivia ? "Planta y Raíz Ltda / Cochabamba (BO)" : cityLabel),
-        flags: mockMatch?.flags || (isEdilson || isOlivia ? ["🇧🇷", "🇧🇴"] : ["🇧🇷"]),
+        flags: isOlivia ? ["🇧🇴"] : (mockMatch?.flags || (isEdilson ? ["🇧🇷", "🇧🇴"] : ["🇧🇷"])),
         plan_tier: (isEdilson || isOlivia || isSuelen) ? "premium" : (d.plan_tier || "free"),
       };
     });
@@ -281,10 +281,10 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       finalPros.unshift({ ...edilsonMock, online: true });
     }
     
-    // Dra. Olivia fallback (offline by default, togglable)
+    // Dra. Olivia fallback (online)
     const oliviaMock = testProfessionals.find(p => p.id === "mock-olivia");
     if (oliviaMock && !isMockReplaced(oliviaMock)) {
-      finalPros.push({ ...oliviaMock, online: getMockOnlineStatus("mock-olivia", false) });
+      finalPros.push({ ...oliviaMock, online: true });
     }
 
     const suelenMock = testProfessionals.find(p => p.id === "mock-suelen");

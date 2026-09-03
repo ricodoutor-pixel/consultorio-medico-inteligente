@@ -5,10 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Trash2, Plus, Minus, ShoppingCart as CartIcon, FileText } from 'lucide-react';
+import { ShippingCalculator } from '@/components/shopping/ShippingCalculator';
+import type { ShippingOption } from '@/lib/shipping-quote';
 
 export function ShoppingCart() {
-  const { items, removeItem, updateQty, clearCart, getSubtotal, getTax, getShipping, getFinalTotal } = useCart();
+  const { items, removeItem, updateQty, clearCart, getSubtotal, getTax } = useCart();
   const [showCart, setShowCart] = useState(false);
+  const [shippingOption, setShippingOption] = useState<ShippingOption | null>(null);
   const location = useLocation();
 
   const allowedPaths = ['/shopping', '/planos', '/precos'];

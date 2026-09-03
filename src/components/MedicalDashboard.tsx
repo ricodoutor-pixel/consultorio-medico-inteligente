@@ -687,6 +687,17 @@ export function MedicalDashboard() {
                 Prescrição Digital
               </h3>
 
+              <div className="mb-3">
+                <PrescriptionTypeSelector
+                  value={prescriptionType}
+                  onChange={setPrescriptionType}
+                  thcPercentage={thcPercentage}
+                  onThcChange={setThcPercentage}
+                  hasDigitalSignature={Boolean(activeDoctor?.signature_url)}
+                />
+              </div>
+
+
               <ScrollArea className="flex-1">
                 <div className="space-y-2 pr-2">
                   {prescriptionItems.length === 0 ? (

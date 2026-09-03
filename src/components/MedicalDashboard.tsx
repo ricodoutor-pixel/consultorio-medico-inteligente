@@ -23,6 +23,12 @@ import { PerformanceBonusWidget } from "@/components/PerformanceBonusWidget";
 import { BlockchainRecordPublisher } from "./BlockchainRecordPublisher";
 import { TitulacaoTrackerCard } from "./TitulacaoTrackerCard";
 import { NurseBrisaAlertSystem } from "@/components/NurseBrisaAlertSystem";
+import { PrescriptionTypeSelector } from "@/components/prescription/PrescriptionTypeSelector";
+import {
+  generateVerificationCode,
+  getPrescriptionTypeMeta,
+  type PrescriptionType,
+} from "@/lib/prescription-types";
 
 // ─── Types ──────────────────────────────────────────────────
 interface WaitingPatient {

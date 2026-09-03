@@ -3270,6 +3270,81 @@ export type Database = {
         }
         Relationships: []
       }
+      fiscal_invoices: {
+        Row: {
+          authorized_at: string | null
+          created_at: string
+          cryptographic_hash: string
+          external_invoice_id: string | null
+          gross_amount: number
+          id: string
+          invoice_status: string | null
+          invoice_type: string
+          net_provider_amount: number
+          nfe_number: string | null
+          nfe_series: string | null
+          nfe_verification_code: string | null
+          order_type: string
+          pdf_url: string
+          platform_fee: number
+          recipient_address: Json | null
+          recipient_cpf_cnpj: string
+          recipient_email: string
+          recipient_name: string
+          reference_id: string
+          user_id: string
+          xml_url: string | null
+        }
+        Insert: {
+          authorized_at?: string | null
+          created_at?: string
+          cryptographic_hash: string
+          external_invoice_id?: string | null
+          gross_amount: number
+          id?: string
+          invoice_status?: string | null
+          invoice_type: string
+          net_provider_amount?: number
+          nfe_number?: string | null
+          nfe_series?: string | null
+          nfe_verification_code?: string | null
+          order_type: string
+          pdf_url: string
+          platform_fee?: number
+          recipient_address?: Json | null
+          recipient_cpf_cnpj: string
+          recipient_email: string
+          recipient_name: string
+          reference_id: string
+          user_id: string
+          xml_url?: string | null
+        }
+        Update: {
+          authorized_at?: string | null
+          created_at?: string
+          cryptographic_hash?: string
+          external_invoice_id?: string | null
+          gross_amount?: number
+          id?: string
+          invoice_status?: string | null
+          invoice_type?: string
+          net_provider_amount?: number
+          nfe_number?: string | null
+          nfe_series?: string | null
+          nfe_verification_code?: string | null
+          order_type?: string
+          pdf_url?: string
+          platform_fee?: number
+          recipient_address?: Json | null
+          recipient_cpf_cnpj?: string
+          recipient_email?: string
+          recipient_name?: string
+          reference_id?: string
+          user_id?: string
+          xml_url?: string | null
+        }
+        Relationships: []
+      }
       funnel_events: {
         Row: {
           created_at: string

@@ -37,8 +37,8 @@ export function ShoppingCart() {
 
   const subtotal = getSubtotal();
   const tax = getTax();
-  const shipping = getShipping();
-  const total = getFinalTotal();
+  const shipping = shippingOption?.price ?? 0;
+  const total = subtotal + tax + shipping;
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center md:justify-end">

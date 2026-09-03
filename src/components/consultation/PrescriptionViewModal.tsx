@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { FileText, Send, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { PrescriptionSignatureStamp } from "@/components/prescription/PrescriptionSignatureStamp";
 import {
   dispatchSignedPrescription,
   listApprovedPharmacies,

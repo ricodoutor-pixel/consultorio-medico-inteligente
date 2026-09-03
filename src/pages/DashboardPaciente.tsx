@@ -23,6 +23,7 @@ import { EvolutionChart } from "@/components/EvolutionChart";
 import { ProgressReportGenerator } from "@/components/ProgressReportGenerator";
 import PassportQRCard from "@/components/passport/PassportQRCard";
 import { SymptomTracker } from "@/components/diary/SymptomTracker";
+import { ConciergeAnvisaTab } from "@/components/anvisa/ConciergeAnvisaTab";
 import { Skeleton } from "@/components/ui/skeleton";
 import { professionals } from "@/data/professionals";
 import AirQualityWidget from "@/components/health/AirQualityWidget";
@@ -407,6 +408,11 @@ const DashboardPaciente = () => {
 
                 {/* Passaporte Canábico Digital */}
                 <PassportQRCard autoCreateIfMissing />
+
+                {/* Concierge ANVISA — importação excepcional RDC 660 */}
+                <div id="concierge-anvisa-section">
+                  <ConciergeAnvisaTab />
+                </div>
 
                 {/* Meu Diário Planta y Raiz — sintomas, sono, humor, gotas */}
                 <div id="symptom-diary-section">

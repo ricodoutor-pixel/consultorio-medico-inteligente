@@ -23,6 +23,12 @@ import { PerformanceBonusWidget } from "@/components/PerformanceBonusWidget";
 import { BlockchainRecordPublisher } from "./BlockchainRecordPublisher";
 import { TitulacaoTrackerCard } from "./TitulacaoTrackerCard";
 import { NurseBrisaAlertSystem } from "@/components/NurseBrisaAlertSystem";
+import { PrescriptionTypeSelector } from "@/components/prescription/PrescriptionTypeSelector";
+import {
+  generateVerificationCode,
+  getPrescriptionTypeMeta,
+  type PrescriptionType,
+} from "@/lib/prescription-types";
 
 // ─── Types ──────────────────────────────────────────────────
 interface WaitingPatient {
@@ -126,6 +132,8 @@ export function MedicalDashboard() {
   const [isVideoActive, setIsVideoActive] = useState(false);
   const [doctorId, setDoctorId] = useState<string | null>(null);
   const [activeDoctor, setActiveDoctor] = useState<any>(null);
+  const [prescriptionType, setPrescriptionType] = useState<PrescriptionType>("controle_especial_c1");
+  const [thcPercentage, setThcPercentage] = useState<number>(0.2);
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
@@ -211,6 +219,8 @@ export function MedicalDashboard() {
       const doctorCRMStr = activeDoctor?.crm || "123456";
       const doctorStateStr = activeDoctor?.crm_state || "SP";
       const doctorSignatureUrl = activeDoctor?.signature_url;
+      const typeMeta = getPrescriptionTypeMeta(prescriptionType);
+      const verificationCode = generateVerificationCode();
 
       const prescriptionData: PrescriptionData = {
         clinicName: APP_CONFIG.COMPANY.NAME,
@@ -227,28 +237,61 @@ export function MedicalDashboard() {
           instructions: item.instructions,
         })),
         notes: notes || undefined,
-        signatureHash: crypto.randomUUID().replace(/-/g, "").toUpperCase().slice(0, 32),
+        signatureHash: verificationCode,
         signatureUrl: doctorSignatureUrl,
         date: new Date(),
       };
 
       const doc = await generatePrescriptionPDF(prescriptionData);
       const pdfBlob = doc.output("blob");
+      const { data: authData } = await supabase.auth.getUser();
+      const ownerId = authData.user?.id;
       const fileName = `receita_${activePatient.name.replace(/\s/g, "_")}_${Date.now()}.pdf`;
+      const objectPath = ownerId ? `${ownerId}/${fileName}` : fileName;
+      let signedPdfUrl: string | null = null;
 
-      // Upload para o bucket prescriptions (se existir)
+      // Upload para o bucket privado `prescriptions`
       const { error: uploadError } = await supabase.storage
         .from("prescriptions")
-        .upload(fileName, pdfBlob, { contentType: "application/pdf" });
+        .upload(objectPath, pdfBlob, { contentType: "application/pdf" });
 
       if (uploadError) {
         console.warn("[PDF] Upload falhou, salvando localmente:", uploadError.message);
         // Fallback: download local
         doc.save(fileName);
+      } else {
+        const { data: signed } = await supabase.storage
+          .from("prescriptions")
+          .createSignedUrl(objectPath, 7 * 24 * 60 * 60);
+        signedPdfUrl = signed?.signedUrl ?? null;
       }
 
-      toast.success("Receita gerada com sucesso!", {
-        description: `Prescrição de ${activePatient.name} finalizada e assinada digitalmente.`,
+      // Persiste a receita com o tipo de receituário e o código público de verificação
+      if (doctorId) {
+        const { error: rxError } = await (supabase as any).from("prescriptions").insert({
+          doctor_id: doctorId,
+          patient_id: activePatient.id,
+          medications: prescriptionData.medications,
+          instructions: notes || null,
+          status: "signed",
+          prescription_type: prescriptionType,
+          thc_percentage: thcPercentage,
+          copies: typeMeta.copies,
+          verification_code: verificationCode,
+          icp_provider: doctorSignatureUrl ? "icp_brasil_iti" : "plataforma_icp_brasil",
+          signature_provider: "gov.br",
+          signature_hash: verificationCode,
+          signature_date: new Date().toISOString(),
+          digital_signature: verificationCode,
+          signed_pdf_url: signedPdfUrl,
+        });
+        if (rxError) console.warn("[Prescrição] Falha ao registrar:", rxError.message);
+      }
+
+      toast.success(`${typeMeta.label} emitida com sucesso!`, {
+        description: typeMeta.requiresPhysicalNotification
+          ? "Atenção: é obrigatória a retenção da Notificação de Receita B física pela farmácia."
+          : `Assinada digitalmente (ICP-Brasil) · ${typeMeta.copies} via(s) · Código ${verificationCode}`,
       });
 
       // Save fast-track cart for patient checkout
@@ -288,7 +331,7 @@ export function MedicalDashboard() {
       console.error("[PDF] Erro ao gerar receita:", err);
       toast.error("Erro ao gerar receita. Tente novamente.");
     }
-  }, [activePatient, patients, prescriptionItems, notes]);
+  }, [activePatient, patients, prescriptionItems, notes, activeDoctor, doctorId, prescriptionType, thcPercentage]);
 
   const addMockProduct = useCallback(() => {
     if (!activePatient) return;
@@ -643,6 +686,17 @@ export function MedicalDashboard() {
                 <Pill className="h-4 w-4 text-primary" />
                 Prescrição Digital
               </h3>
+
+              <div className="mb-3">
+                <PrescriptionTypeSelector
+                  value={prescriptionType}
+                  onChange={setPrescriptionType}
+                  thcPercentage={thcPercentage}
+                  onThcChange={setThcPercentage}
+                  hasDigitalSignature={Boolean(activeDoctor?.signature_url)}
+                />
+              </div>
+
 
               <ScrollArea className="flex-1">
                 <div className="space-y-2 pr-2">

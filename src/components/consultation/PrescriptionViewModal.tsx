@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { FileText, Send, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { PrescriptionSignatureStamp } from "@/components/prescription/PrescriptionSignatureStamp";
 import {
   dispatchSignedPrescription,
   listApprovedPharmacies,
@@ -108,6 +109,23 @@ export function PrescriptionViewModal({ isOpen, onClose, prescription, vendorId 
         </DialogHeader>
 
         <div className="py-6 space-y-4">
+          <PrescriptionSignatureStamp
+            verificationCode={prescription?.verification_code}
+            signatureHash={prescription?.signature_hash ?? prescription?.regulatory_hash}
+            doctorName={prescription?.doctor_name}
+            doctorCRM={prescription?.doctor_crm}
+            signatureDate={prescription?.signature_date ?? prescription?.created_at}
+            prescriptionType={prescription?.prescription_type}
+            provider={prescription?.signature_provider}
+          />
+
+          {prescription?.prescription_type === "notificacao_b" && (
+            <div className="rounded-lg border border-rose-500/40 bg-rose-950/30 p-3 text-[11px] text-rose-200">
+              <strong>Notificação de Receita B:</strong> THC acima de 0,2%. A farmácia deve reter a
+              notificação física numerada; este documento digital é cópia de acompanhamento.
+            </div>
+          )}
+
           <Button 
             className="w-full h-auto py-4 flex flex-col items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400"
             onClick={handleSendToPharmacy}

@@ -332,15 +332,43 @@ Deno.serve(async (req) => {
 
     const mpData = await mpResponse.json();
 
+    // Comprovante de liquidação direta gravado na transação
+    const settlementReceipt = splitDetails
+      ? {
+          ...splitDetails,
+          provider: "mercado_pago",
+          preference_id: String(mpData.id),
+          created_at: new Date().toISOString(),
+        }
+      : null;
+
+    if (settlementReceipt && type === "marketplace_order" && typeof orderId === "string") {
+      await supabase
+        .from("orders")
+        .update({ settlement_receipt: settlementReceipt, payment_id: String(mpData.id) })
+        .eq("id", orderId);
+    }
+    if (settlementReceipt && type === "consultation" && typeof appointmentId === "string") {
+      await supabase
+        .from("payments")
+        .update({ split_details: splitDetails, settlement_receipt: settlementReceipt })
+        .eq("mp_preference_id", String(mpData.id));
+    }
+
     await supabase.from("audit_log").insert({
       user_id: userId,
       action: "mp_checkout_created",
       table_name: "payments",
       record_id: String(mpData.id),
-      new_data: { type, amount, external_reference: externalReference },
+      new_data: { type, amount, external_reference: externalReference, split: splitDetails },
     });
 
-    return json({ init_point: mpData.init_point, preference_id: mpData.id, amount });
+    return json({
+      init_point: mpData.init_point,
+      preference_id: mpData.id,
+      amount,
+      split: splitDetails,
+    });
   } catch (e) {
     console.error("[mp-checkout]", e);
     return json({ error: "Erro interno" }, 500);

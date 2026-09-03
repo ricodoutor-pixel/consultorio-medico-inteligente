@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { sku: rawSku, cartToken, appointmentId, returnUrl, refCode, doctorId } = await req.json();
+    const { sku: rawSku, cartToken, appointmentId, orderId, returnUrl, refCode, doctorId } = await req.json();
     const sku = typeof rawSku === "string" ? (LEGACY_SKU_MAP[rawSku] ?? rawSku) : rawSku;
 
     // Programa de indicações (médicos, pacientes e lojistas) — resolvido no servidor.
@@ -110,7 +110,65 @@ Deno.serve(async (req) => {
     let externalReference: string;
     let type = "sku";
 
-    if (cartToken && typeof cartToken === "string") {
+    // ── Split nativo na adquirente ────────────────────────────────────────────
+    // Telemedicina: 93% médico · 7% plataforma · Shopping/Farmácia: 95% vendor · 5% plataforma
+    const FEE_TELEMEDICINE = 0.07;
+    const FEE_MARKETPLACE = 0.05;
+    let marketplaceFee: number | null = null;
+    let collectorId: string | null = null;
+    let splitDetails: Record<string, unknown> | null = null;
+    const round2 = (n: number) => Math.round(n * 100) / 100;
+
+    if (orderId && typeof orderId === "string") {
+      // Pedido do Shopping/Farmácia — frete integral para o vendor.
+      const { data: order } = await supabase
+        .from("orders")
+        .select("id, user_id, total, subtotal, shipping_cost, vendor_id, status")
+        .eq("id", orderId)
+        .maybeSingle();
+      if (!order) return json({ error: "Pedido não encontrado" }, 404);
+      if (order.user_id !== userId) return json({ error: "Forbidden" }, 403);
+
+      const productsTotal = Number(order.subtotal || 0);
+      const shipping = Number(order.shipping_cost || 0);
+      amount = Math.max(1, round2(Number(order.total || productsTotal + shipping)));
+      // A taxa de 5% incide apenas sobre produtos; o frete é repassado 100% ao vendor.
+      marketplaceFee = round2(productsTotal * FEE_MARKETPLACE);
+      const vendorNet = round2(amount - marketplaceFee);
+
+      if (order.vendor_id) {
+        const { data: vendor } = await supabase
+          .from("vendors")
+          .select("mp_collector_id")
+          .eq("id", order.vendor_id)
+          .maybeSingle();
+        collectorId = (vendor as any)?.mp_collector_id ?? null;
+      }
+
+      splitDetails = {
+        model: "marketplace_95_5",
+        gross_amount: amount,
+        products_amount: productsTotal,
+        shipping_amount: shipping,
+        platform_fee: marketplaceFee,
+        vendor_net_amount: vendorNet,
+        vendor_id: order.vendor_id ?? null,
+        collector_id: collectorId,
+      };
+
+      await supabase
+        .from("orders")
+        .update({
+          platform_fee: marketplaceFee,
+          vendor_net_amount: vendorNet,
+          split_details: splitDetails,
+        })
+        .eq("id", order.id);
+
+      title = "Pedido Shopping Planta y Raiz";
+      externalReference = `order:${order.id}`;
+      type = "marketplace_order";
+    } else if (cartToken && typeof cartToken === "string") {
       const { data: cart } = await supabase
         .from("prescription_carts")
         .select("id, patient_id, total_amount, status, cart_token")
@@ -126,7 +184,7 @@ Deno.serve(async (req) => {
     } else if (appointmentId && typeof appointmentId === "string") {
       const { data: appt } = await supabase
         .from("appointments")
-        .select("id, amount, patient_id")
+        .select("id, amount, patient_id, doctor_id")
         .eq("id", appointmentId)
         .maybeSingle();
       if (!appt) return json({ error: "Consulta não encontrada" }, 404);
@@ -135,6 +193,25 @@ Deno.serve(async (req) => {
       amount = Math.max(1, Number(appt.amount || 0));
       externalReference = `appointment:${appt.id}`;
       type = "consultation";
+
+      // Split telemedicina: 7% plataforma · 93% médico
+      marketplaceFee = round2(amount * FEE_TELEMEDICINE);
+      if (appt.doctor_id) {
+        const { data: doc } = await supabase
+          .from("doctors")
+          .select("mp_collector_id")
+          .eq("id", appt.doctor_id)
+          .maybeSingle();
+        collectorId = (doc as any)?.mp_collector_id ?? null;
+      }
+      splitDetails = {
+        model: "telemedicine_93_7",
+        gross_amount: amount,
+        platform_fee: marketplaceFee,
+        doctor_net_amount: round2(amount - marketplaceFee),
+        doctor_id: appt.doctor_id ?? null,
+        collector_id: collectorId,
+      };
     } else {
       let item = typeof sku === "string" ? CATALOG[sku] : undefined;
       
@@ -161,6 +238,29 @@ Deno.serve(async (req) => {
       }
       externalReference = `${sku}:${userId}:${Date.now()}`;
       type = item.recurring ? "subscription" : "sku";
+
+      // Serviços de telemedicina avulsos também seguem o split 93/7
+      const isTelemedSku = typeof sku === "string" &&
+        (sku.startsWith("consulta") || sku.startsWith("orientacao") || sku.startsWith("retorno"));
+      if (isTelemedSku && !item.recurring) {
+        marketplaceFee = round2(amount * FEE_TELEMEDICINE);
+        if (typeof doctorId === "string") {
+          const { data: doc } = await supabase
+            .from("doctors")
+            .select("mp_collector_id")
+            .eq("id", doctorId)
+            .maybeSingle();
+          collectorId = (doc as any)?.mp_collector_id ?? null;
+        }
+        splitDetails = {
+          model: "telemedicine_93_7",
+          gross_amount: amount,
+          platform_fee: marketplaceFee,
+          doctor_net_amount: round2(amount - marketplaceFee),
+          doctor_id: typeof doctorId === "string" ? doctorId : null,
+          collector_id: collectorId,
+        };
+      }
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -188,8 +288,12 @@ Deno.serve(async (req) => {
         cart_token: cartToken ?? null,
         ref_code: typeof refCode === "string" ? refCode : null,
         referrer_id: referrerId,
+        order_id: typeof orderId === "string" ? orderId : null,
+        split: splitDetails,
       },
-
+      // Split nativo na adquirente (Mercado Pago marketplace)
+      ...(marketplaceFee !== null ? { marketplace_fee: marketplaceFee } : {}),
+      ...(collectorId ? { collector_id: Number(collectorId) || collectorId } : {}),
     };
 
     let endpoint = "https://api.mercadopago.com/checkout/preferences";
@@ -228,15 +332,43 @@ Deno.serve(async (req) => {
 
     const mpData = await mpResponse.json();
 
+    // Comprovante de liquidação direta gravado na transação
+    const settlementReceipt = splitDetails
+      ? {
+          ...splitDetails,
+          provider: "mercado_pago",
+          preference_id: String(mpData.id),
+          created_at: new Date().toISOString(),
+        }
+      : null;
+
+    if (settlementReceipt && type === "marketplace_order" && typeof orderId === "string") {
+      await supabase
+        .from("orders")
+        .update({ settlement_receipt: settlementReceipt, payment_id: String(mpData.id) })
+        .eq("id", orderId);
+    }
+    if (settlementReceipt && type === "consultation" && typeof appointmentId === "string") {
+      await supabase
+        .from("payments")
+        .update({ split_details: splitDetails, settlement_receipt: settlementReceipt })
+        .eq("mp_preference_id", String(mpData.id));
+    }
+
     await supabase.from("audit_log").insert({
       user_id: userId,
       action: "mp_checkout_created",
       table_name: "payments",
       record_id: String(mpData.id),
-      new_data: { type, amount, external_reference: externalReference },
+      new_data: { type, amount, external_reference: externalReference, split: splitDetails },
     });
 
-    return json({ init_point: mpData.init_point, preference_id: mpData.id, amount });
+    return json({
+      init_point: mpData.init_point,
+      preference_id: mpData.id,
+      amount,
+      split: splitDetails,
+    });
   } catch (e) {
     console.error("[mp-checkout]", e);
     return json({ error: "Erro interno" }, 500);

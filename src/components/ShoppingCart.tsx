@@ -5,10 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Trash2, Plus, Minus, ShoppingCart as CartIcon, FileText } from 'lucide-react';
+import { ShippingCalculator } from '@/components/shopping/ShippingCalculator';
+import type { ShippingOption } from '@/lib/shipping-quote';
 
 export function ShoppingCart() {
-  const { items, removeItem, updateQty, clearCart, getSubtotal, getTax, getShipping, getFinalTotal } = useCart();
+  const { items, removeItem, updateQty, clearCart, getSubtotal, getTax } = useCart();
   const [showCart, setShowCart] = useState(false);
+  const [shippingOption, setShippingOption] = useState<ShippingOption | null>(null);
   const location = useLocation();
 
   const allowedPaths = ['/shopping', '/planos', '/precos'];
@@ -34,8 +37,8 @@ export function ShoppingCart() {
 
   const subtotal = getSubtotal();
   const tax = getTax();
-  const shipping = getShipping();
-  const total = getFinalTotal();
+  const shipping = shippingOption?.price ?? 0;
+  const total = subtotal + tax + shipping;
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center md:justify-end">
@@ -76,9 +79,27 @@ export function ShoppingCart() {
         {items.length > 0 && (
           <>
             <div className="border-t border-border p-6 space-y-3">
+              <ShippingCalculator
+                subtotal={subtotal}
+                weightKg={0.5 * Math.max(1, items.reduce((s, i) => s + i.qty, 0))}
+                onSelect={(opt, cep) => {
+                  setShippingOption(opt);
+                  try {
+                    localStorage.setItem(
+                      "pyr_shipping",
+                      JSON.stringify({ cep, carrier: opt.carrier, service: opt.service, price: opt.price, days: opt.days }),
+                    );
+                  } catch { /* storage indisponível */ }
+                }}
+              />
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal:</span><span className="font-semibold">R$ {subtotal.toFixed(2)}</span></div>
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Imposto (10%):</span><span className="font-semibold">R$ {tax.toFixed(2)}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Frete:</span><span className="font-semibold">R$ {shipping.toFixed(2)}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Frete:</span><span className="font-semibold">{shippingOption ? `R$ ${shipping.toFixed(2)}` : "calcule pelo CEP"}</span></div>
+              {shippingOption && (
+                <p className="text-[11px] text-muted-foreground">
+                  {shippingOption.carrier} {shippingOption.service} · até {shippingOption.days} dias úteis · frete repassado 100% à farmácia
+                </p>
+              )}
               <div className="border-t border-border pt-3 flex justify-between"><span className="font-bold">Total:</span><span className="text-xl font-bold text-primary">R$ {total.toFixed(2)}</span></div>
             </div>
             <div className="px-6 space-y-2">

@@ -2590,6 +2590,7 @@ export type Database = {
           last_seen_online: string | null
           latitude: number | null
           longitude: number | null
+          mp_collector_id: string | null
           organization_id: string | null
           plan_tier: string
           price_chat_only: number
@@ -2630,6 +2631,7 @@ export type Database = {
           last_seen_online?: string | null
           latitude?: number | null
           longitude?: number | null
+          mp_collector_id?: string | null
           organization_id?: string | null
           plan_tier?: string
           price_chat_only?: number
@@ -2670,6 +2672,7 @@ export type Database = {
           last_seen_online?: string | null
           latitude?: number | null
           longitude?: number | null
+          mp_collector_id?: string | null
           organization_id?: string | null
           plan_tier?: string
           price_chat_only?: number
@@ -5180,6 +5183,7 @@ export type Database = {
           shipping_carrier: string | null
           shipping_cep: string | null
           shipping_cost: number | null
+          shipping_days: number | null
           shipping_deadline_days: number | null
           shipping_method: string | null
           split_details: Json | null
@@ -5187,6 +5191,7 @@ export type Database = {
           subtotal: number
           total: number
           tracking_code: string | null
+          tracking_url: string | null
           updated_at: string | null
           user_id: string
           vendor_id: string | null
@@ -5203,6 +5208,7 @@ export type Database = {
           shipping_carrier?: string | null
           shipping_cep?: string | null
           shipping_cost?: number | null
+          shipping_days?: number | null
           shipping_deadline_days?: number | null
           shipping_method?: string | null
           split_details?: Json | null
@@ -5210,6 +5216,7 @@ export type Database = {
           subtotal?: number
           total?: number
           tracking_code?: string | null
+          tracking_url?: string | null
           updated_at?: string | null
           user_id: string
           vendor_id?: string | null
@@ -5226,6 +5233,7 @@ export type Database = {
           shipping_carrier?: string | null
           shipping_cep?: string | null
           shipping_cost?: number | null
+          shipping_days?: number | null
           shipping_deadline_days?: number | null
           shipping_method?: string | null
           split_details?: Json | null
@@ -5233,6 +5241,7 @@ export type Database = {
           subtotal?: number
           total?: number
           tracking_code?: string | null
+          tracking_url?: string | null
           updated_at?: string | null
           user_id?: string
           vendor_id?: string | null

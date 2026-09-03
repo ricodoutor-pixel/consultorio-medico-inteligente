@@ -213,6 +213,7 @@ const AdminGlobalOps = lazyWithRecovery(() => import("./pages/AdminGlobalOps"), 
 const WhatsAppInbox = lazyWithRecovery(() => import("./pages/admin/WhatsAppInbox"), { sourceRef: "/admin/whatsapp-inbox" });
 const AdminAprovacoes = lazyWithRecovery(() => import("./pages/admin/AdminAprovacoes"), { sourceRef: "/admin/aprovacoes-medicas" });
 const AdminAprovacoesFarmacias = lazyWithRecovery(() => import("./pages/admin/AdminAprovacoesFarmacias"), { sourceRef: "/admin/aprovacoes-farmacias" });
+const AdminImportacoesAnvisa = lazyWithRecovery(() => import("./pages/admin/AdminImportacoesAnvisa"), { sourceRef: "/admin/importacoes-anvisa" });
 const AdminAprovacoesPacientes = lazyWithRecovery(() => import("./pages/admin/AdminAprovacoesPacientes"), { sourceRef: "/admin/aprovacoes-pacientes" });
 const AdminKycAgentes = lazyWithRecovery(() => import("./pages/admin/AdminKycAgentes"), { sourceRef: "/admin/kyc-agentes" });
 const AdminMedicosOnline = lazyWithRecovery(() => import("./pages/admin/MedicosOnline"), { sourceRef: "/admin/medicos-online" });

@@ -184,7 +184,7 @@ Deno.serve(async (req) => {
     } else if (appointmentId && typeof appointmentId === "string") {
       const { data: appt } = await supabase
         .from("appointments")
-        .select("id, amount, patient_id")
+        .select("id, amount, patient_id, doctor_id")
         .eq("id", appointmentId)
         .maybeSingle();
       if (!appt) return json({ error: "Consulta não encontrada" }, 404);
@@ -193,6 +193,25 @@ Deno.serve(async (req) => {
       amount = Math.max(1, Number(appt.amount || 0));
       externalReference = `appointment:${appt.id}`;
       type = "consultation";
+
+      // Split telemedicina: 7% plataforma · 93% médico
+      marketplaceFee = round2(amount * FEE_TELEMEDICINE);
+      if (appt.doctor_id) {
+        const { data: doc } = await supabase
+          .from("doctors")
+          .select("mp_collector_id")
+          .eq("id", appt.doctor_id)
+          .maybeSingle();
+        collectorId = (doc as any)?.mp_collector_id ?? null;
+      }
+      splitDetails = {
+        model: "telemedicine_93_7",
+        gross_amount: amount,
+        platform_fee: marketplaceFee,
+        doctor_net_amount: round2(amount - marketplaceFee),
+        doctor_id: appt.doctor_id ?? null,
+        collector_id: collectorId,
+      };
     } else {
       let item = typeof sku === "string" ? CATALOG[sku] : undefined;
       

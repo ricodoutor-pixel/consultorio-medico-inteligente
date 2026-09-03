@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { sku: rawSku, cartToken, appointmentId, returnUrl, refCode, doctorId } = await req.json();
+    const { sku: rawSku, cartToken, appointmentId, orderId, returnUrl, refCode, doctorId } = await req.json();
     const sku = typeof rawSku === "string" ? (LEGACY_SKU_MAP[rawSku] ?? rawSku) : rawSku;
 
     // Programa de indicações (médicos, pacientes e lojistas) — resolvido no servidor.

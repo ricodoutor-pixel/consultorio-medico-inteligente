@@ -46,8 +46,7 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
   const totalPendentes = list.filter((d) => !d.is_verified).length;
   const totalContratosAssinados = list.filter((d) => 
     d.is_contract_signed || 
-    localStorage.getItem(`doctor_contract_signed_${d.id}`) === "true" ||
-    ["med-1", "med-2", "med-3", "med-4"].includes(d.id)
+    localStorage.getItem(`doctor_contract_signed_${d.id}`) === "true"
   ).length;
 
   const filtered = list.filter((d) => {
@@ -93,8 +92,7 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
   const handleViewContract = (doc: DoctorRecord) => {
     const isSigned = Boolean(
       doc.is_contract_signed || 
-      localStorage.getItem(`doctor_contract_signed_${doc.id}`) === "true" ||
-      ["med-1", "med-2", "med-3", "med-4"].includes(doc.id)
+      localStorage.getItem(`doctor_contract_signed_${doc.id}`) === "true"
     );
 
     setSelectedContract({
@@ -215,8 +213,7 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
               {filtered.map((d) => {
                 const isContractSigned = Boolean(
                   d.is_contract_signed || 
-                  localStorage.getItem(`doctor_contract_signed_${d.id}`) === "true" ||
-                  ["med-1", "med-2", "med-3", "med-4"].includes(d.id)
+                  localStorage.getItem(`doctor_contract_signed_${d.id}`) === "true"
                 );
 
                 return (

@@ -398,7 +398,7 @@ Deno.serve(async (req) => {
           title: "Pagamento confirmado",
           message: `Seu pedido de R$ ${Number(shopOrder.total || 0).toFixed(2)} foi aprovado. Você receberá o código de rastreio assim que a farmácia despachar.`,
           type: "order",
-          action_url: "/meus-pedidos",
+          action_url: "/shopping",
           metadata: { order_id: shopOrder.id },
         });
       }

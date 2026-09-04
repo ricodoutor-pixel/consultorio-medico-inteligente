@@ -485,7 +485,7 @@ export const AdminAprovacoesPacientes = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                       {(Object.keys(PATIENT_KYC_LABELS) as PatientKycKind[]).map((kind) => {
                         const doc = docOf(patient, kind);
-                        const hasDoc = Boolean(doc?.file_url || doc?.storage_path || patient.id === TEST_PATIENT_DATA.id);
+                        const hasDoc = Boolean(doc?.file_url || doc?.storage_path);
 
                         return (
                           <button

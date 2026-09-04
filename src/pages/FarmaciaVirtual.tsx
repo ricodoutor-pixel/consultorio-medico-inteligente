@@ -758,7 +758,8 @@ export default function FarmaciaVirtual() {
                     <Button
                       className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
                       onClick={() => {
-                        dispensePrescription(selectedPrescription.id);
+                        setTrackingCode("");
+                        setDispensingRxId(selectedPrescription.id);
                         setIsPrescriptionModalOpen(false);
                       }}
                     >
@@ -771,7 +772,52 @@ export default function FarmaciaVirtual() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+            {/* Modal obrigatório de Código de Rastreamento na dispensação */}
+            <Dialog open={!!dispensingRxId} onOpenChange={(open) => { if (!open) setDispensingRxId(null); }}>
+              <DialogContent className="max-w-md bg-card border-border rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2 text-lg font-bold">
+                    <Truck className="text-emerald-400" /> Código de Rastreamento
+                  </DialogTitle>
+                  <DialogDescription className="text-xs">
+                    Informe o código de rastreio da transportadora (mínimo 8 caracteres). O paciente será notificado com o link de rastreio no painel dele.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="py-2 space-y-2">
+                  <Label htmlFor="tracking-code" className="text-xs font-bold">Código de rastreio</Label>
+                  <Input
+                    id="tracking-code"
+                    value={trackingCode}
+                    onChange={(e) => setTrackingCode(e.target.value.toUpperCase())}
+                    placeholder="Ex.: AA123456789BR"
+                    className="font-mono"
+                    autoFocus
+                  />
+                </div>
+
+                <DialogFooter className="flex flex-col sm:flex-row gap-2">
+                  <Button variant="ghost" className="text-xs" onClick={() => setDispensingRxId(null)}>
+                    Cancelar
+                  </Button>
+                  <Button
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
+                    disabled={trackingCode.trim().length < 8}
+                    onClick={async () => {
+                      if (!dispensingRxId) return;
+                      await dispensePrescription(dispensingRxId, trackingCode);
+                      setDispensingRxId(null);
+                      setTrackingCode("");
+                    }}
+                  >
+                    <CheckCircle size={14} className="mr-1.5" /> Confirmar Dispensação
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </TabsContent>
+
 
           {/* ============================================================ */}
           {/* ABA 3: CATÁLOGO (VITRINE) - MÁXIMO 10 PRODUTOS */}

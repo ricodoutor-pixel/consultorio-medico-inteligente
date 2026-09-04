@@ -10,7 +10,7 @@ import { TrustBadges } from '@/components/TrustBadges';
 
 export default function CartCheckout() {
   const navigate = useNavigate();
-  const { items, getSubtotal, getTax, getShipping, getFinalTotal, clearCart } = useCart();
+  const { items, getSubtotal, getTax, getShipping, getFinalTotal, clearCart, shipping: selectedShipping } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -149,7 +149,7 @@ export default function CartCheckout() {
               <div className="space-y-3">
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal:</span><span>R$ {subtotal.toFixed(2)}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Imposto:</span><span>R$ {tax.toFixed(2)}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Frete:</span><span>R$ {shipping.toFixed(2)}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-muted-foreground">Frete{selectedShipping ? ` (${selectedShipping.carrier} ${selectedShipping.service})` : ""}:</span><span>{selectedShipping ? `R$ ${shipping.toFixed(2)}` : "calcule pelo CEP no carrinho"}</span></div>
                 {upsellExtra > 0 && (
                   <div className="flex justify-between text-sm"><span className="text-muted-foreground">Upgrade ({upsellApplied}):</span><span className="text-primary font-semibold">+ R$ {upsellExtra.toFixed(2)}</span></div>
                 )}

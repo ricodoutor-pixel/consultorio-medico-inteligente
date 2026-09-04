@@ -65,7 +65,7 @@ const President360 = () => {
         supabase.from("consultation_queue").select("id", { count: "exact", head: true }).eq("status", "waiting"),
         supabase.from("leads").select("id", { count: "exact", head: true }).gte("created_at", d24h),
         supabase.from("error_logs").select("id", { count: "exact", head: true }).gte("created_at", d24h),
-        supabase.from("alert_history").select("id", { count: "exact", head: true }).gte("created_at", d24h),
+        supabase.from("alert_history").select("id", { count: "exact", head: true }).gte("sent_at", d24h),
         supabase.from("payment_provider_health").select("status,provider,checked_at").order("checked_at", { ascending: false }).limit(3),
       ]);
 

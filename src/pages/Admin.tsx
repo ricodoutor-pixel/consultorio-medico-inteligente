@@ -149,7 +149,7 @@ const Admin = () => {
         supabase.from("doctors").select("id", { count: "exact", head: true }),
         supabase.from("prescriptions").select("id", { count: "exact", head: true }).gte("created_at", d7d),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("alert_history").select("id", { count: "exact", head: true }).gte("created_at", d24h),
+        supabase.from("alert_history").select("id", { count: "exact", head: true }).gte("sent_at", d24h),
         supabase.from("error_logs").select("id", { count: "exact", head: true }).gte("created_at", d24h),
         supabase.from("audit_log").select("id,created_at", { count: "exact" }).gte("created_at", d24h).order("created_at", { ascending: false }).limit(1000),
         supabase.from("orientacao_tecnica_orders").select("id,patient_name,amount,status,payment_method,created_at").order("created_at", { ascending: false }).limit(8),
@@ -157,7 +157,7 @@ const Admin = () => {
         supabase.from("audit_log").select("id,action,table_name,created_at,user_id").order("created_at", { ascending: false }).limit(10),
         supabase.from("manus_growth_runs").select("id,status,pages_analyzed,pages_optimized,started_at").order("started_at", { ascending: false }).limit(5),
         supabase.from("payment_provider_health").select("provider,status,latency_ms,error_rate,checked_at").order("checked_at", { ascending: false }).limit(5),
-        supabase.from("notifications").select("id,title,created_at,read").order("created_at", { ascending: false }).limit(6),
+        supabase.from("notifications").select("id,title,created_at,is_read").order("created_at", { ascending: false }).limit(6),
         supabase.from("funnel_events").select("event_name,funnel,created_at").gte("created_at", d30d),
       ]);
 

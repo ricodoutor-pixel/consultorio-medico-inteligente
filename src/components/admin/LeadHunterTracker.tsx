@@ -31,124 +31,10 @@ interface DoctorLead {
   created_at: string;
 }
 
-const INITIAL_FALLBACK_LEADS: DoctorLead[] = [
-  {
-    id: "lead-1",
-    nome: "Dr. Daniel Kobayashi Colombo",
-    crm: "182941",
-    uf: "SP",
-    especialidade: "Medicina Canabinoide & Dor Crônica",
-    email: "contato@plantayraiz.com.br",
-    telefone: "+5511991363154",
-    origem: "manual",
-    canal_username: "drdanielkobayashi",
-    status_qualificacao: "cadastrado_plataforma",
-    brevo_synced: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-  },
-  {
-    id: "lead-2",
-    nome: "Dr. Edilson Bezerra da Silva",
-    crm: "129481",
-    uf: "PR",
-    especialidade: "Diretoria Médica & Psiquiatria",
-    email: "diretoriamedica@plantayraiz.com.br",
-    telefone: "+5511991363154",
-    origem: "manual",
-    canal_username: "dredilsonbezerra",
-    status_qualificacao: "cadastrado_plataforma",
-    brevo_synced: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-  },
-  {
-    id: "lead-3",
-    nome: "Dra. Inoã Motta",
-    crm: "204918",
-    uf: "SP",
-    especialidade: "Clínica Geral & Fitoterapia",
-    email: "dra.inoa.motta@gmail.com",
-    telefone: "+5511987131241",
-    origem: "instagram_dm",
-    canal_username: "dra_inoamotta",
-    status_qualificacao: "qualificado",
-    brevo_synced: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-  },
-  {
-    id: "lead-4",
-    nome: "Dr. Francisco Prado",
-    crm: "194820",
-    uf: "SP",
-    especialidade: "Neurologia & Canabinoides",
-    email: "drfranciscoprado@gmail.com",
-    telefone: "+5511999887766",
-    origem: "instagram_comment",
-    canal_username: "drfranciscoprado",
-    status_qualificacao: "qualificado",
-    brevo_synced: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 240).toISOString(),
-  },
-  {
-    id: "lead-5",
-    nome: "Dr. Jorge Hellmann",
-    crm: "182049",
-    uf: "RS",
-    especialidade: "Medicina Integrativa",
-    email: "jorgehellmann@gmail.com",
-    telefone: "+5551988776655",
-    origem: "b2b_discovery",
-    canal_username: null,
-    status_qualificacao: "qualificado",
-    brevo_synced: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 360).toISOString(),
-  },
-  {
-    id: "lead-6",
-    nome: "Dra. Elaine Sarno",
-    crm: "174829",
-    uf: "BA",
-    especialidade: "Dermatologia & Canabinoides",
-    email: "elainesarno@gmail.com",
-    telefone: "+5571991122334",
-    origem: "b2b_discovery",
-    canal_username: null,
-    status_qualificacao: "qualificado",
-    brevo_synced: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 480).toISOString(),
-  },
-  {
-    id: "lead-7",
-    nome: "Dr. Higor B. Henriques",
-    crm: "219482",
-    uf: "MG",
-    especialidade: "Ortopedia & Dor Crônica",
-    email: "higorbhenriques@gmail.com",
-    telefone: "+5531988223344",
-    origem: "linkedin_search",
-    canal_username: "drhigorhenriques",
-    status_qualificacao: "qualificado",
-    brevo_synced: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 600).toISOString(),
-  },
-  {
-    id: "lead-8",
-    nome: "Dr. Luan Mendonça",
-    crm: "201948",
-    uf: "RJ",
-    especialidade: "Clínica Geral",
-    email: "luanmendoncaf@gmail.com",
-    telefone: "+5521977665544",
-    origem: "instagram_dm",
-    canal_username: "luanmendoncaf",
-    status_qualificacao: "qualificado",
-    brevo_synced: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 720).toISOString(),
-  },
-];
-
 export const LeadHunterTracker = () => {
-  const [leads, setLeads] = useState<DoctorLead[]>(INITIAL_FALLBACK_LEADS);
-  const [loading, setLoading] = useState(false);
+  const [leads, setLeads] = useState<DoctorLead[]>([]);
+  const [allLeads, setAllLeads] = useState<DoctorLead[]>([]);
+  const [loading, setLoading] = useState(true);
   const [syncingBrevo, setSyncingBrevo] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [testLeadText, setTestLeadText] = useState("");
@@ -156,36 +42,57 @@ export const LeadHunterTracker = () => {
 
   // Meta de 10.000 Médicos Prescritores
   const GOAL = 10000;
-  const totalLeads = leads.length >= 8 ? 2184 + leads.length : 2192;
+  const totalLeads = allLeads.length;
   const progressPct = Math.min(100, Number(((totalLeads / GOAL) * 100).toFixed(1)));
 
-  // Counts by source
+  const since = (days: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+    return d.getTime();
+  };
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const byOrigem = (o: string) => allLeads.filter((l) => (l.origem || "").includes(o)).length;
+
+  // Counts derived from real records only
   const stats = {
-    today: 28,
-    week: 164,
-    month: 642,
+    today: allLeads.filter((l) => new Date(l.created_at).getTime() >= startOfToday.getTime()).length,
+    week: allLeads.filter((l) => new Date(l.created_at).getTime() >= since(7)).length,
+    month: allLeads.filter((l) => new Date(l.created_at).getTime() >= since(30)).length,
     total: totalLeads,
-    brevoSynced: Math.round(totalLeads * 0.94),
-    instagramDm: 840,
-    instagramComments: 412,
-    facebookAds: 390,
-    b2bSearch: 542,
+    brevoSynced: allLeads.filter((l) => l.brevo_synced).length,
+    instagramDm: byOrigem("instagram_dm"),
+    instagramComments: byOrigem("instagram_comment"),
+    facebookAds: byOrigem("facebook"),
+    b2bSearch: byOrigem("b2b"),
   };
 
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("doctor_leads_hunt" as any)
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(15);
+      const { data } = await supabase
+        .from("leads_contatos")
+        .select("id, nome, telefone, email, origem, categoria, created_at")
+        .order("created_at", { ascending: false });
 
-      if (!error && data && data.length > 0) {
-        setLeads(data as any);
-      }
-    } catch (_) {
-      // Fallback preserves initial leads
+      const mapped: DoctorLead[] = (data || []).map((l: any) => ({
+        id: l.id,
+        nome: l.nome,
+        crm: null,
+        uf: null,
+        especialidade: l.categoria || null,
+        email: l.email || null,
+        telefone: l.telefone || null,
+        origem: l.origem || "chat",
+        canal_username: null,
+        status_qualificacao: l.categoria ? "qualificado" : "novo",
+        brevo_synced: false,
+        created_at: l.created_at,
+      }));
+
+      setAllLeads(mapped);
+      setLeads(mapped.slice(0, 15));
     } finally {
       setLoading(false);
     }
@@ -199,7 +106,7 @@ export const LeadHunterTracker = () => {
       .channel("lead-hunter-live")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "doctor_leads_hunt" },
+        { event: "INSERT", schema: "public", table: "leads_contatos" },
         (payload) => {
           if (payload.new) {
             setLeads((prev) => [payload.new as any, ...prev.slice(0, 14)]);

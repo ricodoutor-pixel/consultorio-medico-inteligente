@@ -159,18 +159,14 @@ export default function CartCheckout() {
                     <Input name="zipCode" placeholder="CEP" value={formData.zipCode} onChange={handleInputChange} />
                   </div>
                 </div>
-                <div><h2 className="text-xl font-semibold mb-4">Dados do Cartão</h2>
-                  <div className="space-y-4">
-                    <Input name="cardNumber" placeholder="Número do cartão" value={formData.cardNumber} onChange={handleInputChange} maxLength={19} />
-                    <div className="grid grid-cols-2 gap-4">
-                      <Input name="cardExpiry" placeholder="MM/YY" value={formData.cardExpiry} onChange={handleInputChange} maxLength={5} />
-                      <Input name="cardCVC" placeholder="CVC" value={formData.cardCVC} onChange={handleInputChange} maxLength={4} />
-                    </div>
-                  </div>
-                </div>
+                <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <ShieldCheck size={16} className="text-primary" />
+                  Pagamento seguro no Mercado Pago (PIX, cartão ou boleto) na próxima etapa.
+                </p>
                 <Button type="submit" disabled={loading} className="w-full py-6">
-                  {loading ? (<><Loader className="animate-spin mr-2" size={20} />Processando...</>) : `Confirmar Pagamento - R$ ${total.toFixed(2)}`}
+                  {loading ? (<><Loader className="animate-spin mr-2" size={20} />Processando...</>) : `Pagar com Mercado Pago - R$ ${total.toFixed(2)}`}
                 </Button>
+
               </form>
             </Card>
           </div>

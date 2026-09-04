@@ -101,7 +101,7 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
             ? `Médico ${doc.name} homologado com sucesso!`
             : `Acesso do médico ${doc.name} revogado.`
         );
-        onRefresh?.();
+        refresh();
       }
     } catch {
       toast.success(

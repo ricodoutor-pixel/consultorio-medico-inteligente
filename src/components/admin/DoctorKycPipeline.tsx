@@ -25,6 +25,7 @@ export interface DoctorRecord {
   contract_signed_at?: string;
   contract_ip?: string;
   created_at?: string;
+  docs_count?: number;
 }
 
 interface DoctorKycPipelineProps {
@@ -32,22 +33,45 @@ interface DoctorKycPipelineProps {
   onRefresh?: () => void;
 }
 
-export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipelineProps) => {
+export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [selectedContract, setSelectedContract] = useState<DoctorContractDetails | null>(null);
   const navigate = useNavigate();
+  const { doctors: liveDoctors, fetchDoctors } = useDoctors();
 
-  const list = doctors;
+  // Sem prop explícita, a esteira usa os cadastros reais do banco
+  const list: DoctorRecord[] =
+    doctors && doctors.length > 0
+      ? doctors
+      : liveDoctors.map((d) => ({
+          id: d.id,
+          name: d.profile?.full_name || d.full_name || "Dr(a). Prescritor(a)",
+          crm: d.crm || "—",
+          crm_state: d.crm_state || undefined,
+          cpf: d.profile?.cpf || undefined,
+          specialty: d.specialty || undefined,
+          email: d.profile?.email || undefined,
+          phone: d.profile?.phone || undefined,
+          is_verified: Boolean(d.is_approved_by_admin),
+          is_contract_signed: Boolean(d.is_contract_signed),
+          contract_hash: d.contract_hash || undefined,
+          contract_signed_at: d.contract_signed_at || undefined,
+          contract_ip: d.contract_ip || undefined,
+          created_at: d.created_at || undefined,
+          docs_count: (d.kyc_docs || []).length,
+        }));
 
+  const refresh = () => {
+    fetchDoctors();
+    onRefresh?.();
+  };
 
   const totalCadastrados = list.length;
   const totalAtivos = list.filter((d) => d.is_verified).length;
   const totalPendentes = list.filter((d) => !d.is_verified).length;
-  const totalContratosAssinados = list.filter((d) => 
-    d.is_contract_signed || 
-    localStorage.getItem(`doctor_contract_signed_${d.id}`) === "true"
-  ).length;
+  const totalComDocumentos = list.filter((d) => (d.docs_count ?? 0) > 0).length;
+
 
   const filtered = list.filter((d) => {
     const term = searchTerm.toLowerCase();

@@ -190,7 +190,7 @@ export const AdminAprovacoesPacientes = () => {
             date: new Date(o.created_at).toLocaleDateString("pt-BR"),
             tracking_code: o.tracking_code || undefined,
           })),
-          kyc_docs: [],
+          kyc_docs: docsByUser.get(p.id) || [],
         };
       });
 

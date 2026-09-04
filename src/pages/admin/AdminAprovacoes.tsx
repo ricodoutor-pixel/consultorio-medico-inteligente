@@ -466,19 +466,13 @@ export const AdminAprovacoes = () => {
                 ) : (
                   filteredDoctors.map((doc) => {
                     const docUser = doc.profile || {};
-                    const mockMatch = testProfessionals.find(p => {
-                      const realCrmNum = doc.crm ? doc.crm.replace(/\D/g, '') : '';
-                      const mockCrmNum = p.crm ? p.crm.replace(/\D/g, '') : '';
-                      const matchCrm = !!(realCrmNum && mockCrmNum && mockCrmNum.includes(realCrmNum));
-                      const matchName = p.name && docUser.full_name && p.name.toLowerCase().includes(docUser.full_name.toLowerCase());
-                      return matchCrm || matchName;
-                    });
-                    
-                    const name = mockMatch?.name || docUser.full_name || doc.full_name || 'Dr(a). Prescritor(a)';
-                    const phone = mockMatch?.whatsapp || docUser.phone || doc.personal_phone || doc.whatsapp || 'Não informado';
-                    const crm = mockMatch?.crm || (doc.crm ? `CRM-${doc.crm_state || 'BR'} ${doc.crm}` : 'CRM em Análise');
+
+                    const name = docUser.full_name || doc.full_name || 'Dr(a). Prescritor(a)';
+                    const phone = docUser.phone || doc.personal_phone || doc.whatsapp || 'Não informado';
+                    const crm = doc.crm ? `CRM-${doc.crm_state || 'BR'} ${doc.crm}` : 'CRM em Análise';
                     const cep = docUser.cep || null;
-                    const finalImage = mockMatch?.imageUrl || docUser.avatar_url;
+                    const finalImage = docUser.avatar_url || doc.avatar_url;
+
 
 
                     const isCardActive = Boolean(doc.is_approved_by_admin);

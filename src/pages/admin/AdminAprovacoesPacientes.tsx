@@ -88,8 +88,31 @@ export const AdminAprovacoesPacientes = () => {
           : Promise.resolve({ data: [] as any[] }),
       ]);
 
+      // Documentos KYC realmente anexados no armazenamento privado
+      const docsByUser = new Map<string, Array<{ id: string; document_kind: PatientKycKind; storage_path: string }>>();
+      try {
+        const { data: folders } = await supabase.storage.from(PATIENT_KYC_BUCKET).list("", { limit: 1000 });
+        const userFolders = (folders || []).filter((f) => ids.includes(f.name));
+        await Promise.all(
+          userFolders.map(async (f) => {
+            const { data: files } = await supabase.storage
+              .from(PATIENT_KYC_BUCKET)
+              .list(f.name, { limit: 100 });
+            const mapped = (files || []).map((file) => ({
+              id: `${f.name}/${file.name}`,
+              document_kind: file.name.replace(/\.[^.]+$/, "") as PatientKycKind,
+              storage_path: `${f.name}/${file.name}`,
+            }));
+            if (mapped.length) docsByUser.set(f.name, mapped);
+          })
+        );
+      } catch (err) {
+        console.warn("[AdminAprovacoesPacientes] storage list", err);
+      }
+
       const tcleByUser = new Map<string, { accepted_at: string; version: string }>();
       (tcle.data || []).forEach((t: any) => tcleByUser.set(t.user_id, t));
+
 
       const savedOverrides: Record<string, boolean> = JSON.parse(
         localStorage.getItem("patient_approval_overrides") || "{}"

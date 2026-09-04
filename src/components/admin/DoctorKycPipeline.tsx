@@ -191,8 +191,8 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
 
           <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/40 flex items-center justify-between">
             <div>
-              <span className="text-[10px] text-emerald-300 uppercase font-bold">Contratos Assinados</span>
-              <p className="text-2xl font-black text-emerald-300 mt-0.5">{totalContratosAssinados}</p>
+              <span className="text-[10px] text-emerald-300 uppercase font-bold">Documentos Anexados</span>
+              <p className="text-2xl font-black text-emerald-300 mt-0.5">{totalComDocumentos}</p>
             </div>
             <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
               <ShieldCheck size={16} />

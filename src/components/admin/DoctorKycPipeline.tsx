@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useDoctors } from "@/hooks/useDoctors";
 import DoctorContractViewerModal, { DoctorContractDetails } from "./DoctorContractViewerModal";
 
 export interface DoctorRecord {
@@ -25,6 +26,7 @@ export interface DoctorRecord {
   contract_signed_at?: string;
   contract_ip?: string;
   created_at?: string;
+  docs_count?: number;
 }
 
 interface DoctorKycPipelineProps {
@@ -32,77 +34,45 @@ interface DoctorKycPipelineProps {
   onRefresh?: () => void;
 }
 
-const DEFAULT_DOCTORS: DoctorRecord[] = [
-  {
-    id: "med-1",
-    name: "Dr. Daniel Kobayashi Colombo",
-    crm: "186358",
-    crm_state: "SP",
-    cpf: "186.358.421-00",
-    specialty: "Clínica Geral & Medicina Canabinoide",
-    email: "daniel.colombo@plantayraiz.com.br",
-    phone: "(11) 98713-1241",
-    is_verified: true,
-    is_contract_signed: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "med-2",
-    name: "Dr. Edilson Bezerra da Silva",
-    crm: "214589",
-    crm_state: "SP",
-    cpf: "054.764.445-90",
-    specialty: "Diretor Clínico & Prescritor Especialista",
-    email: "contato@plantayraiz.com.br",
-    phone: "(11) 99136-3154",
-    is_verified: true,
-    is_contract_signed: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "med-3",
-    name: "Dra. Olivia Silva Nogueira",
-    crm: "198742",
-    crm_state: "RJ",
-    cpf: "198.742.631-00",
-    specialty: "Neurologia & Tratamento Canabinoide",
-    email: "dra.olivia@plantayraiz.com.br",
-    phone: "(21) 99844-3211",
-    is_verified: true,
-    is_contract_signed: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "med-4",
-    name: "Dra. Suelen Naves Rodrigues",
-    crm: "49354",
-    crm_state: "PR",
-    cpf: "493.540.812-00",
-    specialty: "Supervisora Técnica CFM & CFM/PR",
-    email: "dra.suelen@plantayraiz.com.br",
-    phone: "(41) 98412-7788",
-    is_verified: true,
-    is_contract_signed: true,
-    created_at: new Date().toISOString(),
-  },
-];
-
-export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipelineProps) => {
+export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [selectedContract, setSelectedContract] = useState<DoctorContractDetails | null>(null);
   const navigate = useNavigate();
+  const { doctors: liveDoctors, fetchDoctors } = useDoctors();
 
-  const list = doctors.length > 0 ? doctors : DEFAULT_DOCTORS;
+  // Sem prop explícita, a esteira usa os cadastros reais do banco
+  const list: DoctorRecord[] =
+    doctors && doctors.length > 0
+      ? doctors
+      : liveDoctors.map((d) => ({
+          id: d.id,
+          name: d.profile?.full_name || d.full_name || "Dr(a). Prescritor(a)",
+          crm: d.crm || "—",
+          crm_state: d.crm_state || undefined,
+          cpf: d.profile?.cpf || undefined,
+          specialty: d.specialty || undefined,
+          email: d.profile?.email || undefined,
+          phone: d.profile?.phone || undefined,
+          is_verified: Boolean(d.is_approved_by_admin),
+          is_contract_signed: Boolean(d.is_contract_signed),
+          contract_hash: d.contract_hash || undefined,
+          contract_signed_at: d.contract_signed_at || undefined,
+          contract_ip: d.contract_ip || undefined,
+          created_at: d.created_at || undefined,
+          docs_count: (d.kyc_docs || []).length,
+        }));
+
+  const refresh = () => {
+    fetchDoctors();
+    onRefresh?.();
+  };
 
   const totalCadastrados = list.length;
   const totalAtivos = list.filter((d) => d.is_verified).length;
   const totalPendentes = list.filter((d) => !d.is_verified).length;
-  const totalContratosAssinados = list.filter((d) => 
-    d.is_contract_signed || 
-    localStorage.getItem(`doctor_contract_signed_${d.id}`) === "true" ||
-    ["med-1", "med-2", "med-3", "med-4"].includes(d.id)
-  ).length;
+  const totalComDocumentos = list.filter((d) => (d.docs_count ?? 0) > 0).length;
+
 
   const filtered = list.filter((d) => {
     const term = searchTerm.toLowerCase();
@@ -131,7 +101,7 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
             ? `Médico ${doc.name} homologado com sucesso!`
             : `Acesso do médico ${doc.name} revogado.`
         );
-        onRefresh?.();
+        refresh();
       }
     } catch {
       toast.success(
@@ -147,8 +117,7 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
   const handleViewContract = (doc: DoctorRecord) => {
     const isSigned = Boolean(
       doc.is_contract_signed || 
-      localStorage.getItem(`doctor_contract_signed_${doc.id}`) === "true" ||
-      ["med-1", "med-2", "med-3", "med-4"].includes(doc.id)
+      localStorage.getItem(`doctor_contract_signed_${doc.id}`) === "true"
     );
 
     setSelectedContract({
@@ -222,8 +191,8 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
 
           <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/40 flex items-center justify-between">
             <div>
-              <span className="text-[10px] text-emerald-300 uppercase font-bold">Contratos Assinados</span>
-              <p className="text-2xl font-black text-emerald-300 mt-0.5">{totalContratosAssinados}</p>
+              <span className="text-[10px] text-emerald-300 uppercase font-bold">Documentos Anexados</span>
+              <p className="text-2xl font-black text-emerald-300 mt-0.5">{totalComDocumentos}</p>
             </div>
             <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
               <ShieldCheck size={16} />
@@ -269,8 +238,7 @@ export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipeline
               {filtered.map((d) => {
                 const isContractSigned = Boolean(
                   d.is_contract_signed || 
-                  localStorage.getItem(`doctor_contract_signed_${d.id}`) === "true" ||
-                  ["med-1", "med-2", "med-3", "med-4"].includes(d.id)
+                  localStorage.getItem(`doctor_contract_signed_${d.id}`) === "true"
                 );
 
                 return (

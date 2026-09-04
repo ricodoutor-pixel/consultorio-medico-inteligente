@@ -32,68 +32,14 @@ interface DoctorKycPipelineProps {
   onRefresh?: () => void;
 }
 
-const DEFAULT_DOCTORS: DoctorRecord[] = [
-  {
-    id: "med-1",
-    name: "Dr. Daniel Kobayashi Colombo",
-    crm: "186358",
-    crm_state: "SP",
-    cpf: "186.358.421-00",
-    specialty: "Clínica Geral & Medicina Canabinoide",
-    email: "daniel.colombo@plantayraiz.com.br",
-    phone: "(11) 98713-1241",
-    is_verified: true,
-    is_contract_signed: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "med-2",
-    name: "Dr. Edilson Bezerra da Silva",
-    crm: "214589",
-    crm_state: "SP",
-    cpf: "054.764.445-90",
-    specialty: "Diretor Clínico & Prescritor Especialista",
-    email: "contato@plantayraiz.com.br",
-    phone: "(11) 99136-3154",
-    is_verified: true,
-    is_contract_signed: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "med-3",
-    name: "Dra. Olivia Silva Nogueira",
-    crm: "198742",
-    crm_state: "RJ",
-    cpf: "198.742.631-00",
-    specialty: "Neurologia & Tratamento Canabinoide",
-    email: "dra.olivia@plantayraiz.com.br",
-    phone: "(21) 99844-3211",
-    is_verified: true,
-    is_contract_signed: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "med-4",
-    name: "Dra. Suelen Naves Rodrigues",
-    crm: "49354",
-    crm_state: "PR",
-    cpf: "493.540.812-00",
-    specialty: "Supervisora Técnica CFM & CFM/PR",
-    email: "dra.suelen@plantayraiz.com.br",
-    phone: "(41) 98412-7788",
-    is_verified: true,
-    is_contract_signed: true,
-    created_at: new Date().toISOString(),
-  },
-];
-
 export const DoctorKycPipeline = ({ doctors = [], onRefresh }: DoctorKycPipelineProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [selectedContract, setSelectedContract] = useState<DoctorContractDetails | null>(null);
   const navigate = useNavigate();
 
-  const list = doctors.length > 0 ? doctors : DEFAULT_DOCTORS;
+  const list = doctors;
+
 
   const totalCadastrados = list.length;
   const totalAtivos = list.filter((d) => d.is_verified).length;

@@ -22,7 +22,9 @@ import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { CountryFlag } from "@/pages/CadastroProfissional";
 import PatientKycDocViewer from "@/components/admin/PatientKycDocViewer";
 import {
+  PATIENT_KYC_BUCKET,
   PATIENT_KYC_LABELS,
+
   PATIENT_KYC_REQUIRED,
   type PatientKycKind,
   type PatientRecord,

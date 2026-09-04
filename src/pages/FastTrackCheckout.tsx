@@ -58,21 +58,33 @@ export default function FastTrackCheckout() {
         return;
       }
 
-      await supabase.from("orders").insert({
-        user_id: user.id,
-        items: items as any,
-        subtotal,
-        total,
-        status: "pending",
+      // 1) Pedido criado no servidor (preços e frete validados lá).
+      const { data: order, error: orderError } = await supabase.functions.invoke("shopping-order-create", {
+        body: {
+          items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })),
+          cep: localStorage.getItem("shipping-cep") || "",
+        },
       });
+      if (orderError || !order?.order_id) {
+        throw new Error(order?.error || orderError?.message || "Não foi possível criar o pedido.");
+      }
 
-      toast.success("Pedido criado! Redirecionando para pagamento...");
+      // 2) Cobrança real no Mercado Pago (split 95% farmácia · 5% plataforma).
+      const { data: payment, error: payError } = await supabase.functions.invoke("mp-checkout", {
+        body: { orderId: order.order_id },
+      });
+      if (payError || !payment?.init_point) {
+        throw new Error(payment?.error || payError?.message || "Falha ao abrir o pagamento.");
+      }
+
       localStorage.removeItem(`fast-cart-${patientId}`);
+      window.location.href = payment.init_point;
     } catch (err) {
-      toast.error("Erro ao processar pedido");
+      toast.error(err instanceof Error ? err.message : "Erro ao processar pedido");
+      setProcessing(false);
     }
-    setProcessing(false);
   };
+
 
   return (
     <div className="min-h-dvh bg-background">

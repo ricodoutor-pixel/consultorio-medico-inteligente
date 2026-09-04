@@ -3,10 +3,11 @@ import { useCart } from '@/store/cart';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { AlertCircle, CheckCircle, Loader } from 'lucide-react';
+import { AlertCircle, CheckCircle, Loader, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UpsellOffer } from '@/components/checkout/UpsellOffer';
 import { TrustBadges } from '@/components/TrustBadges';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function CartCheckout() {
   const navigate = useNavigate();
@@ -21,12 +22,17 @@ export default function CartCheckout() {
 
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', address: '', city: '', state: '', zipCode: '',
-    cardNumber: '', cardExpiry: '', cardCVC: '',
   });
 
   useEffect(() => {
     if (items.length === 0 && !success) navigate('/');
   }, [items, navigate, success]);
+
+  useEffect(() => {
+    if (selectedShipping?.cep) {
+      setFormData((prev) => (prev.zipCode ? prev : { ...prev, zipCode: selectedShipping.cep }));
+    }
+  }, [selectedShipping]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -37,16 +43,49 @@ export default function CartCheckout() {
     setLoading(true);
     setError(null);
     try {
-      if (!formData.name || !formData.email || !formData.phone) throw new Error('Preencha todos os campos obrigatórios');
+      if (!formData.name || !formData.email || !formData.phone) {
+        throw new Error('Preencha todos os campos obrigatórios');
+      }
+      if (!selectedShipping) {
+        throw new Error('Calcule o frete pelo CEP no carrinho antes de pagar.');
+      }
+
+      const { data: session } = await supabase.auth.getSession();
+      if (!session?.session) {
+        navigate('/login?redirect=/cart-checkout');
+        throw new Error('Faça login para concluir o pagamento com segurança.');
+      }
+
+      // 1) Pedido criado no servidor (preços e frete validados lá).
+      const { data: order, error: orderError } = await supabase.functions.invoke('shopping-order-create', {
+        body: {
+          items: items.map((i) => ({ product_id: i.product.id, quantity: i.qty })),
+          cep: selectedShipping.cep,
+          shipping_service: selectedShipping.service,
+        },
+      });
+      if (orderError || !order?.order_id) {
+        throw new Error(order?.error || orderError?.message || 'Não foi possível criar o pedido.');
+      }
+
+      // 2) Pagamento real no Mercado Pago com split 95% farmácia / 5% plataforma.
+      const { data: payment, error: payError } = await supabase.functions.invoke('mp-checkout', {
+        body: { orderId: order.order_id, returnUrl: `${window.location.origin}/payment/success` },
+      });
+      if (payError || !payment?.init_point) {
+        throw new Error(payment?.error || payError?.message || 'Falha ao abrir o pagamento.');
+      }
+
       setSuccess(true);
       clearCart();
-      setTimeout(() => navigate('/payment/success'), 2000);
+      window.location.href = payment.init_point;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao processar pagamento');
     } finally {
       setLoading(false);
     }
   };
+
 
   if (items.length === 0 && !success) {
     return (
@@ -120,18 +159,14 @@ export default function CartCheckout() {
                     <Input name="zipCode" placeholder="CEP" value={formData.zipCode} onChange={handleInputChange} />
                   </div>
                 </div>
-                <div><h2 className="text-xl font-semibold mb-4">Dados do Cartão</h2>
-                  <div className="space-y-4">
-                    <Input name="cardNumber" placeholder="Número do cartão" value={formData.cardNumber} onChange={handleInputChange} maxLength={19} />
-                    <div className="grid grid-cols-2 gap-4">
-                      <Input name="cardExpiry" placeholder="MM/YY" value={formData.cardExpiry} onChange={handleInputChange} maxLength={5} />
-                      <Input name="cardCVC" placeholder="CVC" value={formData.cardCVC} onChange={handleInputChange} maxLength={4} />
-                    </div>
-                  </div>
-                </div>
+                <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <ShieldCheck size={16} className="text-primary" />
+                  Pagamento seguro no Mercado Pago (PIX, cartão ou boleto) na próxima etapa.
+                </p>
                 <Button type="submit" disabled={loading} className="w-full py-6">
-                  {loading ? (<><Loader className="animate-spin mr-2" size={20} />Processando...</>) : `Confirmar Pagamento - R$ ${total.toFixed(2)}`}
+                  {loading ? (<><Loader className="animate-spin mr-2" size={20} />Processando...</>) : `Pagar com Mercado Pago - R$ ${total.toFixed(2)}`}
                 </Button>
+
               </form>
             </Card>
           </div>

@@ -23,7 +23,6 @@ import KycDocViewer from "@/components/admin/KycDocViewer";
 import DoctorContractViewerModal, { DoctorContractDetails } from "@/components/admin/DoctorContractViewerModal";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { KYC_LABELS, KYC_REQUIRED, type KycKind } from "@/lib/kyc-docs";
-import { professionals as testProfessionals } from "@/data/professionals";
 
 export const AdminAprovacoes = () => {
   const { doctors, setDoctors, loading, fetchDoctors, counts } = useDoctors();
@@ -502,7 +501,7 @@ export const AdminAprovacoes = () => {
                                 {isCardActive && <Badge className="bg-emerald-500 text-black text-[10px] font-black h-4 px-1">ON</Badge>}
                               </div>
                               <p className="text-xs text-muted-foreground font-mono">{crm}</p>
-                              <p className="text-[11px] text-emerald-400 font-semibold">{mockMatch?.tags?.[0] || doc.specialty || 'Medicina Canabinoide'}</p>
+                              <p className="text-[11px] text-emerald-400 font-semibold">{doc.specialty || 'Medicina Canabinoide'}</p>
                             </div>
                           </div>
                         </TableCell>

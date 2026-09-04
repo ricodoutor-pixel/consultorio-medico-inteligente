@@ -7,8 +7,18 @@ export type CartItem = {
   qty: number;
 };
 
+export type SelectedShipping = {
+  cep: string;
+  carrier: string;
+  service: string;
+  price: number;
+  days: number;
+};
+
 type CartStore = {
   items: CartItem[];
+  shipping: SelectedShipping | null;
+  setShipping: (shipping: SelectedShipping | null) => void;
   addItem: (product: Product) => void;
   removeItem: (productId: string) => void;
   updateQty: (productId: string, qty: number) => void;
@@ -26,6 +36,8 @@ export const useCart = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      shipping: null,
+      setShipping: (shipping) => set({ shipping }),
       addItem: (product) => {
         const items = get().items;
         const existing = items.find((i) => i.product.id === product.id);

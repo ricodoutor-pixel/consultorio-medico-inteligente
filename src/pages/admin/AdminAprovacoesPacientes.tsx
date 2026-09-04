@@ -44,11 +44,10 @@ export const AdminAprovacoesPacientes = () => {
     name?: string;
   } | null>(null);
 
-  // Carrega pacientes do banco e mescla com o paciente de teste oficial (Edilson Bezerra da Silva)
+  // Carrega SOMENTE pacientes reais cadastrados no banco (sem dados fictícios)
   const fetchPatients = async () => {
     setLoading(true);
     try {
-      // 1. Buscar perfis com user_type = 'patient' ou signup_role = 'paciente'
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select("*")
@@ -57,65 +56,127 @@ export const AdminAprovacoesPacientes = () => {
 
       if (error) {
         console.warn("[AdminAprovacoesPacientes]", error);
+        toast.error("Não foi possível carregar a lista de pacientes");
+        setPatients([]);
+        return;
       }
 
-      // Recuperar overrides salvos no localStorage para persistência de status
+      const ids = (profiles || []).map((p) => p.id);
+
+      // Registros reais vinculados aos pacientes
+      const [tcle, consults, pays, ords] = await Promise.all([
+        ids.length
+          ? supabase.from("tcle_consents").select("user_id, accepted_at, version").in("user_id", ids)
+          : Promise.resolve({ data: [] as any[] }),
+        ids.length
+          ? supabase
+              .from("consultations")
+              .select("id, patient_id, modality, status, started_at, created_at")
+              .in("patient_id", ids)
+          : Promise.resolve({ data: [] as any[] }),
+        ids.length
+          ? supabase
+              .from("payments")
+              .select("id, patient_id, gross_amount, payment_method, status, paid_at, created_at")
+              .in("patient_id", ids)
+          : Promise.resolve({ data: [] as any[] }),
+        ids.length
+          ? supabase
+              .from("orders")
+              .select("id, user_id, items, total, status, created_at, tracking_code")
+              .in("user_id", ids)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+
+      const tcleByUser = new Map<string, { accepted_at: string; version: string }>();
+      (tcle.data || []).forEach((t: any) => tcleByUser.set(t.user_id, t));
+
       const savedOverrides: Record<string, boolean> = JSON.parse(
         localStorage.getItem("patient_approval_overrides") || "{}"
       );
 
       const dbPatients: PatientRecord[] = (profiles || []).map((p: any) => {
-        const isApproved = savedOverrides[p.id] !== undefined ? savedOverrides[p.id] : true;
+        const hasTcle = tcleByUser.has(p.id);
+        // Aptidão real: dados essenciais preenchidos + TCLE assinado
+        const derivedApproved = Boolean(p.full_name && p.cpf && p.phone && p.date_of_birth && hasTcle);
+        const isApproved =
+          savedOverrides[p.id] !== undefined ? savedOverrides[p.id] : derivedApproved;
+
+        const myConsults = (consults.data || []).filter((c: any) => c.patient_id === p.id);
+        const myPays = (pays.data || []).filter((x: any) => x.patient_id === p.id);
+        const myOrders = (ords.data || []).filter((o: any) => o.user_id === p.id);
+
         return {
           id: p.id,
           user_id: p.id,
-          full_name: p.full_name || "Paciente Cadastrado",
-          cpf: p.cpf || "000.000.000-00",
-          email: p.email || "paciente@email.com",
-          phone: p.phone || "+55 11 99999-9999",
-          date_of_birth: p.date_of_birth || "1990-01-01",
-          city: p.city || "São Paulo",
-          state: p.state || "SP",
+          full_name: p.full_name || "Paciente sem nome",
+          cpf: p.cpf || "",
+          email: "",
+          phone: p.phone || "",
+          date_of_birth: p.date_of_birth || "",
+          city: p.city || "",
+          state: p.region || "",
           country: p.country || "BR",
-          avatar_url: p.avatar_url || null,
+          avatar_url: p.avatar_url || undefined,
           is_approved: isApproved,
           status: isApproved ? "apto" : "pendente",
           is_online: false,
           last_seen: p.updated_at || p.created_at || new Date().toISOString(),
           created_at: p.created_at || new Date().toISOString(),
-          visit_count_day: 1,
-          visit_count_week: 3,
-          visit_count_month: 8,
-          green_card_active: false,
+          visit_count_day: 0,
+          visit_count_week: 0,
+          visit_count_month: 0,
+          green_card_active: Boolean(p.is_subscriber),
           green_card_balance: 0,
           friends_referred_count: 0,
-          brisa_interactions_count: 1,
-          brisa_triage_completed: false,
-          consultations: [],
-          payments: [],
-          shopping_orders: [],
+          brisa_interactions_count: 0,
+          brisa_triage_completed: hasTcle,
+          consultations: myConsults.map((c: any) => ({
+            id: c.id,
+            doctor_name: "Médico prescritor",
+            doctor_crm: "",
+            doctor_specialty: "",
+            date: new Date(c.started_at || c.created_at).toLocaleDateString("pt-BR"),
+            time: new Date(c.started_at || c.created_at).toLocaleTimeString("pt-BR", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            type: (c.modality === "chat" ? "chat" : "video") as "chat" | "video",
+            status: (c.status === "completed" ? "completed" : "scheduled") as
+              | "completed"
+              | "scheduled",
+            prescription_issued: false,
+          })),
+          payments: myPays.map((x: any) => ({
+            id: x.id,
+            description: "Pagamento de atendimento",
+            amount: Number(x.gross_amount || 0),
+            method: (x.payment_method || "pix") as any,
+            status: (x.status === "approved" || x.status === "paid" ? "paid" : "pending") as any,
+            date: new Date(x.paid_at || x.created_at).toLocaleString("pt-BR"),
+          })),
+          shopping_orders: myOrders.map((o: any) => ({
+            id: o.id,
+            product_name: Array.isArray(o.items) && o.items.length ? `${o.items.length} item(ns)` : "Pedido",
+            category: "medicamento" as const,
+            quantity: Array.isArray(o.items) ? o.items.length : 1,
+            total: Number(o.total || 0),
+            pharmacy_name: "Farmácia parceira",
+            date: new Date(o.created_at).toLocaleDateString("pt-BR"),
+            tracking_code: o.tracking_code || undefined,
+          })),
           kyc_docs: [],
         };
       });
 
-      // Inclui o paciente oficial de testes
-      const testApproved =
-        savedOverrides[TEST_PATIENT_DATA.id] !== undefined
-          ? savedOverrides[TEST_PATIENT_DATA.id]
-          : TEST_PATIENT_DATA.is_approved;
-
-      const combined: PatientRecord[] = [
-        { ...TEST_PATIENT_DATA, is_approved: testApproved, status: testApproved ? "apto" : "pendente" },
-        ...dbPatients.filter((d) => d.id !== TEST_PATIENT_DATA.id),
-      ];
-
-      setPatients(combined);
+      setPatients(dbPatients);
     } catch (e: any) {
       toast.error("Falha ao sincronizar dados de pacientes");
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchPatients();

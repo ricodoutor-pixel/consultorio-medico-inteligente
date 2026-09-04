@@ -55,17 +55,18 @@ export const useCart = create<CartStore>()(
           set({ items: get().items.map((i) => i.product.id === productId ? { ...i, qty } : i) });
         }
       },
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], shipping: null }),
       total: () => get().items.reduce((sum, i) => sum + i.product.priceValue * i.qty, 0),
       count: () => get().items.reduce((sum, i) => sum + i.qty, 0),
       getSubtotal: () => get().items.reduce((sum, i) => sum + i.product.priceValue * i.qty, 0),
       getTax: (taxRate = 0.1) => get().getSubtotal() * taxRate,
-      getShipping: () => (get().count() > 0 ? 10 : 0),
-      getFinalTotal: (taxRate = 0.1, shippingCost = 10) => {
+      // Frete real selecionado no carrinho (cotação por CEP). Sem CEP = 0.
+      getShipping: () => (get().count() > 0 ? get().shipping?.price ?? 0 : 0),
+      getFinalTotal: (taxRate = 0.1, shippingCost) => {
         const subtotal = get().getSubtotal();
         const tax = subtotal * taxRate;
-        const shipping = get().count() > 0 ? shippingCost : 0;
-        return subtotal + tax + shipping;
+        const shipping = shippingCost ?? get().getShipping();
+        return subtotal + tax + (get().count() > 0 ? shipping : 0);
       },
       hasItems: () => get().items.length > 0,
     }),

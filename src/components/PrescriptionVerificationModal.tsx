@@ -34,7 +34,7 @@ export function PrescriptionVerificationModal({
 
   const openWhatsAppFallback = () => {
     const message = encodeURIComponent(
-      `Olá Enf. Brisa, segue anexo minha receita para liberação da compra do meu medicamento ${productName}!`
+      `Olá Enf. Brisa, segue anexo minha receita para avaliação da farmácia modelo Planta y Raiz referente ao medicamento ${productName}!`
     );
     window.open(`https://wa.me/${BRISA_WHATSAPP}?text=${message}`, "_blank");
     onHasPrescription();
@@ -88,7 +88,7 @@ export function PrescriptionVerificationModal({
       });
 
       toast.success(
-        `Receita enviada para ${pharmacy?.nome_fantasia || "a farmácia homologada"} com hash SHA-512 registrado.`
+        `Receita enviada para ${pharmacy?.nome_fantasia || "a farmácia modelo Planta y Raiz Ltda"} com registro de segurança.`
       );
       onHasPrescription();
     } catch (err) {
@@ -142,6 +142,9 @@ export function PrescriptionVerificationModal({
                 <p className="text-sm text-muted-foreground">
                   Para adquirir <span className="font-semibold text-foreground">{productName}</span>, é necessário apresentar uma receita médica válida com autorização da ANVISA.
                 </p>
+                <p className="mt-2 text-xs text-amber-500 leading-relaxed">
+                  Estamos concluindo a homologação das farmácias parceiras. Por enquanto, as receitas são recebidas pela farmácia modelo <span className="font-semibold">Planta y Raiz Ltda</span> e nossa equipe orienta você sobre a dispensação.
+                </p>
               </div>
             </div>
 
@@ -182,10 +185,10 @@ export function PrescriptionVerificationModal({
                     Já Tenho Minha Receita ANVISA
                   </h3>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Envie sua receita em formato PDF diretamente para a Enfermeira Brisa via WhatsApp para liberação da compra
+                    Envie sua receita em PDF para a farmácia modelo Planta y Raiz Ltda; nossa equipe avalia e orienta a dispensação
                   </p>
                   <div className="flex items-center gap-1 mt-2 text-xs text-emerald-600 font-medium">
-                    <span>Enviar receita via WhatsApp</span>
+                    <span>Enviar receita para a farmácia Planta y Raiz</span>
                     <FileText size={12} />
                   </div>
                 </div>

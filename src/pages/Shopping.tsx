@@ -449,21 +449,17 @@ const ProductDetail = ({ id }: { id: string }) => {
     setRxModal({ open: true, productName: product.name });
   };
 
+  // Vendas reais suspensas até a homologação da primeira farmácia parceira real.
+  // A receita é encaminhada para a farmácia modelo Planta y Raiz Ltda.
   const proceedWithPurchase = () => {
     setRxModal({ open: false, productName: "" });
-    showModal(
-      { type: "compra", productName: product.name, value: product.price } as WhatsAppContext,
-      async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { toast({ title: "Faça login para comprar", variant: "destructive" }); return; }
-        const { data, error } = await supabase.functions.invoke("create-cart-payment", {
-          body: { items: [{ product_id: product.id, quantity: 1 }], description: `Planta y Raiz Ltda - ${product.name}` },
-        });
-        if (error) { toast({ title: "Erro ao gerar pagamento", variant: "destructive" }); return; }
-        if (data?.init_point) { window.open(data.init_point, "_blank"); toast({ title: "Redirecionando para pagamento... 💳" }); }
-      }
-    );
+    toast({
+      title: "Receita recebida pela farmácia modelo Planta y Raiz Ltda ✅",
+      description:
+        "Estamos concluindo a homologação de farmácias parceiras reais. Nossa equipe entra em contato para orientar a dispensação do seu medicamento.",
+    });
   };
+
 
   return (
     <div className="container mx-auto px-4 pt-20 pb-12 md:pt-24 max-w-6xl">
@@ -699,23 +695,16 @@ const Shopping = () => {
     setRxModal({ open: true, productName: p.name, pendingProduct: p });
   };
 
+  // Vendas reais suspensas até a homologação da primeira farmácia parceira real.
   const proceedWithPurchaseMain = () => {
-    const p = rxModal.pendingProduct;
     setRxModal({ open: false, productName: "", pendingProduct: null });
-    if (!p) return;
-    showModal(
-      { type: "compra", productName: p.name, value: p.price } as WhatsAppContext,
-      async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { toast({ title: "Faça login para comprar", variant: "destructive" }); setTimeout(() => window.location.href = "/login", 1500); return; }
-        const { data, error } = await supabase.functions.invoke("create-cart-payment", {
-          body: { items: [{ product_id: p.id, quantity: 1 }], description: `Planta y Raiz Ltda - ${p.name}` },
-        });
-        if (error) { toast({ title: "Erro ao gerar pagamento", variant: "destructive" }); return; }
-        if (data?.init_point) { window.open(data.init_point, "_blank"); toast({ title: "Redirecionando... 💳" }); }
-      }
-    );
+    toast({
+      title: "Receita recebida pela farmácia modelo Planta y Raiz Ltda ✅",
+      description:
+        "Estamos concluindo a homologação de farmácias parceiras reais. Nossa equipe entra em contato para orientar a dispensação do seu medicamento.",
+    });
   };
+
 
   return (
     <div className="min-h-dvh bg-background">

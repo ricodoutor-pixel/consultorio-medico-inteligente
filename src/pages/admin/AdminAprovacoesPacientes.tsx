@@ -26,11 +26,11 @@ import {
   PATIENT_KYC_REQUIRED,
   type PatientKycKind,
   type PatientRecord,
-  } from "@/lib/patient-kyc-docs";
 } from "@/lib/patient-kyc-docs";
 
 export const AdminAprovacoesPacientes = () => {
-  const [patients, setPatients] = useState<PatientRecord[]>([TEST_PATIENT_DATA]);
+  const [patients, setPatients] = useState<PatientRecord[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "apto" | "pending" | "online">("all");

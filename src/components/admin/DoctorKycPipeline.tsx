@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useDoctors } from "@/hooks/useDoctors";
 import DoctorContractViewerModal, { DoctorContractDetails } from "./DoctorContractViewerModal";
 
 export interface DoctorRecord {

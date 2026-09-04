@@ -26,7 +26,7 @@ import {
   PATIENT_KYC_REQUIRED,
   type PatientKycKind,
   type PatientRecord,
-  TEST_PATIENT_DATA,
+  } from "@/lib/patient-kyc-docs";
 } from "@/lib/patient-kyc-docs";
 
 export const AdminAprovacoesPacientes = () => {

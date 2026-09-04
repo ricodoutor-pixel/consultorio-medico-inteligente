@@ -1,15 +1,14 @@
-import { useState } from "react";
-import { Users, Stethoscope, Store, Shield, Search, UserCheck, Phone, Mail, Calendar } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Users, Search } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface CensusUser {
   id: string;
   name: string;
-  email: string;
   role: "patient" | "doctor" | "vendor" | "admin";
   phone?: string;
   document?: string;
@@ -21,35 +20,107 @@ interface UserCensus360Props {
   totalPacientes?: number;
   totalMedicos?: number;
   totalLojistas?: number;
-  users?: CensusUser[];
 }
 
-const DEFAULT_USERS: CensusUser[] = [
-  { id: "u-1", name: "Edilson Bezerra da Silva", email: "contato@plantayraiz.com.br", role: "admin", phone: "(11) 99136-3154", document: "30.740.319/0001-14", status: "Ativo · SuperAdmin", created_at: "2026-08-01" },
-  { id: "u-2", name: "Dr. Daniel Kobayashi Colombo", email: "daniel.colombo@plantayraiz.com.br", role: "doctor", phone: "(11) 98713-1241", document: "CRM-SP 186358", status: "Homologado", created_at: "2026-08-05" },
-  { id: "u-3", name: "Dra. Suelen Naves Rodrigues", email: "dra.suelen@plantayraiz.com.br", role: "doctor", phone: "(41) 98412-7788", document: "CRM-PR 49354", status: "Supervisora Técnica", created_at: "2026-08-10" },
-  { id: "u-4", name: "Farmácia Oficial Planta y Raíz Dispensary", email: "farmacia@plantayraiz.com.br", role: "vendor", phone: "(11) 99136-3154", document: "CNPJ 30.740.319/0001-14", status: "Loja Oficial ANVISA", created_at: "2026-08-12" },
-  { id: "u-5", name: "Carlos Eduardo Mendes (Paciente)", email: "carlos.mendes@email.com", role: "patient", phone: "(11) 97722-1144", document: "CPF ***.482.918-**", status: "Em Tratamento", created_at: "2026-08-20" },
-  { id: "u-6", name: "Mariana Albuquerque (Paciente)", email: "mariana.albuquerque@email.com", role: "patient", phone: "(21) 98833-2255", document: "CPF ***.319.742-**", status: "Receita Ativa", created_at: "2026-08-22" },
-];
-
-export const UserCensus360 = ({
-  totalPacientes = 128,
-  totalMedicos = 32,
-  totalLojistas = 6,
-  users = DEFAULT_USERS,
-}: UserCensus360Props) => {
+export const UserCensus360 = (_props: UserCensus360Props) => {
   const [activeTab, setActiveTab] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [users, setUsers] = useState<CensusUser[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const list = users.length > 0 ? users : DEFAULT_USERS;
+  useEffect(() => {
+    let alive = true;
+    const load = async () => {
+      const [profilesRes, doctorsRes, vendorsRes, rolesRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, full_name, phone, cpf, user_type, signup_role, created_at")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("doctors")
+          .select("id, user_id, crm, specialty, approval_status, is_verified, created_at")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("vendors")
+          .select("id, company_name, cnpj, phone, status, created_at")
+          .order("created_at", { ascending: false }),
+        supabase.from("user_roles").select("user_id, role"),
+      ]);
 
-  const filtered = list.filter((u) => {
+      if (!alive) return;
+
+      const adminIds = new Set(
+        (rolesRes.data || []).filter((r: any) => r.role === "admin").map((r: any) => r.user_id)
+      );
+      const doctorsByUser = new Map<string, any>();
+      (doctorsRes.data || []).forEach((d: any) => d.user_id && doctorsByUser.set(d.user_id, d));
+
+      const profileUsers: CensusUser[] = (profilesRes.data || []).map((p: any) => {
+        const doc = doctorsByUser.get(p.id);
+        const role: CensusUser["role"] = adminIds.has(p.id)
+          ? "admin"
+          : doc
+          ? "doctor"
+          : p.user_type === "pharmacy" || p.user_type === "distributor" || p.signup_role === "lojista"
+          ? "vendor"
+          : "patient";
+
+        const status = doc
+          ? doc.is_verified
+            ? "Homologado"
+            : doc.approval_status || "Pendente"
+          : p.full_name && p.phone
+          ? "Cadastro completo"
+          : "Cadastro incompleto";
+
+        return {
+          id: p.id,
+          name: p.full_name || "Sem nome informado",
+          role,
+          phone: p.phone || undefined,
+          document: doc?.crm ? `CRM ${doc.crm}` : p.cpf || undefined,
+          status,
+          created_at: p.created_at,
+        };
+      });
+
+      const vendorUsers: CensusUser[] = (vendorsRes.data || []).map((v: any) => ({
+        id: `vendor-${v.id}`,
+        name: v.company_name || "Loja sem nome",
+        role: "vendor" as const,
+        phone: v.phone || undefined,
+        document: v.cnpj || undefined,
+        status: v.status || "—",
+        created_at: v.created_at,
+      }));
+
+      setUsers([...profileUsers, ...vendorUsers]);
+      setLoading(false);
+    };
+    load();
+    const t = setInterval(load, 60_000);
+    return () => {
+      alive = false;
+      clearInterval(t);
+    };
+  }, []);
+
+  const counts = useMemo(
+    () => ({
+      patient: users.filter((u) => u.role === "patient").length,
+      doctor: users.filter((u) => u.role === "doctor").length,
+      vendor: users.filter((u) => u.role === "vendor").length,
+      admin: users.filter((u) => u.role === "admin").length,
+    }),
+    [users]
+  );
+
+  const filtered = users.filter((u) => {
     if (activeTab !== "all" && u.role !== activeTab) return false;
     const term = searchTerm.toLowerCase();
+    if (!term) return true;
     return (
       u.name?.toLowerCase().includes(term) ||
-      u.email?.toLowerCase().includes(term) ||
       u.document?.toLowerCase().includes(term) ||
       u.phone?.toLowerCase().includes(term)
     );
@@ -58,7 +129,7 @@ export const UserCensus360 = ({
   const getRoleBadge = (role: string) => {
     switch (role) {
       case "admin":
-        return <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/30 text-[9px]">Admin Mestre</Badge>;
+        return <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/30 text-[9px]">Admin</Badge>;
       case "doctor":
         return <Badge variant="outline" className="bg-sky-500/10 text-sky-400 border-sky-500/30 text-[9px]">Médico Prescritor</Badge>;
       case "vendor":
@@ -71,7 +142,6 @@ export const UserCensus360 = ({
   return (
     <Card className="border-border bg-card/40 backdrop-blur">
       <CardContent className="p-5">
-        {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary">
@@ -81,49 +151,33 @@ export const UserCensus360 = ({
               <h3 className="font-display font-black text-sm md:text-base text-foreground flex items-center gap-2">
                 Censo Geral de Contas & Usuários 360°
                 <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-[10px]">
-                  {totalPacientes + totalMedicos + totalLojistas} Cadastros
+                  {loading ? "Carregando..." : `${users.length} cadastros reais`}
                 </Badge>
               </h3>
-              <p className="text-xs text-muted-foreground">Distribuição consolidada de todos os perfis registrados no ecossistema</p>
+              <p className="text-xs text-muted-foreground">Lista lida diretamente dos cadastros do banco de dados</p>
             </div>
           </div>
         </div>
 
-        {/* Tabs & Search */}
         <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
-          <div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-xl border border-border">
-            <button
-              onClick={() => setActiveTab("all")}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
-                activeTab === "all" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Todos ({list.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("patient")}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
-                activeTab === "patient" ? "bg-emerald-600 text-white" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Pacientes ({totalPacientes})
-            </button>
-            <button
-              onClick={() => setActiveTab("doctor")}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
-                activeTab === "doctor" ? "bg-sky-600 text-white" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Médicos ({totalMedicos})
-            </button>
-            <button
-              onClick={() => setActiveTab("vendor")}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
-                activeTab === "vendor" ? "bg-amber-600 text-white" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Lojistas ({totalLojistas})
-            </button>
+          <div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-xl border border-border flex-wrap">
+            {[
+              { key: "all", label: `Todos (${users.length})`, active: "bg-primary text-primary-foreground" },
+              { key: "patient", label: `Pacientes (${counts.patient})`, active: "bg-emerald-600 text-white" },
+              { key: "doctor", label: `Médicos (${counts.doctor})`, active: "bg-sky-600 text-white" },
+              { key: "vendor", label: `Lojistas (${counts.vendor})`, active: "bg-amber-600 text-white" },
+              { key: "admin", label: `Admin (${counts.admin})`, active: "bg-purple-600 text-white" },
+            ].map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setActiveTab(t.key)}
+                className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors ${
+                  activeTab === t.key ? t.active : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
 
           <div className="relative flex-1 min-w-[200px] max-w-sm">
@@ -131,13 +185,12 @@ export const UserCensus360 = ({
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar por nome, CPF, CRM, e-mail..."
+              placeholder="Buscar por nome, CPF, CRM, telefone..."
               className="pl-9 h-8 text-xs rounded-xl bg-muted/30 border-border"
             />
           </div>
         </div>
 
-        {/* Users Table */}
         <div className="rounded-xl border border-border overflow-hidden">
           <Table>
             <TableHeader className="bg-muted/40">
@@ -150,17 +203,26 @@ export const UserCensus360 = ({
               </TableRow>
             </TableHeader>
             <TableBody>
+              {filtered.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="py-6 text-center text-xs text-muted-foreground">
+                    {loading ? "Carregando cadastros..." : "Nenhum cadastro encontrado."}
+                  </TableCell>
+                </TableRow>
+              )}
               {filtered.map((u) => (
                 <TableRow key={u.id} className="hover:bg-muted/30 transition-colors">
                   <TableCell className="py-2.5">
                     <p className="text-xs font-bold text-foreground leading-tight">{u.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{u.email}</p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {u.created_at ? new Date(u.created_at).toLocaleDateString("pt-BR") : "—"}
+                    </p>
                   </TableCell>
                   <TableCell className="py-2.5">{getRoleBadge(u.role)}</TableCell>
                   <TableCell className="py-2.5 text-xs text-muted-foreground font-mono">{u.document || "—"}</TableCell>
                   <TableCell className="py-2.5 text-[11px] text-muted-foreground">{u.phone || "—"}</TableCell>
                   <TableCell className="py-2.5">
-                    <span className="text-[11px] text-emerald-400 font-semibold">{u.status || "Ativo"}</span>
+                    <span className="text-[11px] text-muted-foreground font-semibold">{u.status || "—"}</span>
                   </TableCell>
                 </TableRow>
               ))}

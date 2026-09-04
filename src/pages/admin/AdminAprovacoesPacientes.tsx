@@ -22,15 +22,17 @@ import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { CountryFlag } from "@/pages/CadastroProfissional";
 import PatientKycDocViewer from "@/components/admin/PatientKycDocViewer";
 import {
+  PATIENT_KYC_BUCKET,
   PATIENT_KYC_LABELS,
+
   PATIENT_KYC_REQUIRED,
   type PatientKycKind,
   type PatientRecord,
-  TEST_PATIENT_DATA,
 } from "@/lib/patient-kyc-docs";
 
 export const AdminAprovacoesPacientes = () => {
-  const [patients, setPatients] = useState<PatientRecord[]>([TEST_PATIENT_DATA]);
+  const [patients, setPatients] = useState<PatientRecord[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "apto" | "pending" | "online">("all");
@@ -44,11 +46,10 @@ export const AdminAprovacoesPacientes = () => {
     name?: string;
   } | null>(null);
 
-  // Carrega pacientes do banco e mescla com o paciente de teste oficial (Edilson Bezerra da Silva)
+  // Carrega SOMENTE pacientes reais cadastrados no banco (sem dados fictícios)
   const fetchPatients = async () => {
     setLoading(true);
     try {
-      // 1. Buscar perfis com user_type = 'patient' ou signup_role = 'paciente'
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select("*")
@@ -57,65 +58,150 @@ export const AdminAprovacoesPacientes = () => {
 
       if (error) {
         console.warn("[AdminAprovacoesPacientes]", error);
+        toast.error("Não foi possível carregar a lista de pacientes");
+        setPatients([]);
+        return;
       }
 
-      // Recuperar overrides salvos no localStorage para persistência de status
+      const ids = (profiles || []).map((p) => p.id);
+
+      // Registros reais vinculados aos pacientes
+      const [tcle, consults, pays, ords] = await Promise.all([
+        ids.length
+          ? supabase.from("tcle_consents").select("user_id, accepted_at, version").in("user_id", ids)
+          : Promise.resolve({ data: [] as any[] }),
+        ids.length
+          ? supabase
+              .from("consultations")
+              .select("id, patient_id, modality, status, started_at, created_at")
+              .in("patient_id", ids)
+          : Promise.resolve({ data: [] as any[] }),
+        ids.length
+          ? supabase
+              .from("payments")
+              .select("id, patient_id, gross_amount, payment_method, status, paid_at, created_at")
+              .in("patient_id", ids)
+          : Promise.resolve({ data: [] as any[] }),
+        ids.length
+          ? supabase
+              .from("orders")
+              .select("id, user_id, items, total, status, created_at, tracking_code")
+              .in("user_id", ids)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+
+      // Documentos KYC realmente anexados no armazenamento privado
+      const docsByUser = new Map<string, Array<{ id: string; document_kind: PatientKycKind; storage_path: string }>>();
+      try {
+        const { data: folders } = await supabase.storage.from(PATIENT_KYC_BUCKET).list("", { limit: 1000 });
+        const userFolders = (folders || []).filter((f) => ids.includes(f.name));
+        await Promise.all(
+          userFolders.map(async (f) => {
+            const { data: files } = await supabase.storage
+              .from(PATIENT_KYC_BUCKET)
+              .list(f.name, { limit: 100 });
+            const mapped = (files || []).map((file) => ({
+              id: `${f.name}/${file.name}`,
+              document_kind: file.name.replace(/\.[^.]+$/, "") as PatientKycKind,
+              storage_path: `${f.name}/${file.name}`,
+            }));
+            if (mapped.length) docsByUser.set(f.name, mapped);
+          })
+        );
+      } catch (err) {
+        console.warn("[AdminAprovacoesPacientes] storage list", err);
+      }
+
+      const tcleByUser = new Map<string, { accepted_at: string; version: string }>();
+      (tcle.data || []).forEach((t: any) => tcleByUser.set(t.user_id, t));
+
+
       const savedOverrides: Record<string, boolean> = JSON.parse(
         localStorage.getItem("patient_approval_overrides") || "{}"
       );
 
       const dbPatients: PatientRecord[] = (profiles || []).map((p: any) => {
-        const isApproved = savedOverrides[p.id] !== undefined ? savedOverrides[p.id] : true;
+        const hasTcle = tcleByUser.has(p.id);
+        // Aptidão real: dados essenciais preenchidos + TCLE assinado
+        const derivedApproved = Boolean(p.full_name && p.cpf && p.phone && p.date_of_birth && hasTcle);
+        const isApproved =
+          savedOverrides[p.id] !== undefined ? savedOverrides[p.id] : derivedApproved;
+
+        const myConsults = (consults.data || []).filter((c: any) => c.patient_id === p.id);
+        const myPays = (pays.data || []).filter((x: any) => x.patient_id === p.id);
+        const myOrders = (ords.data || []).filter((o: any) => o.user_id === p.id);
+
         return {
           id: p.id,
           user_id: p.id,
-          full_name: p.full_name || "Paciente Cadastrado",
-          cpf: p.cpf || "000.000.000-00",
-          email: p.email || "paciente@email.com",
-          phone: p.phone || "+55 11 99999-9999",
-          date_of_birth: p.date_of_birth || "1990-01-01",
-          city: p.city || "São Paulo",
-          state: p.state || "SP",
+          full_name: p.full_name || "Paciente sem nome",
+          cpf: p.cpf || "",
+          email: "",
+          phone: p.phone || "",
+          date_of_birth: p.date_of_birth || "",
+          city: p.city || "",
+          state: p.region || "",
           country: p.country || "BR",
-          avatar_url: p.avatar_url || null,
+          avatar_url: p.avatar_url || undefined,
           is_approved: isApproved,
           status: isApproved ? "apto" : "pendente",
           is_online: false,
           last_seen: p.updated_at || p.created_at || new Date().toISOString(),
           created_at: p.created_at || new Date().toISOString(),
-          visit_count_day: 1,
-          visit_count_week: 3,
-          visit_count_month: 8,
-          green_card_active: false,
+          visit_count_day: 0,
+          visit_count_week: 0,
+          visit_count_month: 0,
+          green_card_active: Boolean(p.is_subscriber),
           green_card_balance: 0,
           friends_referred_count: 0,
-          brisa_interactions_count: 1,
-          brisa_triage_completed: false,
-          consultations: [],
-          payments: [],
-          shopping_orders: [],
-          kyc_docs: [],
+          brisa_interactions_count: 0,
+          brisa_triage_completed: hasTcle,
+          consultations: myConsults.map((c: any) => ({
+            id: c.id,
+            doctor_name: "Médico prescritor",
+            doctor_crm: "",
+            doctor_specialty: "",
+            date: new Date(c.started_at || c.created_at).toLocaleDateString("pt-BR"),
+            time: new Date(c.started_at || c.created_at).toLocaleTimeString("pt-BR", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            type: (c.modality === "chat" ? "chat" : "video") as "chat" | "video",
+            status: (c.status === "completed" ? "completed" : "scheduled") as
+              | "completed"
+              | "scheduled",
+            prescription_issued: false,
+          })),
+          payments: myPays.map((x: any) => ({
+            id: x.id,
+            description: "Pagamento de atendimento",
+            amount: Number(x.gross_amount || 0),
+            method: (x.payment_method || "pix") as any,
+            status: (x.status === "approved" || x.status === "paid" ? "paid" : "pending") as any,
+            date: new Date(x.paid_at || x.created_at).toLocaleString("pt-BR"),
+          })),
+          shopping_orders: myOrders.map((o: any) => ({
+            id: o.id,
+            product_name: Array.isArray(o.items) && o.items.length ? `${o.items.length} item(ns)` : "Pedido",
+            category: "medicamento" as const,
+            quantity: Array.isArray(o.items) ? o.items.length : 1,
+            total: Number(o.total || 0),
+            pharmacy_name: "Farmácia parceira",
+            date: new Date(o.created_at).toLocaleDateString("pt-BR"),
+            tracking_code: o.tracking_code || undefined,
+          })),
+          kyc_docs: docsByUser.get(p.id) || [],
         };
       });
 
-      // Inclui o paciente oficial de testes
-      const testApproved =
-        savedOverrides[TEST_PATIENT_DATA.id] !== undefined
-          ? savedOverrides[TEST_PATIENT_DATA.id]
-          : TEST_PATIENT_DATA.is_approved;
-
-      const combined: PatientRecord[] = [
-        { ...TEST_PATIENT_DATA, is_approved: testApproved, status: testApproved ? "apto" : "pendente" },
-        ...dbPatients.filter((d) => d.id !== TEST_PATIENT_DATA.id),
-      ];
-
-      setPatients(combined);
+      setPatients(dbPatients);
     } catch (e: any) {
       toast.error("Falha ao sincronizar dados de pacientes");
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchPatients();
@@ -361,11 +447,6 @@ export const AdminAprovacoesPacientes = () => {
                           <h3 className="text-lg md:text-xl font-display font-black text-foreground">
                             {patient.full_name}
                           </h3>
-                          {patient.id === TEST_PATIENT_DATA.id && (
-                            <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-[10px] font-bold">
-                              CONTA MESTRE DE TESTES ⭐
-                            </Badge>
-                          )}
                           <OnlineStatusIndicator online={patient.is_online} size="sm" showLabel />
                           {patient.is_approved ? (
                             <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/40 text-[10px] font-bold">
@@ -379,24 +460,26 @@ export const AdminAprovacoesPacientes = () => {
                         </div>
 
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          CPF: <strong className="font-mono text-foreground font-bold">{patient.cpf}</strong> · Nasc: <span className="text-slate-300">{patient.date_of_birth}</span> · E-mail: <strong className="text-foreground">{patient.email}</strong>
+                          CPF: <strong className="font-mono text-foreground font-bold">{patient.cpf || "não informado"}</strong> · Nasc: <span className="text-slate-300">{patient.date_of_birth ? new Date(patient.date_of_birth).toLocaleDateString("pt-BR") : "não informado"}</span> · Tel: <strong className="text-foreground">{patient.phone || "não informado"}</strong>
                         </p>
 
                         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1.5 flex-wrap">
                           <span className="flex items-center gap-1.5 text-slate-200">
                             <CountryFlag code={patient.country} className="w-4 h-3 rounded-xs" />
-                            <MapPin size={12} className="text-primary" /> {patient.city} / {patient.state}
+                            <MapPin size={12} className="text-primary" /> {patient.city || "cidade não informada"}
+                            {patient.state ? ` / ${patient.state}` : ""}
                           </span>
                           <span>·</span>
                           <span className="text-emerald-400 font-medium flex items-center gap-1">
-                            <Activity size={12} /> Visitas: {patient.visit_count_day} hoje · {patient.visit_count_week} semana · {patient.visit_count_month} mês
+                            <Activity size={12} /> Consultas: {patient.consultations.length} · Pagamentos: {patient.payments.length}
                           </span>
                           <span>·</span>
                           <span className="text-sky-300">
-                            Cadastrado há 25 dias
+                            Cadastrado em {new Date(patient.created_at).toLocaleDateString("pt-BR")}
                           </span>
                         </div>
                       </div>
+
                     </div>
 
                     {/* Switch de Aptidão para Agendamento */}
@@ -427,7 +510,7 @@ export const AdminAprovacoesPacientes = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                       {(Object.keys(PATIENT_KYC_LABELS) as PatientKycKind[]).map((kind) => {
                         const doc = docOf(patient, kind);
-                        const hasDoc = Boolean(doc?.file_url || doc?.storage_path || patient.id === TEST_PATIENT_DATA.id);
+                        const hasDoc = Boolean(doc?.file_url || doc?.storage_path);
 
                         return (
                           <button

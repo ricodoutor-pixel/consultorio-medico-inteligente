@@ -24,6 +24,13 @@ export default function CadastroFarmacia() {
   const [submitted, setSubmitted] = useState(false);
   const [protocolNumber, setProtocolNumber] = useState("");
   const [agreedTerms, setAgreedTerms] = useState(false);
+  const [agreedTruth, setAgreedTruth] = useState(false);
+  const [agreedRegulatory, setAgreedRegulatory] = useState(false);
+  const [agreedLiability, setAgreedLiability] = useState(false);
+  const [signerName, setSignerName] = useState("");
+  const [signerDoc, setSignerDoc] = useState("");
+  const [showFullTerm, setShowFullTerm] = useState(false);
+  const allTermsAccepted = agreedTerms && agreedTruth && agreedRegulatory && agreedLiability && signerName.trim().length > 4 && signerDoc.replace(/\D/g, "").length >= 11;
 
   // Form Fields
   const [formData, setFormData] = useState({

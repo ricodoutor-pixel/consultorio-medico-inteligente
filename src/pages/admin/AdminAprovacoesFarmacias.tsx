@@ -170,7 +170,7 @@ export const AdminAprovacoesFarmacias = () => {
   }, []);
 
   // Alterna o status da loja para venda no Shopping
-  const handleToggleApproval = (pharmacy: PharmacyRecord, nextState: boolean) => {
+  const handleToggleApproval = async (pharmacy: PharmacyRecord, nextState: boolean) => {
     const updated = pharmacies.map((p) =>
       p.id === pharmacy.id
         ? {
@@ -182,7 +182,27 @@ export const AdminAprovacoesFarmacias = () => {
     );
     setPharmacies(updated);
 
-    // Salva no localStorage
+    // Persistência real na tabela vendors (homologação de compliance)
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from("vendors" as any)
+        .update({
+          is_kyc_approved: nextState,
+          kyc_status: nextState ? "approved" : "rejected",
+          is_active: nextState,
+          kyc_approved_at: nextState ? new Date().toISOString() : null,
+          kyc_approved_by: nextState ? user?.id ?? null : null,
+        })
+        .or(`id.eq.${pharmacy.id},user_id.eq.${pharmacy.user_id}`);
+      if (error) throw error;
+    } catch (e: any) {
+      console.warn("vendors approval update:", e);
+      toast.error("Não foi possível salvar a homologação no banco. Tente novamente.");
+      return;
+    }
+
+    // Cache local de apoio
     try {
       const overrides: Record<string, boolean> = JSON.parse(
         localStorage.getItem("pharmacy_approval_overrides") || "{}"
@@ -199,6 +219,7 @@ export const AdminAprovacoesFarmacias = () => {
       toast.warning(`Loja "${pharmacy.nome_fantasia}" pausada no Shopping.`);
     }
   };
+
 
   // Documento específico da farmácia
   const docOf = (p: PharmacyRecord, kind: PharmacyKycKind) =>

@@ -166,6 +166,7 @@ export default function CadastroFarmacia() {
         anvisa_afe: formData.anvisa_auth,
         telefone_whatsapp: formData.phone,
         pix_key: formData.pix_key,
+        mp_collector_id: formData.mp_collector_id.trim() || null,
         shipping_origin_cep: formData.cep,
         endereco_completo: {
           cep: formData.cep,

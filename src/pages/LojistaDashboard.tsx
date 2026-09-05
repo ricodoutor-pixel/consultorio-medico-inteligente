@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { 
   DollarSign, Package, AlertTriangle, Building2, BookOpen, Clock, FileText, 
   CheckCircle, Truck, FileSignature, Wallet, Navigation, Sparkles, ShieldCheck, 
-  Upload, UploadCloud, Eye, CheckCircle2, XCircle, ExternalLink, RefreshCw 
+  Upload, UploadCloud, Eye, CheckCircle2, XCircle, ExternalLink, RefreshCw, Star 
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { VipUpgradePopup } from "@/components/VipUpgradePopup";
@@ -23,6 +23,7 @@ import { RastreioPedidoModal } from "@/components/delivery/RastreioPedidoModal";
 import { MedicamentoSatelliteTracker } from "@/components/delivery/MedicamentoSatelliteTracker";
 import PharmacyKycDocViewer from "@/components/admin/PharmacyKycDocViewer";
 import { PharmacyPrescriptionProtocols } from "@/components/vendor/PharmacyPrescriptionProtocols";
+import { BestOfferPanel } from "@/components/vendor/BestOfferPanel";
 import { PHARMACY_KYC_LABELS, type PharmacyKycKind, TEST_PHARMACY_DATA } from "@/lib/pharmacy-kyc-docs";
 
 export interface PrescriptionInboxItem {
@@ -409,8 +410,11 @@ export default function LojistaDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 h-auto bg-muted/60 p-1.5 rounded-2xl border border-border">
+          <TabsList className="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-2 h-auto bg-muted/60 p-1.5 rounded-2xl border border-border">
             <TabsTrigger value="overview" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Visão Geral</TabsTrigger>
+            <TabsTrigger value="oferta" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-emerald-400">
+              <Star size={14} className="mr-1 inline" /> Sua Melhor Oferta
+            </TabsTrigger>
             <TabsTrigger value="rastreio" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-emerald-400">
               <Truck size={14} className="mr-1 inline" /> Rastreamento
             </TabsTrigger>
@@ -427,6 +431,12 @@ export default function LojistaDashboard() {
               <ShieldCheck size={14} className="mr-1 inline" /> KYC & Documentos
             </TabsTrigger>
           </TabsList>
+
+          {/* ABA: SUA MELHOR OFERTA (produto exposto no card da farmácia e na vitrine) */}
+          <TabsContent value="oferta" className="space-y-6">
+            <BestOfferPanel />
+          </TabsContent>
+
 
           {/* ABA 1: OVERVIEW COM KPIS REAIS DINÂMICOS */}
           <TabsContent value="overview" className="space-y-6">

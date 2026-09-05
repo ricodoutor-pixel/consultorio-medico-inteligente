@@ -8181,8 +8181,10 @@ export type Database = {
           image_url_3: string | null
           is_active: boolean
           is_approved_by_admin: boolean
+          is_featured_offer: boolean
           is_showcase: boolean
           name: string
+          offer_label: string
           price: number
           rating: number | null
           requires_prescription: boolean
@@ -8206,8 +8208,10 @@ export type Database = {
           image_url_3?: string | null
           is_active?: boolean
           is_approved_by_admin?: boolean
+          is_featured_offer?: boolean
           is_showcase?: boolean
           name: string
+          offer_label?: string
           price: number
           rating?: number | null
           requires_prescription?: boolean
@@ -8231,8 +8235,10 @@ export type Database = {
           image_url_3?: string | null
           is_active?: boolean
           is_approved_by_admin?: boolean
+          is_featured_offer?: boolean
           is_showcase?: boolean
           name?: string
+          offer_label?: string
           price?: number
           rating?: number | null
           requires_prescription?: boolean

@@ -135,45 +135,73 @@ export const DoctorContractModal = ({
         console.warn("Edge function invocation fallback (saving directly via DB/Storage):", e);
       }
 
-      // 4. Garantir atualização nas tabelas Supabase
+      // 4. Garantir atualização server-side nas tabelas Supabase via RPC
       const { data: { user } } = await supabase.auth.getUser();
       const currentUserId = user?.id || doctorData.user_id;
 
       if (currentUserId && !doctorData.id.startsWith("mock-")) {
-        // Tenta gravar na tabela doctor_contracts
+        let rpcSuccess = false;
         try {
-          await supabase.from("doctor_contracts" as any).upsert({
-            doctor_id: doctorData.id,
-            user_id: currentUserId,
-            doctor_full_name: doctorName,
-            doctor_cpf: doctorCpf,
-            doctor_crm: doctorData.crm,
-            doctor_crm_uf: doctorData.crm_state || "SP",
-            status: "signed",
-            signed_at: timestamp,
-            signer_ip: clientIp,
-            signer_user_agent: userAgent,
-            sha512_hash: finalHash,
-            pdf_url: finalPdfUrl,
-            contract_version: "v1.0",
-            ip_capture_failed: !clientIp,
+          const { data: rpcRes, error: rpcErr } = await (supabase.rpc as any)("sign_doctor_contract", {
+            p_doctor_id: doctorData.id,
+            p_contract_version: "v1.0",
+            p_sha512_hash: finalHash,
+            p_signer_name: doctorName,
+            p_signer_cpf: doctorCpf,
+            p_signer_crm: doctorData.crm,
+            p_signer_crm_uf: doctorData.crm_state || "SP",
+            p_signer_ip: clientIp || null,
+            p_signer_user_agent: userAgent,
+            p_pdf_url: finalPdfUrl,
           });
-        } catch (dbErr) {
-          console.warn("doctor_contracts upsert fallback:", dbErr);
+
+          if (!rpcErr && rpcRes) {
+            rpcSuccess = true;
+            if (rpcRes.signed_at) timestamp = rpcRes.signed_at;
+            if (rpcRes.ip) clientIp = rpcRes.ip;
+          } else if (rpcErr) {
+            console.warn("RPC sign_doctor_contract fallback to direct tables:", rpcErr);
+          }
+        } catch (rpcEx) {
+          console.warn("RPC call failed, using table fallback:", rpcEx);
         }
 
-        // Atualiza is_contract_signed e metadados na tabela doctors
-        try {
-          await supabase.from("doctors").update({ 
-            is_contract_signed: true,
-            contract_signed_at: timestamp,
-            contract_hash: finalHash,
-            contract_ip: clientIp,
-            contract_version: "v1.0",
-            ip_capture_failed: !clientIp,
-          } as any).eq("id", doctorData.id);
-        } catch (docUpErr) {
-          console.warn("doctors update fallback:", docUpErr);
+        if (!rpcSuccess) {
+          // Tenta gravar diretamente na tabela doctor_contracts
+          try {
+            await supabase.from("doctor_contracts" as any).upsert({
+              doctor_id: doctorData.id,
+              user_id: currentUserId,
+              doctor_full_name: doctorName,
+              doctor_cpf: doctorCpf,
+              doctor_crm: doctorData.crm,
+              doctor_crm_uf: doctorData.crm_state || "SP",
+              status: "signed",
+              signed_at: timestamp,
+              signer_ip: clientIp,
+              signer_user_agent: userAgent,
+              sha512_hash: finalHash,
+              pdf_url: finalPdfUrl,
+              contract_version: "v1.0",
+              ip_capture_failed: !clientIp,
+            });
+          } catch (dbErr) {
+            console.warn("doctor_contracts upsert fallback:", dbErr);
+          }
+
+          // Atualiza is_contract_signed e metadados na tabela doctors
+          try {
+            await supabase.from("doctors").update({ 
+              is_contract_signed: true,
+              contract_signed_at: timestamp,
+              contract_hash: finalHash,
+              contract_ip: clientIp,
+              contract_version: "v1.0",
+              ip_capture_failed: !clientIp,
+            } as any).eq("id", doctorData.id);
+          } catch (docUpErr) {
+            console.warn("doctors update fallback:", docUpErr);
+          }
         }
       }
 

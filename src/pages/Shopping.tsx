@@ -600,8 +600,9 @@ const Shopping = () => {
     // 1. Buscar vendor oficial Planta y Raíz
     Promise.resolve(supabase
       .from('vendors')
-      .select('id, store_name, store_logo_url, store_banner_url, rating, total_sales, is_active')
+      .select('id, store_name, store_logo_url, store_banner_url, rating, total_sales, is_active, is_kyc_approved')
       .eq('is_active', true)
+      .eq('is_kyc_approved', true)
       .limit(10))
 
       .then(async ({ data: vData }) => {

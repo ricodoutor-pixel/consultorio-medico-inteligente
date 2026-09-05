@@ -157,7 +157,7 @@ const GlobalCompliance = () => {
               </h2>
               <div className="grid md:grid-cols-2 gap-6 text-sm">
                 <div>
-                  <h3 className="font-bold mb-2">HL7 FHIR R4</h3>
+                  <h3 className="font-bold mb-2">HL7 FHIR R4 & RNDS Brasil</h3>
                   <ul className="space-y-1 text-muted-foreground text-xs">
                     <li>✅ Patient Resource (dados demográficos padronizados)</li>
                     <li>✅ Encounter Resource (registros de teleconsulta)</li>
@@ -165,6 +165,9 @@ const GlobalCompliance = () => {
                     <li>✅ MedicationRequest (prescrições digitais)</li>
                     <li>✅ Condition Resource (diagnósticos CID-10 → ICD-11)</li>
                     <li>✅ DiagnosticReport (laudos)</li>
+                    <li className="text-emerald-400 font-semibold mt-2 pt-1 border-t border-primary/20">
+                      🇧🇷 Em conformidade estrutural com FHIR R4; integração direta com a RNDS / ConecteSUS em homologação técnica pelo Ministério da Saúde.
+                    </li>
                   </ul>
                 </div>
                 <div>

@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { RastreioPedidoModal } from "@/components/delivery/RastreioPedidoModal";
 import { OFFICIAL_ANVISA_PRESCRIPTION } from "@/pages/DashboardPaciente";
+import { downloadFhirBundleJson } from "@/services/fhirExport";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
@@ -52,7 +53,7 @@ const Prontuario = () => {
     setLoading(false);
   };
 
-  const exportPDF = (record: any) => {
+  const exportPDF = async (record: any) => {
     const content = `
 PRONTUÁRIO ELETRÔNICO - PLANTA & RAIZ
 ========================================
@@ -75,6 +76,45 @@ Dados protegidos pela LGPD (Lei 13.709/2018)
     a.download = `prontuario-${record.id.slice(0, 8)}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        await supabase.from("medical_record_access_log" as any).insert({
+          record_id: record.id,
+          accessed_by_user_id: session.user.id,
+          access_role: "patient",
+          access_type: "export_pdf",
+        });
+      }
+    } catch {}
+  };
+
+  const exportFhir = async (record: any) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      downloadFhirBundleJson({
+        record,
+        patient: {
+          id: session?.user?.id,
+          name: session?.user?.user_metadata?.full_name || "Paciente",
+        },
+        medications: Array.isArray(record.prescricao_snapshot?.medications)
+          ? record.prescricao_snapshot.medications
+          : [],
+      });
+
+      if (session?.user?.id) {
+        await supabase.from("medical_record_access_log" as any).insert({
+          record_id: record.id,
+          accessed_by_user_id: session.user.id,
+          access_role: "patient",
+          access_type: "export_fhir",
+        });
+      }
+    } catch (e) {
+      console.warn("FHIR export log notice:", e);
+    }
   };
 
   const statusColors: Record<string, string> = {
@@ -184,9 +224,14 @@ Dados protegidos pela LGPD (Lei 13.709/2018)
                                 {record.diagnosis && <p className="text-xs text-muted-foreground mt-1">Diagnóstico: {record.diagnosis}</p>}
                                 {record.treatment_plan && <p className="text-xs text-muted-foreground mt-1">Tratamento: {record.treatment_plan}</p>}
                               </div>
-                              <Button variant="outline" size="sm" className="rounded-xl text-xs" onClick={() => exportPDF(record)}>
-                                <Download size={12} className="mr-1" /> Exportar
-                              </Button>
+                              <div className="flex flex-col sm:flex-row items-end gap-1.5 shrink-0 ml-3">
+                                <Button variant="outline" size="sm" className="rounded-xl text-xs h-8" onClick={() => exportPDF(record)}>
+                                  <Download size={12} className="mr-1" /> Exportar (TXT)
+                                </Button>
+                                <Button variant="outline" size="sm" className="rounded-xl text-xs h-8 border-primary/40 text-primary hover:bg-primary/10 font-bold" onClick={() => exportFhir(record)}>
+                                  <Download size={12} className="mr-1" /> Exportar FHIR R4
+                                </Button>
+                              </div>
                             </div>
                           </CardContent>
                         </Card>

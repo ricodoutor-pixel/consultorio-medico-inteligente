@@ -15,6 +15,7 @@ import { TriageSummaryCard } from "@/components/doctor/TriageSummaryCard";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { JitsiRoom } from "@/components/consultation/JitsiRoom";
+import { DrugInteractionAlertCard } from "@/components/consultation/DrugInteractionAlertCard";
 
 const WorkspaceMedico = () => {
   const [searchParams] = useSearchParams();
@@ -29,7 +30,7 @@ const WorkspaceMedico = () => {
   const [appointment, setAppointment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(false);
-  const [doctorId, setDoctorId] = useState<string>("mock-suelen");
+  const [doctorId, setDoctorId] = useState<string | null>(null);
 
   // EMR state
   const [notes, setNotes] = useState("");
@@ -60,12 +61,14 @@ const WorkspaceMedico = () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-         const email = session.user.email?.toLowerCase() || '';
-         let docId = "mock-edilson";
-         if (email.includes('olivia')) docId = 'mock-olivia';
-         else if (email.includes('suelen')) docId = 'mock-suelen';
+         const { data: realDoc } = await supabase
+           .from("doctors")
+           .select("id")
+           .eq("user_id", session.user.id)
+           .maybeSingle();
+         const docId = realDoc?.id || session.user.id;
          setDoctorId(docId);
-         setIsOnline(localStorage.getItem(`mock_online_${docId}`) === "true");
+         setIsOnline(localStorage.getItem(`doctor_online_${docId}`) === "true");
       }
 
       const [patientRes, apptRes, recordRes, roomRes] = await Promise.all([
@@ -315,6 +318,13 @@ const WorkspaceMedico = () => {
                     placeholder="1. Óleo CBD 20% THC 1% (Vidro 30ml)..."
                   />
                 </div>
+
+                <DrugInteractionAlertCard
+                  cannabinoids={prescriptionText}
+                  patientMedications={notes}
+                  className="mt-2"
+                />
+
                 <Button className="w-full bg-blue-600 hover:bg-blue-700">Emitir & Assinar Digitalmente</Button>
               </TabsContent>
 

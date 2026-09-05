@@ -23,6 +23,7 @@ import { PerformanceBonusWidget } from "@/components/PerformanceBonusWidget";
 import { BlockchainRecordPublisher } from "./BlockchainRecordPublisher";
 import { TitulacaoTrackerCard } from "./TitulacaoTrackerCard";
 import { NurseBrisaAlertSystem } from "@/components/NurseBrisaAlertSystem";
+import { DrugInteractionAlertCard } from "@/components/consultation/DrugInteractionAlertCard";
 
 // ─── Types ──────────────────────────────────────────────────
 interface WaitingPatient {
@@ -696,6 +697,15 @@ export function MedicalDashboard() {
             </div>
 
             <Separator className="bg-border/20" />
+
+            {/* Suporte Clínico à Decisão: Interações Medicamentosas (CYP450) */}
+            {prescriptionItems.length > 0 && activePatient && (
+              <DrugInteractionAlertCard
+                cannabinoids={prescriptionItems.map((p) => p.name)}
+                patientMedications={activePatient.tags}
+                className="my-2"
+              />
+            )}
 
             {/* Finalize button */}
             <Button

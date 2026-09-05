@@ -437,6 +437,13 @@ export default function LojistaDashboard() {
             <BestOfferPanel />
           </TabsContent>
 
+          {/* ABA: FINANCEIRO — conta de recebimento do repasse 95% */}
+          <TabsContent value="financial" className="space-y-6">
+            <PayoutAccountPanel />
+          </TabsContent>
+
+
+
 
           {/* ABA 1: OVERVIEW COM KPIS REAIS DINÂMICOS */}
           <TabsContent value="overview" className="space-y-6">

@@ -627,24 +627,55 @@ export default function CadastroFarmacia() {
               </CardContent>
             </Card>
 
-            {/* 5. TERMOS & SUBMIT */}
-            <div className="p-5 rounded-2xl bg-muted/40 border border-border space-y-4">
-              <div className="flex items-start gap-3">
-                <Checkbox
-                  id="terms-check"
-                  checked={agreedTerms}
-                  onCheckedChange={(c) => setAgreedTerms(Boolean(c))}
-                  className="mt-1"
-                />
-                <label htmlFor="terms-check" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-                  Declaro que as informações e documentos enviados são autênticos e conferem com as normas da <strong>ANVISA RDC 327/2019</strong>, <strong>RDC 660/2022</strong> e Conselho Regional de Farmácia. Concordo com a taxa de intermediação de 5% sobre produtos faturados no marketplace da <strong>Planta y Raíz Ltda (CNPJ 58.283.475/0001-00)</strong>.
-                </label>
+            {/* 5. TERMO DE RESPONSABILIDADE & SUBMIT */}
+            <div className="p-5 rounded-2xl bg-muted/40 border border-emerald-500/30 space-y-5">
+              <div className="flex items-center gap-2">
+                <FileText size={18} className="text-emerald-400" />
+                <h3 className="text-sm md:text-base font-bold text-foreground">{PHARMACY_TERM_TITLE}</h3>
+                <Badge variant="outline" className="text-[10px] border-emerald-500/40 text-emerald-300">{PHARMACY_TERM_VERSION}</Badge>
               </div>
+
+              <div className={`rounded-xl bg-background/60 border border-border p-4 text-[11px] leading-relaxed text-muted-foreground whitespace-pre-wrap font-mono ${showFullTerm ? "max-h-[420px]" : "max-h-40"} overflow-y-auto`}>
+                {PHARMACY_TERM_TEXT}
+              </div>
+              <Button type="button" variant="ghost" size="sm" className="text-emerald-400 text-xs h-8" onClick={() => setShowFullTerm((v) => !v)}>
+                {showFullTerm ? "Recolher termo" : "Expandir termo completo"}
+              </Button>
+
+              <div className="space-y-3">
+                {[
+                  { id: "t-truth", checked: agreedTruth, set: setAgreedTruth, text: "Declaro, sob as penas da lei, que todos os dados cadastrais e documentos enviados são verdaderos, autênticos e de minha exclusiva responsabilidade, ciente das sanções dos arts. 297 a 299 do Código Penal em caso de falsidade." },
+                  { id: "t-reg", checked: agreedRegulatory, set: setAgreedRegulatory, text: "Assumo integralmente a responsabilidade sanitária e regulatória da operação (ANVISA RDC 327/2019, RDC 660/2022, CRF, alvará sanitário e licenças municipais/estaduais válidas)." },
+                  { id: "t-liab", checked: agreedLiability, set: setAgreedLiability, text: "Assumo a responsabilidade civil, fiscal e consumerista pelos produtos (qualidade, procedência, validade, nota fiscal, entrega e eventos adversos) e isento a Planta y Raiz Ltda, mera intermediadora tecnológica, de qualquer autuação ou reclamação decorrente da minha operação." },
+                  { id: "terms-check", checked: agreedTerms, set: setAgreedTerms, text: "Concordo com a taxa de intermediação de 5% sobre produtos faturados no marketplace da Planta y Raíz Ltda (CNPJ 58.283.475/0001-00), com repasse de 95%, e com a regra de que minha loja só será exibida na vitrine após a homologação do compliance." },
+                ].map((c) => (
+                  <div key={c.id} className="flex items-start gap-3">
+                    <Checkbox id={c.id} checked={c.checked} onCheckedChange={(v) => c.set(Boolean(v))} className="mt-0.5" />
+                    <label htmlFor={c.id} className="text-xs text-muted-foreground leading-relaxed cursor-pointer">{c.text}</label>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Nome completo de quem assina *</Label>
+                  <Input value={signerName} onChange={(e) => setSignerName(e.target.value)} placeholder="Sócio administrador ou responsável legal" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">CPF/CNPJ do signatário *</Label>
+                  <Input value={signerDoc} onChange={(e) => setSignerDoc(e.target.value)} placeholder="000.000.000-00" />
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground flex items-start gap-1.5">
+                <ShieldCheck size={12} className="text-emerald-400 mt-0.5 shrink-0" />
+                Assinatura eletrônica conforme MP 2.200-2/2001: registramos nome, documento, versão do termo, resumo criptográfico (SHA-256), navegador e data/hora do aceite.
+              </p>
 
               <Button
                 type="submit"
                 size="lg"
-                disabled={isSubmitting || !agreedTerms}
+                disabled={isSubmitting || !allTermsAccepted}
+
                 className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-base md:text-lg h-14 rounded-2xl shadow-xl shadow-emerald-950/40 gap-2"
               >
                 {isSubmitting ? (

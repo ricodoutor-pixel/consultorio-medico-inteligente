@@ -16,6 +16,7 @@ import {
   Check, Sparkles, Clock, ExternalLink
 } from "lucide-react";
 import { PHARMACY_KYC_LABELS, type PharmacyKycKind, TEST_PHARMACY_DATA } from "@/lib/pharmacy-kyc-docs";
+import { PHARMACY_TERM_TEXT, PHARMACY_TERM_TITLE, PHARMACY_TERM_VERSION, hashPharmacyTerm } from "@/lib/pharmacy-term";
 
 export default function CadastroFarmacia() {
   const { toast } = useToast();
@@ -24,6 +25,13 @@ export default function CadastroFarmacia() {
   const [submitted, setSubmitted] = useState(false);
   const [protocolNumber, setProtocolNumber] = useState("");
   const [agreedTerms, setAgreedTerms] = useState(false);
+  const [agreedTruth, setAgreedTruth] = useState(false);
+  const [agreedRegulatory, setAgreedRegulatory] = useState(false);
+  const [agreedLiability, setAgreedLiability] = useState(false);
+  const [signerName, setSignerName] = useState("");
+  const [signerDoc, setSignerDoc] = useState("");
+  const [showFullTerm, setShowFullTerm] = useState(false);
+  const allTermsAccepted = agreedTerms && agreedTruth && agreedRegulatory && agreedLiability && signerName.trim().length > 4 && signerDoc.replace(/\D/g, "").length >= 11;
 
   // Form Fields
   const [formData, setFormData] = useState({
@@ -97,10 +105,10 @@ export default function CadastroFarmacia() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!agreedTerms) {
+    if (!allTermsAccepted) {
       toast({
-        title: "Termos Obrigatórios",
-        description: "Você deve aceitar os termos de responsabilidade técnica e repasse.",
+        title: "Termo de Responsabilidade obrigatório",
+        description: "Aceite todas as cláusulas e informe o nome e CPF/CNPJ do responsável que assina.",
         variant: "destructive",
       });
       return;
@@ -111,102 +119,115 @@ export default function CadastroFarmacia() {
     setProtocolNumber(protocol);
 
     try {
-      // 1. Obter usuário autenticado ou criar ID temporário
       const { data: { user } } = await supabase.auth.getUser();
-      const vendorId = user?.id || `vendor_${Date.now()}`;
-
-      // 2. Gravar / Atualizar na tabela vendors do Supabase
-      try {
-        await supabase.from("vendors" as any).upsert({
-          id: user ? undefined : undefined,
-          user_id: user?.id || vendorId,
-          store_name: formData.nome_fantasia || formData.razao_social,
-          store_description: `Farmácia credenciada · RT: ${formData.farmaceutico_nome} (CRF-${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}) · AFE: ${formData.anvisa_auth}`,
-          store_logo_url: uploadedFiles.logo_empresa.previewUrl || "/logo-farmacia.jpg",
-          store_banner_url: uploadedFiles.foto_fachada.previewUrl || "/farmacia-fachada.jpg",
-          is_active: true,
+      if (!user) {
+        setIsSubmitting(false);
+        toast({
+          title: "Faça login para credenciar",
+          description: "O credenciamento é vinculado à conta da farmácia. Crie a conta ou entre e repita o envio.",
+          variant: "destructive",
         });
-      } catch (dbErr) {
-        console.warn("vendors upsert fallback:", dbErr);
+        navigate("/login-farmacia");
+        return;
       }
 
-      // 3. Atualizar tabela profiles
-      if (user) {
-        try {
-          await supabase.from("profiles" as any).update({
-            company_name: formData.razao_social,
-            trade_name: formData.nome_fantasia,
-            cnpj: formData.cnpj,
-            anvisa_auth: formData.anvisa_auth,
-            crf: `${formData.farmaceutico_nome} — CRF/${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}`,
-            city: formData.city,
-            state: formData.state,
-            phone: formData.phone,
-            user_type: "pharmacy",
-          }).eq("id", user.id);
-        } catch (pErr) {
-          console.warn("profiles update fallback:", pErr);
-        }
-      }
-
-      // 4. Salvar Dossiê KYC de Documentos no LocalStorage & Storage
-      const docsRecord: Record<string, string> = {};
-      const kycDocsArray: any[] = [];
-
+      // 1. Upload real dos documentos KYC (bucket privado)
+      const docPaths: Partial<Record<PharmacyKycKind, string>> = {};
       for (const [k, val] of Object.entries(uploadedFiles)) {
         const kind = k as PharmacyKycKind;
-        if (val.file) {
-          const fileUrl = val.previewUrl || "";
-          docsRecord[kind] = fileUrl;
-          kycDocsArray.push({
-            id: `doc_${kind}_${Date.now()}`,
-            document_kind: kind,
-            file_url: fileUrl,
-            is_verified: true,
-          });
-
-          // Upload real no Supabase Storage se possível
-          try {
-            const ext = val.file.name.split(".").pop();
-            const path = `${vendorId}/${kind}.${ext}`;
-            await supabase.storage.from("pharmacy-kyc-documents").upload(path, val.file, { upsert: true });
-          } catch (stErr) {
-            console.warn("Storage upload fallback:", stErr);
-          }
-        }
+        if (!val.file) continue;
+        const ext = (val.file.name.split(".").pop() || "bin").toLowerCase();
+        const path = `${user.id}/${kind}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("pharmacy-kyc-documents")
+          .upload(path, val.file, { upsert: true });
+        if (upErr) throw new Error(`Falha ao enviar ${PHARMACY_KYC_LABELS[kind]}: ${upErr.message}`);
+        docPaths[kind] = path;
       }
 
-      localStorage.setItem(`pharmacy_kyc_docs_${vendorId}`, JSON.stringify(docsRecord));
+      // 2. Gravar farmácia real na tabela vendors (status: em análise)
+      const { data: existing } = await supabase
+        .from("vendors" as any)
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-      // 5. Adicionar a farmácia na lista de cadastros para sincronização com /admin/kyc-lojas
-      const newPharmacyRecord = {
-        id: vendorId,
-        user_id: vendorId,
+      const vendorPayload: Record<string, any> = {
+        user_id: user.id,
+        store_name: formData.nome_fantasia || formData.razao_social,
+        store_description: `Farmácia credenciada · RT: ${formData.farmaceutico_nome} (CRF-${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}) · AFE: ${formData.anvisa_auth}`,
         razao_social: formData.razao_social,
         nome_fantasia: formData.nome_fantasia || formData.razao_social,
         cnpj: formData.cnpj,
-        anvisa_auth: formData.anvisa_auth || "AFE em análise ANVISA",
-        farmaceutico_crf: `${formData.farmaceutico_nome} — CRF/${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}`,
-        email: formData.email,
-        phone: formData.phone,
-        city: formData.city,
-        state: formData.state,
-        country: "BR",
-        logo_url: uploadedFiles.logo_empresa.previewUrl || "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=400&q=80",
-        is_approved: false,
-        status: "pending",
-        created_at: new Date().toISOString(),
-        kyc_docs: kycDocsArray,
+        responsavel_tecnico: formData.farmaceutico_nome,
+        crf_numero: formData.farmaceutico_crf,
+        crf_uf: formData.farmaceutico_crf_uf,
+        anvisa_afe: formData.anvisa_auth,
+        telefone_whatsapp: formData.phone,
+        pix_key: formData.pix_key,
+        shipping_origin_cep: formData.cep,
+        endereco_completo: {
+          cep: formData.cep,
+          logradouro: formData.logradouro,
+          numero: formData.numero,
+          bairro: formData.bairro,
+          city: formData.city,
+          state: formData.state,
+          email: formData.email,
+        },
+        contrato_social_url: docPaths.contrato_social_pdf || null,
+        crf_doc_url: docPaths.crf_responsavel || null,
+        afe_doc_url: docPaths.alvara_sanitario || null,
+        logo_url: docPaths.logo_empresa || null,
+        fachada_foto_url: docPaths.foto_fachada || null,
+        kyc_status: "pending",
+        is_kyc_approved: false,
+        is_active: false, // só entra na vitrine após homologação do compliance
       };
 
-      const existingList: any[] = JSON.parse(localStorage.getItem("registered_pharmacies_list") || "[]");
-      existingList.unshift(newPharmacyRecord);
-      localStorage.setItem("registered_pharmacies_list", JSON.stringify(existingList));
+      const vendorQuery = (existing as any)?.id
+        ? supabase.from("vendors" as any).update(vendorPayload).eq("id", (existing as any)?.id).select("id").single()
+        : supabase.from("vendors" as any).insert(vendorPayload).select("id").single();
+
+      const { data: vendorRow, error: vendorErr } = await vendorQuery;
+      if (vendorErr) throw vendorErr;
+      const vendorId = (vendorRow as any)?.id as string;
+
+      // 3. Registrar assinatura eletrônica do Termo de Responsabilidade
+      const termHash = await hashPharmacyTerm();
+      const { error: termErr } = await supabase.from("vendor_terms_consents" as any).insert({
+        user_id: user.id,
+        vendor_id: vendorId,
+        cnpj: formData.cnpj,
+        signer_name: signerName.trim(),
+        signer_doc: signerDoc.trim(),
+        term_version: PHARMACY_TERM_VERSION,
+        term_hash: termHash,
+        accepted_data_truthfulness: agreedTruth,
+        accepted_regulatory: agreedRegulatory,
+        accepted_liability: agreedLiability,
+        accepted_fees: agreedTerms,
+        user_agent: navigator.userAgent,
+      });
+      if (termErr) throw termErr;
+
+      // 4. Atualizar perfil como farmácia
+      await supabase.from("profiles" as any).update({
+        company_name: formData.razao_social,
+        trade_name: formData.nome_fantasia,
+        cnpj: formData.cnpj,
+        anvisa_auth: formData.anvisa_auth,
+        crf: `${formData.farmaceutico_nome} — CRF/${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}`,
+        city: formData.city,
+        state: formData.state,
+        phone: formData.phone,
+        user_type: "pharmacy",
+      }).eq("id", user.id);
 
       setIsSubmitting(false);
       setSubmitted(true);
       toast({
-        title: "✓ Cadastro de Farmácia Enviado com Sucesso!",
+        title: "✓ Credenciamento protocolado com assinatura registrada",
         description: `Protocolo ${protocol}. O compliance regulatório analisará seus documentos.`,
       });
     } catch (err: any) {
@@ -606,24 +627,55 @@ export default function CadastroFarmacia() {
               </CardContent>
             </Card>
 
-            {/* 5. TERMOS & SUBMIT */}
-            <div className="p-5 rounded-2xl bg-muted/40 border border-border space-y-4">
-              <div className="flex items-start gap-3">
-                <Checkbox
-                  id="terms-check"
-                  checked={agreedTerms}
-                  onCheckedChange={(c) => setAgreedTerms(Boolean(c))}
-                  className="mt-1"
-                />
-                <label htmlFor="terms-check" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-                  Declaro que as informações e documentos enviados são autênticos e conferem com as normas da <strong>ANVISA RDC 327/2019</strong>, <strong>RDC 660/2022</strong> e Conselho Regional de Farmácia. Concordo com a taxa de intermediação de 5% sobre produtos faturados no marketplace da <strong>Planta y Raíz Ltda (CNPJ 58.283.475/0001-00)</strong>.
-                </label>
+            {/* 5. TERMO DE RESPONSABILIDADE & SUBMIT */}
+            <div className="p-5 rounded-2xl bg-muted/40 border border-emerald-500/30 space-y-5">
+              <div className="flex items-center gap-2">
+                <FileText size={18} className="text-emerald-400" />
+                <h3 className="text-sm md:text-base font-bold text-foreground">{PHARMACY_TERM_TITLE}</h3>
+                <Badge variant="outline" className="text-[10px] border-emerald-500/40 text-emerald-300">{PHARMACY_TERM_VERSION}</Badge>
               </div>
+
+              <div className={`rounded-xl bg-background/60 border border-border p-4 text-[11px] leading-relaxed text-muted-foreground whitespace-pre-wrap font-mono ${showFullTerm ? "max-h-[420px]" : "max-h-40"} overflow-y-auto`}>
+                {PHARMACY_TERM_TEXT}
+              </div>
+              <Button type="button" variant="ghost" size="sm" className="text-emerald-400 text-xs h-8" onClick={() => setShowFullTerm((v) => !v)}>
+                {showFullTerm ? "Recolher termo" : "Expandir termo completo"}
+              </Button>
+
+              <div className="space-y-3">
+                {[
+                  { id: "t-truth", checked: agreedTruth, set: setAgreedTruth, text: "Declaro, sob as penas da lei, que todos os dados cadastrais e documentos enviados são verdadeiros, autênticos e de minha exclusiva responsabilidade, ciente das sanções dos arts. 297 a 299 do Código Penal em caso de falsidade." },
+                  { id: "t-reg", checked: agreedRegulatory, set: setAgreedRegulatory, text: "Assumo integralmente a responsabilidade sanitária e regulatória da operação (ANVISA RDC 327/2019, RDC 660/2022, CRF, alvará sanitário e licenças municipais/estaduais válidas)." },
+                  { id: "t-liab", checked: agreedLiability, set: setAgreedLiability, text: "Assumo a responsabilidade civil, fiscal e consumerista pelos produtos (qualidade, procedência, validade, nota fiscal, entrega e eventos adversos) e isento a Planta y Raiz Ltda, mera intermediadora tecnológica, de qualquer autuação ou reclamação decorrente da minha operação." },
+                  { id: "terms-check", checked: agreedTerms, set: setAgreedTerms, text: "Concordo com a taxa de intermediação de 5% sobre produtos faturados no marketplace da Planta y Raíz Ltda (CNPJ 58.283.475/0001-00), com repasse de 95%, e com a regra de que minha loja só será exibida na vitrine após a homologação do compliance." },
+                ].map((c) => (
+                  <div key={c.id} className="flex items-start gap-3">
+                    <Checkbox id={c.id} checked={c.checked} onCheckedChange={(v) => c.set(Boolean(v))} className="mt-0.5" />
+                    <label htmlFor={c.id} className="text-xs text-muted-foreground leading-relaxed cursor-pointer">{c.text}</label>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Nome completo de quem assina *</Label>
+                  <Input value={signerName} onChange={(e) => setSignerName(e.target.value)} placeholder="Sócio administrador ou responsável legal" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">CPF/CNPJ do signatário *</Label>
+                  <Input value={signerDoc} onChange={(e) => setSignerDoc(e.target.value)} placeholder="000.000.000-00" />
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground flex items-start gap-1.5">
+                <ShieldCheck size={12} className="text-emerald-400 mt-0.5 shrink-0" />
+                Assinatura eletrônica conforme MP 2.200-2/2001: registramos nome, documento, versão do termo, resumo criptográfico (SHA-256), navegador e data/hora do aceite.
+              </p>
 
               <Button
                 type="submit"
                 size="lg"
-                disabled={isSubmitting || !agreedTerms}
+                disabled={isSubmitting || !allTermsAccepted}
+
                 className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-base md:text-lg h-14 rounded-2xl shadow-xl shadow-emerald-950/40 gap-2"
               >
                 {isSubmitting ? (

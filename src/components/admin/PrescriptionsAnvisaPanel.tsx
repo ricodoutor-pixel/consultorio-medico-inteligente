@@ -176,10 +176,14 @@ export const PrescriptionsAnvisaPanel = () => {
       in_transit: "in_transit_at",
       delivered: "delivered_at",
     };
-    const patch: Record<string, unknown> = { status: next, updated_at: new Date().toISOString() };
-    if (stamp[next]) patch[stamp[next]] = new Date().toISOString();
+    const nowIso = new Date().toISOString();
+    const patch: Record<string, string> = { status: next, updated_at: nowIso };
+    if (stamp[next]) patch[stamp[next]] = nowIso;
 
-    const { error } = await supabase.from("anvisa_import_processes").update(patch).eq("id", row.id);
+    const { error } = await supabase
+      .from("anvisa_import_processes")
+      .update(patch as never)
+      .eq("id", row.id);
     if (error) {
       toast.error("Não foi possível atualizar o processo");
       return;

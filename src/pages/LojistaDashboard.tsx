@@ -412,7 +412,10 @@ export default function LojistaDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-2 h-auto bg-muted/60 p-1.5 rounded-2xl border border-border">
+          <TabsList className="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-2 h-auto bg-muted/60 p-1.5 rounded-2xl border border-border">
+            <TabsTrigger value="passo-a-passo" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-amber-300">
+              <BookOpen size={14} className="mr-1 inline" /> Passo a Passo
+            </TabsTrigger>
             <TabsTrigger value="overview" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Visão Geral</TabsTrigger>
             <TabsTrigger value="oferta" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-emerald-400">
               <Star size={14} className="mr-1 inline" /> Sua Melhor Oferta

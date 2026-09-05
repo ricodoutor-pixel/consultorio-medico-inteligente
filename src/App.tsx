@@ -1,4 +1,4 @@
-﻿import DashboardDiretoria from "./components/admin/DashboardDiretoria";
+import DashboardDiretoria from "./components/admin/DashboardDiretoria";
 import { Suspense } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { FrogChatModal } from "./components/FrogChatModal";
+import { BrisaChatModal } from "./components/BrisaChatModal";
 import { ShoppingCart } from "./components/ShoppingCart";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { AdminRoute } from "@/components/AdminRoute";
@@ -30,8 +31,10 @@ import { DynamicSEOHead } from "@/components/DynamicSEOHead";
 import { LocalCTABanner } from "@/components/LocalCTABanner";
 import { OnboardingModal } from "@/components/OnboardingModal";
 import { ConsentManager } from "@/components/ConsentManager";
+import { MasterPortalSwitcher } from "@/components/MasterPortalSwitcher";
 import { lazyWithRecovery, reportFrontendRuntimeError } from "@/lib/runtime-recovery";
 
+const MonitoramentoCSI = lazyWithRecovery(() => import("./pages/MonitoramentoCSI"), { sourceRef: "/monitoramento" });
 const Loading = () => (
   <div className="min-h-dvh bg-background flex flex-col items-center justify-center">
     <div className="relative flex items-center justify-center">
@@ -82,6 +85,9 @@ const Cadastro = lazyWithRecovery(() => import("./pages/Cadastro"), { sourceRef:
 const ConfiguracoesMedico = lazyWithRecovery(() => import("./pages/ConfiguracoesMedico"), { sourceRef: "/configuracoes-medico" });
 const AtualizarDocumentosMedico = lazyWithRecovery(() => import("./pages/AtualizarDocumentosMedico"), { sourceRef: "/atualizar-documentos-medico" });
 const Login = lazyWithRecovery(() => import("./pages/Login"), { sourceRef: "/login" });
+const LoginFarmacia = lazyWithRecovery(() => import("./pages/LoginFarmacia"), { sourceRef: "/login-farmacia" });
+const FarmaciaVirtual = lazyWithRecovery(() => import("./pages/FarmaciaVirtual"), { sourceRef: "/farmacia-virtual" });
+const FarmaciaVitrine = lazyWithRecovery(() => import("./pages/FarmaciaVitrine"), { sourceRef: "/shopping/farmacia/:vendorId" });
 const ResetPassword = lazyWithRecovery(() => import("./pages/ResetPassword"), { sourceRef: "/reset-password" });
 const ConsultationPayment = lazyWithRecovery(() => import("./pages/ConsultationPayment"), { sourceRef: "/pagamento" });
 const SpecialistDashboard = lazyWithRecovery(() => import("./pages/SpecialistDashboard"), { sourceRef: "/dashboard-especialista" });
@@ -154,7 +160,10 @@ const OnboardingMatch = lazyWithRecovery(() => import("./pages/OnboardingMatch")
 const TelemedicinaAssincrona = lazyWithRecovery(() => import("./pages/TelemedicinaAssincrona"), { sourceRef: "/telemedicina-assincrona" });
 const AfiliadosGamificado = lazyWithRecovery(() => import("./pages/AfiliadosGamificado"), { sourceRef: "/afiliados" });
 const AdminAfiliados = lazyWithRecovery(() => import("./pages/admin/AdminAfiliados"), { sourceRef: "/admin/afiliados" });
+// Lojistas & Farmácias
+const CadastroFarmacia = lazyWithRecovery(() => import("./pages/CadastroFarmacia"), { sourceRef: "/cadastro-farmacia" });
 const LojistaDashboard = lazyWithRecovery(() => import("./pages/LojistaDashboard"), { sourceRef: "/lojistas" });
+const EntregadorGPS = lazyWithRecovery(() => import("./pages/EntregadorGPS"), { sourceRef: "/entregador" });
 const ConviteMedico = lazyWithRecovery(() => import("./pages/ConviteMedico"), { sourceRef: "/convite-medico" });
 
 // ── Cartão Saúde Verde ──
@@ -203,16 +212,48 @@ const CadastrosRealtime = lazyWithRecovery(() => import("./pages/admin/Cadastros
 const AdminGlobalOps = lazyWithRecovery(() => import("./pages/AdminGlobalOps"), { sourceRef: "/admin/global-ops" });
 const WhatsAppInbox = lazyWithRecovery(() => import("./pages/admin/WhatsAppInbox"), { sourceRef: "/admin/whatsapp-inbox" });
 const AdminAprovacoes = lazyWithRecovery(() => import("./pages/admin/AdminAprovacoes"), { sourceRef: "/admin/aprovacoes-medicas" });
+const AdminAprovacoesFarmacias = lazyWithRecovery(() => import("./pages/admin/AdminAprovacoesFarmacias"), { sourceRef: "/admin/aprovacoes-farmacias" });
+const AdminAprovacoesPacientes = lazyWithRecovery(() => import("./pages/admin/AdminAprovacoesPacientes"), { sourceRef: "/admin/aprovacoes-pacientes" });
+const AdminKycAgentes = lazyWithRecovery(() => import("./pages/admin/AdminKycAgentes"), { sourceRef: "/admin/kyc-agentes" });
 const AdminMedicosOnline = lazyWithRecovery(() => import("./pages/admin/MedicosOnline"), { sourceRef: "/admin/medicos-online" });
 const AuthCallback = lazyWithRecovery(() => import("./pages/AuthCallback"), { sourceRef: "/auth/callback" });
 const MedSocio = lazyWithRecovery(() => import("./pages/MedSocio"), { sourceRef: "/medsocio" });
 const TelemedWhatsApp = lazyWithRecovery(() => import("./pages/TelemedWhatsApp"), { sourceRef: "/telemed-whatsapp" });
 const MonitoramentoSaude = lazyWithRecovery(() => import("./pages/MonitoramentoSaude"), { sourceRef: "/monitoramento-saude" });
+const FeedbackNPS = lazyWithRecovery(() => import("./pages/FeedbackNPS"), { sourceRef: "/feedback" });
+const AdminIaAuditoria = lazyWithRecovery(() => import("./pages/admin/AdminIaAuditoria"), { sourceRef: "/admin/ia-auditoria" });
 
 const queryClient = new QueryClient();
 
+/**
+ * Ruído de extensões do navegador (MetaMask/carteiras cripto, tradutores).
+ * Não são falhas da plataforma e não devem ser reportadas nem acionar recovery.
+ */
+const isExtensionNoise = (err: unknown): boolean => {
+  try {
+    const seen = new Set<unknown>();
+    let cur: any = err;
+    while (cur && !seen.has(cur)) {
+      seen.add(cur);
+      const msg = String(cur?.message ?? cur ?? "");
+      const stack = String(cur?.stack ?? "");
+      if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack + msg)) return true;
+      if (/MetaMask|ethereum provider|web3|Failed to connect to MetaMask/i.test(msg)) return true;
+      cur = cur?.cause;
+    }
+  } catch {
+    /* noop */
+  }
+  return false;
+};
+
 if (typeof window !== "undefined") {
   window.addEventListener("error", (event) => {
+    if (isExtensionNoise(event.error ?? event.message) || /extension:\/\//.test(event.filename || "")) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     reportFrontendRuntimeError(event.error ?? event.message, {
       sourceRef: window.location.pathname,
       phase: "fatal-runtime",
@@ -225,12 +266,18 @@ if (typeof window !== "undefined") {
   });
 
   window.addEventListener("unhandledrejection", (event) => {
+    if (isExtensionNoise(event.reason)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     reportFrontendRuntimeError(event.reason, {
       sourceRef: window.location.pathname,
       phase: "unhandled-rejection",
     });
   });
 }
+
 
 const App = () => (
   <ErrorBoundary>
@@ -252,9 +299,11 @@ const App = () => (
             <FacebookPixelProvider />
             <ReferralCaptureProvider />
             <FrogChatModal />
+            <BrisaChatModal />
             <ShoppingCart />
             <OnboardingModal />
             <ConsentManager />
+            <MasterPortalSwitcher />
             <Suspense fallback={<Loading />}>
               <main id="main-content" role="main">
               <Routes>
@@ -267,18 +316,23 @@ const App = () => (
                 <Route path="/profissionais/:id" element={<Profissionais />} />
                 <Route path="/shopping" element={<Shopping />} />
                 <Route path="/shopping/:id" element={<Shopping />} />
+                <Route path="/loja" element={<Shopping />} />
+                <Route path="/loja/:id" element={<Shopping />} />
                 <Route path="/planos" element={<Precos />} />
                 <Route path="/precos" element={<Precos />} />
                 <Route path="/saude-digital" element={<SaudeDigital />} />
-          <Route path="/convite-medico" element={<ConviteMedico />} />
+                <Route path="/convite-medico" element={<ConviteMedico />} />
                 <Route path="/faq" element={<FAQ />} />
+                <Route path="/feedback" element={<FeedbackNPS />} />
                 <Route path="/manual" element={<ManualPlataforma />} />
                 <Route path="/contato" element={<Contato />} />
                 <Route path="/pay" element={<Pay />} />
                 <Route path="/carteira" element={<Carteira />} />
                 <Route path="/cadastro-profissional" element={<CadastroProfissional />} />
+                <Route path="/cadastro-farmacia" element={<CadastroFarmacia />} />
                 <Route path="/cadastro" element={<Cadastro />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/login-farmacia" element={<Navigate to="/login?type=farmacia&redirect=/lojistas" replace />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/falar-com-especialista" element={<FalarComEspecialista />} />
@@ -330,6 +384,10 @@ const App = () => (
                 <Route path="/dashboard-afiliado" element={<PrivateRoute><AffiliateDashboard /></PrivateRoute>} />
                 <Route path="/afiliados" element={<PrivateRoute><AfiliadosGamificado /></PrivateRoute>} />
                 <Route path="/lojistas" element={<PrivateRoute><LojistaDashboard /></PrivateRoute>} />
+                <Route path="/farmacia-virtual" element={<PrivateRoute><FarmaciaVirtual /></PrivateRoute>} />
+                <Route path="/entregador" element={<EntregadorGPS />} />
+                <Route path="/rastreio" element={<EntregadorGPS />} />
+                <Route path="/shopping/farmacia/:vendorId" element={<FarmaciaVitrine />} />
                 <Route path="/agendamento" element={<Agendamento />} />
                 <Route path="/prontuario" element={<Prontuario />} />
                 <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />
@@ -416,6 +474,13 @@ const App = () => (
                 <Route path="/admin/global-ops" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
                 <Route path="/admin/mapa-global" element={<AdminRoute><AdminGlobalOps /></AdminRoute>} />
                 <Route path="/admin/aprovacoes-medicas" element={<AdminRoute><AdminAprovacoes /></AdminRoute>} />
+                <Route path="/admin/aprovacoes-farmacias" element={<AdminRoute><AdminAprovacoesFarmacias /></AdminRoute>} />
+                <Route path="/admin/kyc-lojas" element={<AdminRoute><AdminAprovacoesFarmacias /></AdminRoute>} />
+                <Route path="/admin/aprovacoes-pacientes" element={<AdminRoute><AdminAprovacoesPacientes /></AdminRoute>} />
+                <Route path="/admin/kyc-pacientes" element={<AdminRoute><AdminAprovacoesPacientes /></AdminRoute>} />
+                <Route path="/admin/kyc-agentes" element={<AdminRoute><AdminKycAgentes /></AdminRoute>} />
+                <Route path="/admin/aprovacoes-agentes" element={<AdminRoute><AdminKycAgentes /></AdminRoute>} />
+                <Route path="/admin/ia-auditoria" element={<AdminRoute><AdminIaAuditoria /></AdminRoute>} />
                 <Route path="/admin/medicos-online" element={<AdminRoute><AdminMedicosOnline /></AdminRoute>} />
                 <Route path="/admin/medicos" element={<AdminRoute><AdminMedicosOnline /></AdminRoute>} />
                 <Route path="/admin/leads/:id" element={<AdminRoute><AdminLeadDetail /></AdminRoute>} />
@@ -450,7 +515,8 @@ const App = () => (
                 <Route path="/exames-com-desconto" element={<SaudeVerdeRede />} />
                 <Route path="/consultas-com-desconto" element={<SaudeVerdeRede />} />
                 <Route path="/medsocio" element={<MedSocio />} />
-                <Route path="/monitoramento-saude" element={<MonitoramentoSaude />} />
+                                <Route path="/monitoramento" element={<MonitoramentoCSI />} />
+<Route path="/monitoramento-saude" element={<MonitoramentoSaude />} />
                 <Route path="/meus-exames" element={<MeusExames />} />
                 <Route path="/telemed-whatsapp" element={<PrivateRoute><TelemedWhatsApp /></PrivateRoute>} />
                 <Route path="*" element={<NotFound />} />

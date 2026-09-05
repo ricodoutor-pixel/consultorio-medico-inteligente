@@ -79,12 +79,34 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
   });
 
   const handleToggleVerify = async (doc: DoctorRecord) => {
-    setLoadingId(doc.id);
     const newStatus = !doc.is_verified;
+
+    // Trava de aprovação KYC: CRM, CPF e Contrato são mandatórios para homologar
+    if (newStatus) {
+      const missing: string[] = [];
+      if (!doc.crm || doc.crm.trim().length < 3) {
+        missing.push("CRM válido (mínimo 3 dígitos)");
+      }
+      const cleanCpf = (doc.cpf || "").replace(/\D/g, "");
+      if (!cleanCpf || cleanCpf.length !== 11) {
+        missing.push("CPF com 11 dígitos numéricos");
+      }
+      const isSigned = Boolean(doc.is_contract_signed || doc.contract_signed_at);
+      if (!isSigned) {
+        missing.push("Contrato CFM assinado digitalmente (SHA-512)");
+      }
+
+      if (missing.length > 0) {
+        toast.error(`Homologação bloqueada! Pré-requisitos pendentes: ${missing.join("; ")}`);
+        return;
+      }
+    }
+
+    setLoadingId(doc.id);
     try {
       const { error } = await supabase
         .from("doctors")
-        .update({ is_verified: newStatus } as any)
+        .update({ is_verified: newStatus, is_approved_by_admin: newStatus } as any)
         .eq("id", doc.id);
 
       if (error) {
@@ -291,19 +313,28 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
                       >
                         <FileText size={11} className="mr-1" /> Contrato SHA-512
                       </Button>
-                      <Button
-                        size="sm"
-                        variant={d.is_verified ? "outline" : "default"}
-                        disabled={loadingId === d.id}
-                        onClick={() => handleToggleVerify(d)}
-                        className={`h-7 text-[10px] rounded-lg px-2.5 ${
-                          d.is_verified
-                            ? "border-destructive/30 text-destructive hover:bg-destructive/10"
-                            : "bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
-                        }`}
-                      >
-                        {d.is_verified ? "Revogar" : "Homologar"}
-                      </Button>
+                      {(() => {
+                        const cleanCpf = (d.cpf || "").replace(/\D/g, "");
+                        const isEligibleToApprove = Boolean(d.crm && d.crm.trim().length >= 3 && cleanCpf.length === 11 && isContractSigned);
+                        return (
+                          <Button
+                            size="sm"
+                            variant={d.is_verified ? "outline" : "default"}
+                            disabled={loadingId === d.id}
+                            onClick={() => handleToggleVerify(d)}
+                            title={!d.is_verified && !isEligibleToApprove ? "Requisitos pendentes: CRM válido, CPF 11 dígitos e Contrato CFM assinado" : undefined}
+                            className={`h-7 text-[10px] rounded-lg px-2.5 ${
+                              d.is_verified
+                                ? "border-destructive/30 text-destructive hover:bg-destructive/10"
+                                : !isEligibleToApprove
+                                ? "bg-amber-600/60 hover:bg-amber-600/80 text-white font-semibold"
+                                : "bg-emerald-600 hover:bg-emerald-500 text-white font-bold"
+                            }`}
+                          >
+                            {d.is_verified ? "Revogar" : "Homologar"}
+                          </Button>
+                        );
+                      })()}
                     </TableCell>
                   </TableRow>
                 );

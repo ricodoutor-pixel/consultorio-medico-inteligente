@@ -113,6 +113,7 @@ export const AdminAprovacoes = () => {
   const kycChecklist = (doc: any) => {
     const p = doc.profile || {};
     const kinds = new Set((doc.kyc_docs || []).map((k: any) => k.document_kind));
+    const isContractSigned = Boolean(doc.is_contract_signed || doc.contract_signed_at);
     return [
       ...[...KYC_REQUIRED, 'icp_brasil'].map((kind) => ({ 
         label: KYC_LABELS[kind], 
@@ -120,6 +121,7 @@ export const AdminAprovacoes = () => {
       })),
       { label: "Nº do CRM", ok: Boolean(doc.crm && String(doc.crm).length >= 3) },
       { label: "CPF", ok: Boolean(p.cpf && String(p.cpf).replace(/\D/g, "").length === 11) },
+      { label: "Contrato CFM assinado", ok: isContractSigned },
       { label: "Data de nascimento", ok: Boolean(p.date_of_birth) },
       { label: "CEP / endereço", ok: Boolean(p.cep && String(p.cep).replace(/\D/g, "").length === 8) },
       { label: "Foto de perfil", ok: Boolean(p.avatar_url) },

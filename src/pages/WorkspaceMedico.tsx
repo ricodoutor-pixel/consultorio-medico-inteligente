@@ -12,6 +12,8 @@ import { FileText, Clock, FilePlus, ChevronLeft, Calendar, Stethoscope, Video, M
 import { useToast } from "@/hooks/use-toast";
 import { DoctorQuickActions } from "@/components/doctor/DoctorQuickActions";
 import { PrescriptionTemplates } from "@/components/doctor/PrescriptionTemplates";
+import { DrugInteractionAlertCard } from "@/components/doctor/DrugInteractionAlertCard";
+
 import { TriageSummaryCard } from "@/components/doctor/TriageSummaryCard";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";

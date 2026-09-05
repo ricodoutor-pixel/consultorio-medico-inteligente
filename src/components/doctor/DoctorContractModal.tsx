@@ -408,7 +408,7 @@ export const DoctorContractModal = ({
               </div>
               <div className="flex items-center justify-between pb-2 border-b">
                 <span className="text-muted-foreground font-bold">Endereço IP Registrado:</span>
-                <strong className="text-emerald-400 font-mono">{signedData?.signer_ip || "187.12.84.190"}</strong>
+                <strong className="text-emerald-400 font-mono">{signedData?.signer_ip || "IP não capturado"}</strong>
               </div>
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
@@ -422,7 +422,7 @@ export const DoctorContractModal = ({
                   </button>
                 </div>
                 <div className="p-2.5 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 font-mono text-[10px] break-all">
-                  {signedData?.sha512_hash || localStorage.getItem(`doctor_contract_hash_${doctorData?.id}`) || "A3F890B1C4E72D8A901F4E72B8C1D9A0E3F4B7C9D2E1A8B9C0D3E4F5A6B7C8D9E0F1A2B3C4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1C2D3E4F5A6B7C8D9E0F1"}
+                  {signedData?.sha512_hash || "Hash não disponível"}
                 </div>
               </div>
             </div>

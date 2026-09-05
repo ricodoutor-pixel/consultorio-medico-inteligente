@@ -51,6 +51,7 @@ export default function CadastroFarmacia() {
     farmaceutico_crf_uf: "SP",
     anvisa_auth: "",
     pix_key: "",
+    mp_collector_id: "",
   });
 
   // Uploaded Files State

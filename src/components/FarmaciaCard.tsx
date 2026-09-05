@@ -23,6 +23,7 @@ export interface FarmaciaCardProps {
       price: number | string;
       image_url?: string | null;
       category?: string | null;
+      offer_label?: string | null;
     } | null;
   };
   onClick?: () => void;

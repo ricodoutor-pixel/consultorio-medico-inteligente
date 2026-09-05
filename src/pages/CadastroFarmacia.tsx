@@ -16,6 +16,7 @@ import {
   Check, Sparkles, Clock, ExternalLink
 } from "lucide-react";
 import { PHARMACY_KYC_LABELS, type PharmacyKycKind, TEST_PHARMACY_DATA } from "@/lib/pharmacy-kyc-docs";
+import { PHARMACY_TERM_TEXT, PHARMACY_TERM_TITLE, PHARMACY_TERM_VERSION, hashPharmacyTerm } from "@/lib/pharmacy-term";
 
 export default function CadastroFarmacia() {
   const { toast } = useToast();
@@ -184,8 +185,8 @@ export default function CadastroFarmacia() {
         is_active: false, // só entra na vitrine após homologação do compliance
       };
 
-      const vendorQuery = existing?.id
-        ? supabase.from("vendors" as any).update(vendorPayload).eq("id", (existing as any).id).select("id").single()
+      const vendorQuery = (existing as any)?.id
+        ? supabase.from("vendors" as any).update(vendorPayload).eq("id", (existing as any)?.id).select("id").single()
         : supabase.from("vendors" as any).insert(vendorPayload).select("id").single();
 
       const { data: vendorRow, error: vendorErr } = await vendorQuery;

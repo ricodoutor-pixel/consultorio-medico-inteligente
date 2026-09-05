@@ -437,6 +437,11 @@ export default function LojistaDashboard() {
             </TabsTrigger>
           </TabsList>
 
+          {/* ABA: PASSO A PASSO DO LOJISTA + DOCUMENTOS */}
+          <TabsContent value="passo-a-passo" className="space-y-6">
+            <PharmacyOnboardingGuide />
+          </TabsContent>
+
           {/* ABA: SUA MELHOR OFERTA (produto exposto no card da farmácia e na vitrine) */}
           <TabsContent value="oferta" className="space-y-6">
             <BestOfferPanel />

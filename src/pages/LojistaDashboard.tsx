@@ -22,6 +22,7 @@ import { useLojista } from "@/hooks/useLojista";
 import { RastreioPedidoModal } from "@/components/delivery/RastreioPedidoModal";
 import { MedicamentoSatelliteTracker } from "@/components/delivery/MedicamentoSatelliteTracker";
 import PharmacyKycDocViewer from "@/components/admin/PharmacyKycDocViewer";
+import { PharmacyPrescriptionProtocols } from "@/components/vendor/PharmacyPrescriptionProtocols";
 import { PHARMACY_KYC_LABELS, type PharmacyKycKind, TEST_PHARMACY_DATA } from "@/lib/pharmacy-kyc-docs";
 
 export interface PrescriptionInboxItem {

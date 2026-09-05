@@ -1020,7 +1020,20 @@ const DashboardMedico = () => {
                   className="min-h-[80px]"
                 />
               </div>
+
+              <DrugInteractionAlertCard
+                medications={[
+                  selectedRequest?.linkedRx?.medication_name,
+                  selectedRequest?.linkedRx?.instructions,
+                  dosageNotes,
+                ]
+                  .filter(Boolean)
+                  .flatMap((t: any) => String(t).split(/[\n;,+]+/))
+                  .map((l: string) => l.replace(/^\s*\d+[.)]\s*/, "").trim())
+                  .filter(Boolean)}
+              />
             </div>
+
           )}
 
           <DialogFooter className="flex flex-col sm:flex-row gap-2">

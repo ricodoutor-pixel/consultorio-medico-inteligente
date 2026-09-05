@@ -12,6 +12,8 @@ import { FileText, Clock, FilePlus, ChevronLeft, Calendar, Stethoscope, Video, M
 import { useToast } from "@/hooks/use-toast";
 import { DoctorQuickActions } from "@/components/doctor/DoctorQuickActions";
 import { PrescriptionTemplates } from "@/components/doctor/PrescriptionTemplates";
+import { DrugInteractionAlertCard } from "@/components/doctor/DrugInteractionAlertCard";
+
 import { TriageSummaryCard } from "@/components/doctor/TriageSummaryCard";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -311,7 +313,11 @@ const WorkspaceMedico = () => {
                     placeholder="1. Óleo CBD 20% THC 1% (Vidro 30ml)..."
                   />
                 </div>
+                <DrugInteractionAlertCard
+                  medications={prescriptionText.split(/[\n;,]+/).map((l) => l.replace(/^\s*\d+[.)]\s*/, "").trim()).filter(Boolean)}
+                />
                 <Button className="w-full bg-blue-600 hover:bg-blue-700">Emitir & Assinar Digitalmente</Button>
+
               </TabsContent>
 
               <TabsContent value="history">

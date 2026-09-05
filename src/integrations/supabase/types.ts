@@ -275,6 +275,9 @@ export type Database = {
           id: string
           input_data: Json | null
           output_data: Json | null
+          revert_reason: string | null
+          reverted_at: string | null
+          reverted_by: string | null
           session_id: string | null
           status: string
           user_id: string | null
@@ -289,6 +292,9 @@ export type Database = {
           id?: string
           input_data?: Json | null
           output_data?: Json | null
+          revert_reason?: string | null
+          reverted_at?: string | null
+          reverted_by?: string | null
           session_id?: string | null
           status?: string
           user_id?: string | null
@@ -303,6 +309,9 @@ export type Database = {
           id?: string
           input_data?: Json | null
           output_data?: Json | null
+          revert_reason?: string | null
+          reverted_at?: string | null
+          reverted_by?: string | null
           session_id?: string | null
           status?: string
           user_id?: string | null
@@ -1569,6 +1578,51 @@ export type Database = {
           tagline?: string | null
           updated_at?: string
           whatsapp?: string
+        }
+        Relationships: []
+      }
+      clinical_ehr_blocks: {
+        Row: {
+          block_hash: string
+          block_index: number
+          created_at: string
+          doctor_id: string | null
+          id: string
+          patient_id: string
+          payload: Json
+          prev_hash: string | null
+          record_type: string
+          reference_id: string | null
+          share_expires_at: string | null
+          share_token: string | null
+        }
+        Insert: {
+          block_hash: string
+          block_index?: number
+          created_at?: string
+          doctor_id?: string | null
+          id?: string
+          patient_id: string
+          payload?: Json
+          prev_hash?: string | null
+          record_type: string
+          reference_id?: string | null
+          share_expires_at?: string | null
+          share_token?: string | null
+        }
+        Update: {
+          block_hash?: string
+          block_index?: number
+          created_at?: string
+          doctor_id?: string | null
+          id?: string
+          patient_id?: string
+          payload?: Json
+          prev_hash?: string | null
+          record_type?: string
+          reference_id?: string | null
+          share_expires_at?: string | null
+          share_token?: string | null
         }
         Relationships: []
       }
@@ -9485,6 +9539,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      revert_ai_agent_action: {
+        Args: { _event_id: string; _reason: string }
+        Returns: {
+          event_id: string
+          reverted_at: string
+        }[]
+      }
       search_scientific_articles: {
         Args: { limit_count?: number; query_text: string }
         Returns: {
@@ -9497,6 +9558,20 @@ export type Database = {
           title: string
           url: string
           year: number
+        }[]
+      }
+      sign_doctor_contract: {
+        Args: {
+          _contract_version?: string
+          _doctor_id: string
+          _signer_ip?: string
+          _signer_user_agent?: string
+        }
+        Returns: {
+          contract_id: string
+          sha512_hash: string
+          signed_at: string
+          signer_ip: string
         }[]
       }
       sync_brisa_vault_secret: { Args: { _value: string }; Returns: string }

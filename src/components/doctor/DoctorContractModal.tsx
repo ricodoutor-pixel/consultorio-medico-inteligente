@@ -76,103 +76,31 @@ export const DoctorContractModal = ({
 
     setSigning(true);
     try {
-      // 1. Obter IP público do signatário
-      let clientIp = "127.0.0.1";
-      try {
-        const ipRes = await fetch("https://api.ipify.org?format=json", { signal: AbortSignal.timeout(3000) });
-        const ipJson = await ipRes.json();
-        if (ipJson?.ip) clientIp = ipJson.ip;
-      } catch {
-        clientIp = "187.12.84.190"; // Fallback BR
+      // Assinatura 100% server-side: hash SHA-512, IP real e user-agent registrados pela RPC.
+      const { data: rpcData, error: rpcError } = await (supabase as any).rpc("sign_doctor_contract", {
+        _doctor_id: doctorData.id,
+        _signer_ip: null,
+        _signer_user_agent: navigator.userAgent.slice(0, 500),
+        _contract_version: "v1.0",
+      });
+
+      if (rpcError) throw rpcError;
+
+      const row = Array.isArray(rpcData) ? rpcData[0] : rpcData;
+      if (!row?.sha512_hash) {
+        throw new Error("O servidor não retornou o comprovante de assinatura. Tente novamente.");
       }
-
-      const userAgent = navigator.userAgent;
-      const timestamp = new Date().toISOString();
-
-      // 2. Gerar Hash Criptográfico SHA-512 no cliente
-      const contractPayload = `CONTRATO-MEDICO-PLANTA-Y-RAIZ|DOC:${doctorData.id}|CRM:${doctorData.crm}|CPF:${doctorCpf}|IP:${clientIp}|DATE:${timestamp}|CFM-2336-2023`;
-      const encoder = new TextEncoder();
-      const data = encoder.encode(contractPayload);
-      const hashBuffer = await crypto.subtle.digest("SHA-512", data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const clientSha512 = hashArray.map(b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
-
-      // 3. Invocar Edge Function generate-doctor-contract (com fallback direto)
-      let finalHash = clientSha512;
-      let finalPdfUrl = `/contracts/${doctorData.id}_contract_v1.html`;
-
-      try {
-        const { data: edgeData, error: edgeErr } = await supabase.functions.invoke("generate-doctor-contract", {
-          body: {
-            doctor_id: doctorData.id,
-            user_id: doctorData.user_id || (await supabase.auth.getUser()).data.user?.id,
-            signer_ip: clientIp,
-            signer_user_agent: userAgent,
-            doctor_full_name: doctorName,
-            doctor_cpf: doctorCpf,
-            doctor_crm: doctorData.crm,
-            doctor_crm_uf: doctorData.crm_state || "SP",
-            contract_version: "v1.0",
-          },
-        });
-
-        if (!edgeErr && edgeData?.sha512_hash) {
-          finalHash = edgeData.sha512_hash;
-          finalPdfUrl = edgeData.pdf_url || finalPdfUrl;
-        }
-      } catch (e) {
-        console.warn("Edge function invocation fallback (saving directly via DB/Storage):", e);
-      }
-
-      // 4. Garantir atualização nas tabelas Supabase
-      const { data: { user } } = await supabase.auth.getUser();
-      const currentUserId = user?.id || doctorData.user_id;
-
-      if (currentUserId && !doctorData.id.startsWith("mock-")) {
-        // Tenta gravar na tabela doctor_contracts
-        try {
-          await supabase.from("doctor_contracts" as any).upsert({
-            doctor_id: doctorData.id,
-            user_id: currentUserId,
-            doctor_full_name: doctorName,
-            doctor_cpf: doctorCpf,
-            doctor_crm: doctorData.crm,
-            doctor_crm_uf: doctorData.crm_state || "SP",
-            status: "signed",
-            signed_at: timestamp,
-            signer_ip: clientIp,
-            signer_user_agent: userAgent,
-            sha512_hash: finalHash,
-            pdf_url: finalPdfUrl,
-          });
-        } catch (dbErr) {
-          console.warn("doctor_contracts upsert fallback:", dbErr);
-        }
-
-        // Atualiza is_contract_signed na tabela doctors
-        try {
-          await supabase.from("doctors").update({ is_contract_signed: true } as any).eq("id", doctorData.id);
-        } catch (docUpErr) {
-          console.warn("doctors update fallback:", docUpErr);
-        }
-      }
-
-      // 5. Salva no localStorage para persistência imediata no preview/sessão
-      localStorage.setItem(`doctor_contract_signed_${doctorData.id}`, "true");
-      localStorage.setItem(`doctor_contract_hash_${doctorData.id}`, finalHash);
-      localStorage.setItem(`doctor_contract_ip_${doctorData.id}`, clientIp);
-      localStorage.setItem(`doctor_contract_date_${doctorData.id}`, timestamp);
 
       setSignedData({
-        sha512_hash: finalHash,
-        signed_at: timestamp,
-        signer_ip: clientIp,
-        pdf_url: finalPdfUrl,
+        sha512_hash: String(row.sha512_hash),
+        signed_at: String(row.signed_at ?? new Date().toISOString()),
+        signer_ip: String(row.signer_ip ?? "registrado"),
       });
 
       setSignedSuccess(true);
       toast.success("✓ Contrato de Credenciamento Médico assinado digitalmente com sucesso! Sua agenda clínica está liberada.");
       onContractSigned?.();
+
     } catch (err: any) {
       console.error(err);
       toast.error("Erro ao assinar contrato: " + (err?.message || "Tente novamente"));

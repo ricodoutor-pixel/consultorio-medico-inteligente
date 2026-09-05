@@ -26,6 +26,8 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { downloadTissGuia } from "@/lib/tiss-export";
+
 
 export interface FiscalInvoice {
   id: string;
@@ -347,6 +349,32 @@ export function PatientInvoicesList({ userId, patientName, patientCpf }: { userI
                       <Download size={14} /> Baixar PDF
                     </Button>
                   </div>
+
+                  {(inv.order_type === "consulta_medica" || inv.invoice_type === "recibo_medico_irpf") && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        try {
+                          downloadTissGuia(inv);
+                          toast({
+                            title: "Guia TISS gerada ✅",
+                            description: "Arquivo XML no padrão ANS TISS 4.01.00 pronto para envio ao seu plano de saúde.",
+                          });
+                        } catch (e) {
+                          toast({
+                            title: "Não foi possível gerar a guia",
+                            description: "Tente novamente em instantes.",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      className="w-full border-sky-500/40 text-sky-300 hover:bg-sky-500/10 font-bold rounded-xl text-xs h-9 flex items-center justify-center gap-1.5"
+                    >
+                      <FileCheck size={14} /> Exportar Guia TISS (XML)
+                    </Button>
+                  )}
+
                 </CardContent>
               </Card>
             );

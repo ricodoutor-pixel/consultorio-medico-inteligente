@@ -4,6 +4,7 @@ import { ComicManual } from './ComicManual';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { SaMDBiofeedbackDisclaimer } from '@/components/compliance/SaMDBiofeedbackDisclaimer';
 
 type ExamPhase = 'intro' | 'measuring' | 'analyzing' | 'result';
 
@@ -134,6 +135,8 @@ export function OximetriaOptica({ onComplete }: { onComplete?: () => void }) {
                 <p className="text-[11px] text-slate-600 leading-tight">Análise em tempo real</p>
               </div>
             </div>
+
+            <SaMDBiofeedbackDisclaimer compact toolName="A oximetria óptica digital por câmera" />
 
             <Button onClick={startCamera} size="lg" className="w-full max-w-sm rounded-xl h-14 text-base shadow-lg shadow-primary/25">
               <Camera className="w-5 h-5 mr-2" /> Iniciar Medição
@@ -294,6 +297,8 @@ export function OximetriaOptica({ onComplete }: { onComplete?: () => void }) {
                   )}
                 </AnimatePresence>
               </div>
+
+              <SaMDBiofeedbackDisclaimer compact toolName="Este parecer de oximetria por fotopletismografia" />
             </div>
 
             <div className="mt-auto pt-6 flex gap-3">

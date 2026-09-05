@@ -644,7 +644,7 @@ export default function CadastroFarmacia() {
 
               <div className="space-y-3">
                 {[
-                  { id: "t-truth", checked: agreedTruth, set: setAgreedTruth, text: "Declaro, sob as penas da lei, que todos os dados cadastrais e documentos enviados são verdaderos, autênticos e de minha exclusiva responsabilidade, ciente das sanções dos arts. 297 a 299 do Código Penal em caso de falsidade." },
+                  { id: "t-truth", checked: agreedTruth, set: setAgreedTruth, text: "Declaro, sob as penas da lei, que todos os dados cadastrais e documentos enviados são verdadeiros, autênticos e de minha exclusiva responsabilidade, ciente das sanções dos arts. 297 a 299 do Código Penal em caso de falsidade." },
                   { id: "t-reg", checked: agreedRegulatory, set: setAgreedRegulatory, text: "Assumo integralmente a responsabilidade sanitária e regulatória da operação (ANVISA RDC 327/2019, RDC 660/2022, CRF, alvará sanitário e licenças municipais/estaduais válidas)." },
                   { id: "t-liab", checked: agreedLiability, set: setAgreedLiability, text: "Assumo a responsabilidade civil, fiscal e consumerista pelos produtos (qualidade, procedência, validade, nota fiscal, entrega e eventos adversos) e isento a Planta y Raiz Ltda, mera intermediadora tecnológica, de qualquer autuação ou reclamação decorrente da minha operação." },
                   { id: "terms-check", checked: agreedTerms, set: setAgreedTerms, text: "Concordo com a taxa de intermediação de 5% sobre produtos faturados no marketplace da Planta y Raíz Ltda (CNPJ 58.283.475/0001-00), com repasse de 95%, e com a regra de que minha loja só será exibida na vitrine após a homologação do compliance." },

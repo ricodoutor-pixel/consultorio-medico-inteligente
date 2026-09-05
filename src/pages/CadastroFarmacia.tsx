@@ -547,6 +547,21 @@ export default function CadastroFarmacia() {
                       className="rounded-xl bg-muted/30 border-border text-sm"
                     />
                   </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold">ID de Vendedor Mercado Pago (collector_id) *</Label>
+                    <Input
+                      required
+                      placeholder="Ex: 123456789"
+                      value={formData.mp_collector_id}
+                      onChange={(e) => setFormData({ ...formData, mp_collector_id: e.target.value })}
+                      className="rounded-xl bg-muted/30 border-border text-sm"
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                      Mercado Pago → Seu negócio → Configurações → Credenciais (User ID). Sem esse número o repasse
+                      automático de 95% não pode ser feito e as vendas ficam bloqueadas.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>

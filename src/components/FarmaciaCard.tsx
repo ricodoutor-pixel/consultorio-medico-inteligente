@@ -64,12 +64,12 @@ export function FarmaciaCard({ vendor, onClick }: FarmaciaCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
           {/* Logotipo Oficial — 100% visível, sem corte */}
-          <div className="absolute -bottom-4 left-4 z-10">
+          <div className="absolute bottom-2 left-4 z-20">
             <div className="w-16 h-16 rounded-xl border-2 border-emerald-500 bg-white p-1 flex items-center justify-center shadow-2xl ring-2 ring-black/30 group-hover:scale-105 transition-transform duration-300">
               <img
                 src={logoSrc}
                 alt={storeName}
-                className="w-[80%] h-[80%] object-contain"
+                className="w-[72%] h-[72%] object-contain"
                 loading="eager"
               />
             </div>

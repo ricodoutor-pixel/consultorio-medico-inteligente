@@ -106,7 +106,10 @@ export function FarmaciaCard({ vendor, onClick }: FarmaciaCardProps) {
 
           {/* Produto em destaque */}
           {vendor?.featured_product && (
-            <div className="bg-muted/40 rounded-xl p-2.5 mb-2 flex items-center gap-2.5 border border-border/50">
+            <div className="bg-muted/40 rounded-xl p-2.5 mb-2 flex items-center gap-2.5 border border-border/50 relative">
+              <span className="absolute -top-2 left-2.5 text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-emerald-600 text-white shadow">
+                {(vendor.featured_product.offer_label || "oferta") === "promocao" ? "Promoção" : "Oferta"}
+              </span>
               <div className="w-10 h-10 rounded-lg bg-background overflow-hidden flex-shrink-0 border border-border/50">
                 <img
                   src={resolveProductImg(vendor.featured_product.image_url)}
@@ -124,6 +127,7 @@ export function FarmaciaCard({ vendor, onClick }: FarmaciaCardProps) {
           )}
         </div>
       </div>
+
 
       <div className="px-4 pb-4 pt-1">
         <Button

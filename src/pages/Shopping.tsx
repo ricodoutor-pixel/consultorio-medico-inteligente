@@ -606,45 +606,47 @@ const Shopping = () => {
 
       .then(async ({ data: vData }) => {
         const official = vData?.find(v => v.store_name.toLowerCase().includes("planta")) || vData?.[0];
-        
-        if (official) {
-          setVerifiedVendors([{
-            id: official.id,
-            store_name: "Planta y Raiz Ltda",
-            store_logo_url: "/logo-farmacia.jpg",
-            store_banner_url: "/farmacia-fachada.jpg",
-            rating: Number(official.rating || 5.0),
-            total_sales: Number(official.total_sales || 48),
-            is_verified: true,
-            city: "São Paulo",
-            state: "SP",
-            featured_product: {
-              name: "Epidiolex / Epidyolex (Canabidiol 100 mg/mL)",
-              price: 2450.00,
-              image_url: "/src/assets/products/oleo-cbd-1.jpg",
-              category: "oleo"
-            }
-          }]);
-        } else {
-          // Fallback robusto para Planta y Raiz Ltda
-          setVerifiedVendors([{
-            id: "vendor-pyr-oficial",
-            store_name: "Planta y Raiz Ltda",
-            store_logo_url: "/logo-farmacia.jpg",
-            store_banner_url: "/farmacia-fachada.jpg",
-            rating: 5.0,
-            total_sales: 48,
-            is_verified: true,
-            city: "São Paulo",
-            state: "SP",
-            featured_product: {
-              name: "Epidiolex / Epidyolex (Canabidiol 100 mg/mL)",
-              price: 2450.00,
-              image_url: "/src/assets/products/oleo-cbd-1.jpg",
-              category: "oleo"
-            }
-          }]);
+
+        const FALLBACK_OFFER = {
+          name: "Epidiolex / Epidyolex (Canabidiol 100 mg/mL)",
+          price: 2450.00,
+          image_url: "/src/assets/products/oleo-cbd-1.jpg",
+          category: "oleo",
+          offer_label: "oferta",
+        };
+
+        let offer: any = FALLBACK_OFFER;
+        if (official?.id) {
+          const { data: offerRow } = await supabase
+            .from("vendor_products")
+            .select("name, price, image_url, category, offer_label")
+            .eq("vendor_id", official.id)
+            .eq("is_featured_offer", true)
+            .eq("is_active", true)
+            .maybeSingle();
+          if (offerRow) {
+            offer = {
+              name: offerRow.name,
+              price: Number(offerRow.price || 0),
+              image_url: offerRow.image_url,
+              category: offerRow.category,
+              offer_label: (offerRow as any).offer_label || "oferta",
+            };
+          }
         }
+
+        setVerifiedVendors([{
+          id: official?.id || "vendor-pyr-oficial",
+          store_name: "Planta y Raiz Ltda",
+          store_logo_url: "/logo-farmacia.jpg",
+          store_banner_url: "/farmacia-fachada.jpg",
+          rating: Number(official?.rating || 5.0),
+          total_sales: Number(official?.total_sales || 48),
+          is_verified: true,
+          city: "São Paulo",
+          state: "SP",
+          featured_product: offer,
+        }]);
       })
       .catch(() => {
         setVerifiedVendors([{
@@ -661,10 +663,12 @@ const Shopping = () => {
             name: "Epidiolex / Epidyolex (Canabidiol 100 mg/mL)",
             price: 2450.00,
             image_url: "/src/assets/products/oleo-cbd-1.jpg",
-            category: "oleo"
+            category: "oleo",
+            offer_label: "oferta",
           }
         }]);
       });
+
 
     // 2. Carregar produtos
     prefetchProducts().then(data => {

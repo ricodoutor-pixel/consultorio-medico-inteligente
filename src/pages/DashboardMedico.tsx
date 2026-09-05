@@ -11,7 +11,7 @@ import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, FileBarChart, Brain, Flame, RefreshCw, ClipboardCheck, Loader2, Camera, UserCircle2, MessageCircle, Network, Settings, BookOpen, ArrowRight } from "lucide-react";
+import { DollarSign, Users, FileText, Star, TrendingUp, Clock, Video, Calendar, Stethoscope, Bell, CheckCircle2, Pill, Activity, MessageSquare, AlertTriangle, Leaf, Watch, Shield, ShieldCheck, FileBarChart, Brain, Flame, RefreshCw, ClipboardCheck, Loader2, Camera, UserCircle2, MessageCircle, Network, Settings, BookOpen, ArrowRight } from "lucide-react";
 import { EvolutionChart } from "@/components/EvolutionChart";
 import { motion } from "framer-motion";
 import { DoctorPerformanceWidget } from "@/components/doctor/DoctorPerformanceWidget";
@@ -23,6 +23,7 @@ import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { VipUpgradePopup } from "@/components/VipUpgradePopup";
 import { VIPExpirationAlert } from "@/components/doctor/VIPExpirationAlert";
 import { DoctorSchedule } from "@/components/doctor/DoctorSchedule";
+import { DoctorContractModal } from "@/components/doctor/DoctorContractModal";
 
 import { DoctorAuxDiagnosticTools } from "@/components/doctor/DoctorAuxDiagnosticTools";
 import { IoTBiometricTracker } from "@/components/IoTBiometricTracker";
@@ -58,6 +59,8 @@ const DashboardMedico = () => {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [dosageNotes, setDosageNotes] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [hasAvailability, setHasAvailability] = useState<boolean | null>(null);
+  const [contractModalOpen, setContractModalOpen] = useState(false);
 
   useEffect(() => {
     fetchDoctorData();
@@ -70,7 +73,7 @@ const DashboardMedico = () => {
     try {
       const [{ data: doctorRaw }, { data: profileRaw }] = await Promise.all([
         supabase.from("doctors").select("*").eq("user_id", session.user.id).single(),
-        supabase.from("profiles").select("full_name, avatar_url").eq("id", session.user.id).maybeSingle(),
+        supabase.from("profiles").select("full_name, avatar_url, cpf").eq("id", session.user.id).maybeSingle(),
       ]);
 
       let doctor = doctorRaw;
@@ -80,15 +83,15 @@ const DashboardMedico = () => {
       if (!doctor) {
          const email = session.user.email?.toLowerCase() || '';
          if (email.includes('olivia')) {
-             doctor = { id: 'mock-olivia', user_id: session.user.id, crm: '87654', crm_state: 'SP', specialty: 'Médicos Prescritores', is_online: false } as any;
-             profile = { full_name: 'Dra. Olivia Zimeri', avatar_url: '/dra-olivia-avatar.jpg' };
+             doctor = { id: 'mock-olivia', user_id: session.user.id, crm: '87654', crm_state: 'SP', specialty: 'Médicos Prescritores', is_online: false, is_contract_signed: true } as any;
+             profile = { full_name: 'Dra. Olivia Zimeri', avatar_url: '/dra-olivia-avatar.jpg', cpf: '123.456.789-00' } as any;
          } else if (email.includes('suelen')) {
-             doctor = { id: 'mock-suelen', user_id: session.user.id, crm: '49354', crm_state: 'SP', specialty: 'Médicos Prescritores', is_online: false } as any;
-             profile = { full_name: 'Dr. Edilson Bezerra', avatar_url: '/dra-suelen-avatar.jpg' };
+             doctor = { id: 'mock-suelen', user_id: session.user.id, crm: '49354', crm_state: 'PR', specialty: 'Supervisora Técnica', is_online: false, is_contract_signed: true } as any;
+             profile = { full_name: 'Dra. Suelen Naves Rodrigues', avatar_url: '/dra-suelen-avatar.jpg', cpf: '987.654.321-00' } as any;
          } else {
              // Fallback default (Dr. Edilson)
-             doctor = { id: 'mock-edilson', user_id: session.user.id, crm: '10963', crm_state: 'Sta-Cruz Bo', specialty: 'Médicos Prescritores', is_online: false } as any;
-             profile = { full_name: 'Dr. Edilson Bezerra', avatar_url: '/dr-edilson-avatar.jpg' };
+             doctor = { id: 'mock-edilson', user_id: session.user.id, crm: '10963', crm_state: 'Sta-Cruz Bo', specialty: 'Médicos Prescritores', is_online: false, is_contract_signed: true } as any;
+             profile = { full_name: 'Dr. Edilson Bezerra', avatar_url: '/dr-edilson-avatar.jpg', cpf: '054.764.445-90' } as any;
          }
       }
 
@@ -97,6 +100,13 @@ const DashboardMedico = () => {
 
       if (doctor) {
         setIsOnline(doctor.is_online);
+
+        const isSigned = Boolean(
+          (doctor as any)?.is_contract_signed || (doctor as any)?.contract_signed_at
+        );
+        if (!isSigned) {
+          setTimeout(() => setContractModalOpen(true), 800);
+        }
 
         if (doctor.id.startsWith('mock-')) {
           const localStatus = localStorage.getItem(`mock_online_${doctor.id}`);
@@ -126,6 +136,14 @@ const DashboardMedico = () => {
           .limit(1)
           .maybeSingle();
         if (sub?.plan_tier) setCurrentTier(sub.plan_tier);
+
+        const { count: availCount } = await supabase
+          .from("doctor_availability")
+          .select("id", { count: "exact", head: true })
+          .eq("doctor_id", doctor.id)
+          .gte("slot_date", new Date().toISOString().split('T')[0]);
+        
+        setHasAvailability(availCount !== null && availCount > 0);
       }
     } catch (e) {
       console.error(e);
@@ -428,6 +446,21 @@ const DashboardMedico = () => {
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Acessar Telemed
                 </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setContractModalOpen(true)}
+                  className={`text-xs rounded-full font-bold border transition-all ${
+                    (doctorData?.is_contract_signed || doctorData?.contract_signed_at)
+                      ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/25 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
+                      : 'bg-amber-500/20 border-amber-500/50 text-amber-300 hover:bg-amber-500/30 animate-pulse shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                  }`}
+                >
+                  <ShieldCheck size={14} className="mr-1.5" />
+                  {(doctorData?.is_contract_signed || doctorData?.contract_signed_at)
+                    ? 'CONTRATO CFM ASSINADO'
+                    : 'ASSINAR CONTRATO CFM'}
+                </Button>
                 <Link to="/manual?tab=medico">
                   <span 
                     className="inline-flex items-center justify-center gap-1.5 bg-background border-2 border-primary/20 text-primary rounded-full px-4 py-2 text-sm font-black hover:bg-primary/10 transition-all transform hover:scale-105 cursor-pointer shadow-[0_0_15px_rgba(255,255,255,0.05)]"
@@ -465,6 +498,23 @@ const DashboardMedico = () => {
                     <p className="font-bold text-foreground">Cadastro em Análise</p>
                     <p className="text-sm text-muted-foreground">Seu cadastro e documentos estão em análise pela Administração. O seu Card Online será liberado em breve.</p>
                   </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {doctorData && doctorData.is_approved_by_admin && hasAvailability === false && (
+              <Card className="border-emerald-500/30 bg-emerald-500/10 mb-8 animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                <CardContent className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <Calendar size={28} className="text-emerald-500 shrink-0" />
+                    <div>
+                      <p className="font-bold text-foreground text-lg">Abertura de Horários Pendente!</p>
+                      <p className="text-sm text-muted-foreground">Configure suas grades de disponibilidade semanal no Consultório Virtual para que o paciente encontre horários livres em qualquer dia.</p>
+                    </div>
+                  </div>
+                  <Button asChild className="bg-emerald-600 hover:bg-emerald-500 font-bold whitespace-nowrap">
+                    <Link to="/configuracoes-medico">Configurar Grade <ArrowRight className="ml-2 w-4 h-4"/></Link>
+                  </Button>
                 </CardContent>
               </Card>
             )}
@@ -984,6 +1034,16 @@ const DashboardMedico = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <DoctorContractModal
+        open={contractModalOpen}
+        onOpenChange={setContractModalOpen}
+        doctorData={doctorData}
+        profileData={profileData}
+        onContractSigned={() => {
+          fetchDoctorData();
+        }}
+      />
     </div>
   );
 };

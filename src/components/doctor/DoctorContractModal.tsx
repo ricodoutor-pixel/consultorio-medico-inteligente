@@ -177,16 +177,6 @@ export const DoctorContractModal = ({
         }
       }
 
-      // 5. Salva no localStorage apenas como cache de sessão do navegador
-      localStorage.setItem(`doctor_contract_signed_${doctorData.id}`, "true");
-      localStorage.setItem(`doctor_contract_hash_${doctorData.id}`, finalHash);
-      if (clientIp) {
-        localStorage.setItem(`doctor_contract_ip_${doctorData.id}`, clientIp);
-      } else {
-        localStorage.removeItem(`doctor_contract_ip_${doctorData.id}`);
-      }
-      localStorage.setItem(`doctor_contract_date_${doctorData.id}`, timestamp);
-
       setSignedData({
         sha512_hash: finalHash,
         signed_at: timestamp,

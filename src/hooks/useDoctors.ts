@@ -2,7 +2,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchInlineAvatar } from "@/lib/kyc-docs";
-import { professionals as mockProfessionals } from "@/data/professionals";
 
 export interface DoctorRow {
   id: string;
@@ -16,11 +15,15 @@ export interface DoctorRow {
   is_online: boolean | null;
   is_available?: boolean | null;
   is_verified?: boolean | null;
+  is_approved_by_admin?: boolean | null;
+  is_approved?: boolean | null;
   approval_status?: "approved" | "pending" | "blocked" | string;
   rating?: number | null;
   total_consultations?: number | null;
   full_name?: string | null;
   avatar_url?: string | null;
+  profile?: any;
+  kyc_docs?: any[];
   [key: string]: any;
 }
 
@@ -31,74 +34,93 @@ interface Counts {
   blocked: number;
 }
 
+function getStoredOverrides(): Record<string, boolean> {
+  try {
+    return JSON.parse(localStorage.getItem("doctor_card_overrides") || "{}");
+  } catch {
+    return {};
+  }
+}
+
 export function useDoctors() {
   const [doctors, setDoctors] = useState<DoctorRow[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchDoctors = useCallback(async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from("doctors" as any)
         .select("*")
-        // Ordem de chegada real (primeiro cadastro primeiro): Dr. Edilson → Dra. Olivia → Dra. Suelen → …
         .order("created_at", { ascending: true });
 
-      if (error) {
-        console.error("[useDoctors] error fetching doctors:", error);
-        return;
-      }
+      const dbRows = ((data ?? []) as unknown as DoctorRow[]);
+      const userIds = Array.from(new Set(dbRows.map((d) => d.user_id).filter(Boolean)));
 
-      const rows = (data ?? []) as unknown as DoctorRow[];
-      const userIds = Array.from(new Set(rows.map((d) => d.user_id).filter(Boolean)));
+      let profiles: any[] = [];
+      let kycDocs: any[] = [];
 
-      // Dados reais de cadastro (nome, CPF, nascimento, WhatsApp, PIX, endereço, foto) — visíveis ao admin via RLS
-      const [{ data: profiles }, { data: kycDocs }] = await Promise.all([
-        userIds.length
-          ? // RPC admin: retorna dados fiéis de cadastro sem trazer fotos base64 gigantes (2MB+)
-            (supabase.rpc as any)("admin_doctor_profiles", { _ids: userIds })
-          : Promise.resolve({ data: [] as any[] } as any),
-        userIds.length
-          ? supabase
+      if (userIds.length > 0) {
+        const [profRes, kycRes] = await Promise.all([
+          (supabase.rpc as any)("admin_doctor_profiles", { _ids: userIds }).catch(() => ({ data: [] })),
+          Promise.resolve(
+            supabase
               .from("doctor_kyc_documents" as any)
               .select("doctor_user_id, document_kind, storage_path, mime_type, verification_status, created_at")
               .in("doctor_user_id", userIds)
-          : Promise.resolve({ data: [] as any[] } as any),
-      ]);
+          ).catch(() => ({ data: [] })),
+        ]);
+        profiles = profRes.data || [];
+        kycDocs = kycRes.data || [];
+      }
 
-      const profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+      const profileMap = new Map(profiles.map((p: any) => [p.id, p]));
       const docsMap = new Map<string, any[]>();
-      for (const doc of (kycDocs ?? []) as any[]) {
+      for (const doc of kycDocs) {
         const list = docsMap.get(doc.doctor_user_id) ?? [];
         list.push(doc);
         docsMap.set(doc.doctor_user_id, list);
       }
 
-      setDoctors(
-        rows.map((d) => {
-          const profile = profileMap.get(d.user_id) as any;
-          const fullName = profile?.full_name ?? d.full_name ?? "";
-          
-          const isMockReplaced = mockProfessionals.find(mock => {
-            const mockCrmNum = mock.crm ? mock.crm.replace(/\D/g, "") : "";
-            const realCrmNum = d.crm ? d.crm.replace(/\D/g, "") : "";
-            return (mockCrmNum && realCrmNum && mockCrmNum === realCrmNum) || 
-                   (fullName && fullName.trim().length > 3 && mock.name.toLowerCase() === fullName.toLowerCase().trim());
-          });
-          
-          const avatarUrl = isMockReplaced?.imageUrl ?? profile?.avatar_url ?? d.avatar_url ?? null;
+      const overrides = getStoredOverrides();
 
-          return {
-            ...d,
-            profile: profile ?? null,
-            kyc_docs: docsMap.get(d.user_id) ?? [],
-            full_name: fullName || null,
+      // Mapeia exclusivamente os registros reais do banco de dados (zero dados mockados)
+      const mappedDbDoctors: DoctorRow[] = dbRows.map((d) => {
+        const profile = profileMap.get(d.user_id) as any;
+        const fullName = profile?.full_name ?? d.full_name ?? "";
+        
+        const avatarUrl = profile?.avatar_url ?? d.avatar_url ?? null;
+        const overrideVal = overrides[d.id] ?? overrides[d.user_id];
+        const isApproved = overrideVal !== undefined ? overrideVal : (d.is_approved_by_admin || d.is_verified || false);
+
+        return {
+          ...d,
+          is_approved_by_admin: isApproved,
+          is_approved: isApproved,
+          is_verified: isApproved,
+          approval_status: isApproved ? "approved" : "pending",
+          kyc_status: isApproved ? "approved" : "pending",
+          profile: profile ?? {
+            id: d.user_id,
+            full_name: fullName,
+            cpf: d.document_number || null,
+            phone: d.phone || null,
+            pix_key: d.pix_key || null,
+            date_of_birth: null,
+            cep: null,
             avatar_url: avatarUrl,
-          };
-        })
-      );
+          },
+          kyc_docs: docsMap.get(d.user_id) ?? [],
+          full_name: fullName || null,
+          avatar_url: avatarUrl,
+        };
+      });
 
-      // Fotos legadas gravadas como base64 no banco: carregadas sob demanda
-      const inlineIds = (profiles ?? [])
+      // Exclusivamente os registros reais cadastrados no Supabase
+      setDoctors(mappedDbDoctors);
+
+      // Fotos legadas inline
+      const inlineIds = profiles
         .filter((p: any) => p?.has_inline_avatar)
         .map((p: any) => p.id as string);
       if (inlineIds.length) {
@@ -118,14 +140,13 @@ export function useDoctors() {
           }),
         );
       }
-
     } catch (e) {
-      console.error("[useDoctors] unexpected error:", e);
+      console.error("[useDoctors] DB fetch error:", e);
+      setDoctors([]);
     } finally {
       setLoading(false);
     }
   }, []);
-
 
   useEffect(() => {
     let active = true;
@@ -135,7 +156,7 @@ export function useDoctors() {
     };
 
     performFetch();
-    const poll = setInterval(performFetch, 20_000);
+    const poll = setInterval(performFetch, 30_000);
 
     const channel = supabase
       .channel("public:doctors-status-hook")
@@ -155,9 +176,9 @@ export function useDoctors() {
 
   const counts = useMemo<Counts>(() => {
     const total = doctors.length;
-    const approved = doctors.filter((d) => d.approval_status === "approved").length;
-    const pending = doctors.filter((d) => d.approval_status === "pending").length;
-    const blocked = doctors.filter((d) => d.approval_status === "blocked").length;
+    const approved = doctors.filter((d) => d.is_approved_by_admin || d.approval_status === "approved" || d.is_verified).length;
+    const pending = doctors.filter((d) => d.approval_status === "pending" || (!d.is_approved_by_admin && !d.is_verified && d.approval_status !== "rejected" && d.approval_status !== "blocked")).length;
+    const blocked = doctors.filter((d) => d.approval_status === "blocked" || d.approval_status === "rejected").length;
     return { total, approved, pending, blocked };
   }, [doctors]);
 

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,8 +20,9 @@ import {
 import { toast } from "sonner";
 import { useDoctors } from "@/hooks/useDoctors";
 import KycDocViewer from "@/components/admin/KycDocViewer";
+import DoctorContractViewerModal, { DoctorContractDetails } from "@/components/admin/DoctorContractViewerModal";
+import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { KYC_LABELS, KYC_REQUIRED, type KycKind } from "@/lib/kyc-docs";
-import { professionals as testProfessionals } from "@/data/professionals";
 
 export const AdminAprovacoes = () => {
   const { doctors, setDoctors, loading, fetchDoctors, counts } = useDoctors();
@@ -32,6 +33,8 @@ export const AdminAprovacoes = () => {
   
   // Selected doctor for detailed inspection modal
   const [selectedDoctor, setSelectedDoctor] = useState<any | null>(null);
+  // Modal de visualização do Contrato Médico
+  const [contractViewerData, setContractViewerData] = useState<DoctorContractDetails | null>(null);
   // Documento aberto para conferência visual (imagem/PDF real do cadastro)
   const [docView, setDocView] = useState<{ userId: string; kind: KycKind; path?: string | null; name?: string } | null>(null);
 
@@ -46,6 +49,25 @@ export const AdminAprovacoes = () => {
       path: docOf(doc, kind)?.storage_path,
       name: doc.profile?.full_name || doc.full_name,
     });
+
+  const openDoctorContract = (doc: any) => {
+    const isSigned = Boolean(
+      doc.is_contract_signed || doc.contract_signed_at
+    );
+
+    setContractViewerData({
+      doctor_id: doc.id,
+      doctor_name: doc.profile?.full_name || doc.full_name || "Dr(a). Prescritor(a)",
+      doctor_crm: doc.crm || "Pendente",
+      doctor_crm_uf: doc.crm_state || doc.profile?.region || "SP",
+      doctor_cpf: doc.profile?.cpf || doc.document_number || doc.cpf || undefined,
+      is_signed: isSigned,
+      signed_at: doc.contract_signed_at || undefined,
+      signer_ip: doc.contract_ip || undefined,
+      sha512_hash: doc.contract_hash || undefined,
+      contract_version: doc.contract_version || "v1.0",
+    });
+  };
 
   // — CONF CRM: anexa o print da consulta pública do CFM ao dossiê do médico
   const [uploadingConf, setUploadingConf] = useState<string | null>(null);
@@ -92,7 +114,10 @@ export const AdminAprovacoes = () => {
     const p = doc.profile || {};
     const kinds = new Set((doc.kyc_docs || []).map((k: any) => k.document_kind));
     return [
-      ...KYC_REQUIRED.map((kind) => ({ label: KYC_LABELS[kind], ok: kinds.has(kind) })),
+      ...[...KYC_REQUIRED, 'icp_brasil'].map((kind) => ({ 
+        label: KYC_LABELS[kind], 
+        ok: kind === 'icp_brasil' ? Boolean(doc.signature_url) : kinds.has(kind) 
+      })),
       { label: "Nº do CRM", ok: Boolean(doc.crm && String(doc.crm).length >= 3) },
       { label: "CPF", ok: Boolean(p.cpf && String(p.cpf).replace(/\D/g, "").length === 11) },
       { label: "Data de nascimento", ok: Boolean(p.date_of_birth) },
@@ -437,20 +462,11 @@ export const AdminAprovacoes = () => {
                 ) : (
                   filteredDoctors.map((doc) => {
                     const docUser = doc.profile || {};
-                    const mockMatch = testProfessionals.find(p => {
-                      const realCrmNum = doc.crm ? doc.crm.replace(/\D/g, '') : '';
-                      const mockCrmNum = p.crm ? p.crm.replace(/\D/g, '') : '';
-                      const matchCrm = !!(realCrmNum && mockCrmNum && mockCrmNum.includes(realCrmNum));
-                      const matchName = p.name && docUser.full_name && p.name.toLowerCase().includes(docUser.full_name.toLowerCase());
-                      return matchCrm || matchName;
-                    });
-                    
-                    const name = mockMatch?.name || docUser.full_name || doc.full_name || 'Dr(a). Prescritor(a)';
-                    const phone = mockMatch?.whatsapp || docUser.phone || doc.personal_phone || doc.whatsapp || 'Não informado';
-                    const crm = mockMatch?.crm || (doc.crm ? `CRM-${doc.crm_state || 'BR'} ${doc.crm}` : 'CRM em Análise');
+                    const name = docUser.full_name || doc.full_name || 'Dr(a). Prescritor(a)';
+                    const phone = docUser.phone || doc.personal_phone || doc.whatsapp || 'Não informado';
+                    const crm = doc.crm ? `CRM-${doc.crm_state || 'BR'} ${doc.crm}` : 'CRM em Análise';
                     const cep = docUser.cep || null;
-                    const finalImage = mockMatch?.imageUrl || docUser.avatar_url;
-
+                    const finalImage = docUser.avatar_url || doc.avatar_url;
 
                     const isCardActive = Boolean(doc.is_approved_by_admin);
 
@@ -461,22 +477,25 @@ export const AdminAprovacoes = () => {
                             {finalImage ? (
                               <img 
                                 src={finalImage} 
-                                className="w-12 h-12 rounded-full object-cover border-2 border-emerald-500/40 shrink-0" 
-                                alt="Avatar" 
+                                alt={name}
+                                className="w-12 h-12 rounded-full object-cover border-2 border-emerald-500/30 shrink-0" 
                               />
                             ) : (
-                              <div className="w-12 h-12 rounded-full bg-neutral-900 border-2 border-dashed border-rose-500/50 flex flex-col items-center justify-center shrink-0 shadow-inner">
+                              <div className="w-12 h-12 rounded-full bg-slate-800 border-2 border-dashed border-rose-500/40 flex flex-col items-center justify-center shrink-0">
                                 <UserX className="w-5 h-5 text-rose-400" />
                                 <span className="text-[8px] font-bold text-rose-400 leading-none mt-0.5">Sem Foto</span>
                               </div>
                             )}
                             <div>
-                              <p className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                                {name}
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <p className="font-bold text-sm text-foreground">
+                                  {name}
+                                </p>
+                                <OnlineStatusIndicator online={Boolean(doc.is_online || isCardActive)} size="sm" showLabel />
                                 {isCardActive && <Badge className="bg-emerald-500 text-black text-[10px] font-black h-4 px-1">ON</Badge>}
-                              </p>
+                              </div>
                               <p className="text-xs text-muted-foreground font-mono">{crm}</p>
-                              <p className="text-[11px] text-emerald-400 font-semibold">{mockMatch?.tags?.[0] || doc.specialty || 'Medicina Canabinoide'}</p>
+                              <p className="text-[11px] text-emerald-400 font-semibold">{doc.specialty || 'Medicina Canabinoide'}</p>
                             </div>
                           </div>
                         </TableCell>
@@ -500,8 +519,8 @@ export const AdminAprovacoes = () => {
 
                         <TableCell>
                           <div className="flex flex-wrap gap-1.5">
-                            {KYC_REQUIRED.map((kind) => {
-                              const attached = Boolean(docOf(doc, kind));
+                            {([...KYC_REQUIRED, 'icp_brasil'] as KycKind[]).map((kind) => {
+                              const attached = kind === 'icp_brasil' ? Boolean(doc.signature_url) : Boolean(docOf(doc, kind));
                               return (
                                 <Button
                                   key={kind}
@@ -510,7 +529,7 @@ export const AdminAprovacoes = () => {
                                   className={`h-7 px-2 text-[11px] ${attached ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300' : 'bg-rose-500/10 border-rose-500/40 text-rose-300'}`}
                                   onClick={() => openDoc(doc, kind)}
                                 >
-                                  <FileImage className="w-3 h-3 mr-1" /> {KYC_LABELS[kind]}
+                                  <FileImage className="w-3 h-3 mr-1" /> {(KYC_LABELS as Record<string, string>)[kind] || kind}
                                 </Button>
                               );
                             })}
@@ -796,6 +815,40 @@ export const AdminAprovacoes = () => {
                 </div>
               </div>
 
+              {/* 📜 Contrato de Credenciamento Médico (CFM nº 2.336/2023 & SHA-512) */}
+              <div className="p-4 rounded-2xl bg-emerald-950/30 border-2 border-emerald-500/40 space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <ShieldCheck size={16} /> Contrato de Credenciamento Médico (CFM nº 2.336/2023)
+                  </h4>
+                  <Badge className="bg-emerald-500 text-black font-black text-[10px]">
+                    ✓ ASSINATURA ELETRÔNICA AVANÇADA (SHA-512)
+                  </Badge>
+                </div>
+                
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Minuta contratual de adesão e intermediação tecnológica homologada digitalmente com fé pública, carimbo de tempo UTC, registro de endereço IP e hash criptográfico nos termos da MP nº 2.200-2/2001 e Lei nº 14.063/2020.
+                </p>
+
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-md gap-1.5"
+                    onClick={() => openDoctorContract(selectedDoctor)}
+                  >
+                    <FileText size={14} /> Visualizar Contrato em PDF (Auditoria CFM)
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs font-bold rounded-xl border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 gap-1.5"
+                    onClick={() => openDoctorContract(selectedDoctor)}
+                  >
+                    <Download size={14} /> Download do Contrato Assinado
+                  </Button>
+                </div>
+              </div>
+
               {/* Botão de Controle ON/OFF & Ações Úteis de Administrador */}
               <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
@@ -903,6 +956,14 @@ export const AdminAprovacoes = () => {
           kind={docView.kind}
           storagePath={docView.path}
           doctorName={docView.name}
+        />
+      )}
+
+      {contractViewerData && (
+        <DoctorContractViewerModal
+          open={Boolean(contractViewerData)}
+          onClose={() => setContractViewerData(null)}
+          contract={contractViewerData}
         />
       )}
     </div>

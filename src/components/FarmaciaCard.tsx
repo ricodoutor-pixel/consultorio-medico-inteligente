@@ -69,7 +69,7 @@ export function FarmaciaCard({ vendor, onClick }: FarmaciaCardProps) {
               <img
                 src={logoSrc}
                 alt={storeName}
-                className="w-full h-full object-contain"
+                className="w-[80%] h-[80%] object-contain"
                 loading="eager"
               />
             </div>

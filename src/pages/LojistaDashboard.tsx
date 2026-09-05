@@ -506,7 +506,13 @@ export default function LojistaDashboard() {
             </div>
           </TabsContent>
 
+          {/* ABA: RECEITAS RECEBIDAS COM PROTOCOLO (DADOS REAIS) */}
+          <TabsContent value="protocolos" className="space-y-6">
+            <PharmacyPrescriptionProtocols />
+          </TabsContent>
+
           {/* ABA 2: RECEITAS & DISPENSAÇÃO INTERATIVA */}
+
           <TabsContent value="inbox" className="space-y-6">
             <Card className="border-border">
               <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">

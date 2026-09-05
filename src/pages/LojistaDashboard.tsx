@@ -408,14 +408,18 @@ export default function LojistaDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 h-auto bg-muted/60 p-1.5 rounded-2xl border border-border">
+          <TabsList className="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 h-auto bg-muted/60 p-1.5 rounded-2xl border border-border">
             <TabsTrigger value="overview" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Visão Geral</TabsTrigger>
             <TabsTrigger value="rastreio" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-emerald-400">
               <Truck size={14} className="mr-1 inline" /> Rastreamento
             </TabsTrigger>
+            <TabsTrigger value="protocolos" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-sky-400">
+              <FileSignature size={14} className="mr-1 inline" /> Receitas Recebidas
+            </TabsTrigger>
             <TabsTrigger value="inbox" className="py-3 font-bold text-xs sm:text-sm rounded-xl">
               Receitas ({pendingRxCount})
             </TabsTrigger>
+
             <TabsTrigger value="catalog" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Catálogo</TabsTrigger>
             <TabsTrigger value="financial" className="py-3 font-bold text-xs sm:text-sm rounded-xl">Financeiro</TabsTrigger>
             <TabsTrigger value="kyc" className="py-3 font-bold text-xs sm:text-sm rounded-xl text-amber-400">

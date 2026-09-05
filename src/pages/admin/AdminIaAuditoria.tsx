@@ -1,13 +1,14 @@
-﻿import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { 
   Bot, ShieldCheck, Activity, Search, Filter, AlertTriangle, 
   CheckCircle2, Clock, RefreshCw, Cpu, Database, Eye, Terminal, ArrowLeft,
-  Sparkles, Zap
+  Sparkles, Zap, RotateCcw, Undo2, ShieldAlert
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -23,6 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -43,10 +45,13 @@ interface AiAgentAction {
   confidence_score: number | null;
   executed_at: string;
   triggered_by: string | null;
-  status: "success" | "failed" | "flagged_for_review" | "pending";
+  status: "success" | "failed" | "flagged_for_review" | "pending" | "reverted";
   error_message?: string | null;
   latency_ms?: number | null;
   created_at?: string;
+  reverted_at?: string | null;
+  reverted_by?: string | null;
+  reversion_reason?: string | null;
 }
 
 export const AdminIaAuditoria: React.FC = () => {
@@ -56,6 +61,9 @@ export const AdminIaAuditoria: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedAction, setSelectedAction] = useState<AiAgentAction | null>(null);
+  const [isReverting, setIsReverting] = useState<boolean>(false);
+  const [reversionReason, setReversionReason] = useState<string>("");
+  const [showRevertPrompt, setShowRevertPrompt] = useState<boolean>(false);
 
   const fetchActions = useCallback(async () => {
     setLoading(true);
@@ -90,6 +98,60 @@ export const AdminIaAuditoria: React.FC = () => {
     }
   }, [agentFilter, statusFilter]);
 
+  const handleRevertAction = async (actionId: string) => {
+    if (!reversionReason.trim() || reversionReason.trim().length < 5) {
+      toast.error("Informe uma justificativa clínica ou operacional válida (mínimo 5 caracteres).");
+      return;
+    }
+
+    setIsReverting(true);
+    try {
+      // 1. Tenta executar via RPC oficial de auditoria
+      let rpcSuccess = false;
+      try {
+        const { data: rpcData, error: rpcError } = await (supabase.rpc as any)("revert_ai_agent_action", {
+          p_action_id: actionId,
+          p_reason: reversionReason.trim(),
+        });
+
+        if (!rpcError && rpcData?.success) {
+          rpcSuccess = true;
+        } else if (rpcError) {
+          console.warn("RPC revert_ai_agent_action error:", rpcError);
+        }
+      } catch (rpcEx) {
+        console.warn("RPC invocation fallback:", rpcEx);
+      }
+
+      // 2. Fallback direto se a RPC ainda não estiver instalada
+      if (!rpcSuccess) {
+        const { error: updateError } = await supabase
+          .from("ai_agent_actions" as any)
+          .update({
+            status: "reverted",
+            reverted_at: new Date().toISOString(),
+            reversion_reason: reversionReason.trim(),
+          })
+          .eq("id", actionId);
+
+        if (updateError) {
+          throw updateError;
+        }
+      }
+
+      toast.success("✓ Decisão de IA revertida com sucesso pelo operador com registro em trilha de auditoria.");
+      setShowRevertPrompt(false);
+      setReversionReason("");
+      setSelectedAction(null);
+      fetchActions();
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Erro ao reverter ação de IA: " + (err?.message || "Tente novamente"));
+    } finally {
+      setIsReverting(false);
+    }
+  };
+
   useEffect(() => {
     fetchActions();
   }, [fetchActions]);
@@ -123,6 +185,12 @@ export const AdminIaAuditoria: React.FC = () => {
         return (
           <Badge variant="outline" className="bg-amber-500/10 text-amber-400 border-amber-500/30 text-[10px] font-bold">
             <Clock size={11} className="mr-1" /> Revisão Clínica
+          </Badge>
+        );
+      case "reverted":
+        return (
+          <Badge variant="outline" className="bg-purple-500/15 text-purple-400 border-purple-500/30 text-[10px] font-bold flex items-center">
+            <RotateCcw size={10} className="mr-1" /> Revertido (HITL)
           </Badge>
         );
       default:
@@ -274,6 +342,7 @@ export const AdminIaAuditoria: React.FC = () => {
                   <SelectItem value="success">Sucesso</SelectItem>
                   <SelectItem value="failed">Falha</SelectItem>
                   <SelectItem value="flagged_for_review">Revisão</SelectItem>
+                  <SelectItem value="reverted">Revertidas (HITL)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -414,6 +483,76 @@ export const AdminIaAuditoria: React.FC = () => {
                     {JSON.stringify(selectedAction.output_payload, null, 2)}
                   </pre>
                 </div>
+
+                {/* Bloco de Informações de Reversão se já revertido */}
+                {selectedAction.status === "reverted" && (
+                  <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 space-y-1.5">
+                    <span className="font-bold flex items-center gap-1.5 text-xs text-purple-400">
+                      <RotateCcw size={14} /> Ação Revertida por Intervenção Humana (Human-in-the-Loop)
+                    </span>
+                    <p className="text-[11px] text-purple-200/90">
+                      <strong>Data da Reversão:</strong> {selectedAction.reverted_at ? new Date(selectedAction.reverted_at).toLocaleString("pt-BR") : "Registrada"}
+                    </p>
+                    <p className="text-[11px] text-purple-200/90">
+                      <strong>Justificativa do Operador:</strong> {selectedAction.reversion_reason || "Reversão clínica solicitada"}
+                    </p>
+                  </div>
+                )}
+
+                {/* Ação de Reversão se ainda não revertido */}
+                {selectedAction.status !== "reverted" && (
+                  <div className="pt-3 border-t border-border flex flex-col gap-3">
+                    {!showRevertPrompt ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                          <ShieldCheck size={12} className="text-emerald-400" /> Governança Clínica: Você pode anular ou reverter esta decisão.
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setShowRevertPrompt(true)}
+                          className="border-purple-500/40 text-purple-400 hover:bg-purple-500/10 text-xs font-bold"
+                        >
+                          <Undo2 size={13} className="mr-1" /> Reverter Decisão de IA
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/40 space-y-2.5">
+                        <label className="text-xs font-bold text-purple-300 flex items-center gap-1.5">
+                          <ShieldAlert size={14} className="text-purple-400" />
+                          Justificativa da Intervenção Humana (Obrigatória para Auditoria)
+                        </label>
+                        <Textarea
+                          value={reversionReason}
+                          onChange={(e) => setReversionReason(e.target.value)}
+                          placeholder="Descreva o motivo da reversão médica ou discordância com o agente de IA..."
+                          className="text-xs min-h-[70px] bg-background/50 border-purple-500/30 text-foreground placeholder:text-muted-foreground/50"
+                        />
+                        <div className="flex items-center justify-end gap-2 pt-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setShowRevertPrompt(false);
+                              setReversionReason("");
+                            }}
+                            className="text-xs text-muted-foreground"
+                          >
+                            Cancelar
+                          </Button>
+                          <Button
+                            size="sm"
+                            disabled={isReverting || reversionReason.trim().length < 5}
+                            onClick={() => handleRevertAction(selectedAction.id)}
+                            className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold"
+                          >
+                            {isReverting ? "Gravando Reversão..." : "Confirmar Reversão na Trilha"}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </DialogContent>
           </Dialog>

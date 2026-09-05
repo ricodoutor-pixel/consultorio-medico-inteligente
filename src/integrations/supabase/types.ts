@@ -8317,6 +8317,75 @@ export type Database = {
           },
         ]
       }
+      vendor_terms_consents: {
+        Row: {
+          accepted_at: string
+          accepted_data_truthfulness: boolean
+          accepted_fees: boolean
+          accepted_liability: boolean
+          accepted_regulatory: boolean
+          cnpj: string | null
+          created_at: string
+          id: string
+          signer_doc: string
+          signer_name: string
+          term_hash: string
+          term_version: string
+          user_agent: string | null
+          user_id: string
+          vendor_id: string | null
+        }
+        Insert: {
+          accepted_at?: string
+          accepted_data_truthfulness?: boolean
+          accepted_fees?: boolean
+          accepted_liability?: boolean
+          accepted_regulatory?: boolean
+          cnpj?: string | null
+          created_at?: string
+          id?: string
+          signer_doc: string
+          signer_name: string
+          term_hash: string
+          term_version?: string
+          user_agent?: string | null
+          user_id: string
+          vendor_id?: string | null
+        }
+        Update: {
+          accepted_at?: string
+          accepted_data_truthfulness?: boolean
+          accepted_fees?: boolean
+          accepted_liability?: boolean
+          accepted_regulatory?: boolean
+          cnpj?: string | null
+          created_at?: string
+          id?: string
+          signer_doc?: string
+          signer_name?: string
+          term_hash?: string
+          term_version?: string
+          user_agent?: string | null
+          user_id?: string
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_terms_consents_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_terms_consents_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_transactions: {
         Row: {
           amount: number

@@ -104,10 +104,10 @@ export default function CadastroFarmacia() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!agreedTerms) {
+    if (!allTermsAccepted) {
       toast({
-        title: "Termos Obrigatórios",
-        description: "Você deve aceitar os termos de responsabilidade técnica e repasse.",
+        title: "Termo de Responsabilidade obrigatório",
+        description: "Aceite todas as cláusulas e informe o nome e CPF/CNPJ do responsável que assina.",
         variant: "destructive",
       });
       return;
@@ -118,102 +118,115 @@ export default function CadastroFarmacia() {
     setProtocolNumber(protocol);
 
     try {
-      // 1. Obter usuário autenticado ou criar ID temporário
       const { data: { user } } = await supabase.auth.getUser();
-      const vendorId = user?.id || `vendor_${Date.now()}`;
-
-      // 2. Gravar / Atualizar na tabela vendors do Supabase
-      try {
-        await supabase.from("vendors" as any).upsert({
-          id: user ? undefined : undefined,
-          user_id: user?.id || vendorId,
-          store_name: formData.nome_fantasia || formData.razao_social,
-          store_description: `Farmácia credenciada · RT: ${formData.farmaceutico_nome} (CRF-${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}) · AFE: ${formData.anvisa_auth}`,
-          store_logo_url: uploadedFiles.logo_empresa.previewUrl || "/logo-farmacia.jpg",
-          store_banner_url: uploadedFiles.foto_fachada.previewUrl || "/farmacia-fachada.jpg",
-          is_active: true,
+      if (!user) {
+        setIsSubmitting(false);
+        toast({
+          title: "Faça login para credenciar",
+          description: "O credenciamento é vinculado à conta da farmácia. Crie a conta ou entre e repita o envio.",
+          variant: "destructive",
         });
-      } catch (dbErr) {
-        console.warn("vendors upsert fallback:", dbErr);
+        navigate("/login-farmacia");
+        return;
       }
 
-      // 3. Atualizar tabela profiles
-      if (user) {
-        try {
-          await supabase.from("profiles" as any).update({
-            company_name: formData.razao_social,
-            trade_name: formData.nome_fantasia,
-            cnpj: formData.cnpj,
-            anvisa_auth: formData.anvisa_auth,
-            crf: `${formData.farmaceutico_nome} — CRF/${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}`,
-            city: formData.city,
-            state: formData.state,
-            phone: formData.phone,
-            user_type: "pharmacy",
-          }).eq("id", user.id);
-        } catch (pErr) {
-          console.warn("profiles update fallback:", pErr);
-        }
-      }
-
-      // 4. Salvar Dossiê KYC de Documentos no LocalStorage & Storage
-      const docsRecord: Record<string, string> = {};
-      const kycDocsArray: any[] = [];
-
+      // 1. Upload real dos documentos KYC (bucket privado)
+      const docPaths: Partial<Record<PharmacyKycKind, string>> = {};
       for (const [k, val] of Object.entries(uploadedFiles)) {
         const kind = k as PharmacyKycKind;
-        if (val.file) {
-          const fileUrl = val.previewUrl || "";
-          docsRecord[kind] = fileUrl;
-          kycDocsArray.push({
-            id: `doc_${kind}_${Date.now()}`,
-            document_kind: kind,
-            file_url: fileUrl,
-            is_verified: true,
-          });
-
-          // Upload real no Supabase Storage se possível
-          try {
-            const ext = val.file.name.split(".").pop();
-            const path = `${vendorId}/${kind}.${ext}`;
-            await supabase.storage.from("pharmacy-kyc-documents").upload(path, val.file, { upsert: true });
-          } catch (stErr) {
-            console.warn("Storage upload fallback:", stErr);
-          }
-        }
+        if (!val.file) continue;
+        const ext = (val.file.name.split(".").pop() || "bin").toLowerCase();
+        const path = `${user.id}/${kind}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("pharmacy-kyc-documents")
+          .upload(path, val.file, { upsert: true });
+        if (upErr) throw new Error(`Falha ao enviar ${PHARMACY_KYC_LABELS[kind]}: ${upErr.message}`);
+        docPaths[kind] = path;
       }
 
-      localStorage.setItem(`pharmacy_kyc_docs_${vendorId}`, JSON.stringify(docsRecord));
+      // 2. Gravar farmácia real na tabela vendors (status: em análise)
+      const { data: existing } = await supabase
+        .from("vendors" as any)
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-      // 5. Adicionar a farmácia na lista de cadastros para sincronização com /admin/kyc-lojas
-      const newPharmacyRecord = {
-        id: vendorId,
-        user_id: vendorId,
+      const vendorPayload: Record<string, any> = {
+        user_id: user.id,
+        store_name: formData.nome_fantasia || formData.razao_social,
+        store_description: `Farmácia credenciada · RT: ${formData.farmaceutico_nome} (CRF-${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}) · AFE: ${formData.anvisa_auth}`,
         razao_social: formData.razao_social,
         nome_fantasia: formData.nome_fantasia || formData.razao_social,
         cnpj: formData.cnpj,
-        anvisa_auth: formData.anvisa_auth || "AFE em análise ANVISA",
-        farmaceutico_crf: `${formData.farmaceutico_nome} — CRF/${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}`,
-        email: formData.email,
-        phone: formData.phone,
-        city: formData.city,
-        state: formData.state,
-        country: "BR",
-        logo_url: uploadedFiles.logo_empresa.previewUrl || "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=400&q=80",
-        is_approved: false,
-        status: "pending",
-        created_at: new Date().toISOString(),
-        kyc_docs: kycDocsArray,
+        responsavel_tecnico: formData.farmaceutico_nome,
+        crf_numero: formData.farmaceutico_crf,
+        crf_uf: formData.farmaceutico_crf_uf,
+        anvisa_afe: formData.anvisa_auth,
+        telefone_whatsapp: formData.phone,
+        pix_key: formData.pix_key,
+        shipping_origin_cep: formData.cep,
+        endereco_completo: {
+          cep: formData.cep,
+          logradouro: formData.logradouro,
+          numero: formData.numero,
+          bairro: formData.bairro,
+          city: formData.city,
+          state: formData.state,
+          email: formData.email,
+        },
+        contrato_social_url: docPaths.contrato_social_pdf || null,
+        crf_doc_url: docPaths.crf_responsavel || null,
+        afe_doc_url: docPaths.alvara_sanitario || null,
+        logo_url: docPaths.logo_empresa || null,
+        fachada_foto_url: docPaths.foto_fachada || null,
+        kyc_status: "pending",
+        is_kyc_approved: false,
+        is_active: false, // só entra na vitrine após homologação do compliance
       };
 
-      const existingList: any[] = JSON.parse(localStorage.getItem("registered_pharmacies_list") || "[]");
-      existingList.unshift(newPharmacyRecord);
-      localStorage.setItem("registered_pharmacies_list", JSON.stringify(existingList));
+      const vendorQuery = existing?.id
+        ? supabase.from("vendors" as any).update(vendorPayload).eq("id", (existing as any).id).select("id").single()
+        : supabase.from("vendors" as any).insert(vendorPayload).select("id").single();
+
+      const { data: vendorRow, error: vendorErr } = await vendorQuery;
+      if (vendorErr) throw vendorErr;
+      const vendorId = (vendorRow as any)?.id as string;
+
+      // 3. Registrar assinatura eletrônica do Termo de Responsabilidade
+      const termHash = await hashPharmacyTerm();
+      const { error: termErr } = await supabase.from("vendor_terms_consents" as any).insert({
+        user_id: user.id,
+        vendor_id: vendorId,
+        cnpj: formData.cnpj,
+        signer_name: signerName.trim(),
+        signer_doc: signerDoc.trim(),
+        term_version: PHARMACY_TERM_VERSION,
+        term_hash: termHash,
+        accepted_data_truthfulness: agreedTruth,
+        accepted_regulatory: agreedRegulatory,
+        accepted_liability: agreedLiability,
+        accepted_fees: agreedTerms,
+        user_agent: navigator.userAgent,
+      });
+      if (termErr) throw termErr;
+
+      // 4. Atualizar perfil como farmácia
+      await supabase.from("profiles" as any).update({
+        company_name: formData.razao_social,
+        trade_name: formData.nome_fantasia,
+        cnpj: formData.cnpj,
+        anvisa_auth: formData.anvisa_auth,
+        crf: `${formData.farmaceutico_nome} — CRF/${formData.farmaceutico_crf_uf} ${formData.farmaceutico_crf}`,
+        city: formData.city,
+        state: formData.state,
+        phone: formData.phone,
+        user_type: "pharmacy",
+      }).eq("id", user.id);
 
       setIsSubmitting(false);
       setSubmitted(true);
       toast({
-        title: "✓ Cadastro de Farmácia Enviado com Sucesso!",
+        title: "✓ Credenciamento protocolado com assinatura registrada",
         description: `Protocolo ${protocol}. O compliance regulatório analisará seus documentos.`,
       });
     } catch (err: any) {

@@ -4,11 +4,13 @@ import { useCart } from '@/store/cart';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { ShippingCalculator } from '@/components/ShippingCalculator';
 import { Trash2, Plus, Minus, ShoppingCart as CartIcon, FileText } from 'lucide-react';
 
 export function ShoppingCart() {
   const { items, removeItem, updateQty, clearCart, getSubtotal, getTax, shipping: selectedShipping, setShipping } = useCart();
   const [showCart, setShowCart] = useState(false);
+  const [shippingCep, setShippingCep] = useState("");
   const location = useLocation();
 
   const allowedPaths = ['/shopping', '/planos', '/precos'];
@@ -77,10 +79,9 @@ export function ShoppingCart() {
           <>
             <div className="border-t border-border p-6 space-y-3">
               <ShippingCalculator
-                subtotal={subtotal}
-                weightKg={0.5 * Math.max(1, items.reduce((s, i) => s + i.qty, 0))}
-                onSelect={(opt, cep) => {
-                  setShipping({ cep, carrier: opt.carrier, service: opt.service, price: opt.price, days: opt.days });
+                cartTotal={subtotal}
+                onSelectShipping={(opt) => {
+                  setShipping({ cep: shippingCep, carrier: opt.company, service: opt.name, price: opt.price, days: opt.delivery_time });
                 }}
               />
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal:</span><span className="font-semibold">R$ {subtotal.toFixed(2)}</span></div>

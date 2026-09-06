@@ -129,8 +129,8 @@ export const generateClinicalBlockHash = async (
       .select("id")
       .single();
 
-    if (!insertErr && inserted?.id) {
-      ledgerId = inserted.id;
+    if (!insertErr && inserted && (inserted as any).id) {
+      ledgerId = (inserted as any).id;
     }
   } catch (dbErr) {
     console.warn("Direct ledger insert fallback:", dbErr);

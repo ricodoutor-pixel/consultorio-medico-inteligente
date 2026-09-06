@@ -29,8 +29,6 @@ const isValidPhone = (value: string): boolean => {
   return digits.length === 10 || digits.length === 11;
 };
 
-// ManyChat removed
-
 export const LeadCaptureModal = ({
   isOpen,
   onClose,
@@ -118,133 +116,12 @@ export const LeadCaptureModal = ({
 
       if (dbError) throw new Error(dbError.message);
 
-      
       // Sync with Brevo
       supabase.functions.invoke('brevo-sync', {
         body: { nome: nome.trim(), email: email.trim() || null, telefone: phoneDigits, categoria: categoria || null, tags: allTags, origem }
       }).catch(e => console.error('Brevo sync failed:', e));
 
-interface LeadCaptureModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: (data: { nome: string; telefone: string; email?: string; categoria?: string }) => void;
-  /** Chamado quando o usuário fecha (X) sem preencher — libera acesso mesmo assim. */
-  onSkip?: () => void;
-  origem: "chat" | "ebook";
-  message?: string;
-  tags?: string[];
-  /** Categoria do visitante: paciente | medico | lojista | ebook */
-  categoria?: "paciente" | "medico" | "lojista" | "ebook";
-}
-
-const formatPhone = (value: string): string => {
-  const digits = value.replace(/\D/g, "").slice(0, 11);
-  if (digits.length <= 2) return `(${digits}`;
-  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-};
-
-const isValidPhone = (value: string): boolean => {
-  const digits = value.replace(/\D/g, "");
-  return digits.length === 10 || digits.length === 11;
-};
-
-// ManyChat removed
-
-export const LeadCaptureModal = ({
-  isOpen,
-  onClose,
-  onSuccess,
-  onSkip,
-  origem,
-  message,
-  tags = [],
-  categoria,
-}: LeadCaptureModalProps) => {
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [recognized, setRecognized] = useState<string | null>(null);
-
-  const defaultMessage = "Comece com seu nome e telefone!";
-
-  const checkExistingLead = useCallback(async (phoneDigits: string) => {
-    try {
-      const { data } = await supabase
-        .from("leads_contatos" as any)
-        .select("nome")
-        .eq("telefone", phoneDigits)
-        .limit(1);
-      if (data && (data as any[]).length > 0) {
-        return (data as any[])[0].nome as string;
-      }
-    } catch {}
-    return null;
-  }, []);
-
-  const handleSubmit = useCallback(async () => {
-    setError("");
-
-    if (!nome.trim()) {
-      setError("Informe seu nome");
-      return;
-    }
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setError("Informe um e-mail válido");
-      return;
-    }
-    if (!isValidPhone(telefone)) {
-      setError("Informe um telefone válido com DDD");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const phoneDigits = telefone.replace(/\D/g, "");
-
-      // Check if phone already exists
-      const existingName = await checkExistingLead(phoneDigits);
-      if (existingName) {
-        setRecognized(existingName);
-        localStorage.setItem("pr_lead_name", existingName);
-        localStorage.setItem("pr_lead_phone", phoneDigits);
-        if (email) localStorage.setItem("pr_lead_email", email.trim());
-        if (categoria) localStorage.setItem("pr_lead_categoria", categoria);
-        setTimeout(() => {
-          onSuccess({ nome: existingName, telefone: phoneDigits, email: email.trim() || undefined, categoria });
-        }, 1500);
-        return;
-      }
-
-      const idioma = (typeof navigator !== "undefined" ? navigator.language.slice(0, 2) : "pt").toLowerCase();
-      const allTags = origem === "ebook" ? ["Origem_Ebook", ...tags] : ["Origem_Chat", ...tags];
-      if (categoria) allTags.push(`Categoria_${categoria}`);
-
-      // Save directly to Supabase (no dependency on edge function)
-      const { error: dbError } = await supabase
-        .from("leads_contatos" as any)
-        .insert({
-          nome: nome.trim(),
-          telefone: phoneDigits,
-          email: email.trim() || null,
-          categoria: categoria || null,
-          idioma,
-          origem,
-          tags: allTags,
-        } as any);
-
-      if (dbError) throw new Error(dbError.message);
-
-      
-      // Sync with Brevo
-      supabase.functions.invoke('brevo-sync', {
-        body: { nome: nome.trim(), email: email.trim() || null, telefone: phoneDigits, categoria: categoria || null, tags: allTags, origem }
-      }).catch(e => console.error('Brevo sync failed:', e));
-
-      // 🚀 Dispara convite automático WhatsApp + email com oferta R$30 (fire-and-forget)
+      // Dispara convite automático WhatsApp + email com oferta R$30 (fire-and-forget)
       supabase.functions
         .invoke("lead-invite-orientacao", {
           body: {

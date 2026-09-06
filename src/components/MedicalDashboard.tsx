@@ -24,6 +24,8 @@ import { BlockchainRecordPublisher } from "./BlockchainRecordPublisher";
 import { TitulacaoTrackerCard } from "./TitulacaoTrackerCard";
 import { NurseBrisaAlertSystem } from "@/components/NurseBrisaAlertSystem";
 import { DrugInteractionAlertCard } from "@/components/consultation/DrugInteractionAlertCard";
+import { PrescriptionTypeSelector } from "@/components/prescription/PrescriptionTypeSelector";
+import { type PrescriptionType, getPrescriptionTypeMeta, generateVerificationCode } from "@/lib/prescription-types";
 
 // ─── Types ──────────────────────────────────────────────────
 interface WaitingPatient {

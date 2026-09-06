@@ -95,7 +95,7 @@ export const DoctorContractModal = ({
       }
 
       const userAgent = navigator.userAgent;
-      const timestamp = new Date().toISOString();
+      let timestamp = new Date().toISOString();
 
       // 2. Gerar Hash Criptográfico SHA-512 no cliente
       const contractPayload = `CONTRATO-MEDICO-PLANTA-Y-RAIZ|DOC:${doctorData.id}|CRM:${doctorData.crm}|CPF:${doctorCpf || "PENDENTE"}|IP:${clientIp || "HEADER_CAPTURED"}|DATE:${timestamp}|CFM-2336-2023`;

@@ -98,7 +98,7 @@ export default function CartCheckout() {
 
       setSuccess(true);
       clearCart();
-      window.location.href = payment.init_point;
+      window.location.href = mpData.init_point;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao processar pagamento');
     } finally {

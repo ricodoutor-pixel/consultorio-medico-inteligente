@@ -1,3 +1,4 @@
+import { DoctorIoMTDashboard } from '@/components/diagnostics/DoctorIoMTDashboard';
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
@@ -11,6 +12,8 @@ import { FileText, Clock, FilePlus, ChevronLeft, Calendar, Stethoscope, Video, M
 import { useToast } from "@/hooks/use-toast";
 import { DoctorQuickActions } from "@/components/doctor/DoctorQuickActions";
 import { PrescriptionTemplates } from "@/components/doctor/PrescriptionTemplates";
+import { DrugInteractionAlertCard } from "@/components/doctor/DrugInteractionAlertCard";
+
 import { TriageSummaryCard } from "@/components/doctor/TriageSummaryCard";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -202,13 +205,7 @@ const WorkspaceMedico = () => {
         </div>
         
         <div className="flex items-center gap-6">
-          <Button 
-            variant="outline" 
-            className="gap-2 bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"
-            onClick={() => window.open("/manual?tab=medico", "_blank")}
-          >
-            <BookOpen size={16} /> Passo a Passo
-          </Button>
+          <ManualMedicoModal />
           <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-background border border-border">
             <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-muted-foreground"}`} />
             <span className="text-xs font-bold mr-2">{isOnline ? "Online" : "Offline"}</span>
@@ -326,6 +323,7 @@ const WorkspaceMedico = () => {
                 />
 
                 <Button className="w-full bg-blue-600 hover:bg-blue-700">Emitir & Assinar Digitalmente</Button>
+
               </TabsContent>
 
               <TabsContent value="history">

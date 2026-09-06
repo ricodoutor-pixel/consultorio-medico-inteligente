@@ -6,6 +6,7 @@
  * ║  Reprodução não autorizada é crime (Lei 9.609/98).          ║
  * ╚══════════════════════════════════════════════════════════════╝
  */
+import { devlog } from "@/lib/devlog";
 
 const AUTHORIZED_DOMAINS = [
   'consultorio-medico-inteligente.lovable.app',
@@ -30,11 +31,11 @@ export function enforceDomainLock(): boolean {
     );
 
     if (!isAuthorized) {
-      console.error(
+      devlog.error(
         '%c⛔ ACESSO NÃO AUTORIZADO — Este software é propriedade exclusiva de Planta & Raiz.',
         'color: red; font-size: 18px; font-weight: bold;'
       );
-      console.error(
+      devlog.error(
         '%cA reprodução ou uso não autorizado viola a Lei 9.609/98 (Software) e Lei 9.610/98 (Direitos Autorais). Ação judicial será tomada.',
         'color: red; font-size: 14px;'
       );
@@ -70,20 +71,17 @@ export function setupAntiDevTools(): void {
   let devtoolsOpen = false;
 
   const checkDevTools = () => {
-    const start = performance.now();
-    // debugger statement causa delay quando devtools está aberto
-    // Removido para não travar - usando abordagem de tamanho
     const widthThreshold = window.outerWidth - window.innerWidth > 160;
     const heightThreshold = window.outerHeight - window.innerHeight > 160;
 
     if (widthThreshold || heightThreshold) {
       if (!devtoolsOpen) {
         devtoolsOpen = true;
-        console.warn(
+        devlog.warn(
           '%c🛡️ Planta & Raiz — Código Protegido',
           'color: #10B981; font-size: 16px; font-weight: bold;'
         );
-        console.warn(
+        devlog.warn(
           '%cEste código é protegido por direitos autorais.\nQualquer cópia ou engenharia reversa é proibida pela Lei 9.609/98.',
           'color: #F59E0B; font-size: 13px;'
         );
@@ -127,7 +125,6 @@ export function setupAntiCopy(): void {
     }
   });
 
-
   // Sobrescreve Ctrl+U (view source)
   document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.key === 'u') {
@@ -139,7 +136,6 @@ export function setupAntiCopy(): void {
 // ── 4. Runtime Integrity Check ──────────────────────────────────
 export function checkRuntimeIntegrity(): boolean {
   try {
-    // Verifica se meta tags da marca existem (aceita Planta & Raiz OU autor médico oficial)
     const metaAuthor = document.querySelector('meta[name="author"]');
     const authorContent = metaAuthor?.getAttribute('content') ?? '';
     const isValidAuthor =
@@ -148,7 +144,7 @@ export function checkRuntimeIntegrity(): boolean {
       authorContent.includes('Suelen') ||
       authorContent.includes('CRM');
     if (!isValidAuthor) {
-      console.warn('⚠️ Meta author não corresponde ao padrão esperado');
+      devlog.warn('⚠️ Meta author não corresponde ao padrão esperado');
     }
 
     // Verifica fingerprint no window
@@ -180,8 +176,7 @@ export function preventUnauthorizedEmbed(): void {
       const referrer = document.referrer || '';
       const isAuthorized = AUTHORIZED_DOMAINS.some((d) => referrer.includes(d));
       if (!isAuthorized && referrer !== '') {
-        console.error('⛔ Embedding não autorizado detectado');
-        // Não bloqueia completamente para não quebrar previews legítimos
+        devlog.error('⛔ Embedding não autorizado detectado');
       }
     }
   } catch {
@@ -191,15 +186,15 @@ export function preventUnauthorizedEmbed(): void {
 
 // ── 7. Console Branding ─────────────────────────────────────────
 export function brandConsole(): void {
-  console.log(
+  devlog.log(
     '%c🌿 Planta & Raiz',
     'color: #10B981; font-size: 24px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);'
   );
-  console.log(
+  devlog.log(
     '%c© 2024-2026 Todos os direitos reservados.\nSoftware protegido pela Lei 9.609/98 e Lei 9.610/98.\nUso não autorizado será processado judicialmente.',
     'color: #6B7280; font-size: 11px;'
   );
-  console.log(
+  devlog.log(
     `%cFingerprint: ${BRAND_FINGERPRINT}`,
     'color: #374151; font-size: 9px;'
   );
@@ -207,16 +202,14 @@ export function brandConsole(): void {
 
 // ── 8. Obfuscation Honeypot ─────────────────────────────────────
 export function setupHoneypot(): void {
-  // Define propriedades que detectam acesso indevido
   Object.defineProperty(window, '__CLONE_CHECK__', {
     get() {
-      console.error('⛔ Tentativa de inspeção detectada — Planta & Raiz Anti-Clone v2.0');
+      devlog.error('⛔ Tentativa de inspeção detectada — Planta & Raiz Anti-Clone v2.0');
       return undefined;
     },
     configurable: false,
   });
 
-  // Marca o timestamp de inicialização
   Object.defineProperty(window, '__PR_INIT__', {
     value: Date.now(),
     writable: false,
@@ -238,7 +231,6 @@ export function initAntiClone(): void {
   setupAntiCopy();
   preventUnauthorizedEmbed();
 
-  // Injeta watermark após DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', injectWatermark);
   } else {

@@ -3,11 +3,12 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, Zap, Stethoscope, ShoppingBag, Shield, FileText, CheckCircle2, ArrowRight, MessageSquare, UserPlus, Download, Loader2, BookOpen } from "lucide-react";
+import { Users, Zap, Stethoscope, ShoppingBag, Shield, FileText, CheckCircle2, ArrowRight, MessageSquare, UserPlus, Download, Loader2, BookOpen, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
 
 const EBOOK_BUCKET = "ebooks";
 const EBOOK_FILE = "planta-y-raiz-cannabis-medicinal.pdf";
@@ -112,6 +113,36 @@ const ComoFunciona = () => {
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               4 passos simples — escolha, pré-entrevista, pague via Pix, atendimento
             </p>
+
+            {/* TOUR INTERATIVO 3D CTA BUTTONS */}
+            <div className="flex items-center justify-center gap-3 mt-8 flex-wrap">
+              <Button
+                onClick={() => openGlobalTour("paciente")}
+                size="lg"
+                className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black rounded-2xl shadow-xl shadow-emerald-500/25 px-8 py-6 text-sm md:text-base hover:scale-105 transition-all"
+              >
+                <Sparkles className="mr-2 animate-pulse" size={18} />
+                🚀 Fazer Tour Interativo 3D (Paciente)
+              </Button>
+              <Button
+                onClick={() => openGlobalTour("medico")}
+                variant="outline"
+                size="lg"
+                className="border-sky-500/40 text-sky-400 hover:bg-sky-500/10 font-bold rounded-2xl px-6 py-6 text-sm"
+              >
+                <Stethoscope className="mr-2" size={16} />
+                Tour Médico Prescritor (93% PIX)
+              </Button>
+              <Button
+                onClick={() => openGlobalTour("farmacia")}
+                variant="outline"
+                size="lg"
+                className="border-amber-500/40 text-amber-400 hover:bg-amber-500/10 font-bold rounded-2xl px-6 py-6 text-sm"
+              >
+                <ShoppingBag className="mr-2" size={16} />
+                Tour Farmácia & Lojista
+              </Button>
+            </div>
           </motion.div>
 
           <motion.div className="space-y-8 max-w-4xl mx-auto" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
@@ -387,6 +418,7 @@ const ComoFunciona = () => {
         </div>
       </section>
 
+      <InteractiveTour3DModal initialRole="paciente" />
       <Footer />
     </div>
   );

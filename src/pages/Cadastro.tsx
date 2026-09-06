@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { trackPixelEvent } from "@/hooks/useFacebookPixel";
 import { linkReferralOnSignup, getReferralCode } from "@/hooks/useReferralTracking";
@@ -13,22 +13,186 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { UserPlus, Stethoscope, Building2, Leaf, Users, CheckCircle2, ArrowRight, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck, Gift } from "lucide-react";
+import { UserPlus, Stethoscope, Building2, Leaf, Users, CheckCircle2, ArrowRight, Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck, Gift, Globe, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
+import * as Flags from "country-flag-icons/react/3x2";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
-type UserType = "paciente" | "medico" | "profissional" | "farmacia" | "produtor" | null;
+export const CountryFlag = ({
+  code,
+  className = "w-5 h-3.5 rounded-sm object-cover shadow-sm shrink-0 border border-slate-700/50 inline-block align-middle",
+}: {
+  code: string;
+  className?: string;
+}) => {
+  const FlagComponent = (Flags as Record<string, any>)[code?.toUpperCase()];
+  if (!FlagComponent) return <span className="text-xs">🌐</span>;
+  return <FlagComponent className={className} title={code} />;
+};
 
-const userTypes = [
-  { id: "paciente" as UserType, label: "Paciente / Usuário", icon: Users, desc: "Busco consulta ou tratamento", color: "green", dbType: "patient" },
-  { id: "medico" as UserType, label: "Médico Prescritor", icon: Stethoscope, desc: "CRM ativo, prescrevo cannabis", color: "green", dbType: "doctor" },
-  { id: "profissional" as UserType, label: "Profissional de Saúde", icon: UserPlus, desc: "Psicólogo, farmacêutico, TO, etc.", color: "purple", dbType: "professional" },
-  { id: "farmacia" as UserType, label: "Farmácia / Loja", icon: Building2, desc: "CNPJ + autorização ANVISA", color: "purple", dbType: "pharmacy" },
-  { id: "produtor" as UserType, label: "Produtor / Cultivador", icon: Leaf, desc: "Autorização judicial ou ANVISA", color: "gold", dbType: "producer" },
-];
+export const COUNTRIES = [
+  // América Latina
+  { code: "BR", name: "Brasil", lang: "PT", regionLabel: "UF", defaultDoc: "CPF" },
+  { code: "BO", name: "Bolívia", lang: "ES", regionLabel: "Departamento", defaultDoc: "CI" },
+  { code: "AR", name: "Argentina", lang: "ES", regionLabel: "Provincia", defaultDoc: "DNI / Pasaporte" },
+  { code: "CL", name: "Chile", lang: "ES", regionLabel: "Región", defaultDoc: "RUT / Pasaporte" },
+  { code: "CO", name: "Colômbia", lang: "ES", regionLabel: "Departamento", defaultDoc: "Cédula / Pasaporte" },
+  { code: "PE", name: "Peru", lang: "ES", regionLabel: "Departamento", defaultDoc: "DNI / Pasaporte" },
+  { code: "UY", name: "Uruguai", lang: "ES", regionLabel: "Departamento", defaultDoc: "CI / Pasaporte" },
+  { code: "PY", name: "Paraguai", lang: "ES", regionLabel: "Departamento", defaultDoc: "CI / Pasaporte" },
+  { code: "EC", name: "Equador", lang: "ES", regionLabel: "Provincia", defaultDoc: "Cédula / Pasaporte" },
+  { code: "MX", name: "México", lang: "ES", regionLabel: "Estado", defaultDoc: "CURP / Pasaporte" },
+  // América do Norte
+  { code: "US", name: "Estados Unidos", lang: "EN", regionLabel: "State", defaultDoc: "SSN / Passport / ID" },
+  { code: "CA", name: "Canadá", lang: "EN", regionLabel: "Province", defaultDoc: "SIN / Passport" },
+  // Europa
+  { code: "PT", name: "Portugal", lang: "PT", regionLabel: "Distrito", defaultDoc: "NIF / Cartão de Cidadão" },
+  { code: "ES", name: "Espanha", lang: "ES", regionLabel: "Provincia", defaultDoc: "DNI / NIE / Pasaporte" },
+  { code: "NL", name: "Holanda (Amsterdã)", lang: "EN", regionLabel: "Provincie", defaultDoc: "BSN / Passport" },
+  // Ásia
+  { code: "CN", name: "China", lang: "EN", regionLabel: "Province", defaultDoc: "National ID / Passport" },
+  { code: "JP", name: "Japão", lang: "EN", regionLabel: "Prefecture", defaultDoc: "My Number / Passport" },
+] as const;
+
+export type CountryCode = typeof COUNTRIES[number]["code"];
+export type LangCode = "PT" | "ES" | "EN";
+
+type UserType = "paciente" | "medico" | "farmacia" | null;
+
+const STRINGS: Record<LangCode, Record<string, string>> = {
+  PT: {
+    createAccount: "CRIAR CONTA",
+    heroTitle: "Faça parte da",
+    heroTitleHl: "Planta & Raiz",
+    heroSubtitle: "Crie sua conta para acessar consultas, telemedicina e toda a plataforma internacional.",
+    alreadyHaveAccount: "Já tem conta? Faça login",
+    languageLabel: "Idioma:",
+    selectProfileBanner: "🎯 Selecione seu perfil. Cada categoria tem ambiente dedicado e leva ao painel correto.",
+    selectProfileTitle: "Selecione seu perfil",
+    patientLabel: "Paciente / Usuário",
+    patientDesc: "Busco consultas, receitas digitais ou tratamento canabinoide",
+    doctorLabel: "Médico Prescritor",
+    doctorDesc: "CRM ativo / Registro médico internacional",
+    pharmacyLabel: "Farmácia / Loja",
+    pharmacyDesc: "CNPJ / Licença sanitária internacional e ANVISA",
+    changeProfile: "← Trocar perfil",
+    googleLoginTitle: "Login rápido para",
+    googleLoginBtn: "Entrar com Google como",
+    googleTerms: "Ao continuar, você aceita os Termos LGPD/GDPR e autoriza conformidade médica para atendimentos.",
+    countryLabel: "País de Residência / Atuação *",
+    fullName: "Nome completo *",
+    fullNamePh: "Seu nome completo",
+    email: "E-mail *",
+    password: "Senha *",
+    passwordPh: "Mínimo 6 caracteres",
+    phone: "Telefone / WhatsApp com DDI",
+    docLabel: "Documento de Identificação *",
+    birthDate: "Data de Nascimento *",
+    zipLabel: "CEP / Código Postal *",
+    street: "Logradouro / Rua",
+    district: "Bairro / Distrito",
+    number: "Número *",
+    complement: "Complemento",
+    pharmacyName: "Razão Social / Nome da Empresa *",
+    cnpjOrTax: "CNPJ / Registro Fiscal (Tax ID) *",
+    anvisaOrAuth: "Autorização Sanitária (ANVISA / FDA / Ministério) *",
+    tcleText: "Li, compreendi e aceito integralmente o TCLE (Termo de Consentimento Livre e Esclarecido) e a Política de Privacidade (LGPD Lei nº 13.709/2018 e Resoluções CFM 2.314/2022 e 2.454/2026). Estou ciente das diretrizes da telemedicina com hash auditável.",
+    submitBtn: "Criar Minha Conta",
+    submitting: "Criando conta...",
+    alreadyRegistered: "Já tem uma conta?",
+    loginLink: "Fazer login",
+  },
+  ES: {
+    createAccount: "CREAR CUENTA",
+    heroTitle: "Forme parte de",
+    heroTitleHl: "Planta & Raiz",
+    heroSubtitle: "Cree su cuenta para acceder a consultas, telemedicina y toda la plataforma internacional.",
+    alreadyHaveAccount: "¿Ya tiene cuenta? Inicie sesión",
+    languageLabel: "Idioma:",
+    selectProfileBanner: "🎯 Seleccione su perfil. Cada categoría tiene un entorno dedicado y lleva al panel correspondiente.",
+    selectProfileTitle: "Seleccione su perfil",
+    patientLabel: "Paciente / Usuario",
+    patientDesc: "Busco consultas, recetas digitales o tratamiento cannabinoide",
+    doctorLabel: "Médico Prescriptor",
+    doctorDesc: "Matrícula activa / Registro médico internacional",
+    pharmacyLabel: "Farmacia / Tienda",
+    pharmacyDesc: "Registro fiscal / Licencia sanitaria internacional",
+    changeProfile: "← Cambiar perfil",
+    googleLoginTitle: "Acceso rápido para",
+    googleLoginBtn: "Entrar con Google como",
+    googleTerms: "Al continuar, acepta los Términos de Protección de Datos y autoriza el cumplimiento médico para atención.",
+    countryLabel: "País de Residencia / Operación *",
+    fullName: "Nombre completo *",
+    fullNamePh: "Su nombre completo legal",
+    email: "Correo electrónico *",
+    password: "Contraseña *",
+    passwordPh: "Mínimo 6 caracteres",
+    phone: "Teléfono / WhatsApp con código de país",
+    docLabel: "Documento de Identificación *",
+    birthDate: "Fecha de Nacimiento *",
+    zipLabel: "Código Postal / Zip *",
+    street: "Dirección / Calle",
+    district: "Barrio / Distrito",
+    number: "Número *",
+    complement: "Complemento / Apto",
+    pharmacyName: "Razón Social / Nombre Comercial *",
+    cnpjOrTax: "Registro Fiscal (Tax ID / RUC / RFC) *",
+    anvisaOrAuth: "Licencia Sanitaria / Autorización Farmacéutica *",
+    tcleText: "He leído y acepto el Consentimiento Informado (TCLE) y la Política de Privacidad de Telemedicina Internacional. Estoy al tanto de las directrices con registro auditable.",
+    submitBtn: "Crear Mi Cuenta",
+    submitting: "Creando cuenta...",
+    alreadyRegistered: "¿Ya tiene una cuenta?",
+    loginLink: "Iniciar sesión",
+  },
+  EN: {
+    createAccount: "CREATE ACCOUNT",
+    heroTitle: "Join",
+    heroTitleHl: "Planta & Raiz",
+    heroSubtitle: "Create your account to access telemedicine consultations, digital prescriptions, and global healthcare.",
+    alreadyHaveAccount: "Already have an account? Sign in",
+    languageLabel: "Language:",
+    selectProfileBanner: "🎯 Select your profile. Each category connects to its specialized dashboard.",
+    selectProfileTitle: "Select your profile",
+    patientLabel: "Patient / User",
+    patientDesc: "Looking for consultations, medical prescriptions, or cannabinoid care",
+    doctorLabel: "Prescribing Doctor",
+    doctorDesc: "Active license / International medical board registration",
+    pharmacyLabel: "Pharmacy / Dispensary",
+    pharmacyDesc: "Business Tax ID / National pharmaceutical & health authority license",
+    changeProfile: "← Change profile",
+    googleLoginTitle: "Quick sign in for",
+    googleLoginBtn: "Sign in with Google as",
+    googleTerms: "By continuing, you agree to GDPR/Privacy Terms and authorize clinical telemetry compliance.",
+    countryLabel: "Country of Residence / Operation *",
+    fullName: "Full Legal Name *",
+    fullNamePh: "Your full name",
+    email: "Email Address *",
+    password: "Password *",
+    passwordPh: "Minimum 6 characters",
+    phone: "Phone / WhatsApp with Country Code",
+    docLabel: "Identity Document / ID Number *",
+    birthDate: "Date of Birth *",
+    zipLabel: "Postal Code / Zip Code *",
+    street: "Street Address",
+    district: "Neighborhood / District",
+    number: "Number / Suite *",
+    complement: "Apartment / Unit",
+    pharmacyName: "Company / Legal Business Name *",
+    cnpjOrTax: "Business Tax ID / Registration *",
+    anvisaOrAuth: "Health Authority / Pharmacy License Number *",
+    tcleText: "I have read and fully accept the Informed Consent (TCLE) and Telemedicine Privacy Policy with audit cryptographic hashing.",
+    submitBtn: "Create My Account",
+    submitting: "Creating account...",
+    alreadyRegistered: "Already have an account?",
+    loginLink: "Sign in",
+  },
+};
 
 const Cadastro = () => {
   const [type, setType] = useState<UserType>(null);
@@ -36,6 +200,9 @@ const Cadastro = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [tcleAccepted, setTcleAccepted] = useState(false);
+  const [country, setCountry] = useState<CountryCode>("BR");
+  const [lang, setLang] = useState<LangCode>("PT");
+  const [cepLoading, setCepLoading] = useState(false);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -43,7 +210,55 @@ const Cadastro = () => {
   const redirectTo = searchParams.get("redirect");
   const activeRefCode = searchParams.get("ref") || searchParams.get("ref_id") || getReferralCode();
 
+  const currentCountryConfig = useMemo(() => {
+    return COUNTRIES.find((c) => c.code === country) || COUNTRIES[0];
+  }, [country]);
+
+  const t = STRINGS[lang] || STRINGS.PT;
+
+  // Auto-switch language on country selection
+  const handleCountryChange = (c: CountryCode) => {
+    setCountry(c);
+    const cfg = COUNTRIES.find(x => x.code === c);
+    if (cfg) {
+      setLang(cfg.lang as LangCode);
+    }
+  };
+
   const handleChange = (key: string, value: string) => setFormData({ ...formData, [key]: value });
+
+  /** ViaCEP — preenche endereço automaticamente no Brasil */
+  const handleCep = async (raw: string) => {
+    if (country !== "BR") {
+      handleChange("cep", raw);
+      return;
+    }
+    const masked = raw.replace(/\D/g, "").slice(0, 8).replace(/^(\d{5})(\d)/, "$1-$2");
+    handleChange("cep", masked);
+    const digits = masked.replace(/\D/g, "");
+    if (digits.length !== 8) return;
+    setCepLoading(true);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+      const data = await res.json();
+      if (data?.erro) {
+        toast({ title: "CEP não encontrado", description: "Verifique os números digitados.", variant: "destructive" });
+        return;
+      }
+      setFormData((p) => ({
+        ...p,
+        logradouro: data.logradouro || p.logradouro || "",
+        bairro: data.bairro || p.bairro || "",
+        cidade: data.localidade || p.cidade || "",
+        uf: data.uf || p.uf || "",
+      }));
+      toast({ title: "Endereço preenchido! 📍", description: `${data.logradouro || ""} — ${data.localidade}/${data.uf}` });
+    } catch {
+      toast({ title: "Não foi possível consultar o CEP", variant: "destructive" });
+    } finally {
+      setCepLoading(false);
+    }
+  };
 
   const validateForm = (): boolean => {
     if (!type) return false;
@@ -63,23 +278,22 @@ const Cadastro = () => {
       toast({ title: "Senha muito curta", description: "Mínimo de 6 caracteres.", variant: "destructive" });
       return false;
     }
-    const telefone = formData.telefone || "";
-    if (telefone && !/^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(telefone.replace(/\s/g, ""))) {
-      toast({ title: "Telefone inválido", description: "Insira um telefone válido.", variant: "destructive" });
-      return false;
+
+    if (country === "BR") {
+      const cpf = formData.cpf || "";
+      if (type === "paciente" && cpf && !validateCPF(cpf)) {
+        toast({ title: "CPF inválido", description: "Insira um CPF válido com 11 dígitos.", variant: "destructive" });
+        return false;
+      }
+      const cnpj = formData.cnpj || "";
+      if (type === "farmacia" && cnpj && !validateCNPJ(cnpj)) {
+        toast({ title: "CNPJ inválido", description: "Insira um CNPJ válido com 14 dígitos.", variant: "destructive" });
+        return false;
+      }
     }
-    const cpf = formData.cpf || "";
-    if (cpf && !validateCPF(cpf)) {
-      toast({ title: "CPF inválido", description: "Insira um CPF válido.", variant: "destructive" });
-      return false;
-    }
-    const cnpj = formData.cnpj || "";
-    if (cnpj && !validateCNPJ(cnpj)) {
-      toast({ title: "CNPJ inválido", description: "Insira um CNPJ válido.", variant: "destructive" });
-      return false;
-    }
+
     if (!tcleAccepted) {
-      toast({ title: "TCLE Obrigatório", description: "Você precisa aceitar os termos do TCLE e LGPD para criar a conta.", variant: "destructive" });
+      toast({ title: "TCLE Obrigatório", description: "Você precisa aceitar os termos do TCLE e Privacidade para criar a conta.", variant: "destructive" });
       return false;
     }
     return true;
@@ -90,18 +304,19 @@ const Cadastro = () => {
     if (!validateForm()) return;
     setLoading(true);
 
-    const selectedType = userTypes.find(u => u.id === type);
-    const dbType = selectedType?.dbType || "patient";
+    const dbType = type === "farmacia" ? "pharmacy" : "patient";
 
     try {
-      // 1. Create auth user
+      // 1. Criar usuário no Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
+        email: formData.email.trim().toLowerCase(),
         password: formData.senha,
         options: {
           emailRedirectTo: window.location.origin,
           data: {
             full_name: formData.nome,
+            country: country,
+            language: lang,
           },
         },
       });
@@ -110,14 +325,12 @@ const Cadastro = () => {
         const msg = authError.message || "";
         if (msg.includes("already registered") || msg.includes("already been registered")) {
           toast({ title: "E-mail já cadastrado", description: "Tente fazer login ou use outro e-mail.", variant: "destructive" });
-        } else if (msg.toLowerCase().includes("weak") || msg.toLowerCase().includes("pwned") || msg.toLowerCase().includes("known to be")) {
+        } else if (msg.toLowerCase().includes("weak") || msg.toLowerCase().includes("pwned")) {
           toast({
-            title: "Senha muito fraca 🔒",
-            description: "Esta senha apareceu em vazamentos públicos. Crie uma senha forte: misture letras maiúsculas, minúsculas, números e símbolos (ex: Plant@Raiz2026!).",
+            title: "Senha fraca 🔒",
+            description: "Esta senha apareceu em vazamentos públicos. Crie uma senha mais forte com letras, números e símbolos.",
             variant: "destructive",
           });
-        } else if (msg.toLowerCase().includes("password")) {
-          toast({ title: "Problema com a senha", description: "Use no mínimo 8 caracteres com letras, números e símbolos.", variant: "destructive" });
         } else {
           toast({ title: "Erro no cadastro", description: msg, variant: "destructive" });
         }
@@ -125,8 +338,7 @@ const Cadastro = () => {
         return;
       }
 
-
-      // 2. Update profile with additional data
+      // 2. Atualizar perfil com dados internacionais
       if (authData.user) {
         await supabase.from("profiles").update({
           full_name: formData.nome,
@@ -137,18 +349,7 @@ const Cadastro = () => {
           date_of_birth: formData.dataNascimento || null,
         }).eq("id", authData.user.id);
 
-        // 3. If doctor, create doctor record
-        if (type === "medico" && formData.crm) {
-          await supabase.from("doctors").insert({
-            user_id: authData.user.id,
-            crm: formData.crm,
-            crm_state: formData.crmUf || "SP",
-            rqe: formData.rqe || null,
-            specialty: formData.especialidade || "Cannabis Medicinal",
-            bio: formData.bio || null,
-          });
-        }
-        // 4. Gravar consentimento TCLE obrigatório com hash criptográfico SHA-256
+        // 3. Gravar consentimento TCLE obrigatório com hash SHA-256
         const timestamp = new Date().toISOString();
         let consentHash = "";
         try {
@@ -164,32 +365,23 @@ const Cadastro = () => {
           version: "2026.1",
           accepted_at: timestamp,
           hash: consentHash,
-          checks: { read: true, limitations: true, privacy: true, ai: true },
+          checks: { read: true, limitations: true, privacy: true, ai: true, country },
           user_agent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 400) : null,
         });
 
-        // 5. Link referral (3-level MLM tree)
+        // 4. Link referral (árvore de indicações)
         await linkReferralOnSignup(authData.user.id);
 
-        // 5. Alerta WhatsApp ao Dr. Edilson — Modo Cadastro Ativado (signup)
+        // 5. Alerta WhatsApp
         supabase.functions
-          .invoke("brisa-signup-alert", { body: { user_id: authData.user.id, event: "signup" } })
-          .catch((e) => console.warn("[brisa-signup-alert] signup", e));
-
-        // 6. Garante sessão ativa para que médico/profissional entre direto no Desktop Médico
-        if (!authData.session && (type === "medico" || type === "profissional")) {
-          await supabase.auth.signInWithPassword({
-            email: formData.email,
-            password: formData.senha,
-          }).catch(() => {});
-        }
+          .invoke("brisa-signup-alert", { body: { user_id: authData.user.id, event: "signup", country, type } })
+          .catch((e) => console.warn("[brisa-signup-alert]", e));
       }
 
-      trackPixelEvent("Lead", { content_name: "patient_signup", content_category: type }, {
+      trackPixelEvent("Lead", { content_name: `${type}_signup`, content_category: type }, {
         leadScore: 30, funnelStage: "intent", category: "conversion",
       });
 
-      // If session created immediately and we have a safe (relative) redirect target, go there
       if (authData.session && redirectTo) {
         const dest = decodeURIComponent(redirectTo);
         if (dest.startsWith("/") && !dest.startsWith("//")) {
@@ -199,7 +391,7 @@ const Cadastro = () => {
       }
 
       setSubmitted(true);
-      toast({ title: "Cadastro realizado! ✅", description: "Verifique seu e-mail para confirmar a conta." });
+      toast({ title: "Cadastro realizado! ✅", description: "Verifique seu e-mail para confirmação da conta." });
     } catch (err) {
       toast({ title: "Erro", description: "Falha ao criar conta. Tente novamente.", variant: "destructive" });
     }
@@ -225,47 +417,38 @@ const Cadastro = () => {
                   Enviamos uma carta de boas-vindas com um link de acesso para o e-mail: <strong className="break-all">{formData.email}</strong>.
                 </p>
                 <p className="text-sm mt-2">
-                  Por favor, confirme o recebimento para ativar completamente sua conta e garantir a segurança dos seus dados.
-                  <br/>
-                  <span className="text-xs opacity-80 mt-1 block">(Caso feche esta janela, você continuará tendo acesso inicial à plataforma, mas o e-mail servirá como lembrete).</span>
+                  Por favor, confirme o recebimento para ativar completamente sua conta.
                 </p>
               </div>
 
-              <div className="flex flex-col gap-2 p-4 rounded-xl bg-primary/5 border border-primary/20 mb-6">
-                <div className="flex items-center justify-center gap-2">
-                  <Mail size={16} className="text-primary" />
-                  <span className="text-sm font-bold text-foreground">Verifique sua caixa de entrada (ou Spam)</span>
-                </div>
-                <p className="text-[10px] text-muted-foreground mt-1">
-                  Dúvidas? Entre em contato: contato@plantayraiz.com.br ou (11) 99136-3154
-                </p>
-              </div>
               <div className="flex flex-col gap-3 justify-center">
-                {(type === "medico" || type === "profissional") && (
-                  <Button size="lg" className="font-black bg-primary text-primary-foreground rounded-2xl shadow-glow" asChild>
-                    <Link to="/dashboard-medico">
-                      <Stethoscope size={18} className="mr-2" />
-                      Entrar no Desktop Médico Agora
-                      <ArrowRight size={16} className="ml-2" />
-                    </Link>
-                  </Button>
-                )}
-                <div className="flex gap-3 justify-center">
-                  <Button className="font-black bg-primary text-primary-foreground rounded-2xl" asChild>
-                    <Link to="/login">Fazer Login <ArrowRight size={16} className="ml-2" /></Link>
-                  </Button>
-                  <Button variant="outline" className="font-bold rounded-2xl" asChild>
-                    <Link to="/">Voltar ao Início</Link>
-                  </Button>
-                </div>
+                <Button
+                  onClick={() => openGlobalTour(type || "paciente")}
+                  className="font-black bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 rounded-2xl h-12 shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all"
+                >
+                  <Sparkles size={16} className="mr-2 animate-pulse" /> 🚀 Fazer Tour 3D da Plataforma
+                </Button>
+                <Button className="font-black bg-primary text-primary-foreground rounded-2xl h-12" asChild>
+                  <Link to="/login">Fazer Login <ArrowRight size={16} className="ml-2" /></Link>
+                </Button>
+                <Button variant="outline" className="font-bold rounded-2xl h-12" asChild>
+                  <Link to="/">Voltar ao Início</Link>
+                </Button>
               </div>
             </motion.div>
           </div>
         </section>
+        <InteractiveTour3DModal initialRole={type || "paciente"} />
         <Footer />
       </div>
     );
   }
+
+  const userTypeOptions = [
+    { id: "paciente" as UserType, label: t.patientLabel, icon: Users, desc: t.patientDesc, color: "green" },
+    { id: "medico" as UserType, label: t.doctorLabel, icon: Stethoscope, desc: t.doctorDesc, color: "green" },
+    { id: "farmacia" as UserType, label: t.pharmacyLabel, icon: Building2, desc: t.pharmacyDesc, color: "purple" },
+  ];
 
   return (
     <div className="min-h-dvh bg-background">
@@ -273,20 +456,43 @@ const Cadastro = () => {
 
       <section className="pt-24 pb-12 md:pt-32 hero-glow">
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-            <div className="flex items-center gap-3 mb-4">
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} className="text-center md:text-left">
+            <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
               <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
                 <UserPlus size={24} className="text-primary" />
               </div>
-              <span className="text-sm font-bold text-primary">CRIAR CONTA</span>
+              <span className="text-sm font-bold text-primary">{t.createAccount}</span>
             </div>
+            
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground leading-tight mb-4">
-              Faça parte da <span className="text-gradient-green">Planta & Raiz</span>
+              {t.heroTitle} <span className="text-gradient-green">{t.heroTitleHl}</span>
             </h1>
-            <p className="text-muted-foreground max-w-2xl font-medium">
-              Crie sua conta para acessar consultas, prontuários e toda a plataforma.{" "}
-              <Link to="/login" className="text-primary font-bold hover:underline">Já tem conta? Faça login</Link>
+            <p className="text-muted-foreground max-w-2xl font-medium mx-auto md:mx-0">
+              {t.heroSubtitle}{" "}
+              <Link to={type === "farmacia" ? "/login?type=farmacia&redirect=/lojistas" : "/login"} className="text-primary font-bold hover:underline">{t.alreadyHaveAccount}</Link>
             </p>
+
+            {/* 🌐 Language Switcher Bar with SVG Flags */}
+            <div className="mt-5 flex items-center gap-2 flex-wrap justify-center md:justify-start">
+              <span className="text-xs font-bold text-muted-foreground flex items-center gap-1">
+                <Globe size={14} className="text-primary" /> {t.languageLabel}
+              </span>
+              {(["PT", "ES", "EN"] as LangCode[]).map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  onClick={() => setLang(l)}
+                  className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
+                    lang === l
+                      ? "bg-primary text-black shadow-md scale-105"
+                      : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  <CountryFlag code={l === "PT" ? "BR" : l === "ES" ? "ES" : "US"} className="w-4 h-3 rounded-sm object-cover" />
+                  {l === "PT" ? "Português" : l === "ES" ? "Español" : "English"}
+                </button>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
@@ -304,28 +510,28 @@ const Cadastro = () => {
                     </div>
                     <div>
                       <p className="font-bold text-foreground">
-                        🎁 Link de Indicação Ativo de Parceiro / Afiliado!
+                        🎁 Link de Indicação Ativo de Parceiro!
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Código Vinculado: <span className="font-mono font-bold text-primary">{activeRefCode}</span>
+                        Código: <span className="font-mono font-bold text-primary">{activeRefCode}</span>
                       </p>
                     </div>
                   </div>
                   <Badge className="bg-emerald-600/30 text-emerald-300 border-emerald-500/40">
-                    Indicação Ativa ✅
+                    Ativo ✅
                   </Badge>
                 </div>
               )}
 
               <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 mb-6 text-center">
                 <p className="text-sm text-emerald-300 font-bold">
-                  🎯 Selecione seu perfil. Cada categoria tem login Google dedicado e leva ao painel correto.
+                  {t.selectProfileBanner}
                 </p>
               </div>
 
-              <h3 className="font-display font-black text-foreground mb-6">Selecione seu perfil</h3>
+              <h3 className="font-display font-black text-foreground mb-6">{t.selectProfileTitle}</h3>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {userTypes.map((ut) => (
+                {userTypeOptions.map((ut) => (
                   <Card
                     key={ut.id}
                     className="border-border hover:border-primary/30 cursor-pointer transition-all hover:-translate-y-1"
@@ -339,11 +545,9 @@ const Cadastro = () => {
                   >
                     <CardContent className="p-6 text-center">
                       <div className={`w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center ${
-                        ut.color === "green" ? "bg-gradient-green border border-green" :
-                        ut.color === "purple" ? "bg-gradient-purple border border-purple" :
-                        "bg-gradient-gold border border-gold"
+                        ut.color === "green" ? "bg-gradient-green border border-green" : "bg-gradient-purple border border-purple"
                       }`}>
-                        <ut.icon size={28} className={ut.color === "green" ? "text-primary" : ut.color === "purple" ? "text-secondary" : "text-[hsl(45,76%,52%)]"} />
+                        <ut.icon size={28} className={ut.color === "green" ? "text-primary" : "text-secondary"} />
                       </div>
                       <h4 className="font-display font-black text-foreground mb-1">{ut.label}</h4>
                       <p className="text-xs text-muted-foreground">{ut.desc}</p>
@@ -354,17 +558,89 @@ const Cadastro = () => {
             </div>
           )}
 
-          {/* Form */}
+          {/* Registration Form */}
           {type && (
             <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-2xl mx-auto">
               <button onClick={() => setType(null)} className="text-xs text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1">
-                ← Trocar perfil
+                {t.changeProfile}
               </button>
 
+              {/* 🌍 Seletor de País de Residência / Atuação */}
+              <div className="mb-4 p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="country" className="font-bold flex items-center gap-2 text-xs text-foreground">
+                    <Globe size={14} className="text-primary" />
+                    {t.countryLabel}
+                  </Label>
+                </div>
+
+                <Select value={country} onValueChange={(v) => handleCountryChange(v as CountryCode)}>
+                  <SelectTrigger id="country" className="h-11 bg-muted border-border font-bold text-sm">
+                    <div className="flex items-center gap-2.5">
+                      <CountryFlag code={currentCountryConfig.code} className="w-5 h-3.5 rounded-sm object-cover shadow-sm border border-slate-700/50" />
+                      <span className="font-bold text-primary">{currentCountryConfig.code}</span>
+                      <span className="text-muted-foreground">—</span>
+                      <span className="text-foreground">{currentCountryConfig.name}</span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="max-h-80 bg-slate-900 text-slate-100 border-slate-700">
+                    <div className="p-2 text-[10px] font-bold text-primary uppercase tracking-wider">América Latina</div>
+                    {COUNTRIES.filter(c => ["BR","BO","AR","CL","CO","PE","UY","PY","EC","MX"].includes(c.code)).map((c) => (
+                      <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer py-2">
+                        <div className="flex items-center gap-2.5">
+                          <CountryFlag code={c.code} className="w-5 h-3.5 rounded-sm object-cover shadow-sm border border-slate-700/50" />
+                          <span className="font-bold text-primary">{c.code}</span>
+                          <span className="text-muted-foreground">—</span>
+                          <span className="font-medium">{c.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+
+                    <div className="p-2 text-[10px] font-bold text-primary uppercase tracking-wider border-t border-slate-800 mt-1">América do Norte</div>
+                    {COUNTRIES.filter(c => ["US","CA"].includes(c.code)).map((c) => (
+                      <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer py-2">
+                        <div className="flex items-center gap-2.5">
+                          <CountryFlag code={c.code} className="w-5 h-3.5 rounded-sm object-cover shadow-sm border border-slate-700/50" />
+                          <span className="font-bold text-primary">{c.code}</span>
+                          <span className="text-muted-foreground">—</span>
+                          <span className="font-medium">{c.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+
+                    <div className="p-2 text-[10px] font-bold text-primary uppercase tracking-wider border-t border-slate-800 mt-1">Europa</div>
+                    {COUNTRIES.filter(c => ["PT","ES","NL"].includes(c.code)).map((c) => (
+                      <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer py-2">
+                        <div className="flex items-center gap-2.5">
+                          <CountryFlag code={c.code} className="w-5 h-3.5 rounded-sm object-cover shadow-sm border border-slate-700/50" />
+                          <span className="font-bold text-primary">{c.code}</span>
+                          <span className="text-muted-foreground">—</span>
+                          <span className="font-medium">{c.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+
+                    <div className="p-2 text-[10px] font-bold text-primary uppercase tracking-wider border-t border-slate-800 mt-1">Ásia</div>
+                    {COUNTRIES.filter(c => ["CN","JP"].includes(c.code)).map((c) => (
+                      <SelectItem key={c.code} value={c.code} className="hover:bg-slate-800 cursor-pointer py-2">
+                        <div className="flex items-center gap-2.5">
+                          <CountryFlag code={c.code} className="w-5 h-3.5 rounded-sm object-cover shadow-sm border border-slate-700/50" />
+                          <span className="font-bold text-primary">{c.code}</span>
+                          <span className="text-muted-foreground">—</span>
+                          <span className="font-medium">{c.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {type === 'paciente' && (
+              <>
               {/* Google login dedicado por categoria */}
               <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 mb-4">
                 <p className="text-[11px] uppercase tracking-wider text-emerald-300 font-bold mb-2 text-center">
-                  Login rápido para {userTypes.find(u => u.id === type)?.label}
+                  {t.googleLoginTitle} {userTypeOptions.find(u => u.id === type)?.label}
                 </p>
                 <Button
                   type="button"
@@ -392,15 +668,17 @@ const Cadastro = () => {
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                   </svg>
                   <span className="truncate text-sm sm:text-base">
-                    Entrar com Google
-                    <span className="hidden sm:inline"> como {userTypes.find(u => u.id === type)?.label}</span>
+                    {t.googleLoginBtn}
+                    <span className="hidden sm:inline"> {userTypeOptions.find(u => u.id === type)?.label}</span>
                   </span>
                 </Button>
 
                 <p className="text-[10px] text-muted-foreground text-center mt-2">
-                  Ao continuar, você aceita os Termos LGPD e autoriza captura de localização para emergências.
+                  {t.googleTerms}
                 </p>
               </div>
+              </>
+              )}
 
               <Card className="border-border">
                 <CardContent className="p-6">
@@ -408,24 +686,24 @@ const Cadastro = () => {
                     {/* Common fields */}
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-xs font-bold text-muted-foreground">Nome completo *</Label>
-                        <Input value={formData.nome || ""} onChange={(e) => handleChange("nome", e.target.value)} placeholder="Seu nome" className="bg-muted border-border" required />
+                        <Label className="text-xs font-bold text-muted-foreground">{t.fullName}</Label>
+                        <Input value={formData.nome || ""} onChange={(e) => handleChange("nome", e.target.value)} placeholder={t.fullNamePh} className="bg-muted border-border" required />
                       </div>
                       <div>
-                        <Label className="text-xs font-bold text-muted-foreground">E-mail *</Label>
+                        <Label className="text-xs font-bold text-muted-foreground">{t.email}</Label>
                         <Input type="email" value={formData.email || ""} onChange={(e) => handleChange("email", e.target.value)} placeholder="seu@email.com" className="bg-muted border-border" required />
                       </div>
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-xs font-bold text-muted-foreground">Senha *</Label>
+                        <Label className="text-xs font-bold text-muted-foreground">{t.password}</Label>
                         <div className="relative">
                           <Input
                             type={showPassword ? "text" : "password"}
                             value={formData.senha || ""}
                             onChange={(e) => handleChange("senha", e.target.value)}
-                            placeholder="Mínimo 6 caracteres"
+                            placeholder={t.passwordPh}
                             className="bg-muted border-border pr-10"
                             required
                             minLength={6}
@@ -436,67 +714,150 @@ const Cadastro = () => {
                         </div>
                       </div>
                       <div>
-                        <Label className="text-xs font-bold text-muted-foreground">Telefone</Label>
-                        <Input value={formData.telefone || ""} onChange={(e) => handleChange("telefone", e.target.value)} placeholder="(11) 99999-9999" className="bg-muted border-border" />
+                        <Label className="text-xs font-bold text-muted-foreground">{t.phone}</Label>
+                        <PhoneInput
+                          international
+                          defaultCountry={country as any}
+                          placeholder="+55 11 99999-9999"
+                          value={formData.telefone || ""}
+                          onChange={(v) => handleChange("telefone", v || "")}
+                          className="phone-input-custom"
+                        />
                       </div>
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-xs font-bold text-muted-foreground">CPF</Label>
-                        <Input value={formData.cpf || ""} onChange={(e) => handleChange("cpf", formatCPF(e.target.value))} placeholder="000.000.000-00" className="bg-muted border-border" />
+                        <Label className="text-xs font-bold text-muted-foreground">
+                          {country === "BR" ? "CPF *" : `${t.docLabel} (${currentCountryConfig.defaultDoc})`}
+                        </Label>
+                        <Input
+                          value={formData.cpf || ""}
+                          onChange={(e) => handleChange("cpf", country === "BR" ? formatCPF(e.target.value) : e.target.value.toUpperCase())}
+                          placeholder={country === "BR" ? "000.000.000-00" : "ID / Passport"}
+                          className="bg-muted border-border font-mono"
+                          required
+                        />
                       </div>
                       <div>
-                        <Label className="text-xs font-bold text-muted-foreground">Data de Nascimento</Label>
-                        <Input type="date" value={formData.dataNascimento || ""} onChange={(e) => handleChange("dataNascimento", e.target.value)} className="bg-muted border-border" />
+                        <Label className="text-xs font-bold text-muted-foreground">{t.birthDate}</Label>
+                        <Input type="date" value={formData.dataNascimento || ""} onChange={(e) => handleChange("dataNascimento", e.target.value)} className="bg-muted border-border" required />
                       </div>
                     </div>
 
-                    {/* Doctor-specific fields */}
-                    {type === "medico" && (
-                      <>
-                        <div className="grid sm:grid-cols-3 gap-4">
-                          <div>
-                            <Label className="text-xs font-bold text-muted-foreground">CRM *</Label>
-                            <Input value={formData.crm || ""} onChange={(e) => handleChange("crm", e.target.value)} placeholder="123456" className="bg-muted border-border" required />
-                          </div>
-                          <div>
-                            <Label className="text-xs font-bold text-muted-foreground">UF do CRM</Label>
-                            <Select value={formData.crmUf || "SP"} onValueChange={(v) => handleChange("crmUf", v)}>
-                              <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
-                              <SelectContent>
-                                {["AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA","PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO"].map(uf => (
-                                  <SelectItem key={uf} value={uf}>{uf}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <Label className="text-xs font-bold text-muted-foreground">RQE</Label>
-                            <Input value={formData.rqe || ""} onChange={(e) => handleChange("rqe", e.target.value)} placeholder="Opcional" className="bg-muted border-border" />
-                          </div>
-                        </div>
-                        <div>
-                          <Label className="text-xs font-bold text-muted-foreground">Especialidade</Label>
-                          <Input value={formData.especialidade || ""} onChange={(e) => handleChange("especialidade", e.target.value)} placeholder="Ex: Cannabis Medicinal, Neurologia..." className="bg-muted border-border" />
-                        </div>
-                        <div>
-                          <Label className="text-xs font-bold text-muted-foreground">Bio</Label>
-                          <Textarea value={formData.bio || ""} onChange={(e) => handleChange("bio", e.target.value)} placeholder="Breve descrição profissional..." className="bg-muted border-border" rows={3} />
-                        </div>
-                      </>
-                    )}
+                    {/* Endereço com CEP */}
+                    <div className="grid sm:grid-cols-3 gap-4">
+                      <div className="space-y-1">
+                        <Label className="text-xs font-bold text-muted-foreground flex items-center justify-between">
+                          <span>{t.zipLabel}</span>
+                          {cepLoading && <span className="text-[10px] text-primary animate-pulse">Buscando...</span>}
+                        </Label>
+                        <Input
+                          value={formData.cep || ""}
+                          onChange={(e) => handleCep(e.target.value)}
+                          placeholder={country === "BR" ? "00000-000" : "Zip Code"}
+                          className="bg-muted border-border font-mono"
+                        />
+                      </div>
+                      <div className="space-y-1 sm:col-span-2">
+                        <Label className="text-xs font-bold text-muted-foreground">{t.street}</Label>
+                        <Input value={formData.logradouro || ""} onChange={(e) => handleChange("logradouro", e.target.value)} className="bg-muted border-border" />
+                      </div>
+                    </div>
 
-                    {/* Pharmacy fields */}
+                    <div className="grid sm:grid-cols-3 gap-4">
+                      <div className="space-y-1">
+                        <Label className="text-xs font-bold text-muted-foreground">{t.number}</Label>
+                        <Input value={formData.numero || ""} onChange={(e) => handleChange("numero", e.target.value)} placeholder="123" className="bg-muted border-border" />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs font-bold text-muted-foreground">{t.district}</Label>
+                        <Input value={formData.bairro || ""} onChange={(e) => handleChange("bairro", e.target.value)} className="bg-muted border-border" />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs font-bold text-muted-foreground">{t.complement}</Label>
+                        <Input value={formData.complemento || ""} onChange={(e) => handleChange("complemento", e.target.value)} placeholder="Apto / Sala" className="bg-muted border-border" />
+                      </div>
+                    </div>
+
+                    {/* Pharmacy fields & KYC Uploads */}
                     {type === "farmacia" && (
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <Label className="text-xs font-bold text-muted-foreground">CNPJ *</Label>
-                          <Input value={formData.cnpj || ""} onChange={(e) => handleChange("cnpj", formatCNPJ(e.target.value))} placeholder="00.000.000/0000-00" className="bg-muted border-border" required />
+                      <div className="space-y-4 pt-2 border-t border-border/50">
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-xs font-bold text-muted-foreground">{t.pharmacyName}</Label>
+                            <Input
+                              value={formData.razaoSocial || ""}
+                              onChange={(e) => handleChange("razaoSocial", e.target.value)}
+                              placeholder="Razão Social / Nome Fantasia da Farmácia"
+                              className="bg-muted border-border"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs font-bold text-muted-foreground">
+                              {country === "BR" ? "CNPJ *" : t.cnpjOrTax}
+                            </Label>
+                            <Input
+                              value={formData.cnpj || ""}
+                              onChange={(e) => handleChange("cnpj", country === "BR" ? formatCNPJ(e.target.value) : e.target.value)}
+                              placeholder={country === "BR" ? "00.000.000/0000-00" : "Tax ID / License"}
+                              className="bg-muted border-border font-mono"
+                              required
+                            />
+                          </div>
                         </div>
-                        <div>
-                          <Label className="text-xs font-bold text-muted-foreground">Autorização ANVISA</Label>
-                          <Input value={formData.anvisaAuth || ""} onChange={(e) => handleChange("anvisaAuth", e.target.value)} placeholder="Número da autorização" className="bg-muted border-border" />
+
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-xs font-bold text-muted-foreground">{t.anvisaOrAuth}</Label>
+                            <Input
+                              value={formData.anvisaAuth || ""}
+                              onChange={(e) => handleChange("anvisaAuth", e.target.value)}
+                              placeholder="Ex: AFE-ANVISA 7.82941.2"
+                              className="bg-muted border-border"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs font-bold text-muted-foreground">Farmacêutico(a) Responsável & CRF *</Label>
+                            <Input
+                              value={formData.crf || ""}
+                              onChange={(e) => handleChange("crf", e.target.value)}
+                              placeholder="Nome do Farmacêutico — CRF/UF 12345"
+                              className="bg-muted border-border"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* 🏢 Uploads de Documentos KYC Lojista */}
+                        <div className="p-4 rounded-2xl bg-muted/20 border border-primary/20 space-y-3">
+                          <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                            <Building2 size={15} className="text-primary" /> Anexo de Documentos & Compliance da Loja Física (KYC)
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">
+                            Estes documentos serão auditados antes da publicação dos seus produtos no Shopping.
+                          </p>
+
+                          <div className="grid sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs font-bold text-muted-foreground">Foto da Fachada / Loja Física *</Label>
+                              <Input type="file" accept="image/*" className="bg-muted border-border text-xs" />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs font-bold text-muted-foreground">Logomarca da Empresa (Shopping) *</Label>
+                              <Input type="file" accept="image/*" className="bg-muted border-border text-xs" />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs font-bold text-muted-foreground">Contrato Social / Razão Social (PDF) *</Label>
+                              <Input type="file" accept=".pdf,image/*" className="bg-muted border-border text-xs" />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs font-bold text-muted-foreground">Alvará Sanitário / ANVISA AFE *</Label>
+                              <Input type="file" accept=".pdf,image/*" className="bg-muted border-border text-xs" />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -510,21 +871,19 @@ const Cadastro = () => {
                           className="mt-0.5 h-5 w-5 border-primary"
                         />
                         <span className="text-xs text-foreground leading-relaxed">
-                          Li, compreendi e aceito integralmente o{" "}
-                          <strong className="text-primary font-bold">TCLE (Termo de Consentimento Livre e Esclarecido)</strong>{" "}
-                          e a Política de Privacidade (LGPD Lei nº 13.709/2018 e Resoluções CFM 2.314/2022 e 2.454/2026). Estou ciente das limitações da telemedicina e que os registros de assunção de responsabilidade serão armazenados com hash auditável.
+                          {t.tcleText}
                         </span>
                       </label>
                     </div>
 
                     <Button type="submit" className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12" disabled={loading || !tcleAccepted}>
                       {loading ? <Loader2 size={16} className="animate-spin mr-2" /> : <UserPlus size={16} className="mr-2" />}
-                      Criar Conta
+                      {loading ? t.submitting : t.submitBtn}
                     </Button>
 
                     <p className="text-center text-xs text-muted-foreground">
-                      Já tem uma conta?{" "}
-                      <Link to="/login" className="text-primary font-bold hover:underline">Fazer login</Link>
+                      {t.alreadyRegistered}{" "}
+                      <Link to={type === "farmacia" ? "/login?type=farmacia&redirect=/lojistas" : "/login"} className="text-primary font-bold hover:underline">{t.loginLink}</Link>
                     </p>
                   </form>
                 </CardContent>

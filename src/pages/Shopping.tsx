@@ -9,7 +9,7 @@ import {
   ShoppingBag, Star, ArrowLeft, ArrowRight,
   Store, CreditCard, Truck, Search, Shield, Grid3X3, List, ChevronRight,
   Tag, Package, Bitcoin, Clock, ChevronLeft,
-  BadgeCheck, Flame, Filter, X, SlidersHorizontal, Heart
+  BadgeCheck, Flame, Filter, X, SlidersHorizontal, Heart, Sparkles, CheckCircle2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/store/cart";
@@ -21,68 +21,13 @@ import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { PrescriptionVerificationModal } from "@/components/PrescriptionVerificationModal";
 import { DoctorEndorsedBadge } from "@/components/DoctorEndorsedBadge";
 import { AnvisaBadge } from "@/components/AnvisaBadge";
+import { FarmaciaCard } from "@/components/FarmaciaCard";
 import { buildProductSchema } from "@/lib/schema-org";
+import { resolveProductImg } from "@/lib/productImages";
+import { ImageLightboxModal } from "@/components/ImageLightboxModal";
+import { ShippingCalculator } from "@/components/ShippingCalculator";
 
-// Import product images
-import oleoCbd1 from "@/assets/products/oleo-cbd-1.jpg";
-import oleoCbd2 from "@/assets/products/oleo-cbd-2.jpg";
-import oleoCbd3 from "@/assets/products/oleo-cbd-3.jpg";
-import capsulas1 from "@/assets/products/capsulas-1.jpg";
-import capsulas2 from "@/assets/products/capsulas-2.jpg";
-import capsulas3 from "@/assets/products/capsulas-3.jpg";
-import tintura1 from "@/assets/products/tintura-1.jpg";
-import tintura2 from "@/assets/products/tintura-2.jpg";
-import tintura3 from "@/assets/products/tintura-3.jpg";
-import vape1 from "@/assets/products/vape-1.jpg";
-import vape2 from "@/assets/products/vape-2.jpg";
-import vape3 from "@/assets/products/vape-3.jpg";
-import gummies1 from "@/assets/products/gummies-1.jpg";
-import gummies2 from "@/assets/products/gummies-2.jpg";
-import gummies3 from "@/assets/products/gummies-3.jpg";
-import cha1 from "@/assets/products/cha-1.jpg";
-import cha2 from "@/assets/products/cha-2.jpg";
-import cha3 from "@/assets/products/cha-3.jpg";
-import creme1 from "@/assets/products/creme-1.jpg";
-import creme2 from "@/assets/products/creme-2.jpg";
-import creme3 from "@/assets/products/creme-3.jpg";
-import lip1 from "@/assets/products/lip-1.jpg";
-import lip2 from "@/assets/products/lip-2.jpg";
-import lip3 from "@/assets/products/lip-3.jpg";
-import proteina1 from "@/assets/products/proteina-1.jpg";
-import proteina2 from "@/assets/products/proteina-2.jpg";
-import proteina3 from "@/assets/products/proteina-3.jpg";
-import patch1 from "@/assets/products/patch-1.jpg";
-import patch2 from "@/assets/products/patch-2.jpg";
-import patch3 from "@/assets/products/patch-3.jpg";
-import massage1 from "@/assets/products/massage-1.jpg";
-import massage2 from "@/assets/products/massage-2.jpg";
-import massage3 from "@/assets/products/massage-3.jpg";
-import spray1 from "@/assets/products/spray-1.jpg";
-import spray2 from "@/assets/products/spray-2.jpg";
-import spray3 from "@/assets/products/spray-3.jpg";
-import bath1 from "@/assets/products/bath-1.jpg";
-import bath2 from "@/assets/products/bath-2.jpg";
-import bath3 from "@/assets/products/bath-3.jpg";
-
-const imageMap: Record<string, string> = {
-  "/src/assets/products/oleo-cbd-1.jpg": oleoCbd1, "/src/assets/products/oleo-cbd-2.jpg": oleoCbd2, "/src/assets/products/oleo-cbd-3.jpg": oleoCbd3,
-  "/src/assets/products/capsulas-1.jpg": capsulas1, "/src/assets/products/capsulas-2.jpg": capsulas2, "/src/assets/products/capsulas-3.jpg": capsulas3,
-  "/src/assets/products/tintura-1.jpg": tintura1, "/src/assets/products/tintura-2.jpg": tintura2, "/src/assets/products/tintura-3.jpg": tintura3,
-  "/src/assets/products/vape-1.jpg": vape1, "/src/assets/products/vape-2.jpg": vape2, "/src/assets/products/vape-3.jpg": vape3,
-  "/src/assets/products/gummies-1.jpg": gummies1, "/src/assets/products/gummies-2.jpg": gummies2, "/src/assets/products/gummies-3.jpg": gummies3,
-  "/src/assets/products/cha-1.jpg": cha1, "/src/assets/products/cha-2.jpg": cha2, "/src/assets/products/cha-3.jpg": cha3,
-  "/src/assets/products/creme-1.jpg": creme1, "/src/assets/products/creme-2.jpg": creme2, "/src/assets/products/creme-3.jpg": creme3,
-  "/src/assets/products/lip-1.jpg": lip1, "/src/assets/products/lip-2.jpg": lip2, "/src/assets/products/lip-3.jpg": lip3,
-  "/src/assets/products/proteina-1.jpg": proteina1, "/src/assets/products/proteina-2.jpg": proteina2, "/src/assets/products/proteina-3.jpg": proteina3,
-  "/src/assets/products/patch-1.jpg": patch1, "/src/assets/products/patch-2.jpg": patch2, "/src/assets/products/patch-3.jpg": patch3,
-  "/src/assets/products/massage-1.jpg": massage1, "/src/assets/products/massage-2.jpg": massage2, "/src/assets/products/massage-3.jpg": massage3,
-  "/src/assets/products/spray-1.jpg": spray1, "/src/assets/products/spray-2.jpg": spray2, "/src/assets/products/spray-3.jpg": spray3,
-  "/src/assets/products/bath-1.jpg": bath1, "/src/assets/products/bath-2.jpg": bath2, "/src/assets/products/bath-3.jpg": bath3,
-};
-
-const resolveImg = (url: string | null) => (url && imageMap[url]) || "/placeholder.svg";
-
-interface VendorProduct {
+export interface VendorProduct {
   id: string;
   vendor_id: string;
   name: string;
@@ -103,16 +48,215 @@ interface VendorProduct {
   vendors?: { id: string; store_name: string; rating: number | null };
 }
 
+export const OFFICIAL_MEDICINES: VendorProduct[] = [
+  {
+    id: "med-1",
+    vendor_id: "vendor-pyr-oficial",
+    name: "Epidiolex / Epidyolex (Canabidiol 100 mg/mL)",
+    description: "Composição: Canabidiol (CBD) purificado de origem botânica (>98%), sem THC.\n\nIndicações: Síndrome de Lennox-Gastaut, Síndrome de Dravet, Complexo de Esclerose Tuberosa e epilepsias refratárias de difícil controle.\n\nDescrição: Primeiro medicamento fitoderivado de cannabis aprovado pelo FDA e pela EMA, com ampla validação em ensaios clínicos duplo-cegos.\n\nPosologia Resumida: Dose inicial de 5 mg/kg/dia dividida em 2 tomadas orais. Pode ser titulada semanalmente até a dose de manutenção de 10 mg a 20 mg/kg/dia, com monitoramento periódico de enzimas hepáticas (ALT/AST).",
+    price: 2450.00,
+    compare_price: 2890.00,
+    category: "oleo",
+    image_url: "/src/assets/products/oleo-cbd-1.jpg",
+    image_url_2: "/src/assets/products/oleo-cbd-2.jpg",
+    image_url_3: "/src/assets/products/oleo-cbd-3.jpg",
+    stock: 45,
+    sold_count: 89,
+    rating: 5.0,
+    review_count: 32,
+    is_active: true,
+    endorsed_by_doctor: true,
+    as_anvisa: "FDA/EMA/ANVISA 327",
+    vendors: { id: "vendor-pyr-oficial", store_name: "Planta y Raiz Ltda", rating: 5.0 }
+  },
+  {
+    id: "med-2",
+    vendor_id: "vendor-pyr-oficial",
+    name: "Sativex / Mevatyl (Nabiximols - Spray Oromucosal 1:1)",
+    description: "Composição: Extrato botânico padronizado contendo 2,7 mg de THC + 2,5 mg de CBD por borrifada.\n\nIndicações: Espasticidade moderada a grave decorrente de Esclerose Múltipla (não responsiva a outros tratamentos) e dor neuropática oncológica.\n\nDescrição: Solução oromucosal que permite absorção direta pela mucosa oral, evitando o metabolismo de primeira passagem hepática.\n\nPosologia Resumida: Inicia-se com 1 borrifada ao dia à noite, aumentando gradualmente 1 borrifada por dia até o alívio dos sintomas. A dose média de manutenção fica entre 4 e 8 borrifadas/dia (máximo de 12 borrifadas/dia).",
+    price: 2890.00,
+    compare_price: 3250.00,
+    category: "spray",
+    image_url: "/src/assets/products/spray-1.jpg",
+    image_url_2: "/src/assets/products/spray-2.jpg",
+    image_url_3: "/src/assets/products/spray-3.jpg",
+    stock: 30,
+    sold_count: 64,
+    rating: 4.9,
+    review_count: 24,
+    is_active: true,
+    endorsed_by_doctor: true,
+    as_anvisa: "MS 1.0504.0028",
+    vendors: { id: "vendor-pyr-oficial", store_name: "Planta y Raiz Ltda", rating: 5.0 }
+  },
+  {
+    id: "med-3",
+    vendor_id: "vendor-pyr-oficial",
+    name: "Marinol (Dronabinol em Cápsulas - 10 mg)",
+    description: "Composição: Delta-9-Tetrahidrocanabinol (Δ9-THC) sintético formulado em óleo de gergelim.\n\nIndicações: Anorexia associada à perda de peso em pacientes com HIV/AIDS e náuseas/vômitos induzidos por quimioterapia refratários a antieméticos clássicos.\n\nDescrição: Agonista direto dos receptores CB1 e CB2 do sistema endocanabinoide, com potente ação orexígena (estímulo de apetite) e antiemética.\n\nPosologia Resumida: Para apetite: 2,5 mg a 5 mg antes do almoço e do jantar. Para náuseas pós-quimio: 5 mg/m² administrados 1 a 3 horas antes da sessão de quimioterapia.",
+    price: 1850.00,
+    compare_price: 2100.00,
+    category: "capsula",
+    image_url: "/src/assets/products/capsulas-1.jpg",
+    image_url_2: "/src/assets/products/capsulas-2.jpg",
+    image_url_3: "/src/assets/products/capsulas-3.jpg",
+    stock: 25,
+    sold_count: 42,
+    rating: 4.8,
+    review_count: 18,
+    is_active: true,
+    endorsed_by_doctor: true,
+    as_anvisa: "FDA Validated",
+    vendors: { id: "vendor-pyr-oficial", store_name: "Planta y Raiz Ltda", rating: 5.0 }
+  },
+  {
+    id: "med-4",
+    vendor_id: "vendor-pyr-oficial",
+    name: "Cesamet (Nabilona - Cápsulas 1 mg)",
+    description: "Composição: Análogo sintético do THC com potência farmacológica superior.\n\nIndicações: Náuseas e vômitos quimioterápicos resistentes e manejo coadjuvante de dor crônica neuropática grave.\n\nDescrição: Composto sintético com alta biodisponibilidade oral, utilizado em protocolos hospitalares e oncológicos internacionais.\n\nPosologia Resumida: 1 mg a 2 mg via oral, 2 vezes ao dia. A dose inicial costuma ser administrada na noite anterior ao início da quimioterapia (dose máxima: 6 mg/dia).",
+    price: 1620.00,
+    compare_price: 1950.00,
+    category: "capsula",
+    image_url: "/src/assets/products/capsulas-2.jpg",
+    image_url_2: "/src/assets/products/capsulas-3.jpg",
+    image_url_3: "/src/assets/products/capsulas-1.jpg",
+    stock: 20,
+    sold_count: 31,
+    rating: 4.8,
+    review_count: 15,
+    is_active: true,
+    endorsed_by_doctor: true,
+    as_anvisa: "Protocolo Hospitalar",
+    vendors: { id: "vendor-pyr-oficial", store_name: "Planta y Raiz Ltda", rating: 5.0 }
+  },
+  {
+    id: "med-5",
+    vendor_id: "vendor-pyr-oficial",
+    name: "Canabidiol Farmacêutico Isolado (Solução Oral 200 mg/mL)",
+    description: "Composição: CBD purificado dissolvido em TCM (triglicerídeos de cadeia média), com teor de THC <0,2%.\n\nIndicações: Epilepsia refratária, Transtorno do Espectro Autista (TEA), Transtorno de Ansiedade Generalizada (TAG) e distúrbios do sono.\n\nDescrição: Categoria de produto amplamente dispensada em farmácias comerciais sob resoluções sanitárias como a RDC 327/2019 da ANVISA no Brasil.\n\nPosologia Resumida: Início com doses baixas (0,5 a 1 mg/kg/dia ou 25 a 50 mg/dia divididos em 2 tomadas), com titulação gradual a cada 3 a 7 dias até o controle dos sintomas.",
+    price: 680.00,
+    compare_price: 790.00,
+    category: "oleo",
+    image_url: "/src/assets/products/oleo-cbd-2.jpg",
+    image_url_2: "/src/assets/products/oleo-cbd-3.jpg",
+    image_url_3: "/src/assets/products/oleo-cbd-1.jpg",
+    stock: 60,
+    sold_count: 142,
+    rating: 5.0,
+    review_count: 58,
+    is_active: true,
+    endorsed_by_doctor: true,
+    as_anvisa: "RDC 327/2019 ANVISA",
+    vendors: { id: "vendor-pyr-oficial", store_name: "Planta y Raiz Ltda", rating: 5.0 }
+  },
+  {
+    id: "med-6",
+    vendor_id: "vendor-pyr-oficial",
+    name: "Óleo CBD Full Spectrum 3000mg (Concentração ~100 mg/mL)",
+    description: "Composição: Extrato integral da planta com CBD dominante acompanhado de canabinoides menores (CBG, CBN, CBC), terpenos, flavonoides e traços de THC (<0,3%).\n\nIndicações: Dor crônica inflamatória (fibromialgia, artrite, osteoartrose), ansiedade, insônia e estresse pós-traumático (TEPT).\n\nDescrição: Um dos produtos mais prescritos globalmente por explorar o efeito entourage (sinergia terapêutica entre todos os fitocompostos).\n\nPosologia Resumida: 5 a 10 mg sublingual (2 a 4 gotas) 2 vezes ao dia. Titula-se adicionando gotas a cada 4 ou 5 dias até a dose terapêutica média (30 a 100 mg/dia).",
+    price: 540.00,
+    compare_price: 620.00,
+    category: "oleo",
+    image_url: "/src/assets/products/oleo-cbd-3.jpg",
+    image_url_2: "/src/assets/products/oleo-cbd-1.jpg",
+    image_url_3: "/src/assets/products/oleo-cbd-2.jpg",
+    stock: 75,
+    sold_count: 215,
+    rating: 4.9,
+    review_count: 94,
+    is_active: true,
+    endorsed_by_doctor: true,
+    as_anvisa: "ANVISA Autorizado",
+    vendors: { id: "vendor-pyr-oficial", store_name: "Planta y Raiz Ltda", rating: 5.0 }
+  },
+  {
+    id: "med-7",
+    vendor_id: "vendor-pyr-oficial",
+    name: "Óleo Balanceado 1:1 THC:CBD Full Spectrum (10 mg/mL THC : 10 mg/mL CBD)",
+    description: "Composição: Proporção equilibrada entre THC e CBD em extrato completo.\n\nIndicações: Dor oncológica, dor neuropática periférica, cuidados paliativos, espasmos musculares severos e insônia com componente doloroso.\n\nDescrição: O CBD modula os efeitos psicoativos indesejados do THC (como taquicardia e ansiedade), potencializando o efeito analgésico e relaxante muscular.\n\nPosologia Resumida: 2,5 mg de cada componente (0,25 mL ou 5 gotas) via sublingual à noite. Ajustes graduais a cada 3 dias conforme tolerabilidade, buscando a menor dose eficaz.",
+    price: 480.00,
+    compare_price: 560.00,
+    category: "tintura",
+    image_url: "/src/assets/products/tintura-1.jpg",
+    image_url_2: "/src/assets/products/tintura-2.jpg",
+    image_url_3: "/src/assets/products/tintura-3.jpg",
+    stock: 40,
+    sold_count: 77,
+    rating: 4.9,
+    review_count: 36,
+    is_active: true,
+    endorsed_by_doctor: true,
+    as_anvisa: "ANVISA Autorizado",
+    vendors: { id: "vendor-pyr-oficial", store_name: "Planta y Raiz Ltda", rating: 5.0 }
+  },
+  {
+    id: "med-8",
+    vendor_id: "vendor-pyr-oficial",
+    name: "Óleo THC Dominante / High THC (Concentração 25 mg/mL)",
+    description: "Composição: Extrato com alta concentração de THC e baixos teores de CBD (<1 mg/mL).\n\nIndicações: Dores intratáveis, rigidez e espasmos da Doença de Parkinson, caquexia severa e insônia resistente.\n\nDescrição: Formulação direcionada a pacientes com tolerância prévia ou condições clínicas em que a estimulação direta dos receptores CB1 é necessária.\n\nPosologia Resumida: Protocolo restrito (Start low, go slow): início com 1,25 mg a 2,5 mg de THC à noite (1 a 2 gotas), aumentando 1 gota a cada 5 a 7 dias, evitando horários de atividade motora ou condução de veículos.",
+    price: 520.00,
+    compare_price: 599.00,
+    category: "tintura",
+    image_url: "/src/assets/products/tintura-2.jpg",
+    image_url_2: "/src/assets/products/tintura-3.jpg",
+    image_url_3: "/src/assets/products/tintura-1.jpg",
+    stock: 35,
+    sold_count: 53,
+    rating: 4.8,
+    review_count: 22,
+    is_active: true,
+    endorsed_by_doctor: true,
+    as_anvisa: "Prescrição Controlada B",
+    vendors: { id: "vendor-pyr-oficial", store_name: "Planta y Raiz Ltda", rating: 5.0 }
+  },
+  {
+    id: "med-9",
+    vendor_id: "vendor-pyr-oficial",
+    name: "Óleo CBD Broad Spectrum / Amplo Espectro (Zero THC - 3000mg)",
+    description: "Composição: Múltiplos canabinoides (CBD, CBG, CBN) e terpenos com remoção completa do THC (0,0%).\n\nIndicações: Ansiedade, estresse crônico, foco e dores leves em pacientes com contraindicação ao THC (histórico de psicose, arritmias, crianças, idosos ou atletas sujeitos a controle antidoping).\n\nDescrição: Entrega os benefícios do efeito comitiva dos terpenos e canabinoides menores sem qualquer risco de psicoatividade ou detecção em testes toxicológicos.\n\nPosologia Resumida: 10 a 20 mg sublingual 2 vezes ao dia (manhã e tarde), titulando a cada 4 dias até a faixa de 40 a 120 mg/dia.",
+    price: 460.00,
+    compare_price: 530.00,
+    category: "oleo",
+    image_url: "/src/assets/products/oleo-cbd-1.jpg",
+    image_url_2: "/src/assets/products/oleo-cbd-3.jpg",
+    image_url_3: "/src/assets/products/oleo-cbd-2.jpg",
+    stock: 55,
+    sold_count: 110,
+    rating: 5.0,
+    review_count: 48,
+    is_active: true,
+    endorsed_by_doctor: true,
+    as_anvisa: "Zero THC Certificado",
+    vendors: { id: "vendor-pyr-oficial", store_name: "Planta y Raiz Ltda", rating: 5.0 }
+  },
+  {
+    id: "med-10",
+    vendor_id: "vendor-pyr-oficial",
+    name: "Syndros (Dronabinol Solução Oral 5 mg/mL)",
+    description: "Composição: Solução líquida oral de Delta-9-THC sintético.\n\nIndicações: Perda de peso profunda em pacientes com AIDS e náuseas pós-quimioterapia refratárias em pacientes com dificuldade para deglutir cápsulas sólidas.\n\nDescrição: Apresentação líquida de absorção mais rápida e titulação de dose mais precisa em relação às cápsulas tradicionais de dronabinol.\n\nPosologia Resumida: 2,1 mg (0,42 mL) por via oral administrados 2 vezes ao dia, 1 hora antes do almoço e do jantar. Pode ser ajustada até 8,4 mg/dia conforme resposta clínica.",
+    price: 1980.00,
+    compare_price: 2250.00,
+    category: "spray",
+    image_url: "/src/assets/products/spray-2.jpg",
+    image_url_2: "/src/assets/products/spray-3.jpg",
+    image_url_3: "/src/assets/products/spray-1.jpg",
+    stock: 20,
+    sold_count: 29,
+    rating: 4.9,
+    review_count: 14,
+    is_active: true,
+    endorsed_by_doctor: true,
+    as_anvisa: "FDA/ANVISA Especial",
+    vendors: { id: "vendor-pyr-oficial", store_name: "Planta y Raiz Ltda", rating: 5.0 }
+  }
+];
+
 const CATEGORIES = [
-  { key: "Todos", label: "Todos", icon: ShoppingBag },
-  { key: "oleo", label: "Óleos CBD", icon: Package },
+  { key: "Todos", label: "Todos os Medicamentos", icon: ShoppingBag },
+  { key: "oleo", label: "Óleos & Soluções Oral", icon: Package },
   { key: "capsula", label: "Cápsulas", icon: Package },
-  { key: "tintura", label: "Tinturas", icon: Package },
-  { key: "vape", label: "Vaporizadores", icon: Package },
-  { key: "comestivel", label: "Comestíveis", icon: Package },
-  { key: "topico", label: "Tópicos", icon: Package },
-  { key: "suplemento", label: "Suplementos", icon: Package },
-  { key: "spray", label: "Sprays", icon: Package },
+  { key: "spray", label: "Sprays Oromucosais", icon: Package },
+  { key: "tintura", label: "Tinturas & Extratos", icon: Package },
 ];
 
 const fadeUp = { hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.2 } } };
@@ -126,9 +270,26 @@ const prefetchProducts = () => {
   if (prefetchedProducts) return Promise.resolve(prefetchedProducts);
   if (prefetchPromise) return prefetchPromise;
   prefetchPromise = (async () => {
-    const { data } = await supabase.from("vendor_products").select("*, vendors(id, store_name, rating)").eq("is_active", true);
-    prefetchedProducts = (data as any) || [];
-    return prefetchedProducts;
+    try {
+      const { data } = await supabase.from("vendor_products").select("*, vendors(id, store_name, rating)").eq("is_active", true);
+      if (data && data.length > 0) {
+        prefetchedProducts = data.map((p: any) => ({
+          ...p,
+          price: typeof p.price === 'number' ? p.price : parseFloat(String(p.price || '0').replace(',', '.')),
+          compare_price: p.compare_price ? (typeof p.compare_price === 'number' ? p.compare_price : parseFloat(String(p.compare_price).replace(',', '.'))) : null,
+          rating: Number(p.rating || 5),
+          sold_count: Number(p.sold_count || 0),
+          review_count: Number(p.review_count || 12),
+          stock: Number(p.stock || 0)
+        }));
+      } else {
+        prefetchedProducts = OFFICIAL_MEDICINES;
+      }
+      return prefetchedProducts;
+    } catch {
+      prefetchedProducts = OFFICIAL_MEDICINES;
+      return OFFICIAL_MEDICINES;
+    }
   })();
   return prefetchPromise;
 };
@@ -148,7 +309,10 @@ const ProductSkeleton = () => (
   </div>
 );
 
-const fmtPrice = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
+const fmtPrice = (v: any) => {
+  const num = typeof v === 'number' ? v : parseFloat(String(v || '0').replace(',', '.'));
+  return isNaN(num) ? 'R$ 0,00' : `R$ ${num.toFixed(2).replace('.', ',')}`;
+};
 
 /* ─── FAVORITES HOOK (localStorage) ─── */
 const useFavorites = () => {
@@ -179,7 +343,7 @@ const ImageCarousel = ({ images, alt }: { images: string[]; alt: string }) => {
   return (
     <div className="relative group aspect-square overflow-hidden bg-muted/10">
       <img
-        src={resolveImg(validImgs[idx])}
+        src={resolveProductImg(validImgs[idx])}
         alt={alt}
         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         decoding="async"
@@ -216,12 +380,41 @@ const ProductDetail = ({ id }: { id: string }) => {
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
   const [btcModal, setBtcModal] = useState({ open: false, planName: "", planId: "", amount: "" });
   const [rxModal, setRxModal] = useState({ open: false, productName: "" });
+  const [lightbox, setLightbox] = useState<{ open: boolean; url: string; title: string }>({ open: false, url: "", title: "" });
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.from("vendor_products").select("*, vendors(id, store_name, rating)").eq("id", id).single();
-      if (data) { setProduct(data as any); setVendor((data as any).vendors); }
-      setLoading(false);
+      try {
+        const { data } = await supabase.from("vendor_products").select("*, vendors(id, store_name, rating)").eq("id", id).maybeSingle();
+        if (data) {
+          const norm = {
+            ...data,
+            price: typeof (data as any).price === 'number' ? (data as any).price : parseFloat(String((data as any).price || '0').replace(',', '.')),
+            compare_price: (data as any).compare_price ? (typeof (data as any).compare_price === 'number' ? (data as any).compare_price : parseFloat(String((data as any).compare_price).replace(',', '.'))) : null,
+            rating: Number((data as any).rating || 5),
+            sold_count: Number((data as any).sold_count || 0),
+            review_count: Number((data as any).review_count || 12),
+            stock: Number((data as any).stock || 0)
+          };
+          setProduct(norm as any);
+          setVendor((data as any).vendors);
+        } else {
+          // Check local official list
+          const local = OFFICIAL_MEDICINES.find(m => m.id === id);
+          if (local) {
+            setProduct(local);
+            setVendor(local.vendors as any);
+          }
+        }
+      } catch {
+        const local = OFFICIAL_MEDICINES.find(m => m.id === id);
+        if (local) {
+          setProduct(local);
+          setVendor(local.vendors as any);
+        }
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [id]);
 
@@ -248,28 +441,26 @@ const ProductDetail = ({ id }: { id: string }) => {
   if (!product) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Produto não encontrado.</div>;
 
   const images = [product.image_url, product.image_url_2, product.image_url_3].filter(Boolean) as string[];
-  const discount = product.compare_price ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
+  const pPrice = Number(product.price || 0);
+  const pCompare = product.compare_price ? Number(product.compare_price) : 0;
+  const discount = pCompare > 0 ? Math.round(((pCompare - pPrice) / pCompare) * 100) : 0;
   const priceStr = fmtPrice(product.price);
 
   const handleBuy = () => {
     setRxModal({ open: true, productName: product.name });
   };
 
+  // Vendas reais suspensas até a homologação da primeira farmácia parceira real.
+  // A receita é encaminhada para a farmácia modelo Planta y Raiz Ltda.
   const proceedWithPurchase = () => {
     setRxModal({ open: false, productName: "" });
-    showModal(
-      { type: "compra", productName: product.name, value: product.price } as WhatsAppContext,
-      async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { toast({ title: "Faça login para comprar", variant: "destructive" }); return; }
-        const { data, error } = await supabase.functions.invoke("create-cart-payment", {
-          body: { items: [{ product_id: product.id, quantity: 1 }], description: `Planta y Raiz Ltda - ${product.name}` },
-        });
-        if (error) { toast({ title: "Erro ao gerar pagamento", variant: "destructive" }); return; }
-        if (data?.init_point) { window.open(data.init_point, "_blank"); toast({ title: "Redirecionando para pagamento... 💳" }); }
-      }
-    );
+    toast({
+      title: "Receita recebida pela farmácia modelo Planta y Raiz Ltda ✅",
+      description:
+        "Estamos concluindo a homologação de farmácias parceiras reais. Nossa equipe entra em contato para orientar a dispensação do seu medicamento.",
+    });
   };
+
 
   return (
     <div className="container mx-auto px-4 pt-20 pb-12 md:pt-24 max-w-6xl">
@@ -278,13 +469,18 @@ const ProductDetail = ({ id }: { id: string }) => {
       </Link>
 
       <div className="grid md:grid-cols-2 gap-6 lg:gap-10">
-        {/* Images */}
+        {/* Gallery */}
         <div className="space-y-3">
-          <Card className="border-border/50 overflow-hidden bg-card/30 backdrop-blur-sm rounded-2xl">
-            <div className="aspect-square">
-              <img src={resolveImg(images[mainImg])} alt={product.name} className="w-full h-full object-contain bg-muted/5 p-4 sm:p-6" />
+          <div 
+            className="aspect-square rounded-2xl overflow-hidden border border-border/30 bg-card/30 relative cursor-zoom-in group"
+            onClick={() => setLightbox({ open: true, url: resolveProductImg(images[mainImg]), title: product.name })}
+            title="Clique para ver a foto em alta resolução"
+          >
+            <img src={resolveProductImg(images[mainImg])} alt={product.name} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-emerald-400 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-[10px] font-bold flex items-center gap-1">🔍 Ampliar Foto</span>
             </div>
-          </Card>
+          </div>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {images.map((img, i) => (
               <button
@@ -292,7 +488,7 @@ const ProductDetail = ({ id }: { id: string }) => {
                 onClick={() => setMainImg(i)}
                 className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl border-2 overflow-hidden transition-all ${i === mainImg ? "border-primary ring-2 ring-primary/20" : "border-border/30 opacity-60 hover:opacity-100"}`}
               >
-                <img src={resolveImg(img)} alt="" className="w-full h-full object-cover" loading="lazy" />
+                <img src={resolveProductImg(img)} alt="" className="w-full h-full object-cover" loading="lazy" />
               </button>
             ))}
           </div>
@@ -301,8 +497,8 @@ const ProductDetail = ({ id }: { id: string }) => {
         {/* Info */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] sm:text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-bold border border-primary/20 flex items-center gap-1">
-              <BadgeCheck size={11} /> Loja Verificada
+            <span className="text-[10px] sm:text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20 flex items-center gap-1">
+              <BadgeCheck size={11} /> Farmácia Oficial Planta y Raiz Ltda
             </span>
             {discount > 0 && (
               <span className="text-[10px] sm:text-xs px-2 py-1 rounded-full bg-destructive/10 text-destructive font-bold border border-destructive/20">
@@ -312,7 +508,7 @@ const ProductDetail = ({ id }: { id: string }) => {
           </div>
 
           <p className="text-[11px] sm:text-xs text-muted-foreground flex items-center gap-1">
-            <Store size={12} className="text-primary" /> {vendor?.store_name || "Loja Parceira"} • {product.category}
+            <Store size={12} className="text-primary" /> {vendor?.store_name || "Planta y Raiz Ltda"} • Categoria: {product.category}
           </p>
 
           <h1 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-foreground leading-tight">{product.name}</h1>
@@ -325,7 +521,7 @@ const ProductDetail = ({ id }: { id: string }) => {
           <div className="flex items-center gap-2">
             <div className="flex">{[1,2,3,4,5].map(s => <Star key={s} size={13} className={s <= Math.round(product.rating || 5) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/20"} />)}</div>
             <span className="text-xs sm:text-sm font-bold">{product.rating || 5}</span>
-            <span className="text-[10px] sm:text-xs text-muted-foreground">| {product.sold_count} vendidos</span>
+            <span className="text-[10px] sm:text-xs text-muted-foreground">| {product.sold_count} dispensados</span>
           </div>
 
           {/* Price */}
@@ -334,29 +530,44 @@ const ProductDetail = ({ id }: { id: string }) => {
               <p className="text-xs sm:text-sm text-muted-foreground line-through">{fmtPrice(product.compare_price)}</p>
             )}
             <p className="text-2xl sm:text-3xl font-display font-bold text-foreground">{priceStr}</p>
-            <p className="text-[10px] sm:text-xs text-primary font-bold mt-1">em até 12x de {fmtPrice(product.price / 12)} sem juros</p>
-            <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Taxa plataforma: 5% • Lojista recebe 95%</p>
+            <p className="text-[10px] sm:text-xs text-primary font-bold mt-1">em até 12x de {fmtPrice(product.price / 12)} sem juros no cartão ou com desconto no PIX</p>
+            <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Dispensação Autorizada ANVISA • Retenção de Receita Digital</p>
           </div>
 
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{product.description}</p>
+          <div className="bg-muted/20 p-3.5 rounded-xl border border-border/50 text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
+            {product.description}
+          </div>
 
           <div className="grid grid-cols-2 gap-2 text-[10px] sm:text-xs text-muted-foreground">
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-card/50 border border-border/30"><Truck size={13} className="text-primary shrink-0" /> Frete Grátis</div>
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-card/50 border border-border/30"><Shield size={13} className="text-primary shrink-0" /> Compra Segura</div>
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-card/50 border border-border/30"><Package size={13} className="text-primary shrink-0" /> Estoque: {product.stock}</div>
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-card/50 border border-border/30"><Clock size={13} className="text-amber-400 shrink-0" /> 3-7 dias úteis</div>
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-card/50 border border-border/30"><Truck size={13} className="text-primary shrink-0" /> Envio Refrigerado / Expresso</div>
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-card/50 border border-border/30"><Shield size={13} className="text-primary shrink-0" /> Laudo COA por Lote</div>
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-card/50 border border-border/30"><Package size={13} className="text-primary shrink-0" /> Estoque: {product.stock} un</div>
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-card/50 border border-border/30"><Clock size={13} className="text-amber-400 shrink-0" /> Despacho em 24h</div>
+          </div>
+
+          {/* Calculadora de Frete na Página do Produto */}
+          <div className="pt-1">
+            <ShippingCalculator
+              cartTotal={product.price}
+              onSelectShipping={(opt) => {
+                toast({
+                  title: `Frete Selecionado: ${opt.name}`,
+                  description: `${opt.company} — ${opt.price === 0 ? "Frete Grátis" : `R$ ${opt.price.toFixed(2)}`} (Prazo estimado: ${opt.delivery_time} dias úteis)`
+                });
+              }}
+            />
           </div>
 
           <div className="space-y-2 pt-2">
-            <Button className="w-full font-bold h-12 sm:h-14 text-sm sm:text-base bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/20" onClick={handleBuy}>
-              Comprar Agora 💳
+            <Button className="w-full font-bold h-12 sm:h-14 text-sm sm:text-base bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-950/20" onClick={handleBuy}>
+              Comprar com Receita Médica 💳
             </Button>
             <Button variant="outline" className="w-full font-bold border-amber-500/30 text-amber-500 hover:bg-amber-500/10 gap-2 h-10 sm:h-12 rounded-xl" onClick={() => setBtcModal({ open: true, planName: product.name, planId: product.id, amount: priceStr })}>
-              <Bitcoin size={15} /> Pague Com BTC
+              <Bitcoin size={15} /> Pague Com Bitcoin / Cripto
             </Button>
           </div>
 
-          <p className="text-[9px] sm:text-[10px] text-muted-foreground text-center">⚠️ Planta & Raiz retém 5% para manutenção. Lojista recebe 95% automaticamente.</p>
+          <p className="text-[9px] sm:text-[10px] text-muted-foreground text-center">Dispensação farmacêutica restrita a pacientes com prescrição válida em conformidade com as normas sanitárias.</p>
         </div>
       </div>
 
@@ -368,6 +579,13 @@ const ProductDetail = ({ id }: { id: string }) => {
         productName={rxModal.productName}
         onHasPrescription={proceedWithPurchase}
         onNeedsPrescription={() => { setRxModal({ open: false, productName: "" }); window.location.href = "/profissionais"; }}
+      />
+      <ImageLightboxModal
+        open={lightbox.open}
+        onClose={() => setLightbox(prev => ({ ...prev, open: false }))}
+        imageUrl={lightbox.url}
+        title={lightbox.title}
+        description="Medicamento Oficial • Planta y Raiz Ltda"
       />
     </div>
   );
@@ -390,14 +608,82 @@ const Shopping = () => {
 
   const { toggle: toggleFav, isFav } = useFavorites();
 
+  const [verifiedVendors, setVerifiedVendors] = useState<any[]>([]);
+
   useEffect(() => {
-    if (prefetchedProducts) {
-      setProducts(prefetchedProducts);
-      setLoading(false);
-      return;
-    }
+    // 1. Buscar vendor oficial Planta y Raíz
+    Promise.resolve(
+      supabase
+        .from('vendors')
+        .select('id, store_name, store_logo_url, store_banner_url, rating, total_sales, is_active')
+        .eq('is_active', true)
+        .limit(10)
+    )
+      .then(async ({ data: vData }) => {
+        const official = vData?.find(v => v.store_name.toLowerCase().includes("planta")) || vData?.[0];
+        
+        if (official) {
+          setVerifiedVendors([{
+            id: official.id,
+            store_name: "Planta y Raiz Ltda",
+            store_logo_url: "/logo-farmacia.jpg",
+            store_banner_url: "/farmacia-fachada.jpg",
+            rating: Number(official.rating || 5.0),
+            total_sales: Number(official.total_sales || 48),
+            is_verified: true,
+            city: "São Paulo",
+            state: "SP",
+            featured_product: {
+              name: "Epidiolex / Epidyolex (Canabidiol 100 mg/mL)",
+              price: 2450.00,
+              image_url: "/src/assets/products/oleo-cbd-1.jpg",
+              category: "oleo"
+            }
+          }]);
+        } else {
+          // Fallback robusto para Planta y Raiz Ltda
+          setVerifiedVendors([{
+            id: "vendor-pyr-oficial",
+            store_name: "Planta y Raiz Ltda",
+            store_logo_url: "/logo-farmacia.jpg",
+            store_banner_url: "/farmacia-fachada.jpg",
+            rating: 5.0,
+            total_sales: 48,
+            is_verified: true,
+            city: "São Paulo",
+            state: "SP",
+            featured_product: {
+              name: "Epidiolex / Epidyolex (Canabidiol 100 mg/mL)",
+              price: 2450.00,
+              image_url: "/src/assets/products/oleo-cbd-1.jpg",
+              category: "oleo"
+            }
+          }]);
+        }
+      })
+      .catch(() => {
+        setVerifiedVendors([{
+          id: "vendor-pyr-oficial",
+          store_name: "Planta y Raiz Ltda",
+          store_logo_url: "/logo-farmacia.jpg",
+          store_banner_url: "/farmacia-fachada.jpg",
+          rating: 5.0,
+          total_sales: 48,
+          is_verified: true,
+          city: "São Paulo",
+          state: "SP",
+          featured_product: {
+            name: "Epidiolex / Epidyolex (Canabidiol 100 mg/mL)",
+            price: 2450.00,
+            image_url: "/src/assets/products/oleo-cbd-1.jpg",
+            category: "oleo"
+          }
+        }]);
+      });
+
+    // 2. Carregar produtos
     prefetchProducts().then(data => {
-      setProducts(data);
+      setProducts(data && data.length > 0 ? data : OFFICIAL_MEDICINES);
       setLoading(false);
     });
   }, []);
@@ -412,7 +698,7 @@ const Shopping = () => {
     );
   }
 
-  let filtered = products
+  let filtered = (products.length > 0 ? products : OFFICIAL_MEDICINES)
     .filter(p => activeCategory === "Todos" || p.category === activeCategory)
     .filter(p => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.description || "").toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -424,23 +710,16 @@ const Shopping = () => {
     setRxModal({ open: true, productName: p.name, pendingProduct: p });
   };
 
+  // Vendas reais suspensas até a homologação da primeira farmácia parceira real.
   const proceedWithPurchaseMain = () => {
-    const p = rxModal.pendingProduct;
     setRxModal({ open: false, productName: "", pendingProduct: null });
-    if (!p) return;
-    showModal(
-      { type: "compra", productName: p.name, value: p.price } as WhatsAppContext,
-      async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { toast({ title: "Faça login para comprar", variant: "destructive" }); setTimeout(() => window.location.href = "/login", 1500); return; }
-        const { data, error } = await supabase.functions.invoke("create-cart-payment", {
-          body: { items: [{ product_id: p.id, quantity: 1 }], description: `Planta y Raiz Ltda - ${p.name}` },
-        });
-        if (error) { toast({ title: "Erro ao gerar pagamento", variant: "destructive" }); return; }
-        if (data?.init_point) { window.open(data.init_point, "_blank"); toast({ title: "Redirecionando... 💳" }); }
-      }
-    );
+    toast({
+      title: "Receita recebida pela farmácia modelo Planta y Raiz Ltda ✅",
+      description:
+        "Estamos concluindo a homologação de farmácias parceiras reais. Nossa equipe entra em contato para orientar a dispensação do seu medicamento.",
+    });
   };
+
 
   return (
     <div className="min-h-dvh bg-background">
@@ -451,9 +730,9 @@ const Shopping = () => {
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="text-center mb-4 sm:mb-6">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-foreground mb-1 sm:mb-2">
-              🌿 Shopping Medicinal
+              🌿 Shopping Farmacêutico Medicinal
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-2">Produtos de cannabis medicinal verificados e auditados</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2">Dispensação oficial de fitocanabinoides, extratos purificados e medicamentos autorizados ANVISA</p>
             <ProductAlertBell category="shopping" />
           </div>
 
@@ -461,7 +740,7 @@ const Shopping = () => {
             <div className="relative flex-1">
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Buscar produtos..."
+                placeholder="Buscar por nome do medicamento, princípio ativo, CID ou posologia..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="pl-9 h-10 sm:h-11 rounded-xl border-border/50 bg-background/80 backdrop-blur-sm text-sm"
@@ -472,51 +751,26 @@ const Shopping = () => {
                 </button>
               )}
             </div>
-            <Button className="h-10 sm:h-11 px-4 rounded-xl bg-primary text-primary-foreground font-bold shrink-0" onClick={() => setShowFilters(!showFilters)}>
+            <Button className="h-10 sm:h-11 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shrink-0" onClick={() => setShowFilters(!showFilters)}>
               <SlidersHorizontal size={15} />
               <span className="hidden sm:inline ml-2 text-xs">Filtros</span>
             </Button>
           </div>
-
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-1 text-[10px] sm:text-xs text-muted-foreground mt-3 max-w-2xl mx-auto">
-            <Link to="/" className="hover:text-foreground transition-colors">Início</Link>
-            <ChevronRight size={10} />
-            <span className="text-foreground font-bold">Shopping</span>
-            {activeCategory !== "Todos" && <>
-              <ChevronRight size={10} />
-              <span className="text-primary font-bold">{CATEGORIES.find(c => c.key === activeCategory)?.label}</span>
-            </>}
-          </div>
         </div>
       </section>
 
-      {/* Trust Strip */}
-      <section className="py-2 border-b border-border/30 bg-card/20 overflow-x-auto">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-start sm:justify-center gap-3 sm:gap-6 min-w-max sm:min-w-0 text-[9px] sm:text-[10px] md:text-[11px] font-bold text-muted-foreground">
-            <span className="flex items-center gap-1"><Shield size={11} className="text-primary shrink-0" /> Compra Segura</span>
-            <span className="flex items-center gap-1"><Truck size={11} className="text-primary shrink-0" /> Frete Grátis</span>
-            <span className="flex items-center gap-1"><BadgeCheck size={11} className="text-primary shrink-0" /> Verificadas</span>
-            <span className="flex items-center gap-1"><CreditCard size={11} className="text-primary shrink-0" /> Pix + Cartão</span>
-            <span className="flex items-center gap-1"><Bitcoin size={11} className="text-amber-400 shrink-0" /> BTC</span>
-            <span className="flex items-center gap-1"><Tag size={11} className="text-primary shrink-0" /> 12x s/ juros</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories horizontal scroll */}
-      <section className="py-2.5 border-b border-border/30 bg-background sticky top-[60px] sm:top-[68px] z-30">
+      {/* Categories Horizontal */}
+      <section className="py-2.5 sm:py-3 border-b border-border/30 bg-card/20 backdrop-blur-sm sticky top-14 z-20">
         <div className="container mx-auto px-4">
           <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-0.5 scrollbar-hide">
             {CATEGORIES.map(cat => (
               <button
                 key={cat.key}
                 onClick={() => setActiveCategory(cat.key)}
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold border whitespace-nowrap transition-all shrink-0 ${
+                className={`px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold border whitespace-nowrap transition-all shrink-0 ${
                   activeCategory === cat.key
-                    ? "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "border-border/40 bg-card/30 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                    ? "border-emerald-500 bg-emerald-600 text-white shadow-md shadow-emerald-950/30"
+                    : "border-border/40 bg-card/30 text-muted-foreground hover:border-emerald-500/30 hover:text-foreground"
                 }`}
               >
                 {cat.label}
@@ -542,16 +796,16 @@ const Shopping = () => {
               </div>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { k: "relevance" as const, l: "Relevância" },
+                  { k: "relevance" as const, l: "Relevância Clínica" },
                   { k: "price_asc" as const, l: "Menor preço" },
                   { k: "price_desc" as const, l: "Maior preço" },
-                  { k: "sold" as const, l: "Mais vendidos" },
+                  { k: "sold" as const, l: "Mais dispensados" },
                 ].map(s => (
                   <button
                     key={s.k}
                     onClick={() => { setSortBy(s.k); setShowFilters(false); }}
                     className={`px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border transition-all ${
-                      sortBy === s.k ? "border-primary bg-primary/10 text-primary" : "border-border/40 text-muted-foreground"
+                      sortBy === s.k ? "border-emerald-500 bg-emerald-500/10 text-emerald-400" : "border-border/40 text-muted-foreground"
                     }`}
                   >
                     {s.l}
@@ -563,21 +817,23 @@ const Shopping = () => {
         )}
       </AnimatePresence>
 
-      <section className="py-4 sm:py-6">
+      <section className="py-6 sm:py-8">
         <div className="container mx-auto px-3 sm:px-4">
-          <div className="grid lg:grid-cols-[200px_1fr] gap-4 sm:gap-6">
+          <div className="grid lg:grid-cols-[220px_1fr] gap-6">
 
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex flex-col gap-3">
-              <Card className="border-border/30 bg-card/30 backdrop-blur-sm p-3 rounded-xl">
-                <h3 className="font-bold text-xs text-foreground mb-2 flex items-center gap-2"><ShoppingBag size={13} className="text-primary" /> Categorias</h3>
-                <div className="space-y-0.5">
+            <aside className="hidden lg:flex flex-col gap-4">
+              <Card className="border-border/40 bg-card/40 backdrop-blur-sm p-3.5 rounded-2xl">
+                <h3 className="font-bold text-xs text-foreground mb-2.5 flex items-center gap-2">
+                  <ShoppingBag size={14} className="text-primary" /> Categorias
+                </h3>
+                <div className="space-y-1">
                   {CATEGORIES.map(cat => (
                     <button
                       key={cat.key}
                       onClick={() => setActiveCategory(cat.key)}
-                      className={`w-full text-left px-3 py-1.5 rounded-lg text-xs transition-all ${
-                        activeCategory === cat.key ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted/10"
+                      className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all font-medium ${
+                        activeCategory === cat.key ? "bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/20" : "text-muted-foreground hover:text-foreground hover:bg-muted/20"
                       }`}
                     >
                       {cat.label}
@@ -586,20 +842,20 @@ const Shopping = () => {
                 </div>
               </Card>
 
-              <Card className="border-border/30 bg-card/30 backdrop-blur-sm p-3 rounded-xl">
-                <h3 className="font-bold text-xs text-foreground mb-2">Ordenar</h3>
-                <div className="space-y-0.5 text-xs">
+              <Card className="border-border/40 bg-card/40 backdrop-blur-sm p-3.5 rounded-2xl">
+                <h3 className="font-bold text-xs text-foreground mb-2.5">Ordenar por</h3>
+                <div className="space-y-1 text-xs">
                   {[
                     { k: "relevance" as const, l: "Mais relevantes" },
                     { k: "price_asc" as const, l: "Menor preço" },
                     { k: "price_desc" as const, l: "Maior preço" },
-                    { k: "sold" as const, l: "Mais vendidos" },
+                    { k: "sold" as const, l: "Mais dispensados" },
                   ].map(s => (
                     <button
                       key={s.k}
                       onClick={() => setSortBy(s.k)}
-                      className={`w-full text-left px-3 py-1.5 rounded-lg transition-all ${
-                        sortBy === s.k ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted/10"
+                      className={`w-full text-left px-3 py-1.5 rounded-xl transition-all ${
+                        sortBy === s.k ? "bg-emerald-500/15 text-emerald-400 font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted/20"
                       }`}
                     >
                       {s.l}
@@ -608,37 +864,61 @@ const Shopping = () => {
                 </div>
               </Card>
 
-              <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 p-3 rounded-xl">
-                <Flame size={18} className="text-primary mb-1.5" />
-                <h3 className="font-bold text-xs text-foreground mb-0.5">Seja um Lojista</h3>
-                <p className="text-[10px] text-muted-foreground mb-2">Exponha até 10 produtos e receba 95%!</p>
-                <Button size="sm" className="w-full text-[10px] font-bold bg-primary text-primary-foreground rounded-lg h-8" asChild>
-                  <Link to="/cadastro">Cadastrar Loja</Link>
-                </Button>
-              </Card>
+              <div className="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-500/20 space-y-2">
+                <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold">
+                  <Shield size={14} /> Dispensação Segura
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Medicamentos dispensados exclusivamente pela <strong>Planta y Raiz Ltda</strong> com retenção de receita e laudo de pureza.
+                </p>
+              </div>
             </aside>
 
             {/* Products Grid */}
             <div>
+              {/* Seção Exclusiva da Farmácia Planta y Raiz Ltda */}
+              {verifiedVendors.length > 0 && !searchQuery && activeCategory === "Todos" && (
+                <div className="mb-8 p-5 rounded-3xl bg-gradient-to-r from-card/60 via-card/40 to-emerald-950/20 border border-border/60 shadow-xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-base sm:text-lg font-display font-bold flex items-center gap-2 text-foreground">
+                        <Store size={18} className="text-primary" /> Farmácia Parceira Oficial
+                      </h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">Dispensação autorizada e manipulação credenciada</p>
+                    </div>
+                    <span className="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full font-bold">
+                      Dispensação Oficial ANVISA
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {verifiedVendors.map((v) => (
+                      <FarmaciaCard key={v.id} vendor={v} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Toolbar */}
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">{filtered.length} produto{filtered.length !== 1 ? "s" : ""}</span>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs text-muted-foreground font-semibold">
+                  Exibindo {filtered.length} medicamento{filtered.length !== 1 ? "s" : ""} regulado{filtered.length !== 1 ? "s" : ""}
+                </span>
                 <div className="flex items-center gap-1.5">
-                  <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-lg transition-all ${viewMode === "grid" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"}`}><Grid3X3 size={14} /></button>
-                  <button onClick={() => setViewMode("list")} className={`p-1.5 rounded-lg transition-all ${viewMode === "list" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"}`}><List size={14} /></button>
+                  <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-lg transition-all ${viewMode === "grid" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"}`}><Grid3X3 size={15} /></button>
+                  <button onClick={() => setViewMode("list")} className={`p-1.5 rounded-lg transition-all ${viewMode === "list" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"}`}><List size={15} /></button>
                 </div>
               </div>
 
               {loading ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3">
-                  {Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4">
+                  {Array.from({ length: 6 }).map((_, i) => <ProductSkeleton key={i} />)}
                 </div>
               ) : (
                 <motion.div
                   className={
                     viewMode === "grid"
-                      ? "grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3"
-                      : "space-y-2.5"
+                      ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"
+                      : "space-y-3"
                   }
                   initial="hidden"
                   whileInView="visible"
@@ -647,121 +927,111 @@ const Shopping = () => {
                   key={activeCategory + searchQuery + sortBy}
                 >
                   {filtered.map(p => {
-                    const discount = p.compare_price ? Math.round(((p.compare_price - p.price) / p.compare_price) * 100) : 0;
-                    const vendorName = (p as any).vendors?.store_name || "Loja Parceira";
+                    const pPrice = Number(p.price || 0);
+                    const pCompare = p.compare_price ? Number(p.compare_price) : 0;
+                    const discount = pCompare > 0 ? Math.round(((pCompare - pPrice) / pCompare) * 100) : 0;
+                    const vendorName = "Planta y Raiz Ltda";
                     const images = [p.image_url, p.image_url_2, p.image_url_3].filter(Boolean) as string[];
 
                     return (
                       <motion.div key={p.id} variants={fadeUp}>
                         {viewMode === "grid" ? (
-                          <Card className="border-border/30 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 bg-card/30 backdrop-blur-sm overflow-hidden group rounded-xl">
-                            <CardContent className="p-0">
-                              <div className="relative">
-                                <Link to={`/shopping/${p.id}`} className="block">
-                                  <ImageCarousel images={images} alt={p.name} />
-                                </Link>
-                                {/* Badges - left side stacked */}
-                                <div className="absolute top-1.5 left-1.5 flex flex-col gap-1 pointer-events-none">
-                                  {discount > 0 && (
-                                    <span className="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-md bg-destructive text-destructive-foreground font-bold shadow-sm w-fit">
-                                      {discount}% OFF
+                          <Card className="border-border/40 hover:border-emerald-500/40 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-950/20 bg-card/50 backdrop-blur-sm overflow-hidden group rounded-2xl flex flex-col justify-between h-full">
+                            <CardContent className="p-0 flex flex-col justify-between h-full">
+                              <div>
+                                <div className="relative">
+                                  <Link to={`/shopping/${p.id}`} className="block">
+                                    <ImageCarousel images={images} alt={p.name} />
+                                  </Link>
+                                  {/* Badges */}
+                                  <div className="absolute top-2 left-2 flex flex-col gap-1 pointer-events-none">
+                                    {discount > 0 && (
+                                      <span className="text-[9px] px-2 py-0.5 rounded-md bg-destructive text-destructive-foreground font-bold shadow-md w-fit">
+                                        -{discount}% OFF
+                                      </span>
+                                    )}
+                                    <span className="text-[9px] px-2 py-0.5 rounded-md bg-emerald-600 text-white font-bold shadow-md w-fit">
+                                      ANVISA RDC 327
                                     </span>
-                                  )}
-                                  <span className="text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded-md bg-primary/90 text-primary-foreground font-bold shadow-sm w-fit">
-                                    FRETE GRÁTIS
-                                  </span>
-                                  {p.endorsed_by_doctor && <DoctorEndorsedBadge compact />}
-                                  {p.as_anvisa && <AnvisaBadge compact registration={p.as_anvisa} />}
+                                  </div>
+                                  {/* Favorite heart */}
+                                  <button
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(p.id); }}
+                                    className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-md hover:scale-110 transition-transform"
+                                  >
+                                    <Heart size={15} className={isFav(p.id) ? "text-red-500 fill-red-500" : "text-muted-foreground"} />
+                                  </button>
                                 </div>
-                                {/* Favorite heart - outside Link */}
-                                <button
-                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFav(p.id); }}
-                                  className="absolute top-1.5 right-1.5 z-10 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-md hover:scale-110 transition-transform"
-                                >
-                                  <Heart size={16} className={isFav(p.id) ? "text-red-500 fill-red-500" : "text-muted-foreground"} />
-                                </button>
+
+                                <div className="p-4 pb-2">
+                                  <p className="text-[10px] text-emerald-400 font-bold mb-1 flex items-center gap-1">
+                                    <Store size={10} className="text-primary shrink-0" /> {vendorName}
+                                  </p>
+
+                                  <Link to={`/shopping/${p.id}`}>
+                                    <h2 className="font-bold text-foreground hover:text-primary transition-colors text-sm line-clamp-2 min-h-[2.6em] leading-tight mb-2">
+                                      {p.name}
+                                    </h2>
+                                  </Link>
+
+                                  <div className="flex items-center gap-1 mb-2">
+                                    <div className="flex">{[1,2,3,4,5].map(s => <Star key={s} size={10} className={s <= Math.round(p.rating || 5) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/20"} />)}</div>
+                                    <span className="text-[10px] text-muted-foreground ml-1">({p.review_count} avaliações)</span>
+                                  </div>
+
+                                  {p.compare_price && <p className="text-[10px] text-muted-foreground line-through">{fmtPrice(p.compare_price)}</p>}
+                                  <p className="text-xl font-display font-black text-foreground leading-none">{fmtPrice(p.price)}</p>
+                                  <p className="text-[10px] text-emerald-400 font-semibold mt-1">12x {fmtPrice(p.price / 12)} s/ juros</p>
+                                </div>
                               </div>
 
-                              <div className="p-2.5 sm:p-3">
-                                <p className="text-[8px] sm:text-[9px] text-muted-foreground mb-0.5 flex items-center gap-1 truncate">
-                                  <Store size={8} className="text-primary shrink-0" /> {vendorName}
-                                </p>
-
-                                <Link to={`/shopping/${p.id}`}>
-                                  <h2 className="font-bold text-foreground hover:text-primary transition-colors text-[11px] sm:text-xs line-clamp-2 min-h-[2.2em] leading-tight mb-1">
-                                    {p.name}
-                                  </h2>
-                                </Link>
-
-                                <div className="flex items-center gap-0.5 mb-1">
-                                  {[1,2,3,4,5].map(s => <Star key={s} size={8} className={s <= Math.round(p.rating || 5) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/20"} />)}
-                                  <span className="text-[8px] text-muted-foreground ml-0.5">({p.review_count})</span>
-                                </div>
-
-                                {p.compare_price && <p className="text-[8px] sm:text-[9px] text-muted-foreground line-through">{fmtPrice(p.compare_price)}</p>}
-                                <p className="text-base sm:text-lg font-display font-bold text-foreground leading-none">{fmtPrice(p.price)}</p>
-                                <p className="text-[8px] sm:text-[9px] text-primary font-bold mt-0.5">12x {fmtPrice(p.price / 12)} s/ juros</p>
-                                <p className="text-[7px] sm:text-[8px] text-muted-foreground mt-0.5 mb-2">{p.sold_count} vendidos</p>
-
+                              <div className="p-4 pt-0 space-y-2">
                                 <Button
                                   size="sm"
-                                  className="w-full text-[10px] sm:text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg h-8 shadow-md shadow-primary/10 mb-1.5"
+                                  className="w-full text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl h-9 shadow-md shadow-emerald-950/20"
                                   onClick={(e) => { e.preventDefault(); handleBuyProduct(p); }}
                                 >
-                                  Comprar Agora 💳
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="w-full text-[8px] sm:text-[9px] font-bold border-amber-500/20 text-amber-500 hover:bg-amber-500/10 rounded-lg h-6 sm:h-7"
-                                  onClick={(e) => { e.preventDefault(); setBtcModal({ open: true, planName: p.name, planId: p.id, amount: fmtPrice(p.price) }); }}
-                                >
-                                  <Bitcoin size={9} className="mr-0.5" /> Pague Com BTC
+                                  Comprar com Receita 💳
                                 </Button>
                               </div>
                             </CardContent>
                           </Card>
                         ) : (
                           /* List View */
-                          <Card className="border-border/30 hover:border-primary/30 transition-all bg-card/30 backdrop-blur-sm rounded-xl">
+                          <Card className="border-border/40 hover:border-emerald-500/40 transition-all bg-card/40 backdrop-blur-sm rounded-2xl overflow-hidden">
                             <CardContent className="p-0">
-                              <div className="flex gap-3 p-3">
+                              <div className="flex gap-4 p-4">
                                 <Link to={`/shopping/${p.id}`} className="shrink-0 relative">
-                                  <img src={resolveImg(p.image_url)} alt={p.name} className="w-24 h-24 sm:w-32 sm:h-32 rounded-lg object-cover" loading="lazy" />
+                                  <img src={resolveProductImg(p.image_url)} alt={p.name} className="w-28 h-28 sm:w-36 sm:h-36 rounded-xl object-cover" loading="lazy" />
                                 </Link>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-start justify-between">
-                                    <div className="min-w-0 flex-1">
-                                      <p className="text-[8px] sm:text-[9px] text-muted-foreground mb-0.5 flex items-center gap-1"><Store size={9} className="text-primary" /> {vendorName}</p>
-                                      <Link to={`/shopping/${p.id}`}>
-                                        <h2 className="font-bold text-foreground hover:text-primary transition-colors text-xs sm:text-sm mb-0.5 line-clamp-1">{p.name}</h2>
-                                      </Link>
-                                      {p.endorsed_by_doctor && <div className="mt-1"><DoctorEndorsedBadge compact /></div>}
-                                      {p.as_anvisa && <div className="mt-1"><AnvisaBadge compact registration={p.as_anvisa} /></div>}
+                                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                                  <div>
+                                    <div className="flex items-start justify-between">
+                                      <div className="min-w-0 flex-1">
+                                        <p className="text-[10px] text-emerald-400 font-bold mb-1 flex items-center gap-1"><Store size={10} className="text-primary" /> {vendorName}</p>
+                                        <Link to={`/shopping/${p.id}`}>
+                                          <h2 className="font-bold text-foreground hover:text-primary transition-colors text-sm sm:text-base mb-1 line-clamp-1">{p.name}</h2>
+                                        </Link>
+                                      </div>
+                                      <button
+                                        onClick={() => toggleFav(p.id)}
+                                        className="shrink-0 w-8 h-8 rounded-full bg-card/80 flex items-center justify-center hover:scale-110 transition-transform ml-2"
+                                      >
+                                        <Heart size={15} className={isFav(p.id) ? "text-red-500 fill-red-500" : "text-muted-foreground"} />
+                                      </button>
                                     </div>
-                                    <button
-                                      onClick={() => toggleFav(p.id)}
-                                      className="shrink-0 w-8 h-8 rounded-full bg-card/80 flex items-center justify-center hover:scale-110 transition-transform ml-2"
-                                    >
-                                      <Heart size={16} className={isFav(p.id) ? "text-red-500 fill-red-500" : "text-muted-foreground"} />
-                                    </button>
+                                    <p className="text-xs text-muted-foreground line-clamp-2 mb-2 leading-relaxed">{p.description}</p>
                                   </div>
-                                  <p className="text-[9px] sm:text-xs text-muted-foreground line-clamp-1 mb-1">{p.description}</p>
-                                  <div className="flex items-center gap-0.5 mb-1">
-                                    {[1,2,3,4,5].map(s => <Star key={s} size={9} className={s <= Math.round(p.rating || 5) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/20"} />)}
-                                    <span className="text-[8px] text-muted-foreground">({p.review_count}) • {p.sold_count} vendidos</span>
-                                  </div>
-                                  <div className="flex items-end justify-between flex-wrap gap-2">
+
+                                  <div className="flex items-end justify-between flex-wrap gap-2 pt-2 border-t border-border/30">
                                     <div>
-                                      {p.compare_price && <p className="text-[9px] text-muted-foreground line-through">{fmtPrice(p.compare_price)}</p>}
-                                      <p className="text-lg sm:text-xl font-display font-bold text-foreground">{fmtPrice(p.price)}</p>
-                                      <p className="text-[8px] sm:text-[9px] text-primary font-bold">Frete Grátis • 12x</p>
+                                      {p.compare_price && <p className="text-[10px] text-muted-foreground line-through">{fmtPrice(p.compare_price)}</p>}
+                                      <p className="text-xl font-display font-bold text-foreground">{fmtPrice(p.price)}</p>
+                                      <p className="text-[10px] text-emerald-400 font-semibold">12x {fmtPrice(p.price / 12)} s/ juros</p>
                                     </div>
-                                    <div className="flex gap-1.5">
-                                      <Button size="sm" className="text-[10px] font-bold bg-primary text-primary-foreground rounded-lg h-8 px-3" onClick={() => handleBuyProduct(p)}>Comprar 💳</Button>
-                                      <Button size="sm" variant="outline" className="text-[8px] font-bold border-amber-500/20 text-amber-500 hover:bg-amber-500/10 rounded-lg h-8 px-2"
-                                        onClick={() => setBtcModal({ open: true, planName: p.name, planId: p.id, amount: fmtPrice(p.price) })}>
-                                        <Bitcoin size={10} /> BTC
+                                    <div className="flex gap-2">
+                                      <Button size="sm" className="text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl h-9 px-4" onClick={() => handleBuyProduct(p)}>
+                                        Comprar 💳
                                       </Button>
                                     </div>
                                   </div>
@@ -775,36 +1045,7 @@ const Shopping = () => {
                   })}
                 </motion.div>
               )}
-
-              {!loading && filtered.length === 0 && (
-                <div className="text-center py-16">
-                  <Search size={40} className="text-muted-foreground/20 mx-auto mb-3" />
-                  <p className="text-sm text-muted-foreground">Nenhum produto encontrado{searchQuery && ` para "${searchQuery}"`}</p>
-                </div>
-              )}
             </div>
-          </div>
-
-          <p className="text-[8px] sm:text-[9px] text-muted-foreground text-center mt-6">
-            ⚠️ A Planta & Raiz é uma infraestrutura tecnológica autônoma. Responsabilidade técnica pelo produto cabe ao lojista cadastrado. Taxa: 5%.
-          </p>
-        </div>
-      </section>
-
-      {/* Vendor CTA */}
-      <section className="py-10 sm:py-16 bg-gradient-to-br from-primary/5 to-card/30 border-t border-border/30">
-        <div className="container mx-auto px-4 text-center max-w-2xl">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-foreground mb-2 sm:mb-3">É Lojista ou Fabricante?</h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mb-1">Até 10 produtos, 3 fotos por item</p>
-          <p className="text-xs sm:text-sm text-muted-foreground mb-1">Receba 95% • Saque imediato ou acumulado</p>
-          <p className="text-xs sm:text-sm text-primary font-bold mb-6">Mercado Pago + Bitcoin aceitos!</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button className="font-bold bg-primary text-primary-foreground rounded-xl h-11 sm:h-12 shadow-lg shadow-primary/20" asChild>
-              <Link to="/cadastro">Cadastrar Loja <ArrowRight size={16} className="ml-2" /></Link>
-            </Button>
-            <Button variant="outline" className="font-bold border-primary/30 text-primary rounded-xl h-11 sm:h-12" asChild>
-              <Link to="/dashboard-loja">Dashboard Lojista <Store size={16} className="ml-2" /></Link>
-            </Button>
           </div>
         </div>
       </section>

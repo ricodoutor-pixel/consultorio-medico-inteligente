@@ -1,3 +1,4 @@
+import { PatientDiagnosticPanel } from '@/components/diagnostics/PatientDiagnosticPanel';
 import React, { useState, Suspense, lazy } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';

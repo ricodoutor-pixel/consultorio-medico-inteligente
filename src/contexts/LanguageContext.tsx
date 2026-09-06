@@ -4,6 +4,19 @@ export type Locale = "pt" | "en" | "es";
 
 const translations: Record<Locale, Record<string, string>> = {
   pt: {
+
+    // --- Mega Atualizacao ---
+    "pro.book": "Agendar Orientação Técnica",
+    "pro.startingAt": "a partir de",
+    "pro.online": "Online",
+    "pro.offline": "Offline",
+    "pro.reviews": "Avaliações",
+    "pro.experience": "Experiência:",
+    "telemed.title": "Telemedicina 24/7",
+    "telemed.subtitle": "Atendimento rápido, seguro e sem sair de casa.",
+    "telemed.triage": "Triagem Rápida",
+    "telemed.chat": "Orientação por Chat",
+  
     // Navbar
     "nav.home": "Início",
     "nav.howItWorks": "Como Funciona",
@@ -82,6 +95,18 @@ const translations: Record<Locale, Record<string, string>> = {
     "a11y.chatArea": "Área de chat",
   },
   en: {
+
+    "pro.book": "Book Technical Guidance",
+    "pro.startingAt": "starting at",
+    "pro.online": "Online",
+    "pro.offline": "Offline",
+    "pro.reviews": "Reviews",
+    "pro.experience": "Experience:",
+    "telemed.title": "Telemedicine 24/7",
+    "telemed.subtitle": "Fast, secure, and from your home.",
+    "telemed.triage": "Quick Triage",
+    "telemed.chat": "Chat Guidance",
+  
     "nav.home": "Home",
     "nav.howItWorks": "How It Works",
     "nav.professionals": "Professionals",
@@ -153,6 +178,18 @@ const translations: Record<Locale, Record<string, string>> = {
     "a11y.chatArea": "Chat area",
   },
   es: {
+
+    "pro.book": "Programar Orientación Técnica",
+    "pro.startingAt": "a partir de",
+    "pro.online": "En línea",
+    "pro.offline": "Desconectado",
+    "pro.reviews": "Reseñas",
+    "pro.experience": "Experiencia:",
+    "telemed.title": "Telemedicina 24/7",
+    "telemed.subtitle": "Atención rápida, segura y desde casa.",
+    "telemed.triage": "Triaje Rápido",
+    "telemed.chat": "Orientación por Chat",
+  
     "nav.home": "Inicio",
     "nav.howItWorks": "Cómo Funciona",
     "nav.professionals": "Profesionales",

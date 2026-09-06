@@ -1,1 +1,247 @@
-[]
+[
+  {
+    "email": "febrafar@febrafar.com.br",
+    "cnpj": "04.288.654/0001-90",
+    "timestamp": "2026-09-05T19:10:26.781Z",
+    "messageId": "<202609051910.35314257426@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "abrafarma@abrafarma.com.br",
+    "cnpj": "65.842.122/0001-38",
+    "timestamp": "2026-09-05T19:11:27.434Z",
+    "messageId": "<202609051911.91806095017@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "anfarmag@anfarmag.org.br",
+    "cnpj": "55.807.419/0001-67",
+    "timestamp": "2026-09-05T19:12:27.971Z",
+    "messageId": "<202609051912.72823926782@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "atendimento@drogariaiguatemi.com.br",
+    "cnpj": "61.085.346/0001-80",
+    "timestamp": "2026-09-05T19:13:28.649Z",
+    "messageId": "<202609051913.38346527926@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "contato@drogarianovaesperanca.com.br",
+    "cnpj": "43.786.654/0001-44",
+    "timestamp": "2026-09-05T19:14:29.278Z",
+    "messageId": "<202609051914.69712494897@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "comercial@drogariasaopaulo.com.br",
+    "cnpj": "61.412.110/0001-55",
+    "timestamp": "2026-09-05T19:15:29.838Z",
+    "messageId": "<202609051915.22419723479@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "farmaceutico@drogariacampea.com.br",
+    "cnpj": "01.458.963/0001-12",
+    "timestamp": "2026-09-05T19:16:30.455Z",
+    "messageId": "<202609051916.82013221671@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "expansao@drogariatotal.com.br",
+    "cnpj": "02.589.632/0001-99",
+    "timestamp": "2026-09-05T19:17:31.040Z",
+    "messageId": "<202609051917.87479949935@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "atendimento@farmaciasantamarta.com.br",
+    "cnpj": "47.123.896/0001-70",
+    "timestamp": "2026-09-05T19:18:32.092Z",
+    "messageId": "<202609051918.86865288784@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "sac@farmaponte.com.br",
+    "cnpj": "48.963.258/0001-41",
+    "timestamp": "2026-09-05T19:19:32.998Z",
+    "messageId": "<202609051919.38125089240@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "relacionamento@drogal.com.br",
+    "cnpj": "54.321.654/0001-88",
+    "timestamp": "2026-09-05T19:20:34.050Z",
+    "messageId": "<202609051920.43216270490@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "contato@farmaciadopovo.com.br",
+    "cnpj": "58.741.852/0001-33",
+    "timestamp": "2026-09-05T19:21:34.903Z",
+    "messageId": "<202609051921.36689956596@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "farmacia@centralpraia.com.br",
+    "cnpj": "59.852.147/0001-66",
+    "timestamp": "2026-09-05T19:22:35.527Z",
+    "messageId": "<202609051922.85220626585@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "comercial@drogariavenancio.com.br",
+    "cnpj": "00.329.583/0001-10",
+    "timestamp": "2026-09-05T19:23:36.055Z",
+    "messageId": "<202609051923.94087773723@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "parcerias@drogariaspacheco.com.br",
+    "cnpj": "33.438.250/0001-67",
+    "timestamp": "2026-09-05T19:24:36.669Z",
+    "messageId": "<202609051924.29220717922@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "atendimento@farmaciacristal.com.br",
+    "cnpj": "28.963.147/0001-52",
+    "timestamp": "2026-09-05T19:25:37.908Z",
+    "messageId": "<202609051925.92645677179@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "contato@drogariamoderna.com.br",
+    "cnpj": "31.458.741/0001-20",
+    "timestamp": "2026-09-05T19:26:38.576Z",
+    "messageId": "<202609051926.19712631684@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "fornecedores@araujo.com.br",
+    "cnpj": "17.256.512/0001-04",
+    "timestamp": "2026-09-05T19:27:39.229Z",
+    "messageId": "<202609051927.81197448936@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "sac@drogariasminasmais.com.br",
+    "cnpj": "22.589.632/0001-01",
+    "timestamp": "2026-09-05T19:28:49.943Z",
+    "messageId": "<202609051928.66626523924@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "atendimento@saojudastadeufarma.com.br",
+    "cnpj": "18.963.254/0001-85",
+    "timestamp": "2026-09-05T19:29:53.825Z",
+    "messageId": "<202609051929.56622500164@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "comercial@drogariaamericana.com.br",
+    "cnpj": "20.147.852/0001-94",
+    "timestamp": "2026-09-05T19:31:10.074Z",
+    "messageId": "<202609051931.25821231845@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "comercial@farmaciasnissei.com.br",
+    "cnpj": "79.980.082/0001-40",
+    "timestamp": "2026-09-05T19:32:32.240Z",
+    "messageId": "<202609051932.48879490442@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "contato@morifarma.com.br",
+    "cnpj": "75.489.632/0001-18",
+    "timestamp": "2026-09-05T19:33:41.260Z",
+    "messageId": "<202609051933.34704223237@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "farmacia@fiesc.com.br",
+    "cnpj": "83.821.564/0001-72",
+    "timestamp": "2026-09-05T19:34:42.285Z",
+    "messageId": "<202609051934.61791163153@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "parcerias@clamed.com.br",
+    "cnpj": "84.683.481/0001-00",
+    "timestamp": "2026-09-05T19:35:51.050Z",
+    "messageId": "<202609051935.91690569972@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "sac@panvel.com.br",
+    "cnpj": "93.209.765/0001-30",
+    "timestamp": "2026-09-05T19:36:54.497Z",
+    "messageId": "<202609051936.29819053106@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "relacionamento@farmaciassaojoao.com.br",
+    "cnpj": "88.212.114/0001-20",
+    "timestamp": "2026-09-05T19:37:55.997Z",
+    "messageId": "<202609051937.50328948497@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "expansao@farmaciasassociadas.com.br",
+    "cnpj": "03.458.963/0001-50",
+    "timestamp": "2026-09-05T19:38:56.856Z",
+    "messageId": "<202609051938.61848115725@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "atendimento@farmaciassantana.com.br",
+    "cnpj": "14.589.632/0001-44",
+    "timestamp": "2026-09-05T19:40:08.119Z",
+    "messageId": "<202609051940.80512354933@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "sac@drogariasglobo.com.br",
+    "cnpj": "08.458.741/0001-15",
+    "timestamp": "2026-09-05T19:41:11.091Z",
+    "messageId": "<202609051941.50832636662@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "sac@paguemenos.com.br",
+    "cnpj": "05.374.123/0001-09",
+    "timestamp": "2026-09-05T19:42:13.599Z",
+    "messageId": "<202609051942.51123609610@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "comercial@santabrancafarma.com.br",
+    "cnpj": "07.896.321/0001-60",
+    "timestamp": "2026-09-05T19:43:14.200Z",
+    "messageId": "<202609051943.38706835973@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "atendimento@santamartagoiania.com.br",
+    "cnpj": "01.258.963/0001-28",
+    "timestamp": "2026-09-05T19:44:14.765Z",
+    "messageId": "<202609051944.97962535358@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "sac@drogariarosario.com.br",
+    "cnpj": "00.147.852/0001-71",
+    "timestamp": "2026-09-05T19:45:15.370Z",
+    "messageId": "<202609051945.58932702678@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  },
+  {
+    "email": "contato@farmaciabrasildf.com.br",
+    "cnpj": "02.852.147/0001-39",
+    "timestamp": "2026-09-05T19:46:15.998Z",
+    "messageId": "<202609051946.53321534486@smtp-relay.mailin.fr>",
+    "status": "SENT"
+  }
+]

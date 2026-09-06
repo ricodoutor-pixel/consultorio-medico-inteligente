@@ -41,7 +41,7 @@ export default defineConfig(({ mode }) => ({
     cssCodeSplit: true,
     chunkSizeWarningLimit: 1000,
     reportCompressedSize: false,
-    target: "es2020",
+    target: ["es2020", "safari13", "ios13"],
     rollupOptions: {
       output: {
         manualChunks: (id) => {

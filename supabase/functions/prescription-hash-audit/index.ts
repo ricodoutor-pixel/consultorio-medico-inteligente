@@ -1,14 +1,7 @@
-// Prescription Hash Audit — verifica integridade ICP-Brasil das prescrições
-// assinadas nas últimas 24h. Confirma presença de signature_hash e
-// acessibilidade do PDF assinado.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -24,6 +17,7 @@ async function probe(url: string): Promise<{ ok: boolean; status: number }> {
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const unauth = requireServiceAuth(req, corsHeaders);
   if (unauth) return unauth;
@@ -46,7 +40,10 @@ serve(async (req) => {
   const failures: any[] = [];
 
   for (const p of rows ?? []) {
-    const hashOk = !!p.signature_hash && String(p.signature_hash).length >= 32;
+    // SECURITY: SHA-512 oficial (128 hex chars) ou SHA-256 legado (64 hex chars)
+    const hashStr = String(p.signature_hash || "").trim();
+    const isHex = /^[a-fA-F0-9]+$/.test(hashStr);
+    const hashOk = isHex && (hashStr.length === 128 || hashStr.length === 64);
     let pdfOk = false;
     let httpStatus: number | null = null;
     if (p.signed_pdf_url) {

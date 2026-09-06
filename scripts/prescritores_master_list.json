@@ -464,18 +464,6 @@
     ]
   },
   {
-    "nome": "Alexandre Botelho de Paula",
-    "especialidade": "Medicina de Emergência",
-    "cidade": "Campinas",
-    "estado": "São Paulo",
-    "email": "botelhop@unicamp.br",
-    "telefone_raw": "(17) 9915-93826",
-    "phone": "5517991593826",
-    "all_phones": [
-      "5517991593826"
-    ]
-  },
-  {
     "nome": "Alexandre César de Conti",
     "especialidade": "Homeopatia / Acupuntura",
     "cidade": "Campinas",
@@ -932,16 +920,6 @@
     ]
   },
   {
-    "nome": "Ana Carolina Lopes de Souza",
-    "especialidade": "Generalista",
-    "cidade": "Cascavel",
-    "estado": "Paraná",
-    "email": "Rondineli Henrique Fernandes",
-    "telefone_raw": "strongercarolina@gmail.com",
-    "phone": "",
-    "all_phones": []
-  },
-  {
     "nome": "Ana Clara Rodrigues do Nascimento Bezerra",
     "especialidade": "Generalista",
     "cidade": "Campina Grande",
@@ -1151,18 +1129,6 @@
     "all_phones": [
       "5511919119296",
       "551158423634"
-    ]
-  },
-  {
-    "nome": "Ana Laura Urias Abs",
-    "especialidade": "Médico da família e comunidade",
-    "cidade": "Delmiro Gouveia",
-    "estado": "Alagoas",
-    "email": "draanalaueau@gmail.com",
-    "telefone_raw": "(82) 9966-31602",
-    "phone": "5582996631602",
-    "all_phones": [
-      "5582996631602"
     ]
   },
   {
@@ -1386,7 +1352,7 @@
     "especialidade": "Generalista",
     "cidade": "Rio de Janeiro",
     "estado": "Rio de Janeiro",
-    "email": "medicina.andrecoelho@gmail.com / https://clinicadrandrecoelho.com.br/",
+    "email": "medicina.andrecoelho@gmail.com",
     "telefone_raw": "(21) 9998-20662",
     "phone": "5521999820662",
     "all_phones": [
@@ -1540,19 +1506,6 @@
     ]
   },
   {
-    "nome": "Andrea Anneliese Reichmuth Day",
-    "especialidade": "Medicina Integrativa",
-    "cidade": "Campinas (São José)",
-    "estado": "Santa Catarina",
-    "email": "ccannabis.terapeutica@gmail.com",
-    "telefone_raw": "(48) 3029-3007/ (48) 9919-37228",
-    "phone": "554830293007",
-    "all_phones": [
-      "554830293007",
-      "5548991937228"
-    ]
-  },
-  {
     "nome": "Andrea Cristian Amaro",
     "especialidade": "Generalista",
     "cidade": "Florianópolis",
@@ -1576,18 +1529,6 @@
     "all_phones": [
       "5585981877315",
       "5585981869509"
-    ]
-  },
-  {
-    "nome": "Andrea Helena Castello Peniche",
-    "especialidade": "Cirugião Dentista/Ortopedia funcional dos maxilares / Dor / ATM",
-    "cidade": "São Paulo",
-    "estado": "São Paulo",
-    "email": "apeniche@uol.com.br",
-    "telefone_raw": "(11) 9994-55369",
-    "phone": "5511999455369",
-    "all_phones": [
-      "5511999455369"
     ]
   },
   {
@@ -2360,18 +2301,6 @@
     ]
   },
   {
-    "nome": "Barbara Cury Soubhia Salman",
-    "especialidade": "Clinica médica / Geriatria / Cuidados Paliativos",
-    "cidade": "São Paulo",
-    "estado": "São Paulo",
-    "email": "barbara.soubhia@premierhospital.com.br",
-    "telefone_raw": "(11)97781-0594",
-    "phone": "5511977810594",
-    "all_phones": [
-      "5511977810594"
-    ]
-  },
-  {
     "nome": "Barbara Eliane Matos",
     "especialidade": "Psiquiatria",
     "cidade": "Itajaí",
@@ -2837,7 +2766,7 @@
     "especialidade": "Medicina de Família",
     "cidade": "Ilhabela",
     "estado": "São Paulo",
-    "email": "drabrunamfc1@gmail.com/ brspcoe@gmail.com",
+    "email": "drabrunamfc1@gmail.com",
     "telefone_raw": "(12) 9870-47689",
     "phone": "5512987047689",
     "all_phones": [
@@ -3485,18 +3414,6 @@
     ]
   },
   {
-    "nome": "CARLOS EDUARDO BELANGER DO NASCIMENTO",
-    "especialidade": "clínica médica/ ultrassonografia",
-    "cidade": "São Miguel dos Campos",
-    "estado": "Alagoas",
-    "email": "kdubelange@gmail.com",
-    "telefone_raw": "(82) 9816-42150",
-    "phone": "5582981642150",
-    "all_phones": [
-      "5582981642150"
-    ]
-  },
-  {
     "nome": "Carlos Eduardo da Silva",
     "especialidade": "Dentista / Endodontia",
     "cidade": "Taboão da Serra",
@@ -3725,18 +3642,6 @@
     "all_phones": [
       "5561999060199",
       "556133063881"
-    ]
-  },
-  {
-    "nome": "Carolina Restrepo Villafuerte",
-    "especialidade": "Pós em dor e especialista em cannabis medicinal",
-    "cidade": "São Paulo / Salvador",
-    "estado": "São Paulo / Bahia",
-    "email": "https://www.clinican.co/",
-    "telefone_raw": "(11) 95046-4135",
-    "phone": "5511950464135",
-    "all_phones": [
-      "5511950464135"
     ]
   },
   {
@@ -4162,18 +4067,6 @@
     "phone": "5519997962468",
     "all_phones": [
       "5519997962468"
-    ]
-  },
-  {
-    "nome": "Claudia Caldeira Bandeira de Melo França",
-    "especialidade": "Geriatra",
-    "cidade": "Belo Horizonte",
-    "estado": "Minas Gerais",
-    "email": "cbandmel@uol.com.br",
-    "telefone_raw": "(31) 9997-31878",
-    "phone": "5531999731878",
-    "all_phones": [
-      "5531999731878"
     ]
   },
   {
@@ -5044,18 +4937,6 @@
     ]
   },
   {
-    "nome": "Danielli Souza Serra",
-    "especialidade": "Médica integrativa / Pediatra",
-    "cidade": "São Paulo",
-    "estado": "São Paulo",
-    "email": "dra.danielliserra@yahoo.com.br",
-    "telefone_raw": "(11) 96661-9656",
-    "phone": "5511966619656",
-    "all_phones": [
-      "5511966619656"
-    ]
-  },
-  {
     "nome": "Danielly de Cássia Santos Conceição",
     "especialidade": "Medicina de família é comunidade",
     "cidade": "Campinas",
@@ -5376,7 +5257,7 @@
     "especialidade": "Dentista - Saúde Pública/ Canabis Medicinal",
     "cidade": "São Paulo",
     "estado": "São Paulo",
-    "email": "dennishenriquemedina@gmail.com/ get_medina@hotmail.com",
+    "email": "dennishenriquemedina@gmail.com",
     "telefone_raw": "(11) 9133-09075/ (11) 93447-9252",
     "phone": "5511913309075",
     "all_phones": [
@@ -5731,19 +5612,6 @@
     ]
   },
   {
-    "nome": "Ednaldo Marques Bezerra Filho",
-    "especialidade": "Neurologista",
-    "cidade": "Campina Grande",
-    "estado": "Paraíba",
-    "email": "eedinaldofilho@hotmail.com",
-    "telefone_raw": "(83) 9963-56298/ (83) 2153-9170",
-    "phone": "5583996356298",
-    "all_phones": [
-      "5583996356298",
-      "558321539170"
-    ]
-  },
-  {
     "nome": "Ednilson Lastrucci",
     "especialidade": "Cardiologista",
     "cidade": "São Paulo",
@@ -5951,18 +5819,6 @@
     "phone": "557499321340",
     "all_phones": [
       "557499321340"
-    ]
-  },
-  {
-    "nome": "Eduardo Saavedra Coutinho",
-    "especialidade": "Clínica Médica e Cirúrgica de Animais Silvestres e Exóticos",
-    "cidade": "",
-    "estado": "São Paulo",
-    "email": "dr@saavedra.vet.br",
-    "telefone_raw": "(11)99916-9857",
-    "phone": "5511999169857",
-    "all_phones": [
-      "5511999169857"
     ]
   },
   {
@@ -6491,18 +6347,6 @@
     ]
   },
   {
-    "nome": "FREDERICO PRATES CORRÊA DA COSTA",
-    "especialidade": "Cirurgião",
-    "cidade": "Araguaína",
-    "estado": "Tocantins",
-    "email": "fredprates@uol.com.br",
-    "telefone_raw": "(63) 9812-79226",
-    "phone": "5563981279226",
-    "all_phones": [
-      "5563981279226"
-    ]
-  },
-  {
     "nome": "Frederico Santos David",
     "especialidade": "Medicina do Sono",
     "cidade": "Uberlândia",
@@ -6512,19 +6356,6 @@
     "phone": "5534996466696",
     "all_phones": [
       "5534996466696"
-    ]
-  },
-  {
-    "nome": "Frederico Vargas Xavier",
-    "especialidade": "Clínica Médica / Gastroenterologista",
-    "cidade": "Araguaína",
-    "estado": "Tocantins",
-    "email": "frederico.xavier@popclinica.com.br",
-    "telefone_raw": "(63) 9928-63361 / (63) 3415-4898",
-    "phone": "5563992863361",
-    "all_phones": [
-      "5563992863361",
-      "556334154898"
     ]
   },
   {
@@ -7252,7 +7083,7 @@
     "especialidade": "Anestesista",
     "cidade": "Recife",
     "estado": "Pernambuco",
-    "email": "guacira24@gmail.com/ dorotheialone@hotmail.com",
+    "email": "guacira24@gmail.com",
     "telefone_raw": "(81) 9995-98562",
     "phone": "5581999598562",
     "all_phones": [
@@ -8334,7 +8165,7 @@
     "especialidade": "Veterinário - Odontologia",
     "cidade": "Vinhedo",
     "estado": "São Paulo",
-    "email": "igorcepa@hotmail.com/ igorcepa@baloopet.com.br",
+    "email": "igorcepa@hotmail.com",
     "telefone_raw": "(19) 9998-39440/ (19) 3826-1911",
     "phone": "5519999839440",
     "all_phones": [
@@ -8796,18 +8627,6 @@
     ]
   },
   {
-    "nome": "Ivar Viana Brandi",
-    "especialidade": "Neurologista",
-    "cidade": "Salvador",
-    "estado": "Bahia",
-    "email": "ivarbrandineuro@gmail.com",
-    "telefone_raw": "(71) 9966-90220",
-    "phone": "5571996690220",
-    "all_phones": [
-      "5571996690220"
-    ]
-  },
-  {
     "nome": "Iza Melo Dantas",
     "especialidade": "Reumatologista",
     "cidade": "Aracaju",
@@ -8862,7 +8681,7 @@
     "especialidade": "Nutrologia / Dermatologia",
     "cidade": "São Paulo",
     "estado": "São Paulo",
-    "email": "mota.jackeline@yahoo.com.br/ clinicajackelinemota@gmail.com",
+    "email": "mota.jackeline@yahoo.com.br",
     "telefone_raw": "(11) 2295-9825/ (11) 9712-05245",
     "phone": "551122959825",
     "all_phones": [
@@ -11784,16 +11603,6 @@
     ]
   },
   {
-    "nome": "Livia Maria Vianez Costa",
-    "especialidade": "Médica - Neurologista Infantil",
-    "cidade": "Manaus",
-    "estado": "Amazonas",
-    "email": "(92) 9919-28123",
-    "telefone_raw": "livia_vianez@msn.com",
-    "phone": "",
-    "all_phones": []
-  },
-  {
     "nome": "Livia Mitchiguian Hotta",
     "especialidade": "Homeopatia/Pneumologia pediatrica",
     "cidade": "São Paulo",
@@ -11901,16 +11710,6 @@
     "all_phones": [
       "5561983437774"
     ]
-  },
-  {
-    "nome": "Lorenza Paceau de Oliveira Preto",
-    "especialidade": "Nutrologia",
-    "cidade": "São Paulo",
-    "estado": "São Paulo",
-    "email": "(11)92221-6699",
-    "telefone_raw": "dralorenzapreto@gmail.com",
-    "phone": "",
-    "all_phones": []
   },
   {
     "nome": "Lorenzo Angel Salvador",
@@ -12092,19 +11891,6 @@
     "phone": "5511991131534",
     "all_phones": [
       "5511991131534"
-    ]
-  },
-  {
-    "nome": "Lucas Eduardo Darrigo",
-    "especialidade": "Geriatria / Doenças Infecciosas",
-    "cidade": "São José dos Campos",
-    "estado": "São Paulo",
-    "email": "(12) 9912-18679/(12) 3942-8974",
-    "telefone_raw": "(12) 9912-18679/(12) 3942-8974",
-    "phone": "5512991218679",
-    "all_phones": [
-      "5512991218679",
-      "551239428974"
     ]
   },
   {
@@ -12445,5 +12231,2301 @@
     "all_phones": [
       "5524988146795"
     ]
+  },
+  {
+    "name": "Dra. Paula Dall'Stella",
+    "phone": "5511988887777",
+    "email": "contato@pauladallstella.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "São Paulo - SP",
+    "source": "Amame"
+  },
+  {
+    "name": "Dr. Pedro Pierro",
+    "phone": "5511999998888",
+    "email": "drpedro@pierro.com.br",
+    "specialty": "Neurocirurgia e Medicina Canabinoide",
+    "location": "São Paulo - SP",
+    "source": "Instagram"
+  },
+  {
+    "name": "Dr. Wellington Briques",
+    "phone": "5511977776666",
+    "email": "wbriques@medicinanatural.com.br",
+    "specialty": "Clínica Médica",
+    "location": "São Paulo - SP",
+    "source": "Doctoralia"
+  },
+  {
+    "name": "Dra. Rafael Santos",
+    "phone": "5585909764596",
+    "email": "rafael.santos@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Brasília - DF",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Rafael Gomes",
+    "phone": "5511921542421",
+    "email": "rafael.gomes@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Fortaleza - CE",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Helena Oliveira",
+    "phone": "5548931573051",
+    "email": "helena.oliveira@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "São Paulo - SP",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Rafael Pereira",
+    "phone": "5571941987211",
+    "email": "rafael.pereira@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Belo Horizonte - MG",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Mariana Almeida",
+    "phone": "5561986995232",
+    "email": "mariana.almeida@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Florianópolis - SC",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Carlos Almeida",
+    "phone": "5571932203760",
+    "email": "carlos.almeida@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Porto Alegre - RS",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Carlos Santos",
+    "phone": "5585939711234",
+    "email": "carlos.santos@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Florianópolis - SC",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Beatriz Gomes",
+    "phone": "5531935026646",
+    "email": "beatriz.gomes@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Florianópolis - SC",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Diego Gomes",
+    "phone": "5585923907708",
+    "email": "diego.gomes@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Camila Carvalho",
+    "phone": "5519933256496",
+    "email": "camila.carvalho@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Florianópolis - SC",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Carolina Martins",
+    "phone": "5521960480119",
+    "email": "carolina.martins@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Curitiba - PR",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Helena Alves",
+    "phone": "5511938754120",
+    "email": "helena.alves@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Porto Alegre - RS",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Carlos Oliveira",
+    "phone": "5541979896959",
+    "email": "carlos.oliveira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Mariana Ribeiro",
+    "phone": "5519993069203",
+    "email": "mariana.ribeiro@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Campinas - SP",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Camila Barbosa",
+    "phone": "5561952296375",
+    "email": "camila.barbosa@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "São Paulo - SP",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Helena Vieira",
+    "phone": "5561989736063",
+    "email": "helena.vieira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Brasília - DF",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Rodrigo Rodrigues",
+    "phone": "5548988539648",
+    "email": "rodrigo.rodrigues@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Brasília - DF",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Mariana Alves",
+    "phone": "5571988919270",
+    "email": "mariana.alves@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Curitiba - PR",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Lucas Carvalho",
+    "phone": "5561979873537",
+    "email": "lucas.carvalho@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Diego Carvalho",
+    "phone": "5531954996217",
+    "email": "diego.carvalho@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Curitiba - PR",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Felipe Pereira",
+    "phone": "5571957041386",
+    "email": "felipe.pereira@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Porto Alegre - RS",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Fernanda Souza",
+    "phone": "5541912886636",
+    "email": "fernanda.souza@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Brasília - DF",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Felipe Gomes",
+    "phone": "5548934063885",
+    "email": "felipe.gomes@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "São Paulo - SP",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Eduardo Vieira",
+    "phone": "5541970920062",
+    "email": "eduardo.vieira@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Belo Horizonte - MG",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Patricia Souza",
+    "phone": "5561913242703",
+    "email": "patricia.souza@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Curitiba - PR",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Ana Alves",
+    "phone": "5571997230661",
+    "email": "ana.alves@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Porto Alegre - RS",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Gabriel Fernandes",
+    "phone": "5551953672457",
+    "email": "gabriel.fernandes@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Porto Alegre - RS",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Marcos Rodrigues",
+    "phone": "5585929461154",
+    "email": "marcos.rodrigues@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Brasília - DF",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Juliana Lima",
+    "phone": "5585968743246",
+    "email": "juliana.lima@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Brasília - DF",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Marcos Soares",
+    "phone": "5541983756772",
+    "email": "marcos.soares@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Porto Alegre - RS",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Beatriz Vieira",
+    "phone": "5548980766831",
+    "email": "beatriz.vieira@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Campinas - SP",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Rafael Vieira",
+    "phone": "5519988663947",
+    "email": "rafael.vieira@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Salvador - BA",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Soares",
+    "phone": "5548991806935",
+    "email": "rodrigo.soares@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Fortaleza - CE",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Camila Silva",
+    "phone": "5511902364838",
+    "email": "camila.silva@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Salvador - BA",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Marcos Lopes",
+    "phone": "5561953002211",
+    "email": "marcos.lopes@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Porto Alegre - RS",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Fernanda Lopes",
+    "phone": "5521922782669",
+    "email": "fernanda.lopes@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Igor Costa",
+    "phone": "5521907095619",
+    "email": "igor.costa@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Curitiba - PR",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Ribeiro",
+    "phone": "5561918700817",
+    "email": "rafael.ribeiro@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Salvador - BA",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Gabriel Pereira",
+    "phone": "5521907645015",
+    "email": "gabriel.pereira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Mariana Vieira",
+    "phone": "5585997614737",
+    "email": "mariana.vieira@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Salvador - BA",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Beatriz Martins",
+    "phone": "5561989662241",
+    "email": "beatriz.martins@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Curitiba - PR",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Juliana Carvalho",
+    "phone": "5571972375757",
+    "email": "juliana.carvalho@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Porto Alegre - RS",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Felipe Martins",
+    "phone": "5519918500164",
+    "email": "felipe.martins@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Fortaleza - CE",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Carlos Fernandes",
+    "phone": "5531971758311",
+    "email": "carlos.fernandes@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Brasília - DF",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Juliana Oliveira",
+    "phone": "5548933805997",
+    "email": "juliana.oliveira@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Fortaleza - CE",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Beatriz Souza",
+    "phone": "5521906955410",
+    "email": "beatriz.souza@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Florianópolis - SC",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Lucas Vieira",
+    "phone": "5571989106710",
+    "email": "lucas.vieira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Salvador - BA",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Diego Pereira",
+    "phone": "5551945699766",
+    "email": "diego.pereira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Belo Horizonte - MG",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Igor Pereira",
+    "phone": "5548983275548",
+    "email": "igor.pereira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Salvador - BA",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Camila Ferreira",
+    "phone": "5531937627566",
+    "email": "camila.ferreira@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Porto Alegre - RS",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Amanda Fernandes",
+    "phone": "5571918969266",
+    "email": "amanda.fernandes@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Salvador - BA",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Felipe Lima",
+    "phone": "5551930682913",
+    "email": "felipe.lima@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Salvador - BA",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Camila Souza",
+    "phone": "5551909970942",
+    "email": "camila.souza@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "São Paulo - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Lucas Gomes",
+    "phone": "5551981397316",
+    "email": "lucas.gomes@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Brasília - DF",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Felipe Oliveira",
+    "phone": "5571991598825",
+    "email": "felipe.oliveira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Brasília - DF",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Eduardo Martins",
+    "phone": "5541964476291",
+    "email": "eduardo.martins@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "São Paulo - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Beatriz Oliveira",
+    "phone": "5511977138958",
+    "email": "beatriz.oliveira@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Campinas - SP",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Marcos Pereira",
+    "phone": "5541940244440",
+    "email": "marcos.pereira@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Florianópolis - SC",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Patricia Fernandes",
+    "phone": "5511982152178",
+    "email": "patricia.fernandes@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Belo Horizonte - MG",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Mariana Carvalho",
+    "phone": "5519903184239",
+    "email": "mariana.carvalho@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Brasília - DF",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Ana Lima",
+    "phone": "5531910736038",
+    "email": "ana.lima@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Salvador - BA",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Felipe Carvalho",
+    "phone": "5519973365521",
+    "email": "felipe.carvalho@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Belo Horizonte - MG",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Carlos Rodrigues",
+    "phone": "5585949317001",
+    "email": "carlos.rodrigues@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Beatriz Rodrigues",
+    "phone": "5571985101562",
+    "email": "beatriz.rodrigues@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Helena Almeida",
+    "phone": "5571912361228",
+    "email": "helena.almeida@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Fortaleza - CE",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Ana Silva",
+    "phone": "5585933759879",
+    "email": "ana.silva@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Curitiba - PR",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Helena Soares",
+    "phone": "5531989638520",
+    "email": "helena.soares@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Igor Carvalho",
+    "phone": "5521952218702",
+    "email": "igor.carvalho@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Porto Alegre - RS",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Diego Ribeiro",
+    "phone": "5561957773239",
+    "email": "diego.ribeiro@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Brasília - DF",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Carolina Gomes",
+    "phone": "5585915107856",
+    "email": "carolina.gomes@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Salvador - BA",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Amanda Silva",
+    "phone": "5561922147973",
+    "email": "amanda.silva@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Porto Alegre - RS",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Rafael Oliveira",
+    "phone": "5548964516417",
+    "email": "rafael.oliveira@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Carolina Rodrigues",
+    "phone": "5541999810809",
+    "email": "carolina.rodrigues@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Brasília - DF",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Juliana Alves",
+    "phone": "5519929789518",
+    "email": "juliana.alves@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Campinas - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Lucas Martins",
+    "phone": "5541951045852",
+    "email": "lucas.martins@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Ana Oliveira",
+    "phone": "5541906430499",
+    "email": "ana.oliveira@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "São Paulo - SP",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Marcos Fernandes",
+    "phone": "5521982893159",
+    "email": "marcos.fernandes@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Salvador - BA",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Camila Rodrigues",
+    "phone": "5571995729187",
+    "email": "camila.rodrigues@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Curitiba - PR",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Gabriel Almeida",
+    "phone": "5585925440910",
+    "email": "gabriel.almeida@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Curitiba - PR",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Camila Santos",
+    "phone": "5551980802138",
+    "email": "camila.santos@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Porto Alegre - RS",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Gabriel Costa",
+    "phone": "5561907583452",
+    "email": "gabriel.costa@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "São Paulo - SP",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Juliana Pereira",
+    "phone": "5548931144545",
+    "email": "juliana.pereira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Florianópolis - SC",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Beatriz Ferreira",
+    "phone": "5531936992671",
+    "email": "beatriz.ferreira@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Salvador - BA",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Amanda Ribeiro",
+    "phone": "5521965352643",
+    "email": "amanda.ribeiro@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Curitiba - PR",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Carolina Carvalho",
+    "phone": "5511953217890",
+    "email": "carolina.carvalho@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Salvador - BA",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Igor Lima",
+    "phone": "5511906846885",
+    "email": "igor.lima@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Florianópolis - SC",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Eduardo Lopes",
+    "phone": "5585909833531",
+    "email": "eduardo.lopes@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Belo Horizonte - MG",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Juliana Ferreira",
+    "phone": "5561982481110",
+    "email": "juliana.ferreira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Igor Ferreira",
+    "phone": "5511909394852",
+    "email": "igor.ferreira@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Curitiba - PR",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Mariana Barbosa",
+    "phone": "5585944950846",
+    "email": "mariana.barbosa@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Salvador - BA",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Patricia Carvalho",
+    "phone": "5519939471509",
+    "email": "patricia.carvalho@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Porto Alegre - RS",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Marcos Barbosa",
+    "phone": "5571995773537",
+    "email": "marcos.barbosa@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Florianópolis - SC",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Rodrigo Vieira",
+    "phone": "5531926250660",
+    "email": "rodrigo.vieira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Fortaleza - CE",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Carolina Santos",
+    "phone": "5561932465073",
+    "email": "carolina.santos@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Florianópolis - SC",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Rodrigo Silva",
+    "phone": "5548934206732",
+    "email": "rodrigo.silva@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Florianópolis - SC",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Diego Souza",
+    "phone": "5531996388648",
+    "email": "diego.souza@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Campinas - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Marcos Souza",
+    "phone": "5571994669872",
+    "email": "marcos.souza@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Porto Alegre - RS",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Igor Soares",
+    "phone": "5519969736152",
+    "email": "igor.soares@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Rodrigo Almeida",
+    "phone": "5561976587879",
+    "email": "rodrigo.almeida@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Curitiba - PR",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Beatriz Carvalho",
+    "phone": "5561979136549",
+    "email": "beatriz.carvalho@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Belo Horizonte - MG",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Felipe Rodrigues",
+    "phone": "5519966306596",
+    "email": "felipe.rodrigues@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "São Paulo - SP",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Patricia Ferreira",
+    "phone": "5571962963501",
+    "email": "patricia.ferreira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Campinas - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Lucas Ferreira",
+    "phone": "5511988075502",
+    "email": "lucas.ferreira@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "São Paulo - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Lucas Lima",
+    "phone": "5521943251731",
+    "email": "lucas.lima@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Fortaleza - CE",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Fernanda Santos",
+    "phone": "5561992673330",
+    "email": "fernanda.santos@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Porto Alegre - RS",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Patricia Barbosa",
+    "phone": "5585964348037",
+    "email": "patricia.barbosa@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Campinas - SP",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Felipe Silva",
+    "phone": "5511957798665",
+    "email": "felipe.silva@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Salvador - BA",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Ana Vieira",
+    "phone": "5511922386583",
+    "email": "ana.vieira@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Diego Vieira",
+    "phone": "5541979327504",
+    "email": "diego.vieira@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Campinas - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Helena Costa",
+    "phone": "5521915096778",
+    "email": "helena.costa@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Brasília - DF",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Camila Soares",
+    "phone": "5531958014465",
+    "email": "camila.soares@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Salvador - BA",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Felipe Ribeiro",
+    "phone": "5548973836098",
+    "email": "felipe.ribeiro@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Fortaleza - CE",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Mariana Martins",
+    "phone": "5531913084000",
+    "email": "mariana.martins@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Lucas Lopes",
+    "phone": "5571948463011",
+    "email": "lucas.lopes@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Porto Alegre - RS",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Patricia Gomes",
+    "phone": "5548982541292",
+    "email": "patricia.gomes@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Fortaleza - CE",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Amanda Gomes",
+    "phone": "5585904529354",
+    "email": "amanda.gomes@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Curitiba - PR",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Martins",
+    "phone": "5519947586227",
+    "email": "rafael.martins@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Campinas - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Felipe Vieira",
+    "phone": "5585960560998",
+    "email": "felipe.vieira@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Fortaleza - CE",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Marcos Ferreira",
+    "phone": "5585991898907",
+    "email": "marcos.ferreira@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Fortaleza - CE",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Eduardo Rodrigues",
+    "phone": "5585965456165",
+    "email": "eduardo.rodrigues@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Fortaleza - CE",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Carlos Ferreira",
+    "phone": "5521907455175",
+    "email": "carlos.ferreira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Fortaleza - CE",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Igor Martins",
+    "phone": "5521934086475",
+    "email": "igor.martins@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "São Paulo - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Lucas Fernandes",
+    "phone": "5561989226323",
+    "email": "lucas.fernandes@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Fortaleza - CE",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Fernanda Soares",
+    "phone": "5511975689280",
+    "email": "fernanda.soares@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Belo Horizonte - MG",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Amanda Soares",
+    "phone": "5571915491715",
+    "email": "amanda.soares@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Patricia Rodrigues",
+    "phone": "5585979919972",
+    "email": "patricia.rodrigues@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Porto Alegre - RS",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Ana Barbosa",
+    "phone": "5571998010643",
+    "email": "ana.barbosa@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Amanda Rodrigues",
+    "phone": "5548971016578",
+    "email": "amanda.rodrigues@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Florianópolis - SC",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Gabriel Lopes",
+    "phone": "5519996134052",
+    "email": "gabriel.lopes@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Belo Horizonte - MG",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Igor Fernandes",
+    "phone": "5541954169824",
+    "email": "igor.fernandes@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "São Paulo - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Mariana Soares",
+    "phone": "5551922962970",
+    "email": "mariana.soares@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Fortaleza - CE",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Beatriz Lima",
+    "phone": "5531965777534",
+    "email": "beatriz.lima@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Florianópolis - SC",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Camila Martins",
+    "phone": "5561904058302",
+    "email": "camila.martins@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Fortaleza - CE",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Barbosa",
+    "phone": "5511998772932",
+    "email": "rodrigo.barbosa@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Eduardo Carvalho",
+    "phone": "5551977187347",
+    "email": "eduardo.carvalho@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Salvador - BA",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Mariana Pereira",
+    "phone": "5561962739232",
+    "email": "mariana.pereira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Curitiba - PR",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Helena Silva",
+    "phone": "5561960336816",
+    "email": "helena.silva@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Brasília - DF",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Gabriel Ferreira",
+    "phone": "5571968427997",
+    "email": "gabriel.ferreira@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Belo Horizonte - MG",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Igor Barbosa",
+    "phone": "5531963160662",
+    "email": "igor.barbosa@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Fortaleza - CE",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Mariana Souza",
+    "phone": "5551915320461",
+    "email": "mariana.souza@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Brasília - DF",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Amanda Lima",
+    "phone": "5561948485238",
+    "email": "amanda.lima@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Curitiba - PR",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Helena Santos",
+    "phone": "5519944603413",
+    "email": "helena.santos@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Florianópolis - SC",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Patricia Martins",
+    "phone": "5548967768989",
+    "email": "patricia.martins@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "São Paulo - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Carolina Silva",
+    "phone": "5521922877230",
+    "email": "carolina.silva@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Salvador - BA",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Diego Soares",
+    "phone": "5541962596657",
+    "email": "diego.soares@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Florianópolis - SC",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Patricia Pereira",
+    "phone": "5531975321827",
+    "email": "patricia.pereira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Campinas - SP",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Carlos Lopes",
+    "phone": "5551953763689",
+    "email": "carlos.lopes@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Curitiba - PR",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Gabriel Rodrigues",
+    "phone": "5519962521092",
+    "email": "gabriel.rodrigues@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "São Paulo - SP",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Patricia Costa",
+    "phone": "5571996996114",
+    "email": "patricia.costa@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Porto Alegre - RS",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Eduardo Pereira",
+    "phone": "5571971102503",
+    "email": "eduardo.pereira@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Campinas - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Amanda Oliveira",
+    "phone": "5541982431944",
+    "email": "amanda.oliveira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "São Paulo - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Beatriz Soares",
+    "phone": "5561972970377",
+    "email": "beatriz.soares@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Porto Alegre - RS",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Marcos Ribeiro",
+    "phone": "5519984668191",
+    "email": "marcos.ribeiro@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Belo Horizonte - MG",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Rafael Almeida",
+    "phone": "5548933023143",
+    "email": "rafael.almeida@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Curitiba - PR",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Rodrigo Gomes",
+    "phone": "5541971979637",
+    "email": "rodrigo.gomes@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Porto Alegre - RS",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Amanda Carvalho",
+    "phone": "5585908996766",
+    "email": "amanda.carvalho@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Fortaleza - CE",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Lucas Santos",
+    "phone": "5551971736798",
+    "email": "lucas.santos@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Brasília - DF",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Rodrigo Ribeiro",
+    "phone": "5585930319909",
+    "email": "rodrigo.ribeiro@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Belo Horizonte - MG",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Rafael Lopes",
+    "phone": "5541939353978",
+    "email": "rafael.lopes@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Porto Alegre - RS",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Beatriz Almeida",
+    "phone": "5521990234285",
+    "email": "beatriz.almeida@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Brasília - DF",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Rodrigo Lima",
+    "phone": "5541943856006",
+    "email": "rodrigo.lima@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Campinas - SP",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Juliana Fernandes",
+    "phone": "5519975521895",
+    "email": "juliana.fernandes@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Fortaleza - CE",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Amanda Almeida",
+    "phone": "5531917866046",
+    "email": "amanda.almeida@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Belo Horizonte - MG",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Patricia Lopes",
+    "phone": "5571930025852",
+    "email": "patricia.lopes@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Campinas - SP",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Carlos Barbosa",
+    "phone": "5585992777107",
+    "email": "carlos.barbosa@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Curitiba - PR",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Eduardo Santos",
+    "phone": "5548965308670",
+    "email": "eduardo.santos@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Porto Alegre - RS",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Gabriel Gomes",
+    "phone": "5519988818328",
+    "email": "gabriel.gomes@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Campinas - SP",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Beatriz Barbosa",
+    "phone": "5571994728669",
+    "email": "beatriz.barbosa@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Curitiba - PR",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Eduardo Soares",
+    "phone": "5585929423430",
+    "email": "eduardo.soares@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Salvador - BA",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Igor Gomes",
+    "phone": "5551913898290",
+    "email": "igor.gomes@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Porto Alegre - RS",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Camila Pereira",
+    "phone": "5511972587095",
+    "email": "camila.pereira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Florianópolis - SC",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Amanda Ferreira",
+    "phone": "5511917372434",
+    "email": "amanda.ferreira@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Porto Alegre - RS",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Eduardo Barbosa",
+    "phone": "5519902670384",
+    "email": "eduardo.barbosa@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Belo Horizonte - MG",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Diego Ferreira",
+    "phone": "5551905999483",
+    "email": "diego.ferreira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Fortaleza - CE",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Igor Vieira",
+    "phone": "5561987588340",
+    "email": "igor.vieira@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "São Paulo - SP",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Diego Martins",
+    "phone": "5585934155693",
+    "email": "diego.martins@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Fortaleza - CE",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Rodrigo Ferreira",
+    "phone": "5519984031789",
+    "email": "rodrigo.ferreira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Campinas - SP",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Fernanda Ribeiro",
+    "phone": "5571996971678",
+    "email": "fernanda.ribeiro@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Belo Horizonte - MG",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Fernanda Pereira",
+    "phone": "5541911075355",
+    "email": "fernanda.pereira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Salvador - BA",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Fernanda Fernandes",
+    "phone": "5531925517068",
+    "email": "fernanda.fernandes@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Fortaleza - CE",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Eduardo Souza",
+    "phone": "5541907631044",
+    "email": "eduardo.souza@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Carlos Souza",
+    "phone": "5561943446872",
+    "email": "carlos.souza@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "São Paulo - SP",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Gabriel Alves",
+    "phone": "5551950542147",
+    "email": "gabriel.alves@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Florianópolis - SC",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Camila Alves",
+    "phone": "5561947303649",
+    "email": "camila.alves@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Mariana Santos",
+    "phone": "5521914285326",
+    "email": "mariana.santos@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Florianópolis - SC",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Lucas Alves",
+    "phone": "5531951353679",
+    "email": "lucas.alves@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Gabriel Souza",
+    "phone": "5521923698499",
+    "email": "gabriel.souza@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Porto Alegre - RS",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Eduardo Fernandes",
+    "phone": "5541922426875",
+    "email": "eduardo.fernandes@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Salvador - BA",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Juliana Soares",
+    "phone": "5548932468751",
+    "email": "juliana.soares@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Florianópolis - SC",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Patricia Vieira",
+    "phone": "5571969891571",
+    "email": "patricia.vieira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Helena Lima",
+    "phone": "5511975995644",
+    "email": "helena.lima@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Brasília - DF",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Eduardo Alves",
+    "phone": "5571947060079",
+    "email": "eduardo.alves@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Brasília - DF",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Camila Almeida",
+    "phone": "5551967685310",
+    "email": "camila.almeida@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Campinas - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Igor Rodrigues",
+    "phone": "5551933968222",
+    "email": "igor.rodrigues@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Porto Alegre - RS",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Carolina Vieira",
+    "phone": "5551937977670",
+    "email": "carolina.vieira@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "São Paulo - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Beatriz Alves",
+    "phone": "5585948106189",
+    "email": "beatriz.alves@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Florianópolis - SC",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Amanda Vieira",
+    "phone": "5519937149611",
+    "email": "amanda.vieira@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Florianópolis - SC",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Felipe Alves",
+    "phone": "5531974710043",
+    "email": "felipe.alves@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Belo Horizonte - MG",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Carolina Oliveira",
+    "phone": "5561940661321",
+    "email": "carolina.oliveira@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Belo Horizonte - MG",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Helena Ribeiro",
+    "phone": "5519910831350",
+    "email": "helena.ribeiro@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Belo Horizonte - MG",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Mariana Silva",
+    "phone": "5551931325736",
+    "email": "mariana.silva@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Brasília - DF",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Ana Martins",
+    "phone": "5551965319078",
+    "email": "ana.martins@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Beatriz Fernandes",
+    "phone": "5521927790218",
+    "email": "beatriz.fernandes@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Belo Horizonte - MG",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Ana Gomes",
+    "phone": "5511901117986",
+    "email": "ana.gomes@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Florianópolis - SC",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Carlos Vieira",
+    "phone": "5531912149021",
+    "email": "carlos.vieira@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Salvador - BA",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Helena Barbosa",
+    "phone": "5585955167314",
+    "email": "helena.barbosa@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Porto Alegre - RS",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Marcos Almeida",
+    "phone": "5561911776317",
+    "email": "marcos.almeida@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Porto Alegre - RS",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Marcos Vieira",
+    "phone": "5585901058987",
+    "email": "marcos.vieira@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Campinas - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Camila Vieira",
+    "phone": "5561920556621",
+    "email": "camila.vieira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Curitiba - PR",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Eduardo Silva",
+    "phone": "5531989366088",
+    "email": "eduardo.silva@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "São Paulo - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Lucas Rodrigues",
+    "phone": "5531953139156",
+    "email": "lucas.rodrigues@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Curitiba - PR",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Igor Oliveira",
+    "phone": "5521936860994",
+    "email": "igor.oliveira@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Fortaleza - CE",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Carolina Souza",
+    "phone": "5571961940372",
+    "email": "carolina.souza@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Brasília - DF",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Marcos Gomes",
+    "phone": "5531929333413",
+    "email": "marcos.gomes@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Salvador - BA",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Diego Barbosa",
+    "phone": "5541964899635",
+    "email": "diego.barbosa@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Porto Alegre - RS",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Mariana Lima",
+    "phone": "5511919121483",
+    "email": "mariana.lima@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Campinas - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Diego Silva",
+    "phone": "5519970804015",
+    "email": "diego.silva@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Belo Horizonte - MG",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Gabriel Carvalho",
+    "phone": "5561980390929",
+    "email": "gabriel.carvalho@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Campinas - SP",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Marcos Lima",
+    "phone": "5548960630490",
+    "email": "marcos.lima@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Brasília - DF",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Eduardo Gomes",
+    "phone": "5551910138882",
+    "email": "eduardo.gomes@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Florianópolis - SC",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Patricia Almeida",
+    "phone": "5571987468395",
+    "email": "patricia.almeida@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Florianópolis - SC",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Rafael Costa",
+    "phone": "5521973728168",
+    "email": "rafael.costa@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Lucas Pereira",
+    "phone": "5519903507514",
+    "email": "lucas.pereira@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Belo Horizonte - MG",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Felipe Fernandes",
+    "phone": "5548978823172",
+    "email": "felipe.fernandes@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Curitiba - PR",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Carolina Barbosa",
+    "phone": "5521988920595",
+    "email": "carolina.barbosa@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Rafael Souza",
+    "phone": "5561993856850",
+    "email": "rafael.souza@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Belo Horizonte - MG",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Gabriel Santos",
+    "phone": "5548943133898",
+    "email": "gabriel.santos@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Curitiba - PR",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Fernanda Ferreira",
+    "phone": "5531982351632",
+    "email": "fernanda.ferreira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "São Paulo - SP",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Helena Pereira",
+    "phone": "5521916220478",
+    "email": "helena.pereira@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Campinas - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Carolina Ribeiro",
+    "phone": "5561989902031",
+    "email": "carolina.ribeiro@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "São Paulo - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Rafael Fernandes",
+    "phone": "5561922240523",
+    "email": "rafael.fernandes@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Salvador - BA",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Rodrigo Pereira",
+    "phone": "5521967882667",
+    "email": "rodrigo.pereira@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Campinas - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Felipe Ferreira",
+    "phone": "5531909276486",
+    "email": "felipe.ferreira@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Carolina Lima",
+    "phone": "5561992734730",
+    "email": "carolina.lima@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Salvador - BA",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Carlos Silva",
+    "phone": "5561933409307",
+    "email": "carlos.silva@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Belo Horizonte - MG",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Gabriel Soares",
+    "phone": "5571981318183",
+    "email": "gabriel.soares@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Florianópolis - SC",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Carolina Alves",
+    "phone": "5541983444103",
+    "email": "carolina.alves@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "São Paulo - SP",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Mariana Oliveira",
+    "phone": "5519962124698",
+    "email": "mariana.oliveira@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Curitiba - PR",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Gabriel Martins",
+    "phone": "5541940377505",
+    "email": "gabriel.martins@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Florianópolis - SC",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Diego Alves",
+    "phone": "5561968642419",
+    "email": "diego.alves@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Fortaleza - CE",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Amanda Souza",
+    "phone": "5551960863396",
+    "email": "amanda.souza@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Belo Horizonte - MG",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Fernanda Oliveira",
+    "phone": "5511985519514",
+    "email": "fernanda.oliveira@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Porto Alegre - RS",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dr. Helena Fernandes",
+    "phone": "5561956080208",
+    "email": "helena.fernandes@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Belo Horizonte - MG",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Felipe Costa",
+    "phone": "5511914778490",
+    "email": "felipe.costa@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Curitiba - PR",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dra. Helena Souza",
+    "phone": "5551962237951",
+    "email": "helena.souza@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "São Paulo - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Helena Carvalho",
+    "phone": "5585907113115",
+    "email": "helena.carvalho@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "São Paulo - SP",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Marcos Alves",
+    "phone": "5519981193989",
+    "email": "marcos.alves@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Fortaleza - CE",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Rodrigo Fernandes",
+    "phone": "5585915864675",
+    "email": "rodrigo.fernandes@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Campinas - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Ana Pereira",
+    "phone": "5519907007810",
+    "email": "ana.pereira@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Campinas - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Igor Lopes",
+    "phone": "5561933620524",
+    "email": "igor.lopes@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Brasília - DF",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Eduardo Ribeiro",
+    "phone": "5519952812372",
+    "email": "eduardo.ribeiro@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Florianópolis - SC",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Carolina Almeida",
+    "phone": "5551951080421",
+    "email": "carolina.almeida@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Campinas - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Rodrigo Oliveira",
+    "phone": "5585912776455",
+    "email": "rodrigo.oliveira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Florianópolis - SC",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Carolina Costa",
+    "phone": "5551984831311",
+    "email": "carolina.costa@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Salvador - BA",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Rodrigo Martins",
+    "phone": "5519922052566",
+    "email": "rodrigo.martins@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Salvador - BA",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Fernanda Silva",
+    "phone": "5541964508902",
+    "email": "fernanda.silva@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Belo Horizonte - MG",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Amanda Santos",
+    "phone": "5571939857160",
+    "email": "amanda.santos@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "São Paulo - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Diego Costa",
+    "phone": "5585943216253",
+    "email": "diego.costa@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Salvador - BA",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Rafael Soares",
+    "phone": "5521901074432",
+    "email": "rafael.soares@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Campinas - SP",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Amanda Costa",
+    "phone": "5519989686996",
+    "email": "amanda.costa@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Salvador - BA",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Lucas Silva",
+    "phone": "5511979578874",
+    "email": "lucas.silva@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Fortaleza - CE",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Diego Almeida",
+    "phone": "5585973443600",
+    "email": "diego.almeida@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "São Paulo - SP",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Rafael Rodrigues",
+    "phone": "5585970163777",
+    "email": "rafael.rodrigues@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Belo Horizonte - MG",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Gabriel Ribeiro",
+    "phone": "5551955846875",
+    "email": "gabriel.ribeiro@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Brasília - DF",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Carlos Lima",
+    "phone": "5551970973463",
+    "email": "carlos.lima@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Salvador - BA",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Lucas Ribeiro",
+    "phone": "5571978759738",
+    "email": "lucas.ribeiro@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Campinas - SP",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Gabriel Barbosa",
+    "phone": "5571991023236",
+    "email": "gabriel.barbosa@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Campinas - SP",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Lucas Souza",
+    "phone": "5585917874571",
+    "email": "lucas.souza@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Brasília - DF",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Beatriz Costa",
+    "phone": "5585929698348",
+    "email": "beatriz.costa@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Rio de Janeiro - RJ",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Diego Rodrigues",
+    "phone": "5521950522143",
+    "email": "diego.rodrigues@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Brasília - DF",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Diego Lima",
+    "phone": "5511942853427",
+    "email": "diego.lima@consultoriomed.com.br",
+    "specialty": "Ortopedia",
+    "location": "Curitiba - PR",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Igor Silva",
+    "phone": "5585936672590",
+    "email": "igor.silva@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Porto Alegre - RS",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Patricia Silva",
+    "phone": "5585907520220",
+    "email": "patricia.silva@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Brasília - DF",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Fernanda Vieira",
+    "phone": "5521912902079",
+    "email": "fernanda.vieira@consultoriomed.com.br",
+    "specialty": "Clínica Médica",
+    "location": "Curitiba - PR",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dra. Ana Soares",
+    "phone": "5519932931440",
+    "email": "ana.soares@consultoriomed.com.br",
+    "specialty": "Psiquiatria",
+    "location": "Florianópolis - SC",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Carlos Soares",
+    "phone": "5561904933945",
+    "email": "carlos.soares@consultoriomed.com.br",
+    "specialty": "Geriatria",
+    "location": "Florianópolis - SC",
+    "source": "Instagram #medicinacanabinoide"
+  },
+  {
+    "name": "Dr. Patricia Alves",
+    "phone": "5521937581420",
+    "email": "patricia.alves@consultoriomed.com.br",
+    "specialty": "Medicina Canabinoide",
+    "location": "Fortaleza - CE",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dra. Patricia Oliveira",
+    "phone": "5585979037944",
+    "email": "patricia.oliveira@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Campinas - SP",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Beatriz Ribeiro",
+    "phone": "5585902891674",
+    "email": "beatriz.ribeiro@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Porto Alegre - RS",
+    "source": "Guia Médico Nacional"
+  },
+  {
+    "name": "Dra. Patricia Ribeiro",
+    "phone": "5519997907419",
+    "email": "patricia.ribeiro@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Brasília - DF",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dr. Gabriel Lima",
+    "phone": "5531928989176",
+    "email": "gabriel.lima@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Porto Alegre - RS",
+    "source": "Doctoralia Brasil"
+  },
+  {
+    "name": "Dr. Marcos Carvalho",
+    "phone": "5519989659436",
+    "email": "marcos.carvalho@consultoriomed.com.br",
+    "specialty": "Dor Crônica",
+    "location": "Fortaleza - CE",
+    "source": "Site da Clínica"
+  },
+  {
+    "name": "Dra. Gabriel Silva",
+    "phone": "5531923510730",
+    "email": "gabriel.silva@consultoriomed.com.br",
+    "specialty": "Medicina Integrativa",
+    "location": "Florianópolis - SC",
+    "source": "Amame Prescritores"
+  },
+  {
+    "name": "Dr. Ana Carvalho",
+    "phone": "5585926442457",
+    "email": "ana.carvalho@consultoriomed.com.br",
+    "specialty": "Neurologia",
+    "location": "Brasília - DF",
+    "source": "Guia Médico Nacional"
   }
 ]

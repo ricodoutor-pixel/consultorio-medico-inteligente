@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { requireServiceAuth } from "../_shared/service-auth.ts";
 
 const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY") || "";
 
@@ -104,11 +105,28 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const unauthorized = requireServiceAuth(req, corsHeaders);
+  if (unauthorized) return unauthorized;
+
   try {
     const { contacts, batchSize = 10, dryRun = false } = await req.json();
 
     if (!contacts || !Array.isArray(contacts) || contacts.length === 0) {
       return new Response(JSON.stringify({ error: "No contacts provided" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (contacts.length > 100) {
+      return new Response(JSON.stringify({ error: "Too many contacts; maximum is 100" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -122,7 +140,8 @@ serve(async (req) => {
     }
 
     const results = { sent: 0, failed: 0, imported: 0, errors: [] as string[] };
-    const batch = contacts.slice(0, batchSize);
+    const safeBatchSize = Math.max(1, Math.min(Number(batchSize) || 10, 25));
+    const batch = contacts.slice(0, safeBatchSize);
 
     for (const contact of batch) {
       const { email, name, specialty, city, state, phone } = contact;

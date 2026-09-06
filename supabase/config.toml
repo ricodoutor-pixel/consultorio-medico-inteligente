@@ -64,3 +64,8 @@ project_id = "shmbwdjuddvquszwkvuq"
     verify_jwt = false
   [functions.dr-edilson-clinical-support]
     verify_jwt = false
+  [functions.shipping-quote]
+    verify_jwt = false
+  [functions.regulatory-assistant]
+    verify_jwt = false
+

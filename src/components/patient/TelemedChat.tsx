@@ -56,7 +56,7 @@ const BRISA_WELCOME: ChatMessage[] = [
   {
     id: "brisa-1",
     role: "assistant",
-    content: "Olá! Eu sou a Enfª Brisa, sua assistente de saúde da Planta & Raiz 🌿\n\nEstou disponível 24h para:\n• Triagem de sintomas\n• Dúvidas sobre tratamento\n• Agendamento de Orientação Técnica\n• Suporte ao paciente\n\nComo posso ajudar você hoje?",
+    content: "Olá! Eu sou a Enfª Brisa, sua enfermeira orientadora e especialista em saúde canabinoide da Planta & Raiz 🌿\n\nEstou disponível 24h para orientações sobre:\n• Regras da Anvisa (RDC 660/2022 e RDC 327/2019)\n• Direitos perante Planos de Saúde e SUS (STJ)\n• Viagens aéreas nacionais com medicamento\n• Laudos médicos para Habeas Corpus de cultivo\n• Agendamento de teleconsulta com médicos especialistas\n\nComo posso orientar você hoje?",
     timestamp: new Date(),
   },
 ];
@@ -175,7 +175,16 @@ export const TelemedChat = ({ patientId }: TelemedChatProps) => {
         const { data, error } = await supabase.functions.invoke("ai-gateway", {
           body: {
             messages: [
-              { role: "system", content: "Você é a Enfermeira Brisa da Planta & Raiz, assistente de saúde especializada em medicina canabinoide. Responda de forma acolhedora, profissional e em português. Ajude com triagem, dúvidas sobre tratamento e agendamento." },
+              {
+                role: "system",
+                content: `Você é a Enfermeira Brisa da Planta y Raíz, enfermeira orientadora e especialista em saúde canabinoide e regulação sanitária brasileira.
+Responda de forma acolhedora, empática, didática e em português do Brasil.
+
+DIRETRIZES:
+- Suas respostas têm caráter estritamente educativo e informativo, não substituindo a consulta médica individual nem a assessoria de um advogado.
+- Você domina: RDC 660/2022 (importação individual pelo gov.br), RDC 327/2019 (farmácias no Brasil com receitas C1/B), transporte em voos nacionais (receita válida + autorização Anvisa + bagagem de mão), cobertura por Planos de Saúde/SUS (jurisprudência do STJ exigindo Laudo Médico Circunstanciado) e Habeas Corpus para cultivo.
+- Sempre convide o paciente a agendar teleconsulta com os médicos especialistas da plataforma em /telemedicina para obter sua receita médica ou laudo circunstanciado.`
+              },
               ...messages.map(m => ({ role: m.role, content: m.content })),
               { role: "user", content: userMsg.content },
             ],
@@ -380,20 +389,49 @@ export const TelemedChat = ({ patientId }: TelemedChatProps) => {
                   <div ref={messagesEndRef} />
                 </div>
 
+                {/* Perguntas Rápidas quando conversando com a Enfª Brisa */}
+                {selectedContact.isBrisa && (
+                  <div className="px-3 py-1.5 border-t border-border/50 bg-muted/20 flex gap-1.5 overflow-x-auto no-scrollbar">
+                    {[
+                      "Como funciona a autorização da Anvisa?",
+                      "Posso viajar de avião com meu óleo?",
+                      "O plano de saúde cobre o tratamento?",
+                      "Como conseguir laudo para processo ou cultivo?",
+                    ].map((q, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        disabled={sending}
+                        onClick={() => {
+                          setInput(q);
+                          setTimeout(() => {
+                            const btn = document.getElementById("telemed-chat-send-btn");
+                            btn?.click();
+                          }, 50);
+                        }}
+                        className="whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] bg-card border border-primary/20 hover:border-primary text-foreground hover:bg-primary/10 transition-colors shrink-0 font-medium"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {/* Input Bar */}
-                <div className="px-3 py-2.5 border-t border-border bg-card">
+                <div className="px-3 py-2.5 border-t border-border bg-card flex flex-col gap-1.5">
                   <form
                     onSubmit={e => { e.preventDefault(); handleSend(); }}
                     className="flex items-center gap-2"
                   >
                     <Input
-                      placeholder={selectedContact.isBrisa ? "Converse com a Enfª Brisa..." : `Mensagem para ${selectedContact.name}...`}
+                      placeholder={selectedContact.isBrisa ? "Dúvidas sobre Anvisa, laudos, viagens..." : `Mensagem para ${selectedContact.name}...`}
                       value={input}
                       onChange={e => setInput(e.target.value)}
                       className="flex-1 bg-muted/30 border-border text-sm h-10 rounded-xl"
                       disabled={sending}
                     />
                     <Button
+                      id="telemed-chat-send-btn"
                       type="submit"
                       size="sm"
                       className="h-10 w-10 rounded-xl bg-primary text-primary-foreground p-0"
@@ -402,6 +440,11 @@ export const TelemedChat = ({ patientId }: TelemedChatProps) => {
                       <Send size={16} />
                     </Button>
                   </form>
+                  {selectedContact.isBrisa && (
+                    <p className="text-[9px] text-muted-foreground text-center leading-tight">
+                      🌿 <strong>Enfª Brisa</strong>: Orientação educativa e de saúde. Não substitui consulta médica ou advocatícia.
+                    </p>
+                  )}
                 </div>
               </>
             ) : (

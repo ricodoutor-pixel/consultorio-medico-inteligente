@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -6,23 +6,57 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Leaf, Mail, Lock, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Leaf, 
+  Mail, 
+  Lock, 
+  ArrowRight, 
+  Eye, 
+  EyeOff, 
+  Loader2, 
+  Store, 
+  User, 
+  Stethoscope, 
+  ShieldAlert, 
+  Sparkles,
+  KeyRound,
+  CheckCircle2
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { isMasterAdminEmail } from "@/lib/admin-auth";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
-const Login = () => {
+type PortalType = "paciente" | "medico" | "farmacia" | "admin";
+
+export default function Login() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const redirectTo = searchParams.get("redirect");
+  const initialType = (searchParams.get("type") || (redirectTo?.includes("lojista") || redirectTo?.includes("farmacia") ? "farmacia" : redirectTo?.includes("medico") || redirectTo?.includes("consultorio") ? "medico" : redirectTo?.includes("admin") ? "admin" : "paciente")) as PortalType;
+
+  const [selectedPortal, setSelectedPortal] = useState<PortalType>(initialType);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [forgotMode, setForgotMode] = useState(false);
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { toast } = useToast();
-  const redirectTo = searchParams.get("redirect");
+
+  const isMaster = isMasterAdminEmail(email);
+
+  useEffect(() => {
+    if (searchParams.get("type")) {
+      const t = searchParams.get("type") as PortalType;
+      if (["paciente", "medico", "farmacia", "admin"].includes(t)) {
+        setSelectedPortal(t);
+      }
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,62 +77,130 @@ const Login = () => {
       }
 
       if (data.user) {
-        // Check user type to redirect
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("user_type, full_name")
+        const userEmail = data.user.email || email;
+        const isMasterUser = isMasterAdminEmail(userEmail);
+
+        // Fetch user profile
+        const { data: profile } = await (supabase
+          .from("profiles") as any)
+          .select("user_type, full_name, company_name")
           .eq("id", data.user.id)
-          .single();
+          .maybeSingle();
 
-        const name = profile?.full_name || "usuário";
-        toast({ title: `Bem-vindo, ${name}! 🌿` });
+        const name = profile?.full_name || profile?.company_name || userEmail.split("@")[0];
 
-        // Alerta WhatsApp ao Dr. Edilson — Modo Cadastro Ativado (login)
-        supabase.functions
-          .invoke("brisa-signup-alert", { body: { user_id: data.user.id, event: "login" } })
-          .catch((e) => console.warn("[brisa-signup-alert] login", e));
-
-        // Redirect: prioritize ?redirect= param (only if safe/relative), then role-based default
+        // Safe redirect handling
         const safeRedirect = (() => {
           if (!redirectTo) return null;
           const d = decodeURIComponent(redirectTo);
           return d.startsWith("/") && !d.startsWith("//") ? d : null;
         })();
-        if (safeRedirect) {
-          navigate(safeRedirect);
-        } else {
-          const userType = profile?.user_type || "patient";
-          
-          const { data: doctorData } = await supabase
-            .from("doctors")
-            .select("id")
-            .eq("user_id", data.user.id)
-            .maybeSingle();
-            
-          const isDoctor = userType === "doctor" || !!doctorData;
 
-          if (isDoctor) {
-            navigate("/consultorio");
-          } else {
-            const { data: roleData } = await supabase
-              .from("user_roles")
-              .select("role")
-              .eq("user_id", data.user.id)
-              .eq("role", "admin")
-              .maybeSingle();
+        // ── 1. ACESSO CHAVE MESTRA (contato@plantayraiz.com.br / Admins) ──
+        if (isMasterUser) {
+          toast({
+            title: `🔑 Chave Mestra Ativada! Bem-vindo, ${name}`,
+            description: `Acesso total concedido ao portal: ${selectedPortal.toUpperCase()}`
+          });
 
-            if (roleData) {
-              navigate("/admin");
-            } else {
-              navigate("/dashboard");
-            }
+          if (safeRedirect) {
+            navigate(safeRedirect);
+            return;
           }
+
+          if (selectedPortal === "paciente") {
+            navigate("/dashboard-paciente");
+          } else if (selectedPortal === "medico") {
+            navigate("/workspace-medico");
+          } else if (selectedPortal === "farmacia") {
+            navigate("/lojistas");
+          } else if (selectedPortal === "admin") {
+            navigate("/admin");
+          } else {
+            navigate("/dashboard-paciente");
+          }
+          return;
         }
+
+        // ── 2. ACESSO DE USUÁRIO REGULAR ──
+        const userType = profile?.user_type || "patient";
+
+        // Check if user is a registered doctor
+        const { data: doctorData } = await supabase
+          .from("doctors")
+          .select("id")
+          .eq("user_id", data.user.id)
+          .maybeSingle();
+
+        const isDoctor = userType === "doctor" || !!doctorData;
+        const isVendor = userType === "vendor" || userType === "lojista" || userType === "dispensario";
+
+        // Check if user is an admin
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", data.user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+
+        const isAdmin = !!roleData;
+
+        // Se o usuário selecionou um portal e tem permissão para ele:
+        if (selectedPortal === "medico") {
+          if (isDoctor) {
+            toast({ title: `Bem-vindo ao Consultório, Dr(a). ${name}! 🩺` });
+            navigate(safeRedirect || "/workspace-medico");
+          } else {
+            toast({
+              title: "Acesso Não Permitido",
+              description: "Você não possui cadastro médico ativo. Redirecionando para seu portal...",
+              variant: "destructive"
+            });
+            navigate(isVendor ? "/lojistas" : "/dashboard-paciente");
+          }
+          return;
+        }
+
+        if (selectedPortal === "farmacia") {
+          if (isVendor) {
+            toast({ title: `Bem-vindo ao Portal da Farmácia! 🏪` });
+            navigate(safeRedirect || "/lojistas");
+          } else {
+            toast({
+              title: "Acesso Não Permitido",
+              description: "Você não possui cadastro de farmácia/lojista. Redirecionando para seu portal...",
+              variant: "destructive"
+            });
+            navigate(isDoctor ? "/workspace-medico" : "/dashboard-paciente");
+          }
+          return;
+        }
+
+        if (selectedPortal === "admin") {
+          if (isAdmin) {
+            toast({ title: `Painel Administrativo Autorizado 🛡️` });
+            navigate(safeRedirect || "/admin");
+          } else {
+            toast({
+              title: "Acesso Negado",
+              description: "Esta conta não possui privilégios de administrador.",
+              variant: "destructive"
+            });
+            navigate(isDoctor ? "/workspace-medico" : isVendor ? "/lojistas" : "/dashboard-paciente");
+          }
+          return;
+        }
+
+        // Portal Paciente (padrão)
+        toast({ title: `Bem-vindo, ${name}! 🌿` });
+        navigate(safeRedirect || "/dashboard-paciente");
       }
     } catch (err) {
+      console.error(err);
       toast({ title: "Erro", description: "Falha na conexão. Tente novamente.", variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -121,25 +223,105 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="min-h-dvh bg-background flex flex-col">
       <Navbar />
-      <section className="pt-24 pb-16 md:pt-32 hero-glow">
+
+      <section className="flex-1 pt-24 pb-16 md:pt-32 flex items-center justify-center">
         <div className="container mx-auto px-4 flex justify-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} className="w-full max-w-md">
-            <div className="flex items-center gap-3 mb-6 justify-center">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
-                <Leaf size={24} className="text-primary" />
+            
+            {/* Cabeçalho */}
+            <div className="flex flex-col items-center mb-6 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-900/30 border border-emerald-500/40 flex items-center justify-center shadow-xl mb-3">
+                {selectedPortal === "paciente" && <User size={28} className="text-emerald-400" />}
+                {selectedPortal === "medico" && <Stethoscope size={28} className="text-sky-400" />}
+                {selectedPortal === "farmacia" && <Store size={28} className="text-amber-400" />}
+                {selectedPortal === "admin" && <ShieldAlert size={28} className="text-purple-400" />}
               </div>
-              <h1 className="text-2xl font-display font-black text-foreground">
-                {forgotMode ? "Recuperar Senha" : "Entrar"}
+              <h1 className="text-2xl sm:text-3xl font-display font-black text-foreground">
+                {forgotMode 
+                  ? "Recuperar Senha" 
+                  : selectedPortal === "paciente" ? "Portal do Paciente"
+                  : selectedPortal === "medico" ? "Consultório Médico"
+                  : selectedPortal === "farmacia" ? "Portal da Farmácia / Lojista"
+                  : "Painel Administrativo"}
               </h1>
+              <p className="text-xs text-muted-foreground mt-1">
+                Acesse sua conta na plataforma Planta y Raíz
+              </p>
             </div>
 
-            <Card className="border-border bg-card">
+            {/* SELETOR DE PORTAL (4 PERFIS) */}
+            {!forgotMode && (
+              <div className="grid grid-cols-4 gap-1.5 p-1.5 bg-muted/60 border border-border rounded-2xl mb-5 shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => setSelectedPortal("paciente")}
+                  className={`py-2 px-1 text-center rounded-xl font-bold text-[11px] transition-all flex flex-col items-center gap-1 ${
+                    selectedPortal === "paciente"
+                      ? "bg-card text-emerald-400 shadow-md border border-emerald-500/30"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <User size={14} /> Paciente
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedPortal("medico")}
+                  className={`py-2 px-1 text-center rounded-xl font-bold text-[11px] transition-all flex flex-col items-center gap-1 ${
+                    selectedPortal === "medico"
+                      ? "bg-card text-sky-400 shadow-md border border-sky-500/30"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Stethoscope size={14} /> Médico
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedPortal("farmacia")}
+                  className={`py-2 px-1 text-center rounded-xl font-bold text-[11px] transition-all flex flex-col items-center gap-1 ${
+                    selectedPortal === "farmacia"
+                      ? "bg-card text-amber-400 shadow-md border border-amber-500/30"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Store size={14} /> Farmácia
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedPortal("admin")}
+                  className={`py-2 px-1 text-center rounded-xl font-bold text-[11px] transition-all flex flex-col items-center gap-1 ${
+                    selectedPortal === "admin"
+                      ? "bg-card text-purple-400 shadow-md border border-purple-500/30"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <ShieldAlert size={14} /> Admin
+                </button>
+              </div>
+            )}
+
+            {/* Aviso de Chave Mestra quando digitar contato@plantayraiz.com.br */}
+            {isMaster && (
+              <div className="mb-4 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-xs text-emerald-300 animate-pulse">
+                <span className="flex items-center gap-1.5 font-bold">
+                  <KeyRound size={14} className="text-emerald-400" /> Chave Mestra Ativa
+                </span>
+                <span className="text-[10px] text-muted-foreground">Acesso Universal a Todos os Portais</span>
+              </div>
+            )}
+
+            {/* Formulário de Login */}
+            <Card className="border-border bg-card/95 backdrop-blur-md shadow-2xl rounded-2xl">
               <CardContent className="p-6">
                 <form onSubmit={forgotMode ? handleForgotPassword : handleLogin} className="space-y-4">
                   <div>
-                    <Label htmlFor="email" className="text-xs font-bold text-muted-foreground">E-mail</Label>
+                    <Label htmlFor="email" className="text-xs font-bold text-muted-foreground">
+                      E-mail de Acesso
+                    </Label>
                     <div className="relative mt-1">
                       <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                       <Input
@@ -148,7 +330,7 @@ const Login = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="seu@email.com"
-                        className="pl-10 bg-muted border-border"
+                        className="pl-10 bg-muted border-border rounded-xl text-xs h-10"
                         required
                       />
                     </div>
@@ -156,7 +338,16 @@ const Login = () => {
 
                   {!forgotMode && (
                     <div>
-                      <Label htmlFor="password" className="text-xs font-bold text-muted-foreground">Senha</Label>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="password" className="text-xs font-bold text-muted-foreground">Senha</Label>
+                        <button
+                          type="button"
+                          onClick={() => setForgotMode(true)}
+                          className="text-[11px] text-emerald-400 hover:underline"
+                        >
+                          Esqueceu a senha?
+                        </button>
+                      </div>
                       <div className="relative mt-1">
                         <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         <Input
@@ -165,7 +356,7 @@ const Login = () => {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="pl-10 pr-10 bg-muted border-border"
+                          className="pl-10 pr-10 bg-muted border-border rounded-xl text-xs h-10"
                           required
                           minLength={6}
                         />
@@ -180,86 +371,49 @@ const Login = () => {
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full bg-primary text-primary-foreground font-bold rounded-xl" disabled={loading}>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl h-11 text-xs shadow-lg shadow-emerald-950/20" 
+                    disabled={loading}
+                  >
                     {loading ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
-                    {forgotMode ? "Enviar Link de Recuperação" : "Entrar"}
+                    {forgotMode ? "Enviar Link de Recuperação" : `Entrar no Portal ${selectedPortal.charAt(0).toUpperCase() + selectedPortal.slice(1)}`}
                     {!loading && <ArrowRight size={16} className="ml-2" />}
                   </Button>
 
-                  {!forgotMode && (
-                    <button
-                      type="button"
-                      onClick={() => setForgotMode(true)}
-                      className="w-full text-center text-xs text-primary hover:underline"
-                    >
-                      Esqueceu a senha?
-                    </button>
-                  )}
-
                   {forgotMode && (
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      className="w-full text-xs font-bold text-muted-foreground"
                       onClick={() => setForgotMode(false)}
-                      className="w-full text-center text-xs text-muted-foreground hover:text-foreground"
                     >
-                      ← Voltar ao login
-                    </button>
+                      Voltar ao Login
+                    </Button>
                   )}
                 </form>
 
+                {/* Atalho para Cadastro */}
                 {!forgotMode && (
-                  <>
-                    <div className="relative my-5">
-                      <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
-                      <div className="relative flex justify-center text-[10px] uppercase tracking-wider"><span className="bg-card px-2 text-muted-foreground">ou continue com</span></div>
-                    </div>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full font-bold h-11 rounded-xl border-border"
-                      disabled={loading}
-                      onClick={async () => {
-                        setLoading(true);
-                        const { error } = await supabase.auth.signInWithOAuth({
-                          provider: "google",
-                          options: {
-                            redirectTo: `${window.location.origin}${redirectTo ? decodeURIComponent(redirectTo) : "/dashboard"}`,
-                          },
-                        });
-                        if (error) {
-                          toast({ title: "Erro com Google", description: "Não foi possível entrar com Google.", variant: "destructive" });
-                          setLoading(false);
-                        }
-                      }}
-                    >
-                      <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                      </svg>
-                      Continuar com Google
-                    </Button>
-
-                    <div className="mt-6 text-center">
-                      <p className="text-xs text-muted-foreground">
-                        Não tem conta?{" "}
-                        <Link to={redirectTo ? `/cadastro?redirect=${redirectTo}` : "/cadastro"} className="text-primary font-bold hover:underline">
-                          Cadastre-se
-                        </Link>
-                      </p>
-                    </div>
-                  </>
+                  <div className="mt-6 pt-4 border-t border-border/50 text-center">
+                    <p className="text-xs text-muted-foreground">
+                      Ainda não tem conta?{" "}
+                      <Link 
+                        to={selectedPortal === "medico" ? "/cadastro-profissional" : selectedPortal === "farmacia" ? "/cadastro-farmacia" : "/cadastro"} 
+                        className="text-emerald-400 font-bold hover:underline"
+                      >
+                        Cadastre-se como {selectedPortal}
+                      </Link>
+                    </p>
+                  </div>
                 )}
               </CardContent>
             </Card>
           </motion.div>
         </div>
       </section>
+
       <Footer />
     </div>
   );
-};
-
-export default Login;
+}

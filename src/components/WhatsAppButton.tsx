@@ -59,6 +59,68 @@ const VISITOR_OPTIONS = [
     landing: null,
     color: "hsl(0 84% 65%)",
   },
+,
+  {
+    id: "humano",
+    keyword: "#HUMANO",
+    label: "Falar com Agente Humano",
+    icon: MessageCircle,
+    description: "Atendimento direto pelo WhatsApp",
+    greeting: "",
+    landing: null,
+    color: "hsl(152 100% 74%)",
+  },
+  {
+    id: "medico",
+    keyword: "#MEDICO",
+    label: "Médico",
+    icon: Stethoscope,
+    description: "Prescrever na plataforma",
+    greeting: "#MEDICO\n\nOlá, Enfª Brisa! 🌿 Sou médico e quero conhecer as vantagens de prescrever pela Planta y Raiz. Como funciona?",
+    landing: null,
+    color: "hsl(217 91% 60%)",
+  },
+  {
+    id: "lojista",
+    keyword: "#LOJISTA",
+    label: "Lojista / Parceiro",
+    icon: Store,
+    description: "Vender no nosso marketplace",
+    greeting: "#LOJISTA\n\nOlá, Enfª Brisa! 🌿 Sou lojista e quero levar meus produtos para o ecossistema Planta y Raiz. Como me cadastro?",
+    landing: null,
+    color: "hsl(45 93% 58%)",
+  },
+  {
+    id: "ebook",
+    keyword: "#EBOOK",
+    label: "Biblioteca / E-book",
+    icon: BookOpen,
+    description: "Acessar material educativo gratuito",
+    greeting: "#EBOOK\n\nOlá, Enfª Brisa! 🌿 Gostaria de receber o e-book gratuito e acessar a biblioteca científica. Pode me enviar?",
+    landing: null,
+    color: "hsl(280 67% 60%)",
+  },
+  {
+    id: "suporte",
+    keyword: "#SUPORTE",
+    label: "Suporte Geral",
+    icon: HelpCircle,
+    description: "Falar direto com o atendimento",
+    greeting: "#SUPORTE\n\nOlá, Enfª Brisa! 🌿 Preciso de ajuda com a plataforma. Pode me dar um suporte?",
+    landing: null,
+    color: "hsl(0 84% 65%)",
+  },
+,
+  {
+    id: "humano",
+    keyword: "#HUMANO",
+    label: "Falar com Agente Humano",
+    icon: MessageCircle,
+    description: "Atendimento direto pelo WhatsApp",
+    greeting: "",
+    landing: null,
+    color: "hsl(142 71% 45%)",
+  }
 ] as const;
 
 export const WhatsAppButton = () => {
@@ -118,40 +180,11 @@ export const WhatsAppButton = () => {
   const handleOptionClick = async (option: (typeof VISITOR_OPTIONS)[number]) => {
     trackPixelEvent("Contact", { content_name: `brisa_${option.id}` });
 
-    try {
-      const nome = localStorage.getItem("pr_lead_name") || "Visitante";
-      const telefone = localStorage.getItem("pr_lead_phone") || "";
-      if (telefone) {
-        await supabase.from("leads_contatos").insert({
-          nome,
-          telefone,
-          origem: "brisa_whatsapp_fab",
-          categoria: option.id,
-          tags: [option.keyword.replace("#", "").toLowerCase()],
-        });
-      }
-    } catch (e) {
-      console.warn("[Brisa] lead persist skipped:", e);
-    }
-
-    // Personaliza a saudação com nome do usuário se disponível (CRM/lead context)
-    const leadName = (typeof window !== "undefined" && localStorage.getItem("pr_lead_name")) || "";
-    const personalizedGreeting = leadName
-      ? option.greeting.replace("Olá, Enfª Brisa!", `Olá, Enfª Brisa! Sou ${leadName} e`)
-      : option.greeting;
-
-    const whatsappUrl = `https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(personalizedGreeting)}`;
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    if (isMobile) {
-      window.location.href = whatsappUrl;
-    } else {
-      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-    }
-
-    // NOTA: redirecionamento para landing pages internas removido — alguns destinos
-    // (ex: /profissionais, /afiliados) podem ter guards de auth que enviavam o
-    // usuário para /admin-login. Mantemos apenas a abertura do WhatsApp.
+    window.dispatchEvent(
+      new CustomEvent("open-brisa-chat", {
+        detail: { id: option.id, label: option.label },
+      })
+    );
 
     setIsOpen(false);
   };

@@ -11,18 +11,24 @@ export type KycKind =
   | "address_proof"
   | "selfie"
   | "cfm_print"
-  | "icp_brasil";
+  | "icp_brasil"
+  | "passport_signature"
+  | "stay_stamp"
+  | "intl_license";
 
 export const KYC_LABELS: Record<KycKind, string> = {
-  crm_front: "CRM — Frente",
-  crm_back: "CRM — Verso",
-  id_front: "RG / CNH — Frente",
-  id_back: "RG / CNH — Verso",
-  cpf_doc: "Documento do CPF",
-  address_proof: "Comprovante de endereço (CEP)",
+  crm_front: "CRM / Registro — Frente",
+  crm_back: "CRM / Registro — Verso",
+  id_front: "RG / CNH / ID — Frente",
+  id_back: "RG / CNH / ID — Verso",
+  cpf_doc: "Documento do CPF / Tax ID",
+  address_proof: "Comprovante de endereço (CEP/Zip)",
   selfie: "Selfie de conferência",
-  cfm_print: "CONF CRM",
-  icp_brasil: "Assinatura Digital (ICP-Brasil)",
+  cfm_print: "CONF CRM / Conselho",
+  icp_brasil: "Assinatura Digital (ICP-Brasil / Certificado)",
+  passport_signature: "Passaporte (Foto e Assinatura)",
+  stay_stamp: "Carimbo de Permanência / Visto / Licença",
+  intl_license: "Licença Médica Internacional",
 };
 
 /** Documentos obrigatórios para liberar o card médico */

@@ -73,26 +73,21 @@ Nossa equipe e a Enfermeira Brisa estão prontas para te auxiliar no WhatsApp:
 Seja muito bem-vindo(a) à medicina do futuro! 🌿💚`;
 
 // ── PERSONA DA ENFERMEIRA BRISA / COPILOTO CLÍNICO VIP ──────────────────
-const PERSONA = `Você é a Enfermeira Brisa 🌿 & ${DOCTOR_NAME} IA, assistente virtual oficial e Copiloto #1 de Decisão Clínica VIP em Medicina Canabinoide e Geral da Planta y Raiz.
+const PERSONA = `Você é a Enfermeira Brisa 🌿, assistente virtual oficial e Especialista em Triagem Clínica da Planta y Raiz.
 
-SUA MISSÃO DUPLA:
-1. ATENDIMENTO AO PACIENTE / CLIENTE:
-   Orientar pacientemente sobre valores, cadastro, agendamento de mentoria e orientação técnica com o ${DOCTOR_NAME} (${DOCTOR_PHONE} / ${DOCTOR_CRM}).
-   Roteiro Obrigatório:
-   ${ROTEIRO_ORIENTACAO_TECNICA}
+SUA MISSÃO: Realizar a Triagem Clínica Autônoma Inicial via WhatsApp e direcionar o paciente.
 
-2. COPILOTO CLÍNICO VIP PARA MÉDICOS (Inspirado na arquitetura Whitebook / mHealth):
-   Auxiliar médicos prescritores com:
-   • Checagem de Interações Medicamentosas (Fitocanabinoides CBD/THC vs ISRS, Benzodiazepínicos, Anticoagulantes, Antihypertensivos via CYP3A4/CYP2C9).
-   • Calculadora Terapêutica de Titulação Drop-by-Drop (Dose inicial baixa 5-10mg/dia, escada de titulação a cada 4-7 dias).
-   • Semiologia Canábica (Escores EVA para dor, Pittsburgh para sono, GAD-7 para ansiedade).
-   • Resumo de pareceres técnicos e orientações de uso para pacientes segundo RDC 660/2022 e RDC 327/2019 ANVISA.
+PASSO A PASSO DA TRIAGEM:
+1. Colete a queixa principal do paciente e um breve histórico de saúde.
+2. Calcule internamente um SCORE DE SEVERIDADE (0.0 a 1.0). Identifique Red Flags (ex: dores agudas, confusão mental, histórico cardíaco grave).
+3. Se houver EMERGÊNCIA médica (risco de vida), oriente buscar o SAMU (192) ou o Pronto Socorro mais próximo imediatamente.
+4. Se o SCORE for >= 0.75 ou houver indicação médica clara, recomende agendamento IMEDIATO.
+5. Nossa recomendação atual (Matchmaking) é com o **Dr. Daniel Kobayashi Colombo** (Clínico Geral), nosso médico plantonista e prescritor certificado.
+6. Envie o link de pagamento seguro para a Triagem/Consulta (Valor: R$ 30,00):
+   👉 *https://plantayraiz.com.br/telemedicina* (Oriente a escolher o Dr. Daniel na lista).
 
-REGRAS SEVERAS:
-• Orientação Técnica e Mentoria no Brasil: encaminhar para https://plantayraiz.com.br/profissionais
-• Chat (30 min): R$ 30,00 | Vídeo Completo: R$ 100,00
-• Emergências médicas → SAMU 192 imediatamente.
-• Tom de voz: acolhedor, altamente científico, rigoroso e profissional.`;
+TOM DE VOZ:
+Empático, acolhedor, rápido e focado em resolver a dor do paciente com segurança clínica. Nunca prescreva medicamentos, apenas faça a triagem e direcione para a consulta médica.`;
 
 // ── RESPOSTAS INSTANTÂNEAS ──────────────────────────────────────────────
 const MSGS = {
@@ -352,12 +347,11 @@ serve(async (req: Request): Promise<Response> => {
   const sent = await sendMsg(chatId, phone, instant);
   await log(phone, text, instant, sent ? 'waha_instant' : 'evo_instant');
 
-  // ── ESTÁGIO 2: Gemini em background ──
+  // ⚡ ESTÁGIO 2: Gemini em background (Triagem Clínica Autônoma Flash) ⚡
   if (GEMINI_KEY || LOVABLE_KEY) {
     const bg = async () => {
       const gemRep = await tryGemini(text, name, phone);
       if (!gemRep || gemRep.length < 30) return;
-      if (gemRep.includes('https://plantayraiz.com.br/profissionais')) return; // evita duplicar roteiro
       await sendMsg(chatId, phone, gemRep);
       await log(phone, text, gemRep, 'gemini_enriched');
     };

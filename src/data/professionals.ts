@@ -1,4 +1,4 @@
-﻿import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
+import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
 import draRenataImg from "@/assets/dra-renata-costa.jpg";
@@ -70,6 +70,9 @@ import drJoaoPedroDetoniImg from "@/assets/dr-joao-pedro-detoni.jpg";
 import drEduardoCorreaImg from "@/assets/dr-eduardo-correa.jpg";
 import drDanielKobayashiImg from "@/assets/dr-daniel-kobayashi.jpg";
 import cfmDaniel from "@/assets/cfm_prints/dr-daniel.png";
+import drJoseGeraldoImg from "@/assets/dr-jose-geraldo.jpg";
+import cfmJoseGeraldo from "@/assets/cfm_prints/dr-jose-geraldo.png";
+
 export type Professional = {
   id: string;
   name: string;
@@ -98,10 +101,140 @@ export type Professional = {
   hospitalUrl?: string;
   cfmPrintUrl?: string;
   flags?: string[];
+  plan_tier?: string;
+}
+
+export const COUNCIL_CONFIG: Record<string, {
+  councilLabel: string;
+  councilFull: string;
+  councilPlaceholder: string;
+  docFrentLabel: string;
+  specialtyLabel: string;
+  specialtyPlaceholder: string;
+  areas: string[];
+}> = {
+  "Médicos Prescritores": {
+    councilLabel: "CRM",
+    councilFull: "Conselho Regional de Medicina",
+    councilPlaceholder: "123456",
+    docFrentLabel: "CRM — frente",
+    specialtyLabel: "Especialidade Médica",
+    specialtyPlaceholder: "Ex: Clínica Geral, Neurologia, Ortopedia",
+    areas: ["Clínica Geral","Neurologia","Psiquiatria","Oncologia","Ortopedia","Geriatria","Medicina de Família","Medicina do Trabalho","Medicina Integrativa","Cannabis Medicinal"],
+  },
+  "Dentista Prescritor": {
+    councilLabel: "CRO",
+    councilFull: "Conselho Regional de Odontologia",
+    councilPlaceholder: "SP-12345",
+    docFrentLabel: "CRO — frente",
+    specialtyLabel: "Especialidade Odontológica",
+    specialtyPlaceholder: "Ex: Endodontia, Periodontia, Odontopediatria",
+    areas: ["Clínico Geral","Endodontia","Periodontia","Odontopediatria","Cirurgia Bucomaxilofacial","Ortodontia","Odontologia do Sono","Medicina Oral","Dor Orofacial","Cannabis Medicinal"],
+  },
+  "Médico Veterinário Prescritor": {
+    councilLabel: "CRMV",
+    councilFull: "Conselho Regional de Medicina Veterinária",
+    councilPlaceholder: "SP-12345",
+    docFrentLabel: "CRMV — frente",
+    specialtyLabel: "Espécies Atendidas / Especialidade",
+    specialtyPlaceholder: "Ex: Pequenos Animais, Equinos, Silvestre",
+    areas: ["Pequenos Animais","Equinos","Bovinos","Aves","Silvestres","Animais Exóticos","Medicina Veterinária Integrativa","Fitoterapia Veterinária"],
+  },
+  "Psicologia & Terapias": {
+    councilLabel: "CRP",
+    councilFull: "Conselho Regional de Psicologia",
+    councilPlaceholder: "06/12345",
+    docFrentLabel: "CRP — frente",
+    specialtyLabel: "Abordagem Terapêutica",
+    specialtyPlaceholder: "Ex: TCC, Psicanálise, Terapia Integrativa",
+    areas: ["TCC","Psicanálise","Terapia Integrativa","EMDR","Terapia Sistêmica","Mindfulness","Neuropsicologia","Terapia de Casal","Psicoterapia Breve"],
+  },
+  "Farmácia Clínica": {
+    councilLabel: "CRF",
+    councilFull: "Conselho Regional de Farmácia",
+    councilPlaceholder: "SP-12345",
+    docFrentLabel: "CRF — frente",
+    specialtyLabel: "Área de Atuação",
+    specialtyPlaceholder: "Ex: Farmácia Magistral, Oncologia, Cannabis",
+    areas: ["Farmácia Hospitalar","Farmácia Magistral","Atenção Farmacêutica","Farmacoterapia","Cannabis Medicinal","Cosmetologia"],
+  },
+  "Enfermagem": {
+    councilLabel: "COREN",
+    councilFull: "Conselho Regional de Enfermagem — Enfermeiro",
+    councilPlaceholder: "SP-123456-ENF",
+    docFrentLabel: "COREN — frente",
+    specialtyLabel: "Área de Atuação",
+    specialtyPlaceholder: "Ex: UTI, Oncologia, Saúde da Família",
+    areas: ["UTI","Centro Cirúrgico","Saúde da Família","Pediatria","Gerontologia","Oncologia","Saúde Mental","Neonatologia"],
+  },
+  "Téc. Enfermagem": {
+    councilLabel: "COREN-TÉC",
+    councilFull: "Conselho Regional de Enfermagem — Técnico",
+    councilPlaceholder: "SP-123456-TEC",
+    docFrentLabel: "COREN Técnico — frente",
+    specialtyLabel: "Área de Atuação",
+    specialtyPlaceholder: "Ex: UTI, Ambulatório, Domiciliar",
+    areas: ["UTI","Ambulatório","Atendimento Domiciliar","Centro Cirúrgico","Pediatria","Psiquiatria"],
+  },
+  "Aux. de Enfermagem": {
+    councilLabel: "COREN-AUX",
+    councilFull: "Conselho Regional de Enfermagem — Auxiliar",
+    councilPlaceholder: "SP-123456-AUX",
+    docFrentLabel: "COREN Auxiliar — frente",
+    specialtyLabel: "Área de Atuação",
+    specialtyPlaceholder: "Ex: Domiciliar, Clínica Geral",
+    areas: ["Atendimento Domiciliar","Clínica Geral","Cuidados Básicos"],
+  },
+  "Saúde Ocupacional": {
+    councilLabel: "CRM / CFO / CREA",
+    councilFull: "Conselho Profissional da Área",
+    councilPlaceholder: "Número do registro",
+    docFrentLabel: "Registro profissional — frente",
+    specialtyLabel: "Área de Atuação",
+    specialtyPlaceholder: "Ex: Medicina do Trabalho, Ergonomia",
+    areas: ["Medicina do Trabalho","Enfermagem do Trabalho","Segurança do Trabalho","Ergonomia","Higiene Ocupacional"],
+  },
+  "Acupuntura": {
+    councilLabel: "CRM / COFFITO",
+    councilFull: "Conselho Profissional (Médico, Fisioterapeuta, etc.)",
+    councilPlaceholder: "Número do registro",
+    docFrentLabel: "Registro — frente",
+    specialtyLabel: "Técnica Praticada",
+    specialtyPlaceholder: "Ex: Acupuntura Chinesa, Auriculoterapia",
+    areas: ["Acupuntura Chinesa","Auriculoterapia","Eletroacupuntura","Acupuntura Sistêmica","Moxibustão"],
+  },
+  "Medicina Integrativa": {
+    councilLabel: "CRM",
+    councilFull: "Conselho Regional de Medicina",
+    councilPlaceholder: "123456",
+    docFrentLabel: "CRM — frente",
+    specialtyLabel: "Modalidades Praticadas",
+    specialtyPlaceholder: "Ex: Ayurveda, Fitoterapia, Homeopatia",
+    areas: ["Ayurveda","Fitoterapia","Homeopatia","Medicina Chinesa","Naturopatia","Ozonioterapia","Terapia Neural"],
+  },
+  "Jardineiros & Cultivo": {
+    councilLabel: "CREA / CFB",
+    councilFull: "Conselho de Registro Profissional",
+    councilPlaceholder: "Número do registro (se houver)",
+    docFrentLabel: "Registro — frente (se houver)",
+    specialtyLabel: "Especialidade em Cultivo",
+    specialtyPlaceholder: "Ex: Cultivo Indoor, Hidroponia, Cannabis",
+    areas: ["Cultivo Indoor","Cultivo Outdoor","Hidroponia","Aeroponia","Cannabis Medicinal","Botânica Aplicada"],
+  },
+  "Cuidadores de Idosos": {
+    councilLabel: "—",
+    councilFull: "Sem conselho obrigatório",
+    councilPlaceholder: "N/A",
+    docFrentLabel: "Documento de identidade",
+    specialtyLabel: "Tipo de Cuidado",
+    specialtyPlaceholder: "Ex: Alzheimer, Parkinson, Cuidados Paliativos",
+    areas: ["Alzheimer","Parkinson","Cuidados Paliativos","Reabilitação","Cuidados Gerais","Demências"],
+  },
 };
 
 export const categories = [
   "Médicos Prescritores",
+  "Dentista Prescritor",
   "Médico Veterinário Prescritor",
   "Psicologia & Terapias",
   "Farmácia Clínica",
@@ -124,6 +257,31 @@ export const STANDARD_DOCTOR_SERVICES = [
 ];
 
 export const professionals: Professional[] = [
+  {
+    id: "med-jose-geraldo",
+    name: "Dr. José Geraldo Barbugli Abbade Filho",
+    category: "Médicos Prescritores",
+    bio: "Médico formado pela ESCOLA SUPERIOR DE CIÊNCIAS DA SANTA CASA DE MISERICORDIA DE VITÓRIA em 1989. Inscrito no CRM 32584/MG. Especialista em Medicina do Trabalho (RQE Nº: 12598).",
+    flags: ["🇧🇷"],
+    experience: "37 anos",
+    tags: ["Medicina do Trabalho", "Medicina Canabinoide", "Medicina Integrativa", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "JG",
+    imageUrl: drJoseGeraldoImg,
+    online: true,
+    cfmPrintUrl: cfmJoseGeraldo,
+    paymentLink: "https://pay.asaas.com/00000",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 08:30", "Hoje 10:00", "Hoje 14:00", "Hoje 16:30"],
+    crm: "32584/MG",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Profissional extremamente experiente e atencioso." }
+    ],
+  },
   {
     id: "med-daniel-kobayashi",
     name: "Dr. Daniel Kobayashi Colombo",
@@ -148,7 +306,6 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento." }
     ],
-    online: false,
   },
   {
     id: "med-eduardo-correa",
@@ -192,6 +349,7 @@ export const professionals: Professional[] = [
     avatar: "EB",
     imageUrl: DrEdilsonImg,
     online: true,
+    plan_tier: "premium",
     crm: "10963 - Sta Cruz (BO)",
     hospital: "Planta y Raíz Ltda / Santa Cruz de la Sierra (BO)",
     hospitalUrl: "https://plantayraiz.com.br",
@@ -520,6 +678,7 @@ export const professionals: Professional[] = [
     hospital: "Planta y Raíz Ltda / Cochabamba (BO)",
     flags: ["🇧🇷", "🇧🇴"],
     online: true,
+    plan_tier: "premium",
     services: [
       { name: "Orientação Técnica + Mentoria Terapêutica (Chat 30 min)", price: "R$ 50,00", desc: "Com relatório completo assinado digitalmente (Brasil)" },
       { name: "Orientação Técnica Completa (Chat + Vídeo)", price: "R$ 100,00", desc: "Avaliação por vídeo e mentoria terapêutica" },
@@ -1971,9 +2130,9 @@ export const professionals: Professional[] = [
     id: "mock-suelen",
     name: "Dra. Suelen Naves Rodrigues",
     category: "Médicos Prescritores",
-    bio: "Médica com atendimento humanizado e individualizado. Prescrição de cannabis medicinal baseada em evidências científicas, com foco na qualidade de vida, bem-estar e cuidado integral do paciente.",
+    bio: "Supervisora Técnica da Planta y Raíz Ltda e Médica Prescritora com atendimento humanizado e individualizado. Prescrição de cannabis medicinal baseada em evidências científicas, com foco na qualidade de vida, bem-estar e cuidado integral do paciente.",
     experience: "8 anos",
-    tags: ["Cannabis Medicinal", "Qualidade de Vida", "Cuidado Integral"],
+    tags: ["Supervisora Técnica", "Cannabis Medicinal", "Qualidade de Vida", "Cuidado Integral"],
     price: "R$ 100,00",
     priceValue: 100,
     paymentLink: "https://mpago.la/12KAwmH",
@@ -1985,6 +2144,7 @@ export const professionals: Professional[] = [
     crm: "49354 - PR",
     flags: ["🇧🇷"],
     online: false,
+    plan_tier: "premium",
     services: [
       { name: "Orientação Inicial via Chat", price: "R$ 100,00", desc: "Avaliação inicial via chat seguro" },
       { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150,00", desc: "Avaliação completa com teleconsulta" },

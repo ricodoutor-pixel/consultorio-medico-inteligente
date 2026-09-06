@@ -8,6 +8,7 @@
 
 import { supabase } from '@/lib/supabase';
 import axios from 'axios';
+import { devlog } from '@/lib/devlog';
 
 // 🟠 CONSTANTES: Split de Taxas
 const SPLIT_RATES = {
@@ -79,7 +80,7 @@ export async function calculateConsultationSplit(
       type: 'consultation',
     };
   } catch (error) {
-    console.error('Erro ao calcular split de consulta:', error);
+    devlog.error('Erro ao calcular split de consulta:', error);
     throw error;
   }
 }
@@ -130,7 +131,7 @@ export async function calculateMarketplaceSplit(
       type: 'marketplace',
     };
   } catch (error) {
-    console.error('Erro ao calcular split de marketplace:', error);
+    devlog.error('Erro ao calcular split de marketplace:', error);
     throw error;
   }
 }
@@ -170,7 +171,7 @@ export async function validateDoctorCRM(
     const crmValidation = await validateCRMWithCFM(crm, state);
 
     if (!crmValidation.isValid) {
-      console.warn(`CRM inválido: ${crm} - ${state}`);
+      devlog.warn(`CRM inválido: ${crm} - ${state}`);
       return false;
     }
 
@@ -185,7 +186,7 @@ export async function validateDoctorCRM(
 
     return true;
   } catch (error) {
-    console.error('Erro ao validar CRM:', error);
+    devlog.error('Erro ao validar CRM:', error);
     return false;
   }
 }
@@ -215,7 +216,7 @@ async function validateCRMWithCFM(
       specialty: response.data.especialidade,
     };
   } catch (error) {
-    console.error('Erro ao validar CRM com CFM:', error);
+    devlog.error('Erro ao validar CRM com CFM:', error);
     // Fallback: se API falhar, permitir (não bloquear fluxo)
     return { isValid: true };
   }
@@ -253,7 +254,7 @@ async function getSubscriberPlan(
       marketplaceFee,
     };
   } catch (error) {
-    console.error('Erro ao obter plano subscriber:', error);
+    devlog.error('Erro ao obter plano subscriber:', error);
     return null;
   }
 }
@@ -293,7 +294,7 @@ export async function checkSubscriberFeeExemption(
       planType: plan.planType,
     };
   } catch (error) {
-    console.error('Erro ao verificar isenção:', error);
+    devlog.error('Erro ao verificar isenção:', error);
     return {
       isExempt: false,
       feeRate:
@@ -364,7 +365,7 @@ export async function processPaymentWithSplit(
       mpPreferenceId,
     };
   } catch (error) {
-    console.error('Erro ao processar pagamento:', error);
+    devlog.error('Erro ao processar pagamento:', error);
     throw error;
   }
 }
@@ -411,7 +412,7 @@ async function createMercadoPagoPreferenceWithSplit(
 
     return response.data.id;
   } catch (error) {
-    console.error('Erro ao criar preferência MP:', error);
+    devlog.error('Erro ao criar preferência MP:', error);
     throw error;
   }
 }

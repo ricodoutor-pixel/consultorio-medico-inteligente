@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.block_doctor_sensitive_update() FROM PUBLIC, anon, authenticated;

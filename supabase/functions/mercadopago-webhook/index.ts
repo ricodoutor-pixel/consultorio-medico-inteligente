@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { corsHeaders, getCorsHeaders } from "../_shared/cors.ts";
 
 const getFirstEnv = (...names: string[]) => {
   for (const name of names) {
@@ -8,12 +9,8 @@ const getFirstEnv = (...names: string[]) => {
   return null;
 };
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-signature, x-request-id, x-admin-replay",
-};
-
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -294,6 +291,126 @@ Deno.serve(async (req) => {
     const isCartPayment = externalRef.startsWith("cart-") || externalRef.startsWith("cart:");
     const isBrisaOrientacao = externalRef.startsWith("brisa-orientacao-");
 
+    // === PEDIDO DO SHOPPING / FARMÁCIA (split 95% lojista · 5% plataforma) ===
+    if (externalRef.startsWith("order:")) {
+      const shopOrderId = externalRef.slice("order:".length);
+      const { data: shopOrder } = await supabase
+        .from("orders")
+        .select("id, user_id, vendor_id, subtotal, total, shipping_cost, platform_fee, vendor_net_amount, status")
+        .eq("id", shopOrderId)
+        .maybeSingle();
+
+      if (!shopOrder) {
+        return new Response(JSON.stringify({ status: "ignored", reason: "order_not_found" }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const approved = payment.status === "approved";
+      const newStatus = approved ? "paid" : payment.status === "rejected" ? "failed" : "pending";
+      const round2 = (n: number) => Math.round(n * 100) / 100;
+      const products = Number(shopOrder.subtotal || 0);
+      const platformFee = Number(shopOrder.platform_fee ?? round2(products * 0.05));
+      const vendorNet = Number(
+        shopOrder.vendor_net_amount ?? round2(Number(shopOrder.total || 0) - platformFee),
+      );
+
+      if (shopOrder.status !== "paid") {
+        await supabase
+          .from("orders")
+          .update({
+            status: newStatus,
+            payment_id: String(paymentId),
+            platform_fee: platformFee,
+            vendor_net_amount: vendorNet,
+            settlement_receipt: {
+              provider: "mercado_pago",
+              model: "marketplace_95_5",
+              payment_id: String(paymentId),
+              payment_status: payment.status,
+              gross_amount: Number(shopOrder.total || 0),
+              products_amount: products,
+              shipping_amount: Number(shopOrder.shipping_cost || 0),
+              platform_fee: platformFee,
+              vendor_net_amount: vendorNet,
+              settled_at: new Date().toISOString(),
+            },
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", shopOrder.id);
+      }
+
+      if (approved && shopOrder.vendor_id && shopOrder.status !== "paid") {
+        await supabase.from("vendor_sales_splits").insert({
+          order_id: shopOrder.id,
+          vendor_id: shopOrder.vendor_id,
+          total_item_amount: products,
+          platform_fee_5pct: platformFee,
+          vendor_net_95pct: vendorNet,
+          payout_status: "pending",
+        }).then(({ error }) => error && console.warn("[order] split insert", error.message));
+
+        await supabase.from("vendor_transactions").insert({
+          vendor_id: shopOrder.vendor_id,
+          buyer_id: shopOrder.user_id,
+          type: "sale",
+          amount: Number(shopOrder.total || 0),
+          platform_fee: platformFee,
+          vendor_amount: vendorNet,
+          status: "completed",
+          payment_method: "mercado_pago",
+          payment_id: String(paymentId),
+          notes: `Pedido ${shopOrder.id}`,
+        }).then(({ error }) => error && console.warn("[order] transaction insert", error.message));
+
+        const { data: vendorRow } = await supabase
+          .from("vendors")
+          .select("user_id, balance, total_sales, store_name")
+          .eq("id", shopOrder.vendor_id)
+          .maybeSingle();
+
+        if (vendorRow) {
+          await supabase
+            .from("vendors")
+            .update({
+              balance: round2(Number(vendorRow.balance || 0) + vendorNet),
+              total_sales: Number(vendorRow.total_sales || 0) + 1,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", shopOrder.vendor_id);
+
+          if (vendorRow.user_id) {
+            await supabase.from("notifications").insert({
+              user_id: vendorRow.user_id,
+              title: "Novo pedido pago",
+              message: `Pedido confirmado de R$ ${Number(shopOrder.total || 0).toFixed(2)}. Repasse líquido: R$ ${vendorNet.toFixed(2)}. Envie e informe o código de rastreio.`,
+              type: "order",
+              action_url: "/farmacia-virtual",
+              metadata: { order_id: shopOrder.id, payment_id: String(paymentId) },
+            });
+          }
+        }
+      }
+
+      if (approved && shopOrder.user_id) {
+        await supabase.from("notifications").insert({
+          user_id: shopOrder.user_id,
+          title: "Pagamento confirmado",
+          message: `Seu pedido de R$ ${Number(shopOrder.total || 0).toFixed(2)} foi aprovado. Você receberá o código de rastreio assim que a farmácia despachar.`,
+          type: "order",
+          action_url: "/shopping",
+          metadata: { order_id: shopOrder.id },
+        });
+      }
+
+      return new Response(
+        JSON.stringify({ status: "processed", module: "marketplace_order", order_status: newStatus }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+
+
 
     // === BRISA ORIENTAÇÃO TÉCNICA (R$30 via WhatsApp) — branch dedicado ===
     // Não existe appointment pré-criado; registramos pagamento, notificamos Dr. Edilson
@@ -390,6 +507,45 @@ Deno.serve(async (req) => {
       );
     }
 
+
+    // === FERRAMENTAS DIAGNÓSTICAS (R$ 29,90) E COMBOS ===
+    if (externalRef.startsWith("tool_") || externalRef.startsWith("tool-")) {
+      const toolUserId = metadata.user_id || externalRef.split(":")[1] || null;
+      if (payment.status === "approved" && toolUserId) {
+        let toolId = externalRef.split(":")[0];
+        if (toolId.startsWith("tool_")) toolId = toolId.replace("tool_", "");
+        if (toolId.startsWith("tool-")) toolId = toolId.replace("tool-", "");
+        
+        let toolsToCredit = [toolId];
+        if (toolId === "combo_tools") {
+          toolsToCredit = ["cardiaco", "fundoscopia", "oximetria", "dermatoscopia", "mobilidade", "estetoscopio", "pulmonar", "tremor", "urine", "acuity", "gps"];
+        }
+
+        for (const tid of toolsToCredit) {
+          const { error: pErr } = await supabase.from("purchased_tools").upsert({
+            user_id: toolUserId,
+            tool_id: tid,
+            payment_id: String(payment.id),
+          }, { onConflict: "user_id,tool_id" });
+          if (pErr) console.error("[tool-purchase] Error crediting tool:", pErr);
+        }
+
+        await supabase.from("notifications").insert({
+          user_id: toolUserId,
+          title: `🎁 ${toolId === 'combo_tools' ? 'Combo de' : 'Nova'} Ferramenta Ativada`,
+          message: `Pagamento aprovado. A ferramenta foi adicionada à sua conta!`,
+          type: "tool_purchased",
+          action_url: "/consultorio",
+        });
+
+        console.log(`✅ [tool-purchase] ${toolId} credited for ${toolUserId}`);
+      }
+
+      return new Response(
+        JSON.stringify({ status: "processed", module: "tools", payment_status: payment.status }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // === PLANOS UNIVERSAIS R$99/mês (paciente · médico · lojista) ===
     // external_reference: `plano_xxx:<user_id>:<ts>` (mp-checkout)

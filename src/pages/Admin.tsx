@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
+import { verifyAndEnsureAdmin } from "@/lib/admin-auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,17 +19,30 @@ import {
   Activity, AlertTriangle, BarChart3, Bell, Bot, CheckCircle2, Clock,
   CreditCard, DollarSign, FileText, Globe, HeartPulse, LogOut, MessageSquare,
   RefreshCw, Send, Server, Shield, ShoppingBag, Stethoscope, TrendingUp,
-  UserPlus, Users, Wallet, XCircle, Zap, UserCheck,
+  UserPlus, Users, Wallet, XCircle, Zap, UserCheck, Building2, Video,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Download, FileDown, Crown } from "lucide-react";
+import { Download, FileDown, Crown, Sparkles } from "lucide-react";
 import { exportCSV, exportAdminPDF } from "@/lib/admin-export";
 import { KpiDrillDown, type DrillSource } from "@/components/admin/KpiDrillDown";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AgentsHub } from "@/components/admin/AgentsHub";
 import { WhatsAppFailoverManager } from "@/components/admin/WhatsAppFailoverManager";
+import { GoogleAnalyticsLiveMirror } from "@/components/admin/GoogleAnalyticsLiveMirror";
 import { useAdminRealtime } from "@/hooks/useAdminRealtime";
+import { BrisaOmniTracker } from "@/components/admin/BrisaOmniTracker";
+import { DoctorKycPipeline } from "@/components/admin/DoctorKycPipeline";
+import { UserCensus360 } from "@/components/admin/UserCensus360";
+import { AgenticCommerceTracker } from "@/components/admin/AgenticCommerceTracker";
+import { FinancialSplitPanel } from "@/components/admin/FinancialSplitPanel";
+import { SystemHealthGrid } from "@/components/admin/SystemHealthGrid";
+import { AgentOptimizerStatusCard } from "@/components/admin/AgentOptimizerStatusCard";
+import { OfficialPharmacyCard } from "@/components/admin/OfficialPharmacyCard";
+import { TikTokAnalyticsPanel } from "@/components/admin/TikTokAnalyticsPanel";
+import { LeadHunterTracker } from "@/components/admin/LeadHunterTracker";
+import { OpusSocialAutomation } from "@/components/admin/OpusSocialAutomation";
+import { AdminFiscalManagement } from "@/components/admin/AdminFiscalManagement";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -104,8 +118,8 @@ const Admin = () => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return navigate("/admin-login");
-      const { data: role } = await supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
-      if (!role) navigate("/admin-login");
+      const isAdmin = await verifyAndEnsureAdmin(user);
+      if (!isAdmin) navigate("/admin-login");
     })();
   }, [navigate]);
 
@@ -135,7 +149,7 @@ const Admin = () => {
         supabase.from("doctors").select("id", { count: "exact", head: true }),
         supabase.from("prescriptions").select("id", { count: "exact", head: true }).gte("created_at", d7d),
         supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("alert_history").select("id", { count: "exact", head: true }).gte("created_at", d24h),
+        supabase.from("alert_history").select("id", { count: "exact", head: true }).gte("sent_at", d24h),
         supabase.from("error_logs").select("id", { count: "exact", head: true }).gte("created_at", d24h),
         supabase.from("audit_log").select("id,created_at", { count: "exact" }).gte("created_at", d24h).order("created_at", { ascending: false }).limit(1000),
         supabase.from("orientacao_tecnica_orders").select("id,patient_name,amount,status,payment_method,created_at").order("created_at", { ascending: false }).limit(8),
@@ -143,7 +157,7 @@ const Admin = () => {
         supabase.from("audit_log").select("id,action,table_name,created_at,user_id").order("created_at", { ascending: false }).limit(10),
         supabase.from("manus_growth_runs").select("id,status,pages_analyzed,pages_optimized,started_at").order("started_at", { ascending: false }).limit(5),
         supabase.from("payment_provider_health").select("provider,status,latency_ms,error_rate,checked_at").order("checked_at", { ascending: false }).limit(5),
-        supabase.from("notifications").select("id,title,created_at,read").order("created_at", { ascending: false }).limit(6),
+        supabase.from("notifications").select("id,title,created_at,is_read").order("created_at", { ascending: false }).limit(6),
         supabase.from("funnel_events").select("event_name,funnel,created_at").gte("created_at", d30d),
       ]);
 
@@ -210,7 +224,7 @@ const Admin = () => {
         kpi: {
           receita30d, receitaHoje,
           ordensTotal, ordensHoje, ticketMedio,
-          consultasHoje: appHoje.count ?? 0,
+          consultasHoje: (appHoje.count ?? 0) + (otHoje.data?.length ?? 0),
           filaAtiva: fila.count ?? 0,
           leadsTotal: leadsAll.count ?? 0,
           leads24h: leads24.data?.length ?? 0,
@@ -241,7 +255,7 @@ const Admin = () => {
 
   useEffect(() => {
     loadData();
-    const i = setInterval(loadData, 30_000);
+    const i = setInterval(loadData, 15_000); // 15s para dados mais frescos
     return () => clearInterval(i);
   }, [loadData]);
 
@@ -343,6 +357,11 @@ const Admin = () => {
     { label: "Leads CRM", path: "/admin/leads", icon: UserPlus },
     { label: "Crédito", path: "/admin/credit-audit", icon: Wallet },
     { label: "Aprovações KYC", path: "/admin/aprovacoes-medicas", icon: UserCheck },
+    { label: "KYC Lojas / Farmácias", path: "/admin/aprovacoes-farmacias", icon: Building2 },
+    { label: "KYC Pacientes", path: "/admin/aprovacoes-pacientes", icon: Users },
+    { label: "KYC Agentes & IAs", path: "/admin/kyc-agentes", icon: Bot },
+    { label: "TikTok Ads & Pixel", path: "/admin/conversoes", icon: Video },
+    { label: "Lead Hunter (10k Médicos)", path: "/admin/leads", icon: Sparkles },
   ];
 
   return (
@@ -387,6 +406,11 @@ const Admin = () => {
                 <LogOut size={14} />
               </Button>
             </div>
+          </motion.div>
+
+          {/* GOOGLE ANALYTICS 4 LIVE MIRROR (TOP WIDGET) */}
+          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+            <GoogleAnalyticsLiveMirror />
           </motion.div>
 
           {/* KPI STRIP */}
@@ -442,6 +466,75 @@ const Admin = () => {
           )}
 
           {/* CHARTS ROW */}
+
+          {/* ============================================== */}
+          {/* NOVOS CARDS ESTRATÉGICOS 360° (ACRÉSCIMO)     */}
+          {/* ============================================== */}
+
+          {/* CARD 1: ATENDIMENTOS ENFª BRISA & WHATSAPP */}
+          <div className="mb-6">
+            <BrisaOmniTracker />
+          </div>
+
+          {/* CARD 2: ESTEIRA DE HOMOLOGAÇÃO KYC DE MÉDICOS */}
+          <div className="mb-6">
+            <DoctorKycPipeline onRefresh={loadData} />
+          </div>
+
+          {/* CARD 3: CENSO GERAL DE USUÁRIOS 360° */}
+          <div className="mb-6">
+            <UserCensus360
+              totalPacientes={kpi.pacientes}
+              totalMedicos={kpi.medicos}
+              totalLojistas={0}
+            />
+          </div>
+
+          {/* CARD 4 & 5: COMÉRCIO AGÊNTICO + FINANCEIRO SPLIT */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <AgenticCommerceTracker />
+            <FinancialSplitPanel
+              receita30d={kpi.receita30d}
+              receitaHoje={kpi.receitaHoje}
+              ordens30d={kpi.ordensTotal}
+              ticketMedio={kpi.ticketMedio}
+            />
+          </div>
+
+          {/* CARD 6: STATUS DE SAÚDE DA INFRAESTRUTURA */}
+          <div className="mb-6">
+            <SystemHealthGrid />
+          </div>
+
+          {/* CARD 7 & 8: BRAIN OPTIMIZER 04H + FARMÁCIA OFICIAL PLANTA Y RAÍZ LTDA */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <AgentOptimizerStatusCard />
+            <OfficialPharmacyCard />
+          </div>
+
+          {/* CARD 9: TIKTOK ADS & VÍDEOS 1-MINUTO (PIXEL DA8R8N3C77UBCVGL01RG) */}
+          <div className="mb-6">
+            <TikTokAnalyticsPanel />
+          </div>
+
+          {/* CARD 10: LEAD HUNTER AI & CRM PIPELINE (META DE 10.000 MÉDICOS) */}
+          <div className="mb-6">
+            <LeadHunterTracker />
+          </div>
+
+          {/* CARD 11: FILA DE 43 VÍDEOS OPUS CLIP COM LINK & WHATSAPP */}
+          <div className="mb-6">
+            <OpusSocialAutomation />
+          </div>
+
+          {/* CARD 12: MOTOR AUTOMÁTICO DE FATURAMENTO, NOTAS FISCAIS & RECIBOS IRPF (DMED) */}
+          <div className="mb-6">
+            <AdminFiscalManagement />
+          </div>
+
+          {/* ============================================== */}
+          {/* FIM DOS NOVOS CARDS ESTRATÉGICOS               */}
+          {/* ============================================== */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
             {/* Receita 30d */}
             <Card className="lg:col-span-2 border-border bg-card/40">

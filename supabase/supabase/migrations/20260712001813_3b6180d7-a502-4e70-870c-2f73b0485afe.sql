@@ -1,0 +1,1 @@
+UPDATE public.profiles SET avatar_url = '/avatars/dra-suelen.jpg?v=20260712a' WHERE id = '51c28fdd-ccd4-4b84-a0da-3cf604233804';

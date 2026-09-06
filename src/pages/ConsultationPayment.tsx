@@ -19,15 +19,50 @@ const ConsultationPayment = () => {
   const [searchParams] = useSearchParams();
   const proId = searchParams.get("pro") || "med-1";
   const appointmentId = searchParams.get("appointment") || null;
+  const agenticOrderId = searchParams.get("agentic_order_id") || null;
   const pro = professionals.find((p) => p.id === proId) || professionals[0];
   const [status, setStatus] = useState<"pending" | "loading" | "processing" | "confirmed" | "rejected">("pending");
   const [processingStep, setProcessingStep] = useState(0);
   const [countdown, setCountdown] = useState(900); // 15 min
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
+  const [agenticOrder, setAgenticOrder] = useState<any>(null);
   const { toast } = useToast();
   const { price: dynamicPrice, gateway, createPayment: createGatewayPayment, loading: loadingGateway } = usePaymentGateway();
 
   const [isExempt, setIsExempt] = useState(false);
+  // Comércio Agêntico (UCP/MCP): valor sempre validado server-side
+  const [agenticOrder, setAgenticOrder] = useState<{ total_amount: number; status: string } | null>(null);
+
+  useEffect(() => {
+    if (!agenticOrderId) return;
+    (async () => {
+      const { data, error } = await (supabase as any)
+        .from("agentic_orders")
+        .select("total_amount, status")
+        .eq("id", agenticOrderId)
+        .maybeSingle();
+      if (error || !data) {
+        toast({ title: "Pedido agêntico não encontrado", description: "Seguindo com o checkout padrão." });
+        return;
+      }
+      setAgenticOrder({ total_amount: Number(data.total_amount), status: data.status });
+    })();
+  }, [agenticOrderId, toast]);
+
+
+  // Busca detalhes do pedido agêntico se informado
+  useEffect(() => {
+    if (!agenticOrderId) return;
+    const fetchAgenticOrder = async () => {
+      const { data } = await (supabase
+        .from("agentic_orders" as any) as any)
+        .select("*")
+        .eq("id", agenticOrderId)
+        .maybeSingle();
+      if (data) setAgenticOrder(data);
+    };
+    fetchAgenticOrder();
+  }, [agenticOrderId]);
 
   // Check if the doctor has an active Consultório Virtual subscription (exempt from 7% fee)
   useEffect(() => {
@@ -46,28 +81,33 @@ const ConsultationPayment = () => {
     checkExemption();
   }, []);
 
-  const feeRate = isExempt ? 0 : 0.07;
-  const basePrice = dynamicPrice || pro.priceValue;
+  const feeRate = isExempt || agenticOrder ? 0 : 0.07;
+  const basePrice = agenticOrder ? Number(agenticOrder.total_amount) : (dynamicPrice || pro.priceValue);
   const commission = basePrice * feeRate;
   const total = basePrice + commission;
 
   // Create payment preference on mount or when dynamic price is ready
   useEffect(() => {
-    if (!loadingGateway) {
+    if (!loadingGateway && (!agenticOrderId || agenticOrder)) {
       createPayment();
     }
-  }, [loadingGateway]);
+  }, [loadingGateway, agenticOrderId, agenticOrder]);
 
   const createPayment = async () => {
     setStatus("loading");
     try {
       const { data: { session } } = await supabase.auth.getSession();
+      const paymentDescription = agenticOrder
+        ? `Pedido Agêntico UCP: ${agenticOrder.items?.[0]?.name || "Medicamento Prescrito"}`
+        : `Orientação Técnica com ${pro.name} - Planta & Raiz`;
+
       const data = await createGatewayPayment({
         appointmentId,
-        doctorName: pro.name,
+        doctorName: agenticOrder ? "Farmácia Dispensary Planta y Raíz" : pro.name,
         patientEmail: session?.user?.email || "",
-        description: `Orientação Técnica com ${pro.name} - Planta & Raiz`,
+        description: paymentDescription,
       });
+
 
       if (data?.init_point || data?.url) {
         setCheckoutUrl(data.init_point || data.url);

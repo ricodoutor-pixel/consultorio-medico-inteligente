@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { verifyAndEnsureAdmin } from "@/lib/admin-auth";
 
 export const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const [state, setState] = useState<"loading" | "ok" | "denied">("loading");
@@ -12,14 +13,9 @@ export const AdminRoute = ({ children }: { children: React.ReactNode }) => {
         setState("denied");
         return;
       }
-      const { data: role } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
 
-      setState(role ? "ok" : "denied");
+      const isAdmin = await verifyAndEnsureAdmin(user);
+      setState(isAdmin ? "ok" : "denied");
     };
     checkAdmin();
   }, []);

@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Authenticated read marketing kpi targets" ON public.marketing_kpi_targets;

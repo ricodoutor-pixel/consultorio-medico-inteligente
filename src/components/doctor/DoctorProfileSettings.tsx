@@ -36,6 +36,28 @@ export const DoctorProfileSettings: React.FC<DoctorProfileSettingsProps> = ({ do
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // SECURITY: Validação estrita de tamanho (10MB) e formato MIME
+    const MAX_SIZE = 10 * 1024 * 1024;
+    const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+
+    if (file.size > MAX_SIZE) {
+      toast({
+        title: "Arquivo muito grande",
+        description: "O tamanho máximo permitido para envio de documentos é de 10 MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!ALLOWED_TYPES.includes(file.type.toLowerCase())) {
+      toast({
+        title: "Formato inválido",
+        description: "Envie apenas imagens (JPG, PNG, WEBP) ou documentos PDF.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       if (field === 'crm_front') setIsUploadingFront(true);
       else if (field === 'crm_back') setIsUploadingBack(true);

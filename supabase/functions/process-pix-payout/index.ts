@@ -4,11 +4,7 @@
  */
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "https://esm.sh/zod@3.22.4";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { getCorsHeaders, corsHeaders } from "../_shared/cors.ts";
 
 const getFirstEnv = (...names: string[]) => {
   for (const name of names) {
@@ -32,10 +28,10 @@ const WebhookSchema = z.object({
   data: z.object({ id: z.string() }).passthrough(),
 });
 
-function json(data: unknown, status = 200) {
+function json(data: unknown, status = 200, req?: Request) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...(req ? getCorsHeaders(req) : corsHeaders), "Content-Type": "application/json" },
   });
 }
 
@@ -254,6 +250,7 @@ async function processPixOut(supabase: any, withdrawal: any, pixKey: string, adm
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   const url = new URL(req.url);

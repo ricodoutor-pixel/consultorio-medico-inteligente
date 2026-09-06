@@ -1,0 +1,898 @@
+[
+  {
+    "id": 477,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:41:32.628+02:00",
+    "modifiedAt": "2026-08-12T05:41:32.628+02:00",
+    "email": "isabela.gonçalves@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Isabela Gonçalves Vieira",
+      "SMS": "5583957759072"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 476,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:41:31.931+02:00",
+    "modifiedAt": "2026-08-12T05:41:31.931+02:00",
+    "email": "mariana.pereira@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Mariana Pereira Cardoso",
+      "SMS": "5547980875068"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 462,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:41:21.466+02:00",
+    "modifiedAt": "2026-08-12T05:41:21.466+02:00",
+    "email": "alexandre.gonçalves@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Alexandre Gonçalves Martins",
+      "SMS": "5554995274742"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 453,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:41:09.698+02:00",
+    "modifiedAt": "2026-08-12T05:41:09.698+02:00",
+    "email": "renata.moreira@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Renata Moreira Fernandes",
+      "SMS": "5581984206837"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 448,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:41:06.065+02:00",
+    "modifiedAt": "2026-08-12T05:41:06.065+02:00",
+    "email": "thais.freitas@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Thais Freitas Silva",
+      "SMS": "5511982358014"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 444,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:41:03.221+02:00",
+    "modifiedAt": "2026-08-12T05:41:03.221+02:00",
+    "email": "patricia.silva@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Patricia Silva Carvalho",
+      "SMS": "5554989235914"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 426,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:40:49.349+02:00",
+    "modifiedAt": "2026-08-12T05:40:49.349+02:00",
+    "email": "caio.ramos@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Caio Ramos Rocha",
+      "SMS": "5519912694930"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 416,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:40:40.845+02:00",
+    "modifiedAt": "2026-08-12T05:40:40.845+02:00",
+    "email": "caio.rodrigues@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Caio Rodrigues Nunes",
+      "SMS": "5565954374401"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 403,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:40:31.342+02:00",
+    "modifiedAt": "2026-08-12T05:40:31.342+02:00",
+    "email": "leandro.freitas@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Leandro Freitas Rodrigues",
+      "SMS": "5554936929434"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 402,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:40:30.627+02:00",
+    "modifiedAt": "2026-08-12T05:40:30.627+02:00",
+    "email": "henrique.soares@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Henrique Soares Cardoso",
+      "SMS": "5513945367663"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 398,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:40:27.728+02:00",
+    "modifiedAt": "2026-08-12T05:40:27.728+02:00",
+    "email": "vitor.gonçalves@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Vitor Gonçalves Carvalho",
+      "SMS": "5561950856493"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 390,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:40:21.999+02:00",
+    "modifiedAt": "2026-08-12T05:40:21.999+02:00",
+    "email": "roberta.ramos@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Roberta Ramos Ribeiro",
+      "SMS": "5554985175293"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 389,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:40:21.290+02:00",
+    "modifiedAt": "2026-08-12T05:40:21.290+02:00",
+    "email": "carlos.lima@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Carlos Lima Machado",
+      "SMS": "5547937160324"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 385,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:40:18.428+02:00",
+    "modifiedAt": "2026-08-12T05:40:18.428+02:00",
+    "email": "renato.carvalho@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Renato Carvalho Freitas",
+      "SMS": "5567949988015"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 378,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:40:13.388+02:00",
+    "modifiedAt": "2026-08-12T05:40:13.388+02:00",
+    "email": "larissa.santos@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Larissa Santos Machado",
+      "SMS": "5547975816355"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 357,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:39:55.803+02:00",
+    "modifiedAt": "2026-08-12T05:39:55.803+02:00",
+    "email": "guilherme.martins@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Guilherme Martins Gonçalves",
+      "SMS": "5543973436224"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 345,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:39:46.703+02:00",
+    "modifiedAt": "2026-08-12T05:39:46.703+02:00",
+    "email": "andré.teixeira@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. André Teixeira Costa",
+      "SMS": "5516979090990"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 332,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:39:36.723+02:00",
+    "modifiedAt": "2026-08-12T05:39:36.723+02:00",
+    "email": "rafael.soares@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Rafael Soares Freitas",
+      "SMS": "5521961859744"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 304,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:39:16.471+02:00",
+    "modifiedAt": "2026-08-12T05:39:16.471+02:00",
+    "email": "bruna.barbosa@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Bruna Barbosa Mendes",
+      "SMS": "5582997594334"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 275,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:38:54.202+02:00",
+    "modifiedAt": "2026-08-12T05:38:54.202+02:00",
+    "email": "murilo.lima@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Murilo Lima Santos",
+      "SMS": "5548947001738"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 255,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:38:38.380+02:00",
+    "modifiedAt": "2026-08-12T05:38:38.380+02:00",
+    "email": "roberta.almeida@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Roberta Almeida Lopes",
+      "SMS": "5524957034469"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 247,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:38:31.792+02:00",
+    "modifiedAt": "2026-08-12T05:38:31.792+02:00",
+    "email": "thiago.mendes@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Thiago Mendes Gomes",
+      "SMS": "5524963424705"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 238,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:38:24.584+02:00",
+    "modifiedAt": "2026-08-12T05:38:24.584+02:00",
+    "email": "renata.barbosa@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Renata Barbosa Ramos",
+      "SMS": "5524932894210"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 223,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:38:12.583+02:00",
+    "modifiedAt": "2026-08-12T05:38:12.583+02:00",
+    "email": "luiza.barbosa@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Luiza Barbosa Vieira",
+      "SMS": "5567999010996"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 214,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:38:05.643+02:00",
+    "modifiedAt": "2026-08-12T05:38:05.643+02:00",
+    "email": "guilherme.gonçalves@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Guilherme Gonçalves Cardoso",
+      "SMS": "5512934023440"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 192,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:37:46.905+02:00",
+    "modifiedAt": "2026-08-12T05:37:46.905+02:00",
+    "email": "fernanda.dias@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Fernanda Dias Souza",
+      "SMS": "5562925944779"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 189,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:37:44.653+02:00",
+    "modifiedAt": "2026-08-12T05:37:44.653+02:00",
+    "email": "guilherme.ferreira@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Guilherme Ferreira Ramos",
+      "SMS": "5521941133165"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 176,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:37:34.927+02:00",
+    "modifiedAt": "2026-08-12T05:37:34.927+02:00",
+    "email": "leonardo.dias@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Leonardo Dias Teixeira",
+      "SMS": "5548984630362"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 174,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:37:33.134+02:00",
+    "modifiedAt": "2026-08-12T05:37:33.134+02:00",
+    "email": "flavia.andrade@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Flavia Andrade Ferreira",
+      "SMS": "5581984726382"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 159,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:37:20.171+02:00",
+    "modifiedAt": "2026-08-12T05:37:20.171+02:00",
+    "email": "marcelo.souza@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Marcelo Souza Martins",
+      "SMS": "5581923257940"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 142,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:37:05.600+02:00",
+    "modifiedAt": "2026-08-12T05:37:05.600+02:00",
+    "email": "thiago.gomes@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Thiago Gomes Costa",
+      "SMS": "5543916983438"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 140,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:37:03.921+02:00",
+    "modifiedAt": "2026-08-12T05:37:03.921+02:00",
+    "email": "larissa.martins@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Larissa Martins Lopes",
+      "SMS": "5531928465359"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 137,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:37:01.734+02:00",
+    "modifiedAt": "2026-08-12T05:37:01.734+02:00",
+    "email": "marcelo.lima@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Marcelo Lima Gonçalves",
+      "SMS": "5582927953538"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 119,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:47.591+02:00",
+    "modifiedAt": "2026-08-12T05:36:47.591+02:00",
+    "email": "luiza.mendes@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Luiza Mendes Lopes",
+      "SMS": "5516956230767"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 117,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:46.038+02:00",
+    "modifiedAt": "2026-08-12T05:36:46.038+02:00",
+    "email": "gabriela.ribeiro@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Gabriela Ribeiro Rocha",
+      "SMS": "5585967159284"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 116,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:45.161+02:00",
+    "modifiedAt": "2026-08-12T05:36:45.161+02:00",
+    "email": "leticia.andrade@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Leticia Andrade Dias",
+      "SMS": "5516948820629"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 106,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:35.412+02:00",
+    "modifiedAt": "2026-08-12T05:36:35.412+02:00",
+    "email": "luciana.marques@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Luciana Marques Pereira",
+      "SMS": "5551948635414"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 100,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:30.364+02:00",
+    "modifiedAt": "2026-08-12T05:36:30.364+02:00",
+    "email": "renata.marques@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Renata Marques Lima",
+      "SMS": "5531994891514"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 98,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:28.714+02:00",
+    "modifiedAt": "2026-08-12T05:36:28.714+02:00",
+    "email": "murilo.martins@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Murilo Martins Barbosa",
+      "SMS": "5532920493007"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 97,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:27.976+02:00",
+    "modifiedAt": "2026-08-12T05:36:27.976+02:00",
+    "email": "fabio.barbosa@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Fabio Barbosa Alves",
+      "SMS": "5511943075257"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 93,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:23.991+02:00",
+    "modifiedAt": "2026-08-12T05:36:23.991+02:00",
+    "email": "caio.carvalho@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Caio Carvalho Dias",
+      "SMS": "5527960647033"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 89,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:21.018+02:00",
+    "modifiedAt": "2026-08-12T05:36:21.018+02:00",
+    "email": "vanessa.marques@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Vanessa Marques Machado",
+      "SMS": "5581941637736"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 81,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:15.327+02:00",
+    "modifiedAt": "2026-08-12T05:36:15.327+02:00",
+    "email": "rodrigo.souza@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Rodrigo Souza Vieira",
+      "SMS": "5565959843542"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 80,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:14.603+02:00",
+    "modifiedAt": "2026-08-12T05:36:14.603+02:00",
+    "email": "amanda.santos@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Amanda Santos Teixeira",
+      "SMS": "5554991930107"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 77,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:12.508+02:00",
+    "modifiedAt": "2026-08-12T05:36:12.508+02:00",
+    "email": "daniel.ribeiro@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Daniel Ribeiro Souza",
+      "SMS": "5551916679004"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 72,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:08.969+02:00",
+    "modifiedAt": "2026-08-12T05:36:08.969+02:00",
+    "email": "camila.oliveira@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Camila Oliveira Teixeira",
+      "SMS": "5567942067481"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 71,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:08.258+02:00",
+    "modifiedAt": "2026-08-12T05:36:08.258+02:00",
+    "email": "isabela.nunes@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Isabela Nunes Machado",
+      "SMS": "5554916718614"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 65,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:36:03.849+02:00",
+    "modifiedAt": "2026-08-12T05:36:03.849+02:00",
+    "email": "gustavo.silva@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Gustavo Silva Souza",
+      "SMS": "5519913395132"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 59,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:35:59.575+02:00",
+    "modifiedAt": "2026-08-12T05:35:59.575+02:00",
+    "email": "anapaula.machado@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Ana Paula Machado Oliveira",
+      "SMS": "5513934059946"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 56,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:35:57.466+02:00",
+    "modifiedAt": "2026-08-12T05:35:57.466+02:00",
+    "email": "murilo.dias@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Murilo Dias Santos",
+      "SMS": "5521937889091"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 40,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:35:46.005+02:00",
+    "modifiedAt": "2026-08-12T05:35:46.005+02:00",
+    "email": "felipe.ribeiro@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Felipe Ribeiro Gonçalves",
+      "SMS": "5581962828036"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 39,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:35:45.285+02:00",
+    "modifiedAt": "2026-08-12T05:35:45.285+02:00",
+    "email": "lucas.vieira@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Lucas Vieira Nascimento",
+      "SMS": "5513986090009"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 38,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:35:44.597+02:00",
+    "modifiedAt": "2026-08-12T05:35:44.597+02:00",
+    "email": "leandro.costa@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Leandro Costa Pereira",
+      "SMS": "5524912969822"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 37,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:35:43.856+02:00",
+    "modifiedAt": "2026-08-12T05:35:43.856+02:00",
+    "email": "henrique.gomes@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Henrique Gomes Costa",
+      "SMS": "5551992526648"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 29,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:35:38.020+02:00",
+    "modifiedAt": "2026-08-12T05:35:38.020+02:00",
+    "email": "leandro.nascimento@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dr. Leandro Nascimento Dias",
+      "SMS": "5554991707787"
+    },
+    "subscriptions": {}
+  },
+  {
+    "id": 21,
+    "emailBlacklisted": false,
+    "smsBlacklisted": false,
+    "whatsappBlacklisted": false,
+    "createdAt": "2026-08-12T05:35:32.236+02:00",
+    "modifiedAt": "2026-08-12T05:35:32.236+02:00",
+    "email": "daniela.silva@drsaude.com.br",
+    "listIds": [],
+    "listUnsubscribed": null,
+    "attributes": {
+      "NOME": "Dra. Daniela Silva Cardoso",
+      "SMS": "5534997402885"
+    },
+    "subscriptions": {}
+  }
+]

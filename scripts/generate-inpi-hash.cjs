@@ -1,0 +1,149 @@
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+const { execSync } = require('child_process');
+
+const rootDir = path.resolve(__dirname, '..');
+const outputZip = path.join(rootDir, 'planta_y_raiz_inpi_source.zip');
+
+const IGNORE_DIRS = new Set([
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
+  '.gemini',
+  'tmp',
+  '.vscode',
+  '.idea'
+]);
+
+const IGNORE_FILES = new Set([
+  '.env',
+  '.env.local',
+  '.env.production',
+  'planta_y_raiz_inpi_source.zip',
+  'planta_y_raiz_source_inpi.zip'
+]);
+
+function getSourceFiles(dir, fileList = []) {
+  const items = fs.readdirSync(dir);
+  for (const item of items) {
+    const fullPath = path.join(dir, item);
+    const stat = fs.statSync(fullPath);
+
+    if (stat.isDirectory()) {
+      if (!IGNORE_DIRS.has(item) && !item.startsWith('.')) {
+        getSourceFiles(fullPath, fileList);
+      }
+    } else if (stat.isFile()) {
+      if (!IGNORE_FILES.has(item) && !item.endsWith('.zip') && !item.endsWith('.log')) {
+        fileList.push({
+          fullPath,
+          relPath: path.relative(rootDir, fullPath).replace(/\\/g, '/'),
+          size: stat.size
+        });
+      }
+    }
+  }
+  return fileList;
+}
+
+function run() {
+  console.log("================================================================================");
+  console.log("  GERAÇÃO DE RESUMO DIGITAL (HASH SHA-512) PARA REGISTRO DE PROGRAMA NO INPI   ");
+  console.log("  Planta y Raíz — Consultório Médico Inteligente & Telemedicina Canabinoide    ");
+  console.log("================================================================================");
+
+  // 1. Coleta de todos os arquivos-fonte do projeto
+  const files = getSourceFiles(rootDir).sort((a, b) => a.relPath.localeCompare(b.relPath));
+  console.log(`[1] Total de arquivos-fonte computados: ${files.length}`);
+
+  // 2. Cálculo Determinístico SHA-512 do Código-Fonte Completo
+  const sourceHash = crypto.createHash('sha512');
+  let totalBytes = 0;
+
+  files.forEach(f => {
+    const data = fs.readFileSync(f.fullPath);
+    totalBytes += data.length;
+    sourceHash.update(`FILE:${f.relPath}\n`);
+    sourceHash.update(data);
+    sourceHash.update('\n');
+  });
+
+  const deterministicSha512 = sourceHash.digest('hex').toUpperCase();
+
+  // 3. Compactação ZIP nativa via PowerShell (sem dependências externas)
+  if (fs.existsSync(outputZip)) {
+    fs.unlinkSync(outputZip);
+  }
+
+  // Lista de diretórios principais para inclusão no pacote INPI
+  const targetInclude = ['src', 'supabase', 'scripts', 'public', 'package.json', 'tsconfig.json', 'vite.config.ts', 'index.html', 'tailwind.config.ts'];
+  const existingIncludes = targetInclude.filter(item => fs.existsSync(path.join(rootDir, item)));
+
+  console.log(`[2] Compactando pacote de código-fonte oficial (.zip)...`);
+  const psCmd = `powershell -Command "Compress-Archive -Path ${existingIncludes.map(i => `'${i}'`).join(',')} -DestinationPath '${outputZip}' -Force"`;
+  execSync(psCmd, { cwd: rootDir });
+
+  // 4. Cálculo do SHA-512 do arquivo ZIP oficial
+  const zipBuffer = fs.readFileSync(outputZip);
+  const zipSha512 = crypto.createHash('sha512').update(zipBuffer).digest('hex').toUpperCase();
+  const zipSizeMb = (zipBuffer.length / (1024 * 1024)).toFixed(2);
+
+  console.log(`[3] Pacote ZIP gerado: planta_y_raiz_inpi_source.zip (${zipSizeMb} MB)`);
+  console.log(`[4] Total de código processado: ${(totalBytes / (1024 * 1024)).toFixed(2)} MB`);
+
+  console.log("\n================================================================================");
+  console.log("  RESUMO DIGITAL DO PACOTE ZIP (SHA-512 - 128 CARACTERES HEXADECIMAL MAIÚSCULO)  ");
+  console.log("  (UTILIZAR ESTE HASH NO CAMPO RESUMO DIGITAL DO FORMULÁRIO DO INPI e-Software): ");
+  console.log("================================================================================");
+  console.log(zipSha512);
+  console.log("================================================================================");
+
+  console.log("\n================================================================================");
+  console.log("  RESUMO DIGITAL DETERMINÍSTICO DO CÓDIGO-FONTE (HASH DIRETO DOS ARQUIVOS):     ");
+  console.log("================================================================================");
+  console.log(deterministicSha512);
+  console.log("================================================================================");
+
+  // 5. Salvar arquivo formal de declaração para o INPI
+  const certReport = {
+    titulo_software: "Planta y Raiz - Plataforma de Telemedicina Canabinoide, Marketplace Farmacêutico & Hub de Agentes Autônomos",
+    titular_direitos: "Planta y Raiz Ltda",
+    autor_responsavel: "Dr. Edilson Bezerra da Silva",
+    versao: "2.6.0-PROD",
+    linguagens_principais: ["TypeScript", "React", "Node.js", "Tailwind CSS", "SQL (PostgreSQL)", "Deno Edge Functions"],
+    campo_aplicacao: "Telemedicina, Prescrição Digital Canabinoide, E-commerce Farmacêutico e Inteligência Artificial para Gestão Clínica",
+    data_calculo: new Date().toISOString(),
+    algoritmo_resumo_digital: "SHA-512 (128 caracteres hexadecimais)",
+    resumo_digital_sha512_pacote_zip: zipSha512,
+    resumo_digital_sha512_deterministico_arquivos: deterministicSha512,
+    arquivo_compactado: "planta_y_raiz_inpi_source.zip",
+    tamanho_pacote_bytes: zipBuffer.length,
+    total_arquivos_fontes: files.length,
+    escopo_pastas: [
+      "src/",
+      "src/components/",
+      "src/components/admin/",
+      "src/pages/",
+      "src/pages/admin/",
+      "src/lib/",
+      "src/hooks/",
+      "src/integrations/",
+      "supabase/functions/",
+      "supabase/migrations/",
+      "scripts/",
+      "public/"
+    ]
+  };
+
+  fs.writeFileSync(
+    path.join(rootDir, 'INPI_DECLARACAO_RESUMO_DIGITAL_SHA512.json'),
+    JSON.stringify(certReport, null, 2),
+    'utf8'
+  );
+
+  console.log(`\n[OK] Certificado e Declaração gerados em: INPI_DECLARACAO_RESUMO_DIGITAL_SHA512.json`);
+}
+
+run();

@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "ot_tokens admin only" ON public.ot_access_tokens;

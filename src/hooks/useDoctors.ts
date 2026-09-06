@@ -32,6 +32,7 @@ interface Counts {
   approved: number;
   pending: number;
   blocked: number;
+  withDocs: number;
 }
 
 function getStoredOverrides(): Record<string, boolean> {
@@ -160,15 +161,15 @@ export function useDoctors() {
 
     const channel = supabase
       .channel("public:doctors-status-hook")
+      .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, () => fetchDoctors())
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "doctors" },
-        () => performFetch()
+        { event: "*", schema: "public", table: "doctor_kyc_documents" },
+        () => fetchDoctors(),
       )
       .subscribe();
 
     return () => {
-      active = false;
       clearInterval(poll);
       supabase.removeChannel(channel);
     };

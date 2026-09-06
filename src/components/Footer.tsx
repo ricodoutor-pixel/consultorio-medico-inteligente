@@ -42,19 +42,23 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Jurídica */}
+          {/* Jurídica & Propriedade Intelectual */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Jurídico</h4>
+            <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Jurídico & Propriedade Intelectual</h4>
             <ul className="space-y-2 text-xs">
               <li><Link to="/termos" className="text-muted-foreground hover:text-primary transition-colors">Termos de Uso</Link></li>
               <li><Link to="/privacidade" className="text-muted-foreground hover:text-primary transition-colors">Política de Privacidade</Link></li>
               <li><Link to="/reembolso" className="text-muted-foreground hover:text-primary transition-colors">Política de Reembolso</Link></li>
             </ul>
-            <div className="pt-2 text-[10px] text-muted-foreground/70 leading-relaxed space-y-0.5">
+            <div className="pt-2 text-[10px] text-muted-foreground/70 leading-relaxed space-y-1">
               <p>Razão Social: Bezerra Med Soluções Integradas Ltda.</p>
               <p>CNPJ: 30.740.319/0001-14</p>
               <p>Nome fantasia: Planta y Raiz — Mega Clínica Digital</p>
               <p>CNAE 6209-1/00 — Intermediação digital em saúde.</p>
+              <div className="pt-1.5 border-t border-border/40 space-y-0.5 text-foreground/80 font-medium">
+                <p>• <strong>Software no INPI:</strong> Proc. nº 512026007103-8 (Lei nº 9.609/1998 — Proteção de Código-Fonte e IA)</p>
+                <p>• <strong>Marca Registrada:</strong> PLANTA Y RAÍZ — Proc. INPI nº 944933084 (Classe NCL 44 - Serviços Médicos e Telemedicina)</p>
+              </div>
             </div>
           </div>
 
@@ -69,17 +73,21 @@ export const Footer = () => {
             </p>
           </div>
 
-          {/* Selos */}
+          {/* Selos de Segurança & Conformidade */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Segurança</h4>
+            <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Segurança & Conformidade</h4>
             <div className="space-y-2.5">
-              <div className="flex items-center gap-2 text-muted-foreground/60">
-                <ShieldCheck size={14} className="text-primary/60 shrink-0" />
-                <span className="text-[10px]">Pagamento Seguro via Stripe</span>
+              <div className="flex items-center gap-2 text-muted-foreground/80">
+                <ShieldCheck size={14} className="text-emerald-400 shrink-0" />
+                <span className="text-[10px] font-medium">Prontuário com Integridade Criptográfica (SHA-512)</span>
               </div>
-              <div className="flex items-center gap-2 text-muted-foreground/60">
-                <Lock size={14} className="text-primary/60 shrink-0" />
-                <span className="text-[10px]">Site Protegido (SSL)</span>
+              <div className="flex items-center gap-2 text-muted-foreground/70">
+                <ShieldCheck size={14} className="text-primary/70 shrink-0" />
+                <span className="text-[10px]">Pagamento Seguro via Mercado Pago</span>
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground/70">
+                <Lock size={14} className="text-primary/70 shrink-0" />
+                <span className="text-[10px]">Site Protegido (SSL 256-bit)</span>
               </div>
               <div className="pt-1">
                 <AnvisaBadge registration="RDC 660/2022" />

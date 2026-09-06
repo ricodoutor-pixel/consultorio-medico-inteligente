@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { BTCPaymentModal } from "@/components/BTCPaymentModal";
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
+import { TrustBadges } from "@/components/TrustBadges";
 import { Activity, Eye, HeartPulse, ScanSearch, Accessibility, Wind, Brain, Beaker, Glasses, Navigation } from "lucide-react";
 
 const diagnosticTools = [
@@ -40,7 +41,7 @@ const Precos = () => {
 
   const plans = [
     {
-      id: "paciente-vip",
+      id: "plano_paciente",
       name: "Paciente VIP",
       price: "R$ 99",
       priceValue: 9900,
@@ -59,7 +60,7 @@ const Precos = () => {
       highlighted: false,
     },
     {
-      id: "lojista-vip",
+      id: "plano_lojista",
       name: "Lojista VIP",
       price: "R$ 99",
       priceValue: 9900,
@@ -79,7 +80,7 @@ const Precos = () => {
       highlighted: false,
     },
     {
-      id: "medico-vip",
+      id: "plano_medico",
       name: "Médico VIP",
       price: "R$ 99",
       priceValue: 9900,
@@ -113,8 +114,8 @@ const Precos = () => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke("create-subscription", {
-        body: { planId },
+      const { data, error } = await supabase.functions.invoke("mp-checkout", {
+        body: { sku: planId },
       });
 
       if (error) {
@@ -161,8 +162,8 @@ const Precos = () => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke("create-tool-checkout", {
-        body: { toolId },
+      const { data, error } = await supabase.functions.invoke("mp-checkout", {
+        body: { sku: `tool_${toolId}` },
       });
 
       if (error) {
@@ -198,6 +199,11 @@ const Precos = () => {
             <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
               Escolha o plano ideal para seu perfil. Pagamento via Pix (Mercado Pago), PayPal (USD) ou BTC.
             </p>
+          </div>
+
+          {/* Selos de Confiança & Conformidade Legal */}
+          <div className="max-w-5xl mx-auto mb-10">
+            <TrustBadges />
           </div>
 
           <div

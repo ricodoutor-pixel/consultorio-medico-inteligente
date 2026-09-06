@@ -1,0 +1,512 @@
+[
+  {
+    "email": "amanda.rocha@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T15:41:54.183Z"
+  },
+  {
+    "email": "thiago.fernandes@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T15:42:56.341Z"
+  },
+  {
+    "email": "eduardo.mendes@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T15:43:58.268Z"
+  },
+  {
+    "email": "renato.cardoso@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T15:45:00.337Z"
+  },
+  {
+    "email": "fabio.ramos@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T15:47:04.832Z"
+  },
+  {
+    "email": "fernando.santana@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T15:48:09.199Z"
+  },
+  {
+    "email": "thiago.moreira@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T15:49:11.905Z"
+  },
+  {
+    "email": "rodrigo.lima@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T15:53:17.576Z"
+  },
+  {
+    "email": "vinicius.martins@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T15:54:19.523Z"
+  },
+  {
+    "email": "gabriela.pereira@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T15:55:21.272Z"
+  },
+  {
+    "email": "fernanda.santana@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T15:56:23.006Z"
+  },
+  {
+    "email": "juliana.souza@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T15:57:26.203Z"
+  },
+  {
+    "email": "monica.barbosa@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T15:58:28.048Z"
+  },
+  {
+    "email": "diego.freitas@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:00:31.028Z"
+  },
+  {
+    "email": "ricardo.lima@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:01:33.718Z"
+  },
+  {
+    "email": "daniel.moreira@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:02:35.490Z"
+  },
+  {
+    "email": "amanda.nascimento@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:03:37.548Z"
+  },
+  {
+    "email": "monica.lima@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:04:39.387Z"
+  },
+  {
+    "email": "thais.soares@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:05:41.212Z"
+  },
+  {
+    "email": "fernanda.rocha@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:06:43.240Z"
+  },
+  {
+    "email": "patricia.costa@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:07:45.244Z"
+  },
+  {
+    "email": "carolina.souza@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:08:46.855Z"
+  },
+  {
+    "email": "leticia.dias@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:09:50.009Z"
+  },
+  {
+    "email": "vitor.machado@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:10:51.997Z"
+  },
+  {
+    "email": "sergio.lopes@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:11:53.958Z"
+  },
+  {
+    "email": "fabio.lima@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:12:56.371Z"
+  },
+  {
+    "email": "daniel.fernandes@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:13:58.484Z"
+  },
+  {
+    "email": "tiago.oliveira@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:15:00.194Z"
+  },
+  {
+    "email": "juliana.machado@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:16:01.761Z"
+  },
+  {
+    "email": "clarissa.nunes@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:17:06.817Z"
+  },
+  {
+    "email": "tiago.martins@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:18:08.567Z"
+  },
+  {
+    "email": "gustavo.carvalho@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:19:10.214Z"
+  },
+  {
+    "email": "murilo.almeida@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:20:12.508Z"
+  },
+  {
+    "email": "natalia.dias@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:22:16.572Z"
+  },
+  {
+    "email": "carlos.barbosa@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:23:18.773Z"
+  },
+  {
+    "email": "caio.rodrigues@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:25:22.880Z"
+  },
+  {
+    "email": "renata.dias@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:27:26.639Z"
+  },
+  {
+    "email": "roberta.santos@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:28:28.926Z"
+  },
+  {
+    "email": "patricia.carvalho@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:29:30.983Z"
+  },
+  {
+    "email": "thais.fernandes@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:30:33.006Z"
+  },
+  {
+    "email": "carlos.oliveira@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:31:36.288Z"
+  },
+  {
+    "email": "natalia.mendes@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:32:38.884Z"
+  },
+  {
+    "email": "vitor.fernandes@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:33:41.302Z"
+  },
+  {
+    "email": "rafael.mendes@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:34:43.781Z"
+  },
+  {
+    "email": "leonardo.mendes@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:35:45.915Z"
+  },
+  {
+    "email": "tatiana.ferreira@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:36:48.238Z"
+  },
+  {
+    "email": "isabela.oliveira@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:37:50.667Z"
+  },
+  {
+    "email": "felipe.soares@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:38:52.929Z"
+  },
+  {
+    "email": "marcelo.machado@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:39:54.922Z"
+  },
+  {
+    "email": "anapaula.moreira@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:40:56.973Z"
+  },
+  {
+    "email": "sabrina.gomes@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:41:59.222Z"
+  },
+  {
+    "email": "vitor.nascimento@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:43:01.684Z"
+  },
+  {
+    "email": "matheus.vieira@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:44:06.378Z"
+  },
+  {
+    "email": "daniel.ferreira@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:45:08.283Z"
+  },
+  {
+    "email": "thais.santos@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:47:11.602Z"
+  },
+  {
+    "email": "natalia.teixeira@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:48:14.052Z"
+  },
+  {
+    "email": "fernanda.rocha@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:49:16.734Z"
+  },
+  {
+    "email": "luiza.vieira@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:50:19.174Z"
+  },
+  {
+    "email": "marcelo.pereira@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:51:20.713Z"
+  },
+  {
+    "email": "clarissa.santos@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:52:22.282Z"
+  },
+  {
+    "email": "felipe.souza@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:53:24.071Z"
+  },
+  {
+    "email": "rodrigo.nunes@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:55:27.191Z"
+  },
+  {
+    "email": "fernando.moreira@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:56:29.074Z"
+  },
+  {
+    "email": "vanessa.vieira@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T16:58:32.118Z"
+  },
+  {
+    "email": "daniel.lopes@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T16:59:36.026Z"
+  },
+  {
+    "email": "matheus.nunes@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:00:37.857Z"
+  },
+  {
+    "email": "roberta.lopes@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:01:39.589Z"
+  },
+  {
+    "email": "diego.rodrigues@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:02:41.471Z"
+  },
+  {
+    "email": "felipe.santana@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:03:43.289Z"
+  },
+  {
+    "email": "caio.soares@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:04:45.524Z"
+  },
+  {
+    "email": "rafael.costa@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:05:48.133Z"
+  },
+  {
+    "email": "priscila.silva@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:06:49.755Z"
+  },
+  {
+    "email": "larissa.moreira@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:07:51.850Z"
+  },
+  {
+    "email": "vanessa.soares@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:08:53.777Z"
+  },
+  {
+    "email": "carlos.santos@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:09:56.014Z"
+  },
+  {
+    "email": "flavia.freitas@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:10:57.917Z"
+  },
+  {
+    "email": "marcelo.martins@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:13:01.239Z"
+  },
+  {
+    "email": "carlos.lopes@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:14:04.381Z"
+  },
+  {
+    "email": "daniel.pereira@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:16:07.476Z"
+  },
+  {
+    "email": "patricia.lima@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:17:09.297Z"
+  },
+  {
+    "email": "denise.barbosa@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:18:10.842Z"
+  },
+  {
+    "email": "isabela.teixeira@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:19:12.855Z"
+  },
+  {
+    "email": "eduardo.santana@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:20:16.115Z"
+  },
+  {
+    "email": "fernando.souza@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:21:17.871Z"
+  },
+  {
+    "email": "isabela.ferreira@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:22:19.649Z"
+  },
+  {
+    "email": "leticia.santana@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:23:21.830Z"
+  },
+  {
+    "email": "luiza.machado@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:24:23.655Z"
+  },
+  {
+    "email": "rafael.andrade@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:26:37.850Z"
+  },
+  {
+    "email": "ricardo.vieira@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:27:39.611Z"
+  },
+  {
+    "email": "roberta.barbosa@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:28:41.379Z"
+  },
+  {
+    "email": "luiza.martins@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:29:43.866Z"
+  },
+  {
+    "email": "fernanda.souza@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:30:45.814Z"
+  },
+  {
+    "email": "priscila.moreira@outlook.com",
+    "status": "sent",
+    "date": "2026-08-20T17:31:47.472Z"
+  },
+  {
+    "email": "camila.lourenco@saudeintegrativa.com.br",
+    "status": "sent",
+    "date": "2026-08-20T17:32:49.284Z"
+  },
+  {
+    "email": "bernardo.althoff@medintegrada.com.br",
+    "status": "sent",
+    "date": "2026-08-20T17:33:51.456Z"
+  },
+  {
+    "email": "rodrigo.mesquita@clinicaequilibrio.com.br",
+    "status": "sent",
+    "date": "2026-08-20T17:34:53.153Z"
+  },
+  {
+    "email": "flavia.guimaraes.med@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:35:55.069Z"
+  },
+  {
+    "email": "contato@drpedromello.com.br",
+    "status": "sent",
+    "date": "2026-08-20T17:36:56.911Z"
+  },
+  {
+    "email": "juliana.ramos.med@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:37:58.719Z"
+  },
+  {
+    "email": "doutormariogrieco@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:39:00.315Z"
+  },
+  {
+    "email": "clinicacav@medcannabis.com.br",
+    "status": "sent",
+    "date": "2026-08-20T17:40:02.313Z"
+  },
+  {
+    "email": "enfbrisaplantayraizltda@gmail.com",
+    "status": "sent",
+    "date": "2026-08-20T17:41:04.344Z"
+  }
+]

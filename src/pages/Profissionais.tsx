@@ -9,7 +9,7 @@ import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { CountryFlag } from "@/components/CountryFlag";
 import { motion } from "framer-motion";
-import { professionals as allProfessionals, categories, Professional } from "@/data/professionals";
+import { professionals as allProfessionals, categories, Professional, COUNCIL_CONFIG } from "@/data/professionals";
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -84,9 +84,19 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
 
 /** Médicos com Plano Med VIP ativo (selo exibido no card). */
 const VIP_DOCTOR_MATCHERS = ["edilson", "suelen", "olivia"];
-const isVipDoctor = (p: Professional) =>
-  p.id === "med-0" ||
-  VIP_DOCTOR_MATCHERS.some((n) => (p.name || "").toLowerCase().includes(n));
+const isVipDoctor = (p: Professional) => {
+  if (p.plan_tier && p.plan_tier !== 'free') return true;
+  return p.id === "med-0" || p.id === "mock-suelen" || p.id === "mock-olivia" || VIP_DOCTOR_MATCHERS.some((n) => (p.name || "").toLowerCase().includes(n));
+};
+
+const getDoctorSealTier = (p: Professional) => {
+  const name = (p.name || "").toLowerCase();
+  if (p.id === "med-0" || p.id === "mock-suelen" || p.id === "mock-olivia" || name.includes("edilson") || name.includes("suelen") || name.includes("olivia") || p.plan_tier === "premium") {
+    return "premium";
+  }
+  if (p.plan_tier && p.plan_tier !== 'free') return p.plan_tier;
+  return "basic";
+};
 
 /** Tags elegantes da vitrine padronizada exibidas no card do profissional. */
 const ServiceTagsRow = () => (
@@ -120,7 +130,7 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
             <CardContent className="p-6">
               <div className="relative">
                 {pro.imageUrl ? (
-                  <img src={pro.imageUrl} alt={`Foto profissional - ${pro.name}`} className="w-20 h-20 rounded-2xl object-cover object-top border border-border mb-4" loading="lazy" decoding="async" />
+                  <img src={pro.imageUrl} alt={`Foto profissional - ${pro.name}`} className={`w-20 h-20 rounded-2xl object-cover ${pro.name.includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border border-border mb-4`} loading="lazy" decoding="async" />
                 ) : (
                   <div className="w-20 h-20 rounded-2xl border border-border mb-4 bg-primary/10 text-primary flex items-center justify-center font-black text-xl">
                     {pro.avatar}
@@ -131,9 +141,13 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
               <h1 className="text-xl font-display font-black text-foreground">{pro.name}</h1>
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <p className="text-sm text-muted-foreground">{pro.category}</p>
-                {isVipDoctor(pro) && <DoctorVIPSeal tier="basic" />}
+                {isVipDoctor(pro) && <DoctorVIPSeal tier={getDoctorSealTier(pro)} />}
               </div>
-              {pro.crm && <p className="text-xs font-bold text-muted-foreground mb-1">CRM {pro.crm}</p>}
+              {pro.crm && (
+                <p className="text-xs font-bold text-muted-foreground mb-1">
+                  {(COUNCIL_CONFIG[pro.category]?.councilLabel || "CRM")} {pro.crm}
+                </p>
+              )}
 
               {pro.hospital && <p className="text-xs text-muted-foreground mb-1">{pro.hospital}</p>}
               <div className="flex items-center gap-2 mb-4">
@@ -332,7 +346,7 @@ const Profissionais = () => {
                               <img
                                 src={p.imageUrl}
                                 alt={`${p.name}`}
-                                className="w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover object-top border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300"
+                                className={`w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover ${p.name.includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300`}
                                 loading="lazy"
                                 decoding="async"
                                 width={64}
@@ -348,8 +362,8 @@ const Profissionais = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              <h2 className="font-black text-foreground text-sm md:text-base truncate">{p.name}</h2>
-                              {isVipDoctor(p) && <DoctorVIPSeal tier="basic" />}
+                              <h2 className="font-black text-foreground text-sm md:text-base">{p.name}</h2>
+                              {isVipDoctor(p) && <DoctorVIPSeal tier={getDoctorSealTier(p)} />}
                               {p.flags && p.flags.map((flag, i) => (
                                 <CountryFlag key={i} code={flag} />
                               ))}
@@ -366,7 +380,9 @@ const Profissionais = () => {
                               </span>
                             </div>
                             {p.crm && (
-                              <p className="text-[11px] font-bold text-muted-foreground mt-0.5">CRM {p.crm}</p>
+                              <p className="text-[11px] font-bold text-muted-foreground mt-0.5">
+                                {(COUNCIL_CONFIG[p.category]?.councilLabel || "CRM")} {p.crm}
+                              </p>
                             )}
 
                             <div className="flex items-center gap-1 mt-1">

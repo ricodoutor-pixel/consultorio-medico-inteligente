@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Hook: useRealProfessionals
  * Fetches real registered doctors from the database.
  * Limits test professionals to 6 + Dr. Edilson (med-0) = 7 total.
@@ -35,6 +35,7 @@ interface RealDoctor {
   rqe: string | null;
   available_hours: any;
   created_at: string;
+  plan_tier: string;
 }
 
 interface RealProfile {
@@ -193,7 +194,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const finalBio = isEdilson
         ? "CEO da Planta y Raíz Ltda e Médico Prescritor em Santa Cruz de la Sierra (Bolívia, Registro 10963). No Brasil, atua prestando Orientação Técnica exclusiva com Relatório de Encaminhamento Completo assinado digitalmente, para que o paciente dê continuidade ao seu atendimento com prescritor referendado."
         : isSuelen
-        ? "Diretora Técnica da Planta y Raíz Ltda. Médica Prescritora com atendimento humanizado e individualizado de cannabis medicinal baseado em evidências científicas, com foco na qualidade de vida e cuidado integral."
+        ? "Supervisora Técnica da Planta y Raíz Ltda e Médica Prescritora com atendimento humanizado e individualizado. Prescrição de cannabis medicinal baseada em evidências científicas, com foco na qualidade de vida, bem-estar e cuidado integral do paciente."
         : isOlivia
         ? "Diretora Técnica da Planta y Raíz para a Bolívia (Cochabamba) e Médica Prescritora em Cochabamba (Bolívia, Registro Z-494444). No Brasil, atua prestando Orientação Técnica exclusiva, Mentoria Terapêutica e Relatório de Encaminhamento Completo assinado digitalmente, para que o paciente dê continuidade ao seu atendimento com prescritor referendado."
         : (d.bio || `Profissional verificado na Planta & Raiz. Especialidade: ${d.specialty}. ${documentLabel}.`);
@@ -201,7 +202,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const finalTags = isEdilson
         ? ["CEO Planta y Raíz", "Orientação Técnica (BR)", "Prescritor Sta Cruz (BO)"]
         : isSuelen
-        ? ["Diretora Técnica", "CRM 49354 - PR", "Cannabis Medicinal"]
+        ? ["Supervisora Técnica", "Cannabis Medicinal", "Qualidade de Vida", "Cuidado Integral"]
         : isOlivia
         ? ["Diretora Técnica (BO)", "Orientação Técnica (BR)", "Prescritor Cochabamba (BO)"]
         : [d.specialty, documentLabel, cityLabel];
@@ -253,6 +254,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         crm: mockMatch?.crm || finalCrm,
         hospital: mockMatch?.hospital || (isEdilson ? "Planta y Raíz Ltda / Santa Cruz de la Sierra (BO)" : isSuelen ? "Planta y Raíz Ltda / Paraná (BR)" : isOlivia ? "Planta y Raíz Ltda / Cochabamba (BO)" : cityLabel),
         flags: mockMatch?.flags || (isEdilson || isOlivia ? ["🇧🇷", "🇧🇴"] : ["🇧🇷"]),
+        plan_tier: (isEdilson || isOlivia || isSuelen) ? "premium" : (d.plan_tier || "free"),
       };
     });
 
@@ -282,7 +284,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     // Dra. Olivia fallback (offline by default, togglable)
     const oliviaMock = testProfessionals.find(p => p.id === "mock-olivia");
     if (oliviaMock && !isMockReplaced(oliviaMock)) {
-      finalPros.push({ ...oliviaMock, online: getMockOnlineStatus("mock-olivia", false) });
+      finalPros.push({ ...oliviaMock, online: true });
     }
 
     const suelenMock = testProfessionals.find(p => p.id === "mock-suelen");
@@ -292,7 +294,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     // Médicos reais recém-cadastrados (KYC pendente): card exposto, mas OFF-LINE
     // até liberação no painel KYC ou ativação pelo próprio médico.
-    const PENDING_REAL_IDS = ["med-eduardo-correa", "med-joao-pedro", "med-marianna", "med-ana-paula", "med-jose-roberto", "med-angela-beatriz", "med-gustavo-nobre", "med-gustavo-simoes", "med-albert-machado", "med-guilherme-campos", "med-ingrid-chiullo", "med-alexandre-stramandinoli", "med-adeonis-oliveira", "med-daniel-kobayashi"];
+    const PENDING_REAL_IDS = ["med-jose-geraldo", "med-eduardo-correa", "med-joao-pedro", "med-marianna", "med-ana-paula", "med-jose-roberto", "med-angela-beatriz", "med-gustavo-nobre", "med-gustavo-simoes", "med-albert-machado", "med-guilherme-campos", "med-ingrid-chiullo", "med-alexandre-stramandinoli", "med-adeonis-oliveira", "med-daniel-kobayashi"];
     for (const pendingId of PENDING_REAL_IDS) {
       const mock = testProfessionals.find((p) => p.id === pendingId);
       if (!mock) continue;

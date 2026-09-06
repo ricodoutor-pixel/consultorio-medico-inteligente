@@ -39,7 +39,17 @@ export function VIPExpirationAlert({ doctorId }: Props) {
 
   if (daysLeft > 5 || daysLeft < 0) return null;
 
-  const pixLink = "https://mpago.la/12KAwmH";
+  const handleRenew = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("mp-checkout", {
+        body: { sku: "plano_medico" },
+      });
+      if (error) throw error;
+      if (data?.init_point) window.location.href = data.init_point;
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <Card className="border-red-500/40 bg-red-500/10 mb-6 animate-pulse-slow">
@@ -59,12 +69,10 @@ export function VIPExpirationAlert({ doctorId }: Props) {
           </div>
         </div>
         <Button
-          asChild
+          onClick={handleRenew}
           className="bg-red-500 hover:bg-red-600 text-white font-black rounded-xl w-full md:w-auto shrink-0"
         >
-          <a href={pixLink} target="_blank" rel="noopener noreferrer">
-            Renovar por R$ 99 (PIX)
-          </a>
+          Renovar por R$ 99 (PIX)
         </Button>
       </CardContent>
     </Card>

@@ -595,6 +595,7 @@ const Telemedicina = () => {
                                 name: patientData.nome,
                                 phone: patientData.telefone,
                                 email: patientData.email,
+                                isInternational: isInternational
                               }
                             });
                             if (error || !data?.payment_url) throw new Error("Falha ao gerar link");

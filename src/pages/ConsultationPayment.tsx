@@ -25,13 +25,11 @@ const ConsultationPayment = () => {
   const [processingStep, setProcessingStep] = useState(0);
   const [countdown, setCountdown] = useState(900); // 15 min
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
-  const [agenticOrder, setAgenticOrder] = useState<any>(null);
+  const [agenticOrder, setAgenticOrder] = useState<{ total_amount: number; status: string } | null>(null);
   const { toast } = useToast();
   const { price: dynamicPrice, gateway, createPayment: createGatewayPayment, loading: loadingGateway } = usePaymentGateway();
 
   const [isExempt, setIsExempt] = useState(false);
-  // Comércio Agêntico (UCP/MCP): valor sempre validado server-side
-  const [agenticOrder, setAgenticOrder] = useState<{ total_amount: number; status: string } | null>(null);
 
   useEffect(() => {
     if (!agenticOrderId) return;

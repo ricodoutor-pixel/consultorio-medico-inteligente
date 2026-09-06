@@ -10,6 +10,7 @@ import { Trash2, Plus, Minus, ShoppingCart as CartIcon, FileText } from 'lucide-
 export function ShoppingCart() {
   const { items, removeItem, updateQty, clearCart, getSubtotal, getTax, shipping: selectedShipping, setShipping } = useCart();
   const [showCart, setShowCart] = useState(false);
+  const [shippingCep, setShippingCep] = useState("");
   const location = useLocation();
 
   const allowedPaths = ['/shopping', '/planos', '/precos'];
@@ -80,7 +81,7 @@ export function ShoppingCart() {
               <ShippingCalculator
                 cartTotal={subtotal}
                 onSelectShipping={(opt) => {
-                  setShipping({ carrier: opt.company, service: opt.name, price: opt.price, days: opt.delivery_time });
+                  setShipping({ cep: shippingCep, carrier: opt.company, service: opt.name, price: opt.price, days: opt.delivery_time });
                 }}
               />
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal:</span><span className="font-semibold">R$ {subtotal.toFixed(2)}</span></div>

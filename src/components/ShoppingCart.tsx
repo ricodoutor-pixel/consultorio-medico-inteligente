@@ -78,10 +78,9 @@ export function ShoppingCart() {
           <>
             <div className="border-t border-border p-6 space-y-3">
               <ShippingCalculator
-                subtotal={subtotal}
-                weightKg={0.5 * Math.max(1, items.reduce((s, i) => s + i.qty, 0))}
-                onSelect={(opt, cep) => {
-                  setShipping({ cep, carrier: opt.carrier, service: opt.service, price: opt.price, days: opt.days });
+                cartTotal={subtotal}
+                onSelectShipping={(opt) => {
+                  setShipping({ carrier: opt.company, service: opt.name, price: opt.price, days: opt.delivery_time });
                 }}
               />
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal:</span><span className="font-semibold">R$ {subtotal.toFixed(2)}</span></div>

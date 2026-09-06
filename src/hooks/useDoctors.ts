@@ -180,7 +180,8 @@ export function useDoctors() {
     const approved = doctors.filter((d) => d.is_approved_by_admin || d.approval_status === "approved" || d.is_verified).length;
     const pending = doctors.filter((d) => d.approval_status === "pending" || (!d.is_approved_by_admin && !d.is_verified && d.approval_status !== "rejected" && d.approval_status !== "blocked")).length;
     const blocked = doctors.filter((d) => d.approval_status === "blocked" || d.approval_status === "rejected").length;
-    return { total, approved, pending, blocked };
+    const withDocs = doctors.filter((d) => d.kyc_docs && (d.kyc_docs as any[]).length > 0).length;
+    return { total, approved, pending, blocked, withDocs };
   }, [doctors]);
 
   return { doctors, setDoctors, loading, fetchDoctors, counts };

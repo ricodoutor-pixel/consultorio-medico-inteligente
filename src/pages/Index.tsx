@@ -30,7 +30,7 @@ import { HomeFAQ } from "@/components/HomeFAQ";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EmergencyCTA } from "@/components/EmergencyCTA";
 import { WelcomeMascotSplash } from "@/components/WelcomeMascotSplash";
-import { PatientsCounter } from "@/components/PatientsCounter";
+
 import { TrustBadges } from "@/components/TrustBadges";
 import { RegulatoryHomeCard, RegulatoryAiFloatingButton } from "@/components/regulatory/RegulatoryAiModal";
 

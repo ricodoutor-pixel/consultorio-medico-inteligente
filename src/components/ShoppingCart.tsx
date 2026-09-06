@@ -4,6 +4,7 @@ import { useCart } from '@/store/cart';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { ShippingCalculator } from '@/components/ShippingCalculator';
 import { Trash2, Plus, Minus, ShoppingCart as CartIcon, FileText } from 'lucide-react';
 
 export function ShoppingCart() {

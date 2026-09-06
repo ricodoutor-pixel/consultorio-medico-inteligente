@@ -7,7 +7,7 @@ import { useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
-const PIXEL_ID = import.meta.env.VITE_FACEBOOK_PIXEL_ID as string | undefined;
+const PIXEL_ID = (import.meta.env.VITE_FACEBOOK_PIXEL_ID as string | undefined) || "820052977324750";
 
 /* ---------- script loader (runs once) ---------- */
 let pixelLoaded = false;

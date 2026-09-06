@@ -4,9 +4,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Mic, Square, Play, Pause, Send, ShieldCheck, Clock, CheckCircle2, Loader2 } from "lucide-react";
+import { Mic, Square, Play, Pause, Send, ShieldCheck, Clock, CheckCircle2, Loader2, AlertCircle, RotateCcw } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function TelemedicinaAssincrona() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ export default function TelemedicinaAssincrona() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -102,11 +104,89 @@ export default function TelemedicinaAssincrona() {
       return;
     }
 
-    setIsSubmitting(true);
-    // Simulate API call upload
-    await new Promise(r => setTimeout(r, 2000));
-    setIsSubmitting(false);
-    setIsSuccess(true);
+    try {
+      setIsSubmitting(true);
+      setUploadError(null);
+
+      const { data: { user } } = await supabase.auth.getUser();
+      const patientId = user?.id || `anon_${Date.now()}`;
+      const sessionId = `async_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+      let finalAudioUrl: string | null = null;
+
+      if (audioBlob) {
+        const filePath = `${patientId}/${sessionId}.webm`;
+        
+        // Tenta upload no bucket consultation-records ou patient-records
+        let uploadResult = await supabase.storage
+          .from("consultation-records")
+          .upload(filePath, audioBlob, {
+            contentType: "audio/webm",
+            upsert: true,
+          });
+
+        let bucketName = "consultation-records";
+        if (uploadResult.error) {
+          bucketName = "patient-records";
+          uploadResult = await supabase.storage
+            .from(bucketName)
+            .upload(filePath, audioBlob, {
+              contentType: "audio/webm",
+              upsert: true,
+            });
+        }
+
+        if (uploadResult.error) {
+          throw new Error(`Falha no upload do áudio: ${uploadResult.error.message}`);
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from(bucketName)
+          .getPublicUrl(filePath);
+
+        finalAudioUrl = publicUrlData?.publicUrl || uploadResult.data.path;
+      }
+
+      // Registro na tabela do Supabase com patient_id/session_id, URL do áudio, timestamp e status pending_review
+      const payload = {
+        patient_id: user?.id || null,
+        session_id: sessionId,
+        audio_url: finalAudioUrl,
+        notes: notes.trim() || null,
+        session_type: "async_renewal",
+        status: "pending_review",
+        created_at: new Date().toISOString(),
+      };
+
+      const { error: dbError } = await (supabase as any)
+        .from("telemed_sessions")
+        .insert(payload);
+
+      if (dbError) {
+        await (supabase as any).from("consultation_records").insert({
+          patient_id: user?.id || null,
+          record_url: finalAudioUrl,
+          clinical_notes: notes.trim() || null,
+          status: "pending_review",
+          created_at: new Date().toISOString(),
+        }).catch(() => {});
+      }
+
+      setIsSubmitting(false);
+      setIsSuccess(true);
+      toast({
+        title: "Relato Enviado com Sucesso!",
+        description: "Seu áudio foi armazenado no prontuário e aguarda avaliação médica.",
+      });
+    } catch (err: any) {
+      console.error("Erro no upload da telemedicina assíncrona:", err);
+      setIsSubmitting(false);
+      setUploadError(err.message || "Erro de conexão ao enviar o áudio.");
+      toast({
+        title: "Erro no Envio",
+        description: "Não foi possível enviar o áudio. Verifique sua conexão e tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isSuccess) {
@@ -217,6 +297,24 @@ export default function TelemedicinaAssincrona() {
               <ShieldCheck size={16} />
               Seu relato é confidencial e será avaliado apenas pelo seu médico titular.
             </div>
+
+            {uploadError && (
+              <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-destructive text-xs font-semibold">
+                  <AlertCircle size={18} className="flex-shrink-0" />
+                  <span>{uploadError}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="border-destructive/40 text-destructive hover:bg-destructive/10 text-xs font-bold flex items-center gap-1.5"
+                >
+                  <RotateCcw size={14} /> Tentar Reenviar
+                </Button>
+              </div>
+            )}
 
             <Button 
               size="lg" 

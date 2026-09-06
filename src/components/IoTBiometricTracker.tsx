@@ -26,26 +26,50 @@ export function IoTBiometricTracker() {
     sleepLight: null,
   });
 
+  const [connectionMessage, setConnectionMessage] = useState<string | null>(null);
+
   const handleSync = async () => {
     setIsSyncing(true);
+    setConnectionMessage(null);
     
     try {
-      // Simula handshake BLE com HealthKit / Google Fit API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Carrega biometria aferida do wearable
+      // Verifica suporte a WebBluetooth real no navegador/dispositivo
+      if (typeof navigator !== "undefined" && "bluetooth" in navigator) {
+        try {
+          const device = await (navigator as any).bluetooth.requestDevice({
+            acceptAllDevices: false,
+            filters: [{ services: ["heart_rate"] }],
+            optionalServices: ["battery_service"]
+          });
+
+          if (device && device.gatt) {
+            await device.gatt.connect();
+            setLastSynced(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+            toast.success(`Dispositivo ${device.name || 'IoMT'} conectado com sucesso via Bluetooth!`);
+            return;
+          }
+        } catch (bleErr: any) {
+          if (bleErr.name !== "NotFoundError") {
+            console.warn("BLE connection info:", bleErr);
+          }
+        }
+      }
+
+      // Sem dispositivo conectado: exibe estado real de desconexão sem dados fictícios
       setMetrics({
-        hrv: 65,
-        restingHr: 62,
-        sleepDeep: 2.1,
-        sleepRem: 1.5,
-        sleepLight: 3.5, 
+        hrv: null,
+        restingHr: null,
+        sleepDeep: null,
+        sleepRem: null,
+        sleepLight: null,
       });
-      
-      setLastSynced(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-      toast.success("Biometria sincronizada com sucesso via Apple Health/Google Fit");
-    } catch (err) {
-      toast.error("Erro ao sincronizar dispositivo wearable.");
+      const realStatusMsg = "Nenhum dispositivo IoMT pareado via Bluetooth. Conecte um aparelho compatível ou informe a aferição manualmente.";
+      setConnectionMessage(realStatusMsg);
+      toast.info(realStatusMsg);
+    } catch (err: any) {
+      const realStatusMsg = "Nenhum dispositivo IoMT pareado via Bluetooth. Conecte um aparelho compatível ou informe a aferição manualmente.";
+      setConnectionMessage(realStatusMsg);
+      toast.error(realStatusMsg);
     } finally {
       setIsSyncing(false);
     }
@@ -167,8 +191,9 @@ export function IoTBiometricTracker() {
               </div>
             </div>
           ) : (
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center text-xs text-muted-foreground">
-              Toque em "Sincronizar Dispositivo" abaixo para emparelhar biometria do Apple Health ou Google Fit.
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
+              <AlertCircle size={15} className="text-amber-500 flex-shrink-0" />
+              <span>{connectionMessage || "Nenhum dispositivo IoMT pareado via Bluetooth. Conecte um aparelho compatível ou informe a aferição manualmente."}</span>
             </div>
           )}
         </div>

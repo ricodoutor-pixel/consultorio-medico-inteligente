@@ -9,8 +9,9 @@ const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GE
 function sanitizePromptInput(input: unknown, maxLength = 80): string {
   if (!input || typeof input !== "string") return "";
   return input
+    .replace(/<[^>]*>?/gm, "") // Remove tags HTML e scripts
     .replace(/[\x00-\x1F\x7F]/g, "")
-    .replace(/[`"'\\]/g, "")
+    .replace(/[`"'\\]/g, "") // Escapar/remover aspas e caracteres de injeção
     .replace(/\b(ignore|instrução|instruction|system|prompt|override|forget|pretend|act as|você é|you are|new instruction|nova instrução)\b/gi, "***")
     .trim()
     .slice(0, maxLength);

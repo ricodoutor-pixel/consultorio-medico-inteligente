@@ -25,42 +25,30 @@ const ConsultationPayment = () => {
   const [processingStep, setProcessingStep] = useState(0);
   const [countdown, setCountdown] = useState(900); // 15 min
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
-  const [agenticOrder, setAgenticOrder] = useState<{ total_amount: number; status: string; items?: { name: string }[] } | null>(null);
   const { toast } = useToast();
   const { price: dynamicPrice, gateway, createPayment: createGatewayPayment, loading: loadingGateway } = usePaymentGateway();
 
   const [isExempt, setIsExempt] = useState(false);
+  // Comércio Agêntico (UCP/MCP): valor sempre validado server-side
+  const [agenticOrder, setAgenticOrder] = useState<{ total_amount: number; status: string; items?: { name: string }[] } | null>(null);
 
+  // Busca detalhes do pedido agêntico se informado
   useEffect(() => {
     if (!agenticOrderId) return;
-    (async () => {
+    const fetchAgenticOrder = async () => {
       const { data, error } = await (supabase as any)
         .from("agentic_orders")
-        .select("total_amount, status")
+        .select("*")
         .eq("id", agenticOrderId)
         .maybeSingle();
       if (error || !data) {
         toast({ title: "Pedido agêntico não encontrado", description: "Seguindo com o checkout padrão." });
         return;
       }
-      setAgenticOrder({ total_amount: Number(data.total_amount), status: data.status });
-    })();
-  }, [agenticOrderId, toast]);
-
-
-  // Busca detalhes do pedido agêntico se informado
-  useEffect(() => {
-    if (!agenticOrderId) return;
-    const fetchAgenticOrder = async () => {
-      const { data } = await (supabase
-        .from("agentic_orders" as any) as any)
-        .select("*")
-        .eq("id", agenticOrderId)
-        .maybeSingle();
-      if (data) setAgenticOrder(data);
+      setAgenticOrder(data);
     };
     fetchAgenticOrder();
-  }, [agenticOrderId]);
+  }, [agenticOrderId, toast]);
 
   // Check if the doctor has an active Consultório Virtual subscription (exempt from 7% fee)
   useEffect(() => {

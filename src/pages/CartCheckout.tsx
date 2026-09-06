@@ -83,12 +83,17 @@ export default function CartCheckout() {
             state: formData.state,
             zipCode: shippingCep || formData.zipCode,
           },
-          items: items.map((i) => ({
-            id: i.product.id,
-            title: i.product.title,
-            quantity: i.qty,
-            unit_price: i.product.priceValue,
-          })),
+          items: [
+            ...items.map((i) => ({
+              id: i.product.id,
+              title: i.product.title,
+              quantity: i.qty,
+              unit_price: i.product.priceValue,
+            })),
+            ...(upsellExtra > 0
+              ? [{ id: 'upgrade', title: `Upgrade: ${upsellApplied ?? 'adicional'}`, quantity: 1, unit_price: upsellExtra }]
+              : []),
+          ],
         },
       });
 

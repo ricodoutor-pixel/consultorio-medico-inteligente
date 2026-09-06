@@ -1,7 +1,10 @@
 {
-  "lastRunDate": "2026-09-05",
-  "dailyCount": 35,
-  "lastOffset": 35,
-  "totalSent": 35,
-  "totalFailed": 0
+  "totalSent": 0,
+  "brevoSentToday": 0,
+  "hostingerSent": 0,
+  "lastOffset": 0,
+  "targetGoal": 3000,
+  "currentGateway": "BREVO",
+  "currentDate": "2026-09-05",
+  "lastUpdated": "2026-09-06T02:40:00.000Z"
 }

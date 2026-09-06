@@ -60,13 +60,15 @@ export default function CartCheckout() {
       const orderId = `ORD-${Date.now()}`;
       const subtotal = getSubtotal();
       const tax = getTax();
-      const finalTotal = subtotal + tax + shippingCost + upsellExtra;
+      // O frete é somado no servidor (mp-checkout) a partir de shipping_cost,
+      // portanto aqui enviamos apenas produtos + imposto + upgrade.
+      const productsTotal = subtotal + tax + upsellExtra;
 
       // Chama a Edge Function mp-checkout com todos os campos de frete e pedido
       const { data: mpData, error: mpError } = await supabase.functions.invoke('mp-checkout', {
         body: {
           orderId,
-          amount: finalTotal,
+          amount: productsTotal,
           description: `Planta y Raiz - Pedido ${orderId}`,
           shipping_cost: shippingCost,
           shipping_cep: shippingCep || formData.zipCode,
@@ -81,12 +83,17 @@ export default function CartCheckout() {
             state: formData.state,
             zipCode: shippingCep || formData.zipCode,
           },
-          items: items.map((i) => ({
-            id: i.product.id,
-            title: i.product.title,
-            quantity: i.qty,
-            unit_price: i.product.priceValue,
-          })),
+          items: [
+            ...items.map((i) => ({
+              id: i.product.id,
+              title: i.product.title,
+              quantity: i.qty,
+              unit_price: i.product.priceValue,
+            })),
+            ...(upsellExtra > 0
+              ? [{ id: 'upgrade', title: `Upgrade: ${upsellApplied ?? 'adicional'}`, quantity: 1, unit_price: upsellExtra }]
+              : []),
+          ],
         },
       });
 

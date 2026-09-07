@@ -57,21 +57,42 @@ export default function CartCheckout() {
         throw new Error('Preencha todos os campos obrigatórios (Nome, E-mail e Telefone)');
       }
 
-      const orderId = `ORD-${Date.now()}`;
-      const subtotal = getSubtotal();
-      const tax = getTax();
-      // O frete é somado no servidor (mp-checkout) a partir de shipping_cost,
-      // portanto aqui enviamos apenas produtos + imposto + upgrade.
-      const productsTotal = subtotal + tax + upsellExtra;
+      const cep = (shippingCep || formData.zipCode || '').replace(/\D/g, '');
+      if (cep.length !== 8) {
+        throw new Error('Informe um CEP válido e calcule o frete antes de continuar.');
+      }
 
-      // Chama a Edge Function mp-checkout com todos os campos de frete e pedido
+      // É necessário estar autenticado para gerar o pedido e o pagamento.
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData?.session) {
+        navigate('/login?redirect=/cart-checkout');
+        return;
+      }
+
+      // 1) O pedido é criado no servidor (preços, frete e split são recalculados lá).
+      const { data: orderData, error: orderError } = await supabase.functions.invoke('shopping-order-create', {
+        body: {
+          cep,
+          shipping_service: shippingCarrier,
+          items: items.map((i) => ({ product_id: i.product.id, quantity: i.qty })),
+        },
+      });
+
+      if (orderError || !orderData?.order_id) {
+        throw new Error(orderData?.error || 'Não foi possível criar o pedido. Tente novamente.');
+      }
+
+      const orderTotal = Number(orderData.total ?? 0);
+      const amount = orderTotal + upsellExtra;
+
+      // 2) Link de pagamento do Mercado Pago para o pedido real.
       const { data: mpData, error: mpError } = await supabase.functions.invoke('mp-checkout', {
         body: {
-          orderId,
-          amount: productsTotal,
-          description: `Planta y Raiz - Pedido ${orderId}`,
-          shipping_cost: shippingCost,
-          shipping_cep: shippingCep || formData.zipCode,
+          orderId: orderData.order_id,
+          amount,
+          description: `Planta y Raiz - Pedido ${orderData.order_id}`,
+          shipping_cost: 0,
+          shipping_cep: cep,
           shipping_carrier: shippingCarrier,
           shipping_days: shippingDays,
           customer: {
@@ -81,7 +102,7 @@ export default function CartCheckout() {
             address: formData.address,
             city: formData.city,
             state: formData.state,
-            zipCode: shippingCep || formData.zipCode,
+            zipCode: cep,
           },
           items: [
             ...items.map((i) => ({
@@ -97,10 +118,8 @@ export default function CartCheckout() {
         },
       });
 
-      if (mpData?.init_point) {
-        clearCart();
-        window.location.href = mpData.init_point;
-        return;
+      if (mpError || !mpData?.init_point) {
+        throw new Error(mpData?.error || 'Não foi possível iniciar o pagamento. Tente novamente em instantes.');
       }
 
       setSuccess(true);
@@ -112,6 +131,7 @@ export default function CartCheckout() {
       setLoading(false);
     }
   };
+
 
 
   if (items.length === 0 && !success) {

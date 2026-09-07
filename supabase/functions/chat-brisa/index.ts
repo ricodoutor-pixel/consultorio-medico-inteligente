@@ -39,21 +39,65 @@ Os exames disponíveis na plataforma são:
 
     const res = await callGeminiApiWithFallback(GEMINI_API_KEY, requestBody, GEMINI_PRIMARY_MODEL);
 
-    if (!res.ok) {
-      throw new Error(res.data?.error?.message || "Failed to process chat with Gemini AI")
+    let answer = res.ok
+      ? (res.data?.candidates?.[0]?.content?.parts?.[0]?.text || "")
+      : "";
+    let usedModel = res.usedModel;
+
+    // Fallback: quando a cota do Gemini estoura (429) usamos o Lovable AI Gateway.
+    if (!answer) {
+      const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+      if (lovableKey) {
+        try {
+          const gw = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Lovable-API-Key": lovableKey },
+            body: JSON.stringify({
+              model: "google/gemini-3.7-flash",
+              messages: [
+                { role: "system", content: systemInstruction },
+                { role: "user", content: question },
+              ],
+            }),
+          });
+          const gwData = await gw.json().catch(() => ({}));
+          if (gw.ok) {
+            answer = gwData?.choices?.[0]?.message?.content || "";
+            usedModel = "lovable-ai-gateway";
+          } else {
+            console.warn("[chat-brisa] Lovable AI fallback falhou:", gw.status, gwData?.error?.message || "");
+          }
+        } catch (gwErr) {
+          console.warn("[chat-brisa] Lovable AI fallback erro:", gwErr);
+        }
+      }
     }
 
-    const answer = res.data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, não consegui processar a resposta agora.";
+    if (!answer) {
+      // Nunca devolvemos 500 para o paciente: mensagem amigável com orientação.
+      return new Response(
+        JSON.stringify({
+          answer:
+            "Estou com muitos atendimentos agora e não consegui responder. Pode tentar de novo em alguns instantes? Se preferir, fale com a nossa equipe pelo WhatsApp.",
+          degraded: true,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
 
-    return new Response(JSON.stringify({ answer, model: res.usedModel }), {
+    return new Response(JSON.stringify({ answer, model: usedModel }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
   } catch (error) {
     console.error("Error in chat-brisa:", error)
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({
+        answer: "Tive um problema técnico rápido. Pode repetir a pergunta, por favor?",
+        degraded: true,
+      }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
+

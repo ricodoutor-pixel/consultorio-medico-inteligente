@@ -48,9 +48,10 @@ Seja bem-vindo(a) à medicina do futuro! 🌿💚`
     async function loadDoctors() {
       try {
         const { data } = await supabase
-          .from("doctors")
+          .from("doctors_public" as any)
           .select("id, full_name, crm, crm_state")
           .limit(20);
+
         if (data && isMounted) {
           // Doctors loaded safely
         }

@@ -43,6 +43,7 @@ import { TikTokAnalyticsPanel } from "@/components/admin/TikTokAnalyticsPanel";
 import { LeadHunterTracker } from "@/components/admin/LeadHunterTracker";
 import { OpusSocialAutomation } from "@/components/admin/OpusSocialAutomation";
 import { AdminFiscalManagement } from "@/components/admin/AdminFiscalManagement";
+import { PrescriptionsAnvisaPanel } from "@/components/admin/PrescriptionsAnvisaPanel";
 
 // ---------- Helpers ----------
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -531,6 +532,12 @@ const Admin = () => {
           <div className="mb-6">
             <AdminFiscalManagement />
           </div>
+
+          {/* CARD 13: PRESCRIÇÕES & PROTOCOLOS ANVISA */}
+          <div className="mb-6">
+            <PrescriptionsAnvisaPanel />
+          </div>
+
 
           {/* ============================================== */}
           {/* FIM DOS NOVOS CARDS ESTRATÉGICOS               */}

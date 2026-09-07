@@ -3,6 +3,7 @@ import { Loader2, Mic, Volume2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import brisaPortrait from "@/assets/enf-brisa-portrait.jpeg";
+import { speakBrisa, stopBrisaVoice } from "@/lib/brisa-voice";
 
 interface Props {
   contextBpm?: number | null;
@@ -63,23 +64,13 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
   const finalizedSessionRef = useRef<number | null>(null);
   const stopTimerRef = useRef<number | null>(null);
   const tickTimerRef = useRef<number | null>(null);
-  const voiceReadyRef = useRef(false);
   const historyRef = useRef<ChatMessage[]>([]);
 
   useEffect(() => {
-    const hydrateVoices = () => {
-      window.speechSynthesis?.getVoices();
-      voiceReadyRef.current = true;
-    };
-
-    hydrateVoices();
-    window.speechSynthesis?.addEventListener?.("voiceschanged", hydrateVoices);
-
     return () => {
       cleanupTimers();
       recognitionRef.current?.abort();
-      window.speechSynthesis?.cancel();
-      window.speechSynthesis?.removeEventListener?.("voiceschanged", hydrateVoices);
+      stopBrisaVoice();
     };
   }, []);
 
@@ -98,42 +89,6 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
     return window.SpeechRecognition || window.webkitSpeechRecognition || null;
   };
 
-  const prepareUtterance = () => {
-    const utterance = new SpeechSynthesisUtterance("");
-    utterance.lang = "pt-BR";
-    utterance.rate = 1.12;
-    utterance.pitch = 1.0;
-    utterance.volume = 1;
-    utterance.voice = pickVoice();
-    utterance.onstart = () => setStatus("speaking");
-    utterance.onend = () => setStatus("idle");
-    utterance.onerror = () => setStatus("idle");
-    utteranceRef.current = utterance;
-    return utterance;
-  };
-
-  // Prefer high-quality neural voices (Google/Microsoft Natural) over the metallic eSpeak default.
-  const pickVoice = () => {
-    const voices = window.speechSynthesis?.getVoices?.() || [];
-    const ptVoices = voices.filter((v) => v.lang?.toLowerCase().startsWith("pt"));
-    if (ptVoices.length === 0) return null;
-
-    const tiers: RegExp[] = [
-      /google.*português.*brasil/i,        // Chrome Android/Desktop — natural neural
-      /microsoft.*(francisca|thalita|brenda|leticia|yara).*online.*natural/i, // Edge Natural
-      /microsoft.*(francisca|thalita|brenda|leticia|yara)/i,
-      /(luciana|joana|fernanda|camila|helena|maria)/i,
-      /female/i,
-      /pt-br/i,
-    ];
-
-    for (const rule of tiers) {
-      const found = ptVoices.find((v) => rule.test(v.name));
-      if (found) return found;
-    }
-    return ptVoices[0];
-  };
-
   const ensureMicrophonePermission = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
@@ -145,7 +100,7 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
     if (status === "processing") return;
 
     if (status === "speaking") {
-      window.speechSynthesis.cancel();
+      stopBrisaVoice();
     }
 
     if (status === "recording") {
@@ -164,12 +119,10 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
     try {
       setErrorMsg("");
       finalizedSessionRef.current = null;
-      window.speechSynthesis.cancel();
-      const utterance = prepareUtterance();
-      if (!voiceReadyRef.current) pickVoice();
+      stopBrisaVoice();
 
       await ensureMicrophonePermission();
-      startRecognition(RecognitionCtor, utterance);
+      startRecognition(RecognitionCtor);
     } catch (error) {
       console.error("Brisa mic permission failed", error);
       setErrorMsg("Permita o uso do microfone para falar com a Brisa.");
@@ -177,7 +130,7 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
     }
   };
 
-  const startRecognition = (RecognitionCtor: SpeechRecognitionCtor, utterance: SpeechSynthesisUtterance) => {
+  const startRecognition = (RecognitionCtor: SpeechRecognitionCtor) => {
     cleanupTimers();
 
     const sessionId = Date.now();
@@ -227,7 +180,7 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
 
     recognition.onend = () => {
       if (hardError) return;
-      void finalizeConversation(sessionId, heardText, utterance);
+      void finalizeConversation(sessionId, heardText);
     };
 
     recognitionRef.current = recognition;
@@ -248,7 +201,6 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
   const finalizeConversation = async (
     sessionId: number,
     transcript: string,
-    utterance: SpeechSynthesisUtterance,
   ) => {
     if (finalizedSessionRef.current === sessionId) return;
     finalizedSessionRef.current = sessionId;
@@ -257,7 +209,7 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
 
     const cleanedTranscript = transcript.trim();
     if (!cleanedTranscript) {
-      speakReply("Olá! Em que posso ajudar hoje?", utterance);
+      speakReply("Olá! Em que posso ajudar hoje?");
       return;
     }
 
@@ -305,20 +257,25 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
         { role: "assistant", content: data.reply },
       );
 
-      speakReply(data.reply, utterance);
+      speakReply(data.reply);
     } catch (error) {
       console.error("Brisa conversation failed", error);
       finalizeError(sessionId, "A Brisa não conseguiu responder agora. Toque e fale novamente.");
     }
   };
 
-  const speakReply = (text: string, utterance?: SpeechSynthesisUtterance) => {
-    const activeUtterance = utterance || utteranceRef.current || prepareUtterance();
-    activeUtterance.voice = pickVoice();
-    activeUtterance.text = text;
+  const speakReply = (text: string) => {
     setStatus("speaking");
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(activeUtterance);
+    const utterance = speakBrisa(text, {
+      onStart: () => setStatus("speaking"),
+      onEnd: () => setStatus("idle"),
+      onError: () => setStatus("idle"),
+    });
+    if (!utterance) {
+      setStatus("idle");
+    } else {
+      utteranceRef.current = utterance;
+    }
   };
 
   const finalizeError = (sessionId: number, message: string) => {
@@ -327,7 +284,7 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
     cleanupTimers();
     recognitionRef.current?.abort();
     recognitionRef.current = null;
-    window.speechSynthesis.cancel();
+    stopBrisaVoice();
     setErrorMsg(message);
     setStatus("error");
   };

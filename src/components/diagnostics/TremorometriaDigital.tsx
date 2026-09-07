@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { SaMDBiofeedbackDisclaimer } from "@/components/compliance/SaMDBiofeedbackDisclaimer";
+import { speakBrisa, stopBrisaVoice } from "@/lib/brisa-voice";
 
 export const TremorometriaDigital = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -26,18 +27,9 @@ export const TremorometriaDigital = () => {
   useEffect(() => {
     return () => {
       stopRecording();
-      speechSynthesis.cancel();
+      stopBrisaVoice();
     };
   }, []);
-
-  const speakBrisa = (text: string) => {
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "pt-BR";
-    utterance.rate = 0.95;
-    utterance.pitch = 1.1;
-    speechSynthesis.speak(utterance);
-  };
 
   const handleDeviceMotion = (event: DeviceMotionEvent) => {
     if (event.acceleration) {

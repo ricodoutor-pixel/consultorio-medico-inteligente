@@ -5,6 +5,7 @@ import { Camera, AlertTriangle, Info, BookOpen, FlaskConical, Loader2, Play } fr
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { speakBrisa, stopBrisaVoice } from "@/lib/brisa-voice";
 
 export const ColorimetriaUrinaria = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -25,18 +26,9 @@ export const ColorimetriaUrinaria = () => {
   useEffect(() => {
     return () => {
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-      speechSynthesis.cancel();
+      stopBrisaVoice();
     };
   }, []);
-
-  const speakBrisa = (text: string) => {
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "pt-BR";
-    utterance.rate = 0.95;
-    utterance.pitch = 1.1;
-    speechSynthesis.speak(utterance);
-  };
 
   const startTimer = () => {
     setIsTimerRunning(true);

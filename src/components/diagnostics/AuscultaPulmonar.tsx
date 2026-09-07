@@ -5,6 +5,7 @@ import { Mic, Square, Volume2, AlertTriangle, Info, BookOpen, Wind, Loader2, Act
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { speakBrisa, stopBrisaVoice } from "@/lib/brisa-voice";
 
 export const AuscultaPulmonar = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -29,7 +30,7 @@ export const AuscultaPulmonar = () => {
     checkPermissionsAndAutoStart();
     return () => {
       stopRecording();
-      speechSynthesis.cancel();
+      stopBrisaVoice();
     };
   }, []);
 
@@ -58,15 +59,6 @@ export const AuscultaPulmonar = () => {
         startRecording(true); // pass true to avoid speaking the prompt again
       }
     }, 1000);
-  };
-
-  const speakBrisa = (text: string) => {
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "pt-BR";
-    utterance.rate = 0.95;
-    utterance.pitch = 1.1; // Voz mais suave e acolhedora
-    speechSynthesis.speak(utterance);
   };
 
   const startRecording = async (isAuto = false) => {

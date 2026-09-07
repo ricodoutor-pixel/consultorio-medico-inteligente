@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Square, Loader2, Volume2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { speakBrisa, stopBrisaVoice } from '@/lib/brisa-voice';
 
 import brisaImg from '@/assets/brisa-enfermeira.webp';
 
@@ -62,7 +63,7 @@ export const BrisaVoiceAssistant = () => {
     return () => {
       recognitionRef.current?.stop();
       if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
-      speechSynthesis.cancel();
+      stopBrisaVoice();
     };
   }, []);
 
@@ -98,20 +99,20 @@ export const BrisaVoiceAssistant = () => {
   };
 
   const speak = (text: string) => {
-    speechSynthesis.cancel();
     setMood('speaking');
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'pt-BR';
-    utterance.rate = 1.0;
-    utterance.pitch = 1.1;
-    utterance.onend = () => setMood('happy');
-    speechSynthesis.speak(utterance);
+    speakBrisa(text, {
+      onStart: () => setMood('speaking'),
+      onEnd: () => setMood('happy'),
+      onError: () => setMood('neutral'),
+    });
   };
 
   const toggleListening = () => {
     if (isListening) {
       recognitionRef.current?.stop();
+      stopBrisaVoice();
     } else {
+      stopBrisaVoice();
       if (recognitionRef.current) {
         setBrisaResponse('');
         setTranscript('');

@@ -6498,14 +6498,18 @@ export type Database = {
           address_complement: string | null
           address_number: string | null
           address_street: string | null
+          anvisa_auth: string | null
           anvisa_protocol: string | null
           avatar_url: string | null
           cannabis_experience: string | null
           cep: string | null
           city: string | null
+          cnpj: string | null
+          company_name: string | null
           country: string | null
           cpf: string | null
           created_at: string
+          crf: string | null
           date_of_birth: string | null
           full_name: string
           geo_updated_at: string | null
@@ -6524,6 +6528,8 @@ export type Database = {
           region: string | null
           signature_url: string | null
           signup_role: string | null
+          state: string | null
+          trade_name: string | null
           updated_at: string
           user_type: string
         }
@@ -6531,14 +6537,18 @@ export type Database = {
           address_complement?: string | null
           address_number?: string | null
           address_street?: string | null
+          anvisa_auth?: string | null
           anvisa_protocol?: string | null
           avatar_url?: string | null
           cannabis_experience?: string | null
           cep?: string | null
           city?: string | null
+          cnpj?: string | null
+          company_name?: string | null
           country?: string | null
           cpf?: string | null
           created_at?: string
+          crf?: string | null
           date_of_birth?: string | null
           full_name?: string
           geo_updated_at?: string | null
@@ -6557,6 +6567,8 @@ export type Database = {
           region?: string | null
           signature_url?: string | null
           signup_role?: string | null
+          state?: string | null
+          trade_name?: string | null
           updated_at?: string
           user_type?: string
         }
@@ -6564,14 +6576,18 @@ export type Database = {
           address_complement?: string | null
           address_number?: string | null
           address_street?: string | null
+          anvisa_auth?: string | null
           anvisa_protocol?: string | null
           avatar_url?: string | null
           cannabis_experience?: string | null
           cep?: string | null
           city?: string | null
+          cnpj?: string | null
+          company_name?: string | null
           country?: string | null
           cpf?: string | null
           created_at?: string
+          crf?: string | null
           date_of_birth?: string | null
           full_name?: string
           geo_updated_at?: string | null
@@ -6590,6 +6606,8 @@ export type Database = {
           region?: string | null
           signature_url?: string | null
           signup_role?: string | null
+          state?: string | null
+          trade_name?: string | null
           updated_at?: string
           user_type?: string
         }

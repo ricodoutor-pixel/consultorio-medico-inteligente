@@ -412,12 +412,18 @@
         // erros de Service Worker dentro de iframe não são falhas da plataforma.
         function isExternalNoise(err){
           try {
-            var msg = String((err && err.message) || err || '');
-            var stack = String((err && err.stack) || '');
-            if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack)) return true;
-            if (/MetaMask|ethereum|web3|Failed to connect to MetaMask/i.test(msg)) return true;
-            if (/ServiceWorkerRegistration|document is in an invalid state/i.test(msg)) return true;
-            if (/ResizeObserver loop/i.test(msg)) return true;
+            var current = err;
+            var depth = 0;
+            while (current && depth < 5) {
+              var msg = String((current && current.message) || current || '');
+              var stack = String((current && current.stack) || '');
+              if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack + msg)) return true;
+              if (/MetaMask|ethereum|web3|Failed to connect to MetaMask|extension not found|inpage\.js/i.test(msg + stack)) return true;
+              if (/ServiceWorkerRegistration|document is in an invalid state/i.test(msg)) return true;
+              if (/ResizeObserver loop/i.test(msg)) return true;
+              current = current && current.cause;
+              depth++;
+            }
           } catch(_){}
           return false;
         }
@@ -453,11 +459,21 @@
           // Preserve filename/source because browser extensions often expose only
           // a generic message while their chrome-extension URL identifies the noise.
           var error = e.error || { message: e.message, stack: String(e.filename || '') };
+          if (isExternalNoise(error) || /extension:\/\//.test(String(e.filename || ''))) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+          }
           reportEarlyError(error, 'window.error');
         }, true);
         window.addEventListener('unhandledrejection', function(e){
+          if (isExternalNoise(e.reason)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+          }
           reportEarlyError(e.reason, 'unhandledrejection');
-        });
+        }, true);
 
         // Watchdog paciente: mantém a tela de carregamento enquanto o bundle
         // compila/baixa. Erros genéricos e de extensões jamais substituem o #root;

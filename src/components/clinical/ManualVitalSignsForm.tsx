@@ -267,8 +267,17 @@ export function ManualVitalSignsForm({
 
   const onSubmit = handleSubmit(async (raw) => {
     const parsed = vitalSignsSchema.parse(raw);
-    const values: VitalSignsValues = parsed;
+    const values: VitalSignsValues = {
+      systolic: Number(parsed.systolic),
+      diastolic: Number(parsed.diastolic),
+      heartRate: Number(parsed.heartRate),
+      spo2: Number(parsed.spo2),
+      respRate: parsed.respRate === undefined ? undefined : Number(parsed.respRate),
+      temperature: parsed.temperature === undefined ? undefined : Number(parsed.temperature),
+      notes: parsed.notes,
+    };
     const riskLevel = classifyRisk(values);
+
 
     const { data, error } = await supabase
       .from("diagnostic_exams")

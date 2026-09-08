@@ -1,10 +1,10 @@
 {
-  "totalSent": 0,
-  "brevoSentToday": 0,
-  "hostingerSent": 0,
-  "lastOffset": 0,
+  "totalSent": 3000,
+  "brevoSentToday": 300,
+  "hostingerSent": 2381,
+  "lastOffset": 3004,
   "targetGoal": 3000,
-  "currentGateway": "BREVO",
-  "currentDate": "2026-09-05",
-  "lastUpdated": "2026-09-06T02:40:00.000Z"
+  "currentGateway": "HOSTINGER",
+  "currentDate": "07/09/2026",
+  "lastUpdated": "2026-09-08T00:11:50.324Z"
 }

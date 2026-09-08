@@ -6,16 +6,8 @@ const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || Deno.env.get('GOOGLE_GE
 
 // SECURITY: Sanitize all user-supplied fields before interpolating into system prompt
 // Prevents prompt injection attacks that could override CFM/ANVISA directives
-function sanitizePromptInput(input: unknown, maxLength = 80): string {
-  if (!input || typeof input !== "string") return "";
-  return input
-    .replace(/<[^>]*>?/gm, "") // Remove tags HTML e scripts
-    .replace(/[\x00-\x1F\x7F]/g, "")
-    .replace(/[`"'\\]/g, "") // Escapar/remover aspas e caracteres de injeção
-    .replace(/\b(ignore|instrução|instruction|system|prompt|override|forget|pretend|act as|você é|you are|new instruction|nova instrução)\b/gi, "***")
-    .trim()
-    .slice(0, maxLength);
-}
+const sanitizePromptInput = (val?: string, max = 80) =>
+  (val || "").replace(/[\x00-\x1F`"'\\]/g, "").replace(/<[^>]*>?/gm, "").trim().slice(0, max);
 
 serve(async (req: Request) => {
   const cors = getCorsHeaders(req);
@@ -39,20 +31,20 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: "Gemini API Key missing" }), { status: 500, headers: cors });
     }
 
-    const safeName = sanitizePromptInput(leadInfo?.name, 80) || "Não informado";
-    const safePhone = sanitizePromptInput(leadInfo?.phone, 30) || "Não informado";
-    const safeCategory = sanitizePromptInput(leadInfo?.category, 40) || "Geral";
-    const audience = String(leadInfo?.audience ?? "paciente").toLowerCase();
-    const isDoctor = audience.includes("medic") || audience.includes("doutor") || audience.includes("prescritor");
+    const safeName = sanitizePromptInput(leadInfo?.name, 80);
+    const safePhone = sanitizePromptInput(leadInfo?.phone, 30);
+    const safeCategory = sanitizePromptInput(leadInfo?.category, 50);
+    const safeAudience = sanitizePromptInput(leadInfo?.audience, 40).toLowerCase();
+    const isDoctor = safeAudience.includes("medic") || safeAudience.includes("doutor") || safeAudience.includes("prescritor");
 
     const systemPrompt = `Você é a Enfª Brisa 🌿, assistente interna oficial da plataforma Planta y Raiz (atendimento DENTRO da plataforma, canal web).
 Aja de forma empática, profissional, elegante e objetiva. Português do Brasil.
 
 Contexto do usuário atual:
-- Nome: ${safeName}
-- Contato: ${safePhone}
+- Nome: ${safeName || "Não informado"}
+- Contato: ${safePhone || "Não informado"}
 - Perfil: ${isDoctor ? 'MÉDICO PRESCRITOR' : 'PACIENTE'}
-- Categoria de Suporte: ${safeCategory}
+- Categoria de Suporte: ${safeCategory || "Geral"}
 
 ${isDoctor ? `ORIENTAÇÃO A MÉDICOS:
 - Explique o Consultório Virtual: chave de plantão ON/OFF (reflete em tempo real no card em Profissionais/Telemedicina), agenda, prontuário e assinatura digital de receitas.

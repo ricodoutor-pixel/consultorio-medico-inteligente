@@ -1,9 +1,9 @@
-﻿import { defineConfig } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
-// Nota: plugin-legacy removido - incompatível com Rolldown (sandbox).
-// Para suporte a navegadores antigos no Hostinger, configure ali separadamente.
+// Nota: @vitejs/plugin-legacy mantido para compatibilidade e polyfills
+// em navegadores e dispositivos móveis legados no Hostinger (iOS >= 13, Safari >= 13, Android).
 
 import legacy from "@vitejs/plugin-legacy";
 

@@ -16,6 +16,15 @@ type Partner = { id: string; name: string; city: string; state: string; rating: 
 
 const TIMES = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
 
+// Lista de contingência estática para especialidades canábicas básicas
+const FALLBACK_SPECIALTIES: Specialty[] = [
+  { id: "esp-neurologia", name: "Neurologia (Epilepsia, Parkinson, TEA)", slug: "neurologia", category: "consulta", price_from_brl: 150 },
+  { id: "esp-psiquiatria", name: "Psiquiatria (Ansiedade, Insônia, Depressão)", slug: "psiquiatria", category: "consulta", price_from_brl: 150 },
+  { id: "esp-dor-cronica", name: "Dor Crônica & Fibromialgia", slug: "dor-cronica", category: "consulta", price_from_brl: 130 },
+  { id: "esp-cuidados-paliativos", name: "Cuidados Paliativos & Oncologia", slug: "cuidados-paliativos", category: "consulta", price_from_brl: 140 },
+  { id: "esp-medicina-integrativa", name: "Medicina Integrativa & Canabinoide", slug: "medicina-integrativa", category: "consulta", price_from_brl: 120 },
+];
+
 export default function SaudeVerdeAgendar() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -35,16 +44,35 @@ export default function SaudeVerdeAgendar() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setHasSub(false); return; }
-      const { data: sub } = await supabase
-        .from("saude_verde_subscriptions" as never)
-        .select("id, status").eq("user_id", user.id).eq("status", "active").maybeSingle();
-      setHasSub(!!sub);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { setHasSub(false); return; }
+        const { data: sub } = await supabase
+          .from("saude_verde_subscriptions" as never)
+          .select("id, status").eq("user_id", user.id).eq("status", "active").maybeSingle();
+        setHasSub(!!sub);
+      } catch {
+        setHasSub(false);
+      }
     })();
-    supabase.from("saude_verde_specialties" as never)
-      .select("*").order("sort_order")
-      .then(({ data }) => setSpecialties((data as unknown as Specialty[]) || []));
+
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("saude_verde_specialties")
+          .select("id, name, slug, category, price_from_brl")
+          .order("sort_order");
+
+        if (error || !data || data.length === 0) {
+          setSpecialties(FALLBACK_SPECIALTIES);
+        } else {
+          setSpecialties(data as Specialty[]);
+        }
+      } catch (err) {
+        console.warn("[saude-verde] Erro ao buscar especialidades, usando contingência:", err);
+        setSpecialties(FALLBACK_SPECIALTIES);
+      }
+    })();
   }, []);
 
   useEffect(() => {

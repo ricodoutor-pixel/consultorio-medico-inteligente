@@ -1,320 +1,203 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Camera, HeartPulse, Zap, RefreshCcw, Activity, ShieldCheck, Database, FileText, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
-import { ComicManual } from './ComicManual';
+import React, { useState } from 'react';
+import { HeartPulse, Activity, FileText, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, Save, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { SaMDBiofeedbackDisclaimer } from '@/components/compliance/SaMDBiofeedbackDisclaimer';
 
-type ExamPhase = 'intro' | 'measuring' | 'analyzing' | 'result';
+interface Props {
+  onComplete?: () => void;
+}
 
-export function OximetriaOptica({ onComplete }: { onComplete?: () => void }) {
-  const [phase, setPhase] = useState<ExamPhase>('intro');
-  const [analyzingProgress, setAnalyzingProgress] = useState(0);
-  const [aiLog, setAiLog] = useState<string>('');
-  const [spo2Value, setSpo2Value] = useState(98);
-  const [measuringTime, setMeasuringTime] = useState(30);
+export function OximetriaOptica({ onComplete }: Props) {
+  const [spo2Input, setSpo2Input] = useState<string>('98');
+  const [bpmInput, setBpmInput] = useState<string>('72');
+  const [isSaved, setIsSaved] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  
-  // Stop camera
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop());
-      streamRef.current = null;
+
+  const spo2Num = Number(spo2Input);
+  const bpmNum = Number(bpmInput);
+
+  const getClassification = (val: number) => {
+    if (val >= 95) {
+      return {
+        label: 'Normal (Saturação adequada)',
+        description: 'Sua saturação de oxigênio está dentro dos parâmetros ideais esperados (95% a 100%).',
+        badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+        textColor: 'text-emerald-600',
+        isDangerous: false,
+      };
     }
+    if (val >= 90) {
+      return {
+        label: 'Atenção (Hipoxemia leve)',
+        description: 'Saturação limítrofe (90% a 94%). Mantenha repouso, repita a aferição e consulte um médico se persistir.',
+        badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+        textColor: 'text-amber-600',
+        isDangerous: true,
+      };
+    }
+    return {
+      label: 'Alerta Clínico (Hipoxemia grave)',
+      description: 'Saturação abaixo de 90%. Recomenda-se avaliação médica presencial ou acionamento imediato do SAMU 192.',
+      badgeColor: 'bg-rose-50 text-rose-800 border-rose-200',
+      textColor: 'text-rose-600',
+      isDangerous: true,
+    };
   };
 
-  useEffect(() => {
-    return () => stopCamera();
-  }, []);
+  const classification = getClassification(spo2Num || 98);
 
-  // Measuring oscillation effect
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (phase === 'measuring') {
-      interval = setInterval(() => {
-        setSpo2Value(Math.floor(Math.random() * (99 - 94 + 1) + 94));
-        setMeasuringTime((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            captureAndAnalyze();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!spo2Num || spo2Num < 70 || spo2Num > 100) {
+      toast.error('Informe um valor de SpO2 válido entre 70% e 100%.');
+      return;
     }
-    return () => clearInterval(interval);
-  }, [phase]);
-
-  const startCamera = async () => {
-    setPhase('measuring');
-    setMeasuringTime(30);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment', advanced: [{ torch: true } as any] } 
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      }
-    } catch (e) {
-      console.error('Camera access error:', e);
-      toast.error('Erro ao acessar a câmera. Simulando a medição.');
-    }
-  };
-
-  const captureAndAnalyze = () => {
-    stopCamera();
-    setPhase('analyzing');
-    setAnalyzingProgress(0);
-    
-    const logs = [
-      'Processando sinal fotopletismográfico (PPG)...',
-      'Analisando razão vermelho/infravermelho...',
-      'Calculando saturação de oxigênio periférica...',
-      'Avaliando perfusão e frequência de pulso...',
-      'Cruzando dados com banco de referência clínica...',
-      'Gerando parecer de oximetria...'
-    ];
-
-    let step = 0;
-    const interval = setInterval(() => {
-      step += 1;
-      setAnalyzingProgress(Math.min(100, step * (100 / logs.length)));
-      setAiLog(logs[step - 1] || 'Finalizando...');
-
-      if (step >= logs.length + 1) {
-        clearInterval(interval);
-        setTimeout(() => setPhase('result'), 500);
-      }
-    }, 1200);
+    setIsSaved(true);
+    toast.success('Oximetria registrada com sucesso no prontuário!');
+    if (onComplete) onComplete();
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-slate-50 relative overflow-hidden rounded-xl border border-border shadow-sm">
-      <ComicManual 
-        title="Como Fazer a Oximetria"
-        icon={HeartPulse}
-        brisaMessage="Vou medir o nível de oxigênio no seu sangue! Deixe o dedo bem quieto na lente."
-        steps={[
-          { title: 'Lave as Mãos', description: 'Certifique-se de que seus dedos estão limpos e secos.', icon: '🧼', colorClass: 'bg-blue-50' },
-          { title: 'Apoie o Dedo', description: 'Coloque o dedo indicador tampando a CÂMERA e o FLASH do celular.', icon: '👆', colorClass: 'bg-red-50' },
-          { title: 'Pressão Leve', description: 'Não aperte muito forte, apenas encoste o dedo cobrindo tudo.', icon: '🎈', colorClass: 'bg-yellow-50' },
-          { title: 'Aguarde 30s', description: 'Fique imóvel até a contagem terminar. Respire fundo!', icon: '⏱️', colorClass: 'bg-green-50' }
-        ]}
-      />
-      
-      <AnimatePresence mode="wait">
-        {phase === 'intro' && (
-          <motion.div 
-            key="intro"
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="flex flex-col items-center justify-center p-6 text-center h-full space-y-6"
-          >
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center border-4 border-primary/20">
-              <HeartPulse className="w-10 h-10 text-primary" />
+    <div className="flex flex-col w-full h-full bg-slate-50 relative overflow-hidden rounded-xl border border-border shadow-sm p-4 md:p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-3 border-b pb-4">
+        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 text-primary">
+          <HeartPulse className="w-6 h-6" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-slate-900 leading-tight">Oximetria & Saturação de Oxigênio (SpO2)</h2>
+          <p className="text-xs text-slate-500">Registro Clínico Homologado · {new Date().toLocaleDateString('pt-BR')}</p>
+        </div>
+      </div>
+
+      {/* AVISO REGULATÓRIO OBRIGATÓRIO (ZERO SIMULAÇÃO) */}
+      <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-start gap-3">
+        <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="text-xs font-bold text-amber-900">Nota Regulatória & Transparência Clínica</p>
+          <p className="text-xs text-amber-800 leading-relaxed">
+            Módulo de oximetria óptica em homologação clínica. Por favor, utilize um oxímetro de pulso homologado ou informe o valor manualmente.
+          </p>
+        </div>
+      </div>
+
+      {/* FORMULÁRIO DE ENTRADA MANUAL */}
+      <form onSubmit={handleSave} className="space-y-4 bg-white p-5 rounded-xl border shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="spo2-input" className="text-xs font-semibold text-slate-700">
+              Saturação de Oxigênio (SpO2 em %) *
+            </Label>
+            <div className="relative">
+              <Input
+                id="spo2-input"
+                type="number"
+                min={70}
+                max={100}
+                step={1}
+                required
+                value={spo2Input}
+                onChange={(e) => {
+                  setSpo2Input(e.target.value);
+                  setIsSaved(false);
+                }}
+                className="text-lg font-bold pr-8"
+                placeholder="Ex: 98"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-bold">%</span>
             </div>
+            <p className="text-[11px] text-slate-500">Faixa de referência esperada: 95% a 100%.</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="bpm-input" className="text-xs font-semibold text-slate-700">
+              Frequência de Pulso (BPM) <span className="text-slate-400 font-normal">(Opcional)</span>
+            </Label>
+            <div className="relative">
+              <Input
+                id="bpm-input"
+                type="number"
+                min={40}
+                max={220}
+                step={1}
+                value={bpmInput}
+                onChange={(e) => {
+                  setBpmInput(e.target.value);
+                  setIsSaved(false);
+                }}
+                className="text-lg font-bold pr-12"
+                placeholder="Ex: 72"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-bold">bpm</span>
+            </div>
+            <p className="text-[11px] text-slate-500">Faixa normal em repouso: 60 a 100 bpm.</p>
+          </div>
+        </div>
+
+        {/* Card de Parecer Imediato */}
+        {spo2Num >= 70 && spo2Num <= 100 && (
+          <div className={`p-4 rounded-xl border ${classification.badgeColor} flex items-start gap-3 transition-colors`}>
+            {classification.isDangerous ? (
+              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            ) : (
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+            )}
             <div>
-              <h2 className="text-xl font-bold text-slate-800 mb-2">Oximetria Óptica Digital</h2>
-              <p className="text-sm text-slate-500 max-w-xs mx-auto">
-                Meça sua saturação de oxigênio (SpO2) usando a câmera e o flash do smartphone. Apoie o dedo sobre a lente.
-              </p>
+              <h4 className="font-bold text-sm">{classification.label}</h4>
+              <p className="text-xs mt-1 leading-relaxed">{classification.description}</p>
             </div>
-            
-            <div className="grid grid-cols-2 gap-3 w-full max-w-sm text-left">
-              <div className="bg-white p-3 rounded-xl border shadow-sm">
-                <ShieldCheck className="w-5 h-5 text-emerald-500 mb-1" />
-                <p className="text-[11px] text-slate-600 leading-tight">Tecnologia PPG Avançada</p>
-              </div>
-              <div className="bg-white p-3 rounded-xl border shadow-sm">
-                <Database className="w-5 h-5 text-blue-500 mb-1" />
-                <p className="text-[11px] text-slate-600 leading-tight">Análise em tempo real</p>
-              </div>
-            </div>
-
-            <SaMDBiofeedbackDisclaimer compact toolName="A oximetria óptica digital por câmera" />
-
-            <Button onClick={startCamera} size="lg" className="w-full max-w-sm rounded-xl h-14 text-base shadow-lg shadow-primary/25">
-              <Camera className="w-5 h-5 mr-2" /> Iniciar Medição
-            </Button>
-          </motion.div>
+          </div>
         )}
 
-        {phase === 'measuring' && (
-          <motion.div 
-            key="measuring"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="flex flex-col w-full h-full bg-black relative"
-          >
-            <video 
-              ref={videoRef} 
-              autoPlay 
-              playsInline 
-              muted
-              className="w-full h-full object-cover opacity-30"
-            />
-            
-            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 space-y-8">
-              <div className="relative w-48 h-48 flex items-center justify-center">
-                {/* Pulse wave animation */}
-                <motion.div 
-                  className="absolute inset-0 rounded-full border-4 border-rose-500/50"
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.8, 0, 0.8] }}
-                  transition={{ repeat: Infinity, duration: 1 }}
-                />
-                <div className="z-20 text-center">
-                  <span className="text-5xl font-black text-white">{spo2Value}</span>
-                  <span className="text-xl text-white/80">%</span>
-                </div>
-                {/* Circular Progress */}
-                <svg className="absolute inset-0 w-full h-full -rotate-90">
-                  <circle
-                    cx="96" cy="96" r="90"
-                    fill="none"
-                    stroke="rgba(255,255,255,0.1)"
-                    strokeWidth="8"
-                  />
-                  <circle
-                    cx="96" cy="96" r="90"
-                    fill="none"
-                    stroke="#10b981"
-                    strokeWidth="8"
-                    strokeDasharray={565.48}
-                    strokeDashoffset={565.48 - (565.48 * (30 - measuringTime)) / 30}
-                    className="transition-all duration-1000 ease-linear"
-                  />
-                </svg>
-              </div>
-              <div className="text-white text-center px-6">
-                <p className="text-lg font-bold mb-1">Medindo SpO2...</p>
-                <p className="text-sm text-white/70">Mantenha o dedo firme sobre a câmera com flash</p>
-                <p className="mt-4 text-xs font-mono text-emerald-400">{measuringTime}s restantes</p>
-              </div>
-            </div>
+        <Button type="submit" className="w-full h-12 rounded-xl text-sm font-semibold shadow-md">
+          <Save className="w-4 h-4 mr-2" />
+          {isSaved ? 'Atualizar no Prontuário' : 'Registrar no Prontuário / Anexar ao Chat'}
+        </Button>
+      </form>
 
-            <div className="absolute bottom-8 w-full flex justify-center px-6">
-              <Button variant="secondary" className="rounded-xl bg-white/20 backdrop-blur-md hover:bg-white/30 text-white" onClick={() => {
-                stopCamera();
-                setPhase('intro');
-              }}>
-                Cancelar
-              </Button>
-            </div>
-          </motion.div>
-        )}
-
-        {phase === 'analyzing' && (
-          <motion.div 
-            key="analyzing"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center p-8 text-center h-full bg-slate-900 text-white space-y-8"
-          >
-            <div className="relative w-32 h-32">
-              <div className="absolute inset-0 bg-rose-500/20 rounded-full animate-ping"></div>
-              <div className="absolute inset-2 bg-rose-500/40 rounded-full animate-pulse"></div>
-              <div className="absolute inset-4 rounded-full overflow-hidden border-2 border-rose-500/50 flex items-center justify-center bg-black/50">
-                <HeartPulse className="w-12 h-12 text-rose-500 opacity-80" />
-                <motion.div 
-                  className="absolute w-full h-1 bg-rose-400 shadow-[0_0_10px_#fb7185]"
-                  animate={{ top: ['0%', '100%', '0%'] }}
-                  transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
-                />
-              </div>
-            </div>
-            
-            <div className="w-full max-w-xs space-y-3">
-              <h3 className="font-semibold text-lg">IA Processando Sinal PPG...</h3>
-              <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                <motion.div className="h-full bg-rose-500" style={{ width: `${analyzingProgress}%` }} />
-              </div>
-              <p className="text-xs text-rose-400 font-mono h-8">{aiLog}</p>
-            </div>
-          </motion.div>
-        )}
-
-        {phase === 'result' && (
-          <motion.div 
-            key="result"
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col p-5 h-full overflow-y-auto bg-white"
-          >
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b">
-              <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                <FileText className="w-6 h-6" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-slate-800 leading-tight">Parecer Oximetria Óptica</h2>
-                <p className="text-xs text-slate-500">Avaliação Respiratória · {new Date().toLocaleDateString()}</p>
-              </div>
-            </div>
-
-            <div className="space-y-5">
-              <div className="flex gap-4">
-                <div className="flex-1 p-4 rounded-xl border bg-slate-50 text-center">
-                  <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">SpO2</p>
-                  <p className="text-3xl font-black text-emerald-500">97%</p>
-                </div>
-                <div className="flex-1 p-4 rounded-xl border bg-slate-50 text-center">
-                  <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Frequência</p>
-                  <p className="text-3xl font-black text-slate-800">72 <span className="text-sm font-medium text-slate-500">bpm</span></p>
+      {/* Accordion Educativo */}
+      <div className="border rounded-xl overflow-hidden bg-white">
+        <button
+          type="button"
+          onClick={() => setShowExplanation(!showExplanation)}
+          className="w-full p-4 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors text-left"
+        >
+          <span className="font-semibold text-slate-800 text-xs md:text-sm">
+            Entenda o que significa a saturação de oxigênio (SpO2)
+          </span>
+          {showExplanation ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+        </button>
+        <AnimatePresence>
+          {showExplanation && (
+            <motion.div
+              initial={{ height: 0 }}
+              animate={{ height: 'auto' }}
+              exit={{ height: 0 }}
+              className="overflow-hidden bg-white"
+            >
+              <div className="p-4 text-xs text-slate-600 space-y-3 border-t">
+                <p>
+                  A oximetria de pulso quantifica a fração de hemoglobina saturada de oxigênio no sangue periférico. Valores acima de 95% indicam troca gasosa pulmonar adequada em ar ambiente.
+                </p>
+                <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
+                  <p className="font-semibold text-primary mb-1 flex items-center gap-1.5">
+                    <Activity className="w-3.5 h-3.5" /> Conexão Endocanabinoide
+                  </p>
+                  <p>
+                    O sistema endocanabinoide modula o tônus bronquial e a resposta inflamatória através de receptores CB1 e CB2. Fitocanabinoides como o CBD vêm sendo investigados por seus papéis antioxidantes e modulação de vias respiratórias.
+                  </p>
                 </div>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-              <div className="p-4 rounded-xl border bg-emerald-50 border-emerald-100 flex items-start gap-3">
-                <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-bold text-emerald-900">Normal (Saturação adequada)</h4>
-                  <p className="text-xs text-emerald-800 mt-1">Sua saturação de oxigênio está dentro dos níveis esperados (95-100%).</p>
-                </div>
-              </div>
-
-              <div className="border rounded-xl overflow-hidden">
-                <button 
-                  onClick={() => setShowExplanation(!showExplanation)}
-                  className="w-full p-4 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors"
-                >
-                  <span className="font-semibold text-slate-800 text-sm">O que significa seu resultado?</span>
-                  {showExplanation ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
-                </button>
-                <AnimatePresence>
-                  {showExplanation && (
-                    <motion.div 
-                      initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
-                      className="overflow-hidden bg-white"
-                    >
-                      <div className="p-4 pt-0 text-xs text-slate-600 space-y-3">
-                        <p className="mt-3">A oximetria mede a quantidade de oxigênio que o sangue está transportando. Valores normais indicam boa função pulmonar e perfusão sanguínea adequada.</p>
-                        <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
-                          <p className="font-semibold text-primary mb-1 flex items-center gap-1.5"><Activity className="w-3.5 h-3.5" /> Conexão Endocanabinoide</p>
-                          <p>O sistema endocanabinoide modula a resposta inflamatória pulmonar. O CBD demonstra propriedades broncodilatadoras e anti-inflamatórias, podendo ser útil na gestão de condições respiratórias crônicas.</p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              <SaMDBiofeedbackDisclaimer compact toolName="Este parecer de oximetria por fotopletismografia" />
-            </div>
-
-            <div className="mt-auto pt-6 flex gap-3">
-              <Button variant="outline" className="flex-1 rounded-xl" onClick={() => setPhase('intro')}>
-                Repetir
-              </Button>
-              <Button className="flex-1 rounded-xl shadow-lg shadow-primary/20" onClick={() => {
-                toast.success('Resultado anexado ao chat!');
-                if (onComplete) onComplete();
-              }}>
-                Anexar ao Chat
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <SaMDBiofeedbackDisclaimer compact toolName="O registro manual de oximetria" />
     </div>
   );
 }

@@ -2,12 +2,7 @@
 // Mesma persona do fluxo WhatsApp, com consciência de tempo e leitura de BPM.
 
 import { processar_triagem_brisa } from "../_shared/brisa-ai.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 interface ChatBody {
   transcript?: string;
@@ -82,7 +77,15 @@ function rateLimit(ip: string): boolean {
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const json = (body: unknown, status = 200) => {
+    return new Response(JSON.stringify(body), {
+      status,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  };
 
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
@@ -124,10 +127,3 @@ Deno.serve(async (req) => {
     return json({ ok: true, reply: "Tive um probleminha agora, mas estou de volta. Pode repetir sua pergunta?" });
   }
 });
-
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}

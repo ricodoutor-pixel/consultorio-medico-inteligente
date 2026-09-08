@@ -19,29 +19,23 @@ export function isOriginAllowed(origin: string): boolean {
   return ALLOWED_ORIGIN_PATTERNS.some((pattern) => pattern.test(origin));
 }
 
-export function getCorsHeaders(req?: Request): Record<string, string> {
-  const origin = req?.headers.get("Origin") ?? req?.headers.get("origin") ?? "";
-  const allowed = isOriginAllowed(origin);
-
-  const headers: Record<string, string> = {
+export const getCorsHeaders = (req?: Request | null) => {
+  const origin = req?.headers?.get("origin") || req?.headers?.get("Origin") || "";
+  const isAllowed = isOriginAllowed(origin);
+  return {
+    "Access-Control-Allow-Origin": isAllowed ? origin : "https://plantayraiz.com.br",
     "Access-Control-Allow-Headers":
       "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
     "Vary": "Origin",
   };
-
-  if (allowed) {
-    headers["Access-Control-Allow-Origin"] = origin;
-  }
-
-  return headers;
-}
+};
 
 // Backward-compat export para preflight estático padrão de produção
-export const corsHeaders: Record<string, string> = {
+export const corsHeaders = {
   "Access-Control-Allow-Origin": "https://plantayraiz.com.br",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
   "Vary": "Origin",
 };

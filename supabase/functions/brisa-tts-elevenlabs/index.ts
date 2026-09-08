@@ -6,11 +6,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { requireServiceAuth } from "../_shared/service-auth.ts";
 import { encode as base64Encode } from "https://deno.land/std@0.224.0/encoding/base64.ts";
 import { BRISA_VOICE_ID } from "../_shared/brisa-persona.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 // ElevenLabs Turbo v2.5 ≈ US$ 0.00018 / char → ~R$ 0.0009 / char @ R$ 5/USD
 const COST_BRL_PER_CHAR = 0.0009;
@@ -25,6 +21,7 @@ interface TtsRequest {
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   const __unauth = requireServiceAuth(req, corsHeaders);
   if (__unauth) return __unauth;

@@ -15,7 +15,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { professionals, type Professional } from "@/data/professionals";
+import { useRealProfessionals } from "@/hooks/useRealProfessionals";
+import type { Professional } from "@/types/professional";
 import { Link } from "react-router-dom";
 
 // ── Types ──────────────────────────────────────────────
@@ -85,6 +86,7 @@ interface TelemedChatProps {
 }
 
 export const TelemedChat = ({ patientId }: TelemedChatProps) => {
+  const { professionals } = useRealProfessionals();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -112,11 +114,9 @@ export const TelemedChat = ({ patientId }: TelemedChatProps) => {
           // Map doctor UUIDs to professional IDs
           for (const a of appts) {
             // Try to find matching professional
-            const match = professionals.find(p => p.id === a.doctor_id);
+            const match = professionals.find(p => p.dbId === a.doctor_id || p.id === a.doctor_id);
             if (match) unlockedIds.add(match.id);
           }
-          // Always unlock med-0 (Dr. Edilson) for OT R$30
-          unlockedIds.add("med-0");
         }
       }
 
@@ -125,7 +125,7 @@ export const TelemedChat = ({ patientId }: TelemedChatProps) => {
     };
 
     loadContacts();
-  }, [patientId]);
+  }, [patientId, professionals]);
 
   // Auto-scroll messages
   useEffect(() => {

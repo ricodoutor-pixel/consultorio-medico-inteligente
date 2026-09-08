@@ -5,7 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { professionals } from "@/data/professionals";
+import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { CheckCircle2, Copy, Clock, ArrowRight, Shield, QrCode, Loader2, AlertCircle, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
@@ -17,10 +17,11 @@ const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, tra
 
 const ConsultationPayment = () => {
   const [searchParams] = useSearchParams();
-  const proId = searchParams.get("pro") || "med-1";
+  const proId = searchParams.get("pro");
   const appointmentId = searchParams.get("appointment") || null;
   const agenticOrderId = searchParams.get("agentic_order_id") || null;
-  const pro = professionals.find((p) => p.id === proId) || professionals[0];
+  const { professionals, loading: professionalsLoading } = useRealProfessionals();
+  const pro = professionals.find((p) => p.id === proId) ?? professionals[0];
   const [status, setStatus] = useState<"pending" | "loading" | "processing" | "confirmed" | "rejected">("pending");
   const [processingStep, setProcessingStep] = useState(0);
   const [countdown, setCountdown] = useState(900); // 15 min
@@ -68,28 +69,29 @@ const ConsultationPayment = () => {
   }, []);
 
   const feeRate = isExempt || agenticOrder ? 0 : 0.07;
-  const basePrice = agenticOrder ? Number(agenticOrder.total_amount) : (dynamicPrice || pro.priceValue);
+  const basePrice = agenticOrder ? Number(agenticOrder.total_amount) : (dynamicPrice || pro?.priceValue || 0);
   const commission = basePrice * feeRate;
   const total = basePrice + commission;
 
   // Create payment preference on mount or when dynamic price is ready
   useEffect(() => {
-    if (!loadingGateway && (!agenticOrderId || agenticOrder)) {
+    if (!loadingGateway && !professionalsLoading && (agenticOrder || pro) && (!agenticOrderId || agenticOrder)) {
       createPayment();
     }
-  }, [loadingGateway, agenticOrderId, agenticOrder]);
+  }, [loadingGateway, professionalsLoading, agenticOrderId, agenticOrder, pro]);
 
   const createPayment = async () => {
+    if (!agenticOrder && !pro) return;
     setStatus("loading");
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const paymentDescription = agenticOrder
         ? `Pedido Agêntico UCP: ${agenticOrder.items?.[0]?.name || "Medicamento Prescrito"}`
-        : `Orientação Técnica com ${pro.name} - Planta & Raiz`;
+        : `Orientação Técnica com ${pro?.name ?? "especialista"} - Planta & Raiz`;
 
       const data = await createGatewayPayment({
         appointmentId,
-        doctorName: agenticOrder ? "Farmácia Dispensary Planta y Raíz" : pro.name,
+        doctorName: agenticOrder ? "Farmácia Dispensary Planta y Raíz" : pro?.name ?? "Especialista",
         patientEmail: session?.user?.email || "",
         description: paymentDescription,
       });
@@ -100,13 +102,13 @@ const ConsultationPayment = () => {
         setStatus("pending");
       } else {
         // Fallback to static link
-        setCheckoutUrl(pro.paymentLink);
+        setCheckoutUrl(pro?.paymentLink || null);
         setStatus("pending");
       }
     } catch (err) {
       console.error("Payment creation error:", err);
       // Fallback to static link
-      setCheckoutUrl(pro.paymentLink);
+      setCheckoutUrl(pro?.paymentLink || null);
       setStatus("pending");
       toast({ title: "Usando link de pagamento direto", description: "Link alternativo disponível." });
     }

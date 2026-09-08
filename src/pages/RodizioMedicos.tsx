@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import { professionals, Professional } from "@/data/professionals";
+import { useState, useEffect, useMemo } from "react";
+import { useRealProfessionals } from "@/hooks/useRealProfessionals";
+import type { Professional } from "@/types/professional";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, UserCheck, Clock, ShieldCheck } from "lucide-react";
@@ -10,9 +11,13 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export const RodizioMedicos = () => {
   const navigate = useNavigate();
+  const { professionals } = useRealProfessionals();
   const [currentDoctor, setCurrentDoctor] = useState<Professional | null>(null);
   const [timeLeft, setTimeLeft] = useState(30);
-  const onlineDoctors = professionals.filter(p => p.category === "Médicos Prescritores" && p.online);
+  const onlineDoctors = useMemo(
+    () => professionals.filter(p => p.category === "Médicos Prescritores" && p.online),
+    [professionals],
+  );
 
   useEffect(() => {
     if (onlineDoctors.length === 0) return;
@@ -37,7 +42,7 @@ export const RodizioMedicos = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [onlineDoctors]);
 
   const handleSelect = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -103,7 +108,7 @@ export const RodizioMedicos = () => {
                     <div className="flex justify-center gap-4 mb-8">
                       <div className="text-center">
                         <p className="text-xs text-muted-foreground uppercase font-bold">Avaliação</p>
-                        <p className="font-black text-foreground">⭐ {currentDoctor.rating}</p>
+                        <p className="font-black text-foreground">{currentDoctor.rating === null ? "Ainda sem avaliações" : `⭐ ${currentDoctor.rating}`}</p>
                       </div>
                       <div className="w-px h-8 bg-border" />
                       <div className="text-center">

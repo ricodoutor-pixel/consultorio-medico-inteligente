@@ -19,7 +19,7 @@ import { Stethoscope, ArrowRight, ArrowLeft, CheckCircle2, Brain, Heart, Activit
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { TCLEConsentModal } from "@/components/TCLEConsentModal";
-import { professionals } from "@/data/professionals";
+import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -175,6 +175,7 @@ const BrisaAvatar = () => {
 };
 
 const Telemedicina = () => {
+  const { professionals } = useRealProfessionals();
   const { value: dynamicPrice, symbol: dynamicSymbol, isInternational } = useDynamicPrice();
   const navigate = useNavigate();
   const [showTCLE, setShowTCLE] = useState(true);

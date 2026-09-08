@@ -60,7 +60,7 @@ window.addEventListener("unhandledrejection", (e) => {
 
   if (isExtensionError) {
     e.preventDefault();
-    e.stopPropagation();
+    e.stopImmediatePropagation();
     return;
   }
 });
@@ -76,7 +76,7 @@ window.addEventListener("error", (e) => {
 
   if (isExtensionError) {
     e.preventDefault();
-    e.stopPropagation();
+    e.stopImmediatePropagation();
     return;
   }
 

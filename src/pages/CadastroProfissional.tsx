@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { InteractiveTour3DModal, openGlobalTour } from "@/components/InteractiveTour3DModal";
 import { KYC_BUCKET, KYC_LABELS, type KycKind } from "@/lib/kyc-docs";
-import { categories, COUNCIL_CONFIG } from "@/data/professionals";
+import { categories, COUNCIL_CONFIG } from "@/data/professional-config";
 import { motion } from "framer-motion";
 import * as Flags from "country-flag-icons/react/3x2";
 import {

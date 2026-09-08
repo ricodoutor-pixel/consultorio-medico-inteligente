@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Star, ArrowLeft, CheckCircle2, Stethoscope, CreditCard, MessageSquare, Video, ArrowRight, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { professionals as staticProfessionals } from "@/data/professionals";
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -159,9 +158,12 @@ const FalarComEspecialista = () => {
                   <h2 className="font-display font-black text-foreground">{pro.name}</h2>
                   <p className="text-sm text-muted-foreground mb-2">{pro.category}</p>
                   <div className="flex items-center gap-2 mb-3">
-                    <Star size={14} className="text-primary fill-primary" />
-                    <span className="text-sm font-black">{pro.rating}</span>
-                    <span className="text-xs text-muted-foreground">• {pro.consults} consultas</span>
+                    {pro.rating === null ? (
+                      <span className="text-xs text-muted-foreground">Ainda sem avaliações</span>
+                    ) : (
+                      <><Star size={14} className="text-primary fill-primary" /><span className="text-sm font-black">{pro.rating}</span></>
+                    )}
+                    <span className="text-xs text-muted-foreground">• {pro.consults === 0 ? "Novo na plataforma" : `${pro.consults} consultas`}</span>
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-4">{pro.bio}</p>
                   <div className="border-t border-border pt-3">

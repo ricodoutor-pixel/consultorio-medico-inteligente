@@ -9,7 +9,8 @@ import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { CountryFlag } from "@/components/CountryFlag";
 import { motion } from "framer-motion";
-import { professionals as allProfessionals, categories, Professional, COUNCIL_CONFIG } from "@/data/professionals";
+import { categories, COUNCIL_CONFIG } from "@/data/professional-config";
+import type { Professional } from "@/types/professional";
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -86,12 +87,12 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
 const VIP_DOCTOR_MATCHERS = ["edilson", "suelen", "olivia"];
 const isVipDoctor = (p: Professional) => {
   if (p.plan_tier && p.plan_tier !== 'free') return true;
-  return p.id === "med-0" || p.id === "mock-suelen" || p.id === "mock-olivia" || VIP_DOCTOR_MATCHERS.some((n) => (p.name || "").toLowerCase().includes(n));
+  return VIP_DOCTOR_MATCHERS.some((n) => (p.name || "").toLowerCase().includes(n));
 };
 
 const getDoctorSealTier = (p: Professional) => {
   const name = (p.name || "").toLowerCase();
-  if (p.id === "med-0" || p.id === "mock-suelen" || p.id === "mock-olivia" || name.includes("edilson") || name.includes("suelen") || name.includes("olivia") || p.plan_tier === "premium") {
+  if (name.includes("edilson") || name.includes("suelen") || name.includes("olivia") || p.plan_tier === "premium") {
     return "premium";
   }
   if (p.plan_tier && p.plan_tier !== 'free') return p.plan_tier;
@@ -114,7 +115,7 @@ const ServiceTagsRow = () => (
 );
 
 
-const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: string; professionals?: Professional[] }) => {
+const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: Professional[] }) => {
   const pro = professionals.find((p) => p.id === id);
   if (!pro) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Profissional não encontrado.</div>;
 
@@ -151,9 +152,8 @@ const ProfessionalDetail = ({ id, professionals = allProfessionals }: { id: stri
 
               {pro.hospital && <p className="text-xs text-muted-foreground mb-1">{pro.hospital}</p>}
               <div className="flex items-center gap-2 mb-4">
-                <Star size={14} className="text-primary fill-primary" />
-                <span className="text-sm font-black">{pro.rating}</span>
-                <span className="text-xs text-muted-foreground">• {pro.consults} consultas</span>
+                 {pro.rating === null ? <span className="text-xs text-muted-foreground">Ainda sem avaliações</span> : <><Star size={14} className="text-primary fill-primary" /><span className="text-sm font-black">{pro.rating}</span></>}
+                 <span className="text-xs text-muted-foreground">• {pro.consults === 0 ? "Novo na plataforma" : `${pro.consults} consultas`}</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">{pro.bio}</p>
               <div className="flex flex-wrap gap-2 mb-4">
@@ -386,9 +386,8 @@ const Profissionais = () => {
                             )}
 
                             <div className="flex items-center gap-1 mt-1">
-                              <Star size={12} className="text-primary fill-primary" />
-                              <span className="text-xs font-black text-foreground">{p.rating}</span>
-                              <span className="text-[10px] text-muted-foreground">• {p.consults} consultas</span>
+                               {p.rating === null ? <span className="text-[10px] text-muted-foreground">Ainda sem avaliações</span> : <><Star size={12} className="text-primary fill-primary" /><span className="text-xs font-black text-foreground">{p.rating}</span></>}
+                               <span className="text-[10px] text-muted-foreground">• {p.consults === 0 ? "Novo na plataforma" : `${p.consults} consultas`}</span>
                             </div>
                           </div>
                         </div>

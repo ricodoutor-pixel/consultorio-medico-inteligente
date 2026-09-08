@@ -3,7 +3,6 @@ import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft, ChevronDow
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
-import { professionals as mockProfessionals } from "@/data/professionals";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -50,14 +49,7 @@ export const Navbar = () => {
           .maybeSingle();
 
         const fullName = profile?.full_name || session.user.email?.split("@")[0] || "Usuário";
-        let avatarUrl = profile?.avatar_url || undefined;
-
-        if (fullName) {
-          const isMockReplaced = mockProfessionals.find(mock => mock.name.toLowerCase() === fullName.toLowerCase());
-          if (isMockReplaced?.imageUrl) {
-            avatarUrl = isMockReplaced.imageUrl;
-          }
-        }
+        const avatarUrl = profile?.avatar_url || undefined;
 
         setUser({
           id: session.user.id,
@@ -79,14 +71,7 @@ export const Navbar = () => {
           .maybeSingle();
 
         const fullName = profile?.full_name || session.user.email?.split("@")[0] || "Usuário";
-        let avatarUrl = profile?.avatar_url || undefined;
-
-        if (fullName) {
-          const isMockReplaced = mockProfessionals.find(mock => mock.name.toLowerCase() === fullName.toLowerCase());
-          if (isMockReplaced?.imageUrl) {
-            avatarUrl = isMockReplaced.imageUrl;
-          }
-        }
+        const avatarUrl = profile?.avatar_url || undefined;
 
         setUser({
           id: session.user.id,

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { professionals as testProfessionals } from "@/data/professionals";
 
 // Fix leaflet default icons
 import iconUrl from "leaflet/dist/images/marker-icon.png";
@@ -95,8 +94,6 @@ export default function DoctorsNearMeMap() {
 
 
         const list = ((data ?? []) as any[]).map(d => {
-          const mockMatch = testProfessionals.find(p => p.crm === d.crm || (p.name && d.full_name && p.name.toLowerCase().includes(d.full_name.toLowerCase())));
-          
           let lat = d.latitude;
           let lng = d.longitude;
           
@@ -120,7 +117,7 @@ export default function DoctorsNearMeMap() {
             ...d,
             latitude: lat,
             longitude: lng,
-            avatar_url: mockMatch?.imageUrl || d.profile?.avatar_url || d.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(d.full_name || "M")
+            avatar_url: d.avatar_url || ""
           };
         }).filter(
           (d) => Number.isFinite(Number(d.latitude)) && Number.isFinite(Number(d.longitude)),

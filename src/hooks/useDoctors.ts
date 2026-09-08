@@ -63,16 +63,28 @@ export function useDoctors() {
 
       if (userIds.length > 0) {
         const [profRes, kycRes] = await Promise.all([
-          (supabase.rpc as any)("admin_doctor_profiles", { _ids: userIds }).catch(() => ({ data: [] })),
+          Promise.resolve(
+            (supabase.rpc as any)("admin_doctor_profiles", { _ids: userIds }),
+          ),
           Promise.resolve(
             supabase
               .from("doctor_kyc_documents" as any)
-              .select("doctor_user_id, document_kind, storage_path, mime_type, verification_status, created_at")
-              .in("doctor_user_id", userIds)
-          ).catch(() => ({ data: [] })),
+              .select("id, doctor_user_id, document_kind, storage_path, mime_type, size_bytes, verification_status, created_at")
+              .in("doctor_user_id", userIds),
+          ),
         ]);
-        profiles = profRes.data || [];
-        kycDocs = kycRes.data || [];
+
+        if (profRes.error) {
+          console.error("[useDoctors] Profile fetch error:", profRes.error);
+        } else {
+          profiles = profRes.data || [];
+        }
+
+        if (kycRes.error) {
+          console.error("[useDoctors] KYC fetch error:", kycRes.error);
+        } else {
+          kycDocs = kycRes.data || [];
+        }
       }
 
       const profileMap = new Map(profiles.map((p: any) => [p.id, p]));

@@ -78,24 +78,8 @@ const DashboardMedico = () => {
         supabase.from("profiles").select("full_name, avatar_url, cpf").eq("id", session.user.id).maybeSingle(),
       ]);
 
-      let doctor = doctorRaw;
-      let profile = profileRaw;
-
-      // Mock para Lovable Preview caso os dados não existam no Supabase
-      if (!doctor) {
-         const email = session.user.email?.toLowerCase() || '';
-         if (email.includes('olivia')) {
-             doctor = { id: 'mock-olivia', user_id: session.user.id, crm: '87654', crm_state: 'SP', specialty: 'Médicos Prescritores', is_online: false, is_contract_signed: true } as any;
-             profile = { full_name: 'Dra. Olivia Zimeri', avatar_url: '/dra-olivia-avatar.jpg', cpf: '123.456.789-00' } as any;
-         } else if (email.includes('suelen')) {
-             doctor = { id: 'mock-suelen', user_id: session.user.id, crm: '49354', crm_state: 'PR', specialty: 'Supervisora Técnica', is_online: false, is_contract_signed: true } as any;
-             profile = { full_name: 'Dra. Suelen Naves Rodrigues', avatar_url: '/dra-suelen-avatar.jpg', cpf: '987.654.321-00' } as any;
-         } else {
-             // Fallback default (Dr. Edilson)
-             doctor = { id: 'mock-edilson', user_id: session.user.id, crm: '10963', crm_state: 'Sta-Cruz Bo', specialty: 'Médicos Prescritores', is_online: false, is_contract_signed: true } as any;
-             profile = { full_name: 'Dr. Edilson Bezerra', avatar_url: '/dr-edilson-avatar.jpg', cpf: '054.764.445-90' } as any;
-         }
-      }
+      const doctor = doctorRaw;
+      const profile = profileRaw;
 
       setDoctorData(doctor);
       setProfileData(profile ?? { full_name: session.user.email ?? null, avatar_url: null });
@@ -108,15 +92,6 @@ const DashboardMedico = () => {
         );
         if (!isSigned) {
           setTimeout(() => setContractModalOpen(true), 800);
-        }
-
-        if (doctor.id.startsWith('mock-')) {
-          const localStatus = localStorage.getItem(`mock_online_${doctor.id}`);
-          if (localStatus !== null) {
-            setIsOnline(localStatus === "true");
-          }
-          setLoading(false);
-          return;
         }
 
         const [apptRes, rxRes, renewRes] = await Promise.all([
@@ -157,12 +132,6 @@ const DashboardMedico = () => {
     setIsOnline(val);
     if (doctorData) {
       await supabase.from("doctors").update({ is_online: val }).eq("id", doctorData.id);
-      
-      // Sync mock status across tabs for demo purposes
-      if (doctorData.id.startsWith("mock-")) {
-        localStorage.setItem(`mock_online_${doctorData.id}`, String(val));
-        window.dispatchEvent(new Event("mock_online_changed"));
-      }
       
       toast({ title: val ? "Você está Online ✅" : "Você está Offline" });
     }
@@ -333,6 +302,23 @@ const DashboardMedico = () => {
     return (
       <div className="min-h-dvh bg-background flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  if (!doctorData) {
+    return (
+      <div className="min-h-dvh bg-background">
+        <Navbar />
+        <main className="container mx-auto flex min-h-[70dvh] max-w-2xl items-center justify-center px-4 pt-24 text-center">
+          <Card className="border-border">
+            <CardContent className="p-8">
+              <AlertTriangle className="mx-auto mb-4 h-10 w-10 text-destructive" />
+              <h1 className="mb-2 text-xl font-bold text-foreground">Perfil médico indisponível</h1>
+              <p className="text-muted-foreground">Não foi possível carregar seu perfil, contate o suporte.</p>
+            </CardContent>
+          </Card>
+        </main>
       </div>
     );
   }

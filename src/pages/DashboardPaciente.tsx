@@ -26,7 +26,7 @@ import { ProgressReportGenerator } from "@/components/ProgressReportGenerator";
 import PassportQRCard from "@/components/passport/PassportQRCard";
 import { SymptomTracker } from "@/components/diary/SymptomTracker";
 import { Skeleton } from "@/components/ui/skeleton";
-import { professionals } from "@/data/professionals";
+import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import AirQualityWidget from "@/components/health/AirQualityWidget";
 import { QuickActionHub } from "@/components/patient/QuickActionHub";
 import { TelemedChat } from "@/components/patient/TelemedChat";
@@ -88,6 +88,7 @@ const allBadges = [
 ];
 
 const DashboardPaciente = () => {
+  const { professionals } = useRealProfessionals();
   const [searchParams] = useSearchParams();
   const initialTab = (searchParams.get("tab") || "overview") as any;
   const [activeTab, setActiveTab] = useState<"overview" | "invoices" | "badges" | "prescriptions" | "triages" | "telemed" | "upgrade" | "rastreamento">(

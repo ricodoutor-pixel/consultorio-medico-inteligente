@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { professionals } from '@/data/professionals';
-import type { Professional } from '@/data/professionals';
+import { useRealProfessionals } from '@/hooks/useRealProfessionals';
+import type { Professional } from '@/types/professional';
 
 /**
  * Calcula a distância em km entre duas coordenadas (Haversine).
@@ -75,6 +75,7 @@ export interface ScoredProfessional extends Professional {
  * @param caseKeyword palavra-chave da triagem (ex: "insônia", "dor", "ansiedade")
  */
 export function useFindNearestDoctor(caseKeyword?: string) {
+  const { professionals } = useRealProfessionals();
   const [userCoords, setUserCoords] = useState<[number, number] | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [geoLoading, setGeoLoading] = useState(true);
@@ -98,10 +99,9 @@ export function useFindNearestDoctor(caseKeyword?: string) {
     );
   }, []);
 
-  /** Dr. Edilson — sempre disponível para Orientação Técnica */
   const edilson = useMemo(
-    () => professionals.find((p) => p.id === 'med-0'),
-    []
+    () => professionals.find((p) => p.name.toLowerCase().includes('edilson')),
+    [professionals]
   );
 
   const ranked = useMemo<ScoredProfessional[]>(() => {
@@ -110,7 +110,7 @@ export function useFindNearestDoctor(caseKeyword?: string) {
       .map((p) => {
         let distanceKm: number | null = null;
         if (userCoords) {
-          const pCoords = resolveCoords((p as any).location ?? p.tags?.join(' '));
+          const pCoords = resolveCoords(p.hospital ?? p.tags?.join(' '));
           if (pCoords) {
             distanceKm = haversineKm(
               userCoords[0], userCoords[1],

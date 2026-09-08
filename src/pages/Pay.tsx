@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { QrCode, Copy, CheckCircle2, ArrowRight, ShoppingCart, AlertCircle, Stethoscope, Star, Loader2, ExternalLink } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { useToast } from "@/hooks/use-toast";
-import { professionals } from "@/data/professionals";
+import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { supabase } from "@/integrations/supabase/client";
 
 const BRISA_WHATSAPP = "5511991363154";
@@ -25,6 +25,7 @@ const Pay = () => {
   const planId = searchParams.get("planId");
   const proId = searchParams.get("proId");
   const amountParam = searchParams.get("amount");
+  const { professionals } = useRealProfessionals();
 
   const { items, total, clearCart, count } = useCart();
   const { toast } = useToast();

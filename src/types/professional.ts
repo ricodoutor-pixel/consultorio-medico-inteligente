@@ -1,0 +1,28 @@
+export type Professional = {
+  id: string;
+  name: string;
+  category: string;
+  bio: string;
+  experience: string;
+  tags: string[];
+  price: string;
+  priceValue: number;
+  whatsapp: string;
+  rating: number | null;
+  consults: number;
+  avatar: string;
+  imageUrl: string;
+  paymentLink: string;
+  services: { name: string; price: string; desc: string }[];
+  slots: string[];
+  reviews: { name: string; rating: number; text: string }[];
+  online?: boolean;
+  dbId?: string;
+  premiumPrice?: number;
+  crm?: string;
+  hospital?: string;
+  hospitalUrl?: string;
+  cfmPrintUrl?: string;
+  flags?: string[];
+  plan_tier?: string;
+};

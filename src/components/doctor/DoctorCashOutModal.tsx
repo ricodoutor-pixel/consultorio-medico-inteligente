@@ -39,7 +39,7 @@ export function DoctorCashOutModal({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [transactionId, setTransactionId] = useState("");
 
-  const MIN_WITHDRAWAL = 100;
+  const MIN_WITHDRAWAL = 50;
   const coinCashValue = coinsToConvert ? calculateCashOutValue(Number(coinsToConvert)) : 0;
   const totalWithdraw = Number(withdrawAmount || 0) + (convertCoins ? coinCashValue : 0);
   const feeRate = 0.05;
@@ -89,22 +89,22 @@ export function DoctorCashOutModal({
         return;
       }
 
-      // Call process-withdrawal edge function
-      const { data: session } = await supabase.auth.getSession();
-      const res = await supabase.functions.invoke("process-withdrawal", {
-        body: {
-          amount: totalWithdraw,
-          pixKey: pixKey,
-        },
+      // Pix automático a partir do saldo do consultório
+      const res = await supabase.functions.invoke("doctor-pix-payout", {
+        body: { amount: totalWithdraw },
       });
 
       if (res.error || !res.data?.success) {
-        throw new Error(res.data?.error || "Erro ao processar saque");
+        throw new Error(res.data?.error || res.error?.message || "Erro ao processar saque");
       }
 
       setTransactionId(res.data.withdrawal?.id || "N/A");
       setStep("success");
-      toast.success("Saque solicitado com sucesso!");
+      toast.success(
+        res.data.mode === "automatic"
+          ? "Pix enviado para sua chave cadastrada!"
+          : "Saque solicitado com sucesso!",
+      );
       onSuccess?.();
     } catch (err: any) {
       console.error("Withdrawal error:", err);

@@ -40,6 +40,8 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
   const [loading, setLoading] = useState(true);
   const [cashOutOpen, setCashOutOpen] = useState(false);
   const [pixKey, setPixKey] = useState<string | null>(null);
+  /** Saldo real acumulado das consultas — fica positivo na carteira até o saque. */
+  const [walletBalance, setWalletBalance] = useState(0);
 
   const fetchMetrics = useCallback(async () => {
     try {
@@ -51,7 +53,15 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
         supabase.from("doctors_financial").select("pix_key").eq("doctor_id", doctorId).single(),
       ]);
 
-      if (doctorRes.data?.pix_key) setPixKey(doctorRes.data.pix_key);
+      const { data: wallet } = await supabase
+        .from("doctor_wallets")
+        .select("balance, pix_key")
+        .eq("doctor_id", doctorId)
+        .maybeSingle();
+
+      setWalletBalance(Number(wallet?.balance || 0));
+      const resolvedPix = wallet?.pix_key || doctorRes.data?.pix_key || null;
+      if (resolvedPix) setPixKey(resolvedPix);
 
       const completedAppts = apptRes.data?.filter(a => a.status === "completed") || [];
       const thisMonthAppts = completedAppts.filter(a => {
@@ -319,7 +329,7 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
       <DoctorCashOutModal
         open={cashOutOpen}
         onOpenChange={setCashOutOpen}
-        balanceReais={metrics.monthlyRevenue || 0}
+        balanceReais={walletBalance}
         plantaCoinBalance={metrics.plantaCoinBalance || 0}
         pixKey={pixKey}
         doctorId={doctorId}

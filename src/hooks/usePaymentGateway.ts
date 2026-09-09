@@ -16,12 +16,17 @@ export const usePaymentGateway = () => {
   const [countryCode, setCountryCode] = useState<string>('BR');
 
   useEffect(() => {
+    // Timeout de 3s: em redes lentas/países onde o ipapi.co demora,
+    // o estado `loading` ficava travado e o botão de pagamento nunca aparecia.
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 3000);
+
     const detectIP = async () => {
       try {
-        const response = await fetch('https://ipapi.co/json/');
-        const data = await response.json();
+        const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+        const data = response.ok ? await response.json() : null;
 
-        if (data.country_code !== 'BR') {
+        if (data?.country_code && data.country_code !== 'BR') {
           setCurrency('USD');
           setPrice(10);
           setCountryCode(data.country_code);
@@ -30,18 +35,24 @@ export const usePaymentGateway = () => {
           setPrice(30);
           setCountryCode('BR');
         }
-      } catch (error) {
-        console.error('Error detecting IP:', error);
+      } catch {
         setCurrency('BRL');
         setPrice(30);
         setCountryCode('BR');
       } finally {
+        window.clearTimeout(timer);
         setLoading(false);
       }
     };
 
     detectIP();
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
   }, []);
+
 
   const createPayment = async (params: {
     appointmentId?: string;

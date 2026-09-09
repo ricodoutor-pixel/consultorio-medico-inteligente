@@ -46,6 +46,13 @@ async function bridgeToSupabase(
   try {
     const { data: { user } } = await supabase.auth.getUser();
 
+    // Visitante anônimo: a tabela é protegida por RLS e o insert retornava 401
+    // em toda navegação. Mantemos apenas o evento client-side nesse caso.
+    if (!user) {
+      if (typeof window.fbq === "function") window.fbq("track", eventName, properties);
+      return;
+    }
+
     const { data } = await supabase.from("social_interactions").insert([{
       platform: "facebook_pixel" as string,
       interaction_type: eventName,

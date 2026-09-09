@@ -103,37 +103,41 @@
     <link rel="preload" as="image" href="/logo-planta-raiz.webp" type="image/webp" fetchpriority="high" />
     <link rel="preload" as="image" href="/verdinho-mascot-256.webp" type="image/webp" fetchpriority="high" />
 
-    <!-- Preconnect & DNS-Prefetch para acelerar handshake TLS (Mobile LCP & WAHA) -->
-    <link rel="preconnect" href="https://tkxxoghzhvhjztdoomgss.supabase.co" crossorigin />
-    <link rel="preconnect" href="https://waha-production-4e9c.up.railway.app" crossorigin />
-    <link rel="dns-prefetch" href="https://waha-production-4e9c.up.railway.app" />
+    <!-- Preconnect & DNS-Prefetch para acelerar handshake TLS (Mobile LCP) -->
+    <link rel="preconnect" href="https://shmbwdjuddvquszwkvuq.supabase.co" crossorigin />
+    <link rel="dns-prefetch" href="https://shmbwdjuddvquszwkvuq.supabase.co" />
     <link rel="dns-prefetch" href="https://www.google-analytics.com" />
     <link rel="dns-prefetch" href="https://analytics.plantayraiz.com.br" />
     <link rel="dns-prefetch" href="https://connect.facebook.net" />
 
-    <!-- Meta Pixel Code -->
+    <!-- Meta Pixel Code — inicializa a fila imediatamente (nenhum evento é
+         perdido) mas o script externo só é baixado quando o navegador está
+         ocioso, para não competir com a primeira renderização em 3G/4G lento. -->
     <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '820052977324750');
-      fbq('track', 'PageView');
+      (function(f,b){
+        if (f.fbq) return;
+        var n = f.fbq = function(){ n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+        if (!f._fbq) f._fbq = n;
+        n.push = n; n.loaded = true; n.version = '2.0'; n.queue = [];
+        f.fbq('init', '820052977324750');
+        f.fbq('track', 'PageView');
+        var loaded = false;
+        function loadPixel(){
+          if (loaded) return; loaded = true;
+          var t = b.createElement('script'); t.async = true;
+          t.src = 'https://connect.facebook.net/en_US/fbevents.js';
+          (b.head || b.getElementsByTagName('script')[0].parentNode).appendChild(t);
+        }
+        if ('requestIdleCallback' in f) f.requestIdleCallback(loadPixel, { timeout: 3000 });
+        else f.addEventListener('load', function(){ setTimeout(loadPixel, 1200); });
+      })(window, document);
     </script>
     <!-- End Meta Pixel Code -->
 
-    <!-- Telemetria de Navegação (Microsoft Clarity - Padrão mHealth Whitebook) -->
-    <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "pyr_clarity_2026");
-    </script>
+    <!-- Microsoft Clarity removido: o ID configurado ("pyr_clarity_2026") não é
+         um projeto válido e retornava HTTP 400 em TODO carregamento de página,
+         gastando uma requisição bloqueante em cada visita mobile. -->
+
 
     <!-- Analytics carregados DEPOIS do consentimento LGPD (cookie banner).
          Escutamos o evento `plr:cookie-consent` disparado pelo CookieConsentBanner.
@@ -297,7 +301,7 @@
     </script>
     <!-- TikTok Pixel Code End -->
 
-    <script type="module" crossorigin src="/assets/index-DluMqz5-.js"></script>
+    <script type="module" crossorigin src="/assets/index-_8vm3nuo.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/date-fns-8SSMhL6z.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-BWnQObm0.js">
     <link rel="modulepreload" crossorigin href="/assets/pdf-excel-C2j4zSo4.js">
@@ -422,12 +426,18 @@
         // erros de Service Worker dentro de iframe não são falhas da plataforma.
         function isExternalNoise(err){
           try {
-            var msg = String((err && err.message) || err || '');
-            var stack = String((err && err.stack) || '');
-            if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack)) return true;
-            if (/MetaMask|ethereum|web3|Failed to connect to MetaMask/i.test(msg)) return true;
-            if (/ServiceWorkerRegistration|document is in an invalid state/i.test(msg)) return true;
-            if (/ResizeObserver loop/i.test(msg)) return true;
+            var current = err;
+            var depth = 0;
+            while (current && depth < 5) {
+              var msg = String((current && current.message) || current || '');
+              var stack = String((current && current.stack) || '');
+              if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack + msg)) return true;
+              if (/MetaMask|ethereum|web3|Failed to connect to MetaMask|extension not found|inpage\.js/i.test(msg + stack)) return true;
+              if (/ServiceWorkerRegistration|document is in an invalid state/i.test(msg)) return true;
+              if (/ResizeObserver loop/i.test(msg)) return true;
+              current = current && current.cause;
+              depth++;
+            }
           } catch(_){}
           return false;
         }
@@ -463,11 +473,21 @@
           // Preserve filename/source because browser extensions often expose only
           // a generic message while their chrome-extension URL identifies the noise.
           var error = e.error || { message: e.message, stack: String(e.filename || '') };
+          if (isExternalNoise(error) || /extension:\/\//.test(String(e.filename || ''))) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+          }
           reportEarlyError(error, 'window.error');
         }, true);
         window.addEventListener('unhandledrejection', function(e){
+          if (isExternalNoise(e.reason)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+          }
           reportEarlyError(e.reason, 'unhandledrejection');
-        });
+        }, true);
 
         // Watchdog paciente: mantém a tela de carregamento enquanto o bundle
         // compila/baixa. Erros genéricos e de extensões jamais substituem o #root;
@@ -516,6 +536,6 @@
     </script>
     <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
     <script nomodule crossorigin id="vite-legacy-polyfill" src="/assets/polyfills-legacy-8XaHBhDD.js"></script>
-    <script nomodule crossorigin id="vite-legacy-entry" data-src="/assets/index-legacy-B-RbVgsr.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+    <script nomodule crossorigin id="vite-legacy-entry" data-src="/assets/index-legacy-E3P-bVJE.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
   </body>
 </html>

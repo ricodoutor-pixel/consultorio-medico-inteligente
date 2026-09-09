@@ -125,9 +125,9 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          template: "nova-consulta-medico",
-          to,
-          data: {
+          templateName: "nova-consulta-medico",
+          recipientEmail: to,
+          templateData: {
             doctorName,
             patientName,
             scheduledAt: when,
@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
     title: "Novo atendimento direcionado a você",
     message: `${patientName} · ${when} · ${modality} · ${amount}`,
     type: "appointment",
-    link: "/consultorio",
+    action_url: "/consultorio",
   }).select("id").maybeSingle();
 
   return json({ ok: true, doctor: doctorName, whatsapp, email });

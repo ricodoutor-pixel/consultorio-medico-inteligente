@@ -77,6 +77,7 @@ export type Professional = {
   id: string;
   name: string;
   category: string;
+  councilLabel?: string;
   bio: string;
   experience: string;
   tags: string[];
@@ -286,7 +287,7 @@ export const professionals: Professional[] = [
     id: "med-daniel-kobayashi",
     name: "Dr. Daniel Kobayashi Colombo",
     category: "Médicos Prescritores",
-    bio: "Médico formado pela FUNDAÇÃO UNIVERSIDADE FEDERAL DE RONDÔNIA em 2018. Inscrito no CRM 5460/RO.",
+    bio: "Médico formado pela FUNDAÇÃO UNIVERSIDADE FEDERAL DE RONDÔNIA em 2018. Inscrito nos CRM 5460/RO e CRM 10346/MT (ambos em situação regular).",
     flags: ["🇧🇷"],
     experience: "6 anos",
     tags: ["Clínica Geral", "Medicina Canabinoide", "Medicina Integrativa", "Prescritor"],
@@ -302,7 +303,7 @@ export const professionals: Professional[] = [
     paymentLink: "https://pay.asaas.com/00000",
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["Hoje 09:00", "Hoje 14:00", "Hoje 17:30"],
-    crm: "5460/RO",
+    crm: "5460/RO • 10346/MT",
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento." }
     ],
@@ -663,8 +664,8 @@ export const professionals: Professional[] = [
     id: "mock-olivia",
     name: "Dra. Olivia Zimeri",
     category: "Médicos Prescritores",
-    councilLabel: "Col Med Reg",
-    bio: "Diretora Técnica da Planta y Raíz para a Bolívia (Cochabamba) e Médica Prescritora em Cochabamba (Bolívia, Col Med Reg Z-494444 - BO). Atendimento e prescrição médica em Cochabamba, Bolívia.",
+    councilLabel: "Col Med Cba",
+    bio: "Diretora Técnica da Planta y Raíz para a Bolívia (Cochabamba) e Médica Prescritora em Cochabamba (Bolívia, Col Med Cba Z-4466260). Atendimento e prescrição médica exclusivamente em Cochabamba, Bolívia.",
     experience: "14 anos",
     tags: ["Diretora Técnica (BO)", "Prescritor Cochabamba (BO)", "Medicina Canabinoide (BO)"],
     price: "R$ 50,00",
@@ -675,7 +676,7 @@ export const professionals: Professional[] = [
     consults: 520,
     avatar: "OZ",
     imageUrl: "/avatars/dra-olivia-zimeri-pro.jpg",
-    crm: "Z-494444 - BO",
+    crm: "Z-4466260",
     hospital: "Planta y Raíz Ltda / Cochabamba (BO)",
     flags: ["🇧🇴"],
     online: true,

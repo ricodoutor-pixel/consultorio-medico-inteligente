@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { HeartPulse, Activity, FileText, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, Save, ShieldAlert } from 'lucide-react';
+import { HeartPulse, Activity, CheckCircle2, AlertTriangle, ChevronDown, ChevronUp, Save, ShieldAlert, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { SaMDBiofeedbackDisclaimer } from '@/components/compliance/SaMDBiofeedbackDisclaimer';
 
 interface Props {
@@ -15,6 +16,7 @@ export function OximetriaOptica({ onComplete }: Props) {
   const [spo2Input, setSpo2Input] = useState<string>('98');
   const [bpmInput, setBpmInput] = useState<string>('72');
   const [isSaved, setIsSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
 
   const spo2Num = Number(spo2Input);
@@ -28,6 +30,7 @@ export function OximetriaOptica({ onComplete }: Props) {
         badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
         textColor: 'text-emerald-600',
         isDangerous: false,
+        riskLevel: 'normal',
       };
     }
     if (val >= 90) {
@@ -37,6 +40,7 @@ export function OximetriaOptica({ onComplete }: Props) {
         badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
         textColor: 'text-amber-600',
         isDangerous: true,
+        riskLevel: 'attention',
       };
     }
     return {
@@ -45,20 +49,55 @@ export function OximetriaOptica({ onComplete }: Props) {
       badgeColor: 'bg-rose-50 text-rose-800 border-rose-200',
       textColor: 'text-rose-600',
       isDangerous: true,
+      riskLevel: 'critical',
     };
   };
 
   const classification = getClassification(spo2Num || 98);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!spo2Num || spo2Num < 70 || spo2Num > 100) {
       toast.error('Informe um valor de SpO2 válido entre 70% e 100%.');
       return;
     }
-    setIsSaved(true);
-    toast.success('Oximetria registrada com sucesso no prontuário!');
-    if (onComplete) onComplete();
+    if (bpmInput.trim() !== '' && (!bpmNum || bpmNum < 40 || bpmNum > 220)) {
+      toast.error('Informe uma frequência de pulso válida entre 40 e 220 bpm.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Entre na sua conta para gravar a aferição no prontuário.');
+        return;
+      }
+
+      const { error } = await supabase.from('diagnostic_exams').insert({
+        user_id: user.id,
+        exam_type: 'oximetry',
+        risk_level: classification.riskLevel,
+        results: {
+          source: 'manual_entry',
+          spo2_percent: spo2Num,
+          pulse_bpm: bpmInput.trim() === '' ? null : bpmNum,
+          classification: classification.label,
+          measured_at: new Date().toISOString(),
+        },
+      });
+
+      if (error) throw error;
+
+      setIsSaved(true);
+      toast.success('Oximetria registrada com sucesso no prontuário!');
+      if (onComplete) onComplete();
+    } catch (err) {
+      console.error('[oximetria] falha ao gravar aferição:', err);
+      toast.error('Não conseguimos gravar a aferição. Tente novamente.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

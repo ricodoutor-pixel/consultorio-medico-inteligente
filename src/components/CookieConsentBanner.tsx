@@ -150,17 +150,22 @@ export const CookieConsentBanner = () => {
               <Shield size={18} className="text-emerald-300 shrink-0 hidden sm:block" />
               <div className="min-w-0">
                 <p className={`font-display font-bold text-white leading-tight sm:mb-1 truncate sm:whitespace-normal ${isPlansRoute && isMobile ? 'text-[11px]' : 'text-xs sm:text-base'}`}>
-                  🍪 Cookies & Privacidade
+                  🍪 Termos, Privacidade & Cookies
                 </p>
                 <p className="hidden sm:block text-emerald-100/80 text-xs sm:text-sm leading-relaxed">
-                  Este site utiliza cookies para aprimorar sua experiência. Saiba mais em nossa{" "}
+                  Ao aceitar, você concorda com os Termos de Uso v2.1, a{" "}
                   <Link to="/privacidade" className="underline underline-offset-2 text-emerald-300 hover:text-white transition-colors">
                     Política de Privacidade
-                  </Link>.
+                  </Link>
+                  , o tratamento de dados médicos (LGPD Art. 11), o uso da geolocalização para emergências, os dados de saúde e wearables, e os cookies do site — conforme LGPD, RDC 660/2022 (ANVISA) e CFM 2.314/2022.
                 </p>
-                <Link to="/privacidade" className={`sm:hidden text-emerald-300 underline underline-offset-2 ${isPlansRoute && isMobile ? 'text-[9px]' : 'text-[10px]'}`}>
-                  Política de Privacidade
-                </Link>
+                <p className={`sm:hidden text-emerald-100/80 leading-snug ${isPlansRoute && isMobile ? 'text-[9px]' : 'text-[10px]'}`}>
+                  Aceito os Termos, dados médicos, geolocalização e cookies.{" "}
+                  <Link to="/privacidade" className="text-emerald-300 underline underline-offset-2">
+                    Privacidade
+                  </Link>
+                </p>
+
                 {/* Micro-badges só no desktop */}
                 <div className="hidden sm:flex flex-wrap gap-2 mt-2">
                   <span className="inline-flex items-center gap-1 text-[10px] text-emerald-200/70 bg-emerald-950/50 rounded-full px-2 py-0.5">

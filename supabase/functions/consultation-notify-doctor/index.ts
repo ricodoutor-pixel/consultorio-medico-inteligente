@@ -86,7 +86,7 @@ Deno.serve(async (req) => {
 
   const { data: patientProfile } = await admin
     .from("profiles")
-    .select("full_name")
+    .select("full_name, phone")
     .eq("id", appt.patient_id)
     .maybeSingle();
 
@@ -96,7 +96,10 @@ Deno.serve(async (req) => {
   const modality = String(appt.type || "video");
   const amount = fmtBRL(appt.amount);
 
-  // --- WhatsApp ---
+  const doctorRoomUrl = `${SITE}/consultorio?appointment=${appt.id}`;
+  const patientRoomUrl = `${SITE}/orientacao-video?appointment=${appt.id}`;
+
+  // --- WhatsApp (canal Enfª Brisa / WAHA) ---
   let whatsapp: { ok: boolean; error?: string } = { ok: false, error: "sem telefone cadastrado" };
   if (docProfile?.phone) {
     const message =
@@ -106,8 +109,20 @@ Deno.serve(async (req) => {
       `*Modalidade:* ${modality}\n` +
       `*Valor:* ${amount}\n\n` +
       `O paciente passa pela triagem da Enfª Brisa e segue para o seu consultório virtual.\n` +
-      `Acesse: ${SITE}/consultorio`;
-    whatsapp = await sendWhatsApp(docProfile.phone, message);
+      `Entrar no consultório: ${doctorRoomUrl}`;
+    whatsapp = await sendWhatsAppAlert(docProfile.phone, message);
+  }
+
+  let whatsappPatient: { ok: boolean; error?: string } = { ok: false, error: "sem telefone cadastrado" };
+  if (patientProfile?.phone) {
+    const message =
+      `🌱 *Planta y Raiz — sua consulta está confirmada*\n\n` +
+      `*Profissional:* ${doctorName}\n` +
+      `*Data:* ${when}\n` +
+      `*Modalidade:* ${modality}\n\n` +
+      `No horário marcado, entre pelo link abaixo:\n${patientRoomUrl}\n\n` +
+      `Qualquer dúvida, responda aqui — sou a Enfª Brisa. 💚`;
+    whatsappPatient = await sendWhatsAppAlert(patientProfile.phone, message);
   }
 
   // --- E-mail ---

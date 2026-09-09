@@ -329,7 +329,7 @@ export function DoctorBICockpit({ doctorId, currentTier }: DoctorBICockpitProps)
       <DoctorCashOutModal
         open={cashOutOpen}
         onOpenChange={setCashOutOpen}
-        balanceReais={metrics.monthlyRevenue || 0}
+        balanceReais={walletBalance}
         plantaCoinBalance={metrics.plantaCoinBalance || 0}
         pixKey={pixKey}
         doctorId={doctorId}

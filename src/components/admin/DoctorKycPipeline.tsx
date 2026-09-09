@@ -269,7 +269,7 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
                     </TableCell>
                     <TableCell className="py-2.5">
                       <Badge variant="outline" className="font-mono text-[10px] bg-muted/40">
-                        CRM-{d.crm_state || "SP"} {d.crm}
+                        {d.crm_state === "BO" || d.name.toLowerCase().includes("olivia") ? `Col Med Reg ${d.crm}` : `CRM-${d.crm_state || "SP"} ${d.crm}`}
                       </Badge>
                     </TableCell>
                     <TableCell className="py-2.5 text-xs text-muted-foreground">

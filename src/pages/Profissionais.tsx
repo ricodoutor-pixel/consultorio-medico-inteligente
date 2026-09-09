@@ -159,10 +159,13 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <p className="text-sm text-muted-foreground">{pro.category}</p>
                 {isVipDoctor(pro) && <DoctorVIPSeal tier={getDoctorSealTier(pro)} />}
+                {pro.flags && pro.flags.map((flag, i) => (
+                  <CountryFlag key={i} code={flag} />
+                ))}
               </div>
               {pro.crm && (
                 <p className="text-xs font-bold text-muted-foreground mb-1">
-                  {(COUNCIL_CONFIG[pro.category]?.councilLabel || "CRM")} {pro.crm}
+                  {(pro.councilLabel || COUNCIL_CONFIG[pro.category]?.councilLabel || "CRM")} {pro.crm}
                 </p>
               )}
 
@@ -406,7 +409,7 @@ const Profissionais = () => {
                             </div>
                             {p.crm && (
                               <p className="text-[11px] font-bold text-muted-foreground mt-0.5">
-                                {(COUNCIL_CONFIG[p.category]?.councilLabel || "CRM")} {p.crm}
+                                {(p.councilLabel || COUNCIL_CONFIG[p.category]?.councilLabel || "CRM")} {p.crm}
                               </p>
                             )}
 
@@ -420,7 +423,7 @@ const Profissionais = () => {
                         <div className="flex items-center gap-3 mt-4 bg-primary/10 rounded-xl border border-primary/20 p-4 sm:p-5 shadow-sm w-full">
                           <ShieldCheck size={30} className="text-primary shrink-0" />
                           <span className="text-[11px] sm:text-xs leading-snug text-primary font-bold tracking-tight">
-                            Perfil 100% Verificado Por IA independente banco de dados do CFM proteção 360-24 x 7 contra fraudes e falsificação de identidade
+                            Perfil 100% Verificado Por IA independente banco de dados do {p.councilLabel === "Col Med Reg" || (p.flags && p.flags.includes("🇧🇴") && !p.flags.includes("🇧🇷")) ? "Colegio Médico da Bolívia" : "CFM"} proteção 360-24 x 7 contra fraudes e falsificação de identidade
                           </span>
                         </div>
                       </div>

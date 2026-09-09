@@ -2,6 +2,7 @@ export type Professional = {
   id: string;
   name: string;
   category: string;
+  councilLabel?: string;
   bio: string;
   experience: string;
   tags: string[];

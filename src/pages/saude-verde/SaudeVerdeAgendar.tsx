@@ -24,6 +24,8 @@ export default function SaudeVerdeAgendar() {
 
   const [step, setStep] = useState(1);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
+  const [specialtiesLoading, setSpecialtiesLoading] = useState(true);
+  const [specialtiesError, setSpecialtiesError] = useState(false);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [specialty, setSpecialty] = useState<Specialty | null>(null);
   const [partner, setPartner] = useState<Partner | null>(null);

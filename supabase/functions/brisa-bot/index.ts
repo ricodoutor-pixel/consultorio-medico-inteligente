@@ -331,8 +331,8 @@ serve(async (req: Request): Promise<Response> => {
 
   if (req.method === 'GET') {
     return new Response(JSON.stringify({
-      ok: true, version: '2026.8.08-DR-EDILSON-ORIENTACAO',
-      responsavel: 'Enfermeira Brisa (Orientação Técnica Dr. Edilson Bezerra)',
+      ok: true, version: '2026.9.09-AGENTES-SEPARADOS-30MIN',
+      agentes: { triagem: 'Enf. Brisa', orientacao_tecnica: 'Dr. Edilson Bezerra On (30 min por pagamento)' },
       roteiro_ativo: true,
       instant_reply: '✅ ATIVO (com o roteiro completo 5 passos)',
     }, null, 2), { headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -402,7 +402,7 @@ serve(async (req: Request): Promise<Response> => {
     }
     const sentOt = await sendMsg(chatId, phone, reply);
     await log(phone, text, reply, 'dr_edilson_on');
-    await touchOtSession(sb, session.session_id, session.seconds_left >= 0 ? 0 : 0);
+    await touchOtSession(sb, session.session_id);
     return new Response(
       JSON.stringify({ ok: true, sent: sentOt, agent: 'dr_edilson_on', minutes_left: left, phone }),
       { headers: { ...cors, 'Content-Type': 'application/json' } },

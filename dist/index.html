@@ -103,41 +103,37 @@
     <link rel="preload" as="image" href="/logo-planta-raiz.webp" type="image/webp" fetchpriority="high" />
     <link rel="preload" as="image" href="/verdinho-mascot-256.webp" type="image/webp" fetchpriority="high" />
 
-    <!-- Preconnect & DNS-Prefetch para acelerar handshake TLS (Mobile LCP) -->
-    <link rel="preconnect" href="https://shmbwdjuddvquszwkvuq.supabase.co" crossorigin />
-    <link rel="dns-prefetch" href="https://shmbwdjuddvquszwkvuq.supabase.co" />
+    <!-- Preconnect & DNS-Prefetch para acelerar handshake TLS (Mobile LCP & WAHA) -->
+    <link rel="preconnect" href="https://tkxxoghzhvhjzdoomgss.supabase.co" crossorigin />
+    <link rel="preconnect" href="https://waha-production-4e9c.up.railway.app" crossorigin />
+    <link rel="dns-prefetch" href="https://waha-production-4e9c.up.railway.app" />
     <link rel="dns-prefetch" href="https://www.google-analytics.com" />
     <link rel="dns-prefetch" href="https://analytics.plantayraiz.com.br" />
     <link rel="dns-prefetch" href="https://connect.facebook.net" />
 
-    <!-- Meta Pixel Code — inicializa a fila imediatamente (nenhum evento é
-         perdido) mas o script externo só é baixado quando o navegador está
-         ocioso, para não competir com a primeira renderização em 3G/4G lento. -->
+    <!-- Meta Pixel Code -->
     <script>
-      (function(f,b){
-        if (f.fbq) return;
-        var n = f.fbq = function(){ n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
-        if (!f._fbq) f._fbq = n;
-        n.push = n; n.loaded = true; n.version = '2.0'; n.queue = [];
-        f.fbq('init', '820052977324750');
-        f.fbq('track', 'PageView');
-        var loaded = false;
-        function loadPixel(){
-          if (loaded) return; loaded = true;
-          var t = b.createElement('script'); t.async = true;
-          t.src = 'https://connect.facebook.net/en_US/fbevents.js';
-          (b.head || b.getElementsByTagName('script')[0].parentNode).appendChild(t);
-        }
-        if ('requestIdleCallback' in f) f.requestIdleCallback(loadPixel, { timeout: 3000 });
-        else f.addEventListener('load', function(){ setTimeout(loadPixel, 1200); });
-      })(window, document);
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '820052977324750');
+      fbq('track', 'PageView');
     </script>
     <!-- End Meta Pixel Code -->
 
-    <!-- Microsoft Clarity removido: o ID configurado ("pyr_clarity_2026") não é
-         um projeto válido e retornava HTTP 400 em TODO carregamento de página,
-         gastando uma requisição bloqueante em cada visita mobile. -->
-
+    <!-- Telemetria de Navegação (Microsoft Clarity - Padrão mHealth Whitebook) -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "pyr_clarity_2026");
+    </script>
 
     <!-- Analytics carregados DEPOIS do consentimento LGPD (cookie banner).
          Escutamos o evento `plr:cookie-consent` disparado pelo CookieConsentBanner.
@@ -301,15 +297,15 @@
     </script>
     <!-- TikTok Pixel Code End -->
 
-    <script type="module" crossorigin src="/assets/index-_8vm3nuo.js"></script>
+    <script type="module" crossorigin src="/assets/index-DpIwhTIg.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/date-fns-8SSMhL6z.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-BWnQObm0.js">
-    <link rel="modulepreload" crossorigin href="/assets/pdf-excel-C2j4zSo4.js">
-    <link rel="modulepreload" crossorigin href="/assets/i18n-BtAviJJu.js">
-    <link rel="modulepreload" crossorigin href="/assets/supabase-Bz-kA_Y5.js">
-    <link rel="modulepreload" crossorigin href="/assets/lucide-U9s8e4Em.js">
-    <link rel="modulepreload" crossorigin href="/assets/ui-primitives-D672jNfr.js">
-    <link rel="modulepreload" crossorigin href="/assets/animation-BWm5B3mz.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-BU6AIbZJ.js">
+    <link rel="modulepreload" crossorigin href="/assets/pdf-excel-C5s_h4-W.js">
+    <link rel="modulepreload" crossorigin href="/assets/i18n-BRgKem2t.js">
+    <link rel="modulepreload" crossorigin href="/assets/supabase-cZcCmh-O.js">
+    <link rel="modulepreload" crossorigin href="/assets/lucide-BFHG1N6h.js">
+    <link rel="modulepreload" crossorigin href="/assets/ui-primitives-DhNFmMbg.js">
+    <link rel="modulepreload" crossorigin href="/assets/animation-r3Y1sS-2.js">
     <link rel="stylesheet" crossorigin href="/assets/vendor-DpsRipQV.css">
     <link rel="stylesheet" crossorigin href="/assets/index-CwUyUyQ8.css">
     <script type="module">import.meta.url;import("_").catch(()=>1);(async function*(){})().next();window.__vite_is_modern_browser=true</script>
@@ -517,7 +513,7 @@
 
       })();
     </script>
-
+
 
     <script>
       // Bridge global de eventos para o GTM/GA4
@@ -536,6 +532,6 @@
     </script>
     <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
     <script nomodule crossorigin id="vite-legacy-polyfill" src="/assets/polyfills-legacy-8XaHBhDD.js"></script>
-    <script nomodule crossorigin id="vite-legacy-entry" data-src="/assets/index-legacy-E3P-bVJE.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+    <script nomodule crossorigin id="vite-legacy-entry" data-src="/assets/index-legacy-BccFrDi8.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
   </body>
 </html>

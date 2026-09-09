@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useDoctors } from "@/hooks/useDoctors";
+import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import DoctorContractViewerModal, { DoctorContractDetails } from "./DoctorContractViewerModal";
 
 export interface DoctorRecord {
@@ -305,6 +306,23 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
                       </Badge>
                     </TableCell>
                     <TableCell className="py-2.5 text-right space-x-1.5">
+                      {(() => {
+                        const cfmUrl = getDoctorCfmPrint(d.crm || d.name);
+                        if (cfmUrl) {
+                          return (
+                            <a
+                              href={cfmUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center h-7 text-[10px] rounded-lg px-2 border border-sky-500/30 text-sky-400 hover:bg-sky-500/10 font-bold transition-colors"
+                              title="Visualizar print oficial do CFM / Conselho"
+                            >
+                              <ShieldCheck size={11} className="mr-1" /> CONF CRM
+                            </a>
+                          );
+                        }
+                        return null;
+                      })()}
                       <Button
                         size="sm"
                         variant="outline"

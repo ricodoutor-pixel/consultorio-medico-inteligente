@@ -50,6 +50,10 @@ export async function getKycSignedUrl(
   kind: KycKind,
   storagePath?: string | null,
 ): Promise<string | null> {
+  if (storagePath && (storagePath.startsWith("/") || storagePath.startsWith("http"))) {
+    return storagePath;
+  }
+
   const candidates = storagePath
     ? [storagePath]
     : ["jpg", "jpeg", "png", "webp", "pdf"].map((ext) => `${userId}/${kind}.${ext}`);

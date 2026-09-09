@@ -2,6 +2,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchInlineAvatar } from "@/lib/kyc-docs";
+import { resolveDoctorAvatar } from "@/hooks/useRealProfessionals";
+import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 
 export interface DoctorRow {
   id: string;
@@ -102,9 +104,27 @@ export function useDoctors() {
         const profile = profileMap.get(d.user_id) as any;
         const fullName = profile?.full_name ?? d.full_name ?? "";
         
-        const avatarUrl = profile?.avatar_url ?? d.avatar_url ?? null;
+        // Foto tratada com jaleco e esteto tem prioridade absoluta para os médicos oficiais
+        const officialAvatar = resolveDoctorAvatar(fullName, d.crm || "", profile?.avatar_url ?? d.avatar_url);
+        const avatarUrl = officialAvatar || (profile?.avatar_url ?? d.avatar_url ?? null);
+
         const overrideVal = overrides[d.id] ?? overrides[d.user_id];
         const isApproved = overrideVal !== undefined ? overrideVal : (d.is_approved_by_admin || d.is_verified || false);
+
+        // Monta lista de documentos KYC incluindo o print oficial do CFM
+        const userDocs = [...(docsMap.get(d.user_id) ?? [])];
+        const cfmPrintPath = getDoctorCfmPrint(d.crm || fullName);
+        if (cfmPrintPath && !userDocs.some((k) => k.document_kind === "cfm_print")) {
+          userDocs.push({
+            id: `cfm-print-${d.id}`,
+            doctor_user_id: d.user_id,
+            document_kind: "cfm_print",
+            storage_path: cfmPrintPath,
+            mime_type: "image/png",
+            verification_status: "verified",
+            created_at: d.created_at || new Date().toISOString(),
+          });
+        }
 
         return {
           ...d,
@@ -123,7 +143,7 @@ export function useDoctors() {
             cep: null,
             avatar_url: avatarUrl,
           },
-          kyc_docs: docsMap.get(d.user_id) ?? [],
+          kyc_docs: userDocs,
           full_name: fullName || null,
           avatar_url: avatarUrl,
         };

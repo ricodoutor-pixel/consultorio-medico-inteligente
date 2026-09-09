@@ -1,6 +1,9 @@
+// src/hooks/useRealProfessionals.ts
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Professional } from "@/types/professional";
+import { professionals as baseProfessionals } from "@/data/professionals";
+import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 
 interface DoctorRow {
   id: string;
@@ -27,56 +30,36 @@ interface DoctorRow {
   council_number?: string | null;
 }
 
-function mapCategoryFromSpecialty(specialty: string | null): string {
-  const value = (specialty ?? "").toLowerCase();
-  if (value.includes("veterin")) return "Médico Veterinário Prescritor";
-  if (value.includes("dentist") || value.includes("odonto")) return "Dentista Prescritor";
-  if (value.includes("psicol") || value.includes("terap")) return "Psicologia & Terapias";
-  if (value.includes("farm")) return "Farmácia Clínica";
-  if (value.includes("ocupacional")) return "Saúde Ocupacional";
-  if (value.includes("acupuntura")) return "Acupuntura";
-  if (value.includes("jardin") || value.includes("cultiv")) return "Jardineiros & Cultivo";
-  if (value.includes("aux") && value.includes("enf")) return "Aux. de Enfermagem";
-  if (value.includes("téc") && value.includes("enf")) return "Téc. Enfermagem";
-  if (value.includes("cuidador")) return "Cuidadores de Idosos";
-  if (value.includes("enferma")) return "Enfermagem";
-  if (value.includes("integrativa")) return "Medicina Integrativa";
-  return "Médicos Prescritores";
-}
+/**
+ * Mapeamento oficial de imagens tratadas com fundo branco, jaleco e estetoscópio.
+ * REGRA CRÍTICA: A imagem tratada oficial configurada tem prioridade absoluta.
+ * Fotos informais ou fotos anexadas no cadastro NÃO podem sobrepor a foto tratada.
+ */
+export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: string | null): string {
+  const n = (name || "").toLowerCase();
+  const c = (crm || "").toLowerCase();
 
-function formatPrice(value: number, country?: string | null): string {
-  const prefix = country === "BO" ? "US$" : "R$";
-  return `${prefix} ${value.toFixed(2).replace(".", ",")}`;
-}
+  // 1. Prioridade ABSOLUTA para os 18 médicos oficiais com foto tratada (jaleco + esteto + fundo branco)
+  if (n.includes("edilson") || c.includes("10963")) return "/avatars/dr-edilson-bezerra.jpg";
+  if (n.includes("suelen") || c.includes("49354")) return "/avatars/dra-suelen-naves.jpg";
+  if (n.includes("olivia") || c.includes("4466260") || c.includes("494444") || c.includes("z-")) return "/avatars/dra-olivia-zimeri-pro.jpg";
+  if (n.includes("geraldo") || c.includes("32584")) return "/avatars/dr-jose-geraldo.jpg";
+  if (n.includes("detoni") || n.includes("girardello") || c.includes("42912")) return "/avatars/dr-joao-pedro-detoni.jpg";
+  if (n.includes("gustavo") && (n.includes("damiani") || n.includes("nobre") || c.includes("35632"))) return "/avatars/dr-gustavo-nobre.jpg";
+  if (n.includes("gustavo") && (n.includes("simoes") || n.includes("llivi") || c.includes("7684"))) return "/avatars/dr-gustavo-simoes.jpg";
+  if (n.includes("marianna") || n.includes("arzamendia") || c.includes("12110")) return "/avatars/dra-marianna-arzamendia.jpg";
+  if (n.includes("ana paula") || c.includes("36942")) return "/avatars/dra-ana-paula-ferreira.jpg";
+  if (n.includes("adeonis") || c.includes("9060")) return "/avatars/dr-adeonis-oliveira.jpg";
+  if (n.includes("albert") || c.includes("34660") || c.includes("16118")) return "/avatars/dr-albert-machado.jpg";
+  if ((n.includes("alexandre") && (n.includes("stramandinoli") || n.includes("corrêa") || n.includes("correa"))) || c.includes("17266")) return "/avatars/dr-alexandre-stramandinoli.jpg";
+  if (n.includes("daniel") && (n.includes("kobayashi") || c.includes("5460") || c.includes("10346"))) return "/avatars/dr-daniel-kobayashi.jpg";
+  if (n.includes("guilherme") && (n.includes("campos") || c.includes("49694"))) return "/avatars/dr-guilherme-campos.jpg";
+  if (n.includes("jose roberto") || n.includes("coutinho") || c.includes("5266864") || c.includes("520668646")) return "/avatars/dr-jose-roberto.jpg";
+  if (n.includes("angela beatriz") || n.includes("mercado") || c.includes("5258084") || c.includes("52580846")) return "/avatars/dra-angela-beatriz.jpg";
+  if (n.includes("ingrid") && (n.includes("chiullo") || n.includes("miranda") || c.includes("216629"))) return "/avatars/dra-ingrid-chiullo.jpg";
+  if (n.includes("eduardo") && (n.includes("correa") || n.includes("migueis") || c.includes("19333"))) return "/avatars/dr-eduardo-correa.jpg";
 
-function initials(name: string): string {
-  return name.split(" ").filter(Boolean).map((part) => part[0]).join("").slice(0, 2).toUpperCase() || "PR";
-}
-
-// Mapeamento automático de fotos locais disponíveis em /avatars/
-function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: string | null): string {
-  if (currentAvatar && currentAvatar.trim() !== "") {
-    return currentAvatar;
-  }
-  const n = name.toLowerCase();
-  if (n.includes("edilson") || crm === "10963") return "/avatars/dr-edilson-bezerra.jpg";
-  if (n.includes("suelen") || crm.includes("49354")) return "/avatars/dra-suelen-naves.jpg";
-  if (n.includes("olivia") || crm.includes("4466260")) return "/avatars/dra-olivia-zimeri-pro.jpg";
-  if (n.includes("geraldo")) return "/avatars/dr-jose-geraldo.jpg";
-  if (n.includes("detoni") || n.includes("girardello")) return "/avatars/dr-joao-pedro-detoni.jpg";
-  if (n.includes("gustavo") && (n.includes("damiani") || n.includes("nobre"))) return "/avatars/dr-gustavo-nobre.jpg";
-  if (n.includes("gustavo") && n.includes("simoes")) return "/avatars/dr-gustavo-simoes.jpg";
-  if (n.includes("marianna") || n.includes("arzamendia")) return "/avatars/dra-marianna-arzamendia.jpg";
-  if (n.includes("ana paula")) return "/avatars/dra-ana-paula-ferreira.jpg";
-  if (n.includes("adeonis")) return "/avatars/dr-adeonis-oliveira.jpg";
-  if (n.includes("albert")) return "/avatars/dr-albert-machado.jpg";
-  if (n.includes("alexandre") && n.includes("stramandinoli")) return "/avatars/dr-alexandre-stramandinoli.jpg";
-  if (n.includes("daniel") && n.includes("kobayashi")) return "/avatars/dr-daniel-kobayashi.jpg";
-  if (n.includes("guilherme") && n.includes("campos")) return "/avatars/dr-guilherme-campos.jpg";
-  if (n.includes("jose roberto") || n.includes("coutinho")) return "/avatars/dr-jose-roberto.jpg";
-  if (n.includes("angela beatriz")) return "/avatars/dra-angela-beatriz.jpg";
-  if (n.includes("ingrid") && n.includes("chiullo")) return "/avatars/dra-ingrid-chiullo.jpg";
-  if (n.includes("eduardo") && n.includes("correa")) return "/avatars/dr-eduardo-correa.jpg";
+  // 2. Especialistas e terapeutas das demais categorias oficiais tratadas
   if (n.includes("fernando") && n.includes("ribeiro")) return "/avatars/dr-fernando-ribeiro.jpg";
   if (n.includes("henrique") && n.includes("almeida")) return "/avatars/dr-henrique-almeida.jpg";
   if (n.includes("mateo") && n.includes("lopez")) return "/avatars/dr-mateo-lopez.jpg";
@@ -89,46 +72,70 @@ function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: string |
   if (n.includes("natalia") && n.includes("souza")) return "/avatars/dra-natalia-souza.jpg";
   if (n.includes("renata") && n.includes("costa")) return "/avatars/dra-renata-costa.jpg";
   if (n.includes("yuki") && n.includes("tanaka")) return "/avatars/dra-yuki-tanaka.jpg";
+  if (n.includes("lucas") && n.includes("ferreira")) return "/avatars/dr-lucas-ferreira.jpg";
+  if (n.includes("carlos") && n.includes("herrera")) return "/avatars/dr-carlos-herrera.jpg";
+  if (n.includes("valentina") && n.includes("reyes")) return "/avatars/dra-valentina-reyes.jpg";
+  if (n.includes("rafael") && n.includes("mendes")) return "/avatars/dr-rafael-mendes.jpg";
+  if (n.includes("camila") && n.includes("duarte")) return "/avatars/dra-camila-duarte.jpg";
+  if (n.includes("wei") && n.includes("chen")) return "/avatars/dr-wei-chen.jpg";
+  if (n.includes("keiko") && n.includes("yamamoto")) return "/avatars/dra-keiko-yamamoto.jpg";
+  if (n.includes("thiago") && n.includes("verde")) return "/avatars/prof-thiago-verde.jpg";
+  if (n.includes("daniela") && n.includes("rojas")) return "/avatars/prof-daniela-rojas.jpg";
+  if (n.includes("bruno") && n.includes("tavares")) return "/avatars/dr-bruno-tavares.jpg";
+  if (n.includes("mei") && n.includes("lin")) return "/avatars/dra-mei-lin.jpg";
+  if (n.includes("ricardo") && n.includes("campos")) return "/avatars/prof-ricardo-campos.jpg";
+  if (n.includes("priscila") && n.includes("andrade")) return "/avatars/dra-priscila-andrade.jpg";
+  if (n.includes("paulo") && n.includes("nakamura")) return "/avatars/dr-paulo-nakamura.jpg";
+  if (n.includes("leticia") && n.includes("verde")) return "/avatars/profa-leticia-verde.jpg";
+  if (n.includes("victor") && n.includes("lima")) return "/avatars/dr-victor-lima.jpg";
+  if (n.includes("gabriela") && n.includes("moreira")) return "/avatars/dra-gabriela-moreira.jpg";
+  if (n.includes("sakura") && n.includes("ito")) return "/avatars/dra-sakura-ito.jpg";
+  if (n.includes("ravi") && n.includes("sharma")) return "/avatars/dr-ravi-sharma.jpg";
+  if (n.includes("diego") && n.includes("santos")) return "/avatars/prof-diego-santos.jpg";
+  if (n.includes("julia") && n.includes("oliveira")) return "/avatars/profa-julia-oliveira.jpg";
+  if (n.includes("maria") && (n.includes("aparecida") || n.includes("aux"))) return "/avatars/aux-enf-maria.jpg";
+  if (n.includes("jose") && (n.includes("nascimento") || n.includes("aux"))) return "/avatars/aux-enf-jose.jpg";
+  if (n.includes("ana") && (n.includes("beatriz") || n.includes("aux"))) return "/avatars/aux-enf-ana.jpg";
+  if (n.includes("francisca") && n.includes("souza")) return "/avatars/aux-enf-francisca.jpg";
+  if (n.includes("claudia") && n.includes("regina")) return "/avatars/aux-enf-claudia.jpg";
+  if (n.includes("patricia") && n.includes("mendonça")) return "/avatars/enf-patricia.jpg";
+  if (n.includes("rodrigo") && n.includes("alves")) return "/avatars/enf-rodrigo.jpg";
+  if (n.includes("claudia") && n.includes("nascimento")) return "/avatars/enf-claudia.jpg";
+  if (n.includes("marcos") && n.includes("vinicius")) return "/avatars/enf-marcos.jpg";
+  if (n.includes("fernanda") && n.includes("bastos")) return "/avatars/enf-fernanda.jpg";
+  if (n.includes("luciana") && n.includes("torres")) return "/avatars/enf-luciana.jpg";
+  if (n.includes("diego") && n.includes("santana")) return "/avatars/enf-diego.jpg";
+  if (n.includes("luciana") && n.includes("pereira")) return "/avatars/tec-enf-luciana.jpg";
+  if (n.includes("carlos") && n.includes("santos")) return "/avatars/tec-enf-carlos.jpg";
+  if (n.includes("rosangela") && n.includes("dias")) return "/avatars/tec-enf-rosangela.jpg";
+  if (n.includes("adriana") && n.includes("gomes")) return "/avatars/tec-enf-adriana.jpg";
+  if (n.includes("helena") && n.includes("barbosa")) return "/avatars/cuid-helena.jpg";
+  if (n.includes("jorge") && n.includes("moreira")) return "/avatars/cuid-jorge.jpg";
+  if (n.includes("sandra") && n.includes("oliveira")) return "/avatars/cuid-sandra.jpg";
+  if (n.includes("mariana") && n.includes("castello")) return "/avatars/dra-mariana-integrativa.jpg";
+  if (n.includes("roberto") && n.includes("figueiredo")) return "/avatars/dr-roberto-integrativa.jpg";
+  if (n.includes("beatriz") && n.includes("herbal")) return "/avatars/dra-beatriz-integrativa.jpg";
+
+  // Se não é um profissional oficial tratado, usa o avatar atual se houver
+  if (currentAvatar && currentAvatar.trim() !== "") {
+    return currentAvatar;
+  }
   return "";
 }
 
-function buildServices(doctor: DoctorRow, isEdilson: boolean, isSuelen: boolean, isOlivia: boolean) {
-  const priceStr = formatPrice(Number(doctor.consultation_price) || 30, doctor.country);
-
-  if (isEdilson) {
-    return [
-      { name: "Orientação Técnica + Relatório de Encaminhamento (Chat 30 min)", price: "R$ 30,00", desc: "Com relatório completo assinado digitalmente (Brasil)" },
-      { name: "Orientação Técnica Completa (Chat + Vídeo)", price: "R$ 100,00", desc: "Avaliação por vídeo e relatório completo" },
-      { name: "Consulta Prescritiva Internacional (Bolívia)", price: "US$ 50,00", desc: "Com receita e assinatura digital (Santa Cruz - BO)" },
-      { name: "Retorno", price: "R$ 30,00", desc: "Acompanhamento" },
-    ];
-  }
-
-  if (isSuelen) {
-    return [
-      { name: "Orientação Inicial via Chat", price: "R$ 100,00", desc: "Avaliação inicial via chat seguro" },
-      { name: "Orientação Completa (Chat + Vídeo)", price: "R$ 150,00", desc: "Avaliação completa com teleconsulta" },
-      { name: "Retorno", price: "R$ 90,00", desc: "Acompanhamento" },
-    ];
-  }
-
-  if (isOlivia) {
-    return [
-      { name: "Orientação Técnica + Mentoria Terapêutica (Chat 30 min)", price: "R$ 50,00", desc: "Com relatório completo assinado digitalmente (Brasil)" },
-      { name: "Orientação Técnica Completa (Chat + Vídeo)", price: "R$ 100,00", desc: "Avaliação por vídeo e mentoria terapêutica" },
-      { name: "Consulta Prescritiva Internacional (Bolívia)", price: "US$ 50,00", desc: "Com receita e assinatura digital (Cochabamba - BO)" },
-      { name: "Retorno", price: "R$ 30,00", desc: "Acompanhamento" },
-    ];
-  }
-
-  return [
-    { name: "Orientação Técnica Inicial", price: priceStr, desc: "Avaliação completa + plano terapêutico individualizado" },
-    { name: "Retorno", price: formatPrice((Number(doctor.consultation_price) || 30) * 0.6, doctor.country), desc: "Acompanhamento clínico e ajuste posológico" },
-  ];
+/**
+ * Normalizador de nome para conferência e deduplicação
+ */
+function normalizeDoctorKey(name: string, crm?: string | null): string {
+  const n = (name || "").toLowerCase()
+    .replace(/^dr\.\s*|^dra\.\s*|^prof\.\s*|^profa\.\s*|^enf\.\s*|^téc\.\s*|^aux\.\s*/i, "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+  return n;
 }
 
 export function useRealProfessionals(): { professionals: Professional[]; realCount: number; loading: boolean } {
-  const [doctors, setDoctors] = useState<DoctorRow[]>([]);
+  const [dbDoctors, setDbDoctors] = useState<DoctorRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -139,36 +146,9 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         const { data: publicDocs, error } = await supabase.from("doctors_public" as never).select("*");
         if (error) throw error;
         if (!active) return;
-
-        const docs = (publicDocs ?? []) as DoctorRow[];
-        const userIds = Array.from(new Set(docs.map((d) => d.user_id).filter(Boolean)));
-        
-        let profileMap = new Map<string, string>();
-        if (userIds.length > 0) {
-          try {
-            const { data: profs } = await supabase
-              .from("profiles")
-              .select("id, avatar_url")
-              .in("id", userIds);
-            if (profs) {
-              for (const p of profs) {
-                if (p.avatar_url) profileMap.set(p.id, p.avatar_url);
-              }
-            }
-          } catch (pErr) {
-            console.warn("[useRealProfessionals] Fallback profiles fetch:", pErr);
-          }
-        }
-
-        const mergedDocs = docs.map((doc) => ({
-          ...doc,
-          avatar_url: profileMap.get(doc.user_id) || doc.avatar_url || null,
-        }));
-
-        if (active) setDoctors(mergedDocs);
+        setDbDoctors((publicDocs ?? []) as DoctorRow[]);
       } catch (error) {
-        console.error("[useRealProfessionals] Error:", error);
-        if (active) setDoctors([]);
+        console.warn("[useRealProfessionals] Fallback to base professionals:", error);
       } finally {
         if (active) setLoading(false);
       }
@@ -177,7 +157,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     void fetchDoctors();
     const poll = window.setInterval(fetchDoctors, 30_000);
     const channel = supabase
-      .channel("public:doctors-status")
+      .channel("public:doctors-status-real")
       .on("postgres_changes", { event: "*", schema: "public", table: "doctors" }, fetchDoctors)
       .subscribe();
 
@@ -188,69 +168,59 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     };
   }, []);
 
-  const professionals = useMemo<Professional[]>(() => doctors.map((doctor) => {
-    const name = doctor.full_name?.trim() || `Profissional ${doctor.crm}`;
-    const priceValue = Number(doctor.consultation_price ?? 30) || 30;
-    const isEdilson = (doctor.crm === "10963" || name.toLowerCase().includes("edilson")) && !name.toLowerCase().includes("suelen");
-    const isSuelen = doctor.crm?.includes("49354") || name.toLowerCase().includes("suelen");
-    const isOlivia = doctor.crm?.toLowerCase().includes("olivia") || doctor.crm?.toLowerCase().includes("z-") || name.toLowerCase().includes("olivia");
+  const professionals = useMemo<Professional[]>(() => {
+    // 1. Mapeamento de busca rápida dos dados reais do banco
+    const dbMapByCrm = new Map<string, DoctorRow>();
+    const dbMapByName = new Map<string, DoctorRow>();
 
-    const countryName = doctor.country === "BO" ? "Bolívia" : "Brasil";
-    const location = [doctor.city, countryName].filter(Boolean).join(", ");
-    const councilType = doctor.council_type || "CRM";
-    const councilNum = doctor.council_number || doctor.crm || "";
-
-    let document = "";
-    if (isEdilson) {
-      document = "CRM 10963 - Sta Cruz (BO)";
-    } else if (isOlivia) {
-      document = "CRM Z-4466260 - BO";
-    } else if (isSuelen) {
-      document = "CRM 49354/PR";
-    } else if (doctor.document_type === "ci") {
-      document = `CI ${councilNum}`;
-    } else {
-      const stateSuffix = doctor.crm_state && doctor.crm_state !== "BR" && !doctor.crm_state.includes("Sta-Cruz") ? `/${doctor.crm_state}` : "";
-      document = `${councilType} ${councilNum}${stateSuffix}`;
+    for (const doc of dbDoctors) {
+      if (doc.crm) {
+        const cleanCrm = doc.crm.replace(/\D/g, "");
+        if (cleanCrm) dbMapByCrm.set(cleanCrm, doc);
+      }
+      const normName = normalizeDoctorKey(doc.full_name || "");
+      if (normName) dbMapByName.set(normName, doc);
     }
 
-    const finalBio = isEdilson
-      ? "CEO da Planta y Raíz Ltda e Médico Prescritor em Santa Cruz de la Sierra (Bolívia, Registro 10963). No Brasil, atua prestando Orientação Técnica exclusiva com Relatório de Encaminhamento Completo assinado digitalmente."
-      : isSuelen
-      ? "Supervisora Técnica da Planta y Raíz Ltda e Médica Prescritora com atendimento humanizado e individualizado. Prescrição de cannabis medicinal baseada em evidências científicas."
-      : isOlivia
-      ? "Diretora Técnica da Planta y Raíz para a Bolívia (Cochabamba) e Médica Prescritora em Cochabamba (Bolívia, Registro Z-4466260). No Brasil, atua prestando Orientação Técnica exclusiva e Mentoria Terapêutica."
-      : (doctor.bio || `Profissional cadastrado na Planta & Raiz. Especialidade: ${doctor.specialty}.`);
+    // 2. Itera sobre os profissionais oficiais configurados (baseProfessionals)
+    // Isso garante que TODAS as 10 categorias e os médicos tratados com jaleco e esteto apareçam perfeitamente.
+    // Médicos novos cadastrados (sem card tratado) permanecem EXCLUSIVAMENTE no KYC admin.
+    const enrichedList: Professional[] = baseProfessionals.map((base) => {
+      // Tenta encontrar correspondente real no banco de dados
+      const cleanBaseCrm = (base.crm || "").replace(/\D/g, "");
+      const normBaseName = normalizeDoctorKey(base.name);
+      
+      const matchedDb = (cleanBaseCrm ? dbMapByCrm.get(cleanBaseCrm) : null) || 
+                        dbMapByName.get(normBaseName);
 
-    const finalAvatar = resolveDoctorAvatar(name, doctor.crm, doctor.avatar_url);
+      // Foto tratada oficial SEMPRE tem prioridade
+      const treatedAvatar = resolveDoctorAvatar(base.name, base.crm || "", base.imageUrl);
+      const cfmPrint = getDoctorCfmPrint(base.crm || base.name) || base.cfmPrintUrl;
 
-    return {
-      id: `real-${doctor.id}`,
-      dbId: doctor.id,
-      name,
-      category: mapCategoryFromSpecialty(doctor.specialty),
-      bio: finalBio,
-      experience: doctor.is_verified ? "Verificado" : "Cadastro em análise",
-      tags: [doctor.specialty, document, location].filter((value): value is string => Boolean(value)),
-      price: formatPrice(priceValue, doctor.country),
-      priceValue,
-      whatsapp: "5511991363154",
-      rating: doctor.rating,
-      consults: doctor.total_consultations ?? 0,
-      avatar: initials(name),
-      imageUrl: finalAvatar,
-      paymentLink: "https://mpago.la/12KAwmH",
-      services: buildServices(doctor, isEdilson, isSuelen, isOlivia),
-      slots: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
-      reviews: [],
-      online: Boolean(doctor.is_online && (doctor.is_available ?? true)),
-      premiumPrice: doctor.price_video_chat ?? undefined,
-      crm: document,
-      hospital: isEdilson ? "Planta y Raíz Ltda / Santa Cruz (BO)" : isSuelen ? "Planta y Raíz Ltda / Paraná (BR)" : isOlivia ? "Planta y Raíz Ltda / Cochabamba (BO)" : location,
-      flags: isEdilson || isOlivia ? ["🇧🇷", "🇧🇴"] : ["🇧🇷"],
-      plan_tier: doctor.plan_tier ?? "free",
-    };
-  }), [doctors]);
+      if (!matchedDb) {
+        return {
+          ...base,
+          imageUrl: treatedAvatar || base.imageUrl,
+          cfmPrintUrl: cfmPrint,
+        };
+      }
 
-  return { professionals, realCount: doctors.length, loading };
-}
+      // Enriquece com informações em tempo real do banco de dados
+      return {
+        ...base,
+        dbId: matchedDb.id,
+        imageUrl: treatedAvatar || base.imageUrl,
+        cfmPrintUrl: cfmPrint,
+        online: Boolean(matchedDb.is_online && (matchedDb.is_available ?? true)),
+        rating: matchedDb.rating ?? base.rating,
+        consults: matchedDb.total_consultations ?? base.consults,
+        premiumPrice: matchedDb.price_video_chat ?? base.premiumPrice,
+        plan_tier: matchedDb.plan_tier ?? base.plan_tier,
+      };
+    });
+
+    return enrichedList;
+  }, [dbDoctors]);
+
+  return { professionals, realCount: professionals.length, loading };
+}

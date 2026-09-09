@@ -157,8 +157,8 @@ const Agendamento = () => {
     setSelectedDate(d);
     setSelectedTime("");
     setSelectedSlotId(null);
-    if (d && selectedDoctor) {
-      fetchSlots(selectedDoctor.id, d);
+    if (d && schedulingDoctorId) {
+      fetchSlots(schedulingDoctorId, d);
       setStep(3);
     }
   };
@@ -182,9 +182,10 @@ const Agendamento = () => {
       value: selectedDoctor.consultation_price,
     }, { leadScore: 35, funnelStage: "decision", category: "conversion" });
 
+    const routedId = schedulingDoctorId ?? selectedDoctor.id;
     const { data: newAppt, error } = await supabase.from("appointments").insert({
       patient_id: userId,
-      doctor_id: selectedDoctor.id,
+      doctor_id: routedId,
       scheduled_at: scheduledAt.toISOString(),
       type: consultType,
       notes,
@@ -206,6 +207,9 @@ const Agendamento = () => {
         appointment_id: newAppt.id,
       }).eq("id", selectedSlotId);
     }
+
+    // Aviso imediato ao profissional (e-mail + WhatsApp)
+    void notifyRoutedDoctor(newAppt.id);
 
     try {
       const { data: session } = await supabase.auth.getSession();

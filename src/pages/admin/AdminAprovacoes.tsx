@@ -23,6 +23,7 @@ import KycDocViewer from "@/components/admin/KycDocViewer";
 import DoctorContractViewerModal, { DoctorContractDetails } from "@/components/admin/DoctorContractViewerModal";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { KYC_LABELS, KYC_REQUIRED, type KycKind } from "@/lib/kyc-docs";
+import { compareDoctorsByCompleteness, doctorTierFromDocs, DOCTOR_TIER_LABEL } from "@/lib/doctor-ranking";
 
 export const AdminAprovacoes = () => {
   const { doctors, setDoctors, loading, fetchDoctors, counts } = useDoctors();

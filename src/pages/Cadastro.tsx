@@ -382,12 +382,32 @@ const Cadastro = () => {
         leadScore: 30, funnelStage: "intent", category: "conversion",
       });
 
-      if (authData.session && redirectTo) {
+      if (redirectTo) {
         const dest = decodeURIComponent(redirectTo);
         if (dest.startsWith("/") && !dest.startsWith("//")) {
           window.location.href = dest;
           return;
         }
+      }
+
+      // Paciente: redirecionamento imediato para o dashboard do paciente
+      if (type === "paciente" || !type) {
+        if (!authData.session && formData.email && formData.senha) {
+          try {
+            await supabase.auth.signInWithPassword({
+              email: formData.email.trim().toLowerCase(),
+              password: formData.senha,
+            });
+          } catch (_) {
+            // auto-login em caso de confirmação opcional
+          }
+        }
+        toast({ 
+          title: "Cadastro realizado com sucesso! 🌿", 
+          description: "Bem-vindo(a) à Planta & Raiz! Abrindo seu painel..." 
+        });
+        navigate("/dashboard-paciente");
+        return;
       }
 
       setSubmitted(true);
@@ -422,9 +442,13 @@ const Cadastro = () => {
               </div>
 
               <div className="flex flex-col gap-3 justify-center">
+                <Button className="font-black bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 rounded-2xl h-12 shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all" asChild>
+                  <Link to="/dashboard-paciente">🌿 Ir para Meu Painel de Paciente <ArrowRight size={16} className="ml-2" /></Link>
+                </Button>
                 <Button
                   onClick={() => openGlobalTour(type || "paciente")}
-                  className="font-black bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 rounded-2xl h-12 shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all"
+                  variant="outline"
+                  className="font-black rounded-2xl h-12 hover:scale-105 transition-all"
                 >
                   <Sparkles size={16} className="mr-2 animate-pulse" /> 🚀 Fazer Tour 3D da Plataforma
                 </Button>

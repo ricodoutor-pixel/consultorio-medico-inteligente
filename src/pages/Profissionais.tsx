@@ -131,7 +131,23 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
             <CardContent className="p-6">
               <div className="relative">
                 {pro.imageUrl ? (
-                  <img src={pro.imageUrl} alt={`Foto profissional - ${pro.name}`} className={`w-20 h-20 rounded-2xl object-cover ${pro.name.includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border border-border mb-4`} loading="lazy" decoding="async" />
+                  <>
+                    <img
+                      src={pro.imageUrl}
+                      alt={`Foto profissional - ${pro.name}`}
+                      className={`w-20 h-20 rounded-2xl object-cover ${pro.name.includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border border-border mb-4`}
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                    <div style={{ display: 'none' }} className="w-20 h-20 rounded-2xl border border-border mb-4 bg-primary/10 text-primary items-center justify-center font-black text-xl">
+                      {pro.avatar}
+                    </div>
+                  </>
                 ) : (
                   <div className="w-20 h-20 rounded-2xl border border-border mb-4 bg-primary/10 text-primary flex items-center justify-center font-black text-xl">
                     {pro.avatar}
@@ -343,16 +359,25 @@ const Profissionais = () => {
                         <div className="flex items-start gap-3">
                           <div className="relative flex-shrink-0">
                             {p.imageUrl ? (
-                              <img
-                                src={p.imageUrl}
-                                alt={`${p.name}`}
-                                className={`w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover ${p.name.includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300`}
-                                loading="lazy"
-                                decoding="async"
-                                width={64}
-                                height={64}
-                              />
-
+                              <>
+                                <img
+                                  src={p.imageUrl}
+                                  alt={`${p.name}`}
+                                  className={`w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover ${p.name.includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300`}
+                                  loading="lazy"
+                                  decoding="async"
+                                  width={64}
+                                  height={64}
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                    if (fallback) fallback.style.display = 'flex';
+                                  }}
+                                />
+                                <div style={{ display: 'none' }} className="w-16 h-16 md:w-18 md:h-18 rounded-2xl border-2 border-background shadow-md bg-primary/10 text-primary items-center justify-center font-black text-lg">
+                                  {p.avatar}
+                                </div>
+                              </>
                             ) : (
                               <div className="w-16 h-16 md:w-18 md:h-18 rounded-2xl border-2 border-background shadow-md bg-primary/10 text-primary flex items-center justify-center font-black text-lg">
                                 {p.avatar}

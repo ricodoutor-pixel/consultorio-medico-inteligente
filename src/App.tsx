@@ -377,6 +377,7 @@ const App = () => (
                 <Route path="/consultation-monitor" element={<PrivateRoute><ConsultationMonitorPage /></PrivateRoute>} />
                 <Route path="/comunidade" element={<ComunidadeConteudoIA />} />
                 <Route path="/dashboard" element={<DashboardPaciente />} />
+                <Route path="/dashboard-paciente" element={<DashboardPaciente />} />
                 <Route path="/telemedicina-assincrona" element={<PrivateRoute><TelemedicinaAssincrona /></PrivateRoute>} />
                 <Route path="/medico/prontuario" element={<PrivateRoute><ProntuarioInteligente /></PrivateRoute>} />
               <Route path="/relatorio-paciente" element={<PrivateRoute><RelatorioPaciente /></PrivateRoute>} />

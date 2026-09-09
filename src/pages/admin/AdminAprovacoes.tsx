@@ -308,6 +308,23 @@ export const AdminAprovacoes = () => {
 
       return true;
     });
+
+    // Fixos primeiro (Edilson, Suelen, Daniel) e, em seguida, quem tem o dossiê
+    // mais completo — o admin confere sempre de cima para baixo.
+    return [...list].sort((a, b) =>
+      compareDoctorsByCompleteness(
+        {
+          name: a.profile?.full_name || a.full_name,
+          registration: a.crm,
+          docsCount: (a.kyc_docs || []).length,
+        },
+        {
+          name: b.profile?.full_name || b.full_name,
+          registration: b.crm,
+          docsCount: (b.kyc_docs || []).length,
+        },
+      ),
+    );
   }, [doctors, searchTerm, statusFilter]);
 
   const countPending = doctors.filter(d => !d.is_approved_by_admin && d.approval_status !== 'rejected').length;

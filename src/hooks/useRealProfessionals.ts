@@ -28,6 +28,7 @@ interface DoctorRow {
   avatar_url?: string | null;
   council_type?: string | null;
   council_number?: string | null;
+  kyc_docs_count?: number | null;
 }
 
 /**
@@ -185,6 +186,8 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     // 2. Itera sobre os profissionais oficiais configurados (baseProfessionals)
     // Isso garante que TODAS as 10 categorias e os médicos tratados com jaleco e esteto apareçam perfeitamente.
     // Médicos novos cadastrados (sem card tratado) permanecem EXCLUSIVAMENTE no KYC admin.
+    const docsCountById = new Map<string, number>();
+
     const enrichedList: Professional[] = baseProfessionals.map((base) => {
       // Tenta encontrar correspondente real no banco de dados
       const cleanBaseCrm = (base.crm || "").replace(/\D/g, "");

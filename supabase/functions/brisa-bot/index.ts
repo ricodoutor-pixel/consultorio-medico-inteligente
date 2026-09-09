@@ -365,22 +365,75 @@ serve(async (req: Request): Promise<Response> => {
     await markDone(messageId, chatId);
   }
 
-  // ── ESTÁGIO 1: resposta instantânea com o roteiro completo ──
-  const instant = instantReply(text, name);
-  const sent = await sendMsg(chatId, phone, instant);
-  await log(phone, text, instant, sent ? 'waha_instant' : 'evo_instant');
+  // ── ROTEADOR DE AGENTES ────────────────────────────────────────────────
+  // Sessão paga ativa → Dr. Edilson Bezerra On (Orientação Técnica, 30 min).
+  // Sem sessão paga  → Enf. Brisa (triagem curta + link de pagamento).
+  const sb = serviceClient();
+  const session = sb ? await resolveOtSession(sb, phone, name) : null;
 
-  // ⚡ ESTÁGIO 2: Gemini em background (Triagem Clínica Autônoma Flash) ⚡
+  // Tempo esgotado → desliga o atendimento e avisa o paciente.
+  if (sb && session && session.seconds_left <= 0) {
+    await closeOtSession(sb, session.session_id);
+    const bye = sessionExpiredMessage();
+    const sentBye = await sendMsg(chatId, phone, bye);
+    await log(phone, text, bye, 'ot_session_expired');
+    return new Response(
+      JSON.stringify({ ok: true, sent: sentBye, agent: 'session_expired', phone }),
+      { headers: { ...cors, 'Content-Type': 'application/json' } },
+    );
+  }
+
+  if (sb && session) {
+    // ── AGENTE: Dr. Edilson Bezerra On (pago, com relógio) ──
+    const left = minutesLeft(session);
+
+    if (session.opened_now) {
+      const hello = sessionOpenedMessage(name);
+      await sendMsg(chatId, phone, hello);
+      await log(phone, '(pagamento aprovado)', hello, 'ot_session_opened');
+    }
+
+    let reply = await tryGemini(text, name, phone, drEdilsonPersona(left));
+    if (!reply || reply.length < 20) {
+      reply = `Recebi sua mensagem e estou analisando tecnicamente. Pode me detalhar os sintomas principais e o que já usou até hoje? Restam cerca de ${left} minuto(s) desta Orientação Técnica.`;
+    }
+    if (left <= 5 && (await markClosingNotice(sb, session.session_id))) {
+      reply += `\n\n${sessionEndingSoonMessage(left)}`;
+    }
+    const sentOt = await sendMsg(chatId, phone, reply);
+    await log(phone, text, reply, 'dr_edilson_on');
+    await touchOtSession(sb, session.session_id, session.seconds_left >= 0 ? 0 : 0);
+    return new Response(
+      JSON.stringify({ ok: true, sent: sentOt, agent: 'dr_edilson_on', minutes_left: left, phone }),
+      { headers: { ...cors, 'Content-Type': 'application/json' } },
+    );
+  }
+
+  // ── AGENTE: Enf. Brisa (triagem) ───────────────────────────────────────
+  const kind = intent(text);
+  const useInstant = kind === 'boas_vindas' || kind === 'medico' || kind === 'lojista' || (!GEMINI_KEY && !LOVABLE_KEY);
+  const instant = useInstant ? instantReply(text, name) : '';
+  let sent = false;
+  if (instant) {
+    sent = await sendMsg(chatId, phone, instant);
+    await log(phone, text, instant, sent ? 'brisa_instant' : 'brisa_instant_failed');
+  }
+
   if (GEMINI_KEY || LOVABLE_KEY) {
     const bg = async () => {
-      const gemRep = await tryGemini(text, name, phone);
-      if (!gemRep || gemRep.length < 30) return;
-      await sendMsg(chatId, phone, gemRep);
-      await log(phone, text, gemRep, 'gemini_enriched');
+      let triage = await tryGemini(text, name, phone, BRISA_TRIAGE_PERSONA);
+      if (!triage || triage.length < 20) {
+        if (instant) return; // já respondemos com o roteiro
+        triage = paywallMessage();
+      }
+      await sendMsg(chatId, phone, triage);
+      await log(phone, text, triage, 'enf_brisa_triagem');
     };
     const rt = (globalThis as unknown as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime;
-    if (rt?.waitUntil) rt.waitUntil(bg()); else bg().catch(() => {});
+    if (rt?.waitUntil) rt.waitUntil(bg()); else await bg().catch(() => {});
+    sent = true;
   }
+
 
   return new Response(
     JSON.stringify({ ok: true, sent, phone, chatId }),

@@ -148,7 +148,7 @@ Deno.serve(async (req) => {
             scheduledAt: when,
             modality,
             amount,
-            consultorioUrl: `${SITE}/consultorio`,
+            consultorioUrl: doctorRoomUrl,
           },
         }),
       });

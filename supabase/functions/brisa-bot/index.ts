@@ -72,22 +72,28 @@ Nossa equipe e a Enfermeira Brisa estão prontas para te auxiliar no WhatsApp:
 
 Seja muito bem-vindo(a) à medicina do futuro! 🌿💚`;
 
-// ── PERSONA DA ENFERMEIRA BRISA / COPILOTO CLÍNICO VIP ──────────────────
-const PERSONA = `Você é a Enfermeira Brisa 🌿, assistente virtual oficial e Especialista em Triagem Clínica da Planta y Raiz.
+// ── PERSONAS SEPARADAS (mesmo cérebro Gemini, conteúdos diferentes) ─────
+// Enf. Brisa    → triagem curta + paywall
+// Dr. Edilson On → orientação técnica paga (30 min por pagamento)
+import {
+  BRISA_TRIAGE_PERSONA,
+  drEdilsonPersona,
+  paywallMessage,
+  sessionOpenedMessage,
+  sessionExpiredMessage,
+  sessionEndingSoonMessage,
+} from '../_shared/agents.ts';
+import {
+  serviceClient,
+  resolveOtSession,
+  touchOtSession,
+  closeOtSession,
+  markClosingNotice,
+  minutesLeft,
+} from '../_shared/ot-session.ts';
 
-SUA MISSÃO: Realizar a Triagem Clínica Autônoma Inicial via WhatsApp e direcionar o paciente.
+const PERSONA = BRISA_TRIAGE_PERSONA;
 
-PASSO A PASSO DA TRIAGEM:
-1. Colete a queixa principal do paciente e um breve histórico de saúde.
-2. Calcule internamente um SCORE DE SEVERIDADE (0.0 a 1.0). Identifique Red Flags (ex: dores agudas, confusão mental, histórico cardíaco grave).
-3. Se houver EMERGÊNCIA médica (risco de vida), oriente buscar o SAMU (192) ou o Pronto Socorro mais próximo imediatamente.
-4. Se o SCORE for >= 0.75 ou houver indicação médica clara, recomende agendamento IMEDIATO.
-5. Nossa recomendação atual (Matchmaking) é com o **Dr. Daniel Kobayashi Colombo** (Clínico Geral), nosso médico plantonista e prescritor certificado.
-6. Envie o link de pagamento seguro para a Triagem/Consulta (Valor: R$ 30,00):
-   👉 *https://plantayraiz.com.br/telemedicina* (Oriente a escolher o Dr. Daniel na lista).
-
-TOM DE VOZ:
-Empático, acolhedor, rápido e focado em resolver a dor do paciente com segurança clínica. Nunca prescreva medicamentos, apenas faça a triagem e direcione para a consulta médica.`;
 
 // ── RESPOSTAS INSTANTÂNEAS ──────────────────────────────────────────────
 const MSGS = {
@@ -234,14 +240,20 @@ async function sendMsg(chatId: string, phone: string, text: string): Promise<boo
 import { GEMINI_PRIMARY_MODEL, GEMINI_FALLBACK_MODEL, GEMINI_MODELS_FALLBACK_CHAIN, GATEWAY_GEMINI_CHAIN, GATEWAY_NO_REASONING } from '../_shared/gemini.ts';
 import { buildScientificContextBlock } from '../_shared/scientific-context.ts';
 
-// ── GEMINI (Estágio 2 — background) ──────────────────────────────────────
-async function tryGemini(text: string, name: string | null, phone: string): Promise<string | null> {
+// ── GEMINI (cérebro único, persona injetada por agente) ─────────────────
+async function tryGemini(
+  text: string,
+  name: string | null,
+  phone: string,
+  persona: string = PERSONA,
+): Promise<string | null> {
   const ctx  = name ? `[${name}|+${phone}]` : `[+${phone}]`;
   const user = `${ctx}\n${text}`;
 
   // 📚 RAG: evidências reais da biblioteca científica interna
   const evidence = await buildScientificContextBlock(text, 3);
-  const systemPrompt = PERSONA + evidence;
+  const systemPrompt = persona + evidence;
+
 
   if (LOVABLE_KEY) {
     for (const model of GATEWAY_GEMINI_CHAIN) {
@@ -319,8 +331,8 @@ serve(async (req: Request): Promise<Response> => {
 
   if (req.method === 'GET') {
     return new Response(JSON.stringify({
-      ok: true, version: '2026.8.08-DR-EDILSON-ORIENTACAO',
-      responsavel: 'Enfermeira Brisa (Orientação Técnica Dr. Edilson Bezerra)',
+      ok: true, version: '2026.9.09-AGENTES-SEPARADOS-30MIN',
+      agentes: { triagem: 'Enf. Brisa', orientacao_tecnica: 'Dr. Edilson Bezerra On (30 min por pagamento)' },
       roteiro_ativo: true,
       instant_reply: '✅ ATIVO (com o roteiro completo 5 passos)',
     }, null, 2), { headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -353,22 +365,75 @@ serve(async (req: Request): Promise<Response> => {
     await markDone(messageId, chatId);
   }
 
-  // ── ESTÁGIO 1: resposta instantânea com o roteiro completo ──
-  const instant = instantReply(text, name);
-  const sent = await sendMsg(chatId, phone, instant);
-  await log(phone, text, instant, sent ? 'waha_instant' : 'evo_instant');
+  // ── ROTEADOR DE AGENTES ────────────────────────────────────────────────
+  // Sessão paga ativa → Dr. Edilson Bezerra On (Orientação Técnica, 30 min).
+  // Sem sessão paga  → Enf. Brisa (triagem curta + link de pagamento).
+  const sb = serviceClient();
+  const session = sb ? await resolveOtSession(sb, phone, name) : null;
 
-  // ⚡ ESTÁGIO 2: Gemini em background (Triagem Clínica Autônoma Flash) ⚡
+  // Tempo esgotado → desliga o atendimento e avisa o paciente.
+  if (sb && session && session.seconds_left <= 0) {
+    await closeOtSession(sb, session.session_id);
+    const bye = sessionExpiredMessage();
+    const sentBye = await sendMsg(chatId, phone, bye);
+    await log(phone, text, bye, 'ot_session_expired');
+    return new Response(
+      JSON.stringify({ ok: true, sent: sentBye, agent: 'session_expired', phone }),
+      { headers: { ...cors, 'Content-Type': 'application/json' } },
+    );
+  }
+
+  if (sb && session) {
+    // ── AGENTE: Dr. Edilson Bezerra On (pago, com relógio) ──
+    const left = minutesLeft(session);
+
+    if (session.opened_now) {
+      const hello = sessionOpenedMessage(name);
+      await sendMsg(chatId, phone, hello);
+      await log(phone, '(pagamento aprovado)', hello, 'ot_session_opened');
+    }
+
+    let reply = await tryGemini(text, name, phone, drEdilsonPersona(left));
+    if (!reply || reply.length < 20) {
+      reply = `Recebi sua mensagem e estou analisando tecnicamente. Pode me detalhar os sintomas principais e o que já usou até hoje? Restam cerca de ${left} minuto(s) desta Orientação Técnica.`;
+    }
+    if (left <= 5 && (await markClosingNotice(sb, session.session_id))) {
+      reply += `\n\n${sessionEndingSoonMessage(left)}`;
+    }
+    const sentOt = await sendMsg(chatId, phone, reply);
+    await log(phone, text, reply, 'dr_edilson_on');
+    await touchOtSession(sb, session.session_id);
+    return new Response(
+      JSON.stringify({ ok: true, sent: sentOt, agent: 'dr_edilson_on', minutes_left: left, phone }),
+      { headers: { ...cors, 'Content-Type': 'application/json' } },
+    );
+  }
+
+  // ── AGENTE: Enf. Brisa (triagem) ───────────────────────────────────────
+  const kind = intent(text);
+  const useInstant = kind === 'boas_vindas' || kind === 'medico' || kind === 'lojista' || (!GEMINI_KEY && !LOVABLE_KEY);
+  const instant = useInstant ? instantReply(text, name) : '';
+  let sent = false;
+  if (instant) {
+    sent = await sendMsg(chatId, phone, instant);
+    await log(phone, text, instant, sent ? 'brisa_instant' : 'brisa_instant_failed');
+  }
+
   if (GEMINI_KEY || LOVABLE_KEY) {
     const bg = async () => {
-      const gemRep = await tryGemini(text, name, phone);
-      if (!gemRep || gemRep.length < 30) return;
-      await sendMsg(chatId, phone, gemRep);
-      await log(phone, text, gemRep, 'gemini_enriched');
+      let triage = await tryGemini(text, name, phone, BRISA_TRIAGE_PERSONA);
+      if (!triage || triage.length < 20) {
+        if (instant) return; // já respondemos com o roteiro
+        triage = paywallMessage();
+      }
+      await sendMsg(chatId, phone, triage);
+      await log(phone, text, triage, 'enf_brisa_triagem');
     };
     const rt = (globalThis as unknown as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime;
-    if (rt?.waitUntil) rt.waitUntil(bg()); else bg().catch(() => {});
+    if (rt?.waitUntil) rt.waitUntil(bg()); else await bg().catch(() => {});
+    sent = true;
   }
+
 
   return new Response(
     JSON.stringify({ ok: true, sent, phone, chatId }),

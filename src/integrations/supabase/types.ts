@@ -5453,6 +5453,81 @@ export type Database = {
         }
         Relationships: []
       }
+      ot_agent_sessions: {
+        Row: {
+          agent: string
+          closed_at: string | null
+          closing_notice_sent_at: string | null
+          created_at: string
+          duration_minutes: number
+          expires_at: string
+          external_reference: string | null
+          id: string
+          last_message_at: string | null
+          messages_count: number
+          order_id: string | null
+          patient_name: string | null
+          patient_phone: string
+          payment_row_id: string | null
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agent?: string
+          closed_at?: string | null
+          closing_notice_sent_at?: string | null
+          created_at?: string
+          duration_minutes?: number
+          expires_at?: string
+          external_reference?: string | null
+          id?: string
+          last_message_at?: string | null
+          messages_count?: number
+          order_id?: string | null
+          patient_name?: string | null
+          patient_phone: string
+          payment_row_id?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agent?: string
+          closed_at?: string | null
+          closing_notice_sent_at?: string | null
+          created_at?: string
+          duration_minutes?: number
+          expires_at?: string
+          external_reference?: string | null
+          id?: string
+          last_message_at?: string | null
+          messages_count?: number
+          order_id?: string | null
+          patient_name?: string | null
+          patient_phone?: string
+          payment_row_id?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ot_agent_sessions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orientacao_tecnica_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ot_agent_sessions_payment_row_id_fkey"
+            columns: ["payment_row_id"]
+            isOneToOne: false
+            referencedRelation: "brisa_orientacao_payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ot_dispatch_events: {
         Row: {
           created_at: string
@@ -9379,6 +9454,14 @@ export type Database = {
       }
       ensure_affiliate_wallet: { Args: { _user_id: string }; Returns: string }
       ensure_referral_code: { Args: { _user_id: string }; Returns: string }
+      expire_ot_agent_sessions: {
+        Args: never
+        Returns: {
+          patient_name: string
+          patient_phone: string
+          session_id: string
+        }[]
+      }
       get_active_contingency_pix: {
         Args: never
         Returns: {
@@ -9527,6 +9610,17 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      open_ot_agent_session: {
+        Args: { _minutes?: number; _name?: string; _phone: string }
+        Returns: {
+          expires_at: string
+          opened_now: boolean
+          seconds_left: number
+          session_id: string
+          started_at: string
+          status: string
+        }[]
       }
       private_get_brisa_cron_secret: { Args: never; Returns: string }
       prune_webhook_idempotency: { Args: never; Returns: undefined }

@@ -4,6 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Professional } from "@/types/professional";
 import { professionals as baseProfessionals } from "@/data/professionals";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
+import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
+
+const MEDICOS_CATEGORY = "Médicos Prescritores";
 
 interface DoctorRow {
   id: string;

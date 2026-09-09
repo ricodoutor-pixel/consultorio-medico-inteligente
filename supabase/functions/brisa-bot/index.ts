@@ -231,31 +231,42 @@ async function sendMsg(chatId: string, phone: string, text: string): Promise<boo
   return sendEvo(phone, text);
 }
 
-import { GEMINI_PRIMARY_MODEL, GEMINI_FALLBACK_MODEL, GEMINI_MODELS_FALLBACK_CHAIN } from '../_shared/gemini.ts';
+import { GEMINI_PRIMARY_MODEL, GEMINI_FALLBACK_MODEL, GEMINI_MODELS_FALLBACK_CHAIN, GATEWAY_GEMINI_CHAIN, GATEWAY_NO_REASONING } from '../_shared/gemini.ts';
+import { buildScientificContextBlock } from '../_shared/scientific-context.ts';
 
 // ── GEMINI (Estágio 2 — background) ──────────────────────────────────────
 async function tryGemini(text: string, name: string | null, phone: string): Promise<string | null> {
   const ctx  = name ? `[${name}|+${phone}]` : `[+${phone}]`;
   const user = `${ctx}\n${text}`;
 
+  // 📚 RAG: evidências reais da biblioteca científica interna
+  const evidence = await buildScientificContextBlock(text, 3);
+  const systemPrompt = PERSONA + evidence;
+
   if (LOVABLE_KEY) {
-    try {
-      const r = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${LOVABLE_KEY}` },
-        body: JSON.stringify({
-          model: `google/${GEMINI_PRIMARY_MODEL}`, max_tokens: 450, temperature: 0.75,
-          messages: [{ role: 'system', content: PERSONA }, { role: 'user', content: user }],
-        }),
-        signal: AbortSignal.timeout(12_000),
-      });
-      if (r.ok) {
-        const j = await r.json() as { choices?: Array<{ message?: { content?: string } }> };
-        const rep = j?.choices?.[0]?.message?.content?.trim();
-        if (rep) { console.log('[brisa] ✅ Lovable/Gemini'); return rep; }
-      }
-    } catch {}
+    for (const model of GATEWAY_GEMINI_CHAIN) {
+      try {
+        const r = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${LOVABLE_KEY}` },
+          body: JSON.stringify({
+            model, max_tokens: 900, temperature: 0.7, reasoning: GATEWAY_NO_REASONING,
+            messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: user }],
+          }),
+          signal: AbortSignal.timeout(25_000),
+        });
+        if (r.ok) {
+          const j = await r.json() as { choices?: Array<{ message?: { content?: string } }> };
+          const rep = j?.choices?.[0]?.message?.content?.trim();
+          if (rep) { console.log(`[brisa] ✅ Lovable/${model} | evidências: ${evidence ? 'sim' : 'nao'}`); return rep; }
+        } else {
+          console.error(`[brisa] gateway ${model} HTTP ${r.status}: ${(await r.text()).slice(0, 200)}`);
+          if (r.status === 402 || r.status === 403) break; // terminal — não insistir
+        }
+      } catch (e: unknown) { console.error(`[brisa] gateway ${model}: ${(e as Error)?.message}`); }
+    }
   }
+
 
   if (!GEMINI_KEY) return null;
 
@@ -267,7 +278,7 @@ async function tryGemini(text: string, name: string | null, phone: string): Prom
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            system_instruction: { parts: [{ text: PERSONA }] },
+            system_instruction: { parts: [{ text: systemPrompt }] },
             contents: [{ role: 'user', parts: [{ text: user }] }],
             generationConfig: { maxOutputTokens: 450, temperature: 0.75 },
           }),

@@ -51,3 +51,18 @@ export async function callGeminiApiWithFallback(
 
   return { ok: false, status: 500, data: null, usedModel: "none" };
 }
+
+// ── Lovable AI Gateway (melhor Gemini disponível — 2026) ─────────────────
+// Usado como cérebro primário da Enfª Brisa / Dr. Edilson On.
+// Ids validados na listagem viva do gateway (google/*).
+export const GATEWAY_GEMINI_PRIMARY = "google/gemini-3.8-flash";
+export const GATEWAY_GEMINI_FALLBACK = "google/gemini-3.1-pro-preview";
+export const GATEWAY_GEMINI_CHAIN = [
+  GATEWAY_GEMINI_PRIMARY,
+  GATEWAY_GEMINI_FALLBACK,
+  "google/gemini-3.5-flash",
+] as const;
+
+// Os modelos Gemini 3.x raciocinam por padrao e consomem todo o orcamento de
+// tokens antes de escrever. Em chat/WhatsApp isso truncava a resposta.
+export const GATEWAY_NO_REASONING = { effort: "none" } as const;

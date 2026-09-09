@@ -23,6 +23,7 @@ import KycDocViewer from "@/components/admin/KycDocViewer";
 import DoctorContractViewerModal, { DoctorContractDetails } from "@/components/admin/DoctorContractViewerModal";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { KYC_LABELS, KYC_REQUIRED, type KycKind } from "@/lib/kyc-docs";
+import { compareDoctorsByCompleteness, doctorTierFromDocs, DOCTOR_TIER_LABEL } from "@/lib/doctor-ranking";
 
 export const AdminAprovacoes = () => {
   const { doctors, setDoctors, loading, fetchDoctors, counts } = useDoctors();
@@ -286,7 +287,7 @@ export const AdminAprovacoes = () => {
 
   // Filtered doctors based on search & status filter
   const filteredDoctors = useMemo(() => {
-    return doctors.filter((doc) => {
+    const list = doctors.filter((doc) => {
       const name = (doc.profile?.full_name || doc.full_name || "").toLowerCase();
       const crm = (doc.crm || "").toLowerCase();
       const specialty = (doc.specialty || "").toLowerCase();
@@ -308,6 +309,23 @@ export const AdminAprovacoes = () => {
 
       return true;
     });
+
+    // Fixos primeiro (Edilson, Suelen, Daniel) e, em seguida, quem tem o dossiê
+    // mais completo — o admin confere sempre de cima para baixo.
+    return [...list].sort((a, b) =>
+      compareDoctorsByCompleteness(
+        {
+          name: a.profile?.full_name || a.full_name,
+          registration: a.crm,
+          docsCount: (a.kyc_docs || []).length,
+        },
+        {
+          name: b.profile?.full_name || b.full_name,
+          registration: b.crm,
+          docsCount: (b.kyc_docs || []).length,
+        },
+      ),
+    );
   }, [doctors, searchTerm, statusFilter]);
 
   const countPending = doctors.filter(d => !d.is_approved_by_admin && d.approval_status !== 'rejected').length;
@@ -498,6 +516,12 @@ export const AdminAprovacoes = () => {
                               </div>
                               <p className="text-xs text-muted-foreground font-mono">{crm}</p>
                               <p className="text-[11px] text-emerald-400 font-semibold">{doc.specialty || 'Medicina Canabinoide'}</p>
+                              <Badge
+                                variant="secondary"
+                                className="mt-1 text-[10px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                              >
+                                {(doc.kyc_docs || []).length} anexos · {DOCTOR_TIER_LABEL[doctorTierFromDocs((doc.kyc_docs || []).length)]}
+                              </Badge>
                             </div>
                           </div>
                         </TableCell>

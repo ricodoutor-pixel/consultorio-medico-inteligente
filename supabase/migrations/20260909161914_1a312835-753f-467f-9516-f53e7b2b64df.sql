@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.sync_doctor_kyc_docs_count() FROM PUBLIC, anon, authenticated;

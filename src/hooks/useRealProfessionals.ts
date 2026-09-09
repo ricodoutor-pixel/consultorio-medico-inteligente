@@ -4,6 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Professional } from "@/types/professional";
 import { professionals as baseProfessionals } from "@/data/professionals";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
+import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
+
+const MEDICOS_CATEGORY = "Médicos Prescritores";
 
 interface DoctorRow {
   id: string;
@@ -28,6 +31,7 @@ interface DoctorRow {
   avatar_url?: string | null;
   council_type?: string | null;
   council_number?: string | null;
+  kyc_docs_count?: number | null;
 }
 
 /**
@@ -185,6 +189,8 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     // 2. Itera sobre os profissionais oficiais configurados (baseProfessionals)
     // Isso garante que TODAS as 10 categorias e os médicos tratados com jaleco e esteto apareçam perfeitamente.
     // Médicos novos cadastrados (sem card tratado) permanecem EXCLUSIVAMENTE no KYC admin.
+    const docsCountById = new Map<string, number>();
+
     const enrichedList: Professional[] = baseProfessionals.map((base) => {
       // Tenta encontrar correspondente real no banco de dados
       const cleanBaseCrm = (base.crm || "").replace(/\D/g, "");
@@ -198,12 +204,16 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const cfmPrint = getDoctorCfmPrint(base.crm || base.name) || base.cfmPrintUrl;
 
       if (!matchedDb) {
+        docsCountById.set(base.id, 0);
         return {
           ...base,
           imageUrl: treatedAvatar || base.imageUrl,
           cfmPrintUrl: cfmPrint,
         };
       }
+
+      docsCountById.set(base.id, matchedDb.kyc_docs_count ?? 0);
+
 
       // Enriquece com informações em tempo real do banco de dados
       return {
@@ -219,7 +229,28 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       };
     });
 
-    return enrichedList;
+    // Ordena APENAS os médicos prescritores: fixos primeiro, depois quem tem
+    // mais documentos anexados no cadastro. As outras categorias mantêm a ordem.
+    const medicoSlots: number[] = [];
+    enrichedList.forEach((p, i) => {
+      if (p.category === MEDICOS_CATEGORY) medicoSlots.push(i);
+    });
+
+    const rankedMedicos = medicoSlots
+      .map((i) => enrichedList[i])
+      .sort((a, b) =>
+        compareDoctorsByCompleteness(
+          { name: a.name, registration: a.crm, docsCount: docsCountById.get(a.id) ?? 0 },
+          { name: b.name, registration: b.crm, docsCount: docsCountById.get(b.id) ?? 0 },
+        ),
+      );
+
+    const ordered = [...enrichedList];
+    medicoSlots.forEach((slot, i) => {
+      ordered[slot] = rankedMedicos[i];
+    });
+
+    return ordered;
   }, [dbDoctors]);
 
   return { professionals, realCount: professionals.length, loading };

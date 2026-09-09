@@ -328,6 +328,24 @@ const Agendamento = () => {
                   <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
                     <CalIcon size={18} className="text-primary" /> Escolha a Data
                   </h2>
+                  {resolvingAssigned ? (
+                    <p className="text-xs text-muted-foreground flex items-center gap-2">
+                      <Loader2 size={12} className="animate-spin" /> Verificando o profissional de plantão…
+                    </p>
+                  ) : assigned ? (
+                    <Card className="border-primary/30 bg-primary/5">
+                      <CardContent className="p-4">
+                        <p className="text-xs text-muted-foreground">
+                          Seu atendimento será conduzido pelo profissional de plantão com cadastro
+                          completo e assinatura digital ativa:
+                        </p>
+                        <p className="text-sm font-bold text-foreground mt-1">
+                          {assigned.full_name || "Profissional de plantão"}
+                          {assigned.crm ? ` · ${assigned.crm}/${assigned.crm_state ?? ""}` : ""}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ) : null}
                   <Card className="border-border overflow-hidden">
                     <CardContent className="p-6 flex justify-center">
                       <Calendar

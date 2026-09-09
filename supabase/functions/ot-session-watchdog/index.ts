@@ -19,16 +19,30 @@ const EVO_URL = (Deno.env.get('EVOLUTION_API_URL') || '').replace(/\/+$/, '');
 const EVO_KEY = Deno.env.get('EVOLUTION_API_KEY') || '';
 const EVO_INST = Deno.env.get('EVOLUTION_INSTANCE') || 'plantayraiz';
 const WEBHOOK_SECRET = Deno.env.get('WAHA_WEBHOOK_SECRET') || '';
-const CRON_SECRET = Deno.env.get('BRISA_CEO_SECRET_KEY') || Deno.env.get('brisa_ceo_secret_key') || '';
 
-function authorized(req: Request): boolean {
-  const auth = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
-  const hdr = req.headers.get('x-webhook-secret') || req.headers.get('x-cron-secret') || '';
-  if (SB_KEY && auth === SB_KEY) return true;
-  if (WEBHOOK_SECRET && (hdr === WEBHOOK_SECRET || auth === WEBHOOK_SECRET)) return true;
-  if (CRON_SECRET && (hdr === CRON_SECRET || auth === CRON_SECRET)) return true;
-  return false;
+/** Segredo do cron guardado no cofre do banco (nunca em código). */
+async function vaultCronSecret(sb: ReturnType<typeof createClient>): Promise<string> {
+  try {
+    const { data } = await sb
+      .schema('vault')
+      .from('decrypted_secrets')
+      .select('decrypted_secret')
+      .eq('name', 'OT_WATCHDOG_CRON_SECRET')
+      .maybeSingle();
+    return (data as { decrypted_secret?: string } | null)?.decrypted_secret || '';
+  } catch {
+    return '';
+  }
 }
+
+function presentedSecret(req: Request): string {
+  return (
+    req.headers.get('x-cron-secret') ||
+    req.headers.get('x-webhook-secret') ||
+    (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '')
+  );
+}
+
 
 
 async function sendWhatsApp(phone: string, text: string): Promise<boolean> {

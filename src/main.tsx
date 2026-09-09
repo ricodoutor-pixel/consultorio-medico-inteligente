@@ -128,3 +128,9 @@ if (!rootElement) {
 rootElement.dataset.reactMounted = "1";
 createRoot(rootElement).render(<App />);
 
+// Remove a tela de inicialização estática assim que o React assume a tela.
+requestAnimationFrame(() => {
+  document.getElementById("__pyr_boot_screen")?.remove();
+});
+
+

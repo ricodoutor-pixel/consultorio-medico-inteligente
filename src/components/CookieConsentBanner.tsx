@@ -81,6 +81,32 @@ export const CookieConsentBanner = () => {
       },
     };
 
+    // Aceite único: grava cookies E os termos legais (LGPD/ANVISA/CFM)
+    try {
+      localStorage.setItem(TERMS_STORAGE_KEY, "true");
+    } catch {
+      // ignore
+    }
+
+    // Sincroniza os consentimentos legais em background (só se logado)
+    void (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user?.id) return;
+        await supabase.from("user_consents").upsert(
+          TERMS_CONSENT_TYPES.map((type) => ({
+            user_id: session.user.id,
+            consent_type: type,
+            version: TERMS_VERSION,
+            accepted: true,
+            user_agent: navigator.userAgent || "WebClient",
+          })) as any
+        );
+      } catch (e) {
+        console.warn("[LGPD] Falha ao sincronizar consentimentos:", e);
+      }
+    })();
+
     setTimeout(() => {
       localStorage.setItem(COOKIE_KEY, JSON.stringify(consent));
       setVisible(false);
@@ -101,6 +127,7 @@ export const CookieConsentBanner = () => {
       console.log("[LGPD] Consentimento registrado:", consent.accepted_at);
     }, 500);
   }, []);
+
 
   if (!visible) return null;
 

@@ -226,7 +226,21 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       };
     });
 
-    return enrichedList;
+    // Ordena APENAS os médicos prescritores: fixos primeiro, depois quem tem
+    // mais documentos anexados no cadastro. As outras categorias mantêm a ordem.
+    const originalIndex = new Map(enrichedList.map((p, i) => [p.id, i]));
+
+    return [...enrichedList].sort((a, b) => {
+      const aMed = a.category === MEDICOS_CATEGORY;
+      const bMed = b.category === MEDICOS_CATEGORY;
+      if (!aMed || !bMed) {
+        return (originalIndex.get(a.id) ?? 0) - (originalIndex.get(b.id) ?? 0);
+      }
+      return compareDoctorsByCompleteness(
+        { name: a.name, registration: a.crm, docsCount: docsCountById.get(a.id) ?? 0 },
+        { name: b.name, registration: b.crm, docsCount: docsCountById.get(b.id) ?? 0 },
+      );
+    });
   }, [dbDoctors]);
 
   return { professionals, realCount: professionals.length, loading };

@@ -104,7 +104,7 @@
     <link rel="preload" as="image" href="/verdinho-mascot-256.webp" type="image/webp" fetchpriority="high" />
 
     <!-- Preconnect & DNS-Prefetch para acelerar handshake TLS (Mobile LCP & WAHA) -->
-    <link rel="preconnect" href="https://tkxxoghzhvhjztdoomgss.supabase.co" crossorigin />
+    <link rel="preconnect" href="https://tkxxoghzhvhjzdoomgss.supabase.co" crossorigin />
     <link rel="preconnect" href="https://waha-production-4e9c.up.railway.app" crossorigin />
     <link rel="dns-prefetch" href="https://waha-production-4e9c.up.railway.app" />
     <link rel="dns-prefetch" href="https://www.google-analytics.com" />
@@ -297,7 +297,7 @@
     </script>
     <!-- TikTok Pixel Code End -->
 
-    <script type="module" crossorigin src="/assets/index-DluMqz5-.js"></script>
+    <script type="module" crossorigin src="/assets/index-Dm6nxNv5.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/date-fns-8SSMhL6z.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-BWnQObm0.js">
     <link rel="modulepreload" crossorigin href="/assets/pdf-excel-C2j4zSo4.js">
@@ -422,12 +422,18 @@
         // erros de Service Worker dentro de iframe não são falhas da plataforma.
         function isExternalNoise(err){
           try {
-            var msg = String((err && err.message) || err || '');
-            var stack = String((err && err.stack) || '');
-            if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack)) return true;
-            if (/MetaMask|ethereum|web3|Failed to connect to MetaMask/i.test(msg)) return true;
-            if (/ServiceWorkerRegistration|document is in an invalid state/i.test(msg)) return true;
-            if (/ResizeObserver loop/i.test(msg)) return true;
+            var current = err;
+            var depth = 0;
+            while (current && depth < 5) {
+              var msg = String((current && current.message) || current || '');
+              var stack = String((current && current.stack) || '');
+              if (/chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\//.test(stack + msg)) return true;
+              if (/MetaMask|ethereum|web3|Failed to connect to MetaMask|extension not found|inpage\.js/i.test(msg + stack)) return true;
+              if (/ServiceWorkerRegistration|document is in an invalid state/i.test(msg)) return true;
+              if (/ResizeObserver loop/i.test(msg)) return true;
+              current = current && current.cause;
+              depth++;
+            }
           } catch(_){}
           return false;
         }
@@ -463,11 +469,21 @@
           // Preserve filename/source because browser extensions often expose only
           // a generic message while their chrome-extension URL identifies the noise.
           var error = e.error || { message: e.message, stack: String(e.filename || '') };
+          if (isExternalNoise(error) || /extension:\/\//.test(String(e.filename || ''))) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+          }
           reportEarlyError(error, 'window.error');
         }, true);
         window.addEventListener('unhandledrejection', function(e){
+          if (isExternalNoise(e.reason)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+          }
           reportEarlyError(e.reason, 'unhandledrejection');
-        });
+        }, true);
 
         // Watchdog paciente: mantém a tela de carregamento enquanto o bundle
         // compila/baixa. Erros genéricos e de extensões jamais substituem o #root;
@@ -516,6 +532,6 @@
     </script>
     <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
     <script nomodule crossorigin id="vite-legacy-polyfill" src="/assets/polyfills-legacy-8XaHBhDD.js"></script>
-    <script nomodule crossorigin id="vite-legacy-entry" data-src="/assets/index-legacy-B-RbVgsr.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+    <script nomodule crossorigin id="vite-legacy-entry" data-src="/assets/index-legacy-SYxzliBb.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
   </body>
 </html>

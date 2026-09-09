@@ -144,16 +144,28 @@ export default function SaudeVerdeAgendar() {
         {step === 1 && (
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">1. Selecione o serviço</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {specialties.map(s => (
-                <button key={s.id} onClick={() => { setSpecialty(s); setStep(2); }}
-                  className={`text-left p-4 rounded-lg border transition-colors ${specialty?.id === s.id ? "border-primary bg-primary/5" : "border-border/50 hover:border-primary/40"}`}>
-                  <div className="font-semibold text-sm">{s.name}</div>
-                  <Badge variant="outline" className="text-[10px] mt-1 capitalize">{s.category}</Badge>
-                  {s.price_from_brl && <div className="text-xs text-muted-foreground mt-2">a partir de R$ {Number(s.price_from_brl).toFixed(2)}</div>}
-                </button>
-              ))}
-            </div>
+            {specialtiesLoading ? (
+              <div className="py-8 text-center text-muted-foreground flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Carregando serviços...
+              </div>
+            ) : specialties.length === 0 ? (
+              <p className="text-muted-foreground py-8 text-center">
+                {specialtiesError
+                  ? "Não conseguimos carregar os serviços agora. Atualize a página em alguns instantes."
+                  : "Nenhum serviço disponível no momento. Em breve!"}
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {specialties.map(s => (
+                  <button key={s.id} onClick={() => { setSpecialty(s); setStep(2); }}
+                    className={`text-left p-4 rounded-lg border transition-colors ${specialty?.id === s.id ? "border-primary bg-primary/5" : "border-border/50 hover:border-primary/40"}`}>
+                    <div className="font-semibold text-sm">{s.name}</div>
+                    <Badge variant="outline" className="text-[10px] mt-1 capitalize">{s.category}</Badge>
+                    {s.price_from_brl && <div className="text-xs text-muted-foreground mt-2">a partir de R$ {Number(s.price_from_brl).toFixed(2)}</div>}
+                  </button>
+                ))}
+              </div>
+            )}
           </Card>
         )}
 

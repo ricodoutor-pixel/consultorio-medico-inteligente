@@ -16,14 +16,6 @@ type Partner = { id: string; name: string; city: string; state: string; rating: 
 
 const TIMES = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
 
-// Lista de contingência estática para especialidades canábicas básicas
-const FALLBACK_SPECIALTIES: Specialty[] = [
-  { id: "esp-neurologia", name: "Neurologia (Epilepsia, Parkinson, TEA)", slug: "neurologia", category: "consulta", price_from_brl: 150 },
-  { id: "esp-psiquiatria", name: "Psiquiatria (Ansiedade, Insônia, Depressão)", slug: "psiquiatria", category: "consulta", price_from_brl: 150 },
-  { id: "esp-dor-cronica", name: "Dor Crônica & Fibromialgia", slug: "dor-cronica", category: "consulta", price_from_brl: 130 },
-  { id: "esp-cuidados-paliativos", name: "Cuidados Paliativos & Oncologia", slug: "cuidados-paliativos", category: "consulta", price_from_brl: 140 },
-  { id: "esp-medicina-integrativa", name: "Medicina Integrativa & Canabinoide", slug: "medicina-integrativa", category: "consulta", price_from_brl: 120 },
-];
 
 export default function SaudeVerdeAgendar() {
   const navigate = useNavigate();

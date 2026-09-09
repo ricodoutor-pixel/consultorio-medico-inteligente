@@ -204,6 +204,54 @@ const ConsultationPayment = () => {
   const minutes = Math.floor(countdown / 60);
   const seconds = countdown % 60;
 
+  // O catálogo de especialistas é carregado do banco (assíncrono). Sem esta
+  // barreira, o primeiro render lia `pro.imageUrl` de `undefined` e a tela
+  // ficava em branco, impedindo o pagamento.
+  if (professionalsLoading && !pro && !agenticOrder) {
+    return (
+      <div className="min-h-dvh bg-background">
+        <Navbar />
+        <section className="pt-32 pb-24">
+          <div className="container mx-auto px-4 max-w-2xl text-center">
+            <Loader2 size={48} className="text-primary animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Carregando dados do especialista...</p>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!pro && !agenticOrder) {
+    return (
+      <div className="min-h-dvh bg-background">
+        <Navbar />
+        <section className="pt-32 pb-24">
+          <div className="container mx-auto px-4 max-w-md text-center">
+            <AlertCircle size={44} className="text-destructive mx-auto mb-4" />
+            <h1 className="font-display font-black text-xl text-foreground mb-2">Especialista não encontrado</h1>
+            <p className="text-muted-foreground mb-6">
+              Escolha novamente o profissional para continuar com o pagamento.
+            </p>
+            <Button asChild>
+              <Link to="/profissionais">Ver especialistas</Link>
+            </Button>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  const proView = {
+    imageUrl: pro?.imageUrl ?? "/placeholder.svg",
+    name: pro?.name ?? "Farmácia Dispensary Planta y Raíz",
+    category: pro?.category ?? "Pedido de medicamento prescrito",
+    price: pro?.price ?? `R$ ${basePrice.toFixed(2).replace(".", ",")}`,
+    id: pro?.id ?? "",
+    paymentLink: pro?.paymentLink ?? undefined,
+  };
+
   return (
     <div className="min-h-dvh bg-background">
       <Navbar />

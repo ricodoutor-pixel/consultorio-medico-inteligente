@@ -231,19 +231,26 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     // Ordena APENAS os médicos prescritores: fixos primeiro, depois quem tem
     // mais documentos anexados no cadastro. As outras categorias mantêm a ordem.
-    const originalIndex = new Map(enrichedList.map((p, i) => [p.id, i]));
-
-    return [...enrichedList].sort((a, b) => {
-      const aMed = a.category === MEDICOS_CATEGORY;
-      const bMed = b.category === MEDICOS_CATEGORY;
-      if (!aMed || !bMed) {
-        return (originalIndex.get(a.id) ?? 0) - (originalIndex.get(b.id) ?? 0);
-      }
-      return compareDoctorsByCompleteness(
-        { name: a.name, registration: a.crm, docsCount: docsCountById.get(a.id) ?? 0 },
-        { name: b.name, registration: b.crm, docsCount: docsCountById.get(b.id) ?? 0 },
-      );
+    const medicoSlots: number[] = [];
+    enrichedList.forEach((p, i) => {
+      if (p.category === MEDICOS_CATEGORY) medicoSlots.push(i);
     });
+
+    const rankedMedicos = medicoSlots
+      .map((i) => enrichedList[i])
+      .sort((a, b) =>
+        compareDoctorsByCompleteness(
+          { name: a.name, registration: a.crm, docsCount: docsCountById.get(a.id) ?? 0 },
+          { name: b.name, registration: b.crm, docsCount: docsCountById.get(b.id) ?? 0 },
+        ),
+      );
+
+    const ordered = [...enrichedList];
+    medicoSlots.forEach((slot, i) => {
+      ordered[slot] = rankedMedicos[i];
+    });
+
+    return ordered;
   }, [dbDoctors]);
 
   return { professionals, realCount: professionals.length, loading };

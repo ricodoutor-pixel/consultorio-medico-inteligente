@@ -20,13 +20,30 @@ const EVO_KEY = Deno.env.get('EVOLUTION_API_KEY') || '';
 const EVO_INST = Deno.env.get('EVOLUTION_INSTANCE') || 'plantayraiz';
 const WEBHOOK_SECRET = Deno.env.get('WAHA_WEBHOOK_SECRET') || '';
 
-function authorized(req: Request): boolean {
-  const auth = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
-  const hdr = req.headers.get('x-webhook-secret') || '';
-  if (SB_KEY && auth === SB_KEY) return true;
-  if (WEBHOOK_SECRET && (hdr === WEBHOOK_SECRET || auth === WEBHOOK_SECRET)) return true;
-  return false;
+/** Segredo do cron guardado no cofre do banco (nunca em código). */
+async function vaultCronSecret(sb: ReturnType<typeof createClient>): Promise<string> {
+  try {
+    const { data } = await sb
+      .schema('vault')
+      .from('decrypted_secrets')
+      .select('decrypted_secret')
+      .eq('name', 'OT_WATCHDOG_CRON_SECRET')
+      .maybeSingle();
+    return (data as { decrypted_secret?: string } | null)?.decrypted_secret || '';
+  } catch {
+    return '';
+  }
 }
+
+function presentedSecret(req: Request): string {
+  return (
+    req.headers.get('x-cron-secret') ||
+    req.headers.get('x-webhook-secret') ||
+    (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '')
+  );
+}
+
+
 
 async function sendWhatsApp(phone: string, text: string): Promise<boolean> {
   if (WAHA_URL && WAHA_KEY) {
@@ -58,11 +75,6 @@ async function sendWhatsApp(phone: string, text: string): Promise<boolean> {
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
-  if (!authorized(req)) {
-    return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), {
-      status: 401, headers: { ...cors, 'Content-Type': 'application/json' },
-    });
-  }
   if (!SB_URL || !SB_KEY) {
     return new Response(JSON.stringify({ ok: false, error: 'missing_config' }), {
       status: 500, headers: { ...cors, 'Content-Type': 'application/json' },
@@ -70,12 +82,26 @@ Deno.serve(async (req: Request) => {
   }
 
   const sb = createClient(SB_URL, SB_KEY);
+
+  const presented = presentedSecret(req);
+  const cronSecret = await vaultCronSecret(sb);
+  const ok =
+    (!!presented && presented === SB_KEY) ||
+    (!!presented && !!WEBHOOK_SECRET && presented === WEBHOOK_SECRET) ||
+    (!!presented && !!cronSecret && presented === cronSecret);
+  if (!ok) {
+    return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), {
+      status: 401, headers: { ...cors, 'Content-Type': 'application/json' },
+    });
+  }
+
   const { data, error } = await sb.rpc('expire_ot_agent_sessions');
   if (error) {
     return new Response(JSON.stringify({ ok: false, error: error.message }), {
       status: 500, headers: { ...cors, 'Content-Type': 'application/json' },
     });
   }
+
 
   const rows = (Array.isArray(data) ? data : []) as Array<{ session_id: string; patient_phone: string }>;
   let notified = 0;

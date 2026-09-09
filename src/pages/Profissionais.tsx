@@ -423,7 +423,7 @@ const Profissionais = () => {
                         <div className="flex items-center gap-3 mt-4 bg-primary/10 rounded-xl border border-primary/20 p-4 sm:p-5 shadow-sm w-full">
                           <ShieldCheck size={30} className="text-primary shrink-0" />
                           <span className="text-[11px] sm:text-xs leading-snug text-primary font-bold tracking-tight">
-                            Perfil 100% Verificado Por IA independente banco de dados do {p.councilLabel === "Col Med Reg" || (p.flags && p.flags.includes("🇧🇴") && !p.flags.includes("🇧🇷")) ? "Colegio Médico da Bolívia" : "CFM"} proteção 360-24 x 7 contra fraudes e falsificação de identidade
+                            Perfil 100% Verificado Por IA independente banco de dados do {p.councilLabel?.startsWith("Col Med") || (p.flags && p.flags.includes("🇧🇴") && !p.flags.includes("🇧🇷")) ? "Colegio Médico da Bolívia" : "CFM"} proteção 360-24 x 7 contra fraudes e falsificação de identidade
                           </span>
                         </div>
                       </div>

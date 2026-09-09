@@ -272,6 +272,18 @@ const Agendamento = () => {
               {/* Step 1: Select Doctor */}
               {step === 1 && (
                 <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                  <Card className="border-primary/40 bg-primary/5">
+                    <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                      <div>
+                        <p className="font-bold text-foreground text-sm">Quer só uma Orientação Técnica por R$ 30?</p>
+                        <p className="text-xs text-muted-foreground">Atendimento imediato, sem agendamento, com documento e selo digital.</p>
+                      </div>
+                      <Button asChild size="sm" className="rounded-xl font-black">
+                        <a href="/brisa-orientacao">Ir para Orientação Técnica</a>
+                      </Button>
+                    </CardContent>
+                  </Card>
+
                   <h2 className="font-display font-black text-lg text-foreground">Escolha o Especialista</h2>
                   {doctors.length === 0 ? (
                     <Card className="border-border">
@@ -283,7 +295,7 @@ const Agendamento = () => {
                     </Card>
                   ) : (
                     doctors.map(doc => (
-                      <Card key={doc.id} className={cn("border-border cursor-pointer transition-all hover:border-primary/40", selectedDoctor?.id === doc.id && "border-primary bg-primary/5")} onClick={() => { setSelectedDoctor(doc); setStep(2); }}>
+                      <Card key={doc.id} className={cn("border-border cursor-pointer transition-all hover:border-primary/40", selectedDoctor?.id === doc.id && "border-primary bg-primary/5")} onClick={() => { void selectDoctor(doc); }}>
                         <CardContent className="p-4 flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">

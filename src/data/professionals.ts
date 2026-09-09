@@ -746,7 +746,7 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 0,
     avatar: "DJ",
-    imageUrl: "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/doctors/36f95180-fafc-46d0-9591-f8b246f9f1d1.jpg",
+    imageUrl: "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/doctors/36f95180-fafc-46d0-9591-f8b246f9f1d1.jpg?v=2",
     online: false,
     crm: "14828/PB (Regular)",
     hospital: "Planta y Raíz Ltda",

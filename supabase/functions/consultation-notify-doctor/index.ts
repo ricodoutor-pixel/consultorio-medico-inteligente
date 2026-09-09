@@ -3,7 +3,7 @@
 // Segurança: exige JWT do paciente dono do agendamento (ou service_role).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { sendWhatsApp } from "../_shared/evolution.ts";
+import { sendWhatsAppAlert } from "../_shared/waha.ts";
 
 const SITE = "https://www.plantayraiz.com.br";
 

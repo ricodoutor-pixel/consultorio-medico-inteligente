@@ -9713,6 +9713,7 @@ export type Database = {
           valid: boolean
         }[]
       }
+      verify_ot_watchdog_secret: { Args: { _secret: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

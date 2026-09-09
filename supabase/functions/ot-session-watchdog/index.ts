@@ -75,11 +75,6 @@ async function sendWhatsApp(phone: string, text: string): Promise<boolean> {
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
-  if (!authorized(req)) {
-    return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), {
-      status: 401, headers: { ...cors, 'Content-Type': 'application/json' },
-    });
-  }
   if (!SB_URL || !SB_KEY) {
     return new Response(JSON.stringify({ ok: false, error: 'missing_config' }), {
       status: 500, headers: { ...cors, 'Content-Type': 'application/json' },
@@ -87,12 +82,26 @@ Deno.serve(async (req: Request) => {
   }
 
   const sb = createClient(SB_URL, SB_KEY);
+
+  const presented = presentedSecret(req);
+  const cronSecret = await vaultCronSecret(sb);
+  const ok =
+    (!!presented && presented === SB_KEY) ||
+    (!!presented && !!WEBHOOK_SECRET && presented === WEBHOOK_SECRET) ||
+    (!!presented && !!cronSecret && presented === cronSecret);
+  if (!ok) {
+    return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), {
+      status: 401, headers: { ...cors, 'Content-Type': 'application/json' },
+    });
+  }
+
   const { data, error } = await sb.rpc('expire_ot_agent_sessions');
   if (error) {
     return new Response(JSON.stringify({ ok: false, error: error.message }), {
       status: 500, headers: { ...cors, 'Content-Type': 'application/json' },
     });
   }
+
 
   const rows = (Array.isArray(data) ? data : []) as Array<{ session_id: string; patient_phone: string }>;
   let notified = 0;

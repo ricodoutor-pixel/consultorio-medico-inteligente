@@ -231,7 +231,7 @@ async function sendMsg(chatId: string, phone: string, text: string): Promise<boo
   return sendEvo(phone, text);
 }
 
-import { GEMINI_PRIMARY_MODEL, GEMINI_FALLBACK_MODEL, GEMINI_MODELS_FALLBACK_CHAIN, GATEWAY_GEMINI_CHAIN } from '../_shared/gemini.ts';
+import { GEMINI_PRIMARY_MODEL, GEMINI_FALLBACK_MODEL, GEMINI_MODELS_FALLBACK_CHAIN, GATEWAY_GEMINI_CHAIN, GATEWAY_NO_REASONING } from '../_shared/gemini.ts';
 import { buildScientificContextBlock } from '../_shared/scientific-context.ts';
 
 // ── GEMINI (Estágio 2 — background) ──────────────────────────────────────
@@ -250,7 +250,7 @@ async function tryGemini(text: string, name: string | null, phone: string): Prom
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${LOVABLE_KEY}` },
           body: JSON.stringify({
-            model, max_tokens: 550, temperature: 0.7,
+            model, max_tokens: 900, temperature: 0.7, reasoning: GATEWAY_NO_REASONING,
             messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: user }],
           }),
           signal: AbortSignal.timeout(25_000),

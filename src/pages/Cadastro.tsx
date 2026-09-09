@@ -340,6 +340,18 @@ const Cadastro = () => {
 
       // 2. Atualizar perfil com dados internacionais
       if (authData.user) {
+        // Garante sessão ativa (necessária para gravar perfil, loja e consentimento)
+        if (!authData.session) {
+          try {
+            await supabase.auth.signInWithPassword({
+              email: formData.email.trim().toLowerCase(),
+              password: formData.senha,
+            });
+          } catch (_) {
+            // confirmação de e-mail pendente
+          }
+        }
+
         await supabase.from("profiles").update({
           full_name: formData.nome,
           phone: formData.telefone || null,
@@ -347,7 +359,50 @@ const Cadastro = () => {
           user_type: dbType,
           signup_role: type || "paciente",
           date_of_birth: formData.dataNascimento || null,
+          ...(type === "farmacia"
+            ? {
+                company_name: formData.razaoSocial || null,
+                trade_name: formData.razaoSocial || null,
+                cnpj: formData.cnpj || null,
+                anvisa_auth: formData.anvisaAuth || null,
+                crf: formData.crf || null,
+                cep: formData.cep || null,
+                address_street: formData.logradouro || null,
+                address_number: formData.numero || null,
+                address_complement: formData.complemento || null,
+                neighborhood: formData.bairro || null,
+              }
+            : {}),
         }).eq("id", authData.user.id);
+
+        // 2b. Farmácia/Lojista: cria a loja já na fila de homologação (KYC pendente)
+        if (type === "farmacia") {
+          const { error: vendorError } = await supabase.from("vendors").insert({
+            user_id: authData.user.id,
+            store_name: formData.razaoSocial || formData.nome,
+            razao_social: formData.razaoSocial || formData.nome,
+            nome_fantasia: formData.razaoSocial || formData.nome,
+            cnpj: formData.cnpj || null,
+            anvisa_afe: formData.anvisaAuth || null,
+            responsavel_tecnico: formData.crf || null,
+            telefone_whatsapp: formData.telefone || null,
+            endereco_completo: [formData.logradouro, formData.numero, formData.bairro, formData.cep]
+              .filter(Boolean)
+              .join(", ") || null,
+            shipping_origin_cep: formData.cep || null,
+            is_active: false,
+            is_kyc_approved: false,
+            kyc_status: "pending",
+          });
+          if (vendorError) {
+            console.warn("[vendors insert]", vendorError);
+            toast({
+              title: "Conta criada, loja pendente",
+              description: "Cadastro criado. Finalize os dados da farmácia no painel do lojista.",
+            });
+          }
+        }
+
 
         // 3. Gravar consentimento TCLE obrigatório com hash SHA-256
         const timestamp = new Date().toISOString();

@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { resolveRoutingDoctor, notifyRoutedDoctor, type RoutedDoctor } from "@/lib/consultation-routing";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
@@ -62,11 +63,30 @@ const Agendamento = () => {
   const [slots, setSlots] = useState<SlotInfo[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [reserving, setReserving] = useState(false);
+  /** Profissional de plantão resolvido no servidor (cadastro mais completo). */
+  const [assigned, setAssigned] = useState<RoutedDoctor | null>(null);
+  const [resolvingAssigned, setResolvingAssigned] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user?.id || null));
     fetchDoctors();
   }, []);
+
+  /** Todo atendimento é direcionado ao profissional com cadastro mais completo. */
+  const selectDoctor = async (doc: Doctor) => {
+    setSelectedDoctor(doc);
+    setSelectedDate(undefined);
+    setSelectedTime("");
+    setSelectedSlotId(null);
+    setResolvingAssigned(true);
+    const routed = await resolveRoutingDoctor(doc.specialty);
+    setAssigned(routed);
+    setResolvingAssigned(false);
+    setStep(2);
+  };
+
+  /** Agenda usada de fato: o profissional de plantão. */
+  const schedulingDoctorId = assigned?.doctor_id ?? selectedDoctor?.id ?? null;
 
   const fetchDoctors = async () => {
     const { data } = await supabase.from("doctors_public").select("*");

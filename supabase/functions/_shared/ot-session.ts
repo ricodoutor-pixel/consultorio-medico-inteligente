@@ -48,12 +48,19 @@ export async function resolveOtSession(
 }
 
 /** Marca uma mensagem consumida na sessão (contador + último acesso). */
-export async function touchOtSession(sb: SupabaseClient, sessionId: string, count: number): Promise<void> {
+export async function touchOtSession(sb: SupabaseClient, sessionId: string): Promise<void> {
+  const { data } = await sb
+    .from('ot_agent_sessions')
+    .select('messages_count')
+    .eq('id', sessionId)
+    .maybeSingle();
+  const current = typeof data?.messages_count === 'number' ? data.messages_count : 0;
   await sb
     .from('ot_agent_sessions')
-    .update({ messages_count: count + 1, last_message_at: new Date().toISOString() })
+    .update({ messages_count: current + 1, last_message_at: new Date().toISOString() })
     .eq('id', sessionId);
 }
+
 
 /** Fecha a sessão (tempo esgotado). */
 export async function closeOtSession(sb: SupabaseClient, sessionId: string): Promise<void> {

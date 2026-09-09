@@ -258,6 +258,8 @@ export const STANDARD_DOCTOR_SERVICES = [
 ];
 
 export const professionals: Professional[] = [
+
+] = [
   {
     id: "med-jose-geraldo",
     name: "Dr. José Geraldo Barbugli Abbade Filho",

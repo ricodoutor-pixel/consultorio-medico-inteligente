@@ -9659,6 +9659,17 @@ export type Database = {
         }
         Returns: undefined
       }
+      request_doctor_pix_payout: {
+        Args: { _amount: number }
+        Returns: {
+          amount: number
+          fee: number
+          net_amount: number
+          pix_key: string
+          remaining_balance: number
+          withdrawal_id: string
+        }[]
+      }
       revert_ai_agent_action: {
         Args: { _event_id: string; _reason: string }
         Returns: {
@@ -9693,6 +9704,10 @@ export type Database = {
           url: string
           year: number
         }[]
+      }
+      settle_doctor_pix_payout: {
+        Args: { _reason?: string; _status: string; _withdrawal_id: string }
+        Returns: undefined
       }
       sign_doctor_contract: {
         Args: {

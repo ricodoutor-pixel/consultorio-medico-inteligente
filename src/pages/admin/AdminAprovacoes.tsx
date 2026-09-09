@@ -286,7 +286,7 @@ export const AdminAprovacoes = () => {
 
   // Filtered doctors based on search & status filter
   const filteredDoctors = useMemo(() => {
-    return doctors.filter((doc) => {
+    const list = doctors.filter((doc) => {
       const name = (doc.profile?.full_name || doc.full_name || "").toLowerCase();
       const crm = (doc.crm || "").toLowerCase();
       const specialty = (doc.specialty || "").toLowerCase();

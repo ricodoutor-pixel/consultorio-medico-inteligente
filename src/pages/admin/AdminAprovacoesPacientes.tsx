@@ -424,11 +424,6 @@ export const AdminAprovacoesPacientes = () => {
                           <h3 className="text-lg md:text-xl font-display font-black text-foreground">
                             {patient.full_name}
                           </h3>
-                          {patient.id === TEST_PATIENT_DATA.id && (
-                            <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-[10px] font-bold">
-                              CONTA MESTRE DE TESTES ⭐
-                            </Badge>
-                          )}
                           <OnlineStatusIndicator online={patient.is_online} size="sm" showLabel />
                           {patient.is_approved ? (
                             <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/40 text-[10px] font-bold">
@@ -442,7 +437,7 @@ export const AdminAprovacoesPacientes = () => {
                         </div>
 
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          CPF: <strong className="font-mono text-foreground font-bold">{patient.cpf}</strong> · Nasc: <span className="text-slate-300">{patient.date_of_birth}</span> · E-mail: <strong className="text-foreground">{patient.email}</strong>
+                          CPF: <strong className="font-mono text-foreground font-bold">{patient.cpf}</strong> · Nasc: <span className="text-slate-300">{patient.date_of_birth}</span> · Telefone: <strong className="text-foreground">{patient.phone || "—"}</strong>
                         </p>
 
                         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1.5 flex-wrap">
@@ -452,14 +447,15 @@ export const AdminAprovacoesPacientes = () => {
                           </span>
                           <span>·</span>
                           <span className="text-emerald-400 font-medium flex items-center gap-1">
-                            <Activity size={12} /> Visitas: {patient.visit_count_day} hoje · {patient.visit_count_week} semana · {patient.visit_count_month} mês
+                            <Activity size={12} /> {patient.consultations.length} consulta(s) · {patient.payments.length} pagamento(s)
                           </span>
                           <span>·</span>
                           <span className="text-sky-300">
-                            Cadastrado há 25 dias
+                            Cadastro: {patient.created_at ? new Date(patient.created_at).toLocaleDateString("pt-BR") : "—"}
                           </span>
                         </div>
                       </div>
+
                     </div>
 
                     {/* Switch de Aptidão para Agendamento */}

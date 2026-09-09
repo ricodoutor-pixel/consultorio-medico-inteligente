@@ -84,11 +84,11 @@ Deno.serve(async (req: Request) => {
   const sb = createClient(SB_URL, SB_KEY);
 
   const presented = presentedSecret(req);
-  const cronSecret = await vaultCronSecret(sb);
   const ok =
     (!!presented && presented === SB_KEY) ||
     (!!presented && !!WEBHOOK_SECRET && presented === WEBHOOK_SECRET) ||
-    (!!presented && !!cronSecret && presented === cronSecret);
+    (await cronSecretValid(sb, presented));
+
   if (!ok) {
     return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), {
       status: 401, headers: { ...cors, 'Content-Type': 'application/json' },

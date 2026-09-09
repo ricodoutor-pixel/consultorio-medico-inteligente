@@ -192,9 +192,9 @@ export function OximetriaOptica({ onComplete }: Props) {
           </div>
         )}
 
-        <Button type="submit" className="w-full h-12 rounded-xl text-sm font-semibold shadow-md">
-          <Save className="w-4 h-4 mr-2" />
-          {isSaved ? 'Atualizar no Prontuário' : 'Registrar no Prontuário / Anexar ao Chat'}
+        <Button type="submit" disabled={saving} className="w-full h-12 rounded-xl text-sm font-semibold shadow-md">
+          {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+          {saving ? 'Gravando no prontuário...' : isSaved ? 'Atualizar no Prontuário' : 'Registrar no Prontuário / Anexar ao Chat'}
         </Button>
       </form>
 

@@ -48,6 +48,8 @@ export default function SaudeVerdeAgendar() {
       }
     })();
 
+    // Só usamos especialidades reais do banco: ids fictícios eram rejeitados
+    // no fechamento do agendamento (chave estrangeira), quebrando o fluxo.
     (async () => {
       try {
         const { data, error } = await supabase
@@ -55,14 +57,14 @@ export default function SaudeVerdeAgendar() {
           .select("id, name, slug, category, price_from_brl")
           .order("sort_order");
 
-        if (error || !data || data.length === 0) {
-          setSpecialties(FALLBACK_SPECIALTIES);
-        } else {
-          setSpecialties(data as Specialty[]);
-        }
+        if (error) throw error;
+        setSpecialties((data ?? []) as Specialty[]);
       } catch (err) {
-        console.warn("[saude-verde] Erro ao buscar especialidades, usando contingência:", err);
-        setSpecialties(FALLBACK_SPECIALTIES);
+        console.warn("[saude-verde] Erro ao buscar especialidades:", err);
+        setSpecialties([]);
+        setSpecialtiesError(true);
+      } finally {
+        setSpecialtiesLoading(false);
       }
     })();
   }, []);

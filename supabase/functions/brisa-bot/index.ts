@@ -240,14 +240,20 @@ async function sendMsg(chatId: string, phone: string, text: string): Promise<boo
 import { GEMINI_PRIMARY_MODEL, GEMINI_FALLBACK_MODEL, GEMINI_MODELS_FALLBACK_CHAIN, GATEWAY_GEMINI_CHAIN, GATEWAY_NO_REASONING } from '../_shared/gemini.ts';
 import { buildScientificContextBlock } from '../_shared/scientific-context.ts';
 
-// ── GEMINI (Estágio 2 — background) ──────────────────────────────────────
-async function tryGemini(text: string, name: string | null, phone: string): Promise<string | null> {
+// ── GEMINI (cérebro único, persona injetada por agente) ─────────────────
+async function tryGemini(
+  text: string,
+  name: string | null,
+  phone: string,
+  persona: string = PERSONA,
+): Promise<string | null> {
   const ctx  = name ? `[${name}|+${phone}]` : `[+${phone}]`;
   const user = `${ctx}\n${text}`;
 
   // 📚 RAG: evidências reais da biblioteca científica interna
   const evidence = await buildScientificContextBlock(text, 3);
-  const systemPrompt = PERSONA + evidence;
+  const systemPrompt = persona + evidence;
+
 
   if (LOVABLE_KEY) {
     for (const model of GATEWAY_GEMINI_CHAIN) {

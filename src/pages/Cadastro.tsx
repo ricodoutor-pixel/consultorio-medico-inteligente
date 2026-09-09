@@ -340,6 +340,18 @@ const Cadastro = () => {
 
       // 2. Atualizar perfil com dados internacionais
       if (authData.user) {
+        // Garante sessão ativa (necessária para gravar perfil, loja e consentimento)
+        if (!authData.session) {
+          try {
+            await supabase.auth.signInWithPassword({
+              email: formData.email.trim().toLowerCase(),
+              password: formData.senha,
+            });
+          } catch (_) {
+            // confirmação de e-mail pendente
+          }
+        }
+
         await supabase.from("profiles").update({
           full_name: formData.nome,
           phone: formData.telefone || null,

@@ -3,9 +3,22 @@ import { Shield, Check, Cookie, BarChart3, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
 
 const COOKIE_KEY = "plr_cookie_consent";
 const CONSENT_VERSION = "1.0";
+
+/** Aceite único: cookies + termos, privacidade, dados médicos, geolocalização e wearables. */
+const TERMS_VERSION = "2.1";
+const TERMS_STORAGE_KEY = `pyr_terms_accepted_v${TERMS_VERSION.replace(".", "_")}`;
+const TERMS_CONSENT_TYPES = [
+  "terms_of_use",
+  "privacy_policy",
+  "medical_data_processing",
+  "geolocation_emergency",
+  "health_data_wearables",
+] as const;
+
 
 interface ConsentRecord {
   version: string;
@@ -68,6 +81,32 @@ export const CookieConsentBanner = () => {
       },
     };
 
+    // Aceite único: grava cookies E os termos legais (LGPD/ANVISA/CFM)
+    try {
+      localStorage.setItem(TERMS_STORAGE_KEY, "true");
+    } catch {
+      // ignore
+    }
+
+    // Sincroniza os consentimentos legais em background (só se logado)
+    void (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user?.id) return;
+        await supabase.from("user_consents").upsert(
+          TERMS_CONSENT_TYPES.map((type) => ({
+            user_id: session.user.id,
+            consent_type: type,
+            version: TERMS_VERSION,
+            accepted: true,
+            user_agent: navigator.userAgent || "WebClient",
+          })) as any
+        );
+      } catch (e) {
+        console.warn("[LGPD] Falha ao sincronizar consentimentos:", e);
+      }
+    })();
+
     setTimeout(() => {
       localStorage.setItem(COOKIE_KEY, JSON.stringify(consent));
       setVisible(false);
@@ -88,6 +127,7 @@ export const CookieConsentBanner = () => {
       console.log("[LGPD] Consentimento registrado:", consent.accepted_at);
     }, 500);
   }, []);
+
 
   if (!visible) return null;
 
@@ -110,17 +150,22 @@ export const CookieConsentBanner = () => {
               <Shield size={18} className="text-emerald-300 shrink-0 hidden sm:block" />
               <div className="min-w-0">
                 <p className={`font-display font-bold text-white leading-tight sm:mb-1 truncate sm:whitespace-normal ${isPlansRoute && isMobile ? 'text-[11px]' : 'text-xs sm:text-base'}`}>
-                  🍪 Cookies & Privacidade
+                  🍪 Termos, Privacidade & Cookies
                 </p>
                 <p className="hidden sm:block text-emerald-100/80 text-xs sm:text-sm leading-relaxed">
-                  Este site utiliza cookies para aprimorar sua experiência. Saiba mais em nossa{" "}
+                  Ao aceitar, você concorda com os Termos de Uso v2.1, a{" "}
                   <Link to="/privacidade" className="underline underline-offset-2 text-emerald-300 hover:text-white transition-colors">
                     Política de Privacidade
-                  </Link>.
+                  </Link>
+                  , o tratamento de dados médicos (LGPD Art. 11), o uso da geolocalização para emergências, os dados de saúde e wearables, e os cookies do site — conforme LGPD, RDC 660/2022 (ANVISA) e CFM 2.314/2022.
                 </p>
-                <Link to="/privacidade" className={`sm:hidden text-emerald-300 underline underline-offset-2 ${isPlansRoute && isMobile ? 'text-[9px]' : 'text-[10px]'}`}>
-                  Política de Privacidade
-                </Link>
+                <p className={`sm:hidden text-emerald-100/80 leading-snug ${isPlansRoute && isMobile ? 'text-[9px]' : 'text-[10px]'}`}>
+                  Aceito os Termos, dados médicos, geolocalização e cookies.{" "}
+                  <Link to="/privacidade" className="text-emerald-300 underline underline-offset-2">
+                    Privacidade
+                  </Link>
+                </p>
+
                 {/* Micro-badges só no desktop */}
                 <div className="hidden sm:flex flex-wrap gap-2 mt-2">
                   <span className="inline-flex items-center gap-1 text-[10px] text-emerald-200/70 bg-emerald-950/50 rounded-full px-2 py-0.5">

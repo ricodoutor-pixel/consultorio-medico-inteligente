@@ -15,14 +15,20 @@ const CONSENT_TYPES = [
   "health_data_wearables",
 ] as const;
 
+/**
+ * O aceite dos termos foi UNIFICADO no CookieConsentBanner (aceite único).
+ * Este modal permanece apenas como utilitário legado e nunca é exibido,
+ * para o paciente não precisar aceitar duas vezes para entrar no site.
+ */
 export function ConsentManager() {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    checkConsent();
+    setShow(false);
   }, []);
+
 
   const checkConsent = async () => {
     // 1. Se já aceitou no localStorage deste dispositivo, nunca trava o usuário

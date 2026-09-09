@@ -204,6 +204,54 @@ const ConsultationPayment = () => {
   const minutes = Math.floor(countdown / 60);
   const seconds = countdown % 60;
 
+  // O catálogo de especialistas é carregado do banco (assíncrono). Sem esta
+  // barreira, o primeiro render lia `pro.imageUrl` de `undefined` e a tela
+  // ficava em branco, impedindo o pagamento.
+  if (professionalsLoading && !pro && !agenticOrder) {
+    return (
+      <div className="min-h-dvh bg-background">
+        <Navbar />
+        <section className="pt-32 pb-24">
+          <div className="container mx-auto px-4 max-w-2xl text-center">
+            <Loader2 size={48} className="text-primary animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Carregando dados do especialista...</p>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!pro && !agenticOrder) {
+    return (
+      <div className="min-h-dvh bg-background">
+        <Navbar />
+        <section className="pt-32 pb-24">
+          <div className="container mx-auto px-4 max-w-md text-center">
+            <AlertCircle size={44} className="text-destructive mx-auto mb-4" />
+            <h1 className="font-display font-black text-xl text-foreground mb-2">Especialista não encontrado</h1>
+            <p className="text-muted-foreground mb-6">
+              Escolha novamente o profissional para continuar com o pagamento.
+            </p>
+            <Button asChild>
+              <Link to="/profissionais">Ver especialistas</Link>
+            </Button>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  const proView = {
+    imageUrl: pro?.imageUrl ?? "/placeholder.svg",
+    name: pro?.name ?? "Farmácia Dispensary Planta y Raíz",
+    category: pro?.category ?? "Pedido de medicamento prescrito",
+    price: pro?.price ?? `R$ ${basePrice.toFixed(2).replace(".", ",")}`,
+    id: pro?.id ?? "",
+    paymentLink: pro?.paymentLink ?? undefined,
+  };
+
   return (
     <div className="min-h-dvh bg-background">
       <Navbar />
@@ -214,13 +262,13 @@ const ConsultationPayment = () => {
             {/* Specialist Summary */}
             <Card className="border-border mb-6">
               <CardContent className="p-5 flex items-center gap-4">
-                <img src={pro.imageUrl} alt={pro.name} className="w-16 h-16 rounded-2xl object-cover border border-border" />
+                <img src={proView.imageUrl} alt={proView.name} className="w-16 h-16 rounded-2xl object-cover border border-border" />
                 <div className="flex-1">
-                  <h2 className="font-display font-black text-foreground">{pro.name}</h2>
-                  <p className="text-sm text-muted-foreground">{pro.category}</p>
+                  <h2 className="font-display font-black text-foreground">{proView.name}</h2>
+                  <p className="text-sm text-muted-foreground">{proView.category}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-display font-black text-gradient-green">{pro.price}</p>
+                  <p className="text-2xl font-display font-black text-gradient-green">{proView.price}</p>
                   <p className="text-xs text-muted-foreground">consulta</p>
                 </div>
               </CardContent>
@@ -265,7 +313,7 @@ const ConsultationPayment = () => {
                   <div className="text-center py-8">
                     <CheckCircle2 size={64} className="text-primary mx-auto mb-4" />
                     <h4 className="text-xl font-display font-black text-foreground mb-2">Pagamento Confirmado!</h4>
-                    <p className="text-muted-foreground mb-4">Sua consulta com {pro.name} está agendada.</p>
+                    <p className="text-muted-foreground mb-4">Sua consulta com {proView.name} está agendada.</p>
                     
                     {/* Anvisa Protocol */}
                     <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 mb-6 text-left">
@@ -285,7 +333,7 @@ const ConsultationPayment = () => {
                     </div>
 
                     <Button className="bg-primary text-primary-foreground font-black rounded-2xl" asChild>
-                      <Link to={`/telemedicina?pro=${pro.id}`}>
+                      <Link to={`/telemedicina?pro=${proView.id}`}>
                         Iniciar Pré-Entrevista IA <ArrowRight size={18} className="ml-2" />
                       </Link>
                     </Button>
@@ -342,7 +390,7 @@ const ConsultationPayment = () => {
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Orientação Técnica</span>
-                        <span className="text-foreground font-bold">{pro.price}</span>
+                        <span className="text-foreground font-bold">{proView.price}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">
@@ -365,7 +413,7 @@ const ConsultationPayment = () => {
                     <div className="space-y-3">
                       <GatewayHibridoCheckout 
                         amountBrl={total} 
-                        productName={`Consulta com ${pro.name}`} 
+                        productName={`Consulta com ${proView.name}`} 
                         triggerComponent={
                           <Button className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12">
                             Pagar com Gateway Sem Fronteiras
@@ -377,7 +425,7 @@ const ConsultationPayment = () => {
                         className="w-full bg-muted text-foreground font-black rounded-2xl h-12 border border-border hover:bg-muted/80"
                         asChild
                       >
-                        <a href={checkoutUrl || pro.paymentLink} target="_blank" rel="noopener noreferrer">
+                        <a href={checkoutUrl || proView.paymentLink} target="_blank" rel="noopener noreferrer">
                           <ExternalLink size={16} className="mr-2" />
                           Pagar via Mercado Pago
                         </a>

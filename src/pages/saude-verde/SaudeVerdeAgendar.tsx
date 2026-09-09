@@ -16,14 +16,6 @@ type Partner = { id: string; name: string; city: string; state: string; rating: 
 
 const TIMES = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
 
-// Lista de contingência estática para especialidades canábicas básicas
-const FALLBACK_SPECIALTIES: Specialty[] = [
-  { id: "esp-neurologia", name: "Neurologia (Epilepsia, Parkinson, TEA)", slug: "neurologia", category: "consulta", price_from_brl: 150 },
-  { id: "esp-psiquiatria", name: "Psiquiatria (Ansiedade, Insônia, Depressão)", slug: "psiquiatria", category: "consulta", price_from_brl: 150 },
-  { id: "esp-dor-cronica", name: "Dor Crônica & Fibromialgia", slug: "dor-cronica", category: "consulta", price_from_brl: 130 },
-  { id: "esp-cuidados-paliativos", name: "Cuidados Paliativos & Oncologia", slug: "cuidados-paliativos", category: "consulta", price_from_brl: 140 },
-  { id: "esp-medicina-integrativa", name: "Medicina Integrativa & Canabinoide", slug: "medicina-integrativa", category: "consulta", price_from_brl: 120 },
-];
 
 export default function SaudeVerdeAgendar() {
   const navigate = useNavigate();
@@ -32,6 +24,8 @@ export default function SaudeVerdeAgendar() {
 
   const [step, setStep] = useState(1);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
+  const [specialtiesLoading, setSpecialtiesLoading] = useState(true);
+  const [specialtiesError, setSpecialtiesError] = useState(false);
   const [partners, setPartners] = useState<Partner[]>([]);
   const [specialty, setSpecialty] = useState<Specialty | null>(null);
   const [partner, setPartner] = useState<Partner | null>(null);
@@ -56,6 +50,8 @@ export default function SaudeVerdeAgendar() {
       }
     })();
 
+    // Só usamos especialidades reais do banco: ids fictícios eram rejeitados
+    // no fechamento do agendamento (chave estrangeira), quebrando o fluxo.
     (async () => {
       try {
         const { data, error } = await supabase
@@ -63,14 +59,14 @@ export default function SaudeVerdeAgendar() {
           .select("id, name, slug, category, price_from_brl")
           .order("sort_order");
 
-        if (error || !data || data.length === 0) {
-          setSpecialties(FALLBACK_SPECIALTIES);
-        } else {
-          setSpecialties(data as Specialty[]);
-        }
+        if (error) throw error;
+        setSpecialties((data ?? []) as Specialty[]);
       } catch (err) {
-        console.warn("[saude-verde] Erro ao buscar especialidades, usando contingência:", err);
-        setSpecialties(FALLBACK_SPECIALTIES);
+        console.warn("[saude-verde] Erro ao buscar especialidades:", err);
+        setSpecialties([]);
+        setSpecialtiesError(true);
+      } finally {
+        setSpecialtiesLoading(false);
       }
     })();
   }, []);
@@ -148,16 +144,28 @@ export default function SaudeVerdeAgendar() {
         {step === 1 && (
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">1. Selecione o serviço</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {specialties.map(s => (
-                <button key={s.id} onClick={() => { setSpecialty(s); setStep(2); }}
-                  className={`text-left p-4 rounded-lg border transition-colors ${specialty?.id === s.id ? "border-primary bg-primary/5" : "border-border/50 hover:border-primary/40"}`}>
-                  <div className="font-semibold text-sm">{s.name}</div>
-                  <Badge variant="outline" className="text-[10px] mt-1 capitalize">{s.category}</Badge>
-                  {s.price_from_brl && <div className="text-xs text-muted-foreground mt-2">a partir de R$ {Number(s.price_from_brl).toFixed(2)}</div>}
-                </button>
-              ))}
-            </div>
+            {specialtiesLoading ? (
+              <div className="py-8 text-center text-muted-foreground flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Carregando serviços...
+              </div>
+            ) : specialties.length === 0 ? (
+              <p className="text-muted-foreground py-8 text-center">
+                {specialtiesError
+                  ? "Não conseguimos carregar os serviços agora. Atualize a página em alguns instantes."
+                  : "Nenhum serviço disponível no momento. Em breve!"}
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {specialties.map(s => (
+                  <button key={s.id} onClick={() => { setSpecialty(s); setStep(2); }}
+                    className={`text-left p-4 rounded-lg border transition-colors ${specialty?.id === s.id ? "border-primary bg-primary/5" : "border-border/50 hover:border-primary/40"}`}>
+                    <div className="font-semibold text-sm">{s.name}</div>
+                    <Badge variant="outline" className="text-[10px] mt-1 capitalize">{s.category}</Badge>
+                    {s.price_from_brl && <div className="text-xs text-muted-foreground mt-2">a partir de R$ {Number(s.price_from_brl).toFixed(2)}</div>}
+                  </button>
+                ))}
+              </div>
+            )}
           </Card>
         )}
 

@@ -72,22 +72,28 @@ Nossa equipe e a Enfermeira Brisa estão prontas para te auxiliar no WhatsApp:
 
 Seja muito bem-vindo(a) à medicina do futuro! 🌿💚`;
 
-// ── PERSONA DA ENFERMEIRA BRISA / COPILOTO CLÍNICO VIP ──────────────────
-const PERSONA = `Você é a Enfermeira Brisa 🌿, assistente virtual oficial e Especialista em Triagem Clínica da Planta y Raiz.
+// ── PERSONAS SEPARADAS (mesmo cérebro Gemini, conteúdos diferentes) ─────
+// Enf. Brisa    → triagem curta + paywall
+// Dr. Edilson On → orientação técnica paga (30 min por pagamento)
+import {
+  BRISA_TRIAGE_PERSONA,
+  drEdilsonPersona,
+  paywallMessage,
+  sessionOpenedMessage,
+  sessionExpiredMessage,
+  sessionEndingSoonMessage,
+} from '../_shared/agents.ts';
+import {
+  serviceClient,
+  resolveOtSession,
+  touchOtSession,
+  closeOtSession,
+  markClosingNotice,
+  minutesLeft,
+} from '../_shared/ot-session.ts';
 
-SUA MISSÃO: Realizar a Triagem Clínica Autônoma Inicial via WhatsApp e direcionar o paciente.
+const PERSONA = BRISA_TRIAGE_PERSONA;
 
-PASSO A PASSO DA TRIAGEM:
-1. Colete a queixa principal do paciente e um breve histórico de saúde.
-2. Calcule internamente um SCORE DE SEVERIDADE (0.0 a 1.0). Identifique Red Flags (ex: dores agudas, confusão mental, histórico cardíaco grave).
-3. Se houver EMERGÊNCIA médica (risco de vida), oriente buscar o SAMU (192) ou o Pronto Socorro mais próximo imediatamente.
-4. Se o SCORE for >= 0.75 ou houver indicação médica clara, recomende agendamento IMEDIATO.
-5. Nossa recomendação atual (Matchmaking) é com o **Dr. Daniel Kobayashi Colombo** (Clínico Geral), nosso médico plantonista e prescritor certificado.
-6. Envie o link de pagamento seguro para a Triagem/Consulta (Valor: R$ 30,00):
-   👉 *https://plantayraiz.com.br/telemedicina* (Oriente a escolher o Dr. Daniel na lista).
-
-TOM DE VOZ:
-Empático, acolhedor, rápido e focado em resolver a dor do paciente com segurança clínica. Nunca prescreva medicamentos, apenas faça a triagem e direcione para a consulta médica.`;
 
 // ── RESPOSTAS INSTANTÂNEAS ──────────────────────────────────────────────
 const MSGS = {

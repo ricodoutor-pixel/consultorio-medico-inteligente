@@ -3,9 +3,22 @@ import { Shield, Check, Cookie, BarChart3, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
 
 const COOKIE_KEY = "plr_cookie_consent";
 const CONSENT_VERSION = "1.0";
+
+/** Aceite único: cookies + termos, privacidade, dados médicos, geolocalização e wearables. */
+const TERMS_VERSION = "2.1";
+const TERMS_STORAGE_KEY = `pyr_terms_accepted_v${TERMS_VERSION.replace(".", "_")}`;
+const TERMS_CONSENT_TYPES = [
+  "terms_of_use",
+  "privacy_policy",
+  "medical_data_processing",
+  "geolocation_emergency",
+  "health_data_wearables",
+] as const;
+
 
 interface ConsentRecord {
   version: string;

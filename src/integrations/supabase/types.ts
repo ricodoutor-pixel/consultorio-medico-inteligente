@@ -9453,6 +9453,10 @@ export type Database = {
         Returns: number
       }
       ensure_affiliate_wallet: { Args: { _user_id: string }; Returns: string }
+      ensure_doctor_availability: {
+        Args: { _days?: number; _doctor_id: string }
+        Returns: number
+      }
       ensure_referral_code: { Args: { _user_id: string }; Returns: string }
       expire_ot_agent_sessions: {
         Args: never
@@ -9632,6 +9636,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      refresh_routing_doctor_availability: { Args: never; Returns: number }
       register_new_doctor: {
         Args: {
           p_avatar_url: string
@@ -9659,6 +9664,20 @@ export type Database = {
         Returns: {
           event_id: string
           reverted_at: string
+        }[]
+      }
+      route_consultation_doctor: {
+        Args: { _specialty?: string }
+        Returns: {
+          crm: string
+          crm_state: string
+          docs_count: number
+          doctor_id: string
+          full_name: string
+          is_online: boolean
+          readiness_score: number
+          specialty: string
+          user_id: string
         }[]
       }
       search_scientific_articles: {

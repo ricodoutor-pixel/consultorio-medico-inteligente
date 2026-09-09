@@ -201,12 +201,16 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       const cfmPrint = getDoctorCfmPrint(base.crm || base.name) || base.cfmPrintUrl;
 
       if (!matchedDb) {
+        docsCountById.set(base.id, 0);
         return {
           ...base,
           imageUrl: treatedAvatar || base.imageUrl,
           cfmPrintUrl: cfmPrint,
         };
       }
+
+      docsCountById.set(base.id, matchedDb.kyc_docs_count ?? 0);
+
 
       // Enriquece com informações em tempo real do banco de dados
       return {

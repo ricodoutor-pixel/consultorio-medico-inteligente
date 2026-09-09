@@ -516,6 +516,12 @@ export const AdminAprovacoes = () => {
                               </div>
                               <p className="text-xs text-muted-foreground font-mono">{crm}</p>
                               <p className="text-[11px] text-emerald-400 font-semibold">{doc.specialty || 'Medicina Canabinoide'}</p>
+                              <Badge
+                                variant="secondary"
+                                className="mt-1 text-[10px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                              >
+                                {(doc.kyc_docs || []).length} anexos · {DOCTOR_TIER_LABEL[doctorTierFromDocs((doc.kyc_docs || []).length)]}
+                              </Badge>
                             </div>
                           </div>
                         </TableCell>

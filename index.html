@@ -313,7 +313,16 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GT-MRLXCRGK"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
+    <!-- Tela de inicialização estática: aparece IMEDIATAMENTE (sem depender de JS)
+         para visitantes em redes lentas/alta latência (ex.: Bolívia). O React a
+         remove quando monta; o watchdog acima também a considera no diagnóstico. -->
+    <div id="__pyr_boot_screen">
+      <img class="pyr-mark" src="/logo-planta-raiz.webp" alt="Planta y Raiz" width="84" height="84" fetchpriority="high" />
+      <p>Carregando a plataforma…</p>
+    </div>
+
     <div id="root"></div>
+
 
     <script>
       // 🍏 Recuperação específica de iOS Safari:

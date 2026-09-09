@@ -20,20 +20,20 @@ const EVO_KEY = Deno.env.get('EVOLUTION_API_KEY') || '';
 const EVO_INST = Deno.env.get('EVOLUTION_INSTANCE') || 'plantayraiz';
 const WEBHOOK_SECRET = Deno.env.get('WAHA_WEBHOOK_SECRET') || '';
 
-/** Segredo do cron guardado no cofre do banco (nunca em código). */
-async function vaultCronSecret(sb: ReturnType<typeof createClient>): Promise<string> {
-  try {
-    const { data } = await sb
-      .schema('vault')
-      .from('decrypted_secrets')
-      .select('decrypted_secret')
-      .eq('name', 'OT_WATCHDOG_CRON_SECRET')
-      .maybeSingle();
-    return (data as { decrypted_secret?: string } | null)?.decrypted_secret || '';
-  } catch {
-    return '';
+/** Confere o segredo do cron via RPC (o valor fica só no cofre do banco). */
+async function cronSecretValid(
+  sb: ReturnType<typeof createClient>,
+  secret: string,
+): Promise<boolean> {
+  if (!secret) return false;
+  const { data, error } = await sb.rpc('verify_ot_watchdog_secret', { _secret: secret });
+  if (error) {
+    console.error('[ot-watchdog][auth]', error.message);
+    return false;
   }
+  return data === true;
 }
+
 
 function presentedSecret(req: Request): string {
   return (
@@ -84,11 +84,11 @@ Deno.serve(async (req: Request) => {
   const sb = createClient(SB_URL, SB_KEY);
 
   const presented = presentedSecret(req);
-  const cronSecret = await vaultCronSecret(sb);
   const ok =
     (!!presented && presented === SB_KEY) ||
     (!!presented && !!WEBHOOK_SECRET && presented === WEBHOOK_SECRET) ||
-    (!!presented && !!cronSecret && presented === cronSecret);
+    (await cronSecretValid(sb, presented));
+
   if (!ok) {
     return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), {
       status: 401, headers: { ...cors, 'Content-Type': 'application/json' },

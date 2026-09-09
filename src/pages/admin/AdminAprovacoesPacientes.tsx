@@ -23,14 +23,12 @@ import { CountryFlag } from "@/pages/CadastroProfissional";
 import PatientKycDocViewer from "@/components/admin/PatientKycDocViewer";
 import {
   PATIENT_KYC_LABELS,
-  PATIENT_KYC_REQUIRED,
   type PatientKycKind,
   type PatientRecord,
-  TEST_PATIENT_DATA,
 } from "@/lib/patient-kyc-docs";
 
 export const AdminAprovacoesPacientes = () => {
-  const [patients, setPatients] = useState<PatientRecord[]>([TEST_PATIENT_DATA]);
+  const [patients, setPatients] = useState<PatientRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "apto" | "pending" | "online">("all");
@@ -44,72 +42,135 @@ export const AdminAprovacoesPacientes = () => {
     name?: string;
   } | null>(null);
 
-  // Carrega pacientes do banco e mescla com o paciente de teste oficial (Edilson Bezerra da Silva)
+  // Carrega exclusivamente dados reais de produção (zero mocks)
   const fetchPatients = async () => {
     setLoading(true);
     try {
-      // 1. Buscar perfis com user_type = 'patient' ou signup_role = 'paciente'
-      const { data: profiles, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .or("user_type.eq.patient,signup_role.eq.paciente")
-        .order("created_at", { ascending: false });
+      const [profRes, docRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("*")
+          .or("user_type.eq.patient,signup_role.eq.paciente")
+          .order("created_at", { ascending: false }),
+        supabase.from("doctors").select("user_id"),
+      ]);
 
-      if (error) {
-        console.warn("[AdminAprovacoesPacientes]", error);
+      if (profRes.error) console.warn("[AdminAprovacoesPacientes]", profRes.error);
+
+      const doctorIds = new Set((docRes.data || []).map((d: any) => d.user_id));
+      const profiles = (profRes.data || []).filter((p: any) => !doctorIds.has(p.id));
+      const ids = profiles.map((p: any) => p.id);
+
+      let consultations: any[] = [];
+      let payments: any[] = [];
+      let orders: any[] = [];
+      let wallets: any[] = [];
+      let doctorsMap = new Map<string, any>();
+
+      if (ids.length) {
+        const [consRes, payRes, ordRes, walRes, docsPubRes] = await Promise.all([
+          supabase
+            .from("consultations")
+            .select("id, patient_id, doctor_id, status, modality, started_at, notes")
+            .in("patient_id", ids),
+          supabase
+            .from("payments")
+            .select("id, patient_id, gross_amount, status, payment_method, created_at, paid_at")
+            .in("patient_id", ids),
+          supabase
+            .from("orders")
+            .select("id, user_id, items, total, status, tracking_code, created_at")
+            .in("user_id", ids),
+          supabase.from("health_card_wallet").select("user_id, balance").in("user_id", ids),
+          supabase.from("doctors_public").select("user_id, full_name, crm, crm_state, specialty, avatar_url"),
+        ]);
+
+        consultations = consRes.data || [];
+        payments = payRes.data || [];
+        orders = ordRes.data || [];
+        wallets = walRes.data || [];
+        doctorsMap = new Map((docsPubRes.data || []).map((d: any) => [d.user_id, d]));
       }
 
-      // Recuperar overrides salvos no localStorage para persistência de status
-      const savedOverrides: Record<string, boolean> = JSON.parse(
-        localStorage.getItem("patient_approval_overrides") || "{}"
-      );
+      const fmt = (iso?: string | null) =>
+        iso ? new Date(iso).toLocaleDateString("pt-BR") : "—";
 
-      const dbPatients: PatientRecord[] = (profiles || []).map((p: any) => {
-        const isApproved = savedOverrides[p.id] !== undefined ? savedOverrides[p.id] : true;
+      const mapped: PatientRecord[] = profiles.map((p: any) => {
+        const wallet = wallets.find((w) => w.user_id === p.id);
+        const pConsults = consultations.filter((c) => c.patient_id === p.id);
+        const pPayments = payments.filter((x) => x.patient_id === p.id);
+        const pOrders = orders.filter((o) => o.user_id === p.id);
+
         return {
           id: p.id,
           user_id: p.id,
-          full_name: p.full_name || "Paciente Cadastrado",
-          cpf: p.cpf || "000.000.000-00",
-          email: p.email || "paciente@email.com",
-          phone: p.phone || "+55 11 99999-9999",
-          date_of_birth: p.date_of_birth || "1990-01-01",
-          city: p.city || "São Paulo",
-          state: p.state || "SP",
+          full_name: p.full_name || "Cadastro sem nome",
+          cpf: p.cpf || "—",
+          email: "—",
+          phone: p.phone || "",
+          date_of_birth: p.date_of_birth || "—",
+          city: p.city || "—",
+          state: p.state || p.region || "—",
           country: p.country || "BR",
           avatar_url: p.avatar_url || null,
-          is_approved: isApproved,
-          status: isApproved ? "apto" : "pendente",
+          is_approved: Boolean(p.onboarding_completed) || pConsults.length > 0,
+          status: (Boolean(p.onboarding_completed) || pConsults.length > 0 ? "apto" : "pendente") as "apto" | "pendente",
           is_online: false,
-          last_seen: p.updated_at || p.created_at || new Date().toISOString(),
-          created_at: p.created_at || new Date().toISOString(),
-          visit_count_day: 1,
-          visit_count_week: 3,
-          visit_count_month: 8,
-          green_card_active: false,
-          green_card_balance: 0,
-          friends_referred_count: 0,
-          brisa_interactions_count: 1,
+          last_seen: p.updated_at || p.created_at || "",
+          created_at: p.created_at || "",
+          visit_count_day: 0,
+          visit_count_week: 0,
+          visit_count_month: 0,
+          green_card_active: Number(wallet?.balance ?? 0) > 0,
+          green_card_balance: Number(wallet?.balance ?? 0),
+          friends_referred_count: profiles.filter((o: any) => o.referred_by === p.id).length,
+          brisa_interactions_count: 0,
           brisa_triage_completed: false,
-          consultations: [],
-          payments: [],
-          shopping_orders: [],
+          consultations: pConsults.map((c) => {
+            const doc = doctorsMap.get(c.doctor_id);
+            return {
+              id: c.id,
+              doctor_name: doc?.full_name || "Médico da plataforma",
+              doctor_crm: doc?.crm ? `${doc.crm}${doc.crm_state ? "/" + doc.crm_state : ""}` : "—",
+              doctor_specialty: doc?.specialty || "—",
+              doctor_avatar: doc?.avatar_url || undefined,
+              date: fmt(c.started_at),
+              time: c.started_at
+                ? new Date(c.started_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+                : "—",
+              type: (c.modality === "video" ? "video" : "chat") as "video" | "chat",
+              status: (c.status || "completed") as any,
+              prescription_issued: false,
+              notes: c.notes || undefined,
+            };
+          }),
+          payments: pPayments.map((x) => ({
+            id: x.id,
+            description: "Pagamento de consulta",
+            amount: Number(x.gross_amount ?? 0),
+            method: (x.payment_method || "pix") as any,
+            status: (x.status === "paid" || x.status === "released" ? "paid" : x.status) as any,
+            date: fmt(x.paid_at || x.created_at),
+            gateway: "Mercado Pago",
+          })),
+          shopping_orders: pOrders.map((o) => {
+            const first = Array.isArray(o.items) ? (o.items[0] as any) : null;
+            return {
+              id: o.id,
+              product_name: first?.name || first?.title || "Pedido do Shopping",
+              category: "medicamento" as const,
+              quantity: Number(first?.quantity ?? 1),
+              total: Number(o.total ?? 0),
+              pharmacy_name: "Planta y Raiz Ltda",
+              date: fmt(o.created_at),
+              tracking_code: o.tracking_code || undefined,
+            };
+          }),
           kyc_docs: [],
         };
       });
 
-      // Inclui o paciente oficial de testes
-      const testApproved =
-        savedOverrides[TEST_PATIENT_DATA.id] !== undefined
-          ? savedOverrides[TEST_PATIENT_DATA.id]
-          : TEST_PATIENT_DATA.is_approved;
-
-      const combined: PatientRecord[] = [
-        { ...TEST_PATIENT_DATA, is_approved: testApproved, status: testApproved ? "apto" : "pendente" },
-        ...dbPatients.filter((d) => d.id !== TEST_PATIENT_DATA.id),
-      ];
-
-      setPatients(combined);
+      setPatients(mapped);
     } catch (e: any) {
       toast.error("Falha ao sincronizar dados de pacientes");
     } finally {
@@ -119,6 +180,8 @@ export const AdminAprovacoesPacientes = () => {
 
   useEffect(() => {
     fetchPatients();
+    const t = setInterval(fetchPatients, 60_000);
+    return () => clearInterval(t);
   }, []);
 
   // Alterna o status de aptidão do paciente para agendamento
@@ -361,11 +424,6 @@ export const AdminAprovacoesPacientes = () => {
                           <h3 className="text-lg md:text-xl font-display font-black text-foreground">
                             {patient.full_name}
                           </h3>
-                          {patient.id === TEST_PATIENT_DATA.id && (
-                            <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-[10px] font-bold">
-                              CONTA MESTRE DE TESTES ⭐
-                            </Badge>
-                          )}
                           <OnlineStatusIndicator online={patient.is_online} size="sm" showLabel />
                           {patient.is_approved ? (
                             <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/40 text-[10px] font-bold">
@@ -379,7 +437,7 @@ export const AdminAprovacoesPacientes = () => {
                         </div>
 
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          CPF: <strong className="font-mono text-foreground font-bold">{patient.cpf}</strong> · Nasc: <span className="text-slate-300">{patient.date_of_birth}</span> · E-mail: <strong className="text-foreground">{patient.email}</strong>
+                          CPF: <strong className="font-mono text-foreground font-bold">{patient.cpf}</strong> · Nasc: <span className="text-slate-300">{patient.date_of_birth}</span> · Telefone: <strong className="text-foreground">{patient.phone || "—"}</strong>
                         </p>
 
                         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1.5 flex-wrap">
@@ -389,14 +447,15 @@ export const AdminAprovacoesPacientes = () => {
                           </span>
                           <span>·</span>
                           <span className="text-emerald-400 font-medium flex items-center gap-1">
-                            <Activity size={12} /> Visitas: {patient.visit_count_day} hoje · {patient.visit_count_week} semana · {patient.visit_count_month} mês
+                            <Activity size={12} /> {patient.consultations.length} consulta(s) · {patient.payments.length} pagamento(s)
                           </span>
                           <span>·</span>
                           <span className="text-sky-300">
-                            Cadastrado há 25 dias
+                            Cadastro: {patient.created_at ? new Date(patient.created_at).toLocaleDateString("pt-BR") : "—"}
                           </span>
                         </div>
                       </div>
+
                     </div>
 
                     {/* Switch de Aptidão para Agendamento */}
@@ -427,7 +486,7 @@ export const AdminAprovacoesPacientes = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                       {(Object.keys(PATIENT_KYC_LABELS) as PatientKycKind[]).map((kind) => {
                         const doc = docOf(patient, kind);
-                        const hasDoc = Boolean(doc?.file_url || doc?.storage_path || patient.id === TEST_PATIENT_DATA.id);
+                        const hasDoc = Boolean(doc?.file_url || doc?.storage_path);
 
                         return (
                           <button

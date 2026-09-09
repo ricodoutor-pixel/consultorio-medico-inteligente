@@ -3,7 +3,7 @@
 // Segurança: exige JWT do paciente dono do agendamento (ou service_role).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { sendWhatsApp } from "../_shared/evolution.ts";
+import { sendWhatsAppAlert } from "../_shared/waha.ts";
 
 const SITE = "https://www.plantayraiz.com.br";
 
@@ -86,7 +86,7 @@ Deno.serve(async (req) => {
 
   const { data: patientProfile } = await admin
     .from("profiles")
-    .select("full_name")
+    .select("full_name, phone")
     .eq("id", appt.patient_id)
     .maybeSingle();
 
@@ -96,7 +96,10 @@ Deno.serve(async (req) => {
   const modality = String(appt.type || "video");
   const amount = fmtBRL(appt.amount);
 
-  // --- WhatsApp ---
+  const doctorRoomUrl = `${SITE}/consultorio?appointment=${appt.id}`;
+  const patientRoomUrl = `${SITE}/orientacao-video?appointment=${appt.id}`;
+
+  // --- WhatsApp (canal Enfª Brisa / WAHA) ---
   let whatsapp: { ok: boolean; error?: string } = { ok: false, error: "sem telefone cadastrado" };
   if (docProfile?.phone) {
     const message =
@@ -106,8 +109,20 @@ Deno.serve(async (req) => {
       `*Modalidade:* ${modality}\n` +
       `*Valor:* ${amount}\n\n` +
       `O paciente passa pela triagem da Enfª Brisa e segue para o seu consultório virtual.\n` +
-      `Acesse: ${SITE}/consultorio`;
-    whatsapp = await sendWhatsApp(docProfile.phone, message);
+      `Entrar no consultório: ${doctorRoomUrl}`;
+    whatsapp = await sendWhatsAppAlert(docProfile.phone, message);
+  }
+
+  let whatsappPatient: { ok: boolean; error?: string } = { ok: false, error: "sem telefone cadastrado" };
+  if (patientProfile?.phone) {
+    const message =
+      `🌱 *Planta y Raiz — sua consulta está confirmada*\n\n` +
+      `*Profissional:* ${doctorName}\n` +
+      `*Data:* ${when}\n` +
+      `*Modalidade:* ${modality}\n\n` +
+      `No horário marcado, entre pelo link abaixo:\n${patientRoomUrl}\n\n` +
+      `Qualquer dúvida, responda aqui — sou a Enfª Brisa. 💚`;
+    whatsappPatient = await sendWhatsAppAlert(patientProfile.phone, message);
   }
 
   // --- E-mail ---
@@ -133,7 +148,7 @@ Deno.serve(async (req) => {
             scheduledAt: when,
             modality,
             amount,
-            consultorioUrl: `${SITE}/consultorio`,
+            consultorioUrl: doctorRoomUrl,
           },
         }),
       });
@@ -145,13 +160,22 @@ Deno.serve(async (req) => {
     email = { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
 
-  await admin.from("notifications").insert({
-    user_id: doctor.user_id,
-    title: "Novo atendimento direcionado a você",
-    message: `${patientName} · ${when} · ${modality} · ${amount}`,
-    type: "appointment",
-    action_url: "/consultorio",
-  }).select("id").maybeSingle();
+  await admin.from("notifications").insert([
+    {
+      user_id: doctor.user_id,
+      title: "Novo atendimento direcionado a você",
+      message: `${patientName} · ${when} · ${modality} · ${amount}`,
+      type: "appointment",
+      action_url: `/consultorio?appointment=${appt.id}`,
+    },
+    {
+      user_id: appt.patient_id,
+      title: "Consulta confirmada",
+      message: `${doctorName} · ${when} · ${modality}`,
+      type: "appointment",
+      action_url: `/orientacao-video?appointment=${appt.id}`,
+    },
+  ]);
 
-  return json({ ok: true, doctor: doctorName, whatsapp, email });
+  return json({ ok: true, doctor: doctorName, whatsapp, whatsappPatient, email });
 });

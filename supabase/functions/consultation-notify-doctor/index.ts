@@ -160,13 +160,22 @@ Deno.serve(async (req) => {
     email = { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
 
-  await admin.from("notifications").insert({
-    user_id: doctor.user_id,
-    title: "Novo atendimento direcionado a você",
-    message: `${patientName} · ${when} · ${modality} · ${amount}`,
-    type: "appointment",
-    action_url: "/consultorio",
-  }).select("id").maybeSingle();
+  await admin.from("notifications").insert([
+    {
+      user_id: doctor.user_id,
+      title: "Novo atendimento direcionado a você",
+      message: `${patientName} · ${when} · ${modality} · ${amount}`,
+      type: "appointment",
+      action_url: `/consultorio?appointment=${appt.id}`,
+    },
+    {
+      user_id: appt.patient_id,
+      title: "Consulta confirmada",
+      message: `${doctorName} · ${when} · ${modality}`,
+      type: "appointment",
+      action_url: `/orientacao-video?appointment=${appt.id}`,
+    },
+  ]);
 
-  return json({ ok: true, doctor: doctorName, whatsapp, email });
+  return json({ ok: true, doctor: doctorName, whatsapp, whatsappPatient, email });
 });

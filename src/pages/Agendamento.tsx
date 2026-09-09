@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { resolveRoutingDoctor, notifyRoutedDoctor, type RoutedDoctor } from "@/lib/consultation-routing";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
@@ -62,11 +63,30 @@ const Agendamento = () => {
   const [slots, setSlots] = useState<SlotInfo[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [reserving, setReserving] = useState(false);
+  /** Profissional de plantão resolvido no servidor (cadastro mais completo). */
+  const [assigned, setAssigned] = useState<RoutedDoctor | null>(null);
+  const [resolvingAssigned, setResolvingAssigned] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user?.id || null));
     fetchDoctors();
   }, []);
+
+  /** Todo atendimento é direcionado ao profissional com cadastro mais completo. */
+  const selectDoctor = async (doc: Doctor) => {
+    setSelectedDoctor(doc);
+    setSelectedDate(undefined);
+    setSelectedTime("");
+    setSelectedSlotId(null);
+    setResolvingAssigned(true);
+    const routed = await resolveRoutingDoctor(doc.specialty);
+    setAssigned(routed);
+    setResolvingAssigned(false);
+    setStep(2);
+  };
+
+  /** Agenda usada de fato: o profissional de plantão. */
+  const schedulingDoctorId = assigned?.doctor_id ?? selectedDoctor?.id ?? null;
 
   const fetchDoctors = async () => {
     const { data } = await supabase.from("doctors_public").select("*");
@@ -137,8 +157,8 @@ const Agendamento = () => {
     setSelectedDate(d);
     setSelectedTime("");
     setSelectedSlotId(null);
-    if (d && selectedDoctor) {
-      fetchSlots(selectedDoctor.id, d);
+    if (d && schedulingDoctorId) {
+      fetchSlots(schedulingDoctorId, d);
       setStep(3);
     }
   };
@@ -162,9 +182,10 @@ const Agendamento = () => {
       value: selectedDoctor.consultation_price,
     }, { leadScore: 35, funnelStage: "decision", category: "conversion" });
 
+    const routedId = schedulingDoctorId ?? selectedDoctor.id;
     const { data: newAppt, error } = await supabase.from("appointments").insert({
       patient_id: userId,
-      doctor_id: selectedDoctor.id,
+      doctor_id: routedId,
       scheduled_at: scheduledAt.toISOString(),
       type: consultType,
       notes,
@@ -186,6 +207,9 @@ const Agendamento = () => {
         appointment_id: newAppt.id,
       }).eq("id", selectedSlotId);
     }
+
+    // Aviso imediato ao profissional (e-mail + WhatsApp)
+    void notifyRoutedDoctor(newAppt.id);
 
     try {
       const { data: session } = await supabase.auth.getSession();
@@ -248,6 +272,18 @@ const Agendamento = () => {
               {/* Step 1: Select Doctor */}
               {step === 1 && (
                 <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                  <Card className="border-primary/40 bg-primary/5">
+                    <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                      <div>
+                        <p className="font-bold text-foreground text-sm">Quer só uma Orientação Técnica por R$ 30?</p>
+                        <p className="text-xs text-muted-foreground">Atendimento imediato, sem agendamento, com documento e selo digital.</p>
+                      </div>
+                      <Button asChild size="sm" className="rounded-xl font-black">
+                        <a href="/brisa-orientacao">Ir para Orientação Técnica</a>
+                      </Button>
+                    </CardContent>
+                  </Card>
+
                   <h2 className="font-display font-black text-lg text-foreground">Escolha o Especialista</h2>
                   {doctors.length === 0 ? (
                     <Card className="border-border">
@@ -259,7 +295,7 @@ const Agendamento = () => {
                     </Card>
                   ) : (
                     doctors.map(doc => (
-                      <Card key={doc.id} className={cn("border-border cursor-pointer transition-all hover:border-primary/40", selectedDoctor?.id === doc.id && "border-primary bg-primary/5")} onClick={() => { setSelectedDoctor(doc); setStep(2); }}>
+                      <Card key={doc.id} className={cn("border-border cursor-pointer transition-all hover:border-primary/40", selectedDoctor?.id === doc.id && "border-primary bg-primary/5")} onClick={() => { void selectDoctor(doc); }}>
                         <CardContent className="p-4 flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -292,6 +328,24 @@ const Agendamento = () => {
                   <h2 className="font-display font-black text-lg text-foreground flex items-center gap-2">
                     <CalIcon size={18} className="text-primary" /> Escolha a Data
                   </h2>
+                  {resolvingAssigned ? (
+                    <p className="text-xs text-muted-foreground flex items-center gap-2">
+                      <Loader2 size={12} className="animate-spin" /> Verificando o profissional de plantão…
+                    </p>
+                  ) : assigned ? (
+                    <Card className="border-primary/30 bg-primary/5">
+                      <CardContent className="p-4">
+                        <p className="text-xs text-muted-foreground">
+                          Seu atendimento será conduzido pelo profissional de plantão com cadastro
+                          completo e assinatura digital ativa:
+                        </p>
+                        <p className="text-sm font-bold text-foreground mt-1">
+                          {assigned.full_name || "Profissional de plantão"}
+                          {assigned.crm ? ` · ${assigned.crm}/${assigned.crm_state ?? ""}` : ""}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ) : null}
                   <Card className="border-border overflow-hidden">
                     <CardContent className="p-6 flex justify-center">
                       <Calendar

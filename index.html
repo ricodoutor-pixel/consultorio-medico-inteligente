@@ -81,9 +81,10 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       
-      // Estado padrão: Negado (cumpre a lei rigorosamente)
+      // Medição de audiência liberada por padrão (dado agregado, IP anonimizado).
+      // Publicidade/remarketing seguem negados até consentimento explícito.
       gtag('consent', 'default', {
-        'analytics_storage': 'denied',
+        'analytics_storage': 'granted',
         'ad_storage': 'denied',
         'ad_user_data': 'denied',
         'ad_personalization': 'denied',

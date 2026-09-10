@@ -1,1 +1,0 @@
-SELECT cron.unschedule(jobid) FROM cron.job WHERE jobname ILIKE '%brisa%auto%' OR jobname ILIKE '%ig_auto%' OR jobname ILIKE '%fb_auto%' OR jobname ILIKE '%social%auto%' OR jobname ILIKE '%auto%post%';

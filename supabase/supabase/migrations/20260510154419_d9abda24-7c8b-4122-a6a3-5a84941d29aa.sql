@@ -1,1 +1,0 @@
-ALTER TABLE public.audit_log ALTER COLUMN user_id DROP NOT NULL;

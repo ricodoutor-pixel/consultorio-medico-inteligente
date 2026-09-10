@@ -81,7 +81,7 @@ Deno.serve(async (req: Request) => {
     // 3. Confirma que a consulta pertence a este medico
     const { data: appointment, error: apptError } = await admin
       .from("appointments")
-      .select("id, doctor_id, patient_id, consultation_id, scheduled_at, status")
+      .select("id, doctor_id, patient_id, scheduled_at, status")
       .eq("id", appointmentId)
       .maybeSingle();
 
@@ -98,7 +98,7 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const consultationId = appointment.consultation_id ?? crypto.randomUUID();
+    const consultationId = appointment.id;
 
     // 3b. IDEMPOTENCIA: reaproveita sala existente e nao expirada
     const { data: existingRoom } = await admin

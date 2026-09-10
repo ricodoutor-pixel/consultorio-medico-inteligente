@@ -182,23 +182,12 @@
           document.head.appendChild(pl);
         }
 
-        // Aguarda consentimento LGPD explícito
-        window.addEventListener('plr:cookie-consent', function(){
-          if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 2000 });
-          else setTimeout(loadAnalytics, 500);
-        });
+        // Carrega para TODO visitante, sem depender de clique no banner.
+        if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 2000 });
+        else window.addEventListener('load', function(){ setTimeout(loadAnalytics, 800); });
 
-        // Se já consentiu em visita anterior, carrega em idle
-        try {
-          var stored = localStorage.getItem('plr_cookie_consent');
-          if (stored) {
-            var parsed = JSON.parse(stored);
-            if (parsed && parsed.version === '1.0') {
-              if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 3500 });
-              else window.addEventListener('load', function(){ setTimeout(loadAnalytics, 1500); });
-            }
-          }
-        } catch(_){}
+        // Consentimento do banner apenas atualiza os sinais de publicidade.
+        window.addEventListener('plr:cookie-consent', function(){ loadAnalytics(); });
       })();
     </script>
 

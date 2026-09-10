@@ -81,9 +81,10 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       
-      // Estado padrão: Negado (cumpre a lei rigorosamente)
+      // Medição de audiência liberada por padrão (dado agregado, IP anonimizado).
+      // Publicidade/remarketing seguem negados até consentimento explícito.
       gtag('consent', 'default', {
-        'analytics_storage': 'denied',
+        'analytics_storage': 'granted',
         'ad_storage': 'denied',
         'ad_user_data': 'denied',
         'ad_personalization': 'denied',
@@ -142,10 +143,9 @@
          gastando uma requisição bloqueante em cada visita mobile. -->
 
 
-    <!-- Analytics carregados DEPOIS do consentimento LGPD (cookie banner).
-         Escutamos o evento `plr:cookie-consent` disparado pelo CookieConsentBanner.
-         Fallback: se o usuário já consentiu em sessão anterior (localStorage),
-         carrega em idle. Nunca carrega antes do consentimento. -->
+    <!-- Analytics de audiência carregado para TODOS os visitantes (contagem
+         geral em tempo real, IP anonimizado). Publicidade/remarketing só
+         são liberados após o consentimento (gtag consent update). -->
     <script>
       (function(){
         var loaded = false;
@@ -182,23 +182,12 @@
           document.head.appendChild(pl);
         }
 
-        // Aguarda consentimento LGPD explícito
-        window.addEventListener('plr:cookie-consent', function(){
-          if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 2000 });
-          else setTimeout(loadAnalytics, 500);
-        });
+        // Carrega para TODO visitante, sem depender de clique no banner.
+        if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 2000 });
+        else window.addEventListener('load', function(){ setTimeout(loadAnalytics, 800); });
 
-        // Se já consentiu em visita anterior, carrega em idle
-        try {
-          var stored = localStorage.getItem('plr_cookie_consent');
-          if (stored) {
-            var parsed = JSON.parse(stored);
-            if (parsed && parsed.version === '1.0') {
-              if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 3500 });
-              else window.addEventListener('load', function(){ setTimeout(loadAnalytics, 1500); });
-            }
-          }
-        } catch(_){}
+        // Consentimento do banner apenas atualiza os sinais de publicidade.
+        window.addEventListener('plr:cookie-consent', function(){ loadAnalytics(); });
       })();
     </script>
 

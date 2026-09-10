@@ -301,6 +301,7 @@ const App = () => (
             <AccessibilitySkipLink />
             <FacebookPixelProvider />
             <ReferralCaptureProvider />
+            <GoogleAnalyticsProvider />
             <FrogChatModal />
             <BrisaChatModal />
             <ShoppingCart />

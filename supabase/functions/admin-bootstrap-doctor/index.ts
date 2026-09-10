@@ -101,11 +101,14 @@ Deno.serve(async (req) => {
       consultation_price,
       document_type: "ci",
       country, city,
-      is_verified: true, is_online: true, is_available: true,
-      kyc_status: "verified", plan_tier: "premium",
+      // GOVERNANÇA: nunca autoaprovar. Aprovação é exclusivamente manual em /admin/aprovacoes-medicas.
+      is_verified: false, is_online: false, is_available: false,
+      kyc_status: "pending", plan_tier: "basic",
     };
     if (existingDoc) {
-      await supabase.from("doctors").update(doctorPayload).eq("id", existingDoc.id);
+      // Não sobrescreve status de aprovação de um registro já existente.
+      const { is_verified: _v, is_online: _o, is_available: _a, kyc_status: _k, plan_tier: _p, ...safeUpdate } = doctorPayload;
+      await supabase.from("doctors").update(safeUpdate).eq("id", existingDoc.id);
     } else {
       const { error: docErr } = await supabase.from("doctors").insert(doctorPayload);
       if (docErr) throw docErr;

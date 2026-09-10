@@ -1,1 +1,0 @@
-REVOKE SELECT ON public.doctors FROM anon, authenticated;

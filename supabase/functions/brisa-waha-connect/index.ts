@@ -25,7 +25,7 @@ const cors = {
 const RAW_WAHA_URL = Deno.env.get('WAHA_API_URL') || 'waha-production-4e9c.up.railway.app';
 const WAHA_KEY     = Deno.env.get('WAHA_API_KEY') || 'planta123';
 const WAHA_SESSION = Deno.env.get('WAHA_SESSION')  || 'default';
-const SB_URL       = Deno.env.get('SUPABASE_URL')  || 'https://tkxxoghzhvhjzdoomgss.supabase.co';
+const SB_URL       = Deno.env.get('SUPABASE_URL')  || 'https://shmbwdjuddvquszwkvuq.supabase.co';
 const SB_KEY       = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const ADMIN_PHONE  = Deno.env.get('ADMIN_PHONE_BR') || '';
 

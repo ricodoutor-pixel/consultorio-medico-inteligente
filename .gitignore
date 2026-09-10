@@ -29,3 +29,11 @@ node_modules
 .env.development
 .env.production
 .env.staging
+
+# Build output / artefatos que não devem ser versionados
+dist/
+dist-ssr/
+*.zip
+*.log
+scratch/
+supabase/.temp/

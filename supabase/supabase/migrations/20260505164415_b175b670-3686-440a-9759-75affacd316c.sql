@@ -1,1 +1,0 @@
-CREATE UNIQUE INDEX IF NOT EXISTS scientific_articles_url_unique ON public.scientific_articles(url);

@@ -26,6 +26,7 @@ import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { OpenGraphHead } from "@/components/OpenGraphHead";
 import { FacebookPixelProvider } from "@/components/FacebookPixelProvider";
 import { ReferralCaptureProvider } from "@/components/ReferralCaptureProvider";
+import { GoogleAnalyticsProvider } from "@/components/GoogleAnalyticsProvider";
 import { SearchEngineOptimization } from "@/components/SearchEngineOptimization";
 import { DynamicSEOHead } from "@/components/DynamicSEOHead";
 import { LocalCTABanner } from "@/components/LocalCTABanner";
@@ -300,6 +301,7 @@ const App = () => (
             <AccessibilitySkipLink />
             <FacebookPixelProvider />
             <ReferralCaptureProvider />
+            <GoogleAnalyticsProvider />
             <FrogChatModal />
             <BrisaChatModal />
             <ShoppingCart />

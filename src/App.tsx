@@ -208,6 +208,7 @@ const AdminLeadsEmergencia = lazyWithRecovery(() => import("./pages/admin/LeadsE
 const President360 = lazyWithRecovery(() => import("./pages/admin/President360"), { sourceRef: "/admin/president" });
 const SentinelControl = lazyWithRecovery(() => import("./pages/admin/SentinelControl"), { sourceRef: "/admin/sentinel" });
 const TelemedBrisaCheck = lazyWithRecovery(() => import("./pages/admin/TelemedBrisaCheck"), { sourceRef: "/admin/telemed-brisa-check" });
+const BrisaWhatsAppQR = lazyWithRecovery(() => import("./pages/admin/BrisaWhatsAppQR"), { sourceRef: "/admin/brisa-whatsapp-qr" });
 const CadastrosRealtime = lazyWithRecovery(() => import("./pages/admin/CadastrosRealtime"), { sourceRef: "/admin/cadastros" });
 const AdminGlobalOps = lazyWithRecovery(() => import("./pages/AdminGlobalOps"), { sourceRef: "/admin/global-ops" });
 const WhatsAppInbox = lazyWithRecovery(() => import("./pages/admin/WhatsAppInbox"), { sourceRef: "/admin/whatsapp-inbox" });

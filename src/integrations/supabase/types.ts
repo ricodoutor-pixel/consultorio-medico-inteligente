@@ -2445,6 +2445,80 @@ export type Database = {
           },
         ]
       }
+      doctor_contracts: {
+        Row: {
+          contract_version: string
+          created_at: string
+          doctor_cpf: string | null
+          doctor_crm: string | null
+          doctor_crm_uf: string | null
+          doctor_full_name: string
+          doctor_id: string
+          id: string
+          ip_capture_failed: boolean | null
+          is_active: boolean | null
+          pdf_storage_path: string | null
+          pdf_url: string | null
+          sha512_hash: string | null
+          signed_at: string | null
+          signer_ip: string | null
+          signer_user_agent: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contract_version?: string
+          created_at?: string
+          doctor_cpf?: string | null
+          doctor_crm?: string | null
+          doctor_crm_uf?: string | null
+          doctor_full_name: string
+          doctor_id: string
+          id?: string
+          ip_capture_failed?: boolean | null
+          is_active?: boolean | null
+          pdf_storage_path?: string | null
+          pdf_url?: string | null
+          sha512_hash?: string | null
+          signed_at?: string | null
+          signer_ip?: string | null
+          signer_user_agent?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contract_version?: string
+          created_at?: string
+          doctor_cpf?: string | null
+          doctor_crm?: string | null
+          doctor_crm_uf?: string | null
+          doctor_full_name?: string
+          doctor_id?: string
+          id?: string
+          ip_capture_failed?: boolean | null
+          is_active?: boolean | null
+          pdf_storage_path?: string | null
+          pdf_url?: string | null
+          sha512_hash?: string | null
+          signed_at?: string | null
+          signer_ip?: string | null
+          signer_user_agent?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_contracts_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doctor_kyc_documents: {
         Row: {
           created_at: string
@@ -2625,6 +2699,10 @@ export type Database = {
           bio: string | null
           city: string | null
           consultation_price: number
+          contract_hash: string | null
+          contract_ip: string | null
+          contract_signed_at: string | null
+          contract_version: string | null
           country: string | null
           created_at: string
           crm: string
@@ -2634,8 +2712,10 @@ export type Database = {
           document_type: string
           fraud_score: number | null
           id: string
+          ip_capture_failed: boolean | null
           is_approved_by_admin: boolean
           is_available: boolean
+          is_contract_signed: boolean | null
           is_crm_valid: boolean
           is_online: boolean
           is_verified: boolean
@@ -2666,6 +2746,10 @@ export type Database = {
           bio?: string | null
           city?: string | null
           consultation_price?: number
+          contract_hash?: string | null
+          contract_ip?: string | null
+          contract_signed_at?: string | null
+          contract_version?: string | null
           country?: string | null
           created_at?: string
           crm: string
@@ -2675,8 +2759,10 @@ export type Database = {
           document_type?: string
           fraud_score?: number | null
           id?: string
+          ip_capture_failed?: boolean | null
           is_approved_by_admin?: boolean
           is_available?: boolean
+          is_contract_signed?: boolean | null
           is_crm_valid?: boolean
           is_online?: boolean
           is_verified?: boolean
@@ -2707,6 +2793,10 @@ export type Database = {
           bio?: string | null
           city?: string | null
           consultation_price?: number
+          contract_hash?: string | null
+          contract_ip?: string | null
+          contract_signed_at?: string | null
+          contract_version?: string | null
           country?: string | null
           created_at?: string
           crm?: string
@@ -2716,8 +2806,10 @@ export type Database = {
           document_type?: string
           fraud_score?: number | null
           id?: string
+          ip_capture_failed?: boolean | null
           is_approved_by_admin?: boolean
           is_available?: boolean
+          is_contract_signed?: boolean | null
           is_crm_valid?: boolean
           is_online?: boolean
           is_verified?: boolean

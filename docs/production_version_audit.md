@@ -2,7 +2,13 @@
 **Projeto**: Planta y Raiz (`consultorio-medico-inteligente`)  
 **Data**: 05 de Setembro de 2026  
 **Auditor**: Agente de Engenharia de Software Antigravity  
-**Supabase de Produção Oficial**: `tkxxoghzhvhjzdoomgss.supabase.co`
+**Supabase de Produção Oficial**: ~~`tkxxoghzhvhjzdoomgss`~~ → **DOCUMENTO HISTÓRICO / DESATUALIZADO**
+
+> ⚠️ **CORREÇÃO OFICIAL (10/09/2026):** o banco de produção é **`shmbwdjuddvquszwkvuq`**
+> (ver `docs/BANCO_UNIFICADO_PLANTA_Y_RAIZ.md`, fonte única da verdade).
+> O projeto `tkxxoghzhvhjzdoomgss` está **DESATIVADO** — zero leituras, zero escritas,
+> zero deploys de edge functions e zero migrações. Todo conteúdo abaixo refere-se
+> ao ambiente legado e não deve ser usado como base para decisões atuais.
 
 ---
 

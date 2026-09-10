@@ -397,8 +397,8 @@ const App = () => (
                 <Route path="/rastreio" element={<EntregadorGPS />} />
                 <Route path="/shopping/farmacia/:vendorId" element={<FarmaciaVitrine />} />
                 <Route path="/agendamento" element={<Agendamento />} />
-                <Route path="/prontuario" element={<Prontuario />} />
-                <Route path="/dashboard-executivo" element={<DashboardExecutivo />} />
+                <Route path="/prontuario" element={<PrivateRoute><Prontuario /></PrivateRoute>} />
+                <Route path="/dashboard-executivo" element={<AdminRoute><DashboardExecutivo /></AdminRoute>} />
                 <Route path="/notificacoes" element={<Notificacoes />} />
                 <Route path="/sala-espera" element={<SalaEspera />} />
                 <Route path="/orientacao-video" element={<OrientacaoVideo />} />
@@ -418,7 +418,7 @@ const App = () => (
                 <Route path="/dispositivos" element={<IoMTHub />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/dashboard-loja" element={<ShoppingDashboard />} />
-                <Route path="/investidores" element={<InvestorDashboard />} />
+                <Route path="/investidores" element={<AdminRoute><InvestorDashboard /></AdminRoute>} />
                 <Route path="/videochamada" element={<LegacyVideoCallRedirect />} />
                 <Route path="/orientacao-rapida" element={<OrientacaoRapida />} />
                 <Route path="/consulta-rapida" element={<OrientacaoRapida />} />

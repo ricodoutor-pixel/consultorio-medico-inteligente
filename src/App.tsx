@@ -368,6 +368,7 @@ const App = () => (
                 <Route path="/admin/sentinela" element={<AdminRoute><SentinelControl /></AdminRoute>} />
                 <Route path="/admin/sentinel" element={<AdminRoute><SentinelControl /></AdminRoute>} />
                 <Route path="/admin/telemed-brisa-check" element={<AdminRoute><TelemedBrisaCheck /></AdminRoute>} />
+                <Route path="/admin/brisa-whatsapp-qr" element={<AdminRoute><BrisaWhatsAppQR /></AdminRoute>} />
                 <Route path="/admin/clinicas" element={<AdminRoute><AdminClinicas /></AdminRoute>} />
                 <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
                 <Route path="/admin/credit-audit" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />

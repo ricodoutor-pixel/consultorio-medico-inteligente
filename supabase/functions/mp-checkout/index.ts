@@ -59,17 +59,17 @@ const CATALOG: Record<string, { title: string; amount: number; recurring?: boole
 /** Módulos/apps de monitoramento do Consultório Digital (preço server-side). */
 const TOOL_CATALOG: Record<string, { title: string; amount: number }> = {
   tool_combo_tools: { title: "Combo 11 Módulos (Consultório Digital)", amount: 97 },
-  tool_monitor_cardiaco: { title: "Módulo Monitor Cardíaco", amount: 29.9 },
-  tool_saude_digital: { title: "Módulo Saúde Digital", amount: 29.9 },
-  tool_diario_sintomas: { title: "Módulo Diário de Sintomas", amount: 29.9 },
-  tool_exames: { title: "Módulo Exames e Laudos", amount: 29.9 },
-  tool_passaporte: { title: "Módulo Passaporte do Paciente", amount: 29.9 },
-  tool_prontuario: { title: "Módulo Prontuário Inteligente", amount: 29.9 },
-  tool_titulacao: { title: "Módulo Titulação Canabinoide", amount: 29.9 },
-  tool_anvisa: { title: "Módulo Automação ANVISA", amount: 29.9 },
-  tool_relatorios: { title: "Módulo Relatórios Clínicos", amount: 29.9 },
-  tool_agenda: { title: "Módulo Agenda e Fila", amount: 29.9 },
-  tool_financeiro: { title: "Módulo Painel Financeiro", amount: 29.9 },
+  tool_cardiaco: { title: "Módulo Monitor Cardíaco", amount: 29.9 },
+  tool_fundoscopia: { title: "Módulo Fundo de Olho (Fundoscopia)", amount: 29.9 },
+  tool_oximetria: { title: "Módulo Oximetria Óptica (SpO2)", amount: 29.9 },
+  tool_dermatoscopia: { title: "Módulo Dermatoscopia Digital", amount: 29.9 },
+  tool_mobilidade: { title: "Módulo Mobilidade Articular", amount: 29.9 },
+  tool_estetoscopio: { title: "Módulo Estetoscópio Digital IA", amount: 29.9 },
+  tool_pulmonar: { title: "Módulo Ausculta Pulmonar IA", amount: 29.9 },
+  tool_tremor: { title: "Módulo Tremorometria IA", amount: 29.9 },
+  tool_urine: { title: "Módulo Urinálise IA", amount: 29.9 },
+  tool_acuity: { title: "Módulo Acuidade Visual", amount: 29.9 },
+  tool_gps: { title: "Módulo Rastreador GPS Cardíaco", amount: 29.9 },
 };
 
 /** Taxas oficiais de intermediação. */

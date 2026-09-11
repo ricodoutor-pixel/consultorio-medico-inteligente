@@ -10,8 +10,10 @@ export type PaymentGateway = 'mercadopago';
  * são processados via Mercado Pago (PIX, cartão e boleto).
  */
 export const usePaymentGateway = () => {
-  const [currency, setCurrency] = useState<'BRL' | 'USD'>('BRL');
-  const [price, setPrice] = useState<number>(30);
+  // A cobrança é sempre liquidada em BRL pelo Mercado Pago.
+  // O valor exibido DEVE ser igual ao valor cobrado (evita cobrança indevida).
+  const [currency] = useState<'BRL'>('BRL');
+  const [price] = useState<number>(30);
   const [loading, setLoading] = useState(true);
   const [countryCode, setCountryCode] = useState<string>('BR');
 
@@ -25,19 +27,8 @@ export const usePaymentGateway = () => {
       try {
         const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
         const data = response.ok ? await response.json() : null;
-
-        if (data?.country_code && data.country_code !== 'BR') {
-          setCurrency('USD');
-          setPrice(10);
-          setCountryCode(data.country_code);
-        } else {
-          setCurrency('BRL');
-          setPrice(30);
-          setCountryCode('BR');
-        }
+        if (data?.country_code) setCountryCode(String(data.country_code));
       } catch {
-        setCurrency('BRL');
-        setPrice(30);
         setCountryCode('BR');
       } finally {
         window.clearTimeout(timer);

@@ -173,84 +173,80 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
   }, []);
 
   const professionals = useMemo<Professional[]>(() => {
-    // 1. Mapeamento de busca rápida dos dados reais do banco
-    const dbMapByCrm = new Map<string, DoctorRow>();
-    const dbMapByName = new Map<string, DoctorRow>();
-
-    for (const doc of dbDoctors) {
-      if (doc.crm) {
-        const cleanCrm = doc.crm.replace(/\D/g, "");
-        if (cleanCrm) dbMapByCrm.set(cleanCrm, doc);
-      }
-      const normName = normalizeDoctorKey(doc.full_name || "");
-      if (normName) dbMapByName.set(normName, doc);
+    // FONTE ÚNICA: a vitrine exibe SOMENTE os profissionais realmente cadastrados
+    // e liberados pelo administrador na página de KYC (view `doctors_public`).
+    // Nenhum profissional fictício ou lista fixa é usado aqui.
+    const baseByCrm = new Map<string, Professional>();
+    const baseByName = new Map<string, Professional>();
+    for (const base of baseProfessionals) {
+      const cleanCrm = (base.crm || "").replace(/\D/g, "");
+      if (cleanCrm) baseByCrm.set(cleanCrm, base);
+      const key = normalizeDoctorKey(base.name);
+      if (key) baseByName.set(key, base);
     }
 
-    // 2. Itera sobre os profissionais oficiais configurados (baseProfessionals)
-    // Isso garante que TODAS as 10 categorias e os médicos tratados com jaleco e esteto apareçam perfeitamente.
-    // Médicos novos cadastrados (sem card tratado) permanecem EXCLUSIVAMENTE no KYC admin.
-    const docsCountById = new Map<string, number>();
+    const mapped: Professional[] = dbDoctors
+      .filter((doc) => doc.is_verified !== false)
+      .map((doc) => {
+        const fullName = doc.full_name || "Profissional";
+        const cleanCrm = (doc.crm || "").replace(/\D/g, "");
+        const base =
+          (cleanCrm ? baseByCrm.get(cleanCrm) : undefined) ||
+          baseByName.get(normalizeDoctorKey(fullName));
 
-    const enrichedList: Professional[] = baseProfessionals.map((base) => {
-      // Tenta encontrar correspondente real no banco de dados
-      const cleanBaseCrm = (base.crm || "").replace(/\D/g, "");
-      const normBaseName = normalizeDoctorKey(base.name);
-      
-      const matchedDb = (cleanBaseCrm ? dbMapByCrm.get(cleanBaseCrm) : null) || 
-                        dbMapByName.get(normBaseName);
+        const registration = doc.crm
+          ? `${doc.crm}${doc.crm_state ? ` - ${doc.crm_state}` : ""}`
+          : "";
+        const isVet =
+          /crmv/i.test(doc.crm || "") ||
+          /veterin/i.test(doc.specialty || "") ||
+          /veterin/i.test(doc.document_type || "");
 
-      // Foto tratada oficial SEMPRE tem prioridade
-      const treatedAvatar = resolveDoctorAvatar(base.name, base.crm || "", base.imageUrl);
-      const cfmPrint = getDoctorCfmPrint(base.crm || base.name) || base.cfmPrintUrl;
+        const priceValue = Number(doc.price_video_chat ?? doc.consultation_price ?? 150) || 150;
+        const avatar = resolveDoctorAvatar(fullName, doc.crm || "", doc.avatar_url) || doc.avatar_url || "";
 
-      if (!matchedDb) {
-        docsCountById.set(base.id, 0);
         return {
-          ...base,
-          imageUrl: treatedAvatar || base.imageUrl,
-          cfmPrintUrl: cfmPrint,
-        };
-      }
+          id: base?.id ?? `db-${doc.id}`,
+          dbId: doc.id,
+          name: fullName,
+          category: isVet ? "Médico Veterinário Prescritor" : MEDICOS_CATEGORY,
+          councilLabel: isVet ? "CRMV" : "CRM",
+          bio: doc.bio || base?.bio || "",
+          experience: base?.experience ?? "",
+          tags: base?.tags ?? [doc.specialty || "Cannabis Medicinal", "Prescritor"],
+          price: `R$ ${priceValue.toFixed(2).replace(".", ",")}`,
+          priceValue,
+          whatsapp: base?.whatsapp ?? "",
+          rating: doc.rating ?? null,
+          consults: doc.total_consultations ?? 0,
+          avatar: fullName
+            .replace(/^(dr|dra|prof|profa)\.?\s*/i, "")
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((part) => part.charAt(0).toUpperCase())
+            .join(""),
+          imageUrl: avatar,
+          paymentLink: base?.paymentLink ?? "",
+          services: base?.services ?? [],
+          slots: base?.slots ?? [],
+          reviews: base?.reviews ?? [],
+          online: Boolean(doc.is_online && (doc.is_available ?? true)),
+          premiumPrice: doc.price_video_chat ?? base?.premiumPrice,
+          crm: registration,
+          cfmPrintUrl: getDoctorCfmPrint(doc.crm || fullName) || base?.cfmPrintUrl,
+          flags: base?.flags ?? (doc.country === "BO" ? ["🇧🇴"] : ["🇧🇷"]),
+          plan_tier: doc.plan_tier ?? "free",
+          _docsCount: doc.kyc_docs_count ?? 0,
+        } as Professional & { _docsCount: number };
+      });
 
-      docsCountById.set(base.id, matchedDb.kyc_docs_count ?? 0);
-
-
-      // Enriquece com informações em tempo real do banco de dados
-      return {
-        ...base,
-        dbId: matchedDb.id,
-        imageUrl: treatedAvatar || base.imageUrl,
-        cfmPrintUrl: cfmPrint,
-        online: Boolean(matchedDb.is_online && (matchedDb.is_available ?? true)),
-        rating: matchedDb.rating ?? base.rating,
-        consults: matchedDb.total_consultations ?? base.consults,
-        premiumPrice: matchedDb.price_video_chat ?? base.premiumPrice,
-        plan_tier: matchedDb.plan_tier ?? base.plan_tier,
-      };
-    });
-
-    // Ordena APENAS os médicos prescritores: fixos primeiro, depois quem tem
-    // mais documentos anexados no cadastro. As outras categorias mantêm a ordem.
-    const medicoSlots: number[] = [];
-    enrichedList.forEach((p, i) => {
-      if (p.category === MEDICOS_CATEGORY) medicoSlots.push(i);
-    });
-
-    const rankedMedicos = medicoSlots
-      .map((i) => enrichedList[i])
-      .sort((a, b) =>
-        compareDoctorsByCompleteness(
-          { name: a.name, registration: a.crm, docsCount: docsCountById.get(a.id) ?? 0 },
-          { name: b.name, registration: b.crm, docsCount: docsCountById.get(b.id) ?? 0 },
-        ),
-      );
-
-    const ordered = [...enrichedList];
-    medicoSlots.forEach((slot, i) => {
-      ordered[slot] = rankedMedicos[i];
-    });
-
-    return ordered;
+    // Ordem oficial: fixos primeiro, depois quem tem mais documentos no cadastro.
+    return mapped.sort((a, b) =>
+      compareDoctorsByCompleteness(
+        { name: a.name, registration: a.crm, docsCount: (a as Professional & { _docsCount?: number })._docsCount ?? 0 },
+        { name: b.name, registration: b.crm, docsCount: (b as Professional & { _docsCount?: number })._docsCount ?? 0 },
+      ),
+    );
   }, [dbDoctors]);
 
   return { professionals, realCount: professionals.length, loading };

@@ -56,6 +56,27 @@ const CATALOG: Record<string, { title: string; amount: number; recurring?: boole
   plano_enterprise: { title: "Plano Empresa & Parceiros", amount: 499.90, recurring: true },
 };
 
+/** Módulos/apps de monitoramento do Consultório Digital (preço server-side). */
+const TOOL_CATALOG: Record<string, { title: string; amount: number }> = {
+  tool_combo_tools: { title: "Combo 11 Módulos (Consultório Digital)", amount: 97 },
+  tool_monitor_cardiaco: { title: "Módulo Monitor Cardíaco", amount: 29.9 },
+  tool_saude_digital: { title: "Módulo Saúde Digital", amount: 29.9 },
+  tool_diario_sintomas: { title: "Módulo Diário de Sintomas", amount: 29.9 },
+  tool_exames: { title: "Módulo Exames e Laudos", amount: 29.9 },
+  tool_passaporte: { title: "Módulo Passaporte do Paciente", amount: 29.9 },
+  tool_prontuario: { title: "Módulo Prontuário Inteligente", amount: 29.9 },
+  tool_titulacao: { title: "Módulo Titulação Canabinoide", amount: 29.9 },
+  tool_anvisa: { title: "Módulo Automação ANVISA", amount: 29.9 },
+  tool_relatorios: { title: "Módulo Relatórios Clínicos", amount: 29.9 },
+  tool_agenda: { title: "Módulo Agenda e Fila", amount: 29.9 },
+  tool_financeiro: { title: "Módulo Painel Financeiro", amount: 29.9 },
+};
+
+/** Taxas oficiais de intermediação. */
+const FEE_TELEMEDICINE = 0.07; // 7% plataforma / 93% profissional
+const FEE_MARKETPLACE = 0.05; // 5% plataforma / 95% lojista
+const round2 = (v: number) => Math.round(Number(v) * 100) / 100;
+
 /** SKUs legados → novos (mantém links antigos funcionando com o preço correto). */
 const LEGACY_SKU_MAP: Record<string, string> = {
   consulta_emergencia: "consulta_video",

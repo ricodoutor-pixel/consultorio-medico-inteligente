@@ -123,26 +123,28 @@ Deno.serve(async (req) => {
     let amount: number;
     let externalReference: string;
     let type = "sku";
+    let marketplaceFee: number | null = null;
+    let collectorId: string | number | null = null;
+    let splitDetails: Record<string, unknown> | null = null;
 
     if (orderId && typeof orderId === "string") {
-      title = directDesc || `Pedido Shopping ${orderId} — Planta y Raiz`;
-      const baseAmt = Number(directAmount || 0);
-      const shipAmt = Number(shipping_cost || 0);
-      amount = Math.max(1, baseAmt + shipAmt);
-      externalReference = `order:${orderId}`;
-      type = "product_order";
-    } else if (cartToken && typeof cartToken === "string") {
-      const { data: cart } = await supabase
-        .from("prescription_carts")
-        .select("id, patient_id, total_amount, status, cart_token")
-        .eq("cart_token", cartToken)
+      // Shopping / Club (camisetas, canecas, souvenirs, produtos): valor SEMPRE do banco.
+      const { data: order } = await supabase
+        .from("orders")
+        .select("id, user_id, vendor_id, subtotal, shipping_cost, total, status")
+        .eq("id", orderId)
         .maybeSingle();
-      if (!order) return json({ error: "Pedido não encontrado" }, 404);
-      if (order.user_id !== userId) return json({ error: "Forbidden" }, 403);
+      if (!order) return json({ error: "Pedido não encontrado" }, 404, req);
+      if (order.user_id !== userId) return json({ error: "Forbidden" }, 403, req);
+      if (order.status && !["pending", "awaiting_payment"].includes(String(order.status))) {
+        return json({ error: "Pedido não está aguardando pagamento" }, 400, req);
+      }
 
-      const productsTotal = Number(order.subtotal || 0);
-      const shipping = Number(order.shipping_cost || 0);
-      amount = Math.max(1, round2(Number(order.total || productsTotal + shipping)));
+      const productsTotal = round2(Number(order.subtotal || 0));
+      const shipping = round2(Number(order.shipping_cost || 0));
+      amount = round2(Number(order.total || productsTotal + shipping));
+      if (!(amount > 0)) return json({ error: "Pedido sem valor válido" }, 400, req);
+
       // A taxa de 5% incide apenas sobre produtos; o frete é repassado 100% ao vendor.
       marketplaceFee = round2(productsTotal * FEE_MARKETPLACE);
       const vendorNet = round2(amount - marketplaceFee);
@@ -185,41 +187,30 @@ Deno.serve(async (req) => {
         .select("id, patient_id, total_amount, status, cart_token")
         .eq("cart_token", cartToken)
         .maybeSingle();
-      if (!cart) return json({ error: "Carrinho não encontrado" }, 404);
-      if (cart.patient_id !== userId) return json({ error: "Forbidden" }, 403);
-      if (cart.status !== "pending") return json({ error: "Carrinho não está pendente" }, 400);
+      if (!cart) return json({ error: "Carrinho não encontrado" }, 404, req);
+      if (cart.patient_id !== userId) return json({ error: "Forbidden" }, 403, req);
+      if (cart.status !== "pending") return json({ error: "Carrinho não está pendente" }, 400, req);
+      amount = round2(Number(cart.total_amount || 0));
+      if (!(amount > 0)) return json({ error: "Carrinho sem valor válido" }, 400, req);
       title = "Carrinho de Prescrição Médica";
-      amount = Math.max(1, Number(cart.total_amount || 0));
       externalReference = `cart:${cart.id}`;
       type = "prescription_cart";
     } else if (appointmentId && typeof appointmentId === "string") {
       const { data: appt } = await supabase
         .from("appointments")
-        .select("id, amount, patient_id, doctor_id")
+        .select("id, amount, patient_id, doctor_id, status")
         .eq("id", appointmentId)
         .maybeSingle();
-      if (!appt) return json({ error: "Consulta não encontrada" }, 404);
-      if (appt.patient_id !== userId) return json({ error: "Forbidden" }, 403);
+      if (!appt) return json({ error: "Consulta não encontrada" }, 404, req);
+      if (appt.patient_id !== userId) return json({ error: "Forbidden" }, 403, req);
+      amount = round2(Number(appt.amount || 0));
+      if (!(amount > 0)) return json({ error: "Consulta sem valor válido" }, 400, req);
       title = "Consulta médica — Planta y Raiz";
-      amount = Math.max(1, Number(appt.amount || 0));
       externalReference = `appointment:${appt.id}`;
       type = "consultation";
-    } else {
-      let item = typeof sku === "string" ? CATALOG[sku] : undefined;
-      
-      if (typeof sku === "string" && sku.startsWith("tool_")) {
-        if (sku === "tool_combo_tools") {
-          item = { title: "Combo 11 Módulos (Consultório Digital)", amount: 97.00 };
-        } else {
-          item = { title: `Módulo Diagnóstico: ${sku.replace('tool_', '')}`, amount: 29.90 };
-        }
-      }
 
-      if (!item) return json({ error: "SKU inválido" }, 400);
-      title = item.title;
-      amount = item.amount;
-      // Consulta Premium é o único serviço com valor definido pelo profissional.
-      if (sku === "consulta_premium" && typeof doctorId === "string") {
+      marketplaceFee = round2(amount * FEE_TELEMEDICINE);
+      if (appt.doctor_id) {
         const { data: doc } = await supabase
           .from("doctors")
           .select("mp_collector_id")
@@ -237,16 +228,12 @@ Deno.serve(async (req) => {
       };
     } else {
       let item = typeof sku === "string" ? CATALOG[sku] : undefined;
-      
+
       if (typeof sku === "string" && sku.startsWith("tool_")) {
-        if (sku === "tool_combo_tools") {
-          item = { title: "Combo 11 Módulos (Consultório Digital)", amount: 97.00 };
-        } else {
-          item = { title: `Módulo Diagnóstico: ${sku.replace('tool_', '')}`, amount: 29.90 };
-        }
+        item = TOOL_CATALOG[sku];
       }
 
-      if (!item) return json({ error: "SKU inválido" }, 400);
+      if (!item) return json({ error: "SKU inválido" }, 400, req);
       title = item.title;
       amount = item.amount;
       // Consulta Premium é o único serviço com valor definido pelo profissional.
@@ -257,7 +244,7 @@ Deno.serve(async (req) => {
           .eq("id", doctorId)
           .maybeSingle();
         const custom = Number(doc?.price_video_chat || 0);
-        if (custom >= 100 && custom <= 2000) amount = custom;
+        if (custom >= 100 && custom <= 2000) amount = round2(custom);
       }
       externalReference = `${sku}:${userId}:${Date.now()}`;
       type = item.recurring ? "subscription" : "sku";

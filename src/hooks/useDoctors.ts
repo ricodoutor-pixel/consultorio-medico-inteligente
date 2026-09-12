@@ -37,13 +37,6 @@ interface Counts {
   withDocs: number;
 }
 
-function getStoredOverrides(): Record<string, boolean> {
-  try {
-    return JSON.parse(localStorage.getItem("doctor_card_overrides") || "{}");
-  } catch {
-    return {};
-  }
-}
 
 export function useDoctors() {
   const [doctors, setDoctors] = useState<DoctorRow[]>([]);
@@ -97,7 +90,6 @@ export function useDoctors() {
         docsMap.set(doc.doctor_user_id, list);
       }
 
-      const overrides = getStoredOverrides();
 
       // Mapeia exclusivamente os registros reais do banco de dados (zero dados mockados)
       const mappedDbDoctors: DoctorRow[] = dbRows.map((d) => {
@@ -108,8 +100,8 @@ export function useDoctors() {
         const officialAvatar = resolveDoctorAvatar(fullName, d.crm || "", profile?.avatar_url ?? d.avatar_url);
         const avatarUrl = officialAvatar || (profile?.avatar_url ?? d.avatar_url ?? null);
 
-        const overrideVal = overrides[d.id] ?? overrides[d.user_id];
-        const isApproved = overrideVal !== undefined ? overrideVal : (d.is_approved_by_admin || d.is_verified || false);
+        // Estado vem exclusivamente do banco (sem memória local do navegador)
+        const isApproved = Boolean(d.is_approved_by_admin ?? d.is_verified ?? false);
 
         // Monta lista de documentos KYC incluindo o print oficial do CFM
         const userDocs = [...(docsMap.get(d.user_id) ?? [])];

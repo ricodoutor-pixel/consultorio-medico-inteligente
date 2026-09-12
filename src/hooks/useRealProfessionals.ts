@@ -186,7 +186,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     }
 
     const mapped: Professional[] = dbDoctors
-      .filter((doc) => doc.is_verified !== false)
+      .filter((doc) => doc.is_verified === true)
       .map((doc) => {
         const fullName = doc.full_name || "Profissional";
         const cleanCrm = (doc.crm || "").replace(/\D/g, "");

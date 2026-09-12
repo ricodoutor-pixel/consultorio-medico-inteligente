@@ -37,13 +37,6 @@ interface Counts {
   withDocs: number;
 }
 
-function getStoredOverrides(): Record<string, boolean> {
-  try {
-    return JSON.parse(localStorage.getItem("doctor_card_overrides") || "{}");
-  } catch {
-    return {};
-  }
-}
 
 export function useDoctors() {
   const [doctors, setDoctors] = useState<DoctorRow[]>([]);

@@ -151,8 +151,28 @@ export const AdminAprovacoes = () => {
         }
       }
 
-      
-      // Update local state immediately for instant feedback
+      // Persiste no banco (fonte única da verdade) ANTES de mudar a tela
+      if (!docId.startsWith('static-')) {
+        const { error: updErr } = await (supabase as any)
+          .from('doctors')
+          .update({
+            is_approved_by_admin: newApprovedState,
+            approval_status: newApprovedState ? 'approved' : 'rejected',
+            is_verified: newApprovedState,
+            is_online: newApprovedState,
+            is_available: newApprovedState,
+            kyc_status: newApprovedState ? 'verified' : 'pending',
+          })
+          .eq('id', docId);
+
+        if (updErr) {
+          toast.error("Não foi possível alterar o card: " + updErr.message);
+          await fetchDoctors();
+          return;
+        }
+      }
+
+      // Reflete na tela após a confirmação do banco
       setDoctors((prev) =>
         prev.map((d) =>
           d.id === docId
@@ -164,33 +184,14 @@ export const AdminAprovacoes = () => {
                 is_verified: newApprovedState,
                 is_online: newApprovedState,
                 is_available: newApprovedState,
-                kyc_status: newApprovedState ? 'approved' : 'rejected',
+                kyc_status: newApprovedState ? 'approved' : 'pending',
               }
             : d
         )
       );
 
-      // Save to localStorage override for marketplace /profissionais
-      try {
-        const savedOverrides = JSON.parse(localStorage.getItem('doctor_card_overrides') || '{}');
-        savedOverrides[docId] = newApprovedState;
-        localStorage.setItem('doctor_card_overrides', JSON.stringify(savedOverrides));
-      } catch (e) {}
-
-      // Update Supabase database
       if (!docId.startsWith('static-')) {
-        await (supabase as any)
-          .from('doctors')
-          .update({
-            is_approved_by_admin: newApprovedState,
-            is_approved: newApprovedState,
-            approval_status: newApprovedState ? 'approved' : 'rejected',
-            is_verified: newApprovedState,
-            is_online: newApprovedState,
-            is_available: newApprovedState,
-            kyc_status: newApprovedState ? 'approved' : 'rejected',
-          })
-          .eq('id', docId);
+
 
         // Trigger WhatsApp welcome / update message
         if (newApprovedState) {

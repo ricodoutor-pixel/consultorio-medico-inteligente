@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { GatewayHibridoCheckout } from "@/components/GatewayHibridoCheckout";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";

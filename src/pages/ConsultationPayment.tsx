@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { GatewayHibridoCheckout } from "@/components/GatewayHibridoCheckout";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -411,23 +410,13 @@ const ConsultationPayment = () => {
 
                     {/* Pay button */}
                     <div className="space-y-3">
-                      <GatewayHibridoCheckout 
-                        amountBrl={total} 
-                        productName={`Consulta com ${proView.name}`} 
-                        triggerComponent={
-                          <Button className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12">
-                            Pagar com Gateway Sem Fronteiras
-                          </Button>
-                        } 
-                      />
-
                       <Button
-                        className="w-full bg-muted text-foreground font-black rounded-2xl h-12 border border-border hover:bg-muted/80"
+                        className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12"
                         asChild
                       >
                         <a href={checkoutUrl || proView.paymentLink} target="_blank" rel="noopener noreferrer">
                           <ExternalLink size={16} className="mr-2" />
-                          Pagar via Mercado Pago
+                          Pagar via Mercado Pago (PIX ou cartão)
                         </a>
                       </Button>
                     </div>

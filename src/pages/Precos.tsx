@@ -197,7 +197,7 @@ const Precos = () => {
               Planos <span className="text-gradient-green">SaaS</span>
             </h1>
             <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
-              Escolha o plano ideal para seu perfil. Pagamento via Pix (Mercado Pago), PayPal (USD) ou BTC.
+              Escolha o plano ideal para seu perfil. Pagamento via Pix ou cartão (Mercado Pago).
             </p>
           </div>
 

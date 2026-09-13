@@ -70,3 +70,8 @@ head.txt
 db_output.txt
 search_results.txt
 temp_cadastro.txt
+
+# Arquivos sensíveis ainda rastreados — remover do index com git rm --cached
+scripts/contatos-enf-brisa.vcf
+scripts/prescritores_master_list.json
+scripts/stats-prescritores.mjs

@@ -19,6 +19,12 @@ export function GatewayHibridoCheckout({ amountBrl, productName, triggerComponen
   const [isOpen, setIsOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // ⛔ DESATIVADO até haver fluxo de pagamento real.
+  // Este "Gateway Sem Fronteiras" era um checkout SIMULADO (Pix/cartão/cripto mock)
+  // que exibia "Pagamento Confirmado!" sem cobrar de verdade. Mantido oculto para
+  // evitar cobrança falsa e exposição de pagamento em cripto/dólar ao usuário final.
+  return null;
+
   // Mock exchange rates
   const usdtAmount = (amountBrl / 5.20).toFixed(2);
   const btcAmount = (amountBrl / 350000).toFixed(6); // Simulando BTC a R$ 350k

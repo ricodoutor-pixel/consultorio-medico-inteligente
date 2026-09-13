@@ -24,6 +24,10 @@ export const BTCPaymentModal = ({ open, onClose, planName, planId, amount }: BTC
   const [step, setStep] = useState<"info" | "confirm">("info");
   const [submitting, setSubmitting] = useState(false);
 
+  // ⛔ DESATIVADO até haver fluxo de pagamento em cripto real e automatizado.
+  // Fluxo manual (depósito BTC + comprovante via WhatsApp) ocultado do usuário final.
+  return null;
+
   const handleCopy = () => {
     navigator.clipboard.writeText(WALLET_ADDRESS);
     setCopied(true);

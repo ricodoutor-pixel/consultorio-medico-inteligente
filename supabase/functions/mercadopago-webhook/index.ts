@@ -184,7 +184,8 @@ Deno.serve(async (req) => {
     // Calculate split using Digital Franchise tiers
     const totalAmount = payment.transaction_amount || 0;
     const metadata = payment.metadata || {};
-    const isMarketplace = metadata.type === "marketplace";
+    const isMarketplace =
+      metadata.type === "marketplace" || metadata.type === "marketplace_order";
 
     // === SAÚDE VERDE — Subscription activation/renewal (handled inline, returns early) ===
     if (metadata.module === "saude_verde" && metadata.user_id) {

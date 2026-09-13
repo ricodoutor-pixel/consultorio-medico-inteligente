@@ -164,13 +164,19 @@ const Agendamento = () => {
   };
 
   const handleBook = async () => {
-    if (!userId) {
-      toast({ title: "Faça login primeiro", description: "Você precisa estar logado para agendar.", variant: "destructive" });
-      return;
-    }
     if (!selectedDoctor || !selectedDate || !selectedTime) return;
 
     setLoading(true);
+    // Revalida a sessão no momento do agendamento (evita token expirado)
+    const { data: freshSession } = await supabase.auth.getSession();
+    const authUid = freshSession.session?.user?.id ?? null;
+    if (!authUid) {
+      setLoading(false);
+      setUserId(null);
+      toast({ title: "Faça login primeiro", description: "Sua sessão expirou. Entre novamente para agendar.", variant: "destructive" });
+      return;
+    }
+    if (authUid !== userId) setUserId(authUid);
     const scheduledAt = new Date(selectedDate);
     const [h, m] = selectedTime.split(":").map(Number);
     scheduledAt.setHours(h, m, 0, 0);
@@ -184,7 +190,7 @@ const Agendamento = () => {
 
     const routedId = schedulingDoctorId ?? selectedDoctor.id;
     const { data: newAppt, error } = await supabase.from("appointments").insert({
-      patient_id: userId,
+      patient_id: authUid,
       doctor_id: routedId,
       scheduled_at: scheduledAt.toISOString(),
       type: consultType,
@@ -485,7 +491,7 @@ const Agendamento = () => {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-bold uppercase">Pagamento</p>
-                          <p className="text-sm font-bold text-foreground">PIX (Mercado Pago) ou PayPal (USD)</p>
+                          <p className="text-sm font-bold text-foreground">PIX ou cartão (Mercado Pago)</p>
                         </div>
                       </div>
 

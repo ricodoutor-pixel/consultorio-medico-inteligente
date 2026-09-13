@@ -93,14 +93,20 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
     if (!doctorId || !pixKey.trim()) return;
     setSavingPix(true);
     try {
-      const { error } = await supabase
-        .from("doctors_financial")
-        .upsert({ doctor_id: doctorId, pix_key: pixKey.trim() }, { onConflict: "doctor_id" });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Sua sessão expirou. Entre novamente para salvar a chave Pix.");
+        return;
+      }
+      const { error } = await (supabase as any).rpc("upsert_doctor_pix", {
+        p_doctor_id: doctorId,
+        p_pix_key: pixKey.trim(),
+      });
       if (error) throw error;
       setSavedPixKey(pixKey.trim());
       toast.success("✅ Chave Pix salva com sucesso!");
-    } catch {
-      toast.error("Erro ao salvar chave Pix");
+    } catch (err: any) {
+      toast.error(err?.message || "Erro ao salvar chave Pix");
     } finally {
       setSavingPix(false);
     }

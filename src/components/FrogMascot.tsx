@@ -107,73 +107,117 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
     handleTap();
   }, [handleTap]);
 
-  // Hover → enlarge 3x (desktop only, via mouse)
+  // Hover → enlarge (apenas mouse real; toque não dispara hover)
+  const isFinePointer = useCallback(
+    () => typeof window === "undefined" || window.matchMedia("(hover: hover) and (pointer: fine)").matches,
+    []
+  );
+
   const handleMouseEnter = useCallback(() => {
+    if (!isFinePointer()) return;
     anim.onHoverStart();
     setIsEnlarged(true);
-  }, [anim]);
+  }, [anim, isFinePointer]);
 
   const handleMouseLeave = useCallback(() => {
+    if (!isFinePointer()) return;
     anim.onHoverEnd();
     // Only shrink if story is not showing
     if (!showStory) {
       setIsEnlarged(false);
     }
-  }, [anim, showStory]);
+  }, [anim, isFinePointer, showStory]);
 
   // On mobile (small size ≤ 73), limit enlargement to 2x to prevent overflow
   const maxScale = size <= 73 ? 2 : 3;
-  const displaySize = isEnlarged ? size * maxScale : showStory ? size * 1.8 : size;
+  // O mascote NUNCA muda de tamanho em layout — só escala via transform (GPU),
+  // evitando re-render/re-decode da imagem e o tremor ao passar o mouse.
+  const displaySize = size;
+  const zoom = isEnlarged ? maxScale : showStory ? 1.8 : 1;
   const isFloating = isEnlarged || showStory;
 
-  // Anchor enlarged frog with position:fixed so it escapes navbar overflow and is fully visible
+  // Área de hover/clique fixa (nunca se move) + camada visual flutuante por cima
   const placeholderRef = useRef<HTMLDivElement>(null);
-  const [rect, setRect] = useState<{ top: number; left: number } | null>(null);
-  useEffect(() => {
-    if (isFloating && placeholderRef.current) {
-      const r = placeholderRef.current.getBoundingClientRect();
-      const left = r.left + r.width / 2 - displaySize / 2;
-      // Keep the enlarged frog below any fixed top bar (min 8px from top) and roughly centered on the trigger
-      const top = Math.max(8, r.top + r.height / 2 - displaySize * 0.35);
-      setRect({ top, left });
-    } else {
-      setRect(null);
-    }
-  }, [isFloating, displaySize]);
+  const [anchor, setAnchor] = useState<{ top: number; left: number } | null>(null);
 
-  const floatingStyle: React.CSSProperties = isFloating && rect
-    ? { position: "fixed", top: rect.top, left: rect.left, zIndex: 9999 }
-    : {};
+  const captureAnchor = useCallback(() => {
+    const el = placeholderRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setAnchor({ top: r.top, left: r.left });
+  }, []);
+
+  useEffect(() => {
+    if (!isFloating) {
+      setAnchor(null);
+      return;
+    }
+    captureAnchor();
+    window.addEventListener("scroll", captureAnchor, { passive: true });
+    window.addEventListener("resize", captureAnchor);
+    return () => {
+      window.removeEventListener("scroll", captureAnchor);
+      window.removeEventListener("resize", captureAnchor);
+    };
+  }, [isFloating, captureAnchor]);
+
+  const floatingStyle: React.CSSProperties = isFloating && anchor
+    ? {
+        position: "fixed",
+        top: anchor.top,
+        left: anchor.left,
+        width: size,
+        height: size,
+        zIndex: 9999,
+        pointerEvents: "none",
+      }
+    : { position: "absolute", inset: 0 };
 
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
         <TooltipTrigger asChild>
-    <div ref={placeholderRef} style={{ width: size, height: size, position: "relative" }}>
-    <motion.div
-      ref={anim.containerRef as any}
+    <div
+      ref={placeholderRef}
       onClick={handleClick}
       onTouchEnd={handleTouchEnd}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="cursor-pointer select-none focus:outline-none relative"
+      role="button"
+      tabIndex={0}
+      aria-label="Toque para ver a história do Verdinho. Toque 2x para conversar."
+      className="cursor-pointer select-none focus:outline-none"
       style={{
-        width: displaySize,
-        height: displaySize,
+        width: size,
+        height: size,
+        position: "relative",
         touchAction: "manipulation",
         WebkitTapHighlightColor: "transparent",
         WebkitUserSelect: "none",
         userSelect: "none",
-        ...floatingStyle,
       }}
-      role="button"
-      tabIndex={0}
-      aria-label="Toque para ver a história do Verdinho. Toque 2x para conversar."
-      
+    >
+    <div
+      style={{
+        ...floatingStyle,
+        transform: `scale(${zoom})`,
+        transformOrigin: "50% 25%",
+        transition: "transform 260ms cubic-bezier(0.22,1,0.36,1)",
+        willChange: "transform",
+      }}
+    >
+    <motion.div
+      ref={anim.containerRef as any}
+      className="select-none relative"
+      style={{
+        width: displaySize,
+        height: displaySize,
+      }}
       whileTap={{ scale: 0.9, rotate: -5 }}
       animate={anim.controls}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
+
 
       {/* Glow */}
       <motion.div

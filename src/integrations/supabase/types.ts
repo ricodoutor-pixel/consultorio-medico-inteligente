@@ -9817,6 +9817,10 @@ export type Database = {
       }
       sync_brisa_vault_secret: { Args: { _value: string }; Returns: string }
       trigger_brisa_social_post: { Args: { _target: string }; Returns: number }
+      upsert_doctor_pix: {
+        Args: { p_doctor_id: string; p_pix_key: string; p_pix_type?: string }
+        Returns: undefined
+      }
       upsert_unified_contact: {
         Args: {
           _channel: string

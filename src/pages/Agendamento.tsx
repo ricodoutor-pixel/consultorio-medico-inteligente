@@ -491,7 +491,7 @@ const Agendamento = () => {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-bold uppercase">Pagamento</p>
-                          <p className="text-sm font-bold text-foreground">PIX (Mercado Pago) ou PayPal (USD)</p>
+                          <p className="text-sm font-bold text-foreground">PIX ou cartão (Mercado Pago)</p>
                         </div>
                       </div>
 

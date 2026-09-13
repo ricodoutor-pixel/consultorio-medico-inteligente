@@ -147,7 +147,7 @@ const FalarComEspecialista = () => {
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground mb-3 tracking-tight">
               Falar com <span className="text-gradient-green">Especialista</span>
             </h1>
-            <p className="text-muted-foreground text-lg font-medium">Preencha a pré-entrevista e pague via Pix ou PayPal para liberar o atendimento — supervisionado por IA de última geração 24×7.</p>
+            <p className="text-muted-foreground text-lg font-medium">Preencha a pré-entrevista e pague via Pix ou cartão para liberar o atendimento — supervisionado por IA de última geração 24×7.</p>
           </motion.div>
 
           <div className="grid lg:grid-cols-3 gap-6">
@@ -175,7 +175,7 @@ const FalarComEspecialista = () => {
                     <h3 className="text-xs font-black text-muted-foreground uppercase tracking-wider">Como funciona</h3>
                       {[
                         { n: "1", text: "Preencha a pré-entrevista" },
-                        { n: "2", text: "Pague via Pix ou PayPal" },
+                        { n: "2", text: "Pague via Pix ou cartão" },
                         { n: "3", text: "Atendimento liberado automaticamente" },
                       ].map((s) => (
                       <div key={s.n} className="flex items-start gap-2">
@@ -255,7 +255,7 @@ const FalarComEspecialista = () => {
                         </Button>
 
                         <p className="text-xs text-muted-foreground text-center">
-                          Após enviar, você será direcionado para o pagamento via Pix ou PayPal.
+                          Após enviar, você será direcionado para o pagamento via Pix ou cartão.
                         </p>
                       </form>
                     </CardContent>
@@ -271,7 +271,7 @@ const FalarComEspecialista = () => {
                         Paciente: <strong>{form.nomePaciente}</strong> • Profissional: <strong>{pro.name}</strong>
                       </p>
                       <p className="text-muted-foreground mb-6">
-                        Finalize o pagamento via Pix ou PayPal para liberar o atendimento.
+                        Finalize o pagamento via Pix ou cartão para liberar o atendimento.
                       </p>
                       <div className="bg-muted/30 border border-border rounded-2xl p-4 mb-4">
                         <p className="text-sm text-muted-foreground mb-1">Valor a pagar</p>
@@ -303,7 +303,7 @@ const FalarComEspecialista = () => {
                         </a>
                       </Button>
                       <p className="text-xs text-muted-foreground mt-4">
-                        Pagamento seguro via Mercado Pago ou PayPal. Atendimento liberado automaticamente.
+                        Pagamento seguro via Mercado Pago. Atendimento liberado automaticamente.
                       </p>
                     </CardContent>
                   </Card>

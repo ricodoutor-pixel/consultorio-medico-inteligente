@@ -28,9 +28,9 @@ const FAQ = () => {
     {
       category: "Pagamentos",
       questions: [
-        { q: "Como funcionam os pagamentos?", a: "Geramos cobrança Pix (Mercado Pago) ou PayPal (USD). Você recebe QR code, link ou instrução de pagamento. Confirmação automática via webhook." },
+        { q: "Como funcionam os pagamentos?", a: "Geramos cobrança Pix ou cartão (Mercado Pago). Você recebe QR code, link ou instrução de pagamento. Confirmação automática via webhook." },
         { q: "Posso cancelar assinatura?", a: "Sim! Cancelamento a qualquer momento sem taxas ou burocracia." },
-        { q: "O pagamento é seguro?", a: "Sim! Usamos Mercado Pago e PayPal com criptografia e conformidade PCI DSS." },
+        { q: "O pagamento é seguro?", a: "Sim! Usamos Mercado Pago com criptografia e conformidade PCI DSS." },
       ],
     },
     {

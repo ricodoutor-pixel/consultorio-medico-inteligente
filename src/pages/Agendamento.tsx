@@ -190,7 +190,7 @@ const Agendamento = () => {
 
     const routedId = schedulingDoctorId ?? selectedDoctor.id;
     const { data: newAppt, error } = await supabase.from("appointments").insert({
-      patient_id: userId,
+      patient_id: authUid,
       doctor_id: routedId,
       scheduled_at: scheduledAt.toISOString(),
       type: consultType,

@@ -407,6 +407,8 @@ export const FrogMascot = memo(({ onClick, size = 64, mood = "happy", enableJump
 
     </motion.div>
     </div>
+    </div>
+
         </TooltipTrigger>
         <TooltipContent side="bottom" className="bg-card border-primary/30 text-foreground font-semibold text-xs">
           <p>💬 Clique para conversar 🐸</p>

@@ -37,3 +37,36 @@ dist-ssr/
 *.log
 scratch/
 supabase/.temp/
+
+# Dados pessoais / LGPD — NUNCA versionar
+contatos_*.json
+contacts_to_send.json
+contatos-brisa.vcf
+mined_doctor_leads*.json
+lista_500_medicos_qualificados.*
+prescritores_*.csv
+apepi_*.json
+apepi_*.html
+pharmacies_raw.json
+drsaude_fakes.json
+campaign_log_*.json
+dispatch_log.json
+dispatch_state.json
+email_sent_state.json
+invites_sent_state.json
+
+# Sessões de navegador / WhatsApp (contêm credenciais)
+scripts/whatsapp_session/
+**/whatsapp_session/
+*.session
+auth_info*/
+
+# Artefatos e lixo de build
+dist.tar.gz
+*.tar.gz
+*.tsbuildinfo
+build-errors.txt
+head.txt
+db_output.txt
+search_results.txt
+temp_cadastro.txt

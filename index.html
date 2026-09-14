@@ -72,6 +72,20 @@
           if (typeof window.structuredClone !== 'function') {
             window.structuredClone = function(v){ return JSON.parse(JSON.stringify(v)); };
           }
+          // Safari/iOS não implementa requestIdleCallback — polyfill obrigatório,
+          // qualquer referência nua lança ReferenceError e derruba o app.
+          if (typeof window.requestIdleCallback !== 'function') {
+            window.requestIdleCallback = function(cb, opts){
+              var start = Date.now();
+              return window.setTimeout(function(){
+                cb({ didTimeout: false, timeRemaining: function(){ return Math.max(0, 50 - (Date.now() - start)); } });
+              }, (opts && opts.timeout) ? Math.min(opts.timeout, 1) : 1);
+            };
+          }
+          if (typeof window.cancelIdleCallback !== 'function') {
+            window.cancelIdleCallback = function(id){ window.clearTimeout(id); };
+          }
+
         } catch(_){}
       })();
     </script>

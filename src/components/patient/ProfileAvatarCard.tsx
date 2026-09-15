@@ -4,9 +4,11 @@
  * Permite upload da foto de perfil para o bucket "avatars".
  */
 import { useRef, useState } from "react";
-import { Camera, Loader2, Phone } from "lucide-react";
+import { Camera, Loader2, Phone, Activity } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 interface ProfileAvatarCardProps {
   userId: string;
@@ -124,9 +126,20 @@ export const ProfileAvatarCard = ({
       </div>
 
       <div>
-        <h1 className="text-2xl md:text-4xl font-display font-black text-foreground leading-tight">
-          Olá, {firstName}! 👋
-        </h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl md:text-4xl font-display font-black text-foreground leading-tight">
+            Olá, {firstName}! 👋
+          </h1>
+          <Button
+            size="sm"
+            className="rounded-xl text-xs font-bold gap-1.5 shadow-lg"
+            asChild
+          >
+            <Link to="/monitoramento-saude" aria-label="Abrir Sinais Vitais — central de monitoramento e exames">
+              <Activity size={14} /> Sinais Vitais
+            </Link>
+          </Button>
+        </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground mt-0.5">
           <span>{completedCount} consulta(s) realizadas</span>
           {phone && (
@@ -134,6 +147,9 @@ export const ProfileAvatarCard = ({
               <Phone size={11} className="text-primary" /> {phone}
             </span>
           )}
+          <span className="inline-flex items-center gap-1">
+            <Activity size={11} className="text-primary" /> Exames e monitoramento sempre disponíveis
+          </span>
         </div>
       </div>
     </div>

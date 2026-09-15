@@ -6229,13 +6229,6 @@ export type Database = {
             referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "payouts_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       pharmacy_prescriptions_inbox: {
@@ -6313,13 +6306,6 @@ export type Database = {
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pharmacy_prescriptions_inbox_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors_public"
             referencedColumns: ["id"]
           },
         ]
@@ -8499,13 +8485,6 @@ export type Database = {
             referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "vendor_products_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       vendor_sales_splits: {
@@ -8548,13 +8527,6 @@ export type Database = {
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "vendor_sales_splits_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors_public"
             referencedColumns: ["id"]
           },
         ]
@@ -8619,13 +8591,6 @@ export type Database = {
             referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "vendor_terms_consents_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       vendor_transactions: {
@@ -8687,13 +8652,6 @@ export type Database = {
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "vendor_transactions_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors_public"
             referencedColumns: ["id"]
           },
         ]
@@ -9433,48 +9391,6 @@ export type Database = {
         }
         Relationships: []
       }
-      vendors_public: {
-        Row: {
-          cidade: string | null
-          created_at: string | null
-          estado: string | null
-          id: string | null
-          is_kyc_approved: boolean | null
-          logo_url: string | null
-          nome_fantasia: string | null
-          rating: number | null
-          store_description: string | null
-          store_logo_url: string | null
-          store_name: string | null
-        }
-        Insert: {
-          cidade?: never
-          created_at?: string | null
-          estado?: never
-          id?: string | null
-          is_kyc_approved?: boolean | null
-          logo_url?: string | null
-          nome_fantasia?: string | null
-          rating?: number | null
-          store_description?: string | null
-          store_logo_url?: never
-          store_name?: never
-        }
-        Update: {
-          cidade?: never
-          created_at?: string | null
-          estado?: never
-          id?: string | null
-          is_kyc_approved?: boolean | null
-          logo_url?: string | null
-          nome_fantasia?: string | null
-          rating?: number | null
-          store_description?: string | null
-          store_logo_url?: never
-          store_name?: never
-        }
-        Relationships: []
-      }
     }
     Functions: {
       admin_doctor_inline_avatar: { Args: { _id: string }; Returns: string }
@@ -9700,6 +9616,18 @@ export type Database = {
       is_human_takeover_active: {
         Args: { _contact_id: string }
         Returns: boolean
+      }
+      list_public_vendors: {
+        Args: never
+        Returns: {
+          cidade: string
+          estado: string
+          id: string
+          logo_url: string
+          rating: number
+          store_description: string
+          store_name: string
+        }[]
       }
       log_unified_message: {
         Args: {

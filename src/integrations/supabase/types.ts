@@ -9435,25 +9435,43 @@ export type Database = {
       }
       vendors_public: {
         Row: {
+          cidade: string | null
+          created_at: string | null
+          estado: string | null
           id: string | null
+          is_kyc_approved: boolean | null
+          logo_url: string | null
+          nome_fantasia: string | null
           rating: number | null
           store_description: string | null
           store_logo_url: string | null
           store_name: string | null
         }
         Insert: {
+          cidade?: never
+          created_at?: string | null
+          estado?: never
           id?: string | null
+          is_kyc_approved?: boolean | null
+          logo_url?: string | null
+          nome_fantasia?: string | null
           rating?: number | null
           store_description?: string | null
-          store_logo_url?: string | null
-          store_name?: string | null
+          store_logo_url?: never
+          store_name?: never
         }
         Update: {
+          cidade?: never
+          created_at?: string | null
+          estado?: never
           id?: string | null
+          is_kyc_approved?: boolean | null
+          logo_url?: string | null
+          nome_fantasia?: string | null
           rating?: number | null
           store_description?: string | null
-          store_logo_url?: string | null
-          store_name?: string | null
+          store_logo_url?: never
+          store_name?: never
         }
         Relationships: []
       }

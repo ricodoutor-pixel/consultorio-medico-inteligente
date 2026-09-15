@@ -422,6 +422,8 @@ const App = () => (
                 <Route path="/videochamada" element={<LegacyVideoCallRedirect />} />
                 <Route path="/orientacao-rapida" element={<OrientacaoRapida />} />
                 <Route path="/consulta-rapida" element={<OrientacaoRapida />} />
+                <Route path="/orientacao-tecnica" element={<OrientacaoRapida />} />
+
                 <Route path="/tratamento-dor-cronica" element={<TratamentoDorCronica />} />
                 <Route path="/tratamento-ansiedade-saude-mental" element={<TratamentoAnsiedadeSaudeMental />} />
                 <Route path="/tratamentos" element={<SEOCondicoes />} />

@@ -25,19 +25,15 @@ export interface DispatchPayload {
 
 /** Farmácias homologadas (KYC aprovado) disponíveis para receber receitas */
 export async function listApprovedPharmacies(): Promise<PharmacyOption[]> {
-  const { data, error } = await (supabase as any)
-    .from("vendors")
-    .select("id, nome_fantasia, store_name, logo_url, store_logo_url, endereco_completo")
-    .eq("is_kyc_approved", true)
-    .order("created_at", { ascending: true });
+  const { data, error } = await (supabase as any).rpc("list_public_vendors");
 
   if (error) throw error;
 
   return (data || []).map((v: any) => ({
     id: v.id,
-    nome_fantasia: v.nome_fantasia || v.store_name || "Farmácia Parceira",
-    logo_url: v.logo_url || v.store_logo_url || null,
-    cidade: v.endereco_completo?.cidade ?? null,
+    nome_fantasia: v.store_name || "Farmácia Parceira",
+    logo_url: v.logo_url || null,
+    cidade: v.cidade ?? null,
   }));
 }
 

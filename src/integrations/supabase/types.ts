@@ -3316,29 +3316,35 @@ export type Database = {
       }
       error_logs: {
         Row: {
+          context: Json
           created_at: string | null
           error_type: string | null
           id: string
           message: string | null
           metadata: Json | null
+          severity: string
           source: string
           user_id: string | null
         }
         Insert: {
+          context?: Json
           created_at?: string | null
           error_type?: string | null
           id?: string
           message?: string | null
           metadata?: Json | null
+          severity?: string
           source?: string
           user_id?: string | null
         }
         Update: {
+          context?: Json
           created_at?: string | null
           error_type?: string | null
           id?: string
           message?: string | null
           metadata?: Json | null
+          severity?: string
           source?: string
           user_id?: string | null
         }

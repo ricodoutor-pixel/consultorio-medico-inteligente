@@ -5,8 +5,10 @@
   Atualizado em 2026-05-27
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://plantayraiz.com.br/</loc><lastmod>2026-05-27</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>https://plantayraiz.com.br/afiliados</loc><lastmod>2026-05-27</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://plantayraiz.com.br/</loc><lastmod>2026-09-18</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://plantayraiz.com.br/triagem</loc><lastmod>2026-09-18</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://plantayraiz.com.br/medicos/ativar</loc><lastmod>2026-09-18</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://plantayraiz.com.br/afiliados</loc><lastmod>2026-09-18</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://plantayraiz.com.br/biblioteca</loc><lastmod>2026-05-27</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://plantayraiz.com.br/cadastro</loc><lastmod>2026-05-27</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
   <url><loc>https://plantayraiz.com.br/club</loc><lastmod>2026-05-27</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>

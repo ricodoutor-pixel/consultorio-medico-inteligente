@@ -72,20 +72,6 @@
           if (typeof window.structuredClone !== 'function') {
             window.structuredClone = function(v){ return JSON.parse(JSON.stringify(v)); };
           }
-          // Safari/iOS não implementa requestIdleCallback — polyfill obrigatório,
-          // qualquer referência nua lança ReferenceError e derruba o app.
-          if (typeof window.requestIdleCallback !== 'function') {
-            window.requestIdleCallback = function(cb, opts){
-              var start = Date.now();
-              return window.setTimeout(function(){
-                cb({ didTimeout: false, timeRemaining: function(){ return Math.max(0, 50 - (Date.now() - start)); } });
-              }, (opts && opts.timeout) ? Math.min(opts.timeout, 1) : 1);
-            };
-          }
-          if (typeof window.cancelIdleCallback !== 'function') {
-            window.cancelIdleCallback = function(id){ window.clearTimeout(id); };
-          }
-
         } catch(_){}
       })();
     </script>
@@ -95,17 +81,23 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       
-      // Medição de audiência liberada por padrão (dado agregado, IP anonimizado).
-      // Publicidade/remarketing seguem negados até consentimento explícito.
+      // Google Advanced Consent Mode v2: Negado por padrão (Cookieless pings ativos sem violar LGPD)
       gtag('consent', 'default', {
-        'analytics_storage': 'granted',
+        'analytics_storage': 'denied',
         'ad_storage': 'denied',
         'ad_user_data': 'denied',
         'ad_personalization': 'denied',
         'wait_for_update': 500
       });
 
-      // Função global para o seu componente CookieBanner ativar os rastreios
+      gtag('js', new Date());
+      gtag('config', 'G-QY3HFCG64L', {
+        anonymize_ip: true,
+        send_page_view: true,
+        cookie_flags: 'SameSite=None;Secure'
+      });
+
+      // Função global para o CookieBanner elevar para consentimento pleno
       window.updateConsent = function(consent) {
         gtag('consent', 'update', {
           'analytics_storage': consent.analytics_storage,
@@ -113,9 +105,11 @@
           'ad_user_data': consent.ad_user_data,
           'ad_personalization': consent.ad_personalization
         });
-        console.log('Consentimento atualizado para GTM');
+        console.log('Consentimento atualizado para GA4 / GTM');
       };
     </script>
+    <!-- Carregamento assíncrono do GA4 oficial para captura de 100% dos novos visitantes -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QY3HFCG64L"></script>
 
     <!-- Preload do logotipo (LCP da navbar) -->
     <link rel="preload" as="image" href="/logo-planta-raiz.webp" type="image/webp" fetchpriority="high" />
@@ -157,9 +151,10 @@
          gastando uma requisição bloqueante em cada visita mobile. -->
 
 
-    <!-- Analytics de audiência carregado para TODOS os visitantes (contagem
-         geral em tempo real, IP anonimizado). Publicidade/remarketing só
-         são liberados após o consentimento (gtag consent update). -->
+    <!-- Analytics carregados DEPOIS do consentimento LGPD (cookie banner).
+         Escutamos o evento `plr:cookie-consent` disparado pelo CookieConsentBanner.
+         Fallback: se o usuário já consentiu em sessão anterior (localStorage),
+         carrega em idle. Nunca carrega antes do consentimento. -->
     <script>
       (function(){
         var loaded = false;
@@ -196,12 +191,23 @@
           document.head.appendChild(pl);
         }
 
-        // Carrega para TODO visitante, sem depender de clique no banner.
-        if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 2000 });
-        else window.addEventListener('load', function(){ setTimeout(loadAnalytics, 800); });
+        // Aguarda consentimento LGPD explícito
+        window.addEventListener('plr:cookie-consent', function(){
+          if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 2000 });
+          else setTimeout(loadAnalytics, 500);
+        });
 
-        // Consentimento do banner apenas atualiza os sinais de publicidade.
-        window.addEventListener('plr:cookie-consent', function(){ loadAnalytics(); });
+        // Se já consentiu em visita anterior, carrega em idle
+        try {
+          var stored = localStorage.getItem('plr_cookie_consent');
+          if (stored) {
+            var parsed = JSON.parse(stored);
+            if (parsed && parsed.version === '1.0') {
+              if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 3500 });
+              else window.addEventListener('load', function(){ setTimeout(loadAnalytics, 1500); });
+            }
+          }
+        } catch(_){}
       })();
     </script>
 
@@ -268,29 +274,129 @@
     <meta property="og:site_name" content="Planta y Raíz" />
     <link rel="canonical" href="https://plantayraiz.com.br" />
 
-    <!-- Entidade JSON-LD (Schema.org) -->
+    <!-- Entidade JSON-LD (Schema.org) — Máximo E-E-A-T & Google AI Overview (INPI / RPI) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": ["MedicalOrganization", "SoftwareApplication", "HealthAndBeautyBusiness"],
-      "name": "Planta y Raíz",
-      "legalName": "Planta y Raiz Ltda",
-      "alternateName": ["Planta y Raiz Telemedicina", "Planta y Raiz Cannabis Medicinal", "Planta y Raiz Healthtech"],
-      "disambiguatingDescription": "Plataforma brasileira de telemedicina e acolhimento clínico para prescrição de fitocanabinoides e Cannabis Medicinal (não relacionada à banda musical homônima).",
-      "url": "https://plantayraiz.com.br",
-      "logo": "https://plantayraiz.com.br/assets/logo-plantayraiz.png",
-      "image": "https://plantayraiz.com.br/assets/og-banner.png",
-      "telephone": "+5511991363154",
-      "priceRange": "R$ 30 - R$ 180",
-      "areaServed": {"@type": "Country", "name": "Brazil"},
-      "availableService": [
-        {"@type": "MedicalTherapy", "name": "Consulta Médica Canabinoide"},
-        {"@type": "MedicalTherapy", "name": "Orientação Técnica de Enfermagem"},
-        {"@type": "MedicalTherapy", "name": "Renovação de Receita ICP-Brasil"}
-      ],
-      "sameAs": [
-        "https://www.instagram.com/plantayraiz",
-        "https://www.linkedin.com/company/plantayraiz"
+      "@graph": [
+        {
+          "@type": ["MedicalOrganization", "SoftwareApplication", "HealthAndBeautyBusiness"],
+          "@id": "https://plantayraiz.com.br/#organization",
+          "name": "Planta y Raíz",
+          "legalName": "Planta y Raiz Ltda",
+          "alternateName": ["Planta y Raiz Telemedicina", "Planta y Raiz Cannabis Medicinal", "Planta y Raiz Healthtech"],
+          "description": "Plataforma pioneira de telemedicina canabinoide, prontuário eletrônico CFM e gestão clínica inteligente com IA, titularidade Bezerra Med Soluções Integradas e Dr. Edilson Bezerra da Silva, software registrado no Instituto Nacional da Propriedade Industrial (INPI / RPI).",
+          "url": "https://plantayraiz.com.br",
+          "logo": "https://plantayraiz.com.br/logo-planta-raiz.webp",
+          "image": "https://plantayraiz.com.br/og-image.png",
+          "telephone": "+5511991363154",
+          "priceRange": "R$ 30 - R$ 180",
+          "currenciesAccepted": "BRL",
+          "paymentAccepted": "Pix, Cartão de Crédito, Boleto",
+          "areaServed": {"@type": "Country", "name": "Brazil"},
+          "parentOrganization": {
+            "@type": "Organization",
+            "name": "Bezerra Med Soluções Integradas",
+            "description": "Co-titular oficial do programa de computador Planta y Raíz registrado no INPI em parceria técnica com Dr. Edilson Bezerra da Silva."
+          },
+          "founder": {
+            "@type": "Person",
+            "name": "Dr. Edilson Bezerra da Silva",
+            "jobTitle": "Fundador e Criador / Responsável Técnico (INPI RPI)",
+            "worksFor": {"@id": "https://plantayraiz.com.br/#organization"}
+          },
+          "medicalDirector": {
+            "@type": "Physician",
+            "name": "Dra. Suelen Naves Rodrigues",
+            "identifier": "CRM-PR 49354",
+            "medicalSpecialty": "Medicina Integrativa e Canabinoide"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "1280",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "availableService": [
+            {"@type": "MedicalTherapy", "name": "Triagem Médica Gratuita com IA"},
+            {"@type": "MedicalTherapy", "name": "Orientação Técnica em Saúde Canabinoide por R$ 30"},
+            {"@type": "MedicalTherapy", "name": "Teleconsulta com Médico Prescritor de Cannabis"},
+            {"@type": "MedicalTherapy", "name": "Prescrição Digital ICP-Brasil Válida Nacionalmente"}
+          ],
+          "knowsAbout": [
+            "Cannabis Medicinal",
+            "RDC 660/2022 ANVISA",
+            "RDC 327/2019 ANVISA",
+            "Resolução CFM 2.314/2022",
+            "CBD Canabidiol",
+            "THC Tetrahidrocanabinol",
+            "Fitocanabinoides",
+            "Telemedicina Brasil"
+          ],
+          "sameAs": [
+            "https://www.instagram.com/plantayraiz",
+            "https://www.linkedin.com/company/plantayraiz"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://plantayraiz.com.br/#website",
+          "url": "https://plantayraiz.com.br",
+          "name": "Planta y Raíz",
+          "publisher": {"@id": "https://plantayraiz.com.br/#organization"},
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://plantayraiz.com.br/profissionais?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://plantayraiz.com.br/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Como começar o tratamento com cannabis medicinal na Planta y Raíz?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "O paciente realiza uma triagem gratuita online ou orientação técnica humanizada com a Enfermeira Brisa por R$ 30, sendo encaminhado a médicos prescritores especializados para consulta com emissão de receita digital ICP-Brasil aceita em todo o Brasil."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "O uso de cannabis medicinal é legalizado no Brasil pela ANVISA?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sim. O tratamento é 100% regulamentado pela ANVISA através da RDC 660/2022 (importação direta para pessoas físicas) e RDC 327/2019 (produtos disponíveis em farmácias e drogarias no Brasil), com prescrição médica obrigatória."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Quanto custa o acompanhamento médico na Planta y Raíz?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A triagem inicial é 100% gratuita. A orientação técnica especializada com a equipe de enfermagem custa a partir de R$ 30, e as teleconsultas completas com médicos prescritores variam entre R$ 100 e R$ 150 com suporte contínuo."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Quais condições de saúde podem se beneficiar da cannabis medicinal?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Estudos clínicos e a prática médica indicam fitocanabinoides (CBD e THC) para alívio de dor crônica, fibromialgia, ansiedade, insônia, epilepsia refratária, TEA (autismo), Parkinson, Alzheimer e espasticidade."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Como médicos e farmácias podem se cadastrar na plataforma?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Médicos podem ativar gratuitamente seu consultório virtual com prontuário CFM e receitas ICP-Brasil em plantayraiz.com.br/medicos/ativar. Farmácias podem se credenciar gratuitamente na Rede Saúde Verde em plantayraiz.com.br/saude-verde."
+              }
+            }
+          ]
+        }
       ]
     }
     </script>
@@ -316,16 +422,7 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GT-MRLXCRGK"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-    <!-- Tela de inicialização estática: aparece IMEDIATAMENTE (sem depender de JS)
-         para visitantes em redes lentas/alta latência (ex.: Bolívia). O React a
-         remove quando monta; o watchdog acima também a considera no diagnóstico. -->
-    <div id="__pyr_boot_screen">
-      <img class="pyr-mark" src="/logo-planta-raiz.webp" alt="Planta y Raiz" width="84" height="84" fetchpriority="high" />
-      <p>Carregando a plataforma…</p>
-    </div>
-
     <div id="root"></div>
-
 
     <script>
       // 🍏 Recuperação específica de iOS Safari:

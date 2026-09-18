@@ -26,6 +26,22 @@ export const routeSEOMap: Record<string, PageSEO> = {
     canonical: `${BASE}/`,
     h1: "Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda",
   },
+  "/triagem": {
+    title: `Triagem Médica Gratuita com IA e Enfª Brisa | ${BRAND}`,
+    description:
+      "Faça sua triagem médica online gratuita em 2 minutos. Descubra se o tratamento com cannabis medicinal regulamentado pela ANVISA é indicado para seu caso.",
+    keywords: "triagem cannabis medicinal, teste cannabis online, enfermeira brisa IA, triagem gratuita dor ansiedade insônia, ANVISA RDC 660",
+    canonical: `${BASE}/triagem`,
+    h1: "Triagem Médica Gratuita de Cannabis Medicinal com Inteligência Clínica",
+  },
+  "/medicos/ativar": {
+    title: `Credenciamento de Médicos Prescritores | ${BRAND}`,
+    description:
+      "Ative seu consultório virtual de telemedicina canabinoide gratuitamente: prontuário CFM, emissão de receitas com assinatura digital ICP-Brasil e repasse imediato via PIX.",
+    keywords: "médico prescritor cannabis, consultório virtual grátis, receita digital ICP-Brasil, telemedicina CFM 2314, credenciamento médico",
+    canonical: `${BASE}/medicos/ativar`,
+    h1: "Portal do Médico Prescritor — Ativação de Consultório Virtual Gratuito",
+  },
   "/nossa-historia": {
     title: `Nossa História — Quem Somos | ${BRAND}`,
     description:

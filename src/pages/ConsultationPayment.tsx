@@ -411,12 +411,12 @@ const ConsultationPayment = () => {
                     {/* Pay button */}
                     <div className="space-y-3">
                       <Button
-                        className="w-full bg-muted text-foreground font-black rounded-2xl h-12 border border-border hover:bg-muted/80"
+                        className="w-full bg-primary text-primary-foreground font-black rounded-2xl h-12"
                         asChild
                       >
                         <a href={checkoutUrl || proView.paymentLink} target="_blank" rel="noopener noreferrer">
                           <ExternalLink size={16} className="mr-2" />
-                          Pagar via Mercado Pago
+                          Pagar via Mercado Pago (PIX ou cartão)
                         </a>
                       </Button>
                     </div>

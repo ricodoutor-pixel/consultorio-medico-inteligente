@@ -47,21 +47,28 @@ export const HeroCarousel = memo(function HeroCarousel() {
 
   // Load remaining images after first paint
   useEffect(() => {
-    const id = requestIdleCallback
-      ? requestIdleCallback(() => loadRest())
-      : setTimeout(() => loadRest(), 200);
-
     function loadRest() {
       Promise.all(carouselImports.map((fn) => fn().then((m) => m.default))).then(
         setLoadedSrcs
       );
     }
 
+    // Safari/iOS não tem requestIdleCallback — referenciar a variável nua
+    // lança ReferenceError e derruba a página inteira.
+    const hasIdle = typeof window !== "undefined" && typeof window.requestIdleCallback === "function";
+    const id = hasIdle
+      ? window.requestIdleCallback(() => loadRest())
+      : window.setTimeout(() => loadRest(), 200);
+
     return () => {
-      if (typeof cancelIdleCallback !== "undefined") cancelIdleCallback(id as number);
-      else clearTimeout(id as number);
+      if (hasIdle && typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(id as number);
+      } else {
+        window.clearTimeout(id as number);
+      }
     };
   }, []);
+
 
   const slides = [
     { src: carousel1, alt: slideAlts[0] },

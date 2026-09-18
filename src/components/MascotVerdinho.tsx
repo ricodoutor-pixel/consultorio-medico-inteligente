@@ -80,29 +80,39 @@ export default function MascotVerdinho({ onChatOpen, className = "", inline = fa
     return "max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem))";
   }, [isPlansRoute]);
   const wrapperClasses = inline
-    ? `relative cursor-pointer transition-all duration-300 ease-out ${className}`
-    : `fixed bottom-20 left-3 z-40 cursor-pointer transition-transform duration-300 ease-out ${className}`;
+    ? `relative cursor-pointer ${className}`
+    : `fixed bottom-20 left-3 z-40 cursor-pointer ${className}`;
+
+  const isFinePointer = () =>
+    typeof window === "undefined" || window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   return (
     <>
-      {/* Mascote */}
+      {/* Mascote — o container NÃO muda de tamanho; só o visual escala (sem tremor no hover) */}
       <div
         className={wrapperClasses}
         style={{
-          transformOrigin: inline ? "center center" : "bottom left",
-          transform: `scale(${scale})`,
           zIndex: inline ? "auto" : 40,
           bottom: !inline ? floatingOffset : undefined,
           left: !inline ? `max(0.75rem, env(safe-area-inset-left))` : undefined,
         }}
         onClick={handleInteraction}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={() => { if (isFinePointer()) setIsHovered(true); }}
+        onMouseLeave={() => { if (isFinePointer()) setIsHovered(false); }}
         onTouchStart={() => setIsHovered(true)}
         onTouchEnd={() => setTimeout(() => setIsHovered(false), 1200)}
         aria-label="Abrir Verdinho IA"
       >
-        <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full bg-card/70 backdrop-blur-md shadow-lg ring-1 ring-emerald-500/25 hover:ring-emerald-400/40 transition">
+        <div
+          className="relative w-24 h-24 md:w-32 md:h-32 rounded-full bg-card/70 backdrop-blur-md shadow-lg ring-1 ring-emerald-500/25 hover:ring-emerald-400/40"
+          style={{
+            transformOrigin: inline ? "center center" : "bottom left",
+            transform: `scale(${scale})`,
+            transition: "transform 260ms cubic-bezier(0.22,1,0.36,1)",
+            willChange: "transform",
+          }}
+        >
+
           <svg viewBox="0 0 100 100" className="w-full h-full p-1" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="35" r="20" fill="#10b981" />
             <circle cx="42" cy="30" r="3" fill="#ffffff" />

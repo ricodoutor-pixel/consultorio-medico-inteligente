@@ -161,7 +161,7 @@ export const AdminAprovacoes = () => {
             is_verified: newApprovedState,
             is_online: newApprovedState,
             is_available: newApprovedState,
-            kyc_status: newApprovedState ? 'verified' : 'pending',
+            kyc_status: newApprovedState ? 'approved' : 'pending',
           })
           .eq('id', docId);
 

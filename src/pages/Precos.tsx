@@ -3,12 +3,12 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, ArrowRight, Users, Stethoscope, Loader2, Bitcoin, Crown, Store, Building2, Heart } from "lucide-react";
+import { CheckCircle2, ArrowRight, Users, Stethoscope, Loader2, Crown, Store, Building2, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 // motion removido — wrappers com whileInView/transform escondiam seções e quebravam position:fixed do MobileBottomNav (mesmo bug da Biblioteca)
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { BTCPaymentModal } from "@/components/BTCPaymentModal";
+// BTC/cripto removido — só Mercado Pago (Pix/cartão) em produção até o gateway real ser implementado.
 import { WhatsAppProofModal, useWhatsAppProofModal, type WhatsAppContext } from "@/components/WhatsAppProofModal";
 import { PWAInstallSection } from "@/components/PWAInstallSection";
 import { TrustBadges } from "@/components/TrustBadges";
@@ -36,7 +36,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 const Precos = () => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [loadingTool, setLoadingTool] = useState<string | null>(null);
-  const [btcModal, setBtcModal] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
+  // const [btcModal, setBtcModal] = useState<{ open: boolean; planName: string; planId: string; amount: string }>({ open: false, planName: "", planId: "", amount: "" });
   const { modalState, showModal, setModalOpen } = useWhatsAppProofModal();
 
   const plans = [
@@ -277,6 +277,9 @@ const Precos = () => {
                           <>Assinar <ArrowRight size={14} className="ml-1" /></>
                         )}
                       </Button>
+                      <p className="text-xs text-center text-muted-foreground mt-3">
+                        Pagamento processado por Mercado Pago (Pix ou cartão).
+                      </p>
                     </CardContent>
                   </Card>
                 </div>
@@ -481,13 +484,7 @@ const Precos = () => {
       <div className="pb-[max(env(safe-area-inset-bottom,0px),1rem)] sm:pb-0">
         <Footer />
       </div>
-      <BTCPaymentModal
-        open={btcModal.open}
-        onClose={() => setBtcModal({ ...btcModal, open: false })}
-        planName={btcModal.planName}
-        planId={btcModal.planId}
-        amount={btcModal.amount}
-      />
+      {/* BTC/cripto desativado até implementação real do gateway */}
     </div>
   );
 };

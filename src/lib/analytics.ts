@@ -5,6 +5,7 @@
 
 declare global {
   interface Window {
+    gtag?: (command: string, ...args: unknown[]) => void;
     fbq?: (...args: unknown[]) => void;
     ttq?: {
       page: () => void;
@@ -19,10 +20,15 @@ declare global {
 type EventProperties = Record<string, string | number | boolean | null | undefined>;
 
 /**
- * Universal track function — fans out to Meta Pixel, TikTok Pixel, CleverTap, and GTM dataLayer.
+ * Universal track function — fans out to GA4 gtag, Meta Pixel, TikTok Pixel, CleverTap, and GTM dataLayer.
  */
 export function trackEvent(eventName: string, properties?: EventProperties): void {
   try {
+    // GA4 direto via gtag
+    if (typeof window.gtag === "function") {
+      window.gtag("event", eventName, properties);
+    }
+
     // GTM dataLayer (always available via GA4 setup)
     window.dataLayer?.push({ event: eventName, ...properties });
 

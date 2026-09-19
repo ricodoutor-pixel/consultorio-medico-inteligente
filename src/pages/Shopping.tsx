@@ -562,9 +562,6 @@ const ProductDetail = ({ id }: { id: string }) => {
             <Button className="w-full font-bold h-12 sm:h-14 text-sm sm:text-base bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-950/20" onClick={handleBuy}>
               Comprar com Receita Médica 💳
             </Button>
-            <Button variant="outline" className="w-full font-bold border-amber-500/30 text-amber-500 hover:bg-amber-500/10 gap-2 h-10 sm:h-12 rounded-xl" onClick={() => setBtcModal({ open: true, planName: product.name, planId: product.id, amount: priceStr })}>
-              <Bitcoin size={15} /> Pague Com Bitcoin / Cripto
-            </Button>
           </div>
 
           <p className="text-[9px] sm:text-[10px] text-muted-foreground text-center">Dispensação farmacêutica restrita a pacientes com prescrição válida em conformidade com as normas sanitárias.</p>

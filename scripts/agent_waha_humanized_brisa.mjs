@@ -105,32 +105,12 @@ async function syncLeadToBrevo(phone, name, category, listIds) {
   }
 }
 
-// ── Envio de mensagem pelo WAHA ────────────────────────────────────────────
+// ── Envio de mensagem pelo WAHA (MUTADO PERMANENTEMENTE PARA O CLAUDE RESPONDER) ────
 async function sendWhatsAppMessage(chatId, text) {
-  try {
-    const res = await fetch(`${WAHA_URL}/api/sendText`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': WAHA_KEY
-      },
-      body: JSON.stringify({
-        session: WAHA_SESSION,
-        chatId,
-        text
-      })
-    });
-    if (res.ok) {
-      console.log(`[WAHA] ✅ Enviado para ${chatId}`);
-      return true;
-    }
-    const errText = await res.text();
-    console.error(`[WAHA] ❌ Erro ao enviar para ${chatId} (${res.status}):`, errText);
-    return false;
-  } catch (e) {
-    console.error(`[WAHA] ❌ Exceção ao enviar para ${chatId}:`, e.message);
-    return false;
-  }
+  // HARD LOCK: Envio automatizado desativado para eliminar qualquer risco de respostas cruzadas.
+  // O atendimento é conduzido exclusivamente pelo agente Claude no WhatsApp Web (Google Chrome).
+  console.log(`[WAHA MUTE] 🔇 Resposta para ${chatId} silenciada. Atendimento exclusivo via Claude no WhatsApp Web.`);
+  return false;
 }
 
 // ── IA Generativa Gemini 2.5 Flash via Supabase Edge Function ──────────────
@@ -245,9 +225,9 @@ async function handleIncomingMessage(msg, chat) {
     category = 'Farmácia / Drogaria B2B';
     listIds = [BREVO_LIST_WHATSAPP_INBOUND, BREVO_LIST_FARMACIAS];
   }
-  // 5. PACIENTE / TRÁFEGO PAGO / DÚVIDAS GERAIS -> GEMINI 2.5 FLASH HUMANIZADO
+  // 5. PACIENTE / TRÁFEGO PAGO / DÚVIDAS GERAIS
   else {
-    replyText = await generateGeminiReply(bodyText, contactName, category);
+    category = 'Paciente Tráfego Pago';
   }
 
   const isHarvesterOnly = process.argv.includes('--harvester-only') || process.env.HARVESTER_ONLY === 'true';

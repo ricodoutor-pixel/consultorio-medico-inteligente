@@ -336,31 +336,11 @@ async function ingestKnownWhatsAppDocuments(state) {
   return totalIngested;
 }
 
-// Disparo de mensagem no WhatsApp via WAHA
+// Disparo de mensagem no WhatsApp via WAHA (SILENCIADO PERMANENTEMENTE)
 async function sendWahaMessage(chatId, text) {
-  try {
-    const res = await fetch(`${WAHA_URL}/api/sendText`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': WAHA_KEY
-      },
-      body: JSON.stringify({
-        chatId,
-        text,
-        session: 'default'
-      })
-    });
-    if (!res.ok) {
-      const errTxt = await res.text();
-      console.warn(`[KYC-Agent] Falha ao enviar WhatsApp para ${chatId}: ${res.status} - ${errTxt}`);
-      return false;
-    }
-    return true;
-  } catch (e) {
-    console.warn(`[KYC-Agent] Exceção ao enviar WhatsApp: ${e.message}`);
-    return false;
-  }
+  // HARD LOCK: envio desativado para evitar respostas cruzadas com o Claude no WhatsApp Web
+  console.log(`[KYC MUTE] 🔇 Notificação para ${chatId} silenciada no WhatsApp. Coleta e condução exclusiva via Claude no WhatsApp Web.`);
+  return false;
 }
 
 // Auditoria Completa dos Médicos & Notificação Inteligente dos Campos em Vermelho

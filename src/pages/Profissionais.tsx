@@ -50,7 +50,8 @@ function useRotatingOnline(base: Professional[]): Professional[] {
 
     return visibleDocs.map((p) => {
       // Check direct online status set by doctor in /consultorio or admin in /admin/aprovacoes-medicas
-      const directStatus = localStorage.getItem(`doctor_online_status_${p.id}`);
+      const directStatus = localStorage.getItem(`doctor_online_status_${p.id}`) ??
+                           (p.dbId ? localStorage.getItem(`doctor_online_status_${p.dbId}`) : null);
       if (directStatus !== null) {
         return { ...p, online: directStatus === 'true' };
       }

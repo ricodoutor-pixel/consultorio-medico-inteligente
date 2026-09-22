@@ -65,7 +65,8 @@ export default function OrientacaoTecnicaAgente() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const [phase, setPhase] = useState<Phase>("triage");
+  // Regra oficial: o pagamento vem SEMPRE primeiro (pagamento → triagem → sala).
+  const [phase, setPhase] = useState<Phase>("payment");
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [draft, setDraft] = useState("");
@@ -124,7 +125,9 @@ export default function OrientacaoTecnicaAgente() {
       );
       if (data?.active) {
         setSecondsLeft(Number(data.seconds_left) || 0);
-        setPhase("room");
+        // Pagamento confirmado: faz a triagem primeiro; se já estiver completa, abre a sala.
+        const triageDone = QUESTIONS.every((item) => answers[item.id]);
+        setPhase(triageDone ? "room" : "triage");
         setUnlockNote(null);
         localStorage.removeItem(REF_STORAGE_KEY);
       } else if (mode === "unlock") {
@@ -190,7 +193,8 @@ export default function OrientacaoTecnicaAgente() {
     sessionStorage.setItem(TRIAGE_STORAGE_KEY, JSON.stringify(next));
     setDraft("");
     if (step < QUESTIONS.length - 1) setStep(step + 1);
-    else setPhase("payment");
+    // Pagamento já confirmado antes da triagem: ao final, a sala abre direto.
+    else setPhase("room");
   };
 
   // ── Pagamento ─────────────────────────────────────────────────────────
@@ -410,10 +414,16 @@ export default function OrientacaoTecnicaAgente() {
                 <CardContent className="p-6 md:p-8">
                   <div className="flex items-center gap-2 mb-4">
                     <CheckCircle2 className="text-primary" size={20} />
-                    <h2 className="font-display font-black text-foreground text-lg">Triagem concluída</h2>
+                    <h2 className="font-display font-black text-foreground text-lg">
+                      Passo 1 — Pagamento da Orientação Técnica
+                    </h2>
                   </div>
 
                   <div className="rounded-2xl bg-card border border-border p-4 mb-6 space-y-2 text-sm">
+                    <p className="text-muted-foreground">
+                      Depois do pagamento confirmado você responde a triagem da Enfª Brisa (10 perguntas)
+                      e a sala do Dr. Edilson Bezerra On abre com 30 minutos no cronômetro.
+                    </p>
                     {QUESTIONS.filter((item) => answers[item.id]).map((item) => (
                       <div key={item.id} className="flex gap-2">
                         <span className="text-muted-foreground shrink-0">{item.label}</span>
@@ -421,6 +431,7 @@ export default function OrientacaoTecnicaAgente() {
                       </div>
                     ))}
                   </div>
+
 
                   <div className="flex items-end justify-between mb-6">
                     <div>

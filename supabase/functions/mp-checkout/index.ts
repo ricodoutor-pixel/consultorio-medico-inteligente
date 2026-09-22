@@ -400,9 +400,11 @@ Deno.serve(async (req) => {
     return json({
       init_point: mpData.init_point,
       preference_id: mpData.id,
+      external_reference: externalReference,
       amount,
       split: splitDetails,
     });
+
   } catch (e) {
     console.error("[mp-checkout]", e);
     return json({ error: "Erro interno" }, 500);

@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { SaMDBiofeedbackDisclaimer } from '@/components/compliance/SaMDBiofeedbackDisclaimer';
 
 type ExamPhase = 'intro' | 'camera' | 'analyzing' | 'ai_diagnosis' | 'result';
 
@@ -170,19 +171,34 @@ export function ExameFundoOlho({ onComplete }: { onComplete?: () => void }) {
           setResult(json.diagnosis);
           setPhase('result');
           toast.success('Diagnóstico IA gerado com sucesso!');
+
+          if (userId) {
+            await supabase.from('diagnostic_exams').insert({
+              user_id: userId,
+              exam_type: 'fundoscopy',
+              results: data,
+              ai_diagnosis: {
+                ...json.diagnosis,
+                regulatory_notice: 'SaMD Classe II (ANVISA RDC 657/2022). Ferramenta de apoio diagnóstico de triagem visual. Exige validação e conduta médica presencial.',
+                human_supervision_required: true,
+                review_status: 'pending_doctor_review'
+              },
+              risk_level: json.diagnosis.risk_level || 'baixo'
+            });
+          }
           return;
         }
       }
       // Fallback to local diagnosis
-      generateFallbackResult(data);
+      generateFallbackResult(data, userId);
     } catch (e) {
       console.error('AI diagnosis error:', e);
       clearInterval(logInterval);
-      generateFallbackResult(data);
+      generateFallbackResult(data, userId);
     }
   };
 
-  const generateFallbackResult = (data: any) => {
+  const generateFallbackResult = (data: any, userId?: string) => {
     const cupDisc = parseFloat(data.cup_disc_ratio);
     const hasHemorrhages = data.hemorrhages !== 'ausentes';
     const hasExudates = data.exudates !== 'ausentes';
@@ -251,7 +267,7 @@ export function ExameFundoOlho({ onComplete }: { onComplete?: () => void }) {
 
     recommendations.push('Consulta presencial com oftalmologista para confirmação.');
 
-    setResult({
+    const finalResult: DiagnosisResult = {
       risk_level: riskLevel,
       detected_pathologies: pathologies,
       clinical_findings: findings,
@@ -279,7 +295,25 @@ export function ExameFundoOlho({ onComplete }: { onComplete?: () => void }) {
         'Keith, Wagener & Barker (1939). Classification of Hypertensive Retinopathy.',
       ],
       disclaimer: 'Este é um exame de triagem digital. Recomendamos SEMPRE confirmação presencial com oftalmologista habilitado.',
-    });
+    };
+
+    setResult(finalResult);
+
+    if (userId) {
+      supabase.from('diagnostic_exams').insert({
+        user_id: userId,
+        exam_type: 'fundoscopy',
+        results: data,
+        ai_diagnosis: {
+          ...finalResult,
+          regulatory_notice: 'SaMD Classe II (ANVISA RDC 657/2022). Ferramenta de apoio diagnóstico de triagem visual. Exige validação e conduta médica presencial.',
+          human_supervision_required: true,
+          review_status: 'pending_doctor_review'
+        },
+        risk_level: riskLevel
+      }).then(() => {}).catch(err => console.error("Error saving fundoscopy exam:", err));
+    }
+
     setPhase('result');
     toast.success('Parecer técnico gerado com sucesso!');
   };
@@ -318,6 +352,9 @@ export function ExameFundoOlho({ onComplete }: { onComplete?: () => void }) {
 
   return (
     <div className="flex flex-col w-full h-full bg-slate-50 relative overflow-hidden rounded-xl border border-border shadow-sm">
+      <div className="p-4 pb-0">
+        <SaMDBiofeedbackDisclaimer toolName="O exame de triagem de fundo de olho por inteligência artificial" />
+      </div>
       <ComicManual 
         title="Como Fazer o Exame de Fundo de Olho"
         icon={Eye}

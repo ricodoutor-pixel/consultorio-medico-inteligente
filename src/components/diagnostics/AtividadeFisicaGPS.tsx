@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import { Play, Square, Map as MapIcon, Activity, Flame, Footprints, Clock, Wind, ArrowUp, AlertTriangle, BookOpen, Pause } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { SaMDBiofeedbackDisclaimer } from '@/components/compliance/SaMDBiofeedbackDisclaimer';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import L from 'leaflet';
 import { speakBrisa, stopBrisaVoice } from '@/lib/brisa-voice';
@@ -284,7 +285,9 @@ export const AtividadeFisicaGPS = () => {
       </CardHeader>
 
       <CardContent className="p-0">
-        
+        <div className="p-4 pb-2">
+          <SaMDBiofeedbackDisclaimer toolName="O monitoramento cardiorrespiratório e esforço físico por GPS" />
+        </div>
         {/* Map Area */}
         <div className="h-64 md:h-80 w-full relative z-0 bg-gray-900">
           <MapContainer 

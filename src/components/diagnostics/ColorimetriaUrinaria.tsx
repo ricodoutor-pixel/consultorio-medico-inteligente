@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Camera, AlertTriangle, Info, BookOpen, FlaskConical, Loader2, Play } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { SaMDBiofeedbackDisclaimer } from "@/components/compliance/SaMDBiofeedbackDisclaimer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { speakBrisa, stopBrisaVoice } from "@/lib/brisa-voice";
 
@@ -160,6 +161,7 @@ export const ColorimetriaUrinaria = () => {
       </CardHeader>
       
       <CardContent className="p-6 space-y-6">
+        <SaMDBiofeedbackDisclaimer toolName="A urinálise preliminar por imagem e colorimetria óptica computacional" />
         <div className="flex flex-col items-center justify-center p-8 border-4 border-dashed border-muted rounded-3xl bg-muted/30">
           
           <input 

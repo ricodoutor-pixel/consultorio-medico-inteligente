@@ -374,8 +374,8 @@ const OrientacaoVideo = () => {
         <div className="flex flex-1 overflow-hidden">
           {/* Video area */}
           <div className="flex-1 flex flex-col relative bg-black/90">
-            {/* rPPG Vital Signs Overlay (doctor only) */}
-            {isDoctor && <VitalSignsOverlay enabled={tcleAccepted} />}
+            {/* rPPG Vital Signs Overlay (doctor only — com aviso regulatório e dados reais apenas) */}
+            {isDoctor && <VitalSignsOverlay enabled={tcleAccepted} appointmentId={appointmentId || undefined} />}
 
             {/* Biometric Shield */}
             <BiometricShield enabled={tcleAccepted} isDoctor={isDoctor} />

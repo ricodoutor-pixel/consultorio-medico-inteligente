@@ -65,7 +65,8 @@ export default function OrientacaoTecnicaAgente() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const [phase, setPhase] = useState<Phase>("triage");
+  // Regra oficial: o pagamento vem SEMPRE primeiro (pagamento → triagem → sala).
+  const [phase, setPhase] = useState<Phase>("payment");
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [draft, setDraft] = useState("");
@@ -190,7 +191,8 @@ export default function OrientacaoTecnicaAgente() {
     sessionStorage.setItem(TRIAGE_STORAGE_KEY, JSON.stringify(next));
     setDraft("");
     if (step < QUESTIONS.length - 1) setStep(step + 1);
-    else setPhase("payment");
+    // Pagamento já confirmado antes da triagem: ao final, a sala abre direto.
+    else setPhase("room");
   };
 
   // ── Pagamento ─────────────────────────────────────────────────────────

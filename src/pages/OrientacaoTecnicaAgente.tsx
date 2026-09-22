@@ -114,7 +114,7 @@ export default function OrientacaoTecnicaAgente() {
   const checkSession = useCallback(async (mode: "status" | "unlock") => {
     if (!authed) return;
     const ref = localStorage.getItem(REF_STORAGE_KEY);
-    if (mode === "unlock" && !ref) return;
+
     setUnlocking(true);
     try {
       const data = await callFn(

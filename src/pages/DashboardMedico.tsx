@@ -26,6 +26,8 @@ import { VipUpgradePopup } from "@/components/VipUpgradePopup";
 import { VIPExpirationAlert } from "@/components/doctor/VIPExpirationAlert";
 import { DoctorSchedule } from "@/components/doctor/DoctorSchedule";
 import { DoctorContractModal } from "@/components/doctor/DoctorContractModal";
+import { ConsultationOfferBanner } from "@/components/doctor/ConsultationOfferBanner";
+
 
 import { DoctorAuxDiagnosticTools } from "@/components/doctor/DoctorAuxDiagnosticTools";
 import { IoTBiometricTracker } from "@/components/IoTBiometricTracker";

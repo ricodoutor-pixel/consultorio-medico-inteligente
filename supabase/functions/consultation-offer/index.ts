@@ -169,7 +169,7 @@ Deno.serve(async (req) => {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const bearer = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
   const isService = bearer === serviceKey ||
-    req.headers.get("x-cron-secret") === Deno.env.get("CRON_SECRET");
+    req.headers.get("x-cron-secret") === Deno.env.get("BRISA_CEO_SECRET_KEY");
 
   let body: Record<string, unknown> = {};
   if (req.method === "POST") body = await req.json().catch(() => ({}));

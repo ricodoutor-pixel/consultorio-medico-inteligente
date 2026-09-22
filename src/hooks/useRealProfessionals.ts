@@ -5,6 +5,7 @@ import type { Professional } from "@/types/professional";
 import { professionals as baseProfessionals } from "@/data/professionals";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
+import { ensureDoctorTitle } from "@/lib/doctor-title";
 
 const MEDICOS_CATEGORY = "Médicos Prescritores";
 
@@ -188,7 +189,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     const mapped: Professional[] = dbDoctors
       .filter((doc) => doc.is_verified === true)
       .map((doc) => {
-        const fullName = doc.full_name || "Profissional";
+        const fullName = doc.full_name ? ensureDoctorTitle(doc.full_name) : "Profissional";
         const cleanCrm = (doc.crm || "").replace(/\D/g, "");
         const base =
           (cleanCrm ? baseByCrm.get(cleanCrm) : undefined) ||

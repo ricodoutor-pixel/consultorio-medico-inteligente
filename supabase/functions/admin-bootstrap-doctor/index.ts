@@ -62,6 +62,11 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Regra da vitrine: nenhum médico entra sem o título "Dr."/"Dra." no nome.
+    if (!/^(dr|dra)\.\s*/i.test(full_name.trim())) {
+      full_name = `Dr. ${full_name.trim()}`;
+    }
+
     const supabase = admin;
 
     let userId: string | undefined;

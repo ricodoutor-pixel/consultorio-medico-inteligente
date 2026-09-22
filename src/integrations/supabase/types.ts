@@ -9729,6 +9729,7 @@ export type Database = {
         }
         Returns: number
       }
+      normalize_doctor_title: { Args: { n: string }; Returns: string }
       open_ot_agent_session: {
         Args: { _minutes?: number; _name?: string; _phone: string }
         Returns: {

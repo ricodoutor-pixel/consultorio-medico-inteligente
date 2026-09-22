@@ -92,35 +92,65 @@ Deno.serve(async (req) => {
         });
       }
 
+      // Candidatos de pagamento: o ref enviado pelo cliente (quando existe) +
+      // os checkouts de orientação criados por este usuário nas últimas 24h
+      // (registrados em audit_log pelo mp-checkout). Assim a sala abre mesmo se
+      // o navegador perdeu a referência (aba anônima, troca de domínio, etc).
+      const candidates: string[] = [];
       const ref = sanitize(body?.external_reference, 200);
-      if (!ref || !ref.startsWith("orientacao") || !ref.includes(`:${uid}:`)) {
-        return json({ error: "Referência de pagamento inválida" }, 400);
+      if (ref && ref.startsWith("orientacao") && ref.includes(`:${uid}:`)) candidates.push(ref);
+
+      const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { data: recent } = await sb
+        .from("audit_log")
+        .select("new_data, created_at")
+        .eq("user_id", uid)
+        .eq("action", "mp_checkout_created")
+        .gte("created_at", since)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      for (const row of recent ?? []) {
+        const candidate = (row as any)?.new_data?.external_reference;
+        if (typeof candidate === "string" && candidate.startsWith("orientacao") && !candidates.includes(candidate)) {
+          candidates.push(candidate);
+        }
       }
 
-      // Já consumida?
-      const { data: used } = await sb
+      if (candidates.length === 0) return json({ active: false, reason: "payment_not_found" });
+
+      // Remove referências já consumidas por uma sessão anterior
+      const { data: usedRows } = await sb
         .from("ot_web_sessions")
-        .select("id")
-        .eq("external_reference", ref)
-        .maybeSingle();
-      if (used) return json({ active: false, reason: "session_already_used" });
+        .select("external_reference")
+        .in("external_reference", candidates);
+      const used = new Set((usedRows ?? []).map((r: any) => r.external_reference));
+      const pending = candidates.filter((c) => !used.has(c));
+      if (pending.length === 0) return json({ active: false, reason: "session_already_used" });
 
       const mpToken = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
       if (!mpToken) return json({ error: "Mercado Pago não configurado" }, 500);
 
-      const mpRes = await fetch(
-        `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(ref)}`,
-        { headers: { Authorization: `Bearer ${mpToken}` } },
-      );
-      if (!mpRes.ok) {
-        console.error("[ot-edilson-web] MP search error", mpRes.status, await mpRes.text());
-        return json({ error: "Não foi possível confirmar o pagamento agora" }, 502);
+      let approved: any = null;
+      let approvedRef: string | null = null;
+      let sawPending = false;
+      for (const candidate of pending) {
+        const mpRes = await fetch(
+          `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(candidate)}`,
+          { headers: { Authorization: `Bearer ${mpToken}` } },
+        );
+        if (!mpRes.ok) {
+          console.error("[ot-edilson-web] MP search error", mpRes.status, await mpRes.text().catch(() => ""));
+          continue;
+        }
+        const mpData = await mpRes.json();
+        const results = mpData?.results || [];
+        const hit = results.find((p: any) => p?.status === "approved");
+        if (hit) { approved = hit; approvedRef = candidate; break; }
+        if (results.length > 0) sawPending = true;
       }
-      const mpData = await mpRes.json();
-      const approved = (mpData?.results || []).find((p: any) => p?.status === "approved");
-      if (!approved) {
-        const pending = (mpData?.results || [])[0];
-        return json({ active: false, reason: pending ? "payment_pending" : "payment_not_found" });
+
+      if (!approved || !approvedRef) {
+        return json({ active: false, reason: sawPending ? "payment_pending" : "payment_not_found" });
       }
 
       const startedAt = new Date();
@@ -129,7 +159,7 @@ Deno.serve(async (req) => {
         .from("ot_web_sessions")
         .insert({
           user_id: uid,
-          external_reference: ref,
+          external_reference: approvedRef,
           mp_payment_id: String(approved.id),
           triage: body?.triage && typeof body.triage === "object" ? body.triage : {},
           started_at: startedAt.toISOString(),
@@ -138,6 +168,7 @@ Deno.serve(async (req) => {
         })
         .select("id, user_id, external_reference, expires_at, status, messages_count")
         .single();
+
 
       if (insErr || !inserted) {
         console.error("[ot-edilson-web] insert error", insErr?.message);

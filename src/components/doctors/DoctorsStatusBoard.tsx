@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { Loader2, Stethoscope } from "lucide-react";
+import { ensureDoctorTitle } from "@/lib/doctor-title";
 import { useDoctors } from "@/hooks/useDoctors";
 
 interface Props {

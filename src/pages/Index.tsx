@@ -362,7 +362,7 @@ const Index = () => {
               </div>
 
               <p className="text-xs text-muted-foreground italic">
-                * Fluxo exclusivo deste card: <strong>Enfª Brisa (triagem) → Pix Seguro Mercado Pago → Orientação Técnica com o Dr. Edilson Bezerra</strong>. Nenhum paciente fala direto com o profissional antes do pagamento e auditoria. Pacientes internacionais: US$10.
+                * Fluxo exclusivo deste card: <strong>Pix Seguro Mercado Pago (pagamento) → Enfª Brisa (triagem) → Orientação Técnica com o Dr. Edilson Bezerra</strong>. O pagamento vem sempre primeiro; nenhum paciente fala direto com o profissional antes do pagamento e auditoria. Pacientes internacionais: US$10.
               </p>
             </div>
           </motion.div>

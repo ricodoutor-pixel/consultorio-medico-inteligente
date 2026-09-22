@@ -130,6 +130,8 @@ const LegacyVideoCallRedirect = () => {
   return <Navigate to={`/orientacao-video${location.search}`} replace />;
 };
 const OrientacaoRapida = lazyWithRecovery(() => import("./pages/OrientacaoRapida"), { sourceRef: "/orientacao-rapida" });
+const OrientacaoTecnicaAgente = lazyWithRecovery(() => import("./pages/OrientacaoTecnicaAgente"), { sourceRef: "/orientacao-tecnica" });
+
 const SEOCondicoes = lazyWithRecovery(() => import("./pages/SEOCondicoes"), { sourceRef: "/tratamentos" });
 const Status = lazyWithRecovery(() => import("./pages/Status"), { sourceRef: "/status" });
 const Passaporte = lazyWithRecovery(() => import("./pages/Passaporte"), { sourceRef: "/passaporte" });
@@ -422,7 +424,7 @@ const App = () => (
                 <Route path="/videochamada" element={<LegacyVideoCallRedirect />} />
                 <Route path="/orientacao-rapida" element={<OrientacaoRapida />} />
                 <Route path="/consulta-rapida" element={<OrientacaoRapida />} />
-                <Route path="/orientacao-tecnica" element={<OrientacaoRapida />} />
+                <Route path="/orientacao-tecnica" element={<OrientacaoTecnicaAgente />} />
 
                 <Route path="/tratamento-dor-cronica" element={<TratamentoDorCronica />} />
                 <Route path="/tratamento-ansiedade-saude-mental" element={<TratamentoAnsiedadeSaudeMental />} />

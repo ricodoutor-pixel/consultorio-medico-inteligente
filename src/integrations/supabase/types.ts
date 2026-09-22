@@ -5688,6 +5688,51 @@ export type Database = {
         }
         Relationships: []
       }
+      ot_web_sessions: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          expires_at: string
+          external_reference: string
+          id: string
+          last_message_at: string | null
+          messages_count: number
+          mp_payment_id: string | null
+          started_at: string
+          status: string
+          triage: Json
+          user_id: string
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          expires_at: string
+          external_reference: string
+          id?: string
+          last_message_at?: string | null
+          messages_count?: number
+          mp_payment_id?: string | null
+          started_at?: string
+          status?: string
+          triage?: Json
+          user_id: string
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          external_reference?: string
+          id?: string
+          last_message_at?: string | null
+          messages_count?: number
+          mp_payment_id?: string | null
+          started_at?: string
+          status?: string
+          triage?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       pacientes_leads: {
         Row: {
           cidade: string | null

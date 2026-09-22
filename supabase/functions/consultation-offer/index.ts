@@ -33,7 +33,7 @@ function svcClient() {
   );
 }
 
-function htmlPage(title: string, body: string) {
+function htmlPage(title: string, body: string, extraHeaders: Record<string, string> = {}) {
   return new Response(
     `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -43,7 +43,7 @@ function htmlPage(title: string, body: string) {
 h1{font-size:20px;margin:0 0 12px}p{font-size:15px;line-height:1.5;color:#b9e6cd;margin:0 0 18px}
 a{display:inline-block;background:#1B4332;color:#fff;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:14px}</style>
 </head><body><div class="c"><h1>${title}</h1>${body}</div></body></html>`,
-    { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } },
+    { status: 200, headers: { ...extraHeaders, "Content-Type": "text/html; charset=utf-8" } },
   );
 }
 

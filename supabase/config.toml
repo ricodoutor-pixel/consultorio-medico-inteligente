@@ -68,4 +68,6 @@ project_id = "shmbwdjuddvquszwkvuq"
     verify_jwt = false
   [functions.regulatory-assistant]
     verify_jwt = false
+  [functions.consultation-offer]
+    verify_jwt = false
 

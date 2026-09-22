@@ -148,12 +148,14 @@ Deno.serve(async (req) => {
       return json({ error: insErr?.message ?? "Falha ao abrir atendimento" }, 500);
     }
 
-    // Avisa o profissional (não bloqueia a liberação)
+    // Convite da Enfª Brisa: o profissional tem 60s para aceitar; se recusar ou
+    // não responder, a consulta passa ao próximo de plantão (não bloqueia a liberação)
     try {
-      await svc.functions.invoke("consultation-notify-doctor", {
-        body: { appointmentId: appt.id },
+      await svc.functions.invoke("consultation-offer", {
+        body: { action: "dispatch", appointment_id: appt.id },
       });
     } catch { /* aviso é best-effort */ }
+
 
     return json({
       active: true,

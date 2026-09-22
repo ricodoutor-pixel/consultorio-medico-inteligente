@@ -1902,8 +1902,10 @@ export type Database = {
           accepted_at: string | null
           amount: number
           appointment_id: string | null
+          attempt: number
           consultation_type: string
           created_at: string
+          declined_at: string | null
           distance_km: number | null
           doctor_id: string
           expires_at: string
@@ -1912,6 +1914,7 @@ export type Database = {
           patient_lat: number | null
           patient_lng: number | null
           payload: Json | null
+          response_token: string | null
           status: string
           triage_id: string | null
           updated_at: string
@@ -1920,8 +1923,10 @@ export type Database = {
           accepted_at?: string | null
           amount?: number
           appointment_id?: string | null
+          attempt?: number
           consultation_type?: string
           created_at?: string
+          declined_at?: string | null
           distance_km?: number | null
           doctor_id: string
           expires_at?: string
@@ -1930,6 +1935,7 @@ export type Database = {
           patient_lat?: number | null
           patient_lng?: number | null
           payload?: Json | null
+          response_token?: string | null
           status?: string
           triage_id?: string | null
           updated_at?: string
@@ -1938,8 +1944,10 @@ export type Database = {
           accepted_at?: string | null
           amount?: number
           appointment_id?: string | null
+          attempt?: number
           consultation_type?: string
           created_at?: string
+          declined_at?: string | null
           distance_km?: number | null
           doctor_id?: string
           expires_at?: string
@@ -1948,6 +1956,7 @@ export type Database = {
           patient_lat?: number | null
           patient_lng?: number | null
           payload?: Json | null
+          response_token?: string | null
           status?: string
           triage_id?: string | null
           updated_at?: string
@@ -9493,6 +9502,22 @@ export type Database = {
       complete_brisa_orientacao: {
         Args: { _notes?: string; _payment_row_id: string }
         Returns: Json
+      }
+      consultation_doctor_pool: {
+        Args: { _specialty?: string }
+        Returns: {
+          approved_docs: number
+          crm: string
+          crm_state: string
+          doctor_id: string
+          full_name: string
+          is_online: boolean
+          kyc_green: boolean
+          phone: string
+          score: number
+          specialty: string
+          user_id: string
+        }[]
       }
       credit_affiliate_wallet: {
         Args: { _amount: number; _user_id: string }

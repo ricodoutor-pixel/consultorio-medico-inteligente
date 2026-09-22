@@ -26,6 +26,8 @@ import { VipUpgradePopup } from "@/components/VipUpgradePopup";
 import { VIPExpirationAlert } from "@/components/doctor/VIPExpirationAlert";
 import { DoctorSchedule } from "@/components/doctor/DoctorSchedule";
 import { DoctorContractModal } from "@/components/doctor/DoctorContractModal";
+import { ConsultationOfferBanner } from "@/components/doctor/ConsultationOfferBanner";
+
 
 import { DoctorAuxDiagnosticTools } from "@/components/doctor/DoctorAuxDiagnosticTools";
 import { IoTBiometricTracker } from "@/components/IoTBiometricTracker";
@@ -329,7 +331,9 @@ const DashboardMedico = () => {
       <section className="pt-24 pb-16 md:pt-32">
         <div className="container mx-auto px-4">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+            <ConsultationOfferBanner doctorId={doctorData?.id} />
             {/* Header */}
+
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
               <div className="flex flex-col items-start gap-2">
                 <VipUpgradePopup role="medico" inline className="ml-1" />

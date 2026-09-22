@@ -65,8 +65,16 @@ export function ConsultationOfferBanner({ doctorId }: Props) {
     if (!offer?.response_token) return;
     setBusy(reply);
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
       const res = await fetch(
         `${FN_URL}?action=respond&offer=${offer.id}&token=${offer.response_token}&reply=${reply}`,
+        {
+          headers: {
+            apikey: anonKey,
+            Authorization: `Bearer ${sessionData.session?.access_token ?? anonKey}`,
+          },
+        },
       );
       if (!res.ok) throw new Error(String(res.status));
       if (reply === "yes" && offer.appointment_id) {

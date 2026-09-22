@@ -115,14 +115,17 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Profissional de plantão (cadastro mais completo) — fallback: escolhido
+    // O profissional escolhido pelo paciente tem prioridade absoluta.
+    // O roteamento automático só entra quando o paciente não escolheu ninguém.
     let assignedDoctor = doctorId;
-    try {
-      const { data: routed } = await svc.rpc("route_consultation_doctor", { _specialty: null });
-      const first = Array.isArray(routed) ? routed[0] : null;
-      if (first?.doctor_id) assignedDoctor = first.doctor_id;
-    } catch (e) {
-      console.warn("[consulta-unlock] routing falhou", e);
+    if (!assignedDoctor) {
+      try {
+        const { data: routed } = await svc.rpc("route_consultation_doctor", { _specialty: null });
+        const first = Array.isArray(routed) ? routed[0] : null;
+        if (first?.doctor_id) assignedDoctor = first.doctor_id;
+      } catch (e) {
+        console.warn("[consulta-unlock] routing falhou", e);
+      }
     }
     if (!assignedDoctor) return json({ active: false, reason: "no_doctor_available" });
 

@@ -33,7 +33,7 @@ function svcClient() {
   );
 }
 
-function htmlPage(title: string, body: string) {
+function htmlPage(title: string, body: string, extraHeaders: Record<string, string> = {}) {
   return new Response(
     `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -43,7 +43,7 @@ function htmlPage(title: string, body: string) {
 h1{font-size:20px;margin:0 0 12px}p{font-size:15px;line-height:1.5;color:#b9e6cd;margin:0 0 18px}
 a{display:inline-block;background:#1B4332;color:#fff;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:14px}</style>
 </head><body><div class="c"><h1>${title}</h1>${body}</div></body></html>`,
-    { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } },
+    { status: 200, headers: { ...extraHeaders, "Content-Type": "text/html; charset=utf-8" } },
   );
 }
 
@@ -157,6 +157,7 @@ async function dispatchOffer(
 
 Deno.serve(async (req) => {
   const cors = getCorsHeaders(req);
+  const htmlPageCors = (title: string, body: string) => htmlPage(title, body, cors);
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   const json = (body: unknown, status = 200) =>
     new Response(JSON.stringify(body), {
@@ -181,7 +182,7 @@ Deno.serve(async (req) => {
       const offerId = String(url.searchParams.get("offer") ?? body.offer ?? "");
       const token = String(url.searchParams.get("token") ?? body.token ?? "");
       const reply = String(url.searchParams.get("reply") ?? body.reply ?? "").toLowerCase();
-      if (!offerId || !token) return htmlPage("Link inválido", "<p>Convite não encontrado.</p>");
+      if (!offerId || !token) return htmlPageCors("Link inválido", "<p>Convite não encontrado.</p>");
 
       const { data: offer } = await svc
         .from("consultation_offers")
@@ -190,10 +191,10 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (!offer || offer.response_token !== token) {
-        return htmlPage("Link inválido", "<p>Este convite não é mais válido.</p>");
+        return htmlPageCors("Link inválido", "<p>Este convite não é mais válido.</p>");
       }
       if (offer.status !== "pending") {
-        return htmlPage(
+        return htmlPageCors(
           "Convite encerrado",
           `<p>Esta consulta já foi ${offer.status === "accepted" ? "aceita" : "repassada a outro profissional"}.</p>
            <a href="${SITE}/dashboard-medico">Abrir meu painel</a>`,
@@ -211,7 +212,7 @@ Deno.serve(async (req) => {
           })
           .eq("id", offer.id);
         const next = await dispatchOffer(svc, String(offer.appointment_id));
-        return htmlPage(
+        return htmlPageCors(
           expired ? "Tempo esgotado" : "Consulta repassada",
           `<p>${expired ? "O prazo de 1 minuto expirou." : "Tudo bem, obrigado pela resposta."} ${
             next.ok ? "A consulta foi encaminhada ao próximo profissional de plantão." : "Nossa equipe foi avisada."
@@ -232,7 +233,7 @@ Deno.serve(async (req) => {
         .select("id, doctor_id, appointment_id")
         .maybeSingle();
 
-      if (!accepted) return htmlPage("Convite encerrado", "<p>Esta consulta já foi atribuída.</p>");
+      if (!accepted) return htmlPageCors("Convite encerrado", "<p>Esta consulta já foi atribuída.</p>");
 
       await svc
         .from("appointments")
@@ -271,7 +272,7 @@ Deno.serve(async (req) => {
         }
       }
 
-      return htmlPage(
+      return htmlPageCors(
         "Consulta confirmada ✅",
         `<p>Obrigado! O paciente já foi avisado. Entre no consultório virtual para iniciar o atendimento.</p>
          <a href="${SITE}/consultorio?appointment=${accepted.appointment_id}">Entrar no consultório</a>`,

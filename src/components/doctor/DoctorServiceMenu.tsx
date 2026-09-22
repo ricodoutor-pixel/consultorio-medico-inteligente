@@ -52,18 +52,30 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice }: Doctor
         return;
       }
 
+      // Orientação Técnica é exclusiva do Dr. Edilson Bezerra On (agente em nuvem):
+      // a própria página conduz pagamento → triagem → sala de 30 minutos.
+      if (item.redirectToEdilson) {
+        navigate("/orientacao-tecnica");
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("mp-checkout", {
         body: {
           sku: item.sku,
           doctorId,
-          returnUrl: item.redirectToEdilson
-            ? "https://www.plantayraiz.com.br/brisa-orientacao"
-            : "https://www.plantayraiz.com.br/quiz-triagem",
+          returnUrl: `https://www.plantayraiz.com.br/atendimento?paid=1&sku=${item.sku}${doctorId ? `&doctorId=${doctorId}` : ""}`,
         },
       });
       if (error) throw error;
 
       if (data?.init_point) {
+        // O pagamento vem SEMPRE primeiro: guardamos a referência para o
+        // servidor confirmar a cobrança antes de abrir triagem e consulta.
+        if (data?.external_reference) {
+          localStorage.setItem("pyr_consulta_external_reference", data.external_reference);
+        }
+        localStorage.setItem("pyr_consulta_sku", item.sku);
+        if (doctorId) localStorage.setItem("pyr_consulta_doctor", doctorId);
         toast.success("Redirecionando para o Mercado Pago…");
         window.location.href = data.init_point;
       } else {
@@ -142,8 +154,14 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice }: Doctor
         })}
       </div>
       <p className="text-[11px] text-muted-foreground">
-        {FIXED_SERVICE_NOTICE} Após o pagamento você passa pela triagem da Enfª Brisa e é direcionado
-        à consulta com {doctorName}.
+        {FIXED_SERVICE_NOTICE} O pagamento vem sempre primeiro: após a confirmação você passa pela
+        triagem da Enfª Brisa e é direcionado à consulta com {doctorName}.
+      </p>
+      <p className="text-[11px] text-muted-foreground">
+        <strong className="text-foreground">Orientação Técnica</strong> é modalidade exclusiva do{" "}
+        <strong className="text-foreground">Dr. Edilson Bezerra On</strong> (agente em nuvem com mais de
+        40.000 estudos científicos), que orienta tecnicamente e encaminha ao especialista. Nenhum outro
+        profissional da vitrine realiza essa modalidade.
       </p>
     </div>
   );

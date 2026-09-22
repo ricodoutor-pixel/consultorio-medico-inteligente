@@ -149,7 +149,7 @@ async function dispatchOffer(
     title: "Consulta agora — pode atender?",
     message: `${patient?.full_name ?? "Paciente"} aguarda. Responda em 1 minuto.`,
     type: "consultation_offer",
-    action_url: `/painel-medico?offer=${offer.id}`,
+    action_url: `/dashboard-medico?offer=${offer.id}`,
   });
 
   return { ok: true, offer_id: offer.id as string, doctor: next.full_name ?? next.doctor_id };
@@ -196,7 +196,7 @@ Deno.serve(async (req) => {
         return htmlPage(
           "Convite encerrado",
           `<p>Esta consulta já foi ${offer.status === "accepted" ? "aceita" : "repassada a outro profissional"}.</p>
-           <a href="${SITE}/painel-medico">Abrir meu painel</a>`,
+           <a href="${SITE}/dashboard-medico">Abrir meu painel</a>`,
         );
       }
       const expired = new Date(offer.expires_at as string).getTime() < Date.now();
@@ -215,7 +215,7 @@ Deno.serve(async (req) => {
           expired ? "Tempo esgotado" : "Consulta repassada",
           `<p>${expired ? "O prazo de 1 minuto expirou." : "Tudo bem, obrigado pela resposta."} ${
             next.ok ? "A consulta foi encaminhada ao próximo profissional de plantão." : "Nossa equipe foi avisada."
-          }</p><a href="${SITE}/painel-medico">Abrir meu painel</a>`,
+          }</p><a href="${SITE}/dashboard-medico">Abrir meu painel</a>`,
         );
       }
 

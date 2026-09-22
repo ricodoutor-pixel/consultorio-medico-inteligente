@@ -328,17 +328,17 @@ const Index = () => {
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] leading-relaxed text-amber-100/90">
                 ⚖️ <strong>Aviso Legal:</strong> O Dr. Edilson Bezerra <strong>não emite receitas, não realiza consultas, não prescreve medicamentos e não fornece diagnósticos</strong> através desta plataforma. O serviço consiste exclusivamente em <strong>orientação técnica educativa</strong> sobre o sistema endocanabinoide, com entrega de <strong>relatório técnico em PDF assinado digitalmente (ICP-Brasil / gov.br)</strong>. Para prescrições, o paciente é encaminhado a profissional habilitado.
               </div>
-              {/* Fluxo exclusivo deste card: Enfª Brisa (Triagem) → Pix Seguro Mercado Pago → Orientação Técnica Dr. Edilson Bezerra */}
+              {/* Ordem oficial: Pagamento (Pix Seguro) → Triagem (Enfª Brisa) → Consulta/Orientação Técnica */}
               <div className="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-background/40 border border-primary/20">
                 <div className="text-center">
-                  <div className="text-2xl mb-1">👩‍⚕️</div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">1. Enfª Brisa</p>
-                  <p className="text-[10px] text-muted-foreground">Triagem IA</p>
+                  <div className="text-2xl mb-1">🔒</div>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">1. Pix Seguro</p>
+                  <p className="text-[10px] text-muted-foreground">Mercado Pago</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl mb-1">🔒</div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">2. Pix Seguro</p>
-                  <p className="text-[10px] text-muted-foreground">Mercado Pago</p>
+                  <div className="text-2xl mb-1">👩‍⚕️</div>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">2. Enfª Brisa</p>
+                  <p className="text-[10px] text-muted-foreground">Triagem IA</p>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl mb-1">⚕️</div>
@@ -362,7 +362,7 @@ const Index = () => {
               </div>
 
               <p className="text-xs text-muted-foreground italic">
-                * Fluxo exclusivo deste card: <strong>Enfª Brisa (triagem) → Pix Seguro Mercado Pago → Orientação Técnica com o Dr. Edilson Bezerra</strong>. Nenhum paciente fala direto com o profissional antes do pagamento e auditoria. Pacientes internacionais: US$10.
+                * Fluxo exclusivo deste card: <strong>Pix Seguro Mercado Pago (pagamento) → Enfª Brisa (triagem) → Orientação Técnica com o Dr. Edilson Bezerra</strong>. O pagamento vem sempre primeiro; nenhum paciente fala direto com o profissional antes do pagamento e auditoria. Pacientes internacionais: US$10.
               </p>
             </div>
           </motion.div>

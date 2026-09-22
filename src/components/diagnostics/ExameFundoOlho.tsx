@@ -143,9 +143,11 @@ export function ExameFundoOlho({ onComplete }: { onComplete?: () => void }) {
       if (step >= aiLogs.length) clearInterval(logInterval);
     }, 1500);
 
+    let userId: string | undefined;
     try {
       const { data: session } = await supabase.auth.getSession();
-      const userId = session?.session?.user?.id;
+      userId = session?.session?.user?.id;
+
       
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fundoscopy-ai-diagnosis`,
@@ -300,18 +302,19 @@ export function ExameFundoOlho({ onComplete }: { onComplete?: () => void }) {
     setResult(finalResult);
 
     if (userId) {
-      supabase.from('diagnostic_exams').insert({
+      void supabase.from('diagnostic_exams').insert({
         user_id: userId,
         exam_type: 'fundoscopy',
         results: data,
-        ai_diagnosis: {
+        ai_diagnosis: JSON.parse(JSON.stringify({
           ...finalResult,
           regulatory_notice: 'SaMD Classe II (ANVISA RDC 657/2022). Ferramenta de apoio diagnóstico de triagem visual. Exige validação e conduta médica presencial.',
           human_supervision_required: true,
           review_status: 'pending_doctor_review'
-        },
+        })),
         risk_level: riskLevel
-      }).then(() => {}).catch(err => console.error("Error saving fundoscopy exam:", err));
+      }).then(({ error }) => { if (error) console.error("Error saving fundoscopy exam:", error); });
+
     }
 
     setPhase('result');

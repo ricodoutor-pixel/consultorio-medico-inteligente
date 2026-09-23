@@ -6,6 +6,7 @@ import { professionals as baseProfessionals } from "@/data/professionals";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
 import { ensureDoctorTitle } from "@/lib/doctor-title";
+import drLuizMedinaAsset from "@/assets/doctors/dr-luiz-roberto-medina.jpg.asset.json";
 
 const MEDICOS_CATEGORY = "Médicos Prescritores";
 
@@ -63,6 +64,7 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("angela beatriz") || n.includes("mercado") || c.includes("5258084") || c.includes("52580846")) return "/avatars/dra-angela-beatriz.jpg";
   if (n.includes("ingrid") && (n.includes("chiullo") || n.includes("miranda") || c.includes("216629"))) return "/avatars/dra-ingrid-chiullo.jpg";
   if (n.includes("eduardo") && (n.includes("correa") || n.includes("migueis") || c.includes("19333"))) return "/avatars/dr-eduardo-correa.jpg";
+  if ((n.includes("luiz roberto") && n.includes("medina")) || c.includes("11496")) return drLuizMedinaAsset.url;
 
   // 2. Especialistas e terapeutas das demais categorias oficiais tratadas
   if (n.includes("fernando") && n.includes("ribeiro")) return "/avatars/dr-fernando-ribeiro.jpg";

@@ -1,4 +1,5 @@
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
+import drLuizMedinaAsset from "@/assets/doctors/dr-luiz-roberto-medina.jpg.asset.json";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
 import draRenataImg from "@/assets/dra-renata-costa.jpg";
@@ -673,7 +674,7 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 0,
     avatar: "LM",
-    imageUrl: "https://shmbwdjuddvquszwkvuq.supabase.co/storage/v1/object/public/avatars/doctors/fada664c-4f05-4b35-97e5-22744285da1e.jpg",
+    imageUrl: drLuizMedinaAsset.url,
     online: true,
     crm: "11496/SC (Regular)",
     hospital: "Planta y Raíz Ltda",

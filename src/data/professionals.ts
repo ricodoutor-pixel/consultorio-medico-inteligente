@@ -1,5 +1,4 @@
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
-import drLuizMedinaAsset from "@/assets/doctors/dr-luiz-roberto-medina.jpg.asset.json";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
 import draRenataImg from "@/assets/dra-renata-costa.jpg";
@@ -674,7 +673,7 @@ export const professionals: Professional[] = [
     rating: 5.0,
     consults: 0,
     avatar: "LM",
-    imageUrl: drLuizMedinaAsset.url,
+    imageUrl: "/avatars/dr-luiz-roberto-medina.jpg",
     online: true,
     crm: "11496/SC (Regular)",
     hospital: "Planta y Raíz Ltda",

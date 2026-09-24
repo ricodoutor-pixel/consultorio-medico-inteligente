@@ -83,13 +83,16 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       
-      // Google Advanced Consent Mode v2: Negado por padrão (Cookieless pings ativos sem violar LGPD)
+      // Consent Mode v2: medição de audiência anônima (IP anonimizado) ativa para
+      // TODOS os visitantes; publicidade/personalização só após aceite do termo.
+      var __pyrStored = null;
+      try { __pyrStored = JSON.parse(localStorage.getItem('plr_cookie_consent') || 'null'); } catch(e) {}
+      var __pyrAnalyticsRefused = !!(__pyrStored && __pyrStored.analytics === false);
       gtag('consent', 'default', {
-        'analytics_storage': 'denied',
+        'analytics_storage': __pyrAnalyticsRefused ? 'denied' : 'granted',
         'ad_storage': 'denied',
         'ad_user_data': 'denied',
-        'ad_personalization': 'denied',
-        'wait_for_update': 500
+        'ad_personalization': 'denied'
       });
 
       gtag('js', new Date());
@@ -179,7 +182,7 @@
           ga.onload = function(){
             gtag('js', new Date());
             gtag('config', 'G-QY3HFCG64L', {
-              anonymize_ip: true, send_page_view: true,
+              anonymize_ip: true, send_page_view: false,
               cookie_flags: 'SameSite=None;Secure'
             });
           };

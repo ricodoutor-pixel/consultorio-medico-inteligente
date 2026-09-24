@@ -44,7 +44,8 @@ export function useDoctors() {
 
   const fetchDoctors = useCallback(async () => {
     try {
-      setLoading(true);
+      // Atualizações em segundo plano (poll/realtime) NÃO mostram a tela de
+      // carregamento — antes isso fazia a página KYC "reiniciar" a cada evento.
       const { data, error } = await supabase
         .from("doctors" as any)
         .select("*")
@@ -167,7 +168,7 @@ export function useDoctors() {
       }
     } catch (e) {
       console.error("[useDoctors] DB fetch error:", e);
-      setDoctors([]);
+      // Mantém a lista atual em falhas temporárias para não apagar a tela.
     } finally {
       setLoading(false);
     }

@@ -133,8 +133,10 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
  * Normalizador de nome para conferência e deduplicação
  */
 function normalizeDoctorKey(name: string, crm?: string | null): string {
+  // Remove TODOS os títulos iniciais (Dr., Dra., Prof., Profa., etc.),
+  // mesmo combinados ("Prof. Dr. ..."), para não perder o perfil estático.
   const n = (name || "").toLowerCase()
-    .replace(/^dr\.\s*|^dra\.\s*|^prof\.\s*|^profa\.\s*|^enf\.\s*|^téc\.\s*|^aux\.\s*/i, "")
+    .replace(/^((dr|dra|prof|profa|enf|téc|tec|aux)\.\s*)+/i, "")
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
   return n;

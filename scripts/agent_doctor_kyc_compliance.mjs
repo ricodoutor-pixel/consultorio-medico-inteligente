@@ -33,7 +33,7 @@ const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://shmbwdjuddvquszwk
 const ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobWJ3ZGp1ZGR2cXVzendrdnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE4MDksImV4cCI6MjA4Nzg2NzgwOX0.wGL0NQi2gKWyiC4L1ca1xxzSvEbvq2Uc8jvM7XOH9xQ';
 
 const WAHA_URL = process.env.WAHA_URL || 'https://waha-production-4e9c.up.railway.app';
-const WAHA_KEY = process.env.WAHA_API_KEY || 'planta123';
+const WAHA_KEY = process.env.WAHA_API_KEY || '';
 
 const supabase = createClient(SUPABASE_URL, ANON_KEY);
 
@@ -62,7 +62,7 @@ function saveState(state) {
 async function authenticateAdmin() {
   const { data, error } = await supabase.auth.signInWithPassword({
     email: 'contato@plantayraiz.com.br',
-    password: '95654045Pa#'
+    password: process.env.SMTP_PASS || ''
   });
   if (error) {
     console.error('[KYC-Agent] ❌ Falha na autenticação admin:', error.message);

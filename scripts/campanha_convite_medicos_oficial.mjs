@@ -28,7 +28,7 @@ const PROGRESS_FILE = path.join(__dirname, 'campanha_medicos_oficial_progress.js
 const LOG_FILE = path.join(__dirname, 'campanha_medicos_oficial.log');
 
 const SMTP_USER = process.env.SMTP_USER || 'contato@plantayraiz.com.br';
-const SMTP_PASS = process.env.SMTP_PASS || '95654045Pa#';
+const SMTP_PASS = process.env.SMTP_PASS || '';
 const SENDER_NAME = 'Planta y Raíz | Expansão Médica';
 
 // Transporter Hostinger SMTP Oficial

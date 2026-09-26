@@ -13,7 +13,7 @@ const path = require('path');
 const SMTP_HOST = 'smtp.hostinger.com';
 const SMTP_PORT = 465;
 const SMTP_USER = 'contato@plantayraiz.com.br';
-const SMTP_PASS = process.env.SMTP_PASS || '95654045Pa#';
+const SMTP_PASS = process.env.SMTP_PASS || '';
 
 // Parse CLI args
 const args = process.argv.slice(2);

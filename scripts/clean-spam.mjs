@@ -6,7 +6,7 @@ dotenv.config();
 const IMAP_HOST = 'imap.hostinger.com';
 const IMAP_PORT = 993;
 const USER = process.env.SMTP_USER || 'contato@plantayraiz.com.br';
-const PASS = process.env.SMTP_PASS || '95654045Pa#';
+const PASS = process.env.SMTP_PASS || '';
 
 async function cleanFolders() {
   console.log(`🔌 Conectando via IMAP TLS para limpeza da pasta Spam / Lixo...`);

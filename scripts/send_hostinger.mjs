@@ -104,7 +104,7 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     user: process.env.SMTP_USER || 'contato@plantayraiz.com.br',
-    pass: process.env.SMTP_PASS || '95654045Pa#'
+    pass: process.env.SMTP_PASS || ''
   },
   pool: true,
   maxConnections: 1,

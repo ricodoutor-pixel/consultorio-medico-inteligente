@@ -118,7 +118,7 @@ async function runAudit() {
   console.log('\n📱 [5/5] TESTANDO INTEGRAÇÃO WHATSAPP (WAHA Railway)');
   try {
     const wahaUrl = (process.env.WAHA_API_URL || 'https://waha-production-4e9c.up.railway.app').replace(/\/$/, '');
-    const wahaKey = process.env.WAHA_API_KEY || 'planta123';
+    const wahaKey = process.env.WAHA_API_KEY || '';
     const r = await fetch(`${wahaUrl}/api/sessions?all=true`, {
       headers: { 'X-Api-Key': wahaKey },
       signal: AbortSignal.timeout(6000)

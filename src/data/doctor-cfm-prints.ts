@@ -4,7 +4,6 @@
  * salvos em public/cfm_prints/ e src/assets/cfm_prints/
  */
 export const DOCTOR_CFM_PRINTS: Record<string, string> = {
-  "10963": "/cfm_prints/proof_cpf_edilson.png",
   "32584": "/cfm_prints/dr-jose-geraldo.png",
   "5460": "/cfm_prints/dr-daniel.png",
   "10346": "/cfm_prints/dr-daniel.png",
@@ -35,7 +34,6 @@ export function getDoctorCfmPrint(nameOrCrm?: string | null): string | null {
     if (str.includes(crmKey.toLowerCase())) return path;
   }
 
-  if (str.includes("edilson")) return "/cfm_prints/proof_cpf_edilson.png";
   if (str.includes("geraldo")) return "/cfm_prints/dr-jose-geraldo.png";
   if (str.includes("daniel") && (str.includes("kobayashi") || str.includes("colombo"))) return "/cfm_prints/dr-daniel.png";
   if (str.includes("joao pedro") || str.includes("detoni") || str.includes("girardello")) return "/cfm_prints/cfm-dr-joao-pedro.png";

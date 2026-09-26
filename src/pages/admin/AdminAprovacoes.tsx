@@ -814,8 +814,8 @@ export const AdminAprovacoes = () => {
                       variant="outline" 
                       className="text-xs font-bold border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10"
                       onClick={() => {
-                        const url = selectedDoctor.cpf_proof_url || (selectedDoctor.crm === "10963" || selectedDoctor.crm === "42912" ? "/proof_cpf_edilson.png" : "/proof_cpf_edilson.png");
-                        window.open(url, '_blank');
+                        const url = selectedDoctor.cpf_proof_url || "";
+                        if (url) window.open(url, '_blank');
                       }}
                     >
                       <ExternalLink size={12} className="mr-1" /> Ver CPF Receita
@@ -833,7 +833,7 @@ export const AdminAprovacoes = () => {
                       className="text-xs font-bold border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
                       onClick={() => {
                         const url = selectedDoctor.crm_proof_url || (selectedDoctor.crm === "42912" || selectedDoctor.crm === "10963" ? "/proof_crm_joao_pedro.jpg" : "/proof_crm_joao_pedro.jpg");
-                        window.open(url, '_blank');
+                        if (url) window.open(url, '_blank');
                       }}
                     >
                       <ExternalLink size={12} className="mr-1" /> Ver CRM CFM

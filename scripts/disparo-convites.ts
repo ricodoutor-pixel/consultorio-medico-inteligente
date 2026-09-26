@@ -1,7 +1,7 @@
 // scripts/disparo-convites.ts
 
 const WAHA_API_URL = 'https://waha-production-4e9c.up.railway.app';
-const WAHA_API_KEY = 'planta123';
+const WAHA_API_KEY = process.env.WAHA_API_KEY || '';
 const WAHA_SESSION = 'default';
 const DELAY_MS = 30000;
 

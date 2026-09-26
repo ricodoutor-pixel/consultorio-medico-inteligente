@@ -814,7 +814,7 @@ export const AdminAprovacoes = () => {
                       variant="outline" 
                       className="text-xs font-bold border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10"
                       onClick={() => {
-                        const url = selectedDoctor.cpf_proof_url || (selectedDoctor.crm === "10963" || selectedDoctor.crm === "42912" ? "/proof_cpf_edilson.png" : "/proof_cpf_edilson.png");
+                        const url = selectedDoctor.cpf_proof_url || "";
                         window.open(url, '_blank');
                       }}
                     >

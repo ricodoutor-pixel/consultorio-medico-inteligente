@@ -118,8 +118,7 @@ Seja bem-vindo(a) à medicina do futuro! 🌿💚`
           const wahaRes = await fetch("https://waha-production-4e9c.up.railway.app/api/sendText", {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
-              "X-Api-Key": "planta123"
+              "Content-Type": "application/json"
             },
             body: JSON.stringify({
               session: "default",

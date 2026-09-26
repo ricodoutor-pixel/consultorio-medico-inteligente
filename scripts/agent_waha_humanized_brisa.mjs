@@ -25,7 +25,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const STATE_FILE = path.join(__dirname, 'brisa_processed_wa_messages.json');
 
 const WAHA_URL = 'https://waha-production-4e9c.up.railway.app';
-const WAHA_KEY = 'planta123';
+const WAHA_KEY = process.env.WAHA_API_KEY || '';
 const WAHA_SESSION = 'default';
 
 import dotenv from 'dotenv';

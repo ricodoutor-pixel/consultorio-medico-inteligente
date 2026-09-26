@@ -5,7 +5,7 @@ dotenv.config();
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.hostinger.com';
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465');
 const SMTP_USER = process.env.SMTP_USER || 'contato@plantayraiz.com.br';
-const SMTP_PASS = process.env.SMTP_PASS || '95654045Pa#';
+const SMTP_PASS = process.env.SMTP_PASS || '';
 
 export const DOCTOR_FORMAL_PROPOSAL_HTML = (doctorName = 'Doutor(a)') => {
   const firstName = doctorName.replace(/^(Dr\.|Dra\.|Dr|Dra)\s*/i, '').split(' ')[0] || 'Doutor(a)';

@@ -5,7 +5,7 @@ dotenv.config();
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.hostinger.com';
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465');
 const SMTP_USER = process.env.SMTP_USER || 'contato@plantayraiz.com.br';
-const SMTP_PASS = process.env.SMTP_PASS || '95654045Pa#';
+const SMTP_PASS = process.env.SMTP_PASS || '';
 
 async function testSmtpConnection() {
   console.log(`🔌 Testando conexão SMTP Hostinger (${SMTP_HOST}:${SMTP_PORT})...`);

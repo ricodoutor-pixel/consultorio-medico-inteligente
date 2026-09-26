@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
   secure: true, // true para 465 (SSL)
   auth: {
     user: process.env.SMTP_USER || 'contato@plantayraiz.com.br',
-    pass: process.env.SMTP_PASS || '95654045Pa#'
+    pass: process.env.SMTP_PASS || ''
   }
 });
 

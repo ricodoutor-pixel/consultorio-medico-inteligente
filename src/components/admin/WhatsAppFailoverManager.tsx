@@ -112,40 +112,16 @@ Seja bem-vindo(a) à medicina do futuro! 🌿💚`
       
       let isSuccess = false;
 
-      // 1. Tentar envio direto via WAHA API (Instância Enfª Brisa)
-      if (activeInstance === "brisa") {
-        try {
-          const wahaRes = await fetch("https://waha-production-4e9c.up.railway.app/api/sendText", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              session: "default",
-              chatId: `${cleanPhone}@c.us`,
-              text: messageText
-            })
-          });
-
-          if (wahaRes.ok) {
-            isSuccess = true;
-          }
-        } catch (wahaErr) {
-          console.warn("Falha no envio direto WAHA, tentando edge function...", wahaErr);
+      // Envio sempre via edge function whatsapp-send (a chave WAHA/Evolution
+      // fica segura no servidor — nunca no navegador).
+      const { error } = await supabase.functions.invoke("whatsapp-send", {
+        body: {
+          number: cleanPhone,
+          text: messageText,
+          instance: activeInstance
         }
-      }
-
-      // 2. Fallback via Supabase Edge Function whatsapp-send
-      if (!isSuccess) {
-        const { error } = await supabase.functions.invoke("whatsapp-send", {
-          body: {
-            number: cleanPhone,
-            text: messageText,
-            instance: activeInstance
-          }
-        });
-        if (!error) isSuccess = true;
-      }
+      });
+      if (!error) isSuccess = true;
 
       if (isSuccess) {
         setSentCount((prev) => prev + 1);

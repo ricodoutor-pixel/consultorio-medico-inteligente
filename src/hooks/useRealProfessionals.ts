@@ -64,6 +64,13 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("ingrid") && (n.includes("chiullo") || n.includes("miranda") || c.includes("216629"))) return "/avatars/dra-ingrid-chiullo.jpg";
   if (n.includes("eduardo") && (n.includes("correa") || n.includes("migueis") || c.includes("19333"))) return "/avatars/dr-eduardo-correa.jpg";
   if ((n.includes("luiz roberto") && n.includes("medina")) || c.includes("11496")) return "/avatars/dr-luiz-roberto-medina.jpg";
+  if (n.includes("victor henrique") || n.includes("fonseca") || c.includes("206873")) return "/avatars/dr-victor-lima.jpg";
+  if (n.includes("otavio") || n.includes("otávio") || n.includes("bassete") || c.includes("21907")) return "/avatars/dr-roberto-integrativa.jpg";
+  if (n.includes("sadi") || n.includes("menta") || c.includes("16301")) return "/avatars/dr-marcos-oliveira.jpg";
+  if (n.includes("geovana") || n.includes("mozaner") || c.includes("98083")) return "/avatars/dra-gabriela-moreira.jpg";
+  if (n.includes("grace") || n.includes("conceicao") || n.includes("conceição") || c.includes("190386") || c.includes("190.386")) return "/avatars/dra-beatriz-integrativa.jpg";
+  if (n.includes("frederico") && n.includes("menezes")) return "/avatars/dr-antonio-silva.jpg";
+  if (n.includes("mariana") && (n.includes("alves") || n.includes("rezende") || c.includes("135012"))) return "/avatars/dra-mariana-alves.jpg";
 
   // 2. Especialistas e terapeutas das demais categorias oficiais tratadas
   if (n.includes("fernando") && n.includes("ribeiro")) return "/avatars/dr-fernando-ribeiro.jpg";
@@ -245,12 +252,41 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       });
 
     // Ordem oficial: fixos primeiro, depois quem tem mais documentos no cadastro.
-    return mapped.sort((a, b) =>
+    const sortedMedicos = mapped.sort((a, b) =>
       compareDoctorsByCompleteness(
         { name: a.name, registration: a.crm, docsCount: (a as Professional & { _docsCount?: number })._docsCount ?? 0 },
         { name: b.name, registration: b.crm, docsCount: (b as Professional & { _docsCount?: number })._docsCount ?? 0 },
       ),
     );
+
+    // Garantir que o card da Dra. Mariana Alves Rezende fique lado a lado com o card da Dra. Olivia Zimeri
+    const marianaIdx = sortedMedicos.findIndex(
+      (m) => m.id === "med-mariana-alves" || (m.crm && m.crm.includes("135012")) || m.name.toLowerCase().includes("mariana alves")
+    );
+    const oliviaIdx = sortedMedicos.findIndex(
+      (m) => m.id === "mock-olivia" || (m.crm && m.crm.includes("4466260")) || m.name.toLowerCase().includes("olivia")
+    );
+
+    if (marianaIdx !== -1 && oliviaIdx !== -1) {
+      const [marianaDoc] = sortedMedicos.splice(marianaIdx, 1);
+      const newOliviaIdx = sortedMedicos.findIndex(
+        (m) => m.id === "mock-olivia" || (m.crm && m.crm.includes("4466260")) || m.name.toLowerCase().includes("olivia")
+      );
+      const [oliviaDoc] = sortedMedicos.splice(newOliviaIdx, 1);
+
+      let targetSlot = newOliviaIdx;
+      if (targetSlot % 2 !== 0) {
+        targetSlot = Math.max(0, targetSlot - 1);
+      }
+      sortedMedicos.splice(targetSlot, 0, marianaDoc, oliviaDoc);
+    }
+
+    // Preservar as demais 10 categorias oficiais configuradas (Terapeutas, Enfermagem, etc.)
+    const nonMedical = baseProfessionals.filter(
+      (b) => b.category !== MEDICOS_CATEGORY && b.category !== "Médico Veterinário Prescritor"
+    );
+
+    return [...sortedMedicos, ...nonMedical];
   }, [dbDoctors]);
 
   return { professionals, realCount: professionals.length, loading };

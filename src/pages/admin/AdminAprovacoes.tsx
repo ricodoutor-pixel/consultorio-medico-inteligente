@@ -26,7 +26,7 @@ import { KYC_LABELS, KYC_REQUIRED, type KycKind } from "@/lib/kyc-docs";
 import { compareDoctorsByCompleteness, doctorTierFromDocs, DOCTOR_TIER_LABEL } from "@/lib/doctor-ranking";
 
 export const AdminAprovacoes = () => {
-  const { doctors, setDoctors, loading, fetchDoctors, counts } = useDoctors();
+  const { doctors, setDoctors, loading, isRefreshing, fetchDoctors, counts } = useDoctors();
   const [isAuditing, setIsAuditing] = useState(false);
   const [isSendingEmails, setIsSendingEmails] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -319,11 +319,19 @@ export const AdminAprovacoes = () => {
           name: a.profile?.full_name || a.full_name,
           registration: a.crm,
           docsCount: (a.kyc_docs || []).length,
+          hasPix: Boolean(a.profile?.pix_key || a.pix_key || a.mp_collector_id),
+          hasAvatar: Boolean(a.profile?.avatar_url || a.avatar_url),
+          hasContract: Boolean(a.is_contract_signed || a.contract_signed_at),
+          isApproved: Boolean(a.is_approved_by_admin),
         },
         {
           name: b.profile?.full_name || b.full_name,
           registration: b.crm,
           docsCount: (b.kyc_docs || []).length,
+          hasPix: Boolean(b.profile?.pix_key || b.pix_key || b.mp_collector_id),
+          hasAvatar: Boolean(b.profile?.avatar_url || b.avatar_url),
+          hasContract: Boolean(b.is_contract_signed || b.contract_signed_at),
+          isApproved: Boolean(b.is_approved_by_admin),
         },
       ),
     );
@@ -333,7 +341,7 @@ export const AdminAprovacoes = () => {
   const countApproved = doctors.filter(d => d.is_approved_by_admin).length;
   const countBlocked = doctors.filter(d => d.approval_status === 'rejected').length;
 
-  if (loading) {
+  if (loading && doctors.length === 0) {
     return (
       <div className="min-h-dvh bg-background flex flex-col">
         <Navbar />
@@ -358,6 +366,11 @@ export const AdminAprovacoes = () => {
             <div>
               <h1 className="text-2xl md:text-3xl font-black text-foreground flex items-center gap-2">
                 Painel de Averiguação & Liberação de Cards Médicos <Sparkles className="text-emerald-400" size={24} />
+                {isRefreshing && (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 animate-pulse">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Atualizando em segundo plano...
+                  </span>
+                )}
               </h1>
               <p className="text-muted-foreground text-sm mt-0.5">
                 Auditoria completa de cadastros, inspeção de documentos KYC, chave PIX e controle do chaveador ON/OFF do Card Público.

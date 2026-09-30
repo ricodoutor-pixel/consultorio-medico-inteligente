@@ -10,9 +10,9 @@
  */
 
 const PINNED: Array<{ names: string[]; registrations: string[] }> = [
-  { names: ["edilson"], registrations: ["10963"] },
   { names: ["suelen"], registrations: ["49354"] },
   { names: ["daniel kobayashi", "kobayashi"], registrations: ["5460", "10346"] },
+  { names: ["edilson"], registrations: ["10963"] },
 ];
 
 function normalize(value: string | null | undefined): string {
@@ -39,6 +39,23 @@ export interface DoctorRankInput {
   registration?: string | null;
   /** Quantidade real de documentos anexados no cadastro KYC */
   docsCount: number;
+  /** Possui chave PIX cadastrada para recebimento */
+  hasPix?: boolean;
+  /** Possui foto de perfil oficial tratada */
+  hasAvatar?: boolean;
+  /** Possui contrato assinado digitalmente */
+  hasContract?: boolean;
+  /** Status de aprovação pelo admin */
+  isApproved?: boolean;
+}
+
+export function computeCompletenessScore(item: DoctorRankInput): number {
+  let score = (item.docsCount || 0) * 100;
+  if (item.hasContract) score += 50;
+  if (item.hasPix) score += 30;
+  if (item.hasAvatar) score += 20;
+  if (item.isApproved) score += 10;
+  return score;
 }
 
 /** Comparador único usado na vitrine pública e no painel de aprovações. */
@@ -46,6 +63,11 @@ export function compareDoctorsByCompleteness(a: DoctorRankInput, b: DoctorRankIn
   const pinnedA = pinnedDoctorRank(a.name, a.registration);
   const pinnedB = pinnedDoctorRank(b.name, b.registration);
   if (pinnedA !== pinnedB) return pinnedA - pinnedB;
+
+  const scoreA = computeCompletenessScore(a);
+  const scoreB = computeCompletenessScore(b);
+  if (scoreA !== scoreB) return scoreB - scoreA;
+
   if (a.docsCount !== b.docsCount) return b.docsCount - a.docsCount;
   return normalize(a.name).localeCompare(normalize(b.name));
 }

@@ -1,3 +1,5 @@
+import draMarianaAlvesImg from "@/assets/dra-mariana-alves.jpg";
+import cfmMarianaAlves from "@/assets/cfm_prints/cfm-dra-mariana-alves.png";
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
@@ -755,6 +757,31 @@ export const professionals: Professional[] = [
     reviews: [],
   },
   {
+    id: "med-mariana-alves",
+    name: "Dra. Mariana Alves Rezende",
+    category: "Médicos Prescritores",
+    bio: "Médica graduada pela Universidade Federal do Acre (UFAC) em 2025. Inscrita no CRM 135012-9/RJ (situação regular no CFM). Atuação focada em Medicina Canabinoide, Fitoterapia e Saúde Integrativa, com avaliação individualizada e manejo humanizado do paciente.",
+    flags: ["🇧🇷"],
+    experience: "1 ano",
+    tags: ["Clínica Geral", "Medicina Canabinoide", "Fitoterapia", "Prescritora"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 0,
+    avatar: "MR",
+    imageUrl: draMarianaAlvesImg,
+    online: false,
+    cfmPrintUrl: cfmMarianaAlves,
+    paymentLink: "https://pay.asaas.com/00000",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 09:30", "Hoje 11:00", "Hoje 15:00", "Hoje 17:00"],
+    crm: "135012-9/RJ",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Excelente médica, atendimento acolhedor e esclarecedor." }
+    ],
+  },
+  {
     id: "mock-olivia",
     name: "Dra. Olivia Zimeri",
     category: "Médicos Prescritores",
@@ -1092,7 +1119,6 @@ export const professionals: Professional[] = [
     ],
   },
 ];
-
 
 
 

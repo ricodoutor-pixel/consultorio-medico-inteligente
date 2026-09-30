@@ -24,6 +24,9 @@ export const DOCTOR_CFM_PRINTS: Record<string, string> = {
   "85182": "/cfm_prints/cfm-leuma.png",
   "12361": "/cfm_prints/cfm-barbara.png",
   "14828": "/cfm_prints/cfm-diego.png",
+  "135012": "/cfm_prints/cfm-dra-mariana-alves.png",
+  "1350129": "/cfm_prints/cfm-dra-mariana-alves.png",
+  "135012-9": "/cfm_prints/cfm-dra-mariana-alves.png",
 };
 
 export function getDoctorCfmPrint(nameOrCrm?: string | null): string | null {
@@ -50,6 +53,7 @@ export function getDoctorCfmPrint(nameOrCrm?: string | null): string | null {
   if (str.includes("leuma")) return "/cfm_prints/cfm-leuma.png";
   if (str.includes("barbara") && str.includes("matos")) return "/cfm_prints/cfm-barbara.png";
   if (str.includes("diego") && (str.includes("cartaxo") || str.includes("jacome"))) return "/cfm_prints/cfm-diego.png";
+  if (str.includes("mariana") && (str.includes("alves") || str.includes("rezende") || str.includes("135012"))) return "/cfm_prints/cfm-dra-mariana-alves.png";
 
   return null;
 }

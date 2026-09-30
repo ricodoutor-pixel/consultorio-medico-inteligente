@@ -219,7 +219,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         return {
           id: base?.id ?? `db-${doc.id}`,
           dbId: doc.id,
-          name: fullName,
+          name: base?.name ?? fullName,
           category: isVet ? "Médico Veterinário Prescritor" : MEDICOS_CATEGORY,
           councilLabel: isVet ? "CRMV" : "CRM",
           bio: doc.bio || base?.bio || "",

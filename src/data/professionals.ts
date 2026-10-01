@@ -820,7 +820,7 @@ export const professionals: Professional[] = [
     id: "med-victor-fonseca",
     name: "Dr. Victor Henrique Bueno da Fonseca",
     category: "Médicos Prescritores",
-    bio: "Univ. Federal do Estado do Rio de Janeiro (UNIRIO). Pós em Psiquiatria. Certificação Internacional em Medicina Endocanabinoide pela WeCann Academy. 7 anos de atuação • + 10.000 pacientes.",
+    bio: "Médico graduado pela Universidade Federal do Estado do Rio de Janeiro (UNIRIO), pós-graduado em Psiquiatria, Endocrinologia, Acupuntura e Medicina Tradicional Chinesa, com Certificação Internacional em Medicina Endocanabinoide pela conceituada WeCann Academy. Membro da Sociedade Latino-Americana de Dor (LAPS) e com aperfeiçoamento em Transtorno do Espectro Autista (TEA), TDAH e Medicina do Esporte. Com mais de 7 anos de atuação e mais de 10.000 pacientes atendidos, dedica sua prática à saúde mental integrativa e ao manejo da dor crônica, aliando alto rigor científico a uma escuta empática e acompanhamento longitudinal próximo e humanizado.",
     flags: ["🇧🇷"],
     experience: "7 anos",
     tags: ["Psiquiatria", "Medicina Canabinoide", "WeCann Academy", "Prescritor"],

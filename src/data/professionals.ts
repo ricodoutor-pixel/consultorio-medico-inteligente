@@ -4,6 +4,8 @@ import drVictorFonsecaImg from "@/assets/dr-victor-fonseca.jpg";
 import cfmDrVictorFonseca from "@/assets/cfm_prints/cfm-dr-victor-fonseca.png";
 import drSadiMentaImg from "@/assets/dr-sadi-menta.jpg";
 import cfmDrSadiMenta from "@/assets/cfm_prints/cfm-dr-sadi-menta.png";
+import draGeovanaTorresImg from "@/assets/dra-geovana-torres.jpg";
+import cfmDraGeovanaTorres from "@/assets/cfm_prints/cfm-dra-geovana-torres.png";
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
@@ -866,6 +868,31 @@ export const professionals: Professional[] = [
     crm: "16301/SC",
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Médico experiente, atencioso e muito acolhedor." }
+    ],
+  },
+  {
+    id: "med-geovana-torres",
+    name: "Dra. Geovana Torres Mozaner",
+    category: "Médicos Prescritores",
+    bio: "Médica graduada pela Faculdade de Ciências Médicas e da Saúde de Juiz de Fora (FCMS/JF) em 2023. Inscrita no CRM 98083/MG e CRM 247790/SP (situação regular no CFM). Atuação focada em Clínica Geral, Medicina Canabinoide, acolhimento humanizado, manejo integrativo e promoção da qualidade de vida.",
+    flags: ["🇧🇷"],
+    experience: "3 anos",
+    tags: ["Clínica Geral", "Medicina Canabinoide", "Medicina Integrativa", "Prescritor"],
+    price: "R$ 100,00",
+    priceValue: 100,
+    whatsapp: "5532984599585",
+    rating: 5.0,
+    consults: 0,
+    avatar: "GT",
+    imageUrl: draGeovanaTorresImg,
+    online: false,
+    cfmPrintUrl: cfmDraGeovanaTorres,
+    paymentLink: "https://pay.asaas.com/00000",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 09:00", "Hoje 11:00", "Hoje 14:30", "Hoje 16:30"],
+    crm: "98083/MG • 247790/SP",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento, muito atenciosa e dedicada." }
     ],
   },
   {

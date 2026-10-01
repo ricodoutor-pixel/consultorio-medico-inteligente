@@ -2,6 +2,8 @@ import draMarianaAlvesImg from "@/assets/dra-mariana-alves.jpg";
 import cfmMarianaAlves from "@/assets/cfm_prints/cfm-dra-mariana-alves.png";
 import drVictorFonsecaImg from "@/assets/dr-victor-fonseca.jpg";
 import cfmDrVictorFonseca from "@/assets/cfm_prints/cfm-dr-victor-fonseca.png";
+import drSadiMentaImg from "@/assets/dr-sadi-menta.jpg";
+import cfmDrSadiMenta from "@/assets/cfm_prints/cfm-dr-sadi-menta.png";
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
@@ -839,6 +841,31 @@ export const professionals: Professional[] = [
     crm: "206873/SP",
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento em psiquiatria e acolhimento exemplar." }
+    ],
+  },
+  {
+    id: "med-sadi-menta",
+    name: "Dr. Sadi Roberto Menta",
+    category: "Médicos Prescritores",
+    bio: "UFPEL 1999. Pós-graduação em Psiquiatria, Autismo, Cannabis Medicinal e Psicanálise. Especialista em Medicina Legal e Perícia Médica (RQE Nº 21448). Atendimento humanizado e foco no acolhimento ao paciente.",
+    flags: ["🇧🇷"],
+    experience: "25 anos",
+    tags: ["Psiquiatria", "Medicina Canabinoide", "Autismo", "Perícia Médica", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5548996609299",
+    rating: 5.0,
+    consults: 0,
+    avatar: "SM",
+    imageUrl: drSadiMentaImg,
+    online: false,
+    cfmPrintUrl: cfmDrSadiMenta,
+    paymentLink: "https://pay.asaas.com/00000",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 10:00", "Hoje 14:00", "Hoje 16:30"],
+    crm: "16301/SC",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Médico experiente, atencioso e muito acolhedor." }
     ],
   },
   {

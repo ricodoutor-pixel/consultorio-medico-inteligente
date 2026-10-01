@@ -66,7 +66,7 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if ((n.includes("luiz roberto") && n.includes("medina")) || c.includes("11496")) return "/avatars/dr-luiz-roberto-medina.jpg";
   if (n.includes("victor henrique") || n.includes("fonseca") || c.includes("206873")) return "/avatars/dr-victor-fonseca.jpg?v=2";
   if (n.includes("otavio") || n.includes("otávio") || n.includes("bassete") || c.includes("21907")) return "/avatars/dr-roberto-integrativa.jpg";
-  if (n.includes("sadi") || n.includes("menta") || c.includes("16301")) return "/avatars/dr-marcos-oliveira.jpg";
+  if (n.includes("sadi") || n.includes("menta") || c.includes("16301")) return "/avatars/dr-sadi-menta.jpg?v=1";
   if (n.includes("geovana") || n.includes("mozaner") || c.includes("98083")) return "/avatars/dra-gabriela-moreira.jpg";
   if (n.includes("grace") || n.includes("conceicao") || n.includes("conceição") || c.includes("190386") || c.includes("190.386")) return "/avatars/dra-beatriz-integrativa.jpg";
   if (n.includes("frederico") && n.includes("menezes")) return "/avatars/dr-antonio-silva.jpg";
@@ -259,38 +259,47 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       ),
     );
 
-    // Garantir que os cards da Dra. Mariana Alves Rezende e do Dr. Victor Henrique Bueno da Fonseca fiquem ao lado da Dra. Olivia Zimeri
+    // Garantir que os cards da Dra. Mariana, Dra. Olivia, Dr. Victor e Dr. Sadi fiquem agrupados na vitrine
     const marianaIdx = sortedMedicos.findIndex(
       (m) => m.id === "med-mariana-alves" || (m.crm && m.crm.includes("135012")) || m.name.toLowerCase().includes("mariana alves")
     );
     const victorIdx = sortedMedicos.findIndex(
       (m) => m.id === "med-victor-fonseca" || (m.crm && m.crm.includes("206873")) || m.name.toLowerCase().includes("victor henrique")
     );
+    const sadiIdx = sortedMedicos.findIndex(
+      (m) => m.id === "med-sadi-menta" || (m.crm && m.crm.includes("16301")) || m.name.toLowerCase().includes("sadi")
+    );
     const oliviaIdx = sortedMedicos.findIndex(
       (m) => m.id === "mock-olivia" || (m.crm && m.crm.includes("4466260")) || m.name.toLowerCase().includes("olivia")
     );
 
-    const trio: Professional[] = [];
+    const group: Professional[] = [];
     if (marianaIdx !== -1) {
-      trio.push(sortedMedicos.splice(marianaIdx, 1)[0]);
+      group.push(sortedMedicos.splice(marianaIdx, 1)[0]);
     }
     const curOliviaIdx = sortedMedicos.findIndex(
       (m) => m.id === "mock-olivia" || (m.crm && m.crm.includes("4466260")) || m.name.toLowerCase().includes("olivia")
     );
     if (curOliviaIdx !== -1) {
-      trio.push(sortedMedicos.splice(curOliviaIdx, 1)[0]);
+      group.push(sortedMedicos.splice(curOliviaIdx, 1)[0]);
     }
     const curVictorIdx = sortedMedicos.findIndex(
       (m) => m.id === "med-victor-fonseca" || (m.crm && m.crm.includes("206873")) || m.name.toLowerCase().includes("victor henrique")
     );
     if (curVictorIdx !== -1) {
-      trio.push(sortedMedicos.splice(curVictorIdx, 1)[0]);
+      group.push(sortedMedicos.splice(curVictorIdx, 1)[0]);
+    }
+    const curSadiIdx = sortedMedicos.findIndex(
+      (m) => m.id === "med-sadi-menta" || (m.crm && m.crm.includes("16301")) || m.name.toLowerCase().includes("sadi")
+    );
+    if (curSadiIdx !== -1) {
+      group.push(sortedMedicos.splice(curSadiIdx, 1)[0]);
     }
 
-    if (trio.length > 0) {
+    if (group.length > 0) {
       let targetSlot = curOliviaIdx !== -1 ? curOliviaIdx : 0;
       targetSlot = Math.min(targetSlot, sortedMedicos.length);
-      sortedMedicos.splice(targetSlot, 0, ...trio);
+      sortedMedicos.splice(targetSlot, 0, ...group);
     }
 
     // Preservar as demais 10 categorias oficiais configuradas (Terapeutas, Enfermagem, etc.)

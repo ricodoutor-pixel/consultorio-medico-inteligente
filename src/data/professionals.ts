@@ -6,6 +6,8 @@ import drSadiMentaImg from "@/assets/dr-sadi-menta.jpg";
 import cfmDrSadiMenta from "@/assets/cfm_prints/cfm-dr-sadi-menta.png";
 import draGeovanaTorresImg from "@/assets/dra-geovana-torres.jpg";
 import cfmDraGeovanaTorres from "@/assets/cfm_prints/cfm-dra-geovana-torres.png";
+import draGraceConceicaoImg from "@/assets/dra-grace-conceicao.jpg";
+import cfmDraGraceConceicao from "@/assets/cfm_prints/cfm-dra-grace-conceicao.png";
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
@@ -893,6 +895,31 @@ export const professionals: Professional[] = [
     crm: "98083/MG • 247790/SP",
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento, muito atenciosa e dedicada." }
+    ],
+  },
+  {
+    id: "med-grace-conceicao",
+    name: "Dra. Grace Adriana Lopes Conceição",
+    category: "Médicos Prescritores",
+    bio: "Graduada pela Escola Bahiana de Medicina e Saúde Pública (1990). Pós-graduada em Psiquiatria (IPEMED) com aperfeiçoamento pela UNIFESP e membra da Sociedade Brasileira de Estudo da Cannabis (SBEC). Inscrita no CRM 190386/SP e CRM 10372/BA (situação regular no CFM). Mais de 34 anos de atuação clínica, com foco em saúde mental integrativa, acolhimento humanizado e fitoterapia canabinoide.",
+    flags: ["🇧🇷"],
+    experience: "34 anos",
+    tags: ["Psiquiatria", "Medicina Canabinoide", "SBEC", "Saúde Mental", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5511999903567",
+    rating: 5.0,
+    consults: 0,
+    avatar: "GC",
+    imageUrl: draGraceConceicaoImg,
+    online: false,
+    cfmPrintUrl: cfmDraGraceConceicao,
+    paymentLink: "https://pay.asaas.com/00000",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 09:30", "Hoje 11:30", "Hoje 15:00", "Hoje 17:00"],
+    crm: "190386/SP • 10372/BA",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento em psiquiatria e acolhimento exemplar." }
     ],
   },
   {

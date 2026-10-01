@@ -68,7 +68,7 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("otavio") || n.includes("otávio") || n.includes("bassete") || c.includes("21907")) return "/avatars/dr-roberto-integrativa.jpg";
   if (n.includes("sadi") || n.includes("menta") || c.includes("16301")) return "/avatars/dr-sadi-menta.jpg?v=1";
   if (n.includes("geovana") || n.includes("mozaner") || c.includes("98083") || c.includes("247790")) return "/avatars/dra-geovana-torres.jpg?v=1";
-  if (n.includes("grace") || n.includes("conceicao") || n.includes("conceição") || c.includes("190386") || c.includes("190.386")) return "/avatars/dra-beatriz-integrativa.jpg";
+  if (n.includes("grace") || n.includes("conceicao") || n.includes("conceição") || c.includes("190386") || c.includes("190.386") || c.includes("10372")) return "/avatars/dra-grace-conceicao.jpg?v=1";
   if (n.includes("frederico") && n.includes("menezes")) return "/avatars/dr-antonio-silva.jpg";
   if (n.includes("mariana") && (n.includes("alves") || n.includes("rezende") || c.includes("135012"))) return "/avatars/dra-mariana-alves.jpg";
 
@@ -259,7 +259,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       ),
     );
 
-    // Garantir que os cards da Dra. Mariana, Dra. Olivia, Dr. Victor, Dr. Sadi e Dra. Geovana fiquem agrupados na vitrine
+    // Garantir que os cards da Dra. Mariana, Dra. Olivia, Dr. Victor, Dr. Sadi, Dra. Geovana e Dra. Grace fiquem agrupados na vitrine
     const marianaIdx = sortedMedicos.findIndex(
       (m) => m.id === "med-mariana-alves" || (m.crm && m.crm.includes("135012")) || m.name.toLowerCase().includes("mariana alves")
     );
@@ -271,6 +271,9 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     );
     const geovanaIdx = sortedMedicos.findIndex(
       (m) => m.id === "med-geovana-torres" || (m.crm && m.crm.includes("98083")) || m.name.toLowerCase().includes("geovana")
+    );
+    const graceIdx = sortedMedicos.findIndex(
+      (m) => m.id === "med-grace-conceicao" || (m.crm && (m.crm.includes("190386") || m.crm.includes("190.386"))) || m.name.toLowerCase().includes("grace")
     );
     const oliviaIdx = sortedMedicos.findIndex(
       (m) => m.id === "mock-olivia" || (m.crm && m.crm.includes("4466260")) || m.name.toLowerCase().includes("olivia")
@@ -303,6 +306,12 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     );
     if (curGeovanaIdx !== -1) {
       group.push(sortedMedicos.splice(curGeovanaIdx, 1)[0]);
+    }
+    const curGraceIdx = sortedMedicos.findIndex(
+      (m) => m.id === "med-grace-conceicao" || (m.crm && (m.crm.includes("190386") || m.crm.includes("190.386"))) || m.name.toLowerCase().includes("grace")
+    );
+    if (curGraceIdx !== -1) {
+      group.push(sortedMedicos.splice(curGraceIdx, 1)[0]);
     }
 
     if (group.length > 0) {

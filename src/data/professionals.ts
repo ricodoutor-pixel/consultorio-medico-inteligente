@@ -1,5 +1,7 @@
 import draMarianaAlvesImg from "@/assets/dra-mariana-alves.jpg";
 import cfmMarianaAlves from "@/assets/cfm_prints/cfm-dra-mariana-alves.png";
+import drVictorFonsecaImg from "@/assets/dr-victor-fonseca.jpg";
+import cfmDrVictorFonseca from "@/assets/cfm_prints/cfm-dr-victor-fonseca.png";
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
@@ -812,6 +814,31 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Família Santos", rating: 5, text: "Muito atenciosa e excelente acompanhamento." },
       { name: "Cláudia V.", rating: 5, text: "Humana, competente e acessível. Gratidão." },
+    ],
+  },
+  {
+    id: "med-victor-fonseca",
+    name: "Dr. Victor Henrique Bueno da Fonseca",
+    category: "Médicos Prescritores",
+    bio: "Univ. Federal do Estado do Rio de Janeiro (UNIRIO). Pós em Psiquiatria. Certificação Internacional em Medicina Endocanabinoide pela WeCann Academy. 7 anos de atuação • + 10.000 pacientes.",
+    flags: ["🇧🇷"],
+    experience: "7 anos",
+    tags: ["Psiquiatria", "Medicina Canabinoide", "WeCann Academy", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "551153045378",
+    rating: 5.0,
+    consults: 0,
+    avatar: "VF",
+    imageUrl: drVictorFonsecaImg,
+    online: false,
+    cfmPrintUrl: cfmDrVictorFonseca,
+    paymentLink: "https://pay.asaas.com/00000",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 09:30", "Hoje 11:00", "Hoje 15:00", "Hoje 17:00"],
+    crm: "206873/SP",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento em psiquiatria e acolhimento exemplar." }
     ],
   },
   {

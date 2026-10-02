@@ -26,7 +26,7 @@ import { KYC_LABELS, KYC_REQUIRED, type KycKind } from "@/lib/kyc-docs";
 import { compareDoctorsByCompleteness, doctorTierFromDocs, DOCTOR_TIER_LABEL } from "@/lib/doctor-ranking";
 
 export const AdminAprovacoes = () => {
-  const { doctors, setDoctors, loading, isRefreshing, fetchDoctors, counts } = useDoctors();
+  const { doctors, setDoctors, loading, fetchDoctors, counts } = useDoctors();
   const [isAuditing, setIsAuditing] = useState(false);
   const [isSendingEmails, setIsSendingEmails] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -371,7 +371,7 @@ export const AdminAprovacoes = () => {
             <div>
               <h1 className="text-2xl md:text-3xl font-black text-foreground flex items-center gap-2">
                 Painel de Averiguação & Liberação de Cards Médicos <Sparkles className="text-emerald-400" size={24} />
-                {isRefreshing && (
+                {loading && doctors.length > 0 && (
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 animate-pulse">
                     <Loader2 className="w-3 h-3 animate-spin" /> Atualizando em segundo plano...
                   </span>

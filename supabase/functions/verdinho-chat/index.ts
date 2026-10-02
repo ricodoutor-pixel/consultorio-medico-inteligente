@@ -146,7 +146,7 @@ serve(async (req) => {
             content: lastUserMsg.content,
             topic,
             sentiment,
-          }).catch(() => {});
+          }).then(() => {}, () => {});
         }
       } catch { /* ignore logging errors */ }
     }

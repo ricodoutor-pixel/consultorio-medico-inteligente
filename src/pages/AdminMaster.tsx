@@ -71,36 +71,57 @@ const PATHOLOGY_DATA: Record<string, { condition: string; intensity: number; col
   "Brasília": [{ condition: "Ansiedade", intensity: 75, color: "#FF6B35" }],
 };
 
+// Sem telemetria geográfica real por cidade: marcadores ficam estáticos (sem simulação).
 const generateMarkers = () => CITIES_BASE.map(c => ({
-  ...c, online: Math.random() > 0.4, recentLogin: Math.random() > 0.6,
-  heatIntensity: (PATHOLOGY_DATA[c.name]?.[0]?.intensity || 20) + Math.floor(Math.random() * 10 - 5),
+  ...c, online: false, recentLogin: false,
+  heatIntensity: PATHOLOGY_DATA[c.name]?.[0]?.intensity || 20,
   topCondition: PATHOLOGY_DATA[c.name]?.[0]?.condition || "Geral",
 }));
 
-const generateRevenueData = () => {
-  const days = [];
+type DatedAmount = { amount: number | string | null; created_at: string; status?: string | null };
+
+// Receita diária real (últimos 31 dias) a partir de escrow (consultas) e vendor_transactions (Shopping).
+const buildRevenueData = (escrows: DatedAmount[], vendorTxs: DatedAmount[]) => {
+  const days: { key: string; date: string; receita: number; consultas: number; marketplace: number }[] = [];
   for (let i = 30; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
-    days.push({ date: d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }), receita: Math.floor(3000 + Math.random() * 12000), consultas: Math.floor(800 + Math.random() * 5000), marketplace: Math.floor(400 + Math.random() * 3000) });
+    days.push({ key: d.toISOString().slice(0, 10), date: d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }), receita: 0, consultas: 0, marketplace: 0 });
   }
-  return days;
+  const idx = new Map(days.map((d, i) => [d.key, i]));
+  for (const e of escrows) {
+    const i = idx.get(String(e.created_at).slice(0, 10));
+    if (i !== undefined) { days[i].consultas += Number(e.amount) || 0; days[i].receita += Number(e.amount) || 0; }
+  }
+  for (const t of vendorTxs) {
+    if (t.status !== "completed" && t.status !== "approved") continue;
+    const i = idx.get(String(t.created_at).slice(0, 10));
+    if (i !== undefined) { days[i].marketplace += Number(t.amount) || 0; days[i].receita += Number(t.amount) || 0; }
+  }
+  return days.map(({ key: _k, ...rest }) => rest);
 };
 
-const generateFunnelData = () => [
-  { name: "Home", value: 1000 + Math.floor(Math.random() * 500), fill: "#39FF14" },
-  { name: "Página de Serviço", value: 650 + Math.floor(Math.random() * 200), fill: "#00D4FF" },
-  { name: "Clicou Agendar", value: 320 + Math.floor(Math.random() * 100), fill: "#A855F7" },
-  { name: "Página Pagamento", value: 180 + Math.floor(Math.random() * 60), fill: "#FF6B35" },
-  { name: "Pagamento OK", value: 85 + Math.floor(Math.random() * 30), fill: "#39FF14" },
+// Funil real (últimos 30 dias): cadastros → agendamentos → pagamentos aprovados.
+const buildFunnelData = (counts: { users: number; appointments: number; payments: number; approved: number }) => [
+  { name: "Cadastros", value: counts.users, fill: "#39FF14" },
+  { name: "Agendamentos", value: counts.appointments, fill: "#00D4FF" },
+  { name: "Pagamentos Iniciados", value: counts.payments, fill: "#FF6B35" },
+  { name: "Pagamento OK", value: counts.approved, fill: "#39FF14" },
 ];
 
-const generateSentimentData = () => {
-  const hours = [];
+// Sentimento real por hora (últimas 24h) a partir de nps_responses.
+const buildSentimentData = (nps: { score: number; created_at: string }[]) => {
+  const hours: { hora: string; positivo: number; neutro: number; negativo: number; _h: number }[] = [];
   for (let i = 23; i >= 0; i--) {
-    const h = new Date(); h.setHours(h.getHours() - i);
-    hours.push({ hora: `${h.getHours().toString().padStart(2, "0")}h`, positivo: Math.floor(40 + Math.random() * 45), neutro: Math.floor(20 + Math.random() * 25), negativo: Math.floor(2 + Math.random() * 18) });
+    const h = new Date(); h.setHours(h.getHours() - i, 0, 0, 0);
+    hours.push({ hora: `${h.getHours().toString().padStart(2, "0")}h`, positivo: 0, neutro: 0, negativo: 0, _h: h.getTime() });
   }
-  return hours;
+  for (const r of nps) {
+    const t = new Date(r.created_at); t.setMinutes(0, 0, 0);
+    const slot = hours.find(h => h._h === t.getTime());
+    if (!slot) continue;
+    if (r.score >= 9) slot.positivo++; else if (r.score >= 7) slot.neutro++; else slot.negativo++;
+  }
+  return hours.map(({ _h, ...rest }) => rest);
 };
 
 const generateSecurityLogs = () => [

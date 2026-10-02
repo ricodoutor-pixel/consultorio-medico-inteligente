@@ -187,15 +187,17 @@ const AdminMaster = () => {
       setUserRole(roles.includes("admin") ? "admin" : (roles[0] ?? "viewer"));
     })();
   }, []);
-  const [markers, setMarkers] = useState(generateMarkers());
-  const [revenueData] = useState(generateRevenueData());
+  const [markers] = useState(generateMarkers());
+  const [revenueData, setRevenueData] = useState(() => buildRevenueData([], []));
   const [securityLogs] = useState(generateSecurityLogs());
   const [hoveredMarker, setHoveredMarker] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
   const [pulsePhase, setPulsePhase] = useState(0);
   const [mapMode, setMapMode] = useState<"users" | "heatmap">("users");
-  const [sentimentData] = useState(generateSentimentData());
-  const [funnelData, setFunnelData] = useState(generateFunnelData());
+  const [sentimentData, setSentimentData] = useState(() => buildSentimentData([]));
+  const [funnelData, setFunnelData] = useState(() => buildFunnelData({ users: 0, appointments: 0, payments: 0, approved: 0 }));
+  const [npsRows, setNpsRows] = useState<{ score: number; professional_id: string | null }[]>([]);
+  const [opsCounts, setOpsCounts] = useState({ queueWaiting: 0, alertsOpen: 0 });
 
   // Real data
   const [totalUsers, setTotalUsers] = useState(0);
@@ -213,9 +215,13 @@ const AdminMaster = () => {
   const [salesTab, setSalesTab] = useState("todas");
 
   const loadDashboardData = useCallback(async () => {
+    const since30 = new Date(Date.now() - 30 * 86400000).toISOString();
+    const since24 = new Date(Date.now() - 86400000).toISOString();
     const [
       { count: usersCount }, { data: doctors }, { data: escrows }, { data: payments },
       { count: subsCount }, { data: vTxs }, { data: allEscrows }, { data: appts }, { data: vProducts },
+      { data: npsRows }, { data: nps24 }, { count: users30 }, { count: appts30 }, { count: pays30 }, { count: approved30 },
+      { count: queueWaiting }, { count: alertsOpen },
     ] = await Promise.all([
       supabase.from("profiles").select("*", { count: "exact", head: true }),
       supabase.from("doctors").select("id, user_id, specialty, is_online, is_verified, rating, total_consultations, crm, crm_state").order("is_online", { ascending: false }),
@@ -226,6 +232,14 @@ const AdminMaster = () => {
       supabase.from("escrow_transactions").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("appointments").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("vendor_products").select("id, name, stock, sold_count, is_active, category, vendor_id").order("stock", { ascending: true }).limit(20),
+      supabase.from("nps_responses").select("score, professional_id, created_at").gte("created_at", since30).limit(1000),
+      supabase.from("nps_responses").select("score, created_at").gte("created_at", since24).limit(1000),
+      supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", since30),
+      supabase.from("appointments").select("id", { count: "exact", head: true }).gte("created_at", since30),
+      supabase.from("payment_webhooks").select("id", { count: "exact", head: true }).gte("created_at", since30),
+      supabase.from("payment_webhooks").select("id", { count: "exact", head: true }).gte("created_at", since30).eq("status", "approved"),
+      supabase.from("consultation_queue").select("id", { count: "exact", head: true }).eq("status", "waiting"),
+      supabase.from("system_alerts").select("id", { count: "exact", head: true }).eq("resolved", false),
     ]);
     setTotalUsers(usersCount || 0);
     if (doctors) { setTotalDoctors(doctors.length); setOnlineDoctors(doctors.filter(d => d.is_online).length); setDoctorsList(doctors); }
@@ -236,16 +250,17 @@ const AdminMaster = () => {
     if (allEscrows) setEscrowTxs(allEscrows);
     if (appts) setAppointments(appts);
     if (vProducts) setVendorProducts(vProducts);
+    setRevenueData(buildRevenueData((escrows ?? []) as DatedAmount[], (vTxs ?? []) as DatedAmount[]));
+    setSentimentData(buildSentimentData((nps24 ?? []) as { score: number; created_at: string }[]));
+    setNpsRows((npsRows ?? []) as { score: number; professional_id: string | null }[]);
+    setFunnelData(buildFunnelData({ users: users30 || 0, appointments: appts30 || 0, payments: pays30 || 0, approved: approved30 || 0 }));
+    setOpsCounts({ queueWaiting: queueWaiting || 0, alertsOpen: alertsOpen || 0 });
     setLastRefresh(new Date());
   }, []);
 
   useEffect(() => {
     loadDashboardData();
-    const interval = setInterval(() => {
-      setMarkers(generateMarkers());
-      setPulsePhase(p => p + 1);
-      setFunnelData(generateFunnelData());
-    }, 5000);
+    const interval = setInterval(() => setPulsePhase(p => p + 1), 5000);
     return () => clearInterval(interval);
   }, [loadDashboardData]);
 

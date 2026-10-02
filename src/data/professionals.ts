@@ -8,6 +8,8 @@ import draGeovanaTorresImg from "@/assets/dra-geovana-torres.jpg";
 import cfmDraGeovanaTorres from "@/assets/cfm_prints/cfm-dra-geovana-torres.png";
 import draGraceConceicaoImg from "@/assets/dra-grace-conceicao.jpg";
 import cfmDraGraceConceicao from "@/assets/cfm_prints/cfm-dra-grace-conceicao.png";
+import drOtavioBasseteImg from "@/assets/dr-otavio-bassete.jpg";
+import cfmDrOtavioBassete from "@/assets/cfm_prints/cfm-dr-otavio-bassete.png";
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
@@ -341,6 +343,31 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
     reviews: [],
+  },
+  {
+    id: "med-otavio-bassete",
+    name: "Dr. Otávio Paiva Bassete",
+    category: "Médico Veterinário Prescritor",
+    bio: "Médico Veterinário atuante em Medicina Veterinária Integrativa e Terapia Canabinoide. Inscrito no CRMV 21907/PR (situação regular e ativo no CFMV). Foco em terapias complementares, modulação do sistema endocanabinoide veterinário, controle de dor crônica, inflamação e qualidade de vida para animais de pequeno e grande porte.",
+    flags: ["🇧🇷"],
+    experience: "5 anos",
+    tags: ["Medicina Veterinária", "Canabinoides Veterinários", "Medicina Integrativa", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5541987099186",
+    rating: 5.0,
+    consults: 0,
+    avatar: "OB",
+    imageUrl: drOtavioBasseteImg,
+    online: false,
+    cfmPrintUrl: cfmDrOtavioBassete,
+    paymentLink: "https://pay.asaas.com/00000",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 09:00", "Hoje 11:00", "Hoje 14:00", "Hoje 16:30"],
+    crm: "21907/PR",
+    reviews: [
+      { name: "Tutor Verificado", rating: 5, text: "Excelente atendimento veterinário integrativo, muito cuidadoso e atencioso com meu pet." }
+    ],
   },
   {
     id: "med-0",

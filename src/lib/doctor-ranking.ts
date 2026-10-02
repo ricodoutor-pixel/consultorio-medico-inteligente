@@ -47,10 +47,13 @@ export interface DoctorRankInput {
   hasContract?: boolean;
   /** Status de aprovação pelo admin */
   isApproved?: boolean;
+  /** Quantidade de itens do checklist KYC aprovados (cards mais verdes) */
+  greenChecksCount?: number;
 }
 
 export function computeCompletenessScore(item: DoctorRankInput): number {
   let score = (item.docsCount || 0) * 100;
+  if (item.greenChecksCount) score += item.greenChecksCount * 20;
   if (item.hasContract) score += 50;
   if (item.hasPix) score += 30;
   if (item.hasAvatar) score += 20;
@@ -60,15 +63,19 @@ export function computeCompletenessScore(item: DoctorRankInput): number {
 
 /** Comparador único usado na vitrine pública e no painel de aprovações. */
 export function compareDoctorsByCompleteness(a: DoctorRankInput, b: DoctorRankInput): number {
-  const pinnedA = pinnedDoctorRank(a.name, a.registration);
-  const pinnedB = pinnedDoctorRank(b.name, b.registration);
-  if (pinnedA !== pinnedB) return pinnedA - pinnedB;
-
+  // 1. Quem tem dossiê mais completo (pontuação geral de completude) aparece primeiro
   const scoreA = computeCompletenessScore(a);
   const scoreB = computeCompletenessScore(b);
   if (scoreA !== scoreB) return scoreB - scoreA;
 
+  // 2. Quem tem mais documentos KYC físicos anexados aparece na frente
   if (a.docsCount !== b.docsCount) return b.docsCount - a.docsCount;
+
+  // 3. Médicos fundadores/supervisores fixos mantêm prioridade de desempate
+  const pinnedA = pinnedDoctorRank(a.name, a.registration);
+  const pinnedB = pinnedDoctorRank(b.name, b.registration);
+  if (pinnedA !== pinnedB) return pinnedA - pinnedB;
+
   return normalize(a.name).localeCompare(normalize(b.name));
 }
 

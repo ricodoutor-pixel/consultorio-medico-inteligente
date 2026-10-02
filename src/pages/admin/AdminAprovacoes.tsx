@@ -311,14 +311,18 @@ export const AdminAprovacoes = () => {
       return true;
     });
 
-    // Fixos primeiro (Edilson, Suelen, Daniel) e, em seguida, quem tem o dossiê
-    // mais completo — o admin confere sempre de cima para baixo.
-    return [...list].sort((a, b) =>
-      compareDoctorsByCompleteness(
+    // Ordenação estrita por completude do dossiê: médicos que anexaram mais
+    // documentos e possuem os cards mais verdes aparecem primeiro na esteira KYC.
+    return [...list].sort((a, b) => {
+      const aGreenChecks = kycChecklist(a).filter((i) => i.ok).length;
+      const bGreenChecks = kycChecklist(b).filter((i) => i.ok).length;
+
+      return compareDoctorsByCompleteness(
         {
           name: a.profile?.full_name || a.full_name,
           registration: a.crm,
           docsCount: (a.kyc_docs || []).length,
+          greenChecksCount: aGreenChecks,
           hasPix: Boolean(a.profile?.pix_key || a.pix_key || a.mp_collector_id),
           hasAvatar: Boolean(a.profile?.avatar_url || a.avatar_url),
           hasContract: Boolean(a.is_contract_signed || a.contract_signed_at),
@@ -328,13 +332,14 @@ export const AdminAprovacoes = () => {
           name: b.profile?.full_name || b.full_name,
           registration: b.crm,
           docsCount: (b.kyc_docs || []).length,
+          greenChecksCount: bGreenChecks,
           hasPix: Boolean(b.profile?.pix_key || b.pix_key || b.mp_collector_id),
           hasAvatar: Boolean(b.profile?.avatar_url || b.avatar_url),
           hasContract: Boolean(b.is_contract_signed || b.contract_signed_at),
           isApproved: Boolean(b.is_approved_by_admin),
         },
-      ),
-    );
+      );
+    });
   }, [doctors, searchTerm, statusFilter]);
 
   const countPending = doctors.filter(d => !d.is_approved_by_admin && d.approval_status !== 'rejected').length;

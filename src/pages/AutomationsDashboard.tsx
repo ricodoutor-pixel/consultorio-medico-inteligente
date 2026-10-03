@@ -115,44 +115,38 @@ interface Alert {
   automation: string;
 }
 
-// ── Simulate live data ──────────────────────────────────────────
-function simulateAutomations(): Automation[] {
-  return AUTOMATIONS_CATALOG.map((a) => {
-    const r = Math.random();
-    const status: Automation["status"] = r > 0.08 ? "online" : r > 0.04 ? "idle" : r > 0.02 ? "error" : "offline";
-    return {
-      ...a,
-      status,
-      lastRun: new Date(Date.now() - Math.random() * 3600000),
-      responseTime: Math.round(50 + Math.random() * 400),
-      errorCount: status === "error" ? Math.ceil(Math.random() * 5) : 0,
-      successRate: status === "online" ? 95 + Math.random() * 5 : status === "idle" ? 80 + Math.random() * 15 : 40 + Math.random() * 40,
-    };
-  });
-}
-
-function generateTrafficData() {
-  return Array.from({ length: 24 }, (_, i) => ({
-    time: `${String(i).padStart(2, "0")}:00`,
-    users: Math.round(20 + Math.random() * 180),
-    conversion: +(2 + Math.random() * 8).toFixed(1),
-    revenue: Math.round(500 + Math.random() * 4500),
+// ── Real data (sem simulação) ──────────────────────────────────
+function buildAutomations(latencyMs: number, healthy: boolean): Automation[] {
+  return AUTOMATIONS_CATALOG.map((a) => ({
+    ...a,
+    status: healthy ? "idle" : "error",
+    lastRun: new Date(),
+    responseTime: latencyMs,
+    errorCount: healthy ? 0 : 1,
+    successRate: healthy ? 100 : 0,
   }));
 }
 
+async function fetchTrafficData() {
+  const since = new Date(Date.now() - 24 * 3600000).toISOString();
+  const [prof, appt, esc] = await Promise.all([
+    supabase.from("profiles").select("created_at").gte("created_at", since),
+    supabase.from("appointments").select("created_at").gte("created_at", since),
+    supabase.from("escrow_transactions").select("amount, created_at").gte("created_at", since),
+  ]);
+  const rows = Array.from({ length: 24 }, (_, i) => ({ time: `${String(i).padStart(2, "0")}:00`, users: 0, appts: 0, conversion: 0, revenue: 0 }));
+  const h = (d: string) => new Date(d).getHours();
+  (prof.data ?? []).forEach((r: { created_at: string }) => { rows[h(r.created_at)].users++; });
+  (appt.data ?? []).forEach((r: { created_at: string }) => { rows[h(r.created_at)].appts++; });
+  (esc.data ?? []).forEach((r: { created_at: string; amount: number }) => { rows[h(r.created_at)].revenue += Number(r.amount) || 0; });
+  return rows.map(({ appts, ...r }) => ({ ...r, conversion: r.users > 0 ? +((appts / r.users) * 100).toFixed(1) : 0 }));
+}
+
 function generateAlerts(automations: Automation[]): Alert[] {
-  const alerts: Alert[] = [];
-  automations.forEach((a) => {
-    if (a.status === "error") {
-      alerts.push({ id: `${a.id}-err`, timestamp: new Date(), severity: "error", message: `Falha na execução — ${a.errorCount} erro(s)`, automation: a.name });
-    }
-    if (a.status === "offline") {
-      alerts.push({ id: `${a.id}-off`, timestamp: new Date(), severity: "critical", message: "Serviço offline — verificação necessária", automation: a.name });
-    }
-  });
-  if (Math.random() > 0.6) alerts.push({ id: "sys-1", timestamp: new Date(), severity: "warning", message: "Latência elevada detectada no ManyChat API", automation: "Sistema" });
-  if (Math.random() > 0.8) alerts.push({ id: "sys-2", timestamp: new Date(), severity: "info", message: "Backup automático concluído com sucesso", automation: "Sistema" });
-  return alerts.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 15);
+  return automations
+    .filter((a) => a.status === "error" || a.status === "offline")
+    .slice(0, 1)
+    .map((a) => ({ id: `${a.id}-err`, timestamp: new Date(), severity: "critical" as const, message: "Banco de dados não respondeu à verificação", automation: "Sistema" }));
 }
 
 // ── KPI fetcher ──────────────────────────────────────────
@@ -177,26 +171,29 @@ const AutomationsDashboard = () => {
   const navigate = useNavigate();
   const [automations, setAutomations] = useState<Automation[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [trafficData, setTrafficData] = useState(generateTrafficData());
+  const [trafficData, setTrafficData] = useState<{ time: string; users: number; conversion: number; revenue: number }[]>([]);
   const [kpis, setKpis] = useState({ totalUsers: 0, totalConsultations: 0, avgNPS: 0, totalRevenue: 0, conversionRate: 0 });
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [uptime] = useState(99.9);
   const [latency, setLatency] = useState(145);
   const [lastRefresh, setLastRefresh] = useState(new Date());
 
-  const refresh = useCallback(() => {
-    const auto = simulateAutomations();
+  const refresh = useCallback(async () => {
+    const t0 = performance.now();
+    const { error } = await supabase.from("profiles").select("id", { count: "exact", head: true });
+    const ms = Math.round(performance.now() - t0);
+    const auto = buildAutomations(ms, !error);
     setAutomations(auto);
     setAlerts(generateAlerts(auto));
-    setTrafficData(generateTrafficData());
-    setLatency(Math.round(80 + Math.random() * 200));
+    fetchTrafficData().then(setTrafficData).catch(console.error);
+    setLatency(ms);
     setLastRefresh(new Date());
   }, []);
 
   useEffect(() => {
     refresh();
     fetchKPIs().then(setKpis).catch(console.error);
-    const iv = setInterval(refresh, 5000);
+    const iv = setInterval(refresh, 30000);
     return () => clearInterval(iv);
   }, [refresh]);
 

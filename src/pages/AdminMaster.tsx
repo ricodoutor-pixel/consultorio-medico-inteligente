@@ -310,12 +310,12 @@ const AdminMaster = () => {
 
   const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = "/"; };
 
-  const simulatedMonthlyRevenue = 47850 + totalRevenue;
+  const simulatedMonthlyRevenue = totalRevenue;
   const conversionRate = totalUsers > 0 ? ((totalDoctors * 3.2 / totalUsers) * 100).toFixed(1) : "0";
 
   /* ═══ ALERT ZONE CALCULATION ═══ */
   const alertZone = useMemo<AlertZone>(() => {
-    const openSACCount = Math.floor(Math.random() * 20); // simulated
+    const openSACCount = 0; // sem fonte real de tickets SAC ainda
     const paymentFailing = recentPayments.some(p => p.status === "rejected" || p.status === "refunded");
     const longQueueDoctor = doctorsList.some(d => d.is_online && (d.total_consultations || 0) > 50);
     if (paymentFailing || longQueueDoctor) return "red";
@@ -331,9 +331,9 @@ const AdminMaster = () => {
   };
 
   const doctorPerformance = useMemo(() => doctorsList.map(doc => {
-    const hoursOnline = Math.floor(Math.random() * 10);
-    const nps = Math.floor(60 + Math.random() * 40);
-    return { ...doc, hoursOnline, avgResponseMin: Math.floor(1 + Math.random() * 8), avgConsultMin: Math.floor(15 + Math.random() * 30), nps, isBurnout: hoursOnline >= 6, fatigueLevel: hoursOnline >= 6 ? "critical" : hoursOnline >= 4 ? "warning" : "ok" };
+    const hoursOnline = 0; // sem telemetria de sessão por médico
+    const nps = 0;
+    return { ...doc, hoursOnline, avgResponseMin: 0, avgConsultMin: 0, nps, isBurnout: hoursOnline >= 6, fatigueLevel: hoursOnline >= 6 ? "critical" : hoursOnline >= 4 ? "warning" : "ok" };
   }), [doctorsList]);
 
   const sentimentTotals = useMemo(() => {
@@ -755,10 +755,10 @@ const AdminMaster = () => {
       <h2 className="text-sm font-bold" style={{ color: "#00D4FF" }}>📞 SAC / Vendas — Operacional</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Atendimentos Ativos", value: `${Math.floor(3 + Math.random() * 12)}`, color: "#00D4FF" },
-          { label: "Tempo Médio Resposta", value: `${Math.floor(2 + Math.random() * 6)} min`, color: "#39FF14" },
-          { label: "Tickets Abertos", value: `${Math.floor(1 + Math.random() * 8)}`, color: "#FFB800" },
-          { label: "NPS Geral", value: `${Math.floor(75 + Math.random() * 20)}`, color: "#A855F7" },
+          { label: "Atendimentos Ativos", value: `${doctorsList.filter(d => d.is_online).length}`, color: "#00D4FF" },
+          { label: "Tempo Médio Resposta", value: "—", color: "#39FF14" },
+          { label: "Tickets Abertos", value: "—", color: "#FFB800" },
+          { label: "NPS Geral", value: `${sentimentTotals.positive}%`, color: "#A855F7" },
         ].map((c, i) => (
           <Card key={i} className="border-0" style={{ background: "#0F1340", borderLeft: `3px solid ${c.color}` }}>
             <CardContent className="p-3"><p className="text-[10px]" style={{ color: "#ffffff50" }}>{c.label}</p><p className="text-xl font-bold text-white">{c.value}</p></CardContent>
@@ -942,7 +942,7 @@ const AdminMaster = () => {
               <span>Médico</span><span>CRM/UF</span><span>Especialidade</span><span>Verificado</span><span>Receitas</span><span>Status CRM</span>
             </div>
             {doctorsList.map(doc => {
-              const crmExpiring = Math.random() > 0.8;
+              const crmExpiring = false; // sem data de validade do CRM no cadastro
               return (
                 <div key={doc.id} className="grid grid-cols-3 md:grid-cols-6 gap-2 px-3 py-2.5 rounded-lg mb-0.5 items-center" style={{ background: crmExpiring ? "#FFB80008" : "#0A0E2790", border: crmExpiring ? "1px solid #FFB80025" : "none" }}>
                   <span className="text-[10px] text-white font-medium">{doc.specialty?.charAt(0)} Dr.</span>

@@ -120,6 +120,13 @@ serve(async (req) => {
       `_Gerado automaticamente pelo Manus CEO Cron._`,
     ].join("\n");
 
+    // 🔒 Modo simulação: ?dry_run=1 não grava nem envia WhatsApp
+    if (new URL(req.url).searchParams.get("dry_run") === "1") {
+      return new Response(JSON.stringify({ success: true, dry_run: true, metrics, preview: md }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Persist
     const { data: saved } = await supabase
       .from("manus_ceo_reports")

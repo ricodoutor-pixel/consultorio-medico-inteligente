@@ -86,6 +86,19 @@ serve(async (req) => {
       return json({ ok: true, item: data });
     }
 
+    // 🔒 TRAVA HUMANA: set/delete só executam com confirm:true. Sem isso (ou com dry_run:true) = simulação.
+    if ((action === "set" || action === "delete") && (body?.confirm !== true || body?.dry_run === true)) {
+      if (!key) return json({ error: "key required" }, 400);
+      const { data: current } = await supabase
+        .from("system_settings").select("key, value").eq("key", key).maybeSingle();
+      await audit(`${action}_dry_run`, key, body?.value ?? null, true, undefined, ip ?? undefined);
+      return json({
+        ok: true, dry_run: true, action, key, current: current ?? null,
+        proposed: action === "set" ? body?.value ?? null : null,
+        message: "Simulação. Reenvie com confirm:true para executar.",
+      });
+    }
+
     if (action === "set") {
       if (!key) return json({ error: "key required" }, 400);
       if (typeof body.value === "undefined") return json({ error: "value required" }, 400);

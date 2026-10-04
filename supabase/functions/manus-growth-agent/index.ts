@@ -158,6 +158,19 @@ async function optimize(supa: any, runId: string, targets: GscRow[]) {
         continue;
       }
 
+      // 🔒 TRAVA HUMANA: só aplica no site se MANUS_GROWTH_AUTO_APPLY=true.
+      // Caso contrário, registra a proposta para aprovação do admin.
+      if (Deno.env.get("MANUS_GROWTH_AUTO_APPLY") !== "true") {
+        await supa.from("manus_growth_logs").insert({
+          run_id: runId, phase: "optimize", url, action: "seo_override_proposed",
+          before_state: { position: t.position, ctr: t.ctr },
+          after_state: { route, ...parsed, target_query: query },
+          status: "pending_approval",
+        });
+        optimized++;
+        continue;
+      }
+
       await supa.from("manus_seo_overrides").upsert({
         route, meta_title: parsed.meta_title, meta_description: parsed.meta_description,
         h1: parsed.h1, h2_list: parsed.h2_list, schema_org: parsed.schema_org_snippet,

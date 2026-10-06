@@ -596,10 +596,12 @@ const Telemedicina = () => {
                                 name: patientData.nome,
                                 phone: patientData.telefone,
                                 email: patientData.email,
-                                isInternational: isInternational
+                                isInternational: isInternational,
+                                triageId,
                               }
                             });
                             if (error || !data?.payment_url) throw new Error("Falha ao gerar link");
+                            if (data.external_reference) localStorage.setItem("ot_last_order_ref", data.external_reference);
                             
                             if (typeof window !== "undefined" && (window as any).fbq) {
                               (window as any).fbq("track", "InitiateCheckout", { 
@@ -608,11 +610,8 @@ const Telemedicina = () => {
                                 content_name: "Orientação Técnica — Dr. Edilson Bezerra" 
                               });
                             }
-                            window.open(data.payment_url, "_blank", "noopener,noreferrer");
-                            toast({ 
-                              title: "Link de pagamento gerado!", 
-                              description: "Confirme o pagamento para liberar sua orientação técnica." 
-                            });
+                            toast({ title: "Abrindo pagamento seguro...", description: "Após pagar, você volta automaticamente ao site." });
+                            window.location.href = data.payment_url;
                           } catch (e) {
                             toast({ 
                               title: "Erro ao gerar link", 
@@ -633,13 +632,44 @@ const Telemedicina = () => {
                         Pagar {dynamicSymbol} {dynamicPrice} — Orientação Técnica
                       </Button>
 
-                      {/* Botão Secundário — WhatsApp Dr. Edilson */}
+                      {/* Botão Secundário — só libera o WhatsApp com pagamento CONFIRMADO */}
                       <Button 
                         variant="outline"
                         className="w-full h-12 sm:h-14 border-green-500/30 text-green-500 font-black rounded-2xl text-sm sm:text-base hover:bg-green-500/10 transition-all"
-                        onClick={() => {
-                          const message = `Olá Dr. Edilson, finalizei minha triagem com a Brisa! Meu nome é ${patientData.nome || "paciente"} e gostaria de agendar minha Orientação Técnica. Triagem concluída: ${selectedPathology || "Cannabis Medicinal"}.`;
-                          window.open(`https://wa.me/5511987131241?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+                        disabled={aiLoading}
+                        onClick={async () => {
+                          const ref = localStorage.getItem("ot_last_order_ref");
+                          if (!ref) {
+                            toast({ title: "Nenhum pagamento encontrado", description: "Clique em Pagar para gerar sua Orientação Técnica." });
+                            return;
+                          }
+                          setAiLoading(true);
+                          try {
+                            const { data } = await supabase.functions.invoke("brisa-payment-link", {
+                              body: { action: "status", external_reference: ref },
+                            });
+                            if (data?.status !== "approved") {
+                              toast({
+                                title: "Pagamento ainda não confirmado",
+                                description: "Assim que o Mercado Pago confirmar, sua Orientação Técnica é liberada. Aguarde alguns minutos e tente de novo.",
+                              });
+                              return;
+                            }
+                            const resumo = interviewQuestions
+                              .map((q) => {
+                                const a = answers[q.id];
+                                const v = q.type === "slider" ? `${sliderValue[0]}%` : Array.isArray(a) ? a.join(", ") : a;
+                                return v ? `• ${q.question} ${v}` : null;
+                              })
+                              .filter(Boolean)
+                              .join("\n");
+                            const message = `Olá Dr. Edilson, paguei minha Orientação Técnica.\nPedido: ${ref}\nNome: ${patientData.nome || "paciente"}\n\nResumo da triagem:\n${resumo}`;
+                            window.open(`https://wa.me/${OFFICIAL_OT_WHATSAPP}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+                          } catch {
+                            toast({ title: "Não foi possível verificar o pagamento", description: "Tente novamente em instantes.", variant: "destructive" });
+                          } finally {
+                            setAiLoading(false);
+                          }
                         }}
                       >
                         <MessageCircle className="mr-2" size={18} />

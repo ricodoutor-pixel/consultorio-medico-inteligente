@@ -17,7 +17,10 @@ export function DoctorsStatusBoard({ variant = "public", title = "Médicos na pl
 
   // Sort: online first, then alphabetical
   const doctors = useMemo(() => {
-    return [...rawDoctors].sort((a, b) => {
+    return rawDoctors.filter((doctor) => {
+      const registration = `${doctor.crm || ""} ${doctor.document_type || ""} ${doctor.specialty || ""}`;
+      return !/crmv|veterin/i.test(registration);
+    }).sort((a, b) => {
       const ao = a.is_online && (a.is_available ?? true) ? 0 : 1;
       const bo = b.is_online && (b.is_available ?? true) ? 0 : 1;
       if (ao !== bo) return ao - bo;

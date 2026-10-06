@@ -16,6 +16,8 @@
 - [ ] Validar o fluxo central sem contaminar dados reais
 ## Verificação da automação Hostinger
 
-- [ ] Verificar a configuração concluída pelo Antigravity sem alterar serviços
-- [ ] Validar VPS, Evolution, n8n, webhooks e resposta da Brisa
+- [x] Verificar endereços e certificados da Evolution e do n8n sem alterar serviços
+- [ ] Acessar a VPS Hostinger com as credenciais existentes — bloqueado: API retorna 403 e SSH recusa a credencial atualizada
+- [ ] Ativar e validar o webhook de produção do n8n — bloqueado pelo acesso administrativo; POST retornou 404
+- [ ] Validar entrada e resposta real da Brisa na Hostinger — depende do fluxo n8n ativo
 

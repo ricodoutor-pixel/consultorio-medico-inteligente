@@ -433,10 +433,23 @@ Deno.serve(async (req) => {
           patient_phone: orientacaoPhone,
           patient_name: orientacaoName,
           patient_email: orientacaoEmail,
+          patient_user_id: metadata.user_id || null,
           raw_payload: payment,
           updated_at: new Date().toISOString(),
         }, { onConflict: "payment_id" });
       if (upsertErr) console.error("[brisa-orientacao] upsert error:", upsertErr);
+
+      const orderStatus = payment.status === "approved" ? "approved" : payment.status === "rejected" ? "rejected" : "pending";
+      const { error: orderUpdateError } = await supabase
+        .from("orientacao_tecnica_orders")
+        .update({
+          status: orderStatus,
+          mp_payment_id: String(payment.id),
+          mp_preference_id: payment.preference_id ? String(payment.preference_id) : null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("external_reference", externalRef);
+      if (orderUpdateError) console.error("[brisa-orientacao] order update:", orderUpdateError.message);
 
       if (payment.status === "approved") {
         const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
@@ -444,6 +457,16 @@ Deno.serve(async (req) => {
         const instance = Deno.env.get("EVOLUTION_INSTANCE") || "plantayraiz";
         const adminPhone = Deno.env.get("ADMIN_WHATSAPP") || "5511987131241";
         const amount = (payment.transaction_amount || 30).toFixed(2);
+
+        // Abre a sessão imediatamente; a próxima mensagem do paciente já entra na orientação paga.
+        if (orientacaoPhone) {
+          const { error: sessionError } = await supabase.rpc("open_ot_agent_session", {
+            _phone: orientacaoPhone,
+            _name: orientacaoName,
+            _minutes: 30,
+          });
+          if (sessionError) console.error("[brisa-orientacao] session open:", sessionError.message);
+        }
 
         // 1) Notifica Dr. Edilson
         if (evolutionUrl && evolutionKey) {
@@ -466,8 +489,8 @@ Deno.serve(async (req) => {
             const patientMsg =
               `✅ *Pagamento confirmado — Planta y Raiz*\n\n` +
               `Olá ${orientacaoName?.split(" ")[0] || ""}! Recebemos seu pagamento de *R$ ${amount}*.\n\n` +
-              `🩺 O *Dr. Edilson Bezerra (CRM-CE 10963)* (CRM-PR 49354) entrará em contato em breve por aqui mesmo no WhatsApp para sua *Orientação Técnica em Cannabis Medicinal*.\n\n` +
-              `Qualquer dúvida fale comigo, a Enfª Brisa, neste número.`;
+              `🤖 Seu atendimento com o *Dr. Edilson Bezerra ON* está liberado neste WhatsApp. Ele é um assistente de inteligência artificial supervisionado pelo Dr. Edilson Bezerra.\n\n` +
+              `Responda a esta mensagem para iniciar sua Orientação Técnica. A decisão clínica e qualquer prescrição permanecem sob responsabilidade de um médico humano habilitado.`;
             await fetch(`${evolutionUrl}/message/sendText/${instance}`, {
               method: "POST",
               headers: { "Content-Type": "application/json", apikey: evolutionKey },

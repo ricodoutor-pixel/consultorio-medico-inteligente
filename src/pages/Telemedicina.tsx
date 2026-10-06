@@ -1,4 +1,3 @@
-import { useDynamicPrice } from '@/hooks/useDynamicPrice';
 import { useState, useEffect, lazy, Suspense } from "react";
 const WidgetMonitorRapido = lazy(() => import("@/components/WidgetMonitorRapido"));
 import brisaImg from "@/assets/brisa-enfermeira.png";
@@ -26,6 +25,20 @@ import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
+
+const OFFICIAL_OT_WHATSAPP = (import.meta.env.VITE_DOCTOR_WHATSAPP_NUMBER || "5511991363154").replace(/\D/g, "");
+
+function isValidCpf(value: string): boolean {
+  const cpf = value.replace(/\D/g, "");
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+  const digit = (length: number) => {
+    let sum = 0;
+    for (let index = 0; index < length; index += 1) sum += Number(cpf[index]) * (length + 1 - index);
+    const remainder = (sum * 10) % 11;
+    return remainder === 10 ? 0 : remainder;
+  };
+  return digit(9) === Number(cpf[9]) && digit(10) === Number(cpf[10]);
+}
 
 const interviewQuestions = [
   { id: 1, question: "Qual é sua principal queixa e qual a intensidade (0-10)?", type: "textarea", placeholder: "Ex: Dor lombar crônica, intensidade 8. Descreva seus sintomas..." },
@@ -176,25 +189,13 @@ const BrisaAvatar = () => {
 
 const Telemedicina = () => {
   const { professionals } = useRealProfessionals();
-  const { value: dynamicPrice, symbol: dynamicSymbol, isInternational } = useDynamicPrice();
+  const dynamicPrice = 30;
+  const dynamicSymbol = "R$";
   const navigate = useNavigate();
   const [showTCLE, setShowTCLE] = useState(true);
   const [showFlowInfo, setShowFlowInfo] = useState(false);
-  // Médicos prescritores online — varia entre 3 e 6 a cada 30 minutos
-  const [onlineDoctors, setOnlineDoctors] = useState<number>(() => {
-    const slot = Math.floor(Date.now() / (30 * 60 * 1000));
-    return 3 + (slot % 4); // 3..6
-  });
-  useEffect(() => {
-    const tick = () => {
-      const slot = Math.floor(Date.now() / (30 * 60 * 1000));
-      setOnlineDoctors(3 + (slot % 4));
-    };
-    const id = setInterval(tick, 60 * 1000);
-    return () => clearInterval(id);
-  }, []);
   const [step, setStep] = useState(-1);
-  const [answers, setAnswers] = useState<Record<number, any>>({});
+  const [answers, setAnswers] = useState<Record<number, string | string[]>>({});
   const [sliderValue, setSliderValue] = useState([50]);
   const [showPrescription, setShowPrescription] = useState(false);
   const [showWearables, setShowWearables] = useState(false);
@@ -203,6 +204,7 @@ const Telemedicina = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const { toast } = useToast();
   const [selectedPathology, setSelectedPathology] = useState("");
+  const [triageId, setTriageId] = useState<string | null>(null);
   const [patientData, setPatientData] = useState({
     nome: "",
     cpf: "",
@@ -224,6 +226,7 @@ const Telemedicina = () => {
   const currentQ = interviewQuestions[step - 1];
   const progress = step <= 0 ? 0 : step > 10 ? 100 : Math.round((step / 10) * 100);
   const medicos = professionals.filter(p => p.category === "Médicos Prescritores");
+  const onlineDoctors = medicos.filter((doctor) => doctor.online).length;
 
   const handleCheckbox = (option: string, checked: boolean) => {
     const current = (answers[step] as string[]) || [];
@@ -245,10 +248,54 @@ const Telemedicina = () => {
 
   const isPatientDataValid = () => {
     return patientData.nome.trim().length >= 3 &&
-      patientData.cpf.replace(/\D/g, "").length === 11 &&
+      isValidCpf(patientData.cpf) &&
       patientData.dataNascimento &&
       patientData.email.includes("@") &&
       patientData.telefone.replace(/\D/g, "").length >= 10;
+  };
+
+  const completeTriage = async () => {
+    if (!isAnswered() || aiLoading) return;
+    setAiLoading(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData.session?.user;
+      if (!user) throw new Error("Faça login novamente para salvar sua triagem.");
+      const completeAnswers = { ...answers, 9: `${sliderValue[0]}%` };
+      const answerText = interviewQuestions
+        .map((question) => `${question.id}. ${question.question}\n${Array.isArray(completeAnswers[question.id]) ? completeAnswers[question.id].join(", ") : completeAnswers[question.id] || ""}`)
+        .join("\n\n");
+      const { data, error } = await supabase.from("brisa_triages").insert({
+        patient_id: user.id,
+        symptoms: String(completeAnswers[1] || "Triagem clínica"),
+        patient_info: {
+          name: patientData.nome,
+          cpf_last4: patientData.cpf.replace(/\D/g, "").slice(-4),
+          birth_date: patientData.dataNascimento,
+          email: patientData.email,
+          phone: patientData.telefone.replace(/\D/g, ""),
+          answers: completeAnswers,
+        },
+        triage_result: answerText,
+        category: selectedPathology || "Cannabis Medicinal",
+        urgency: String(completeAnswers[10] || "Moderada"),
+        status: "completed",
+        completed_at: new Date().toISOString(),
+      }).select("id").single();
+      if (error || !data?.id) throw new Error(error?.message || "Não foi possível salvar a triagem.");
+      setAnswers(completeAnswers);
+      setTriageId(data.id);
+      setStep(11);
+      toast({ title: "Triagem salva", description: "Suas respostas foram arquivadas com segurança." });
+    } catch (error) {
+      toast({
+        title: "Não foi possível concluir a triagem",
+        description: error instanceof Error ? error.message : "Tente novamente em instantes.",
+        variant: "destructive",
+      });
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   return (
@@ -455,7 +502,8 @@ const Telemedicina = () => {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="tele-cpf" className="text-xs font-bold uppercase">CPF</Label>
-                          <Input id="tele-cpf" name="cpf" placeholder="000.000.000-00" value={patientData.cpf} onChange={(e) => setPatientData({...patientData, cpf: e.target.value})} className="h-12 rounded-xl" />
+                          <Input id="tele-cpf" name="cpf" placeholder="000.000.000-00" value={patientData.cpf} onChange={(e) => setPatientData({...patientData, cpf: e.target.value})} className="h-12 rounded-xl" aria-invalid={patientData.cpf.length > 0 && !isValidCpf(patientData.cpf)} />
+                          {patientData.cpf.length > 0 && !isValidCpf(patientData.cpf) && <p className="text-xs text-destructive">Digite um CPF válido.</p>}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="tele-nascimento" className="text-xs font-bold uppercase">Nascimento</Label>
@@ -516,16 +564,34 @@ const Telemedicina = () => {
                         onChange={(e) => setAnswers({...answers, [step]: e.target.value})}
                       />
                     )}
-                    {/* ... (Demais tipos de input seguem a lógica anterior) */}
+                    {currentQ.type === "select" && (
+                      <Select value={typeof answers[step] === "string" ? String(answers[step]) : ""} onValueChange={(value) => setAnswers({ ...answers, [step]: value })}>
+                        <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder="Selecione uma resposta" /></SelectTrigger>
+                        <SelectContent>{currentQ.options?.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent>
+                      </Select>
+                    )}
+                    {currentQ.type === "radio" && (
+                      <RadioGroup value={typeof answers[step] === "string" ? String(answers[step]) : ""} onValueChange={(value) => setAnswers({ ...answers, [step]: value })} className="space-y-3">
+                        {currentQ.options?.map((option) => <label key={option} className="flex items-center gap-3 rounded-xl border border-border p-3 cursor-pointer"><RadioGroupItem value={option} /><span className="text-sm text-foreground">{option}</span></label>)}
+                      </RadioGroup>
+                    )}
+                    {currentQ.type === "checkbox" && (
+                      <div className="space-y-3">{currentQ.options?.map((option) => <label key={option} className="flex items-center gap-3 rounded-xl border border-border p-3 cursor-pointer"><Checkbox checked={Array.isArray(answers[step]) && answers[step].includes(option)} onCheckedChange={(checked) => handleCheckbox(option, Boolean(checked))} /><span className="text-sm text-foreground">{option}</span></label>)}</div>
+                    )}
+                    {currentQ.type === "slider" && (
+                      <div className="space-y-4"><Slider value={sliderValue} onValueChange={setSliderValue} min={0} max={100} step={10} aria-label="Sensibilidade a efeitos psicoativos" /><p className="text-center text-sm font-bold text-primary">{sliderValue[0]}%</p></div>
+                    )}
                      <div className="flex gap-3 sm:gap-4 mt-6 sm:mt-8">
                        <Button variant="ghost" onClick={() => setStep(step - 1)} className="h-10 sm:h-12 rounded-xl font-bold text-sm">
                          <ArrowLeft className="mr-1 sm:mr-2" size={16} /> Voltar
                        </Button>
                        <Button 
                          className="flex-1 h-10 sm:h-12 bg-primary text-primary-foreground font-black rounded-xl text-sm"
-                        onClick={() => setStep(step + 1)}
+                        disabled={!isAnswered() || aiLoading}
+                        onClick={() => step === 10 ? void completeTriage() : setStep(step + 1)}
                       >
-                        Próximo <ArrowRight className="ml-2" />
+                        {aiLoading ? <Loader2 className="mr-2 animate-spin" size={18} /> : null}
+                        {step === 10 ? "Concluir Triagem" : "Próximo"} <ArrowRight className="ml-2" />
                       </Button>
                     </div>
                   </CardContent>
@@ -596,7 +662,6 @@ const Telemedicina = () => {
                                 name: patientData.nome,
                                 phone: patientData.telefone,
                                 email: patientData.email,
-                                isInternational: isInternational,
                                 triageId,
                               }
                             });
@@ -605,8 +670,8 @@ const Telemedicina = () => {
                             
                             if (typeof window !== "undefined" && (window as any).fbq) {
                               (window as any).fbq("track", "InitiateCheckout", { 
-                                value: isInternational ? 10 : 30, 
-                                currency: isInternational ? "USD" : "BRL", 
+                                value: 30,
+                                currency: "BRL",
                                 content_name: "Orientação Técnica — Dr. Edilson Bezerra" 
                               });
                             }

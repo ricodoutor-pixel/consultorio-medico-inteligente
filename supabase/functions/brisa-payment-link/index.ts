@@ -1,12 +1,6 @@
-// Public endpoint — generates a Mercado Pago R$30 PIX/checkout link (BR) OR Stripe $10 USD link (International)
-// for "Orientação Técnica com Dr. Edilson Bezerra (CRM-CE 10963)" that Enf. Brisa shares via WhatsApp.
+// Authenticated endpoint for the official R$30 Mercado Pago Orientation flow.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import Stripe from "npm:stripe@^14.0.0";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const SITE = "https://plantayraiz.com.br";
 
@@ -16,10 +10,34 @@ Deno.serve(async (req) => {
   try {
     let body: any = {};
     try { body = await req.json(); } catch { /* allow empty */ }
-    const { phone = "", name = "", email = "", isInternational = false } = body || {};
+    const { phone = "", name = "", email = "", triageId = null, action = "create", external_reference = "" } = body || {};
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supaService = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+
+    const authHeader = req.headers.get("Authorization") || "";
+    const token = authHeader.replace(/^Bearer\s+/i, "");
+    const { data: authData } = token ? await supaService.auth.getUser(token) : { data: { user: null } };
+    const user = authData.user;
+    if (!user) {
+      return new Response(JSON.stringify({ error: "Login necessário" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    if (action === "status") {
+      if (!external_reference || !String(external_reference).startsWith("brisa-orientacao-")) {
+        return new Response(JSON.stringify({ error: "Referência inválida" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const { data: row } = await supaService.from("brisa_orientacao_payments").select("status, external_reference").eq("external_reference", String(external_reference)).eq("patient_user_id", user.id).maybeSingle();
+      return new Response(JSON.stringify({ ok: true, status: row?.status || "pending" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    if (!phone || !name || !email || !triageId) {
+      return new Response(JSON.stringify({ error: "Triagem completa obrigatória" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const { data: triage } = await supaService.from("brisa_triages").select("id").eq("id", String(triageId)).eq("patient_id", user.id).eq("status", "completed").maybeSingle();
+    if (!triage) {
+      return new Response(JSON.stringify({ error: "Triagem não encontrada" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     // SECURITY: IP rate limit
     const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
@@ -34,48 +52,27 @@ Deno.serve(async (req) => {
 
     const externalRef = `brisa-orientacao-${phone || "anon"}-${Date.now()}`;
 
-    if (isInternational) {
-      // STRIPE FLOW (USD)
-      const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || Deno.env.get("STRIPE_LIVE_API_KEY");
-      if (!stripeKey) {
-        return new Response(JSON.stringify({ error: "Stripe key missing" }), {
-          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    const { error: orderError } = await supaService.from("orientacao_tecnica_orders").insert({
+      user_id: user.id,
+      patient_name: String(name).slice(0, 160),
+      patient_whatsapp: String(phone).replace(/\D/g, "").slice(0, 20),
+      patient_email: String(email).slice(0, 255),
+      topic: "Orientação Técnica — Dr. Edilson Bezerra ON",
+      amount: 30,
+      currency: "BRL",
+      platform_fee: 2.10,
+      doctor_payout: 27.90,
+      external_reference: externalRef,
+      status: "pending",
+      payment_method: "mercado_pago",
+      ai_analysis: JSON.stringify({ triage_id: String(triageId) }),
+    });
+    if (orderError) {
+      console.error("[brisa-payment-link] order:", orderError.message);
+      return new Response(JSON.stringify({ error: "Não foi possível registrar o pedido" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
-      const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
-
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        line_items: [{
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "Technical Guidance - Dr. Edilson Bezerra",
-              description: "Technical assessment in Medical Cannabis with Nurse Brisa's follow-up, PDF report and clinical referral.",
-            },
-            unit_amount: 1000, // $10.00 USD
-          },
-          quantity: 1,
-        }],
-        mode: "payment",
-        success_url: `${SITE}/payment-success?ref=${externalRef}`,
-        cancel_url: `${SITE}/payment-failure?ref=${externalRef}`,
-        client_reference_id: externalRef,
-        metadata: { source: "brisa_whatsapp", product: "orientacao_tecnica", phone: String(phone), name: String(name) },
-        customer_email: email || undefined,
-      });
-
-      return new Response(JSON.stringify({
-        ok: true,
-        payment_url: session.url,
-        preference_id: session.id,
-        external_reference: externalRef,
-        amount: 10.0,
-        currency: "USD",
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 });
-
-    } else {
+    {
       // MERCADO PAGO FLOW (BRL)
       const MP = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
       if (!MP) {
@@ -86,7 +83,7 @@ Deno.serve(async (req) => {
 
       const preference: any = {
         items: [{
-          title: "Orientação Técnica — Dr. Edilson Bezerra (CRM-CE 10963)",
+          title: "Orientação Técnica — Dr. Edilson Bezerra ON",
           description: "Avaliação técnica em Cannabis Medicinal com acompanhamento da Enf. Brisa, relatório PDF e encaminhamento clínico.",
           quantity: 1,
           unit_price: 30.0,
@@ -106,7 +103,7 @@ Deno.serve(async (req) => {
         notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
         external_reference: externalRef,
         statement_descriptor: "PLANTAYRAIZ",
-        metadata: { source: "brisa_whatsapp", product: "orientacao_tecnica" },
+        metadata: { source: "brisa_whatsapp", product: "orientacao_tecnica", user_id: user.id, triage_id: String(triageId) },
       };
 
       if (email) {

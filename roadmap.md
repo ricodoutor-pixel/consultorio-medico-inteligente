@@ -7,10 +7,10 @@
 
 ## Fluxo Orientação Técnica — correções do teste
 
-- [ ] Renderizar e exigir respostas nas 10 perguntas da triagem
-- [ ] Validar CPF e salvar a triagem real ligada ao paciente
-- [ ] Vincular pedido de R$ 30 à triagem e consultar seu status
-- [ ] Liberar WhatsApp somente após pagamento aprovado
-- [ ] Confirmar pagamento e iniciar automaticamente o atendimento da Brisa
-- [ ] Preservar TCLE auditável e revisar separação humano/veterinário
+- [x] Renderizar e exigir respostas nas 10 perguntas da triagem
+- [x] Validar CPF e salvar a triagem real ligada ao paciente
+- [x] Vincular pedido de R$ 30 à triagem e consultar seu status
+- [x] Liberar WhatsApp somente após pagamento aprovado
+- [x] Confirmar pagamento e iniciar automaticamente o atendimento da Brisa
+- [x] Preservar TCLE auditável e revisar separação humano/veterinário
 - [ ] Validar o fluxo central sem contaminar dados reais

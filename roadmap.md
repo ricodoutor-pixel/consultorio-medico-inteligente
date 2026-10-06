@@ -14,3 +14,8 @@
 - [x] Confirmar pagamento e iniciar automaticamente o atendimento da Brisa
 - [x] Preservar TCLE auditável e revisar separação humano/veterinário
 - [ ] Validar o fluxo central sem contaminar dados reais
+## Verificação da automação Hostinger
+
+- [ ] Verificar a configuração concluída pelo Antigravity sem alterar serviços
+- [ ] Validar VPS, Evolution, n8n, webhooks e resposta da Brisa
+

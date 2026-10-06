@@ -439,6 +439,18 @@ Deno.serve(async (req) => {
         }, { onConflict: "payment_id" });
       if (upsertErr) console.error("[brisa-orientacao] upsert error:", upsertErr);
 
+      const orderStatus = payment.status === "approved" ? "approved" : payment.status === "rejected" ? "rejected" : "pending";
+      const { error: orderUpdateError } = await supabase
+        .from("orientacao_tecnica_orders")
+        .update({
+          status: orderStatus,
+          mp_payment_id: String(payment.id),
+          mp_preference_id: payment.preference_id ? String(payment.preference_id) : null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("external_reference", externalRef);
+      if (orderUpdateError) console.error("[brisa-orientacao] order update:", orderUpdateError.message);
+
       if (payment.status === "approved") {
         const evolutionUrl = Deno.env.get("EVOLUTION_API_URL");
         const evolutionKey = Deno.env.get("EVOLUTION_API_KEY");

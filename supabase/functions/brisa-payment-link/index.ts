@@ -1,5 +1,4 @@
-// Public endpoint — generates a Mercado Pago R$30 PIX/checkout link (BR) OR Stripe $10 USD link (International)
-// for "Orientação Técnica com Dr. Edilson Bezerra (CRM-CE 10963)" that Enf. Brisa shares via WhatsApp.
+// Authenticated endpoint for the official R$30 Mercado Pago Orientation flow.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
@@ -52,6 +51,26 @@ Deno.serve(async (req) => {
     }
 
     const externalRef = `brisa-orientacao-${phone || "anon"}-${Date.now()}`;
+
+    const { error: orderError } = await supaService.from("orientacao_tecnica_orders").insert({
+      user_id: user.id,
+      patient_name: String(name).slice(0, 160),
+      patient_whatsapp: String(phone).replace(/\D/g, "").slice(0, 20),
+      patient_email: String(email).slice(0, 255),
+      topic: "Orientação Técnica — Dr. Edilson Bezerra ON",
+      amount: 30,
+      currency: "BRL",
+      platform_fee: 2.10,
+      doctor_payout: 27.90,
+      external_reference: externalRef,
+      status: "pending",
+      payment_method: "mercado_pago",
+      ai_analysis: JSON.stringify({ triage_id: String(triageId) }),
+    });
+    if (orderError) {
+      console.error("[brisa-payment-link] order:", orderError.message);
+      return new Response(JSON.stringify({ error: "Não foi possível registrar o pedido" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     {
       // MERCADO PAGO FLOW (BRL)

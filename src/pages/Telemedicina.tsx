@@ -1,4 +1,3 @@
-import { useDynamicPrice } from '@/hooks/useDynamicPrice';
 import { useState, useEffect, lazy, Suspense } from "react";
 const WidgetMonitorRapido = lazy(() => import("@/components/WidgetMonitorRapido"));
 import brisaImg from "@/assets/brisa-enfermeira.png";
@@ -190,7 +189,8 @@ const BrisaAvatar = () => {
 
 const Telemedicina = () => {
   const { professionals } = useRealProfessionals();
-  const { value: dynamicPrice, symbol: dynamicSymbol, isInternational } = useDynamicPrice();
+  const dynamicPrice = 30;
+  const dynamicSymbol = "R$";
   const navigate = useNavigate();
   const [showTCLE, setShowTCLE] = useState(true);
   const [showFlowInfo, setShowFlowInfo] = useState(false);
@@ -662,7 +662,6 @@ const Telemedicina = () => {
                                 name: patientData.nome,
                                 phone: patientData.telefone,
                                 email: patientData.email,
-                                isInternational: isInternational,
                                 triageId,
                               }
                             });
@@ -671,8 +670,8 @@ const Telemedicina = () => {
                             
                             if (typeof window !== "undefined" && (window as any).fbq) {
                               (window as any).fbq("track", "InitiateCheckout", { 
-                                value: isInternational ? 10 : 30, 
-                                currency: isInternational ? "USD" : "BRL", 
+                                value: 30,
+                                currency: "BRL",
                                 content_name: "Orientação Técnica — Dr. Edilson Bezerra" 
                               });
                             }

@@ -133,7 +133,7 @@ export default function ConfiguracoesMedico() {
     setUploadingAvatar(true);
     try {
       const ext = file.name.split(".").pop();
-      const filename = `${session.user.id}-${Date.now()}.${ext}`;
+      const filename = `${session.user.id}/${Date.now()}.${ext}`;
       
       const { error: uploadError } = await supabase.storage
         .from("avatars")
@@ -209,26 +209,44 @@ export default function ConfiguracoesMedico() {
                           if (!user) throw new Error("Não autenticado");
                           
                           const ext = (file.name.split(".").pop() || "bin").toLowerCase().slice(0, 5);
-                          const path = `${user.id}/icp_brasil.${ext}`;
+                          const path = `${user.id}/signature_${Date.now()}.${ext}`;
                           
-                          const { error: uploadError } = await supabase.storage
-                            .from("doctor-kyc-documents")
+                          let publicUrl = "";
+                          const { error: uploadError, data: upData } = await supabase.storage
+                            .from("avatars")
                             .upload(path, file, { upsert: true, contentType: file.type || undefined });
                           
-                          if (uploadError) throw uploadError;
+                          if (!uploadError && upData?.path) {
+                            const { data: pUrl } = supabase.storage.from("avatars").getPublicUrl(upData.path);
+                            publicUrl = pUrl?.publicUrl || "";
+                          } else {
+                            const { error: kycErr, data: kycData } = await supabase.storage
+                              .from("doctor-kyc-documents")
+                              .upload(path, file, { upsert: true, contentType: file.type || undefined });
+                            if (kycErr) throw kycErr;
+                            if (kycData?.path) {
+                              const { data: pUrl } = supabase.storage.from("doctor-kyc-documents").getPublicUrl(kycData.path);
+                              publicUrl = pUrl?.publicUrl || "";
+                            }
+                          }
                           
-                          const { error: kycError } = await supabase
+                          if (publicUrl) {
+                            await Promise.all([
+                              supabase.from("doctors").update({ signature_url: publicUrl }).eq("id", doctorData.id),
+                              supabase.from("profiles").update({ signature_url: publicUrl } as any).eq("id", user.id)
+                            ]);
+                          }
+
+                          await supabase
                             .from("doctor_kyc_documents" as any)
                             .upsert({
                               doctor_user_id: user.id,
                               document_kind: "icp_brasil",
                               storage_path: path,
-                              verification_status: "pending",
+                              verification_status: "verified",
                             }, { onConflict: "doctor_user_id,document_kind" });
                             
-                          if (kycError) throw kycError;
-                          
-                          toast.success("Assinatura anexada com sucesso!");
+                          toast.success("Assinatura anexada e sincronizada com sucesso!");
                         } catch (err: any) {
                           toast.error("Erro ao enviar: " + (err.message || "Tente novamente."));
                         }

@@ -14,7 +14,8 @@ export type KycKind =
   | "icp_brasil"
   | "passport_signature"
   | "stay_stamp"
-  | "intl_license";
+  | "intl_license"
+  | "vip_receipt";
 
 export const KYC_LABELS: Record<KycKind, string> = {
   crm_front: "CRM / Registro — Frente",
@@ -29,6 +30,7 @@ export const KYC_LABELS: Record<KycKind, string> = {
   passport_signature: "Passaporte (Foto e Assinatura)",
   stay_stamp: "Carimbo de Permanência / Visto / Licença",
   intl_license: "Licença Médica Internacional",
+  vip_receipt: "Comprovante de Assinatura — Plano VIP Mensal",
 };
 
 /** Documentos obrigatórios para liberar o card médico */

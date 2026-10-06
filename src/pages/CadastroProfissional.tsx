@@ -476,10 +476,10 @@ const CadastroProfissional = () => {
         });
         return;
       }
-      if (!isCuidador && (!kycFiles["crm_front"] || !kycFiles["icp_brasil"])) {
+      if (!isCuidador && !kycFiles["crm_front"]) {
         toast({
-          title: "Documentos Incompletos",
-          description: "Obrigatório enviar a FRENTE do seu registro profissional e Assinatura Digital ICP-Brasil.",
+          title: "Documento Incompleto",
+          description: "Obrigatório enviar a FRENTE do seu registro profissional.",
           variant: "destructive",
         });
         return;
@@ -542,26 +542,49 @@ const CadastroProfissional = () => {
         if (!file) continue;
         const ext = (file.name.split(".").pop() || "bin").toLowerCase().slice(0, 5);
         
-        // Assinatura ICP-Brasil vai para bucket 'avatars'
+        // Assinatura ICP-Brasil / Eletrônica
         if (kind === "icp_brasil") {
-          const path = `documents/${userId}/signature_${Date.now()}.${ext}`;
+          const path = `${userId}/signature_${Date.now()}.${ext}`;
           uploads.push(
-            supabase.storage
-              .from('avatars')
-              .upload(path, file, { upsert: true, contentType: file.type || undefined })
-              .then(async ({ error, data }) => {
-                if (error) throw error;
-                if (data?.path) {
-                  const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(data.path);
-                  if (publicUrlData?.publicUrl) {
-                    await (supabase.from("doctors") as any).update({ signature_url: publicUrlData.publicUrl }).eq("user_id", userId);
+            (async () => {
+              try {
+                let publicUrl = "";
+                const { error: upErr, data: upData } = await supabase.storage
+                  .from('avatars')
+                  .upload(path, file, { upsert: true, contentType: file.type || undefined });
+                
+                if (!upErr && upData?.path) {
+                  const { data: pUrl } = supabase.storage.from('avatars').getPublicUrl(upData.path);
+                  publicUrl = pUrl?.publicUrl || "";
+                } else {
+                  // Fallback para KYC_BUCKET
+                  const { error: kycErr, data: kycData } = await supabase.storage
+                    .from(KYC_BUCKET)
+                    .upload(path, file, { upsert: true, contentType: file.type || undefined });
+                  if (!kycErr && kycData?.path) {
+                    const { data: pUrl } = supabase.storage.from(KYC_BUCKET).getPublicUrl(kycData.path);
+                    publicUrl = pUrl?.publicUrl || "";
                   }
                 }
-              })
-              .catch((err) => {
-                console.error("[signature upload]", err);
-              })
+
+                if (publicUrl) {
+                  await Promise.all([
+                    (supabase.from("doctors") as any).update({ signature_url: publicUrl }).eq("user_id", userId),
+                    supabase.from("profiles").update({ signature_url: publicUrl } as any).eq("id", userId)
+                  ]);
+                }
+              } catch (err) {
+                console.error("[signature upload error]", err);
+              }
+            })()
           );
+
+          kycRows.push({
+            doctor_user_id: userId,
+            document_kind: kind,
+            storage_path: path,
+            verification_status: "pending",
+          });
           continue;
         }
 
@@ -1130,19 +1153,19 @@ const CadastroProfissional = () => {
                           <>
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">{t.passportSignLabel}</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("passport_signature")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("passport_signature")} className="bg-muted border-border text-xs" />
                             </div>
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">{t.stayStampLabel}</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("stay_stamp")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("stay_stamp")} className="bg-muted border-border text-xs" />
                             </div>
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">Registro Médico / License ({currentCountryConfig.name}) *</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} className="bg-muted border-border text-xs" />
                             </div>
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">Comprovante de Endereço / Residência *</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-muted border-border text-xs" />
                             </div>
                           </>
                         ) : (
@@ -1151,25 +1174,28 @@ const CadastroProfissional = () => {
                               <>
                                 <div className="space-y-1">
                                   <Label className="text-xs font-bold text-muted-foreground">{categoryCouncil.docFrentLabel} *</Label>
-                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} className="bg-muted border-border text-xs" required />
+                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_front")} className="bg-muted border-border text-xs" />
                                 </div>
                                 <div className="space-y-1">
-                                  <Label className="text-xs font-bold text-muted-foreground">{categoryCouncil.docFrentLabel.replace("frente","verso").replace("Frente","Verso")} *</Label>
-                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_back")} className="bg-muted border-border text-xs" required />
+                                  <Label className="text-xs font-bold text-muted-foreground">{categoryCouncil.docFrentLabel.replace("frente","verso").replace("Frente","Verso")}</Label>
+                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("crm_back")} className="bg-muted border-border text-xs" />
                                 </div>
                                 <div className="space-y-1 sm:col-span-2">
-                                  <Label className="text-xs font-bold text-muted-foreground">Assinatura Digital (ICP-Brasil) — Imagem *</Label>
-                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("icp_brasil")} className="bg-muted border-border text-xs" required />
+                                  <div className="flex items-center justify-between">
+                                    <Label className="text-xs font-bold text-muted-foreground">Assinatura Digital / Eletrônica (ICP-Brasil, Imagem ou PDF)</Label>
+                                    <span className="text-[10px] text-emerald-400 font-medium">Opcional no cadastro (pode ativar no painel)</span>
+                                  </div>
+                                  <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("icp_brasil")} className="bg-muted border-border text-xs" />
                                 </div>
                               </>
                             )}
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">{KYC_LABELS.cpf_doc} *</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("cpf_doc")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("cpf_doc")} className="bg-muted border-border text-xs" />
                             </div>
                             <div className="space-y-1">
                               <Label className="text-xs font-bold text-muted-foreground">{KYC_LABELS.address_proof} *</Label>
-                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-muted border-border text-xs" required />
+                              <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-muted border-border text-xs" />
                             </div>
                           </>
                         )}

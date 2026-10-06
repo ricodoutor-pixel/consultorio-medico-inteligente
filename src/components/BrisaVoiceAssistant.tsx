@@ -141,20 +141,40 @@ export default function BrisaVoiceAssistant({ contextBpm }: Props) {
     let hardError = false;
 
     recognition.lang = "pt-BR";
-    recognition.interimResults = false;
+    recognition.interimResults = true;
     recognition.continuous = false;
     recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event) => {
-      const transcript = Array.from(event.results || [])
-        .map((result) => result?.[0]?.transcript || "")
-        .join(" ")
-        .trim();
+    let silenceTimer: number | null = null;
 
-      heardText = transcript;
-      setStatus("processing");
-      cleanupTimers();
-      recognition.stop();
+    recognition.onresult = (event) => {
+      if (silenceTimer) {
+        window.clearTimeout(silenceTimer);
+        silenceTimer = null;
+      }
+      let current = "";
+      let hasFinal = false;
+      const results = event.results || [];
+      for (let i = 0; i < results.length; i++) {
+        current += (results[i]?.[0]?.transcript || "") + " ";
+        if (results[i]?.isFinal) {
+          hasFinal = true;
+        }
+      }
+      current = current.trim();
+      heardText = current;
+
+      if (hasFinal && current.length > 3) {
+        setStatus("processing");
+        cleanupTimers();
+        recognition.stop();
+      } else if (current.length > 0) {
+        silenceTimer = window.setTimeout(() => {
+          setStatus("processing");
+          cleanupTimers();
+          recognition.stop();
+        }, 1200);
+      }
     };
 
     recognition.onerror = (event) => {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Stethoscope, CheckCircle2, Clock, AlertTriangle, ShieldCheck, Check, X, FileText, Phone, Mail, ExternalLink, Search, Shield, Eye } from "lucide-react";
+import { Stethoscope, CheckCircle2, Clock, AlertTriangle, ShieldCheck, Check, X, FileText, Phone, Mail, ExternalLink, Search, Shield, Eye, CreditCard } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useDoctors } from "@/hooks/useDoctors";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
 import DoctorContractViewerModal, { DoctorContractDetails } from "./DoctorContractViewerModal";
+import DoctorPlanViewerModal, { DoctorPlanDetails } from "./DoctorPlanViewerModal";
 
 export interface DoctorRecord {
   id: string;
@@ -39,6 +40,7 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
   const [searchTerm, setSearchTerm] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [selectedContract, setSelectedContract] = useState<DoctorContractDetails | null>(null);
+  const [selectedPlanDoctor, setSelectedPlanDoctor] = useState<DoctorPlanDetails | null>(null);
   const navigate = useNavigate();
   const { doctors: dbDoctors, fetchDoctors } = useDoctors();
 
@@ -326,6 +328,24 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
                       <Button
                         size="sm"
                         variant="outline"
+                        onClick={() => setSelectedPlanDoctor({
+                          doctor_id: d.id,
+                          doctor_name: d.name,
+                          doctor_crm: d.crm,
+                          doctor_crm_uf: d.crm_state || "SP",
+                          plan_tier: d.name.toLowerCase().includes("victor") ? "vip_prescritor" : "standard",
+                          is_vip: d.name.toLowerCase().includes("victor") || d.name.toLowerCase().includes("edilson") || d.name.toLowerCase().includes("suelen") || d.name.toLowerCase().includes("olivia"),
+                          subscription_status: d.name.toLowerCase().includes("victor") ? "active" : "pending",
+                          payment_link: "https://www.asaas.com/c/planta-y-raiz-vip-medico",
+                        })}
+                        className="h-7 text-[10px] rounded-lg px-2 border-amber-500/30 text-amber-400 hover:bg-amber-500/10 font-bold"
+                        title="Ver assinatura VIP, mensalidades e comprovantes de pagamento"
+                      >
+                        <CreditCard size={11} className="mr-1" /> Planos
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
                         onClick={() => handleViewContract(d)}
                         className="h-7 text-[10px] rounded-lg px-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 font-bold"
                       >
@@ -360,6 +380,15 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
             </TableBody>
           </Table>
         </div>
+
+        {/* Modal de Gestão de Planos & Assinatura VIP */}
+        {selectedPlanDoctor && (
+          <DoctorPlanViewerModal
+            open={Boolean(selectedPlanDoctor)}
+            onClose={() => setSelectedPlanDoctor(null)}
+            doctor={selectedPlanDoctor}
+          />
+        )}
 
         {/* Modal de Auditoria e Visualização do Contrato */}
         {selectedContract && (

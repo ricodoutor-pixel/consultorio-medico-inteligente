@@ -76,3 +76,8 @@ scripts/contatos-enf-brisa.vcf
 scripts/prescritores_master_list.json
 scripts/stats-prescritores.mjs
 private-docs/
+public/evolution_qrcode.png
+scripts/*.json
+scripts/*.mjs
+scripts/*.cjs
+scripts/*.sh

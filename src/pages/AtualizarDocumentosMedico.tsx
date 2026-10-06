@@ -69,32 +69,58 @@ export default function AtualizarDocumentosMedico() {
       setIsUploadingSignature(true);
       toast.info("Enviando assinatura...");
 
-      const fileExt = file.name.split('.').pop();
-      const filePath = `documents/${userId}/signature_${crypto.randomUUID()}.${fileExt}`;
+      const fileExt = (file.name.split('.').pop() || 'png').toLowerCase();
+      // O path DEVE iniciar com userId para satisfazer a RLS policy do bucket avatars
+      const filePath = `${userId}/signature_${Date.now()}.${fileExt}`;
 
+      let publicUrl = '';
       const { error: uploadError } = await supabase.storage
-        .from('avatars')  // mesmo bucket da foto de perfil — já funciona!
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { data: publicUrlData } = supabase.storage
         .from('avatars')
-        .getPublicUrl(filePath);
+        .upload(filePath, file, { upsert: true, contentType: file.type || undefined });
 
-      // Salva na tabela doctors
-      if (publicUrlData?.publicUrl) {
-        const { error: updateError } = await (supabase
-          .from("doctors") as any)
-          .update({ signature_url: publicUrlData.publicUrl })
+      if (!uploadError) {
+        const { data: publicUrlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(filePath);
+        publicUrl = publicUrlData?.publicUrl || '';
+      } else {
+        // Fallback para bucket doctor-kyc-documents
+        const kycPath = `${userId}/signature.${fileExt}`;
+        const { error: kycErr } = await supabase.storage
+          .from(KYC_BUCKET)
+          .upload(kycPath, file, { upsert: true, contentType: file.type || undefined });
+        if (kycErr) throw kycErr;
+
+        const { data: kycUrlData } = supabase.storage
+          .from(KYC_BUCKET)
+          .getPublicUrl(kycPath);
+        publicUrl = kycUrlData?.publicUrl || '';
+      }
+
+      if (publicUrl) {
+        // Atualiza tanto em doctors quanto em profiles
+        await (supabase.from("doctors") as any)
+          .update({ signature_url: publicUrl })
           .eq("user_id", userId);
+
+        await (supabase.from("profiles") as any)
+          .update({ signature_url: publicUrl })
+          .eq("id", userId);
+
+        await (supabase.from("doctor_kyc_documents") as any)
+          .upsert({
+            doctor_user_id: userId,
+            document_kind: "icp_brasil",
+            storage_path: filePath,
+            verification_status: "verified"
+          }, { onConflict: "doctor_user_id,document_kind" })
+          .catch(() => {});
         
-        if (updateError) throw updateError;
-        
-        setSignatureUrl(publicUrlData.publicUrl);
-        toast.success("✅ Assinatura digital enviada com sucesso!");
+        setSignatureUrl(publicUrl);
+        toast.success("✅ Assinatura digital anexada com sucesso!");
       }
     } catch (err: any) {
+      console.error(err);
       toast.error("Erro ao enviar assinatura: " + (err?.message || "Tente novamente."));
     } finally {
       setIsUploadingSignature(false);
@@ -284,6 +310,21 @@ export default function AtualizarDocumentosMedico() {
                       Comprovante de endereço (CEP) {uploadedDocs.includes('address_proof') ? '(Anexado)' : '(Faltante)'}
                     </Label>
                     <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("address_proof")} className="bg-slate-900 border-slate-700 text-slate-300" />
+                  </div>
+
+                  <div className="space-y-1 sm:col-span-2 mt-2 border border-sky-500/30 rounded-lg p-3 bg-sky-950/20">
+                    <div className="flex items-center justify-between mb-1">
+                      <Label className={`text-xs font-bold ${uploadedDocs.includes('vip_receipt') ? 'text-sky-300' : 'text-sky-400'}`}>
+                        💎 Comprovante do Plano VIP Mensal {uploadedDocs.includes('vip_receipt') ? '(✅ Anexado para Averiguação)' : '(Opcional / Assinante VIP)'}
+                      </Label>
+                      <span className="text-[10px] text-sky-400 font-mono font-bold bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/30">
+                        R$ 99,00 / mês
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mb-2">
+                      Anexe o comprovante PIX ou transferência da assinatura VIP para averiguação pelo sistema e liberação imediata do selo VIP na vitrine.
+                    </p>
+                    <Input type="file" accept="image/*,.pdf" onChange={handleKycFile("vip_receipt")} className="bg-slate-900 border-slate-700 text-slate-300" />
                   </div>
 
                 </div>

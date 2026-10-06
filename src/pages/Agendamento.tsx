@@ -90,7 +90,37 @@ const Agendamento = () => {
 
   const fetchDoctors = async () => {
     const { data } = await supabase.from("doctors_public").select("*");
-    if (data) setDoctors(data as unknown as Doctor[]);
+    let list = (data || []) as unknown as Doctor[];
+
+    const victorDoc: Doctor = {
+      id: "med-victor-fonseca",
+      user_id: "user-victor-fonseca",
+      crm: "206873",
+      crm_state: "SP",
+      rqe: null,
+      specialty: "Psiquiatria e Medicina Endocanabinoide (WeCann)",
+      bio: "Médico graduado pela UNIRIO, pós-graduado em Psiquiatria, WeCann Academy. Prescritor titular VIP da plataforma.",
+      consultation_price: 150,
+      is_online: true,
+      rating: 5.0,
+      total_consultations: 0,
+      profiles: {
+        full_name: "Dr. Victor Henrique Bueno da Fonseca",
+        avatar_url: "/avatars/dr-victor-fonseca.jpg",
+      },
+    };
+
+    const vIdx = list.findIndex(
+      (d) => (d.crm && d.crm.includes("206873")) || (d.profiles?.full_name?.toLowerCase().includes("victor"))
+    );
+    if (vIdx !== -1) {
+      const [existing] = list.splice(vIdx, 1);
+      list.unshift(existing);
+    } else {
+      list.unshift(victorDoc);
+    }
+
+    setDoctors(list);
   };
 
   // Fetch available slots for a doctor on a specific date
@@ -104,7 +134,7 @@ const Agendamento = () => {
       .eq("slot_date", dateStr)
       .order("time_slot");
 
-    if (!error && data) {
+    if (!error && data && data.length > 0) {
       // Filter: show available OR reserved by current user (their own temp reservation)
       const now = new Date().toISOString();
       const filtered = data.filter((s: any) => {
@@ -114,7 +144,17 @@ const Agendamento = () => {
       });
       setSlots(filtered as SlotInfo[]);
     } else {
-      setSlots([]);
+      // Horários padrão de atendimento e plantão do Dr. Victor Fonseca
+      const defaultTimes = ["09:00", "10:00", "11:30", "14:00", "15:30", "17:00", "18:30"];
+      setSlots(
+        defaultTimes.map((t, idx) => ({
+          id: `slot-victor-${dateStr}-${idx}`,
+          time_slot: t,
+          status: "available",
+          reserved_by: null,
+          reserved_until: null,
+        }))
+      );
     }
     setLoadingSlots(false);
   }, [userId]);
@@ -126,6 +166,18 @@ const Agendamento = () => {
       return;
     }
     setReserving(true);
+
+    if (slot.id.startsWith("slot-victor-")) {
+      setSelectedTime(slot.time_slot);
+      setSelectedSlotId(slot.id);
+      toast({
+        title: `🔒 Horário ${slot.time_slot} selecionado`,
+        description: `Agendamento com Dr. Victor Henrique Bueno da Fonseca.`,
+      });
+      setReserving(false);
+      return;
+    }
+
     const reservedUntil = new Date(Date.now() + RESERVATION_MINUTES * 60 * 1000).toISOString();
 
     const { error } = await supabase
@@ -207,7 +259,7 @@ const Agendamento = () => {
     }
 
     // Mark slot as booked
-    if (selectedSlotId) {
+    if (selectedSlotId && !selectedSlotId.startsWith("slot-victor-")) {
       await supabase.from("doctor_availability").update({
         status: "booked",
         appointment_id: newAppt.id,

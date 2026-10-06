@@ -5,12 +5,13 @@
 // historico completo desta correcao (identificada e aplicada em brisa-bot
 // semanas antes de ser encontrada aqui tambem).
 
-export const GEMINI_PRIMARY_MODEL = "gemini-2.5-flash";
-export const GEMINI_FALLBACK_MODEL = "gemini-2.5-pro";
+export const GEMINI_PRIMARY_MODEL = "gemini-3.8-flash";
+export const GEMINI_FALLBACK_MODEL = "gemini-2.5-flash";
 
 export const GEMINI_MODELS_FALLBACK_CHAIN = [
   GEMINI_PRIMARY_MODEL,
-  GEMINI_FALLBACK_MODEL,
+  "gemini-2.5-flash",
+  "gemini-2.5-pro",
 ] as const;
 
 export function getGeminiEndpoint(modelName = GEMINI_PRIMARY_MODEL): string {

@@ -84,19 +84,18 @@ const WhatsAppContactButton = ({ name, className = "" }: { name: string; classNa
   );
 };
 
-/** Médicos com Plano Med VIP ativo (selo exibido no card). */
-const VIP_DOCTOR_MATCHERS = ["edilson", "suelen", "olivia"];
+/** Médicos com Plano Med VIP ativo (selo exibido no card). Apenas Dr. Victor, Dr. Edilson, Dra. Suelen e Dra. Olívia */
+const VIP_DOCTOR_MATCHERS = ["victor", "edilson", "suelen", "olivia"];
 const isVipDoctor = (p: Professional) => {
-  if (p.plan_tier && p.plan_tier !== 'free') return true;
-  return VIP_DOCTOR_MATCHERS.some((n) => (p.name || "").toLowerCase().includes(n));
+  const name = (p.name || "").toLowerCase();
+  return VIP_DOCTOR_MATCHERS.some((n) => name.includes(n));
 };
 
 const getDoctorSealTier = (p: Professional) => {
   const name = (p.name || "").toLowerCase();
-  if (name.includes("edilson") || name.includes("suelen") || name.includes("olivia") || p.plan_tier === "premium") {
+  if (name.includes("victor") || name.includes("edilson") || name.includes("suelen") || name.includes("olivia")) {
     return "premium";
   }
-  if (p.plan_tier && p.plan_tier !== 'free') return p.plan_tier;
   return "basic";
 };
 
@@ -301,7 +300,17 @@ const Profissionais = () => {
     );
   }
 
-  const filtered = professionals.filter((p) => p.category === activeCategory);
+  const filtered = useMemo(() => {
+    const list = professionals.filter((p) => p.category === activeCategory);
+    if (activeCategory === "Médicos Prescritores") {
+      const vIdx = list.findIndex((p) => (p.name || "").toLowerCase().includes("victor"));
+      if (vIdx !== -1) {
+        const [victorDoc] = list.splice(vIdx, 1);
+        list.unshift(victorDoc);
+      }
+    }
+    return list;
+  }, [professionals, activeCategory]);
 
   return (
     <div className="min-h-dvh bg-background">

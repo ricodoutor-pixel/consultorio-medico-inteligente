@@ -289,12 +289,15 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     if (curOliviaIdx !== -1) {
       group.push(sortedMedicos.splice(curOliviaIdx, 1)[0]);
     }
+    // Dr. Victor Henrique Bueno da Fonseca SEMPRE em 1º lugar absoluto na vitrine médica (posição 0)
     const curVictorIdx = sortedMedicos.findIndex(
-      (m) => m.id === "med-victor-fonseca" || (m.crm && m.crm.includes("206873")) || m.name.toLowerCase().includes("victor henrique")
+      (m) => m.id === "med-victor-fonseca" || (m.crm && m.crm.includes("206873")) || m.name.toLowerCase().includes("victor")
     );
+    let victorDoc: Professional | null = null;
     if (curVictorIdx !== -1) {
-      group.push(sortedMedicos.splice(curVictorIdx, 1)[0]);
+      victorDoc = sortedMedicos.splice(curVictorIdx, 1)[0];
     }
+
     const curSadiIdx = sortedMedicos.findIndex(
       (m) => m.id === "med-sadi-menta" || (m.crm && m.crm.includes("16301")) || m.name.toLowerCase().includes("sadi")
     );
@@ -318,6 +321,11 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       let targetSlot = curOliviaIdx !== -1 ? curOliviaIdx : 0;
       targetSlot = Math.min(targetSlot, sortedMedicos.length);
       sortedMedicos.splice(targetSlot, 0, ...group);
+    }
+
+    // Dr. Victor Fonseca sempre em 1º lugar na fila
+    if (victorDoc) {
+      sortedMedicos.unshift(victorDoc);
     }
 
     // Preservar as demais 10 categorias oficiais configuradas (Terapeutas, Enfermagem, etc.)

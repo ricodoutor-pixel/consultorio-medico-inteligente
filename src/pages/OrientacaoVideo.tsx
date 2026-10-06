@@ -79,7 +79,7 @@ const OrientacaoVideo = () => {
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [doctorId, setDoctorId] = useState<string>("");
   const [appointmentType, setAppointmentType] = useState<string>("video");
-  const [doctorInfo, setDoctorInfo] = useState<{ name: string; photo: string }>({ name: "Médico", photo: "" });
+  const [doctorInfo, setDoctorInfo] = useState<{ name: string; photo: string }>({ name: "Dr. Victor Henrique Bueno da Fonseca", photo: "/avatars/dr-victor-fonseca.jpg" });
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

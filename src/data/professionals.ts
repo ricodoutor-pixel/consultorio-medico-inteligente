@@ -271,6 +271,31 @@ export const STANDARD_DOCTOR_SERVICES = [
 
 export const professionals: Professional[] = [
   {
+    id: "med-victor-fonseca",
+    name: "Dr. Victor Henrique Bueno da Fonseca",
+    category: "Médicos Prescritores",
+    bio: "Médico graduado pela Universidade Federal do Estado do Rio de Janeiro (UNIRIO), pós-graduado em Psiquiatria, Endocrinologia, Acupuntura e Medicina Tradicional Chinesa, com Certificação Internacional em Medicina Endocanabinoide pela conceituada WeCann Academy. Membro da Sociedade Latino-Americana de Dor (LAPS) e com aperfeiçoamento em Transtorno do Espectro Autista (TEA), TDAH e Medicina do Esporte. Com mais de 7 anos de atuação e mais de 10.000 pacientes atendidos, dedica sua prática à saúde mental integrativa e ao manejo da dor crônica, aliando alto rigor científico a uma escuta empática e acompanhamento longitudinal próximo e humanizado.",
+    flags: ["🇧🇷"],
+    experience: "7 anos",
+    tags: ["Psiquiatria", "Medicina Canabinoide", "WeCann Academy", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5511953045378",
+    rating: 5.0,
+    consults: 0,
+    avatar: "VF",
+    imageUrl: drVictorFonsecaImg,
+    online: true,
+    cfmPrintUrl: cfmDrVictorFonseca,
+    paymentLink: "https://pay.asaas.com/00000",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 09:30", "Hoje 11:00", "Hoje 15:00", "Hoje 17:00"],
+    crm: "206873/SP",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento em psiquiatria e acolhimento exemplar." }
+    ],
+  },
+  {
     id: "med-jose-geraldo",
     name: "Dr. José Geraldo Barbugli Abbade Filho",
     category: "Médicos Prescritores",
@@ -849,31 +874,7 @@ export const professionals: Professional[] = [
       { name: "Cláudia V.", rating: 5, text: "Humana, competente e acessível. Gratidão." },
     ],
   },
-  {
-    id: "med-victor-fonseca",
-    name: "Dr. Victor Henrique Bueno da Fonseca",
-    category: "Médicos Prescritores",
-    bio: "Médico graduado pela Universidade Federal do Estado do Rio de Janeiro (UNIRIO), pós-graduado em Psiquiatria, Endocrinologia, Acupuntura e Medicina Tradicional Chinesa, com Certificação Internacional em Medicina Endocanabinoide pela conceituada WeCann Academy. Membro da Sociedade Latino-Americana de Dor (LAPS) e com aperfeiçoamento em Transtorno do Espectro Autista (TEA), TDAH e Medicina do Esporte. Com mais de 7 anos de atuação e mais de 10.000 pacientes atendidos, dedica sua prática à saúde mental integrativa e ao manejo da dor crônica, aliando alto rigor científico a uma escuta empática e acompanhamento longitudinal próximo e humanizado.",
-    flags: ["🇧🇷"],
-    experience: "7 anos",
-    tags: ["Psiquiatria", "Medicina Canabinoide", "WeCann Academy", "Prescritor"],
-    price: "R$ 150,00",
-    priceValue: 150,
-    whatsapp: "551153045378",
-    rating: 5.0,
-    consults: 0,
-    avatar: "VF",
-    imageUrl: drVictorFonsecaImg,
-    online: true,
-    cfmPrintUrl: cfmDrVictorFonseca,
-    paymentLink: "https://pay.asaas.com/00000",
-    services: STANDARD_DOCTOR_SERVICES,
-    slots: ["Hoje 09:30", "Hoje 11:00", "Hoje 15:00", "Hoje 17:00"],
-    crm: "206873/SP",
-    reviews: [
-      { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento em psiquiatria e acolhimento exemplar." }
-    ],
-  },
+
   {
     id: "med-sadi-menta",
     name: "Dr. Sadi Roberto Menta",

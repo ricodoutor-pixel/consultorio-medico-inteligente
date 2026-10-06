@@ -186,6 +186,7 @@ const BrisaOrientacoes = lazyWithRecovery(() => import("./pages/admin/BrisaOrien
 const OfertaEspecial = lazyWithRecovery(() => import("./pages/OfertaEspecial"), { sourceRef: "/oferta-especial" });
 const AdminFinanceiro = lazyWithRecovery(() => import("./pages/AdminFinanceiro"), { sourceRef: "/admin/financeiro" });
 const AdminCreditAudit = lazyWithRecovery(() => import("./pages/AdminCreditAudit"), { sourceRef: "/admin/credit-audit" });
+const AdminComprovantesPagamento = lazyWithRecovery(() => import("./pages/admin/AdminComprovantesPagamento"), { sourceRef: "/admin/comprovantes-pagamento" });
 const GrowthDashboard = lazyWithRecovery(() => import("./pages/admin/GrowthDashboard"), { sourceRef: "/admin/growth" });
 const AdminMonitoramento = lazyWithRecovery(() => import("./pages/AdminMonitoramento"), { sourceRef: "/admin/monitoramento" });
 const QuizTriagem = lazyWithRecovery(() => import("./pages/QuizTriagem"), { sourceRef: "/quiz-triagem" });
@@ -377,6 +378,8 @@ const App = () => (
                 <Route path="/admin/clinicas" element={<AdminRoute><AdminClinicas /></AdminRoute>} />
                 <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
                 <Route path="/admin/credit-audit" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />
+                <Route path="/admin/comprovantes-pagamento" element={<AdminRoute><AdminComprovantesPagamento /></AdminRoute>} />
+                <Route path="/admin/comprovantes" element={<AdminRoute><AdminComprovantesPagamento /></AdminRoute>} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/biblioteca" element={<BibliotecaCientifica />} />
                 <Route path="/download" element={<DownloadApp />} />

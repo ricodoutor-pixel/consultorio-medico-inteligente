@@ -361,6 +361,7 @@ const Admin = () => {
     { label: "KYC Lojas / Farmácias", path: "/admin/aprovacoes-farmacias", icon: Building2 },
     { label: "KYC Pacientes", path: "/admin/aprovacoes-pacientes", icon: Users },
     { label: "KYC Agentes & IAs", path: "/admin/kyc-agentes", icon: Bot },
+    { label: "💳 Comprovantes de Pagamento", path: "/admin/comprovantes-pagamento", icon: CreditCard },
     { label: "TikTok Ads & Pixel", path: "/admin/conversoes", icon: Video },
     { label: "Lead Hunter (10k Médicos)", path: "/admin/leads", icon: Sparkles },
   ];
@@ -390,6 +391,9 @@ const Admin = () => {
             <div className="flex gap-2 flex-wrap">
               <Button onClick={loadData} variant="outline" size="sm" className="rounded-xl" disabled={loading}>
                 <RefreshCw size={14} className={`mr-1.5 ${loading ? "animate-spin" : ""}`} /> Sync
+              </Button>
+              <Button onClick={() => navigate("/admin/comprovantes-pagamento")} variant="outline" size="sm" className="rounded-xl border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 font-bold">
+                <CreditCard size={14} className="mr-1.5" /> Comprovantes
               </Button>
               <Button onClick={handleExportCSV} variant="outline" size="sm" className="rounded-xl">
                 <Download size={14} className="mr-1.5" /> CSV

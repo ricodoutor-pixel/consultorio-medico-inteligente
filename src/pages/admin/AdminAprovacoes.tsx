@@ -36,6 +36,7 @@ export const AdminAprovacoes = () => {
   const [selectedDoctor, setSelectedDoctor] = useState<any | null>(null);
   // Modal de visualização do Contrato Médico
   const [contractViewerData, setContractViewerData] = useState<DoctorContractDetails | null>(null);
+  const [docView, setDocView] = useState<{ userId: string; kind: KycKind; path?: string; name?: string } | null>(null);
   // Documento aberto para conferência visual (imagem/PDF real do cadastro)
   const isVictorDoctor = (d: any) => {
     const name = (d?.profile?.full_name || d?.full_name || "").toLowerCase();

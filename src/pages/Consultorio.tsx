@@ -54,8 +54,7 @@ const Consultorio = () => {
       const isVictorUser = Boolean(
         user.email?.toLowerCase().includes("victor") ||
         profileData?.full_name?.toLowerCase().includes("victor") ||
-        doctorData?.crm === "206873" ||
-        doctorData?.full_name?.toLowerCase().includes("victor")
+        doctorData?.crm === "206873"
       );
 
       if (isVictorUser) {

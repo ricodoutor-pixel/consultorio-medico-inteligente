@@ -68,18 +68,15 @@ const Consultorio = () => {
           is_available: true,
           is_verified: true,
           is_approved_by_admin: true,
-          is_approved: true,
           plan_tier: "vip_prescritor",
           consultation_price: 150,
           rating: 5.0,
           total_consultations: 0,
-          full_name: "Dr. Victor Henrique Bueno da Fonseca",
           avatar_url: "/avatars/dr-victor-fonseca.jpg",
           ...(doctorData || {}),
         };
         // Garante flag de verificação ativa
         doctorData.is_verified = true;
-        doctorData.is_approved = true;
         doctorData.is_approved_by_admin = true;
       }
 

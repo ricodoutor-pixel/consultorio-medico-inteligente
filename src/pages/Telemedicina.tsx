@@ -260,7 +260,17 @@ const Telemedicina = () => {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const user = sessionData.session?.user;
-      if (!user) throw new Error("Faça login novamente para salvar sua triagem.");
+      if (!user) {
+        localStorage.setItem("ot_triage_draft", JSON.stringify({
+          answers: { ...answers, 9: `${sliderValue[0]}%` },
+          patientData,
+          selectedPathology,
+          sliderValue,
+        }));
+        toast({ title: "Crie sua conta para concluir", description: "Suas respostas ficam salvas. Entre para finalizar o pagamento." });
+        navigate(`/login?redirect=${encodeURIComponent("/telemedicina")}`);
+        return;
+      }
       const completeAnswers = { ...answers, 9: `${sliderValue[0]}%` };
       const answerText = interviewQuestions
         .map((question) => `${question.id}. ${question.question}\n${Array.isArray(completeAnswers[question.id]) ? completeAnswers[question.id].join(", ") : completeAnswers[question.id] || ""}`)

@@ -223,6 +223,27 @@ const Telemedicina = () => {
     }
   }, []);
 
+  // Restore triage draft after login redirect (guest flow)
+  useEffect(() => {
+    const draft = localStorage.getItem("ot_triage_draft");
+    if (!draft) return;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session?.user) return;
+      try {
+        const d = JSON.parse(draft);
+        if (d.answers) setAnswers(d.answers);
+        if (d.patientData) setPatientData(d.patientData);
+        if (d.selectedPathology) setSelectedPathology(d.selectedPathology);
+        if (Array.isArray(d.sliderValue)) setSliderValue(d.sliderValue);
+        localStorage.removeItem("ot_triage_draft");
+        setStep(10);
+        toast({ title: "Triagem recuperada", description: "Clique em Concluir Triagem para finalizar." });
+      } catch {
+        localStorage.removeItem("ot_triage_draft");
+      }
+    });
+  }, []);
+
   const currentQ = interviewQuestions[step - 1];
   const progress = step <= 0 ? 0 : step > 10 ? 100 : Math.round((step / 10) * 100);
   const medicos = professionals.filter(p => p.category === "Médicos Prescritores");
@@ -293,6 +314,7 @@ const Telemedicina = () => {
         completed_at: new Date().toISOString(),
       }).select("id").single();
       if (error || !data?.id) throw new Error(error?.message || "Não foi possível salvar a triagem.");
+      localStorage.removeItem("ot_triage_draft");
       setAnswers(completeAnswers);
       setTriageId(data.id);
       setStep(11);

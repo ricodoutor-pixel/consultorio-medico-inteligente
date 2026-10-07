@@ -72,7 +72,6 @@ const Consultorio = () => {
           consultation_price: 150,
           rating: 5.0,
           total_consultations: 0,
-          avatar_url: "/avatars/dr-victor-fonseca.jpg",
           ...(doctorData || {}),
         };
         // Garante flag de verificação ativa

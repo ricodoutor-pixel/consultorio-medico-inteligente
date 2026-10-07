@@ -19,8 +19,62 @@ Deno.serve(async (req) => {
     const token = authHeader.replace(/^Bearer\s+/i, "");
     const { data: authData } = token ? await supaService.auth.getUser(token) : { data: { user: null } };
     const user = authData.user;
+
+    // Guest checkout (oferta-especial via WhatsApp): phone + name only, no triage required.
     if (!user) {
-      return new Response(JSON.stringify({ error: "Login necessário" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (!phone || !name) {
+        return new Response(JSON.stringify({ error: "Nome e WhatsApp são obrigatórios" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const guestIp = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+      const { data: guestIpOk } = await supaService.rpc("check_edge_rate_limit", {
+        p_bucket: "brisa_payment_guest_ip", p_key: guestIp, p_max_hits: 5, p_window_seconds: 600,
+      });
+      if (guestIpOk === false) {
+        return new Response(JSON.stringify({ error: "Too many requests. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const MP_GUEST = Deno.env.get("MERCADO_PAGO_ACCESS_TOKEN");
+      if (!MP_GUEST) {
+        return new Response(JSON.stringify({ error: "MP token missing" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const guestRef = `brisa-orientacao-${String(phone).replace(/\D/g, "") || "anon"}-${Date.now()}`;
+      const guestPref = {
+        items: [{
+          title: "Orientação Técnica — Dr. Edilson Bezerra ON",
+          description: "Avaliação técnica em Cannabis Medicinal com acompanhamento da Enf. Brisa, relatório PDF e encaminhamento clínico.",
+          quantity: 1,
+          unit_price: 30.0,
+          currency_id: "BRL",
+          category_id: "services",
+        }],
+        payment_methods: { excluded_payment_types: [{ id: "ticket" }], installments: 3 },
+        back_urls: {
+          success: `${SITE}/payment-success?ref=${guestRef}`,
+          failure: `${SITE}/payment-failure?ref=${guestRef}`,
+          pending: `${SITE}/payment-pending?ref=${guestRef}`,
+        },
+        auto_return: "approved",
+        notification_url: `${supabaseUrl}/functions/v1/mercadopago-webhook`,
+        external_reference: guestRef,
+        statement_descriptor: "PLANTAYRAIZ",
+        metadata: { source: "oferta_especial", product: "orientacao_tecnica", phone: String(phone).substring(0, 250), name: String(name).substring(0, 250) },
+      };
+      const guestRes = await fetch("https://api.mercadopago.com/checkout/preferences", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${MP_GUEST}`, "Content-Type": "application/json" },
+        body: JSON.stringify(guestPref),
+      });
+      const guestData = await guestRes.json();
+      if (!guestRes.ok) {
+        return new Response(JSON.stringify({ error: "MP failed", details: guestData }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      return new Response(JSON.stringify({
+        ok: true,
+        payment_url: guestData.init_point,
+        preference_id: guestData.id,
+        external_reference: guestRef,
+        amount: 30.0,
+        currency: "BRL",
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 });
     }
 
     if (action === "status") {

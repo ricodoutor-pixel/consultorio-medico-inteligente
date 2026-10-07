@@ -37,11 +37,27 @@ export const AdminAprovacoes = () => {
   // Modal de visualização do Contrato Médico
   const [contractViewerData, setContractViewerData] = useState<DoctorContractDetails | null>(null);
   const [docView, setDocView] = useState<{ userId: string; kind: KycKind; path?: string; name?: string } | null>(null);
-  // Documento aberto para conferência visual (imagem/PDF real do cadastro)
   const isVictorDoctor = (d: any) => {
     const name = (d?.profile?.full_name || d?.full_name || "").toLowerCase();
     const crm = String(d?.crm || "");
     return name.includes("victor") || crm.includes("206873");
+  };
+
+  const hasAdminValidatedVoucher = (doctor: any) => {
+    if (isVictorDoctor(doctor)) return true;
+    const docs = doctor?.kyc_docs || [];
+    return docs.some((d: any) => 
+      (d?.verification_notes && (
+        d.verification_notes.includes('Diretor Técnico') || 
+        d.verification_notes.includes('Dr. Edilson') || 
+        d.verification_notes.includes('WhatsApp')
+      )) ||
+      (d?.storage_path && (
+        d.storage_path.includes('comprovante_pagamento') ||
+        d.storage_path.includes('transacao_recusada') ||
+        d.storage_path.includes('vip_receipt_admin')
+      ))
+    );
   };
 
   // Localiza o registro real do documento anexado pelo médico
@@ -553,12 +569,23 @@ export const AdminAprovacoes = () => {
                               </div>
                               <p className="text-xs text-muted-foreground font-mono">{crm}</p>
                               <p className="text-[11px] text-emerald-400 font-semibold">{doc.specialty || 'Medicina Canabinoide'}</p>
-                              <Badge
-                                variant="secondary"
-                                className="mt-1 text-[10px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
-                              >
-                                {(doc.kyc_docs || []).length} anexos · {DOCTOR_TIER_LABEL[doctorTierFromDocs((doc.kyc_docs || []).length)]}
-                              </Badge>
+                              <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                                <Badge
+                                  variant="secondary"
+                                  className="text-[10px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                                >
+                                  {(doc.kyc_docs || []).length} anexos · {DOCTOR_TIER_LABEL[doctorTierFromDocs((doc.kyc_docs || []).length)]}
+                                </Badge>
+                                {hasAdminValidatedVoucher(doc) && (
+                                  <Badge
+                                    className="text-[10px] font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white border border-emerald-400/60 shadow-md flex items-center gap-1 py-0.5 px-2"
+                                    title="Comprovante de pagamento validado diretamente pelo Dr. Edilson Bezerra (Diretor Técnico) via WhatsApp"
+                                  >
+                                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
+                                    🛡️ Comprovante Validado pelo Diretor Técnico
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </TableCell>
@@ -716,8 +743,14 @@ export const AdminAprovacoes = () => {
                       <Badge variant="destructive" className="font-bold">CARD OCULTO (OFF)</Badge>
                     )}
                   </DialogTitle>
-                  <DialogDescription className="text-xs text-emerald-400 font-mono">
-                    CRM: {selectedDoctor.crm} / {selectedDoctor.crm_state || 'BR'} • {selectedDoctor.specialty || 'Medicina Canabinoide'}
+                  <DialogDescription className="text-xs text-emerald-400 font-mono flex items-center gap-2 flex-wrap mt-1">
+                    <span>CRM: {selectedDoctor.crm} / {selectedDoctor.crm_state || 'BR'} • {selectedDoctor.specialty || 'Medicina Canabinoide'}</span>
+                    {hasAdminValidatedVoucher(selectedDoctor) && (
+                      <Badge className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-[11px] border border-emerald-400/50 shadow flex items-center gap-1 py-0.5 px-2">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-200" />
+                        🛡️ Comprovante Validado pelo Diretor Técnico
+                      </Badge>
+                    )}
                   </DialogDescription>
                 </div>
               </div>

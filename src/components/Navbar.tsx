@@ -157,9 +157,9 @@ export const Navbar = () => {
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             
               {/* Logo + Seta Consultorio */}
-              <div className="flex flex-col justify-center flex-shrink-0 -ml-1 md:-ml-3 lg:-ml-4">
+              <div className="flex flex-col justify-center flex-shrink-0 -ml-1 md:-ml-2 lg:-ml-3">
                 <div className="flex items-center gap-1.5 md:gap-3">
-                  <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3">
+                  <NavLink to="/" aria-label="Planta y Raíz - Início" className="flex items-center gap-2 md:gap-3 group">
                     <img
                       src="/logo-planta-raiz.webp"
                       alt="Planta y Raíz - Mega Clínica Digital"
@@ -168,17 +168,17 @@ export const Navbar = () => {
                       {...({ fetchpriority: "high" } as Record<string, string>)}
                       loading="eager"
                       decoding="sync"
-                      className="h-[56px] sm:h-[62px] md:h-[74px] w-auto max-w-[180px] sm:max-w-[210px] md:max-w-[260px] object-contain object-left drop-shadow-[0_0_14px_rgba(34,197,94,0.25)]"
+                      className="h-[46px] sm:h-[52px] md:h-[60px] w-auto max-w-[170px] sm:max-w-[200px] md:max-w-[240px] object-contain object-left drop-shadow-[0_0_12px_rgba(34,197,94,0.22)] group-hover:drop-shadow-[0_0_18px_rgba(34,197,94,0.4)] transition-all duration-200"
                     />
                   </NavLink>
                 </div>
                 {(location.pathname === "/consultorio" || location.pathname === "/dashboard" || location.pathname === "/dashboard-medico") && (
                   <button
                     onClick={() => navigate(location.pathname === "/consultorio" ? "/dashboard" : "/consultorio")}
-                    className="flex items-center gap-1 text-[11px] uppercase font-black text-primary hover:text-primary/80 transition-colors ml-4 md:ml-6 -mt-1 md:-mt-2"
+                    className="flex items-center gap-1 text-[10px] md:text-[11px] uppercase font-black text-primary hover:text-primary/80 transition-colors ml-1 md:ml-2 mt-0.5"
                     title={location.pathname === "/consultorio" ? "Sair da Sala de Espera" : "Ir para Consultório Virtual"}
                   >
-                    <ArrowLeft size={12} /> Consultório Virtual
+                    <ArrowLeft size={11} /> Consultório Virtual
                   </button>
                 )}
               </div>

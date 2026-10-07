@@ -290,16 +290,7 @@ const Profissionais = () => {
     }
   };
 
-  if (id) {
-    return (
-      <div className="min-h-dvh bg-background">
-        <Navbar />
-        <ProfessionalDetail id={id} professionals={professionals} />
-        <Footer />
-      </div>
-    );
-  }
-
+  // Hooks SEMPRE antes de qualquer return condicional (Regras dos Hooks do React).
   const filtered = useMemo(() => {
     const list = professionals.filter((p) => p.category === activeCategory);
     if (activeCategory === "Médicos Prescritores") {
@@ -311,6 +302,16 @@ const Profissionais = () => {
     }
     return list;
   }, [professionals, activeCategory]);
+
+  if (id) {
+    return (
+      <div className="min-h-dvh bg-background">
+        <Navbar />
+        <ProfessionalDetail id={id} professionals={professionals} />
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-dvh bg-background">

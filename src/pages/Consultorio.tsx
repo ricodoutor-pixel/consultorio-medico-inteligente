@@ -73,7 +73,7 @@ const Consultorio = () => {
           rating: 5.0,
           total_consultations: 0,
           ...(doctorData || {}),
-        };
+        } as typeof doctorData;
         // Garante flag de verificação ativa
         doctorData.is_verified = true;
         doctorData.is_approved_by_admin = true;

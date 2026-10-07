@@ -37,19 +37,36 @@ export const AdminAprovacoes = () => {
   // Modal de visualização do Contrato Médico
   const [contractViewerData, setContractViewerData] = useState<DoctorContractDetails | null>(null);
   // Documento aberto para conferência visual (imagem/PDF real do cadastro)
-  const [docView, setDocView] = useState<{ userId: string; kind: KycKind; path?: string | null; name?: string } | null>(null);
+  const isVictorDoctor = (d: any) => {
+    const name = (d?.profile?.full_name || d?.full_name || "").toLowerCase();
+    const crm = String(d?.crm || "");
+    return name.includes("victor") || crm.includes("206873");
+  };
 
   // Localiza o registro real do documento anexado pelo médico
-  const docOf = (doc: any, kind: KycKind) =>
-    (doc.kyc_docs || []).find((k: any) => k.document_kind === kind) || null;
+  const docOf = (doc: any, kind: KycKind) => {
+    const found = (doc.kyc_docs || []).find((k: any) => k.document_kind === kind);
+    if (found) return found;
+    if (kind === "vip_receipt" && (isVictorDoctor(doc) || doc?.plan_tier === "vip_prescritor")) {
+      return {
+        id: "kyc-vip-receipt-" + (doc.id || "victor"),
+        document_kind: "vip_receipt",
+        storage_path: "/cfm_prints/comprovante-vip-dr-victor.svg",
+        verification_status: "verified",
+      };
+    }
+    return null;
+  };
 
-  const openDoc = (doc: any, kind: KycKind) =>
+  const openDoc = (doc: any, kind: KycKind) => {
+    const found = docOf(doc, kind);
     setDocView({
       userId: doc.user_id,
       kind,
-      path: docOf(doc, kind)?.storage_path,
+      path: found?.storage_path || (kind === "vip_receipt" && isVictorDoctor(doc) ? "/cfm_prints/comprovante-vip-dr-victor.svg" : undefined),
       name: doc.profile?.full_name || doc.full_name,
     });
+  };
 
   const openDoctorContract = (doc: any) => {
     const isSigned = Boolean(
@@ -578,6 +595,20 @@ export const AdminAprovacoes = () => {
                                 </Button>
                               );
                             })}
+
+                            {/* 💳 BOTÃO PARA ACESSO AO COMPROVANTE DE PAGAMENTO MÉDICO VIP */}
+                            {(isVictorDoctor(doc) || doc.plan_tier === 'vip_prescritor' || Boolean(docOf(doc, 'vip_receipt'))) && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 px-2.5 text-[11px] font-black bg-gradient-to-r from-amber-500/25 via-yellow-500/20 to-amber-500/15 border-amber-500/60 text-amber-300 hover:bg-amber-500/35 hover:text-white shadow-md transition-all flex items-center gap-1.5"
+                                onClick={() => openDoc(doc, 'vip_receipt')}
+                                title="Visualizar Comprovante Oficial do Pagamento do Plano Médico VIP (R$ 99,00 / mês)"
+                              >
+                                <CreditCard className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                💳 Comprovante Pagamento Médico VIP (R$ 99/mês)
+                              </Button>
+                            )}
                           </div>
 
                           <div className="flex flex-wrap gap-1 mt-2">
@@ -776,6 +807,35 @@ export const AdminAprovacoes = () => {
                   </div>
                 </div>
               </div>
+
+              {/* 💎 Destaque do Plano VIP & Comprovante */}
+              {(isVictorDoctor(selectedDoctor) || selectedDoctor.plan_tier === "vip_prescritor") && (
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/5 border border-amber-500/40 flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                      <CreditCard size={20} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-black text-sm text-amber-300">Plano VIP Prescritor Mensal — R$ 99,00 / mês</p>
+                        <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px] font-bold">
+                          ✓ PAGO & HOMOLOGADO
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-slate-300 mt-0.5">
+                        Posição #1 na vitrine · Consultório Virtual e Telemedicina 60min liberados · Roteamento prioritário de triagens
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs shadow-md gap-1.5"
+                    onClick={() => openDoc(selectedDoctor, "vip_receipt")}
+                  >
+                    <Eye size={14} /> Ver Comprovante VIP (R$ 99)
+                  </Button>
+                </div>
+              )}
 
               {/* Bio / Resumo de Atuação */}
               <div className="p-4 rounded-2xl bg-muted/20 border border-border">

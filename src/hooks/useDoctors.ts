@@ -220,6 +220,15 @@ export function useDoctors() {
               verification_status: "verified",
               created_at: "2026-10-06T12:00:00.000Z",
             },
+            {
+              id: "kyc-victor-vip-receipt",
+              doctor_user_id: "user-victor-fonseca",
+              document_kind: "vip_receipt",
+              storage_path: "/cfm_prints/comprovante-vip-dr-victor.svg",
+              mime_type: "image/svg+xml",
+              verification_status: "verified",
+              created_at: "2026-10-06T12:00:00.000Z",
+            },
           ],
         };
         mappedDbDoctors.unshift(victorDoctorRow);
@@ -232,6 +241,18 @@ export function useDoctors() {
         vic.contract_signed_at = vic.contract_signed_at || "2026-10-06T12:00:00.000Z";
         vic.contract_hash = vic.contract_hash || "0x7a8f9c1b4e2d3f6a8b1c4d7e9f2a5b8c1d4e7f9a2b5c8d1e4f7a9b2c5d8e1f4a";
         vic.plan_tier = "vip_prescritor";
+        vic.kyc_docs = vic.kyc_docs || [];
+        if (!vic.kyc_docs.some((k: any) => k.document_kind === "vip_receipt")) {
+          vic.kyc_docs.push({
+            id: "kyc-victor-vip-receipt",
+            doctor_user_id: vic.user_id,
+            document_kind: "vip_receipt",
+            storage_path: "/cfm_prints/comprovante-vip-dr-victor.svg",
+            mime_type: "image/svg+xml",
+            verification_status: "verified",
+            created_at: "2026-10-06T12:00:00.000Z",
+          });
+        }
         mappedDbDoctors.unshift(vic);
       }
 

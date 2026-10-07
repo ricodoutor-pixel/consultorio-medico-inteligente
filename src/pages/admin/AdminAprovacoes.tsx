@@ -51,7 +51,7 @@ export const AdminAprovacoes = () => {
       return {
         id: "kyc-vip-receipt-" + (doc.id || "victor"),
         document_kind: "vip_receipt",
-        storage_path: "/cfm_prints/comprovante-vip-dr-victor.svg",
+        storage_path: "/cfm_prints/comprovante-vip-dr-victor.jpg",
         verification_status: "verified",
       };
     }
@@ -63,7 +63,7 @@ export const AdminAprovacoes = () => {
     setDocView({
       userId: doc.user_id,
       kind,
-      path: found?.storage_path || (kind === "vip_receipt" && isVictorDoctor(doc) ? "/cfm_prints/comprovante-vip-dr-victor.svg" : undefined),
+      path: found?.storage_path || (kind === "vip_receipt" && isVictorDoctor(doc) ? "/cfm_prints/comprovante-vip-dr-victor.jpg" : undefined),
       name: doc.profile?.full_name || doc.full_name,
     });
   };

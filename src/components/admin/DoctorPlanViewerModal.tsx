@@ -38,7 +38,7 @@ export default function DoctorPlanViewerModal({ open, onClose, doctor }: Props) 
   
   // Link de pagamento mensal recorrente configurado no Asaas
   const monthlyPaymentLink = doctor.payment_link || "https://www.asaas.com/c/planta-y-raiz-vip-medico";
-  const receiptUrl = doctor.receipt_url || (isVictor ? "/cfm_prints/cfm-dr-victor-fonseca.png" : undefined);
+  const receiptUrl = doctor.receipt_url || (isVictor ? "/cfm_prints/comprovante-vip-dr-victor.jpg" : undefined);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(monthlyPaymentLink);

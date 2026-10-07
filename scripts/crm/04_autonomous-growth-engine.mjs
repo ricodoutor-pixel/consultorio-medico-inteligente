@@ -11,7 +11,7 @@
  * FLUXO DIÁRIO:
  *   09:00h → Captação Instagram (100 leads)
  *   10:00h → Disparo WhatsApp (50 msgs)
- *   */30min → Verificar respostas e follow-ups
+ *   A cada 30min → Verificar respostas e follow-ups
  *   23:59h → Relatório diário + checar meta 500
  */
 

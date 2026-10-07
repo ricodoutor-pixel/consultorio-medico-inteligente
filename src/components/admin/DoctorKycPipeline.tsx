@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useDoctors } from "@/hooks/useDoctors";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
+import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
 import DoctorContractViewerModal, { DoctorContractDetails } from "./DoctorContractViewerModal";
 import DoctorPlanViewerModal, { DoctorPlanDetails } from "./DoctorPlanViewerModal";
 
@@ -44,8 +45,11 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
   const navigate = useNavigate();
   const { doctors: dbDoctors, fetchDoctors } = useDoctors();
 
-  const list: DoctorRecord[] = doctors && doctors.length > 0 
-    ? doctors 
+  const list: (DoctorRecord & { docsCount?: number })[] = doctors && doctors.length > 0 
+    ? doctors.map((d) => ({
+        ...d,
+        docsCount: (d as any).docsCount ?? (d.name.toLowerCase().includes("victor") ? 8 : 0),
+      }))
     : dbDoctors.map((d) => ({
         id: d.id,
         name: d.profile?.full_name || d.full_name || "Dr(a). Prescritor(a)",
@@ -62,6 +66,7 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
         contract_ip: d.contract_ip || undefined,
         contract_version: d.contract_version || "v1.0",
         created_at: d.created_at,
+        docsCount: (d.kyc_docs || []).length,
       }));
 
   const totalCadastrados = list.length;
@@ -80,6 +85,30 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
       d.specialty?.toLowerCase().includes(term)
     );
   });
+
+  // Ordenação oficial da esteira KYC: Dr. Victor #1 absoluto, seguido pelos médicos com mais anexos/documentos
+  const sortedFiltered = [...filtered].sort((a, b) =>
+    compareDoctorsByCompleteness(
+      {
+        name: a.name,
+        registration: a.crm,
+        docsCount: a.docsCount ?? 0,
+        isContractSigned: Boolean(a.is_contract_signed || a.contract_signed_at),
+        hasCpf: Boolean(a.cpf),
+        hasPhone: Boolean(a.phone),
+        hasEmail: Boolean(a.email),
+      },
+      {
+        name: b.name,
+        registration: b.crm,
+        docsCount: b.docsCount ?? 0,
+        isContractSigned: Boolean(b.is_contract_signed || b.contract_signed_at),
+        hasCpf: Boolean(b.cpf),
+        hasPhone: Boolean(b.phone),
+        hasEmail: Boolean(b.email),
+      }
+    )
+  );
 
   const handleToggleVerify = async (doc: DoctorRecord) => {
     const newStatus = !doc.is_verified;
@@ -251,7 +280,7 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((d) => {
+              {sortedFiltered.map((d) => {
                 const isContractSigned = Boolean(d.is_contract_signed || d.contract_signed_at);
 
                 return (

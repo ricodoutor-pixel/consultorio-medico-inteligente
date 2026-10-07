@@ -251,7 +251,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
         } as Professional & { _docsCount: number };
       });
 
-    // Ordem oficial: fixos primeiro, depois quem tem mais documentos no cadastro.
+    // Ordem oficial: Dr. Victor #1 absoluto, depois quem tem mais documentos enviados no cadastro (anexos verdes).
     const sortedMedicos = mapped.sort((a, b) =>
       compareDoctorsByCompleteness(
         { name: a.name, registration: a.crm, docsCount: (a as Professional & { _docsCount?: number })._docsCount ?? 0 },
@@ -259,72 +259,12 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
       ),
     );
 
-    // Garantir que os cards da Dra. Mariana, Dra. Olivia, Dr. Victor, Dr. Sadi, Dra. Geovana e Dra. Grace fiquem agrupados na vitrine
-    const marianaIdx = sortedMedicos.findIndex(
-      (m) => m.id === "med-mariana-alves" || (m.crm && m.crm.includes("135012")) || m.name.toLowerCase().includes("mariana alves")
-    );
-    const victorIdx = sortedMedicos.findIndex(
-      (m) => m.id === "med-victor-fonseca" || (m.crm && m.crm.includes("206873")) || m.name.toLowerCase().includes("victor henrique")
-    );
-    const sadiIdx = sortedMedicos.findIndex(
-      (m) => m.id === "med-sadi-menta" || (m.crm && m.crm.includes("16301")) || m.name.toLowerCase().includes("sadi")
-    );
-    const geovanaIdx = sortedMedicos.findIndex(
-      (m) => m.id === "med-geovana-torres" || (m.crm && m.crm.includes("98083")) || m.name.toLowerCase().includes("geovana")
-    );
-    const graceIdx = sortedMedicos.findIndex(
-      (m) => m.id === "med-grace-conceicao" || (m.crm && (m.crm.includes("190386") || m.crm.includes("190.386"))) || m.name.toLowerCase().includes("grace")
-    );
-    const oliviaIdx = sortedMedicos.findIndex(
-      (m) => m.id === "mock-olivia" || (m.crm && m.crm.includes("4466260")) || m.name.toLowerCase().includes("olivia")
-    );
-
-    const group: Professional[] = [];
-    if (marianaIdx !== -1) {
-      group.push(sortedMedicos.splice(marianaIdx, 1)[0]);
-    }
-    const curOliviaIdx = sortedMedicos.findIndex(
-      (m) => m.id === "mock-olivia" || (m.crm && m.crm.includes("4466260")) || m.name.toLowerCase().includes("olivia")
-    );
-    if (curOliviaIdx !== -1) {
-      group.push(sortedMedicos.splice(curOliviaIdx, 1)[0]);
-    }
-    // Dr. Victor Henrique Bueno da Fonseca SEMPRE em 1º lugar absoluto na vitrine médica (posição 0)
+    // Dr. Victor Henrique Bueno da Fonseca sempre em 1º lugar absoluto na vitrine médica (posição 0)
     const curVictorIdx = sortedMedicos.findIndex(
       (m) => m.id === "med-victor-fonseca" || (m.crm && m.crm.includes("206873")) || m.name.toLowerCase().includes("victor")
     );
-    let victorDoc: Professional | null = null;
-    if (curVictorIdx !== -1) {
-      victorDoc = sortedMedicos.splice(curVictorIdx, 1)[0];
-    }
-
-    const curSadiIdx = sortedMedicos.findIndex(
-      (m) => m.id === "med-sadi-menta" || (m.crm && m.crm.includes("16301")) || m.name.toLowerCase().includes("sadi")
-    );
-    if (curSadiIdx !== -1) {
-      group.push(sortedMedicos.splice(curSadiIdx, 1)[0]);
-    }
-    const curGeovanaIdx = sortedMedicos.findIndex(
-      (m) => m.id === "med-geovana-torres" || (m.crm && m.crm.includes("98083")) || m.name.toLowerCase().includes("geovana")
-    );
-    if (curGeovanaIdx !== -1) {
-      group.push(sortedMedicos.splice(curGeovanaIdx, 1)[0]);
-    }
-    const curGraceIdx = sortedMedicos.findIndex(
-      (m) => m.id === "med-grace-conceicao" || (m.crm && (m.crm.includes("190386") || m.crm.includes("190.386"))) || m.name.toLowerCase().includes("grace")
-    );
-    if (curGraceIdx !== -1) {
-      group.push(sortedMedicos.splice(curGraceIdx, 1)[0]);
-    }
-
-    if (group.length > 0) {
-      let targetSlot = curOliviaIdx !== -1 ? curOliviaIdx : 0;
-      targetSlot = Math.min(targetSlot, sortedMedicos.length);
-      sortedMedicos.splice(targetSlot, 0, ...group);
-    }
-
-    // Dr. Victor Fonseca sempre em 1º lugar na fila
-    if (victorDoc) {
+    if (curVictorIdx > 0) {
+      const [victorDoc] = sortedMedicos.splice(curVictorIdx, 1);
       sortedMedicos.unshift(victorDoc);
     }
 

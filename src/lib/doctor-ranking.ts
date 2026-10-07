@@ -10,9 +10,7 @@
  */
 
 const PINNED: Array<{ names: string[]; registrations: string[] }> = [
-  { names: ["suelen"], registrations: ["49354"] },
-  { names: ["daniel kobayashi", "kobayashi"], registrations: ["5460", "10346"] },
-  { names: ["edilson"], registrations: ["10963"] },
+  { names: ["victor henrique bueno da fonseca", "victor henrique", "victor fonseca", "victor"], registrations: ["206873"] },
 ];
 
 function normalize(value: string | null | undefined): string {
@@ -22,7 +20,7 @@ function normalize(value: string | null | undefined): string {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-/** 0, 1, 2 para os médicos fixos; 99 para os demais. */
+/** 0 para o Dr. Victor (#1); 99 para os demais. */
 export function pinnedDoctorRank(name: string | null | undefined, registration?: string | null): number {
   const n = normalize(name);
   const r = normalize(registration);
@@ -63,18 +61,26 @@ export function computeCompletenessScore(item: DoctorRankInput): number {
 
 /** Comparador único usado na vitrine pública e no painel de aprovações. */
 export function compareDoctorsByCompleteness(a: DoctorRankInput, b: DoctorRankInput): number {
-  // 1. Quem tem dossiê mais completo (pontuação geral de completude) aparece primeiro
+  // 1. Dr. Victor é sempre #1 absoluto
+  const isVictorA = pinnedDoctorRank(a.name, a.registration) === 0;
+  const isVictorB = pinnedDoctorRank(b.name, b.registration) === 0;
+  if (isVictorA && !isVictorB) return -1;
+  if (!isVictorA && isVictorB) return 1;
+
+  // 2. Quem tem mais documentos KYC anexados (anexos verdes) aparece na frente sucessivamente
+  const docsA = a.docsCount || 0;
+  const docsB = b.docsCount || 0;
+  if (docsA !== docsB) return docsB - docsA;
+
+  // 3. Quem tem mais itens verdes aprovados no checklist KYC
+  const greenA = a.greenChecksCount || 0;
+  const greenB = b.greenChecksCount || 0;
+  if (greenA !== greenB) return greenB - greenA;
+
+  // 4. Pontuação geral de completude
   const scoreA = computeCompletenessScore(a);
   const scoreB = computeCompletenessScore(b);
   if (scoreA !== scoreB) return scoreB - scoreA;
-
-  // 2. Quem tem mais documentos KYC físicos anexados aparece na frente
-  if (a.docsCount !== b.docsCount) return b.docsCount - a.docsCount;
-
-  // 3. Médicos fundadores/supervisores fixos mantêm prioridade de desempate
-  const pinnedA = pinnedDoctorRank(a.name, a.registration);
-  const pinnedB = pinnedDoctorRank(b.name, b.registration);
-  if (pinnedA !== pinnedB) return pinnedA - pinnedB;
 
   return normalize(a.name).localeCompare(normalize(b.name));
 }

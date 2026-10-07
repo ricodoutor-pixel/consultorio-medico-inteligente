@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchInlineAvatar } from "@/lib/kyc-docs";
 import { resolveDoctorAvatar } from "@/hooks/useRealProfessionals";
 import { getDoctorCfmPrint } from "@/data/doctor-cfm-prints";
+import { compareDoctorsByCompleteness } from "@/lib/doctor-ranking";
 
 export interface DoctorRow {
   id: string;
@@ -255,6 +256,37 @@ export function useDoctors() {
         }
         mappedDbDoctors.unshift(vic);
       }
+
+      // Ordenação oficial da esteira KYC e da plataforma:
+      // Dr. Victor #1 absoluto, seguido decrescentemente pela quantidade de anexos/documentos enviados (anexos verdes)
+      mappedDbDoctors.sort((a, b) => {
+        const aGreen = (a.kyc_docs || []).filter((d: any) => d.verification_status === "verified" || d.verification_status === "approved").length;
+        const bGreen = (b.kyc_docs || []).filter((d: any) => d.verification_status === "verified" || d.verification_status === "approved").length;
+        return compareDoctorsByCompleteness(
+          {
+            name: a.profile?.full_name || a.full_name,
+            registration: a.crm,
+            docsCount: (a.kyc_docs || []).length,
+            greenChecksCount: aGreen,
+            isContractSigned: Boolean(a.is_contract_signed || a.contract_signed_at),
+            hasSignature: Boolean(a.signature_url),
+            hasCpf: Boolean(a.profile?.cpf || a.document_number),
+            hasPhone: Boolean(a.profile?.phone || a.phone),
+            hasEmail: Boolean(a.profile?.email || a.email),
+          },
+          {
+            name: b.profile?.full_name || b.full_name,
+            registration: b.crm,
+            docsCount: (b.kyc_docs || []).length,
+            greenChecksCount: bGreen,
+            isContractSigned: Boolean(b.is_contract_signed || b.contract_signed_at),
+            hasSignature: Boolean(b.signature_url),
+            hasCpf: Boolean(b.profile?.cpf || b.document_number),
+            hasPhone: Boolean(b.profile?.phone || b.phone),
+            hasEmail: Boolean(b.profile?.email || b.email),
+          }
+        );
+      });
 
       setDoctors(mappedDbDoctors);
 

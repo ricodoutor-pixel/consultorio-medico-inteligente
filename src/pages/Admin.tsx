@@ -676,8 +676,8 @@ const Admin = () => {
                         <TableCell className="text-xs">{BRL(Number(o.amount))}</TableCell>
                         <TableCell className="text-[10px] text-muted-foreground uppercase">{o.payment_method?.replace("_", " ")}</TableCell>
                         <TableCell>
-                          <Badge variant={o.status === "paid" ? "default" : o.status === "pending" ? "secondary" : "outline"} className="text-[9px]">
-                            {o.status}
+                          <Badge variant={o.status === "paid" || o.status === "approved" ? "default" : o.status === "pending" ? "secondary" : "outline"} className={`text-[9px] ${o.status === "approved" || o.status === "paid" ? "bg-emerald-600 text-white hover:bg-emerald-700" : ""}`}>
+                            {o.status === "approved" ? "Aprovado" : o.status === "paid" ? "Pago" : o.status === "pending" ? "Pendente" : o.status}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-[10px] text-muted-foreground">{since(o.created_at)}</TableCell>

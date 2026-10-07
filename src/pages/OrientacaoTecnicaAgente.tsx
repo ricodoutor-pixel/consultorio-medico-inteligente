@@ -205,10 +205,12 @@ export default function OrientacaoTecnicaAgente() {
     }
     setCreatingCheckout(true);
     try {
+      const returnUrl = `${window.location.origin}/orientacao-tecnica?paid=1`;
       const { data, error } = await supabase.functions.invoke("mp-checkout", {
         body: {
           sku: "orientacao_tecnica",
-          returnUrl: "https://www.plantayraiz.com.br/orientacao-tecnica?paid=1",
+          returnUrl,
+          triage: answers,
         },
       });
       if (error) throw error;

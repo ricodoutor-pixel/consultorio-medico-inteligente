@@ -124,7 +124,8 @@ Deno.serve(async (req) => {
       shipping_carrier,
       shipping_days,
       amount: directAmount,
-      description: directDesc
+      description: directDesc,
+      triage
     } = await req.json();
     const sku = typeof rawSku === "string" ? (LEGACY_SKU_MAP[rawSku] ?? rawSku) : rawSku;
 
@@ -296,7 +297,8 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const siteUrl = "https://www.plantayraiz.com.br";
-    const success = typeof returnUrl === "string" && returnUrl.startsWith(siteUrl)
+    const isAllowedSuccess = typeof returnUrl === "string" && ALLOWED_ORIGINS.some((origin) => returnUrl.startsWith(origin));
+    const success = isAllowedSuccess
       ? returnUrl
       : `${siteUrl}/payment-success`;
 
@@ -387,6 +389,32 @@ Deno.serve(async (req) => {
         .from("payments")
         .update({ split_details: splitDetails, settlement_receipt: settlementReceipt })
         .eq("mp_preference_id", String(mpData.id));
+    }
+
+    if (typeof sku === "string" && (sku.startsWith("orientacao") || sku === "orientacao_tecnica")) {
+      const patientName = authData.user.user_metadata?.full_name || authData.user.email?.split("@")[0] || "Paciente";
+      const patientPhone = authData.user.user_metadata?.phone || authData.user.user_metadata?.whatsapp || "";
+      const patientEmail = authData.user.email || "";
+      const platformFee = round2(amount * FEE_TELEMEDICINE);
+      const doctorPayout = round2(amount - platformFee);
+
+      await supabase.from("orientacao_tecnica_orders").insert({
+        external_reference: externalReference,
+        patient_name: patientName,
+        patient_whatsapp: patientPhone,
+        patient_email: patientEmail,
+        amount: amount,
+        platform_fee: platformFee,
+        doctor_payout: doctorPayout,
+        payment_method: "mercadopago",
+        mp_preference_id: String(mpData.id),
+        status: "pending",
+        currency: "BRL",
+        topic: typeof triage === "object" && triage?.queixa ? `Orientação: ${String(triage.queixa).slice(0, 100)}` : "Orientação Técnica",
+        ai_analysis: triage && typeof triage === "object" ? JSON.stringify(triage) : null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
     }
 
     await supabase.from("audit_log").insert({

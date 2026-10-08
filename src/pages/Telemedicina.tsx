@@ -249,7 +249,7 @@ const Telemedicina = () => {
   const [rating, setRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
-  const [selectedServiceMode, setSelectedServiceMode] = useState<"video" | "chat" | "orientacao">("orientacao");
+  const [selectedServiceMode, setSelectedServiceMode] = useState<"video" | "chat">("video");
   const [uberDispatchStatus, setUberDispatchStatus] = useState<"buscando" | "conectado">("buscando");
   const [matchedDoctor, setMatchedDoctor] = useState<any>(null);
 
@@ -423,10 +423,10 @@ const Telemedicina = () => {
               <span className="text-sm font-bold text-primary">TELEMEDICINA AVANÇADA</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground leading-tight mb-4">
-              Inicie Sua <span className="text-gradient-green">Triagem Inteligente</span>
+              Inicie Sua <span className="text-gradient-green">Teleconsulta Médica Direta</span>
             </h1>
             <p className="text-muted-foreground max-w-2xl font-medium mb-6 mx-auto">
-              Triagem conduzida pela <strong>Enf. Brisa</strong> + análise clínica + receita + assinatura digital com ANVISA — supervisionado por nossa IA autônoma de última geração 24×7. O prontuário será encaminhado ao médico de sua escolha — defina um médico na página Profissionais.
+              Entrevista clínica em 5 perguntas com a <strong>Enf. Brisa</strong> → Pagamento Seguro da Teleconsulta → Atendimento Médico ao Vivo com Especialista → Avaliação do Paciente → Liberação instantânea do repasse ao médico via PIX.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-center mb-4">
@@ -745,67 +745,59 @@ const Telemedicina = () => {
                       </p>
                     </div>
 
-                    {/* Cards das Modalidades */}
-                    <div className="grid gap-4 sm:grid-cols-3">
-                      {/* 1. Orientação Técnica Dr. Edilson ON */}
-                      <div 
-                        onClick={() => setSelectedServiceMode("orientacao")}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${selectedServiceMode === "orientacao" ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border bg-card hover:border-primary/40"}`}
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <Badge className="bg-emerald-500/20 text-emerald-500 text-[10px]">Triagem Educacional</Badge>
-                            <span className="font-black text-primary text-base">R$ 30</span>
-                          </div>
-                          <h3 className="font-black text-sm text-foreground mb-1">Dr. Edilson Bezerra ON</h3>
-                          <p className="text-[11px] text-muted-foreground leading-snug">
-                            Ambiente virtual exclusivo com acesso a 40.000 estudos científicos. Relatório do Perfil Canabinoide Personalizado e Encaminhamento em PDF assinado digitalmente (CRM Bolívia).
-                          </p>
-                        </div>
-                        <div className="mt-3 pt-2 border-t border-border/50 text-[10px] text-primary font-bold">
-                          ✓ Prepara para a consulta médica
-                        </div>
-                      </div>
-
-                      {/* 2. Teleconsulta Vídeo HD */}
+                    {/* Cards das Modalidades de Teleconsulta Médica */}
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {/* 1. Teleconsulta Vídeo HD */}
                       <div 
                         onClick={() => setSelectedServiceMode("video")}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${selectedServiceMode === "video" ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border bg-card hover:border-primary/40"}`}
+                        className={`p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${selectedServiceMode === "video" ? "border-primary bg-primary/10 shadow-lg scale-[1.01]" : "border-border bg-card hover:border-primary/40"}`}
                       >
                         <div>
                           <div className="flex items-center justify-between mb-2">
-                            <Badge className="bg-primary/20 text-primary text-[10px]">Recomendada</Badge>
-                            <span className="font-black text-primary text-base">R$ 150</span>
+                            <Badge className="bg-primary/20 text-primary text-[10px] font-bold">Mais Escolhida · Recomendada</Badge>
+                            <span className="font-black text-primary text-xl">R$ 150</span>
                           </div>
-                          <h3 className="font-black text-sm text-foreground mb-1">Teleconsulta por Vídeo HD</h3>
-                          <p className="text-[11px] text-muted-foreground leading-snug">
-                            Consulta completa ao vivo por vídeo com médico especialista prescritor, receita especial digital ANVISA/CFM com QR Code e direito a retorno clínico.
+                          <h3 className="font-black text-base text-foreground mb-1">Teleconsulta por Vídeo HD</h3>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Consulta médica ao vivo com médico especialista prescritor, emissão de receita oficial digital ANVISA/CFM com QR Code e direito a retorno clínico incluso no protocolo.
                           </p>
                         </div>
-                        <div className="mt-3 pt-2 border-t border-border/50 text-[10px] text-primary font-bold">
-                          ✓ Receita oficial válida em farmácias
+                        <div className="mt-4 pt-3 border-t border-border/50 text-[11px] text-primary font-bold flex items-center gap-1.5">
+                          <CheckCircle2 size={14} /> Atendimento médico completo + Receita oficial válida em todo o Brasil
                         </div>
                       </div>
 
-                      {/* 3. Consulta Chat */}
+                      {/* 2. Consulta Chat */}
                       <div 
                         onClick={() => setSelectedServiceMode("chat")}
-                        className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${selectedServiceMode === "chat" ? "border-primary bg-primary/10 shadow-lg scale-[1.02]" : "border-border bg-card hover:border-primary/40"}`}
+                        className={`p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${selectedServiceMode === "chat" ? "border-primary bg-primary/10 shadow-lg scale-[1.01]" : "border-border bg-card hover:border-primary/40"}`}
                       >
                         <div>
                           <div className="flex items-center justify-between mb-2">
-                            <Badge variant="outline" className="text-[10px]">Ágil</Badge>
-                            <span className="font-black text-primary text-base">R$ 100</span>
+                            <Badge variant="outline" className="text-[10px] font-bold border-primary/30 text-primary">Atendimento Ágil</Badge>
+                            <span className="font-black text-primary text-xl">R$ 100</span>
                           </div>
-                          <h3 className="font-black text-sm text-foreground mb-1">Consulta por Chat</h3>
-                          <p className="text-[11px] text-muted-foreground leading-snug">
-                            Atendimento clínico por chat seguro na plataforma, análise da anamnese e emissão de prescrição médica digital homologada.
+                          <h3 className="font-black text-base text-foreground mb-1">Consulta Médica por Chat</h3>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Atendimento clínico ágil por chat seguro na plataforma, análise da anamnese e emissão de prescrição médica digital homologada pelo especialista.
                           </p>
                         </div>
-                        <div className="mt-3 pt-2 border-t border-border/50 text-[10px] text-primary font-bold">
-                          ✓ Prontuário e receita digital
+                        <div className="mt-4 pt-3 border-t border-border/50 text-[11px] text-primary font-bold flex items-center gap-1.5">
+                          <CheckCircle2 size={14} /> Prontuário eletrônico completo + Prescrição digital
                         </div>
                       </div>
+                    </div>
+
+                    {/* Link para Orientação Técnica em Nuvem (Dr. Edilson On - R$ 30) */}
+                    <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+                      <div className="text-xs text-muted-foreground leading-relaxed">
+                        <span>💡 Procura apenas a <strong>Orientação Técnica Prévia por R$ 30</strong> com o Dr. Edilson Bezerra On (ambiente virtual em nuvem com 40.000 estudos)?</span>
+                      </div>
+                      <Link to="/orientacao-tecnica">
+                        <Button variant="outline" size="sm" className="text-xs font-black border-primary text-primary hover:bg-primary/10 gap-1 rounded-xl shrink-0">
+                          Ir para Orientação Técnica em Nuvem (R$ 30) <ArrowRight size={13} />
+                        </Button>
+                      </Link>
                     </div>
 
                     {/* Botões de Pagamento */}
@@ -815,8 +807,8 @@ const Telemedicina = () => {
                         onClick={async () => {
                           setAiLoading(true);
                           try {
-                            const price = selectedServiceMode === "video" ? 150 : selectedServiceMode === "chat" ? 100 : 30;
-                            const title = selectedServiceMode === "video" ? "Teleconsulta por Vídeo HD" : selectedServiceMode === "chat" ? "Consulta Médica por Chat" : "Orientação Técnica — Dr. Edilson Bezerra ON";
+                            const price = selectedServiceMode === "video" ? 150 : 100;
+                            const title = selectedServiceMode === "video" ? "Teleconsulta por Vídeo HD" : "Consulta Médica por Chat";
 
                             const { data, error } = await supabase.functions.invoke("brisa-payment-link", {
                               body: {
@@ -845,7 +837,7 @@ const Telemedicina = () => {
                         disabled={aiLoading}
                       >
                         {aiLoading ? <Loader2 className="animate-spin mr-2" size={18} /> : <CreditCard className="mr-2" size={18} />}
-                        Pagar via Mercado Pago / Cartão ou PIX
+                        Pagar {selectedServiceMode === "video" ? "R$ 150" : "R$ 100"} via Mercado Pago (Cartão ou PIX)
                       </Button>
 
                       {/* Botão de Liberação com Comprovante */}

@@ -178,7 +178,7 @@ export default function OrientacaoTecnicaAgente() {
     if (phase === "room" && messages.length === 0) {
       setMessages([{
         role: "assistant",
-        content: `Olá${answers.nome ? `, **${answers.nome.split(" ")[0]}**` : ""}. Seja bem-vindo(a) à Orientação Técnica da **Planta y Raíz Ltda** (sob supervisão técnica médica da Dra. Suelen Naves Rodrigues, CRM-PR 49354, e Dr. Edilson Bezerra, CRM-CE 10963). Já li toda a sua triagem — não vou repetir perguntas.\n\nTemos **30 minutos** de Orientação Técnica especializada. Pode começar pela sua principal dúvida sobre o tratamento canabinoide.`,
+        content: `Olá${answers.nome ? `, **${answers.nome.split(" ")[0]}**` : ""}. Seja bem-vindo(a) à Orientação Técnica da **Planta y Raíz Ltda** com o **Dr. Edilson Bezerra On** (Médico Prescritor · CRM Santa Cruz / Bolívia nº 10963 · Assinatura Digital Homologada). Já li toda a sua triagem — não vou repetir perguntas.\n\nTemos **30 minutos** de Orientação Técnica especializada com acesso a mais de 40.000 estudos científicos. Ao final da sessão, geramos seu Relatório do Perfil Canabinoide Personalizado e Encaminhamento em PDF assinado digitalmente. Pode começar pela sua principal dúvida sobre o tratamento canabinoide.`,
       }]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -320,14 +320,14 @@ export default function OrientacaoTecnicaAgente() {
           {/* Cabeçalho */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-black px-4 py-2 rounded-full mb-4">
-              <Stethoscope size={14} /> ORIENTAÇÃO TÉCNICA — DR. EDILSON BEZERRA ON
+              <Stethoscope size={14} /> DR. EDILSON BEZERRA ON · MÉDICO PRESCRITOR CRM SANTA CRUZ / BOLÍVIA Nº 10963 · ASSINATURA DIGITAL
             </div>
             <h1 className="text-3xl md:text-4xl font-display font-black text-foreground">
-              Triagem, pagamento e <span className="text-gradient-green">30 minutos</span> de orientação técnica
+              Orientação Técnica em Nuvem · <span className="text-gradient-green">R$ 30</span>
             </h1>
             <p className="text-muted-foreground mt-3 text-sm md:text-base">
               Modalidade exclusiva do Dr. Edilson Bezerra On, com base em mais de 40.000 estudos
-              científicos publicados sobre cannabis medicinal.
+              científicos publicados sobre cannabis medicinal. Inclui Relatório do Perfil Canabinoide e Encaminhamento em PDF assinado digitalmente.
             </p>
           </div>
 

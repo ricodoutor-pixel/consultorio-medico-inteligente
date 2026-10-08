@@ -239,12 +239,13 @@ const Index = () => {
               {/* Pulse verde leve atrás do botão da Enfª Brisa */}
               <span aria-hidden className="pointer-events-none absolute -inset-2 rounded-3xl bg-primary/40 blur-2xl opacity-70 animate-brisa-pulse" />
               <BrisaCTAGate
-                href={`https://wa.me/5511991363154?text=${encodeURIComponent("Olá Enfª Brisa, eu preciso de uma orientação técnica com Dr. Edilson Bezerra Agora!")}`}
+                href="/orientacao-tecnica"
+                newTab={false}
                 className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-12 sm:h-14 px-6 sm:px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/30 transition-all hover:scale-105"
                 source="CTA_Index_Hero"
-                modalMessage="Antes de falar com a Enf. Brisa, deixe seu contato — assim agilizamos sua Orientação Técnica de apenas R$30 com o Dr. Edilson Bezerra."
+                modalMessage="Antes de entrar na sala virtual, deixe seu contato — assim agilizamos sua Orientação Técnica em Nuvem de apenas R$30 com o Dr. Edilson Bezerra On."
               >
-                🎯 Iniciar Orientação Técnica <ArrowRight size={18} className="ml-2" />
+                🎯 Iniciar Orientação Técnica (R$ 30) <ArrowRight size={18} className="ml-2" />
               </BrisaCTAGate>
             </div>
           </div>
@@ -351,12 +352,13 @@ const Index = () => {
                   {/* Pulse verde leve atrás do CTA da Brisa (Triagem) */}
                   <span aria-hidden className="pointer-events-none absolute -inset-3 rounded-3xl bg-primary/40 blur-2xl opacity-70 animate-brisa-pulse" />
                   <BrisaCTAGate
-                    href="https://wa.me/5511991363154?text=Ol%C3%A1%20Enf%C2%AA%20Brisa%2C%20quero%20iniciar%20a%20triagem%20para%20a%20Orienta%C3%A7%C3%A3o%20T%C3%A9cnica%20com%20a%20Dr.%20Edilson%20Bezerra"
+                    href="/orientacao-tecnica"
+                    newTab={false}
                     className="relative inline-flex items-center justify-center text-sm sm:text-base font-black h-14 sm:h-16 px-8 sm:px-10 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all"
                     source="CTA_DrEdilson_Triagem"
-                    modalMessage="Antes da triagem com a Enf. Brisa, deixe seu contato — garantimos sua Orientação Técnica de R$30 com o Dr. Edilson Bezerra."
+                    modalMessage="Antes de entrar na sala virtual, deixe seu contato — garantimos sua Orientação Técnica em Nuvem de R$30 com o Dr. Edilson Bezerra On."
                   >
-                    💬 Iniciar Triagem com Enfª Brisa <ArrowRight size={20} className="ml-2" />
+                    💬 Iniciar Orientação Técnica em Nuvem (R$ 30) <ArrowRight size={20} className="ml-2" />
                   </BrisaCTAGate>
                 </div>
               </div>

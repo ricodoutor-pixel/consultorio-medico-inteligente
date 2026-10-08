@@ -268,22 +268,14 @@ export function useDoctors() {
             registration: a.crm,
             docsCount: (a.kyc_docs || []).length,
             greenChecksCount: aGreen,
-            isContractSigned: Boolean(a.is_contract_signed || a.contract_signed_at),
-            hasSignature: Boolean(a.signature_url),
-            hasCpf: Boolean(a.profile?.cpf || a.document_number),
-            hasPhone: Boolean(a.profile?.phone || a.phone),
-            hasEmail: Boolean(a.profile?.email || a.email),
+            hasContract: Boolean(a.is_contract_signed || a.contract_signed_at),
           },
           {
             name: b.profile?.full_name || b.full_name,
             registration: b.crm,
             docsCount: (b.kyc_docs || []).length,
             greenChecksCount: bGreen,
-            isContractSigned: Boolean(b.is_contract_signed || b.contract_signed_at),
-            hasSignature: Boolean(b.signature_url),
-            hasCpf: Boolean(b.profile?.cpf || b.document_number),
-            hasPhone: Boolean(b.profile?.phone || b.phone),
-            hasEmail: Boolean(b.profile?.email || b.email),
+            hasContract: Boolean(b.is_contract_signed || b.contract_signed_at),
           }
         );
       });

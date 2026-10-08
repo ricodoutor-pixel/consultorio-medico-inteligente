@@ -35,7 +35,7 @@ type TriageQuestion = {
 };
 
 const QUESTIONS: TriageQuestion[] = [
-  { id: "nome", label: "Como você se chama?", hint: "Nome que o Dr. Edilson vai usar no atendimento.", type: "text" },
+  { id: "nome", label: "Como você se chama?", hint: "Nome que a equipe clínica vai usar no atendimento.", type: "text" },
   { id: "idade", label: "Qual a sua idade?", hint: "Idade em anos.", type: "text" },
   { id: "queixa", label: "Qual a sua queixa principal?", hint: "Descreva o que mais te incomoda hoje.", type: "long" },
   { id: "tempo", label: "Há quanto tempo você sente isso?", hint: "Selecione a opção mais próxima.", type: "choice", options: ["Menos de 1 mês", "1 a 6 meses", "6 meses a 2 anos", "Mais de 2 anos"] },
@@ -178,7 +178,7 @@ export default function OrientacaoTecnicaAgente() {
     if (phase === "room" && messages.length === 0) {
       setMessages([{
         role: "assistant",
-        content: `Olá${answers.nome ? `, **${answers.nome.split(" ")[0]}**` : ""}. Sou o **Dr. Edilson Bezerra On** (CRM-CE 10963). Já li toda a sua triagem — não vou repetir perguntas.\n\nTemos **30 minutos** de Orientação Técnica. Pode começar pela sua principal dúvida sobre o tratamento canabinoide.`,
+        content: `Olá${answers.nome ? `, **${answers.nome.split(" ")[0]}**` : ""}. Seja bem-vindo(a) à Orientação Técnica da **Planta y Raíz Ltda** (sob supervisão técnica médica da Dra. Suelen Naves Rodrigues, CRM-PR 49354, e Dr. Edilson Bezerra, CRM-CE 10963). Já li toda a sua triagem — não vou repetir perguntas.\n\nTemos **30 minutos** de Orientação Técnica especializada. Pode começar pela sua principal dúvida sobre o tratamento canabinoide.`,
       }]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -424,7 +424,7 @@ export default function OrientacaoTecnicaAgente() {
                   <div className="rounded-2xl bg-card border border-border p-4 mb-6 space-y-2 text-sm">
                     <p className="text-muted-foreground">
                       Depois do pagamento confirmado você responde a triagem da Enfª Brisa (10 perguntas)
-                      e a sala do Dr. Edilson Bezerra On abre com 30 minutos no cronômetro.
+                      e a sala de Orientação Técnica abre com 30 minutos no cronômetro.
                     </p>
                     {QUESTIONS.filter((item) => answers[item.id]).map((item) => (
                       <div key={item.id} className="flex gap-2">
@@ -438,7 +438,7 @@ export default function OrientacaoTecnicaAgente() {
                   <div className="flex items-end justify-between mb-6">
                     <div>
                       <p className="text-xs uppercase font-black text-muted-foreground tracking-wider">Orientação Técnica</p>
-                      <p className="text-sm text-muted-foreground">30 minutos com o Dr. Edilson Bezerra On</p>
+                      <p className="text-sm text-muted-foreground">30 minutos com especialista — Planta y Raíz Ltda</p>
                     </div>
                     <p className="text-3xl font-display font-black text-gradient-green">R$ 30</p>
                   </div>

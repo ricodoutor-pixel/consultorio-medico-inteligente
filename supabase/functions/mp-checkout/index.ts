@@ -40,20 +40,20 @@ const json = (body: unknown, status = 200, req?: Request) => {
  *  planos   → 3 planos universais (paciente/médico/lojista) a R$99/mês
  */
 const CATALOG: Record<string, { title: string; amount: number; recurring?: boolean }> = {
-  orientacao_tecnica: { title: "Orientação Técnica (Planta y Raiz)", amount: 30 },
-  orientacao: { title: "Orientação Técnica (Planta y Raiz)", amount: 30 },
-  retorno_consulta: { title: "Retorno com o Profissional", amount: 90 },
-  consulta_chat: { title: "Consulta por Chat (com receita assinada)", amount: 100 },
-  consulta_video: { title: "Consulta por Vídeo (com receita assinada)", amount: 150 },
-  consulta_premium: { title: "Consulta Premium (Vídeo + Chat)", amount: 180 },
-  consulta_canabinoide: { title: "Consulta Canabinoide Especializada", amount: 250 },
-  plano_paciente: { title: "Plano Paciente (mensal)", amount: 99, recurring: true },
-  plano_medico: { title: "Plano Médico (mensal)", amount: 99, recurring: true },
-  plano_lojista: { title: "Plano Lojista (mensal)", amount: 99, recurring: true },
-  plano_basic: { title: "Plano Individual Básico", amount: 49.90, recurring: true },
-  plano_professional: { title: "Plano Médico Profissional", amount: 99.90, recurring: true },
-  plano_premium: { title: "Plano Saúde Verde Família", amount: 199.90, recurring: true },
-  plano_enterprise: { title: "Plano Empresa & Parceiros", amount: 499.90, recurring: true },
+  orientacao_tecnica: { title: "Orientação Técnica — Planta y Raíz Ltda", amount: 30 },
+  orientacao: { title: "Orientação Técnica — Planta y Raíz Ltda", amount: 30 },
+  retorno_consulta: { title: "Retorno de Consulta — Planta y Raíz Ltda", amount: 90 },
+  consulta_chat: { title: "Consulta por Chat — Planta y Raíz Ltda", amount: 100 },
+  consulta_video: { title: "Consulta por Vídeo — Planta y Raíz Ltda", amount: 150 },
+  consulta_premium: { title: "Consulta Premium — Planta y Raíz Ltda", amount: 180 },
+  consulta_canabinoide: { title: "Consulta Especializada — Planta y Raíz Ltda", amount: 250 },
+  plano_paciente: { title: "Plano Paciente — Planta y Raíz Ltda", amount: 99, recurring: true },
+  plano_medico: { title: "Plano Médico — Planta y Raíz Ltda", amount: 99, recurring: true },
+  plano_lojista: { title: "Plano Lojista — Planta y Raíz Ltda", amount: 99, recurring: true },
+  plano_basic: { title: "Plano Individual Básico — Planta y Raíz Ltda", amount: 49.90, recurring: true },
+  plano_professional: { title: "Plano Médico Profissional — Planta y Raíz Ltda", amount: 99.90, recurring: true },
+  plano_premium: { title: "Plano Saúde Verde Família — Planta y Raíz Ltda", amount: 199.90, recurring: true },
+  plano_enterprise: { title: "Plano Empresa & Parceiros — Planta y Raíz Ltda", amount: 499.90, recurring: true },
 };
 
 /** Módulos/apps de monitoramento do Consultório Digital (preço server-side). */

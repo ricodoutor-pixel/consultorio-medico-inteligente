@@ -93,19 +93,13 @@ export const DoctorKycPipeline = ({ doctors, onRefresh }: DoctorKycPipelineProps
         name: a.name,
         registration: a.crm,
         docsCount: a.docsCount ?? 0,
-        isContractSigned: Boolean(a.is_contract_signed || a.contract_signed_at),
-        hasCpf: Boolean(a.cpf),
-        hasPhone: Boolean(a.phone),
-        hasEmail: Boolean(a.email),
+        hasContract: Boolean(a.is_contract_signed || a.contract_signed_at),
       },
       {
         name: b.name,
         registration: b.crm,
         docsCount: b.docsCount ?? 0,
-        isContractSigned: Boolean(b.is_contract_signed || b.contract_signed_at),
-        hasCpf: Boolean(b.cpf),
-        hasPhone: Boolean(b.phone),
-        hasEmail: Boolean(b.email),
+        hasContract: Boolean(b.is_contract_signed || b.contract_signed_at),
       }
     )
   );

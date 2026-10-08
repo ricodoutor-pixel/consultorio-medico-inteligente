@@ -24,6 +24,11 @@ jobs:
       - name: Typecheck
         run: bunx tsc --noEmit -p tsconfig.app.json
 
+      - name: Testes unitários (Vitest)
+        # Escopo em src/ via vitest.config.ts. Os testes em supabase/tests/ são
+        # de integração (runtime Deno + credenciais) e não rodam aqui.
+        run: bunx vitest run --passWithNoTests
+
       - name: Lint
         run: bunx eslint . --max-warnings 0
         continue-on-error: true

@@ -16,7 +16,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { Stethoscope, ArrowRight, ArrowLeft, CheckCircle2, Brain, Heart, Activity, Shield, Leaf, Watch, FileText, Download, Printer, UserCheck, Scale, AlertTriangle, Loader2, MessageCircle, X, CreditCard, Wallet, Users, Info, HelpCircle, Star, MapPin, Sparkles, Award } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { TCLEConsentModal } from "@/components/TCLEConsentModal";
 import { useRealProfessionals } from "@/hooks/useRealProfessionals";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -231,6 +231,7 @@ const Telemedicina = () => {
   const dynamicPrice = 30;
   const dynamicSymbol = "R$";
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showTCLE, setShowTCLE] = useState(true);
   const [showFlowInfo, setShowFlowInfo] = useState(false);
   const [step, setStep] = useState(-1);
@@ -260,6 +261,25 @@ const Telemedicina = () => {
     email: "",
     telefone: "",
   });
+
+  // 🔗 PERSONALIZAÇÃO DE LINK (Modalidade, Paciente e Telefone)
+  useEffect(() => {
+    const modalidade = searchParams.get("modalidade");
+    if (modalidade === "chat" || modalidade === "video") {
+      setSelectedServiceMode(modalidade);
+    }
+    const urlNome = searchParams.get("paciente") || searchParams.get("nome");
+    const urlTel = searchParams.get("tel") || searchParams.get("whatsapp");
+    const urlEmail = searchParams.get("email");
+    if (urlNome || urlTel || urlEmail) {
+      setPatientData(prev => ({
+        ...prev,
+        nome: urlNome || prev.nome,
+        telefone: urlTel || prev.telefone,
+        email: urlEmail || prev.email,
+      }));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const saved = sessionStorage.getItem("triage_condition");
@@ -575,6 +595,25 @@ const Telemedicina = () => {
                 <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
               </div>
             </div>
+          )}
+
+          {/* Banner de Encaminhamento Personalizado WhatsApp */}
+          {searchParams.get("origem") === "whatsapp" && (
+            <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-2xl mx-auto mb-6">
+              <div className="bg-primary/10 border-2 border-primary/30 rounded-2xl p-4 flex items-center gap-3 text-left">
+                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
+                  <Sparkles className="text-primary" size={20} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-foreground text-sm">
+                    Olá{patientData.nome ? `, ${patientData.nome}` : ""}! Atendimento Encaminhado pela Enfª Brisa 🌿
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Modalidade pré-selecionada: <strong>{selectedServiceMode === "video" ? "Teleconsulta por Vídeo HD (R$ 150)" : "Consulta Médica por Chat (R$ 100)"}</strong>. Preencha as 5 perguntas para conectar com seu médico especialista.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
           )}
 
           <div className="max-w-2xl mx-auto">

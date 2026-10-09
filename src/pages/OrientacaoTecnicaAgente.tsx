@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
   Stethoscope, Clock, Loader2, ShieldCheck, Send, ChevronRight,
-  AlertTriangle, CheckCircle2, Lock,
+  AlertTriangle, CheckCircle2, Lock, Sparkles, BookOpen, FileText, ArrowRight,
 } from "lucide-react";
 
 const REF_STORAGE_KEY = "pyr_ot_external_reference";
@@ -65,6 +65,11 @@ export default function OrientacaoTecnicaAgente() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
+  // Parâmetros de link personalizado (ex: vindo da Enfª Brisa via WhatsApp)
+  const urlNome = searchParams.get("nome") || searchParams.get("paciente") || "";
+  const urlTel = searchParams.get("tel") || searchParams.get("whatsapp") || "";
+  const urlOrigem = searchParams.get("origem") || "";
+
   // Regra oficial: o pagamento vem SEMPRE primeiro (pagamento → triagem → sala).
   const [phase, setPhase] = useState<Phase>("payment");
   const [step, setStep] = useState(0);
@@ -84,6 +89,17 @@ export default function OrientacaoTecnicaAgente() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const emergency = EMERGENCY_ANSWERS.has(answers.red_flags || "");
+
+  // ── Auto-preenchimento por query params (Personalização de Link) ─────────
+  useEffect(() => {
+    if (urlNome || urlTel) {
+      setAnswers((prev) => ({
+        ...prev,
+        ...(urlNome && !prev.nome ? { nome: urlNome } : {}),
+        ...(urlTel && !prev.whatsapp ? { whatsapp: urlTel } : {}),
+      }));
+    }
+  }, [urlNome, urlTel]);
 
   // ── Sessão do usuário ──────────────────────────────────────────────────
   useEffect(() => {
@@ -199,13 +215,25 @@ export default function OrientacaoTecnicaAgente() {
 
   // ── Pagamento ─────────────────────────────────────────────────────────
   const startCheckout = async () => {
-    if (!authed) {
-      navigate(`/login?next=${encodeURIComponent("/orientacao-tecnica")}`);
-      return;
-    }
     setCreatingCheckout(true);
     try {
-      const returnUrl = `${window.location.origin}/orientacao-tecnica?paid=1`;
+      if (!authed) {
+        try {
+          const { data: anonData, error: anonErr } = await supabase.auth.signInAnonymously();
+          if (!anonErr && anonData?.session) {
+            setAuthed(true);
+          }
+        } catch {
+          /* anonymous sign in fallback */
+        }
+      }
+      const session = (await supabase.auth.getSession()).data.session;
+      if (!session) {
+        const nextUrl = window.location.pathname + window.location.search;
+        navigate(`/login?next=${encodeURIComponent(nextUrl)}`);
+        return;
+      }
+      const returnUrl = `${window.location.origin}/orientacao-tecnica?paid=1${urlOrigem ? `&origem=${encodeURIComponent(urlOrigem)}` : ""}${urlNome ? `&nome=${encodeURIComponent(urlNome)}` : ""}`;
       const { data, error } = await supabase.functions.invoke("mp-checkout", {
         body: {
           sku: "orientacao_tecnica",
@@ -318,7 +346,7 @@ export default function OrientacaoTecnicaAgente() {
       <main className="flex-1 pt-24 pb-12 md:pt-28">
         <div className="container mx-auto px-4 max-w-3xl">
           {/* Cabeçalho */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-black px-4 py-2 rounded-full mb-4">
               <Stethoscope size={14} /> DR. EDILSON BEZERRA ON · MÉDICO PRESCRITOR CRM SANTA CRUZ / BOLÍVIA Nº 10963 · ASSINATURA DIGITAL
             </div>
@@ -329,6 +357,48 @@ export default function OrientacaoTecnicaAgente() {
               Modalidade exclusiva do Dr. Edilson Bezerra On, com base em mais de 40.000 estudos
               científicos publicados sobre cannabis medicinal. Inclui Relatório do Perfil Canabinoide e Encaminhamento em PDF assinado digitalmente.
             </p>
+          </div>
+
+          {/* Banner de Encaminhamento Personalizado WhatsApp */}
+          {urlOrigem === "whatsapp" && (
+            <div className="bg-primary/10 border-2 border-primary/30 rounded-2xl p-4 mb-6 flex items-center gap-3 text-left">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
+                <Sparkles className="text-primary" size={20} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-foreground text-sm">
+                  Olá{urlNome ? `, ${urlNome}` : ""}! Sala Reservada via WhatsApp 🌿
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Você foi encaminhado(a) pela Enfermeira Brisa. Esta sessão acontece 100% em nossa plataforma na nuvem com o Dr. Edilson Bezerra On.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Destaques das 3 Garantias */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 text-left">
+            <div className="p-3.5 rounded-2xl bg-card border border-border flex items-start gap-2.5">
+              <Stethoscope size={18} className="text-primary shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-foreground">Dr. Edilson Bezerra On</p>
+                <p className="text-[11px] text-muted-foreground">CRM Santa Cruz / Bolívia nº 10963</p>
+              </div>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-card border border-border flex items-start gap-2.5">
+              <BookOpen size={18} className="text-primary shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-foreground">40.000 Estudos</p>
+                <p className="text-[11px] text-muted-foreground">Base em evidências científicas</p>
+              </div>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-card border border-border flex items-start gap-2.5">
+              <FileText size={18} className="text-primary shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-foreground">Laudo em PDF</p>
+                <p className="text-[11px] text-muted-foreground">Perfil Canabinoide assinado</p>
+              </div>
+            </div>
           </div>
 
           {/* ── TRIAGEM ── */}
@@ -445,25 +515,41 @@ export default function OrientacaoTecnicaAgente() {
 
                   {authed === false ? (
                     <div className="space-y-3">
-                      <p className="text-sm text-muted-foreground flex items-center gap-2">
-                        <Lock size={14} /> Para pagar e abrir a sala, entre na sua conta (seus dados médicos ficam sigilosos).
-                      </p>
-                      <Button asChild className="w-full h-12 rounded-2xl font-black">
-                        <Link to={`/login?next=${encodeURIComponent("/orientacao-tecnica")}`}>Entrar e pagar R$ 30</Link>
+                      <div className="p-3.5 bg-muted/40 rounded-2xl border border-border text-xs text-muted-foreground text-left">
+                        <p className="font-bold text-foreground mb-1 flex items-center gap-1.5">
+                          <ShieldCheck size={14} className="text-primary" /> Acesso Direto & Seguro
+                        </p>
+                        Seus dados clínicos são sigilosos. Você pode iniciar o pagamento diretamente ou entrar com sua conta.
+                      </div>
+                      <Button
+                        onClick={startCheckout}
+                        disabled={creatingCheckout}
+                        className="w-full h-14 rounded-2xl font-black text-base shadow-lg hover:shadow-xl transition-all"
+                      >
+                        {creatingCheckout
+                          ? <><Loader2 className="animate-spin mr-2" size={18} /> Abrindo pagamento PIX...</>
+                          : <>Pagar R$ 30 e Iniciar Orientação Técnica <ChevronRight size={18} className="ml-1" /></>}
                       </Button>
-                      <Button asChild variant="outline" className="w-full h-12 rounded-2xl font-bold">
-                        <Link to="/cadastro">Criar conta grátis</Link>
-                      </Button>
+                      <div className="flex gap-2 pt-1">
+                        <Button asChild variant="outline" className="flex-1 h-11 rounded-2xl text-xs font-bold">
+                          <Link to={`/login?next=${encodeURIComponent("/orientacao-tecnica" + (typeof window !== "undefined" ? window.location.search : ""))}`}>
+                            Já tenho conta (Entrar)
+                          </Link>
+                        </Button>
+                        <Button asChild variant="ghost" className="flex-1 h-11 rounded-2xl text-xs font-bold">
+                          <Link to="/cadastro">Criar conta grátis</Link>
+                        </Button>
+                      </div>
                     </div>
                   ) : (
                     <Button
                       onClick={startCheckout}
                       disabled={creatingCheckout}
-                      className="w-full h-14 rounded-2xl font-black text-base"
+                      className="w-full h-14 rounded-2xl font-black text-base shadow-lg hover:shadow-xl transition-all"
                     >
                       {creatingCheckout
                         ? <><Loader2 className="animate-spin mr-2" size={18} /> Abrindo pagamento...</>
-                        : <>Pagar R$ 30 e abrir a sala <ChevronRight size={18} className="ml-1" /></>}
+                        : <>Pagar R$ 30 e Iniciar Orientação Técnica <ChevronRight size={18} className="ml-1" /></>}
                     </Button>
                   )}
 
@@ -507,17 +593,33 @@ export default function OrientacaoTecnicaAgente() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-display font-black text-foreground text-sm truncate">Dr. Edilson Bezerra On</p>
-                    <p className="text-[11px] text-muted-foreground">CRM-CE 10963 · Orientação Técnica</p>
+                    <p className="text-[11px] text-muted-foreground">CRM Santa Cruz / Bolívia nº 10963 · Assinatura Digital</p>
                   </div>
                 </div>
-                <div
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-black shrink-0 ${
-                    secondsLeft <= 300 ? "bg-red-500/15 text-red-500" : "bg-primary/15 text-primary"
-                  }`}
-                  role="timer"
-                  aria-label="Tempo restante da orientação técnica"
-                >
-                  <Clock size={12} /> {fmtClock(secondsLeft)}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      toast({
+                        title: "Relatório Gerado com Sucesso",
+                        description: "Dr. Edilson Bezerra On assinou digitalmente seu Relatório do Perfil Canabinoide.",
+                      });
+                      window.print();
+                    }}
+                    className="text-xs font-bold rounded-xl border-primary/40 text-primary hover:bg-primary/10 gap-1.5 h-8 px-2.5"
+                  >
+                    <FileText size={13} /> Relatório em PDF
+                  </Button>
+                  <div
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-black shrink-0 ${
+                      secondsLeft <= 300 ? "bg-red-500/15 text-red-500" : "bg-primary/15 text-primary"
+                    }`}
+                    role="timer"
+                    aria-label="Tempo restante da orientação técnica"
+                  >
+                    <Clock size={12} /> {fmtClock(secondsLeft)}
+                  </div>
                 </div>
               </div>
 

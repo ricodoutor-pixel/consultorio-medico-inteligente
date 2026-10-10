@@ -16,6 +16,7 @@ import { isConsultationPaid, createConsultationCheckout } from "./telemedicine-c
 describe("real consultation rules", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.stubGlobal("window", { location: { origin: "http://localhost:8080" } });
     mocks.session.mockResolvedValue({ data: { session: { user: { id: "patient-id" } } } });
   });
   it("video costs R$150 on the server", () => expect(fixedConsultationPrice("video")).toBe(150));

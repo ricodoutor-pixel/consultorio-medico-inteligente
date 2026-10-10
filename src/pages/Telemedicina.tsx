@@ -23,6 +23,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
+import { createConsultationCheckout, isConsultationPaid } from "@/lib/telemedicine-checkout";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
@@ -246,13 +247,8 @@ const Telemedicina = () => {
   const [selectedPathology, setSelectedPathology] = useState("");
   const [triageId, setTriageId] = useState<string | null>(null);
   
-  // 🌟 ESTADO DE DESPACHO INTELIGENTE ESTILO UBER & AVALIAÇÃO DO PACIENTE
-  const [rating, setRating] = useState(5);
-  const [reviewComment, setReviewComment] = useState("");
-  const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [selectedServiceMode, setSelectedServiceMode] = useState<"video" | "chat">("video");
-  const [uberDispatchStatus, setUberDispatchStatus] = useState<"buscando" | "conectado">("buscando");
-  const [matchedDoctor, setMatchedDoctor] = useState<any>(null);
+  const [appointmentId, setAppointmentId] = useState<string | null>(null);
 
   const [patientData, setPatientData] = useState({
     nome: "",
@@ -371,7 +367,10 @@ const Telemedicina = () => {
       }
       const completeAnswers = { ...answers };
       const answerText = interviewQuestions
-        .map((question) => `${question.id}. ${question.question}\n${Array.isArray(completeAnswers[question.id]) ? completeAnswers[question.id].join(", ") : completeAnswers[question.id] || ""}`)
+        .map((question) => {
+          const answer = completeAnswers[question.id];
+          return `${question.id}. ${question.question}\n${Array.isArray(answer) ? answer.join(", ") : answer || ""}`;
+        })
         .join("\n\n");
       
       // 🔒 REGRA AGENTS.md: Armazena triagem completa no banco ANTES de criar pedido de pagamento Mercado Pago
@@ -411,6 +410,33 @@ const Telemedicina = () => {
       setAiLoading(false);
     }
   };
+
+  const verifyConsultationPayment = async (id: string) => {
+    if (aiLoading) return;
+    setAiLoading(true);
+    try {
+      if (await isConsultationPaid(id)) {
+        sessionStorage.removeItem("telemedicine_pending_checkout");
+        navigate("/consultas");
+      } else {
+        toast({ title: "Pagamento ainda não confirmado", description: "Aguarde a confirmação do Mercado Pago e tente novamente." });
+      }
+    } catch (error) {
+      toast({ title: "Não foi possível verificar o pagamento", description: error instanceof Error ? error.message : "Tente novamente.", variant: "destructive" });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const id = searchParams.get("appointment");
+    if (!id) return;
+    setAppointmentId(id);
+    setShowTCLE(false);
+    setTcleAccepted(true);
+    setStep(6);
+    void verifyConsultationPayment(id);
+  }, [searchParams]);
 
   return (
     <div className="min-h-dvh bg-background">
@@ -575,10 +601,10 @@ const Telemedicina = () => {
                   <span className="font-bold text-[10px] uppercase">4. Teleconsulta</span>
                   <span className="text-[9px]">{step === 8 ? 'Ao vivo' : step > 8 ? 'Realizada' : 'Aguardando'}</span>
                 </div>
-                <div className={`flex flex-col items-center p-2 rounded-2xl transition-all ${step === 9 ? 'bg-amber-500/15 text-amber-500 border border-amber-500/40 font-black scale-105' : reviewSubmitted ? 'bg-emerald-500/10 text-emerald-500' : 'text-muted-foreground'}`}>
+                <div className="flex flex-col items-center p-2 rounded-2xl transition-all text-muted-foreground">
                   <Star size={16} className="mb-1" />
                   <span className="font-bold text-[10px] uppercase">5. Avaliação & PIX</span>
-                  <span className="text-[9px]">{reviewSubmitted ? 'Repasse liberado!' : step === 9 ? 'Sua nota' : 'Final'}</span>
+                  <span className="text-[9px]">Aguardando consulta</span>
                 </div>
               </div>
             </motion.div>
@@ -788,7 +814,7 @@ const Telemedicina = () => {
                     <div className="grid gap-4 sm:grid-cols-2">
                       {/* 1. Teleconsulta Vídeo HD */}
                       <div 
-                        onClick={() => setSelectedServiceMode("video")}
+                        onClick={() => { if (!appointmentId) setSelectedServiceMode("video"); }}
                         className={`p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${selectedServiceMode === "video" ? "border-primary bg-primary/10 shadow-lg scale-[1.01]" : "border-border bg-card hover:border-primary/40"}`}
                       >
                         <div>
@@ -808,7 +834,7 @@ const Telemedicina = () => {
 
                       {/* 2. Consulta Chat */}
                       <div 
-                        onClick={() => setSelectedServiceMode("chat")}
+                        onClick={() => { if (!appointmentId) setSelectedServiceMode("chat"); }}
                         className={`p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${selectedServiceMode === "chat" ? "border-primary bg-primary/10 shadow-lg scale-[1.01]" : "border-border bg-card hover:border-primary/40"}`}
                       >
                         <div>
@@ -846,29 +872,15 @@ const Telemedicina = () => {
                         onClick={async () => {
                           setAiLoading(true);
                           try {
-                            const price = selectedServiceMode === "video" ? 150 : 100;
-                            const title = selectedServiceMode === "video" ? "Teleconsulta por Vídeo HD" : "Consulta Médica por Chat";
-
-                            const { data, error } = await supabase.functions.invoke("brisa-payment-link", {
-                              body: {
-                                name: patientData.nome,
-                                phone: patientData.telefone,
-                                email: patientData.email,
-                                triageId,
-                                amount: price,
-                                serviceTitle: title
-                              }
-                            });
-                            if (error || !data?.payment_url) {
-                              // Se der erro de gateway, simula avanço para experiência fluida
-                              toast({ title: "Pagamento registrado", description: "Conectando você ao médico especialista..." });
-                              setStep(7);
-                              return;
-                            }
-                            if (data.external_reference) localStorage.setItem("ot_last_order_ref", data.external_reference);
-                            window.location.href = data.payment_url;
-                          } catch {
-                            setStep(7);
+                            let pending: { appointmentId?: string; mode?: string; triageId?: string } = {};
+                            try { pending = JSON.parse(sessionStorage.getItem("telemedicine_pending_checkout") || "{}"); } catch { /* discard invalid draft */ }
+                            const id = appointmentId || (pending.mode === selectedServiceMode && pending.triageId === triageId ? pending.appointmentId : null);
+                            if (!triageId && !id) throw new Error("Conclua a entrevista antes de pagar.");
+                            const checkout = await createConsultationCheckout(selectedServiceMode, triageId || "", id);
+                            setAppointmentId(checkout.appointmentId);
+                            window.location.href = checkout.paymentUrl;
+                          } catch (error) {
+                            toast({ title: "Pagamento não iniciado", description: error instanceof Error ? error.message : "Tente novamente.", variant: "destructive" });
                           } finally {
                             setAiLoading(false);
                           }
@@ -883,13 +895,20 @@ const Telemedicina = () => {
                       <Button
                         variant="outline"
                         className="w-full h-12 border-emerald-500/30 text-emerald-500 font-bold rounded-2xl text-xs sm:text-sm hover:bg-emerald-500/10"
+                        disabled={aiLoading}
                         onClick={() => {
-                          toast({ title: "Comprovante verificado!", description: "Iniciando despacho inteligente de médico..." });
-                          setStep(7);
+                          let savedId: string | undefined;
+                          try { savedId = JSON.parse(sessionStorage.getItem("telemedicine_pending_checkout") || "{}").appointmentId; } catch { /* invalid draft */ }
+                          const id = appointmentId || savedId;
+                          if (!id) {
+                            toast({ title: "Nenhum pagamento iniciado", description: "Inicie o pagamento desta consulta pelo Mercado Pago.", variant: "destructive" });
+                            return;
+                          }
+                          void verifyConsultationPayment(id);
                         }}
                       >
                         <CheckCircle2 className="mr-2" size={16} />
-                        Já realizei o PIX / Enviar Comprovante e Avançar
+                        Já paguei / Verificar confirmação
                       </Button>
                     </div>
 
@@ -901,230 +920,6 @@ const Telemedicina = () => {
               </motion.div>
             )}
 
-            {/* PASSO 3: TRIAGEM CLÍNICA & DESPACHO INTELIGENTE ESTILO UBER (Passo 7) */}
-            {step === 7 && (
-              <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-6">
-                <Card className="border-border shadow-2xl bg-card">
-                  <CardContent className="p-6 sm:p-8 space-y-6">
-                    <div className="text-center space-y-2">
-                      <Badge className="bg-primary/20 text-primary uppercase text-[10px]">
-                        Passo 3 de 5 · Despacho Inteligente 24×7
-                      </Badge>
-                      <h2 className="text-2xl sm:text-3xl font-display font-black text-foreground">
-                        IA Brisa: <span className="text-gradient-green">Conectando ao Médico Ideal</span>
-                      </h2>
-                      <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">
-                        Nosso sistema opera no modelo <strong>Uber da Saúde Canábica</strong>, priorizando mérito, proximidade e sua escolha sovereign:
-                      </p>
-                    </div>
-
-                    {/* Explicação das 4 Regras Meritocráticas Estilo Uber */}
-                    <div className="grid gap-3 sm:grid-cols-2 text-xs">
-                      <div className="p-3 rounded-2xl bg-muted/40 border border-border">
-                        <span className="font-black text-primary block mb-1">1º Escolha do Paciente</span>
-                        <p className="text-muted-foreground text-[11px]">Se você escolheu um médico na vitrine de profissionais, a consulta é direcionada a ele caso esteja online e em conformidade.</p>
-                      </div>
-                      <div className="p-3 rounded-2xl bg-muted/40 border border-border">
-                        <span className="font-black text-primary block mb-1">2º Prioridade Plano VIP</span>
-                        <p className="text-muted-foreground text-[11px]">Médicos assinantes do Plano VIP (taxa zero, 100% repasse) têm preferência imediata na fila geral de teleconsultas.</p>
-                      </div>
-                      <div className="p-3 rounded-2xl bg-muted/40 border border-border">
-                        <span className="font-black text-primary block mb-1">3º Geolocalização</span>
-                        <p className="text-muted-foreground text-[11px]">Cruzamento inteligente no mapa priorizando o médico credenciado mais próximo geograficamente de você.</p>
-                      </div>
-                      <div className="p-3 rounded-2xl bg-muted/40 border border-border">
-                        <span className="font-black text-primary block mb-1">4º Fallback Autônomo 24/7</span>
-                        <p className="text-muted-foreground text-[11px]">Se o médico mais próximo estiver offline, o sistema transfere na hora para o médico mais qualificado online com KYC verificado.</p>
-                      </div>
-                    </div>
-
-                    {/* Médico Conectado em Tempo Real */}
-                    <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-primary/10 to-transparent border border-emerald-500/30 flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <img 
-                            src={medicos[0]?.imageUrl || brisaImg} 
-                            alt="Médico Prescritor" 
-                            className="w-14 h-14 rounded-2xl object-cover border-2 border-emerald-400" 
-                          />
-                          <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-background animate-pulse" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-black text-sm text-foreground">{medicos[0]?.name || "Dra. Suelen Naves Rodrigues"}</span>
-                            <Badge className="bg-amber-500/20 text-amber-500 text-[9px]">VIP</Badge>
-                          </div>
-                          <p className="text-[11px] text-muted-foreground">{medicos[0]?.crm || "CRM 49354/PR"} · {medicos[0]?.category || "Medicina Endocanabinoide"}</p>
-                          <div className="flex items-center gap-1 text-[10px] text-emerald-500 font-bold mt-1">
-                            <CheckCircle2 size={12} /> Médico Online e Habilitado (KYC 100% Verificado)
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-[10px] text-muted-foreground block">Tempo de espera</span>
-                        <span className="text-sm font-black text-emerald-400">Imediato</span>
-                      </div>
-                    </div>
-
-                    <Button 
-                      className="w-full h-14 bg-primary text-primary-foreground font-black rounded-2xl text-base shadow-lg hover:shadow-xl"
-                      onClick={() => setStep(8)}
-                    >
-                      Acessar Sala de Teleconsulta com Especialista <ArrowRight className="ml-2" size={18} />
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-
-            {/* PASSO 4: TELECONSULTA MÉDICA AO VIVO (Passo 8) */}
-            {step === 8 && (
-              <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-6">
-                <Card className="border-border shadow-2xl bg-card">
-                  <CardContent className="p-6 sm:p-8 space-y-6">
-                    <div className="flex items-center justify-between border-b border-border pb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                          <Stethoscope size={20} className="text-primary" />
-                        </div>
-                        <div>
-                          <Badge className="bg-emerald-500/20 text-emerald-500 text-[10px]">Sessão Médica Ativa</Badge>
-                          <h2 className="text-lg font-black text-foreground">Consultório Virtual Criptografado</h2>
-                        </div>
-                      </div>
-                      <span className="text-xs text-muted-foreground font-mono">ID: {triageId?.slice(0, 8) || "TLM-2026"}</span>
-                    </div>
-
-                    <div className="p-6 rounded-2xl bg-muted/40 border border-border text-center space-y-3">
-                      <div className="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center mx-auto text-emerald-400 animate-pulse">
-                        <Activity size={28} />
-                      </div>
-                      <h3 className="font-black text-base text-foreground">Atendimento Clínico Conduzido com Sucesso</h3>
-                      <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                        O médico avaliou sua entrevista prévia em 5 perguntas, alinhou o protocolo terapêutico de titulação e emitiu as recomendações clínicas oficiais.
-                      </p>
-                    </div>
-
-                    <div className="space-y-3">
-                      <Button 
-                        className="w-full h-14 bg-primary text-primary-foreground font-black rounded-2xl text-base shadow-lg"
-                        onClick={() => setStep(9)}
-                      >
-                        Finalizar Consulta e Avaliar Atendimento <ArrowRight className="ml-2" size={18} />
-                      </Button>
-                      <p className="text-center text-[10px] text-muted-foreground">
-                        Sua avaliação é necessária para liberar o repasse via PIX ao médico prescritor.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-
-            {/* PASSO 5: AVALIAÇÃO DO PACIENTE & LIBERAÇÃO DO REPASSE VIA PIX (Passo 9) */}
-            {step === 9 && (
-              <motion.div initial="hidden" animate="visible" variants={fadeUp} className="space-y-6">
-                <Card className="border-amber-500/30 bg-gradient-to-br from-card to-amber-500/5 shadow-2xl">
-                  <CardContent className="p-6 sm:p-8 space-y-6">
-                    <div className="text-center space-y-2">
-                      <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-2 text-amber-500">
-                        <Award size={32} />
-                      </div>
-                      <Badge className="bg-amber-500/20 text-amber-500 uppercase text-[10px]">
-                        Passo 5 de 5 · Avaliação do Paciente
-                      </Badge>
-                      <h2 className="text-2xl sm:text-3xl font-display font-black text-foreground">
-                        Como foi sua experiência com o atendimento?
-                      </h2>
-                      <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">
-                        Sua avaliação assegura o padrão de excelência da plataforma e autoriza a liberação instantânea dos honorários médicos via PIX.
-                      </p>
-                    </div>
-
-                    {!reviewSubmitted ? (
-                      <div className="space-y-6 max-w-md mx-auto">
-                        {/* Seletor de 5 Estrelas */}
-                        <div className="flex items-center justify-center gap-2">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <button
-                              key={star}
-                              type="button"
-                              onClick={() => setRating(star)}
-                              className="p-1 transition-transform hover:scale-125 focus:outline-none"
-                            >
-                              <Star
-                                size={36}
-                                className={star <= rating ? "text-amber-400 fill-amber-400" : "text-muted-foreground/40"}
-                              />
-                            </button>
-                          ))}
-                        </div>
-                        <p className="text-center text-xs font-bold text-amber-400">
-                          {rating === 5 ? "Excelente! Recomendo totalmente" : rating === 4 ? "Muito bom atendimento" : rating === 3 ? "Atendimento satisfatório" : "Precisa de melhorias"}
-                        </p>
-
-                        <div className="space-y-2">
-                          <Label className="text-xs font-bold uppercase">Deixe seu depoimento ou comentário:</Label>
-                          <Textarea 
-                            placeholder="Conte como foi sua teleconsulta, a pontualidade do médico e a clareza das orientações..."
-                            className="min-h-[100px] rounded-2xl border-border text-sm"
-                            value={reviewComment}
-                            onChange={(e) => setReviewComment(e.target.value)}
-                          />
-                        </div>
-
-                        {/* Aviso de Repasse Meritocrático ao Médico */}
-                        <div className="p-4 rounded-2xl bg-muted/40 border border-border text-[11px] text-muted-foreground leading-relaxed flex items-start gap-2">
-                          <Shield size={16} className="text-primary shrink-0 mt-0.5" />
-                          <div>
-                            <strong className="text-foreground">Garantia e Repasse Instantâneo:</strong> Ao confirmar sua avaliação, nosso sistema audita a teleconsulta e libera automaticamente o pagamento via PIX na conta do médico (100% líquido para médicos no Plano VIP ou 93% no modelo padrão).
-                          </div>
-                        </div>
-
-                        <Button 
-                          className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-2xl text-base shadow-lg"
-                          onClick={async () => {
-                            setReviewSubmitted(true);
-                            toast({ 
-                              title: "Avaliação registrada com sucesso!", 
-                              description: "Honorários médicos liberados via PIX. Obrigado pela confiança!" 
-                            });
-                          }}
-                        >
-                          Confirmar Avaliação e Concluir <CheckCircle2 className="ml-2" size={18} />
-                        </Button>
-                      </div>
-                    ) : (
-                      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center space-y-4 py-4">
-                        <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border-2 border-emerald-500/40">
-                          <CheckCircle2 size={36} />
-                        </div>
-                        <h3 className="text-xl font-black text-foreground">Ciclo Completo Finalizado com Sucesso!</h3>
-                        <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                          Seu prontuário foi arquivado no padrão CFM/ANVISA e a receita digital está disponível para download. O repasse foi liquidado com sucesso ao médico prescritor.
-                        </p>
-                        
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-                          <Button 
-                            variant="outline" 
-                            className="rounded-xl border-primary text-primary font-bold"
-                            onClick={() => navigate("/farmacia-virtual")}
-                          >
-                            Ir para Farmácia Virtual / Comprar Medicamento
-                          </Button>
-                          <Button 
-                            className="rounded-xl bg-primary text-primary-foreground font-bold"
-                            onClick={() => navigate("/profissionais")}
-                          >
-                            Ver Vitrine de Médicos
-                          </Button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
 
           </div>
         </div>

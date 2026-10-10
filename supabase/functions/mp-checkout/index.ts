@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { fixedConsultationPrice } from "../_shared/consultation-price.ts";
 
 const ALLOWED_ORIGINS = [
   "https://plantayraiz.com.br",
@@ -220,14 +221,20 @@ Deno.serve(async (req) => {
     } else if (appointmentId && typeof appointmentId === "string") {
       const { data: appt } = await supabase
         .from("appointments")
-        .select("id, amount, patient_id, doctor_id, status")
+        .select("id, amount, patient_id, doctor_id, status, type")
         .eq("id", appointmentId)
         .maybeSingle();
       if (!appt) return json({ error: "Consulta não encontrada" }, 404, req);
       if (appt.patient_id !== userId) return json({ error: "Forbidden" }, 403, req);
-      amount = round2(Number(appt.amount || 0));
+      const fixedPrice = fixedConsultationPrice(appt.type);
+      amount = fixedPrice ?? round2(Number(appt.amount || 0));
+      if (fixedPrice !== null && Number(appt.amount) !== fixedPrice) {
+        const { error: priceError } = await supabase.from("appointments")
+          .update({ amount: fixedPrice }).eq("id", appt.id).eq("payment_status", "pending");
+        if (priceError) return json({ error: "Não foi possível registrar o valor da consulta" }, 500, req);
+      }
       if (!(amount > 0)) return json({ error: "Consulta sem valor válido" }, 400, req);
-      title = "Consulta médica — Planta y Raiz";
+      title = appt.type === "video" ? CATALOG.consulta_video.title : appt.type === "chat" ? CATALOG.consulta_chat.title : "Consulta médica — Planta y Raiz";
       externalReference = `appointment:${appt.id}`;
       type = "consultation";
 

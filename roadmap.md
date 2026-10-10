@@ -1,5 +1,11 @@
 # Roadmap
 
+## Achados de pagamentos e agendamento — 10/10/2026
+
+- [ ] Corrigir encaminhamento para médicos e horários reais, sem identificadores fictícios
+- [ ] Conferir e corrigir cobrança de vídeo R$150 / chat R$100
+- [ ] Impedir avanço por erro de pagamento ou declaração de PIX sem confirmação
+
 - [ ] Validar e completar o cadastro KYC da Dra. Mariana sem autoaprovação
 - [ ] Anexar a comprovação oficial do CRM e preparar foto padronizada preservando marcas oficiais
 - [ ] Criar o card offline em vermelho até completar os anexos obrigatórios

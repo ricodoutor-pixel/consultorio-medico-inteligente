@@ -601,10 +601,10 @@ const Telemedicina = () => {
                   <span className="font-bold text-[10px] uppercase">4. Teleconsulta</span>
                   <span className="text-[9px]">{step === 8 ? 'Ao vivo' : step > 8 ? 'Realizada' : 'Aguardando'}</span>
                 </div>
-                <div className={`flex flex-col items-center p-2 rounded-2xl transition-all ${step === 9 ? 'bg-amber-500/15 text-amber-500 border border-amber-500/40 font-black scale-105' : reviewSubmitted ? 'bg-emerald-500/10 text-emerald-500' : 'text-muted-foreground'}`}>
+                <div className="flex flex-col items-center p-2 rounded-2xl transition-all text-muted-foreground">
                   <Star size={16} className="mb-1" />
                   <span className="font-bold text-[10px] uppercase">5. Avaliação & PIX</span>
-                  <span className="text-[9px]">{reviewSubmitted ? 'Repasse liberado!' : step === 9 ? 'Sua nota' : 'Final'}</span>
+                  <span className="text-[9px]">Aguardando consulta</span>
                 </div>
               </div>
             </motion.div>

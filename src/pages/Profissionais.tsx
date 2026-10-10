@@ -116,7 +116,7 @@ const ServiceTagsRow = () => (
 
 
 const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: Professional[] }) => {
-  const pro = professionals.find((p) => p.id === id);
+  const pro = professionals.find((p) => p.id === id || p.dbId === id || (p.dbId && `db-${p.dbId}` === id));
   if (!pro) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Profissional não encontrado.</div>;
 
   return (

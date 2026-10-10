@@ -10,6 +10,8 @@ import draGraceConceicaoImg from "@/assets/dra-grace-conceicao.jpg";
 import cfmDraGraceConceicao from "@/assets/cfm_prints/cfm-dra-grace-conceicao.png";
 import drOtavioBasseteImg from "@/assets/dr-otavio-bassete.jpg";
 import cfmDrOtavioBassete from "@/assets/cfm_prints/cfm-dr-otavio-bassete.png";
+import drBrenoBoueriImg from "@/assets/dr-breno-boueri.jpg";
+import cfmDrBrenoBoueri from "@/assets/cfm_prints/cfm-dr-breno-boueri.png";
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
@@ -293,6 +295,31 @@ export const professionals: Professional[] = [
     crm: "206873/SP",
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento em psiquiatria e acolhimento exemplar." }
+    ],
+  },
+  {
+    id: "med-breno-boueri",
+    name: "Dr. Breno Boueri Affonso",
+    category: "Médicos Prescritores",
+    bio: "Médico graduado pela Universidade de Mogi das Cruzes (UMC) em 1992, com mais de 32 anos de sólida atuação médica. Devidamente inscrito no CRM 75492/SP em situação regular, é Especialista com RQE Nº 58756 em Diagnóstico por Imagem, com atuação de destaque em Radiologia Intervencionista e Angiorradiologia. Aliando vasta experiência clínica e precisão diagnóstica ao potencial terapêutico da Medicina Endocanabinoide, dedica-se ao tratamento humanizado e baseado em evidências de dores crônicas, distúrbios inflamatórios e melhora global da qualidade de vida. Seus pacientes encontram acolhimento, conduta ética e acompanhamento longitudinal próximo.",
+    flags: ["🇧🇷"],
+    experience: "32 anos",
+    tags: ["Diagnóstico por Imagem", "Radiologia Intervencionista", "Cannabis Medicinal", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5511982625115",
+    rating: 5.0,
+    consults: 0,
+    avatar: "BA",
+    imageUrl: drBrenoBoueriImg,
+    online: true,
+    cfmPrintUrl: cfmDrBrenoBoueri,
+    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 10:00", "Hoje 11:30", "Hoje 14:30", "Hoje 16:00"],
+    crm: "75492/SP",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Excelente médico, muito atencioso, explicou todo o tratamento com extrema clareza." }
     ],
   },
   {

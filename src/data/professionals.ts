@@ -12,6 +12,8 @@ import drOtavioBasseteImg from "@/assets/dr-otavio-bassete.jpg";
 import cfmDrOtavioBassete from "@/assets/cfm_prints/cfm-dr-otavio-bassete.png";
 import drBrenoBoueriImg from "@/assets/dr-breno-boueri.jpg";
 import cfmDrBrenoBoueri from "@/assets/cfm_prints/cfm-dr-breno-boueri.png";
+import drMiltonUrbanImg from "@/assets/dr-milton-urban.jpg";
+import cfmDrMiltonUrban from "@/assets/cfm_prints/cfm-dr-milton-urban.png";
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
@@ -320,6 +322,31 @@ export const professionals: Professional[] = [
     crm: "75492/SP",
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente médico, muito atencioso, explicou todo o tratamento com extrema clareza." }
+    ],
+  },
+  {
+    id: "med-milton-urban",
+    name: "Dr. Milton Dimas Tadeu Urban",
+    category: "Médicos Prescritores",
+    bio: "Médico graduado pela tradicional Universidade Federal do Rio de Janeiro (UFRJ) em 1986, com 38 anos de sólida atuação médica e pediátrica. Devidamente inscrito no CRM 58169/SP em situação regular, possui especialização voltada para neurodesenvolvimento e acolhimento dedicado a pacientes com Transtorno do Espectro Autista (TEA). Prescritor experiente de fitocanabinoides, oferece acompanhamento humanizado e próximo para famílias e pacientes com planos terapêuticos individualizados.",
+    flags: ["🇧🇷"],
+    experience: "38 anos",
+    tags: ["Pediatria", "Autismo Infantil (TEA)", "Cannabis Medicinal", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5519999059665",
+    rating: 5.0,
+    consults: 0,
+    avatar: "MU",
+    imageUrl: drMiltonUrbanImg,
+    online: true,
+    cfmPrintUrl: cfmDrMiltonUrban,
+    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 09:30", "Hoje 11:00", "Hoje 15:00", "Hoje 17:00"],
+    crm: "58169/SP",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Excelente médico, muito atencioso, explicou todo o tratamento com extrema clareza e dedicação." }
     ],
   },
   {

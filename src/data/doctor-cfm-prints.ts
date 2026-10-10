@@ -36,6 +36,7 @@ export const DOCTOR_CFM_PRINTS: Record<string, string> = {
   "10372": "/cfm_prints/cfm-dra-grace-conceicao.png",
   "21907": "/cfm_prints/cfm-dr-otavio-bassete.png",
   "75492": "/cfm_prints/cfm-dr-breno-boueri.png",
+  "58169": "/cfm_prints/cfm-dr-milton-urban.png",
 };
 
 export function getDoctorCfmPrint(nameOrCrm?: string | null): string | null {
@@ -47,6 +48,7 @@ export function getDoctorCfmPrint(nameOrCrm?: string | null): string | null {
   }
 
   if (str.includes("breno") || str.includes("boueri") || str.includes("affonso") || str.includes("75492")) return "/cfm_prints/cfm-dr-breno-boueri.png";
+  if (str.includes("milton") || str.includes("urban") || str.includes("58169")) return "/cfm_prints/cfm-dr-milton-urban.png";
   if (str.includes("geraldo")) return "/cfm_prints/dr-jose-geraldo.png";
   if (str.includes("daniel") && (str.includes("kobayashi") || str.includes("colombo"))) return "/cfm_prints/dr-daniel.png";
   if (str.includes("joao pedro") || str.includes("detoni") || str.includes("girardello")) return "/cfm_prints/cfm-dr-joao-pedro.png";

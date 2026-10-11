@@ -4,3 +4,4 @@
 - Public medical listings derive from approved backend records and exclude veterinary registrations from human-care views; this preserves clinical scope and a single source of truth.
 - Appointment routing uses the real server-returned doctor or the selected public record, and availability uses persisted slots only; synthetic identifiers cannot satisfy appointment foreign keys.
 - Telemedicine checkout records a pending appointment and uses mp-checkout with server-enforced modality prices; access proceeds only after reading the patient's paid appointment, never from a receipt button or payment error.
+- Service worker updates never force a page reload; cache only same-origin static files and reuse hash-versioned bundles while keeping HTML network-first, so reopens are faster without interrupting active care or payments.

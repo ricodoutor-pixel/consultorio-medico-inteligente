@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2 } from "lucide-react";
+import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2, Search, X } from "lucide-react";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { CountryFlag } from "@/components/CountryFlag";
@@ -242,6 +242,7 @@ const Profissionais = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const [searchQuery, setSearchQuery] = useState("");
   const { professionals: mergedPros, realCount } = useRealProfessionals();
   const professionals = useRotatingOnline(mergedPros);
 
@@ -292,6 +293,19 @@ const Profissionais = () => {
 
   // Hooks SEMPRE antes de qualquer return condicional (Regras dos Hooks do React).
   const filtered = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+
+    if (q) {
+      return professionals.filter((p) => {
+        const nameMatch = (p.name || "").toLowerCase().includes(q);
+        const crmMatch = (p.crm || "").toLowerCase().includes(q);
+        const bioMatch = (p.bio || "").toLowerCase().includes(q);
+        const catMatch = (p.category || "").toLowerCase().includes(q);
+        const tagMatch = (p.tags || []).some((t) => t.toLowerCase().includes(q));
+        return nameMatch || crmMatch || bioMatch || catMatch || tagMatch;
+      });
+    }
+
     const list = professionals.filter((p) => p.category === activeCategory);
     if (activeCategory === "Médicos Prescritores") {
       const vIdx = list.findIndex((p) => (p.name || "").toLowerCase().includes("victor"));
@@ -301,7 +315,7 @@ const Profissionais = () => {
       }
     }
     return list;
-  }, [professionals, activeCategory]);
+  }, [professionals, activeCategory, searchQuery]);
 
   if (id) {
     return (
@@ -338,6 +352,46 @@ const Profissionais = () => {
           </motion.div>
 
 
+          {/* Barra de Busca de Médicos */}
+          <div className="mb-6 md:mb-8 max-w-2xl">
+            <div className="relative flex items-center">
+              <Search className="absolute left-4 w-5 h-5 text-primary pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar médico por nome, CRM ou especialidade..."
+                className="w-full pl-12 pr-11 py-3.5 bg-card/80 hover:bg-card focus:bg-card border border-border/80 focus:border-primary rounded-2xl text-sm md:text-base text-foreground placeholder:text-muted-foreground outline-none transition-all shadow-sm focus:ring-2 focus:ring-primary/20"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3.5 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+                  title="Limpar busca"
+                  aria-label="Limpar busca"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            {searchQuery.trim() && (
+              <div className="flex items-center justify-between mt-2.5 px-2 text-xs text-muted-foreground">
+                <span>
+                  Resultados para <strong className="text-foreground font-black">"{searchQuery}"</strong>:{" "}
+                  <strong className="text-primary font-black">{filtered.length}</strong> profissional(is)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="text-primary hover:underline font-bold"
+                >
+                  Limpar filtro
+                </button>
+              </div>
+            )}
+          </div>
+
           {/* Tabs - scroll horizontal no mobile */}
 
           <div className="flex gap-1.5 md:gap-2 mb-6 md:mb-10 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap scrollbar-hide">
@@ -346,9 +400,12 @@ const Profissionais = () => {
               return (
                 <button
                   key={cat}
-                  onClick={() => setActiveCategory(cat)}
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    setSearchQuery("");
+                  }}
                   className={`px-3 md:px-4 py-2 md:py-2.5 rounded-full text-xs md:text-sm font-black border transition-colors whitespace-nowrap flex-shrink-0 min-h-[44px] ${
-                    activeCategory === cat
+                    activeCategory === cat && !searchQuery.trim()
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border bg-card/50 text-muted-foreground hover:text-foreground"
                   }`}
@@ -359,8 +416,26 @@ const Profissionais = () => {
             })}
           </div>
 
-          {/* Cards - grid responsivo */}
-          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5" initial="hidden" animate="visible" variants={stagger} key={`${activeCategory}-${filtered.length}`}>
+          {/* Cards - grid responsivo ou estado vazio */}
+          {filtered.length === 0 ? (
+            <div className="text-center py-16 px-4 bg-card/40 border border-border/70 rounded-3xl max-w-lg mx-auto my-8">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4 border border-primary/20">
+                <Search className="w-7 h-7" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground mb-1.5">Nenhum profissional encontrado</h3>
+              <p className="text-sm text-muted-foreground mb-5">
+                Não encontramos resultados para <strong className="text-foreground font-bold">"{searchQuery}"</strong>. Verifique o nome ou busque pelo CRM.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => setSearchQuery("")}
+                className="rounded-xl border-primary text-primary hover:bg-primary/10 font-bold"
+              >
+                Limpar busca e ver todos
+              </Button>
+            </div>
+          ) : (
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5" initial="hidden" animate="visible" variants={stagger} key={`${activeCategory}-${filtered.length}-${searchQuery}`}>
             {filtered.map((p) => (
               <motion.div key={p.id} variants={fadeUp}>
                   <Card
@@ -473,6 +548,7 @@ const Profissionais = () => {
               </motion.div>
             ))}
           </motion.div>
+          )}
 
           {/* Mapa: médicos próximos a você */}
           <div className="mt-8 mb-6 md:mb-10">

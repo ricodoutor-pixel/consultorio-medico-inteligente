@@ -195,6 +195,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
     const baseByCrm = new Map<string, Professional>();
     const baseByName = new Map<string, Professional>();
     for (const base of baseProfessionals) {
+      if (!base) continue;
       const cleanCrm = (base.crm || "").replace(/\D/g, "");
       if (cleanCrm) baseByCrm.set(cleanCrm, base);
       const key = normalizeDoctorKey(base.name);
@@ -275,7 +276,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
 
     // Preservar as demais 10 categorias oficiais configuradas (Terapeutas, Enfermagem, etc.)
     const nonMedical = baseProfessionals.filter(
-      (b) => b.category !== MEDICOS_CATEGORY && b.category !== "Médico Veterinário Prescritor"
+      (b) => Boolean(b) && b.category !== MEDICOS_CATEGORY && b.category !== "Médico Veterinário Prescritor"
     );
 
     return [...sortedMedicos, ...nonMedical];

@@ -304,7 +304,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento em psiquiatria e acolhimento exemplar." }
     ],
-  },,
+  },
   {
     id: "med-milton-urban",
     name: "Dr. Milton Dimas Tadeu Urban",
@@ -329,7 +329,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente médico, muito atencioso, explicou todo o tratamento com extrema clareza e dedicação." }
     ],
-  },,
+  },
   {
     id: "med-barbara-matos",
     name: "Dra. Barbara Eliane Matos",
@@ -353,7 +353,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-geovana-torres",
     name: "Dra. Geovana Torres Mozaner",
@@ -378,7 +378,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento, muito atenciosa e dedicada." }
     ],
-  },,
+  },
   {
     id: "med-daniel-kobayashi",
     name: "Dr. Daniel Kobayashi Colombo",
@@ -403,7 +403,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento." }
     ],
-  },,
+  },
   {
     id: "med-jose-geraldo",
     name: "Dr. José Geraldo Barbugli Abbade Filho",
@@ -428,7 +428,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Profissional extremamente experiente e atencioso." }
     ],
-  },,
+  },
   {
     id: "med-ana-karoliny",
     name: "Dra. Ana Karoliny Martins",
@@ -453,7 +453,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Atendimento maravilhoso, muito atenciosa, humana e esclareceu todas as dúvidas com clareza." }
     ],
-  },,
+  },
   {
     id: "med-albert-machado",
     name: "Dr. Albert Machado Tenorio",
@@ -477,7 +477,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-sadi-menta",
     name: "Dr. Sadi Roberto Menta",
@@ -502,7 +502,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Médico experiente, atencioso e muito acolhedor." }
     ],
-  },,
+  },
   {
     id: "med-mariana-alves",
     name: "Dra. Mariana Alves Rezende",
@@ -527,7 +527,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente médica, atendimento acolhedor e esclarecedor." }
     ],
-  },,
+  },
   {
     id: "med-breno-boueri",
     name: "Dr. Breno Boueri Affonso",
@@ -552,7 +552,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente médico, muito atencioso, explicou todo o tratamento com extrema clareza." }
     ],
-  },,
+  },
   {
     id: "med-joao-pedro",
     name: "Dr. João Pedro Girardello Detoni",
@@ -579,7 +579,7 @@ export const professionals: Professional[] = [
       { name: "Fernanda R.", rating: 5, text: "Dr. João Pedro é extremamente humano e esclarecedor. Excelente atendimento!" },
       { name: "Rodrigo M.", rating: 5, text: "Ótima orientação técnica, esclareceu todas as dúvidas sobre o tratamento." },
     ],
-  },,
+  },
   {
     id: "med-grace-conceicao",
     name: "Dra. Grace Adriana Lopes Conceição",
@@ -604,7 +604,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente atendimento em psiquiatria e acolhimento exemplar." }
     ],
-  },,
+  },
   {
     id: "med-raissa-chagas",
     name: "Dra. Raíssa Ruperto Souza das Chagas",
@@ -629,7 +629,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente médica, atendimento acolhedor, empático e de altíssimo nível técnico." }
     ],
-  },,
+  },
   {
     id: "med-diego-cartaxo",
     name: "Dr. Diego Cartaxo Jacome",
@@ -653,7 +653,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-gustavo-nobre",
     name: "Dr. Gustavo Nobre Damiani Pereira",
@@ -677,7 +677,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-leuma-netta",
     name: "Dra. Leuma Leão Netta",
@@ -701,7 +701,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-luiz-medina",
     name: "Prof. Dr. Luiz Roberto Medina dos Santos",
@@ -725,7 +725,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-ana-paula",
     name: "Dra. Ana Paula Ferreira Lima",
@@ -750,7 +750,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["09:00", "10:30", "14:00", "15:30", "17:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-adeonis-oliveira",
     name: "Dr. Adeonis Oliveira Lima",
@@ -774,7 +774,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-alexandre-stramandinoli",
     name: "Dr. Alexandre Stramandinoli Correa da Silva",
@@ -798,7 +798,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-0",
     name: "Dr. Edilson Bezerra",
@@ -832,7 +832,7 @@ export const professionals: Professional[] = [
       { name: "Maria A.", rating: 5, text: "Atencioso, acessível e muito competente. Recomendo!" },
       { name: "José R.", rating: 5, text: "Finalmente encontrei um médico que entende cannabis medicinal de verdade." },
     ],
-  },,
+  },
   {
     id: "med-guilherme-campos",
     name: "Dr. Guilherme Campos Silva",
@@ -856,7 +856,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-gustavo-simoes",
     name: "Dr. Gustavo Simoes Llivi Ibanez",
@@ -880,7 +880,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-jose-roberto",
     name: "Dr. José Roberto Silva Coutinho",
@@ -904,7 +904,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-angela-beatriz",
     name: "Dra. Angela Beatriz Mercado Acevedo",
@@ -928,7 +928,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-ingrid-chiullo",
     name: "Dra. Ingrid Chiullo Miranda",
@@ -952,7 +952,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:30", "14:00", "15:30", "16:00"],
     reviews: [],
-  },,
+  },
   {
     id: "med-marianna",
     name: "Dra. Marianna Coimbra Arzamendia",
@@ -976,7 +976,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["09:00", "10:30", "14:00", "15:30", "17:00"],
     reviews: [],
-  },,
+  },
   {
     id: "mock-olivia",
     name: "Dra. Olivia Zimeri",
@@ -1009,7 +1009,7 @@ export const professionals: Professional[] = [
       { name: "Família Santos", rating: 5, text: "Muito atenciosa e excelente acompanhamento." },
       { name: "Cláudia V.", rating: 5, text: "Humana, competente e acessível. Gratidão." },
     ],
-  },,
+  },
   {
     id: "mock-suelen",
     name: "Dra. Suelen Naves Rodrigues",
@@ -1090,7 +1090,7 @@ export const professionals: Professional[] = [
     reviews: [
       { name: "Tutor Verificado", rating: 5, text: "Excelente atendimento veterinário integrativo, muito cuidadoso e atencioso com meu pet." }
     ],
-  },,
+  },
   {
     id: "med-eduardo-correa",
     name: "Dr. Eduardo Migueis Correa",
@@ -1114,7 +1114,7 @@ export const professionals: Professional[] = [
     services: STANDARD_DOCTOR_SERVICES,
     slots: ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"],
     reviews: [],
-  },,
+  },
   {
     id: "psi-1",
     name: "Dra. Larissa Monteiro (perfil demonstrativo)",
@@ -1141,7 +1141,7 @@ export const professionals: Professional[] = [
       { name: "Carolina S.", rating: 5, text: "Me ajudou muito com ansiedade generalizada." },
       { name: "Marcos T.", rating: 5, text: "Profissional excelente e acolhedora." },
     ],
-  },,
+  },
   {
     id: "farm-1",
     name: "Dr. Pablo Quispe (perfil demonstrativo)",
@@ -1169,7 +1169,7 @@ export const professionals: Professional[] = [
       { name: "Marcos V.", rating: 5, text: "Entende tudo sobre dosagens e interações." },
       { name: "Carla B.", rating: 4, text: "Muito atencioso e detalhista." },
     ],
-  },,
+  },
   {
     id: "ocu-1",
     name: "Dr. Rafael Mendes (perfil demonstrativo)",
@@ -1196,7 +1196,7 @@ export const professionals: Professional[] = [
       { name: "André L.", rating: 5, text: "Me ajudou com minha LER crônica usando CBD." },
       { name: "Patrícia S.", rating: 5, text: "Profissional atualizado e muito humano." },
     ],
-  },,
+  },
   {
     id: "acu-1",
     name: "Dr. Wei Chen (perfil demonstrativo)",
@@ -1223,7 +1223,7 @@ export const professionals: Professional[] = [
       { name: "Luciana F.", rating: 5, text: "Mestre na arte da acupuntura, transformou minha dor." },
       { name: "Roberto C.", rating: 5, text: "Combinação perfeita de acupuntura e cannabis." },
     ],
-  },,
+  },
   {
     id: "jar-1",
     name: "Prof. Thiago Verde (perfil demonstrativo)",
@@ -1250,7 +1250,7 @@ export const professionals: Professional[] = [
       { name: "Pedro H.", rating: 5, text: "Ótima orientação para meu cultivo autorizado." },
       { name: "Renata M.", rating: 4, text: "Muito didático e paciente." },
     ],
-  },,
+  },
   {
     id: "aux-1",
     name: "Maria Aparecida Silva (perfil demonstrativo)",
@@ -1277,7 +1277,7 @@ export const professionals: Professional[] = [
       { name: "Dona Rosa S.", rating: 5, text: "Cuidou da minha mãe com muito carinho." },
       { name: "Carlos M.", rating: 5, text: "Profissional dedicada e pontual." },
     ],
-  },,
+  },
   {
     id: "enf-1",
     name: "Enf. Patrícia Mendonça (perfil demonstrativo)",
@@ -1304,7 +1304,7 @@ export const professionals: Professional[] = [
       { name: "Dona Maria J.", rating: 5, text: "Enfermeira excepcional, muito competente." },
       { name: "Roberto A.", rating: 5, text: "Coordenou todo cuidado domiciliar do meu pai." },
     ],
-  },,
+  },
   {
     id: "tec-1",
     name: "Téc. Luciana Pereira (perfil demonstrativo)",
@@ -1331,7 +1331,7 @@ export const professionals: Professional[] = [
       { name: "Dona Aparecida", rating: 5, text: "Cuidou de mim como se fosse da família." },
       { name: "Filho de Seu José", rating: 5, text: "Profissional dedicada e competente." },
     ],
-  },,
+  },
   {
     id: "cuid-1",
     name: "Helena Cristina Barbosa (perfil demonstrativo)",
@@ -1359,7 +1359,7 @@ export const professionals: Professional[] = [
       { name: "Dr. Paulo", rating: 5, text: "Cuidadora exemplar, recomendo sem hesitar." },
       { name: "Dona Maria", rating: 5, text: "16 anos de dedicação fazem toda diferença." },
     ],
-  },,
+  },
   {
     id: "int-1",
     name: "Dra. Mariana Castello (perfil demonstrativo)",
@@ -1387,7 +1387,7 @@ export const professionals: Professional[] = [
       { name: "Fernando L.", rating: 5, text: "Combinação de acupuntura com CBD foi transformadora." },
       { name: "Regina S.", rating: 5, text: "Finalmente uma médica que olha o paciente como um todo." },
     ],
-  },,
+  },
 ];
 
 

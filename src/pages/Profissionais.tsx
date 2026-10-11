@@ -46,7 +46,7 @@ function useRotatingOnline(base: Professional[]): Professional[] {
     } catch (e) {}
 
     // Filter out doctors blocked/turned OFF by admin
-    const visibleDocs = base.filter((p) => cardOverrides[p.id] !== false);
+    const visibleDocs = base.filter((p) => Boolean(p) && cardOverrides[p.id] !== false);
 
     return visibleDocs.map((p) => {
       // Check direct online status set by doctor in /consultorio or admin in /admin/aprovacoes-medicas
@@ -176,7 +176,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">{pro.bio}</p>
               <div className="flex flex-wrap gap-2 mb-4">
-                {pro.tags.map((t) => (
+                {(pro.tags || []).map((t) => (
                   <span key={t} className="px-2 py-1 rounded-full text-xs font-bold border border-border bg-card text-muted-foreground">{t}</span>
                 ))}
               </div>
@@ -203,7 +203,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
               <h2 className="text-lg font-display font-black text-foreground mb-4 flex items-center gap-2"><Clock size={18} /> Agenda Disponível</h2>
               <p className="text-sm text-muted-foreground mb-3">Horários para hoje (exemplo ilustrativo)</p>
               <div className="flex flex-wrap gap-2">
-                {pro.slots.map((slot) => (
+                {(pro.slots || []).map((slot) => (
                   <Button key={slot} variant="outline" size="sm" className="border-border hover:border-primary/50 hover:bg-primary/10 text-sm rounded-xl" asChild>
                     <Link to={`/falar-com-especialista?pro=${pro.id}`}>{slot}</Link>
                   </Button>
@@ -216,7 +216,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
             <CardContent className="p-6">
               <h2 className="text-lg font-display font-black text-foreground mb-4">Avaliações</h2>
               <div className="space-y-3">
-                {pro.reviews.map((r, i) => (
+                {(pro.reviews || []).map((r, i) => (
                   <div key={i} className="p-3 rounded-2xl bg-muted/30 border border-border">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-black text-sm">{r.name}</span>
@@ -452,7 +452,7 @@ const Profissionais = () => {
                                 <img
                                   src={p.imageUrl}
                                   alt={`${p.name}`}
-                                  className={`w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover ${p.name.includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300`}
+                                  className={`w-16 h-16 md:w-18 md:h-18 rounded-2xl object-cover ${(p.name || '').includes('Geraldo') ? 'object-[center_15%]' : 'object-top'} border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-300`}
                                   loading="lazy"
                                   decoding="async"
                                   width={64}
@@ -518,7 +518,7 @@ const Profissionais = () => {
                       <div className="px-4 py-3">
                         <p className="text-xs md:text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">{p.bio}</p>
                         <div className="flex flex-wrap gap-1 mb-2">
-                          {p.tags.slice(0, 3).map((t) => (
+                          {(p.tags || []).slice(0, 3).map((t) => (
                             <span key={t} className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-border bg-card text-muted-foreground">{t}</span>
                           ))}
                         </div>

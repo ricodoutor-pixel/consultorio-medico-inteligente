@@ -249,12 +249,64 @@ export const routeSEOMap: Record<string, PageSEO> = {
   },
 };
 
+export const DOCTOR_SEO_MAP: Record<string, { name: string; crm: string; category: string }> = {
+  "med-victor-fonseca": { name: "Dr. Victor Henrique Bueno da Fonseca", crm: "CRM 206873/SP", category: "Médico Prescritor" },
+  "med-milton-urban": { name: "Dr. Milton Dimas Tadeu Urban", crm: "CRM 58169/SP", category: "Médico Prescritor" },
+  "med-barbara-matos": { name: "Dra. Barbara Eliane Matos", crm: "CRM 12361/SC", category: "Médico Prescritor" },
+  "med-geovana-torres": { name: "Dra. Geovana Torres Mozaner", crm: "CRM 98083/MG • 247790/SP", category: "Médico Prescritor" },
+  "med-daniel-kobayashi": { name: "Dr. Daniel Kobayashi Colombo", crm: "CRM 5460/RO • 10346/MT", category: "Médico Prescritor" },
+  "med-jose-geraldo": { name: "Dr. José Geraldo Barbugli Abbade Filho", crm: "CRM 32584/MG", category: "Médico Prescritor" },
+  "med-ana-karoliny": { name: "Dra. Ana Karoliny Martins", crm: "CRM 13942/RN", category: "Médico Prescritor" },
+  "med-albert-machado": { name: "Dr. Albert Machado Tenorio", crm: "CRM 34660/PE", category: "Médico Prescritor" },
+  "med-sadi-menta": { name: "Dr. Sadi Roberto Menta", crm: "CRM 16301/SC", category: "Médico Prescritor" },
+  "med-mariana-alves": { name: "Dra. Mariana Alves Rezende", crm: "CRM 135012-9/RJ", category: "Médico Prescritor" },
+  "med-breno-boueri": { name: "Dr. Breno Boueri Affonso", crm: "CRM 75492/SP", category: "Médico Prescritor" },
+  "med-joao-pedro": { name: "Dr. João Pedro Girardello Detoni", crm: "CRM 42912/RS", category: "Médico Prescritor" },
+  "med-grace-conceicao": { name: "Dra. Grace Adriana Lopes Conceição", crm: "CRM 190386/SP • 10372/BA", category: "Médico Prescritor" },
+  "med-raissa-chagas": { name: "Dra. Raíssa Ruperto Souza das Chagas", crm: "CRM 26470/DF", category: "Médico Prescritor" },
+  "med-diego-cartaxo": { name: "Dr. Diego Cartaxo Jacome", crm: "CRM 14828/PB", category: "Médico Prescritor" },
+  "med-gustavo-nobre": { name: "Dr. Gustavo Nobre Damiani Pereira", crm: "CRM 35632/PR", category: "Médico Prescritor" },
+  "med-leuma-netta": { name: "Dra. Leuma Leão Netta", crm: "CRM 85182/MG", category: "Médico Prescritor" },
+  "med-luiz-medina": { name: "Prof. Dr. Luiz Roberto Medina dos Santos", crm: "CRM 11496/SC", category: "Médico Prescritor" },
+  "med-ana-paula": { name: "Dra. Ana Paula Ferreira Lima", crm: "CRM 36942/PR", category: "Médico Prescritor" },
+  "med-adeonis-oliveira": { name: "Dr. Adeonis Oliveira Lima", crm: "CRM 9060/SE", category: "Médico Prescritor" },
+  "med-alexandre-stramandinoli": { name: "Dr. Alexandre Stramandinoli Correa da Silva", crm: "CRM 17266/PB", category: "Médico Prescritor" },
+  "med-0": { name: "Dr. Edilson Bezerra", crm: "CRM 10963 - Sta Cruz (BO)", category: "Médico Prescritor" },
+  "med-guilherme-campos": { name: "Dr. Guilherme Campos Silva", crm: "CRM 49694/PR", category: "Médico Prescritor" },
+  "med-gustavo-simoes": { name: "Dr. Gustavo Simoes Llivi Ibanez", crm: "CRM 7684/RO", category: "Médico Prescritor" },
+  "med-jose-roberto": { name: "Dr. José Roberto Silva Coutinho", crm: "CRM 5266864-8/RJ", category: "Médico Prescritor" },
+  "med-angela-beatriz": { name: "Dra. Angela Beatriz Mercado Acevedo", crm: "CRM 5258084-6/RJ", category: "Médico Prescritor" },
+  "med-ingrid-chiullo": { name: "Dra. Ingrid Chiullo Miranda", crm: "CRM 216629/SP", category: "Médico Prescritor" },
+  "med-marianna": { name: "Dra. Marianna Coimbra Arzamendia", crm: "CRM 12110/MS", category: "Médico Prescritor" },
+  "mock-olivia": { name: "Dra. Olivia Zimeri", crm: "CRM Z-4466260", category: "Médico Prescritor" },
+  "mock-suelen": { name: "Dra. Suelen Naves Rodrigues", crm: "CRM 49354/PR", category: "Médico Prescritor" },
+  "med-arthur-barretto": { name: "Dr. Arthur de Vasconcelos Paes Barretto", crm: "CRMV-SP 06871", category: "Médico Veterinário Prescritor" },
+  "med-rafaella-soletti": { name: "Dra. Rafaella da Rocha Soletti", crm: "CRMV-SC 13542", category: "Médico Veterinário Prescritor" },
+  "med-otavio-bassete": { name: "Dr. Otávio Paiva Bassete", crm: "CRMV 21907/PR", category: "Médico Veterinário Prescritor" },
+  "med-eduardo-correa": { name: "Dr. Eduardo Migueis Correa", crm: "CRMV 19333 - SP", category: "Médico Veterinário Prescritor" },
+};
+
 /**
  * Get SEO config for a given pathname, with fallback
  */
 export function getPageSEO(pathname: string): PageSEO {
   // Exact match
   if (routeSEOMap[pathname]) return routeSEOMap[pathname];
+
+  // Match professional direct profile
+  if (pathname.startsWith("/profissionais/")) {
+    const slug = pathname.replace("/profissionais/", "").trim();
+    const doc = DOCTOR_SEO_MAP[slug];
+    if (doc) {
+      return {
+        title: `${doc.name} - ${doc.category} (${doc.crm}) | ${BRAND}`.slice(0, 60),
+        description: `${doc.name} (${doc.crm}) é ${doc.category} de Cannabis Medicinal na ${BRAND}. Agende telemedicina e atendimento online.`.slice(0, 158),
+        keywords: `${doc.name}, ${doc.crm}, ${doc.category}, médico cannabis medicinal, prescritor cannabis medicinal, telemedicina, Planta y Raiz`,
+        canonical: `${BASE}/profissionais/${slug}`,
+        h1: `${doc.name} — ${doc.category} (${doc.crm})`,
+      };
+    }
+  }
 
   // Match base route (e.g. /tratamentos/ansiedade → /tratamentos)
   const base = "/" + pathname.split("/").filter(Boolean)[0];

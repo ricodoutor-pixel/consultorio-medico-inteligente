@@ -20,6 +20,8 @@ import draAnaKarolinyImg from "@/assets/dra-ana-karoliny.jpg";
 import cfmDraAnaKaroliny from "@/assets/cfm_prints/cfm-dra-ana-karoliny.png";
 import drArthurBarrettoImg from "@/assets/dr-arthur-barretto.jpg";
 import cfmvDrArthurBarretto from "@/assets/cfm_prints/cfmv-dr-arthur-barretto.png";
+import draRafaellaSolettiImg from "@/assets/dra-rafaella-soletti.jpg";
+import cfmvDraRafaellaSoletti from "@/assets/cfm_prints/cfmv-dra-rafaella-soletti.png";
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
@@ -1064,6 +1066,31 @@ export const professionals: Professional[] = [
     crm: "CRMV-SP 06871",
     reviews: [
       { name: "Tutor Verificado", rating: 5, text: "Excelente veterinário integrativo, acolhedor, altamente capacitado e salvou a qualidade de vida do meu pet." }
+    ],
+  },
+  {
+    id: "med-rafaella-soletti",
+    name: "Dra. Rafaella da Rocha Soletti",
+    category: "Médico Veterinário Prescritor",
+    bio: "Médica Veterinária graduada pela Universidade do Estado de Santa Catarina (UDESC) e pós-graduada em Cannabis Medicinal pela Faculdade Iguaçu. Atuante em Clínica Médica de Pequenos Animais e Endocanabinologia há mais de 2 anos, inscrita no CRMV-SC 13542 em situação regular. Dedica-se ao tratamento integrativo e controle de dor crônica, distúrbios neurológicos e melhora da qualidade de vida de cães e gatos através da modulação do sistema endocanabinoide.",
+    flags: ["🇧🇷"],
+    experience: "2 anos",
+    tags: ["Medicina Veterinária", "Cannabis Medicinal", "Pequenos Animais", "Endocanabinologia", "CRMV-SC 13542", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5549999910251",
+    rating: 5.0,
+    consults: 0,
+    avatar: "RS",
+    imageUrl: draRafaellaSolettiImg,
+    online: true,
+    cfmPrintUrl: cfmvDraRafaellaSoletti,
+    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 09:30", "Hoje 11:00", "Hoje 14:30", "Hoje 17:00"],
+    crm: "CRMV-SC 13542",
+    reviews: [
+      { name: "Tutor Verificado", rating: 5, text: "Excelente atendimento veterinário com cannabis medicinal, muito atenciosa e dedicada ao bem-estar do paciente." }
     ],
   },
   {

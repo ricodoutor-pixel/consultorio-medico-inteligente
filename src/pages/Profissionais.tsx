@@ -117,6 +117,77 @@ const ServiceTagsRow = () => (
 
 const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: Professional[] }) => {
   const pro = professionals.find((p) => p.id === id || p.dbId === id || (p.dbId && `db-${p.dbId}` === id));
+
+  useEffect(() => {
+    if (!pro) return;
+    const pageTitle = `${pro.name} - ${pro.category} ${pro.crm ? `(${pro.crm})` : ""} | Planta y Raíz`;
+    document.title = pageTitle;
+
+    const setMeta = (attr: "name" | "property", key: string, content: string) => {
+      let el = document.querySelector(`meta[${attr}="${key}"]`);
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+
+    const desc = `${pro.name} ${pro.crm ? `(${pro.crm})` : ""} é ${pro.category} de Cannabis Medicinal na Planta y Raíz. ${pro.bio ? pro.bio.slice(0, 140) : "Atendimento humanizado e telemedicina"}... Agende sua consulta online.`;
+    setMeta("name", "description", desc);
+    setMeta("name", "keywords", `${pro.name}, ${pro.crm || ""}, ${pro.category}, cannabis medicinal, prescritor cannabis medicinal, Planta y Raiz, telemedicina`);
+    setMeta("property", "og:title", pageTitle);
+    setMeta("property", "og:description", desc);
+    setMeta("property", "og:url", `https://plantayraiz.com.br/profissionais/${pro.id}`);
+    if (pro.imageUrl) {
+      const fullImg = pro.imageUrl.startsWith("http") ? pro.imageUrl : `https://plantayraiz.com.br${pro.imageUrl}`;
+      setMeta("property", "og:image", fullImg);
+    }
+    setMeta("name", "twitter:title", pageTitle);
+    setMeta("name", "twitter:description", desc);
+
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.href = `https://plantayraiz.com.br/profissionais/${pro.id}`;
+
+    // Injeta Schema.org JSON-LD para indexação e snippets do Google
+    const isVet = pro.category.toLowerCase().includes("veterinário");
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": isVet ? "VeterinaryCare" : "Physician",
+      "@id": `https://plantayraiz.com.br/profissionais/${pro.id}#profile`,
+      "name": pro.name,
+      "description": pro.bio,
+      "url": `https://plantayraiz.com.br/profissionais/${pro.id}`,
+      "image": pro.imageUrl ? (pro.imageUrl.startsWith("http") ? pro.imageUrl : `https://plantayraiz.com.br${pro.imageUrl}`) : undefined,
+      "medicalSpecialty": isVet ? "Medicina Veterinária Canabinoide" : (pro.tags?.join(", ") || "Medicina Endocanabinoide"),
+      "priceRange": "R$ 30 - R$ 150",
+      "telephone": pro.whatsapp ? `+${pro.whatsapp}` : "+5511991363154",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "BR"
+      }
+    };
+
+    let script = document.getElementById("doctor-schema-jsonld") as HTMLScriptElement | null;
+    if (!script) {
+      script = document.createElement("script");
+      script.id = "doctor-schema-jsonld";
+      script.type = "application/ld+json";
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(jsonLd);
+
+    return () => {
+      const el = document.getElementById("doctor-schema-jsonld");
+      if (el) el.remove();
+    };
+  }, [pro]);
+
   if (!pro) return <div className="container mx-auto px-4 pt-32 text-center text-muted-foreground">Profissional não encontrado.</div>;
 
   return (

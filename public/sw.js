@@ -4,8 +4,8 @@
  * Protocolo: Cache-First com Network Fallback
  */
 
-const CACHE_VERSION = 'plantayraiz-v2.7';
-const DYNAMIC_CACHE = 'plantayraiz-dynamic-v2.4';
+const CACHE_VERSION = 'plantayraiz-v2.8';
+const DYNAMIC_CACHE = 'plantayraiz-dynamic-v2.5';
 
 // Assets essenciais para cache imediato (apenas arquivos garantidamente existentes)
 const PRECACHE_ASSETS = [
@@ -23,7 +23,8 @@ self.addEventListener('install', (event) => {
   console.log('[SW] Instalando Service Worker v2.0...');
   event.waitUntil(
     caches.open(CACHE_VERSION)
-      .then((cache) => cache.addAll(PRECACHE_ASSETS))
+      // Um ícone indisponível não pode impedir a instalação inteira.
+      .then((cache) => Promise.allSettled(PRECACHE_ASSETS.map((asset) => cache.add(asset))))
       .then(() => self.skipWaiting()) // Ativa imediatamente
   );
 });
@@ -35,7 +36,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) =>
       Promise.all(
         cacheNames
-          .filter((name) => name !== CACHE_VERSION && name !== DYNAMIC_CACHE)
+          .filter((name) => name.startsWith('plantayraiz-') && name !== CACHE_VERSION && name !== DYNAMIC_CACHE)
           .map((name) => {
             console.log('[SW] Removendo cache antigo:', name);
             return caches.delete(name);
@@ -54,8 +55,7 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   // Ignorar requests externos (analytics, etc.)
-  if (!url.origin.includes(self.location.origin) && 
-      !url.pathname.includes('supabase')) return;
+  if (url.origin !== self.location.origin) return;
 
   // HTML/documentos da SPA: SEMPRE priorizar rede para evitar shell antigo preso em cache
   if (request.mode === 'navigate' || request.destination === 'document') {
@@ -83,9 +83,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Bundles versionados: network-first para evitar servir chunk antigo após publish
+  // O hash muda a URL a cada versão: reaproveitar o arquivo exato é seguro.
   if (url.pathname.startsWith('/assets/')) {
-    event.respondWith(networkFirst(request));
+    event.respondWith(/-[a-zA-Z0-9_-]{8,}\.[^/]+$/.test(url.pathname)
+      ? cacheFirst(request)
+      : networkFirst(request));
     return;
   }
 
@@ -102,7 +104,7 @@ async function cacheFirst(request) {
     const response = await fetch(request);
     if (response.ok) {
       const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, response.clone());
+      await cache.put(request, response.clone()).catch(() => {});
     }
     return response;
   } catch (err) {
@@ -118,7 +120,7 @@ async function networkFirst(request) {
     if (response.ok) {
       const cache = await caches.open(CACHE_VERSION);
       if (request.method === 'GET') {
-        cache.put(request, response.clone());
+        await cache.put(request, response.clone()).catch(() => {});
       }
     }
     return response;

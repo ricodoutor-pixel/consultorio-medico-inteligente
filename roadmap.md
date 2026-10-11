@@ -1,5 +1,10 @@
 # Roadmap
 
+## Reinicialização do site — 11/10/2026
+
+- [ ] Otimizar o reaproveitamento de arquivos e evitar recarregamentos automáticos durante o uso
+- [ ] Verificar reabertura e atualização sem alterar a aparência
+
 ## Achados de pagamentos e agendamento — 10/10/2026
 
 - [ ] Corrigir encaminhamento para médicos e horários reais, sem identificadores fictícios

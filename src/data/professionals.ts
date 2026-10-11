@@ -16,6 +16,8 @@ import drMiltonUrbanImg from "@/assets/dr-milton-urban.jpg";
 import cfmDrMiltonUrban from "@/assets/cfm_prints/cfm-dr-milton-urban.png";
 import draRaissaChagasImg from "@/assets/dra-raissa-chagas.jpg";
 import cfmDraRaissaChagas from "@/assets/cfm_prints/cfm-dra-raissa-chagas.png";
+import draAnaKarolinyImg from "@/assets/dra-ana-karoliny.jpg";
+import cfmDraAnaKaroliny from "@/assets/cfm_prints/cfm-dra-ana-karoliny.png";
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
@@ -374,6 +376,31 @@ export const professionals: Professional[] = [
     crm: "26470/DF",
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente médica, atendimento acolhedor, empático e de altíssimo nível técnico." }
+    ],
+  },
+  {
+    id: "med-ana-karoliny",
+    name: "Dra. Ana Karoliny Martins",
+    category: "Médicos Prescritores",
+    bio: "Médica com atuação em Medicina de Família e Comunidade e Medicina Canabinoide, graduada pela Universidad de Aquino Bolivia em 2018 com diploma revalidado pelo Centro Universitário UNIRG. Devidamente inscrita no CRM 13942/RN em situação regular, dedica-se ao cuidado humanizado, ciência e acolhimento, com foco no uso terapêutico consciente dos canabinoides e na promoção da qualidade de vida com planos terapêuticos individualizados.",
+    flags: ["🇧🇷"],
+    experience: "8 anos",
+    tags: ["Medicina de Família", "Medicina Canabinoide", "Cuidado Humanizado", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5584999727982",
+    rating: 5.0,
+    consults: 0,
+    avatar: "AK",
+    imageUrl: draAnaKarolinyImg,
+    online: true,
+    cfmPrintUrl: cfmDraAnaKaroliny,
+    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 09:00", "Hoje 11:30", "Hoje 14:00", "Hoje 16:30"],
+    crm: "13942/RN",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Atendimento maravilhoso, muito atenciosa, humana e esclareceu todas as dúvidas com clareza." }
     ],
   },
   {

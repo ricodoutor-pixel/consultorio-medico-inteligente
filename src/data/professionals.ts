@@ -14,6 +14,8 @@ import drBrenoBoueriImg from "@/assets/dr-breno-boueri.jpg";
 import cfmDrBrenoBoueri from "@/assets/cfm_prints/cfm-dr-breno-boueri.png";
 import drMiltonUrbanImg from "@/assets/dr-milton-urban.jpg";
 import cfmDrMiltonUrban from "@/assets/cfm_prints/cfm-dr-milton-urban.png";
+import draRaissaChagasImg from "@/assets/dra-raissa-chagas.jpg";
+import cfmDraRaissaChagas from "@/assets/cfm_prints/cfm-dra-raissa-chagas.png";
 import DrEdilsonImg from "@/assets/dr-edilson-bezerra.jpg";
 import draYukiImg from "@/assets/dra-yuki-tanaka.jpg";
 import drPabloImg from "@/assets/dr-pablo-quispe.jpg";
@@ -347,6 +349,31 @@ export const professionals: Professional[] = [
     crm: "58169/SP",
     reviews: [
       { name: "Paciente Verificado", rating: 5, text: "Excelente médico, muito atencioso, explicou todo o tratamento com extrema clareza e dedicação." }
+    ],
+  },
+  {
+    id: "med-raissa-chagas",
+    name: "Dra. Raíssa Ruperto Souza das Chagas",
+    category: "Médicos Prescritores",
+    bio: "Médica graduada pela Universidade Federal de Alagoas, com pós-graduação em Medicina Integrativa pela UNIUBE, especialização em Cuidados Paliativos e Terapia da Dor pela PUC-MG, e Mestra em Saúde da População e Comunidade pela Universidade de Saskatchewan no Canadá. Devidamente inscrita no CRM 26470/DF em situação regular, é prescritora de fitocanabinoides há mais de 4 anos, oferecendo atendimento empático, acolhedor e com sólido embasamento científico focado no controle de dor crônica, ansiedade e qualidade de vida.",
+    flags: ["🇧🇷"],
+    experience: "7 anos",
+    tags: ["Clínica Geral", "Medicina Integrativa", "Terapia da Dor", "Cannabis Medicinal", "Prescritor"],
+    price: "R$ 150,00",
+    priceValue: 150,
+    whatsapp: "5561993330811",
+    rating: 5.0,
+    consults: 0,
+    avatar: "RC",
+    imageUrl: draRaissaChagasImg,
+    online: true,
+    cfmPrintUrl: cfmDraRaissaChagas,
+    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
+    services: STANDARD_DOCTOR_SERVICES,
+    slots: ["Hoje 10:30", "Hoje 14:00", "Hoje 16:30", "Hoje 18:00"],
+    crm: "26470/DF",
+    reviews: [
+      { name: "Paciente Verificado", rating: 5, text: "Excelente médica, atendimento acolhedor, empático e de altíssimo nível técnico." }
     ],
   },
   {

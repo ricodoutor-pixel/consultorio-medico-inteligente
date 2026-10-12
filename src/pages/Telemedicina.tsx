@@ -466,13 +466,19 @@ const Telemedicina = () => {
               <div className="w-12 h-12 rounded-2xl bg-gradient-green border border-green flex items-center justify-center glow-green">
                 <Stethoscope size={24} className="text-primary" />
               </div>
-              <span className="text-sm font-bold text-primary">TELEMEDICINA AVANÇADA</span>
+              <span className="text-xs md:text-sm font-bold text-primary uppercase tracking-wide">
+                Plataforma de Gestão Clínica e Telemedicina para Médicos Prescritores do Sistema Endocanabinoide
+              </span>
             </div>
             <h1 className="text-3xl md:text-5xl font-display font-black text-foreground leading-tight mb-4">
               Inicie Sua <span className="text-gradient-green">Teleconsulta Médica Direta</span>
             </h1>
-            <p className="text-muted-foreground max-w-2xl font-medium mb-6 mx-auto">
-              Entrevista clínica em 5 perguntas com a <strong>Enf. Brisa</strong> → Pagamento Seguro da Teleconsulta → Atendimento Médico ao Vivo com Especialista → Avaliação do Paciente → Liberação instantânea do repasse ao médico via PIX.
+            <p className="text-muted-foreground max-w-2xl font-medium mb-3 mx-auto">
+              Entrevista clínica prévia com a <strong>Enf. Brisa</strong> → Conexão Segura ao Consultório → Atendimento Médico ao Vivo com Especialista Credenciado.
+            </p>
+            <p className="text-xs text-muted-foreground/80 max-w-xl mx-auto mb-6 flex items-center justify-center gap-1.5">
+              <Shield className="w-4 h-4 text-primary shrink-0" />
+              <span>Consultas médicas em conformidade com a Resolução CFM nº 2.314/2022 e RDCs ANVISA 660 e 327. Proteção de dados sob a LGPD (Lei 13.709/2018).</span>
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 items-center justify-center mb-4">

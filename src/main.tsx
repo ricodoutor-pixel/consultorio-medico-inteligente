@@ -1,5 +1,4 @@
 import { createRoot } from "react-dom/client";
-import { initAntiClone } from "./lib/anti-clone";
 import { registerServiceWorker } from "./lib/serviceWorkerRegistration";
 import { devlog } from "./lib/devlog";
 import "./lib/i18n"; // Initialize i18next before App
@@ -22,10 +21,6 @@ if (import.meta.env.PROD) {
     console.warn = noop;
   }
 }
-
-
-// Inicializa proteções anti-clonagem ANTES do React
-initAntiClone();
 
 // 🔄 Recupera de chunks falhados (Hostinger 429 ou deploy invalidando hashes)
 const RELOAD_KEY = "__pr_chunk_reload__";

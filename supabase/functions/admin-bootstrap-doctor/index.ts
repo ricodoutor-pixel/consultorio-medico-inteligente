@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
     const {
       email,
       password,
-      full_name,
+      full_name: rawFullName,
       whatsapp,
       country = "BO",
       city = "Cochabamba",
@@ -56,16 +56,16 @@ Deno.serve(async (req) => {
       avatar_url,
     } = body;
 
-    if (!email || !password || !full_name) {
+    if (!email || !password || !rawFullName) {
       return new Response(JSON.stringify({ error: "email, password, full_name required" }), {
         status: 400, headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
     // Regra da vitrine: nenhum médico entra sem o título "Dr."/"Dra." no nome.
-    if (!/^(dr|dra)\.\s*/i.test(full_name.trim())) {
-      full_name = `Dr. ${full_name.trim()}`;
-    }
+    const full_name = /^(dr|dra)\.\s*/i.test(rawFullName.trim())
+      ? rawFullName
+      : `Dr. ${rawFullName.trim()}`;
 
     const supabase = admin;
 
@@ -88,7 +88,8 @@ Deno.serve(async (req) => {
       if (!userId) throw createErr;
       await supabase.auth.admin.updateUserById(userId, { password, email_confirm: true });
     } else {
-      userId = created.user!.id;
+      if (!created.user) throw new Error("User creation returned no user");
+      userId = created.user.id;
     }
 
     await supabase.from("profiles").upsert({

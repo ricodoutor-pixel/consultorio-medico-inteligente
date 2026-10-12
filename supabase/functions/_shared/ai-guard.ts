@@ -2,7 +2,7 @@
 // - requireAuthedUser: validates the caller's Supabase JWT and returns the user id
 // - rateLimit: per-key (user id or IP) throttle via check_edge_rate_limit RPC
 // - clientIp / assertPayloadSize helpers
-import { createClient } from "npm:@supabase/supabase-js@2.49.1";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;

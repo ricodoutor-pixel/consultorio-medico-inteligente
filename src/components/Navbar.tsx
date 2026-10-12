@@ -3,6 +3,7 @@ import { Menu, X, Leaf, LogIn, LogOut, User, ChevronRight, ArrowLeft, ChevronDow
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { FrogMascot } from "@/components/FrogMascot";
+import { HolidayPlantaoBanner } from "@/components/HolidayPlantaoBanner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -153,6 +154,7 @@ export const Navbar = () => {
         role="navigation"
         aria-label="Navegação principal"
       >
+        <HolidayPlantaoBanner />
         <div className="container mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex items-center h-16 md:h-[72px] justify-between">
             

@@ -92,6 +92,7 @@ export function resolveDoctorAvatar(name: string, crm: string, currentAvatar?: s
   if (n.includes("renata") && n.includes("costa")) return "/avatars/dra-renata-costa.jpg";
   if (n.includes("yuki") && n.includes("tanaka")) return "/avatars/dra-yuki-tanaka.jpg";
   if (n.includes("lucas") && n.includes("ferreira")) return "/avatars/dr-lucas-ferreira.jpg";
+  if (n.includes("juliana") && n.includes("ferreira")) return "/avatars/dra-juliana-ferreira.jpg";
   if (n.includes("carlos") && n.includes("herrera")) return "/avatars/dr-carlos-herrera.jpg";
   if (n.includes("valentina") && n.includes("reyes")) return "/avatars/dra-valentina-reyes.jpg";
   if (n.includes("rafael") && n.includes("mendes")) return "/avatars/dr-rafael-mendes.jpg";

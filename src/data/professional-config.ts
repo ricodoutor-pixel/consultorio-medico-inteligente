@@ -31,6 +31,18 @@ export const COUNCIL_CONFIG: Record<string, {
     specialtyPlaceholder: "Ex: TCC, Psicanálise, Terapia Integrativa",
     areas: ["TCC", "Psicanálise", "Terapia Integrativa", "EMDR", "Terapia Sistêmica", "Mindfulness", "Neuropsicologia", "Terapia de Casal", "Psicoterapia Breve"],
   },
+  "Nutricionistas": {
+    councilLabel: "CRN", councilFull: "Conselho Regional de Nutricionistas", councilPlaceholder: "CRN-3 48291",
+    docFrentLabel: "CRN — frente", specialtyLabel: "Especialidade / Foco Nutricional",
+    specialtyPlaceholder: "Ex: Nutrição Clínica, Funcional, Fitoterapia e Canabinoides",
+    areas: ["Nutrição Clínica", "Nutrição Funcional", "Fitoterapia e Canabinoides", "Nutrição Esportiva", "Modulação Intestinal", "Doenças Crônicas e Inflamatórias", "Nutrição Oncológica", "Saúde da Mulher", "Emagrecimento Saudável", "Longevidade Saudável"],
+  },
+  "Fisioterapeutas": {
+    councilLabel: "CREFITO", councilFull: "Conselho Regional de Fisioterapia e Terapia Ocupacional", councilPlaceholder: "CREFITO-3 189423-F",
+    docFrentLabel: "CREFITO — frente", specialtyLabel: "Especialidade / Foco Fisioterapêutico",
+    specialtyPlaceholder: "Ex: Dor Crônica, Traumato-Ortopédica, Neurofuncional, Pilates Clínico",
+    areas: ["Fisioterapia na Dor Crônica", "Traumato-Ortopédica", "Fisioterapia Neurofuncional", "Fisioterapia Respiratória", "Pilates Clínico", "Reabilitação Postural (RPG)", "Gerontologia e Mobilidade", "Fisioterapia Esportiva", "Saúde da Mulher e Pélvica", "Eletroterapia e Laserterapia"],
+  },
   "Farmácia Clínica": {
     councilLabel: "CRF", councilFull: "Conselho Regional de Farmácia", councilPlaceholder: "SP-12345",
     docFrentLabel: "CRF — frente", specialtyLabel: "Área de Atuação", specialtyPlaceholder: "Ex: Farmácia Magistral, Oncologia, Cannabis",

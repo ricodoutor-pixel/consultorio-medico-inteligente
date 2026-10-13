@@ -165,6 +165,24 @@ export const COUNCIL_CONFIG: Record<string, {
     specialtyPlaceholder: "Ex: Pequenos Animais, Equinos, Silvestre",
     areas: ["Pequenos Animais","Equinos","Bovinos","Aves","Silvestres","Animais Exóticos","Medicina Veterinária Integrativa","Fitoterapia Veterinária"],
   },
+  "Nutricionistas": {
+    councilLabel: "CRN",
+    councilFull: "Conselho Regional de Nutricionistas",
+    councilPlaceholder: "CRN-3 48291",
+    docFrentLabel: "CRN — frente",
+    specialtyLabel: "Especialidade / Foco Nutricional",
+    specialtyPlaceholder: "Ex: Nutrição Clínica, Funcional, Fitoterapia e Canabinoides",
+    areas: ["Nutrição Clínica", "Nutrição Funcional", "Fitoterapia e Canabinoides", "Nutrição Esportiva", "Modulação Intestinal", "Doenças Crônicas e Inflamatórias", "Nutrição Oncológica", "Saúde da Mulher", "Emagrecimento Saudável", "Longevidade Saudável"],
+  },
+  "Fisioterapeutas": {
+    councilLabel: "CREFITO",
+    councilFull: "Conselho Regional de Fisioterapia e Terapia Ocupacional",
+    councilPlaceholder: "CREFITO-3 189423-F",
+    docFrentLabel: "CREFITO — frente",
+    specialtyLabel: "Especialidade / Foco Fisioterapêutico",
+    specialtyPlaceholder: "Ex: Dor Crônica, Traumato-Ortopédica, Neurofuncional, Pilates Clínico",
+    areas: ["Fisioterapia na Dor Crônica", "Traumato-Ortopédica", "Fisioterapia Neurofuncional", "Fisioterapia Respiratória", "Pilates Clínico", "Reabilitação Postural (RPG)", "Gerontologia e Mobilidade", "Fisioterapia Esportiva", "Saúde da Mulher e Pélvica", "Eletroterapia e Laserterapia"],
+  },
   "Psicologia & Terapias": {
     councilLabel: "CRP",
     councilFull: "Conselho Regional de Psicologia",
@@ -262,6 +280,8 @@ export const categories = [
   "Dentista Prescritor",
   "Médico Veterinário Prescritor",
   "Psicologia & Terapias",
+  "Nutricionistas",
+  "Fisioterapeutas",
   "Farmácia Clínica",
   "Saúde Ocupacional",
   "Acupuntura",
@@ -1415,11 +1435,62 @@ export const professionals: Professional[] = [
       { name: "Regina S.", rating: 5, text: "Finalmente uma médica que olha o paciente como um todo." },
     ],
   },
+  {
+    id: "nutri-juliana-ferreira",
+    name: "Dra. Juliana Ferreira",
+    category: "Nutricionistas",
+    bio: "Nutricionista Clínica e Funcional graduada pela UNIFESP com especialização em Fitoterapia e Modulação do Sistema Endocanabinoide. Inscrita no Conselho Regional de Nutricionistas (CRN-3 48291). Atua com foco em saúde intestinal, controle de inflamação subclínica, manejo nutricional da dor crônica, ansiedade e emagrecimento consciente, elaborando planos alimentares personalizados e integrados à terapêutica canabinoide.",
+    experience: "8 anos",
+    tags: ["Nutrição Clínica", "Nutrição Funcional", "Fitoterapia", "Modulação Intestinal", "CRN-3 48291"],
+    price: "R$ 100,00",
+    priceValue: 100,
+    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 87,
+    avatar: "JF",
+    imageUrl: "/avatars/dra-juliana-ferreira.jpg",
+    flags: ["🇧🇷"],
+    crm: "CRN-3 48291/SP",
+    online: true,
+    services: [
+      { name: "Consulta Nutricional Online", price: "R$ 100,00", desc: "Avaliação nutricional completa com plano alimentar individualizado" },
+      { name: "Modulação Intestinal & Anti-inflamatória", price: "R$ 120,00", desc: "Plano focado em saúde digestiva e redução de inflamação" },
+      { name: "Acompanhamento Mensal", price: "R$ 80,00", desc: "Retorno e ajustes de evolução alimentar" },
+    ],
+    slots: ["Hoje 09:00", "Hoje 11:30", "Hoje 14:00", "Hoje 16:30"],
+    reviews: [
+      { name: "Mariana C.", rating: 5, text: "Excelente nutricionista! Ajustou minha alimentação e meu intestino melhorou 100% junto com o óleo." },
+      { name: "Felipe S.", rating: 5, text: "Atendimento muito humanizado e plano alimentar fácil de seguir no dia a dia." },
+    ],
+  },
+  {
+    id: "fisio-lucas-ferreira",
+    name: "Dr. Lucas Ferreira",
+    category: "Fisioterapeutas",
+    bio: "Fisioterapeuta especialista em Manejo da Dor Crônica e Reabilitação Traumato-Ortopédica, pós-graduado pela USP e inscrito no CREFITO-3 189423-F. Possui mais de 10 anos de experiência clínica no tratamento de fibromialgia, hérnia de disco, lombalgias crônicas e artrose. Utiliza protocolos integrativos associados à modulação terapêutica e exercícios clínicos supervisionados por teleatendimento, devolvendo funcionalidade, flexibilidade e qualidade de vida.",
+    experience: "10 anos",
+    tags: ["Fisioterapia na Dor", "Reabilitação Ortopédica", "Fibromialgia", "Coluna & Postura", "CREFITO-3 189423-F"],
+    price: "R$ 100,00",
+    priceValue: 100,
+    paymentLink: "https://link.mercadopago.com.br/plantayraiz",
+    whatsapp: "5511991363154",
+    rating: 5.0,
+    consults: 114,
+    avatar: "LF",
+    imageUrl: "/avatars/dr-lucas-ferreira.jpg",
+    flags: ["🇧🇷"],
+    crm: "CREFITO-3 189423-F/SP",
+    online: true,
+    services: [
+      { name: "Avaliação Fisioterapêutica Online", price: "R$ 100,00", desc: "Diagnóstico funcional e prescrição de protocolo de reabilitação" },
+      { name: "Sessão de Fisioterapia para Dor Crônica", price: "R$ 90,00", desc: "Orientação e exercícios terapêuticos guiados ao vivo" },
+      { name: "Programa de Postura & Coluna", price: "R$ 130,00", desc: "Plano mensal de reabilitação postural ergonômica" },
+    ],
+    slots: ["Hoje 08:30", "Hoje 10:00", "Hoje 15:00", "Hoje 17:30"],
+    reviews: [
+      { name: "Rogério M.", rating: 5, text: "Dr. Lucas aliviou minhas dores nas costas com exercícios certeiros. Muito capacitado!" },
+      { name: "Claudia B.", rating: 5, text: "Ótimo profissional, muito paciente e atencioso na teleconsulta." },
+    ],
+  },
 ];
-
-
-
-
-
-
-

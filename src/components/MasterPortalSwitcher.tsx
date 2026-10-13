@@ -45,7 +45,7 @@ export function MasterPortalSwitcher() {
 
   const portals = [
     { name: "Paciente", path: "/dashboard-paciente", icon: User, color: "text-emerald-400" },
-    { name: "Médico", path: "/workspace-medico", icon: Stethoscope, color: "text-sky-400" },
+    { name: "Médico", path: "/dashboard-medico", icon: Stethoscope, color: "text-sky-400" },
     { name: "Farmácia", path: "/lojistas", icon: Store, color: "text-amber-400" },
     { name: "Admin", path: "/admin", icon: ShieldAlert, color: "text-purple-400" },
     { name: "Entregador GPS", path: "/entregador", icon: Truck, color: "text-cyan-400" }

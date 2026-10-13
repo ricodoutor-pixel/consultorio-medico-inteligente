@@ -3,7 +3,7 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Smartphone, Shield, Wifi, Users, Star, Zap, Heart, Globe, ArrowRight } from "lucide-react";
+import { Download, Smartphone, Shield, Wifi, Users, Star, Zap, Heart, Globe, ArrowRight, Monitor, FolderDown } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
@@ -17,14 +17,39 @@ const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, tra
 const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 const DownloadApp = () => {
-  const { canInstall, isInstalled, promptInstall } = usePWAInstall();
+  const { canInstall, isInstalled, isIOS, isDesktop, promptInstall, downloadDesktopShortcut } = usePWAInstall();
   const { toast } = useToast();
 
   const handleInstallPWA = async () => {
     if (isInstalled) {
-      toast({ title: "App já instalado ✅", description: "Abra a partir da sua tela inicial." });
+      toast({ title: "App já instalado ✅", description: "Abra a partir da sua tela inicial ou desktop." });
       return;
     }
+
+    // No Desktop: dispara prompt nativo ou baixa atalho oficial em 1 clique
+    if (isDesktop) {
+      let accepted = false;
+      if (canInstall) {
+        try {
+          const outcome = await promptInstall();
+          if (outcome === "accepted") {
+            accepted = true;
+            toast({ title: "App Instalado com Sucesso! 🐸", description: "O Dr. Verdinho já está no seu sistema." });
+            return;
+          }
+        } catch (_) {}
+      }
+
+      if (!accepted) {
+        downloadDesktopShortcut();
+        toast({
+          title: "🎉 Atalho do Dr. Verdinho Baixado!",
+          description: "O arquivo foi salvo em Downloads. Dê 2 cliques ou arraste para sua Área de Trabalho.",
+        });
+      }
+      return;
+    }
+
     if (canInstall) {
       const outcome = await promptInstall();
       if (outcome === "accepted") {
@@ -32,11 +57,29 @@ const DownloadApp = () => {
       }
       return;
     }
+
+    if (isIOS) {
+      toast({
+        title: "Instale no iPhone/iPad",
+        description: "Toque em Compartilhar (ícone de seta) no Safari → Adicionar à Tela de Início.",
+      });
+      return;
+    }
+
+    downloadDesktopShortcut();
     toast({
-      title: "Instale como App (PWA)",
-      description: "No iOS, toque em Compartilhar → Adicionar à Tela de Início. No Android, abra o menu do navegador → Instalar app.",
+      title: "Atalho Baixado!",
+      description: "Toque no arquivo para abrir o app na hora.",
     });
   };
+
+  const buttonText = isInstalled
+    ? "App instalado ✓"
+    : isDesktop
+      ? "Baixar App para Desktop (1 Clique)"
+      : canInstall
+        ? "Instalar agora (PWA)"
+        : "Instalar como App (PWA)";
 
   return (
     <div className="min-h-dvh bg-background">
@@ -47,18 +90,18 @@ const DownloadApp = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div initial="hidden" animate="visible" variants={stagger}>
               <motion.div variants={fadeUp}>
-                <Badge className="mb-4 bg-primary/10 text-primary border-green text-xs font-bold">
-                  📱 DISPONÍVEL iOS & ANDROID
+                <Badge className="mb-4 bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-xs font-bold">
+                  💻 DESKTOP & 📱 DISPONÍVEL iOS & ANDROID
                 </Badge>
               </motion.div>
 
               <motion.h1 variants={fadeUp} className="text-4xl md:text-6xl font-display font-black text-foreground leading-tight mb-6">
                 Sua clínica de cannabis medicinal no{" "}
-                <span className="text-gradient-green">bolso</span>
+                <span className="text-gradient-green">computador e no bolso</span>
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-muted-foreground text-lg mb-8 font-medium max-w-lg">
-                Orientações Técnicas, receitas, shopping e biblioteca científica — tudo offline-first com biometria, push notifications e a melhor experiência mobile do mercado.
+                Orientações Técnicas, receitas, shopping e biblioteca científica — tudo offline-first com biometria, push notifications e atalho em 1 clique na sua Área de Trabalho.
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -80,11 +123,33 @@ const DownloadApp = () => {
                 </Button>
               </motion.div>
 
-              <motion.div variants={fadeUp} className="mb-8">
-                <Button onClick={handleInstallPWA} size="lg" variant="outline" className="h-12 px-6 border-primary/40 text-primary font-bold rounded-xl gap-2">
-                  <Download size={18} />
-                  {isInstalled ? "App instalado ✓" : canInstall ? "Instalar agora (PWA)" : "Instalar como App (PWA)"}
+              <motion.div variants={fadeUp} className="mb-8 flex flex-wrap gap-3">
+                <Button
+                  onClick={handleInstallPWA}
+                  size="lg"
+                  className="h-14 px-8 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl shadow-xl shadow-emerald-900/30 gap-3"
+                >
+                  {isDesktop ? <Monitor size={20} /> : <Download size={20} />}
+                  {buttonText}
                 </Button>
+
+                {isDesktop && (
+                  <Button
+                    onClick={() => {
+                      downloadDesktopShortcut();
+                      toast({
+                        title: "Atalho Baixado!",
+                        description: "Arquivo 'Planta y Raiz - Dr Verdinho.url' salvo em seus Downloads.",
+                      });
+                    }}
+                    size="lg"
+                    variant="outline"
+                    className="h-14 px-6 border-emerald-500/40 text-emerald-400 font-bold rounded-2xl gap-2 hover:bg-emerald-500/10"
+                  >
+                    <FolderDown size={18} />
+                    Baixar Atalho Direto (.url)
+                  </Button>
+                )}
               </motion.div>
 
               <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -108,16 +173,19 @@ const DownloadApp = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
             >
-              <div className="w-[280px] h-[560px] rounded-[40px] border-4 border-border bg-card p-4 shadow-2xl relative overflow-hidden">
+              <div className="w-[300px] h-[580px] rounded-[44px] border-4 border-emerald-500/40 bg-card p-4 shadow-2xl relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-green opacity-10" />
                 <div className="relative z-10 h-full flex flex-col items-center justify-center text-center gap-4">
-                  <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center glow-green">
-                    <span className="text-4xl">🌿</span>
+                  <div className="w-24 h-24 rounded-3xl bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center glow-green overflow-hidden shadow-xl">
+                    <img src="/dr-verdinho-192.png?v=9" alt="Dr. Verdinho" className="w-full h-full object-cover" />
                   </div>
-                  <h3 className="font-display font-black text-foreground text-xl">Planta & Raiz</h3>
-                  <p className="text-xs text-muted-foreground font-medium">Mega Clínica Digital</p>
+                  <h3 className="font-display font-black text-foreground text-xl">Planta y Raíz</h3>
+                  <p className="text-xs text-muted-foreground font-medium">Mega Clínica Digital & PWA Oficial</p>
                   <div className="flex gap-1 mt-2">
                     {[1,2,3,4,5].map(s => <Star key={s} size={14} className="text-[hsl(45,76%,52%)] fill-[hsl(45,76%,52%)]" />)}
+                  </div>
+                  <div className="mt-4 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-400 font-bold">
+                    ✓ Instalável em 1 Clique
                   </div>
                 </div>
               </div>

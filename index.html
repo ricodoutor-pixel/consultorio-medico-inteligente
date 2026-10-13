@@ -79,6 +79,26 @@
     </script>
 
 
+    <!-- 🚀 Captura precoce do evento beforeinstallprompt do Chrome/Edge/Android -->
+    <script>
+      window.__pyr_install_prompt = null;
+      window.addEventListener("beforeinstallprompt", function(e) {
+        try {
+          e.preventDefault();
+          window.__pyr_install_prompt = e;
+          window.dispatchEvent(new CustomEvent("pyr:can-install", { detail: e }));
+          console.log("✅ PWA beforeinstallprompt capturado globalmente");
+        } catch(_) {}
+      });
+      window.addEventListener("appinstalled", function() {
+        try {
+          window.__pyr_install_prompt = null;
+          window.dispatchEvent(new Event("pyr:installed"));
+          console.log("✅ PWA appinstalled detectado");
+        } catch(_) {}
+      });
+    </script>
+
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}

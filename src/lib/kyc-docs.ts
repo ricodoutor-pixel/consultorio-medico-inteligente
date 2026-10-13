@@ -56,16 +56,66 @@ export async function getKycSignedUrl(
     return storagePath;
   }
 
-  const candidates = storagePath
-    ? [storagePath]
-    : ["jpg", "jpeg", "png", "webp", "pdf"].map((ext) => `${userId}/${kind}.${ext}`);
+  // Lista de extensões suportadas
+  const exts = ["jpeg", "jpg", "png", "webp", "pdf"];
 
-  for (const path of candidates) {
-    const { data, error } = await supabase.storage
-      .from(KYC_BUCKET)
-      .createSignedUrl(path, 60 * 10);
-    if (!error && data?.signedUrl) return data.signedUrl;
+  // 1. Monta lista ordenada de candidatos sem duplicidades
+  const candidates: string[] = [];
+  if (storagePath) candidates.push(storagePath);
+
+  // Caminhos padrão para este tipo específico de documento
+  for (const ext of exts) {
+    const p = `${userId}/${kind}.${ext}`;
+    if (!candidates.includes(p)) candidates.push(p);
   }
+
+  // Fallbacks cruzados: muitos médicos enviam sua cédula profissional (CRM) como ID ou vice-versa
+  if (kind === "crm_front") {
+    for (const ext of exts) {
+      const p = `${userId}/id_front.${ext}`;
+      if (!candidates.includes(p)) candidates.push(p);
+    }
+  } else if (kind === "crm_back") {
+    for (const ext of exts) {
+      const p = `${userId}/id_back.${ext}`;
+      if (!candidates.includes(p)) candidates.push(p);
+    }
+  } else if (kind === "id_front") {
+    for (const ext of exts) {
+      const p = `${userId}/crm_front.${ext}`;
+      if (!candidates.includes(p)) candidates.push(p);
+    }
+  } else if (kind === "id_back") {
+    for (const ext of exts) {
+      const p = `${userId}/crm_back.${ext}`;
+      if (!candidates.includes(p)) candidates.push(p);
+    }
+  }
+
+  // Tenta assinar no bucket doctor-kyc-documents
+  for (const path of candidates) {
+    try {
+      const { data, error } = await supabase.storage
+        .from(KYC_BUCKET)
+        .createSignedUrl(path, 60 * 10);
+      if (!error && data?.signedUrl) return data.signedUrl;
+    } catch {}
+  }
+
+  // Fallback no bucket avatars se for crm_front ou id_front
+  if (kind === "crm_front" || kind === "id_front") {
+    try {
+      const { data: avatarFiles } = await supabase.storage.from("avatars").list(userId);
+      const crmAvatar = (avatarFiles || []).find((f) => f.name.includes("crm_front"));
+      if (crmAvatar) {
+        const { data: pubData } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(`${userId}/${crmAvatar.name}`);
+        if (pubData?.publicUrl) return pubData.publicUrl;
+      }
+    } catch {}
+  }
+
   return null;
 }
 

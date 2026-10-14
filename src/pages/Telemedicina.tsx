@@ -233,14 +233,20 @@ const Telemedicina = () => {
   const dynamicSymbol = "R$";
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [showTCLE, setShowTCLE] = useState(true);
+  const [showTCLE, setShowTCLE] = useState(false);
   const [showFlowInfo, setShowFlowInfo] = useState(false);
   const [step, setStep] = useState(-1);
   const [answers, setAnswers] = useState<Record<number, string | string[]>>({});
   const [sliderValue, setSliderValue] = useState([50]);
   const [showPrescription, setShowPrescription] = useState(false);
   const [showWearables, setShowWearables] = useState(false);
-  const [tcleAccepted, setTcleAccepted] = useState(false);
+  const [tcleAccepted, setTcleAccepted] = useState(() => {
+    try {
+      return !!localStorage.getItem("pyr_guest_tcle");
+    } catch {
+      return false;
+    }
+  });
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const { toast } = useToast();
@@ -394,6 +400,23 @@ const Telemedicina = () => {
 
       if (error || !data?.id) throw new Error(error?.message || "Não foi possível salvar a triagem.");
       localStorage.removeItem("ot_triage_draft");
+
+      // 🔒 REGRA CFM/LGPD: Sincroniza consentimento prévio do visitante com o prontuário no Supabase
+      const guestTcle = localStorage.getItem("pyr_guest_tcle");
+      if (guestTcle) {
+        try {
+          const parsedTcle = JSON.parse(guestTcle);
+          await supabase.from("tcle_consents").insert({
+            user_id: user.id,
+            doctor_name: parsedTcle.doctorName || "Corpo Clínico Planta y Raíz",
+            version: parsedTcle.version || "2026.1",
+            checks: parsedTcle.checks,
+            user_agent: parsedTcle.userAgent,
+          });
+          localStorage.removeItem("pyr_guest_tcle");
+        } catch { /* ignore sync error */ }
+      }
+
       setAnswers(completeAnswers);
       setTriageId(data.id);
       
@@ -453,8 +476,7 @@ const Telemedicina = () => {
         }}
         onDecline={() => {
           setShowTCLE(false);
-          navigate("/");
-          toast({ title: "Consentimento recusado", description: "Você foi redirecionado à página inicial.", variant: "destructive" });
+          toast({ title: "Termo de Consentimento", description: "Você pode navegar pelo site e ler o termo quando desejar iniciar." });
         }}
         patientName={patientData.nome || "Paciente"}
       />
@@ -649,20 +671,66 @@ const Telemedicina = () => {
           )}
 
           <div className="max-w-2xl mx-auto">
-            {/* Waiting for TCLE acceptance */}
-            {step === -1 && !showTCLE && !tcleAccepted && (
+            {/* Landing Hero & Call to Action (Passo Inicial) */}
+            {step === -1 && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-                 <Card className="border-border">
-                   <CardContent className="p-5 sm:p-8 text-center">
-                     <Shield size={36} className="text-primary mx-auto mb-3 sm:mb-4 sm:w-12 sm:h-12" />
-                     <h2 className="text-lg sm:text-xl font-display font-black text-foreground mb-3 sm:mb-4">Consentimento Necessário</h2>
-                     <p className="text-sm text-muted-foreground mb-4 sm:mb-6">Você precisa aceitar o Termo de Consentimento (TCLE) para prosseguir com a teleconsulta.</p>
-                     <Button 
-                       className="w-full h-12 sm:h-14 bg-primary text-primary-foreground font-black rounded-2xl text-base sm:text-lg"
-                      onClick={() => setShowTCLE(true)}
-                    >
-                      <FileText className="mr-2" /> Ler e Aceitar o TCLE
-                    </Button>
+                <Card className="border-border shadow-2xl bg-card/95 backdrop-blur overflow-hidden">
+                  <div className="h-2 bg-gradient-to-r from-emerald-500 via-primary to-teal-400" />
+                  <CardContent className="p-6 sm:p-10 text-center space-y-6">
+                    <div className="w-16 h-16 rounded-3xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto text-primary shadow-inner">
+                      <Stethoscope size={32} />
+                    </div>
+                    <div className="space-y-3">
+                      <Badge className="bg-primary/20 text-primary border-primary/30 text-xs px-3 py-1 font-bold uppercase tracking-wider">
+                        Telemedicina Segura · Res. CFM nº 2.314/2022
+                      </Badge>
+                      <h2 className="text-2xl sm:text-3xl font-display font-black text-foreground tracking-tight">
+                        Consulta Médica Online & <span className="text-gradient-green">Orientação Clínica</span>
+                      </h2>
+                      <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+                        Acolhimento humanizado com médicos especialistas credenciados. Faça a triagem clínica prévia em 5 perguntas rápidas com a <strong>Enfª Brisa IA</strong> e receba sua orientação médica com receita digital válida em todo o Brasil.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg mx-auto pt-2">
+                      <Button
+                        size="lg"
+                        className="h-14 font-black rounded-2xl bg-primary text-primary-foreground text-base shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                        onClick={() => {
+                          if (tcleAccepted) {
+                            setStep(0);
+                          } else {
+                            setShowTCLE(true);
+                          }
+                        }}
+                      >
+                        <Sparkles size={18} /> Iniciar Triagem Grátis
+                      </Button>
+                      <Link to="/orientacao-tecnica" className="w-full">
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="w-full h-14 font-bold rounded-2xl border-primary/40 text-primary hover:bg-primary/10 text-sm"
+                        >
+                          Orientação Técnica (R$ 30)
+                        </Button>
+                      </Link>
+                    </div>
+
+                    <div className="pt-6 border-t border-border/60 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-muted-foreground text-left sm:text-center">
+                      <div className="flex items-center gap-2 justify-center">
+                        <Shield size={16} className="text-primary shrink-0" />
+                        <span>Conforme CFM 2.314/2022</span>
+                      </div>
+                      <div className="flex items-center gap-2 justify-center">
+                        <FileText size={16} className="text-primary shrink-0" />
+                        <span>Receita Digital ICP-Brasil</span>
+                      </div>
+                      <div className="col-span-2 sm:col-span-1 flex items-center gap-2 justify-center">
+                        <Users size={16} className="text-primary shrink-0" />
+                        <span>{onlineDoctors} Médicos Disponíveis</span>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>

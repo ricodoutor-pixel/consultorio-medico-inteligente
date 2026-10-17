@@ -543,8 +543,26 @@ Deno.serve(async (req) => {
     if (isOrientacaoTecnica) {
       const platformFee = round2(totalAmount * 0.07);
       const doctorPayout = round2(totalAmount - platformFee);
-      const orderStatus = payment.status === "approved" ? "approved" : payment.status === "rejected" ? "rejected" : "pending";
-      const orientacaoUserId = metadata.user_id || (externalRef.includes(":") ? externalRef.split(":")[1] : null);
+      // Preço autoritativo da Orientação Técnica: R$ 30. Valor menor nunca libera a sala.
+      const amountOk = Number(totalAmount) >= 30;
+      const approvedOk = payment.status === "approved" && amountOk;
+      if (payment.status === "approved" && !amountOk) {
+        console.error(`[orientacao-tecnica] valor inválido R$ ${totalAmount} para ${externalRef} — sala NÃO liberada`);
+      }
+      const orderStatus = approvedOk
+        ? "approved"
+        : payment.status === "approved"
+          ? "failed"
+          : payment.status === "rejected" ? "rejected" : "pending";
+      const { data: existingOrder } = await supabase
+        .from("orientacao_tecnica_orders")
+        .select("id, user_id, ai_analysis, patient_name")
+        .eq("external_reference", externalRef)
+        .maybeSingle();
+      const refUserId = externalRef.includes(":") ? externalRef.split(":")[1] : null;
+      const uuidLike = (v: unknown) => typeof v === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+      const orientacaoUserId: string | null =
+        (existingOrder as any)?.user_id || (uuidLike(metadata.user_id) ? metadata.user_id : null) || (uuidLike(refUserId) ? refUserId : null);
 
       // 1. Atualiza ou insere em orientacao_tecnica_orders (fonte principal do Admin / Command Center 360)
       const { data: updatedOrders } = await supabase
@@ -612,7 +630,25 @@ Deno.serve(async (req) => {
       }, { onConflict: "payment_id" });
 
       if (payment.status === "approved") {
-        // 4. Registra transação em escrow_transactions para métricas de receita
+        // 4. Libera a sessão da Orientação Técnica no banco com status 'ready' (AGENTS.md)
+        if (orientacaoUserId) {
+          let triageObj: Record<string, unknown> = {};
+          if ((existingOrder as any)?.ai_analysis) {
+            try { triageObj = JSON.parse((existingOrder as any).ai_analysis); } catch { /* ignore */ }
+          }
+          await supabase.from("ot_web_sessions").upsert({
+            user_id: orientacaoUserId,
+            external_reference: externalRef,
+            mp_payment_id: String(payment.id),
+            triage: triageObj,
+            status: "ready",
+            messages_count: 0,
+            started_at: null,
+            expires_at: null,
+          }, { onConflict: "external_reference" });
+        }
+
+        // 4b. Registra transação em escrow_transactions para métricas de receita
         await supabase.from("escrow_transactions").insert({
           patient_id: orientacaoUserId,
           amount: totalAmount,

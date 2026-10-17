@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 const WidgetMonitorRapido = lazy(() => import("@/components/WidgetMonitorRapido"));
 import brisaImg from "@/assets/brisa-enfermeira.png";
+import DrEdilsonPhoto from "@/assets/dr-edilson-bezerra.jpg";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -314,6 +315,18 @@ const Telemedicina = () => {
     });
   }, []);
 
+  // 🎯 Scroll suave automático para a seção explicativa de Orientação Técnica
+  useEffect(() => {
+    if (window.location.hash === "#orientacao-tecnica") {
+      const el = document.getElementById("orientacao-tecnica");
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 200);
+      }
+    }
+  }, []);
+
   const currentQ = interviewQuestions[step - 1];
   const progress = step <= 0 ? 0 : step > 5 ? 100 : Math.round((step / 5) * 100);
   
@@ -581,8 +594,8 @@ const Telemedicina = () => {
                   </div>
 
                   <div className="rounded-2xl border border-border p-4 bg-muted/30">
-                    <p className="font-black text-foreground mb-1">3 · Triagem + Orientação Técnica (sem consulta)</p>
-                    <p className="text-xs text-muted-foreground">Enf. Brisa triagem → Orientação Técnica personalizada com <strong>Dr. Edilson Bezerra</strong> → relatório em PDF e encaminhamento emitido diretamente com assinatura digital.</p>
+                    <p className="font-black text-foreground mb-1">3 · Triagem + Orientação Técnica Educativa</p>
+                    <p className="text-xs text-muted-foreground">Enf. Brisa triagem → Orientação Técnica com o <strong>Dr. Edilson Bezerra ON</strong> (supervisionado) → relatório informativo em PDF revisado pelo Dr. Edilson e encaminhamento para médicos da vitrine (não substitui consulta médica).</p>
                   </div>
                 </div>
 
@@ -688,7 +701,7 @@ const Telemedicina = () => {
                         Consulta Médica Online & <span className="text-gradient-green">Orientação Clínica</span>
                       </h2>
                       <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-                        Acolhimento humanizado com médicos especialistas credenciados. Faça a triagem clínica prévia em 5 perguntas rápidas com a <strong>Enfª Brisa IA</strong> e receba sua orientação médica com receita digital válida em todo o Brasil.
+                        Acolhimento humanizado com médicos especialistas credenciados. Faça a triagem clínica prévia em 5 perguntas com a <strong>Enfª Brisa IA</strong> e realize sua teleconsulta com emissão de receita digital válida em todo o Brasil, caso indicada após avaliação médica.
                       </p>
                     </div>
 
@@ -704,7 +717,7 @@ const Telemedicina = () => {
                           }
                         }}
                       >
-                        <Sparkles size={18} /> Iniciar Triagem Grátis
+                        <Sparkles size={18} /> Iniciar Triagem Prévia
                       </Button>
                       <Link to="/orientacao-tecnica" className="w-full">
                         <Button
@@ -995,6 +1008,95 @@ const Telemedicina = () => {
             )}
 
 
+          </div>
+        </div>
+      </section>
+
+      {/* 🌿 Seção Explicativa Oficial: Orientação Técnica — Dr. Edilson Bezerra ON */}
+      <section
+        id="orientacao-tecnica"
+        className="scroll-mt-24 md:scroll-mt-28 py-16 bg-gradient-to-br from-primary/10 via-background to-emerald-500/10 border-t border-primary/20"
+      >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+          <div className="bg-card/90 backdrop-blur border border-primary/30 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
+              <img
+                src={DrEdilsonPhoto}
+                alt="Dr. Edilson Bezerra"
+                className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover ring-4 ring-primary/30 shadow-xl shrink-0"
+              />
+              <div className="text-center md:text-left space-y-2">
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                  <Badge className="bg-primary text-primary-foreground font-black text-xs px-3 py-1 uppercase tracking-wider">
+                    Triagem Clínica & Educação em Saúde
+                  </Badge>
+                  <Badge variant="outline" className="border-primary/40 text-primary font-bold text-xs">
+                    ⚕️ CRM Bolívia 10963 · Formado em 2018
+                  </Badge>
+                  <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 font-bold text-xs">
+                    📚 40.000 Estudos Clínicos
+                  </Badge>
+                </div>
+                <h3 className="text-2xl sm:text-4xl font-display font-black text-foreground">
+                  Orientação e Avaliação Técnica com{" "}
+                  <span className="text-gradient-green">Dr. Edilson Bezerra ON</span>
+                </h3>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl">
+                  Modalidade institucional desenvolvida para <strong>filtrar pacientes reais versus curiosos</strong>,
+                  compreender profundamente o histórico de cada caso e educar sobre a terapêutica canabinoide
+                  antes da consulta médica formal. Conduzida pelo agente autônomo <strong>Dr. Edilson Bezerra ON</strong> (IA com mais de 10 anos de prática clínica integrativa, consultório físico em Santa Cruz de la Sierra: Edifício Ecodente, 1º Anillo, Andar 13, Sala 15), sob <strong>supervisão médica humana em tempo real</strong>.
+                </p>
+              </div>
+            </div>
+
+            {/* Aviso de Compliance e Vedações */}
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-100/90 text-xs sm:text-sm leading-relaxed mb-8 flex items-start gap-3">
+              <Scale size={20} className="text-amber-500 shrink-0 mt-0.5" />
+              <div>
+                <strong>Aviso Legal & Diretrizes CFM/ANVISA:</strong> A Orientação Técnica <strong>NÃO é consulta médica diagnóstica e NÃO prescreve substâncias, produtos ou medicamentos sob qualquer hipótese</strong>. Trata-se de uma etapa de acolhimento e triagem avançada baseada em evidências científicas publicadas. Ao término da sessão, você recebe um <strong>Relatório Educativo em PDF revisado pelo Dr. Edilson</strong> e o encaminhamento com prioridade para o Médico Prescritor credenciado da vitrine mais indicado para o seu caso.
+              </div>
+            </div>
+
+            {/* Esteira de 4 Passos */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+              <div className="p-4 rounded-2xl bg-muted/40 border border-border text-center space-y-1">
+                <span className="text-2xl">👩‍⚕️</span>
+                <p className="text-xs font-black uppercase tracking-wider text-primary">1. Triagem Brisa</p>
+                <p className="text-[11px] text-muted-foreground">Queixas e histórico no WhatsApp</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-muted/40 border border-border text-center space-y-1">
+                <span className="text-2xl">💳</span>
+                <p className="text-xs font-black uppercase tracking-wider text-primary">2. Taxa R$ 30</p>
+                <p className="text-[11px] text-muted-foreground">Pagamento seguro Mercado Pago</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-muted/40 border border-border text-center space-y-1">
+                <span className="text-2xl">💬</span>
+                <p className="text-xs font-black uppercase tracking-wider text-primary">3. Chat 30 min</p>
+                <p className="text-[11px] text-muted-foreground">Sala estilo WhatsApp com a IA</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-muted/40 border border-border text-center space-y-1">
+                <span className="text-2xl">📄</span>
+                <p className="text-xs font-black uppercase tracking-wider text-primary">4. Relatório & Vitrine</p>
+                <p className="text-[11px] text-muted-foreground">PDF oficial e médico indicado</p>
+              </div>
+            </div>
+
+            {/* CTA Final em Destaque */}
+            <div className="text-center pt-2">
+              <Link to="/orientacao-tecnica">
+                <Button
+                  size="lg"
+                  className="h-14 sm:h-16 px-8 sm:px-12 text-base sm:text-lg font-black rounded-2xl bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-600/30 hover:scale-105 transition-all gap-3"
+                >
+                  <Sparkles size={20} /> Iniciar Orientação Técnica — R$ 30,00 <ArrowRight size={20} />
+                </Button>
+              </Link>
+              <p className="text-xs text-muted-foreground mt-3 flex items-center justify-center gap-1.5">
+                <Shield size={14} className="text-primary" /> Liberação instantânea após confirmação · Sem filas
+              </p>
+            </div>
           </div>
         </div>
       </section>

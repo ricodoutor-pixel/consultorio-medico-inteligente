@@ -131,6 +131,7 @@ const LegacyVideoCallRedirect = () => {
 };
 const OrientacaoRapida = lazyWithRecovery(() => import("./pages/OrientacaoRapida"), { sourceRef: "/orientacao-rapida" });
 const OrientacaoTecnicaAgente = lazyWithRecovery(() => import("./pages/OrientacaoTecnicaAgente"), { sourceRef: "/orientacao-tecnica" });
+const OrientacaoRelatorio = lazyWithRecovery(() => import("./pages/OrientacaoRelatorio"), { sourceRef: "/orientacao-tecnica/relatorio/:id" });
 const FluxoAtendimento = lazyWithRecovery(() => import("./pages/FluxoAtendimento"), { sourceRef: "/atendimento" });
 
 const SEOCondicoes = lazyWithRecovery(() => import("./pages/SEOCondicoes"), { sourceRef: "/tratamentos" });
@@ -183,6 +184,7 @@ const SaudeVerdeAssinatura = lazyWithRecovery(() => import("./pages/saude-verde/
 const OmniChannelDashboard = lazyWithRecovery(() => import("./pages/OmniChannelDashboard"), { sourceRef: "/admin/omni-channel" });
 const BrisaCEO = lazyWithRecovery(() => import("./pages/admin/BrisaCEO"), { sourceRef: "/admin/brisa-ceo" });
 const BrisaOrientacoes = lazyWithRecovery(() => import("./pages/admin/BrisaOrientacoes"), { sourceRef: "/admin/brisa-orientacoes" });
+const OrientacaoAoVivo = lazyWithRecovery(() => import("./pages/admin/OrientacaoAoVivo"), { sourceRef: "/admin/orientacao-ao-vivo" });
 const OfertaEspecial = lazyWithRecovery(() => import("./pages/OfertaEspecial"), { sourceRef: "/oferta-especial" });
 const AdminFinanceiro = lazyWithRecovery(() => import("./pages/AdminFinanceiro"), { sourceRef: "/admin/financeiro" });
 const AdminCreditAudit = lazyWithRecovery(() => import("./pages/AdminCreditAudit"), { sourceRef: "/admin/credit-audit" });
@@ -429,6 +431,9 @@ const App = () => (
                 <Route path="/orientacao-rapida" element={<OrientacaoRapida />} />
                 <Route path="/consulta-rapida" element={<OrientacaoRapida />} />
                 <Route path="/orientacao-tecnica" element={<OrientacaoTecnicaAgente />} />
+                <Route path="/orientacao-tecnica/chat" element={<OrientacaoTecnicaAgente />} />
+                <Route path="/orientacao-tecnica/chat/:sessionId" element={<OrientacaoTecnicaAgente />} />
+                <Route path="/orientacao-tecnica/relatorio/:id" element={<OrientacaoRelatorio />} />
                 <Route path="/atendimento" element={<FluxoAtendimento />} />
 
                 <Route path="/tratamento-dor-cronica" element={<TratamentoDorCronica />} />
@@ -467,6 +472,7 @@ const App = () => (
                 <Route path="/admin/brisa" element={<AdminRoute><BrisaCEO /></AdminRoute>} />
                 <Route path="/admin/brisa-orientacoes" element={<AdminRoute><BrisaOrientacoes /></AdminRoute>} />
                 <Route path="/admin/orientacoes" element={<AdminRoute><BrisaOrientacoes /></AdminRoute>} />
+                <Route path="/admin/orientacao-ao-vivo" element={<AdminRoute><OrientacaoAoVivo /></AdminRoute>} />
                 <Route path="/admin/whatsapp-inbox" element={<AdminRoute><WhatsAppInbox /></AdminRoute>} />
                 <Route path="/admin/inbox" element={<AdminRoute><WhatsAppInbox /></AdminRoute>} />
                 <Route path="/admin/auditoria-de-crédito" element={<AdminRoute><AdminCreditAudit /></AdminRoute>} />

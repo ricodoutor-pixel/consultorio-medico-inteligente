@@ -86,6 +86,30 @@ const LEGACY_SKU_MAP: Record<string, string> = {
   vip_mensal: "plano_medico",
 };
 
+/** SKUs da Orientação Técnica (web). */
+const isOrientacaoSku = (sku: unknown): sku is string =>
+  typeof sku === "string" && sku.startsWith("orientacao");
+
+const filled = (v: unknown) => typeof v === "string" ? v.trim().length > 0 : v !== null && v !== undefined && v !== "";
+
+/** Red flags indicam emergência? Aceita boolean, array ou texto ("nenhum"/"não" = sem emergência). */
+function hasEmergencyRedFlags(triage: Record<string, unknown>): boolean {
+  if (triage.emergency === true) return true;
+  const rf = triage.red_flags;
+  if (rf === true) return true;
+  const none = /^(nenhum|nenhuma|nao|não|no|none|false|0|-)?$/i;
+  if (Array.isArray(rf)) return rf.some((x) => !none.test(String(x ?? "").trim()));
+  if (typeof rf === "string") return !none.test(rf.trim());
+  return false;
+}
+
+/** Triagem mínima exigida antes de criar a ordem da Orientação Técnica. */
+function isTriageReady(triage: unknown): triage is Record<string, unknown> {
+  if (!triage || typeof triage !== "object" || Array.isArray(triage)) return false;
+  const t = triage as Record<string, unknown>;
+  return filled(t.nome) && filled(t.queixa) && filled(t.tempo) && !hasEmergencyRedFlags(t);
+}
+
 Deno.serve(async (req) => {
   const cors = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
@@ -263,6 +287,9 @@ Deno.serve(async (req) => {
       }
 
       if (!item) return json({ error: "SKU inválido" }, 400, req);
+      if (isOrientacaoSku(sku) && !isTriageReady(triage)) {
+        return json({ error: "triage_required" }, 400, req);
+      }
       title = item.title;
       amount = item.amount;
       // Consulta Premium é o único serviço com valor definido pelo profissional.
@@ -283,7 +310,7 @@ Deno.serve(async (req) => {
         (sku.startsWith("consulta") || sku.startsWith("orientacao") || sku.startsWith("retorno"));
       if (isTelemedSku && !item.recurring) {
         marketplaceFee = round2(amount * FEE_TELEMEDICINE);
-        if (typeof doctorId === "string") {
+        if (typeof doctorId === "string" && !isOrientacaoSku(sku)) {
           const { data: doc } = await supabase
             .from("doctors")
             .select("mp_collector_id")
@@ -359,6 +386,47 @@ Deno.serve(async (req) => {
       };
     }
 
+    // Orientação Técnica: grava a ordem + triagem ANTES da preferência (AGENTS.md).
+    const isOrientacaoOrder = type === "sku" && isOrientacaoSku(sku);
+    if (isOrientacaoOrder) {
+      const t = (triage ?? {}) as Record<string, unknown>;
+      const meta = (authData.user.user_metadata ?? {}) as Record<string, unknown>;
+      let patientPhone = String(t.whatsapp ?? t.telefone ?? t.phone ?? meta.phone ?? meta.whatsapp ?? "").replace(/\D/g, "");
+      if (!/^\d{10,15}$/.test(patientPhone)) {
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("whatsapp, phone")
+          .eq("id", userId)
+          .maybeSingle();
+        patientPhone = String((prof as any)?.whatsapp || (prof as any)?.phone || "").replace(/\D/g, "");
+      }
+      const patientName = String(t.nome || meta.full_name || authData.user.email?.split("@")[0] || "Paciente").trim().slice(0, 120);
+      const platformFee = round2(amount * FEE_TELEMEDICINE);
+      const nowIso = new Date().toISOString();
+
+      const { error: orderErr } = await supabase.from("orientacao_tecnica_orders").insert({
+        external_reference: externalReference,
+        user_id: userId,
+        patient_name: patientName.length >= 2 ? patientName : "Paciente",
+        patient_whatsapp: /^\d{10,15}$/.test(patientPhone) ? patientPhone : null,
+        patient_email: authData.user.email || null,
+        amount,
+        platform_fee: platformFee,
+        doctor_payout: round2(amount - platformFee),
+        payment_method: "mercadopago",
+        status: "pending",
+        currency: "BRL",
+        topic: `Orientação: ${String(t.queixa).slice(0, 100)}`,
+        ai_analysis: JSON.stringify(t),
+        created_at: nowIso,
+        updated_at: nowIso,
+      });
+      if (orderErr) {
+        console.error("[mp-checkout] orientacao order insert", orderErr.message);
+        return json({ error: "Não foi possível registrar a triagem da Orientação Técnica" }, 500, req);
+      }
+    }
+
     const mpResponse = await fetch(endpoint, {
       method: "POST",
       headers: {
@@ -370,10 +438,21 @@ Deno.serve(async (req) => {
 
     if (!mpResponse.ok) {
       console.error("[mp-checkout] MP error", mpResponse.status, await mpResponse.text());
+      if (isOrientacaoOrder) {
+        await supabase.from("orientacao_tecnica_orders")
+          .update({ status: "failed", updated_at: new Date().toISOString() })
+          .eq("external_reference", externalReference);
+      }
       return json({ error: "Erro ao criar pagamento no Mercado Pago" }, 502);
     }
 
     const mpData = await mpResponse.json();
+
+    if (isOrientacaoOrder) {
+      await supabase.from("orientacao_tecnica_orders")
+        .update({ mp_preference_id: String(mpData.id), updated_at: new Date().toISOString() })
+        .eq("external_reference", externalReference);
+    }
 
     // Comprovante de liquidação direta gravado na transação
     const settlementReceipt = splitDetails
@@ -396,32 +475,6 @@ Deno.serve(async (req) => {
         .from("payments")
         .update({ split_details: splitDetails, settlement_receipt: settlementReceipt })
         .eq("mp_preference_id", String(mpData.id));
-    }
-
-    if (typeof sku === "string" && (sku.startsWith("orientacao") || sku === "orientacao_tecnica")) {
-      const patientName = authData.user.user_metadata?.full_name || authData.user.email?.split("@")[0] || "Paciente";
-      const patientPhone = authData.user.user_metadata?.phone || authData.user.user_metadata?.whatsapp || "";
-      const patientEmail = authData.user.email || "";
-      const platformFee = round2(amount * FEE_TELEMEDICINE);
-      const doctorPayout = round2(amount - platformFee);
-
-      await supabase.from("orientacao_tecnica_orders").insert({
-        external_reference: externalReference,
-        patient_name: patientName,
-        patient_whatsapp: patientPhone,
-        patient_email: patientEmail,
-        amount: amount,
-        platform_fee: platformFee,
-        doctor_payout: doctorPayout,
-        payment_method: "mercadopago",
-        mp_preference_id: String(mpData.id),
-        status: "pending",
-        currency: "BRL",
-        topic: typeof triage === "object" && triage?.queixa ? `Orientação: ${String(triage.queixa).slice(0, 100)}` : "Orientação Técnica",
-        ai_analysis: triage && typeof triage === "object" ? JSON.stringify(triage) : null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
     }
 
     await supabase.from("audit_log").insert({

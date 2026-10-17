@@ -235,7 +235,7 @@ const WorkspaceMedico = () => {
             <div className="flex items-center gap-2">
               <h2 className="font-semibold text-lg">{patient?.full_name || "Paciente Remoto"}</h2>
               <Badge variant={type === 'video' ? "default" : "secondary"} className="text-[10px]">
-                {type === 'video' ? "Consulta Completa - Resolução CFM 2.314/22" : "Orientação Técnica Rápida"}
+                {type === 'video' ? "Teleconsulta por Vídeo - Resolução CFM 2.314/22" : "Consulta Médica por Chat Clínico"}
               </Badge>
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">

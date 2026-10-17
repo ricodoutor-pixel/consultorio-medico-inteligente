@@ -89,11 +89,9 @@ export default function NossaHistoria() {
             className="space-y-6 text-justify leading-[1.6] text-sm sm:text-base text-gray-200/90 mb-14"
           >
             <motion.p variants={fadeUp}>
-              Olá, somos a <strong className="text-white">Planta y Raiz Ltda.</strong>, a plataforma de
-              telemedicina canabinoide mais completa do mundo. Criada durante o auge da pandemia de
-              COVID-19, a Planta y Raiz nasceu de uma grande tragédia: a morte prematura de três
-              jovens médicos que, na linha de frente do combate ao vírus, perderam suas vidas após
-              15 dias de luta, deixando famílias, amigos e pacientes em profundo pesar.
+              Olá, somos a <strong className="text-white">Planta y Raiz Ltda.</strong>, plataforma de
+              tecnologia em saúde digital, telemedicina e acolhimento clínico. Criada durante o auge da pandemia de
+              COVID-19, a Planta y Raiz nasceu com o compromisso de facilitar o acesso a cuidados médicos de qualidade.
             </motion.p>
 
             <motion.p variants={fadeUp}>

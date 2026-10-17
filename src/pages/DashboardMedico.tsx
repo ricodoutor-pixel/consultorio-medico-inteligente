@@ -277,13 +277,13 @@ const DashboardMedico = () => {
 
       await supabase.from("notifications").insert({
         user_id: selectedRequest.patient_id,
-        title: "📋 Nova Orientação Técnica Necessária",
+        title: "📋 Nova Consulta Médica Necessária",
         message: "Seu médico analisou sua solicitação e recomenda uma nova consulta antes de renovar a receita. Agende pelo Dashboard.",
         type: "info",
         action_url: "/agendamento",
       });
 
-      toast({ title: "Orientação Técnica solicitada", description: "Paciente notificado para agendar nova consulta." });
+      toast({ title: "Consulta médica solicitada", description: "Paciente notificado para agendar nova consulta." });
       setRenewalRequests(prev => prev.filter(r => r.id !== selectedRequest.id));
       setReviewModalOpen(false);
     } catch (err) {
@@ -901,7 +901,7 @@ const DashboardMedico = () => {
         <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
-              <FileBarChart size={18} className="text-primary" /> Relatório Pré-Orientação Técnica (Brisa IA)
+              <FileBarChart size={18} className="text-primary" /> Relatório Clínico e Triagem Prévia (Brisa IA)
             </SheetTitle>
             <SheetDescription>Resumo da triagem do paciente antes da consulta</SheetDescription>
           </SheetHeader>
@@ -932,7 +932,7 @@ const DashboardMedico = () => {
 
               <Card className="border-border">
                 <CardContent className="p-4">
-                  <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Calendar size={14} className="text-primary" /> Orientação Técnica</h4>
+                  <h4 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2"><Calendar size={14} className="text-primary" /> Consulta Médica</h4>
                   <p className="text-xs text-muted-foreground">Horário: {format(new Date(selectedPatientTriage.appointment.scheduled_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
                   <p className="text-xs text-muted-foreground">Tipo: {selectedPatientTriage.appointment.type}</p>
                   <Badge className="mt-2 text-[10px] bg-primary/10 text-primary border-green capitalize">{selectedPatientTriage.appointment.status}</Badge>
@@ -1075,7 +1075,7 @@ const DashboardMedico = () => {
           <DialogFooter className="flex flex-col sm:flex-row gap-2">
             <Button variant="outline" className="rounded-xl" onClick={handleRequestConsultation} disabled={processing}>
               {processing ? <Loader2 size={14} className="animate-spin mr-1" /> : <Calendar size={14} className="mr-1" />}
-              Solicitar Nova Orientação Técnica
+              Solicitar Nova Consulta Médica
             </Button>
             <Button className="rounded-xl bg-primary" onClick={handleApproveRenewal} disabled={processing}>
               {processing ? <Loader2 size={14} className="animate-spin mr-1" /> : <CheckCircle2 size={14} className="mr-1" />}

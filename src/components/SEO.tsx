@@ -10,9 +10,9 @@ interface SEOProps {
 }
 
 export const SEO = ({
-  title = "Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas R$30 - Planta y Raiz Ltda",
-  description = "Inicie Agora Seu Tratamento Com Cannabis Medicinal Com Apenas 30rs - Planta y Raiz Ltda a Melhor e Mais Completa Clínica Digital do Planeta! Assistência Jurídica de Ponta a Ponta LGPD-ANVISA-CFM - Orientação Técnica Personalizada Via WhatsApp - Comunidade Científica com mais de 300 mil membros (Supervisão Técnica: Dra. Suelen Naves Rodrigues (CRM 49354/PR)) Cadastro e Ebook Gratuito!",
-  keywords = "cannabis medicinal, telemedicina, CBD, THC, saúde digital, triagem IA, supervisão IA 24x7",
+  title = "Planta y Raíz — Telemedicina e Saúde Integrativa",
+  description = "Telemedicina com médicos habilitados e emissão de receita digital válida em todo o Brasil. A prescrição depende de avaliação médica individualizada conforme Resolução CFM nº 2.314/2022.",
+  keywords = "telemedicina, consulta médica online, saúde integrativa, receita médica digital, CFM 2314/2022, orientação médica, Planta y Raiz",
   image = "https://plantayraiz.com.br/dr-verdinho-512.png",
   url = "https://plantayraiz.com.br",
   type = "website"
@@ -48,11 +48,11 @@ export const SEO = ({
       "@context": "https://schema.org",
       "@type": "MedicalClinic",
       "name": "Planta y Raiz",
-      "alternateName": "Mega Clínica Digital",
+      "alternateName": "Planta y Raiz Telemedicina",
       "url": "https://plantayraiz.com.br",
       "logo": "https://plantayraiz.com.br/dr-verdinho-512.png",
       "description": description,
-      "medicalSpecialty": ["Cannabis Medicinal", "Telemedicina", "Clínica Geral"],
+      "medicalSpecialty": ["Telemedicina", "Saúde Integrativa", "Clínica Geral"],
       "availableService": [
         {
           "@type": "MedicalTest",

@@ -15,8 +15,8 @@ export const HolidayPlantaoBanner: React.FC = () => {
             <Stethoscope className="w-3.5 h-3.5" /> Plantão de Feriado Ativo
           </span>
           <span className="hidden sm:inline text-emerald-200/80">•</span>
-          <span className="hidden sm:inline text-emerald-100/90 font-medium">
-            Consultórios físicos fechados hoje? Nossa equipe médica e orientação canabinoide atendem normalmente.
+          <span className="text-emerald-100/90 font-medium">
+            Telemedicina com médicos habilitados. A prescrição médica depende de avaliação individualizada.
           </span>
         </div>
 

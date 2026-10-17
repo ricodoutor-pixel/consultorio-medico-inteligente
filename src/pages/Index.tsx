@@ -6,7 +6,7 @@ import { Leaf, Users, Star, ArrowRight, TrendingUp, UserPlus, Download, Quote, N
 import { motion } from "framer-motion";
 import { lazy, Suspense } from "react";
 const CannabisMarketChart = lazy(() => import("@/components/CannabisMarketChart"));
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { LocalMapSection } from "@/components/LocalMapSection";
 import { BrisaCTAGate } from "@/components/BrisaCTAGate";
@@ -48,11 +48,11 @@ const fadeUpMobile = {
 const stagger = { visible: { transition: { staggerChildren: 0.12 } } };
 
 const steps = [
-  { n: "1", title: "Escolha o especialista", desc: "Navegue por categorias, veja avaliações, preços populares e perfis verificados.", img: triagemPatient },
-  { n: "2", title: "Pré-entrevista rápida", desc: "Preencha um formulário de 2 minutos com seu objetivo e resumo do caso.", img: triagemForm },
-  { n: "3", title: "Pague via Pix", desc: "Pagamento instantâneo com QR code Mercado Pago. Confirmação automática.", img: consultaChat },
-  { n: "4", title: "Receba atendimento", desc: "O profissional recebe seu resumo e inicia o atendimento (chat ou vídeo).", img: triagemPatient },
-  { n: "5", title: "Compre seu tratamento", desc: "Acesse nossas lojas parceiras e compre seus medicamentos com receita digital e frete grátis.", img: triagemPatient },
+  { n: "1", title: "Escolha o especialista", desc: "Navegue por especialidades médicas, consulte qualificações e verifique o registro profissional no CFM.", img: triagemPatient },
+  { n: "2", title: "Pré-entrevista clínica", desc: "Preencha um questionário prévio rápido com seu histórico e principais queixas de saúde.", img: triagemForm },
+  { n: "3", title: "Pagamento seguro", desc: "Processamento transparente com confirmação instantânea via Mercado Pago.", img: consultaChat },
+  { n: "4", title: "Teleconsulta médica", desc: "Atendimento humanizado com médico habilitado por chat seguro ou videoconferência.", img: triagemPatient },
+  { n: "5", title: "Receita médica digital", desc: "Receba sua receita médica digital válida em todo o Brasil para dispensação ou importação legal, se indicada.", img: triagemPatient },
 ];
 
 const GOOGLE_REVIEWS_URL = "https://www.google.com/search?q=Planta+y+Raiz+Ltda+Coment%C3%A1rios";
@@ -64,7 +64,7 @@ const testimonialData = [
     city: "São Paulo, SP",
     date: "Março 2026",
     condition: "Artrite Reumatoide",
-    quote: "Depois de 8 anos sofrendo com artrite, o óleo de CBD mudou minha vida. Reduzi 70% dos analgésicos e voltei a fazer crochê.",
+    quote: "O acompanhamento médico individualizado e o ajuste da conduta terapêutica me proporcionaram mais conforto articular e qualidade de vida na minha rotina.",
     image: testimonialMaria,
     googleReviewUrl: GOOGLE_REVIEWS_URL,
   },
@@ -73,8 +73,8 @@ const testimonialData = [
     age: "45 anos",
     city: "Curitiba, PR",
     date: "Fevereiro 2026",
-    condition: "Epilepsia do filho",
-    quote: "Meu filho tinha 15 crises por semana. Com o tratamento prescrito aqui, as crises reduziram para 2 por mês. Divisor de águas!",
+    condition: "Epilepsia refratária",
+    quote: "A atenção dedicada do especialista e o acompanhamento próximo trouxeram mais estabilidade ao tratamento do meu filho, com excelente suporte da equipe.",
     image: testimonialRoberto,
     googleReviewUrl: GOOGLE_REVIEWS_URL,
   },
@@ -84,7 +84,7 @@ const testimonialData = [
     city: "Belo Horizonte, MG",
     date: "Janeiro 2026",
     condition: "Ansiedade e Insônia",
-    quote: "Tomava 3 remédios para dormir. A psiquiatra da plataforma ajustou meu protocolo com CBD e em 3 meses consegui dormir naturalmente.",
+    quote: "A teleconsulta foi muito esclarecedora. O médico avaliou todo meu histórico com calma e estruturou um plano terapêutico integrativo que melhorou minhas noites.",
     image: testimonialJuliana,
     googleReviewUrl: GOOGLE_REVIEWS_URL,
   },
@@ -93,8 +93,8 @@ const testimonialData = [
     age: "71 anos",
     city: "Rio de Janeiro, RJ",
     date: "Dezembro 2025",
-    condition: "Parkinson",
-    quote: "Os tremores melhoraram muito. Consigo comer sozinho de novo. A telemedicina facilitou porque não preciso sair de casa.",
+    condition: "Doença de Parkinson",
+    quote: "A facilidade da telemedicina para quem tem mobilidade reduzida é excelente. O médico foi muito atencioso na revisão das minhas medicações.",
     image: testimonialAntonio,
     googleReviewUrl: GOOGLE_REVIEWS_URL,
   },
@@ -109,6 +109,25 @@ const Index = () => {
     // Título da página é gerenciado por DynamicSEOHead/OpenGraphHead (rota-aware) — evita duplicação.
     // ManyChat widget (ID 11227069) é injetado centralizadamente via <ManyChatWidget /> após consentimento LGPD.
   }, []);
+
+  // Deep link para âncoras da landing (ex.: /#orientacao-tecnica vindo da vitrine).
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (!hash) return;
+    const id = decodeURIComponent(hash.slice(1));
+    let tries = 0;
+    const timer = window.setInterval(() => {
+      const el = document.getElementById(id);
+      tries += 1;
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.clearInterval(timer);
+      } else if (tries > 20) {
+        window.clearInterval(timer);
+      }
+    }, 150);
+    return () => window.clearInterval(timer);
+  }, [hash]);
 
   return (
     <div className="min-h-dvh bg-background w-full overflow-x-hidden">
@@ -145,12 +164,12 @@ const Index = () => {
               >
                 <div className="absolute -inset-4 bg-gradient-to-r from-primary/10 via-[hsl(280,80%,65%)]/8 to-[hsl(190,90%,50%)]/10 rounded-2xl blur-xl"></div>
                 <p className="relative leading-[1.8] font-display font-black text-xl xl:text-2xl 2xl:text-[1.7rem] tracking-wide">
-                  <span className="text-primary drop-shadow-[0_0_8px_hsl(142,70%,45%/0.4)]">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
-                  <span className="text-[hsl(25,95%,60%)] drop-shadow-[0_0_8px_hsl(25,95%,60%/0.3)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
-                  <span className="text-[hsl(280,80%,65%)] drop-shadow-[0_0_8px_hsl(280,80%,65%/0.3)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}
-                  <span className="text-[hsl(190,90%,50%)] drop-shadow-[0_0_8px_hsl(190,90%,50%/0.3)]">Canabinoide oferecendo orientação técnica com relatório digital em PDF</span>{' '}
-                  <span className="text-[hsl(45,90%,55%)] drop-shadow-[0_0_8px_hsl(45,90%,55%/0.3)]">por apenas R$30.</span>{' '}
-                  <span className="text-[hsl(340,85%,60%)] drop-shadow-[0_0_10px_hsl(340,85%,60%/0.4)]">Venha Você Também Fazer Parte desta revolução!</span>
+                  <span className="text-primary drop-shadow-[0_0_8px_hsl(142,70%,45%/0.4)]">Telemedicina e Saúde Integrativa com Rigor Clínico no Brasil.</span>{' '}
+                  <span className="text-[hsl(25,95%,60%)] drop-shadow-[0_0_8px_hsl(25,95%,60%/0.3)]">A Planta y Raíz promove a equidade</span>{' '}
+                  <span className="text-[hsl(280,80%,65%)] drop-shadow-[0_0_8px_hsl(280,80%,65%/0.3)]">no acesso a médicos habilitados e orientação especializada,</span>{' '}
+                  <span className="text-[hsl(190,90%,50%)] drop-shadow-[0_0_8px_hsl(190,90%,50%/0.3)]">com emissão de relatório informativo revisado</span>{' '}
+                  <span className="text-[hsl(45,90%,55%)] drop-shadow-[0_0_8px_hsl(45,90%,55%/0.3)]">por R$ 30,</span>{' '}
+                  <span className="text-[hsl(340,85%,60%)] drop-shadow-[0_0_10px_hsl(340,85%,60%/0.4)]">em estrita conformidade com o CFM nº 2.314/2022 e ANVISA RDC 660/2022.</span>
                 </p>
               </motion.div>
             </motion.div>
@@ -185,12 +204,12 @@ const Index = () => {
                 </div>
                 {/* Texto institucional abaixo do carrossel - apenas mobile */}
                 <p className="mt-8 text-center leading-relaxed font-display font-bold text-[clamp(0.85rem,2vw,1.1rem)] max-w-full lg:hidden mx-auto px-4 bg-card/30 p-6 rounded-3xl border border-border/50 backdrop-blur-sm">
-                  <span className="text-primary">Referência No Tratamento Com Cannabis Medicinal No Brasil,</span>{' '}
+                  <span className="text-primary">Telemedicina e Saúde Integrativa com Rigor Clínico no Brasil.</span>{' '}
                   <span className="text-[hsl(25,95%,60%)]">a Planta y Raiz está Promovendo a Equidade</span>{' '}
                   <span className="text-[hsl(280,80%,65%)]">e Realmente democratizando o acesso ao tratamento,</span>{' '}
                   <span className="text-[hsl(190,90%,50%)]">Canabinoide oferecendo orientação técnica com relatório digital em PDF</span>{' '}
-                  <span className="text-[hsl(45,90%,55%)]">por apenas R$30.</span>{' '}
-                  <span className="text-[hsl(340,85%,60%)]">Venha Você Também Fazer Parte desta revolução!</span>
+                  <span className="text-[hsl(45,90%,55%)]">por R$ 30,</span>{' '}
+                  <span className="text-[hsl(340,85%,60%)]">em conformidade com o CFM nº 2.314/2022 e ANVISA RDC 660/2022.</span>
                 </p>
               </div>
             </motion.div>
@@ -214,8 +233,8 @@ const Index = () => {
           <EmergencyCTA />
 
           <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
-            <h2 className="font-display font-black mb-4 md:mb-6">Tratamento em <span className="text-gradient-purple">5 Passos</span></h2>
-            <p className="text-muted-foreground font-medium">Sua jornada completa, do diagnóstico à entrega do medicamento, com economia e segurança total.</p>
+            <h2 className="font-display font-black mb-4 md:mb-6">Atendimento em <span className="text-gradient-purple">5 Passos</span></h2>
+            <p className="text-muted-foreground font-medium">Atendimento humanizado e orientação ética, da triagem clínica à emissão da receita digital válida.</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 mb-10">
             {steps.map((step, i) => (
@@ -273,20 +292,20 @@ const Index = () => {
                 <div className="grid grid-cols-3 gap-3 pt-2">
                   <div className="text-center p-3 rounded-xl bg-background/60 border border-border">
                     <p className="text-xl font-black text-primary">R$30</p>
-                    <p className="text-[10px] text-muted-foreground font-bold uppercase">Brasil</p>
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase">Taxa</p>
                   </div>
                   <div className="text-center p-3 rounded-xl bg-background/60 border border-border">
                     <p className="text-xl font-black text-primary">30min</p>
                     <p className="text-[10px] text-muted-foreground font-bold uppercase">Duração</p>
                   </div>
                   <div className="text-center p-3 rounded-xl bg-background/60 border border-border">
-                    <p className="text-xl font-black text-primary">4.9★</p>
-                    <p className="text-[10px] text-muted-foreground font-bold uppercase">Avaliação</p>
+                    <p className="text-xl font-black text-primary">Online</p>
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase">Supervisão</p>
                   </div>
                 </div>
                 <div className="pt-2 border-t border-border">
                   <p className="text-xs text-muted-foreground italic leading-relaxed">
-                    "Atendo com base científica, escutando cada paciente. Cannabis salva vidas — e a equidade no acesso é a minha missão."
+                    "Atendo com base científica, escutando cada paciente com empatia. A equidade no acesso à saúde é a nossa missão."
                   </p>
                 </div>
               </CardContent>
@@ -298,7 +317,7 @@ const Index = () => {
       {/* Live Stats - removido a pedido */}
 
       {/* Dr. Edilson Bezerra — Orientação Técnica Destacada */}
-      <section className="section-padding bg-gradient-to-br from-primary/10 via-background to-[hsl(280,80%,65%)]/10 border-y border-primary/20">
+      <section id="orientacao-tecnica" className="scroll-mt-24 md:scroll-mt-28 section-padding bg-gradient-to-br from-primary/10 via-background to-[hsl(280,80%,65%)]/10 border-y border-primary/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -315,36 +334,35 @@ const Index = () => {
                 <span className="text-gradient-green">Dr. Edilson Bezerra</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                Orientador Técnico em Medicina Endocanabinoide e Especialista em Medicina Integrativa. Persona virtual autônoma Inteligente trilíngue via WhatsApp, com acesso a banco de dados pessoal com mais de 40 mil estudos científicos publicados sobre modulação do sistema endocanabinoide humano. Cruza dados científicos e tratamentos divulgados para gerar um relatório final preciso e personalizado, baseado em evidências. Atendimento 100% autônomo, com suporte completo da Enfª Brisa via WhatsApp.
+                Triagem e educação em saúde sobre a sua necessidade antes da consulta real. Quem conduz a sala é o <strong>Dr. Edilson Bezerra ON</strong>: um assistente de IA com a persona do Dr. Edilson Bezerra (médico formado em 2018, medicina integrativa, CRM Bolívia nº 10963), <strong>supervisionado em tempo real</strong> por ele — que acompanha a conversa e pode pausar e intervir a qualquer momento. As orientações se apoiam em evidências científicas publicadas e terminam com um encaminhamento ao médico prescritor mais indicado da nossa vitrine.
               </p>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Triagem individual personalizada com Enfª Brisa</li>
                 <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Pagamento seguro via Pix com confirmação automática</li>
-                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Avaliação técnica humanitária completa</li>
-                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Encaminhamento técnico preciso por especialidade e Patologia</li>
-                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Relatório digital em PDF com assinatura ICP-Brasil e selo gov.br</li>
-                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Mentoria, Orientações e consultoria particular especializada</li>
-                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Importação RDC 660/2022 facilitada com desconto e frete grátis</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> 30 minutos de orientação educativa baseada em evidências</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Encaminhamento ao médico prescritor mais indicado por especialidade e patologia</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Relatório individual em PDF revisado pelo Dr. Edilson</li>
+                <li className="flex items-start gap-2"><Leaf size={16} className="text-primary mt-0.5 shrink-0" /> Esclarecimentos sobre os trâmites legais de importação pela RDC 660/2022 da ANVISA</li>
               </ul>
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] leading-relaxed text-amber-100/90">
-                ⚖️ <strong>Aviso Legal:</strong> O Dr. Edilson Bezerra <strong>não emite receitas, não realiza consultas, não prescreve medicamentos e não fornece diagnósticos</strong> através desta plataforma. O serviço consiste exclusivamente em <strong>orientação técnica educativa</strong> sobre o sistema endocanabinoide, com entrega de <strong>relatório técnico em PDF assinado digitalmente (ICP-Brasil / gov.br)</strong>. Para prescrições, o paciente é encaminhado a profissional habilitado.
+                ⚖️ <strong>Aviso Legal:</strong> A Orientação Técnica <strong>não é consulta</strong>: não emite receitas, não prescreve nem indica medicamentos ou doses e não fornece diagnósticos. O serviço consiste exclusivamente em <strong>triagem e orientação técnica educativa</strong>, com entrega de <strong>relatório individual em PDF revisado e aprovado pelo Dr. Edilson Bezerra</strong>. Para prescrições, o paciente é encaminhado a profissional habilitado.
               </div>
-              {/* Ordem oficial: Pagamento (Pix Seguro) → Triagem (Enfª Brisa) → Consulta/Orientação Técnica */}
+              {/* Ordem oficial: Triagem (Enfª Brisa) → Pagamento (Pix Seguro) → Sala Dr. Edilson ON */}
               <div className="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-background/40 border border-primary/20">
                 <div className="text-center">
-                  <div className="text-2xl mb-1">🔒</div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">1. Pix Seguro</p>
-                  <p className="text-[10px] text-muted-foreground">Mercado Pago</p>
+                  <div className="text-2xl mb-1">👩‍⚕️</div>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">1. Triagem</p>
+                  <p className="text-[10px] text-muted-foreground">com a Enfª Brisa</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl mb-1">👩‍⚕️</div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">2. Enfª Brisa</p>
-                  <p className="text-[10px] text-muted-foreground">Triagem IA</p>
+                  <div className="text-2xl mb-1">🔒</div>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">2. Pagamento</p>
+                  <p className="text-[10px] text-muted-foreground">seguro R$ 30</p>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl mb-1">⚕️</div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">3. Dr. Edilson ON</p>
-                  <p className="text-[10px] text-muted-foreground">Orientação Técnica</p>
+                  <p className="text-[10px] font-black uppercase tracking-wider text-primary">3. Sala</p>
+                  <p className="text-[10px] text-muted-foreground">com Dr. Edilson ON</p>
                 </div>
               </div>
               <div className="flex justify-center pt-4">
@@ -364,7 +382,7 @@ const Index = () => {
               </div>
 
               <p className="text-xs text-muted-foreground italic">
-                * Fluxo exclusivo deste card: <strong>Pix Seguro Mercado Pago (pagamento) → Enfª Brisa (triagem) → Orientação Técnica com o Dr. Edilson Bezerra</strong>. O pagamento vem sempre primeiro; nenhum paciente fala direto com o profissional antes do pagamento e auditoria. Pacientes internacionais: US$10.
+                * Fluxo exclusivo deste card: <strong>Enfª Brisa (triagem) → Pix Seguro Mercado Pago (pagamento) → Sala com o Dr. Edilson Bezerra ON</strong>. A sala só abre depois que o Mercado Pago confirma o pagamento. Pacientes internacionais: US$10.
               </p>
             </div>
           </motion.div>
@@ -382,10 +400,10 @@ const Index = () => {
               Selecione as suas <span className="text-gradient-green">patologias</span>
             </h2>
             <p className="text-muted-foreground font-medium">
-              Inicie seu tratamento com cannabis medicinal ainda hoje!
+              Consulte médicos habilitados para avaliação clínica individualizada.
             </p>
             <p className="text-base text-muted-foreground mt-2">
-              Para qual condição você busca um tratamento?
+              Para qual condição de saúde você busca orientação médica?
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
@@ -475,6 +493,9 @@ const Index = () => {
               </motion.div>
             ))}
           </div>
+          <p className="text-[11px] text-muted-foreground/75 text-center mt-6 max-w-2xl mx-auto leading-relaxed">
+            * Os relatos acima refletem experiências individuais de pacientes acompanhados por médicos cadastrados. A conduta terapêutica e os resultados dependem exclusivamente de avaliação médica individualizada e não constituem garantia de desfecho clínico.
+          </p>
           <div className="flex justify-center mt-10">
             <Button
               size="lg"

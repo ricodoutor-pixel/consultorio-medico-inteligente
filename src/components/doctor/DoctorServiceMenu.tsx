@@ -42,6 +42,14 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice }: Doctor
     item.sku === "consulta_premium" ? premiumPrice || PREMIUM_SUGGESTED_PRICE : item.price;
 
   const handleSelect = async (item: ServiceMenuItem) => {
+    // Orientação Técnica é exclusiva do Dr. Edilson Bezerra On (agente em nuvem):
+    // leva à seção explicativa da landing, que conduz triagem → pagamento → sala.
+    // Não exige sessão aqui — a própria página trata login.
+    if (item.redirectToEdilson) {
+      navigate("/telemedicina#orientacao-tecnica");
+      return;
+    }
+
     setLoadingSku(item.sku);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -49,13 +57,6 @@ export function DoctorServiceMenu({ doctorName, doctorId, premiumPrice }: Doctor
         toast.error("Faça seu cadastro para contratar um serviço.", {
           action: { label: "Cadastro", onClick: () => navigate("/cadastro") },
         });
-        return;
-      }
-
-      // Orientação Técnica é exclusiva do Dr. Edilson Bezerra On (agente em nuvem):
-      // a própria página conduz pagamento → triagem → sala de 30 minutos.
-      if (item.redirectToEdilson) {
-        navigate("/orientacao-tecnica");
         return;
       }
 

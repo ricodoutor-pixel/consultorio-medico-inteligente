@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2, Search, X } from "lucide-react";
+import { Star, ArrowRight, ArrowLeft, Clock, MessageSquare, Phone, Zap, Video, FileText, ShieldCheck, Loader2, Search, X, Calendar } from "lucide-react";
 import { OnlineStatusIndicator } from "@/components/OnlineStatusIndicator";
 import { DoctorVIPSeal } from "@/components/doctor/DoctorVIPSeal";
 import { CountryFlag } from "@/components/CountryFlag";
@@ -116,11 +116,14 @@ const ServiceTagsRow = () => (
 
 
 const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: Professional[] }) => {
+  const navigate = useNavigate();
   const pro = professionals.find((p) => p.id === id || p.dbId === id || (p.dbId && `db-${p.dbId}` === id));
 
   useEffect(() => {
     if (!pro) return;
-    const pageTitle = `${pro.name} - ${pro.category} ${pro.crm ? `(${pro.crm})` : ""} | Planta y Raíz`;
+    const doctorSpecialty = (pro.tags && pro.tags[0]) || (pro.category === "Médicos Prescritores" ? "Clínica Geral e Saúde Integrativa" : pro.category);
+    const crmLabel = pro.crm ? ` (${(pro.councilLabel || "CRM")} ${pro.crm})` : "";
+    const pageTitle = `${pro.name} — ${doctorSpecialty} | Consulta online${crmLabel}`;
     document.title = pageTitle;
 
     const setMeta = (attr: "name" | "property", key: string, content: string) => {
@@ -133,9 +136,12 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
       el.setAttribute("content", content);
     };
 
-    const desc = `${pro.name} ${pro.crm ? `(${pro.crm})` : ""} é ${pro.category} de Cannabis Medicinal na Planta y Raíz. ${pro.bio ? pro.bio.slice(0, 140) : "Atendimento humanizado e telemedicina"}... Agende sua consulta online.`;
+    let desc = `${pro.name}, ${doctorSpecialty}${crmLabel}. Telemedicina e consulta online na Planta y Raíz com prescrição médica individual.`;
+    if (desc.length > 155) {
+      desc = desc.slice(0, 152) + "...";
+    }
     setMeta("name", "description", desc);
-    setMeta("name", "keywords", `${pro.name}, ${pro.crm || ""}, ${pro.category}, cannabis medicinal, prescritor cannabis medicinal, Planta y Raiz, telemedicina`);
+    setMeta("name", "keywords", `${pro.name}, ${pro.crm || ""}, ${doctorSpecialty}, telemedicina, consulta online, Planta y Raiz`);
     setMeta("property", "og:title", pageTitle);
     setMeta("property", "og:description", desc);
     setMeta("property", "og:url", `https://plantayraiz.com.br/profissionais/${pro.id}`);
@@ -154,7 +160,7 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
     }
     canonical.href = `https://plantayraiz.com.br/profissionais/${pro.id}`;
 
-    // Injeta Schema.org JSON-LD para indexação e snippets do Google
+    // Injeta Schema.org JSON-LD para indexação e rich snippets do Google
     const isVet = pro.category.toLowerCase().includes("veterinário");
     const jsonLd = {
       "@context": "https://schema.org",
@@ -164,7 +170,12 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
       "description": pro.bio,
       "url": `https://plantayraiz.com.br/profissionais/${pro.id}`,
       "image": pro.imageUrl ? (pro.imageUrl.startsWith("http") ? pro.imageUrl : `https://plantayraiz.com.br${pro.imageUrl}`) : undefined,
-      "medicalSpecialty": isVet ? "Medicina Veterinária Canabinoide" : (pro.tags?.join(", ") || "Medicina Endocanabinoide"),
+      "medicalSpecialty": doctorSpecialty,
+      "identifier": pro.crm ? {
+        "@type": "PropertyValue",
+        "name": pro.councilLabel || (isVet ? "CRMV" : "CRM"),
+        "value": pro.crm
+      } : undefined,
       "priceRange": "R$ 30 - R$ 150",
       "telephone": pro.whatsapp ? `+${pro.whatsapp}` : "+5511991363154",
       "address": {
@@ -253,7 +264,14 @@ const ProfessionalDetail = ({ id, professionals }: { id: string; professionals: 
               </div>
               <p className="text-xs text-muted-foreground mb-1">Experiência: {pro.experience}</p>
               <p className="text-2xl font-display font-black text-gradient-green mb-4">a partir de {formatBRL(SERVICE_MENU[0].price)} <span className="text-sm text-muted-foreground font-normal">/ serviço</span></p>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
+                <Button
+                  size="lg"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black rounded-xl gap-2 text-sm h-11 shadow-md shadow-primary/20"
+                  onClick={() => navigate(`/agendamento?pro=${pro.id}`)}
+                >
+                  <Calendar className="w-4 h-4" /> Agendar Consulta
+                </Button>
                 <WhatsAppContactButton name={pro.name} />
               </div>
             </CardContent>
@@ -554,7 +572,9 @@ const Profissionais = () => {
                               ))}
                             </div>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                              <p className="text-xs text-primary font-bold">{p.category}</p>
+                              <p className="text-xs text-primary font-bold">
+                                {p.specialty || (p.tags && p.tags[0]) || p.category}
+                              </p>
                               <span className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-wide ${p.online ? 'text-green-300' : 'text-red-400'}`}>
                                 <span className="relative flex items-center justify-center w-6 h-6">
                                   <span className={`absolute inset-0 rounded-full animate-ping ${p.online ? 'bg-green-400/60' : 'bg-red-500/50'}`} style={{ animationDuration: '1.2s' }} />
@@ -603,15 +623,26 @@ const Profissionais = () => {
                           </span>
                         </div>
 
-                        {/* Botão Agendar Orientação Técnica via WhatsApp */}
+                        {/* Orientação Técnica (triagem educativa da plataforma, R$ 30) → seção da landing Telemedicina */}
                         <Button
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, eu gostaria de iniciar Orientação Técnica com ${p.name}`)}`, "_blank", "noopener,noreferrer");
+                            navigate("/telemedicina#orientacao-tecnica");
                           }}
-                          className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white font-black rounded-xl gap-2 text-sm h-10"
+                          className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white font-black rounded-xl gap-2 text-sm h-10 shadow-md shadow-green-600/20"
                         >
-                          <Phone size={14} /> Agendar Orientação Técnica
+                          <Zap size={14} /> Orientação Técnica — R$ 30
+                        </Button>
+                        {/* Contato com a Enfª Brisa via WhatsApp (separado) */}
+                        <Button
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`https://wa.me/${BRISA_WHATSAPP}?text=${encodeURIComponent(`Olá Enfermeira Brisa, meu nome é ___, gostaria de informações sobre atendimento com ${p.name}`)}`, "_blank", "noopener,noreferrer");
+                          }}
+                          className="mt-2 w-full font-bold rounded-xl gap-2 text-xs h-9"
+                        >
+                          <Phone size={13} /> Falar com a Enfª Brisa (WhatsApp)
                         </Button>
                       </div>
                     </CardContent>
@@ -626,8 +657,8 @@ const Profissionais = () => {
             <DoctorsNearMeMap />
           </div>
 
-          <p className="text-xs text-muted-foreground text-center mt-6 md:mt-8">
-            ⚠️ Perfis ilustrativos. Prescrição e conduta dependem de avaliação individual.
+          <p className="text-xs text-muted-foreground text-center mt-6 md:mt-8 max-w-2xl mx-auto leading-relaxed">
+            Profissionais devidamente habilitados e inscritos em seus respectivos conselhos de classe (CFM, CRO, CRMV). A prescrição médica e a conduta clínica dependem exclusivamente de avaliação individualizada em consulta.
           </p>
         </div>
       </section>

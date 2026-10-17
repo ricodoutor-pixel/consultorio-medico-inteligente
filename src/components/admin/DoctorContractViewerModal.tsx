@@ -147,6 +147,24 @@ export default function DoctorContractViewerModal({ open, onClose, contract }: P
                 O presente contrato é firmado digitalmente nos termos do art. 10, § 2º da <strong>Medida Provisória nº 2.200-2/2001</strong> e da <strong>Lei nº 14.063/2020</strong>, possuindo plena eficácia jurídica, validade probatória e fé pública mediante vinculação de carimbo de tempo UTC, endereço IP do signatário e Hash Criptográfico SHA-512.
               </p>
             </div>
+
+            <div>
+              <h4 className="font-bold text-foreground text-xs uppercase text-emerald-400 mb-1">
+                Cláusula 5ª — Da Emissão de Receituários & Assinatura Digital Avançada
+              </h4>
+              <p className="text-justify text-slate-300">
+                As receitas médicas emitidas através da plataforma serão assinadas eletronicamente (ICP-Brasil ou carimbo digital qualificado com Hash SHA-512 e validação em 1-clique via QR Code), assegurando autenticidade e validade jurídica perante farmácias nacionais e internacionais.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-foreground text-xs uppercase text-emerald-400 mb-1">
+                Cláusula 6ª — Da Autorização de Uso de Imagem, Nome e Publicidade Institucional (Meta, Google e Redes Sociais)
+              </h4>
+              <p className="text-justify text-slate-300">
+                O(A) CONTRATADO(A) autoriza expressamente e de forma voluntária e gratuita a PLANTA Y RAIZ LTDA a veicular seu nome profissional, fotografia, especialidade, número de inscrição no CRM/UF e titulações acadêmicas em suas redes sociais oficiais (Meta Platforms - Instagram e Facebook, Google Ads, YouTube, TikTok, LinkedIn) e nos canais digitais da plataforma, com finalidade exclusivamente educativa, informativa e de divulgação dos serviços de telemedicina e acolhimento clínico, em estrita observância à Resolução CFM nº 2.336/2023 e à LGPD (Lei nº 13.709/2018), sem qualquer promessa de cura ou sensacionalismo.
+              </p>
+            </div>
           </div>
 
           {/* Electronic Signature Stamp Box */}

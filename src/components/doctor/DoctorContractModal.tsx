@@ -41,6 +41,7 @@ export const DoctorContractModal = ({
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedCFM, setAgreedCFM] = useState(false);
   const [agreedSignature, setAgreedSignature] = useState(false);
+  const [agreedImage, setAgreedImage] = useState(false);
   const [signing, setSigning] = useState(false);
   const [signedSuccess, setSignedSuccess] = useState(false);
   const [signedData, setSignedData] = useState<{
@@ -54,7 +55,7 @@ export const DoctorContractModal = ({
   const doctorName = profileData?.full_name || "Dr(a). Prescritor(a)";
   const doctorCrm = doctorData?.crm ? `CRM-${doctorData.crm_state || "SP"} ${doctorData.crm}` : "CRM Regular";
   const doctorCpf = profileData?.cpf || "000.000.000-00";
-  const isAllAgreed = agreedTerms && agreedCFM && agreedSignature;
+  const isAllAgreed = agreedTerms && agreedCFM && agreedSignature && agreedImage;
 
   // Check if contract is already signed in local or doctor state
   useEffect(() => {
@@ -340,6 +341,15 @@ export const DoctorContractModal = ({
                     As partes concordam expressamente com a celebração deste contrato em formato puramente digital, reconhecendo a autenticidade e fé pública do registro que vincula o endereço IP, navegador, carimbo de tempo UTC e Hash SHA-512 como prova inequívoca de manifestação de vontade.
                   </p>
                 </div>
+
+                <div>
+                  <h4 className="font-bold text-foreground text-xs uppercase text-emerald-400 mb-1">
+                    Cláusula 6ª — Da Autorização de Uso de Imagem, Nome e Publicidade Institucional (Meta, Google e Redes Sociais)
+                  </h4>
+                  <p>
+                    O(A) MÉDICO(A) CONTRATADO(A) autoriza expressamente e de forma voluntária e gratuita a PLANTA Y RAIZ LTDA a veicular seu nome profissional, fotografia, especialidade, número de inscrição no CRM/UF e titulações acadêmicas em suas redes sociais oficiais (Meta Platforms - Instagram e Facebook, Google Ads, YouTube, TikTok, LinkedIn) e nos canais digitais da plataforma, com finalidade exclusivamente educativa, informativa e de divulgação dos serviços de telemedicina e acolhimento clínico, em estrita observância à Resolução CFM nº 2.336/2023 e à LGPD (Lei nº 13.709/2018), sem qualquer promessa de cura ou sensacionalismo.
+                  </p>
+                </div>
               </div>
             </ScrollArea>
 
@@ -378,6 +388,18 @@ export const DoctorContractModal = ({
                 />
                 <label htmlFor="agree-sig" className="text-xs text-foreground font-medium cursor-pointer leading-tight">
                   Autorizo a emissão de <strong>Carimbo Criptográfico Eletrônico (SHA-512)</strong> com registro de IP e Carimbo de Tempo para auditoria permanente de fé pública.
+                </label>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <Checkbox 
+                  id="agree-image" 
+                  checked={agreedImage} 
+                  onCheckedChange={(c) => setAgreedImage(Boolean(c))}
+                  className="mt-0.5"
+                />
+                <label htmlFor="agree-image" className="text-xs text-foreground font-medium cursor-pointer leading-tight">
+                  Autorizo com 1 clique o uso da minha <strong>imagem profissional, nome, CRM e especialidade</strong> em redes sociais e campanhas institucionais (Meta/Instagram, Facebook e Google) da Planta y Raíz, em conformidade com o <strong>CFM nº 2.336/2023</strong>.
                 </label>
               </div>
             </div>

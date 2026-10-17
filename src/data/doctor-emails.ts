@@ -60,7 +60,7 @@ export const DOCTOR_CONTACTS_MAP: Record<string, DoctorContactInfo> = {
   // Médicos da Plataforma
   "10963": {
     crm: "10963",
-    crm_state: "CE",
+    crm_state: "Sta Cruz (BO)",
     email: "contato@plantayraiz.com.br",
     phone: "5511991363154",
   },

@@ -213,9 +213,12 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
           (cleanCrm ? baseByCrm.get(cleanCrm) : undefined) ||
           baseByName.get(normalizeDoctorKey(fullName));
 
-        const registration = doc.crm
-          ? `${doc.crm}${doc.crm_state ? ` - ${doc.crm_state}` : ""}`
-          : "";
+        const isEdilson = cleanCrm === "10963" || (fullName && fullName.toLowerCase().includes("edilson"));
+        const registration = isEdilson
+          ? "10963 - Sta Cruz (BO)"
+          : (doc.crm
+              ? `${doc.crm}${doc.crm_state ? ` - ${doc.crm_state}` : ""}`
+              : "");
         const isVet =
           /crmv/i.test(doc.crm || "") ||
           /veterin/i.test(doc.specialty || "") ||
@@ -232,7 +235,7 @@ export function useRealProfessionals(): { professionals: Professional[]; realCou
           councilLabel: isVet ? "CRMV" : "CRM",
           bio: (doc.bio && doc.bio.trim() !== "") ? doc.bio.trim() : (base?.bio || ""),
           experience: base?.experience ?? "",
-          tags: base?.tags ?? [doc.specialty || "Cannabis Medicinal", "Prescritor"],
+          tags: isEdilson ? ["CEO Planta y Raíz", "Orientação Técnica (BR)", "Prescritor Sta Cruz (BO)"] : (base?.tags ?? [doc.specialty || "Cannabis Medicinal", "Prescritor"]),
           price: `R$ ${priceValue.toFixed(2).replace(".", ",")}`,
           priceValue,
           whatsapp: base?.whatsapp ?? "",

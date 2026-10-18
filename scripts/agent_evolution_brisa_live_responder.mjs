@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { exec } from 'child_process';
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 
@@ -13,6 +14,34 @@ const HUMAN_LOCK_FILE = path.join(__dirname, 'evolution_human_mode_contacts.json
 const BLACKLIST_FILE = path.join(__dirname, 'evolution_optout_blacklist.json');
 const DOCTORS_LIST_FILE = path.join(__dirname, 'database_doctors_list.json');
 const PAUSE_GLOBAL_FILE = path.join(__dirname, 'PAUSE_AUTOMATION.flag');
+const N8N_ORIENTATION_FILE = path.join(__dirname, 'n8n_active_orientation_contacts.json');
+
+function isHandledByN8nOrientation(phone) {
+  try {
+    if (fs.existsSync(N8N_ORIENTATION_FILE)) {
+      const data = JSON.parse(fs.readFileSync(N8N_ORIENTATION_FILE, 'utf8'));
+      const clean = (phone || '').replace(/\D/g, '');
+      if (!clean || clean.length < 8) return false;
+      const list = data.activePatients || [];
+      return list.some(p => {
+        const pClean = p.replace(/\D/g, '');
+        return pClean.endsWith(clean.slice(-8)) || clean.endsWith(pClean.slice(-8));
+      });
+    }
+  } catch (e) {}
+  return false;
+}
+
+let lastN8nSync = 0;
+function triggerN8nSyncAsync() {
+  const now = Date.now();
+  if (now - lastN8nSync < 30000) return;
+  lastN8nSync = now;
+  const syncScript = path.join(__dirname, 'sync_n8n_orientation_contacts.py');
+  if (fs.existsSync(syncScript)) {
+    exec(`python3 "${syncScript}"`, () => {});
+  }
+}
 
 function isGlobalPauseActive() {
   return fs.existsSync(PAUSE_GLOBAL_FILE);
@@ -300,8 +329,8 @@ function isPauseRequested(text) {
 
 // Filtro estrito de respostas automáticas de consultórios/robôs para evitar loops
 function isAutoReply(text) {
-  const low = text.toLowerCase();
-  return /(não estou disponível|nao estou disponivel|não posso responder|nao posso responder|fora do horário|fora do expediente|agradece seu contato|resposta automática|resposta automatica|mensagem automática|mensagem automatica|não ouço áudios|nao ouco audios|atendimento automático|atendimento automatico|seja bem-vindo\(a\)|obrigad[oa] por entrar em contato|obrigad[oa] pelo contato|estou em atendimento|assim que possível retornarei|assim que possivel retornarei|em breve retorno|deixe seu recado|atendimento pelo whatsapp funciona|retornaremos em breve|assim que possivel entraremos em contato|assim que possível entraremos em contato)/i.test(low);
+  const low = (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return /(nao estou disponivel|nao posso responder|fora do horario|fora do expediente|agradece(mos)? (o|seu|a|sua)|resposta automatica|mensagem automatica|nao ouco audios|atendimento automatico|seja bem-vindo|obrigad[oa] por entrar em contato|obrigad[oa] pelo contato|estou em atendimento|assim que possivel|em breve retorno|responderemos em breve|retornaremos em breve|deixe seu recado|deixe sua mensagem|atendimento pelo whatsapp funciona|estamos ausentes|nosso horario de atendimento)/i.test(low);
 }
 
 // 🧠 MEMÓRIA DE CONVERSA PERSISTENTE (LEMBRANÇA CONTÍNUA POR CONTATO)
@@ -901,18 +930,18 @@ function getDoctorSpecializedAnswer(question, senderName, doctorObj) {
   }
 
   // Dúvidas sobre a Orientação Técnica (FAQ oficial para médicos)
-  if (/orienta[cç][aã]o\s*t[eé]cnica|edilson/i.test(q)) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\n*O que é a Orientação Técnica (R$ 30)?*\n\n• É uma modalidade de *triagem e educação* criada pela plataforma para separar pacientes realmente interessados dos curiosos e educar o paciente sobre sua necessidade/patologia *antes da consulta real* com o médico prescritor.\n• É conduzida integralmente por uma *IA* (persona do Dr. Edilson Bezerra, formado em 2018, medicina integrativa, consultório em Santa Cruz de la Sierra – Ed. Ecodent, 1º Anillo, 13º andar, sala 15 – CRM Bolívia 10963), *supervisionada em tempo real* por ele, que pode pausar e intervir.\n• A IA *não prescreve nem indica medicamentos*; ela encaminha o paciente ao médico da vitrine mais indicado para o caso, com relatório revisado.\n• Os médicos *NÃO oferecem nem cobram* Orientação Técnica: ela aparece no card apenas como porta de entrada. O senhor(a) recebe pacientes já triados e educados para a consulta (*Chat R$ 100 / Vídeo R$ 150*).\n\nQualquer dúvida, sigo à sua inteira disposição! 🙏✨`;
+  if (/orienta[cç][aã]o\s*t[eé]cnica|orientacao/i.test(q)) {
+    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\n*O que é a Orientação Técnica (R$ 30)?*\n\n• É uma modalidade de *triagem e educação em saúde* criada pela plataforma para separar pacientes realmente interessados dos curiosos e educar o paciente sobre sua necessidade/patologia *antes da consulta real* com o médico prescritor.\n• É conduzida integralmente por uma *inteligência artificial supervisionada em tempo real* pela diretoria técnica da plataforma.\n• A IA *não prescreve nem indica medicamentos*; ela encaminha o paciente ao médico da vitrine mais indicado para o caso, com relatório estruturado.\n• Os médicos *NÃO oferecem nem cobram* Orientação Técnica: ela aparece no card apenas como porta de entrada. O senhor(a) recebe pacientes já triados e educados para a consulta (*Chat R$ 100 / Vídeo R$ 150*).\n\nQualquer dúvida, sigo à sua inteira disposição! 🙏✨`;
   }
 
   // Dúvidas sobre valores, repasse e honorários médicos
   if (q.includes('quanto') || q.includes('valor') || q.includes('repass') || q.includes('porcentagem') || q.includes('pix') || q.includes('honorário') || q.includes('ganho') || q.includes('plano vip')) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nNossa estrutura de valores e repasses para médicos prescritores é 100% transparente:\n\n• *Plano Médico VIP (R$ 99/mês)*: Você recebe *100% do valor da consulta* (taxa zero da plataforma), com selo de verificação oficial e destaque na vitrine!\n• *Modelo Padrão Avulso*: Repasse de *93% líquido* por consulta, transferido instantaneamente via PIX ao término de cada atendimento avaliado pelo paciente!\n\nValores das modalidades:\n• *Consulta Médica por Chat*: R$ 100\n• *Teleconsulta por Vídeo HD*: R$ 150\n• *Renovação de Protocolo*: R$ 90\n\nA *Orientação Técnica (R$ 30)* não é oferecida nem cobrada pelo médico: é a porta de entrada da plataforma (IA supervisionada pelo Dr. Edilson Bezerra) que entrega pacientes já triados e educados para a sua consulta.\n\nVocê define livremente sua própria disponibilidade de agenda.`;
+    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nNossa estrutura de valores e repasses para médicos prescritores é 100% transparente:\n\n• *Plano Médico VIP (R$ 99/mês)*: Você recebe *100% do valor da consulta* (taxa zero da plataforma), com selo de verificação oficial e destaque na vitrine!\n• *Modelo Padrão Avulso*: Repasse de *93% líquido* por consulta, transferido instantaneamente via PIX ao término de cada atendimento avaliado pelo paciente!\n\nValores das modalidades:\n• *Consulta Médica por Chat*: R$ 100\n• *Teleconsulta por Vídeo HD*: R$ 150\n• *Renovação de Protocolo*: R$ 90\n\nA *Orientação Técnica (R$ 30)* não é oferecida nem cobrada pelo médico: é a porta de entrada da plataforma (IA de triagem supervisionada em tempo real) que entrega pacientes já triados e educados para a sua consulta.\n\nVocê define livremente sua própria disponibilidade de agenda.`;
   }
 
   // Dúvidas sobre distribuição de pacientes, escolha do paciente, modelo estilo Uber
   if (q.includes('distribui') || q.includes('paciente') || q.includes('chegam') || q.includes('vitrine') || q.includes('encaminha') || q.includes('escolhe') || q.includes('uber') || q.includes('divis') || q.includes('divisão') || q.includes('divisao') || q.includes('fila') || q.includes('indica') || q.includes('funciona a escolha')) {
-    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\nSobre a *escolha do paciente* e nossa *distribuição de consultas* (operamos no estilo *Uber da Saúde Canábica*), o sistema funciona com critérios técnicos e meritocráticos:\n\n1️⃣ *Escolha Soberana do Paciente*: Na vitrine de especialistas (https://www.plantayraiz.com.br/profissionais), o paciente conhece sua biografia e títulos e pode escolher agendar diretamente com o senhor(a). Se você estiver online e apto, o atendimento é seu! Se estiver offline no momento urgente, o paciente é avisado e a consulta é transferida para o médico mais qualificado online.\n\n2️⃣ *Despacho Inteligente e Rodízio Autônomo (\"Estilo Uber\")*:\n• *Prioridade #1*: Médicos assinantes do *Plano VIP* (R$ 99/mês, taxa zero e 100% repasse) têm preferência imediata na fila geral.\n• *Prioridade #2*: *Geolocalização* — o sistema cruza as coordenadas e prioriza o médico mais próximo geograficamente do paciente.\n• *Fallback Autônomo 24/7*: Se o médico mais próximo estiver offline, o sistema busca o próximo médico com assinatura em dia, KYC 100% verificado e status Online.\n\n3️⃣ *Fluxo da Telemedicina*: Entrevista com 5 perguntas -> Pagamento -> Triagem -> Teleconsulta -> Avaliação do paciente -> Liberação instantânea do repasse via PIX ao médico!\n\n4️⃣ *Orientação Técnica (porta de entrada, R$ 30)*: triagem e educação conduzidas por uma IA (persona do Dr. Edilson Bezerra) supervisionada em tempo real por ele. A IA não prescreve nem indica medicamentos e encaminha o paciente ao médico da vitrine mais indicado, com relatório revisado. O médico não oferece nem cobra esse serviço — recebe o paciente já triado e educado para a consulta (Chat R$ 100 / Vídeo R$ 150).\n\nQualquer dúvida, sigo à sua inteira disposição! 🙏✨`;
+    return `Olá, Dr(a). ${senderName}! Aqui é a Enfermeira Brisa da coordenação clínica da Planta y Raíz 🌿🩺\n\nSobre a *escolha do paciente* e nossa *distribuição de consultas* (operamos no estilo *Uber da Saúde Canábica*), o sistema funciona com critérios técnicos e meritocráticos:\n\n1️⃣ *Escolha Soberana do Paciente*: Na vitrine de especialistas (https://www.plantayraiz.com.br/profissionais), o paciente conhece sua biografia e títulos e pode escolher agendar diretamente com o senhor(a). Se você estiver online e apto, o atendimento é seu! Se estiver offline no momento urgente, o paciente é avisado e a consulta é transferida para o médico mais qualificado online.\n\n2️⃣ *Despacho Inteligente e Rodízio Autônomo ("Estilo Uber")*:\n• *Prioridade #1*: Médicos assinantes do *Plano VIP* (R$ 99/mês, taxa zero e 100% repasse) têm preferência imediata na fila geral.\n• *Prioridade #2*: *Geolocalização* — o sistema cruza as coordenadas e prioriza o médico mais próximo geograficamente do paciente.\n• *Fallback Autônomo 24/7*: Se o médico mais próximo estiver offline, o sistema busca o próximo médico com assinatura em dia, KYC 100% verificado e status Online.\n\n3️⃣ *Fluxo da Telemedicina*: Entrevista com 5 perguntas -> Pagamento -> Triagem -> Teleconsulta -> Avaliação do paciente -> Liberação instantânea do repasse via PIX ao médico!\n\n4️⃣ *Orientação Técnica (porta de entrada, R$ 30)*: triagem e educação em saúde conduzidas por inteligência artificial supervisionada em tempo real pela diretoria técnica. A IA não prescreve nem indica medicamentos e encaminha o paciente ao médico da vitrine mais indicado, com relatório estruturado. O médico recebe o paciente já triado e educado para a consulta (Chat R$ 100 / Vídeo R$ 150).\n\nQualquer dúvida, sigo à sua inteira disposição! 🙏✨`;
   }
 
   return null;
@@ -962,7 +991,7 @@ function getPatientSpecializedAnswer(question, senderName, recipient = '') {
 
   // 🌟 Visitante vindo do Google Ads / Pesquisa Google
   if (q.includes('google') || q.includes('anuncio') || q.includes('anúncio') || q.includes('pesquisa') || q.includes('achei vocês') || q.includes('achei voces')) {
-    return `Olá, ${senderName}! Que alegria receber você aqui vindo pelo Google! 🌿🩺\n\nSou a Enfermeira Brisa da Planta y Raíz, a mais completa plataforma de telemedicina do Brasil.\n\nPara agilizar seu atendimento médico sem filas, veja as opções disponíveis agora:\n\n1️⃣ *Orientação Técnica em Saúde (R$ 30)*: Triagem rápida de sintomas e educação em saúde com IA supervisionada em tempo real pelo Dr. Edilson Bezerra (CRM Bolívia nº 10963) com indicação do médico especialista ideal.\n👉 *Acesse*: ${otLink}\n\n2️⃣ *Teleconsulta por Vídeo HD (R$ 150)*: Consulta médica ao vivo com médico especialista + Receita digital válida em 100% das farmácias do Brasil + Retorno incluso.\n👉 *Acesse*: ${videoLink}\n\n3️⃣ *Consulta Médica por Chat (R$ 100)*: Avaliação clínica direta e emissão de receita oficial.\n👉 *Acesse*: ${chatLink}\n\nMe conte: qual é o seu principal sintoma ou especialidade médica que você procura hoje? Estou aqui para te acolher! 🙏✨`;
+    return `Olá, ${senderName}! Que alegria receber você aqui vindo pelo Google! 🌿🩺\n\nSou a Enfermeira Brisa da Planta y Raíz, a mais completa plataforma de telemedicina do Brasil.\n\nPara agilizar seu atendimento médico sem filas, veja as opções disponíveis agora:\n\n1️⃣ *Orientação Técnica em Saúde (R$ 30)*: Triagem rápida de sintomas e educação em saúde com IA supervisionada em tempo real pela diretoria técnica da plataforma, com indicação do médico especialista ideal.\n👉 *Acesse*: ${otLink}\n\n2️⃣ *Teleconsulta por Vídeo HD (R$ 150)*: Consulta médica ao vivo com médico especialista + Receita digital válida em 100% das farmácias do Brasil + Retorno incluso.\n👉 *Acesse*: ${videoLink}\n\n3️⃣ *Consulta Médica por Chat (R$ 100)*: Avaliação clínica direta e emissão de receita oficial.\n👉 *Acesse*: ${chatLink}\n\nMe conte: qual é o seu principal sintoma ou especialidade médica que você procura hoje? Estou aqui para te acolher! 🙏✨`;
   }
 
   // 🩺 Receita Médica Digital / Validade Nacional
@@ -971,8 +1000,8 @@ function getPatientSpecializedAnswer(question, senderName, recipient = '') {
   }
 
   // 1. Solicitação Específica de Orientação Técnica (R$ 30)
-  if (/\b(orienta[cç][aã]o|t[eé]cnica|edilson)\b/i.test(q)) {
-    return `Olá, ${senderName}! Que ótimo você procurar a nossa *Orientação Técnica*! 🌿🩺\n\nTudo acontece *100% dentro da plataforma segura*:\n\n• *O que é*: uma etapa de *triagem e educação em saúde* (30 minutos) conduzida por uma *inteligência artificial* com a persona do Dr. Edilson Bezerra On, *supervisionada em tempo real* pelo Dr. Edilson Bezerra (médico formado em 2018, medicina integrativa, CRM Bolívia nº 10963), que pode pausar e intervir.\n• *O que ela faz*: acolhe, explica sua condição de forma educativa, orienta hábitos e próximos passos e indica o *médico prescritor da vitrine* mais adequado para o seu caso.\n• *O que ela NÃO faz*: não prescreve, não indica medicamentos ou produtos e não emite receita — isso é feito na consulta com o médico (Chat R$ 100 / Vídeo R$ 150).\n• *Relatório*: o relatório de encaminhamento só é liberado após a revisão do Dr. Edilson.\n• *Como funciona*: 1️⃣ triagem rápida → 2️⃣ pagamento de R$ 30 (Pix ou Cartão) → 3️⃣ sala liberada após a confirmação do pagamento.\n\n👉 *Comece por aqui*: ${otLink}\n\nEstou aqui caso precise de qualquer apoio com o acesso! 🙏✨`;
+  if (/\b(orienta[cç][aã]o|t[eé]cnica)\b/i.test(q)) {
+    return `Olá, ${senderName}! Que ótimo você procurar a nossa *Orientação Técnica*! 🌿🩺\n\nTudo acontece *100% dentro da plataforma segura*:\n\n• *O que é*: uma etapa de *triagem e educação em saúde* (30 minutos) conduzida por uma *inteligência artificial*, *supervisionada em tempo real* pela diretoria técnica da plataforma.\n• *O que ela faz*: acolhe, explica sua condição de forma educativa, orienta hábitos e próximos passos e indica o *médico prescritor da vitrine* mais adequado para o seu caso.\n• *O que ela NÃO faz*: não prescreve, não indica medicamentos ou produtos e não emite receita — isso é feito na consulta com o médico (Chat R$ 100 / Vídeo R$ 150).\n• *Relatório*: o relatório de encaminhamento só é liberado após a revisão da diretoria técnica.\n• *Como funciona*: 1️⃣ triagem rápida → 2️⃣ pagamento de R$ 30 (Pix ou Cartão) → 3️⃣ sala liberada após a confirmação do pagamento.\n\n👉 *Comece por aqui*: ${otLink}\n\nEstou aqui caso precise de qualquer apoio com o acesso! 🙏✨`;
   }
 
   // 2. Solicitação Específica de Teleconsulta por Vídeo HD (R$ 150)
@@ -997,7 +1026,7 @@ function getPatientSpecializedAnswer(question, senderName, recipient = '') {
 
   // 6. Dúvidas Gerais de Consulta / Quanto custa / Como funciona
   if (q.includes('quanto') || q.includes('valor') || q.includes('preco') || q.includes('preço') || q.includes('consulta') || q.includes('agendar') || q.includes('marcar') || q.includes('como funciona')) {
-    return `Olá, ${senderName}! Sou a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nTodas as nossas atividades acontecem diretamente em nosso ambiente seguro na plataforma:\n\n1️⃣ *Orientação Técnica (R$ 30)*: triagem e educação com IA supervisionada pelo Dr. Edilson Bezerra, que indica o médico prescritor mais adequado (não prescreve nem indica medicamentos). Ordem: triagem → pagamento → sala.\n👉 *Acesse*: ${otLink}\n\n2️⃣ *Teleconsulta por Vídeo HD (R$ 150)*: Consulta médica ao vivo com especialista prescritor + Receita oficial ANVISA/CFM + Retorno incluso.\n👉 *Acesse*: ${videoLink}\n\n3️⃣ *Consulta Médica por Chat (R$ 100)*: Atendimento ágil e prescrição médica.\n👉 *Acesse*: ${chatLink}\n\n4️⃣ *Shopping da Farmácia*: ${shoppingLink}\n\nQual modalidade atende melhor o seu momento hoje?`;
+    return `Olá, ${senderName}! Sou a Enfermeira Brisa da Planta y Raíz 🌿🩺\n\nTodas as nossas atividades acontecem diretamente em nosso ambiente seguro na plataforma:\n\n1️⃣ *Orientação Técnica (R$ 30)*: triagem e educação com IA supervisionada em tempo real pela diretoria técnica da plataforma, que indica o médico prescritor mais adequado (não prescreve nem indica medicamentos). Ordem: triagem → pagamento → sala.\n👉 *Acesse*: ${otLink}\n\n2️⃣ *Teleconsulta por Vídeo HD (R$ 150)*: Consulta médica ao vivo com especialista prescritor + Receita oficial ANVISA/CFM + Retorno incluso.\n👉 *Acesse*: ${videoLink}\n\n3️⃣ *Consulta Médica por Chat (R$ 100)*: Atendimento ágil e prescrição médica.\n👉 *Acesse*: ${chatLink}\n\n4️⃣ *Shopping da Farmácia*: ${shoppingLink}\n\nQual modalidade atende melhor o seu momento hoje?`;
   }
 
   return null;
@@ -1493,6 +1522,15 @@ async function loop() {
             // 🛑 VERIFICAÇÃO 0: Se a automação estiver pausada globalmente pelo Admin, silencia para todos
             if (isGlobalPauseActive()) {
               log(`🛑 [PAUSA GLOBAL ATIVA] Mensagem de ${senderName} (${recipient}) recebida, mas a automação está pausada globalmente pelo Admin. IA em silêncio.`);
+              continue;
+            }
+
+            // 🛑 VERIFICAÇÃO 0.1: Contato está em Orientação Técnica ativa no n8n?
+            // Regra mútua: o brisa-live-responder cuida de médicos e documentos; o n8n, só de pacientes da orientação.
+            // Os dois nunca respondem o mesmo número.
+            triggerN8nSyncAsync();
+            if (isHandledByN8nOrientation(recipient)) {
+              log(`🔒 [N8N EXCLUSION] Contato ${senderName} (${recipient}) está em atendimento exclusivo no n8n (Orientação Técnica). Enfª Brisa em silêncio absoluto.`);
               continue;
             }
 

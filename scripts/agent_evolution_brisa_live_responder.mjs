@@ -1333,8 +1333,9 @@ async function loop() {
 
                 // Se o Dr. Edilson enviou "pausa", "pausar", "pare", "stop", etc. dentro do próprio chat (com limite de palavra)
                 const mem = getContactMemory(jid);
-                const isBrisaSent = mem?.lastAnswerSent && text.includes(mem.lastAnswerSent.slice(0, 30));
-                if (!isBrisaSent && /\b(pausa|pausar|pare|parar|stop|silenciar|modo\s+humano)\b/i.test(text)) {
+                const isBrisaSent = (mem?.lastAnswerSent && text.includes(mem.lastAnswerSent.slice(0, 30))) || text.includes('Enfermeira Brisa') || text.includes('Planta y Raíz');
+                const isShortOperatorCommand = text.length <= 40;
+                if (!isBrisaSent && isShortOperatorCommand && /^\s*(pausa|pausar|pare|parar|stop|silenciar|modo\s+humano)[\s.!,]*$/i.test(text)) {
                   if (recipientClean && !humanLocked.has(recipientClean)) {
                     humanLocked.add(recipientClean);
                     const digits = recipientClean.replace(/\D/g, '');

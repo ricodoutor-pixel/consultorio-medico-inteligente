@@ -42,9 +42,17 @@ supabase/.temp/
 contatos_*.json
 contacts_to_send.json
 contatos-brisa.vcf
+contatos*
+**/contatos*
+*.vcf
+emails_*.json
+email_campaign_*.json
+**/emails_*.json
 mined_doctor_leads*.json
 lista_500_medicos_qualificados.*
 prescritores_*.csv
+prescritores_*.json
+**/prescritores_*.json
 apepi_*.json
 apepi_*.html
 pharmacies_raw.json

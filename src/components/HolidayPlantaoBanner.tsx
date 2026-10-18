@@ -39,10 +39,10 @@ export const HolidayPlantaoBanner: React.FC = () => {
 
         <div className="shrink-0 z-10 pl-2">
           <Link
-            to="/telemedicina?origem=aviso_saude"
+            to="/orientacao-tecnica"
             className="inline-flex items-center gap-1 font-bold text-white bg-red-600 hover:bg-red-500 px-3 py-1 rounded-full text-xs shadow-md hover:shadow-lg transition-all transform hover:scale-105"
           >
-            Orientação Médica <ArrowRight className="w-3 h-3" />
+            Orientação Técnica <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
       </div>

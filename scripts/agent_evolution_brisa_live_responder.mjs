@@ -28,12 +28,12 @@ function setGlobalPause(active) {
   } catch (e) {}
 }
 
-const EVO_URL = process.env.EVOLUTION_URL_VPS || 'https://whatsapp.plantayraiz.com.br';
-const EVO_KEY = process.env.EVOLUTION_API_KEY_VPS || '39d3c0208169d52717027e27477cdc9f63d70fda54296c501fbe409c10562a59';
-const INSTANCE = 'plantayraiz';
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://shmbwdjuddvquszwkvuq.supabase.co';
-const ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNobWJ3ZGp1ZGR2cXVzendrdnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE4MDksImV4cCI6MjA4Nzg2NzgwOX0.wGL0NQi2gKWyiC4L1ca1xxzSvEbvq2Uc8jvM7XOH9xQ';
-const ADMIN_PHONE = '5511987131241'; // Dr. Edilson Bezerra (Fundador & Diretor Técnico)
+const EVO_URL = process.env.EVOLUTION_URL_VPS || process.env.EVOLUTION_URL || 'https://whatsapp.plantayraiz.com.br';
+const EVO_KEY = process.env.EVOLUTION_API_KEY_VPS || process.env.EVOLUTION_API_KEY || '';
+const INSTANCE = process.env.EVOLUTION_INSTANCE || 'plantayraiz';
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://shmbwdjuddvquszwkvuq.supabase.co';
+const ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+const ADMIN_PHONE = process.env.ADMIN_WHATSAPP_PHONE || '5511987131241'; // Dr. Edilson Bezerra (Fundador & Diretor Técnico)
 
 const supabase = createClient(SUPABASE_URL, ANON_KEY);
 

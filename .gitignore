@@ -79,5 +79,7 @@ private-docs/
 public/evolution_qrcode.png
 scripts/*.json
 scripts/*.mjs
+!scripts/agent_brevo_doctor_whatsapp_inviter.mjs
+!scripts/agent_evolution_brisa_live_responder.mjs
 scripts/*.cjs
 scripts/*.sh

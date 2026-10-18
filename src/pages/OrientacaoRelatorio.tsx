@@ -29,7 +29,7 @@ export default function OrientacaoRelatorio() {
     (async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from("ot_reports")
           .select("*")
           .eq("id", id)

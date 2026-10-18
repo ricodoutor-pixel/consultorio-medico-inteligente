@@ -26,4 +26,5 @@ export type Professional = {
   cfmPrintUrl?: string;
   flags?: string[];
   plan_tier?: string;
+  specialty?: string;
 };
